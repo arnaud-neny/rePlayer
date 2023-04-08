@@ -1,0 +1,13 @@
+.vs/
+/.temporaries
+/bin
+*.vcxproj.user
+*.aps
+/data/rePlayer.exe
+/data/settings.ini
+/data/db/
+/data/logs/
+/data/replays/
+/data/songs/
+/external/
+/source/enc_temp_folder

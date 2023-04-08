@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="core::Array&lt;*&gt;">
+        <DisplayString>numItems = {m_numItems} ({m_maxItems} max)</DisplayString>
+        <Expand>
+            <ArrayItems>
+                <Size>m_numItems</Size>
+                <ValuePointer>m_items</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="core::SmartPtr&lt;*&gt;">
+        <DisplayString Condition="m_ptr == nullptr">nullptr</DisplayString>
+        <DisplayString Condition="m_ptr != nullptr">{*m_ptr}</DisplayString>
+        <Expand>
+            <ExpandedItem>m_ptr</ExpandedItem>
+        </Expand>
+    </Type>
+
+    <Type Name="core::Span&lt;*&gt;">
+        <DisplayString>numItems = {m_numItems}</DisplayString>
+        <Expand>
+            <ArrayItems>
+                <Size>m_numItems</Size>
+                <ValuePointer>m_items</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+</AutoVisualizer>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{6bdd194c-d1bd-4020-aeca-36d2bb6c2967}</ProjectGuid>
+    <RootNamespace>rePlayer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\curl;$(SolutionDir)3rdParty\tidy;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>Core.lib;Replay.lib;taglib.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\curl;$(SolutionDir)3rdParty\tidy;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Core.lib;Replay.lib;taglib.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <PostBuildEvent>
+      <Command>del $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Database\Database.cpp" />
+    <ClCompile Include="Database\DatabaseArtistsUI.cpp" />
+    <ClCompile Include="Database\SongEditor.cpp" />
+    <ClCompile Include="Database\DatabaseSongsUI.cpp" />
+    <ClCompile Include="Database\SongEndEditor.cpp" />
+    <ClCompile Include="Database\Types\Artist.cpp" />
+    <ClCompile Include="Database\Types\Countries.cpp" />
+    <ClCompile Include="Database\Types\MusicID.cpp" />
+    <ClCompile Include="Database\Types\Song.cpp" />
+    <ClCompile Include="Database\Types\SourceID.cpp" />
+    <ClCompile Include="Database\Types\Tags.cpp" />
+    <ClCompile Include="Deck\Deck.cpp" />
+    <ClCompile Include="Deck\Player.cpp" />
+    <ClCompile Include="Graphics\Graphics.cpp" />
+    <ClCompile Include="Graphics\GraphicsImGui.cpp" />
+    <ClCompile Include="Graphics\GraphicsImpl.cpp" />
+    <ClCompile Include="Graphics\GraphicsPremul.cpp" />
+    <ClCompile Include="Library\Library.cpp" />
+    <ClCompile Include="Library\LibraryArtistsUI.cpp" />
+    <ClCompile Include="Library\LibrarySongMerger.cpp" />
+    <ClCompile Include="Library\LibrarySongsUI.cpp" />
+    <ClCompile Include="Library\Sources\AmigaMusicPreservation.cpp" />
+    <ClCompile Include="Library\Sources\FileImport.cpp" />
+    <ClCompile Include="Library\Sources\HighVoltageSIDCollection.cpp" />
+    <ClCompile Include="Library\Sources\Modland.cpp" />
+    <ClCompile Include="Library\Sources\TheModArchive.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Playlist\Playlist.cpp" />
+    <ClCompile Include="Playlist\PlaylistDropTarget.cpp" />
+    <ClCompile Include="Playlist\PlaylistSongsUI.cpp" />
+    <ClCompile Include="RePlayer\About.cpp" />
+    <ClCompile Include="RePlayer\CoreOverride.cpp" />
+    <ClCompile Include="RePlayer\RePlayer.cpp" />
+    <ClCompile Include="RePlayer\Core.cpp" />
+    <ClCompile Include="RePlayer\CoreVersion.cpp" />
+    <ClCompile Include="RePlayer\Replays.cpp" />
+    <ClCompile Include="RePlayer\Settings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Database\Database.h" />
+    <ClInclude Include="Database\Database.inl.h" />
+    <ClInclude Include="Database\DatabaseArtistsUI.h" />
+    <ClInclude Include="Database\DatabaseSongsUI.inl.h" />
+    <ClInclude Include="Database\SongEditor.h" />
+    <ClInclude Include="Database\DatabaseSongsUI.h" />
+    <ClInclude Include="Database\SongEndEditor.h" />
+    <ClInclude Include="Database\Types\Artist.h" />
+    <ClInclude Include="Database\Types\Countries.h" />
+    <ClInclude Include="Database\Types\MusicID.h" />
+    <ClInclude Include="Database\Types\Proxy.h" />
+    <ClInclude Include="Database\Types\Proxy.inl.h" />
+    <ClInclude Include="Database\Types\Song.h" />
+    <ClInclude Include="Database\Types\SourceID.h" />
+    <ClInclude Include="Database\Types\Subsong.h" />
+    <ClInclude Include="Database\Types\SubsongID.h" />
+    <ClInclude Include="Database\Types\Tags.h" />
+    <ClInclude Include="Database\Types\Tags.inl.h" />
+    <ClInclude Include="Deck\Deck.h" />
+    <ClInclude Include="Deck\Player.h" />
+    <ClInclude Include="Deck\TagLibStream.h" />
+    <ClInclude Include="Graphics\Graphics.h" />
+    <ClInclude Include="Graphics\GraphicsFontLog.h" />
+    <ClInclude Include="Graphics\GraphicsImGui.h" />
+    <ClInclude Include="Graphics\GraphicsImGuiPS.h" />
+    <ClInclude Include="Graphics\GraphicsImGuiVS.h" />
+    <ClInclude Include="Graphics\GraphicsImpl.h" />
+    <ClInclude Include="Graphics\GraphicsPremul.h" />
+    <ClInclude Include="Graphics\GraphicsPremulPS.h" />
+    <ClInclude Include="Graphics\GraphicsPremulVS.h" />
+    <ClInclude Include="Library\Library.h" />
+    <ClInclude Include="Library\LibraryArtistsUI.h" />
+    <ClInclude Include="Library\LibrarySongMerger.h" />
+    <ClInclude Include="Library\LibrarySongsUI.h" />
+    <ClInclude Include="Library\Source.h" />
+    <ClInclude Include="Library\Sources\AmigaMusicPreservation.h" />
+    <ClInclude Include="Library\Sources\FileImport.h" />
+    <ClInclude Include="Library\Sources\HighVoltageSIDCollection.h" />
+    <ClInclude Include="Library\Sources\Modland.h" />
+    <ClInclude Include="Library\Sources\TheModArchive.h" />
+    <ClInclude Include="Library\Sources\TheModArchiveKey.h" />
+    <ClInclude Include="Library\Sources\WebHandler.h" />
+    <ClInclude Include="Library\Sources\XmlHandler.h" />
+    <ClInclude Include="Playlist\Playlist.h" />
+    <ClInclude Include="Playlist\PlaylistDropTarget.h" />
+    <ClInclude Include="Playlist\PlaylistSongsUI.h" />
+    <ClInclude Include="RePlayer\About.h" />
+    <ClInclude Include="RePlayer\RePlayer.h" />
+    <ClInclude Include="RePlayer\Core.h" />
+    <ClInclude Include="RePlayer\Core.inl.h" />
+    <ClInclude Include="RePlayer\CoreHeader.h" />
+    <ClInclude Include="RePlayer\Replays.h" />
+    <ClInclude Include="RePlayer\Settings.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.gitignore" />
+    <None Include="..\3rdParties.md" />
+    <None Include="..\LICENSE" />
+    <None Include="..\README.md" />
+    <None Include="..\TODO.md" />
+    <None Include="Database\Types\Countries.inc" />
+    <None Include="Database\Types\Countries.inl" />
+    <None Include="Database\Types\MusicID.inl.h" />
+    <None Include="Database\Types\SongTypes.inc" />
+    <None Include="Database\Types\SubsongID.inl" />
+    <None Include="Database\Types\Tags.inc" />
+    <None Include="Deck\Player.inl" />
+    <None Include="Graphics\GraphicsImpl.inl" />
+    <None Include="Library\Library.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="3rdParty\curl\libcurl.dll.a" />
+    <Library Include="3rdParty\libarchive\archive.lib" />
+    <Library Include="3rdParty\tidy\tidy.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="replayer.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rePlayer.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

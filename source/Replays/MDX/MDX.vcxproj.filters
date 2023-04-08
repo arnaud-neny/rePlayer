@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\mdxmini">
+      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{4b8242b0-d43f-48f3-994e-2cddd98bc77c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayMDX.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\class.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\mdx.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\mdx2151.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\mdxmini.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\nlg.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\pcm8.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\version.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+    <ClInclude Include="mdxmini\src\ym2151.h">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayMDX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\mdx2151.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\mdxfile.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\mdxmini.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\mdxmml_ym2151.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\nlg.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\pcm8.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\pdxfile.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+    <ClCompile Include="mdxmini\src\ym2151.c">
+      <Filter>Source Files\mdxmini</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mdxmini\src\sin_tab.dat">
+      <Filter>Source Files\mdxmini</Filter>
+    </None>
+    <None Include="mdxmini\src\tl_tab.dat">
+      <Filter>Source Files\mdxmini</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

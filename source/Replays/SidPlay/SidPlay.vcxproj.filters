@@ -1,0 +1,543 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp">
+      <UniqueIdentifier>{85720bf1-267c-4631-aa30-5057c800530d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\sidtune">
+      <UniqueIdentifier>{c522e34c-cd11-4aed-a5c8-0ddfb8f12fad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\sidplayfp">
+      <UniqueIdentifier>{e7f97e06-ed44-4b33-b063-e6db089314c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\c64">
+      <UniqueIdentifier>{026bb2a1-63ac-48f8-b283-971569afac11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\c64\Banks">
+      <UniqueIdentifier>{e56b3c5e-fdbb-4cda-8f49-3d68d8e6a473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\c64\CIA">
+      <UniqueIdentifier>{66fb8931-04a4-4af1-8658-735964c50098}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\c64\CPU">
+      <UniqueIdentifier>{95bc379a-7624-46f1-b60f-431abeb32ee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\c64\VIC_II">
+      <UniqueIdentifier>{f2f79db4-72fc-440a-9095-72600e2dec32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders">
+      <UniqueIdentifier>{df87b77f-5d9d-402b-ab61-24cdc9102082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\residfp-builder">
+      <UniqueIdentifier>{e6ae966f-e565-4596-bb90-fc9e9fddb965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\utils">
+      <UniqueIdentifier>{56750c06-9fd5-47b1-a23a-cc14b3eaf3d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\utils\MD5">
+      <UniqueIdentifier>{fced5531-28d9-4b45-8f74-2e2dbcce9ca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\utils\STILview">
+      <UniqueIdentifier>{1f0836f5-54c9-42a8-8ff5-0fd94384c564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\residfp-builder\residfp">
+      <UniqueIdentifier>{1df6b16d-6de7-41d0-8dd6-8d20424c760b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\residfp-builder\residfp\resample">
+      <UniqueIdentifier>{5da7fd9b-5df5-48e6-a2ea-12edcdbeabbd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplaySidPlay.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\Event.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\EventCallback.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\EventScheduler.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\mixer.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\player.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\psiddrv.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\reloc65.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\romCheck.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidcxx11.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidcxx14.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidemu.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidendian.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\SidInfoImpl.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidmd5.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidmemory.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidrandom.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\stringutils.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\MUS.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\p00.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\prg.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\PSID.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\SidTuneBase.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\SidTuneCfg.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\SidTuneInfoImpl.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\SidTuneTools.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidtune\SmartPtr.h">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\sidbuilder.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\SidConfig.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\siddefs.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\SidInfo.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\sidplayfp.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\SidTune.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\SidTuneInfo.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\config.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64cia.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64cpu.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64env.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64sid.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\c64vic.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\mmu.h">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\Bank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\ColorRAMBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\DisconnectedBusBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\ExtraSidBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\IOBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\NullSid.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\pla.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\SidBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\SystemRAMBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\SystemROMBanks.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\Banks\ZeroRAMBank.h">
+      <Filter>Source Files\libsidplayfp\c64\Banks</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CIA\interrupt.h">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CIA\mos652x.h">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CIA\SerialPort.h">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CIA\timer.h">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CIA\tod.h">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CPU\flags.h">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CPU\mos6510.h">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CPU\mos6510debug.h">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\CPU\opcodes.h">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\VIC_II\lightpen.h">
+      <Filter>Source Files\libsidplayfp\c64\VIC_II</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\VIC_II\mos656x.h">
+      <Filter>Source Files\libsidplayfp\c64\VIC_II</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\c64\VIC_II\sprites.h">
+      <Filter>Source Files\libsidplayfp\c64\VIC_II</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp-emu.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\sidplayfp\sidversion.h">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\iMd5.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\iniParser.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\md5Factory.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\md5Gcrypt.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\md5Internal.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\SidDatabase.h">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\MD5\MD5.h">
+      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\MD5\MD5_Defs.h">
+      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\STILview\stil.h">
+      <Filter>Source Files\libsidplayfp\utils\STILview</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\utils\STILview\stildefs.h">
+      <Filter>Source Files\libsidplayfp\utils\STILview</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\array.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Dac.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\EnvelopeGenerator.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\ExternalFilter.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Filter.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Filter6581.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Filter8580.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig6581.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig8580.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator6581.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator8580.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Potentiometer.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\SID.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\siddefs-fp.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Spline.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Voice.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformCalculator.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformGenerator.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Resampler.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\SincResampler.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\TwoPassSincResampler.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\ZeroOrderResampler.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libsidplayfp\EventScheduler.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\mixer.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\player.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\psiddrv.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\reloc65.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidemu.cpp">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\MUS.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\p00.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\prg.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\PSID.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\SidTuneBase.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidtune\SidTuneTools.cpp">
+      <Filter>Source Files\libsidplayfp\sidtune</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\sidbuilder.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\SidConfig.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\SidInfo.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\sidplayfp.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\SidTune.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\sidplayfp\SidTuneInfo.cpp">
+      <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\c64.cpp">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\mmu.cpp">
+      <Filter>Source Files\libsidplayfp\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CIA\interrupt.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CIA\mos652x.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CIA\SerialPort.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CIA\timer.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CIA\tod.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CIA</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CPU\mos6510.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\CPU\mos6510debug.cpp">
+      <Filter>Source Files\libsidplayfp\c64\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\c64\VIC_II\mos656x.cpp">
+      <Filter>Source Files\libsidplayfp\c64\VIC_II</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp-builder.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp-emu.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\utils\iniParser.cpp">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\utils\md5Factory.cpp">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\utils\SidDatabase.cpp">
+      <Filter>Source Files\libsidplayfp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\utils\MD5\MD5.cpp">
+      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\utils\STILview\stil.cpp">
+      <Filter>Source Files\libsidplayfp\utils\STILview</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Dac.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\EnvelopeGenerator.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\ExternalFilter.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Filter.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Filter6581.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Filter8580.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig6581.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig8580.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Integrator6581.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Integrator8580.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\SID.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\Spline.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\version.cc">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\WaveformCalculator.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\WaveformGenerator.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\resample\SincResampler.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplaySidPlay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\curl\libcurl.dll.a">
+      <Filter>Source Files</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReplaySidPlayBasic.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="ReplaySidPlayKernal.inl">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

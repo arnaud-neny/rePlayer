@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="core::BlobArray&lt;*,0&gt;">
+        <DisplayString>numItems = {m_handle.highNumItems * 256 + m_handle.lowNumItems} static</DisplayString>
+        <Expand>
+            <ArrayItems>
+                <Size>m_handle.highNumItems * 256 + m_handle.lowNumItems</Size>
+                <ValuePointer>($T1*)(((uint8_t*)this) + m_handle.highOffset * 256 + m_handle.lowOffset)</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="core::BlobArray&lt;*,1&gt;">
+        <DisplayString>numItems = {m_handle.m_numItems} dynamic</DisplayString>
+        <Expand>
+            <ArrayItems>
+                <Size>m_handle.m_numItems</Size>
+                <ValuePointer>m_handle.m_items</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="core::BlobString&lt;0&gt;">
+        <DisplayString>{((char*)this) + m_handle.highOffset * 256 + m_handle.lowOffset} static</DisplayString>
+    </Type>
+
+    <Type Name="core::BlobString&lt;1&gt;">
+        <DisplayString>{m_handle} dynamic</DisplayString>
+    </Type>
+
+</AutoVisualizer>

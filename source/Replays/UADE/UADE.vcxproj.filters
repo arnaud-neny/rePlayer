@@ -1,0 +1,467 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\uade">
+      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\frontends">
+      <UniqueIdentifier>{62239282-c29f-4c9d-baaa-589579f83f9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\include">
+      <UniqueIdentifier>{72e0038c-06ed-462f-8ee7-102daf398ee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\machdep">
+      <UniqueIdentifier>{dc1a23bd-9fb7-4ff6-8f6f-246e2ec23514}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\frontends\common">
+      <UniqueIdentifier>{9e243faa-24ec-4459-b736-8da79b65536b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\frontends\include">
+      <UniqueIdentifier>{d451f353-8762-4b9b-8e89-c9ed28fbac0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uade\frontends\include\uade">
+      <UniqueIdentifier>{9a18d21c-54ad-4e0b-aeb9-8976763bcf8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bencode">
+      <UniqueIdentifier>{26337b1d-3ceb-4658-bdcd-0e0370117550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bencode\include">
+      <UniqueIdentifier>{b869a68c-2f01-43ef-80e3-6839d619b688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bencode\include\bencodetools">
+      <UniqueIdentifier>{b45495d1-5aa5-4617-bc25-3523af5d5d85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat">
+      <UniqueIdentifier>{e9dce91e-8e03-426f-b5f8-f09db952269e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader">
+      <UniqueIdentifier>{03dfffb6-a191-4c39-9212-6c51bd1d0a03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook">
+      <UniqueIdentifier>{6734e66a-7ae8-408c-8faa-dd69d13b88c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\include">
+      <UniqueIdentifier>{9dbe9899-baf9-4f6f-819b-85eeb6424ad5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\src">
+      <UniqueIdentifier>{7aa19e6c-a9de-4f81-8e8d-8f31eefd1ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\src\hde">
+      <UniqueIdentifier>{5894f482-d624-46db-9dc0-e4f8ad1dd9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{965cd881-a7b7-4e59-9913-bc40a62a4dcd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayUADE.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\sd-sound-generic.h">
+      <Filter>Source Files\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\sysconfig.h">
+      <Filter>Source Files\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\target.h">
+      <Filter>Source Files\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\common\fifo.h">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\common\md5.h">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\common\support.h">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\common\unixwalkdir.h">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\amifilemagic.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\amigafilter.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\eagleplayer.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\effects.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\rmc.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\songdb.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uade.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadeconf.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadeconfstructure.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadeconstants.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadecontrol.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadeipc.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadestate.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\uadeutils.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\unixatomic.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\unixsupport.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\vparray.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\amigamsg.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\audio.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\cia.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\commpipe.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\compiler.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\custom.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\debug.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\events.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\execlib.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\gensound.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\memory.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\newcpu.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\options.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\osemu.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\readcpu.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\sinctable.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\sysdeps.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\text_scope.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\uadectl.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\uae.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\write_audio.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\write_audio_ext.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\machdep\m68k.h">
+      <Filter>Source Files\uade\machdep</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\machdep\maccess.h">
+      <Filter>Source Files\uade\machdep</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\sd-sound.h">
+      <Filter>Source Files\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\options.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="bencode\include\bencodetools\bencode.h">
+      <Filter>Source Files\bencode\include\bencodetools</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\cputbl.h">
+      <Filter>Source Files\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="compat\memmemrep.h">
+      <Filter>Source Files\compat</Filter>
+    </ClInclude>
+    <ClInclude Include="compat\strlrep.h">
+      <Filter>Source Files\compat</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\dllloader.h">
+      <Filter>Source Files\dllloader</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\ntddk.h">
+      <Filter>Source Files\dllloader</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\include\MinHook.h">
+      <Filter>Source Files\dllloader\minhook\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\buffer.h">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\trampoline.h">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\hde32.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\hde64.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\pstdint.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\table32.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\table64.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\ossupport.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\compilersupport.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\frontends\include\uade\sysincludes.h">
+      <Filter>Source Files\uade\frontends\include\uade</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplayUADE.inl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayUADE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\audio.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\build68k.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\cfgfile.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\cia.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\compiler.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\custom.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\debug.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\fpp.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\gencpu.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\main.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\md-support.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\memory.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\missing.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\newcpu.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\readcpu.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\sd-sound-generic.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\sinctable.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\text_scope.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\uade.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\uademain.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\write_audio.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\amifilemagic.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\eagleplayer.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\effects.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\fifo.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\md5.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\rmc.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\songdb.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\songinfo.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\support.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\uadeconf.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\uadecontrol.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\uadeipc.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\uadestate.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\uadeutils.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\unixatomic.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\unixsupport.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\unixwalkdir.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\frontends\common\vparray.c">
+      <Filter>Source Files\uade\frontends\common</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\machdep\support.c">
+      <Filter>Source Files\uade\machdep</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\sd-sound.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="bencode\bencode.c">
+      <Filter>Source Files\bencode</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\cpudefs.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\cpustbl.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\cpuemu.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\memmemrep.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\memmemtest.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\strlrep.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\strltest.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\unlikelytest.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\dllloader.cpp">
+      <Filter>Source Files\dllloader</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\buffer.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hook.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\trampoline.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hde\hde32.c">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hde\hde64.c">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplayUADEWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="uade\src\table68k">
+      <Filter>Source Files\uade</Filter>
+    </None>
+    <None Include="uade.inl">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="uade.7z">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

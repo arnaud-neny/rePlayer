@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{16448c84-d18f-4c92-b945-62f070876e7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database">
+      <UniqueIdentifier>{4bb0306e-cab7-4fe0-9a2b-2c7b6b41d2cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{4f2c9a60-1cf1-41bc-b3ac-e3c2206033c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Library">
+      <UniqueIdentifier>{4f2632c3-63f2-4cd6-8b52-2b0c4f94995d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Library\Sources">
+      <UniqueIdentifier>{5039fc38-653e-4f50-a37a-157fdf74be6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database\Types">
+      <UniqueIdentifier>{ab155f10-cb1b-4c28-8840-cf9fd1e99b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Playlist">
+      <UniqueIdentifier>{ea90343a-09f6-47c6-b432-bf61fc0e4f9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RePlayer">
+      <UniqueIdentifier>{cadf168f-5420-4068-95f2-e0f5b116b70e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Deck">
+      <UniqueIdentifier>{8c8628cd-b41e-4edd-98d9-08a7c632197c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsImGui.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Graphics.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsImpl.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsPremul.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\SongEditor.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\AmigaMusicPreservation.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\FileImport.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\Modland.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\TheModArchive.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Library.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Database.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LibrarySongMerger.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseSongsUI.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LibrarySongsUI.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\Artist.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\Countries.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\MusicID.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\Song.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\SourceID.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\Types\Tags.cpp">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseArtistsUI.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LibraryArtistsUI.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\SongEndEditor.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Playlist\Playlist.cpp">
+      <Filter>Source Files\Playlist</Filter>
+    </ClCompile>
+    <ClCompile Include="Playlist\PlaylistDropTarget.cpp">
+      <Filter>Source Files\Playlist</Filter>
+    </ClCompile>
+    <ClCompile Include="Playlist\PlaylistSongsUI.cpp">
+      <Filter>Source Files\Playlist</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\RePlayer.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\CoreVersion.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Deck\Deck.cpp">
+      <Filter>Source Files\Deck</Filter>
+    </ClCompile>
+    <ClCompile Include="Deck\Player.cpp">
+      <Filter>Source Files\Deck</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\Replays.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\Settings.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\Core.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\CoreOverride.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\HighVoltageSIDCollection.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="RePlayer\About.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Graphics\GraphicsImGui.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsImGuiPS.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsImGuiVS.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Graphics.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsImpl.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsPremul.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsPremulPS.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsPremulVS.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\SongEditor.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsFontLog.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\AmigaMusicPreservation.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\FileImport.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\Modland.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\TheModArchive.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\WebHandler.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\XmlHandler.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Library.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Source.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Database.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Database.inl.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibrarySongMerger.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseSongsUI.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibrarySongsUI.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseSongsUI.inl.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Artist.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Countries.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\MusicID.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Song.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\SourceID.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Subsong.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\SubsongID.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Tags.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Tags.inl.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseArtistsUI.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibraryArtistsUI.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\SongEndEditor.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Playlist\Playlist.h">
+      <Filter>Source Files\Playlist</Filter>
+    </ClInclude>
+    <ClInclude Include="Playlist\PlaylistDropTarget.h">
+      <Filter>Source Files\Playlist</Filter>
+    </ClInclude>
+    <ClInclude Include="Playlist\PlaylistSongsUI.h">
+      <Filter>Source Files\Playlist</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\RePlayer.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\CoreHeader.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck\Deck.h">
+      <Filter>Source Files\Deck</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck\Player.h">
+      <Filter>Source Files\Deck</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck\TagLibStream.h">
+      <Filter>Source Files\Deck</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\Replays.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\Settings.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Proxy.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Types\Proxy.inl.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\Core.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\Core.inl.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\HighVoltageSIDCollection.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\About.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\TheModArchiveKey.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Graphics\GraphicsImpl.inl">
+      <Filter>Source Files\Graphics</Filter>
+    </None>
+    <None Include="..\README.md" />
+    <None Include="..\.gitignore" />
+    <None Include="Library\Library.inl">
+      <Filter>Source Files\Library</Filter>
+    </None>
+    <None Include="Database\Types\Countries.inc">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Database\Types\Countries.inl">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Database\Types\MusicID.inl.h">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Database\Types\SongTypes.inc">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Database\Types\SubsongID.inl">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Database\Types\Tags.inc">
+      <Filter>Source Files\Database\Types</Filter>
+    </None>
+    <None Include="Deck\Player.inl">
+      <Filter>Source Files\Deck</Filter>
+    </None>
+    <None Include="..\3rdParties.md" />
+    <None Include="..\LICENSE" />
+    <None Include="..\TODO.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="3rdParty\curl\libcurl.dll.a">
+      <Filter>3rdParty</Filter>
+    </Library>
+    <Library Include="3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+    <Library Include="3rdParty\tidy\tidy.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="replayer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rePlayer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

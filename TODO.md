@@ -1,0 +1,41 @@
+# rePlayer (another multi-formats music player)
+
+- improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
+- mp3: sync info (bitrate) with playback
+- async tasks (imports...)
+- database: add album database
+- modland: source validation (check for removed files)
+- mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)
+- source: don't load on start, just at access (to save memory)
+- support for .cue, .m3u, .pls
+- pure database random play (System::Mode::Random)
+- duplicates finder (https://github.com/jmacd/xdelta https://github.com/ilanschnell/bsdiff4 https://github.com/sisong/HDiffPatch)
+- audio normalization (https://github.com/jiixyj/libebur128)
+- crossfader
+- editable countries (to prevent missing ones)
+- remove std::string
+- memory allocator profiler
+- remove allocated vb & ib and replace it by a scratch buffer
+- handle properly gpucrash/device lost
+- profiler (cpu + gpu)
+- multi-threaded load/import (with main screens lock)
+- http://sndh.atari.org/sndh/browser/index.php?dir=sndh_lf%2F importer
+- http://asma.atari.org/ importer : https://asma.atari.org/asma/Misc/lack_of_filters_cause.sap
+- https://www.amigaremix.com/ importer
+- https://remix.kwed.org/ importer
+- https://zxart.ee/eng/music/ importer
+- https://www.exotica.org.uk/ importer?
+- https://www.modules.pl/ importer?
+- https://www.demozoo.org/ importer?
+- https://www.zophar.net/ importer?
+- https://vgmrips.net/ importer?
+- investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
+- check zxtune for more players: https://bitbucket.org/zxtune/zxtune/
+- Youtube music player? (using https://github.com/dujeonglee/YoutubeClipDownloader)
+- Soundcloud music player?
+- Bandcamp music player?
+- scplayer? https://github.com/Deltafire/SCPlayer (maybe already in zxtune)
+- ixs: https://bitbucket.org/wothke/webixs/src/master/
+- ttt: tia tracker (sap) https://www.pouet.net/prod.php?which=67648
+
+- DEMO! utilise Firefox avec The final hyperbase (openmpt - change to surround), drax (uade - change to surround + song end editor)

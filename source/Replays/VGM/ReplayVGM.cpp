@@ -1,0 +1,317 @@
+#include "ReplayVGM.h"
+
+#include <Audio/AudioTypes.inl.h>
+#include <Containers/Array.inl.h>
+#include <Core/Log.h>
+#include <Core/String.h>
+#include <Core/Window.inl.h>
+#include <Imgui.h>
+#include <ReplayDll.h>
+
+#include <player/vgmplayer.hpp>
+#include <player/s98player.hpp>
+#include <player/droplayer.hpp>
+#include <player/gymplayer.hpp>
+#include <utils/MemoryLoader.h>
+
+#define LIBVGM_VERSION "@fd7da37"
+
+namespace rePlayer
+{
+    ReplayPlugin g_replayPlugin = {
+        .replayId = eReplay::VGM,
+        .name = "Video Game Music",
+        .extensions = "vgm;vgz",
+        .about = "libvgm",
+        .init = ReplayVGM::Init,
+        .load = ReplayVGM::Load,
+        .displaySettings = ReplayVGM::DisplaySettings,
+        .editMetadata = ReplayVGM::Settings::Edit
+    };
+
+    bool ReplayVGM::Init(SharedContexts* ctx, Window& window)
+    {
+        ctx->Init();
+
+        window.RegisterSerializedData(ms_stereoSeparation, "ReplayVGMStereoSeparation");
+        window.RegisterSerializedData(ms_surround, "ReplayVGMSurround");
+        window.RegisterSerializedData(ms_droV2Opl3, "ReplayVGMDroV2Opl3");
+        window.RegisterSerializedData(ms_vgmPlaybackHz, "ReplayVGMPlaybackHz");
+        window.RegisterSerializedData(ms_vgmHardStopOld, "ReplayVGMHardStopOld");
+
+        return false;
+    }
+
+    Replay* ReplayVGM::Load(io::Stream* stream, CommandBuffer metadata)
+    {
+        auto settings = metadata.Find<Settings>();
+
+        auto* droPlayer = new DROPlayer;
+        DRO_PLAY_OPTIONS droOptions;
+        droPlayer->GetPlayerOptions(droOptions);
+        droOptions.v2opl3Mode = uint8_t((settings && settings->overrideDroV2Opl3) ? settings->droV2Opl3 : ms_droV2Opl3);
+        droPlayer->SetPlayerOptions(droOptions);
+
+        auto* vgmPlayer = new VGMPlayer;
+        VGM_PLAY_OPTIONS vgmOptions;
+        vgmPlayer->GetPlayerOptions(vgmOptions);
+        static uint32_t hz[] = { 0, 50, 60 };
+        vgmOptions.playbackHz = hz[(settings&& settings->overrideVgmPlaybackHz) ? settings->vgmPlaybackHz : ms_vgmPlaybackHz];
+        vgmOptions.hardStopOld = uint8_t((settings && settings->overrideVgmHardStopOld) ? settings->vgmHardStopOld : ms_vgmHardStopOld);
+        vgmPlayer->SetPlayerOptions(vgmOptions);
+
+        auto* player = new PlayerA();
+        player->RegisterPlayerEngine(new GYMPlayer);
+        player->RegisterPlayerEngine(new S98Player);
+        player->RegisterPlayerEngine(vgmPlayer);
+        player->RegisterPlayerEngine(droPlayer);
+
+        if (player->SetOutputSettings(kSampleRate, 2, 16, kSampleBufferLen))
+        {
+            Log::Error("[VGM] Unsupported sample rate %dHz\n", kSampleRate);
+            delete player;
+            return nullptr;
+        }
+
+        auto data = stream->Read();
+        auto* loader = MemoryLoader_Init(data.Items(), uint32_t(data.Size()));
+        if (DataLoader_Load(loader) || player->LoadFile(loader))
+        {
+            delete player;
+            DataLoader_Deinit(loader);
+            return nullptr;
+        }
+
+        player->SetLoopCount(16);
+        player->SetEndSilenceSamples(kSampleRate / 4);
+        player->Start();
+
+        return new ReplayVGM(stream, player, loader);
+    }
+
+    bool ReplayVGM::DisplaySettings()
+    {
+        bool changed = false;
+        if (ImGui::CollapsingHeader("libvgm " LIBVGM_VERSION, ImGuiTreeNodeFlags_None))
+        {
+            if (!ImGui::GetIO().KeyCtrl)
+                ImGui::PushID("VGM");
+            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+            const char* const surround[] = { "Stereo", "Surround" };
+            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+            const char* const dro[] = { "Detect", "Header", "Forced"};
+            changed |= ImGui::Combo("DRO v2 with Opl3", &ms_droV2Opl3, dro, _countof(dro));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+            const char* const hz[] = { "Default", "PAL", "NTSC" };
+            changed |= ImGui::Combo("VGM playback", &ms_vgmPlaybackHz, hz, _countof(hz));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+            const char* const stop[] = { "Off", "On" };
+            changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, _countof(stop));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+            if (!ImGui::GetIO().KeyCtrl)
+                ImGui::PopID();
+        }
+        return changed;
+    }
+
+    void ReplayVGM::Settings::Edit(ReplayMetadataContext& context)
+    {
+        Settings dummy;
+        auto* entry = context.metadata.Find<Settings>(&dummy);
+
+        SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
+            ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
+        ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
+            ms_surround, "Output: Stereo", "Output: Surround");
+        ComboOverride("DroV2Opl3", GETSET(entry, overrideDroV2Opl3), GETSET(entry, droV2Opl3),
+            ms_droV2Opl3, "dro v2 with Opl3: Detect", "dro v2 with Opl3: Header", "dro v2 with Opl3: Forced");
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+        ComboOverride("VgmPlayback", GETSET(entry, overrideVgmPlaybackHz), GETSET(entry, vgmPlaybackHz),
+            ms_vgmPlaybackHz, "VGM playback: Default", "VGM playback: PAL", "VGM playback: NTSC");
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+        ComboOverride("VgmHardStopOld", GETSET(entry, overrideVgmHardStopOld), GETSET(entry, vgmHardStopOld),
+            ms_vgmHardStopOld, "Hard stop on old VGM: Off", "Hard stop on old VGM: On");
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+
+        context.metadata.Update(entry, entry->value == 0);
+    }
+
+    int32_t ReplayVGM::ms_stereoSeparation = 100;
+    int32_t ReplayVGM::ms_surround = 1;
+    int32_t ReplayVGM::ms_droV2Opl3 = DRO_V2OPL3_DETECT;
+    int32_t ReplayVGM::ms_vgmPlaybackHz = 0;
+    int32_t ReplayVGM::ms_vgmHardStopOld = 0;
+
+    ReplayVGM::~ReplayVGM()
+    {
+        delete m_player;
+        DataLoader_Deinit(m_loader);
+    }
+
+    ReplayVGM::ReplayVGM(io::Stream* stream, PlayerA* player, DATA_LOADER* loader)
+        : Replay(GetExtension(stream, player, loader), eReplay::VGM)
+        , m_stream(stream)
+        , m_player(player)
+        , m_loader(loader)
+        , m_surround(kSampleRate)
+    {
+        player->SetEventCallback(OnEvent, this);
+    }
+
+    UINT8 ReplayVGM::OnEvent(PlayerBase* /*player*/, void* userParam, UINT8 evtType, void* /*evtParam*/)
+    {
+        switch (evtType)
+        {
+        case PLREVT_NONE:
+        case PLREVT_START:
+        case PLREVT_STOP:
+            break;
+        case PLREVT_LOOP:
+            reinterpret_cast<ReplayVGM*>(userParam)->m_hasLooped = true;
+            break;
+        case PLREVT_END:
+            reinterpret_cast<ReplayVGM*>(userParam)->m_hasEnded = true;
+            break;
+        }
+        return 0;
+    }
+
+    uint32_t ReplayVGM::Render(StereoSample* output, uint32_t numSamples)
+    {
+        if (m_hasEnded)
+            return 0;
+        if (m_hasLooped)
+        {
+            m_hasLooped = false;
+            return 0;
+        }
+
+        auto buf = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
+        numSamples = m_player->Render(numSamples * sizeof(int16_t) * 2, buf) / sizeof(int16_t) / 2;
+
+        output->Convert(m_surround, buf, numSamples, m_stereoSeparation);
+
+        return numSamples;
+    }
+
+    uint32_t ReplayVGM::Seek(uint32_t timeInMs)
+    {
+        uint64_t pos = timeInMs;
+        pos *= kSampleRate;
+        pos /= 1000;
+        m_player->Seek(PLAYPOS_SAMPLE, uint32_t(pos));
+        return timeInMs;
+    }
+
+    void ReplayVGM::ResetPlayback()
+    {
+        m_surround.Reset();
+        m_player->Reset();
+        m_hasEnded = m_hasLooped = false;
+    }
+
+    void ReplayVGM::ApplySettings(const CommandBuffer metadata)
+    {
+        auto settings = metadata.Find<Settings>();
+        m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
+        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+    }
+
+    void ReplayVGM::SetSubsong(uint16_t subsongIndex)
+    {
+        m_subsongIndex = subsongIndex;
+        ResetPlayback();
+    }
+
+    eExtension ReplayVGM::GetExtension(io::Stream* stream, PlayerA* player, DATA_LOADER* loader)
+    {
+        switch (player->GetPlayer()->GetPlayerType())
+        {
+        case FCC_VGM:
+            return loader->_bytesTotal > stream->GetSize() ? eExtension::_vgz : eExtension::_vgm;
+        case FCC_S98:
+            return eExtension::_s98;
+        case FCC_GYM:
+            return eExtension::_gym;
+        case FCC_DRO:
+            return eExtension::_dro;
+        }
+        return eExtension::Unknown;
+    }
+
+    uint32_t ReplayVGM::GetDurationMs() const
+    {
+        m_player->SetLoopCount(1);
+        m_player->Reset();
+        auto duration = uint32_t(m_player->GetTotalTime(true) * 1000ull);
+        m_player->SetLoopCount(16);
+        m_player->Reset();
+        return duration;
+    }
+
+    uint32_t ReplayVGM::GetNumSubsongs() const
+    {
+        return 1;
+    }
+
+    std::string ReplayVGM::GetExtraInfo() const
+    {
+        std::string metadata;
+        auto* tags = m_player->GetPlayer()->GetTags();
+        while (*tags)
+        {
+            if (!metadata.empty())
+                metadata += "\n";
+            metadata += *tags++;
+            metadata += " : ";
+            metadata += *tags++;
+        }
+        return metadata;
+    }
+
+    std::string ReplayVGM::GetInfo() const
+    {
+        std::string info;
+        info = "2 channels\n";
+
+        auto* tags = m_player->GetPlayer()->GetTags();
+        while (*tags)
+        {
+            if (_stricmp(tags[0], "system") == 0)
+            {
+                if (tags[1][0] && tags[1][0] != '?')
+                {
+                    info += tags[1];
+                    break;
+                }
+            }
+            if (_stricmp(tags[0], "system") == 0)
+            {
+                if (tags[1][0] && tags[1][0] != '?')
+                {
+                    info += tags[1];
+                    break;
+                }
+            }
+            tags += 2;
+        }
+        if (*tags == nullptr)
+        {
+            if (m_player->GetPlayer()->GetPlayerType() == FCC_GYM)
+                info += "Mega Drive GYM";
+            else if (m_player->GetPlayer()->GetPlayerType() == FCC_DRO)
+                info += "Adlib DOSBox";
+            else
+                info += m_player->GetPlayer()->GetPlayerName();
+        }
+        info += "\nlibvgm " LIBVGM_VERSION;
+        return info;
+    }
+}
+// namespace rePlayer

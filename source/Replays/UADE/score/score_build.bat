@@ -1,0 +1,1 @@
+@vasmm68k_mot.exe -no-opt -Fhunkexe -nosym -I . -Fbin score.s -o score

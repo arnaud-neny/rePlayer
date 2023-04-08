@@ -1,0 +1,397 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\gme">
+      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gme\ext">
+      <UniqueIdentifier>{d3c114e1-0ed2-4f1b-96ff-6bd0da005b1b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayGME.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ay_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ay_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ay_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\blargg_common.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\blargg_config.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\blargg_endian.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\blargg_source.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Blip_Buffer.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Classic_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Data_Reader.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Dual_Resampler.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Effects_Buffer.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Fir_Resampler.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gb_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gb_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\gb_cpu_io.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gb_Oscs.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gbs_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\gme.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gme_File.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\gme_types.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Gym_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Hes_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Hes_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\hes_cpu_io.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Hes_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Kss_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Kss_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Kss_Scc_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\M3u_Playlist.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Multi_Buffer.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Music_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\nes_cpu_io.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Fds_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Fme7_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Mmc5_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Namco_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Oscs.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Vrc6_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nes_Vrc7_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nsf_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Nsfe_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Sap_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Sap_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\sap_cpu_io.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Sap_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Sms_Apu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Sms_Oscs.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Snes_Spc.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Spc_Cpu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Spc_Dsp.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Spc_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Spc_Filter.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Vgm_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Vgm_Emu_Impl.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ym2413_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ym2612_Emu.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ym2612_GENS.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ym2612_MAME.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\Ym2612_Nuked.h">
+      <Filter>Source Files\gme</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\2413tone.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\emu2413.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\emutypes.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\mamedef.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\panning.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="gme\gme\ext\vrc7tone.h">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayGME.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ay_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ay_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ay_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Blip_Buffer.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Classic_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Data_Reader.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Dual_Resampler.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Effects_Buffer.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Fir_Resampler.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gb_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gb_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gb_Oscs.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gbs_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\gme.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gme_File.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Gym_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Hes_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Hes_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Hes_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Kss_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Kss_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Kss_Scc_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\M3u_Playlist.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Multi_Buffer.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Music_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Fds_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Fme7_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Namco_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Oscs.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Vrc6_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nes_Vrc7_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nsf_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Nsfe_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Sap_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Sap_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Sap_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Sms_Apu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Snes_Spc.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Spc_Cpu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Spc_Dsp.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Spc_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Spc_Filter.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Vgm_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Vgm_Emu_Impl.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ym2413_Emu.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ym2612_GENS.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ym2612_MAME.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\Ym2612_Nuked.cpp">
+      <Filter>Source Files\gme</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\ext\emu2413.c">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="gme\gme\ext\panning.c">
+      <Filter>Source Files\gme\ext</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gme\gme\gme_types.h.in">
+      <Filter>Source Files\gme</Filter>
+    </None>
+    <None Include="gme\gme\libgme.pc.in">
+      <Filter>Source Files\gme</Filter>
+    </None>
+  </ItemGroup>
+</Project>

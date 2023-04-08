@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\protrekkr">
+      <UniqueIdentifier>{48386355-57d1-493c-bfb8-61cf8b996468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\include">
+      <UniqueIdentifier>{1fd34e7a-a7fd-4d8b-9788-3fcc5056cf68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\replay">
+      <UniqueIdentifier>{1ec77062-cdb1-467d-adb8-728f5710666a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\replay\include">
+      <UniqueIdentifier>{76cba85d-cd66-4691-9d7e-bcbd0f2fcb81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\files">
+      <UniqueIdentifier>{063830c4-5f81-4a68-957d-1e85e60d9d53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\samples">
+      <UniqueIdentifier>{e09d3f35-3de3-42f4-a6ac-0148c8b39647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\samples\aiff">
+      <UniqueIdentifier>{018da5b0-8ce5-4b60-b843-9a8f03ebbbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\samples\aiff\include">
+      <UniqueIdentifier>{f42f677f-7815-4415-bd0a-3ad9f9520e86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\samples\wav">
+      <UniqueIdentifier>{12196eb7-972a-4df8-bd57-dcdcdecd77f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\samples\wav\include">
+      <UniqueIdentifier>{3bb38ee0-e2d1-4c3a-835a-6a701e1c22ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\files\include">
+      <UniqueIdentifier>{b6d56339-0ab1-4bc6-a46a-c44bcf921018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\editors">
+      <UniqueIdentifier>{b3361446-e8f9-4128-a77e-e10b01ef23e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\protrekkr\editors\include">
+      <UniqueIdentifier>{9eec13eb-c80e-4391-91f3-33b625a8276b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader">
+      <UniqueIdentifier>{2164e032-b6d2-4b42-ae8c-53f222aa4923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook">
+      <UniqueIdentifier>{e432739a-fbce-4261-9aac-c239e9a1beef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\include">
+      <UniqueIdentifier>{332c1407-5466-4ff9-92e3-4176c007091d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\src">
+      <UniqueIdentifier>{6eb5ac3f-378b-4d69-8567-13e41a84a8b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dllloader\minhook\src\hde">
+      <UniqueIdentifier>{d94b4eac-656f-4b9b-8295-7b2da17f6048}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayProTrekkr.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\include\version.h">
+      <Filter>Source Files\protrekkr\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\endianness.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\replay.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\ptk_def_properties.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\cubic_spline.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\spline.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\tb_303.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\ptkreplay.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\samples_unpack.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\synth.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\sounddriver_dummy.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\replay\include\wavpack.h">
+      <Filter>Source Files\protrekkr\replay\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\include\ptk.h">
+      <Filter>Source Files\protrekkr\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\samples\aiff\include\aiff.h">
+      <Filter>Source Files\protrekkr\samples\aiff\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\samples\wav\include\riff.h">
+      <Filter>Source Files\protrekkr\samples\wav\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\samples\wav\include\ddc.h">
+      <Filter>Source Files\protrekkr\samples\wav\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\files.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\files_list.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\303s.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\midi_cfg.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\mods.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\patterns.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\reverbs.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_reverb.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\patterns_blocks.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_pattern.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_midi.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_sequencer.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_setup.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\editors\include\editor_303.h">
+      <Filter>Source Files\protrekkr\editors\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\synths.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\files\include\ptps.h">
+      <Filter>Source Files\protrekkr\files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="protrekkr\include\variables.h">
+      <Filter>Source Files\protrekkr\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\dllloader.h">
+      <Filter>Source Files\dllloader</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\ntddk.h">
+      <Filter>Source Files\dllloader</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\include\MinHook.h">
+      <Filter>Source Files\dllloader\minhook\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\buffer.h">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\trampoline.h">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\hde32.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\hde64.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\pstdint.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\table32.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="dllloader\minhook\src\hde\table64.h">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayProTrekkr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\replay.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\tb_303.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\spline.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\samples_unpack.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\wavpack.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\replay\synth.cpp">
+      <Filter>Source Files\protrekkr\replay</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\files\files.cpp">
+      <Filter>Source Files\protrekkr\files</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\files\reverbs.cpp">
+      <Filter>Source Files\protrekkr\files</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\editors\patterns_blocks.cpp">
+      <Filter>Source Files\protrekkr\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\files\303s.cpp">
+      <Filter>Source Files\protrekkr\files</Filter>
+    </ClCompile>
+    <ClCompile Include="protrekkr\files\synths.cpp">
+      <Filter>Source Files\protrekkr\files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\dllloader.cpp">
+      <Filter>Source Files\dllloader</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\buffer.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hook.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\trampoline.c">
+      <Filter>Source Files\dllloader\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hde\hde32.c">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="dllloader\minhook\src\hde\hde64.c">
+      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

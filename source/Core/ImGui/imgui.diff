@@ -1,0 +1,183 @@
+diff --git "a/external\\imgui-docking\\imconfig.h" "b/source\\Core\\ImGui\\imconfig.h"
+index ed26508..962c18f 100644
+--- "a/external\\imgui-docking\\imconfig.h"
++++ "b/source\\Core\\ImGui\\imconfig.h"
+@@ -27,8 +27,8 @@
+ //#define IMGUI_API __declspec( dllimport )
+ 
+ //---- Don't define obsolete functions/enums/behaviors. Consider enabling from time to time after updating to avoid using soon-to-be obsolete function/names.
+-//#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+-//#define IMGUI_DISABLE_OBSOLETE_KEYIO                      // 1.87: disable legacy io.KeyMap[]+io.KeysDown[] in favor io.AddKeyEvent(). This will be folded into IMGUI_DISABLE_OBSOLETE_FUNCTIONS in a few versions.
++#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
++#define IMGUI_DISABLE_OBSOLETE_KEYIO                      // 1.87: disable legacy io.KeyMap[]+io.KeysDown[] in favor io.AddKeyEvent(). This will be folded into IMGUI_DISABLE_OBSOLETE_FUNCTIONS in a few versions.
+ 
+ //---- Disable all of Dear ImGui or don't implement standard windows/tools.
+ // It is very strongly recommended to NOT disable the demo windows and debug tool during development. They are extremely useful in day to day work. Please read comments in imgui_demo.cpp.
+@@ -46,7 +46,7 @@
+ //#define IMGUI_DISABLE_DEFAULT_MATH_FUNCTIONS              // Don't implement ImFabs/ImSqrt/ImPow/ImFmod/ImCos/ImSin/ImAcos/ImAtan2 so you can implement them yourself.
+ //#define IMGUI_DISABLE_FILE_FUNCTIONS                      // Don't implement ImFileOpen/ImFileClose/ImFileRead/ImFileWrite and ImFileHandle at all (replace them with dummies)
+ //#define IMGUI_DISABLE_DEFAULT_FILE_FUNCTIONS              // Don't implement ImFileOpen/ImFileClose/ImFileRead/ImFileWrite and ImFileHandle so you can implement them yourself if you don't want to link with fopen/fclose/fread/fwrite. This will also disable the LogToTTY() function.
+-//#define IMGUI_DISABLE_DEFAULT_ALLOCATORS                  // Don't implement default allocators calling malloc()/free() to avoid linking with them. You will need to call ImGui::SetAllocatorFunctions().
++#define IMGUI_DISABLE_DEFAULT_ALLOCATORS                  // Don't implement default allocators calling malloc()/free() to avoid linking with them. You will need to call ImGui::SetAllocatorFunctions().
+ //#define IMGUI_DISABLE_SSE                                 // Disable use of SSE intrinsics even if available
+ 
+ //---- Include imgui_user.h at the end of imgui.h as a convenience
+@@ -68,7 +68,7 @@
+ 
+ //---- Use stb_sprintf.h for a faster implementation of vsnprintf instead of the one from libc (unless IMGUI_DISABLE_DEFAULT_FORMAT_FUNCTIONS is defined)
+ // Compatibility checks of arguments and formats done by clang and GCC will be disabled in order to support the extra formats provided by stb_sprintf.h.
+-//#define IMGUI_USE_STB_SPRINTF
++#define IMGUI_USE_STB_SPRINTF
+ 
+ //---- Use FreeType to build and rasterize the font atlas (instead of stb_truetype which is embedded by default in Dear ImGui)
+ // Requires FreeType headers to be available in the include path. Requires program to be compiled with 'misc/freetype/imgui_freetype.cpp' (in this repository) + the FreeType library (not provided).
+diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
+index bfe8fe5..2d03dd4 100644
+--- "a/external\\imgui-docking\\imgui.h"
++++ "b/source\\Core\\ImGui\\imgui.h"
+@@ -555,7 +555,7 @@ namespace ImGui
+     IMGUI_API bool          DragInt3(const char* label, int v[3], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
+     IMGUI_API bool          DragInt4(const char* label, int v[4], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
+     IMGUI_API bool          DragIntRange2(const char* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
+-    IMGUI_API bool          DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0);
++    IMGUI_API bool          DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0, const ImVec2& text_align = ImVec2(0.5f, 0.5f));
+     IMGUI_API bool          DragScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0);
+ 
+     // Widgets: Regular Sliders
+diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
+index 53b43d3..c34a539 100644
+--- "a/external\\imgui-docking\\imgui_widgets.cpp"
++++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
+@@ -2384,7 +2384,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
+ 
+ // Note: p_data, p_min and p_max are _pointers_ to a memory address holding the data. For a Drag widget, p_min and p_max are optional.
+ // Read code of e.g. DragFloat(), DragInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
+-bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
++bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags, const ImVec2& text_align)
+ {
+     ImGuiWindow* window = GetCurrentWindow();
+     if (window->SkipItems)
+@@ -2463,7 +2463,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
+     const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
+     if (g.LogEnabled)
+         LogSetNextTextDecoration("{", "}");
+-    RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, ImVec2(0.5f, 0.5f));
++    RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, text_align);
+ 
+     if (label_size.x > 0.0f)
+         RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
+diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
+index e7d3c51..323e9ce 100644
+--- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
++++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
+@@ -883,21 +883,26 @@ struct ImGui_ImplWin32_ViewportData
+     ~ImGui_ImplWin32_ViewportData() { IM_ASSERT(Hwnd == nullptr); }
+ };
+ 
+-static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)
++// rePlayer begin
++static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style, bool isChild)
+ {
+     if (flags & ImGuiViewportFlags_NoDecoration)
+         *out_style = WS_POPUP;
+     else
+         *out_style = WS_OVERLAPPEDWINDOW;
+ 
+-    if (flags & ImGuiViewportFlags_NoTaskBarIcon)
+-        *out_ex_style = WS_EX_TOOLWINDOW;
++    if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
++        *out_ex_style = WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP;
+     else
+-        *out_ex_style = WS_EX_APPWINDOW;
++    {
++        *out_style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX; // min max to trigger wm_syscommand
++        *out_ex_style = WS_EX_APPWINDOW | WS_EX_NOREDIRECTIONBITMAP;
++    }
+ 
+     if (flags & ImGuiViewportFlags_TopMost)
+         *out_ex_style |= WS_EX_TOPMOST;
+ }
++// rePlayer end
+ 
+ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+ {
+@@ -905,7 +910,10 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+     viewport->PlatformUserData = vd;
+ 
+     // Select style and parent window
+-    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &vd->DwStyle, &vd->DwExStyle);
++    // rePlayer begin
++    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &vd->DwStyle, &vd->DwExStyle, viewport->ParentViewportId != ImGui::GetMainViewport()->ID);
++    // rePlayer end
++
+     HWND parent_window = nullptr;
+     if (viewport->ParentViewportId != 0)
+         if (ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId))
+@@ -960,7 +968,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
+     IM_ASSERT(vd->Hwnd != 0);
+     DWORD new_style;
+     DWORD new_ex_style;
+-    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &new_style, &new_ex_style);
++    // rePlayer begin
++    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &new_style, &new_ex_style, viewport->ParentViewportId != ImGui::GetMainViewport()->ID);
++    // rePlayer end
+ 
+     // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
+     if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
+@@ -1095,6 +1105,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+ #endif
+ }
+ 
++// rePlayer begin
++void OnRePlayerSysCommand(bool isMinimizing);
++// rePlayer end
++
+ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+ {
+     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+@@ -1104,6 +1118,20 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+     {
+         switch (msg)
+         {
++        // rePlayer begin
++        case WM_SYSCOMMAND:
++            if (wParam == SC_MINIMIZE)
++            {
++                OnRePlayerSysCommand(true);
++                return 0;
++            }
++            else if (wParam == SC_RESTORE || wParam == SC_MAXIMIZE)
++            {
++                OnRePlayerSysCommand(false);
++                return 0;
++            }
++            break;
++        // rePlayer end
+         case WM_CLOSE:
+             viewport->PlatformRequestClose = true;
+             return 0;
+@@ -1133,6 +1161,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+ 
+ static void ImGui_ImplWin32_InitPlatformInterface()
+ {
++    // rePlayer begin
+     WNDCLASSEX wcex;
+     wcex.cbSize = sizeof(WNDCLASSEX);
+     wcex.style = CS_HREDRAW | CS_VREDRAW;
+@@ -1140,13 +1169,14 @@ static void ImGui_ImplWin32_InitPlatformInterface()
+     wcex.cbClsExtra = 0;
+     wcex.cbWndExtra = 0;
+     wcex.hInstance = ::GetModuleHandle(nullptr);
+-    wcex.hIcon = nullptr;
++    wcex.hIcon = (HICON)GetClassLongPtr(ImGui_ImplWin32_GetBackendData()->hWnd, GCLP_HICON);
+     wcex.hCursor = nullptr;
+     wcex.hbrBackground = (HBRUSH)(COLOR_BACKGROUND + 1);
+     wcex.lpszMenuName = nullptr;
+     wcex.lpszClassName = _T("ImGui Platform");
+-    wcex.hIconSm = nullptr;
++    wcex.hIconSm = (HICON)GetClassLongPtr(ImGui_ImplWin32_GetBackendData()->hWnd, GCLP_HICONSM);
+     ::RegisterClassEx(&wcex);
++    // rePlayer end
+ 
+     ImGui_ImplWin32_UpdateMonitors();
+ 

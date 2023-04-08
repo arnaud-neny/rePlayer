@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libayfly">
+      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libayfly\players">
+      <UniqueIdentifier>{3c7d43df-0ffe-4ed9-9233-4d62236334a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libayfly\z80ex">
+      <UniqueIdentifier>{6d67b1c6-d3ef-446e-82d9-ace632d22c2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libayfly\z80ex\include">
+      <UniqueIdentifier>{ff0b1a55-9d17-4b80-a26d-93579e1b4822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libayfly\z80ex\opcodes">
+      <UniqueIdentifier>{2577e81d-2f6a-4900-826e-278dd13d3e92}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayAyfly.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\AbstractAudio.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\ay.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\ay_s60.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\ayfly.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\ayflyString.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\Filter3.h">
+      <Filter>Source Files\libayfly</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\ASCPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\AYPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\PSCPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\PSGPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\PT1Play.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\PT2Play.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\PT3Play.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\SQTPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\STCPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\STPPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\VTXPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\players\YMPlay.h">
+      <Filter>Source Files\libayfly\players</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\z80ex\macros.h">
+      <Filter>Source Files\libayfly\z80ex</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\z80ex\typedefs.h">
+      <Filter>Source Files\libayfly\z80ex</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\z80ex\include\z80ex.h">
+      <Filter>Source Files\libayfly\z80ex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libayfly\z80ex\include\z80ex_common.h">
+      <Filter>Source Files\libayfly\z80ex\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayAyfly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\AbstractAudio.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\ay.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\ay_s60.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\ayflyString.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\common.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\Filter3.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\formats.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\lha.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\speccy.cpp">
+      <Filter>Source Files\libayfly</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\ptables.c">
+      <Filter>Source Files\libayfly\z80ex</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\z80ex.c">
+      <Filter>Source Files\libayfly\z80ex</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_base.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_cb.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_dasm.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_dd.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_ddcb.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_ed.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_fd.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+    <ClCompile Include="libayfly\z80ex\opcodes\opcodes_fdcb.c">
+      <Filter>Source Files\libayfly\z80ex\opcodes</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,488 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\adplug">
+      <UniqueIdentifier>{48386355-57d1-493c-bfb8-61cf8b996468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\adplug\libbinio">
+      <UniqueIdentifier>{d73ced18-9638-4b23-a0b1-7395ffda39af}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayAdLib.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\libbinio\binfile.h">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\libbinio\binio.h">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\libbinio\binstr.h">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\libbinio\binwrap.h">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\a2m.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\adl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\adlibemu.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\adplug.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\adtrack.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\amd.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\analopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\bam.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\bmf.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\cff.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\cmf.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\cmfmcsop.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\d00.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\database.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\debug.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\dfm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\diskopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\dmo.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\dro.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\dro2.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\dtm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\emuopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\flash.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\fmc.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\fmopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\fprovide.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\got.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\herad.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\hsc.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\hsp.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\hybrid.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\hyp.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\imf.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\jbm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\kemuopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\ksm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\lds.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\load_helper.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mad.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mdi.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mid.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mididata.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mkj.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\msc.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mtk.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\mus.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\nemuopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\nukedopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\opl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\player.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\players.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\protrack.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\psi.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\rad2.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\rat.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\raw.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\realopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\rix.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\rol.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\s3m.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\sa2.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\silentopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\sng.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\sop.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\surroundopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\temuopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\u6m.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\version.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\vgm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\wemuopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\woodyopl.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\xad.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\xsm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplugdb.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\composer.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\strnlen.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\coktel.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayAdLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\libbinio\binfile.cpp">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\libbinio\binio.cpp">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\libbinio\binstr.cpp">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\libbinio\binwrap.cpp">
+      <Filter>Source Files\adplug\libbinio</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\a2m.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\adl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\adlibemu.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\adplug.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\adtrack.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\amd.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\analopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\bam.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\bmf.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\cff.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\cmf.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\cmfmcsop.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\d00.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\database.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\debug.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\dfm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\diskopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\dmo.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\dro.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\dro2.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\dtm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\emuopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\flash.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\fmc.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\fmopl.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\fprovide.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\got.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\herad.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\hsc.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\hsp.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\hybrid.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\hyp.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\imf.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\jbm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\ksm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\lds.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mad.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mdi.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mid.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mkj.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\msc.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mtk.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\mus.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\nemuopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\nukedopl.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\player.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\players.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\protrack.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\psi.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\rad2.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\rat.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\raw.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\realopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\rix.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\rol.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\s3m.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\sa2.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\sng.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\sop.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\surroundopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\temuopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\u6m.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\vgm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\woodyopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\xad.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\xsm.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\composer.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\coktel.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

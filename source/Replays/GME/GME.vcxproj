@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{B85FCD45-A142-491F-9128-E9E1BA787814}</ProjectGuid>
+    <RootNamespace>GME</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;HAVE_ZLIB_H;VGM_YM2612_NUKED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\zlib;$(ProjectDir)gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;HAVE_ZLIB_H;VGM_YM2612_NUKED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\zlib;$(ProjectDir)gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="gme\gme\Ay_Apu.h" />
+    <ClInclude Include="gme\gme\Ay_Cpu.h" />
+    <ClInclude Include="gme\gme\Ay_Emu.h" />
+    <ClInclude Include="gme\gme\blargg_common.h" />
+    <ClInclude Include="gme\gme\blargg_config.h" />
+    <ClInclude Include="gme\gme\blargg_endian.h" />
+    <ClInclude Include="gme\gme\blargg_source.h" />
+    <ClInclude Include="gme\gme\Blip_Buffer.h" />
+    <ClInclude Include="gme\gme\Classic_Emu.h" />
+    <ClInclude Include="gme\gme\Data_Reader.h" />
+    <ClInclude Include="gme\gme\Dual_Resampler.h" />
+    <ClInclude Include="gme\gme\Effects_Buffer.h" />
+    <ClInclude Include="gme\gme\ext\2413tone.h" />
+    <ClInclude Include="gme\gme\ext\emu2413.h" />
+    <ClInclude Include="gme\gme\ext\emutypes.h" />
+    <ClInclude Include="gme\gme\ext\mamedef.h" />
+    <ClInclude Include="gme\gme\ext\panning.h" />
+    <ClInclude Include="gme\gme\ext\vrc7tone.h" />
+    <ClInclude Include="gme\gme\Fir_Resampler.h" />
+    <ClInclude Include="gme\gme\Gbs_Emu.h" />
+    <ClInclude Include="gme\gme\Gb_Apu.h" />
+    <ClInclude Include="gme\gme\Gb_Cpu.h" />
+    <ClInclude Include="gme\gme\gb_cpu_io.h" />
+    <ClInclude Include="gme\gme\Gb_Oscs.h" />
+    <ClInclude Include="gme\gme\gme.h" />
+    <ClInclude Include="gme\gme\Gme_File.h" />
+    <ClInclude Include="gme\gme\gme_types.h" />
+    <ClInclude Include="gme\gme\Gym_Emu.h" />
+    <ClInclude Include="gme\gme\Hes_Apu.h" />
+    <ClInclude Include="gme\gme\Hes_Cpu.h" />
+    <ClInclude Include="gme\gme\hes_cpu_io.h" />
+    <ClInclude Include="gme\gme\Hes_Emu.h" />
+    <ClInclude Include="gme\gme\Kss_Cpu.h" />
+    <ClInclude Include="gme\gme\Kss_Emu.h" />
+    <ClInclude Include="gme\gme\Kss_Scc_Apu.h" />
+    <ClInclude Include="gme\gme\M3u_Playlist.h" />
+    <ClInclude Include="gme\gme\Multi_Buffer.h" />
+    <ClInclude Include="gme\gme\Music_Emu.h" />
+    <ClInclude Include="gme\gme\Nes_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Cpu.h" />
+    <ClInclude Include="gme\gme\nes_cpu_io.h" />
+    <ClInclude Include="gme\gme\Nes_Fds_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Fme7_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Mmc5_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Namco_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Oscs.h" />
+    <ClInclude Include="gme\gme\Nes_Vrc6_Apu.h" />
+    <ClInclude Include="gme\gme\Nes_Vrc7_Apu.h" />
+    <ClInclude Include="gme\gme\Nsfe_Emu.h" />
+    <ClInclude Include="gme\gme\Nsf_Emu.h" />
+    <ClInclude Include="gme\gme\Sap_Apu.h" />
+    <ClInclude Include="gme\gme\Sap_Cpu.h" />
+    <ClInclude Include="gme\gme\sap_cpu_io.h" />
+    <ClInclude Include="gme\gme\Sap_Emu.h" />
+    <ClInclude Include="gme\gme\Sms_Apu.h" />
+    <ClInclude Include="gme\gme\Sms_Oscs.h" />
+    <ClInclude Include="gme\gme\Snes_Spc.h" />
+    <ClInclude Include="gme\gme\Spc_Cpu.h" />
+    <ClInclude Include="gme\gme\Spc_Dsp.h" />
+    <ClInclude Include="gme\gme\Spc_Emu.h" />
+    <ClInclude Include="gme\gme\Spc_Filter.h" />
+    <ClInclude Include="gme\gme\Vgm_Emu.h" />
+    <ClInclude Include="gme\gme\Vgm_Emu_Impl.h" />
+    <ClInclude Include="gme\gme\Ym2413_Emu.h" />
+    <ClInclude Include="gme\gme\Ym2612_Emu.h" />
+    <ClInclude Include="gme\gme\Ym2612_GENS.h" />
+    <ClInclude Include="gme\gme\Ym2612_MAME.h" />
+    <ClInclude Include="gme\gme\Ym2612_Nuked.h" />
+    <ClInclude Include="ReplayGME.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gme\gme\Ay_Apu.cpp" />
+    <ClCompile Include="gme\gme\Ay_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Ay_Emu.cpp" />
+    <ClCompile Include="gme\gme\Blip_Buffer.cpp" />
+    <ClCompile Include="gme\gme\Classic_Emu.cpp" />
+    <ClCompile Include="gme\gme\Data_Reader.cpp" />
+    <ClCompile Include="gme\gme\Dual_Resampler.cpp" />
+    <ClCompile Include="gme\gme\Effects_Buffer.cpp" />
+    <ClCompile Include="gme\gme\ext\emu2413.c" />
+    <ClCompile Include="gme\gme\ext\panning.c" />
+    <ClCompile Include="gme\gme\Fir_Resampler.cpp" />
+    <ClCompile Include="gme\gme\Gbs_Emu.cpp" />
+    <ClCompile Include="gme\gme\Gb_Apu.cpp" />
+    <ClCompile Include="gme\gme\Gb_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Gb_Oscs.cpp" />
+    <ClCompile Include="gme\gme\gme.cpp" />
+    <ClCompile Include="gme\gme\Gme_File.cpp" />
+    <ClCompile Include="gme\gme\Gym_Emu.cpp" />
+    <ClCompile Include="gme\gme\Hes_Apu.cpp" />
+    <ClCompile Include="gme\gme\Hes_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Hes_Emu.cpp" />
+    <ClCompile Include="gme\gme\Kss_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Kss_Emu.cpp" />
+    <ClCompile Include="gme\gme\Kss_Scc_Apu.cpp" />
+    <ClCompile Include="gme\gme\M3u_Playlist.cpp" />
+    <ClCompile Include="gme\gme\Multi_Buffer.cpp" />
+    <ClCompile Include="gme\gme\Music_Emu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Fds_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Fme7_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Namco_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Oscs.cpp" />
+    <ClCompile Include="gme\gme\Nes_Vrc6_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nes_Vrc7_Apu.cpp" />
+    <ClCompile Include="gme\gme\Nsfe_Emu.cpp" />
+    <ClCompile Include="gme\gme\Nsf_Emu.cpp" />
+    <ClCompile Include="gme\gme\Sap_Apu.cpp" />
+    <ClCompile Include="gme\gme\Sap_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Sap_Emu.cpp" />
+    <ClCompile Include="gme\gme\Sms_Apu.cpp" />
+    <ClCompile Include="gme\gme\Snes_Spc.cpp" />
+    <ClCompile Include="gme\gme\Spc_Cpu.cpp" />
+    <ClCompile Include="gme\gme\Spc_Dsp.cpp" />
+    <ClCompile Include="gme\gme\Spc_Emu.cpp" />
+    <ClCompile Include="gme\gme\Spc_Filter.cpp" />
+    <ClCompile Include="gme\gme\Vgm_Emu.cpp" />
+    <ClCompile Include="gme\gme\Vgm_Emu_Impl.cpp" />
+    <ClCompile Include="gme\gme\Ym2413_Emu.cpp" />
+    <ClCompile Include="gme\gme\Ym2612_GENS.cpp" />
+    <ClCompile Include="gme\gme\Ym2612_MAME.cpp" />
+    <ClCompile Include="gme\gme\Ym2612_Nuked.cpp" />
+    <ClCompile Include="ReplayGME.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gme\gme\gme_types.h.in" />
+    <None Include="gme\gme\libgme.pc.in" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

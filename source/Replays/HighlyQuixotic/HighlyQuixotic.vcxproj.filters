@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\highly_quixotic">
+      <UniqueIdentifier>{a1bed234-269f-4775-81b7-b4e828a0a96e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\psflib">
+      <UniqueIdentifier>{aa84cb30-6abb-46c9-aff9-489bbd846f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{d8e5a52b-e1dc-481a-8d8e-9c70fde30428}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayHighlyQuixotic.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\emuconfig.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\kabuki.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\qmix.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\qsound.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\qsound_ctr.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="highly_quixotic\z80.h">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psf2fs.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psflib.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayHighlyQuixotic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="highly_quixotic\kabuki.c">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClCompile>
+    <ClCompile Include="highly_quixotic\qmix.c">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClCompile>
+    <ClCompile Include="highly_quixotic\qsound.c">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClCompile>
+    <ClCompile Include="highly_quixotic\qsound_ctr.c">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClCompile>
+    <ClCompile Include="highly_quixotic\z80.c">
+      <Filter>Source Files\highly_quixotic</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psf2fs.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psflib.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

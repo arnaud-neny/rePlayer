@@ -1,0 +1,640 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\psflib">
+      <UniqueIdentifier>{aa84cb30-6abb-46c9-aff9-489bbd846f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{d8e5a52b-e1dc-481a-8d8e-9c70fde30428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA">
+      <UniqueIdentifier>{12873674-cd73-4003-8e9e-2c6a05d7f013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src">
+      <UniqueIdentifier>{c5042238-6ef6-42c4-98bf-068534ef9ceb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\arm">
+      <UniqueIdentifier>{099546bd-bd32-4faa-b4a4-53dcdfa5a7fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\core">
+      <UniqueIdentifier>{16247eac-a495-49ae-b0e1-46059a5860a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gb">
+      <UniqueIdentifier>{2b27e270-351a-43b3-8d06-8e1983d29ea7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gba">
+      <UniqueIdentifier>{869e00ac-0222-41a9-9970-9ae5f68528a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\platform">
+      <UniqueIdentifier>{ed2abae5-f204-41d7-8520-48f6aaeb315e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\third-party">
+      <UniqueIdentifier>{bedd8dba-c11f-426e-a572-dfa74f42cb4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\util">
+      <UniqueIdentifier>{42f0fd7e-d0a8-4ca1-8984-035de57aeb2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gba\cart">
+      <UniqueIdentifier>{653cb656-e2f6-4a86-90e6-fd4c94fbdc80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gba\cheats">
+      <UniqueIdentifier>{974f1f1a-25e3-44a0-b136-a2b28edb028d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gba\extra">
+      <UniqueIdentifier>{5622536f-c207-449b-beba-a16afd664207}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\gba\sio">
+      <UniqueIdentifier>{8046e904-1f84-4d60-a270-15da8e80249b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\platform\windows">
+      <UniqueIdentifier>{3d83eebe-571d-4771-be42-735c9fc3229a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\third-party\blip_buf">
+      <UniqueIdentifier>{82611f0b-748d-4814-a69f-e406600c353b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\third-party\inih">
+      <UniqueIdentifier>{36c41e35-5c52-4dbf-8e7c-2fe4bfc93f3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\src\util\vfs">
+      <UniqueIdentifier>{98027638-8f62-4e40-9402-703b97d29a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include">
+      <UniqueIdentifier>{2583ca02-2ffc-4a3f-ac37-e02f691317c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba">
+      <UniqueIdentifier>{5db3928e-dbd0-4303-b81a-3a648a34e807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba-util">
+      <UniqueIdentifier>{559348aa-3fc7-4861-9e54-4e7880ad2fc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\core">
+      <UniqueIdentifier>{a44ae7be-7ed4-4284-bbd5-124c7632a764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\debugger">
+      <UniqueIdentifier>{3607805b-3318-48ff-b7c5-1fea7142ec7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\feature">
+      <UniqueIdentifier>{f5ad5fe9-6d1a-4bf5-bb19-4c66b86252fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\gb">
+      <UniqueIdentifier>{61e5f1cf-98d2-4d3f-bc02-af11bedc1003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\gba">
+      <UniqueIdentifier>{c744e17e-a361-4e6f-8e51-87939d2df2da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal">
+      <UniqueIdentifier>{5c1cd3dd-3cf2-4fed-a082-f02e04f17bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\arm">
+      <UniqueIdentifier>{29d4284b-f32b-49cc-9190-f0009a9438d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\arm\debugger">
+      <UniqueIdentifier>{3b173bc7-6797-4379-a4b9-f8d0abe048f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\debugger">
+      <UniqueIdentifier>{64694408-566c-4c28-8c7a-e90db5237d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gb">
+      <UniqueIdentifier>{233eedf5-c039-42b3-881a-65f05bf6d712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gba">
+      <UniqueIdentifier>{5d7d1cab-f927-4b52-b7b1-137139e66351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gba\cart">
+      <UniqueIdentifier>{5c81eaea-2b3d-4393-8e39-8b922135c2fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gba\extra">
+      <UniqueIdentifier>{d052a6a9-f9c0-4502-98a7-236494f29aaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gba\renderers">
+      <UniqueIdentifier>{3b18e2d3-1cfc-42a6-8275-b0d4852e550b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba\internal\gba\sio">
+      <UniqueIdentifier>{59c69808-76b7-43f6-9900-b874f15ca168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mGBA\include\mgba-util\patch">
+      <UniqueIdentifier>{90032138-3b88-415e-897e-7ebf0487e604}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayHighlyAdvanced.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psf2fs.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psflib.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\src\gba\cheats\gameshark.h">
+      <Filter>Source Files\mGBA\src\gba\cheats</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\src\gba\cheats\parv3.h">
+      <Filter>Source Files\mGBA\src\gba\cheats</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\src\third-party\inih\ini.h">
+      <Filter>Source Files\mGBA\src\third-party\inih</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\bitmap-cache.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\blip_buf.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\cache-set.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\cheats.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\config.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\core.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\cpu.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\directories.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\input.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\interface.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\lockstep.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\log.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\map-cache.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\rewind.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\serialize.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\sync.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\thread.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\tile-cache.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\timing.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\core\version.h">
+      <Filter>Source Files\mGBA\include\mgba\core</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\debugger\debugger.h">
+      <Filter>Source Files\mGBA\include\mgba\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\feature\video-logger.h">
+      <Filter>Source Files\mGBA\include\mgba\feature</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\gb\interface.h">
+      <Filter>Source Files\mGBA\include\mgba\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\gba\core.h">
+      <Filter>Source Files\mGBA\include\mgba\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\gba\interface.h">
+      <Filter>Source Files\mGBA\include\mgba\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\arm.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\decoder.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\decoder-inlines.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-arm.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-inlines.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-thumb.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-arm.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-inlines.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-thumb.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\macros.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\arm\debugger\debugger.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\arm\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\cli-debugger.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\stack-trace.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\symbols.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\audio.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\gb.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\io.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\memory.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\serialize.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\sio.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\timer.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gb\video.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\audio.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\bios.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cheats.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\dma.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\gba.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\input.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\io.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\memory.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\overrides.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\savedata.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\serialize.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sharkport.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\timer.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\video.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\ereader.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\cart</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\gpio.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\cart</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\matrix.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\cart</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\vfame.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\cart</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\extra\audio-mixer.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\extra</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\extra\cli.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\extra</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\cache-set.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\common.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\proxy.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\video-software.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio\gbp.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\sio</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio\lockstep.h">
+      <Filter>Source Files\mGBA\include\mgba\internal\gba\sio</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\circle-buffer.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\common.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\configuration.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\crc32.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\dllexports.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\formatting.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\hash.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\math.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\memory.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\patch.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\ring-fifo.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\string.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\table.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\threading.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\vector.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\vfs.h">
+      <Filter>Source Files\mGBA\include\mgba-util</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\patch\fast.h">
+      <Filter>Source Files\mGBA\include\mgba-util\patch</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\patch\ips.h">
+      <Filter>Source Files\mGBA\include\mgba-util\patch</Filter>
+    </ClInclude>
+    <ClInclude Include="mGBA\include\mgba-util\patch\ups.h">
+      <Filter>Source Files\mGBA\include\mgba-util\patch</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayHighlyAdvanced.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psf2fs.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psflib.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\arm.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\decoder.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\decoder-arm.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\decoder-thumb.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\isa-arm.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\arm\isa-thumb.c">
+      <Filter>Source Files\mGBA\src\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\config.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\core.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\directories.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\input.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\interface.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\lockstep.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\log.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\rewind.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\serialize.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\sync.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\thread.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\tile-cache.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\timing.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gb\audio.c">
+      <Filter>Source Files\mGBA\src\gb</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cart\gpio.c">
+      <Filter>Source Files\mGBA\src\gba\cart</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cart\matrix.c">
+      <Filter>Source Files\mGBA\src\gba\cart</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cart\vfame.c">
+      <Filter>Source Files\mGBA\src\gba\cart</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cheats\codebreaker.c">
+      <Filter>Source Files\mGBA\src\gba\cheats</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cheats\gameshark.c">
+      <Filter>Source Files\mGBA\src\gba\cheats</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cheats\parv3.c">
+      <Filter>Source Files\mGBA\src\gba\cheats</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\extra\audio-mixer.c">
+      <Filter>Source Files\mGBA\src\gba\extra</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\sio\gbp.c">
+      <Filter>Source Files\mGBA\src\gba\sio</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\sio\lockstep.c">
+      <Filter>Source Files\mGBA\src\gba\sio</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\audio.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\bios.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\core.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\dma.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\gba.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\hle-bios.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\input.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\io.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\memory.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\overrides.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\savedata.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\serialize.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\sharkport.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\sio.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\timer.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\video.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\platform\windows\memory.c">
+      <Filter>Source Files\mGBA\src\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\third-party\blip_buf\blip_buf.c">
+      <Filter>Source Files\mGBA\src\third-party\blip_buf</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\third-party\inih\ini.c">
+      <Filter>Source Files\mGBA\src\third-party\inih</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\vfs\vfs-fd.c">
+      <Filter>Source Files\mGBA\src\util\vfs</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\vfs\vfs-mem.c">
+      <Filter>Source Files\mGBA\src\util\vfs</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\circle-buffer.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\configuration.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\crc32.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\formatting.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\hash.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\patch.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\patch-fast.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\patch-ips.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\patch-ups.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\ring-fifo.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\string.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\table.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\vfs.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\core\cheats.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\gba\cheats.c">
+      <Filter>Source Files\mGBA\src\gba</Filter>
+    </ClCompile>
+    <ClCompile Include="mGBA\src\util\gbk-table.c">
+      <Filter>Source Files\mGBA\src\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{F1BED4BC-EE67-40DB-8020-6AA81A6EA21C}</ProjectGuid>
+    <RootNamespace>AdLib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)adplug\libbinio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)adplug\libbinio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="adplugdb.h" />
+    <ClInclude Include="adplug\a2m.h" />
+    <ClInclude Include="adplug\adl.h" />
+    <ClInclude Include="adplug\adlibemu.h" />
+    <ClInclude Include="adplug\adplug.h" />
+    <ClInclude Include="adplug\adtrack.h" />
+    <ClInclude Include="adplug\amd.h" />
+    <ClInclude Include="adplug\analopl.h" />
+    <ClInclude Include="adplug\bam.h" />
+    <ClInclude Include="adplug\bmf.h" />
+    <ClInclude Include="adplug\cff.h" />
+    <ClInclude Include="adplug\cmf.h" />
+    <ClInclude Include="adplug\cmfmcsop.h" />
+    <ClInclude Include="adplug\coktel.h" />
+    <ClInclude Include="adplug\composer.h" />
+    <ClInclude Include="adplug\d00.h" />
+    <ClInclude Include="adplug\database.h" />
+    <ClInclude Include="adplug\debug.h" />
+    <ClInclude Include="adplug\dfm.h" />
+    <ClInclude Include="adplug\diskopl.h" />
+    <ClInclude Include="adplug\dmo.h" />
+    <ClInclude Include="adplug\dro.h" />
+    <ClInclude Include="adplug\dro2.h" />
+    <ClInclude Include="adplug\dtm.h" />
+    <ClInclude Include="adplug\emuopl.h" />
+    <ClInclude Include="adplug\flash.h" />
+    <ClInclude Include="adplug\fmc.h" />
+    <ClInclude Include="adplug\fmopl.h" />
+    <ClInclude Include="adplug\fprovide.h" />
+    <ClInclude Include="adplug\got.h" />
+    <ClInclude Include="adplug\herad.h" />
+    <ClInclude Include="adplug\hsc.h" />
+    <ClInclude Include="adplug\hsp.h" />
+    <ClInclude Include="adplug\hybrid.h" />
+    <ClInclude Include="adplug\hyp.h" />
+    <ClInclude Include="adplug\imf.h" />
+    <ClInclude Include="adplug\jbm.h" />
+    <ClInclude Include="adplug\kemuopl.h" />
+    <ClInclude Include="adplug\ksm.h" />
+    <ClInclude Include="adplug\lds.h" />
+    <ClInclude Include="adplug\libbinio\binfile.h" />
+    <ClInclude Include="adplug\libbinio\binio.h" />
+    <ClInclude Include="adplug\libbinio\binstr.h" />
+    <ClInclude Include="adplug\libbinio\binwrap.h" />
+    <ClInclude Include="adplug\load_helper.h" />
+    <ClInclude Include="adplug\mad.h" />
+    <ClInclude Include="adplug\mdi.h" />
+    <ClInclude Include="adplug\mid.h" />
+    <ClInclude Include="adplug\mididata.h" />
+    <ClInclude Include="adplug\mkj.h" />
+    <ClInclude Include="adplug\msc.h" />
+    <ClInclude Include="adplug\mtk.h" />
+    <ClInclude Include="adplug\mus.h" />
+    <ClInclude Include="adplug\nemuopl.h" />
+    <ClInclude Include="adplug\nukedopl.h" />
+    <ClInclude Include="adplug\opl.h" />
+    <ClInclude Include="adplug\player.h" />
+    <ClInclude Include="adplug\players.h" />
+    <ClInclude Include="adplug\protrack.h" />
+    <ClInclude Include="adplug\psi.h" />
+    <ClInclude Include="adplug\rad2.h" />
+    <ClInclude Include="adplug\rat.h" />
+    <ClInclude Include="adplug\raw.h" />
+    <ClInclude Include="adplug\realopl.h" />
+    <ClInclude Include="adplug\rix.h" />
+    <ClInclude Include="adplug\rol.h" />
+    <ClInclude Include="adplug\s3m.h" />
+    <ClInclude Include="adplug\sa2.h" />
+    <ClInclude Include="adplug\silentopl.h" />
+    <ClInclude Include="adplug\sng.h" />
+    <ClInclude Include="adplug\sop.h" />
+    <ClInclude Include="adplug\strnlen.h" />
+    <ClInclude Include="adplug\surroundopl.h" />
+    <ClInclude Include="adplug\temuopl.h" />
+    <ClInclude Include="adplug\u6m.h" />
+    <ClInclude Include="adplug\version.h" />
+    <ClInclude Include="adplug\vgm.h" />
+    <ClInclude Include="adplug\wemuopl.h" />
+    <ClInclude Include="adplug\woodyopl.h" />
+    <ClInclude Include="adplug\xad.h" />
+    <ClInclude Include="adplug\xsm.h" />
+    <ClInclude Include="ReplayAdLib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="adplug\a2m.cpp" />
+    <ClCompile Include="adplug\adl.cpp" />
+    <ClCompile Include="adplug\adlibemu.c" />
+    <ClCompile Include="adplug\adplug.cpp" />
+    <ClCompile Include="adplug\adtrack.cpp" />
+    <ClCompile Include="adplug\amd.cpp" />
+    <ClCompile Include="adplug\analopl.cpp" />
+    <ClCompile Include="adplug\bam.cpp" />
+    <ClCompile Include="adplug\bmf.cpp" />
+    <ClCompile Include="adplug\cff.cpp" />
+    <ClCompile Include="adplug\cmf.cpp" />
+    <ClCompile Include="adplug\cmfmcsop.cpp" />
+    <ClCompile Include="adplug\coktel.cpp" />
+    <ClCompile Include="adplug\composer.cpp" />
+    <ClCompile Include="adplug\d00.cpp" />
+    <ClCompile Include="adplug\database.cpp" />
+    <ClCompile Include="adplug\debug.c" />
+    <ClCompile Include="adplug\dfm.cpp" />
+    <ClCompile Include="adplug\diskopl.cpp" />
+    <ClCompile Include="adplug\dmo.cpp" />
+    <ClCompile Include="adplug\dro.cpp" />
+    <ClCompile Include="adplug\dro2.cpp" />
+    <ClCompile Include="adplug\dtm.cpp" />
+    <ClCompile Include="adplug\emuopl.cpp" />
+    <ClCompile Include="adplug\flash.cpp" />
+    <ClCompile Include="adplug\fmc.cpp" />
+    <ClCompile Include="adplug\fmopl.c" />
+    <ClCompile Include="adplug\fprovide.cpp" />
+    <ClCompile Include="adplug\got.cpp" />
+    <ClCompile Include="adplug\herad.cpp" />
+    <ClCompile Include="adplug\hsc.cpp" />
+    <ClCompile Include="adplug\hsp.cpp" />
+    <ClCompile Include="adplug\hybrid.cpp" />
+    <ClCompile Include="adplug\hyp.cpp" />
+    <ClCompile Include="adplug\imf.cpp" />
+    <ClCompile Include="adplug\jbm.cpp" />
+    <ClCompile Include="adplug\ksm.cpp" />
+    <ClCompile Include="adplug\lds.cpp" />
+    <ClCompile Include="adplug\libbinio\binfile.cpp" />
+    <ClCompile Include="adplug\libbinio\binio.cpp" />
+    <ClCompile Include="adplug\libbinio\binstr.cpp" />
+    <ClCompile Include="adplug\libbinio\binwrap.cpp" />
+    <ClCompile Include="adplug\mad.cpp" />
+    <ClCompile Include="adplug\mdi.cpp" />
+    <ClCompile Include="adplug\mid.cpp" />
+    <ClCompile Include="adplug\mkj.cpp" />
+    <ClCompile Include="adplug\msc.cpp" />
+    <ClCompile Include="adplug\mtk.cpp" />
+    <ClCompile Include="adplug\mus.cpp" />
+    <ClCompile Include="adplug\nemuopl.cpp" />
+    <ClCompile Include="adplug\nukedopl.c" />
+    <ClCompile Include="adplug\player.cpp" />
+    <ClCompile Include="adplug\players.cpp" />
+    <ClCompile Include="adplug\protrack.cpp" />
+    <ClCompile Include="adplug\psi.cpp" />
+    <ClCompile Include="adplug\rad2.cpp" />
+    <ClCompile Include="adplug\rat.cpp" />
+    <ClCompile Include="adplug\raw.cpp" />
+    <ClCompile Include="adplug\realopl.cpp" />
+    <ClCompile Include="adplug\rix.cpp" />
+    <ClCompile Include="adplug\rol.cpp" />
+    <ClCompile Include="adplug\s3m.cpp" />
+    <ClCompile Include="adplug\sa2.cpp" />
+    <ClCompile Include="adplug\sng.cpp" />
+    <ClCompile Include="adplug\sop.cpp" />
+    <ClCompile Include="adplug\surroundopl.cpp" />
+    <ClCompile Include="adplug\temuopl.cpp" />
+    <ClCompile Include="adplug\u6m.cpp" />
+    <ClCompile Include="adplug\vgm.cpp" />
+    <ClCompile Include="adplug\woodyopl.cpp" />
+    <ClCompile Include="adplug\xad.cpp" />
+    <ClCompile Include="adplug\xsm.cpp" />
+    <ClCompile Include="ReplayAdLib.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

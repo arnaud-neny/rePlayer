@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\V2">
+      <UniqueIdentifier>{48386355-57d1-493c-bfb8-61cf8b996468}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayV2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\int128_t.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\phonemtab.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\scriptasm.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\sounddef.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\synth.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\synthasm.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\types.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\v2mconv.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\v2mplayer.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+    <ClInclude Include="V2\scriptasm.inl.h">
+      <Filter>Source Files\V2</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayV2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\ronan.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\scriptasm.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\sounddef.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\synth_core.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\synthasm.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\v2mconv.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+    <ClCompile Include="V2\v2mplayer.cpp">
+      <Filter>Source Files\V2</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

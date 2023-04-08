@@ -1,0 +1,488 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\sc68">
+      <UniqueIdentifier>{93baba8e-28bf-4e91-b081-2f0b5ebbbfc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\file68">
+      <UniqueIdentifier>{946524ef-720d-4411-9967-a57be7e282e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\file68\sc68">
+      <UniqueIdentifier>{4545f37d-3de4-4003-8590-e0a7eb50dd22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\file68\src">
+      <UniqueIdentifier>{c8da3916-7f78-4550-9243-478b54b1c1dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\unice68">
+      <UniqueIdentifier>{4d9e1a09-d3b6-4872-ae6c-872c191f15fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68">
+      <UniqueIdentifier>{c3685294-5231-4bb7-bfdd-2a5581e70166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68\dial68">
+      <UniqueIdentifier>{d3a3c2c3-cd54-4b61-8070-e653b7c51bdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68\emu68">
+      <UniqueIdentifier>{a45c29c6-9484-4060-a44e-44fe2a6e56a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68\io68">
+      <UniqueIdentifier>{0d6367b0-9b45-4eb4-af7a-e80f34a0f7cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68\sc68">
+      <UniqueIdentifier>{74540725-dbc3-4fea-87ad-b60d641bac61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\libsc68\src">
+      <UniqueIdentifier>{ac3b9ce6-b506-4ee1-8470-19bc1938182e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sc68\sc68-libc">
+      <UniqueIdentifier>{af76ec1d-6305-44b7-9c82-a127991f27ab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplaySC68.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_api.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_chk.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_err.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_ice.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_msg.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_opt.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_ord.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_reg.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_rsc.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_str.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_tag.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_tdb.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_uri.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_ao.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_curl.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_def.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_fd.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_file.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_mem.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_null.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_vfs_z.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_zip.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\src\file68_private.h">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\src\replay.inc.h">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\src\timedb.inc.h">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\config_msvc.h">
+      <Filter>Source Files\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\unice68\unice68.h">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\unice68\unice68_private.h">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\dial68\dial68.h">
+      <Filter>Source Files\sc68\libsc68\dial68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\assert68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\cc68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\emu68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\emu68_api.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\emu68_private.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\error68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\excep68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_arithmetic.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_bcd.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_bitmanip.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_datamove.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_exception.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_logic.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_progctrl.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_shifting.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inl68_systctrl.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\inst68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\ioplug68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\lines68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\macro68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\mem68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\srdef68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\struct68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\emu68\type68.h">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\default.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\io68.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\io68_api.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\io68_private.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\mfp_io.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\mfpemul.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\mw_io.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\mwemul.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\paula_io.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\paulaemul.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\shifter_io.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ym_blep.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ym_dump.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ym_fixed_vol.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ym_io.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ym_puls.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ymemul.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ymout2k9.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\io68\ymoutorg.h">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\sc68\conf68.h">
+      <Filter>Source Files\sc68\libsc68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\sc68\mixer68.h">
+      <Filter>Source Files\sc68\libsc68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\sc68\sc68.h">
+      <Filter>Source Files\sc68\libsc68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\sc68\sc68_private.h">
+      <Filter>Source Files\sc68\libsc68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\src\config.h">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\unice68\config.h">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\sc68-libc\libc68.h">
+      <Filter>Source Files\sc68\sc68-libc</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\sc68\trap68.h">
+      <Filter>Source Files\sc68\libsc68\sc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\libsc68\config.h">
+      <Filter>Source Files\sc68\libsc68</Filter>
+    </ClInclude>
+    <ClInclude Include="sc68\file68\sc68\file68_features.h">
+      <Filter>Source Files\sc68\file68\sc68</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="sc68\file68\src\endian68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\error68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\file68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\gzip68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\ice68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\init68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\msg68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\option68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\registry68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\replay68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\rsc68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\string68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\timedb68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\uri68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_ao.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_curl.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_fd.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_file.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_mem.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_null.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\file68\src\vfs68_z.c">
+      <Filter>Source Files\sc68\file68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\unice68\unice68.c">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\unice68\unice68_pack.c">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\unice68\unice68_unpack.c">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\unice68\unice68_version.c">
+      <Filter>Source Files\sc68\unice68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\dial68\dial_conf.c">
+      <Filter>Source Files\sc68\libsc68\dial68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\dial68\dial_finf.c">
+      <Filter>Source Files\sc68\libsc68\dial68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\dial68\dial_tsel.c">
+      <Filter>Source Files\sc68\libsc68\dial68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\dial68\dial68.c">
+      <Filter>Source Files\sc68\libsc68\dial68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\emu68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\error68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\getea68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\inst68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\ioplug68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\mem68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\table68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\io68.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\mfp_io.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\mfpemul.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\mw_io.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\mwemul.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\paula_io.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\paulaemul.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\shifter_io.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ym_blep.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ym_dump.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ym_envel.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ym_io.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ym_puls.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\io68\ymemul.c">
+      <Filter>Source Files\sc68\libsc68\io68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\src\api68.c">
+      <Filter>Source Files\sc68\libsc68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\src\conf68.c">
+      <Filter>Source Files\sc68\libsc68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\src\libsc68.c">
+      <Filter>Source Files\sc68\libsc68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\src\mixer68.c">
+      <Filter>Source Files\sc68\libsc68\src</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\cc68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\libsc68\emu68\lines68.c">
+      <Filter>Source Files\sc68\libsc68\emu68</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\sc68-libc\basename.c">
+      <Filter>Source Files\sc68\sc68-libc</Filter>
+    </ClCompile>
+    <ClCompile Include="sc68\sc68-libc\strtoul.c">
+      <Filter>Source Files\sc68\sc68-libc</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplaySC68.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

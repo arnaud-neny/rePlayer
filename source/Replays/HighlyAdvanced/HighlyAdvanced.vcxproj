@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{ABA800D1-0191-46BB-9C4A-B9306A5CF63B}</ProjectGuid>
+    <RootNamespace>HighlyAdvanced</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__BUILD_MGBA__;DISABLE_THREADING;MINIMAL_CORE=3;M_CORE_GBA;MGBA_STANDALONE;HAVE_STRDUP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\zlib;$(ProjectDir)mGBA\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__BUILD_MGBA__;DISABLE_THREADING;MINIMAL_CORE=3;M_CORE_GBA;MGBA_STANDALONE;HAVE_STRDUP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\zlib;$(ProjectDir)mGBA\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="mGBA\include\mgba-util\circle-buffer.h" />
+    <ClInclude Include="mGBA\include\mgba-util\common.h" />
+    <ClInclude Include="mGBA\include\mgba-util\configuration.h" />
+    <ClInclude Include="mGBA\include\mgba-util\crc32.h" />
+    <ClInclude Include="mGBA\include\mgba-util\dllexports.h" />
+    <ClInclude Include="mGBA\include\mgba-util\formatting.h" />
+    <ClInclude Include="mGBA\include\mgba-util\hash.h" />
+    <ClInclude Include="mGBA\include\mgba-util\math.h" />
+    <ClInclude Include="mGBA\include\mgba-util\memory.h" />
+    <ClInclude Include="mGBA\include\mgba-util\patch.h" />
+    <ClInclude Include="mGBA\include\mgba-util\patch\fast.h" />
+    <ClInclude Include="mGBA\include\mgba-util\patch\ips.h" />
+    <ClInclude Include="mGBA\include\mgba-util\patch\ups.h" />
+    <ClInclude Include="mGBA\include\mgba-util\ring-fifo.h" />
+    <ClInclude Include="mGBA\include\mgba-util\string.h" />
+    <ClInclude Include="mGBA\include\mgba-util\table.h" />
+    <ClInclude Include="mGBA\include\mgba-util\threading.h" />
+    <ClInclude Include="mGBA\include\mgba-util\vector.h" />
+    <ClInclude Include="mGBA\include\mgba-util\vfs.h" />
+    <ClInclude Include="mGBA\include\mgba\core\bitmap-cache.h" />
+    <ClInclude Include="mGBA\include\mgba\core\blip_buf.h" />
+    <ClInclude Include="mGBA\include\mgba\core\cache-set.h" />
+    <ClInclude Include="mGBA\include\mgba\core\cheats.h" />
+    <ClInclude Include="mGBA\include\mgba\core\config.h" />
+    <ClInclude Include="mGBA\include\mgba\core\core.h" />
+    <ClInclude Include="mGBA\include\mgba\core\cpu.h" />
+    <ClInclude Include="mGBA\include\mgba\core\directories.h" />
+    <ClInclude Include="mGBA\include\mgba\core\input.h" />
+    <ClInclude Include="mGBA\include\mgba\core\interface.h" />
+    <ClInclude Include="mGBA\include\mgba\core\lockstep.h" />
+    <ClInclude Include="mGBA\include\mgba\core\log.h" />
+    <ClInclude Include="mGBA\include\mgba\core\map-cache.h" />
+    <ClInclude Include="mGBA\include\mgba\core\rewind.h" />
+    <ClInclude Include="mGBA\include\mgba\core\serialize.h" />
+    <ClInclude Include="mGBA\include\mgba\core\sync.h" />
+    <ClInclude Include="mGBA\include\mgba\core\thread.h" />
+    <ClInclude Include="mGBA\include\mgba\core\tile-cache.h" />
+    <ClInclude Include="mGBA\include\mgba\core\timing.h" />
+    <ClInclude Include="mGBA\include\mgba\core\version.h" />
+    <ClInclude Include="mGBA\include\mgba\debugger\debugger.h" />
+    <ClInclude Include="mGBA\include\mgba\feature\video-logger.h" />
+    <ClInclude Include="mGBA\include\mgba\gba\core.h" />
+    <ClInclude Include="mGBA\include\mgba\gba\interface.h" />
+    <ClInclude Include="mGBA\include\mgba\gb\interface.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\arm.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\debugger\debugger.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\decoder-inlines.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\decoder.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-arm.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-inlines.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\emitter-thumb.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-arm.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-inlines.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\isa-thumb.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\arm\macros.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\cli-debugger.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\stack-trace.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\debugger\symbols.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\audio.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\bios.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\ereader.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\gpio.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\matrix.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cart\vfame.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\cheats.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\dma.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\extra\audio-mixer.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\extra\cli.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\gba.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\input.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\io.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\memory.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\overrides.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\cache-set.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\common.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\proxy.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\renderers\video-software.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\savedata.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\serialize.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sharkport.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio\gbp.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\sio\lockstep.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\timer.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gba\video.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\audio.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\gb.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\io.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\memory.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\serialize.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\sio.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\timer.h" />
+    <ClInclude Include="mGBA\include\mgba\internal\gb\video.h" />
+    <ClInclude Include="mGBA\src\gba\cheats\gameshark.h" />
+    <ClInclude Include="mGBA\src\gba\cheats\parv3.h" />
+    <ClInclude Include="mGBA\src\third-party\inih\ini.h" />
+    <ClInclude Include="psflib\psf2fs.h" />
+    <ClInclude Include="psflib\psflib.h" />
+    <ClInclude Include="ReplayHighlyAdvanced.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mGBA\src\arm\arm.c" />
+    <ClCompile Include="mGBA\src\arm\decoder-arm.c" />
+    <ClCompile Include="mGBA\src\arm\decoder-thumb.c" />
+    <ClCompile Include="mGBA\src\arm\decoder.c" />
+    <ClCompile Include="mGBA\src\arm\isa-arm.c" />
+    <ClCompile Include="mGBA\src\arm\isa-thumb.c" />
+    <ClCompile Include="mGBA\src\core\cheats.c" />
+    <ClCompile Include="mGBA\src\core\config.c" />
+    <ClCompile Include="mGBA\src\core\core.c" />
+    <ClCompile Include="mGBA\src\core\directories.c" />
+    <ClCompile Include="mGBA\src\core\input.c" />
+    <ClCompile Include="mGBA\src\core\interface.c" />
+    <ClCompile Include="mGBA\src\core\lockstep.c" />
+    <ClCompile Include="mGBA\src\core\log.c" />
+    <ClCompile Include="mGBA\src\core\rewind.c" />
+    <ClCompile Include="mGBA\src\core\serialize.c" />
+    <ClCompile Include="mGBA\src\core\sync.c" />
+    <ClCompile Include="mGBA\src\core\thread.c" />
+    <ClCompile Include="mGBA\src\core\tile-cache.c" />
+    <ClCompile Include="mGBA\src\core\timing.c" />
+    <ClCompile Include="mGBA\src\gba\audio.c" />
+    <ClCompile Include="mGBA\src\gba\bios.c" />
+    <ClCompile Include="mGBA\src\gba\cart\gpio.c" />
+    <ClCompile Include="mGBA\src\gba\cart\matrix.c" />
+    <ClCompile Include="mGBA\src\gba\cart\vfame.c" />
+    <ClCompile Include="mGBA\src\gba\cheats.c" />
+    <ClCompile Include="mGBA\src\gba\cheats\codebreaker.c" />
+    <ClCompile Include="mGBA\src\gba\cheats\gameshark.c" />
+    <ClCompile Include="mGBA\src\gba\cheats\parv3.c" />
+    <ClCompile Include="mGBA\src\gba\core.c" />
+    <ClCompile Include="mGBA\src\gba\dma.c" />
+    <ClCompile Include="mGBA\src\gba\extra\audio-mixer.c" />
+    <ClCompile Include="mGBA\src\gba\gba.c" />
+    <ClCompile Include="mGBA\src\gba\hle-bios.c" />
+    <ClCompile Include="mGBA\src\gba\input.c" />
+    <ClCompile Include="mGBA\src\gba\io.c" />
+    <ClCompile Include="mGBA\src\gba\memory.c" />
+    <ClCompile Include="mGBA\src\gba\overrides.c" />
+    <ClCompile Include="mGBA\src\gba\savedata.c" />
+    <ClCompile Include="mGBA\src\gba\serialize.c" />
+    <ClCompile Include="mGBA\src\gba\sharkport.c" />
+    <ClCompile Include="mGBA\src\gba\sio.c" />
+    <ClCompile Include="mGBA\src\gba\sio\gbp.c" />
+    <ClCompile Include="mGBA\src\gba\sio\lockstep.c" />
+    <ClCompile Include="mGBA\src\gba\timer.c" />
+    <ClCompile Include="mGBA\src\gba\video.c" />
+    <ClCompile Include="mGBA\src\gb\audio.c" />
+    <ClCompile Include="mGBA\src\platform\windows\memory.c" />
+    <ClCompile Include="mGBA\src\third-party\blip_buf\blip_buf.c" />
+    <ClCompile Include="mGBA\src\third-party\inih\ini.c" />
+    <ClCompile Include="mGBA\src\util\circle-buffer.c" />
+    <ClCompile Include="mGBA\src\util\configuration.c" />
+    <ClCompile Include="mGBA\src\util\crc32.c" />
+    <ClCompile Include="mGBA\src\util\formatting.c" />
+    <ClCompile Include="mGBA\src\util\gbk-table.c" />
+    <ClCompile Include="mGBA\src\util\hash.c" />
+    <ClCompile Include="mGBA\src\util\patch-fast.c" />
+    <ClCompile Include="mGBA\src\util\patch-ips.c" />
+    <ClCompile Include="mGBA\src\util\patch-ups.c" />
+    <ClCompile Include="mGBA\src\util\patch.c" />
+    <ClCompile Include="mGBA\src\util\ring-fifo.c" />
+    <ClCompile Include="mGBA\src\util\string.c" />
+    <ClCompile Include="mGBA\src\util\table.c" />
+    <ClCompile Include="mGBA\src\util\vfs.c" />
+    <ClCompile Include="mGBA\src\util\vfs\vfs-fd.c" />
+    <ClCompile Include="mGBA\src\util\vfs\vfs-mem.c" />
+    <ClCompile Include="psflib\psf2fs.c" />
+    <ClCompile Include="psflib\psflib.c" />
+    <ClCompile Include="ReplayHighlyAdvanced.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
