@@ -3,7 +3,7 @@
 #include <replay/include/replay.h>
 #include <files/include/files.h>
 
-#include "dllloader/dllloader.h"
+#include <dllloader.h>
 
 #include <Core/String.h>
 #include <IO/File.h>
@@ -105,7 +105,7 @@ namespace rePlayer
         {
             // ProTrekker is a hard mess... to make it "thread safe" without rewriting everything, we duplicate the dll per song so all the data are in the module memory space.
             // Thanx to dll manager for that.
-            // We still have to share some data from the main dll (replayProTrekkr.dll) with the others such as the SharedContext...
+            // We still have to share some data from the main dll (ProTrekkr.dll) with the others such as the SharedContext...
 
             // Load the main dll in memory
             char* pgrPath;

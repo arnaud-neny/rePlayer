@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\webixs">
+      <UniqueIdentifier>{80ece45b-31b2-4f29-93f5-768242fa3a25}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayIXalance.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\PlayerIXS.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\Module.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\FileSFXI.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\FileMapSFXI.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\FileMap.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\basetypes.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\MixerBase.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\File0.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\mem.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\Packer.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\PlayerCore.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\WaveGen.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\winaudio.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\Mixer2.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\asmEmu.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+    <ClInclude Include="webixs\Mixer3.h">
+      <Filter>Source Files\webixs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayIXalance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\PlayerIXS.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\Module.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\FileSFXI.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\FileMapSFXI.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\FileMap.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\MixerBase.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\File0.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\Packer.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\PlayerCore.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\WaveGen.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\winaudio.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\Mixer2.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\asmEmu.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\Mixer3.cpp">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+    <ClCompile Include="webixs\WaveLibrary.c">
+      <Filter>Source Files\webixs</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

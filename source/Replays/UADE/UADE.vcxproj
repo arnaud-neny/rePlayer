@@ -22,14 +22,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include;$(ProjectDir)dllloader\minhook\include;$(SolutionDir)3rdParty\libarchive</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include;$(SolutionDir)3rdParty\dllloader;$(SolutionDir)3rdParty\libarchive</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -68,7 +68,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -82,7 +82,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include;$(ProjectDir)dllloader\minhook\include;$(SolutionDir)3rdParty\libarchive</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include;$(SolutionDir)3rdParty\dllloader;$(SolutionDir)3rdParty\libarchive</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -93,7 +93,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -106,16 +106,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="bencode\include\bencodetools\bencode.h" />
     <ClInclude Include="compat\memmemrep.h" />
     <ClInclude Include="compat\strlrep.h" />
-    <ClInclude Include="dllloader\dllloader.h" />
-    <ClInclude Include="dllloader\minhook\include\MinHook.h" />
-    <ClInclude Include="dllloader\minhook\src\buffer.h" />
-    <ClInclude Include="dllloader\minhook\src\hde\hde32.h" />
-    <ClInclude Include="dllloader\minhook\src\hde\hde64.h" />
-    <ClInclude Include="dllloader\minhook\src\hde\pstdint.h" />
-    <ClInclude Include="dllloader\minhook\src\hde\table32.h" />
-    <ClInclude Include="dllloader\minhook\src\hde\table64.h" />
-    <ClInclude Include="dllloader\minhook\src\trampoline.h" />
-    <ClInclude Include="dllloader\ntddk.h" />
     <ClInclude Include="ReplayUADE.h" />
     <ClInclude Include="ReplayUADE.inl.h" />
     <ClInclude Include="uade\src\cputbl.h" />
@@ -192,12 +182,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="dllloader\dllloader.cpp" />
-    <ClCompile Include="dllloader\minhook\src\buffer.c" />
-    <ClCompile Include="dllloader\minhook\src\hde\hde32.c" />
-    <ClCompile Include="dllloader\minhook\src\hde\hde64.c" />
-    <ClCompile Include="dllloader\minhook\src\hook.c" />
-    <ClCompile Include="dllloader\minhook\src\trampoline.c" />
     <ClCompile Include="ReplayUADE.cpp" />
     <ClCompile Include="ReplayUADEWrapper.cpp" />
     <ClCompile Include="uade\src\audio.c" />

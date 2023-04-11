@@ -48,21 +48,6 @@
     <Filter Include="Source Files\protrekkr\editors\include">
       <UniqueIdentifier>{9eec13eb-c80e-4391-91f3-33b625a8276b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\dllloader">
-      <UniqueIdentifier>{2164e032-b6d2-4b42-ae8c-53f222aa4923}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook">
-      <UniqueIdentifier>{e432739a-fbce-4261-9aac-c239e9a1beef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\include">
-      <UniqueIdentifier>{332c1407-5466-4ff9-92e3-4176c007091d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\src">
-      <UniqueIdentifier>{6eb5ac3f-378b-4d69-8567-13e41a84a8b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\src\hde">
-      <UniqueIdentifier>{d94b4eac-656f-4b9b-8295-7b2da17f6048}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayProTrekkr.h">
@@ -167,36 +152,6 @@
     <ClInclude Include="protrekkr\include\variables.h">
       <Filter>Source Files\protrekkr\include</Filter>
     </ClInclude>
-    <ClInclude Include="dllloader\dllloader.h">
-      <Filter>Source Files\dllloader</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\ntddk.h">
-      <Filter>Source Files\dllloader</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\include\MinHook.h">
-      <Filter>Source Files\dllloader\minhook\include</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\buffer.h">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\trampoline.h">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\hde32.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\hde64.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\pstdint.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\table32.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\table64.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayProTrekkr.cpp">
@@ -234,24 +189,6 @@
     </ClCompile>
     <ClCompile Include="protrekkr\files\synths.cpp">
       <Filter>Source Files\protrekkr\files</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\dllloader.cpp">
-      <Filter>Source Files\dllloader</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\buffer.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hook.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\trampoline.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hde\hde32.c">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hde\hde64.c">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

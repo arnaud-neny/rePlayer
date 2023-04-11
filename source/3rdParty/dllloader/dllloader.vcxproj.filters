@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\minhook">
+      <UniqueIdentifier>{78cdf91e-6a8d-46db-b43c-e6d76897f331}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\minhook\include">
+      <UniqueIdentifier>{bd878bdb-7e67-4dee-9fc3-43509ea58b55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\minhook\src">
+      <UniqueIdentifier>{2a1bcef7-0c30-4006-9506-8b38d8627cea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\minhook\src\hde">
+      <UniqueIdentifier>{0c53b068-d73e-4dfb-adee-12acd51e0b6a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\buffer.c">
+      <Filter>Source Files\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\hook.c">
+      <Filter>Source Files\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\trampoline.c">
+      <Filter>Source Files\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\hde\hde32.c">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\hde\hde64.c">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dllloader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ntddk.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\include\MinHook.h">
+      <Filter>Source Files\minhook\include</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\buffer.h">
+      <Filter>Source Files\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\trampoline.h">
+      <Filter>Source Files\minhook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\hde\hde32.h">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\hde\hde64.h">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\hde\pstdint.h">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\hde\table32.h">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="minhook\src\hde\table64.h">
+      <Filter>Source Files\minhook\src\hde</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

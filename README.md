@@ -176,3 +176,4 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - TFMX: library to play Chris Huelsbeck files (customized).
 - [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
+- [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).

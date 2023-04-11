@@ -302,3 +302,4 @@ EXTENSION(ptk)      // ProTrekkr
 EXTENSION(mdy)      // Adlib: AdLib MIDI/IMS Format
 EXTENSION(mcr)      // UADE: Mark_Cooksey_Old
 EXTENSION(mgb)      // Gameboy Tracker: no known replay :(
+EXTENSION(ixs)      // iXalance

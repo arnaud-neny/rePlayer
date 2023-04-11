@@ -17,7 +17,7 @@ extern "C"
 #include <uade/uadestate.h>
 #include <include/uadectl.h>
 }
-#include "dllloader/dllloader.h"
+#include <dllloader.h>
 
 #include <Audio/AudioTypes.inl.h>
 #include <Core/Log.h>

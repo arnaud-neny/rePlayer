@@ -42,21 +42,6 @@
     <Filter Include="Source Files\compat">
       <UniqueIdentifier>{e9dce91e-8e03-426f-b5f8-f09db952269e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\dllloader">
-      <UniqueIdentifier>{03dfffb6-a191-4c39-9212-6c51bd1d0a03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook">
-      <UniqueIdentifier>{6734e66a-7ae8-408c-8faa-dd69d13b88c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\include">
-      <UniqueIdentifier>{9dbe9899-baf9-4f6f-819b-85eeb6424ad5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\src">
-      <UniqueIdentifier>{7aa19e6c-a9de-4f81-8e8d-8f31eefd1ecf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\dllloader\minhook\src\hde">
-      <UniqueIdentifier>{5894f482-d624-46db-9dc0-e4f8ad1dd9c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3rdParty">
       <UniqueIdentifier>{965cd881-a7b7-4e59-9913-bc40a62a4dcd}</UniqueIdentifier>
     </Filter>
@@ -227,36 +212,6 @@
     <ClInclude Include="compat\strlrep.h">
       <Filter>Source Files\compat</Filter>
     </ClInclude>
-    <ClInclude Include="dllloader\dllloader.h">
-      <Filter>Source Files\dllloader</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\ntddk.h">
-      <Filter>Source Files\dllloader</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\include\MinHook.h">
-      <Filter>Source Files\dllloader\minhook\include</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\buffer.h">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\trampoline.h">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\hde32.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\hde64.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\pstdint.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\table32.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
-    <ClInclude Include="dllloader\minhook\src\hde\table64.h">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClInclude>
     <ClInclude Include="uade\src\frontends\include\uade\ossupport.h">
       <Filter>Source Files\uade\frontends\include\uade</Filter>
     </ClInclude>
@@ -423,24 +378,6 @@
     </ClCompile>
     <ClCompile Include="compat\unlikelytest.c">
       <Filter>Source Files\compat</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\dllloader.cpp">
-      <Filter>Source Files\dllloader</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\buffer.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hook.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\trampoline.c">
-      <Filter>Source Files\dllloader\minhook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hde\hde32.c">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
-    </ClCompile>
-    <ClCompile Include="dllloader\minhook\src\hde\hde64.c">
-      <Filter>Source Files\dllloader\minhook\src\hde</Filter>
     </ClCompile>
     <ClCompile Include="ReplayUADEWrapper.cpp">
       <Filter>Source Files</Filter>
