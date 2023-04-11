@@ -86,7 +86,7 @@ namespace rePlayer
                     if (curl_easy_perform(curl) == CURLE_OK)
                     {
                         // rename
-                        std::filesystem::rename(std::filesystem::path(mainPath).replace_filename("rePlayer.exe"), std::filesystem::path(mainPath).replace_filename("rePlayer.old"));
+                        std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer.exe", std::filesystem::path(mainPath) / "rePlayer.old");
                         std::filesystem::rename(std::filesystem::path(mainPath) / "replays/", std::filesystem::path(mainPath) / "replays.old/");
                         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
                         {
