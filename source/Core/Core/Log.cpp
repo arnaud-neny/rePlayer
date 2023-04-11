@@ -140,17 +140,20 @@ namespace core
         // with ImGui, the configuration load happens once at the beginning, so clear the older logs
         auto now = std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now()));
         auto mainPath = std::filesystem::current_path();
-        for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath / "logs/"))
+        if (std::filesystem::exists(mainPath / "logs/"))
         {
-            if (dirEntry.is_regular_file())
+            for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath / "logs/"))
             {
-                int32_t year, month, day;
-                if (sscanf_s(reinterpret_cast<const char*>(dirEntry.path().filename().u8string().c_str()), "%04d%02d%02d", &year, &month, &day) == 3)
+                if (dirEntry.is_regular_file())
                 {
-                    auto fileTime = std::chrono::year{ year } / month / day;
-                    auto days = now - std::chrono::sys_days{ fileTime };
-                    if (days.count() > int32_t(m_filesLifetime))
-                        std::filesystem::remove(dirEntry);
+                    int32_t year, month, day;
+                    if (sscanf_s(reinterpret_cast<const char*>(dirEntry.path().filename().u8string().c_str()), "%04d%02d%02d", &year, &month, &day) == 3)
+                    {
+                        auto fileTime = std::chrono::year{ year } / month / day;
+                        auto days = now - std::chrono::sys_days{ fileTime };
+                        if (days.count() > int32_t(m_filesLifetime))
+                            std::filesystem::remove(dirEntry);
+                    }
                 }
             }
         }
