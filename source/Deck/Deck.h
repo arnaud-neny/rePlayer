@@ -65,11 +65,6 @@ namespace rePlayer
             IsEnabled = true
         };
 
-        static constexpr uint32_t kMajorVersion = 0;
-        static constexpr uint32_t kMinorVersion = 0;
-        static constexpr uint32_t kPatchVersion = 0;
-        static constexpr uint32_t kVersion = (kMajorVersion << 28) | (kMinorVersion << 14) | kPatchVersion;
-
     private:
         void OnBeginUpdate() override;
         std::string OnGetWindowTitle() override;

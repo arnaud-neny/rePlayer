@@ -798,7 +798,7 @@ namespace rePlayer
         {
             ImGui::Begin("SystrayBalloon", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
 
-            ImGui::Text("rePlayer v%d.%d.%d", kMajorVersion, kMinorVersion, kPatchVersion);
+            ImGui::Text("rePlayer %d.%d.%d", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
             ImGui::Separator();
             if (auto* player = m_currentPlayer.Get())
             {
