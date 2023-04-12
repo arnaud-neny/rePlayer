@@ -94,7 +94,9 @@ namespace rePlayer
     }
 
     Database::Database()
-    {}
+    {
+        Reset();
+    }
 
     Database::~Database()
     {}
