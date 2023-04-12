@@ -18,7 +18,7 @@ namespace rePlayer
 {
     static constexpr uint32_t kMajorVersion = 0;
     static constexpr uint32_t kMinorVersion = 1;
-    static constexpr uint32_t kPatchVersion = 1;
+    static constexpr uint32_t kPatchVersion = 2;
     static constexpr uint32_t kVersion = (kMajorVersion << 28) | (kMinorVersion << 14) | kPatchVersion;
 
     uint32_t Core::GetVersion()

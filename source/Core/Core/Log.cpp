@@ -171,6 +171,9 @@ namespace core
 
     void Log::Printf(LogType type, uint32_t color, const char* const format, ...)
     {
+        if (m_mode == Mode::kDisabled)
+            return;
+
         // get text buffer
         char* buf;
         uint32_t charMaxSize = m_charPages.Size();
@@ -360,8 +363,11 @@ namespace core
                 if (*dst++ == '\n')
                 {
                     CloseLine();
+                    if (m_mode != Mode::kFileOnly)
+                        m_currentChar.size++;
                 }
-                m_currentChar.size++;
+                else
+                    m_currentChar.size++;
                 size--;
                 len--;
             }
