@@ -305,13 +305,9 @@ namespace rePlayer
         if (!globalSettings->isEnabled)
             globalSettings = ms_settings;
 
-        if (settings && (settings->overrideStereoSeparation))
-            openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_STEREOSEPARATION_PERCENT, 100 - settings->stereoSeparation);
-        else
-            openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_STEREOSEPARATION_PERCENT, 100);
-
-        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && (settings->overrideInterpolation)) ? settings->interpolation : globalSettings->interpolation)) >> 1);
-        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && (settings->overrideRamping)) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
+        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_STEREOSEPARATION_PERCENT, (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globalSettings->stereoSeparation);
+        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && settings->overrideInterpolation) ? settings->interpolation : globalSettings->interpolation)) >> 1);
+        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && settings->overrideRamping) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
 
         openmpt_module_ctl_set_integer(m_module, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
 
