@@ -22,7 +22,7 @@ namespace core
         };
 
     public:
-        static bool IsEnabled() { return ms_instance != nullptr; }
+        static bool IsEnabled() { return ms_instance != nullptr && ms_instance->Window::IsEnabled(); }
         static Log& Get() { return *ms_instance; }
 
         template <typename... Args>

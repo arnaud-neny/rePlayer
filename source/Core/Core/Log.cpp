@@ -217,7 +217,8 @@ namespace core
         va_end(va);
 
         // temporary close the current line
-        m_stringPages[m_currentString].numChars = m_currentChar.size - PageHandle(m_stringPages[m_currentString].charIndex, m_stringPages[m_currentString].charOffset).size;
+        if (m_mode != Mode::kDisabled && m_mode != Mode::kFileOnly)
+            m_stringPages[m_currentString].numChars = m_currentChar.size - PageHandle(m_stringPages[m_currentString].charIndex, m_stringPages[m_currentString].charOffset).size;
     }
 
     Log::TimeStr Log::PrintTime(uint32_t relativeTime)
