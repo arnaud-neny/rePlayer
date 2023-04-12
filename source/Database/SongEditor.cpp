@@ -370,7 +370,7 @@ namespace rePlayer
                 break;
             }
         }
-        auto selectedNewArtist = m_musicId.GetArtist(selectedNewArtistId);
+        auto selectedNewArtist = selectedNewArtistId != ArtistID::Invalid ? m_musicId.GetArtist(selectedNewArtistId) : nullptr;
         if (selectedNewArtist == nullptr)
             selectedNewArtistId = {};
         if (ImGui::BeginCombo("##newartist", selectedNewArtistId == ArtistID::Invalid ? "" : selectedNewArtist->GetHandle()))
