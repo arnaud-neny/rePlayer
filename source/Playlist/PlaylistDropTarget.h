@@ -46,6 +46,7 @@ namespace rePlayer
         int32_t m_refCount = 0;
         bool m_isDropped = false;
         bool m_isAcceptingAll = false;
+        bool m_canDrop = false;
         Array<std::string> m_files;
     };
 }

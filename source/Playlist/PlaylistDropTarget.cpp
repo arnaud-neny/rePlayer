@@ -35,6 +35,12 @@ namespace rePlayer
 
                 ImGui::EndDragDropSource();
             }
+
+            auto mousePos = ImGui::GetMousePos();
+            auto topLeft = ImGui::GetWindowPos();
+            auto right = topLeft.x + ImGui::GetWindowSize().x;
+            auto bottom = topLeft.y + ImGui::GetWindowSize().y;
+            m_canDrop = mousePos.x >= topLeft.x && mousePos.y >= topLeft.y && mousePos.x < right && mousePos.y < bottom;
         }
     }
 
@@ -100,14 +106,10 @@ namespace rePlayer
 
         }
 
-        m_files = std::move(files);
-        if (files.IsEmpty())
+        *pdwEffect &= DROPEFFECT_NONE;
+        if (!files.IsEmpty())
         {
-            *pdwEffect &= DROPEFFECT_NONE;
-        }
-        else
-        {
-            *pdwEffect &= DROPEFFECT_COPY;
+            m_files = std::move(files);
 
             // ImGui hooks
             auto& io = ImGui::GetIO();
@@ -143,6 +145,7 @@ namespace rePlayer
         io.MouseDownDuration[0] = 0.0f;
         io.MouseDownDuration[1] = 0.0f;
         io.MouseDownDuration[2] = 0.0f;
+        m_canDrop = false;
 
         return S_OK;
     }
@@ -169,7 +172,7 @@ namespace rePlayer
             io.MouseDownDuration[2] = 1.0f;
         }
 
-        *pdwEffect &= DROPEFFECT_COPY;
+        *pdwEffect &= m_canDrop ? DROPEFFECT_COPY : DROPEFFECT_NONE;
         return S_OK;
     }
 
@@ -185,25 +188,22 @@ namespace rePlayer
         io.MouseDownDuration[1] = 0.0f;
         io.MouseDownDuration[2] = 0.0f;
 
-        m_isDropped = true;
+        m_isDropped = m_canDrop;
         m_isAcceptingAll = grfKeyState & MK_CONTROL;
 
-        *pdwEffect &= DROPEFFECT_COPY;
+        *pdwEffect &= m_canDrop ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+        m_canDrop = false;
         return S_OK;
     }
 
     void Playlist::DropTarget::OnCreateWindow(ImGuiViewport* vp)
     {
-        auto viewport = reinterpret_cast<ImGuiViewportP*>(vp);
-        if (strstr(viewport->Window->Name, "###Playlist"))
-            RegisterDragDrop(HWND(vp->PlatformHandle), this);
+        RegisterDragDrop(HWND(vp->PlatformHandle), this);
     }
 
     void Playlist::DropTarget::OnDestroyWindow(ImGuiViewport* vp)
     {
-        auto viewport = reinterpret_cast<ImGuiViewportP*>(vp);
-        if (viewport->Window && strstr(viewport->Window->Name, "###Playlist"))
-            RevokeDragDrop(HWND(vp->PlatformHandle));
+        RevokeDragDrop(HWND(vp->PlatformHandle));
     }
 }
 // namespace rePlayer
