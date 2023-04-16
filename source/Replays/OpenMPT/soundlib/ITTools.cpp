@@ -511,13 +511,14 @@ void ITSample::ConvertToIT(const ModSample &mptSmp, MODTYPE fromType, bool compr
 		cvt = ITSample::cvtOPLInstrument;
 	} else if(mptSmp.uFlags[SMP_KEEPONDISK])
 	{
-#ifndef MPT_EXTERNAL_SAMPLES
-		allowExternal = false;
-#endif  // MPT_EXTERNAL_SAMPLES
 		// Save external sample (filename at sample pointer)
-		if(allowExternal && mptSmp.HasSampleData())
+		if(mptSmp.HasSampleData())
 		{
-			cvt = ITSample::cvtExternalSample;
+#if !defined(MPT_EXTERNAL_SAMPLES)
+			allowExternal = false;
+#endif  // MPT_EXTERNAL_SAMPLES
+			if(allowExternal)
+				cvt = ITSample::cvtExternalSample;
 		} else
 		{
 			length = loopbegin = loopend = susloopbegin = susloopend = 0;
