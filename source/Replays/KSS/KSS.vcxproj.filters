@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libkss">
+      <UniqueIdentifier>{874edfda-604d-4b01-ac7a-9ab4a96fc1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules">
+      <UniqueIdentifier>{76625331-190a-4720-8be9-a83e7cad301a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\src">
+      <UniqueIdentifier>{3d514caf-e987-4e0c-b507-0e546ebcd822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\drivers">
+      <UniqueIdentifier>{01c5db2c-1b58-47f4-8ada-d6e1db4df351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\emu2149">
+      <UniqueIdentifier>{2e9830c5-55ec-45df-99bb-4883b5783ce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\emu2212">
+      <UniqueIdentifier>{c1e1e645-60d9-48eb-b6f3-315631c71871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\emu2413">
+      <UniqueIdentifier>{e91e6ad5-007b-4c65-8124-83c1e3483c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\emu8950">
+      <UniqueIdentifier>{c62192ee-27ca-43c2-97c3-40ee8b6cb771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\emu76489">
+      <UniqueIdentifier>{d7bcc838-7e62-4454-80c1-18ed46bd5762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\modules\kmz80">
+      <UniqueIdentifier>{316fc77e-0392-449c-b25f-56458995f7ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\src\filters">
+      <UniqueIdentifier>{fbbdf142-d2e7-440b-a0e8-b9b468af42b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\src\kss">
+      <UniqueIdentifier>{5bf06c3f-bc78-4b3a-9a96-7b09859ce64a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\src\rconv">
+      <UniqueIdentifier>{afdbf707-f1ef-458a-bb40-8bd8c5b8c9b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libkss\src\vm">
+      <UniqueIdentifier>{0c898687-9ba2-47a1-ac45-aefb18face10}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayKSS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\kinrou5.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\mbr143.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\mgsdrv.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\mpk103.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\mpk106.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\drivers\opx4kss.h">
+      <Filter>Source Files\libkss\modules\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu2149\emu2149.h">
+      <Filter>Source Files\libkss\modules\emu2149</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu2212\emu2212.h">
+      <Filter>Source Files\libkss\modules\emu2212</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu2413\emu2413.h">
+      <Filter>Source Files\libkss\modules\emu2413</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu8950\emu8950.h">
+      <Filter>Source Files\libkss\modules\emu8950</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu8950\emuadpcm.h">
+      <Filter>Source Files\libkss\modules\emu8950</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\emu76489\emu76489.h">
+      <Filter>Source Files\libkss\modules\emu76489</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\kmz80\kmevent.h">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\kmz80\kmtypes.h">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\kmz80\kmz80.h">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\modules\kmz80\kmz80i.h">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\filters\dc_filter.h">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\filters\filter.h">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\filters\rc_filter.h">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\kss\kss.h">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\rconv\psg_rconv.h">
+      <Filter>Source Files\libkss\src\rconv</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\vm\detect.h">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\vm\mmap.h">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\vm\vm.h">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\kss2vgm.h">
+      <Filter>Source Files\libkss\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libkss\src\kssplay.h">
+      <Filter>Source Files\libkss\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayKSS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu2149\emu2149.c">
+      <Filter>Source Files\libkss\modules\emu2149</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu2212\emu2212.c">
+      <Filter>Source Files\libkss\modules\emu2212</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu2413\emu2413.c">
+      <Filter>Source Files\libkss\modules\emu2413</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu8950\emu8950.c">
+      <Filter>Source Files\libkss\modules\emu8950</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu8950\emuadpcm.c">
+      <Filter>Source Files\libkss\modules\emu8950</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\emu76489\emu76489.c">
+      <Filter>Source Files\libkss\modules\emu76489</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmdmg.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmevent.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmr800.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmz80.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmz80c.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\kmz80t.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\modules\kmz80\makeft.c">
+      <Filter>Source Files\libkss\modules\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\filters\dc_filter.c">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\filters\filter.c">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\filters\rc_filter.c">
+      <Filter>Source Files\libkss\src\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\bgm2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\kss2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\kssload.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\mbm2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\mgs2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\mpk2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss\opx2kss.c">
+      <Filter>Source Files\libkss\src\kss</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\rconv\psg_rconv.c">
+      <Filter>Source Files\libkss\src\rconv</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\vm\detect.c">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\vm\mmap.c">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\vm\vm.c">
+      <Filter>Source Files\libkss\src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kss2vgm.c">
+      <Filter>Source Files\libkss\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libkss\src\kssplay.c">
+      <Filter>Source Files\libkss\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

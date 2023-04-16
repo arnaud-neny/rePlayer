@@ -32,6 +32,7 @@
 - Highly Advanced: https://gitlab.com/kode54/mgba, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_gsf
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - iXalance: https://bitbucket.org/wothke/webixs
+- LIBKSS: https://github.com/digital-sound-antiques/libkss
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{4FBD68C0-EA99-44FB-B219-4FB866D02FCE}</ProjectGuid>
+    <RootNamespace>KSS</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libkss\modules;$(ProjectDir)libkss\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libkss\modules;$(ProjectDir)libkss\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="libkss\modules\drivers\kinrou5.h" />
+    <ClInclude Include="libkss\modules\drivers\mbr143.h" />
+    <ClInclude Include="libkss\modules\drivers\mgsdrv.h" />
+    <ClInclude Include="libkss\modules\drivers\mpk103.h" />
+    <ClInclude Include="libkss\modules\drivers\mpk106.h" />
+    <ClInclude Include="libkss\modules\drivers\opx4kss.h" />
+    <ClInclude Include="libkss\modules\emu2149\emu2149.h" />
+    <ClInclude Include="libkss\modules\emu2212\emu2212.h" />
+    <ClInclude Include="libkss\modules\emu2413\emu2413.h" />
+    <ClInclude Include="libkss\modules\emu76489\emu76489.h" />
+    <ClInclude Include="libkss\modules\emu8950\emu8950.h" />
+    <ClInclude Include="libkss\modules\emu8950\emuadpcm.h" />
+    <ClInclude Include="libkss\modules\kmz80\kmevent.h" />
+    <ClInclude Include="libkss\modules\kmz80\kmtypes.h" />
+    <ClInclude Include="libkss\modules\kmz80\kmz80.h" />
+    <ClInclude Include="libkss\modules\kmz80\kmz80i.h" />
+    <ClInclude Include="libkss\src\filters\dc_filter.h" />
+    <ClInclude Include="libkss\src\filters\filter.h" />
+    <ClInclude Include="libkss\src\filters\rc_filter.h" />
+    <ClInclude Include="libkss\src\kss2vgm.h" />
+    <ClInclude Include="libkss\src\kssplay.h" />
+    <ClInclude Include="libkss\src\kss\kss.h" />
+    <ClInclude Include="libkss\src\rconv\psg_rconv.h" />
+    <ClInclude Include="libkss\src\vm\detect.h" />
+    <ClInclude Include="libkss\src\vm\mmap.h" />
+    <ClInclude Include="libkss\src\vm\vm.h" />
+    <ClInclude Include="ReplayKSS.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libkss\modules\emu2149\emu2149.c" />
+    <ClCompile Include="libkss\modules\emu2212\emu2212.c" />
+    <ClCompile Include="libkss\modules\emu2413\emu2413.c" />
+    <ClCompile Include="libkss\modules\emu76489\emu76489.c" />
+    <ClCompile Include="libkss\modules\emu8950\emu8950.c" />
+    <ClCompile Include="libkss\modules\emu8950\emuadpcm.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmdmg.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmevent.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmr800.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmz80.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmz80c.c" />
+    <ClCompile Include="libkss\modules\kmz80\kmz80t.c" />
+    <ClCompile Include="libkss\modules\kmz80\makeft.c" />
+    <ClCompile Include="libkss\src\filters\dc_filter.c" />
+    <ClCompile Include="libkss\src\filters\filter.c" />
+    <ClCompile Include="libkss\src\filters\rc_filter.c" />
+    <ClCompile Include="libkss\src\kss2vgm.c" />
+    <ClCompile Include="libkss\src\kssplay.c" />
+    <ClCompile Include="libkss\src\kss\bgm2kss.c" />
+    <ClCompile Include="libkss\src\kss\kss.c" />
+    <ClCompile Include="libkss\src\kss\kss2kss.c" />
+    <ClCompile Include="libkss\src\kss\kssload.c" />
+    <ClCompile Include="libkss\src\kss\mbm2kss.c" />
+    <ClCompile Include="libkss\src\kss\mgs2kss.c" />
+    <ClCompile Include="libkss\src\kss\mpk2kss.c" />
+    <ClCompile Include="libkss\src\kss\opx2kss.c" />
+    <ClCompile Include="libkss\src\rconv\psg_rconv.c" />
+    <ClCompile Include="libkss\src\vm\detect.c" />
+    <ClCompile Include="libkss\src\vm\mmap.c" />
+    <ClCompile Include="libkss\src\vm\vm.c" />
+    <ClCompile Include="ReplayKSS.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

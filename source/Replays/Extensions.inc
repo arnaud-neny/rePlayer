@@ -140,7 +140,7 @@ EXTENSION(gbr)
 EXTENSION(gb)
 EXTENSION(gym)
 EXTENSION(hes)
-EXTENSION(kss)
+EXTENSION(kss)      // KSS & GME
 EXTENSION(nsf)
 EXTENSION(nsfe)
 EXTENSION(spc)
@@ -303,3 +303,8 @@ EXTENSION(mdy)      // Adlib: AdLib MIDI/IMS Format
 EXTENSION(mcr)      // UADE: Mark_Cooksey_Old
 EXTENSION(mgb)      // Gameboy Tracker: no known replay :(
 EXTENSION(ixs)      // iXalance
+EXTENSION(mgs)      // KSS
+EXTENSION(bgm)      // KSS
+EXTENSION(opx)      // KSS
+EXTENSION(mpk)      // KSS
+EXTENSION(mbm)      // KSS
