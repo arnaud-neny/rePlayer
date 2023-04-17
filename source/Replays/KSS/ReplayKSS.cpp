@@ -63,7 +63,8 @@ namespace rePlayer
         if (entry == nullptr)
         {
             // ok, we are here because we never played this song in this player
-            entry = context.metadata.Create<Settings>();
+            entry = context.metadata.Create<Settings>(sizeof(Settings) + sizeof(uint32_t));
+            entry->GetDurations()[0] = 0;
         }
 
         SliderOverride("Master Volume", GETSET(entry, overrideMasterVolume), GETSET(entry, masterVolume),
@@ -273,23 +274,23 @@ namespace rePlayer
 
     void ReplayKSS::SetupMetadata(CommandBuffer metadata)
     {
-        auto numSongs = m_kss->trk_max - m_kss->trk_min + 1u;
+        auto numSongsMinusOne = m_kss->trk_max - m_kss->trk_min;
         auto settings = metadata.Find<Settings>();
-        if (settings && settings->numSongsMinusOne == (numSongs - 1))
+        if (settings && settings->numSongsMinusOne == numSongsMinusOne)
         {
             auto durations = settings->GetDurations();
-            for (uint32_t i = 0; i < numSongs; i++)
+            for (uint32_t i = 0; i <= numSongsMinusOne; i++)
                 m_durations[i] = durations[i];
             m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
         }
         else
         {
             auto value = settings ? settings->value : 0;
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(int32_t));
+            settings = metadata.Create<Settings>(sizeof(Settings) + (numSongsMinusOne + 1) * sizeof(int32_t));
             settings->value = value;
-            settings->numSongsMinusOne = numSongs - 1;
+            settings->numSongsMinusOne = numSongsMinusOne;
             auto durations = settings->GetDurations();
-            for (uint16_t i = 0; i < numSongs; i++)
+            for (uint16_t i = 0; i <= numSongsMinusOne; i++)
             {
                 durations[i] = 0;
                 m_durations[i] = 0;
