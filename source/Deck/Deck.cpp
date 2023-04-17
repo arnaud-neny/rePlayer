@@ -333,6 +333,8 @@ namespace rePlayer
         viewport->Flags &= ~ImGuiViewportFlags_NoTaskBarIcon;
         // Hack end
 
+        Core::GetPlaylist().UpdateDragDropSource(1);
+
         SongSheet* song = nullptr;
         auto player = m_currentPlayer;
         auto isPlayerValid = player.IsValid();

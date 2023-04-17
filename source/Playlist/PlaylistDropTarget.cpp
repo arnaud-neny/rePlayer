@@ -9,7 +9,7 @@
 
 namespace rePlayer
 {
-    void Playlist::DropTarget::UpdateDragDropSource()
+    void Playlist::DropTarget::UpdateDragDropSource(uint8_t dropId)
     {
         if (m_files.IsNotEmpty())
         {
@@ -40,7 +40,10 @@ namespace rePlayer
             auto topLeft = ImGui::GetWindowPos();
             auto right = topLeft.x + ImGui::GetWindowSize().x;
             auto bottom = topLeft.y + ImGui::GetWindowSize().y;
-            m_canDrop = mousePos.x >= topLeft.x && mousePos.y >= topLeft.y && mousePos.x < right && mousePos.y < bottom;
+            if (mousePos.x >= topLeft.x && mousePos.y >= topLeft.y && mousePos.x < right && mousePos.y < bottom)
+                m_canDrop |= 1 << dropId;
+            else
+                m_canDrop &= ~(1 << dropId);
         }
     }
 
@@ -145,7 +148,7 @@ namespace rePlayer
         io.MouseDownDuration[0] = 0.0f;
         io.MouseDownDuration[1] = 0.0f;
         io.MouseDownDuration[2] = 0.0f;
-        m_canDrop = false;
+        m_canDrop = 0;
 
         return S_OK;
     }
@@ -190,9 +193,10 @@ namespace rePlayer
 
         m_isDropped = m_canDrop;
         m_isAcceptingAll = grfKeyState & MK_CONTROL;
+        m_isOverriding = grfKeyState & MK_SHIFT;
 
         *pdwEffect &= m_canDrop ? DROPEFFECT_COPY : DROPEFFECT_NONE;
-        m_canDrop = false;
+        m_canDrop = 0;
         return S_OK;
     }
 

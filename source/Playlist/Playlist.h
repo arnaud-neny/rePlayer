@@ -50,6 +50,8 @@ namespace rePlayer
 
         void FocusCurrentSong();
 
+        void UpdateDragDropSource(uint8_t dropId);
+
     private:
         struct Cue
         {

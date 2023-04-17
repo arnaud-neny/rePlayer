@@ -19,11 +19,12 @@ namespace rePlayer
     public:
         DropTarget(Playlist& playlist) : m_playlist(playlist) {}
 
-        void UpdateDragDropSource();
+        void UpdateDragDropSource(uint8_t dropId);
 
         bool IsEnabled() const { return m_files.IsNotEmpty(); }
         bool IsDropped() const { return m_isDropped; }
         bool IsAcceptingAll() const { return m_isAcceptingAll; }
+        bool IsOverriding() const { return m_isOverriding; }
         Array<std::string> AcquireFiles();
 
         ULONG AddRef() override;
@@ -46,7 +47,8 @@ namespace rePlayer
         int32_t m_refCount = 0;
         bool m_isDropped = false;
         bool m_isAcceptingAll = false;
-        bool m_canDrop = false;
+        bool m_isOverriding = false;
+        uint8_t m_canDrop = 0;
         Array<std::string> m_files;
     };
 }

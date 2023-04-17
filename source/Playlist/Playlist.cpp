@@ -612,6 +612,11 @@ namespace rePlayer
         m_isCurrentEntryFocus = true;
     }
 
+    void Playlist::UpdateDragDropSource(uint8_t dropId)
+    {
+        m_dropTarget->UpdateDragDropSource(dropId);
+    }
+
     std::string Playlist::OnGetWindowTitle()
     {
         //TODO: cache this operation and check for a dirty state (song/playlist update?)
@@ -632,7 +637,7 @@ namespace rePlayer
     {
         auto& deck = Core::GetDeck();
 
-        m_dropTarget->UpdateDragDropSource();
+        m_dropTarget->UpdateDragDropSource(0);
 
         ButtonLoad();
         ImGui::SameLine();
@@ -999,13 +1004,13 @@ namespace rePlayer
                 }
             }
         }
-
-        if (m_dropTarget->IsDropped())
-            ProcessExternalDranAndDrop(m_cue.entries.NumItems<int32_t>());
     }
 
     void Playlist::OnEndUpdate()
     {
+        if (m_dropTarget->IsDropped())
+            ProcessExternalDranAndDrop(m_cue.entries.NumItems<int32_t>());
+
         m_songs->OnEndUpdate();
     }
 
@@ -1094,6 +1099,9 @@ namespace rePlayer
 
     void Playlist::ProcessExternalDranAndDrop(int32_t droppedEntryIndex)
     {
+        if (m_dropTarget->IsOverriding())
+            Clear();
+
         auto& replays = Core::GetReplays();
         auto currentPlayingEntry = droppedEntryIndex <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : MusicID();
         bool isAcceptingAll = m_dropTarget->IsAcceptingAll();
