@@ -192,6 +192,9 @@
     <None Include="Thread\SpinLock.inl.h">
       <Filter>Source Files\Thread</Filter>
     </None>
+    <None Include="ImGui\imgui.natstepfilter">
+      <Filter>Source Files\ImGui</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Log.cpp">
@@ -270,6 +273,9 @@
     </Natvis>
     <Natvis Include="Blob\Blob.natvis">
       <Filter>Source Files\Blob</Filter>
+    </Natvis>
+    <Natvis Include="ImGui\imgui.natvis">
+      <Filter>Source Files\ImGui</Filter>
     </Natvis>
   </ItemGroup>
 </Project>

@@ -144,34 +144,34 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 ## Third Parties
 
 ### System 3rd parties:
-- [ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
+- [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
 - [stb](https://github.com/nothings/stb): for the optimized sprintf.
 - [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog): a file dialog for ImGui.
-- [Curl](https://curl.se/): library for transferring data with URLs.
-- [Tidy Html](https://www.html-tidy.org/): to correct and cleanup html (for better parsing).
+- [Curl](https://curl.se): library for transferring data with URLs.
+- [Tidy Html](https://www.html-tidy.org): to correct and cleanup html (for better parsing).
 - [TinyXML-2](https://github.com/leethomason/tinyxml2): to parse xml.
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
-- [TagLib](https://taglib.org/): to read tag from music formats.
+- [TagLib](https://taglib.org): to read tag from music formats.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
 
 ### Replays 3rd parties:
-- [OpenMPT](https://lib.openmpt.org/libopenmpt/): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
+- [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [HivelyTracker](https://github.com/pete-gordon/hivelytracker): ahx-thx-hvl formats.
-- [SoundMon](http://www.brianpostma.com/): Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
+- [SoundMon](http://www.brianpostma.com): Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
 - [StSound](https://github.com/arnaud-carre/StSound): ym files.
-- [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder/): fc-smod formats.
+- [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
-- [sc68](https://sourceforge.net/projects/sc68/): Atari ST and Amiga music player (sc68, sndh).
+- [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
-- [ASAP](http://asap.sourceforge.net/): Another Slight Atari Player.
+- [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
 - [MP3/FLAC/WAV](https://github.com/mackron/dr_libs): Well, it can play default music files.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
 - [game-music-emu](https://bitbucket.org/mpyne/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
-- [UADE](https://zakalwe.fi/uade/): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
+- [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
 - [Highly Quixotic](https://gitlab.com/kode54/highly_quixotic): QSound arcade audio sound chip and processor emulator library.
 - [Highly Advanced](https://gitlab.com/kode54/mgba): Gameboy Advanced player.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.

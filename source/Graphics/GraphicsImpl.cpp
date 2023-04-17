@@ -299,7 +299,7 @@ namespace rePlayer
         for (int i = 1; i < platform_io.Viewports.Size; i++)
         {
             ImGuiViewport* viewport = platform_io.Viewports[i];
-            if (viewport->Flags & ImGuiViewportFlags_Minimized || viewport->RendererUserData == nullptr)
+            if (viewport->Flags & ImGuiViewportFlags_IsMinimized || viewport->RendererUserData == nullptr)
                 continue;
 
             auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
@@ -345,7 +345,7 @@ namespace rePlayer
         for (int i = 1; i < platform_io.Viewports.Size; i++)
         {
             ImGuiViewport* viewport = platform_io.Viewports[i];
-            if (viewport->Flags & ImGuiViewportFlags_Minimized)
+            if (viewport->Flags & ImGuiViewportFlags_IsMinimized)
                 continue;
 
             auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
