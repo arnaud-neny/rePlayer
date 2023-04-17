@@ -182,6 +182,7 @@ namespace rePlayer
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
             if ((numSamples | preNumSamples) == 0)
             {
+                m_duration = uint32_t((m_currentSample * 1000ull) / replay->GetSampleRate());
                 std::atomic_ref(m_currentSample) += remainingSamples;
                 remainingSamples = 0;
             }
