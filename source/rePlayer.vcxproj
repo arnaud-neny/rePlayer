@@ -208,6 +208,7 @@ $(SolutionDir)..\tools\upx --best --compress-exports=0 -o $(SolutionDir)..\data\
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include="..\3rdParties.md" />
+    <None Include="..\CHANGELOG.md" />
     <None Include="..\LICENSE" />
     <None Include="..\README.md" />
     <None Include="..\TODO.md" />

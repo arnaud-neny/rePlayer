@@ -347,6 +347,7 @@
     <None Include="..\3rdParties.md" />
     <None Include="..\LICENSE" />
     <None Include="..\TODO.md" />
+    <None Include="..\CHANGELOG.md" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="3rdParty\curl\libcurl.dll.a">
