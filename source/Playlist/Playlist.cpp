@@ -1030,7 +1030,7 @@ namespace rePlayer
                     if (count > 1)
                     {
                         auto holdEntry = m_cue.entries[i];
-                        std::memmove(m_cue.entries.Items(i), m_cue.entries.Items(i + 1), sizeof(MusicID) * (count - 1));
+                        std::memmove(m_cue.entries.Items(i), m_cue.entries.Items(i + 1), sizeof(Cue::Entry) * (count - 1));
                         m_cue.entries[firstSelected - 1] = holdEntry;
                     }
                     firstSelected--;
@@ -1045,7 +1045,7 @@ namespace rePlayer
                     if (count > 1)
                     {
                         auto holdEntry = m_cue.entries[i];
-                        std::memmove(m_cue.entries.Items(lastSelected + 2), m_cue.entries.Items(lastSelected + 1), sizeof(MusicID) * (count - 1));
+                        std::memmove(m_cue.entries.Items(lastSelected + 2), m_cue.entries.Items(lastSelected + 1), sizeof(Cue::Entry) * (count - 1));
                         m_cue.entries[lastSelected + 1] = holdEntry;
                     }
                     lastSelected++;
