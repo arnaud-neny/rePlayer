@@ -286,7 +286,9 @@ namespace rePlayer
                 }
 
                 auto cursorFrame = m_frames[offset + uint32_t(ImGui::GetMousePos().x - pos.x)];
-                ImGui::Tooltip("min: %d\nmax: %d\nrms: %u", cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
+                auto time = uint64_t(offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel;
+                ImGui::Tooltip("pos: %u:%u:%u\nmin: %d\nmax: %d\nrms: %u", time / 60000, (time / 1000) % 60, time % 1000
+                    , cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
             }
             if (ImGui::IsItemActive())
             {
