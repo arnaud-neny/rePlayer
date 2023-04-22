@@ -41,7 +41,7 @@ index 876cf32..88b43c1 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index 9f8a571..fd2b0e9 100644
+index 38948f6..ba5f6c4 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
 @@ -556,7 +556,7 @@ namespace ImGui
@@ -54,7 +54,7 @@ index 9f8a571..fd2b0e9 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 6ee140b..4277b1d 100644
+index 211368c..3f5c70b 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 @@ -2392,7 +2392,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
@@ -76,10 +76,10 @@ index 6ee140b..4277b1d 100644
      if (label_size.x > 0.0f)
          RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-index ec2c2da..9ca0b0b 100644
+index d24c655..1c33e8d 100644
 --- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-@@ -904,21 +904,26 @@ struct ImGui_ImplWin32_ViewportData
+@@ -958,21 +958,26 @@ struct ImGui_ImplWin32_ViewportData
      ~ImGui_ImplWin32_ViewportData() { IM_ASSERT(Hwnd == nullptr); }
  };
  
@@ -110,7 +110,7 @@ index ec2c2da..9ca0b0b 100644
  
  static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
  {
-@@ -926,7 +931,10 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+@@ -980,7 +985,10 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
      viewport->PlatformUserData = vd;
  
      // Select style and parent window
@@ -122,7 +122,7 @@ index ec2c2da..9ca0b0b 100644
      HWND parent_window = nullptr;
      if (viewport->ParentViewportId != 0)
          if (ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId))
-@@ -981,7 +989,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
+@@ -1035,7 +1043,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
      IM_ASSERT(vd->Hwnd != 0);
      DWORD new_style;
      DWORD new_ex_style;
@@ -133,7 +133,7 @@ index ec2c2da..9ca0b0b 100644
  
      // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
      if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
-@@ -1116,6 +1126,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+@@ -1170,6 +1180,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
  #endif
  }
  
@@ -144,7 +144,7 @@ index ec2c2da..9ca0b0b 100644
  static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
  {
      if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-@@ -1125,6 +1139,20 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1179,6 +1193,20 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
      {
          switch (msg)
          {
@@ -165,15 +165,15 @@ index ec2c2da..9ca0b0b 100644
          case WM_CLOSE:
              viewport->PlatformRequestClose = true;
              return 0;
-@@ -1154,6 +1182,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1208,6 +1236,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
  
- static void ImGui_ImplWin32_InitPlatformInterface()
+ static void ImGui_ImplWin32_InitPlatformInterface(bool platform_has_own_dc)
  {
 +    // rePlayer begin
      WNDCLASSEX wcex;
      wcex.cbSize = sizeof(WNDCLASSEX);
-     wcex.style = CS_HREDRAW | CS_VREDRAW;
-@@ -1161,13 +1190,14 @@ static void ImGui_ImplWin32_InitPlatformInterface()
+     wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0);
+@@ -1215,13 +1244,14 @@ static void ImGui_ImplWin32_InitPlatformInterface(bool platform_has_own_dc)
      wcex.cbClsExtra = 0;
      wcex.cbWndExtra = 0;
      wcex.hInstance = ::GetModuleHandle(nullptr);
