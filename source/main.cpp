@@ -281,11 +281,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 if (s_rePlayer->UpdateFrame() != core::Status::kOk)
                     break;
 
+#if _DEBUG
                 static bool show_demo_window = false;
                 if (ImGui::IsKeyPressed(ImGuiKey_F11))
                     show_demo_window = !show_demo_window;
                 if (show_demo_window)
                     ImGui::ShowDemoWindow(&show_demo_window);
+#endif
 
 /*
                 if (!ImGui::GetCurrentContext()->HoveredWindow)
