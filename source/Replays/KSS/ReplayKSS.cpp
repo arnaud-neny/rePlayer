@@ -274,7 +274,7 @@ namespace rePlayer
 
     void ReplayKSS::SetupMetadata(CommandBuffer metadata)
     {
-        auto numSongsMinusOne = m_kss->trk_max - m_kss->trk_min;
+        uint32_t numSongsMinusOne = m_kss->trk_max - m_kss->trk_min;
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongsMinusOne == numSongsMinusOne)
         {
