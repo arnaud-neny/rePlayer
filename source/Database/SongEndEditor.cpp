@@ -2,6 +2,7 @@
 
 // core
 #include <Imgui.h>
+#include <Core/Log.h>
 #include <IO/Stream.h>
 
 // rePlayer
@@ -57,7 +58,7 @@ namespace rePlayer
 
         OpenAudio();
 
-        ImGui::OpenPopup("SongEndEditor");
+        ImGui::OpenPopup("End Of Song Editor");
     }
 
     SongEndEditor::~SongEndEditor()
@@ -88,7 +89,7 @@ namespace rePlayer
         ImGui::SetNextWindowSize(ImVec2(640.0f, 128.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, ImGui::GetFrameHeightWithSpacing() * 5), ImVec2(FLT_MAX, FLT_MAX));
         bool isOpened = true;
-        if (ImGui::BeginPopupModal("SongEndEditor", &isOpened, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+        if (ImGui::BeginPopupModal("End Of Song Editor", &isOpened, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
         {
             auto numMillisecondsPerPixel = m_numMillisecondsPerPixel;
             auto sampleRate = m_replay->GetSampleRate();
@@ -167,7 +168,11 @@ namespace rePlayer
 
             ImGui::EndPopup();
         }
-
+        else if (isOpened == true)
+        {
+            Log::Warning("End Of Song Editor: unexpected close\n");
+            isOpened = false;
+        }
         return !isOpened;
     }
 
@@ -253,8 +258,11 @@ namespace rePlayer
                 m_isWaveScrolling = false;
             }
             auto numMillisecondsPerPixel = m_numMillisecondsPerPixel;
-            auto size = ImGui::GetContentRegionAvail();
+            const auto size = ImGui::GetContentRegionAvail();
             auto offset = uint32_t(ImGui::GetScrollX());
+            auto maxFrames = Min(uint64_t(size.x), m_frames.NumItems<uint64_t>());
+            if ((offset + maxFrames) > m_frames.NumItems<uint64_t>()) // prevent offset overflow
+                offset = uint32_t(m_frames.NumItems<uint64_t>() - maxFrames);
             if (ImGui::InvisibleButton("DrawWave", ImVec2(Max(size.x, m_frames.NumItems<float>()), size.y), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonMiddle | ImGuiButtonFlags_MouseButtonRight))
             {
                 if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && m_wave->outHandle && m_isPlaying)
@@ -305,7 +313,6 @@ namespace rePlayer
             auto color0 = ImGui::GetColorU32(ImGuiCol_Button);
             auto color1 = ImGui::GetColorU32(ImGuiCol_ButtonActive);
             auto* frames = m_frames.Items();
-            auto maxFrames = Min(uint64_t(size.x), m_frames.NumItems<uint64_t>());
             for (uint64_t x = 0, e = maxFrames; x < e; x++)
             {
                 auto frame = frames[x + offset];
