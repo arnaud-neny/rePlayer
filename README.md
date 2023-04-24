@@ -179,3 +179,4 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
+- [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](https://github.com/jprjr/libnezplug) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd.

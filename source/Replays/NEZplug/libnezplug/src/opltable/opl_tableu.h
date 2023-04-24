@@ -1,0 +1,7 @@
+#undef SINTBL_BITS
+#undef AMTBL_BITS
+#undef PMTBL_BITS
+#undef PM_SHIFT
+#undef ARTBL_BITS
+#undef ARTBL_SHIFT
+#undef TLLTBL_BITS

@@ -42,6 +42,7 @@
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
+- libnezplug: https://github.com/jprjr/libnezplug
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

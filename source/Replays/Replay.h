@@ -40,6 +40,7 @@ namespace rePlayer
             #define GETSET(This, Member) GetSet([This]() { return This->Member; }, [This](auto v) { This->Member = v; })
 
             static void SliderOverride(const char* id, auto&& isEnabled, auto&& currentValue, int32_t defaultValue, int32_t min, int32_t max, const char* format, int32_t valueOffset = 0);
+            static void SliderOverride(const char* id, auto&& isEnabled, auto&& currentValue, float defaultValue, float min, float max, const char* format);
             template <typename... Items> // Items as const char* const
             static void ComboOverride(const char* id, auto&& isEnabled, auto&& currentValue, int32_t defaultValue, Items&&... items);
             static void Durations(ReplayMetadataContext& context, uint32_t* durations, uint32_t numDurations, const char* format);

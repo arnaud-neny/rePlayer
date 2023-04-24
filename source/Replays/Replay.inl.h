@@ -29,6 +29,26 @@ namespace rePlayer
     }
 
     template <typename CommandType, auto type>
+    inline void Replay::Command<CommandType, type>::SliderOverride(const char* id, auto&& isEnabled, auto&& currentValue, float defaultValue, float min, float max, const char* format)
+    {
+        ImGui::PushID(id);
+        bool isChecked = isEnabled;
+        float sliderValue = isChecked ? currentValue : defaultValue;
+        if (ImGui::Checkbox("##Checkbox", &isChecked))
+        {
+            sliderValue = defaultValue;
+            isEnabled = isChecked;
+        }
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!isChecked);
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::SliderFloat("##Slider", &sliderValue, min, max, format, ImGuiSliderFlags_AlwaysClamp);
+        currentValue = isChecked ? sliderValue : 0;
+        ImGui::EndDisabled();
+        ImGui::PopID();
+    }
+
+    template <typename CommandType, auto type>
     template <typename... Items>
     inline void Replay::Command<CommandType, type>::ComboOverride(const char* id, auto&& isEnabled, auto&& currentValue, int32_t defaultValue, Items&&... items)
     {

@@ -1,3 +1,8 @@
+v0.3.0
+- Added NEZplug player
+- ImGui 1.89.53 (to fix the modals getting closed on focus)
+- Bug fixes
+
 v0.2.1:
 - Added KSS player
 - Updated OpenMPT to 0.6.10

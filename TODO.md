@@ -39,5 +39,3 @@
 - libnezplug: https://github.com/jprjr/libnezplug
 
 - DEMO! utilise Firefox avec The final hyperbase (openmpt - change to surround), drax (uade - change to surround + song end editor)
-
-- Allister Brimble - slightly magic.emul: doesn't work with game-music-emu (no sound), ayfly song length are crap

@@ -1,0 +1,377 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libnezplug">
+      <UniqueIdentifier>{5b3112ed-0c7f-4f2c-8cb3-c214ad93f7e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\include">
+      <UniqueIdentifier>{935038b1-06a3-48f1-8b3e-a8d66751d41c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\include\nezplug">
+      <UniqueIdentifier>{8258b004-7e5a-4e2c-9310-0ea3ef72d1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\format">
+      <UniqueIdentifier>{61835835-0878-43ff-9306-7a5d1e37e2a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\device">
+      <UniqueIdentifier>{1c4c9f56-fa20-4abc-8f5e-ca00d0b9fc18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\device\nes">
+      <UniqueIdentifier>{143e434b-7eee-41aa-9fe2-aecbe8145f0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\device\opl">
+      <UniqueIdentifier>{83d76dfe-64d0-43ca-abc2-65847e166d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\device\opl\ill">
+      <UniqueIdentifier>{4893290e-c064-4b70-b608-fa7c403b14e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\common">
+      <UniqueIdentifier>{c0ae0c69-0c15-4a54-8a31-cb42b065e5b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\logtable">
+      <UniqueIdentifier>{e00f7f56-2a8f-4c5b-b11d-b42d1cc1170c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\cpu">
+      <UniqueIdentifier>{421ecc0a-e71a-4bbf-a7c7-fe4672a6a000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\cpu\km6502">
+      <UniqueIdentifier>{29b2b2cd-4541-4ef0-85ad-b6ccb4ee0287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\cpu\kmz80">
+      <UniqueIdentifier>{aeabdef9-a768-461f-8c5f-2705a785a743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libnezplug\opltable">
+      <UniqueIdentifier>{46296e9c-bffa-4b48-85db-823e25c8d3b7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayNEZplug.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\include\nezplug\nezint.h">
+      <Filter>Source Files\libnezplug\include\nezplug</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\include\nezplug\nezplug.h">
+      <Filter>Source Files\libnezplug\include\nezplug</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\audiosys.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\handler.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_gbr.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_hes.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_kss.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_nsd.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_nsf.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_sgc.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\m_zxay.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\nsf6502.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\songinfo.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\format\trackinfo.h">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\normalize.h">
+      <Filter>Source Files\libnezplug</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_apu.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_fds.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_fme7.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_mmc5.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_n106.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_vrc6.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\nes\s_vrc7.h">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\opl\s_deltat.h">
+      <Filter>Source Files\libnezplug\device\opl</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\opl\s_opl.h">
+      <Filter>Source Files\libnezplug\device\opl</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\kmsnddev.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\logtable.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_dmg.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_hes.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_hesad.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_psg.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_scc.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\device\s_sng.h">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\common\divfix.h">
+      <Filter>Source Files\libnezplug\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\common\muldiv.h">
+      <Filter>Source Files\libnezplug\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\common\util.h">
+      <Filter>Source Files\libnezplug\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\logtable\log_table.h">
+      <Filter>Source Files\libnezplug\logtable</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km2a03m.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km2a03u.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km2a03w.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km65c02.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km65c02m.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6280.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6280m.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6280u.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6280w.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502cd.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502ct.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502ex.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502ft.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502m.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\km6502ot.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\kmconfig.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\km6502\kmundef.h">
+      <Filter>Source Files\libnezplug\cpu\km6502</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\kmz80\kmevent.h">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\kmz80\kmtypes.h">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\kmz80\kmz80.h">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\kmz80\kmz80i.h">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\cpu\kmz80\kmz80t.h">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\opltable\opl_table.h">
+      <Filter>Source Files\libnezplug\opltable</Filter>
+    </ClInclude>
+    <ClInclude Include="libnezplug\src\opltable\opl_tableu.h">
+      <Filter>Source Files\libnezplug\opltable</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayNEZplug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\audiosys.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\handler.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_gbr.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_hes.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_kss.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_nsd.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_nsf.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_sgc.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\m_zxay.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\nezplug.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\nsf6502.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\songinfo.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\format\trackinfo.c">
+      <Filter>Source Files\libnezplug\format</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_apu.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_fds.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_fds1.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_fds2.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_fds3.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_fme7.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_mmc5.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_n106.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_vrc6.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\nes\s_vrc7.c">
+      <Filter>Source Files\libnezplug\device\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\opl\s_deltat.c">
+      <Filter>Source Files\libnezplug\device\opl</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\opl\s_opl.c">
+      <Filter>Source Files\libnezplug\device\opl</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\logtable.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_dmg.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_hes.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_hesad.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_psg.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_scc.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\device\s_sng.c">
+      <Filter>Source Files\libnezplug\device</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\logtable\log_table_12_7_30.c">
+      <Filter>Source Files\libnezplug\logtable</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\logtable\log_table_12_8_30.c">
+      <Filter>Source Files\libnezplug\logtable</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmdmg.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmevent.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmr800.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmz80.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmz80c.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmz80t.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\kmz80u.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\cpu\kmz80\makeft.c">
+      <Filter>Source Files\libnezplug\cpu\kmz80</Filter>
+    </ClCompile>
+    <ClCompile Include="libnezplug\src\opltable\opl_table.c">
+      <Filter>Source Files\libnezplug\opltable</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

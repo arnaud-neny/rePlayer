@@ -125,7 +125,7 @@ EXTENSION(tfm)
 EXTENSION(mp3)
 EXTENSION(flac)
 EXTENSION(ogg)
-EXTENSION(ay)
+EXTENSION(ay)       // Ayfly & GME & NEZplug
 EXTENSION(vtx)
 EXTENSION(psg)
 EXTENSION(asc)
@@ -135,14 +135,14 @@ EXTENSION(pt3)
 EXTENSION(stc)
 EXTENSION(sqt)      // AyFly: ? & UADE: Quartet_PSG
 EXTENSION(psc)
-EXTENSION(gbs)
-EXTENSION(gbr)
+EXTENSION(gbs)      // GBSPlay & GME & NEZplug
+EXTENSION(gbr)      // GBSPlay & NEZplug
 EXTENSION(gb)
 EXTENSION(gym)
-EXTENSION(hes)
-EXTENSION(kss)      // KSS & GME
-EXTENSION(nsf)
-EXTENSION(nsfe)
+EXTENSION(hes)      // GME & NEZplug
+EXTENSION(kss)      // KSS & GME & NEZplug
+EXTENSION(nsf)      // GME & NEZplug
+EXTENSION(nsfe)     // GME & NEZplug
 EXTENSION(spc)
 EXTENSION(rsn)
 EXTENSION(mdx)
@@ -308,3 +308,5 @@ EXTENSION(bgm)      // KSS
 EXTENSION(opx)      // KSS
 EXTENSION(mpk)      // KSS
 EXTENSION(mbm)      // KSS
+EXTENSION(sgc)      // NEZplug
+EXTENSION(nsd)      // NEZplug
