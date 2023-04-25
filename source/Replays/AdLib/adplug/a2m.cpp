@@ -47,7 +47,8 @@ CPlayer *Ca2mLoader::factory(Copl *newopl)
 bool Ca2mLoader::load(const std::string &filename, const CFileProvider &fp)
 {
   binistream *f = fp.open(filename); if (!f) return false;
-  int i, j, k, t;
+  unsigned int i;
+  int j, k, t;
   unsigned int l;
   unsigned char *org, *orgptr, flags = 0;
   unsigned long alength;
@@ -161,9 +162,11 @@ bool Ca2mLoader::load(const std::string &filename, const CFileProvider &fp)
   orgptr += length;
   for (i = 0; i < length; i++)
     if ((order[i] & 0x7f) >= numpats) {		// invalid pattern in order list
-      delete [] org;
-      fp.close(f);
-      return false;
+      // What to do in this case in not defined in documentation? There are songs that contain this fault.
+      // We have two options:
+      //  1. allocate an empty pattern and redirect to this - more work and lots of quirks
+      //  2. adjust order list to point to pattern 0 / jump to order 0 instead
+      order[i] &= 0x80; // make it point to pattern 0 / jump to order 0
     }
 
   bpm = *orgptr++;
@@ -199,7 +202,7 @@ bool Ca2mLoader::load(const std::string &filename, const CFileProvider &fp)
     orgptr = org + alength;
   }
 
-  if (orgptr - org < needed) {
+  if (orgptr - org < (signed long)needed) {
     delete [] org;
     fp.close(f);
     return false;

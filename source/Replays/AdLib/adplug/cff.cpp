@@ -103,7 +103,7 @@ bool CcffLoader::load(const std::string &filename, const CFileProvider &fp)
 
   // number of patterns
   nop = module[0x5E0];
-  if (nop < 1 || nop > 36 || 0x669 + nop * 64 * 9 * 3 > module_size) {
+  if (nop < 1 || nop > 36 || (size_t)0x669 + nop * 64 * 9 * 3 > module_size) {
     delete [] module;
     return false;
   }
@@ -292,7 +292,7 @@ unsigned int CcffLoader::getinstruments()
   return 47;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(disable:4244)
 #pragma warning(disable:4018)
 #endif
@@ -450,7 +450,7 @@ void CcffLoader::cff_unpacker::expand_dictionary(unsigned char *string)
   heap_length += string[0] + 1;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSC_VER)
 #pragma warning(default:4244)
 #pragma warning(default:4018)
 #endif

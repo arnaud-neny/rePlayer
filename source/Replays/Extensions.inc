@@ -310,3 +310,4 @@ EXTENSION(mpk)      // KSS
 EXTENSION(mbm)      // KSS
 EXTENSION(sgc)      // NEZplug
 EXTENSION(nsd)      // NEZplug
+EXTENSION(pis)      // AdLib: Beni Tracker

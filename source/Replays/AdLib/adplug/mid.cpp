@@ -143,10 +143,20 @@ CmidPlayer::CmidPlayer(Copl *newopl)
 {
 }
 
-unsigned char CmidPlayer::datalook(long pos)
+unsigned char CmidPlayer::datalook(unsigned long pos)
 {
-    if (pos<0 || pos >= flen) return(0);
+    if (pos >= flen) return(0);
     return(data[pos]);
+}
+
+void CmidPlayer::readString(char *dst, unsigned long num)
+{
+	unsigned long i;
+
+    for (i=0; i<num; i++)
+        {
+        dst[i]=(char)datalook(pos); pos++;
+        }
 }
 
 unsigned long CmidPlayer::getnexti(unsigned long num)
@@ -309,7 +319,24 @@ bool CmidPlayer::load(const std::string &filename, const CFileProvider &fp)
             if (s[1]=='D' && s[2]=='L') good=FILE_LUCAS;
             break;
         case 'M':
-            if (s[1]=='T' && s[2]=='h' && s[3]=='d') good=FILE_MIDI;
+            if (s[1]=='T' && s[2]=='h' && s[3]=='d')
+            {
+                /* "MThd"              header-chunk
+                 * 0x00 0x00 0x00 0x06 header size
+                 * 0x00 0x0n           midi file type: 0=single-track format, 1=multiple-track format, 2=multiple-song format
+                 * 0xnn 0xnn           number of tracks
+                 * 0xnn 0xnn           tempo
+                 */
+                f->seek(-2, binio::Add); // we have already read 6 bytes from the start
+                f->setFlag(binio::BigEndian, true);
+                if (f->readInt(4) != 6)
+                    break;
+                midi_type=f->readInt(2);
+                if (midi_type > 2 || f->readInt(2) < 1)
+                    break;
+                good=FILE_MIDI;
+                midiprintf ("General MIDI type: %d\n", midi_type);
+            }
             break;
         case 'C':
             if (s[1]=='T' && s[2]=='M' && s[3]=='F') good=FILE_CMF;
@@ -943,19 +970,43 @@ void CmidPlayer::rewind(int subsong)
             case FILE_MIDI:
                 if (type != FILE_LUCAS)
                     tins=128;
-                getnext(11);  /*skip header*/
+                getnext(11); /* skip past header data until deltas is reached */
                 deltas=getnext(2);
                 midiprintf ("deltas:%ld\n",deltas);
-                getnext(4);
+
+                /* MIDI files should be played back one octave and a semi-note off in to be played back correctly */
+                if (type != FILE_LUCAS)
+                {
+                    for (i=0; i<16; i++)
+                    {
+                        ch[i].nshift=-13;
+                    }
+                }
 
                 curtrack=0;
-                track[curtrack].on=1;
-                track[curtrack].tend=getnext(4);
-                midiprintf ("tracklen:%lu\n",track[curtrack].tend);
-                //track[curtrack].tend += pos; // FIXME: length -> end position
-                if (track[curtrack].tend > flen) // no music after end of file
-                    track[curtrack].tend = flen;
-                track[curtrack].spos=pos;
+                while ((curtrack == 0) ||
+                       ((midi_type == 1) && (curtrack < 16)))
+                {
+                    /* MIDI type 0 (and LucasArts AdLib MIDI) stores all the MIDI channels in a single track,
+                     * while MIDI type 1 splits each channel into separate tracks */
+                    int len;
+                    char s[5];
+                    readString(s, 4);
+                    s[4] = 0;
+                    midiprintf ("Offset=0x%08lx\n", pos);
+                    midiprintf ("trkHeader: '%s'\n", s);
+                    if (strcmp(s, "MTrk"))
+                        break;
+                    track[curtrack].on=1;
+                    len=getnext(4);
+                    midiprintf ("tracklen:%lu\n",len);
+                    track[curtrack].tend = pos + len;
+                    if (track[curtrack].tend > flen) // no music after end of file
+                        track[curtrack].tend = flen;
+                    track[curtrack].spos=pos;
+                    pos+=len;
+                    curtrack++;
+                }
                 break;
             case FILE_CMF:
                 getnext(3);  // ctmf
@@ -967,15 +1018,15 @@ void CmidPlayer::rewind(int subsong)
                 if (i) msqtr = 1000000L / i * deltas;
 
                 i=getnexti(2);
-                if (i > 0 && i < flen &&
+                if (i > 0 && (unsigned long)i < flen &&
                     strnlen((char *)data + i, flen - i) < flen - i)
                   title = (char *)data + i;
                 i=getnexti(2);
-                if (i > 0 && i < flen &&
+                if (i > 0 && (unsigned long)i < flen &&
                     strnlen((char *)data + i, flen - i) < flen - i)
                   author = (char *)data + i;
                 i=getnexti(2);
-                if (i > 0 && i < flen &&
+                if (i > 0 && (unsigned long)i < flen &&
                     strnlen((char *)data + i, flen - i) < flen - i)
                   remarks = (char *)data + i;
 
@@ -1128,7 +1179,8 @@ std::string CmidPlayer::gettype()
 	case FILE_LUCAS:
 		return std::string("LucasArts AdLib MIDI");
 	case FILE_MIDI:
-		return std::string("General MIDI");
+		// avoid using std::to_string(midi_type) which is c++11 and may be broken in mingw32
+		return std::string("General MIDI (type " + std::string(1, '0' + midi_type) + ")");
 	case FILE_CMF:
 		return std::string("Creative Music Format (CMF MIDI)");
 	case FILE_OLDLUCAS:

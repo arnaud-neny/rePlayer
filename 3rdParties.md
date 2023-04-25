@@ -34,7 +34,7 @@
 - game-music-emu: https://bitbucket.org/mpyne/game-music-emu
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - libvgm: https://github.com/ValleyBell/libvgm
-- UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player  
+- UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade  
   Some changes there to improved the loops (score) and some windows port.
 - Highly Quixotic: https://gitlab.com/kode54/highly_quixotic, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_qsf
 - Highly Advanced: https://gitlab.com/kode54/mgba, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_gsf

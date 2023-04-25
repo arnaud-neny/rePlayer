@@ -159,6 +159,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="adplug\nemuopl.h" />
     <ClInclude Include="adplug\nukedopl.h" />
     <ClInclude Include="adplug\opl.h" />
+    <ClInclude Include="adplug\pis.h" />
     <ClInclude Include="adplug\player.h" />
     <ClInclude Include="adplug\players.h" />
     <ClInclude Include="adplug\protrack.h" />
@@ -223,6 +224,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="adplug\hyp.cpp" />
     <ClCompile Include="adplug\imf.cpp" />
     <ClCompile Include="adplug\jbm.cpp" />
+    <ClCompile Include="adplug\kemuopl.cpp" />
     <ClCompile Include="adplug\ksm.cpp" />
     <ClCompile Include="adplug\lds.cpp" />
     <ClCompile Include="adplug\libbinio\binfile.cpp" />
@@ -238,6 +240,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="adplug\mus.cpp" />
     <ClCompile Include="adplug\nemuopl.cpp" />
     <ClCompile Include="adplug\nukedopl.c" />
+    <ClCompile Include="adplug\pis.cpp" />
     <ClCompile Include="adplug\player.cpp" />
     <ClCompile Include="adplug\players.cpp" />
     <ClCompile Include="adplug\protrack.cpp" />

@@ -263,6 +263,9 @@
     <ClInclude Include="adplug\coktel.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
+    <ClInclude Include="adplug\pis.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayAdLib.cpp">
@@ -482,6 +485,12 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\coktel.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\kemuopl.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\pis.cpp">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,6 @@
 v0.3.0
 - Added NEZplug player
+- Updated adplug to 2.3.3.801
 - ImGui 1.89.53 (to fix the modals getting closed on focus)
 - Bug fixes
 
