@@ -23,7 +23,7 @@ namespace rePlayer
         s.Store(sourceIds);
         s.Store(metadata);
         s.Store(releaseYear);
-        s.Store(padding);
+        s.Store(databaseDay);
         for (uint16_t i = 0; i <= lastSubsongIndex; i++)
             s.Store(subsongs[i]);
         return s;
@@ -74,6 +74,13 @@ namespace rePlayer
         if (dataSize != 0)
             return releaseYear;
         return Dynamic()->releaseYear;
+    }
+
+    const uint16_t Song::GetDatabaseDay() const
+    {
+        if (dataSize != 0)
+            return databaseDay;
+        return Dynamic()->databaseDay;
     }
 
     const MediaType Song::GetType() const
@@ -232,6 +239,7 @@ namespace rePlayer
             song->fileCrc = fileCrc;
             song->tags = tags;
             song->releaseYear = releaseYear;
+            song->databaseDay = databaseDay;
             song->type = type;
             song->name = name;
             song->artistIds.Clear();

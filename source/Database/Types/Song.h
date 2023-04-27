@@ -29,7 +29,7 @@ namespace rePlayer
         BlobArray<SourceID, storage> sourceIds;                 // offset : 32
         BlobArray<CommandBuffer::Command, storage> metadata;    // offset : 34
         uint16_t releaseYear = 0;                               // offset : 36
-        uint16_t padding = 0;                                   // offset : 38
+        uint16_t databaseDay = 0;                               // offset : 38
         Subsongs subsongs;                                      // offset : 40
 
         SongData();
@@ -67,6 +67,7 @@ namespace rePlayer
         const uint32_t GetFileCrc() const;
         const Tag GetTags() const;
         const uint16_t GetReleaseYear() const;
+        const uint16_t GetDatabaseDay() const;
         const MediaType GetType() const;
         const bool IsInvalid() const;
         const bool IsUnavailable() const;

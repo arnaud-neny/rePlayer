@@ -77,6 +77,7 @@ namespace rePlayer
             kCRC,
             kState,
             kRating,
+            kDatabaseDate,
             kNumIDs
         };
 

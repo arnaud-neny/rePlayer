@@ -4,6 +4,7 @@
 #include <Core/String.h>
 #include <Helpers/CommandBuffer.inl.h>
 #include <Imgui.h>
+#include <Imgui/imgui_internal.h>
 #include <IO/File.h>
 #include <IO/Stream.h>
 
@@ -17,6 +18,7 @@
 #include <Replays/ReplayContexts.h>
 
 #include <algorithm>
+#include <chrono>
 
 namespace rePlayer
 {
@@ -152,10 +154,11 @@ namespace rePlayer
             ImGui::TableNextColumn();
             if (currentSong)
             {
-                ImGui::Text("id%06X%c | %.2fKB | crc%08X | Release Year", static_cast<uint32_t>(m_musicId.subsongId.songId)
+                auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(currentSong->GetDatabaseDay() + Core::kReferenceDate)));
+                ImGui::Text("id%06X%c | %.2fKB | %04d/%02u/%02u | Release Year", static_cast<uint32_t>(m_musicId.subsongId.songId)
                     , m_musicId.databaseId == DatabaseID::kPlaylist ? 'P' : 'L'
                     , currentSong->GetFileSize() / 1024.0f
-                    , currentSong->GetFileCrc());
+                    , int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
                 ImGui::SameLine();
                 ImGui::SetNextItemWidth(-FLT_MIN);
                 int32_t year = m_song.edited.releaseYear;

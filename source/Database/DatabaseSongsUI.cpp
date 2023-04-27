@@ -11,6 +11,7 @@
 #include <RePlayer/Core.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 
 namespace rePlayer
@@ -310,6 +311,7 @@ namespace rePlayer
             ImGui::TableSetupColumn("CRC", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_DefaultHide, 0.0f, kCRC);
             ImGui::TableSetupColumn(">|", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 0.0f, kState);
             ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
+            ImGui::TableSetupColumn("Added", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide, 0.0f, kDatabaseDate);
             ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
             ImGui::TableHeadersRow();
 
@@ -401,6 +403,9 @@ namespace rePlayer
                         }
                         ImGui::EndPopup();
                     }
+                    ImGui::TableNextColumn();
+                    auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(song->GetDatabaseDay() + Core::kReferenceDate)));
+                    ImGui::Text("%04d/%02u/%02u", int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
                     ImGui::PopID();
                 }
             }
@@ -466,6 +471,9 @@ namespace rePlayer
                         break;
                     case kRating:
                         delta = int64_t(lSong->GetSubsongRating(l.id.index)) - int64_t(rSong->GetSubsongRating(r.id.index));
+                        break;
+                    case kDatabaseDate:
+                        delta = int64_t(lSong->GetDatabaseDay()) - int64_t(rSong->GetDatabaseDay());
                         break;
                     }
 

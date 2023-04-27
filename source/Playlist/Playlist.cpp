@@ -1106,6 +1106,7 @@ namespace rePlayer
         auto currentPlayingEntry = droppedEntryIndex <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : MusicID();
         bool isAcceptingAll = m_dropTarget->IsAcceptingAll();
 
+        auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
         auto files = m_dropTarget->AcquireFiles();
         for (auto filename : files)
         {
@@ -1150,6 +1151,7 @@ namespace rePlayer
                     songSheet->type = replays.Find(path.extension().string().c_str() + 1);
                     songSheet->name = reinterpret_cast<const char*>(songSheet->type.ext != eExtension::Unknown ? path.stem().u8string().c_str() : path.filename().u8string().c_str());
                     songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
+                    songSheet->databaseDay = databaseDay;
                     m_cue.paths.Add(filename.c_str(), filename.size() + 1);
                     m_cue.arePathsDirty = true;
 

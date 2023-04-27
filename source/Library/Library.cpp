@@ -29,6 +29,7 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <chrono>
 
 namespace rePlayer
 {
@@ -958,6 +959,8 @@ namespace rePlayer
                 sprintf(txt, "%d %s to import###Process", numChecked, numChecked == 1 ? "song" : "songs");
             if (ImGui::Button(txt, ImVec2(-1.0f, 0.0f)))
             {
+                auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
+
                 // first, update the fetch time of the imported artist if they already exist in the library
                 for (auto importedArtistId : m_imports.sourceResults.importedArtists)
                 {
@@ -1055,6 +1058,8 @@ namespace rePlayer
                             auto* oldSong = m_db[newSong->id]->Edit();
                             oldSong->sourceIds.Remove(newSong->sourceIds[0]);
                         }
+
+                        newSong->databaseDay = databaseDay;
 
                         auto* dbNewSong = m_db.AddSong(newSong);
                         m_sources[newSong->sourceIds[0].sourceId]->OnSongUpdate(dbNewSong);
