@@ -16,6 +16,7 @@ namespace rePlayer
         .replayId = eReplay::OpenMPT,
         .name = "OpenMPT",
         .about = "OpenMPT " OPENMPT_API_VERSION_STRING "\nCopyright (c) 2004-2023 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
+        .settings = "OpenMPT " OPENMPT_API_VERSION_STRING,
         .init = ReplayOpenMPT::Init,
         .release = ReplayOpenMPT::Release,
         .load = ReplayOpenMPT::Load,
@@ -94,45 +95,38 @@ namespace rePlayer
     bool ReplayOpenMPT::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("OpenMPT " OPENMPT_API_VERSION_STRING, ImGuiTreeNodeFlags_None))
+        struct
         {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("OpenMPT");
-            struct
+            int32_t index{ 0 };
+            static bool getter(void*, int32_t index, const char** outText) { *outText = ms_settings[index].format; return true; }
+        } static cb;
+        ImGui::Combo("Format", &cb.index, cb.getter, nullptr, _countof(ms_settings));
+        if (cb.index != 0)
+        {
+            const char* const overridden[] = { "Disable", "Enable" };
+            if (ImGui::Combo("Override", &ms_settings[cb.index].isEnabled, overridden, _countof(overridden)))
             {
-                int32_t index{ 0 };
-                static bool getter(void*, int32_t index, const char** outText) { *outText = ms_settings[index].format; return true; }
-            } static cb;
-            ImGui::Combo("Format", &cb.index, cb.getter, nullptr, _countof(ms_settings));
-            if (cb.index != 0)
-            {
-                const char* const overridden[] = { "Disable", "Enable" };
-                if (ImGui::Combo("Override", &ms_settings[cb.index].isEnabled, overridden, _countof(overridden)))
-                {
-                    ms_settings[cb.index].interpolation = ms_settings[0].interpolation;
-                    ms_settings[cb.index].ramping = ms_settings[0].ramping;
-                    ms_settings[cb.index].stereoSeparation = ms_settings[0].stereoSeparation;
-                    ms_settings[cb.index].surround = ms_settings[0].surround;
-                    ms_settings[cb.index].vblank = ms_settings[0].vblank;
-                    changed = true;
-                }
+                ms_settings[cb.index].interpolation = ms_settings[0].interpolation;
+                ms_settings[cb.index].ramping = ms_settings[0].ramping;
+                ms_settings[cb.index].stereoSeparation = ms_settings[0].stereoSeparation;
+                ms_settings[cb.index].surround = ms_settings[0].surround;
+                ms_settings[cb.index].vblank = ms_settings[0].vblank;
+                changed = true;
             }
-            auto settingsIndex = ms_settings[cb.index].isEnabled ? cb.index : 0;
-            ImGui::BeginDisabled(!ms_settings[cb.index].isEnabled);
-            const char* const interpolation[] = { "default", "off", "linear", "cubic", "sinc" };
-            changed |= ImGui::Combo("Interpolation", &ms_settings[settingsIndex].interpolation, interpolation, _countof(interpolation));
-            changed |= ImGui::SliderInt("Ramping", &ms_settings[settingsIndex].ramping, -1, 10, "%d", ImGuiSliderFlags_NoInput);
-            changed |= ImGui::SliderInt("Stereo", &ms_settings[settingsIndex].stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, _countof(surround));
-            const char* const vblank[] = { "Auto", "CIA", "VBlank" };
-            int32_t vblankValue = ms_settings[settingsIndex].vblank + 1;
-            changed |= ImGui::Combo("Timing", &vblankValue, vblank, _countof(vblank));
-            ms_settings[settingsIndex].vblank = vblankValue - 1;
-            ImGui::EndDisabled();
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
         }
+        auto settingsIndex = ms_settings[cb.index].isEnabled ? cb.index : 0;
+        ImGui::BeginDisabled(!ms_settings[cb.index].isEnabled);
+        const char* const interpolation[] = { "default", "off", "linear", "cubic", "sinc" };
+        changed |= ImGui::Combo("Interpolation", &ms_settings[settingsIndex].interpolation, interpolation, _countof(interpolation));
+        changed |= ImGui::SliderInt("Ramping", &ms_settings[settingsIndex].ramping, -1, 10, "%d", ImGuiSliderFlags_NoInput);
+        changed |= ImGui::SliderInt("Stereo", &ms_settings[settingsIndex].stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, _countof(surround));
+        const char* const vblank[] = { "Auto", "CIA", "VBlank" };
+        int32_t vblankValue = ms_settings[settingsIndex].vblank + 1;
+        changed |= ImGui::Combo("Timing", &vblankValue, vblank, _countof(vblank));
+        ms_settings[settingsIndex].vblank = vblankValue - 1;
+        ImGui::EndDisabled();
         return changed;
     }
 

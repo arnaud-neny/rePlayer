@@ -23,6 +23,7 @@ namespace rePlayer
         .name = "Video Game Music",
         .extensions = "vgm;vgz",
         .about = "libvgm",
+        .settings = "libvgm " LIBVGM_VERSION,
         .init = ReplayVGM::Init,
         .load = ReplayVGM::Load,
         .displaySettings = ReplayVGM::DisplaySettings,
@@ -92,28 +93,21 @@ namespace rePlayer
     bool ReplayVGM::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("libvgm " LIBVGM_VERSION, ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("VGM");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            const char* const dro[] = { "Detect", "Header", "Forced"};
-            changed |= ImGui::Combo("DRO v2 with Opl3", &ms_droV2Opl3, dro, _countof(dro));
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Applied only on reload :(");
-            const char* const hz[] = { "Default", "PAL", "NTSC" };
-            changed |= ImGui::Combo("VGM playback", &ms_vgmPlaybackHz, hz, _countof(hz));
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Applied only on reload :(");
-            const char* const stop[] = { "Off", "On" };
-            changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, _countof(stop));
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Applied only on reload :(");
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        const char* const dro[] = { "Detect", "Header", "Forced"};
+        changed |= ImGui::Combo("DRO v2 with Opl3", &ms_droV2Opl3, dro, _countof(dro));
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+        const char* const hz[] = { "Default", "PAL", "NTSC" };
+        changed |= ImGui::Combo("VGM playback", &ms_vgmPlaybackHz, hz, _countof(hz));
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+        const char* const stop[] = { "Off", "On" };
+        changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, _countof(stop));
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
         return changed;
     }
 

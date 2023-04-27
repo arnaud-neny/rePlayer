@@ -15,6 +15,7 @@ namespace rePlayer
         .name = "SoundMon",
         .extensions = "bp;bp3;bs",
         .about = "BSPlay 1.1\nBrian Postma",
+        .settings = "SoundMon",
         .init = ReplaySoundMon::Init,
         .load = ReplaySoundMon::Load,
         .displaySettings = ReplaySoundMon::DisplaySettings,
@@ -44,16 +45,9 @@ namespace rePlayer
     bool ReplaySoundMon::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("SoundMon", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("SoundMon");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

@@ -153,10 +153,15 @@ namespace rePlayer
     bool Replays::DisplaySettings() const
     {
         bool changed = false;
-        for (auto* plugin : m_plugins)
+        if (ImGui::CollapsingHeader("Replays", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            if (plugin)
-                changed |= plugin->displaySettings();
+            struct
+            {
+                static bool getter(void* data, int32_t index, const char** outText) { *outText = reinterpret_cast<Replays*>(data)->m_settingsPlugins[index]->settings; return true; }
+            } cb;
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            ImGui::Combo("##Replays", &m_selectedSettings, cb.getter, (void*)this, m_numSettings);
+            changed = m_settingsPlugins[m_selectedSettings]->displaySettings();
         }
         return changed;
     }
@@ -232,6 +237,27 @@ namespace rePlayer
         {
             m_replayToIndex[indices[i]] = uint8_t(i);
             m_sortedPlugins[i] = m_plugins[indices[i]];
+            m_settingsPlugins[i] = m_plugins[i];
+            if (m_plugins[i]->settings)
+                m_numSettings++;
+        }
+        std::sort(m_settingsPlugins, m_settingsPlugins + uint16_t(eReplay::Count), [](auto l, auto r)
+        {
+            if (l->settings == nullptr && r->settings == nullptr)
+                return r < l;
+            if (l->settings == nullptr && r->settings != nullptr)
+                return false;
+            if (l->settings != nullptr && r->settings == nullptr)
+                return true;
+            return _stricmp(l->settings, r->settings) < 0;
+        });
+        for (uint16_t i = 0; i < m_numSettings; i++)
+        {
+            if (m_settingsPlugins[i]->replayId == eReplay::OpenMPT)
+            {
+                m_selectedSettings = i;
+                break;
+            }
         }
     }
 

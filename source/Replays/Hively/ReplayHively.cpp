@@ -20,6 +20,7 @@ namespace rePlayer
         .name = "HivelyTracker",
         .extensions = "ahx;hvl",
         .about = "HivelyTracker 1.9\nCopyright (c) 2006-2018 Pete Gordon",
+        .settings = "HivelyTracker 1.9",
         .init = ReplayHively::Init,
         .load = ReplayHively::Load,
         .displaySettings = ReplayHively::DisplaySettings,
@@ -67,16 +68,9 @@ namespace rePlayer
     bool ReplayHively::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("HivelyTracker 1.9 (AHX/HVL)", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("Hively");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

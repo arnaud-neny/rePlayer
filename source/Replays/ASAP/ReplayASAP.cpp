@@ -14,6 +14,7 @@ namespace rePlayer
         .name = "Another Slight Atari Player",
         .extensions = "sap;cmc;cm3;cmr;cms;dmc;dlt;fc;mpt;mpd;rmt;cm3;tmc;tm8;tm2",
         .about = "Another Slight Atari Player " ASAPInfo_VERSION "\nCopyright (c) 2005-2023 Piotr Fusik\nCMC, MPT, TMC, TM2 players (c) 1994-2005 Marcin Lewandowski\nRMT player (c) 2002-2005 Radek Sterba\nDLT player (c) 2009 Marek Konopka\nCMS player (c) 1999 David Spilka\nFC player (c) 2011 Jerzy Kut",
+        .settings = "Another Slight Atari Player " ASAPInfo_VERSION,
         .init = ReplayASAP::Init,
         .load = ReplayASAP::Load,
         .displaySettings = ReplayASAP::DisplaySettings,
@@ -46,16 +47,9 @@ namespace rePlayer
     bool ReplayASAP::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("Another Slight Atari Player " ASAPInfo_VERSION, ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("ASAP");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

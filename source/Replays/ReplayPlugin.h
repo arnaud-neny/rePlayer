@@ -40,6 +40,7 @@ namespace rePlayer
         const char* name = "Unknown";
         const char* extensions = "";
         const char* about = nullptr;
+        const char* settings = nullptr;
 
         bool (*init)(SharedContexts*, Window&) = [](SharedContexts* ctx, Window&) { ctx->Init(); return false; };
         void (*release)() = [](){};

@@ -186,7 +186,7 @@ namespace rePlayer
 
     void Deck::DisplaySettings()
     {
-        if (ImGui::CollapsingHeader("System", ImGuiTreeNodeFlags_None))
+        if (ImGui::CollapsingHeader("System", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Checkbox("Focus current playing song in Playlist", &m_isTrackingSongInPlaylist);
             ImGui::Checkbox("Focus current playing song in Database", &m_isTrackingSongInDatabase);

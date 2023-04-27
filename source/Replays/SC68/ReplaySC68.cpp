@@ -15,6 +15,7 @@ namespace rePlayer
         .name = "sc68",
         .extensions = "sc68;sndh;snd",
         .about = "libsc68 3.0.0a\nCopyright (c) 1998-2015 Benjamin Gerard",
+        .settings = sc68_versionstr() + 3,
         .init = ReplaySC68::Init,
         .release = ReplaySC68::Release,
         .load = ReplaySC68::Load,
@@ -91,42 +92,33 @@ namespace rePlayer
     bool ReplaySC68::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader(sc68_versionstr() + 3, ImGuiTreeNodeFlags_None))
         {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("sc68");
-
-            {
-                const char* const aSIDfier[] = { "off", "on", "force"};
-                changed |= ImGui::Combo("aSIDfier", &ms_aSIDfier, aSIDfier, _countof(aSIDfier));
-            }
-            {
-                const char* const engines[] = { "blep", "pulse/2-poles", "pulse/mixed", "pulse/1-pole", "pulse/boxcar", "pulse/none"};
-                changed |= ImGui::Combo("YM Engine & Filter", &ms_ymEngineAndFilter, engines, _countof(engines));
-                if (ImGui::IsItemHovered())
-                    ImGui::Tooltip("Applied only on reload :(");
-            }
-            {
-                const char* const volumeModels[] = { "atari", "linear" };
-                changed |= ImGui::Combo("YM Volume Model", &ms_ymVolumeModel, volumeModels, _countof(volumeModels));
-                if (ImGui::IsItemHovered())
-                    ImGui::Tooltip("Applied only on reload :(");
-            }
-            {
-                const char* const paulaFilters[] = { "off", "on" };
-                changed |= ImGui::Combo("Paula Filter", &ms_paulaFilter, paulaFilters, _countof(paulaFilters));
-                if (ImGui::IsItemHovered())
-                    ImGui::Tooltip("Applied only on reload :(");
-            }
-            changed |= ImGui::SliderInt("Paula Blending Factor", &ms_paulaBlending, 0, 255, "%d", ImGuiSliderFlags_NoInput);
+            const char* const aSIDfier[] = { "off", "on", "force"};
+            changed |= ImGui::Combo("aSIDfier", &ms_aSIDfier, aSIDfier, _countof(aSIDfier));
+        }
+        {
+            const char* const engines[] = { "blep", "pulse/2-poles", "pulse/mixed", "pulse/1-pole", "pulse/boxcar", "pulse/none"};
+            changed |= ImGui::Combo("YM Engine & Filter", &ms_ymEngineAndFilter, engines, _countof(engines));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
-            const char* const surround[] = { "Default", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
         }
+        {
+            const char* const volumeModels[] = { "atari", "linear" };
+            changed |= ImGui::Combo("YM Volume Model", &ms_ymVolumeModel, volumeModels, _countof(volumeModels));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+        }
+        {
+            const char* const paulaFilters[] = { "off", "on" };
+            changed |= ImGui::Combo("Paula Filter", &ms_paulaFilter, paulaFilters, _countof(paulaFilters));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+        }
+        changed |= ImGui::SliderInt("Paula Blending Factor", &ms_paulaBlending, 0, 255, "%d", ImGuiSliderFlags_NoInput);
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Applied only on reload :(");
+        const char* const surround[] = { "Default", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

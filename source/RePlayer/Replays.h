@@ -44,7 +44,10 @@ namespace rePlayer
     private:
         ReplayPlugin* m_plugins[uint16_t(eReplay::Count)];
         ReplayPlugin* m_sortedPlugins[uint16_t(eReplay::Count)];
+        ReplayPlugin* m_settingsPlugins[uint16_t(eReplay::Count)];
         uint8_t m_replayToIndex[uint16_t(eReplay::Count)];
+        uint16_t m_numSettings = 0;
+        mutable int32_t m_selectedSettings = 0;
 
         const char* m_fileFilters = nullptr;
 

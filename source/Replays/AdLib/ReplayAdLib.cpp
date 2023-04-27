@@ -176,28 +176,17 @@ namespace rePlayer
     bool ReplayAdLib::DisplaySettings()
     {
         bool changed = false;
-        std::string adplug = "AdPlug ";
-        adplug += CAdPlug::get_version();
-        if (ImGui::CollapsingHeader(adplug.c_str(), ImGuiTreeNodeFlags_None))
         {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("AdLib");
-
-            {
-                const char* const opls[] = { "DOSBox OPL3", "Nuked OPL3", "Ken Silverman", "Tatsuyuki Satoh MAME OPL2"};
-                changed |= ImGui::Combo("OPL Emulator", reinterpret_cast<int32_t*>(&ms_opl), opls, _countof(opls));
-                if (ImGui::IsItemHovered())
-                    ImGui::Tooltip("Applied only on reload :(");
-            }
-            {
-                const char* const surround[] = { "Stereo", "Surround" };
-                changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-                if (ImGui::IsItemHovered())
-                    ImGui::Tooltip("Applied only on reload :(");
-            }
-
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
+            const char* const opls[] = { "DOSBox OPL3", "Nuked OPL3", "Ken Silverman", "Tatsuyuki Satoh MAME OPL2"};
+            changed |= ImGui::Combo("OPL Emulator", reinterpret_cast<int32_t*>(&ms_opl), opls, _countof(opls));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
+        }
+        {
+            const char* const surround[] = { "Stereo", "Surround" };
+            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload :(");
         }
         return changed;
     }
@@ -261,12 +250,18 @@ namespace rePlayer
         memcpy(ext, extensions.c_str(), extensions.size() + 1);
         g_replayPlugin.extensions = ext;
 
+        auto settingsLabel = std::string("AdPlug ") + CAdPlug::get_version();
+        auto settings = new char[settingsLabel.size() + 1];
+        memcpy(settings, settingsLabel.c_str(), settingsLabel.size() + 1);
+        g_replayPlugin.settings = settings;
+
         return false;
     }
 
     void ReplayAdLib::Release()
     {
         delete[] g_replayPlugin.extensions;
+        delete[] g_replayPlugin.settings;
     }
 
     ReplayAdLib::~ReplayAdLib()

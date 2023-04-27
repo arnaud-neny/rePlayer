@@ -15,6 +15,7 @@ namespace rePlayer
         .name = "Farbrausch ViruZ II",
         .extensions = "v2m",
         .about = "Farbrausch ViruZ II\nCopyright (c) 2000-2008 Tammo \"kb\" Hinrichs",
+        .settings = "Farbrausch ViruZ II",
         .init = ReplayV2::Init,
         .load = ReplayV2::Load,
         .displaySettings = ReplayV2::DisplaySettings,
@@ -63,21 +64,12 @@ namespace rePlayer
     bool ReplayV2::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("Farbrausch ViruZ II", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("V2");
-
-            const char* const synths[] = { "x86", "Core" };
-            int index = ms_isCoreSynth ? 1 : 0;
-            changed |= ImGui::Combo("Synth engine", &index, synths, _countof(synths));
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("V2 Synth x86 is \"emulating\" original assembler code.\nV2 Synth Core is a lot fast but it isn't playing properly some tunes.");
-            ms_isCoreSynth = index == 1;
-
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        const char* const synths[] = { "x86", "Core" };
+        int index = ms_isCoreSynth ? 1 : 0;
+        changed |= ImGui::Combo("Synth engine", &index, synths, _countof(synths));
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("V2 Synth x86 is \"emulating\" original assembler code.\nV2 Synth Core is a lot fast but it isn't playing properly some tunes.");
+        ms_isCoreSynth = index == 1;
         return changed;
     }
 

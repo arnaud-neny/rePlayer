@@ -21,6 +21,7 @@ namespace rePlayer
         .name = "GBSPlay",
         .extensions = "gbs;gbr;gb;vgm;vgz",
         .about = "GBSPlay " GBS_VERSION "\nCopyright (c) 2003-2021 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>\nChristian Garbs <mitch@cgarbs.de>\nMaximilian Rehkopf <otakon@gmx.net>\nVegard Nossum <vegardno@ifi.uio.no>",
+        .settings = "GBSPlay " GBS_VERSION,
         .init = ReplayGBSPlay::Init,
         .release = ReplayGBSPlay::Release,
         .load = ReplayGBSPlay::Load,
@@ -59,18 +60,11 @@ namespace rePlayer
     bool ReplayGBSPlay::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("GBSPlay " GBS_VERSION, ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("GBSPlay");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            const char* const filters[] = { "Off", "Game Boy Classic", "Game Boy Color" };
-            changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        const char* const filters[] = { "Off", "Game Boy Classic", "Game Boy Color" };
+        changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
         return changed;
     }
 

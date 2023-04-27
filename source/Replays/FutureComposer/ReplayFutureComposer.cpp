@@ -15,6 +15,7 @@ namespace rePlayer
         .name = "Future Composer",
         .extensions = "smod;fc",
         .about = "Future Composer 1.0.3",
+        .settings = "Future Composer 1.0.3",
         .init = ReplayFutureComposer::Init,
         .load = ReplayFutureComposer::Load,
         .displaySettings = ReplayFutureComposer::DisplaySettings,
@@ -55,18 +56,11 @@ namespace rePlayer
     bool ReplayFutureComposer::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("FutureComposer 1.0.3", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("FutureComposer");
-            const char* const clocks[] = { "PAL", "NTSC" };
-            changed |= ImGui::Combo("Amiga Clock###FCAmigaClock", &ms_isNtsc, clocks, _countof(clocks));
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        const char* const clocks[] = { "PAL", "NTSC" };
+        changed |= ImGui::Combo("Amiga Clock###FCAmigaClock", &ms_isNtsc, clocks, _countof(clocks));
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

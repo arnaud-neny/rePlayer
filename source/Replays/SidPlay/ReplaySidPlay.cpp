@@ -39,6 +39,7 @@ namespace rePlayer
         .name = "SidPlay",
         .extensions = "psid;rsid;sid;mus",
         .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2023 Leandro Nini",
+        .settings = "SidPlay " PACKAGE_VERSION,
         .init = ReplaySidPlay::Init,
         .release = ReplaySidPlay::Release,
         .load = ReplaySidPlay::Load,
@@ -111,42 +112,35 @@ namespace rePlayer
     bool ReplaySidPlay::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("SidPlay " PACKAGE_VERSION, ImGuiTreeNodeFlags_None))
         {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("SidPlay");
-            {
-                const char* const sidModels[] = { "6581", "8580" };
-                int index = ms_isSidModel8580 ? 1 : 0;
-                changed |= ImGui::Combo("SID Default Model", &index, sidModels, _countof(sidModels));
-                ms_isSidModel8580 = index == 1;
-            }
-            {
-                const char* const clocks[] = { "PAL", "NTSC" };
-                auto index = ms_isNtsc ? 1 : 0;
-                changed |= ImGui::Combo("Default Clock###SidClock", &index, clocks, _countof(clocks));
-                ms_isNtsc = index == 1;
-            }
-            {
-                const char* const samplings[] = { "Interpolate", "Resample" };
-                auto index = ms_isResampling ? 1 : 0;
-                changed |= ImGui::Combo("Sampling###SidSampling", &index, samplings, _countof(samplings));
-                ms_isResampling = index == 1;
-            }
-            {
-                const char* const samplings[] = { "Off", "On" };
-                auto index = ms_isFilterEnabled ? 1 : 0;
-                changed |= ImGui::Combo("Filter###SidFilter", &index, samplings, _countof(samplings));
-                ms_isFilterEnabled = index != 0;
-            }
-            changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            {
-                const char* const surround[] = { "Default", "Surround" };
-                changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            }
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
+            const char* const sidModels[] = { "6581", "8580" };
+            int index = ms_isSidModel8580 ? 1 : 0;
+            changed |= ImGui::Combo("SID Default Model", &index, sidModels, _countof(sidModels));
+            ms_isSidModel8580 = index == 1;
+        }
+        {
+            const char* const clocks[] = { "PAL", "NTSC" };
+            auto index = ms_isNtsc ? 1 : 0;
+            changed |= ImGui::Combo("Default Clock###SidClock", &index, clocks, _countof(clocks));
+            ms_isNtsc = index == 1;
+        }
+        {
+            const char* const samplings[] = { "Interpolate", "Resample" };
+            auto index = ms_isResampling ? 1 : 0;
+            changed |= ImGui::Combo("Sampling###SidSampling", &index, samplings, _countof(samplings));
+            ms_isResampling = index == 1;
+        }
+        {
+            const char* const samplings[] = { "Off", "On" };
+            auto index = ms_isFilterEnabled ? 1 : 0;
+            changed |= ImGui::Combo("Filter###SidFilter", &index, samplings, _countof(samplings));
+            ms_isFilterEnabled = index != 0;
+        }
+        changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        {
+            const char* const surround[] = { "Default", "Surround" };
+            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         }
         return changed;
     }

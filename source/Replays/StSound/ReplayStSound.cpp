@@ -14,6 +14,7 @@ namespace rePlayer
         .name = "StSound",
         .extensions = "ym",
         .about = "StSound\nCopyright (c) 2021 Arnaud Carré",
+        .settings = "StSound",
         .init = ReplayStSound::Init,
         .load = ReplayStSound::Load,
         .displaySettings = ReplayStSound::DisplaySettings,
@@ -45,19 +46,10 @@ namespace rePlayer
     bool ReplayStSound::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("StSound", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("StSound");
-
-            const char* const filter[] = { "Off", "On" };
-            int32_t index = ms_isLowpassFilterEnabled ? 1 : 0;
-            changed |= ImGui::Combo("Lowpass filter", &index, filter, _countof(filter));
-            ms_isLowpassFilterEnabled = index != 0;
-
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        const char* const filter[] = { "Off", "On" };
+        int32_t index = ms_isLowpassFilterEnabled ? 1 : 0;
+        changed |= ImGui::Combo("Lowpass filter", &index, filter, _countof(filter));
+        ms_isLowpassFilterEnabled = index != 0;
         return changed;
     }
 

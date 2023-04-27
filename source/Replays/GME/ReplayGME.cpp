@@ -15,7 +15,8 @@ namespace rePlayer
         .replayId = eReplay::GME,
         .name = "Game-Music-Emu",
         .extensions = "ay;gbs;gym;hes;kss;nsf;nsfe;sap;spc;rsn;vgm;vgz",
-        .about = "Game-Music-Emu 0.7.0@6cd4bdb" "\nShay Green & Michael Pyne",
+        .about = "Game-Music-Emu 0.7.0 @6cd4bdb" "\nShay Green & Michael Pyne",
+        .settings = "Game-Music-Emu 0.7.0 @6cd4bdb",
         .init = ReplayGME::Init,
         .load = ReplayGME::Load,
         .displaySettings = ReplayGME::DisplaySettings,
@@ -83,16 +84,9 @@ namespace rePlayer
     bool ReplayGME::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("Game-Music-Emu 0.7.0@6cd4bdb", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("GME");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

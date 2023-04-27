@@ -13,6 +13,7 @@ namespace rePlayer
         .name = "Ayfly",
         .extensions = "ay;vtx;ym;psg;asc;pt1;pt2;pt3;stc;stp;psc;sqt",
         .about = "ayfly " AYFLY_VERSION_TEXT "b",
+        .settings = "ayfly " AYFLY_VERSION_TEXT "b",
         .init = ReplayAyfly::Init,
         .load = ReplayAyfly::Load,
         .displaySettings = ReplayAyfly::DisplaySettings,
@@ -44,18 +45,11 @@ namespace rePlayer
     bool ReplayAyfly::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("Ayfly 0.0.25b", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("Ayfly");
-            const char* const oversamples[] = { "x1", "x2", "x3", "x4" };
-            changed |= ImGui::Combo("Oversample", &ms_oversample, oversamples, _countof(oversamples));
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        const char* const oversamples[] = { "x1", "x2", "x3", "x4" };
+        changed |= ImGui::Combo("Oversample", &ms_oversample, oversamples, _countof(oversamples));
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 

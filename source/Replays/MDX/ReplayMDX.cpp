@@ -19,6 +19,7 @@ namespace rePlayer
         .name = "MDX X68000 Chiptunes",
         .extensions = "mdx;mdxPk",
         .about = "mdxmini",
+        .settings = "mdxmini " VERSION_ID,
         .init = ReplayMDX::Init,
         .load = ReplayMDX::Load,
         .displaySettings = ReplayMDX::DisplaySettings,
@@ -123,17 +124,10 @@ namespace rePlayer
     bool ReplayMDX::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("mdxmini " VERSION_ID, ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("MDX");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            changed |= ImGui::SliderInt("Loops", &ms_loops, 0, 15, "%d", ImGuiSliderFlags_NoInput);
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::SliderInt("Loops", &ms_loops, 0, 15, "%d", ImGuiSliderFlags_NoInput);
         return changed;
     }
 

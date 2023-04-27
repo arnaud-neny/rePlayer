@@ -20,6 +20,7 @@ namespace rePlayer
         .name = "TFMX",
         .extensions = "tfx;tfm",
         .about = "TFMXPlay 1.0.2\nCopyright (c) 1996 Jonathan H. Pickard",
+        .settings = "TFMX 1.0.2",
         .init = ReplayTFMX::Init,
         .load = ReplayTFMX::Load,
         .displaySettings = ReplayTFMX::DisplaySettings,
@@ -82,20 +83,13 @@ namespace rePlayer
     bool ReplayTFMX::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("TFMX 1.0.2", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("TFMX");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            const char* const filters[] = { "Off", "Low", "Medium", "High" };
-            changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
-            const char* const resampling[] = { "Disable", "Enable" };
-            changed |= ImGui::Combo("Resampling", &ms_resampling, resampling, _countof(resampling));
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        const char* const filters[] = { "Off", "Low", "Medium", "High" };
+        changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
+        const char* const resampling[] = { "Disable", "Enable" };
+        changed |= ImGui::Combo("Resampling", &ms_resampling, resampling, _countof(resampling));
         return changed;
     }
 

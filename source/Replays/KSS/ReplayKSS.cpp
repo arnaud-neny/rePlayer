@@ -12,9 +12,10 @@ namespace rePlayer
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::KSS,
-        .name = LIBKSS_VERSION,
+        .name = "LIBKSS",
         .extensions = "kss;mgs;bgm;opx;mpk;mbm",
         .about = "LIBKSS\nCopyright (c) 2015 Mitsutaka Okazaki",
+        .settings = LIBKSS_VERSION,
         .init = ReplayKSS::Init,
         .load = ReplayKSS::Load,
         .displaySettings = ReplayKSS::DisplaySettings,
@@ -44,16 +45,9 @@ namespace rePlayer
     bool ReplayKSS::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader(LIBKSS_VERSION, ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("KSS");
-            changed |= ImGui::SliderInt("Master Volume", &ms_masterVolume, -127, 127, "%d", ImGuiSliderFlags_NoInput);
-            changed |= ImGui::SliderInt("Device Pan", &ms_devicePan, -127, 127, "%d", ImGuiSliderFlags_NoInput);
-            changed |= ImGui::SliderInt("Silence TimeOut", &ms_silence, 0, 30, "%d sec", ImGuiSliderFlags_NoInput);
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        changed |= ImGui::SliderInt("Master Volume", &ms_masterVolume, -127, 127, "%d", ImGuiSliderFlags_NoInput);
+        changed |= ImGui::SliderInt("Device Pan", &ms_devicePan, -127, 127, "%d", ImGuiSliderFlags_NoInput);
+        changed |= ImGui::SliderInt("Silence TimeOut", &ms_silence, 0, 30, "%d sec", ImGuiSliderFlags_NoInput);
         return changed;
     }
 

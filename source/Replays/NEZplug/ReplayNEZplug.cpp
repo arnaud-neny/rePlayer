@@ -13,6 +13,7 @@ namespace rePlayer
         .name = "NEZplug++",
         .extensions = "nsf;nsfe;hes;kss;gbr;gbs;ay;sgc;nsd",
         .about = "NEZplug++/libnezplug\n\nCopyright (c) 2019 MamiyaCopyright (c) 2020 John Regan",
+        .settings = "NEZplug++",
         .init = ReplayNEZplug::Init,
         .load = ReplayNEZplug::Load,
         .displaySettings = ReplayNEZplug::DisplaySettings,
@@ -59,18 +60,11 @@ namespace rePlayer
     bool ReplayNEZplug::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("NEZplug++", ImGuiTreeNodeFlags_None))
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("NEZplug");
-            const char* const filter[] = { "None", "LowPass", "Weighted", "LowPass Weighted" };
-            changed |= ImGui::Combo("Filter", &ms_filter, filter, _countof(filter));
-            float gain = 1.0f + 7.0f * ms_gain / 255.0f;
-            changed |= ImGui::SliderFloat("Gain", &gain, 1.0f, 8.0f, "x%1.3f", ImGuiSliderFlags_NoInput);
-            ms_gain = int32_t(255.0f * (gain - 1.0f) / 7.0f);
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
-        }
+        const char* const filter[] = { "None", "LowPass", "Weighted", "LowPass Weighted" };
+        changed |= ImGui::Combo("Filter", &ms_filter, filter, _countof(filter));
+        float gain = 1.0f + 7.0f * ms_gain / 255.0f;
+        changed |= ImGui::SliderFloat("Gain", &gain, 1.0f, 8.0f, "x%1.3f", ImGuiSliderFlags_NoInput);
+        ms_gain = int32_t(255.0f * (gain - 1.0f) / 7.0f);
         return changed;
     }
 

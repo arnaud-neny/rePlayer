@@ -33,6 +33,7 @@ namespace rePlayer
         .replayId = eReplay::UADE,
         .name = "Unix Amiga Delitracker Emulator",
         .about = "UADE 3.0.2\nHeikki Orsila & Michael Doering",
+        .settings = "Unix Amiga Delitracker Emulator 3.0.2",
         .init = ReplayUADE::Init,
         .release = ReplayUADE::Release,
         .load = ReplayUADE::Load,
@@ -354,27 +355,20 @@ namespace rePlayer
     bool ReplayUADE::DisplaySettings()
     {
         bool changed = false;
-        if (ImGui::CollapsingHeader("Unix Amiga Delitracker Emulator 3.0.2", ImGuiTreeNodeFlags_None))
+        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        const char* const surround[] = { "Stereo", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        const char* const filters[] = { "None", "A500", "A1200"};
+        changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
+        const char* const region[] = { "PAL", "NTSC" };
+        changed |= ImGui::Combo("Region", &ms_isNtsc, region, _countof(region));
+        if (changed)
         {
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PushID("UADE");
-            changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
-            const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-            const char* const filters[] = { "None", "A500", "A1200"};
-            changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
-            const char* const region[] = { "PAL", "NTSC" };
-            changed |= ImGui::Combo("Region", &ms_isNtsc, region, _countof(region));
-            if (changed)
+            for (auto& dllEntry : s_dlls)
             {
-                for (auto& dllEntry : s_dlls)
-                {
-                    if (dllEntry.replay)
-                        dllEntry.replay->SetSettings(ms_stereoSeparation, ms_surround, ms_filter, ms_isNtsc);
-                }
+                if (dllEntry.replay)
+                    dllEntry.replay->SetSettings(ms_stereoSeparation, ms_surround, ms_filter, ms_isNtsc);
             }
-            if (!ImGui::GetIO().KeyCtrl)
-                ImGui::PopID();
         }
         return changed;
     }
