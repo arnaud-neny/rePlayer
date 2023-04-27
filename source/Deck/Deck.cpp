@@ -796,7 +796,7 @@ namespace rePlayer
         // todo: for the pivot, detect the position of the taskbar icon
         ImGui::SetNextWindowPos(ImVec2(m_systrayPos[0], m_systrayPos[1]), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
         ImGui::SetNextWindowClass(&c);
-        if (m_isSystrayBalloonEnabled)
+        if (m_isSystrayBalloonEnabled && !ImGui::IsPopupOpen("SystrayMenu"))
         {
             ImGui::Begin("SystrayBalloon", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
 
