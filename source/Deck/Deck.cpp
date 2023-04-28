@@ -30,6 +30,14 @@ namespace rePlayer
         Enable(true);
         m_volume = Player::GetVolume();
         Player::SetVolume(m_volume);
+
+        auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
+        ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_NEXTTRACK, MOD_NOREPEAT, VK_MEDIA_NEXT_TRACK);
+        ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_PREVIOUSTRACK, MOD_NOREPEAT, VK_MEDIA_PREV_TRACK);
+        ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_STOP, MOD_NOREPEAT, VK_MEDIA_STOP);
+        ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE, MOD_NOREPEAT, VK_MEDIA_PLAY_PAUSE);
+        ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
+        ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
     }
 
     Deck::~Deck()
@@ -195,6 +203,38 @@ namespace rePlayer
             uint32_t saveMax = 24 * 60;
             if (ImGui::SliderScalar("AutoSave", ImGuiDataType_U32, &saveFrequency, &saveMin, &saveMax, "Every %u minutes", ImGuiSliderFlags_AlwaysClamp))
                 m_saveFrequency = saveFrequency * 60;
+            if (ImGui::Checkbox("Playback media hot keys", &m_arePlaybackMediaHotKeysEnabled))
+            {
+                auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
+                if (m_arePlaybackMediaHotKeysEnabled)
+                {
+                    ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_NEXTTRACK, MOD_NOREPEAT, VK_MEDIA_NEXT_TRACK);
+                    ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_PREVIOUSTRACK, MOD_NOREPEAT, VK_MEDIA_PREV_TRACK);
+                    ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_STOP, MOD_NOREPEAT, VK_MEDIA_STOP);
+                    ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE, MOD_NOREPEAT, VK_MEDIA_PLAY_PAUSE);
+                }
+                else
+                {
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_NEXTTRACK);
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_PREVIOUSTRACK);
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_STOP);
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE);
+                }
+            }
+            if (ImGui::Checkbox("Volume media hot keys", &m_areVolumeMediaHotKeysEnabled))
+            {
+                auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
+                if (m_areVolumeMediaHotKeysEnabled)
+                {
+                    ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
+                    ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
+                }
+                else
+                {
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
+                }
+            }
             ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
             Log::DisplaySettings();
         }
@@ -571,6 +611,20 @@ namespace rePlayer
             m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
         }
         Player::SetVolume(m_volume);
+
+        auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
+        if (!m_arePlaybackMediaHotKeysEnabled)
+        {
+            ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_NEXTTRACK);
+            ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_PREVIOUSTRACK);
+            ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_STOP);
+            ::UnregisterHotKey(hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE);
+        }
+        if (!m_areVolumeMediaHotKeysEnabled)
+        {
+            ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
+            ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
+        }
     }
 
     void Deck::PlayPreviousSong()

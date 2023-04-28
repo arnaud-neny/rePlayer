@@ -186,14 +186,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         if (rePlayer::Graphics::Init(g_hWnd))
             return -1;
 
-        // register media hot keys
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_MEDIA_NEXTTRACK, MOD_NOREPEAT, VK_MEDIA_NEXT_TRACK);
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_MEDIA_PREVIOUSTRACK, MOD_NOREPEAT, VK_MEDIA_PREV_TRACK);
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_MEDIA_STOP, MOD_NOREPEAT, VK_MEDIA_STOP);
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE, MOD_NOREPEAT, VK_MEDIA_PLAY_PAUSE);
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
-        ::RegisterHotKey(g_hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
-
 #if 0
         // enumerate the monitors
         struct Test

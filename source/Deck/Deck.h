@@ -101,9 +101,9 @@ namespace rePlayer
             Solo,
             Playlist
         } m_mode = Mode::Solo;
-        Serialized<bool> m_isLooping = { "Loop", false};
-        Serialized<bool> m_isTrackingSongInPlaylist = { "TrackPlaylist", true};
-        Serialized<bool> m_isTrackingSongInDatabase = { "TrackDatabase", true};
+        Serialized<bool> m_isLooping = { "Loop", false };
+        Serialized<bool> m_isTrackingSongInPlaylist = { "TrackPlaylist", true };
+        Serialized<bool> m_isTrackingSongInDatabase = { "TrackDatabase", true };
         bool m_isSystrayEnabled = false;
         bool m_isSystrayMenuEnabled = false;
         bool m_isSystrayBalloonEnabled = false;
@@ -124,6 +124,9 @@ namespace rePlayer
         float m_systrayPos[2];
         void* m_hSystrayWnd = nullptr;
         Window::States m_windowStates;
+
+        Serialized<bool> m_arePlaybackMediaHotKeysEnabled = { "PlaybackMediaHotKeys", true };
+        Serialized<bool> m_areVolumeMediaHotKeysEnabled = { "VolumeMediaHotKeys", true };
     };
 }
 // namespace rePlayer
