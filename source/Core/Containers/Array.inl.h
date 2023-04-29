@@ -901,7 +901,7 @@ namespace core
     inline uint32_t operator-(const ItemType* const item, const Array<ItemType>& array)
     {
         auto* items = array.Items();
-        assert((item != nullptr) && (item >= items) && (item < items + array.NumItems()));
+        assert((item == nullptr && items == nullptr) || (item >= items) && (item <= items + array.NumItems()));
         return uint32_t(item - items); // returns the index of element
     }
 }
