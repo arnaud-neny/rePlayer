@@ -111,7 +111,7 @@ namespace rePlayer
     private:
         Cue m_cue;
 
-        SmartPtr<DropTarget> m_dropTarget;
+        DropTarget* m_dropTarget;
 
         Array<Summary> m_playlists;
 
