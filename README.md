@@ -17,8 +17,8 @@ Oh, and occasionally, you can use it as a normal player as it can alsoi play mow
 
 The first time, download the [lastest release](https://github.com/arnaud-neny/rePlayer/releases/latest/download/rePlayer.zip), unzip it and start rePlayer.exe  
 The software will try to auto-update itself each time you start it, so you won't have to download it again.  
-If you want to play your own file, just drag and drop them into the playlist. Or if you want to download new ones in the library, just click on import and select what you want it from (songs, artist or files), tehn search and pick your songs, you can later drag and drop from the library to the playlist.
-The player works only on PC with Windows (x64).
+If you want to play your own files, just drag and drop them into the playlist. Or if you want to download new ones in the library, just click on import and select what you want it from (songs, artist or files), then search and pick your songs, you can later drag and drop from the library to the playlist.
+The player works only on PC with Windows 10 (x64) and later versions.
 
 ## The deck
 

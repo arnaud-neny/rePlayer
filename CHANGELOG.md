@@ -1,7 +1,8 @@
-v0.3.0
+v0.3.1
 - Added NEZplug player
 - Added SNDH import
 - Updated adplug to 2.3.3.801
+- Updated OpenMPT to 0.7.0
 - ImGui 1.89.53 (to fix the modals getting closed on focus) with single axis auto resize patch
 - Settings for the media hot keys
 - Unfold deck option to display song metadata
