@@ -104,6 +104,7 @@ namespace rePlayer
         Serialized<bool> m_isLooping = { "Loop", false };
         Serialized<bool> m_isTrackingSongInPlaylist = { "TrackPlaylist", true };
         Serialized<bool> m_isTrackingSongInDatabase = { "TrackDatabase", true };
+        Serialized<bool> m_isExpanded = { "IsExpanded", false };
         bool m_isSystrayEnabled = false;
         bool m_isSystrayMenuEnabled = false;
         bool m_isSystrayBalloonEnabled = false;

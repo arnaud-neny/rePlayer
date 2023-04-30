@@ -359,7 +359,10 @@ namespace rePlayer
 
     std::string Deck::OnGetWindowTitle()
     {
+        SetFlags(ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize, !m_isExpanded);
         ImGui::SetNextWindowPos(ImVec2(24.0f, 24.0f), ImGuiCond_FirstUseEver);
+        if (m_isExpanded)
+            ImGui::SetNextWindowSizeConstraints(ImVec2(-1.0f, 200.0f), ImVec2(-1.0f, FLT_MAX));
         if (m_isSystrayEnabled)
             ImGui::SetNextWindowFocus();
         return "rePlayer";
@@ -566,8 +569,26 @@ namespace rePlayer
                 m_isOpened = false;
             ImGui::EndPopup();
         }
+        ImGui::SameLine();
+        if (ImGui::Button(m_isExpanded ? "^" : "v"))
+        {
+            m_isExpanded = !m_isExpanded;
+        }
         ImGui::EndGroup();
         m_VuMeterHeight = ImGui::GetItemRectSize().y;
+
+        if (m_isExpanded)
+        {
+            auto window = ImGui::GetCurrentWindow();
+            window->AutoFitFramesX = 2;
+
+            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_HorizontalScrollbar))
+            {
+                auto metadata = isPlayerValid ? player->GetMetadata() : "";
+                ImGui::TextUnformatted(metadata.c_str());
+            }
+            ImGui::EndChild();
+        }
     }
 
     void Deck::OnEndUpdate()
