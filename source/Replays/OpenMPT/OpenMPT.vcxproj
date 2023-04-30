@@ -22,14 +22,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;MPT_BUILD_DEBUG;MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;MPT_BUILD_DEBUG;MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -77,7 +77,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -114,13 +114,15 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="common\mptBaseMacros.h" />
     <ClInclude Include="common\mptBaseTypes.h" />
     <ClInclude Include="common\mptBaseUtils.h" />
+    <ClInclude Include="common\mptCPU.h" />
     <ClInclude Include="common\mptFileIO.h" />
+    <ClInclude Include="common\mptFileTemporary.h" />
+    <ClInclude Include="common\mptFileType.h" />
     <ClInclude Include="common\mptPathString.h" />
     <ClInclude Include="common\mptRandom.h" />
     <ClInclude Include="common\mptString.h" />
     <ClInclude Include="common\mptStringBuffer.h" />
     <ClInclude Include="common\mptStringFormat.h" />
-    <ClInclude Include="common\mptStringParse.h" />
     <ClInclude Include="common\mptTime.h" />
     <ClInclude Include="common\Profiler.h" />
     <ClInclude Include="common\serialization_utils.h" />
@@ -138,6 +140,10 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_buffer.h" />
     <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_fd.h" />
     <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file.h" />
+    <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file_mingw.h" />
+    <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file_msvcrt.h" />
+    <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file_posix.h" />
+    <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file_posix_lfs64.h" />
     <ClInclude Include="libopenmpt\libopenmpt_version.h" />
     <ClInclude Include="ReplayOpenMPT.h" />
     <ClInclude Include="sounddsp\AGC.h" />
@@ -220,12 +226,11 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="common\ComponentManager.cpp" />
     <ClCompile Include="common\Logging.cpp" />
     <ClCompile Include="common\mptFileIO.cpp" />
+    <ClCompile Include="common\mptFileTemporary.cpp" />
+    <ClCompile Include="common\mptFileType.cpp" />
     <ClCompile Include="common\mptPathString.cpp" />
     <ClCompile Include="common\mptRandom.cpp" />
-    <ClCompile Include="common\mptString.cpp" />
     <ClCompile Include="common\mptStringBuffer.cpp" />
-    <ClCompile Include="common\mptStringFormat.cpp" />
-    <ClCompile Include="common\mptStringParse.cpp" />
     <ClCompile Include="common\mptTime.cpp" />
     <ClCompile Include="common\Profiler.cpp" />
     <ClCompile Include="common\serialization_utils.cpp" />
@@ -249,6 +254,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="soundlib\InstrumentExtensions.cpp" />
     <ClCompile Include="soundlib\ITCompression.cpp" />
     <ClCompile Include="soundlib\ITTools.cpp" />
+    <ClCompile Include="soundlib\Load_667.cpp" />
     <ClCompile Include="soundlib\Load_669.cpp" />
     <ClCompile Include="soundlib\Load_amf.cpp" />
     <ClCompile Include="soundlib\Load_ams.cpp" />
@@ -262,6 +268,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="soundlib\Load_far.cpp" />
     <ClCompile Include="soundlib\Load_fmt.cpp" />
     <ClCompile Include="soundlib\Load_gdm.cpp" />
+    <ClCompile Include="soundlib\Load_gt2.cpp" />
     <ClCompile Include="soundlib\Load_imf.cpp" />
     <ClCompile Include="soundlib\Load_it.cpp" />
     <ClCompile Include="soundlib\Load_itp.cpp" />
@@ -287,6 +294,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="soundlib\Load_ult.cpp" />
     <ClCompile Include="soundlib\Load_wav.cpp" />
     <ClCompile Include="soundlib\Load_xm.cpp" />
+    <ClCompile Include="soundlib\Load_xmf.cpp" />
     <ClCompile Include="soundlib\Message.cpp" />
     <ClCompile Include="soundlib\MIDIEvents.cpp" />
     <ClCompile Include="soundlib\MIDIMacros.cpp" />

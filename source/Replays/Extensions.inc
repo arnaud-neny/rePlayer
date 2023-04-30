@@ -311,3 +311,7 @@ EXTENSION(mbm)      // KSS
 EXTENSION(sgc)      // NEZplug
 EXTENSION(nsd)      // NEZplug
 EXTENSION(pis)      // AdLib: Beni Tracker
+EXTENSION(667)      // OpenMPT: Composer 667
+EXTENSION(gtk)      // OpenMPT: Gramouf Tracker
+EXTENSION(gt2)      // OpenMPT: Gramouf Tracker
+EXTENSION(xmf)      // OpenMPT

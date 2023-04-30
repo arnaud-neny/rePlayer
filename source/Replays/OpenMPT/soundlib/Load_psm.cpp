@@ -12,6 +12,8 @@
 #include "stdafx.h"
 #include "Loaders.h"
 
+#include "mpt/parse/parse.hpp"
+
 #ifdef LIBOPENMPT_BUILD
 #define MPT_PSM_USE_REAL_SUBSONGS
 #endif
@@ -228,7 +230,7 @@ static PATTERNINDEX ReadPSMPatternIndex(FileReader &file, bool &sinariaFormat)
 		sinariaFormat = true;
 		offset = 0;
 	}
-	return ConvertStrTo<uint16>(&patternID[offset]);
+	return mpt::parse<uint16>(&patternID[offset]);
 }
 
 
@@ -383,7 +385,7 @@ bool CSoundFile::ReadPSM(FileReader &file, ModLoadingFlags loadFlags)
 				{
 					char cversion[7];
 					subChunk.ReadString<mpt::String::maybeNullTerminated>(cversion, 6);
-					uint32 version = ConvertStrTo<uint32>(cversion);
+					uint32 version = mpt::parse<uint32>(cversion);
 					// Sinaria song dates (just to go sure...)
 					if(version == 800211 || version == 940902 || version == 940903 ||
 						version == 940906 || version == 940914 || version == 941213)
@@ -657,7 +659,7 @@ bool CSoundFile::ReadPSM(FileReader &file, ModLoadingFlags loadFlags)
 		// Read pattern.
 		for(ROWINDEX row = 0; row < numRows; row++)
 		{
-			PatternRow rowBase = Patterns[pat].GetRow(row);
+			auto rowBase = Patterns[pat].GetRow(row);
 			uint16 rowSize = chunk.ReadUint16LE();
 			if(rowSize <= 2)
 			{
