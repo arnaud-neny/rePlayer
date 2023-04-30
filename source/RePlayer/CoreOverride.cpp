@@ -1,5 +1,9 @@
 #include "Core.h"
 
+// Core
+#include <Core/Log.h>
+
+// rePlayer
 #include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
@@ -11,6 +15,9 @@
 
 // curl
 #include <curl/curl.h>
+
+// stl
+#include <atomic>
 
 namespace rePlayer
 {
@@ -30,6 +37,25 @@ namespace rePlayer
             ms_instance = new Core();
         else
             curl_global_cleanup();
+
+        struct
+        {
+            static LONG WINAPI TopLevelExceptionFilter(EXCEPTION_POINTERS* e)
+            {
+                if (ms_instance)
+                {
+                    static std::atomic<int32_t> isLock = 0;
+                    if (isLock.exchange(1) == 0)
+                    {
+                        Log::Error("CRASH: %08X\n", e->ExceptionRecord->ExceptionCode);
+                        ms_instance->m_library->Save();
+                        ms_instance->m_playlist->Save();
+                    }
+                }
+                return EXCEPTION_CONTINUE_SEARCH;
+            }
+        } cb;
+        ::SetUnhandledExceptionFilter(&cb.TopLevelExceptionFilter);
 
         return ms_instance;
     }
