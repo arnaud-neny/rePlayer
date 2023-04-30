@@ -106,7 +106,6 @@ namespace rePlayer
 
     Playlist::~Playlist()
     {
-        delete m_dropTarget;
         delete m_artists;
         delete m_songs;
     }
