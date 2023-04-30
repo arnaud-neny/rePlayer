@@ -12,7 +12,7 @@ namespace rePlayer
         .replayId = eReplay::NEZplug,
         .name = "NEZplug++",
         .extensions = "nsf;nsfe;hes;kss;gbr;gbs;ay;sgc;nsd",
-        .about = "NEZplug++/libnezplug\n\nCopyright (c) 2019 MamiyaCopyright (c) 2020 John Regan",
+        .about = "NEZplug++/libnezplug\nCopyright (c) 2019 Mamiya\nCopyright (c) 2020 John Regan",
         .settings = "NEZplug++",
         .init = ReplayNEZplug::Init,
         .load = ReplayNEZplug::Load,
