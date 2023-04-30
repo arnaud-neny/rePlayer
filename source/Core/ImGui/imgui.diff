@@ -53,6 +53,21 @@ index 38948f6..ba5f6c4 100644
      IMGUI_API bool          DragScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, float v_speed = 1.0f, const void* p_min = NULL, const void* p_max = NULL, const char* format = NULL, ImGuiSliderFlags flags = 0);
  
      // Widgets: Regular Sliders
+diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
+index 569c08a..a50d0d3 100644
+--- "a/external\\imgui-docking\\imgui.cpp"
++++ "b/source\\Core\\ImGui\\imgui.cpp"
+@@ -5997,7 +5997,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
+     ImGuiContext& g = *GImGui;
+     ImGuiWindowFlags flags = window->Flags;
+ 
+-    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || window->AutoFitFramesX > 0 || window->AutoFitFramesY > 0)
++    // rePlayer begin
++    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || (window->AutoFitFramesX > 0 && window->AutoFitFramesY > 0))
++    // rePlayer end
+         return false;
+     if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
+         return false;
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 index 211368c..3f5c70b 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"

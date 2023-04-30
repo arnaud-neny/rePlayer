@@ -5997,7 +5997,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
     ImGuiContext& g = *GImGui;
     ImGuiWindowFlags flags = window->Flags;
 
-    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || window->AutoFitFramesX > 0 || window->AutoFitFramesY > 0)
+    // rePlayer begin
+    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || (window->AutoFitFramesX > 0 && window->AutoFitFramesY > 0))
+    // rePlayer end
         return false;
     if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
         return false;
