@@ -23,7 +23,7 @@
 namespace rePlayer
 {
     SongEditor::SongEditor()
-        : Window("SongEditor", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse)
+        : Window("SongEditor", ImGuiWindowFlags_NoCollapse)
     {
         for (int32_t i = 0; i < int32_t(eExtension::Count); i++)
             m_sortedExtensions[i] = eExtension(i);
@@ -58,11 +58,16 @@ namespace rePlayer
     std::string SongEditor::OnGetWindowTitle()
     {
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(0.0f, 300.0f), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(-1.0f, 300.0f), ImVec2(-1.0f, FLT_MAX));
         return "Song Editor";
     }
 
     void SongEditor::OnDisplay()
     {
+        auto window = ImGui::GetCurrentWindow();
+        window->AutoFitFramesX = 2;
+
         // check if the song has not been updated outside the editor
         Song* currentSong = nullptr;
         if (m_musicId.IsValid())
