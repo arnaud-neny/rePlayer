@@ -17,6 +17,14 @@ namespace core
         window->RegisterSerializedData(m_data, name);
     }
 
+    inline void Window::SetFlags(ImGuiWindowFlags flags, bool isEnabled)
+    {
+        if (isEnabled)
+            m_flags |= flags;
+        else
+            m_flags &= ~flags;
+    }
+
     template <typename T>
     inline void Window::RegisterSerializedData(T& data, const char* name)
     {

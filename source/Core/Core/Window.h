@@ -60,6 +60,8 @@ namespace core
 
         static void Update(States states);
 
+        void SetFlags(ImGuiWindowFlags flags, bool isEnabled);
+
         States GetStates() const { return m_handle.states; }
 
         void Enable(bool isEnabled) { m_handle.states.isEnabled = isEnabled; }
