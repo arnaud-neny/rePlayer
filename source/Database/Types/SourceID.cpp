@@ -3,11 +3,12 @@
 namespace rePlayer
 {
     const char* const SourceID::sourceNames[NumSourceIDs] = {
-            "Amiga Music Preservation",
-            "The Mod Archive",
-            "Modland",
-            "File Import",
-            "High Voltage SID Collection"
+        "Amiga Music Preservation",
+        "The Mod Archive",
+        "Modland",
+        "File Import",
+        "High Voltage SID Collection",
+        "SNDH - Atari ST YM2149 Archive"
     };
 }
 // namespace rePlayer

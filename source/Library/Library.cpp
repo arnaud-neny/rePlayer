@@ -18,10 +18,11 @@
 #include <Library/LibraryArtistsUI.h>
 #include <Library/LibrarySongsUI.h>
 #include <Library/Sources/AmigaMusicPreservation.h>
-#include <Library/Sources/Modland.h>
-#include <Library/Sources/TheModArchive.h>
 #include <Library/Sources/FileImport.h>
 #include <Library/Sources/HighVoltageSIDCollection.h>
+#include <Library/Sources/Modland.h>
+#include <Library/Sources/SNDH.h>
+#include <Library/Sources/TheModArchive.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/CoreHeader.h>
 #include <RePlayer/Replays.h>
@@ -47,6 +48,7 @@ namespace rePlayer
         m_sources[SourceID::ModlandSourceID] = new SourceModland();
         m_sources[SourceID::FileImportID] = new SourceFileImport();
         m_sources[SourceID::HighVoltageSIDCollectionID] = new SourceHighVoltageSIDCollection();
+        m_sources[SourceID::SNDHID] = new SourceSNDH();
 
         Load();
 
@@ -318,10 +320,22 @@ namespace rePlayer
                 bool isChecked = selectedSources & (1ull << i);
                 if (ImGui::Checkbox(SourceID::sourceNames[i], &isChecked))
                 {
-                    selectedSources ^= 1ull << i;
-                    if (selectedSources == 0)
-                        selectedSources = ~(1ull << i) & kSelectableSources;
+                    if (ImGui::GetIO().KeyCtrl)
+                    {
+                        if (isChecked)
+                            selectedSources = 1ull << i;
+                        else
+                            selectedSources = ~(1ull << i) & kSelectableSources;
+                    }
+                    else
+                    {
+                        selectedSources ^= 1ull << i;
+                        if (selectedSources == 0)
+                            selectedSources = ~(1ull << i) & kSelectableSources;
+                    }
                 }
+                if (ImGui::IsItemHovered())
+                    ImGui::Tooltip("Press Ctrl for exclusive check");
             }
             m_selectedSources = selectedSources;
 

@@ -13,6 +13,7 @@ namespace rePlayer
             ModlandSourceID = 2,
             FileImportID = 3,
             HighVoltageSIDCollectionID = 4,
+            SNDHID = 5,
 
             NumSourceIDs
         };
