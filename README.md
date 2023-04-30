@@ -31,8 +31,9 @@ The main panel where you can see your playing song, and interact with the playba
 4. Artist(s).
 5. Playback informations (number of channels, playback type, player).
 6. Seek bar displaying playback time and song length (and playlist position and size). It's possible you can't interact with it if the player doesn't allow it.
-7. Classic playback buttons (go to previous song in the playlist, stop, play/pause, go to next song in the playlist, toogle the playlist loop)
-8. Menu (access to settings, enable/disable other panels, close the application...)
+7. Classic playback buttons (go to previous song in the playlist, stop, play/pause, go to next song in the playlist, toogle the playlist loop).
+8. Menu (access to settings, enable/disable other panels, close the application...).
+9. Song metadata, click to expand/fold the deck (protracker instruments, id tags, extra informations...).
 
 ## The library
 
@@ -84,7 +85,7 @@ Right click on selected songs bring a menu:
 ![rePlayer's Song Editor](/doc/songed.png)
 
 You can edit all the properties of a song there.
-- Info: database id (with L for library and P for playlist), file size, file crc and release year.
+- Info: database id (with L for library and P for playlist), file size, date when the file was added to the database and release year.
 - Title: main song title.
 - Subsong: if there are subsongs you can unfold by click the Subsong label. Change here the subsong title, end of playback behavior and rating.
 - Artist: the artist(s); you can add, remove and re-order these.
@@ -113,9 +114,10 @@ Note 2: while drag and dropping files, keep Ctrl pressed to force all files in t
 
 Enable/disable the songs focus there (when a song start to play, it is focused in the playlist and/or database).  
 AutoSave frequency of the rePlayer. (it will save on quit anyway).  
+Enable/disable the media hot keys (for playback and volume).  
 Transparency of the windows.  
 Live loggin can be enabled/disabled as well as its save on the disk. The log retention can be changed too (older log files than the retention days limit are deleted).  
-You can change the global settings of each players. I will not enter into the details here, I'm too lazy.
+You can change the global settings of each players. I will not enter into the details here, I'm too lazy (I've just enabled by default my simple surround filter because I like it).
 
 ## The tray icon
 
@@ -134,10 +136,11 @@ Middle click will turn on/off the invert States flag.
 ## Web Sites
 
 Here are the actual web sites you can import from (and thank you for all these repositories):
-- [Amiga Music Preservation](https://amp.dascene.net/): one of the best organized amiga music repository.
-- [The Mod Archive](https://modarchive.org/): a huge module repository.
-- [Modland](http://modland.com/pub/modules/): a multi-formats repository organized by format.
-- [High Voltage SID Collection](https://hvsc.de/): an exclusive Commodore 64 repository.
+- [Amiga Music Preservation](https://amp.dascene.net): one of the best organized amiga music repository.
+- [The Mod Archive](https://modarchive.org): a huge module repository.
+- [Modland](http://modland.com/pub/modules): a multi-formats repository organized by format.
+- [High Voltage SID Collection](https://hvsc.de): an exclusive Commodore 64 repository.
+- [SNDH](https://sndh.atari.org): Atari ST YM2149 archive.
 
 You can chat about some of these on the [Demozoo](https://discord.io/demozoo) discord server in the modland channel.
 
