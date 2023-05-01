@@ -1112,16 +1112,22 @@ namespace rePlayer
         {
             auto addFile = [&](const std::filesystem::path& path)
             {
-                // add only known extensions
-                auto extension = path.extension().u8string();
-                if (extension.size() > 1 && !isAcceptingAll)
+                // add only known extensions (or prefixes)
+                auto extension = path.extension().string();
+                if (!isAcceptingAll)
                 {
+                    auto stem = path.stem().string();
                     for (uint16_t i = 0;; i++)
                     {
                         if (i == uint16_t(eExtension::Count))
                             return;
-                        if (_stricmp(reinterpret_cast<const char*>(extension.c_str()) + 1, MediaType::extensionNames[i]) == 0)
+                        if (extension.size() > 1 && _stricmp(extension.c_str() + 1, MediaType::extensionNames[i]) == 0)
                             break;
+                        if (_strnicmp(MediaType::extensionNames[i], stem.c_str(), MediaType::extensionLengths[i]) == 0)
+                        {
+                            if (MediaType::extensionLengths[i] == stem.size() || stem[MediaType::extensionLengths[i]] == '.')
+                                break;
+                        }
                     }
                 }
 
@@ -1148,7 +1154,7 @@ namespace rePlayer
                 else
                 {
                     auto* songSheet = new SongSheet;
-                    songSheet->type = replays.Find(path.extension().string().c_str() + 1);
+                    songSheet->type = replays.Find(extension.c_str() + 1);
                     songSheet->name = reinterpret_cast<const char*>(songSheet->type.ext != eExtension::Unknown ? path.stem().u8string().c_str() : path.filename().u8string().c_str());
                     songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
                     songSheet->databaseDay = databaseDay;
