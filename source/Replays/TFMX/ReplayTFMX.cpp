@@ -5,6 +5,7 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
+#include <IO/StreamFile.h>
 #include <ReplayDll.h>
 
 extern "C"
@@ -13,12 +14,14 @@ extern "C"
 #include "TFMX/tfmx_iface.h"
 }
 
+#include <filesystem>
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::TFMX,
         .name = "TFMX",
-        .extensions = "tfx;tfm",
+        .extensions = "tfx;tfm;mdat",
         .about = "TFMXPlay 1.0.2\nCopyright (c) 1996 Jonathan H. Pickard",
         .settings = "TFMX 1.0.2",
         .init = ReplayTFMX::Init,
@@ -41,15 +44,50 @@ namespace rePlayer
 
     Replay* ReplayTFMX::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        TfmxData mdat = {};
+        TfmxData smpl = {};
+
         auto data = stream->Read();
+        SmartPtr< io::StreamFile> smplStream;
+        bool isSplit = false;
         if (memcmp(data.Items(), "TFMX-MOD", 8) != 0)
-            return nullptr;
+        {
+            isSplit = true;
+            mdat = { const_cast<uint8_t*>(data.Items()), data.Size(), 0 };
 
-        auto smplOfs = *reinterpret_cast<const uint32_t*>(data.Items() + 8);
-        auto smplSize = *reinterpret_cast<const uint32_t*>(data.Items() + 12) - smplOfs;
+            std::filesystem::path mdatName = stream->GetName();
+            auto name = mdatName.stem().u8string();
+            if (tolower(name[0]) == 'm' && tolower(name[1]) == 'd' && tolower(name[2]) == 'a' && tolower(name[3]) == 't')
+            {
+                name[0] = 's';
+                name[1] = 'm';
+                name[2] = 'p';
+                name[3] = 'l';
+                auto smplName = mdatName;
+                smplName.replace_filename(name);
+                smplName += mdatName.extension();
+                smplStream = io::StreamFile::Create(reinterpret_cast<const char*>(smplName.u8string().c_str()));
+            }
+            if (smplStream.IsInvalid())
+            {
+                auto smplName = mdatName;
+                smplName.replace_extension("smpl");
+                smplStream = io::StreamFile::Create(reinterpret_cast<const char*>(smplName.u8string().c_str()));
+            }
+            if (smplStream.IsValid())
+            {
+                auto smplData = smplStream->Read();
+                smpl = { const_cast<uint8_t*>(smplData.Items()), smplData.Size(), 0 };
+            }
+        }
+        else
+        {
+            auto smplOfs = *reinterpret_cast<const uint32_t*>(data.Items() + 8);
+            auto smplSize = *reinterpret_cast<const uint32_t*>(data.Items() + 12) - smplOfs;
+            mdat = { const_cast<uint8_t*>(data.Items()) + 20, smplOfs - 20, 0 };
+            smpl = { const_cast<uint8_t*>(data.Items()) + smplOfs, smplSize, 0 };
+        }
 
-        TfmxData mdat{ const_cast<uint8_t*>(data.Items()) + 20, smplOfs - 20, 0 };
-        TfmxData smpl{ const_cast<uint8_t*>(data.Items()) + smplOfs, smplSize, 0 };
         TfmxState* state = new TfmxState();
         TfmxState_init(state);
         state->outRate = kSampleRate;
@@ -77,7 +115,7 @@ namespace rePlayer
             }
         }
 
-        return new ReplayTFMX(state);
+        return new ReplayTFMX(state, isSplit);
     }
 
     bool ReplayTFMX::DisplaySettings()
@@ -121,8 +159,8 @@ namespace rePlayer
         delete m_state;
     }
 
-    ReplayTFMX::ReplayTFMX(TfmxState* state)
-        : Replay(eExtension::_tfm, eReplay::TFMX)
+    ReplayTFMX::ReplayTFMX(TfmxState* state, bool isSplit)
+        : Replay(isSplit ? eExtension::_mdat : eExtension::_tfm, eReplay::TFMX)
         , m_state(state)
         , m_surround(kSampleRate)
     {}

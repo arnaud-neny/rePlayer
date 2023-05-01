@@ -60,7 +60,7 @@ namespace rePlayer
         static constexpr uint32_t kSampleRate = 48000;
 
     private:
-        ReplayTFMX(TfmxState* state);
+        ReplayTFMX(TfmxState* state, bool isSplit);
 
     private:
         TfmxState* m_state;
