@@ -315,3 +315,4 @@ EXTENSION(667)      // OpenMPT: Composer 667
 EXTENSION(gtk)      // OpenMPT: Gramouf Tracker
 EXTENSION(gt2)      // OpenMPT: Gramouf Tracker
 EXTENSION(xmf)      // OpenMPT
+EXTENSION(mdat)     // TFMX & UADE: TFMX

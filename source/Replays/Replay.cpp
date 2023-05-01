@@ -9,6 +9,13 @@ namespace rePlayer
     };
     #undef EXTENSION
 
+    #define EXTENSION(a) sizeof(#a) - 1,
+    const size_t MediaType::extensionLengths[] = {
+        sizeof("---") - 1,
+        #include "Extensions.inc"
+    };
+    #undef EXTENSION
+
     #define REPLAY(a, b) #a,
     const char* const MediaType::replayNames[] = {
         "Dummy",

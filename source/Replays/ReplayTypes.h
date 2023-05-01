@@ -48,6 +48,7 @@ namespace rePlayer
         const char* const GetReplay() const;
 
         static const char* const extensionNames[];
+        static const size_t extensionLengths[];
         static const char* const replayNames[];
     };
 }
