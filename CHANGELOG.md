@@ -1,4 +1,4 @@
-v0.3.1
+v0.3.2
 - Added NEZplug player
 - Added SNDH import
 - Updated adplug to 2.3.3.801
@@ -6,6 +6,8 @@ v0.3.1
 - ImGui 1.89.53 (to fix the modals getting closed on focus) with single axis auto resize patch
 - Settings for the media hot keys
 - Unfold deck option to display song metadata
+- Added missing support for splitted tfmx files (mdat & smpl)
+- External drag and drop is filtered with extensions and prefixes
 - Bug fixes
 
 v0.2.1:
