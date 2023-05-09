@@ -1,4 +1,5 @@
 #include "Core.h"
+#include "Version.h"
 
 #include <Containers/Array.h>
 #include <Core/String.h>
@@ -16,9 +17,9 @@
 
 namespace rePlayer
 {
-    static constexpr uint32_t kMajorVersion = 0;
-    static constexpr uint32_t kMinorVersion = 3;
-    static constexpr uint32_t kPatchVersion = 2;
+    static constexpr uint32_t kMajorVersion = REPLAYER_VERSION_MAJOR;
+    static constexpr uint32_t kMinorVersion = REPLAYER_VERSION_MINOR;
+    static constexpr uint32_t kPatchVersion = REPLAYER_VERSION_PATCH;
     static constexpr uint32_t kVersion = (kMajorVersion << 28) | (kMinorVersion << 14) | kPatchVersion;
 
     uint32_t Core::GetVersion()

@@ -205,6 +205,7 @@ $(SolutionDir)..\tools\upx --best --compress-exports=0 -o $(SolutionDir)..\data\
     <ClInclude Include="RePlayer\CoreHeader.h" />
     <ClInclude Include="RePlayer\Replays.h" />
     <ClInclude Include="RePlayer\Settings.h" />
+    <ClInclude Include="RePlayer\Version.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

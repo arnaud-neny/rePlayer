@@ -319,6 +319,9 @@
     <ClInclude Include="Library\Sources\SNDH.h">
       <Filter>Source Files\Library\Sources</Filter>
     </ClInclude>
+    <ClInclude Include="RePlayer\Version.h">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\GraphicsImpl.inl">
