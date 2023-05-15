@@ -1,4 +1,4 @@
-v0.3.3
+v0.3.4
 - Added NEZplug player
 - Added SNDH import
 - Updated adplug to 2.3.3.801
@@ -8,6 +8,8 @@ v0.3.3
 - Unfold deck option to display song metadata
 - Added missing support for splitted tfmx files (mdat & smpl)
 - External drag and drop is filtered with extensions and prefixes
+- Display song source within tooltip
+- Selected currently used replay when opening settings panel
 - Bug fixes
 
 v0.2.1:
