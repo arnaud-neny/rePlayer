@@ -196,6 +196,21 @@ namespace rePlayer
         return "!!! Missing Plugin !!!";
     }
 
+    void Replays::SetSelectedSettings(eReplay replay)
+    {
+        if (replay != eReplay::Unknown)
+        {
+            for (int32_t selectedSettings = 0; selectedSettings < int32_t(eReplay::Count); selectedSettings++)
+            {
+                if (m_settingsPlugins[selectedSettings]->replayId == replay)
+                {
+                    m_selectedSettings = selectedSettings;
+                    break;
+                }
+            }
+        }
+    }
+
     void Replays::LoadPlugins()
     {
         char* pgrPath;

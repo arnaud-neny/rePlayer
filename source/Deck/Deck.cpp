@@ -12,6 +12,7 @@
 #include <Playlist/Playlist.h>
 #include <Replayer/About.h>
 #include <Replayer/Core.h>
+#include <Replayer/Replays.h>
 #include <Replayer/Settings.h>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -546,7 +547,11 @@ namespace rePlayer
         {
             bool isEnabled = Core::GetSettings().IsEnabled();
             if (ImGui::MenuItem("Settings", "", &isEnabled))
+            {
                 Core::GetSettings().Enable(isEnabled);
+                if (isEnabled && player)
+                    Core::GetReplays().SetSelectedSettings(player->GetMediaType().replay);
+            }
             ImGui::Separator();
             isEnabled = Core::GetLibrary().IsEnabled();
             if (ImGui::MenuItem("Library", "", &isEnabled))

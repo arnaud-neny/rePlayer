@@ -37,6 +37,8 @@ namespace rePlayer
 
         const char* GetName(eReplay replay) const;
 
+        void SetSelectedSettings(eReplay replay);
+
     private:
         void LoadPlugins();
         void BuildFileFilters();
