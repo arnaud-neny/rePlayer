@@ -109,6 +109,7 @@ namespace rePlayer
         }
         if (song->GetType().replay != eReplay::Unknown)
             ImGui::Text("Replay : %s", Core::GetReplays().GetName(song->GetType().replay));
+        ImGui::Text("Source : %s", song->GetSourceName());
         auto metadata = Core::GetDeck().GetMetadata(*this);
         if (metadata.size())
         {
