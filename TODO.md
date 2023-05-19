@@ -34,7 +34,6 @@
 - Soundcloud music player?
 - Bandcamp music player?
 - scplayer? https://github.com/Deltafire/SCPlayer (maybe already in zxtune)
-- ttt: tia tracker (sap) https://www.pouet.net/prod.php?which=67648
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
 
 - DEMO! utilise Firefox avec The final hyperbase (openmpt - change to surround), drax (uade - change to surround + song end editor)

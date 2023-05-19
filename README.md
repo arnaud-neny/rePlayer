@@ -156,6 +156,7 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
 - [TagLib](https://taglib.org): to read tag from music formats.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
+- [JSON](https://github.com/nlohmann/json): JSON for Modern C++
 
 ### Replays 3rd parties:
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
@@ -183,3 +184,4 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](https://github.com/jprjr/libnezplug) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd.
+- [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS. Current version: 1.3.

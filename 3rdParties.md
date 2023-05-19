@@ -12,6 +12,7 @@
 - libarchive: https://github.com/libarchive/libarchive
 - TagLib: https://taglib.org
 - dllloader: https://github.com/tapika/dllloader
+- JSON for Modern C++: https://github.com/nlohmann/json
 - OpenMPT: https://lib.openmpt.org/libopenmpt  
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - HivelyTracker: https://github.com/pete-gordon/hivelytracker  
@@ -43,6 +44,7 @@
   Fixed some memory leaks and made it x64 compliant.
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
+- TIATracker: https://bitbucket.org/kylearan/tiatracker
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\track">
+      <UniqueIdentifier>{db72713e-0d15-46eb-8568-3d7feb0cc696}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tiasound">
+      <UniqueIdentifier>{fd7fe2c5-1870-48d2-b5dd-8ac625fec5a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\qt">
+      <UniqueIdentifier>{3be891db-c048-426f-b858-73840d242435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\emulation">
+      <UniqueIdentifier>{83820d6a-9c51-4645-924f-62f17c4fe1b5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayTIATracker.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="track\track.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\instrument.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\note.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\pattern.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\percussion.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\sequence.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="track\sequenceentry.h">
+      <Filter>Source Files\track</Filter>
+    </ClInclude>
+    <ClInclude Include="tiasound\pitchguide.h">
+      <Filter>Source Files\tiasound</Filter>
+    </ClInclude>
+    <ClInclude Include="tiasound\tiasound.h">
+      <Filter>Source Files\tiasound</Filter>
+    </ClInclude>
+    <ClInclude Include="tiasound\instrumentpitchguide.h">
+      <Filter>Source Files\tiasound</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\QJsonObject.h">
+      <Filter>Source Files\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\QList.h">
+      <Filter>Source Files\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\QMutex.h">
+      <Filter>Source Files\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\QString.h">
+      <Filter>Source Files\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="qt\QMap.h">
+      <Filter>Source Files\qt</Filter>
+    </ClInclude>
+    <ClInclude Include="instrumentstab.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mainwindow.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="percussiontab.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emulation\player.h">
+      <Filter>Source Files\emulation</Filter>
+    </ClInclude>
+    <ClInclude Include="emulation\TIASnd.h">
+      <Filter>Source Files\emulation</Filter>
+    </ClInclude>
+    <ClInclude Include="emulation\bspf.h">
+      <Filter>Source Files\emulation</Filter>
+    </ClInclude>
+    <ClInclude Include="emulation\SoundSDL2.h">
+      <Filter>Source Files\emulation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayTIATracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="track\track.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\instrument.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\note.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\pattern.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\percussion.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\sequence.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\sequenceentry.cpp">
+      <Filter>Source Files\track</Filter>
+    </ClCompile>
+    <ClCompile Include="tiasound\pitchguide.cpp">
+      <Filter>Source Files\tiasound</Filter>
+    </ClCompile>
+    <ClCompile Include="tiasound\tiasound.cpp">
+      <Filter>Source Files\tiasound</Filter>
+    </ClCompile>
+    <ClCompile Include="tiasound\instrumentpitchguide.cpp">
+      <Filter>Source Files\tiasound</Filter>
+    </ClCompile>
+    <ClCompile Include="emulation\player.cpp">
+      <Filter>Source Files\emulation</Filter>
+    </ClCompile>
+    <ClCompile Include="emulation\TIASnd.cpp">
+      <Filter>Source Files\emulation</Filter>
+    </ClCompile>
+    <ClCompile Include="emulation\SoundSDL2.cpp">
+      <Filter>Source Files\emulation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="qt\QJsonObject">
+      <Filter>Source Files\qt</Filter>
+    </None>
+    <None Include="qt\QList">
+      <Filter>Source Files\qt</Filter>
+    </None>
+    <None Include="qt\QMutex">
+      <Filter>Source Files\qt</Filter>
+    </None>
+    <None Include="qt\QString">
+      <Filter>Source Files\qt</Filter>
+    </None>
+    <None Include="qt\QMap">
+      <Filter>Source Files\qt</Filter>
+    </None>
+    <None Include="README.md" />
+  </ItemGroup>
+</Project>
