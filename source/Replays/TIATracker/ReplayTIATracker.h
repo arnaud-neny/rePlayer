@@ -62,7 +62,7 @@ namespace rePlayer
         Track::Track m_track;
         Emulation::Player m_player;
         uint32_t m_numRemainingSamples = 0;
-        uint32_t m_numSamplesPerFrame;
+        const uint32_t m_numSamplesPerFrame;
         int16_t* m_samples;
         Surround m_surround;
         int32_t m_stereoSeparation;
@@ -71,7 +71,6 @@ namespace rePlayer
         struct Order
         {
             int v[2];
-            int& operator[](size_t index) { return v[index]; }
             bool operator==(const Order& other) const { return v[0] == other.v[0] && v[1] == other.v[1]; }
         };
         Array<Order> m_sequences;

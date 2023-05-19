@@ -151,6 +151,7 @@ namespace rePlayer
         m_sequences.Clear();
         m_trackCurNoteIndex[0] = m_trackCurNoteIndex[1] = INT_MAX;
         m_isLoopîng = false;
+        m_numRemainingSamples = 0;
         m_player.playTrack(0, 0);
     }
 
