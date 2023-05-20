@@ -39,7 +39,8 @@ namespace rePlayer
         void IncreaseVolume();
         void DecreaseVolume();
 
-        bool IsLooping() const { return m_isLooping; }
+        bool IsLooping() const { return m_loop == Loop::Playlist; }
+        bool IsEndless() const { return m_loop == Loop::Single; }
         bool IsSolo() const { return m_mode == Mode::Solo; }
 
         void OnNewPlaylist();
@@ -101,7 +102,14 @@ namespace rePlayer
             Solo,
             Playlist
         } m_mode = Mode::Solo;
-        Serialized<bool> m_isLooping = { "Loop", false };
+        enum class Loop : uint8_t
+        {
+            None,
+            Playlist,
+            Single,
+            Count
+        };
+        Serialized<Loop> m_loop = { "Loop", Loop::None };
         Serialized<bool> m_isTrackingSongInPlaylist = { "TrackPlaylist", true };
         Serialized<bool> m_isTrackingSongInDatabase = { "TrackDatabase", true };
         Serialized<bool> m_isExpanded = { "IsExpanded", false };

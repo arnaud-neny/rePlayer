@@ -2,6 +2,7 @@
 //#include "font.h"
 #include "GraphicsFontLog.h"
 #include "GraphicsImGui.h"
+#include "MediaIcons.h"
 
 #include <Imgui.h>
 
@@ -175,7 +176,14 @@ namespace rePlayer
         // Build texture atlas
         ImGuiIO& io = ImGui::GetIO();
 
-        io.Fonts->AddFontDefault();
+        auto* font = io.Fonts->AddFontDefault();
+
+        // add media icons
+        int32_t widths[] = { 19, 19, 15, 14, 14, 25, 25, 25, 21 };
+        int32_t rectIds[_countof(widths)];
+        for (uint32_t i = 0; i < _countof(widths); i++)
+            rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xffff - _countof(widths) + i + 1), widths[i], 15, float(widths[i]), ImVec2(0, -1));
+
 /*
         {
             ImFontConfig fontConfig;
@@ -197,9 +205,24 @@ namespace rePlayer
             io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_fontLog_compressed_data_base85, 0, &fontConfig);
         }
 
-        unsigned char* pixels;
+        uint8_t* pixels;
         int width, height;
         io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
+
+        uint32_t mediaIconsOffset = 0;
+        for (uint32_t i = 0; i < _countof(widths); i++)
+        {
+            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(rectIds[i]))
+            {
+                for (int32_t y = 0; y < rect->Height; y++)
+                {
+                    uint8_t* src = s_mediaIcons + mediaIconsOffset + 177 * y;
+                    uint8_t* dst = pixels + (rect->Y + y) * width + rect->X;
+                    memcpy(dst, src, widths[i]);
+                }
+            }
+            mediaIconsOffset += widths[i];
+        }
 
         //temporary: create the heap
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};

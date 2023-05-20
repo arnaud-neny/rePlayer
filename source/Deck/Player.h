@@ -51,6 +51,8 @@ namespace rePlayer
         static uint32_t GetVolume();
         static void SetVolume(uint32_t volume);
 
+        void EnableEndless(bool isEnabled);
+
     private:
         Player(MusicID id, Replay* replay);
         ~Player() override;

@@ -181,6 +181,7 @@ $(SolutionDir)..\tools\upx --best --compress-exports=0 -o $(SolutionDir)..\data\
     <ClInclude Include="Graphics\GraphicsPremul.h" />
     <ClInclude Include="Graphics\GraphicsPremulPS.h" />
     <ClInclude Include="Graphics\GraphicsPremulVS.h" />
+    <ClInclude Include="Graphics\MediaIcons.h" />
     <ClInclude Include="Library\Library.h" />
     <ClInclude Include="Library\LibraryArtistsUI.h" />
     <ClInclude Include="Library\LibrarySongMerger.h" />

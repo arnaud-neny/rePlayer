@@ -322,6 +322,9 @@
     <ClInclude Include="RePlayer\Version.h">
       <Filter>Source Files\RePlayer</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\MediaIcons.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\GraphicsImpl.inl">

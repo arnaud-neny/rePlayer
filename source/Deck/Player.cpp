@@ -7,6 +7,7 @@
 
 // rePlayer
 #include <RePlayer/Core.h>
+#include <Deck/Deck.h>
 
 // TagLib
 #include <fileref.h>
@@ -61,9 +62,9 @@ namespace rePlayer
             m_songPos = 0;
             m_songEnd = ~0ull;
             m_waveFillPos = m_numCachedSamples;
-            m_hasSeeked = false;
 
-            m_numLoops = GetSubsong().state == SubsongState::Loop ? 1 : 0;
+            m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
+            m_hasSeeked = m_replay->CanLoop() && Core::GetDeck().IsEndless();
             m_remainingFadeOut = m_replay->GetSampleRate() * 4;
             m_fadeOutSilence = 0;
 
@@ -116,7 +117,7 @@ namespace rePlayer
             m_songEnd = ~0ull;
             m_waveFillPos = m_numCachedSamples;
 
-            m_numLoops = GetSubsong().state == SubsongState::Loop ? 1 : 0;
+            m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
             m_remainingFadeOut = m_replay->GetSampleRate() * 4;
             m_fadeOutSilence = 0;
 
@@ -305,6 +306,12 @@ namespace rePlayer
         waveOutSetVolume(nullptr, volume | (volume << 16));
     }
 
+    void Player::EnableEndless(bool isEnabled)
+    {
+        m_numLoops = m_replay->CanLoop() ? isEnabled ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
+        m_hasSeeked |= m_replay->CanLoop() && isEnabled;
+    }
+
     Player::Player(MusicID id, Replay* replay)
         : m_id(id)
         , m_replay(replay)
@@ -359,7 +366,8 @@ namespace rePlayer
 
         SongSheet* song = m_song = m_id.GetSong()->Edit();
         m_replay->SetSubsong(m_id.subsongId.index);
-        m_numLoops = song->subsongs[m_id.subsongId.index].state == SubsongState::Loop && m_replay->CanLoop() ? 1 : 0;
+        m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : song->subsongs[m_id.subsongId.index].state == SubsongState::Loop ? 1 : 0 : 0;
+        m_hasSeeked = m_replay->CanLoop() && Core::GetDeck().IsEndless();
         m_remainingFadeOut = m_replay->GetSampleRate() * 4;
         m_fadeOutRatio = 1.0f / m_remainingFadeOut;
         m_replay->ApplySettings(song->metadata.Container());

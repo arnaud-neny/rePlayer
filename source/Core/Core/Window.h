@@ -46,6 +46,9 @@ namespace core
 
             T* operator&() { return &m_data; }
 
+            template <typename Type>
+            Type As() const { return Type(m_data); }
+
         private:
             T m_data;
         };

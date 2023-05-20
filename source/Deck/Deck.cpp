@@ -500,48 +500,59 @@ namespace rePlayer
             ImGui::PopStyleVar(2);
         }
 
-        if (ImGui::Button("Prev"))
+        auto spacing = ImGui::GetStyle().ItemSpacing.x + 2.0f;
+        if (ImGui::Button("\xef\xbf\xb7")) // prev
         {
             PlayPreviousSong();
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Stop") && isPlayerValid && !player->IsStopped())
+        ImGui::SameLine(0.0f, spacing);
+        if (ImGui::Button("\xef\xbf\xb9") && isPlayerValid && !player->IsStopped()) // stop
         {
             player->Stop();
             if (m_nextPlayer.IsValid())
                 m_nextPlayer->Stop();
         }
-        ImGui::SameLine();
+        ImGui::SameLine(0.0f, spacing);
         if (!isPlayerValid)
         {
-            ImGui::Button("Play");
+            ImGui::Button("\xef\xbf\xba"); // play
         }
         else if (!player->IsPlaying())
         {
-            if (ImGui::Button("Play"))
+            if (ImGui::Button("\xef\xbf\xba")) // play
                 Play();
         }
-        else if (ImGui::Button("Pause"))
+        else if (ImGui::Button("\xef\xbf\xbb")) // pause
         {
             player->Pause();
             if (m_nextPlayer.IsValid())
                 m_nextPlayer->Pause();
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Next"))
+        ImGui::SameLine(0.0f, spacing);
+        if (ImGui::Button("\xef\xbf\xb8")) // next
         {
             PlayNextSong();
         }
-        ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(m_isLooping ? ImGuiCol_ButtonActive : ImGuiCol_Button));
-        if (ImGui::Button("Loop"))
+        ImGui::SameLine(0.0f, spacing);
+        if (ImGui::Button(m_loop == Loop::None ? "\xef\xbf\xbc" : m_loop == Loop::Playlist ? "\xef\xbf\xbd" : "\xef\xbf\xbe")) // loop
         {
-            m_isLooping = !m_isLooping;
+            m_loop = Loop((m_loop.As<uint8_t>() + 1) % uint8_t(Loop::Count));
+            if (m_loop != Loop::Playlist)
+            {
+                auto isEnabled = m_loop == Loop::Single;
+                if (m_currentPlayer.IsValid())
+                    m_currentPlayer->EnableEndless(isEnabled);
+                if (m_nextPlayer.IsValid())
+                    m_nextPlayer->EnableEndless(isEnabled);
+                if (m_shelvedPlayer.IsValid())
+                    m_shelvedPlayer->EnableEndless(isEnabled);
+            }
             ValidateNextSong();
         }
-        ImGui::PopStyleColor();
-        ImGui::SameLine();
-        if (ImGui::Button("Menu"))
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip(m_loop == Loop::None ? "No loop" : m_loop == Loop::Playlist ? "Playlist loop" : "Endless song");
+        ImGui::SameLine(0.0f, spacing);
+        if (ImGui::Button("\xef\xbf\xbf")) // menu
             ImGui::OpenPopup("Windows");
         if (ImGui::BeginPopup("Windows"))
         {
@@ -574,7 +585,7 @@ namespace rePlayer
                 m_isOpened = false;
             ImGui::EndPopup();
         }
-        ImGui::SameLine();
+        ImGui::SameLine(0.0f, spacing);
         if (ImGui::Button(m_isExpanded ? "^" : "v"))
         {
             m_isExpanded = !m_isExpanded;
