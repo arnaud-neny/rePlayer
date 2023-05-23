@@ -58,6 +58,8 @@ namespace core
         ReturnType Add(OtherItemType&& otherItem);
         template <typename OtherItemType, typename ReturnType = ItemType*>
         ReturnType Add(const OtherItemType* otherItems, size_t numOtherItems);
+        template <typename ReturnType = ItemType*>
+        ReturnType Add(const ItemType& otherItem, size_t numOtherItems);
 
         std::pair<ItemType*, bool> AddOnce(const ItemType& otherItem);
 

@@ -32,6 +32,9 @@
     <Filter Include="Source Files\Thread">
       <UniqueIdentifier>{15ebea9d-703d-4ed5-97d7-f1fbb017fca7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\JSON">
+      <UniqueIdentifier>{7b6a2dc7-e59f-42d1-ac1e-78e03fa3f707}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Containers\SmartPtr.h">
@@ -180,6 +183,12 @@
     </ClInclude>
     <ClInclude Include="Thread\Semaphore.h">
       <Filter>Source Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\json.hpp">
+      <Filter>Source Files\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\json_fwd.hpp">
+      <Filter>Source Files\JSON</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

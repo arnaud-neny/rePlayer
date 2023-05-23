@@ -55,6 +55,8 @@
     <ClInclude Include="IO\Stream.h" />
     <ClInclude Include="IO\StreamFile.h" />
     <ClInclude Include="IO\StreamMemory.h" />
+    <ClInclude Include="JSON\json.hpp" />
+    <ClInclude Include="JSON\json_fwd.hpp" />
     <ClInclude Include="Thread\Mutex.h" />
     <ClInclude Include="Thread\Mutex.inl.h" />
     <ClInclude Include="Thread\Semaphore.h" />

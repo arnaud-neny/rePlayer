@@ -450,6 +450,39 @@ namespace core
     }
 
     template <typename ItemType>
+    template <typename ReturnType>
+    inline ReturnType Array<ItemType>::Add(const ItemType& otherItem, size_t numOtherItems)
+    {
+        auto items = m_items;
+        auto numItems = m_numItems;
+        auto newNumItems = numItems + uint32_t(numOtherItems);
+        if (newNumItems > m_maxItems)
+        {
+            auto newItems = Grow(numItems, newNumItems);
+            if constexpr (std::is_trivially_copyable<ItemType>::value)
+                memcpy(newItems, items, numItems * sizeof(ItemType));
+            else for (size_t i = 0; i < numItems; ++i)
+            {
+                new (newItems + i) ItemType(std::move(items[i]));
+                items[i].~ItemType();
+            }
+            Free(items);
+            items = newItems;
+        }
+        m_numItems = newNumItems;
+        items += numItems;
+        auto newItem = items;
+        while (numOtherItems--)
+            new (items++) ItemType(otherItem);
+        if constexpr (std::is_pointer<ReturnType>::value)
+            return reinterpret_cast<ReturnType>(newItem);
+        else if constexpr (std::is_reference<ReturnType>::value)
+            return reinterpret_cast<ReturnType>(*newItem);
+        else
+            return static_cast<ReturnType>(numItems);
+    }
+
+    template <typename ItemType>
     inline std::pair<ItemType*, bool> Array<ItemType>::AddOnce(const ItemType& otherItem)
     {
         for (auto& item : *this)
