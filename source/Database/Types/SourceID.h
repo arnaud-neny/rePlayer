@@ -14,6 +14,7 @@ namespace rePlayer
             FileImportID = 3,
             HighVoltageSIDCollectionID = 4,
             SNDHID = 5,
+            AtariSAPMusicArchiveID = 6,
 
             NumSourceIDs
         };

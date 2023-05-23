@@ -18,13 +18,13 @@
 #include <Library/LibraryArtistsUI.h>
 #include <Library/LibrarySongsUI.h>
 #include <Library/Sources/AmigaMusicPreservation.h>
+#include <Library/Sources/AtariSAPMusicArchive.h>
 #include <Library/Sources/FileImport.h>
 #include <Library/Sources/HighVoltageSIDCollection.h>
 #include <Library/Sources/Modland.h>
 #include <Library/Sources/SNDH.h>
 #include <Library/Sources/TheModArchive.h>
 #include <RePlayer/Core.h>
-#include <RePlayer/CoreHeader.h>
 #include <RePlayer/Replays.h>
 
 #include <zlib.h>
@@ -49,6 +49,7 @@ namespace rePlayer
         m_sources[SourceID::FileImportID] = new SourceFileImport();
         m_sources[SourceID::HighVoltageSIDCollectionID] = new SourceHighVoltageSIDCollection();
         m_sources[SourceID::SNDHID] = new SourceSNDH();
+        m_sources[SourceID::AtariSAPMusicArchiveID] = new SourceAtariSAPMusicArchive();
 
         Load();
 

@@ -152,6 +152,9 @@
     <ClCompile Include="Library\Sources\SNDH.cpp">
       <Filter>Source Files\Library\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Sources\AtariSAPMusicArchive.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -324,6 +327,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\MediaIcons.h">
       <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\AtariSAPMusicArchive.h">
+      <Filter>Source Files\Library\Sources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

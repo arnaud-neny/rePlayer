@@ -8,7 +8,8 @@ namespace rePlayer
         "Modland",
         "File Import",
         "High Voltage SID Collection",
-        "SNDH - Atari ST YM2149 Archive"
+        "SNDH - Atari ST YM2149 Archive",
+        "Atari SAP Music Archive"
     };
 }
 // namespace rePlayer

@@ -19,7 +19,6 @@
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
 - multi-threaded load/import (with main screens lock)
-- http://asma.atari.org/ importer : https://asma.atari.org/asma/Misc/lack_of_filters_cause.sap
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://zxart.ee/eng/music/ importer
