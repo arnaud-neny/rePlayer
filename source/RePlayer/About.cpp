@@ -1,5 +1,6 @@
 #include "About.h"
 
+#include <Database/Types/SourceID.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 
@@ -39,6 +40,16 @@ namespace rePlayer
 
         ImGui::Text("rePlayer %u.%u.%u", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
         ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2023 Arnaud Nény (aka replay/Razor1911)"));
+
+        ImGui::TextUnformatted("\nSupported databases:");
+        for (auto* source : SourceID::sourceNames)
+        {
+            if (source != SourceID::sourceNames[SourceID::FileImportID])
+            {
+                ImGui::Bullet();
+                ImGui::TextUnformatted(source);
+            }
+        }
 
         ImGui::TextUnformatted("\nSystem 3rd parties:");
         ImGui::Bullet();
