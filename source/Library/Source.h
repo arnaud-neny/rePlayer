@@ -5,6 +5,7 @@
 #include <Database/Types/Artist.h>
 #include <Database/Types/Song.h>
 #include <Database/Types/SourceID.h>
+#include <RePlayer/CoreHeader.h>
 
 namespace rePlayer
 {

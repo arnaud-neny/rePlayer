@@ -278,7 +278,7 @@ namespace rePlayer
         m_replays.Push();
         m_songs.Push();
         m_strings.Add('\0'); // 0 == empty string == invalid offset
-        m_data.Add(&m_areStringsDirty, 4); // add 4 zeros
+        m_data.Add(uint8_t(0), alignof(SourceSong));
     }
 
     SourceModland::~SourceModland()
@@ -722,7 +722,7 @@ namespace rePlayer
                 if (m_areDataDirty)
                 {
                     Array<uint8_t> data(0ull, m_data.NumItems<size_t>());
-                    data.Add(m_data.Items(), 4);
+                    data.Add(m_data.Items(), alignof(SourceSong));
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);
                     for (auto i = m_songs.NumItems<int64_t>() - 1; i > 0; i--)
@@ -819,7 +819,7 @@ namespace rePlayer
                 else if (dbSong.artists[0])
                     continue;
 
-                return uint16_t(i);
+                return i;
             }
         }
         // add a new one

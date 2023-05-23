@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Source.h"
-#include <RePlayer/CoreHeader.h>
 
 namespace rePlayer
 {
