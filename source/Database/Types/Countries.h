@@ -22,6 +22,7 @@ namespace rePlayer
     private:
         static const uint16_t ms_countriesId[];
         static const char* const ms_countriesName[];
+        static const uint8_t ms_countriesSize[];
     };
 }
 // namespace rePlayer

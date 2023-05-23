@@ -16,12 +16,18 @@ namespace rePlayer
     };
     #undef COUNTRY
 
+    #define COUNTRY(a,b,c,d) sizeof(b) - 1,
+    const uint8_t Countries::ms_countriesSize[] = {
+        #include "Countries.inc"
+    };
+    #undef COUNTRY
+
     int32_t Countries::GetIndex(const char* name)
     {
         int16_t countryIndex = -1;
         for (int16_t i = 0; i < _countof(ms_countriesName); i++)
         {
-            if (_stricmp(ms_countriesName[i], name) == 0)
+            if (_strnicmp(ms_countriesName[i], name, ms_countriesSize[i]) == 0)
             {
                 countryIndex = i;
                 break;
