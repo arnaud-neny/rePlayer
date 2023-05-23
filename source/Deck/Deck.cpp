@@ -132,6 +132,8 @@ namespace rePlayer
             m_currentPlayer.Reset();
             m_mode = Mode::Solo;
         }
+        else if (m_currentPlayer.IsValid() && !m_currentPlayer->GetId().IsValid())
+            m_currentPlayer.Reset();
     }
 
     void Deck::DisplayProgressBarInTable(float backgroundRatio)
@@ -289,12 +291,13 @@ namespace rePlayer
             bool hasChanged = false;
             bool isPlaying = m_currentPlayer->IsPlaying();
             bool isStopped = m_currentPlayer->IsStopped();
+            auto& playlist = Core::GetPlaylist();
 
             // 1 - check for the playlist file in shelved mode (m_mode should be Mode::Solo)
-            if (m_shelvedPlayer.IsValid() && (m_shelvedPlayer->GetSubsong().isDiscarded || m_shelvedPlayer->GetMediaType() != m_shelvedPlayer->GetSong()->type))
+            if (m_shelvedPlayer.IsValid() && (m_shelvedPlayer->GetSubsong().isDiscarded || m_shelvedPlayer->GetMediaType() != m_shelvedPlayer->GetSong()->type || m_shelvedPlayer->GetId() != playlist.GetCurrentEntry()))
             {
-                m_shelvedPlayer = Core::GetPlaylist().LoadCurrentSong();
-                m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
+                m_shelvedPlayer = playlist.LoadCurrentSong();
+                m_nextPlayer = playlist.LoadNextSong(false);
             }
 
             // 2 - check solo vs playlist
@@ -302,7 +305,7 @@ namespace rePlayer
             {
                 if (m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type)
                 {
-                    m_currentPlayer = Core::GetPlaylist().LoadSong(m_currentPlayer->GetId());
+                    m_currentPlayer = playlist.LoadSong(m_currentPlayer->GetId());
                     hasChanged = true;
                 }
                 if (m_currentPlayer.IsInvalid() || m_currentPlayer->GetSubsong().isDiscarded)
@@ -312,21 +315,21 @@ namespace rePlayer
                         m_mode = Mode::Playlist;
                         m_currentPlayer = std::move(m_shelvedPlayer);
                         if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->type))
-                            m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
+                            m_nextPlayer = playlist.LoadNextSong(false);
                         hasChanged = true;
                     }
                     else
                         m_currentPlayer.Reset();
                 }
             }
-            else if (m_currentPlayer->GetSubsong().isDiscarded || m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type)
+            else if (m_currentPlayer->GetSubsong().isDiscarded || m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type || m_currentPlayer->GetId() != playlist.GetCurrentEntry())
             {
-                m_currentPlayer = Core::GetPlaylist().LoadCurrentSong();
-                m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
+                m_currentPlayer = playlist.LoadCurrentSong();
+                m_nextPlayer = playlist.LoadNextSong(false);
                 hasChanged = true;
             }
             else if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->type))
-                m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
+                m_nextPlayer = playlist.LoadNextSong(false);
             // we could validate here, but we might spam the servers if we move entries in the playlist
             //else
             //    ValidateNextSong();
