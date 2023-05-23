@@ -101,6 +101,8 @@ namespace rePlayer
             txt += db[song->GetArtistId(i)]->GetHandle();
         }
         ImGui::TextUnformatted(txt.c_str());
+        if (auto year = song->GetReleaseYear())
+            ImGui::Text("Year   : %hu", year);
         if (song->GetTags() != Tag::kNone)
         {
             txt = "Tags   : ";
