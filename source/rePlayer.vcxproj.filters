@@ -155,6 +155,9 @@
     <ClCompile Include="Library\Sources\AtariSAPMusicArchive.cpp">
       <Filter>Source Files\Library\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="RePlayer\Export.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -330,6 +333,9 @@
     </ClInclude>
     <ClInclude Include="Library\Sources\AtariSAPMusicArchive.h">
       <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\Export.h">
+      <Filter>Source Files\RePlayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -35,12 +35,12 @@ namespace rePlayer
         WAVEHDR header{};
     };
 
-    SmartPtr<Player> Player::Create(MusicID id, Replay* replay, io::Stream* stream)
+    SmartPtr<Player> Player::Create(MusicID id, SongSheet* song, Replay* replay, io::Stream* stream, bool isExport)
     {
         if (replay)
         {
-            SmartPtr<Player> player(kAllocate, id, replay);
-            if (player->Init(stream))
+            SmartPtr<Player> player(kAllocate, id, song, replay);
+            if (player->Init(stream, isExport))
                 return nullptr;
             return player;
         }
@@ -312,8 +312,9 @@ namespace rePlayer
         m_hasSeeked |= m_replay->CanLoop() && isEnabled;
     }
 
-    Player::Player(MusicID id, Replay* replay)
+    Player::Player(MusicID id, SongSheet* song, Replay* replay)
         : m_id(id)
+        , m_song(song)
         , m_replay(replay)
         , m_wave(new Wave())
         , m_numSamples(1 << (32 - std::countl_zero(replay->GetSampleRate())))
@@ -339,7 +340,7 @@ namespace rePlayer
         delete[] m_waveData;
     }
 
-    bool Player::Init(io::Stream* stream)
+    bool Player::Init(io::Stream* stream, bool isExport)
     {
         WAVEFORMATEX waveFormat{};
         waveFormat.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
@@ -350,7 +351,7 @@ namespace rePlayer
         waveFormat.nAvgBytesPerSec = waveFormat.nSamplesPerSec * waveFormat.nBlockAlign;
         waveFormat.cbSize = 0;
 
-        if (waveOutOpen(&m_wave->outHandle, WAVE_MAPPER, &waveFormat, 0, 0, 0) != S_OK)
+        if (!isExport && waveOutOpen(&m_wave->outHandle, WAVE_MAPPER, &waveFormat, 0, 0, 0) != S_OK)
             return true;
 
         auto numSamples = m_numSamples;
@@ -362,9 +363,10 @@ namespace rePlayer
         m_wave->header.dwBytesRecorded = 0;
         m_wave->header.dwUser = 0;
         m_wave->header.dwLoops = 0xffFFffFF;
-        waveOutPrepareHeader(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
+        if (!isExport)
+            waveOutPrepareHeader(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
 
-        SongSheet* song = m_song = m_id.GetSong()->Edit();
+        SongSheet* song = m_song;
         m_replay->SetSubsong(m_id.subsongId.index);
         m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : song->subsongs[m_id.subsongId.index].state == SubsongState::Loop ? 1 : 0 : 0;
         m_hasSeeked = m_replay->CanLoop() && Core::GetDeck().IsEndless();
@@ -372,66 +374,69 @@ namespace rePlayer
         m_fadeOutRatio = 1.0f / m_remainingFadeOut;
         m_replay->ApplySettings(song->metadata.Container());
 
-        Render(m_numCachedSamples, 0);
-        m_waveFillPos = m_numCachedSamples;
-        memset(m_waveData + m_waveFillPos, 0, (numSamples - m_numCachedSamples) * sizeof(StereoSample));
-
-        waveOutPause(m_wave->outHandle);
-        waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
-        m_status = Status::Paused;
-
-        m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
-        if (m_threadHandle == 0)
-            return true;
-
-        SetThreadPriority(m_threadHandle, THREAD_PRIORITY_TIME_CRITICAL);// THREAD_PRIORITY_HIGHEST);
-
-        // read stream tags if there is any
-        TagLibStream tagLibStream(stream->Clone());
-        TagLib::FileRef f(&tagLibStream);
-        if (auto tag = f.tag())
+        if (!isExport)
         {
-            if (!tag->artist().isEmpty())
-            {
-                m_extraInfo = "Artist: ";
-                m_extraInfo += tag->artist().to8Bit();
-            }
-            if (!tag->title().isEmpty())
-            {
-                if (!m_extraInfo.empty())
-                    m_extraInfo += "\n";
-                m_extraInfo += "Title : ";
-                m_extraInfo += tag->title().to8Bit();
-            }
-            if (!tag->album().isEmpty())
-            {
-                if (!m_extraInfo.empty())
-                    m_extraInfo += "\n";
-                m_extraInfo += "Album : ";
-                m_extraInfo += tag->album().to8Bit();
-            }
-            if (!tag->genre().isEmpty())
-            {
-                if (!m_extraInfo.empty())
-                    m_extraInfo += "\n";
-                m_extraInfo += "Genre : ";
-                m_extraInfo += tag->genre().to8Bit();
-            }
-            if (tag->year())
-            {
-                if (!m_extraInfo.empty())
-                    m_extraInfo += "\n";
-                m_extraInfo += "Year  : ";
-                char buf[64];
-                core::sprintf(buf, "%d", tag->year());
-                m_extraInfo += buf;
-            }
+            Render(m_numCachedSamples, 0);
+            m_waveFillPos = m_numCachedSamples;
+            memset(m_waveData + m_waveFillPos, 0, (numSamples - m_numCachedSamples) * sizeof(StereoSample));
 
-            if (!tag->comment().isEmpty())
+            waveOutPause(m_wave->outHandle);
+            waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
+            m_status = Status::Paused;
+
+            m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
+            if (m_threadHandle == 0)
+                return true;
+
+            SetThreadPriority(m_threadHandle, THREAD_PRIORITY_TIME_CRITICAL);// THREAD_PRIORITY_HIGHEST);
+
+            // read stream tags if there is any
+            TagLibStream tagLibStream(stream->Clone());
+            TagLib::FileRef f(&tagLibStream);
+            if (auto tag = f.tag())
             {
-                if (!m_extraInfo.empty())
-                    m_extraInfo += "\n\n";
-                m_extraInfo += tag->comment().to8Bit();
+                if (!tag->artist().isEmpty())
+                {
+                    m_extraInfo = "Artist: ";
+                    m_extraInfo += tag->artist().to8Bit();
+                }
+                if (!tag->title().isEmpty())
+                {
+                    if (!m_extraInfo.empty())
+                        m_extraInfo += "\n";
+                    m_extraInfo += "Title : ";
+                    m_extraInfo += tag->title().to8Bit();
+                }
+                if (!tag->album().isEmpty())
+                {
+                    if (!m_extraInfo.empty())
+                        m_extraInfo += "\n";
+                    m_extraInfo += "Album : ";
+                    m_extraInfo += tag->album().to8Bit();
+                }
+                if (!tag->genre().isEmpty())
+                {
+                    if (!m_extraInfo.empty())
+                        m_extraInfo += "\n";
+                    m_extraInfo += "Genre : ";
+                    m_extraInfo += tag->genre().to8Bit();
+                }
+                if (tag->year())
+                {
+                    if (!m_extraInfo.empty())
+                        m_extraInfo += "\n";
+                    m_extraInfo += "Year  : ";
+                    char buf[64];
+                    core::sprintf(buf, "%d", tag->year());
+                    m_extraInfo += buf;
+                }
+
+                if (!tag->comment().isEmpty())
+                {
+                    if (!m_extraInfo.empty())
+                        m_extraInfo += "\n\n";
+                    m_extraInfo += tag->comment().to8Bit();
+                }
             }
         }
         return false;

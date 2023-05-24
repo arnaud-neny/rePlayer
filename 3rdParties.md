@@ -1,6 +1,6 @@
 # rePlayer (another multi-formats music player)
 
-## External Libraries:
+## General purpose libraries:
 - Dear ImGui: https://github.com/ocornut/imgui/tree/docking  
   To merge newer versions, replace imgui files in source\Core\ImGui and run batch DiffApplyImGui.bat (this will apply our changes to ImGui).  
   Then copy the imgui folder in rePlayer\external and run batch DiffMakeImGui.bat (this will create a patch file from the new version).
@@ -13,6 +13,8 @@
 - TagLib: https://taglib.org
 - dllloader: https://github.com/tapika/dllloader
 - JSON for Modern C++: https://github.com/nlohmann/json
+
+## Replays Libraries:
 - OpenMPT: https://lib.openmpt.org/libopenmpt  
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - HivelyTracker: https://github.com/pete-gordon/hivelytracker  
@@ -28,7 +30,7 @@
 - adplug: https://github.com/adplug/adplug  
   Patched some players for continuous play and loop/end detection.
 - ASAP: http://asap.sourceforge.net
-- MP3/FLAC/WAV: https://github.com/mackron/dr_libs
+- dr_libs (MP3/FLAC/WAV): https://github.com/mackron/dr_libs
 - Vorbis: https://github.com/edubart/minivorbis
 - Ayfly: https://github.com/l29ah/ayfly
 - gbsplay: https://github.com/mmitch/gbsplay

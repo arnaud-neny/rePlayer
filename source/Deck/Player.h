@@ -10,6 +10,7 @@ namespace rePlayer
     class Player : public RefCounted
     {
         friend class SmartPtr<Player>;
+        friend class Export;
     public:
         enum EndingState
         {
@@ -19,7 +20,7 @@ namespace rePlayer
         };
 
     public:
-        static SmartPtr<Player> Create(MusicID id, Replay* replay, io::Stream* stream);
+        static SmartPtr<Player> Create(MusicID id, SongSheet* song, Replay* replay, io::Stream* stream, bool isExport = false);
 
         void Play();
         void Pause();
@@ -54,10 +55,10 @@ namespace rePlayer
         void EnableEndless(bool isEnabled);
 
     private:
-        Player(MusicID id, Replay* replay);
+        Player(MusicID id, SongSheet* song, Replay* replay);
         ~Player() override;
 
-        bool Init(io::Stream* stream);
+        bool Init(io::Stream* stream, bool isExport);
 
         static uint32_t ThreadFunc(uint32_t* lpdwParam);
         void ThreadUpdate();
@@ -79,7 +80,7 @@ namespace rePlayer
         StereoSample* m_waveData = nullptr;
         uint64_t m_songEnd = ~0ull;
         uint64_t m_songSeek = 0;
-        uint32_t m_songPos = 0;
+        uint64_t m_songPos = 0;
         uint32_t m_waveFillPos = 0;
         const uint32_t m_numSamples;
         const uint32_t m_numCachedSamples;

@@ -19,6 +19,7 @@ namespace rePlayer
     using namespace core;
 
     class Database;
+    class Export;
     class Song;
 
     class DatabaseSongsUI
@@ -49,6 +50,8 @@ namespace rePlayer
 
         void FilteringUI(bool& isDirty);
         void SongsUI(bool isDirty);
+
+        void ExportAsWavUI();
 
         // SongUI
         void SortSubsongs(bool isDirty);
@@ -119,6 +122,9 @@ namespace rePlayer
         SubsongID m_trackedSubsongId;
 
         HashMap<SubsongID, float> m_subsongHighlights;
+
+        bool m_isExportAsWavTriggered = false;
+        Export* m_export;
 
         Array<SubsongID> m_deletedSubsongs;
     };

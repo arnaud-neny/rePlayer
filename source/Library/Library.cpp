@@ -230,7 +230,7 @@ namespace rePlayer
             }
             if (musicId.subsongId.index < numSubsongs)
             {
-                player = Player::Create(musicId, replay, stream);
+                player = Player::Create(musicId, song, replay, stream);
                 player->MarkSongAsNew(hasChanged);
                 Log::Message("%s: loaded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->type.GetExtension());
             }

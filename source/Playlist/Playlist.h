@@ -34,6 +34,7 @@ namespace rePlayer
         void Clear();
         void Enqueue(MusicID musicId);
         void Discard(MusicID musicId);
+        SmartPtr<core::io::Stream> GetStream(Song* song);
         SmartPtr<core::io::Stream> GetStream(const MusicID musicId);
         SmartPtr<Player> LoadSong(const MusicID musicId);
         void LoadPreviousSong(SmartPtr<Player>& currentPlayer, SmartPtr<Player>& nextPlayer);

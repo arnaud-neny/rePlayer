@@ -9,6 +9,7 @@
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
 #include <RePlayer/Core.h>
+#include <RePlayer/Export.h>
 
 #include <algorithm>
 #include <chrono>
@@ -52,6 +53,7 @@ namespace rePlayer
 
         FilteringUI(isDirty);
         SongsUI(isDirty);
+        ExportAsWavUI();
     }
 
     void DatabaseSongsUI::OnEndUpdate()
@@ -436,6 +438,54 @@ namespace rePlayer
         ImGui::EndChild();
     }
 
+    void DatabaseSongsUI::ExportAsWavUI()
+    {
+        if (m_isExportAsWavTriggered)
+        {
+            m_isExportAsWavTriggered = false;
+            m_export = new Export();
+            for (auto& entry : m_entries)
+            {
+                if (entry.isSelected)
+                    m_export->Enqueue({ entry.id, m_databaseId });
+            }
+            if (m_export->Start())
+                ImGui::OpenPopup("ExportAsWav");
+            else
+                delete m_export;
+        }
+        ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+        if (ImGui::BeginPopupModal("ExportAsWav", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            MusicID musicId;
+            float progress;
+            uint32_t duration;
+            m_export->GetStatus(musicId, progress, duration);
+
+            ImGui::Text("ID     : %08X%c", musicId.subsongId.value, musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
+            ImGui::Text("Title  : %s", musicId.GetTitle().c_str());
+            ImGui::Text(musicId.GetSong()->NumArtistIds() > 1 ? "Artists: %s" : "Artist : %s", musicId.GetArtists().c_str());
+            ImGui::Text("Replay : %s", musicId.GetSong()->GetType().GetReplay());
+            if (duration != 0xffFFffFF)
+            {
+                char buf[32];
+                sprintf(buf, "%d:%02d", duration / 60, duration % 60);
+                ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), buf);
+            }
+            else
+                ImGui::ProgressBar(1.0f, ImVec2(-FLT_MIN, 0), "Writing WAV");
+
+            if (m_export->IsDone())
+            {
+                delete m_export;
+                m_export = nullptr;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
     void DatabaseSongsUI::SortSubsongs(bool isDirty)
     {
         auto* sortsSpecs = ImGui::TableGetSortSpecs();
@@ -666,6 +716,11 @@ namespace rePlayer
         {
             isSelected = Discard();
             ImGui::EndMenu();
+        }
+        if (ImGui::Selectable("Export as WAV"))
+        {
+            m_isExportAsWavTriggered = true;
+            ImGui::CloseCurrentPopup();
         }
         OnSelectionContext();
     }

@@ -213,10 +213,15 @@ namespace rePlayer
             m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
     }
 
+    SmartPtr<core::io::Stream> Playlist::GetStream(Song* song)
+    {
+        return io::StreamFile::Create(m_cue.paths.Items(song->GetSourceId(0).internalId));
+    }
+
     SmartPtr<core::io::Stream> Playlist::GetStream(const MusicID musicId)
     {
         auto* song = m_cue.db[musicId.subsongId];
-        return io::StreamFile::Create(m_cue.paths.Items(song->GetSourceId(0).internalId));
+        return GetStream(song);
     }
 
     SmartPtr<Player> Playlist::LoadSong(const MusicID musicId)
@@ -301,7 +306,7 @@ namespace rePlayer
                     }
                     if (musicId.subsongId.index < numSubsongs)
                     {
-                        player = Player::Create(musicId, replay, stream);
+                        player = Player::Create(musicId, song, replay, stream);
                         player->MarkSongAsNew(hasChanged);
                         Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.paths.Items(song->sourceIds[0].internalId));
                     }
