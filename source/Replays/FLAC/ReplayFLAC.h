@@ -8,7 +8,7 @@
 #define DRFLAC_REALLOC(p, sz) core::Realloc((p), (sz))
 #define DRFLAC_FREE(p) core::Free((p))
 #define DR_FLAC_NO_STDIO
-#include "dr_libs/dr_flac.h"
+#include <dr_flac.h>
 
 namespace rePlayer
 {

@@ -9,16 +9,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\dr_libs">
-      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayWAV.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dr_libs\dr_wav.h">
-      <Filter>Source Files\dr_libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

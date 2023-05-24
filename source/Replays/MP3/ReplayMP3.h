@@ -8,7 +8,7 @@
 #define DRMP3_FREE(p) core::Free((p))
 #define DR_MP3_NO_STDIO
 #define DR_MP3_FLOAT_OUTPUT
-#include "dr_libs/dr_mp3.h"
+#include <dr_mp3.h>
 
 namespace rePlayer
 {

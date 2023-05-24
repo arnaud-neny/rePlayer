@@ -8,7 +8,7 @@
 #define DRWAV_REALLOC(p, sz) core::Realloc((p), (sz))
 #define DRWAV_FREE(p) core::Free((p))
 #define DR_WAV_NO_STDIO
-#include "dr_libs/dr_wav.h"
+#include <dr_wav.h>
 
 namespace rePlayer
 {
