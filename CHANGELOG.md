@@ -1,21 +1,34 @@
-v0.3.4
+v0.4.0:
+- Added TIATracker
+- Added Atari SAP Music Archive import
+- Added JSON for Modern C++
+- Replaced deck buttons labels with icons
+- Added endless song playback
+- Added export to wav
+- Updated libcurl to 8.1.1
+- Updated dr_flac to 0.12.40
+- Updated dr_mp3 to 0.6.35
+- Updated dr_wav to 0.13.9
+- Bug fixes
+
+v0.3.4:
 - Added NEZplug player
 - Added SNDH import
 - Updated adplug to 2.3.3.801
 - Updated OpenMPT to 0.7.1
-- ImGui 1.89.53 (to fix the modals getting closed on focus) with single axis auto resize patch
+- Updated ImGui to 1.89.53 (to fix the modals getting closed on focus) with single axis auto resize patch
 - Settings for the media hot keys
 - Unfold deck option to display song metadata
 - Added missing support for splitted tfmx files (mdat & smpl)
 - External drag and drop is filtered with extensions and prefixes
 - Display song source within tooltip
-- Selected currently used replay when opening settings panel
+- Select currently used replay when opening settings panel
 - Bug fixes
 
 v0.2.1:
 - Added KSS player
 - Updated OpenMPT to 0.6.10
-- ImGui 1.89.5
+- Updated ImGui to ImGui 1.89.5
 - Playlist columns reorderable and hideable
 - Drag and drop files onto the deck; press shift on drop to clear the current playlist
 - Bug fixes

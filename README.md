@@ -6,7 +6,7 @@
 
 With this piece of software, you can play a lot of oldschool music format from the old times, such as the <b>Amiga</b> (which was the original purpose of this player), Atari, C64, Nintendo, Sega...  
 But why doing that when you already have other softwares like xmplay, foobar, vlc... ? Well, nowadays, you download your music package from websites like Amiga Music Preservation, The Mod Archive, Modland... and drop your files in the software.  
-As a maniac collector, it started to get very annoyed to keep up to date with newer songs from an artist, check for songs duplicates, and also some missing playback functionnalities.  
+As a maniac collector, it started to get very annoyed to keep up to date with newer songs from an artist, check for songs duplicates, and also some missing playback functionalities.  
 So I started to write my own player, first to play default modules from the amiga using ImGui (for the interface), OpenMPT (to play amiga modules) and libcurl (to handle the downloads from the websites).  
 I've improved it in my spare time, adding more playable formats, a way to handle my database(s), some features I've always wanted in other software...
 
@@ -31,7 +31,7 @@ The main panel where you can see your playing song, and interact with the playba
 4. Artist(s).
 5. Playback informations (number of channels, playback type, player).
 6. Seek bar displaying playback time and song length (and playlist position and size). It's possible you can't interact with it if the player doesn't allow it.
-7. Classic playback buttons (go to previous song in the playlist, stop, play/pause, go to next song in the playlist, toogle the playlist loop).
+7. Classic playback buttons (go to previous song in the playlist, stop, play/pause, go to next song in the playlist, toggle the playlist or endless song loop).
 8. Menu (access to settings, enable/disable other panels, close the application...).
 9. Song metadata, click to expand/fold the deck (protracker instruments, id tags, extra informations...).
 
@@ -63,6 +63,7 @@ Right click on selected songs bring a menu:
     - Add to artist (shortcut to assign the song to another artist)
     - Tags: you can assign the tags to the songs
     - Discard: remove the song from the database
+    - Export as WAV
     - Merge songs: open a pop up where you can "merge" the songs (to remove duplicates but keep references between each other from different sources).
       In this editor, songs are by default merged if there are identical.
       Then you can do some drag and drop to force some merge.
@@ -156,7 +157,7 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
 - [TagLib](https://taglib.org): to read tag from music formats.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
-- [JSON](https://github.com/nlohmann/json): JSON for Modern C++
+- [JSON](https://github.com/nlohmann/json): JSON for Modern C++.
 
 ### Replays 3rd parties:
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
@@ -169,7 +170,7 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
-- [MP3/FLAC/WAV](https://github.com/mackron/dr_libs): Well, it can play default music files.
+- [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
 - [game-music-emu](https://bitbucket.org/mpyne/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
@@ -184,4 +185,4 @@ You can chat about some of these on the [Demozoo](https://discord.io/demozoo) di
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](https://github.com/jprjr/libnezplug) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd.
-- [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS. Current version: 1.3.
+- [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
