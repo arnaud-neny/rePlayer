@@ -37,7 +37,7 @@ namespace rePlayer
 
     inline constexpr bool Tag::IsEnabled(Tag tag) const
     {
-        return (m_value & tag.m_value) == tag;
+        return (m_value & tag.m_value) == tag.m_value;
     }
 
     inline constexpr bool Tag::IsAnyEnabled(Tag tag) const
