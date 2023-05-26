@@ -487,7 +487,7 @@ namespace rePlayer
         {
             DrawClippedText(" ");
             DrawClippedText(" ");
-            DrawClippedText("              /\\\n       <-  rePlayer  ->\n              \\/");
+            DrawClippedText("            /\\\n     <-  rePlayer  ->\n            \\/");
 
             ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 4);
             ImGui::PushStyleVar(ImGuiStyleVar_DisabledAlpha, 1.0f);
@@ -867,7 +867,7 @@ namespace rePlayer
     {
         auto info = player->GetInfo();
         if (info.empty())
-            info = "              /\\\n       <-  rePlayer  ->\n              \\/";
+            info = "            /\\\n     <-  rePlayer  ->\n            \\/";
         DrawClippedText(info, [player](const ImVec2& min, const ImVec2& max)
         {
             player->DrawOscilloscope(min.x, min.y, max.x, max.y);
