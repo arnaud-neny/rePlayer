@@ -17,7 +17,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::HighlyQuixotic,
         .name = "Highly Quixotic",
-        .extensions = "qsfmini;qsfPk",
+        .extensions = "miniqsf;qsfPk",
         .about = "Highly Quixotic 3.1.1\nChristopher Snowhill",
         .init = ReplayHighlyQuixotic::Init,
         .load = ReplayHighlyQuixotic::Load

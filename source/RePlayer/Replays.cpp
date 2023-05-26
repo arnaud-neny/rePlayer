@@ -82,6 +82,7 @@ namespace rePlayer
                             stream->Seek(0, io::Stream::kSeekBegin);
                             if (auto replay = plugin->load(stream, metadata))
                                 return replay;
+                            plugins[replayIndex] = nullptr;
                             break;
                         }
                         if (*nextExt)
@@ -89,8 +90,6 @@ namespace rePlayer
                         else
                             break;
                     }
-
-                    plugins[replayIndex] = nullptr;
                 }
             }
         }

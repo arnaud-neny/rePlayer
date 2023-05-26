@@ -18,7 +18,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::HighlyAdvanced,
         .name = "Highly Advanced",
-        .extensions = "gsfmini;gsfPk",
+        .extensions = "minigsf;gsfPk",
         .about = "Highly Advanced 3.0.23\nChristopher Snowhill",
         .init = ReplayHighlyAdvanced::Init,
         .load = ReplayHighlyAdvanced::Load
