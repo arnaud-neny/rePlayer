@@ -61,12 +61,17 @@ namespace rePlayer
         return true;
     }
 
-    void Export::GetStatus(MusicID& musicId, float& progress, uint32_t& duration) const
+    void Export::Cancel()
+    {
+        std::atomic_ref(m_isCancelled).store(1);
+    }
+
+    uint32_t Export::GetStatus(float& progress, uint32_t& duration) const
     {
         auto currentEntry = std::atomic_ref(m_currentEntry).load();
-        musicId = m_songs[currentEntry].id;
         progress = std::atomic_ref(m_progress).load();
         duration = std::atomic_ref(m_duration).load();
+        return currentEntry;
     }
 
     bool Export::IsDone()
@@ -83,7 +88,7 @@ namespace rePlayer
 
     void Export::Update()
     {
-        for (uint32_t i = 0, e = m_songs.NumItems(); i < e; i++)
+        for (uint32_t i = 0, e = m_songs.NumItems(); i < e && !IsCancelled(); i++)
         {
             std::atomic_ref(m_progress).store(0.0f);
             std::atomic_ref(m_duration).store(0);
@@ -129,7 +134,7 @@ namespace rePlayer
                 if (!drwav_init_file_write(&wav, filename.c_str(), &format, nullptr))
                     continue;
 
-                for(;;)
+                for(; !IsCancelled();)
                 {
                     auto currentPos = player->m_songPos;
                     player->Render(player->m_numSamples, 0);
@@ -150,6 +155,11 @@ namespace rePlayer
                 drwav_uninit(&wav);
             }
         }
+    }
+
+    bool Export::IsCancelled() const
+    {
+        return std::atomic_ref(m_isCancelled).load();
     }
 }
 // namespace rePlayer

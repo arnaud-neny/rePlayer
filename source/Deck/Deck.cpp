@@ -257,6 +257,8 @@ namespace rePlayer
     {
         if (m_isSystrayMenuEnabled && state == SystrayState::kMouseButtonRight)
             return;
+        if (Core::IsLocked())
+            return;
         if (state == SystrayState::kMouseButtonLeft)
         {
             m_windowStates.isEnabled = !m_windowStates.isEnabled;

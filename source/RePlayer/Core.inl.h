@@ -52,5 +52,20 @@ namespace rePlayer
         else
             ms_instance->m_artistsStack.items.Add(id);
     }
+
+    inline void Core::Lock()
+    {
+        ms_instance->m_isLocked++;
+    }
+
+    inline void Core::Unlock()
+    {
+        ms_instance->m_isLocked--;
+    }
+
+    inline bool Core::IsLocked()
+    {
+        return ms_instance->m_isLocked;
+    }
 }
 // namespace rePlayer

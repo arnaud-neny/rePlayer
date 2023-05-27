@@ -124,7 +124,7 @@ namespace rePlayer
         HashMap<SubsongID, float> m_subsongHighlights;
 
         bool m_isExportAsWavTriggered = false;
-        Export* m_export;
+        Export* m_export = nullptr;
 
         Array<SubsongID> m_deletedSubsongs;
     };

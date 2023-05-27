@@ -1,16 +1,25 @@
 #include "DatabaseSongsUI.h"
 
+// Core
 #include <ImGui.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <ImGui/imgui_internal.h>
 
+// rePlayer
 #include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Export.h>
 
+// Windows
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+
+// stl
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -35,6 +44,13 @@ namespace rePlayer
 
     DatabaseSongsUI::~DatabaseSongsUI()
     {
+        if (m_export)
+        {
+            m_export->Cancel();
+            while (!m_export->IsDone())
+                ::Sleep(1);
+            delete m_export;
+        }
         delete m_songFilter;
     }
 
@@ -450,22 +466,37 @@ namespace rePlayer
                     m_export->Enqueue({ entry.id, m_databaseId });
             }
             if (m_export->Start())
+            {
                 ImGui::OpenPopup("ExportAsWav");
+                // lock the rePlayer to avoid opening the systray menu
+                Core::Lock();
+            }
             else
+            {
                 delete m_export;
+                m_export = nullptr;
+            }
         }
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
-        if (ImGui::BeginPopupModal("ExportAsWav", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::BeginPopupModal("ExportAsWav", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
         {
-            MusicID musicId;
             float progress;
             uint32_t duration;
-            m_export->GetStatus(musicId, progress, duration);
+            auto songIndex = m_export->GetStatus(progress, duration);
+            MusicID musicId = m_export->GetMusicId(songIndex);
 
+            ImGui::BeginChild("Labels", ImVec2(320.0f, ImGui::GetFrameHeight() * 3 + ImGui::GetFrameHeightWithSpacing()), false, ImGuiWindowFlags_NoSavedSettings);
             ImGui::Text("ID     : %08X%c", musicId.subsongId.value, musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
             ImGui::Text("Title  : %s", musicId.GetTitle().c_str());
             ImGui::Text(musicId.GetSong()->NumArtistIds() > 1 ? "Artists: %s" : "Artist : %s", musicId.GetArtists().c_str());
             ImGui::Text("Replay : %s", musicId.GetSong()->GetType().GetReplay());
+            ImGui::EndChild();
+            {
+                auto numSongs = m_export->NumSongs();
+                char buf[32];
+                sprintf(buf, "Song %d/%d", songIndex + 1, numSongs);
+                ImGui::ProgressBar((songIndex + 1.0f) / numSongs, ImVec2(-FLT_MIN, 0), buf);
+            }
             if (duration != 0xffFFffFF)
             {
                 char buf[32];
@@ -475,11 +506,15 @@ namespace rePlayer
             else
                 ImGui::ProgressBar(1.0f, ImVec2(-FLT_MIN, 0), "Writing WAV");
 
+            if (ImGui::Button("Cancel", ImVec2(-FLT_MIN, 0.0f)))
+                m_export->Cancel();
+
             if (m_export->IsDone())
             {
                 delete m_export;
                 m_export = nullptr;
                 ImGui::CloseCurrentPopup();
+                Core::Unlock();
             }
 
             ImGui::EndPopup();

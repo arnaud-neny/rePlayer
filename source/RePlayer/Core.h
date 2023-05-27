@@ -26,6 +26,12 @@ namespace rePlayer
         static void Enqueue(MusicID musicId);
         static void Discard(MusicID musicId);
 
+        // Lock system to prevent issues with imgui and multi-window
+        // (opening another pop-up while a modal is opened is closing the modal)
+        static void Lock();
+        static void Unlock();
+        static bool IsLocked();
+
         // Jukebox
         static About& GetAbout();
         static Database& GetDatabase(DatabaseID databaseId);
@@ -95,6 +101,8 @@ namespace rePlayer
 
         Stack<SongID> m_songsStack;
         Stack<ArtistID> m_artistsStack;
+
+        uint32_t m_isLocked = 0;
 
         static Core* ms_instance;
     };
