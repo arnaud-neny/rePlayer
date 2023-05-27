@@ -1,4 +1,4 @@
-v0.4.0:
+v0.4.1:
 - Added TIATracker
 - Added Atari SAP Music Archive import
 - Added JSON for Modern C++

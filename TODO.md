@@ -19,6 +19,7 @@
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
 - multi-threaded load/import (with main screens lock)
+- thread helper/wrappers (sleep, yield...)
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://zxart.ee/eng/music/ importer
@@ -34,5 +35,5 @@
 - Bandcamp music player?
 - scplayer? https://github.com/Deltafire/SCPlayer (maybe already in zxtune)
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
-
-- DEMO! utilise Firefox avec The final hyperbase (openmpt - change to surround), drax (uade - change to surround + song end editor)
+- FurnaceTracker: https://github.com/tildearrow/furnace
+- single channel export

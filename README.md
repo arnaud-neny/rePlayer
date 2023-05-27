@@ -145,6 +145,11 @@ Here are the actual web sites you can import from (and thank you for all these r
 
 You can chat about some of these on the [Demozoo](https://discord.io/demozoo) discord server in the modland channel.
 
+Or add some comments (and likes) there:
+- [pouet](https://www.pouet.net/prod.php?which=94326)
+- [demozoo](https://demozoo.org/productions/323598)
+- [me](https://twitter.com/ArnaudNeny)
+
 ## Third Parties
 
 ### System 3rd parties:
