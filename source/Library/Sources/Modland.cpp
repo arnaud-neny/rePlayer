@@ -286,7 +286,8 @@ namespace rePlayer
 
     void SourceModland::FindArtists(ArtistsCollection& artists, const char* name)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
         for (auto& dbArtist : m_db.artists)
@@ -310,7 +311,8 @@ namespace rePlayer
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         uint16_t dbImportedArtistId = 0;
         {
@@ -383,6 +385,8 @@ namespace rePlayer
                 song->type = { eExtension::_qsfPk, eReplay::HighlyQuixotic };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
                 song->type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
+                song->type = { eExtension::_2sfPk, eReplay::vio2sf };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -424,7 +428,8 @@ namespace rePlayer
 
     void SourceModland::FindSongs(const char* name, SourceResults& collectedSongs)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
 
@@ -484,6 +489,8 @@ namespace rePlayer
                 song->type = { eExtension::_qsfPk, eReplay::HighlyQuixotic};
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
                 song->type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
+                song->type = { eExtension::_2sfPk, eReplay::vio2sf };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -536,6 +543,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kQSF);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Gameboy Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kGSF);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Nintendo DS Sound Format") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::k2SF);
 
         CURL* curl = curl_easy_init();
 
@@ -1074,7 +1083,8 @@ namespace rePlayer
 
     std::pair<Array<uint8_t>, bool> SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return { {}, true };
 
         auto* songSource = GetSongSource(sourceId.internalId);
 
@@ -1259,7 +1269,7 @@ namespace rePlayer
         return nullptr;
     }
 
-    void SourceModland::DownloadDatabase()
+    bool SourceModland::DownloadDatabase()
     {
         if (m_db.songs.IsEmpty())
         {
@@ -1311,6 +1321,7 @@ namespace rePlayer
             if (unpackedData.IsNotEmpty())
                 DecodeDatabase(unpackedData.Items(), unpackedData.Items() + unpackedData.NumItems());
         }
+        return m_db.songs.IsEmpty();
     }
 
     #define BuildPathList(a) { a, sizeof(a) - 1 }
@@ -1334,7 +1345,6 @@ namespace rePlayer
             BuildPathList("HVSC"),                      // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),      // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
             BuildPathList("MusicMaker V8 Old/"),        // uade issue?
-            BuildPathList("Nintendo DS Sound Format/"),
             BuildPathList("Playstation 2 Sound Format/"),
             BuildPathList("Playstation Sound Format/"),
             BuildPathList("Pollytracker/"),             // c64 player, available as sid
@@ -1422,7 +1432,7 @@ namespace rePlayer
                     uint16_t item = 0;
                     char* ext = nullptr;
                     // mdx, qsf & gsf goes into a package
-                    if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF)
+                    if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1540,6 +1550,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kQSF;
         else if (theReplay == "Gameboy Sound Format")
             m_db.replays.Last().type = ModlandReplay::kGSF;
+        else if (theReplay == "Nintendo DS Sound Format")
+            m_db.replays.Last().type = ModlandReplay::k2SF;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         m_db.replays.Last().name.Set(m_db.strings, theReplay);

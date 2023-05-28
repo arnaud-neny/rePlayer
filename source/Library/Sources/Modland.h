@@ -69,7 +69,8 @@ namespace rePlayer
                 kAdLibVisualComposer,
                 kMDX,
                 kQSF,
-                kGSF
+                kGSF,
+                k2SF
             };
 
             Chars name;
@@ -153,7 +154,7 @@ namespace rePlayer
         static const ModlandReplayOverride* const GetReplayOverride(const char* name);
         const ModlandReplayOverride* const GetReplayOverride(SourceSong* songSource) const;
 
-        void DownloadDatabase();
+        bool DownloadDatabase();
         void DecodeDatabase(char* bufBegin, const char* bufEnd);
 
         uint16_t FindDatabaseReplay(const char* newReplay);
