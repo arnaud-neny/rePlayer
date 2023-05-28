@@ -133,6 +133,7 @@ namespace rePlayer
     {
         if (extension != nullptr)
         {
+            auto length = strlen(extension);
             for (auto* plugin : m_sortedPlugins)
             {
                 for (auto exts = plugin->extensions; *exts; exts++)
@@ -141,7 +142,7 @@ namespace rePlayer
                     while (*exts && *exts != ';')
                         ++exts;
 
-                    if (_strnicmp(ext, extension, exts - ext) == 0)
+                    if ((exts - ext) == length && _strnicmp(ext, extension, length) == 0)
                         return { extension, plugin->replayId };
                 }
             }
