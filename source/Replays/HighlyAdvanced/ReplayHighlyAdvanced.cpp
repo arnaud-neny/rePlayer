@@ -512,6 +512,9 @@ namespace rePlayer
             if (_stricmp(m_tags[i].c_str(), "title") == 0)
                 return m_tags[i + 1];
         }
+        auto offset = m_title.find_last_of('.');
+        if (offset != m_title.npos)
+            return std::string(m_title.c_str(), offset);
         return m_title;
     }
 
