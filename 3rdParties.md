@@ -47,6 +47,7 @@
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
 - TIATracker: https://bitbucket.org/kylearan/tiatracker
+- vio2sf: https://bitbucket.org/losnoco/vio2sf and https://bitbucket.org/losnoco/psflib
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

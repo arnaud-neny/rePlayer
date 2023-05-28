@@ -317,3 +317,5 @@ EXTENSION(gt2)      // OpenMPT: Gramouf Tracker
 EXTENSION(xmf)      // OpenMPT
 EXTENSION(mdat)     // TFMX & UADE: TFMX
 EXTENSION(ttt)      // TIATracker
+EXTENSION(mini2sf)  // vio2sf
+EXTENSION(2sfPk)    // vio2sf
