@@ -63,7 +63,8 @@ namespace rePlayer
 
     void SourceHighVoltageSIDCollection::FindArtists(ArtistsCollection& artists, const char* name)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
         for (auto& dbArtist : m_db.artists)
@@ -87,7 +88,8 @@ namespace rePlayer
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         uint16_t dbImportedArtistId = 0;
         {
@@ -158,7 +160,8 @@ namespace rePlayer
 
     void SourceHighVoltageSIDCollection::FindSongs(const char* name, SourceResults& collectedSongs)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
 
@@ -554,7 +557,7 @@ namespace rePlayer
         return url;
     }
 
-    void SourceHighVoltageSIDCollection::DownloadDatabase()
+    bool SourceHighVoltageSIDCollection::DownloadDatabase()
     {
         if (m_db.songs.IsEmpty())
         {
@@ -584,6 +587,7 @@ namespace rePlayer
             if (buffer.IsNotEmpty())
                 DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems());
         }
+        return m_db.songs.IsEmpty();
     }
 
     void SourceHighVoltageSIDCollection::DecodeDatabase(char* bufBegin, const char* bufEnd)

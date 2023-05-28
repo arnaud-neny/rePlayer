@@ -119,7 +119,7 @@ namespace rePlayer
         uint32_t FindSong(const ASMASong& dbSong);
         std::string SetupUrl(void* curl, SourceSong* songSource) const;
 
-        void DownloadDatabase();
+        bool DownloadDatabase();
         uint32_t FindDatabaseRoot(std::string& filePath);
         uint32_t FindDatabaseArtist(const std::string& author);
         void FindDatabaseArtists(std::string author, uint32_t songOffset);

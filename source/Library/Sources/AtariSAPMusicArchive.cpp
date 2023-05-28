@@ -74,7 +74,8 @@ namespace rePlayer
 
     void SourceAtariSAPMusicArchive::FindArtists(ArtistsCollection& artists, const char* name)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
         for (auto& dbArtist : m_db.artists)
@@ -125,7 +126,8 @@ namespace rePlayer
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         int32_t dbImportedArtistId = -1;
         {
@@ -206,7 +208,8 @@ namespace rePlayer
 
     void SourceAtariSAPMusicArchive::FindSongs(const char* name, SourceResults& collectedSongs)
     {
-        DownloadDatabase();
+        if (DownloadDatabase())
+            return;
 
         std::string lName = ToLower(name);
 
@@ -639,7 +642,7 @@ namespace rePlayer
         return url;
     }
 
-    void SourceAtariSAPMusicArchive::DownloadDatabase()
+    bool SourceAtariSAPMusicArchive::DownloadDatabase()
     {
         if (m_db.songs.IsEmpty())
         {
@@ -755,6 +758,7 @@ namespace rePlayer
                 }
             }
         }
+        return m_db.songs.IsEmpty();
     }
 
     uint32_t SourceAtariSAPMusicArchive::FindDatabaseRoot(std::string& filePath)
