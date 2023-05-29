@@ -123,6 +123,8 @@ namespace rePlayer
         uint64_t m_currentDuration = 0;
         uint32_t m_currentSubsongIndex = 0xffFFffFF;
 
+        bool m_hasLib = false;
+
         Array<Subsong> m_subsongs;
 
         static int32_t ms_interpolation;

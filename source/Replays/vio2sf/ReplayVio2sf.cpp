@@ -20,7 +20,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::vio2sf,
         .name = "vio2sf",
-        .extensions = "mini2sf;2sfPk",
+        .extensions = "2sf;mini2sf;2sfPk",
         .about = "vio2sf\nChristopher Snowhill",
         .settings = "vio2sf",
         .init = ReplayVio2sf::Init,
@@ -203,7 +203,7 @@ namespace rePlayer
         {
             This->m_loaderState.arm7_clockdown_level = strtoul(value, &end, 10);
         }
-        else if (!_stricmp(name, "replaygain_"))
+        else if (!_strnicmp(name, "replaygain_", sizeof("replaygain_") - 1))
         {}
         else if (!_stricmp(name, "length"))
         {
@@ -259,7 +259,9 @@ namespace rePlayer
         else if (!_stricmp(name, "utf8"))
         {}
         else if (!_stricmp(name, "_lib"))
-        {}
+        {
+            This->m_hasLib = true;
+        }
         else if (name[0] == '_')
         {}
         else
@@ -480,7 +482,7 @@ namespace rePlayer
                 {
                     if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x24, TwosfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
                     {
-                        m_mediaType.ext = eExtension::_mini2sf;
+                        m_mediaType.ext = m_hasLib ? eExtension::_mini2sf : eExtension::_2sf;
                         m_subsongs.Add({ 0, uint32_t(m_length) });
                     }
                 }
