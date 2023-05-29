@@ -142,7 +142,7 @@ namespace rePlayer
                     while (*exts && *exts != ';')
                         ++exts;
 
-                    if ((exts - ext) == length && _strnicmp(ext, extension, length) == 0)
+                    if (size_t(exts - ext) == length && _strnicmp(ext, extension, length) == 0)
                         return { extension, plugin->replayId };
                 }
             }
