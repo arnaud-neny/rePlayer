@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\psflib">
+      <UniqueIdentifier>{0b64f16f-a9c1-4261-b5ac-b2a2555123d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{93ce3595-d4cb-4b78-858e-974372860cc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\c68k">
+      <UniqueIdentifier>{b1abcbff-8992-434e-a1b5-b4286c52050b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayHighlyTheoretical.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psf2fs.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psflib.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="core\arm.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\dcsound.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\emuconfig.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\satsound.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sega.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\yam.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\c68k\c68k.h">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClInclude>
+    <ClInclude Include="core\c68k\core.h">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClInclude>
+    <ClInclude Include="core\c68k\gen68k.h">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayHighlyTheoretical.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psf2fs.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psflib.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="core\arm.c">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\dcsound.c">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\satsound.c">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\sega.c">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\yam.c">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\c68k\c68k.c">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClCompile>
+    <ClCompile Include="core\c68k\c68kexec.c">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClCompile>
+    <ClCompile Include="core\c68k\gen68k.c">
+      <Filter>Source Files\core\c68k</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="core\c68k\c68k_ini.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op0.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op1.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op2.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op3.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op4.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op5.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op6.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op7.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op8.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_op9.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opA.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opB.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opC.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opD.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opE.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68k_opF.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\c68kmac.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+    <None Include="core\c68k\gen68k.inc">
+      <Filter>Source Files\core\c68k</Filter>
+    </None>
+  </ItemGroup>
+</Project>

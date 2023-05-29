@@ -319,3 +319,11 @@ EXTENSION(mdat)     // TFMX & UADE: TFMX
 EXTENSION(ttt)      // TIATracker
 EXTENSION(mini2sf)  // vio2sf
 EXTENSION(2sfPk)    // vio2sf
+EXTENSION(minissf)  // Highly Theoretical
+EXTENSION(ssfPk)    // Highly Theoretical
+EXTENSION(minidsf)  // Highly Theoretical
+EXTENSION(dsfPk)    // Highly Theoretical
+EXTENSION(ssf)      // Highly Theoretical
+EXTENSION(dsf)      // Highly Theoretical
+EXTENSION(gsf)      // Highly Advanced
+EXTENSION(2sf)      // vio2sf
