@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{57ED10F2-9059-4DAA-8F31-0EF6FCD2C5E5}</ProjectGuid>
+    <RootNamespace>LazyUSF</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ARCH_MIN_SSE2;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\zlib;$(ProjectDir)lazyusf2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ARCH_MIN_SSE2;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\zlib;$(ProjectDir)lazyusf2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="lazyusf2\ai\ai_controller.h" />
+    <ClInclude Include="lazyusf2\api\callbacks.h" />
+    <ClInclude Include="lazyusf2\api\m64p_common.h" />
+    <ClInclude Include="lazyusf2\api\m64p_config.h" />
+    <ClInclude Include="lazyusf2\api\m64p_debugger.h" />
+    <ClInclude Include="lazyusf2\api\m64p_frontend.h" />
+    <ClInclude Include="lazyusf2\api\m64p_plugin.h" />
+    <ClInclude Include="lazyusf2\api\m64p_types.h" />
+    <ClInclude Include="lazyusf2\api\m64p_vidext.h" />
+    <ClInclude Include="lazyusf2\debugger\dbg_decoder.h" />
+    <ClInclude Include="lazyusf2\debugger\dbg_decoder_local.h" />
+    <ClInclude Include="lazyusf2\debugger\dbg_types.h" />
+    <ClInclude Include="lazyusf2\main\list.h" />
+    <ClInclude Include="lazyusf2\main\main.h" />
+    <ClInclude Include="lazyusf2\main\rom.h" />
+    <ClInclude Include="lazyusf2\main\savestates.h" />
+    <ClInclude Include="lazyusf2\main\util.h" />
+    <ClInclude Include="lazyusf2\main\version.h" />
+    <ClInclude Include="lazyusf2\memory\memory.h" />
+    <ClInclude Include="lazyusf2\osal\preproc.h" />
+    <ClInclude Include="lazyusf2\pi\cart_rom.h" />
+    <ClInclude Include="lazyusf2\pi\pi_controller.h" />
+    <ClInclude Include="lazyusf2\r4300\cached_interp.h" />
+    <ClInclude Include="lazyusf2\r4300\cp0.h" />
+    <ClInclude Include="lazyusf2\r4300\cp1.h" />
+    <ClInclude Include="lazyusf2\r4300\exception.h" />
+    <ClInclude Include="lazyusf2\r4300\fpu.h" />
+    <ClInclude Include="lazyusf2\r4300\instr_counters.h" />
+    <ClInclude Include="lazyusf2\r4300\interupt.h" />
+    <ClInclude Include="lazyusf2\r4300\macros.h" />
+    <ClInclude Include="lazyusf2\r4300\mi_controller.h" />
+    <ClInclude Include="lazyusf2\r4300\ops.h" />
+    <ClInclude Include="lazyusf2\r4300\pure_interp.h" />
+    <ClInclude Include="lazyusf2\r4300\r4300.h" />
+    <ClInclude Include="lazyusf2\r4300\r4300_core.h" />
+    <ClInclude Include="lazyusf2\r4300\recomp.h" />
+    <ClInclude Include="lazyusf2\r4300\recomph.h" />
+    <ClInclude Include="lazyusf2\r4300\reset.h" />
+    <ClInclude Include="lazyusf2\r4300\tlb.h" />
+    <ClInclude Include="lazyusf2\rdp\rdp_core.h" />
+    <ClInclude Include="lazyusf2\ri\rdram.h" />
+    <ClInclude Include="lazyusf2\ri\rdram_detection_hack.h" />
+    <ClInclude Include="lazyusf2\ri\ri_controller.h" />
+    <ClInclude Include="lazyusf2\rsp\rsp_core.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\alist.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\arithmetics.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\audio.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\common.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\hle.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\hle_external.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\hle_internal.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\memory.h" />
+    <ClInclude Include="lazyusf2\rsp_hle\ucodes.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\config.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\execute.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\matrix.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\rsp.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\rsp_lle.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\su.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\cf.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\clamp.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\divrom.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\shuffle.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vabs.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vadd.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vaddc.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vand.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vch.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vcl.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vcr.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\veq.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vge.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vlt.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacf.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacq.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacu.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadh.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadl.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadm.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadn.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmov.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmrg.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudh.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudl.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudm.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudn.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmulf.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmulu.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnand.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vne.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnop.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnor.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnxor.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vor.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcp.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcph.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcpl.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsq.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsqh.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsql.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsaw.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsub.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsubc.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vu.h" />
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vxor.h" />
+    <ClInclude Include="lazyusf2\si\cic.h" />
+    <ClInclude Include="lazyusf2\si\game_controller.h" />
+    <ClInclude Include="lazyusf2\si\n64_cic_nus_6105.h" />
+    <ClInclude Include="lazyusf2\si\pif.h" />
+    <ClInclude Include="lazyusf2\si\si_controller.h" />
+    <ClInclude Include="lazyusf2\usf\barray.h" />
+    <ClInclude Include="lazyusf2\usf\resampler.h" />
+    <ClInclude Include="lazyusf2\usf\usf.h" />
+    <ClInclude Include="lazyusf2\usf\usf_internal.h" />
+    <ClInclude Include="lazyusf2\vi\vi_controller.h" />
+    <ClInclude Include="psflib\psf2fs.h" />
+    <ClInclude Include="psflib\psflib.h" />
+    <ClInclude Include="ReplayLazyUSF.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lazyusf2\ai\ai_controller.c" />
+    <ClCompile Include="lazyusf2\api\callbacks.c" />
+    <ClCompile Include="lazyusf2\debugger\dbg_decoder.c" />
+    <ClCompile Include="lazyusf2\main\main.c" />
+    <ClCompile Include="lazyusf2\main\rom.c" />
+    <ClCompile Include="lazyusf2\main\savestates.c" />
+    <ClCompile Include="lazyusf2\main\util.c" />
+    <ClCompile Include="lazyusf2\memory\memory.c" />
+    <ClCompile Include="lazyusf2\pi\cart_rom.c" />
+    <ClCompile Include="lazyusf2\pi\pi_controller.c" />
+    <ClCompile Include="lazyusf2\r4300\cached_interp.c" />
+    <ClCompile Include="lazyusf2\r4300\cp0.c" />
+    <ClCompile Include="lazyusf2\r4300\cp1.c" />
+    <ClCompile Include="lazyusf2\r4300\empty_dynarec.c" />
+    <ClCompile Include="lazyusf2\r4300\exception.c" />
+    <ClCompile Include="lazyusf2\r4300\instr_counters.c" />
+    <ClCompile Include="lazyusf2\r4300\interupt.c" />
+    <ClCompile Include="lazyusf2\r4300\mi_controller.c" />
+    <ClCompile Include="lazyusf2\r4300\pure_interp.c" />
+    <ClCompile Include="lazyusf2\r4300\r4300.c" />
+    <ClCompile Include="lazyusf2\r4300\r4300_core.c" />
+    <ClCompile Include="lazyusf2\r4300\recomp.c" />
+    <ClCompile Include="lazyusf2\r4300\reset.c" />
+    <ClCompile Include="lazyusf2\r4300\tlb.c" />
+    <ClCompile Include="lazyusf2\rdp\rdp_core.c" />
+    <ClCompile Include="lazyusf2\ri\rdram.c" />
+    <ClCompile Include="lazyusf2\ri\rdram_detection_hack.c" />
+    <ClCompile Include="lazyusf2\ri\ri_controller.c" />
+    <ClCompile Include="lazyusf2\rsp\rsp_core.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\alist.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\alist_audio.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\alist_naudio.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\alist_nead.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\audio.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\cicx105.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\hle.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\hvqm.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\jpeg.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\memory.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\mp3.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\musyx.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\plugin.c" />
+    <ClCompile Include="lazyusf2\rsp_hle\re2.c" />
+    <ClCompile Include="lazyusf2\rsp_lle\rsp.c" />
+    <ClCompile Include="lazyusf2\si\cic.c" />
+    <ClCompile Include="lazyusf2\si\game_controller.c" />
+    <ClCompile Include="lazyusf2\si\n64_cic_nus_6105.c" />
+    <ClCompile Include="lazyusf2\si\pif.c" />
+    <ClCompile Include="lazyusf2\si\si_controller.c" />
+    <ClCompile Include="lazyusf2\usf\barray.c" />
+    <ClCompile Include="lazyusf2\usf\resampler.c" />
+    <ClCompile Include="lazyusf2\usf\usf.c" />
+    <ClCompile Include="lazyusf2\vi\vi_controller.c" />
+    <ClCompile Include="psflib\psf2fs.c" />
+    <ClCompile Include="psflib\psflib.c" />
+    <ClCompile Include="ReplayLazyUSF.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lazyusf2\r4300\interpreter.def" />
+    <None Include="lazyusf2\r4300\interpreter_cop0.def" />
+    <None Include="lazyusf2\r4300\interpreter_cop1.def" />
+    <None Include="lazyusf2\r4300\interpreter_r4300.def" />
+    <None Include="lazyusf2\r4300\interpreter_regimm.def" />
+    <None Include="lazyusf2\r4300\interpreter_special.def" />
+    <None Include="lazyusf2\r4300\interpreter_tlb.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,627 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\psflib">
+      <UniqueIdentifier>{0b64f16f-a9c1-4261-b5ac-b2a2555123d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2">
+      <UniqueIdentifier>{3846730c-c24b-4131-8877-8cd9abf77776}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\ai">
+      <UniqueIdentifier>{85561dfe-2af8-4429-8d61-22bc229355b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\api">
+      <UniqueIdentifier>{d534adfd-7ed5-4b8f-a684-9131530f088a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\debugger">
+      <UniqueIdentifier>{4681ba46-a789-4db6-8b2c-494c2ede5e45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\main">
+      <UniqueIdentifier>{8c726157-c213-4696-9b8e-aaa79132036b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\memory">
+      <UniqueIdentifier>{92d06f28-4b61-474a-8fe8-9a25229f2614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\osal">
+      <UniqueIdentifier>{2b739fac-75ac-48e1-bbc5-d50623888dd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\pi">
+      <UniqueIdentifier>{e264176c-6f0d-4d2e-9d83-cdbfb72f8b7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\r4300">
+      <UniqueIdentifier>{ab05018b-9f0a-47c4-bc47-277ca046b113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\rdp">
+      <UniqueIdentifier>{c8553b08-9281-4adb-b7c3-0615866258f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\ri">
+      <UniqueIdentifier>{ec8fb0da-1702-4d0a-8761-2ddb9d405771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\rsp">
+      <UniqueIdentifier>{3e1e0c66-cbff-4cd7-9b6e-19c34043926f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\rsp_hle">
+      <UniqueIdentifier>{35ed6965-708f-4b1b-b6b9-fe3cf97755b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\rsp_lle">
+      <UniqueIdentifier>{24927f0d-efaf-4dd1-9cc4-bb3e94d04903}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\rsp_lle\vu">
+      <UniqueIdentifier>{cc5745f8-02ee-49f0-8293-85deabab86e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\si">
+      <UniqueIdentifier>{072c0692-0eac-4448-81fe-adfc6e942cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\usf">
+      <UniqueIdentifier>{d6f8f298-e72f-402c-90f0-16ee812a6211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lazyusf2\vi">
+      <UniqueIdentifier>{bc667c56-4cbd-486d-895b-59f38ecfe318}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayLazyUSF.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psf2fs.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psflib.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\ai\ai_controller.h">
+      <Filter>Source Files\lazyusf2\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\callbacks.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_common.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_config.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_debugger.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_frontend.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_plugin.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_types.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\api\m64p_vidext.h">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\debugger\dbg_decoder.h">
+      <Filter>Source Files\lazyusf2\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\debugger\dbg_decoder_local.h">
+      <Filter>Source Files\lazyusf2\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\debugger\dbg_types.h">
+      <Filter>Source Files\lazyusf2\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\list.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\main.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\rom.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\savestates.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\util.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\main\version.h">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\memory\memory.h">
+      <Filter>Source Files\lazyusf2\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\osal\preproc.h">
+      <Filter>Source Files\lazyusf2\osal</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\pi\cart_rom.h">
+      <Filter>Source Files\lazyusf2\pi</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\pi\pi_controller.h">
+      <Filter>Source Files\lazyusf2\pi</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\cached_interp.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\cp0.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\cp1.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\exception.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\fpu.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\instr_counters.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\interupt.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\macros.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\mi_controller.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\ops.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\pure_interp.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\r4300.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\r4300_core.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\recomp.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\recomph.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\reset.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\r4300\tlb.h">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rdp\rdp_core.h">
+      <Filter>Source Files\lazyusf2\rdp</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\ri\rdram.h">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\ri\rdram_detection_hack.h">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\ri\ri_controller.h">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp\rsp_core.h">
+      <Filter>Source Files\lazyusf2\rsp</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\alist.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\arithmetics.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\audio.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\common.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\hle.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\hle_external.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\hle_internal.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\memory.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_hle\ucodes.h">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\config.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\execute.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\matrix.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\rsp.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\rsp_lle.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\su.h">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\cf.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\clamp.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\divrom.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\shuffle.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vabs.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vadd.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vaddc.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vand.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vch.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vcl.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vcr.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\veq.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vge.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vlt.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacf.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacq.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmacu.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadh.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadl.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadm.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmadn.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmov.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmrg.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudh.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudl.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudm.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmudn.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmulf.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vmulu.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnand.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vne.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnop.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnor.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vnxor.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vor.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcp.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcph.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrcpl.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsq.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsqh.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vrsql.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsaw.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsub.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vsubc.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vu.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\rsp_lle\vu\vxor.h">
+      <Filter>Source Files\lazyusf2\rsp_lle\vu</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\si\cic.h">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\si\game_controller.h">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\si\n64_cic_nus_6105.h">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\si\pif.h">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\si\si_controller.h">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\usf\barray.h">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\usf\resampler.h">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\usf\usf.h">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\usf\usf_internal.h">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyusf2\vi\vi_controller.h">
+      <Filter>Source Files\lazyusf2\vi</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayLazyUSF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psf2fs.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psflib.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\ai\ai_controller.c">
+      <Filter>Source Files\lazyusf2\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\api\callbacks.c">
+      <Filter>Source Files\lazyusf2\api</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\debugger\dbg_decoder.c">
+      <Filter>Source Files\lazyusf2\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\main\main.c">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\main\rom.c">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\main\savestates.c">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\main\util.c">
+      <Filter>Source Files\lazyusf2\main</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\memory\memory.c">
+      <Filter>Source Files\lazyusf2\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\pi\cart_rom.c">
+      <Filter>Source Files\lazyusf2\pi</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\pi\pi_controller.c">
+      <Filter>Source Files\lazyusf2\pi</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\cached_interp.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\cp0.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\cp1.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\empty_dynarec.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\exception.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\instr_counters.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\interupt.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\mi_controller.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\pure_interp.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\r4300.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\r4300_core.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\recomp.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\reset.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\r4300\tlb.c">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rdp\rdp_core.c">
+      <Filter>Source Files\lazyusf2\rdp</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\ri\rdram.c">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\ri\rdram_detection_hack.c">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\ri\ri_controller.c">
+      <Filter>Source Files\lazyusf2\ri</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp\rsp_core.c">
+      <Filter>Source Files\lazyusf2\rsp</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\alist.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\alist_audio.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\alist_naudio.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\alist_nead.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\audio.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\cicx105.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\hle.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\hvqm.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\jpeg.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\memory.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\mp3.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\musyx.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\plugin.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_hle\re2.c">
+      <Filter>Source Files\lazyusf2\rsp_hle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\rsp_lle\rsp.c">
+      <Filter>Source Files\lazyusf2\rsp_lle</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\si\cic.c">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\si\game_controller.c">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\si\n64_cic_nus_6105.c">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\si\pif.c">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\si\si_controller.c">
+      <Filter>Source Files\lazyusf2\si</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\usf\barray.c">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\usf\resampler.c">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\usf\usf.c">
+      <Filter>Source Files\lazyusf2\usf</Filter>
+    </ClCompile>
+    <ClCompile Include="lazyusf2\vi\vi_controller.c">
+      <Filter>Source Files\lazyusf2\vi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lazyusf2\r4300\interpreter.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_cop0.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_cop1.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_r4300.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_regimm.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_special.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+    <None Include="lazyusf2\r4300\interpreter_tlb.def">
+      <Filter>Source Files\lazyusf2\r4300</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -332,3 +332,6 @@ EXTENSION(psfPk)    // Highly Experimental
 EXTENSION(psf2)     // Highly Experimental
 EXTENSION(minipsf2) // Highly Experimental
 EXTENSION(psf2Pk)   // Highly Experimental
+EXTENSION(usf)      // LazyUSF
+EXTENSION(miniusf)  // LazyUSF
+EXTENSION(usfPk)    // LazyUSF
