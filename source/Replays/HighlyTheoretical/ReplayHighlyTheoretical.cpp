@@ -319,9 +319,9 @@ namespace rePlayer
             if (psfType == 0x11 || psfType == 0x12)
             {
                 auto extPos = m_stream->GetName().find_last_of('.');
-                if (extPos == std::string::npos || _stricmp(m_stream->GetName().c_str() + extPos + 1, m_psfType == 0x11 ? "ssflib" : "dsflib") != 0)
+                if (extPos == std::string::npos || _stricmp(m_stream->GetName().c_str() + extPos + 1, psfType == 0x11 ? "ssflib" : "dsflib") != 0)
                 {
-                    if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, m_psfType, SdsfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
+                    if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, uint8_t(psfType), SdsfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
                     {
                         m_psfType = uint8_t(psfType);
                         m_mediaType.ext = psfType == 0x11 ? m_hasLib ? eExtension::_minissf : eExtension::_ssf : m_hasLib ? eExtension::_minidsf: eExtension::_dsf;
