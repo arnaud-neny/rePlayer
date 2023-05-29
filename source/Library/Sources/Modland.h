@@ -70,7 +70,9 @@ namespace rePlayer
                 kMDX,
                 kQSF,
                 kGSF,
-                k2SF
+                k2SF,
+                kSSF,
+                kDSF
             };
 
             Chars name;
@@ -98,17 +100,17 @@ namespace rePlayer
         struct ModlandSong
         {
             Chars name;
-            uint16_t replayId : 15;
-            uint16_t isExtensionOverriden : 1;
+            uint16_t replayId;
+            uint16_t isExtensionOverriden;
             uint16_t artists[2];
-            uint16_t item;
+            uint32_t item;
             uint32_t nextSong[2]; // next song from the each artist
         };
 
         struct ModlandItem
         {
             Chars name;
-            uint16_t next;
+            uint32_t next;
         };
 
         struct SourceReplay
