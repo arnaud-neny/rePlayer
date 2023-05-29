@@ -448,17 +448,19 @@ namespace rePlayer
 
     void ReplayHighlyExperimental::ResetPlayback()
     {
+        psx_clear_state(m_psxState, uint8_t(m_psfType));
+        if (m_psf2fs)
+        {
+            psf2fs_delete(m_psf2fs);
+            m_psf2fs = psf2fs_create();
+        }
+        m_loaderState.Clear();
+
         auto subsongIndex = m_subsongIndex;
         if (m_streamArchive.IsValid() && m_currentSubsongIndex != subsongIndex)
         {
-            m_loaderState.Clear();
             m_tags.Clear();
             m_title.clear();
-            if (m_psf2fs)
-            {
-                psf2fs_delete(m_psf2fs);
-                m_psf2fs = psf2fs_create();
-            }
 
             auto data = m_streamArchive->Read();
 
@@ -480,12 +482,15 @@ namespace rePlayer
             auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
             assert(readSize == fileSize);
 
-            m_stream = io::StreamMemory::Create(m_title.c_str(), unpackedData.Items(), fileSize, true);
+            m_stream = io::StreamMemory::Create(m_title.c_str(), unpackedData.Detach(), fileSize, false);
 
-            psx_clear_state(m_psxState, m_psfType);
             psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, m_psfType, m_psfType == 1 ? PsfLoad : psf2fs_load_callback, m_psfType == 1 ? this : m_psf2fs, InfoMetaPSF, this, 1, nullptr, nullptr);
 
             archive_read_free(archive);
+        }
+        else
+        {
+            psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, m_psfType, m_psfType == 1 ? PsfLoad : psf2fs_load_callback, m_psfType == 1 ? this : m_psf2fs, nullptr, nullptr, 0, nullptr, nullptr);
         }
 
         m_currentPosition = 0;
