@@ -395,6 +395,8 @@ namespace rePlayer
                 song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
+                song->type = { eExtension::_usfPk, eReplay::LazyUSF };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -507,6 +509,8 @@ namespace rePlayer
                 song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
+                song->type = { eExtension::_usfPk, eReplay::LazyUSF };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -569,6 +573,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kPSF);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation 2 Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kPSF2);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Ultra64 Sound Format") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kUSF);
 
         CURL* curl = curl_easy_init();
 
@@ -1377,7 +1383,6 @@ namespace rePlayer
             BuildPathList("TFMX ST/"),
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
-            BuildPathList("Ultra64 Sound Format/"),
             BuildPathList("Unique Development/"),
             BuildPathList("Zoundmonitor/Samples/"),     // simply ignore this
             BuildPathList("Zoundmonitor/readme.txt")    // simply ignore this
@@ -1453,7 +1458,7 @@ namespace rePlayer
                     char* ext = nullptr;
                     // mdx, qsf & gsf goes into a package
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
-                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2)
+                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2 || currentReplayType == ModlandReplay::kUSF)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1581,6 +1586,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kPSF;
         else if (theReplay == "Playstation 2 Sound Format")
             m_db.replays.Last().type = ModlandReplay::kPSF2;
+        else if (theReplay == "Ultra64 Sound Format")
+            m_db.replays.Last().type = ModlandReplay::kUSF;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
