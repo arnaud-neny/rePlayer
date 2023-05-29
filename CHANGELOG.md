@@ -1,3 +1,16 @@
+v0.5.0:
+- Added vio2sf
+- Added Highly Theoretical
+- Added Highly Experimental
+- Added LazyUSF
+- Updated modland to import Nintendo DS Sound Format
+- Updated modland to import Saturn Sound Format
+- Updated modland to import Dreamcast Sound Format
+- Updated modland to import Playstation Sound Format
+- Updated modland to import Playstation 2 Sound Format
+- Updated modland to import Ultra64 Sound Format
+- Bug fixes
+
 v0.4.1:
 - Added TIATracker
 - Added Atari SAP Music Archive import

@@ -191,3 +191,7 @@ Or add some comments (and likes) there:
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](https://github.com/jprjr/libnezplug) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd.
 - [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
+- [vio2sf](https://bitbucket.org/losnoco/vio2sf): Nintendo DS music player.
+- [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
+- [Highly Experimental](https://bitbucket.org/losnoco/highly_experimental): Playstation and Playstation 2 music player.
+- [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
