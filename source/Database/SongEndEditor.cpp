@@ -370,7 +370,7 @@ namespace rePlayer
 
     void SongEndEditor::PlaybackUI()
     {
-        if (ImGui::Button("Stop"))
+        if (ImGui::Button("\xef\xbf\xb9")) // stop
         {
             if ((m_isPlaying || m_waveStartPosition != 0) && m_wave->outHandle)
             {
@@ -387,7 +387,7 @@ namespace rePlayer
             m_isPlaying = false;
         }
         ImGui::SameLine();
-        if (ImGui::Button(m_isPlaying ? "Pause###Playback" : "Play###Playback"))
+        if (ImGui::Button(m_isPlaying ? "\xef\xbf\xbb" : "\xef\xbf\xba")) // pause/play
         {
             m_isPlaying = !m_isPlaying;
             if (m_wave->outHandle)
