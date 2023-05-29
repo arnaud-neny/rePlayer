@@ -14,6 +14,21 @@ namespace rePlayer
 
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
+        struct Settings : public Command<Settings, eReplay::HighlyAdvanced>
+        {
+            union
+            {
+                uint32_t value = 0;
+                struct
+                {
+                    uint32_t numSongsMinusOne : 8;
+                };
+            };
+            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+
+            static void Edit(ReplayMetadataContext& context);
+        };
+
     private:
         static void* OpenPSF(void* context, const char* uri);
         static size_t ReadPSF(void* buffer, size_t size, size_t count, void* handle);
@@ -47,11 +62,20 @@ namespace rePlayer
 
     private:
         static constexpr uint32_t kSampleRate = 48000/*32768*/;
-        static constexpr uint32_t kDefaultLength = 180 * 1000; // in milliseconds
+        static constexpr uint32_t kDefaultSongDuration = 180 * 1000; // in milliseconds
+
+        struct Subsong
+        {
+            uint32_t index = 0;
+            uint32_t duration = 0;
+            uint32_t overriddenDuration = 0;
+        };
 
     private:
         ReplayHighlyAdvanced(io::Stream* stream);
-        ReplayHighlyAdvanced* Load();
+        ReplayHighlyAdvanced* Load(CommandBuffer metadata);
+
+        void SetupMetadata(CommandBuffer metadata);
 
     private:
         SmartPtr<io::Stream> m_streamArchive;
@@ -83,13 +107,16 @@ namespace rePlayer
             uint32_t numSamples;
         } m_gbaStream;
 
-        uint64_t m_length = kDefaultLength;
+        uint64_t m_length;
         std::string m_title;
-        uint64_t m_currentPosition = 0;
         uint64_t m_globalPosition = 0;
+        uint64_t m_currentPosition = 0;
+        uint64_t m_currentDuration = 0;
         uint32_t m_currentSubsongIndex = 0xffFFffFF;
 
-        Array<uint32_t> m_subsongs;
+        bool m_hasLib = false;
+
+        Array<Subsong> m_subsongs;
     };
 }
 // namespace rePlayer

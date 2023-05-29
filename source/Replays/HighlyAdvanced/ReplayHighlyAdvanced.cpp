@@ -18,10 +18,11 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::HighlyAdvanced,
         .name = "Highly Advanced",
-        .extensions = "minigsf;gsfPk",
+        .extensions = "gsf;minigsf;gsfPk",
         .about = "Highly Advanced 3.0.23\nChristopher Snowhill",
         .init = ReplayHighlyAdvanced::Init,
-        .load = ReplayHighlyAdvanced::Load
+        .load = ReplayHighlyAdvanced::Load,
+        .editMetadata = ReplayHighlyAdvanced::Settings::Edit
     };
 
     bool ReplayHighlyAdvanced::Init(SharedContexts* ctx, Window& /*window*/)
@@ -31,10 +32,74 @@ namespace rePlayer
         return false;
     }
 
-    Replay* ReplayHighlyAdvanced::Load(io::Stream* stream, CommandBuffer /*metadata*/)
+    Replay* ReplayHighlyAdvanced::Load(io::Stream* stream, CommandBuffer metadata)
     {
         auto replay = new ReplayHighlyAdvanced(stream);
-        return replay->Load();
+        return replay->Load(metadata);
+    }
+
+    void ReplayHighlyAdvanced::Settings::Edit(ReplayMetadataContext& context)
+    {
+        auto* entry = context.metadata.Find<Settings>();
+        if (entry == nullptr)
+        {
+            // ok, we are here because we never played this song in this player
+            entry = context.metadata.Create<Settings>(sizeof(Settings) + sizeof(uint32_t));
+            entry->GetDurations()[0] = 0;
+        }
+
+        const float buttonSize = ImGui::GetFrameHeight();
+        auto durations = entry->GetDurations();
+        for (uint16_t i = 0; i <= entry->numSongsMinusOne; i++)
+        {
+            ImGui::PushID(i);
+            bool isEnabled = durations[i] != 0;
+            uint32_t duration = isEnabled ? durations[i] : kDefaultSongDuration;
+            auto pos = ImGui::GetCursorPosX();
+            if (ImGui::Checkbox("##Checkbox", &isEnabled))
+                duration = kDefaultSongDuration;
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!isEnabled);
+            char txt[64];
+            sprintf(txt, "Subsong #%d Duration", i + 1);
+            auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
+            ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
+            ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, txt, ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
+            int32_t milliseconds = duration % 1000;
+            int32_t seconds = (duration / 1000) % 60;
+            int32_t minutes = duration / 60000;
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
+            ImGui::SetNextItemWidth(width / 3.0f);
+            ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
+            ImGui::SetNextItemWidth(width / 2.0f);
+            ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
+            ImGui::SetNextItemWidth(width);
+            ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
+            {
+                context.duration = duration;
+                context.songIndex = i;
+                context.isSongEndEditorEnabled = true;
+            }
+            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && context.songIndex == i)
+            {
+                milliseconds = context.duration % 1000;
+                seconds = (context.duration / 1000) % 60;
+                minutes = context.duration / 60000;
+                context.duration = 0;
+            }
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Open Waveform Viewer");
+            ImGui::EndDisabled();
+            durations[i] = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
+            ImGui::PopID();
+        }
     }
 
     void* ReplayHighlyAdvanced::OpenPSF(void* context, const char* uri)
@@ -102,7 +167,7 @@ namespace rePlayer
     {
         auto This = reinterpret_cast<ReplayHighlyAdvanced*>(context);
         auto tag = name;
-        if (!_stricmp(tag, "replaygain_"))
+        if (!_strnicmp(name, "replaygain_", sizeof("replaygain_") - 1))
         {}
         else if (!_stricmp(tag, "length"))
         {
@@ -158,7 +223,9 @@ namespace rePlayer
         else if (!_stricmp(tag, "utf8"))
         {}
         else if (!_stricmp(tag, "_lib"))
-        {}
+        {
+            This->m_hasLib = true;
+        }
         else if (tag[0] == '_')
         {
             return -1;
@@ -274,7 +341,7 @@ namespace rePlayer
         };
     }
 
-    ReplayHighlyAdvanced* ReplayHighlyAdvanced::Load()
+    ReplayHighlyAdvanced* ReplayHighlyAdvanced::Load(CommandBuffer metadata)
     {
         auto data = m_stream->Read();
 
@@ -282,13 +349,17 @@ namespace rePlayer
         archive_read_support_format_all(archive);
         if (archive_read_open_memory(archive, data.Items(), data.Size()) != ARCHIVE_OK)
         {
+            m_length = kDefaultSongDuration;
             if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
             {
                 auto extPos = m_stream->GetName().find_last_of('.');
                 if (extPos == std::string::npos || _stricmp(m_stream->GetName().c_str() + extPos + 1, "gsflib") != 0)
                 {
                     if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, GsfLoad, &m_gbaRom, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
-                        m_mediaType.ext = eExtension::_minigsf;
+                    {
+                        m_mediaType.ext = m_hasLib ? eExtension::_minigsf : eExtension::_gsf;
+                        m_subsongs.Add({ 0, uint32_t(m_length) });
+                    }
                 }
             }
         }
@@ -309,13 +380,14 @@ namespace rePlayer
 
                 m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
 
+                m_length = kDefaultSongDuration;
                 if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
                 {
                     auto extPos = entryName.find_last_of('.');
                     if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "gsflib") != 0)
                     {
                         m_mediaType.ext = eExtension::_gsfPk;
-                        m_subsongs.Add(fileIndex);
+                        m_subsongs.Add({ fileIndex, uint32_t(m_length) });
                     }
                 }
                 m_tags.Clear();
@@ -331,6 +403,8 @@ namespace rePlayer
             return nullptr;
         }
 
+        SetupMetadata(metadata);
+
         return this;
     }
 
@@ -339,19 +413,17 @@ namespace rePlayer
         if (m_gbaCore == nullptr)
             return 0;
 
-        uint64_t length = m_length;
         uint64_t currentPosition = m_currentPosition;
-        length *= kSampleRate;
-        length /= 1000;
-        if (currentPosition == length)
+        auto currentDuration = m_currentDuration;
+        if (currentPosition == currentDuration)
         {
             m_currentPosition = 0;
             return 0;
         }
 
         uint64_t nextPosition = currentPosition + numSamples;
-        if (nextPosition > length)
-            numSamples = uint32_t(length - currentPosition);
+        if (nextPosition > currentDuration)
+            numSamples = uint32_t(currentDuration - currentPosition);
 
         auto remainingSamples = numSamples;
         while (remainingSamples)
@@ -402,10 +474,7 @@ namespace rePlayer
 
         m_globalPosition = globalPosition;
         seekPosition = globalPosition;
-        uint64_t length = m_length;
-        length *= kSampleRate;
-        length /= 1000;
-        m_currentPosition = globalPosition % length;
+        m_currentPosition = globalPosition % m_currentDuration;
         return uint32_t((seekPosition * 1000) / kSampleRate);
     }
 
@@ -417,7 +486,6 @@ namespace rePlayer
             m_gbaRom = {};
             m_tags.Clear();
             m_title.clear();
-            m_length = kDefaultLength;
 
             auto data = m_streamArchive->Read();
 
@@ -425,7 +493,7 @@ namespace rePlayer
             archive_read_support_format_all(archive);
             archive_read_open_memory(archive, data.Items(), data.Size());
             archive_entry* entry;
-            for (uint32_t fileIndex = 0; fileIndex < m_subsongs[subsongIndex]; ++fileIndex)
+            for (uint32_t fileIndex = 0; fileIndex < m_subsongs[subsongIndex].index; ++fileIndex)
             {
                 archive_read_next_header(archive, &entry);
                 archive_read_data_skip(archive);
@@ -448,6 +516,7 @@ namespace rePlayer
 
         m_currentPosition = 0;
         m_globalPosition = 0;
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         m_currentSubsongIndex = subsongIndex;
         m_gbaStream.numSamples = 0;
 
@@ -486,8 +555,17 @@ namespace rePlayer
         m_gbaCore = core;
     }
 
-    void ReplayHighlyAdvanced::ApplySettings(const CommandBuffer /*metadata*/)
-    {}
+    void ReplayHighlyAdvanced::ApplySettings(const CommandBuffer metadata)
+    {
+        auto settings = metadata.Find<Settings>();
+        if (settings)
+        {
+            auto durations = settings->GetDurations();
+            for (uint16_t i = 0; i <= settings->numSongsMinusOne; i++)
+                m_subsongs[i].overriddenDuration = durations[i];
+            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+        }
+    }
 
     void ReplayHighlyAdvanced::SetSubsong(uint16_t subsongIndex)
     {
@@ -497,7 +575,7 @@ namespace rePlayer
 
     uint32_t ReplayHighlyAdvanced::GetDurationMs() const
     {
-        return uint32_t(m_length);
+        return m_subsongs[m_subsongIndex].overriddenDuration > 0 ? m_subsongs[m_subsongIndex].overriddenDuration : m_subsongs[m_subsongIndex].duration;
     }
 
     uint32_t ReplayHighlyAdvanced::GetNumSubsongs() const
@@ -534,7 +612,30 @@ namespace rePlayer
 
     std::string ReplayHighlyAdvanced::GetInfo() const
     {
-        return "2 channels\nGame Boy Advance Sound Format\nHighly Advanced 3.0.23";
+        return "6 channels\nGame Boy Advance Sound Format\nHighly Advanced 3.0.23";
+    }
+
+    void ReplayHighlyAdvanced::SetupMetadata(CommandBuffer metadata)
+    {
+        uint32_t numSongsMinusOne = m_subsongs.NumItems() - 1;
+        auto settings = metadata.Find<Settings>();
+        if (settings && settings->numSongsMinusOne == numSongsMinusOne)
+        {
+            auto durations = settings->GetDurations();
+            for (uint32_t i = 0; i <= numSongsMinusOne; i++)
+                m_subsongs[i].overriddenDuration = durations[i];
+        }
+        else
+        {
+            auto value = settings ? settings->value : 0;
+            settings = metadata.Create<Settings>(sizeof(Settings) + (numSongsMinusOne + 1) * sizeof(int32_t));
+            settings->value = value;
+            settings->numSongsMinusOne = numSongsMinusOne;
+            auto durations = settings->GetDurations();
+            for (uint16_t i = 0; i <= numSongsMinusOne; i++)
+                durations[i] = 0;
+        }
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
     }
 }
 // namespace rePlayer
