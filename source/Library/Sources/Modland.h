@@ -72,7 +72,9 @@ namespace rePlayer
                 kGSF,
                 k2SF,
                 kSSF,
-                kDSF
+                kDSF,
+                kPSF,
+                kPSF2
             };
 
             Chars name;

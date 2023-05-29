@@ -391,6 +391,10 @@ namespace rePlayer
                 song->type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
                 song->type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
+                song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
+                song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -499,6 +503,10 @@ namespace rePlayer
                 song->type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
                 song->type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
+                song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
+                song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -557,6 +565,10 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kSSF);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Dreamcast Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kDSF);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation Sound Format") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kPSF);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation 2 Sound Format") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kPSF2);
 
         CURL* curl = curl_easy_init();
 
@@ -1356,8 +1368,6 @@ namespace rePlayer
             BuildPathList("HVSC"),                      // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),      // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
             BuildPathList("MusicMaker V8 Old/"),        // uade issue?
-            BuildPathList("Playstation 2 Sound Format/"),
-            BuildPathList("Playstation Sound Format/"),
             BuildPathList("Pollytracker/"),             // c64 player, available as sid
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
@@ -1443,7 +1453,7 @@ namespace rePlayer
                     char* ext = nullptr;
                     // mdx, qsf & gsf goes into a package
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
-                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF)
+                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1567,6 +1577,10 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kSSF;
         else if (theReplay == "Dreamcast Sound Format")
             m_db.replays.Last().type = ModlandReplay::kDSF;
+        else if (theReplay == "Playstation Sound Format")
+            m_db.replays.Last().type = ModlandReplay::kPSF;
+        else if (theReplay == "Playstation 2 Sound Format")
+            m_db.replays.Last().type = ModlandReplay::kPSF2;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
