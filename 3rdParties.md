@@ -49,6 +49,7 @@
 - TIATracker: https://bitbucket.org/kylearan/tiatracker
 - vio2sf: https://bitbucket.org/losnoco/vio2sf and https://bitbucket.org/losnoco/psflib
 - Highly Theoretical: https://bitbucket.org/losnoco/highly_theoretical and https://bitbucket.org/losnoco/psflib
+- Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

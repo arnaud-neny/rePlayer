@@ -257,7 +257,7 @@ EXTENSION(sa)       // UADE: SonicArranger
 EXTENSION(smus)     // UADE: SonixMusicDriver
 EXTENSION(spl)      // UADE: SoundProgrammingLanguage
 EXTENSION(sc)       // UADE: SoundControl
-EXTENSION(psf)      // UADE: SoundFactory
+EXTENSION(psf)      // UADE: SoundFactory & Highly Experimental
 EXTENSION(tw)       // UADE: SoundImages
 EXTENSION(sm)       // UADE: SoundMaster
 EXTENSION(sm2)      // UADE: SoundMaster
@@ -327,3 +327,8 @@ EXTENSION(ssf)      // Highly Theoretical
 EXTENSION(dsf)      // Highly Theoretical
 EXTENSION(gsf)      // Highly Advanced
 EXTENSION(2sf)      // vio2sf
+EXTENSION(minipsf)  // Highly Experimental
+EXTENSION(psfPk)    // Highly Experimental
+EXTENSION(psf2)     // Highly Experimental
+EXTENSION(minipsf2) // Highly Experimental
+EXTENSION(psf2Pk)   // Highly Experimental
