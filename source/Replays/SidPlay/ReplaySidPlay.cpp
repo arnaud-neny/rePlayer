@@ -92,9 +92,9 @@ namespace rePlayer
                         bufferRef.resize(oldSize + fileSize);
                         file.Read(bufferRef.data() + oldSize, fileSize);
                     }
-                    else
-                        throw libsidplayfp::loadError("Can't open file");
                 }
+                if (bufferRef.empty())
+                    throw libsidplayfp::loadError("Can't open file");
             }
         } loader;
         SidTune* sidTune = new SidTune(loader.cb, stream, stream->GetName().c_str());
