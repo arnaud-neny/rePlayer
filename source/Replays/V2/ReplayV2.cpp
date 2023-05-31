@@ -34,13 +34,13 @@ namespace rePlayer
     Replay* ReplayV2::Load(io::Stream* stream, CommandBuffer metadata)
     {
         auto data = stream->Read();
-        if (data[2] != 0 || data[3] != 0)
+        if (data.Size() < 4 || data[2] != 0 || data[3] != 0)
             return nullptr;
 
         sdInit();
 
         uint8_t* tune{ nullptr };
-        int newSize{ 0 };
+        int newSize = 0;
         ConvertV2M(data.Items(), static_cast<int>(data.Size()), &tune, &newSize);
 
         sdClose();
