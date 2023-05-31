@@ -1125,13 +1125,29 @@ namespace rePlayer
                     for (uint16_t i = 0;; i++)
                     {
                         if (i == uint16_t(eExtension::Count))
+                        {
+                            // look for it the hard way
+                            auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
+                            Array<CommandBuffer::Command> commands;
+                            if (auto* replay = replays.Load(stream, commands, {}))
+                            {
+                                extension = ".";
+                                extension += replay->GetMediaType().GetExtension();
+                                delete replay;
+                                break;
+                            }
                             return;
+                        }
                         if (extension.size() > 1 && _stricmp(extension.c_str() + 1, MediaType::extensionNames[i]) == 0)
                             break;
                         if (_strnicmp(MediaType::extensionNames[i], stem.c_str(), MediaType::extensionLengths[i]) == 0)
                         {
                             if (MediaType::extensionLengths[i] == stem.size() || stem[MediaType::extensionLengths[i]] == '.')
+                            {
+                                extension = ".";
+                                extension += MediaType::extensionNames[i];
                                 break;
+                            }
                         }
                     }
                 }
@@ -1160,7 +1176,19 @@ namespace rePlayer
                 {
                     auto* songSheet = new SongSheet;
                     songSheet->type = replays.Find(extension.c_str() + 1);
-                    songSheet->name = reinterpret_cast<const char*>(songSheet->type.ext != eExtension::Unknown ? path.stem().u8string().c_str() : path.filename().u8string().c_str());
+                    if (songSheet->type.ext == eExtension::Unknown)
+                        songSheet->name = path.filename().string().c_str();
+                    else if (_stricmp(path.extension().string().c_str() + 1, songSheet->type.GetExtension()) == 0)
+                        songSheet->name = path.stem().string().c_str();
+                    else
+                    {
+                        auto name = path.filename().string();
+                        auto extSize = songSheet->type.extensionLengths[size_t(songSheet->type.ext)];
+                        if (_strnicmp(name.c_str(), songSheet->type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
+                            songSheet->name = name.c_str() + extSize + 1;
+                        else
+                            songSheet->name = name.c_str();
+                    }
                     songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
                     songSheet->databaseDay = databaseDay;
                     m_cue.paths.Add(filename.c_str(), filename.size() + 1);
