@@ -1,4 +1,4 @@
-v0.5.0:
+v0.5.1:
 - Added vio2sf
 - Added Highly Theoretical
 - Added Highly Experimental
@@ -9,6 +9,8 @@ v0.5.0:
 - Updated modland to import Playstation Sound Format
 - Updated modland to import Playstation 2 Sound Format
 - Updated modland to import Ultra64 Sound Format
+- Updated libcurl to 8.1.2
+- add missing Tim Follin extension (.tf)
 - Bug fixes
 
 v0.4.1:
