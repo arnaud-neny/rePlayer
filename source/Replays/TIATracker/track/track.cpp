@@ -551,11 +551,15 @@ void Track::toJson(QJsonObject &json) {
 /*************************************************************************/
 
 bool Track::fromJson(const QJsonObject &json) {
+    if (!json.contains("version"))
+        return false;
     int version = json["version"].get<int>();
     if (version > MainWindow::version) {
         MainWindow::displayMessage("This song is from a later version of TIATracker!");
         return false;
     }
+    if (!json.contains("tvmode"))
+        return false;
     if (json["tvmode"] == "pal") {
         tvMode = TiaSound::TvStandard::PAL;
     } else if (json["tvmode"] == "ntsc") {
@@ -564,6 +568,8 @@ bool Track::fromJson(const QJsonObject &json) {
         MainWindow::displayMessage("Invalid tv mode!");
         return false;
     }
+    if (!json.contains("evenspeed"))
+        return false;
     evenSpeed = json["evenspeed"].get<int>();
     if (json.contains("globalspeed")) {
         globalSpeed = json["globalspeed"].get<bool>();

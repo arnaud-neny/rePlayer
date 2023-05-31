@@ -33,10 +33,13 @@ namespace rePlayer
     {
         auto data = stream->Read();
 
-        auto json = QJsonObject::parse(data.begin(), data.end());
-        Track::Track track;
-        if (track.fromJson(json))
-            return new ReplayTIATracker(std::move(track));
+        if (QJsonObject::accept(data.begin(), data.end()))
+        {
+            auto json = QJsonObject::parse(data.begin(), data.end());
+            Track::Track track;
+            if (track.fromJson(json))
+                return new ReplayTIATracker(std::move(track));
+        }
         return nullptr;
     }
 
