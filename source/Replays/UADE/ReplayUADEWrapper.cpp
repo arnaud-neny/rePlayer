@@ -189,8 +189,13 @@ extern "C" FILE* stdioemu_fopen(const char* filename, const char*)
         }
     }
     archive_read_free(uadeArchive);
-    if (stream == nullptr)
-        stream = reinterpret_cast<FILE*>(core::io::StreamFile::Create(filename).Detach());
+    if (stream == nullptr && std::filesystem::exists(filename))
+    {
+        if (std::filesystem::is_directory(filename))
+            stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, nullptr, 0, false).Detach());
+        else
+            stream = reinterpret_cast<FILE*>(core::io::StreamFile::Create(filename).Detach());
+    }
 
     return stream;
 }

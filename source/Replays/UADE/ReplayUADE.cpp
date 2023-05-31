@@ -128,6 +128,9 @@ namespace rePlayer
 
     Replay* ReplayUADE::Load(io::Stream* stream, CommandBuffer metadata)
     {
+        if (stream->Read().IsEmpty())
+            return nullptr;
+
         if (s_isMainModule)
         {
             // UADE is a hard mess... to make it "thread safe" without rewriting everything, we duplicate the dll per song so all the data are in the module memory space.
