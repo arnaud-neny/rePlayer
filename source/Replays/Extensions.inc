@@ -335,3 +335,4 @@ EXTENSION(psf2Pk)   // Highly Experimental
 EXTENSION(usf)      // LazyUSF
 EXTENSION(miniusf)  // LazyUSF
 EXTENSION(usfPk)    // LazyUSF
+EXTENSION(tf)       // UADE: TimFollin
