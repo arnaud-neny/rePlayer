@@ -262,8 +262,11 @@ namespace rePlayer
 
     ReplayLazyUSF::~ReplayLazyUSF()
     {
-        usf_shutdown(m_lazyState);
-        delete[] m_lazyState;
+        if (m_lazyState)
+        {
+            usf_shutdown(m_lazyState);
+            delete[] m_lazyState;
+        }
     }
 
     ReplayLazyUSF::ReplayLazyUSF(io::Stream* stream)
