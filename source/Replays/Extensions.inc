@@ -336,3 +336,4 @@ EXTENSION(usf)      // LazyUSF
 EXTENSION(miniusf)  // LazyUSF
 EXTENSION(usfPk)    // LazyUSF
 EXTENSION(tf)       // UADE: TimFollin
+EXTENSION(cust)     // UADE: custom
