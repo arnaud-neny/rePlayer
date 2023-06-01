@@ -71,9 +71,14 @@ namespace rePlayer
         struct ReplayOverride
         {
             const char* header;
-            eExtension (*build)(const uint8_t*&, std::filesystem::path&, size_t&);
-            bool (*load)(const uint8_t*&, const char*, size_t&);
-            uint32_t headerSize = 12;
+            eExtension (*build)(ReplayUADE*, const uint8_t*&, std::filesystem::path&, size_t&);
+            bool (*load)(ReplayUADE*, const uint8_t*&, const char*, size_t&);
+            void (*main)(ReplayUADE*, const uint8_t*&, size_t&) = [](ReplayUADE* replay, const uint8_t*& data, size_t& dataSize)
+            {
+                (void)replay;
+                dataSize = *reinterpret_cast<const uint32_t*>(data + 8) - 12;
+                data += 12;
+            };
         };
 
     private:
@@ -88,6 +93,7 @@ namespace rePlayer
     private:
         uint32_t m_lastSubsongIndex = 0;
         SmartPtr<io::Stream> m_stream;
+        SmartPtr<io::Stream> m_tempStream;
         uade_state* m_uadeState;
         uint32_t* m_durations = nullptr;
         uint64_t m_currentPosition = 0;

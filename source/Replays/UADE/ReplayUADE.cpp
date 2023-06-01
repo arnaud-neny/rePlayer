@@ -244,7 +244,7 @@ namespace rePlayer
         {
             if (memcmp(data, replayOverride.header, 8) == 0)
             {
-                replay->m_mediaType.ext = replayOverride.build(data, filepath, dataSize);
+                replay->m_mediaType.ext = replayOverride.build(replay, data, filepath, dataSize);
                 filename = filepath.filename().string();
                 break;
             }
@@ -295,8 +295,7 @@ namespace rePlayer
             {
                 if (memcmp(data, replayOverride.header, 8) == 0)
                 {
-                    dataSize = *buffer.Items<const uint32_t>(8) - replayOverride.headerSize;
-                    data += replayOverride.headerSize;
+                    replayOverride.main(This, data, dataSize);
                     break;
                 }
             }
@@ -328,7 +327,7 @@ namespace rePlayer
         // rePlayer extra formats
         for (auto& replayOverride : ms_replayOverrides)
         {
-            if (memcmp(data, replayOverride.header, 8) == 0 && replayOverride.load(data, name, dataSize))
+            if (memcmp(data, replayOverride.header, 8) == 0 && replayOverride.load(This, data, name, dataSize))
             {
                 struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
                 f->name = strdup(name);
@@ -602,7 +601,7 @@ namespace rePlayer
             {
                 if (memcmp(data, replayOverride.header, 8) == 0)
                 {
-                    replayOverride.build(data, filepath, dataSize);
+                    replayOverride.build(this, data, filepath, dataSize);
                     filename = filepath.filename().string();
                     break;
                 }

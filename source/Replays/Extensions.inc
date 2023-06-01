@@ -296,7 +296,7 @@ EXTENSION(gsfPk)    // Highly Advanced
 EXTENSION(ymst)     // UADE: YMST
 EXTENSION(wav)      // WAV
 EXTENSION(sid)      // SidPlay & UADE: SidMon1
-EXTENSION(mug)      // UADE: MugicianII
+EXTENSION(mug)      // UADE: Mugician
 EXTENSION(mso)      // UADE: Medley
 EXTENSION(ptk)      // ProTrekkr
 EXTENSION(mdy)      // Adlib: AdLib MIDI/IMS Format
