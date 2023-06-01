@@ -75,7 +75,8 @@ namespace rePlayer
                 kDSF,
                 kPSF,
                 kPSF2,
-                kUSF
+                kUSF,
+                kDelitrackerCustom
             };
 
             Chars name;

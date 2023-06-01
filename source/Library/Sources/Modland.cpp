@@ -397,6 +397,8 @@ namespace rePlayer
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
                 song->type = { eExtension::_usfPk, eReplay::LazyUSF };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
+                song->type = { eExtension::_cust, eReplay::UADE };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -511,6 +513,8 @@ namespace rePlayer
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
                 song->type = { eExtension::_usfPk, eReplay::LazyUSF };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
+                song->type = { eExtension::_cust, eReplay::UADE };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
             {
                 song->type = { eExtension::_sid1, eReplay::UADE };
@@ -599,8 +603,16 @@ namespace rePlayer
         bool isEntryMissing = false;
         if (curlError == CURLE_OK)
         {
-            if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
+            if ((buffer.Size() < 256 && strstr(buffer.Items<const char>(), "404 Not Found"))
+                || strstr(buffer.Items<const char>(), "<!DOCTYPE html>"))
             {
+                if (strcmp(m_replays[songSource->replay].name(m_strings), "Delitracker Custom") == 0)
+                {
+                    Log::Message("Discarded\n");
+                    curl_easy_cleanup(curl);
+                    return ImportPkSong(sourceId, ModlandReplay::kDelitrackerCustom);
+                }
+
                 isEntryMissing = true;
                 buffer.Reset();
                 if (songSource->artists[0])
@@ -1114,9 +1126,12 @@ namespace rePlayer
     std::pair<Array<uint8_t>, bool> SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType)
     {
         if (DownloadDatabase())
-            return { {}, true };
+            return {};
 
         auto* songSource = GetSongSource(sourceId.internalId);
+        CURL* curl = curl_easy_init();
+        std::string baseUrl = SetupUrl(curl, songSource);
+        baseUrl += "/";
 
         for (auto& dbSong : m_db.songs)
         {
@@ -1162,16 +1177,11 @@ namespace rePlayer
                 }
             } curlBuffer;
 
-            CURL* curl = curl_easy_init();
-
             char errorBuffer[CURL_ERROR_SIZE];
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlBuffer.Writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &curlBuffer);
-
-            std::string baseUrl = SetupUrl(curl, songSource);
-            baseUrl += "/";
 
             struct ArchiveBuffer : public Array<uint8_t>
             {
@@ -1196,6 +1206,9 @@ namespace rePlayer
                     return _length;
                 }
             } archiveBuffer;
+            if (replayType == ModlandReplay::kDelitrackerCustom)
+                archiveBuffer.Add("CUST-PKG", sizeof("CUST-PKG") - 1);
+
             bool hasFailed = false;
             bool isEntryMissing = false;
 
@@ -1266,7 +1279,19 @@ namespace rePlayer
             return { std::move(archiveBuffer), isEntryMissing };
         }
 
-        return {};
+        if (songSource->artists[0])
+            m_areStringsDirty |= --m_artists[songSource->artists[0]].refcount == 0;
+        if (songSource->artists[1])
+            m_areStringsDirty |= --m_artists[songSource->artists[1]].refcount == 0;
+        new (songSource) SourceSong();
+        m_areDataDirty = true;
+        m_availableSongIds.Add(sourceId.internalId);
+
+        Log::Error("Modland: file \"%s\" not found\n", baseUrl.c_str());
+
+        curl_easy_cleanup(curl);
+
+        return { {}, true };
     }
 
     const SourceModland::ModlandReplayOverride* const SourceModland::GetReplayOverride(ModlandReplay::Type type)
@@ -1454,11 +1479,22 @@ namespace rePlayer
                             continue;
                     }
 
+                    // check for .cust (multiple files to put in a package)
+                    int32_t mergeDelitrackerCustom = -1;
+                    if (currentReplayType == ModlandReplay::kDelitrackerCustom)
+                    {
+                        auto str = line;
+                        while (*str != '/' && *str != 0)
+                            str++;
+                        mergeDelitrackerCustom = *str == '/';
+                    }
+
                     uint32_t item = 0;
                     char* ext = nullptr;
-                    // mdx, qsf & gsf goes into a package
+                    // packaged songs
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
-                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2 || currentReplayType == ModlandReplay::kUSF)
+                        || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
+                        || currentReplayType == ModlandReplay::kUSF || mergeDelitrackerCustom > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1488,7 +1524,7 @@ namespace rePlayer
                         m_db.items.Last().next = 0;
                         newSong = oldLine;
                     }
-                    else if (currentReplayType <= ModlandReplay::kDefault)
+                    else if (currentReplayType <= ModlandReplay::kDefault || mergeDelitrackerCustom == 0)
                     {
                         while (*line != 0)
                         {
@@ -1590,6 +1626,11 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kUSF;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
+        else if (theReplay == "Delitracker Custom")
+        {
+            m_db.replays.Last().type = ModlandReplay::kDelitrackerCustom;
+            m_db.replays.Last().ext.Set(m_db.strings, "cus");
+        }
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
         if (m_db.replays.Last().type <= ModlandReplay::kDefault)
         {
