@@ -1,4 +1,4 @@
-v0.5.1:
+v0.5.2:
 - Added vio2sf
 - Added Highly Theoretical
 - Added Highly Experimental
@@ -9,8 +9,10 @@ v0.5.1:
 - Updated modland to import Playstation Sound Format
 - Updated modland to import Playstation 2 Sound Format
 - Updated modland to import Ultra64 Sound Format
+- Updated modland to import packaged Delitracker Custom Format
 - Updated libcurl to 8.1.2
 - add missing Tim Follin extension (.tf)
+- add missing Delitracker Custom extension (.cust)
 - Bug fixes
 
 v0.4.1:
