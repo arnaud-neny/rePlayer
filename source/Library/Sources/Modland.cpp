@@ -397,6 +397,8 @@ namespace rePlayer
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
                 song->type = { eExtension::_usfPk, eReplay::LazyUSF };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
+                song->type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
                 song->type = { eExtension::_cust, eReplay::UADE };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
@@ -513,6 +515,8 @@ namespace rePlayer
                 song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
                 song->type = { eExtension::_usfPk, eReplay::LazyUSF };
+            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
+                song->type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
                 song->type = { eExtension::_cust, eReplay::UADE };
             else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
@@ -579,6 +583,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kPSF2);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Ultra64 Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kUSF);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Super Nintendo Sound Format") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kSNSF);
 
         CURL* curl = curl_easy_init();
 
@@ -1404,7 +1410,6 @@ namespace rePlayer
             BuildPathList("Renoise Old/"),
             BuildPathList("Startrekker AM/"),           // need to add to uade (multi-files)
             BuildPathList("Stonetracker/"),             // need to add to uade (multi-files)
-            BuildPathList("Super Nintendo Sound Format/"),
             BuildPathList("TFMX ST/"),
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
@@ -1494,7 +1499,7 @@ namespace rePlayer
                     // packaged songs
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
-                        || currentReplayType == ModlandReplay::kUSF || mergeDelitrackerCustom > 0)
+                        || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || mergeDelitrackerCustom > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1624,6 +1629,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kPSF2;
         else if (theReplay == "Ultra64 Sound Format")
             m_db.replays.Last().type = ModlandReplay::kUSF;
+        else if (theReplay == "Super Nintendo Sound Format")
+            m_db.replays.Last().type = ModlandReplay::kSNSF;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         else if (theReplay == "Delitracker Custom")
