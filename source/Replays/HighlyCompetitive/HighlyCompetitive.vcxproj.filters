@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x">
+      <UniqueIdentifier>{ce60cc9b-9595-40f7-9e85-d685e8513457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu">
+      <UniqueIdentifier>{a163e229-a13e-4055-981c-abd9d10810ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu">
+      <UniqueIdentifier>{c95bc8c3-1449-4e17-9f00-dcb36876a26b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu\dsp">
+      <UniqueIdentifier>{2276c99c-e5eb-48c8-bbcb-8b0d17c216cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu\smp">
+      <UniqueIdentifier>{27aa41f3-1a74-4805-b9d7-4c94447ab368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu\smp\core">
+      <UniqueIdentifier>{dfa025bf-6868-4f2b-b53b-166c1cfc52ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu\smp\debugger">
+      <UniqueIdentifier>{2bdbf4bc-457c-4e1d-92d3-234854937cc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\snes9x\apu\bapu\snes">
+      <UniqueIdentifier>{e5357944-4a30-4564-b682-68385924beb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\psflib">
+      <UniqueIdentifier>{a147958b-1865-453d-a541-04d71e960d34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayHighlyCompetitive.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\blargg_common.h">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\blargg_config.h">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\blargg_endian.h">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\blargg_source.h">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\sdsp.hpp">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\dsp\SPC_DSP.h">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\smp\debugger\debugger.hpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\smp\smp.hpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\bapu\snes\snes.hpp">
+      <Filter>Source Files\snes9x\apu\bapu\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\apu.h">
+      <Filter>Source Files\snes9x\apu</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\apu\resampler.h">
+      <Filter>Source Files\snes9x\apu</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\65c816.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\cpuaddr.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\cpuexec.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\cpumacro.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\cpuops.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\dma.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\getset.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\memmap.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\messages.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\pixform.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\port.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\ppu.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\sa1.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\sdd1.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\sha256.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="snes9x\snes9x.h">
+      <Filter>Source Files\snes9x</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psf2fs.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="psflib\psflib.h">
+      <Filter>Source Files\psflib</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplayHighlyCompetitiveWrapper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayHighlyCompetitive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\dsp\sdsp.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\dsp\SPC_DSP.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core\oppseudo_misc.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core\oppseudo_mov.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core\oppseudo_pc.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core\oppseudo_read.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core\oppseudo_rmw.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\core</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\debugger\debugger.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\debugger\disassembler.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp\debugger</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\algorithms.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\core.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\iplrom.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\memory.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\smp.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\smp_state.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\bapu\smp\timing.cpp">
+      <Filter>Source Files\snes9x\apu\bapu\smp</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\apu\apu.cpp">
+      <Filter>Source Files\snes9x\apu</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\cpu.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\cpuexec.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\cpuops.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\dma.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\globals.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\memmap.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\ppu.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\sa1.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\sdd1.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="snes9x\sha256.cpp">
+      <Filter>Source Files\snes9x</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psf2fs.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="psflib\psflib.c">
+      <Filter>Source Files\psflib</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplayHighlyCompetitiveWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+  </ItemGroup>
+</Project>

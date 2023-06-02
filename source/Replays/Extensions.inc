@@ -337,3 +337,6 @@ EXTENSION(miniusf)  // LazyUSF
 EXTENSION(usfPk)    // LazyUSF
 EXTENSION(tf)       // UADE: TimFollin
 EXTENSION(cust)     // UADE: custom
+EXTENSION(snsf)     // Highly Competitive
+EXTENSION(minisnsf) // Highly Competitive
+EXTENSION(snsfPk)   // Highly Competitive

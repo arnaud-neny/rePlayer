@@ -51,6 +51,7 @@
 - Highly Theoretical: https://bitbucket.org/losnoco/highly_theoretical and https://bitbucket.org/losnoco/psflib
 - Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
+- Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler
