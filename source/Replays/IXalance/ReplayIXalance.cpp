@@ -175,6 +175,8 @@ namespace rePlayer
     ReplayIXalance::~ReplayIXalance()
     {
         m_player->vftable->delete0(m_player);
+        if (m_dllEntries)
+            (*m_dllEntries)[m_dllIndex].replay = nullptr;
     }
 
     ReplayIXalance::ReplayIXalance(IXS::PlayerIXS* player)
