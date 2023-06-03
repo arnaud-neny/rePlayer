@@ -364,7 +364,7 @@ namespace rePlayer
             {
                 std::string filters = "All Files (*.*){.*},";
                 filters += Core::GetReplays().GetFileFilters();
-                ImGuiFileDialog::Instance()->OpenDialog("ImportFiles", "Import Files", filters.c_str(), m_lastFileDialogPath, 0, nullptr, ImGuiFileDialogFlags_DisableCreateDirectoryButton);
+                ImGuiFileDialog::Instance()->OpenDialog("ImportFiles", "Import Files", filters.c_str(), m_lastFileDialogPath, 0, nullptr, ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_Modal);
 
                 ImGui::CloseCurrentPopup();
             }
