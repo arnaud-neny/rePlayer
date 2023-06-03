@@ -169,7 +169,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="libsidplayfp\reloc65.h" />
     <ClInclude Include="libsidplayfp\romCheck.h" />
     <ClInclude Include="libsidplayfp\sidcxx11.h" />
-    <ClInclude Include="libsidplayfp\sidcxx14.h" />
     <ClInclude Include="libsidplayfp\sidemu.h" />
     <ClInclude Include="libsidplayfp\sidendian.h" />
     <ClInclude Include="libsidplayfp\SidInfoImpl.h" />

@@ -15,6 +15,9 @@
 /* define if the compiler supports basic C++14 syntax */
 #define HAVE_CXX14
 
+/* define if the compiler supports basic C++17 syntax */
+#define HAVE_CXX17
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -60,10 +63,6 @@
 /* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define to 1 if you have the `stricmp' function. */
-#define HAVE_STRICMP
-#define stricmp _stricmp
-
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
@@ -72,10 +71,6 @@
 
 /* Define to 1 if you have the `strncasecmp' function. */
 #undef HAVE_STRNCASECMP
-
-/* Define to 1 if you have the `strnicmp' function. */
-#define HAVE_STRNICMP
-#define strnicmp _strnicmp
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -99,7 +94,7 @@
 #define PACKAGE_NAME "libsidplayfp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsidplayfp 2.4.2"
+#define PACKAGE_STRING "libsidplayfp 2.5.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsidplayfp"
@@ -108,7 +103,7 @@
 #define PACKAGE_URL "https://github.com/libsidplayfp/libsidplayfp/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.4.2"
+#define PACKAGE_VERSION "2.5.0"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -129,7 +124,7 @@
 #undef STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "2.4.2"
+#define VERSION "2.5.0"
 
 /* Path to VICE testsuite. */
 #undef VICE_TESTSUITE

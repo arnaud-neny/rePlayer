@@ -280,69 +280,70 @@ namespace rePlayer
 
         if (m_sidplayfp[1] != nullptr)
         {
-            auto samplesLeft = reinterpret_cast<int16_t*>(output);
-            auto samplesRight = reinterpret_cast<int16_t*>(output + numSamples) - numSamples;
-            auto numSamplesLeft = m_sidplayfp[0]->play(samplesLeft, numSamples);
-            auto numSamplesRight = m_sidplayfp[1]->play(samplesRight, numSamples);
-            if (numSamplesLeft != numSamplesRight || numSamplesLeft == 0 || !m_sidplayfp[0]->isPlaying() || !m_sidplayfp[1]->isPlaying()) // todo error reporting?
-                return 0;
-
-            if (auto numBootSamples = m_numBootSamples)
+            auto numRemainingSamples = numSamples;
+            auto numCachedSamples = m_numSamples;
+            auto* samples = output;
+            while (numRemainingSamples)
             {
-                //remove the boot sound glitch...
-                auto maxBootSamples = GetMaxBootingSamples();
-                auto offset = maxBootSamples - numBootSamples;
-                numBootSamples = Min(numBootSamples, numSamples);
-                for (uint32_t i = 0; i < numBootSamples; i++)
+                if (numCachedSamples == 0)
                 {
-                    int64_t v = samplesLeft[i];
-                    v *= i + offset; v *= i + offset; v /= maxBootSamples; v /= maxBootSamples;
-                    samplesLeft[i] = int16_t(v);
-                    v = samplesRight[i];
-                    v *= i + offset; v *= i + offset; v /= maxBootSamples; v /= maxBootSamples;
-                    samplesRight[i] = int16_t(v);
+                    auto numSamplesLeft = m_sidplayfp[0]->play(m_samples, kNumSamples);
+                    auto numSamplesRight = m_sidplayfp[1]->play(m_samples + kNumSamples, kNumSamples);
+                    if (numSamplesLeft != numSamplesRight || numSamplesLeft == 0 || !m_sidplayfp[0]->isPlaying() || !m_sidplayfp[1]->isPlaying()) // todo error reporting?
+                        return 0;
+                    numCachedSamples = kNumSamples;
                 }
-                m_numBootSamples -= numBootSamples;
-            }
-
-            if (m_surround.IsEnabled())
-            {
-                auto samples = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
-                for (uint32_t i = 0; i < numSamplesLeft; i++)
+                else
                 {
-                    samples[i * 2 + 0] = samplesLeft[i];
-                    samples[i * 2 + 1] = samplesRight[i];
+                    auto samplesLeft = m_samples + kNumSamples - numCachedSamples;
+                    auto samplesRight = samplesLeft + (m_surround.IsEnabled() ? kNumSamples : 0);
+                    auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
+                    samples = samples->Convert(m_surround, samplesLeft, samplesRight, numSamplesToCopy, 100, m_surround.IsEnabled() ? 3.0f : 2.0f);
+                    numRemainingSamples -= numSamplesToCopy;
+                    numCachedSamples -= numSamplesToCopy;
                 }
-                output->Convert(m_surround, samples, numSamplesLeft, 100, 3.0f);
             }
-            else
-                output->Convert(m_surround, samplesRight, samplesRight, numSamplesLeft, 100, 2.0f);
+            m_numSamples = numCachedSamples;
         }
         else
         {
-            auto samples = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
-            numSamples = m_sidplayfp[0]->play(samples, numSamples * 2) / 2;
-            if (numSamples == 0 || !m_sidplayfp[0]->isPlaying()) // todo error reporting?
-                return 0;
-            if (auto numBootSamples = m_numBootSamples)
+            auto numRemainingSamples = numSamples;
+            auto numCachedSamples = m_numSamples;
+            auto* samples = output;
+            while (numRemainingSamples)
             {
-                //remove the boot sound glitch...
-                auto maxBootSamples = GetMaxBootingSamples();
-                auto offset = maxBootSamples - numBootSamples;
-                numBootSamples = Min(numBootSamples, numSamples);
-                for (uint32_t i = 0; i < numBootSamples; i++)
+                if (numCachedSamples == 0)
                 {
-                    int64_t v = samples[i * 2 + 0];
-                    v *= i + offset; v *= i + offset; v /= maxBootSamples; v /= maxBootSamples;
-                    samples[i * 2 + 0] = int16_t(v);
-                    v = samples[i * 2 + 1];
-                    v *= i + offset; v *= i + offset; v /= maxBootSamples; v /= maxBootSamples;
-                    samples[i * 2 + 1] = int16_t(v);
+                    auto numSamplesStereo = m_sidplayfp[0]->play(m_samples, kNumSamples * 2);
+                    if (numSamplesStereo == 0 || !m_sidplayfp[0]->isPlaying()) // todo error reporting?
+                        return 0;
+                    numCachedSamples = kNumSamples;
                 }
-                m_numBootSamples -= numBootSamples;
+                else
+                {
+                    auto samplesStereo = m_samples + (kNumSamples - numCachedSamples) * 2;
+                    auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
+                    samples = samples->Convert(m_surround, samplesStereo, numSamplesToCopy, 100, m_surround.IsEnabled() ? 2.6f : 2.0f);
+                    numRemainingSamples -= numSamplesToCopy;
+                    numCachedSamples -= numSamplesToCopy;
+                }
             }
-
-            output->Convert(m_surround, samples, numSamples, 100, m_surround.IsEnabled() ? 2.6f : 2.0f);
+            m_numSamples = numCachedSamples;
+        }
+        if (auto numBootSamples = m_numBootSamples)
+        {
+            //remove the boot sound glitch...
+            auto maxBootSamples = GetMaxBootingSamples();
+            auto offset = maxBootSamples - numBootSamples;
+            numBootSamples = Min(numBootSamples, numSamples);
+            for (uint32_t i = 0; i < numBootSamples; i++)
+            {
+                auto p = i + offset;
+                output->left *= output->left * (p * p) / (maxBootSamples * maxBootSamples);
+                output->right *= output->right * (p * p) / (maxBootSamples * maxBootSamples);
+                output++;
+            }
+            m_numBootSamples -= numBootSamples;
         }
 
         return numSamples;
@@ -350,6 +351,7 @@ namespace rePlayer
 
     void ReplaySidPlay::ResetPlayback()
     {
+        m_surround.Reset();
         m_sidplayfp[0]->stop();
         if (m_sidplayfp[1])
             m_sidplayfp[1]->stop();
@@ -359,6 +361,7 @@ namespace rePlayer
         m_sidplayfp[0]->play(nullptr, 0);
         if (m_sidplayfp[1])
             m_sidplayfp[1]->play(nullptr, 0);
+        m_numSamples = 0;
     }
 
     void ReplaySidPlay::ApplySettings(const CommandBuffer metadata)

@@ -69,6 +69,7 @@ namespace rePlayer
 
     private:
         static constexpr uint32_t kSampleRate = 48000;
+        static constexpr uint32_t kNumSamples = 4096;
 
         static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
@@ -94,6 +95,10 @@ namespace rePlayer
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
         uint32_t m_numBootSamples = 0;
+
+        int16_t m_samples[kNumSamples * 2];
+        uint32_t m_numSamples = 0;
+
         static uint8_t ms_c64RomKernal[];
         static uint8_t ms_c64RomBasic[];
         static SidDatabase* ms_sidDatabase;

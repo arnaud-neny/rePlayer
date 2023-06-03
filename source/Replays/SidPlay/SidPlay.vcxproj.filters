@@ -86,9 +86,6 @@
     <ClInclude Include="libsidplayfp\sidcxx11.h">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClInclude>
-    <ClInclude Include="libsidplayfp\sidcxx14.h">
-      <Filter>Source Files\libsidplayfp</Filter>
-    </ClInclude>
     <ClInclude Include="libsidplayfp\sidemu.h">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClInclude>
