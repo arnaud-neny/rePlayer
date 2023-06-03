@@ -9,7 +9,9 @@ namespace core
 
     Surround::Surround(uint32_t samplingRate)
         : m_context(samplingRate)
-    {}
+    {
+        Reset();
+    }
 
     Surround::~Surround()
     {
