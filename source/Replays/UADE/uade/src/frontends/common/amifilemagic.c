@@ -1276,6 +1276,8 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
       }
     }
 
+  } else if (buf[0] == 'P' && buf[1] == 'R' && buf[2] == 'T') {
+      strcpy(pre, "PRT");	/* PreTracker */
   } else if (buf[12] == 0x00) {
     int s = (buf[12] * 256 + buf[13] + 1) * 14;
     if (s < (bufsize - 91)) {

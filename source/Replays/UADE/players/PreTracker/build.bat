@@ -1,0 +1,1 @@
+@vasmm68k_mot.exe -no-opt -Fhunkexe -nosym -kick1hunks -I . pretracker.s -o PreTracker

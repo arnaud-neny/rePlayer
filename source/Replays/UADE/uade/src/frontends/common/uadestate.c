@@ -1431,8 +1431,11 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 			 */
 			break;
 		default:
-			uade_warning("uade_get_event returned %s which is not handled before playloop.\n", uade_event_name(&event));
-			goto fatalerror;
+			if (!song->info.detectioninfo.ep || strcmp(song->info.detectioninfo.ep->playername, "PreTracker"))
+            {
+                uade_warning("uade_get_event returned %s which is not handled before playloop.\n", uade_event_name(&event));
+                goto fatalerror;
+            }
 		}
 	}
 
