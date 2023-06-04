@@ -195,3 +195,4 @@ Or add some comments (and likes) there:
 - [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
 - [Highly Experimental](https://bitbucket.org/losnoco/highly_experimental): Playstation and Playstation 2 music player.
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
+- [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.

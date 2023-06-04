@@ -1,3 +1,12 @@
+v0.6.0:
+- Added Highly Competitive/Snsf9x
+- Updated UADE to support PreTracker
+- Updated libsidplay to 2.5.0
+- Updated ImGui to 1.89.60
+- Updated ImGuiFileDialog to 0.6.5
+- Updated modland to import Super Nintendo Sound Format
+- Bug fixes
+
 v0.5.2:
 - Added vio2sf
 - Added Highly Theoretical
@@ -45,7 +54,7 @@ v0.3.4:
 v0.2.1:
 - Added KSS player
 - Updated OpenMPT to 0.6.10
-- Updated ImGui to ImGui 1.89.5
+- Updated ImGui to 1.89.5
 - Playlist columns reorderable and hideable
 - Drag and drop files onto the deck; press shift on drop to clear the current playlist
 - Bug fixes
