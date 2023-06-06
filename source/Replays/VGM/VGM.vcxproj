@@ -132,6 +132,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="libvgm\emu\cores\k051649.h" />
     <ClInclude Include="libvgm\emu\cores\k053260.h" />
     <ClInclude Include="libvgm\emu\cores\k054539.h" />
+    <ClInclude Include="libvgm\emu\cores\mikey.h" />
     <ClInclude Include="libvgm\emu\cores\multipcm.h" />
     <ClInclude Include="libvgm\emu\cores\nesintf.h" />
     <ClInclude Include="libvgm\emu\cores\nes_apu.h" />
@@ -248,6 +249,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="libvgm\emu\cores\k051649.c" />
     <ClCompile Include="libvgm\emu\cores\k053260.c" />
     <ClCompile Include="libvgm\emu\cores\k054539.c" />
+    <ClCompile Include="libvgm\emu\cores\mikey.c" />
     <ClCompile Include="libvgm\emu\cores\multipcm.c" />
     <ClCompile Include="libvgm\emu\cores\nesintf.c" />
     <ClCompile Include="libvgm\emu\cores\nes_apu.c" />

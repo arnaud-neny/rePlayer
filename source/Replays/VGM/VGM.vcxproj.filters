@@ -371,6 +371,9 @@
     <ClInclude Include="libvgm\utils\StrUtils.h">
       <Filter>Source Files\libvgm\utils</Filter>
     </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\mikey.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGM.cpp">
@@ -663,6 +666,9 @@
     </ClCompile>
     <ClCompile Include="libvgm\utils\StrUtils-CPConv_Win.c">
       <Filter>Source Files\libvgm\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\mikey.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

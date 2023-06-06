@@ -278,12 +278,13 @@ protected:
 	DATA_LOADER *_dLoad;
 	const UINT8* _fileData;	// data pointer for quick access, equals _dLoad->GetFileData().data()
 	std::vector<UINT8> _yrwRom;	// cache for OPL4 sample ROM (yrw801.rom)
+	UINT8 _shownCmdWarnings[0x100];
 	
 	enum
 	{
 		_HDR_BUF_SIZE = 0x100,
-		_OPT_DEV_COUNT = 0x29,
-		_CHIP_COUNT = 0x29,
+		_OPT_DEV_COUNT = 0x2a,
+		_CHIP_COUNT = 0x2a,
 		_PCM_BANK_COUNT = 0x40
 	};
 	

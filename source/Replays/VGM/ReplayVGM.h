@@ -34,6 +34,7 @@ namespace rePlayer
                     uint32_t vgmHardStopOld : 1;
                 };
             };
+            uint32_t duration = 0;
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -60,6 +61,7 @@ namespace rePlayer
     private:
         static constexpr uint32_t kSampleRate = 48000;
         static constexpr uint32_t kSampleBufferLen = 2048;
+        static constexpr uint32_t kDefaultSongDuration = 180 * 1000;
 
     private:
         ReplayVGM(io::Stream* stream, PlayerA* player, DATA_LOADER* loader);
@@ -76,6 +78,8 @@ namespace rePlayer
         uint32_t m_stereoSeparation = 100;
         bool m_hasEnded = false;
         bool m_hasLooped = false;
+        uint64_t m_currentPosition = 0;
+        uint64_t m_currentDuration = 0;
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
         static int32_t ms_droV2Opl3;

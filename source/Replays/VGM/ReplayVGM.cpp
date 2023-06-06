@@ -14,14 +14,14 @@
 #include <player/gymplayer.hpp>
 #include <utils/MemoryLoader.h>
 
-#define LIBVGM_VERSION "@fd7da37"
+#define LIBVGM_VERSION "@5ad95d6"
 
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGM,
         .name = "Video Game Music",
-        .extensions = "vgm;vgz",
+        .extensions = "vgm;vgz;s98;gym;dro",
         .about = "libvgm",
         .settings = "libvgm " LIBVGM_VERSION,
         .init = ReplayVGM::Init,
@@ -83,7 +83,7 @@ namespace rePlayer
             return nullptr;
         }
 
-        player->SetLoopCount(16);
+        player->SetLoopCount(0);
         player->SetEndSilenceSamples(kSampleRate / 4);
         player->Start();
 
@@ -115,6 +115,12 @@ namespace rePlayer
     {
         Settings dummy;
         auto* entry = context.metadata.Find<Settings>(&dummy);
+        if (entry->numEntries != dummy.numEntries) // check for older format as duration has been added after 0.6.0
+        {
+            dummy.value = entry->value;
+            context.metadata.Update(entry, true);
+            entry = &dummy;
+        }
 
         SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
             ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
@@ -133,7 +139,52 @@ namespace rePlayer
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
 
-        context.metadata.Update(entry, entry->value == 0);
+        const float buttonSize = ImGui::GetFrameHeight();
+        bool isEnabled = entry->duration != 0;
+        uint32_t duration = isEnabled ? entry->duration : kDefaultSongDuration;
+        auto pos = ImGui::GetCursorPosX();
+        if (ImGui::Checkbox("##Checkbox", &isEnabled))
+            duration = kDefaultSongDuration;
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!isEnabled);
+        auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
+        ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
+        ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, "Duration", ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
+        int32_t milliseconds = duration % 1000;
+        int32_t seconds = (duration / 1000) % 60;
+        int32_t minutes = duration / 60000;
+        ImGui::SameLine();
+        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
+        ImGui::SetNextItemWidth(width / 3.0f);
+        ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SameLine();
+        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
+        ImGui::SetNextItemWidth(width / 2.0f);
+        ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SameLine();
+        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
+        ImGui::SetNextItemWidth(width);
+        ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SameLine();
+        if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
+        {
+            context.duration = duration;
+            context.songIndex = 0;
+            context.isSongEndEditorEnabled = true;
+        }
+        else if (context.isSongEndEditorEnabled == false && context.duration != 0)
+        {
+            milliseconds = context.duration % 1000;
+            seconds = (context.duration / 1000) % 60;
+            minutes = context.duration / 60000;
+            context.duration = 0;
+        }
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Open Waveform Viewer");
+        ImGui::EndDisabled();
+        entry->duration = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
+
+        context.metadata.Update(entry, entry->value == 0 && entry->duration == 0);
     }
 
     int32_t ReplayVGM::ms_stereoSeparation = 100;
@@ -180,11 +231,27 @@ namespace rePlayer
     {
         if (m_hasEnded)
             return 0;
-        if (m_hasLooped)
+        auto currentPosition = m_currentPosition;
+        auto currentDuration = m_currentDuration;
+        if (m_currentDuration != 0)
+        {
+            if ((currentPosition + numSamples) >= currentDuration)
+            {
+                numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
+                if (numSamples == 0)
+                {
+                    m_currentPosition = 0;
+                    return 0;
+                }
+            }
+            m_hasLooped = false;
+        }
+        else if (m_hasLooped)
         {
             m_hasLooped = false;
             return 0;
         }
+        m_currentPosition = currentPosition + numSamples;
 
         auto buf = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
         numSamples = m_player->Render(numSamples * sizeof(int16_t) * 2, buf) / sizeof(int16_t) / 2;
@@ -208,6 +275,7 @@ namespace rePlayer
         m_surround.Reset();
         m_player->Reset();
         m_hasEnded = m_hasLooped = false;
+        m_currentPosition = 0;
     }
 
     void ReplayVGM::ApplySettings(const CommandBuffer metadata)
@@ -215,6 +283,9 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+        m_currentDuration = (settings
+            && settings->numEntries == Settings().numEntries // check for older format as duration has been added after 0.6.0
+            && settings->duration) ? (uint64_t(settings->duration) * kSampleRate) / 1000 : 0;
     }
 
     void ReplayVGM::SetSubsong(uint16_t subsongIndex)
@@ -244,7 +315,7 @@ namespace rePlayer
         m_player->SetLoopCount(1);
         m_player->Reset();
         auto duration = uint32_t(m_player->GetTotalTime(true) * 1000ull);
-        m_player->SetLoopCount(16);
+        m_player->SetLoopCount(0);
         m_player->Reset();
         return duration;
     }
