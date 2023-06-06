@@ -1,7 +1,10 @@
-v0.6.0:
+v0.6.1:
 - Added Highly Competitive/Snsf9x
-- Updated UADE to support PreTracker
+- Updated adplug to 2.3.3.804
+- Updated gbsplay to 0.0.94@e358ee9
 - Updated libsidplay to 2.5.0
+- Updated libvgm to fd7da37
+- Updated UADE to support PreTracker
 - Updated ImGui to 1.89.60
 - Updated ImGuiFileDialog to 0.6.5
 - Updated modland to import Super Nintendo Sound Format
