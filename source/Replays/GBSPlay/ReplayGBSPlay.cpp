@@ -86,7 +86,7 @@ namespace rePlayer
         Durations(context, entry->GetDurations(), entry->numSongs, "Subsong #%d Duration");
     }
 
-    int32_t ReplayGBSPlay::ms_filter = FILTER_OFF;
+    int32_t ReplayGBSPlay::ms_filter = FILTER_DMG;
     int32_t ReplayGBSPlay::ms_stereoSeparation = 100;
     int32_t ReplayGBSPlay::ms_surround = 1;
 

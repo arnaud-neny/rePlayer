@@ -9,12 +9,14 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-#include "config.h"
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <math.h>
+
+#include "config.h"
 
 typedef uint64_t cycles_t;
 
@@ -47,10 +49,15 @@ typedef uint64_t cycles_t;
 #define TEXTDOMAIN "gbsplay"
 #define N_(x) x
 
-#define LN2 .69314718055994530941
-#define MAGIC 5.78135971352465960412
-#define FREQ(x) (262144 / (x))
-#define NOTE(x) ((long)((log(FREQ(x))/LN2 - MAGIC)*12 + .2))
+#define C0HZ 16.35
+#define C0MIDI 12
+#define C6GBRAW 1923 /* First note in gameboy startup sound, 1048.576Hz (3.4 cents too high) */
+#define C6GB (2048 - C6GBRAW)
+#define C6MIDI 84 /* 1046.50Hz in equal temperament */
+/* wave channel produces half the frequency */
+#define FREQ(x,ch) (131072. / ((x)<<((ch)>1)))
+#define FREQTONOTE(f) (lround(log2((f)/C0HZ)*12)+C0MIDI)
+#define NOTE(x,ch) FREQTONOTE(FREQ(x,ch))
 
 #if USE_I18N == 1
 
@@ -101,49 +108,42 @@ static inline void i18n_init(void) {}
 
 #endif
 
-#ifndef _MSC_VER
-#include <sys/param.h>
-#endif
-
-#ifndef BYTE_ORDER
-
-#  define BIG_ENDIAN 1
-#  define LITTLE_ENDIAN 2
-
+#ifdef _MSC_VER
+#  define __ORDER_BIG_ENDIAN__ 1
+#  define __ORDER_LITTLE_ENDIAN__ 2
 #  ifdef _BIG_ENDIAN
-#    define BYTE_ORDER BIG_ENDIAN
+#    define __BYTE_ORDER__ __ORDER_BIG_ENDIAN__
 #  endif
 
 #  ifdef _LITTLE_ENDIAN
-#    define BYTE_ORDER LITTLE_ENDIAN
+#    define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #  endif
-
-#endif /* BYTE_ORDER */
-
-#if !BYTE_ORDER || !BIG_ENDIAN || !LITTLE_ENDIAN
-#  error endian defines missing
-#endif
-
-#if BYTE_ORDER == BIG_ENDIAN
-
-static inline long is_le_machine() {
-	return false;
-}
-
-static inline long is_be_machine() {
-	return true;
-}
-
 #else
 
+#if !defined(__BYTE_ORDER__) || !defined(__ORDER_LITTLE_ENDIAN__) || !defined(__ORDER_BIG_ENDIAN__)
+#error Unsupported compiler
+#endif
+#if __BYTE_ORDER__ != 1234 && __BYTE_ORDER__ != 4321
+#error Unexpected endian value __BYTE_ORDER__
+#endif
+#if __ORDER_LITTLE_ENDIAN__ != 1234
+#error Unexpected endian value
+#endif
+#if __ORDER_BIG_ENDIAN__ != 4321
+#error Unexpected endian value
+#endif
+#endif
+
+#define GBS_BYTE_ORDER __BYTE_ORDER__
+#define GBS_ORDER_LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+#define GBS_ORDER_BIG_ENDIAN __ORDER_BIG_ENDIAN__
+
 static inline long is_le_machine() {
-	return true;
+	return __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__;
 }
 
 static inline long is_be_machine() {
-	return false;
+	return __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__;
 }
-
-#endif
 
 #endif

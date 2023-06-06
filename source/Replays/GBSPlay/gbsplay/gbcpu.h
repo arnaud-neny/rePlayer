@@ -11,6 +11,7 @@
 #define _GBCPU_H_
 
 #include <inttypes.h>
+
 #include "common.h"
 
 #define ZF	0x80
@@ -57,7 +58,7 @@ static inline void foo(void)
 
 #endif
 
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if GBS_BYTE_ORDER == GBS_ORDER_LITTLE_ENDIAN
 
 #define REGS16_R(r, i) (r.rw[i])
 #define REGS16_W(r, i, x) (r.rw[i]) = x

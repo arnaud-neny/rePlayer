@@ -125,7 +125,7 @@ static uint32_t get_imm16(struct gbcpu* const gbcpu)
 	uint32_t res;
 	REGS16_W(gbcpu->regs, PC, pc + 2);
 	res = mem_get(gbcpu, pc) + (mem_get(gbcpu, pc+1) << 8);
-	DPRINTF("%04x", res);
+	DPRINTF("%02x%02x", res & 0xFF, res >> 8);
 	return res;
 }
 
@@ -418,6 +418,7 @@ static void op_cbprefix(struct gbcpu* const gbcpu, uint32_t op, const struct opi
 
 	REGS16_W(gbcpu->regs, PC, pc + 1);
 	op = mem_get(gbcpu, pc);
+	DPRINTF("%02x", op);
 	switch (op >> 6) {
 		case 0: cbops[(op >> 3) & 7].fn(gbcpu, op, &cbops[(op >> 3) & 7]);
 			return;
