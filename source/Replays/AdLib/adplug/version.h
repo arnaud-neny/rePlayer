@@ -1,2 +1,2 @@
-// commit: 5ee792a
-#define ADPLUG_VERSION "2.3.3.801"
+// commit: aa920d9
+#define ADPLUG_VERSION "2.3.3.804"

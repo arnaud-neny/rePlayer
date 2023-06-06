@@ -341,3 +341,4 @@ EXTENSION(snsf)     // Highly Competitive
 EXTENSION(minisnsf) // Highly Competitive
 EXTENSION(snsfPk)   // Highly Competitive
 EXTENSION(prt)      // UADE: PreTracker
+EXTENSION(mtr)      // Adlib: Master Tracker

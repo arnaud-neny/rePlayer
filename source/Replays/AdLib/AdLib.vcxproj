@@ -155,6 +155,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="adplug\mkj.h" />
     <ClInclude Include="adplug\msc.h" />
     <ClInclude Include="adplug\mtk.h" />
+    <ClInclude Include="adplug\mtr.h" />
     <ClInclude Include="adplug\mus.h" />
     <ClInclude Include="adplug\nemuopl.h" />
     <ClInclude Include="adplug\nukedopl.h" />
@@ -237,6 +238,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="adplug\mkj.cpp" />
     <ClCompile Include="adplug\msc.cpp" />
     <ClCompile Include="adplug\mtk.cpp" />
+    <ClCompile Include="adplug\mtr.cpp" />
     <ClCompile Include="adplug\mus.cpp" />
     <ClCompile Include="adplug\nemuopl.cpp" />
     <ClCompile Include="adplug\nukedopl.c" />
