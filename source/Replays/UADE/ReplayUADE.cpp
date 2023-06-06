@@ -677,7 +677,7 @@ namespace rePlayer
 
     uint32_t ReplayUADE::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex] == 0 ? kDefaultSongDuration : m_durations[m_subsongIndex];
+        return m_durations[m_subsongIndex];
     }
 
     uint32_t ReplayUADE::GetNumSubsongs() const
