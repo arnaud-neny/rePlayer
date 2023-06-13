@@ -54,10 +54,23 @@ index 9ffb654..ebd8a8c 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 1ddd17c..4c66f7b 100644
+index 1ddd17c..f2a0138 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -6011,7 +6011,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
+@@ -2145,8 +2145,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+         // One byte is consumed in case of invalid first byte of in_text.
+         // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
+         // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
+-        wanted = ImMin(wanted, !!s[0] + !!s[1] + !!s[2] + !!s[3]);
+-        *out_char = IM_UNICODE_CODEPOINT_INVALID;
++        // rePlayer begin
++        wanted = 1;
++        *out_char = s[0];
++        // rePlayer end
+     }
+ 
+     return wanted;
+@@ -6011,7 +6013,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  

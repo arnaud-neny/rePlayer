@@ -2145,8 +2145,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* 
         // One byte is consumed in case of invalid first byte of in_text.
         // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
         // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
-        wanted = ImMin(wanted, !!s[0] + !!s[1] + !!s[2] + !!s[3]);
-        *out_char = IM_UNICODE_CODEPOINT_INVALID;
+        // rePlayer begin
+        wanted = 1;
+        *out_char = s[0];
+        // rePlayer end
     }
 
     return wanted;
