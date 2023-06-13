@@ -42,6 +42,7 @@ namespace rePlayer
         {
             enum Type : int32_t
             {
+                kOctaMED = -1,
                 kSidMon1 = -1,
                 kDefault = 0,
                 kTFMX,
@@ -160,6 +161,8 @@ namespace rePlayer
         static const ModlandReplayOverride* const GetReplayOverride(ModlandReplay::Type type);
         static const ModlandReplayOverride* const GetReplayOverride(const char* name);
         const ModlandReplayOverride* const GetReplayOverride(SourceSong* songSource) const;
+
+        MediaType UpdateMediaType(const ModlandSong& dbSong, std::string& dbSongName) const;
 
         bool DownloadDatabase();
         void DecodeDatabase(char* bufBegin, const char* bufEnd);

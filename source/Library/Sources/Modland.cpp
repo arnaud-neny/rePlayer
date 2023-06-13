@@ -372,59 +372,7 @@ namespace rePlayer
                 }
             }
 
-            if (auto* replay = GetReplayOverride(m_db.replays[dbSong.replayId].type))
-                song->type = replay->getTypeAndName(dbSongName);
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kTFMX)
-            {
-                dbSongName.erase(dbSongName.begin(), dbSongName.begin() + 5);// remove mdat.
-                song->type = { eExtension::_tfm, eReplay::TFMX };
-            }
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMDX)
-                song->type = { eExtension::_mdxPk, eReplay::MDX };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kQSF)
-                song->type = { eExtension::_qsfPk, eReplay::HighlyQuixotic };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
-                song->type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
-                song->type = { eExtension::_2sfPk, eReplay::vio2sf };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSSF)
-                song->type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
-                song->type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
-                song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
-                song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
-                song->type = { eExtension::_usfPk, eReplay::LazyUSF };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
-                song->type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
-                song->type = { eExtension::_cust, eReplay::UADE };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
-            {
-                song->type = { eExtension::_sid1, eReplay::UADE };
-                dbSongName.resize(dbSongName.size() - 4);
-            }
-            else if (dbSong.isExtensionOverriden)
-            {
-                auto extOffset = dbSongName.find_last_of('.');
-                if (extOffset != dbSongName.npos)
-                {
-                    song->type = Core::GetReplays().Find(dbSongName.c_str() + extOffset + 1);
-                    if (song->type.ext != eExtension::Unknown)
-                        dbSongName.resize(extOffset);
-                }
-            }
-            else
-            {
-                song->type = Core::GetReplays().Find(m_db.replays[dbSong.replayId].ext(m_db.strings));
-                if (song->type.ext == eExtension::Unknown)
-                {
-                    dbSongName += '.';
-                    dbSongName += m_db.replays[dbSong.replayId].ext(m_db.strings);
-                }
-            }
+            song->type = UpdateMediaType(dbSong, dbSongName);
             song->name = dbSongName;
             if (dbSong.artists[0])
             {
@@ -490,59 +438,7 @@ namespace rePlayer
                 }
             }
 
-            if (auto* replay = GetReplayOverride(m_db.replays[dbSong.replayId].type))
-                song->type = replay->getTypeAndName(dbSongName);
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kTFMX)
-            {
-                dbSongName.erase(dbSongName.begin(), dbSongName.begin() + 5);// remove mdat.
-                song->type = { eExtension::_tfm, eReplay::TFMX };
-            }
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMDX)
-                song->type = { eExtension::_mdxPk, eReplay::MDX };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kQSF)
-                song->type = { eExtension::_qsfPk, eReplay::HighlyQuixotic};
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
-                song->type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
-                song->type = { eExtension::_2sfPk, eReplay::vio2sf };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSSF)
-                song->type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
-                song->type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
-                song->type = { eExtension::_psfPk, eReplay::HighlyExperimental };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
-                song->type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
-                song->type = { eExtension::_usfPk, eReplay::LazyUSF };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
-                song->type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
-                song->type = { eExtension::_cust, eReplay::UADE };
-            else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
-            {
-                song->type = { eExtension::_sid1, eReplay::UADE };
-                dbSongName.resize(dbSongName.size() - 4);
-            }
-            else if (dbSong.isExtensionOverriden)
-            {
-                auto extOffset = dbSongName.find_last_of('.');
-                if (extOffset != dbSongName.npos)
-                {
-                    song->type = Core::GetReplays().Find(dbSongName.c_str() + extOffset + 1);
-                    if (song->type.ext != eExtension::Unknown)
-                        dbSongName.resize(extOffset);
-                }
-            }
-            else
-            {
-                song->type = Core::GetReplays().Find(m_db.replays[dbSong.replayId].ext(m_db.strings));
-                if (song->type.ext == eExtension::Unknown)
-                {
-                    dbSongName += '.';
-                    dbSongName += m_db.replays[dbSong.replayId].ext(m_db.strings);
-                }
-            }
+            song->type = UpdateMediaType(dbSong, dbSongName);
             song->name = dbSongName;
             if (dbSong.artists[0])
             {
@@ -1330,6 +1226,70 @@ namespace rePlayer
         return nullptr;
     }
 
+    MediaType SourceModland::UpdateMediaType(const ModlandSong& dbSong, std::string& dbSongName) const
+    {
+        MediaType type;
+        if (auto* replay = GetReplayOverride(m_db.replays[dbSong.replayId].type))
+            type = replay->getTypeAndName(dbSongName);
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kTFMX)
+        {
+            dbSongName.erase(dbSongName.begin(), dbSongName.begin() + 5);// remove mdat.
+            type = { eExtension::_tfm, eReplay::TFMX };
+        }
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMDX)
+            type = { eExtension::_mdxPk, eReplay::MDX };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kQSF)
+            type = { eExtension::_qsfPk, eReplay::HighlyQuixotic };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
+            type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
+            type = { eExtension::_2sfPk, eReplay::vio2sf };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSSF)
+            type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
+            type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
+            type = { eExtension::_psfPk, eReplay::HighlyExperimental };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
+            type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
+            type = { eExtension::_usfPk, eReplay::LazyUSF };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
+            type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
+            type = { eExtension::_cust, eReplay::UADE };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
+        {
+            type = { eExtension::_sid1, eReplay::UADE };
+            dbSongName.resize(dbSongName.size() - 4);
+        }
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
+        {
+            type = { eExtension::_med, eReplay::OpenMPT };
+            dbSongName.resize(dbSongName.size() - 5);
+        }
+        else if (dbSong.isExtensionOverriden)
+        {
+            auto extOffset = dbSongName.find_last_of('.');
+            if (extOffset != dbSongName.npos)
+            {
+                type = Core::GetReplays().Find(dbSongName.c_str() + extOffset + 1);
+                if (type.ext != eExtension::Unknown)
+                    dbSongName.resize(extOffset);
+            }
+        }
+        else
+        {
+            type = Core::GetReplays().Find(m_db.replays[dbSong.replayId].ext(m_db.strings));
+            if (type.ext == eExtension::Unknown)
+            {
+                dbSongName += '.';
+                dbSongName += m_db.replays[dbSong.replayId].ext(m_db.strings);
+            }
+        }
+        return type;
+    }
+
     bool SourceModland::DownloadDatabase()
     {
         if (m_db.songs.IsEmpty())
@@ -1633,6 +1593,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kSNSF;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
+        else if (theReplay.starts_with("OctaMED"))
+            m_db.replays.Last().type = ModlandReplay::kOctaMED;
         else if (theReplay == "Delitracker Custom")
         {
             m_db.replays.Last().type = ModlandReplay::kDelitrackerCustom;
