@@ -506,12 +506,12 @@ namespace rePlayer
         }
 
         auto spacing = ImGui::GetStyle().ItemSpacing.x + 2.0f;
-        if (ImGui::Button("\xef\xbf\xb7")) // prev
+        if (ImGui::Button(ImGuiIconMediaPrev))
         {
             PlayPreviousSong();
         }
         ImGui::SameLine(0.0f, spacing);
-        if (ImGui::Button("\xef\xbf\xb9") && isPlayerValid && !player->IsStopped()) // stop
+        if (ImGui::Button(ImGuiIconMediaStop) && isPlayerValid && !player->IsStopped())
         {
             player->Stop();
             if (m_nextPlayer.IsValid())
@@ -520,26 +520,26 @@ namespace rePlayer
         ImGui::SameLine(0.0f, spacing);
         if (!isPlayerValid)
         {
-            ImGui::Button("\xef\xbf\xba"); // play
+            ImGui::Button(ImGuiIconMediaPlay);
         }
         else if (!player->IsPlaying())
         {
-            if (ImGui::Button("\xef\xbf\xba")) // play
+            if (ImGui::Button(ImGuiIconMediaPlay))
                 Play();
         }
-        else if (ImGui::Button("\xef\xbf\xbb")) // pause
+        else if (ImGui::Button(ImGuiIconMediaPause))
         {
             player->Pause();
             if (m_nextPlayer.IsValid())
                 m_nextPlayer->Pause();
         }
         ImGui::SameLine(0.0f, spacing);
-        if (ImGui::Button("\xef\xbf\xb8")) // next
+        if (ImGui::Button(ImGuiIconMediaNext))
         {
             PlayNextSong();
         }
         ImGui::SameLine(0.0f, spacing);
-        if (ImGui::Button(m_loop == Loop::None ? "\xef\xbf\xbc" : m_loop == Loop::Playlist ? "\xef\xbf\xbd" : "\xef\xbf\xbe")) // loop
+        if (ImGui::Button(m_loop == Loop::None ? ImGuiIconMediaLoopNone : m_loop == Loop::Playlist ? ImGuiIconMediaLoopPlaylist : ImGuiIconMediaLoopSingle))
         {
             m_loop = Loop((m_loop.As<uint8_t>() + 1) % uint8_t(Loop::Count));
             if (m_loop != Loop::Playlist)
@@ -557,7 +557,7 @@ namespace rePlayer
         if (ImGui::IsItemHovered())
             ImGui::Tooltip(m_loop == Loop::None ? "No loop" : m_loop == Loop::Playlist ? "Playlist loop" : "Endless song");
         ImGui::SameLine(0.0f, spacing);
-        if (ImGui::Button("\xef\xbf\xbf")) // menu
+        if (ImGui::Button(ImGuiIconMediaMenu))
             ImGui::OpenPopup("Windows");
         if (ImGui::BeginPopup("Windows"))
         {

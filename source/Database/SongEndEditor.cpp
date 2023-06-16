@@ -295,7 +295,7 @@ namespace rePlayer
 
                 auto cursorFrame = m_frames[offset + uint32_t(ImGui::GetMousePos().x - pos.x)];
                 auto time = uint64_t(offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel;
-                ImGui::Tooltip("pos: %u:%u:%u\nmin: %d\nmax: %d\nrms: %u", time / 60000, (time / 1000) % 60, time % 1000
+                ImGui::Tooltip("pos: %u:%02u:%03u\nmin: %d\nmax: %d\nrms: %u", time / 60000, (time / 1000) % 60, time % 1000
                     , cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
             }
             if (ImGui::IsItemActive())
@@ -370,7 +370,7 @@ namespace rePlayer
 
     void SongEndEditor::PlaybackUI()
     {
-        if (ImGui::Button("\xef\xbf\xb9")) // stop
+        if (ImGui::Button(ImGuiIconMediaStop))
         {
             if ((m_isPlaying || m_waveStartPosition != 0) && m_wave->outHandle)
             {
@@ -387,7 +387,7 @@ namespace rePlayer
             m_isPlaying = false;
         }
         ImGui::SameLine();
-        if (ImGui::Button(m_isPlaying ? "\xef\xbf\xbb" : "\xef\xbf\xba")) // pause/play
+        if (ImGui::Button(m_isPlaying ? ImGuiIconMediaPause : ImGuiIconMediaPlay))
         {
             m_isPlaying = !m_isPlaying;
             if (m_wave->outHandle)

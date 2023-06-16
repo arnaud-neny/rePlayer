@@ -182,7 +182,7 @@ namespace rePlayer
         int32_t widths[] = { 19, 19, 15, 14, 14, 25, 25, 25, 21 };
         int32_t rectIds[_countof(widths)];
         for (uint32_t i = 0; i < _countof(widths); i++)
-            rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xffff - _countof(widths) + i + 1), widths[i], 15, float(widths[i]), ImVec2(0, -1));
+            rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xE000 + i), widths[i], 15, float(widths[i]), ImVec2(0, -1));
 
 /*
         {

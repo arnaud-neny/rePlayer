@@ -109,4 +109,14 @@ namespace rePlayer
 }
 // namespace rePlayer
 
+#define ImGuiIconMediaPrev "\xee\x80\x80"
+#define ImGuiIconMediaNext "\xee\x80\x81"
+#define ImGuiIconMediaStop "\xee\x80\x82"
+#define ImGuiIconMediaPlay "\xee\x80\x83"
+#define ImGuiIconMediaPause "\xee\x80\x84"
+#define ImGuiIconMediaLoopNone "\xee\x80\x85"
+#define ImGuiIconMediaLoopPlaylist "\xee\x80\x86"
+#define ImGuiIconMediaLoopSingle "\xee\x80\x87"
+#define ImGuiIconMediaMenu "\xee\x80\x88"
+
 #include "Core.inl.h"
