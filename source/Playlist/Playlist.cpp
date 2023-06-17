@@ -1281,10 +1281,10 @@ namespace rePlayer
                 m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
             };
 
-            auto path = std::filesystem::path(filename);
+            auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(filename.c_str()));
             if (std::filesystem::is_directory(path))
             {
-                for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(filename))
+                for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path))
                 {
                     if (!dir_entry.is_directory())
                         addFile(dir_entry.path());

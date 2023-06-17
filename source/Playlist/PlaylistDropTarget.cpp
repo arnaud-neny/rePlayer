@@ -89,18 +89,22 @@ namespace rePlayer
         if (SUCCEEDED(pDataObj->GetData(&fmte, &stgm)))
         {
             HDROP hdrop = (HDROP)stgm.hGlobal; // or reinterpret_cast<HDROP> if preferred
-            UINT file_count = DragQueryFile(hdrop, 0xFFFFFFFF, NULL, 0);
+            UINT file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, NULL, 0);
 
             // we can drag more than one file at the same time, so we have to loop here
             for (UINT i = 0; i < file_count; i++)
             {
-                UINT numChars = DragQueryFile(hdrop, i, nullptr, 0);
+                UINT numChars = DragQueryFileW(hdrop, i, nullptr, 0);
                 if (numChars > 0)
                 {
-                    std::string szFile;
+                    std::wstring szFile;
                     szFile.resize(numChars);
-                    DragQueryFile(hdrop, i, szFile.data(), numChars + 1);
-                    files.Add(std::move(szFile));
+                    DragQueryFileW(hdrop, i, szFile.data(), numChars + 1);
+                    // convert from unicde to utf-8
+                    std::string filename;
+                    filename.resize(::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, NULL, 0, NULL, NULL));
+                    ::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, filename.data(), int(filename.size()), NULL, NULL);
+                    files.Add(std::move(filename));
                 }
             }
 
