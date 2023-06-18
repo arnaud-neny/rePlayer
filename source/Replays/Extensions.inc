@@ -342,3 +342,4 @@ EXTENSION(minisnsf) // Highly Competitive
 EXTENSION(snsfPk)   // Highly Competitive
 EXTENSION(prt)      // UADE: PreTracker
 EXTENSION(mtr)      // Adlib: Master Tracker
+EXTENSION(buz2)     // Buzzic 2
