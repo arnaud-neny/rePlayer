@@ -1,3 +1,8 @@
+v0.7.0:
+- Added Buzzic 2
+- Updated modland to convert Octamed extensions
+- Bug fixes
+
 v0.6.1:
 - Added Highly Competitive/Snsf9x
 - Updated adplug to 2.3.3.804

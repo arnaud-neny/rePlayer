@@ -1,5 +1,6 @@
 # rePlayer (another multi-formats music player)
 
+- add in the settings the replay selection for each extension
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
 - async tasks (imports...)
@@ -30,6 +31,7 @@
 - https://vgmrips.net/ importer?
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
 - check zxtune for more players: https://bitbucket.org/zxtune/zxtune/
+- check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
 - Youtube music player? (using https://github.com/dujeonglee/YoutubeClipDownloader)
 - Soundcloud music player?
 - Bandcamp music player?
