@@ -53,7 +53,7 @@ namespace rePlayer
 
     inline bool Playlist::Cue::Entry::IsAvailable() const
     {
-        return !(isUnavailable || GetSong()->IsInvalid());
+        return !GetSong()->IsInvalid();
     }
 
     void Playlist::Summary::Load(io::File& file)
@@ -362,7 +362,6 @@ namespace rePlayer
                 currentPlayer = LoadSong(m_cue.entries[previousEntryIndex]);
                 if (currentPlayer.IsValid())
                 {
-                    m_cue.entries[previousEntryIndex].isUnavailable = false;
                     if (currentPlayer->IsNewSong())
                     {
                         currentPlayer->MarkSongAsNew(false);
@@ -391,7 +390,6 @@ namespace rePlayer
                 }
                 else
                 {
-                    m_cue.entries[previousEntryIndex].isUnavailable = true;
                     if (numEntries != m_cue.entries.NumItems<int32_t>())
                         return LoadPreviousSong(currentPlayer, nextPlayer);
                 }
@@ -426,7 +424,6 @@ namespace rePlayer
                 player = LoadSong(m_cue.entries[entryIndex]);
                 if (player.IsValid())
                 {
-                    m_cue.entries[entryIndex].isUnavailable = false;
                     m_currentEntryIndex = entryIndex;
 
                     if (player->IsNewSong())
@@ -449,7 +446,6 @@ namespace rePlayer
                 }
                 else
                 {
-                    m_cue.entries[entryIndex].isUnavailable = true;
                     if (numEntries != m_cue.entries.NumItems<int32_t>())
                         return LoadCurrentSong();
                 }
@@ -502,7 +498,6 @@ namespace rePlayer
                 player = LoadSong(m_cue.entries[nextEntryIndex]);
                 if (player.IsValid())
                 {
-                    m_cue.entries[nextEntryIndex].isUnavailable = false;
                     if (player->IsNewSong())
                     {
                         player->MarkSongAsNew(false);
@@ -524,7 +519,6 @@ namespace rePlayer
                 }
                 else
                 {
-                    m_cue.entries[nextEntryIndex].isUnavailable = true;
                     if (numEntries != m_cue.entries.NumItems<int32_t>())
                         return LoadNextSong(isAdvancing);
                 }
@@ -568,7 +562,6 @@ namespace rePlayer
                 newPlayer = LoadSong(m_cue.entries[nextEntryIndex]);
                 if (newPlayer.IsValid())
                 {
-                    m_cue.entries[nextEntryIndex].isUnavailable = false;
                     if (newPlayer->IsNewSong())
                     {
                         newPlayer->MarkSongAsNew(false);
@@ -590,7 +583,6 @@ namespace rePlayer
                 }
                 else
                 {
-                    m_cue.entries[nextEntryIndex].isUnavailable = true;
                     if (numEntries != m_cue.entries.NumItems<int32_t>())
                         return ValidateNextSong(player);
                 }
@@ -773,7 +765,6 @@ namespace rePlayer
                                     player1 = LoadSong(currentPlayerId);
                                     if (player1.IsInvalid())
                                     {
-                                        m_cue.entries[currentEntryIndex].isUnavailable = true;
                                         currentEntryIndex++;
                                         if (currentEntryIndex >= lastEntryIndex)
                                             break;
@@ -782,7 +773,6 @@ namespace rePlayer
                                     }
                                     else
                                     {
-                                        m_cue.entries[currentEntryIndex].isUnavailable = false;
                                         if (player1->IsNewSong())
                                         {
                                             player1->MarkSongAsNew(false);

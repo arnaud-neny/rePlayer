@@ -59,7 +59,6 @@ namespace rePlayer
             struct Entry : public MusicID
             {
                 bool isSelected = false;
-                bool isUnavailable = false;
 
                 Entry& operator=(const MusicID& musicId);
                 bool operator==(PlaylistID other) const;
