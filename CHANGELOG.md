@@ -1,5 +1,6 @@
-v0.7.0:
+v0.7.1:
 - Added Buzzic 2
+- Updated OpenMPT to 0.7.2
 - Updated modland to convert Octamed extensions
 - Bug fixes
 
