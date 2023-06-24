@@ -537,10 +537,10 @@ namespace rePlayer
                     switch (sortSpec.ColumnUserID)
                     {
                     case kTitle:
-                        delta = _stricmp(lSong->GetName(), rSong->GetName());
+                        delta = CompareStringMixed(lSong->GetName(), rSong->GetName());
                         break;
                     case kArtists:
-                        delta = _stricmp(m_db.GetArtists(l.id.songId).c_str(), m_db.GetArtists(r.id.songId).c_str());
+                        delta = CompareStringMixed(m_db.GetArtists(l.id.songId).c_str(), m_db.GetArtists(r.id.songId).c_str());
                         break;
                     case kType:
                         delta = strcmp(lSong->GetType().GetExtension(), rSong->GetType().GetExtension());
