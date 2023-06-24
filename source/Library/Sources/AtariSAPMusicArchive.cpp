@@ -291,7 +291,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
         bool isEntryMissing = false;
-        if (curlError == CURLE_OK)
+        if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {

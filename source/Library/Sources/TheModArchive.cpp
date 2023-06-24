@@ -509,7 +509,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
         bool isEntryMissing = false;
-        if (curlError == CURLE_OK)
+        if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (memcmp(buffer.begin(), "Invalid ID Error", sizeof("Invalid ID Error")) == 0)
             {

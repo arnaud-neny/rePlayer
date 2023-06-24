@@ -503,7 +503,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
         bool isEntryMissing = false;
-        if (curlError == CURLE_OK)
+        if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if ((buffer.Size() < 256 && strstr(buffer.Items<const char>(), "404 Not Found"))
                 || strstr(buffer.Items<const char>(), "<!DOCTYPE html>"))
@@ -888,7 +888,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         bool isEntryMissing = false;
         auto curlError = curl_easy_perform(curl);
-        if (curlError == CURLE_OK)
+        if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {
@@ -974,7 +974,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         bool isEntryMissing = false;
         auto curlError = curl_easy_perform(curl);
-        if (curlError == CURLE_OK)
+        if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {
@@ -1129,7 +1129,7 @@ namespace rePlayer
                 Log::Message("\"%s\"...", url.c_str());
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 auto curlError = curl_easy_perform(curl);
-                if (curlError == CURLE_OK)
+                if (curlError == CURLE_OK && curlBuffer.IsNotEmpty())
                 {
                     if (curlBuffer.Size() < 256 && strstr((const char*)curlBuffer.begin(), "404 Not Found"))
                     {
