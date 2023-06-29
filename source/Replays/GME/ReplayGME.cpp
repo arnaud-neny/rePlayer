@@ -75,6 +75,7 @@ namespace rePlayer
         if (numTracks == 0)
         {
             delete[] tracks;
+            gme_delete(emu);
             return nullptr;
         }
 
