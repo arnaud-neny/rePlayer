@@ -3,6 +3,10 @@
 #include <assert.h>
 #include <stdint.h>
 
+#ifndef NOMINMAX
+#   define NOMINMAX
+#endif
+
 namespace core
 {
     // basic enum to force definition of some functions (see SmartPtr(AutoAllocate...))
