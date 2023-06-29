@@ -26,7 +26,7 @@ EXTENSION(mtm)
 EXTENSION(nst)
 EXTENSION(okt)      // OpenMPT & UADE: Oktalyzer
 EXTENSION(plm)
-EXTENSION(psm)
+EXTENSION(psm)      // ZXTune: Pro Sound Maker
 EXTENSION(pt36)
 EXTENSION(ptm)
 EXTENSION(sfx)      // OpenMPT & UADE: Sound-FX
@@ -34,7 +34,7 @@ EXTENSION(sfx2)
 EXTENSION(st26)
 EXTENSION(stk)
 EXTENSION(stm)
-EXTENSION(stp)
+EXTENSION(stp)      // ZXTune: Sound Tracker Pro
 EXTENSION(ult)
 EXTENSION(wow)
 EXTENSION(gdm)
@@ -47,7 +47,7 @@ EXTENSION(mmcmp)
 EXTENSION(hvl)
 EXTENSION(ahx)
 EXTENSION(bp)       // SoundMon & UAE: SoundMon2.0
-EXTENSION(ym)
+EXTENSION(ym)       // ZXTune: ST-Sound
 EXTENSION(dsym)
 EXTENSION(fmt)
 EXTENSION(mus)      // OpenMPT: ? & Sidplay: ? & UADE: UFO
@@ -125,16 +125,16 @@ EXTENSION(tfm)
 EXTENSION(mp3)
 EXTENSION(flac)
 EXTENSION(ogg)
-EXTENSION(ay)       // Ayfly & GME & NEZplug
-EXTENSION(vtx)
-EXTENSION(psg)
-EXTENSION(asc)
-EXTENSION(pt1)
-EXTENSION(pt2)
-EXTENSION(pt3)
-EXTENSION(stc)
-EXTENSION(sqt)      // AyFly: ? & UADE: Quartet_PSG
-EXTENSION(psc)
+EXTENSION(ay)       // Ayfly & GME & NEZplug & ZXTune: AY/Emul
+EXTENSION(vtx)      // ZXTune: Vortex Project
+EXTENSION(psg)      // ZXTune: Programmable Sound Generator
+EXTENSION(asc)      // ZXTune: ASC Sound Master
+EXTENSION(pt1)      // ZXTune: Pro Tracker
+EXTENSION(pt2)      // ZXTune: Pro Tracker
+EXTENSION(pt3)      // ZXTune: Pro Tracker
+EXTENSION(stc)      // ZXTune: Sound Tracker
+EXTENSION(sqt)      // AyFly: ? & UADE: Quartet_PSG & ZXTune: SQ-Tracker
+EXTENSION(psc)      // ZXTune: Pro Sound Creator
 EXTENSION(gbs)      // GBSPlay & GME & NEZplug
 EXTENSION(gbr)      // GBSPlay & NEZplug
 EXTENSION(gb)
@@ -343,3 +343,46 @@ EXTENSION(snsfPk)   // Highly Competitive
 EXTENSION(prt)      // UADE: PreTracker
 EXTENSION(mtr)      // Adlib: Master Tracker
 EXTENSION(buz2)     // Buzzic 2
+EXTENSION(txt)      // ZXTune: VortexTracker
+EXTENSION(st1)      // ZXTune: Sound Tracker
+EXTENSION(st3)      // ZXTune: Sound Tracker
+EXTENSION(ts)       // ZXTune: TurboSound
+EXTENSION(gtr)      // ZXTune: Global Tracker
+EXTENSION(ayc)      // ZXTune: CPC AYC
+EXTENSION(ftc)      // ZXTune: Fast Tracker
+EXTENSION(as0)      // ZXTune: ASC Sound Master
+EXTENSION(str)      // ZXTune: Sample Tracker
+EXTENSION(chi)      // ZXTune: Chip Tracker
+EXTENSION(sqd)      // ZXTune: SQ Digital Tracker
+EXTENSION(dmm)      // ZXTune: Digital Music Maker
+EXTENSION(pdt)      // ZXTune: ProDigi Tracker
+EXTENSION(dst)      // ZXTune: Digital Studio
+EXTENSION(et1)      // ZXTune: Extreme Tracker
+EXTENSION(mtc)      // ZXTune: Multitrack Container
+EXTENSION(cop)      // ZXTune: E-Tracker
+EXTENSION(tfe)      // ZXTune: TFM Music Maker
+EXTENSION(tf0)      // ZXTune: TFM Music Maker
+EXTENSION(tfd)      // ZXTune: TurboFM
+EXTENSION(tfc)      // ZXTune: TurboFM
+EXTENSION(trd)      // ZXTune: TR-DOS
+EXTENSION(szx)      // ZXTune: ZXState
+EXTENSION(scl)      // ZXTune: SINCLAIR
+EXTENSION(hrp)      // ZXTune: Hrust RiP
+EXTENSION(zip)      // ZXTune: ZXZip
+EXTENSION(bin)      // ZXTune: Hrust v1
+EXTENSION(p)        // ZXTune: Hrust v2
+EXTENSION(fdi)      // ZXTune: Full Disk Image
+EXTENSION(hbt)      // ZXTune: Hobeta
+EXTENSION(hrm)      // ZXTune: Hrum
+EXTENSION(dsq)      // ZXTune: DataSqueezer
+EXTENSION(esv)      // ZXTune: ESVCruncher
+EXTENSION(tlz)      // ZXTune: TurboLZ
+EXTENSION(tlzp)     // ZXTune: TurboLZ
+EXTENSION(trs)      // ZXTune: Trush
+EXTENSION(cc3)      // ZXTune: CodeCruncher
+EXTENSION(gam)      // ZXTune: GamePacker
+EXTENSION(gamplus)  // ZXTune: GamePacker
+EXTENSION(lzs)      // ZXTune: ASCLZSPack
+EXTENSION(msp)      // ZXTune: MicrospacePacker
+EXTENSION(td0)      // ZXTune: TeleDisk Image
+EXTENSION(pcd)      // ZXTune: Powerfull Code Decreaser

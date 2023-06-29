@@ -53,6 +53,7 @@
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
 - Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
 - Buzzic 2: https://www.pouet.net/prod.php?which=54407
+- ZXTune: https://zxtune.bitbucket.io
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

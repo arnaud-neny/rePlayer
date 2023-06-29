@@ -30,13 +30,13 @@
 - https://www.zophar.net/ importer?
 - https://vgmrips.net/ importer?
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
-- check zxtune for more players: https://bitbucket.org/zxtune/zxtune/
 - check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
+- check NostalgicPlayer for more players: https://github.com/neumatho/NostalgicPlayer
 - Youtube music player? (using https://github.com/dujeonglee/YoutubeClipDownloader)
 - Soundcloud music player?
 - Bandcamp music player?
-- scplayer? https://github.com/Deltafire/SCPlayer (maybe already in zxtune)
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
 - FurnaceTracker: https://github.com/tildearrow/furnace
 - single channel export
 - refactor replays using dll loader to avoid duplicated code
+- vgmstream support? https://github.com/vgmstream/vgmstream
