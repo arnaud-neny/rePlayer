@@ -652,7 +652,7 @@ namespace rePlayer
             char errorBuffer[CURL_ERROR_SIZE];
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_easy_setopt(curl, CURLOPT_URL, "https://asma.atari.org/asmadb/asma.json");
+            curl_easy_setopt(curl, CURLOPT_URL, "https://asma.atari.org/asmadb/asmadb.js");
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
             struct Buffer : public Array<uint8_t>
