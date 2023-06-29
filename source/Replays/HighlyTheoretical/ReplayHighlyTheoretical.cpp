@@ -342,28 +342,29 @@ namespace rePlayer
                 auto fileSize = archive_entry_size(entry);
                 unpackedData.Resize(fileSize);
                 auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-                assert(readSize == fileSize);
-
-                m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
-
-                m_length = kDefaultSongDuration;
-                auto psfType = psf_load(entryName.c_str(), &m_psfFileSystem, 0, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr);
-                if (psfType == 0x11 || psfType == 0x12)
+                if (readSize > 0)
                 {
-                    if (m_psfType == 0 || m_psfType == psfType)
+                    m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
+
+                    m_length = kDefaultSongDuration;
+                    auto psfType = psf_load(entryName.c_str(), &m_psfFileSystem, 0, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr);
+                    if (psfType == 0x11 || psfType == 0x12)
                     {
-                        auto extPos = entryName.find_last_of('.');
-                        if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, psfType == 0x11 ? "ssflib" : "dsflib") != 0)
+                        if (m_psfType == 0 || m_psfType == psfType)
                         {
-                            m_psfType = uint8_t(psfType);
-                            m_mediaType.ext = psfType == 0x11 ? eExtension::_ssfPk : eExtension::_dsfPk;
-                            m_subsongs.Add({ fileIndex, uint32_t(m_length) });
+                            auto extPos = entryName.find_last_of('.');
+                            if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, psfType == 0x11 ? "ssflib" : "dsflib") != 0)
+                            {
+                                m_psfType = uint8_t(psfType);
+                                m_mediaType.ext = psfType == 0x11 ? eExtension::_ssfPk : eExtension::_dsfPk;
+                                m_subsongs.Add({ fileIndex, uint32_t(m_length) });
+                            }
                         }
                     }
-                }
-                m_tags.Clear();
+                    m_tags.Clear();
 
-                fileIndex++;
+                    fileIndex++;
+                }
             }
         }
         archive_read_free(archive);

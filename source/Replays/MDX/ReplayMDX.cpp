@@ -81,38 +81,39 @@ namespace rePlayer
                 auto fileSize = archive_entry_size(entry);
                 unpackedData.Resize(fileSize);
                 auto readSize = archive_read_data(mdxArchive, unpackedData.Items(), fileSize);
-                assert(readSize == fileSize);
-
-                auto pdxArchive = archive_read_new();
-                archive_read_support_format_all(pdxArchive);
-                archive_read_open_memory(pdxArchive, data.Items(), data.Size());
-                struct
+                if (readSize > 0)
                 {
-                    static size_t load(const char* filename, void** buf, void* user_data)
+                    auto pdxArchive = archive_read_new();
+                    archive_read_support_format_all(pdxArchive);
+                    archive_read_open_memory(pdxArchive, data.Items(), data.Size());
+                    struct
                     {
-                        archive_entry* entry;
-                        while (archive_read_next_header(reinterpret_cast<struct archive*>(user_data), &entry) == ARCHIVE_OK)
+                        static size_t load(const char* filename, void** buf, void* user_data)
                         {
-                            if (_stricmp(archive_entry_pathname(entry), filename) == 0)
+                            archive_entry* entry;
+                            while (archive_read_next_header(reinterpret_cast<struct archive*>(user_data), &entry) == ARCHIVE_OK)
                             {
-                                auto fileSize = archive_entry_size(entry);
-                                *buf = malloc(fileSize);
-                                auto readSize = archive_read_data(reinterpret_cast<struct archive*>(user_data), *buf, fileSize);
-                                assert(readSize == fileSize);
-                                return fileSize;
+                                if (_stricmp(archive_entry_pathname(entry), filename) == 0)
+                                {
+                                    auto fileSize = archive_entry_size(entry);
+                                    *buf = malloc(fileSize);
+                                    auto readSize = archive_read_data(reinterpret_cast<struct archive*>(user_data), *buf, fileSize);
+                                    assert(readSize == fileSize);
+                                    return fileSize;
+                                }
                             }
+                            Log::Error("[MDX] can't open %s\n", filename);
+                            return 0;
                         }
-                        Log::Error("[MDX] can't open %s\n", filename);
-                        return 0;
-                    }
-                } cb;
+                    } cb;
 
-                t_mdxmini mdx = {};
-                auto res = mdx_open(&mdx, unpackedData.Items(), unpackedData.Size(), kSampleRate, cb.load, pdxArchive);
-                archive_read_free(pdxArchive);
-                if (res == 0)
-                    return new ReplayMDX(std::move(mdx), mdxArchive, fileIndex, std::move(entryName), stream);
-                mdx_close(&mdx);
+                    t_mdxmini mdx = {};
+                    auto res = mdx_open(&mdx, unpackedData.Items(), unpackedData.Size(), kSampleRate, cb.load, pdxArchive);
+                    archive_read_free(pdxArchive);
+                    if (res == 0)
+                        return new ReplayMDX(std::move(mdx), mdxArchive, fileIndex, std::move(entryName), stream);
+                    mdx_close(&mdx);
+                }
                 fileIndex++;
             }
         }

@@ -280,22 +280,23 @@ namespace rePlayer
                 auto fileSize = archive_entry_size(entry);
                 unpackedData.Resize(fileSize);
                 auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-                assert(readSize == fileSize);
-
-                m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
-
-                if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x41, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+                if (readSize > 0)
                 {
-                    auto extPos = entryName.find_last_of('.');
-                    if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "qsflib") != 0)
-                    {
-                        m_mediaType.ext = eExtension::_qsfPk;
-                        m_subsongs.Add(fileIndex);
-                    }
-                }
-                m_tags.Clear();
+                    m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
 
-                fileIndex++;
+                    if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x41, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+                    {
+                        auto extPos = entryName.find_last_of('.');
+                        if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "qsflib") != 0)
+                        {
+                            m_mediaType.ext = eExtension::_qsfPk;
+                            m_subsongs.Add(fileIndex);
+                        }
+                    }
+                    m_tags.Clear();
+
+                    fileIndex++;
+                }
             }
         }
         archive_read_free(archive);

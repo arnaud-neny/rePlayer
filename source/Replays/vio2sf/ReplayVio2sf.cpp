@@ -500,23 +500,24 @@ namespace rePlayer
                 auto fileSize = archive_entry_size(entry);
                 unpackedData.Resize(fileSize);
                 auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-                assert(readSize == fileSize);
-
-                m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
-
-                m_length = kDefaultSongDuration;
-                if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x24, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+                if (readSize > 0)
                 {
-                    auto extPos = entryName.find_last_of('.');
-                    if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "2sflib") != 0)
-                    {
-                        m_mediaType.ext = eExtension::_2sfPk;
-                        m_subsongs.Add({ fileIndex, uint32_t(m_length) });
-                    }
-                }
-                m_tags.Clear();
+                    m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
 
-                fileIndex++;
+                    m_length = kDefaultSongDuration;
+                    if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x24, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+                    {
+                        auto extPos = entryName.find_last_of('.');
+                        if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "2sflib") != 0)
+                        {
+                            m_mediaType.ext = eExtension::_2sfPk;
+                            m_subsongs.Add({ fileIndex, uint32_t(m_length) });
+                        }
+                    }
+                    m_tags.Clear();
+
+                    fileIndex++;
+                }
             }
         }
         archive_read_free(archive);
