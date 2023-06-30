@@ -701,6 +701,7 @@ namespace rePlayer
         Log::Message("Amiga Music Preservation: downloading \"%s\"...", url);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
 
         struct Buffer : public Array<uint8_t>
         {
@@ -719,11 +720,14 @@ namespace rePlayer
         {
             if (memcmp(buffer.begin(), "<!DOCTYPE html", sizeof("<!DOCTYPE html") - 1) == 0)
             {
-                isEntryMissing = true;
+                if (IsInvalidIndex(buffer.Items<char>(), buffer.NumItems()))
+                {
+                    isEntryMissing = true;
+                    auto* song = FindSong(sourceToDownload.internalId);
+                    m_songs.RemoveAt(song - m_songs);
+                    m_isDirty = true;
+                }
                 buffer.Reset();
-                auto* song = FindSong(sourceToDownload.internalId);
-                m_songs.RemoveAt(song - m_songs);
-                m_isDirty = true;
 
                 Log::Error("Amiga Music Preservation: file \"%s\" not found\n", url);
             }
@@ -913,6 +917,13 @@ namespace rePlayer
         collector.Fetch("https://amp.dascene.net/detail.php?detail=modules&view=%u", artistID);
 
         return collector;
+    }
+
+    bool SourceAmigaMusicPreservation::IsInvalidIndex(const char* buffer, uint32_t size) const
+    {
+        if (size > (sizeof("<!DOCTYPE ") + sizeof("lalala<BR/>invalid index !<BR/>")))
+            return strstr(buffer + sizeof("<!DOCTYPE "), "lalala<BR/>invalid index !<BR/>");
+        return false;
     }
 }
 // namespace rePlayer

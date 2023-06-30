@@ -53,6 +53,7 @@ namespace rePlayer
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;
         Collector Collect(uint32_t artistID) const;
+        bool IsInvalidIndex(const char* buffer, uint32_t size) const;
 
     private:
         Array<SongSource> m_songs;
