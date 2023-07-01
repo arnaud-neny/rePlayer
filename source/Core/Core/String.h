@@ -4,6 +4,9 @@
 #include <ImGui/stb_sprintf.h>
 #include <string>
 
+#define STRINGIZE(s) #s
+#define TOSTRING(s) STRINGIZE(s)
+
 namespace core
 {
     template <uint32_t N, typename... Arguments>
