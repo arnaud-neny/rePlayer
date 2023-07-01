@@ -4,6 +4,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 
+#include <Core/String.h>
 #include <Imgui.h>
 #include <ImGui/ImGuiFileDialog.h>
 #include <Xml/tinyxml2.h>
@@ -13,6 +14,9 @@
 
 // libarchive
 #include <libarchive/archive.h>
+
+// TagLib
+#include <toolkit/taglib.h>
 
 // tidy
 #include <Tidy/tidy.h>
@@ -73,7 +77,7 @@ namespace rePlayer
         ImGui::Bullet();
         ImGui::TextUnformatted("libarchive " ARCHIVE_VERSION_ONLY_STRING);
         ImGui::Bullet();
-        ImGui::TextUnformatted("TagLib 1.13");
+        ImGui::TextUnformatted("TagLib " TOSTRING(TAGLIB_MAJOR_VERSION) "." TOSTRING(TAGLIB_MINOR_VERSION) "." TOSTRING(TAGLIB_PATCH_VERSION));
         ImGui::Bullet();
         ImGui::TextUnformatted("dllloader\n"
             "Copyright (c) 2012-2022 Scott Chacon and others");
