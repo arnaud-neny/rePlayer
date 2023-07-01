@@ -231,6 +231,9 @@
     <ClCompile Include="taglib\xm\xmfile.cpp" />
     <ClCompile Include="taglib\xm\xmproperties.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

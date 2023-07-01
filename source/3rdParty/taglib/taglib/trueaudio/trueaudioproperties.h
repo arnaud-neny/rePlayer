@@ -36,8 +36,6 @@ namespace TagLib {
 
   namespace TrueAudio {
 
-    class File;
-
     static const unsigned int HeaderSize = 18;
 
     //! An implementation of audio property reading for TrueAudio
@@ -127,7 +125,7 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-  }
-}
+  }  // namespace TrueAudio
+}  // namespace TagLib
 
 #endif
