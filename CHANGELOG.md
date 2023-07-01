@@ -1,3 +1,8 @@
+v0.8.0:
+- Added ZXTune
+- Updated TagLib to 1.13.1
+- Bug fixes
+
 v0.7.1:
 - Added Buzzic 2
 - Updated OpenMPT to 0.7.2
@@ -29,8 +34,8 @@ v0.5.2:
 - Updated modland to import Ultra64 Sound Format
 - Updated modland to import packaged Delitracker Custom Format
 - Updated libcurl to 8.1.2
-- add missing Tim Follin extension (.tf)
-- add missing Delitracker Custom extension (.cust)
+- Added missing Tim Follin extension (.tf)
+- Added missing Delitracker Custom extension (.cust)
 - Bug fixes
 
 v0.4.1:

@@ -142,6 +142,7 @@ Here are the actual web sites you can import from (and thank you for all these r
 - [Modland](http://modland.com/pub/modules): a multi-formats repository organized by format.
 - [High Voltage SID Collection](https://hvsc.de): an exclusive Commodore 64 repository.
 - [SNDH](https://sndh.atari.org): Atari ST YM2149 archive.
+- [ASMA](https://asma.atari.org/): Atari SAP Music Archive.
 
 You can chat about some of these on the [Demozoo](https://discord.io/demozoo) discord server in the modland channel.
 
@@ -197,3 +198,4 @@ Or add some comments (and likes) there:
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
 - [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
+- [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already own libraries).
