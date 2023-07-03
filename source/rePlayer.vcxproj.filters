@@ -158,6 +158,9 @@
     <ClCompile Include="RePlayer\Export.cpp">
       <Filter>Source Files\RePlayer</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Sources\ZXArt.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -336,6 +339,9 @@
     </ClInclude>
     <ClInclude Include="RePlayer\Export.h">
       <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\ZXArt.h">
+      <Filter>Source Files\Library\Sources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

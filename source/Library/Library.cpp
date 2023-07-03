@@ -24,6 +24,7 @@
 #include <Library/Sources/Modland.h>
 #include <Library/Sources/SNDH.h>
 #include <Library/Sources/TheModArchive.h>
+#include <Library/Sources/ZXArt.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 
@@ -50,6 +51,7 @@ namespace rePlayer
         m_sources[SourceID::HighVoltageSIDCollectionID] = new SourceHighVoltageSIDCollection();
         m_sources[SourceID::SNDHID] = new SourceSNDH();
         m_sources[SourceID::AtariSAPMusicArchiveID] = new SourceAtariSAPMusicArchive();
+        m_sources[SourceID::ZXArtID] = new SourceZXArt();
 
         Load();
 

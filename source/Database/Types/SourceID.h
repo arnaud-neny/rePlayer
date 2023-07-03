@@ -15,6 +15,7 @@ namespace rePlayer
             HighVoltageSIDCollectionID = 4,
             SNDHID = 5,
             AtariSAPMusicArchiveID = 6,
+            ZXArtID = 7,
 
             NumSourceIDs
         };
@@ -34,7 +35,7 @@ namespace rePlayer
             };
         };
 
-        static const char* const sourceNames[NumSourceIDs];
+        static const char* const sourceNames[];
     };
 
     static constexpr SourceID kInvalidSourceID = { SourceID::AmigaMusicPreservationSourceID, 0 };

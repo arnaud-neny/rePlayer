@@ -46,12 +46,12 @@ namespace rePlayer
         ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2023 Arnaud Nény (aka replay/Razor1911)"));
 
         ImGui::TextUnformatted("\nSupported databases:");
-        for (auto* source : SourceID::sourceNames)
+        for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
         {
-            if (source != SourceID::sourceNames[SourceID::FileImportID])
+            if (i != SourceID::FileImportID)
             {
                 ImGui::Bullet();
-                ImGui::TextUnformatted(source);
+                ImGui::TextUnformatted(SourceID::sourceNames[i]);
             }
         }
 
