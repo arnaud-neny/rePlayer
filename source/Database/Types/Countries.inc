@@ -1,5 +1,5 @@
 COUNTRY(65535, "Unknown", "--", "---")
-//https://github.com/stefangabos/world_countries/blob/master/data/en/world.sql
+// https://github.com/stefangabos/world_countries/blob/master/data/countries/_combined/world.csv
 COUNTRY(4, "Afghanistan", "af", "afg")
 COUNTRY(248, "Åland Islands", "ax", "ala")
 COUNTRY(8, "Albania", "al", "alb")
@@ -147,7 +147,9 @@ COUNTRY(480, "Mauritius", "mu", "mus")
 COUNTRY(175, "Mayotte", "yt", "myt")
 COUNTRY(484, "Mexico", "mx", "mex")
 COUNTRY(583, "Micronesia (Federated States of)", "fm", "fsm")
+COUNTRY(498, "Moldova", "md", "mda")
 COUNTRY(498, "Moldova, Republic of", "md", "mda")
+COUNTRY(497, "Transnistria", "md", "mda")
 COUNTRY(492, "Monaco", "mc", "mco")
 COUNTRY(496, "Mongolia", "mn", "mng")
 COUNTRY(499, "Montenegro", "me", "mne")
@@ -242,6 +244,7 @@ COUNTRY(826, "United Kingdom", "gb", "gbr")
 COUNTRY(827, "Scotland", "gb", "gbr")//fake iso: I incremented the previous iso
 COUNTRY(828, "Isle of Wight", "im", "imn")//fake iso: I incremented the previous iso
 COUNTRY(840, "USA", "us", "usa")
+COUNTRY(840, "United States", "us", "usa")
 COUNTRY(840, "United States of America", "us", "usa")
 COUNTRY(581, "United States Minor Outlying Islands", "um", "umi")
 COUNTRY(858, "Uruguay", "uy", "ury")
