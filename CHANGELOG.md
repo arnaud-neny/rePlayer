@@ -1,5 +1,6 @@
-v0.8.0:
+v0.8.1:
 - Added ZXTune
+- Added ZX-Art import
 - Updated TagLib to 1.13.1
 - Bug fixes
 

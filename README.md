@@ -142,7 +142,8 @@ Here are the actual web sites you can import from (and thank you for all these r
 - [Modland](http://modland.com/pub/modules): a multi-formats repository organized by format.
 - [High Voltage SID Collection](https://hvsc.de): an exclusive Commodore 64 repository.
 - [SNDH](https://sndh.atari.org): Atari ST YM2149 archive.
-- [ASMA](https://asma.atari.org/): Atari SAP Music Archive.
+- [ASMA](https://asma.atari.org): Atari SAP Music Archive.
+- [ZX-Art](https://zxart.ee): Large collection of 8-bit ZX Spectrum software, games, demoscene, chiptune music and pixel art graphics, sorted by demoparties, authors and years.
 
 You can chat about some of these on the [Demozoo](https://discord.io/demozoo) discord server in the modland channel.
 
