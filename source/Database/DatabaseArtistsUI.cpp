@@ -112,7 +112,7 @@ namespace rePlayer
                         ImGui::TableNextColumn();
                         ImGui::PushID(static_cast<int>(artistId));
                         bool isSelected = selectedArtist != nullptr && artistId == selectedArtist->GetId();
-                        if (isSelected = ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//TBD: using imgui_internal for row height
+                        if (isSelected = ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//TBD: using imgui_internal for row height
                         {
                             selectedArtist = artist;
                             if (m_selectedArtistCopy.id != artistId)

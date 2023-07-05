@@ -713,7 +713,7 @@ namespace rePlayer
                         else if (!song->IsSubsongPlayed(subsongId.index))
                             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.25f, 0.25f, 0.25f, 1.0f) : ImVec4(0.25f, 0.25f, 0.25f, 0.93f)));
 
-                        ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick;
+                        ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick;
                         if (ImGui::Selectable("##select", curEntry.isSelected, selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//TBD: using imgui_internal for row height
                         {
                             Core::GetSongEditor().OnSongSelected(curEntry);
@@ -1356,7 +1356,7 @@ namespace rePlayer
                 {
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    if (ImGui::Selectable(summary.name.data(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
+                    if (ImGui::Selectable(summary.name.data(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap))
                     {
                         auto file = io::File::OpenForRead(GetPlaylistFilename(summary.name).c_str());
                         if (file.IsValid())

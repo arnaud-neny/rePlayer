@@ -125,7 +125,7 @@ namespace rePlayer
                         // title + check box + child
                         ImGui::TableNextColumn();
                         ImGui::AlignTextToFramePadding(); // to avoid different height per lines between text only and widgets (check box)
-                        if (ImGui::Selectable("##selected", m_entries[rowIdx].isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_DontClosePopups))
+                        if (ImGui::Selectable("##selected", m_entries[rowIdx].isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_DontClosePopups))
                         {
                             if (ImGui::IsMouseDoubleClicked(0))
                             {

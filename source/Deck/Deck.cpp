@@ -763,7 +763,7 @@ namespace rePlayer
             const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
             ImGui::ItemSize(size);
             ImGui::ItemAdd(bb, 0);
-            isHoovered = ImGui::ItemHoverable(bb, 0);
+            isHoovered = ImGui::ItemHoverable(bb, 0, 0);
         }
 
         const ImVec2 p0 = ImGui::GetItemRectMin();
@@ -814,7 +814,7 @@ namespace rePlayer
             const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
             ImGui::ItemSize(size);
             ImGui::ItemAdd(bb, 0);
-            isHoovered = ImGui::ItemHoverable(bb, 0);
+            isHoovered = ImGui::ItemHoverable(bb, 0, 0);
         }
 
         const ImVec2 p0 = ImGui::GetItemRectMin();

@@ -252,7 +252,7 @@ namespace rePlayer
                 {
                     ImGui::PushID(i);
                     auto isSelected = m_selectedSubsong == i;
-                    if (ImGui::Selectable("##SelectSubsong", isSelected, ImGuiSelectableFlags_AllowItemOverlap))
+                    if (ImGui::Selectable("##SelectSubsong", isSelected, ImGuiSelectableFlags_AllowOverlap))
                         m_selectedSubsong = i;
                     if (isSelected)
                         ImGui::SetItemDefaultFocus();

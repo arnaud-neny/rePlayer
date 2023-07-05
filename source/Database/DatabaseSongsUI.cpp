@@ -602,7 +602,7 @@ namespace rePlayer
     {
         // Update the selection
         bool isSelected = m_entries[rowIdx].isSelected;
-        if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//tbd: using imgui_internal for row height
+        if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//tbd: using imgui_internal for row height
             isSelected = Select(rowIdx, musicId, isSelected);
         // Open song editor with middle button
         if (ImGui::IsItemClicked(ImGuiMouseButton_Middle))

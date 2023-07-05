@@ -598,7 +598,7 @@ namespace rePlayer
                     ImGui::PushID(artist.id.value);
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    if (ImGui::Selectable("##select", state.isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
+                    if (ImGui::Selectable("##select", state.isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap))
                     {
                         if (ImGui::GetIO().KeyShift)
                         {
@@ -827,7 +827,7 @@ namespace rePlayer
 
                     ImGui::TableNextColumn();
                     bool isSelected = m_imports.selected[songIndex];
-                    if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
+                    if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap))
                     {
                         if (ImGui::GetIO().KeyShift)
                         {
