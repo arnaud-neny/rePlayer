@@ -199,4 +199,4 @@ Or add some comments (and likes) there:
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
 - [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
-- [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already own libraries).
+- [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).

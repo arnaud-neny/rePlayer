@@ -1,7 +1,9 @@
-v0.8.1:
+v0.8.2:
 - Added ZXTune
 - Added ZX-Art import
+- Updated ZXTune to r5040
 - Updated TagLib to 1.13.1
+- Updated ImGui to 1.89.71
 - Bug fixes
 
 v0.7.1:
