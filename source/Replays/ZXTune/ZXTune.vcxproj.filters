@@ -13637,6 +13637,15 @@
     <ClInclude Include="src\platform\version\src\x86.h">
       <Filter>Source Files\src\platform\version\src</Filter>
     </ClInclude>
+    <ClInclude Include="src\strings\casing.h">
+      <Filter>Source Files\src\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="src\strings\join.h">
+      <Filter>Source Files\src\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="src\strings\split.h">
+      <Filter>Source Files\src\strings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayZXTune.cpp">
@@ -14797,6 +14806,9 @@
     <ClCompile Include="src\platform\version\src\version.cpp">
       <Filter>Source Files\src\platform\version\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\strings\src\casing.cpp">
+      <Filter>Source Files\src\strings\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\strings\src\sjis2unicode.inc">
@@ -14804,9 +14816,6 @@
     </None>
     <None Include="src\module\players\Makefile">
       <Filter>Source Files\src\module\players</Filter>
-    </None>
-    <None Include="3rdparty\z80ex\include\z80ex_common.patch">
-      <Filter>Source Files\3rdparty\z80ex\include</Filter>
     </None>
     <None Include="3rdparty\lhasa\lib\public\Makefile.am">
       <Filter>Source Files\3rdparty\lhasa\lib\public</Filter>

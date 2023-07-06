@@ -10,8 +10,32 @@
 
 #pragma once
 
+// common includes
+#include <types.h>
+
+// rePlayer beging
+#ifdef OUT
+#   undef OUT
+#endif
+// rePlayer end
+
 namespace ZXTune
 {
+  class PluginId : public StringView
+  {
+    constexpr PluginId(const char* str, std::size_t size)
+      : StringView(str, size)
+    {}
+
+  public:
+    friend constexpr PluginId operator""_id(const char*, std::size_t) noexcept;
+  };
+
+  constexpr PluginId operator"" _id(const char* str, std::size_t size) noexcept
+  {
+    return {str, size};
+  }
+
   /*
     Type - Module - Device type - AY38910
          |        |             - Turbosound

@@ -47,6 +47,9 @@ namespace Module::Xmp
       ::xmp_free_context(Data);
     }
 
+    BaseContext(const BaseContext& rh) = delete;
+    BaseContext& operator=(const BaseContext& rh) = delete;
+
     void Call(void (*func)(xmp_context))
     {
       func(Data);
@@ -82,9 +85,6 @@ namespace Module::Xmp
     }
 
   private:
-    BaseContext(const BaseContext& rh);
-    void operator=(const BaseContext& rh);
-
     static void CheckError(int code)
     {
       // TODO
@@ -98,7 +98,7 @@ namespace Module::Xmp
   class Context : public BaseContext
   {
   public:
-    typedef std::shared_ptr<Context> Ptr;
+    using Ptr = std::shared_ptr<Context>;
 
     Context(const Binary::Container& rawData, const struct format_loader* loader)
     {
@@ -117,10 +117,10 @@ namespace Module::Xmp
   class Information : public Module::TrackInformation
   {
   public:
-    typedef std::shared_ptr<const Information> Ptr;
+    using Ptr = std::shared_ptr<const Information>;
 
     Information(xmp_module module, DurationType duration)
-      : Info(std::move(module))
+      : Info(module)
       , TotalDuration(duration)
     {}
 
@@ -154,7 +154,7 @@ namespace Module::Xmp
     const DurationType TotalDuration;
   };
 
-  typedef std::shared_ptr<xmp_frame_info> StatePtr;
+  using StatePtr = std::shared_ptr<xmp_frame_info>;
 
   class TrackState : public Module::TrackState
   {
@@ -228,7 +228,7 @@ namespace Module::Xmp
   class Renderer : public Module::Renderer
   {
   public:
-    Renderer(uint_t channels, Context::Ptr ctx, uint_t samplerate, Parameters::Accessor::Ptr params)
+    Renderer(uint_t /*channels*/, Context::Ptr ctx, uint_t samplerate, Parameters::Accessor::Ptr params)
       : Ctx(std::move(ctx))
       , State(new xmp_frame_info())
       , Params(std::move(params))
@@ -339,7 +339,7 @@ namespace Module::Xmp
 
   struct PluginDescription
   {
-    const char* const Id;
+    const ZXTune::PluginId Id;
     const StringView Format;
     const struct format_loader* const Loader;
   };
@@ -442,14 +442,16 @@ namespace Module::Xmp
     const PluginDescription& Desc;
   };
 
+  using ZXTune::operator""_id;
+
   // clang-format off
   const PluginDescription PLUGINS[] =
   {
-    //{"ARCH", &arch_loader},
-    //{"COCO", &coco_loader},
+    //{"ARCH"_id, &arch_loader},
+    //{"COCO"_id, &coco_loader},
     //Desktop Tracker
     {
-      "DTT"
+      "DTT"_id
       ,
       "'D's'k'T"_sv
       ,
@@ -457,7 +459,7 @@ namespace Module::Xmp
     },
     //Quadra Composer
     {
-      "EMOD"
+      "EMOD"_id
       ,
       "'F'O'R'M"
       "????"
@@ -468,7 +470,7 @@ namespace Module::Xmp
     },
     //Funktracker
     {
-      "FNK"
+      "FNK"_id
       ,
       "'F'u'n'k"
       "?"
@@ -481,7 +483,7 @@ namespace Module::Xmp
     },
     //Graoumf Tracker
     {
-      "GTK"
+      "GTK"_id
       ,
       "'G'T'K"
       "00-03"
@@ -491,7 +493,7 @@ namespace Module::Xmp
     },
     //Images Music System
     {
-      "IMS"
+      "IMS"_id
       ,
       "?{20}"
       "("                  //instruments
@@ -513,7 +515,7 @@ namespace Module::Xmp
     },
     //Liquid Tracker
     {
-      "LIQ"
+      "LIQ"_id
       ,
       "'L'i'q'u'i'd' 'M'o'd'u'l'e':"
       ""_sv
@@ -522,7 +524,7 @@ namespace Module::Xmp
     },
     //MED 1.12 MED2
     {
-      "MED"
+      "MED"_id
       ,
       "'M'E'D"
       "02"
@@ -532,7 +534,7 @@ namespace Module::Xmp
     },
     //MED 2.00 MED3
     {
-      "MED"
+      "MED"_id
       ,
       "'M'E'D"
       "03"
@@ -541,7 +543,7 @@ namespace Module::Xmp
       &med3_loader
     },
     {
-      "MED"
+      "MED"_id
       ,
       "'M'E'D"
       "04"
@@ -549,11 +551,11 @@ namespace Module::Xmp
       ,
       &med4_loader
     },
-    //{"MFP", &mfp_loader},//requires additional files
-    //{"MGT", &mgt_loader},experimental
+    //{"MFP"_id, &mfp_loader},//requires additional files
+    //{"MGT"_id, &mgt_loader},experimental
     //Liquid Tracker NO
     {
-      "LIQ"
+      "LIQ"_id
       ,
       "'N'O"
       "0000"
@@ -561,11 +563,11 @@ namespace Module::Xmp
       ,
       &no_loader
     },
-    //{"MOD", &polly_loader},//rle packed, too weak structure
-    //{"MOD", &pw_loader},//requires depacking
+    //{"MOD"_id, &polly_loader},//rle packed, too weak structure
+    //{"MOD"_id, &pw_loader},//requires depacking
     //Real Tracker
     {
-      "RTM"
+      "RTM"_id
       ,
       "'R'T'M'M"
       "20"
@@ -573,10 +575,10 @@ namespace Module::Xmp
       ,
       &rtm_loader
     },
-    //{"MTP", &mtp_loader},//experimental
+    //{"MTP"_id, &mtp_loader},//experimental
     //Slamtilt
     {
-      "STIM"
+      "STIM"_id
       ,
       "'S'T'I'M"         //signature
       "00???"            //BE samples offsets (assume 16Mb is enough)
@@ -590,7 +592,7 @@ namespace Module::Xmp
     },
     //STMIK 0.2
     {
-      "STX"
+      "STX"_id
       ,
       "?{20}"
       "('!|'B)"
@@ -609,10 +611,10 @@ namespace Module::Xmp
       ,
       &stx_loader
     },
-    //{"SYM", &sym_loader},
+    //{"SYM"_id, &sym_loader},
     //TCB Tracker
     {
-      "TCB"
+      "TCB"_id
       ,
       "'A'N' 'C'O'O'L('.|'!)"
       ""_sv

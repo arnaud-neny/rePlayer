@@ -21,6 +21,7 @@
 // library includes
 #include <binary/format_factories.h>
 #include <debug/log.h>
+#include <strings/casing.h>
 #include <strings/format.h>
 #include <strings/optimize.h>
 #include <strings/trim.h>
@@ -28,8 +29,6 @@
 #include <array>
 #include <cctype>
 #include <cstring>
-// boost includes
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace Formats::Chiptune
 {
@@ -85,8 +84,6 @@ namespace Formats::Chiptune
     const uint8_t PSC_ID_0[] = {'P', 'S', 'C', ' ', 'V'};
     const uint8_t PSC_ID_1[] = {' ', 'C', 'O', 'M', 'P', 'I', 'L', 'A', 'T', 'I', 'O', 'N', ' ', 'O', 'F', ' '};
 
-    const Char BY_DELIMITER[] = {'B', 'Y', 0};
-
     struct RawId
     {
       uint8_t Identifier1[5];       //'PSC V'
@@ -106,13 +103,14 @@ namespace Formats::Chiptune
 
       bool HasAuthor() const
       {
+        const auto BY_DELIMITER = "BY"_sv;
         const auto trimId = Strings::TrimSpaces(Identifier3);
-        return boost::algorithm::iequals(trimId, BY_DELIMITER);
+        return Strings::EqualNoCaseAscii(trimId, BY_DELIMITER);
       }
 
       uint_t GetVersion() const
       {
-        if (std::isdigit(uint8_t(Version[0])) && Version[1] == '.' && std::isdigit(uint8_t(Version[2])) && std::isdigit(uint8_t(Version[3]))) // rePlayer
+        if (std::isdigit(Version[0]) && Version[1] == '.' && std::isdigit(Version[2]) && std::isdigit(Version[3]))
         {
           return 100 * (Version[0] - '0') + 10 * (Version[2] - '0') + (Version[3] - '0');
         }
@@ -508,9 +506,8 @@ namespace Formats::Chiptune
 
     Traits GetOldVersionTraits(const RawHeader& hdr)
     {
-      const String programName = hdr.Id.Check() ? Strings::Format(EDITOR, StringView(hdr.Id.Version)) : EDITOR_OLD;
-      const Traits res = {programName, 0, 0};
-      return res;
+      String programName = hdr.Id.Check() ? Strings::Format(EDITOR, StringView(hdr.Id.Version)) : EDITOR_OLD;
+      return {std::move(programName), 0, 0};
     }
 
     Traits GetNewVersionTraits(const RawHeader& hdr)
@@ -537,7 +534,8 @@ namespace Formats::Chiptune
     public:
       uint_t Add(const RawPattern& pat)
       {
-        const auto begin = Container.begin(), end = Container.end();
+        const auto begin = Container.begin();
+        const auto end = Container.end();
         const auto it = std::find_if(
             begin, end, [&pat](const RawPattern& rh) { return pat.Size == rh.Size && pat.Offsets == rh.Offsets; });
         if (it != end)
@@ -551,13 +549,13 @@ namespace Formats::Chiptune
         return newIdx;
       }
 
-      typedef std::vector<RawPattern> ContainerType;
+      using ContainerType = std::vector<RawPattern>;
 
-      typedef RangeIterator<ContainerType::const_iterator> Iterator;
+      using Iterator = RangeIterator<ContainerType::const_iterator>;
 
       Iterator Get() const
       {
-        return Iterator(Container.begin(), Container.end());
+        return {Container.begin(), Container.end()};
       }
 
     private:
@@ -726,15 +724,11 @@ namespace Formats::Chiptune
       {
         struct ChannelState
         {
-          std::size_t Offset;
-          uint_t Period;
-          uint_t Counter;
+          std::size_t Offset = 0;
+          uint_t Period = 0;
+          uint_t Counter = 0;
 
-          ChannelState()
-            : Offset()
-            , Period()
-            , Counter()
-          {}
+          ChannelState() = default;
 
           void Skip(uint_t toSkip)
           {
@@ -750,7 +744,6 @@ namespace Formats::Chiptune
         std::array<ChannelState, 3> Channels;
 
         explicit ParserState(const DataCursors& src)
-          : Channels()
         {
           for (std::size_t idx = 0; idx != src.size(); ++idx)
           {
@@ -924,7 +917,7 @@ namespace Formats::Chiptune
 
       Sample ParseSample(std::size_t offset) const
       {
-        const RawSample& src = GetObject<RawSample>(offset);
+        const auto& src = GetObject<RawSample>(offset);
         Sample result;
         const std::size_t availSize = (Data.Size() - offset) / sizeof(RawSample::Line);
         for (std::size_t idx = 0, lim = std::min(availSize, MAX_SAMPLE_SIZE); idx != lim; ++idx)
@@ -958,7 +951,7 @@ namespace Formats::Chiptune
 
       Ornament ParseOrnament(std::size_t offset) const
       {
-        const RawOrnament& src = GetObject<RawOrnament>(offset);
+        const auto& src = GetObject<RawOrnament>(offset);
         Ornament result;
         const std::size_t availSize = (Data.Size() - offset) / sizeof(RawOrnament::Line);
         for (std::size_t idx = 0, lim = std::min(availSize, MAX_ORNAMENT_SIZE); idx != lim; ++idx)
@@ -1055,11 +1048,7 @@ namespace Formats::Chiptune
           return false;
         }
         const std::size_t samplesSize = GetAreaSize(SAMPLES);
-        if (samplesSize == Undefined || samplesSize < sizeof(RawSample))
-        {
-          return false;
-        }
-        return true;
+        return samplesSize != Undefined && samplesSize >= sizeof(RawSample);
       }
 
       bool CheckOrnaments() const
@@ -1070,11 +1059,7 @@ namespace Formats::Chiptune
           return false;
         }
         const std::size_t samplesSize = GetAreaSize(ORNAMENTS);
-        if (samplesSize == Undefined || samplesSize < sizeof(RawOrnament))
-        {
-          return false;
-        }
-        return true;
+        return samplesSize != Undefined && samplesSize >= sizeof(RawOrnament);
       }
 
       bool CheckPositions() const

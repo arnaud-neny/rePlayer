@@ -130,7 +130,7 @@ namespace Formats::Archived
     public:
       virtual ~Visitor() = default;
 
-      virtual void OnFile(const String& name, std::size_t offset, std::size_t size) = 0;
+      virtual void OnFile(StringView name, std::size_t offset, std::size_t size) = 0;
     };
 
     std::size_t Parse(Binary::View data, Visitor& visitor)
@@ -215,10 +215,10 @@ namespace Formats::Archived
         : Builder(builder)
       {}
 
-      void OnFile(const String& filename, std::size_t offset, std::size_t size) override
+      void OnFile(StringView filename, std::size_t offset, std::size_t size) override
       {
-        const TRDos::File::Ptr file = TRDos::File::CreateReference(filename, offset, size);
-        Builder.AddFile(file);
+        auto file = TRDos::File::CreateReference(filename, offset, size);
+        Builder.AddFile(std::move(file));
       }
 
     private:
@@ -248,7 +248,7 @@ namespace Formats::Archived
       const Binary::View data(rawData);
       if (!Format->Match(data))
       {
-        return Container::Ptr();
+        return {};
       }
       const auto builder = TRDos::CatalogueBuilder::CreateFlat();
       TRD::BuildVisitorAdapter visitor(*builder);
@@ -257,7 +257,7 @@ namespace Formats::Archived
         builder->SetRawData(rawData.GetSubcontainer(0, size));
         return builder->GetResult();
       }
-      return Container::Ptr();
+      return {};
     }
 
   private:

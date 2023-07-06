@@ -15,7 +15,6 @@
 // common includes
 #include <make_ptr.h>
 // library includes
-#include <binary/container_factories.h>
 #include <binary/format_factories.h>
 #include <binary/input_stream.h>
 #include <debug/log.h>
@@ -54,7 +53,7 @@ namespace Formats::Packed
 
       bool FastCheck() const
       {
-        if (std::size_t usedSize = GetUsedSize())
+        if (const auto usedSize = GetUsedSize())
         {
           return usedSize <= Data.Size();
         }
@@ -115,7 +114,7 @@ namespace Formats::Packed
     class CompressedFile
     {
     public:
-      typedef std::unique_ptr<const CompressedFile> Ptr;
+      using Ptr = std::unique_ptr<const CompressedFile>;
       virtual ~CompressedFile() = default;
 
       virtual Binary::Container::Ptr Decompress(const Container& container) const = 0;
@@ -133,7 +132,7 @@ namespace Formats::Packed
         if (data->Size() != outSize)
         {
           Dbg("Stored file sizes mismatch");
-          return Binary::Container::Ptr();
+          return {};
         }
         else
         {
@@ -175,20 +174,20 @@ namespace Formats::Packed
       {
         try
         {
-          std::unique_ptr<Binary::Dump> result(new Binary::Dump(outSize));
-          Stream.SetUnpackToMemory(result->data(), outSize);
+          Binary::DataBuilder result(outSize);
+          Stream.SetUnpackToMemory(static_cast<byte*>(result.Allocate(outSize)), outSize);
           Decoder.SetDestSize(outSize);
           Decoder.DoUnpack(method, isSolid);
           if (crc != Stream.GetUnpackedCrc())
           {
             Dbg("Crc mismatch: stored 0x{:08x}, calculated 0x{:08x}", crc, Stream.GetUnpackedCrc());
           }
-          return Binary::CreateContainer(std::move(result));
+          return result.CaptureResult();
         }
         catch (const std::exception& e)
         {
           Dbg("Failed to decode: {}", e.what());
-          return Binary::Container::Ptr();
+          return {};
         }
       }
 
@@ -225,9 +224,9 @@ namespace Formats::Packed
 
     String FileBlockHeader::GetName() const
     {
-      const uint8_t* const self = safe_ptr_cast<const uint8_t*>(this);
+      const auto* const self = safe_ptr_cast<const uint8_t*>(this);
       const uint8_t* const filename = self + (IsBigFile() ? sizeof(BigFileBlockHeader) : sizeof(FileBlockHeader));
-      return String(filename, filename + NameSize);
+      return {filename, filename + NameSize};
     }
 
     bool FileBlockHeader::IsValid() const
@@ -295,7 +294,7 @@ namespace Formats::Packed
       const Rar::Container container(rawData);
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       return CreateContainer(Decoder->Decompress(container), container.GetUsedSize());
     }

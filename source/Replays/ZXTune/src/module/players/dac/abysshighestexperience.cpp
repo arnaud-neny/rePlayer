@@ -15,6 +15,7 @@
 #include <make_ptr.h>
 #include <pointers.h>
 // library includes
+#include <binary/container_factories.h>
 #include <debug/log.h>
 #include <formats/chiptune/digital/abysshighestexperience.h>
 #include <module/players/platforms.h>
@@ -28,7 +29,7 @@ namespace Module::AHX
 {
   const Debug::Stream Dbg("Core::AHXSupp");
 
-  typedef std::shared_ptr<hvl_tune> HvlPtr;
+  using HvlPtr = std::shared_ptr<hvl_tune>;
 
   enum StereoSeparation
   {
@@ -44,9 +45,9 @@ namespace Module::AHX
       hvl_InitReplayer();
       initialized = true;
     }
-    const HvlPtr result =
+    auto result =
         HvlPtr(hvl_ParseTune(static_cast<const uint8*>(data.Start()), data.Size(), samplerate, MONO), &hvl_FreeTune);
-    Require(result.get() != nullptr);
+    Require(result != nullptr);
     return result;
   }
 
@@ -120,15 +121,8 @@ namespace Module::AHX
 
     Time::AtMillisecond At() const override
     {
-      if (Hvl->ht_SongEndReached)
-      {
-        // TODO: investigate
-        return Time::AtMillisecond() + Total();
-      }
-      else
-      {
-        return Time::AtMillisecond() + Total();
-      }
+      // TODO: investigate for Hvl->ht_SongEndReached
+      return Time::AtMillisecond() + Total();
     }
 
     Time::Milliseconds Total() const override
@@ -183,7 +177,7 @@ namespace Module::AHX
   class HVL
   {
   public:
-    typedef std::shared_ptr<HVL> Ptr;
+    using Ptr = std::shared_ptr<HVL>;
 
     HVL(Binary::View data, uint_t samplerate)
       : Hvl(LoadModule(data, samplerate))
@@ -272,7 +266,7 @@ namespace Module::AHX
   class Holder : public Module::Holder
   {
   public:
-    Holder(Binary::Dump tune, Parameters::Accessor::Ptr props)
+    Holder(Binary::Data::Ptr tune, Parameters::Accessor::Ptr props)
       : Tune(std::move(tune))
       , Properties(std::move(props))
     {}
@@ -281,7 +275,7 @@ namespace Module::AHX
     {
       if (!Info)
       {
-        Info = MakePtr<TrackInformation>(Tune);
+        Info = MakePtr<TrackInformation>(*Tune);
       }
       return Info;
     }
@@ -293,11 +287,11 @@ namespace Module::AHX
 
     Renderer::Ptr CreateRenderer(uint_t samplerate, Parameters::Accessor::Ptr /*params*/) const override
     {
-      return MakePtr<Renderer>(MakePtr<HVL>(Tune, samplerate));
+      return MakePtr<Renderer>(MakePtr<HVL>(*Tune, samplerate));
     }
 
   private:
-    const Binary::Dump Tune;
+    const Binary::Data::Ptr Tune;
     const Parameters::Accessor::Ptr Properties;
     mutable Information::Ptr Info;
   };
@@ -337,9 +331,7 @@ namespace Module::AHX
           props.SetSource(*container);
           props.SetPlatform(Platforms::AMIGA);
 
-          // TODO: extract
-          const auto rawData = static_cast<const uint8_t*>(container->Start());
-          Binary::Dump tune(rawData, rawData + container->Size());
+          auto tune = Binary::CreateContainer(Binary::View(*container));
           return MakePtr<Holder>(std::move(tune), std::move(properties));
         }
       }
@@ -347,7 +339,7 @@ namespace Module::AHX
       {
         Dbg("Failed to create AHX: {}", e.what());
       }
-      return Module::Holder::Ptr();
+      return {};
     }
 
   private:

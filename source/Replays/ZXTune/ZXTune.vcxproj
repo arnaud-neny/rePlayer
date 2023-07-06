@@ -4327,15 +4327,18 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="src\sound\service.h" />
     <ClInclude Include="src\sound\sound_parameters.h" />
     <ClInclude Include="src\strings\array.h" />
+    <ClInclude Include="src\strings\casing.h" />
     <ClInclude Include="src\strings\conversion.h" />
     <ClInclude Include="src\strings\encoding.h" />
     <ClInclude Include="src\strings\fields.h" />
     <ClInclude Include="src\strings\fields_filter.h" />
     <ClInclude Include="src\strings\format.h" />
+    <ClInclude Include="src\strings\join.h" />
     <ClInclude Include="src\strings\map.h" />
     <ClInclude Include="src\strings\optimize.h" />
     <ClInclude Include="src\strings\prefixed_index.h" />
     <ClInclude Include="src\strings\set.h" />
+    <ClInclude Include="src\strings\split.h" />
     <ClInclude Include="src\strings\src\utf8.h" />
     <ClInclude Include="src\strings\template.h" />
     <ClInclude Include="src\strings\trim.h" />
@@ -4919,6 +4922,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\strings\src\casing.cpp" />
     <ClCompile Include="src\strings\src\encoding.cpp" />
     <ClCompile Include="src\strings\src\format.cpp" />
     <ClCompile Include="src\strings\src\optimize.cpp" />
@@ -4931,7 +4935,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
   </ItemGroup>
   <ItemGroup>
     <None Include="3rdparty\lhasa\lib\public\Makefile.am" />
-    <None Include="3rdparty\z80ex\include\z80ex_common.patch" />
     <None Include="README.md" />
     <None Include="src\core\plugins\players\sid\basic.inc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

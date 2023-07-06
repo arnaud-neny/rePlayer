@@ -15,6 +15,7 @@
 #include <contract.h>
 #include <make_ptr.h>
 // library includes
+#include <binary/container_factories.h>
 #include <core/plugin_attrs.h>
 #include <core/plugins_parameters.h>
 #include <debug/log.h>
@@ -37,11 +38,11 @@ namespace Module::SPC
   {
     using Ptr = std::shared_ptr<const Model>;
 
-    const Binary::Dump Data;
+    const Binary::Data::Ptr Data;
     const Time::Milliseconds Duration;
 
-    Model(const Binary::Data& data, Time::Milliseconds duration)
-      : Data(static_cast<const uint8_t*>(data.Start()), static_cast<const uint8_t*>(data.Start()) + data.Size())
+    Model(Binary::View data, Time::Milliseconds duration)
+      : Data(Binary::CreateContainer(data))
       , Duration(duration)
     {}
   };
@@ -52,7 +53,7 @@ namespace Module::SPC
     static const uint_t C_7_FREQ = 2093;
 
   public:
-    typedef std::shared_ptr<SPC> Ptr;
+    using Ptr = std::shared_ptr<SPC>;
 
     explicit SPC(Binary::View data)
       : Data(data)
@@ -68,7 +69,7 @@ namespace Module::SPC
       Spc.clear_echo();
       Spc.disable_surround(true);
       Filter.clear();
-      Filter.set_gain(::SPC_Filter::gain_unit * 1.4);  // as in GME
+      Filter.set_gain(static_cast<int>(::SPC_Filter::gain_unit * 1.4));  // as in GME
     }
 
     Sound::Chunk Render(uint_t samples)
@@ -76,15 +77,16 @@ namespace Module::SPC
       static_assert(Sound::Sample::CHANNELS == 2, "Incompatible sound channels count");
       static_assert(Sound::Sample::BITS == 16, "Incompatible sound bits count");
       Sound::Chunk result(samples);
-      ::SNES_SPC::sample_t* const buffer = safe_ptr_cast< ::SNES_SPC::sample_t*>(result.data());
-      CheckError(Spc.play(samples * Sound::Sample::CHANNELS, buffer));
-      Filter.run(buffer, samples * Sound::Sample::CHANNELS);
+      auto* const buffer = safe_ptr_cast< ::SNES_SPC::sample_t*>(result.data());
+      const auto dataSize = static_cast<int>(samples * Sound::Sample::CHANNELS);
+      CheckError(Spc.play(dataSize, buffer));
+      Filter.run(buffer, dataSize);
       return result;
     }
 
     void Skip(uint_t samples)
     {
-      CheckError(Spc.skip(samples * Sound::Sample::CHANNELS));
+      CheckError(Spc.skip(static_cast<int>(samples * Sound::Sample::CHANNELS)));
     }
 
   private:
@@ -111,7 +113,7 @@ namespace Module::SPC
   public:
     Renderer(Model::Ptr tune, Sound::Converter::Ptr target)
       : Tune(std::move(tune))
-      , Engine(MakePtr<SPC>(Tune->Data))
+      , Engine(MakePtr<SPC>(*Tune->Data))
       , State(MakePtr<TimedState>(Tune->Duration))
       , Target(std::move(target))
     {}
@@ -123,7 +125,7 @@ namespace Module::SPC
 
     Sound::Chunk Render() override
     {
-      const auto avail = State->Consume(FRAME_DURATION);
+      const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Target->Apply(Engine->Render(GetSamples(avail)));
     }
 
@@ -185,47 +187,26 @@ namespace Module::SPC
   public:
     explicit DataBuilder(PropertiesHelper& props)
       : Properties(props)
+      , Meta(props)
     {}
+
+    Formats::Chiptune::MetaBuilder& GetMetaBuilder() override
+    {
+      return Meta;
+    }
 
     void SetRegisters(uint16_t /*pc*/, uint8_t /*a*/, uint8_t /*x*/, uint8_t /*y*/, uint8_t /*psw*/,
                       uint8_t /*sp*/) override
     {}
 
-    void SetTitle(String title) override
+    void SetDumper(StringView dumper) override
     {
-      if (Title.empty())
-      {
-        Properties.SetTitle(Title = std::move(title));
-      }
+      Meta.SetStrings({dumper.to_string()});
     }
 
-    void SetGame(String game) override
+    void SetDumpDate(StringView date) override
     {
-      if (Program.empty())
-      {
-        Properties.SetProgram(Program = std::move(game));
-      }
-    }
-
-    void SetDumper(String dumper) override
-    {
-      if (Author.empty())
-      {
-        Properties.SetAuthor(Author = std::move(dumper));
-      }
-    }
-
-    void SetComment(String comment) override
-    {
-      if (Comment.empty())
-      {
-        Properties.SetComment(Comment = std::move(comment));
-      }
-    }
-
-    void SetDumpDate(String date) override
-    {
-      Properties.SetDate(std::move(date));
+      Properties.SetDate(date);
     }
 
     void SetIntro(Time::Milliseconds duration) override
@@ -252,11 +233,6 @@ namespace Module::SPC
       }
     }
 
-    void SetArtist(String artist) override
-    {
-      Properties.SetAuthor(Author = std::move(artist));
-    }
-
     void SetRAM(Binary::View /*data*/) override {}
 
     void SetDSPRegisters(Binary::View /*data*/) override {}
@@ -270,10 +246,7 @@ namespace Module::SPC
 
   private:
     PropertiesHelper& Properties;
-    String Title;
-    String Program;
-    String Author;
-    String Comment;
+    MetaProperties Meta;
     Time::Milliseconds Intro;
     Time::Milliseconds Loop;
     Time::Milliseconds Fade;
@@ -317,12 +290,12 @@ namespace ZXTune
 {
   void RegisterSPCSupport(PlayerPluginsRegistrator& registrator)
   {
-    const Char ID[] = {'S', 'P', 'C', 0};
+    const auto ID = "SPC"_id;
     const uint_t CAPS = Capabilities::Module::Type::MEMORYDUMP | Capabilities::Module::Device::SPC700;
 
-    const Formats::Chiptune::Decoder::Ptr decoder = Formats::Chiptune::CreateSPCDecoder();
-    const Module::SPC::Factory::Ptr factory = MakePtr<Module::SPC::Factory>();
-    const PlayerPlugin::Ptr plugin = CreatePlayerPlugin(ID, CAPS, decoder, factory);
-    registrator.RegisterPlugin(plugin);
+    auto decoder = Formats::Chiptune::CreateSPCDecoder();
+    auto factory = MakePtr<Module::SPC::Factory>();
+    auto plugin = CreatePlayerPlugin(ID, CAPS, std::move(decoder), std::move(factory));
+    registrator.RegisterPlugin(std::move(plugin));
   }
 }  // namespace ZXTune

@@ -23,7 +23,6 @@
 #include <formats/packed.h>
 #include <math/numeric.h>
 // std includes
-#include <iterator> // rePlayer
 #include <numeric>
 
 namespace Formats::Packed
@@ -131,7 +130,7 @@ namespace Formats::Packed
       std::size_t GetUsedSizeWithPadding() const
       {
         const std::size_t usefulSize = GetUsedSize();
-        const std::size_t sizeOnDisk = Math::Align<std::size_t>(usefulSize, 256);
+        const auto sizeOnDisk = Math::Align<std::size_t>(usefulSize, 256);
         const std::size_t resultSize = std::min(sizeOnDisk, Size);
         const std::size_t paddingSize = resultSize - usefulSize;
         const std::size_t MIN_SIGNATURE_MATCH = 9;
@@ -210,8 +209,6 @@ namespace Formats::Packed
         : IsValid(container.FastCheck())
         , Header(container.GetHeader())
         , Stream(Header.BitStream, Header.SizeOfPacked - sizeof(Header.Padding7))
-        , Result(new Binary::Dump())
-        , Decoded(*Result)
       {
         if (IsValid && !Stream.Eof())
         {
@@ -219,24 +216,24 @@ namespace Formats::Packed
         }
       }
 
-      std::unique_ptr<Binary::Dump> GetResult()
+      Binary::Container::Ptr GetResult()
       {
-        return IsValid ? std::move(Result) : std::unique_ptr<Binary::Dump>();
+        return IsValid ? Decoded.CaptureResult() : Binary::Container::Ptr();
       }
 
     private:
       bool DecodeData()
       {
         // The main concern is to decode data as much as possible, skipping defenitely invalid structure
-        Decoded.reserve(2 * Header.SizeOfPacked);
+        Decoded = Binary::DataBuilder(2 * Header.SizeOfPacked);
         // put first byte
-        Decoded.push_back(Stream.GetByte());
+        Decoded.AddByte(Stream.GetByte());
         // assume that first byte always exists due to header format
-        while (!Stream.Eof() && Decoded.size() < MAX_DECODED_SIZE)
+        while (!Stream.Eof() && Decoded.Size() < MAX_DECODED_SIZE)
         {
           if (Stream.GetBit())
           {
-            Decoded.push_back(Stream.GetByte());
+            Decoded.AddByte(Stream.GetByte());
             continue;
           }
           uint_t len = 1 + Stream.GetLen();
@@ -265,7 +262,7 @@ namespace Formats::Packed
           }
         }
         // put remaining bytes
-        std::copy(Header.LastBytes, std::end(Header.LastBytes), std::back_inserter(Decoded));
+        Decoded.Add(Header.LastBytes);
         return true;
       }
 
@@ -290,8 +287,7 @@ namespace Formats::Packed
       bool IsValid;
       const RawHeader& Header;
       Bitstream Stream;
-      std::unique_ptr<Binary::Dump> Result;
-      Binary::Dump& Decoded;
+      Binary::DataBuilder Decoded;
     };
   }  // namespace Hrum
 
@@ -316,12 +312,12 @@ namespace Formats::Packed
     {
       if (!Depacker->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       const Hrum::Container container(rawData.Start(), rawData.Size());
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       Hrum::DataDecoder decoder(container);
       return CreateContainer(decoder.GetResult(), container.GetUsedSizeWithPadding());

@@ -17,7 +17,7 @@
 
 namespace rePlayer
 {
-    #define ZXtuneVersion "r5030"
+    #define ZXtuneVersion "r5040"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::ZXTune,
@@ -43,7 +43,7 @@ namespace rePlayer
         std::string buffer;
         for (auto& plugin : ZXTune::PlayerPlugin::Enumerate())
         {
-            if (extensions.AddOnce(plugin->Id()).second)
+            if (extensions.AddOnce(plugin->Id().to_string()).second)
             {
                 if (!buffer.empty())
                     buffer += ';';
@@ -75,7 +75,7 @@ namespace rePlayer
         class ModuleDetector : public Module::DetectCallback
         {
         public:
-            Parameters::Container::Ptr CreateInitialProperties(const String& subpath) const override
+            Parameters::Container::Ptr CreateInitialProperties(StringView subpath) const override
             {
                 (void)subpath;
                 return Parameters::Container::Create();
@@ -93,7 +93,7 @@ namespace rePlayer
                     firstInChain = chain->GetIterator()->Get();
 
                 if (firstInChain.empty())
-                    subsong->type = { decoder.Id().c_str(), eReplay::ZXTune };
+                    subsong->type = { decoder.Id().data(), eReplay::ZXTune };
                 else if (firstInChain == "ZXSTATE")
                     subsong->type.ext = eExtension::_szx;
                 else if (firstInChain == "ZXZIP")

@@ -46,15 +46,13 @@ namespace Module::ASAP
   public:
     using Ptr = std::shared_ptr<AsapTune>;
 
-    AsapTune(const String& id, Binary::View data, int track)
+    AsapTune(StringView id, Binary::View data, int track)
       : Module(::ASAP_New())
-      , Info()
       , Track(track)
-      , Channels()
     {
-      CheckError(
-          ::ASAP_Load(Module, ("dummy." + id).c_str(), static_cast<const unsigned char*>(data.Start()), data.Size()),
-          "ASAP_Load");
+      CheckError(::ASAP_Load(Module, String("dummy.").append(id).c_str(),
+                             static_cast<const unsigned char*>(data.Start()), data.Size()),
+                 "ASAP_Load");
       Reset();  // required for subsequential calls
       Info = ::ASAP_GetInfo(Module);
       Require(Track == ::ASAPInfo_GetDefaultSong(Info));
@@ -84,7 +82,7 @@ namespace Module::ASAP
 
     Time::Duration<TimeUnit> GetDuration() const
     {
-      return Time::Duration<TimeUnit>(::ASAPInfo_GetDuration(Info, Track));
+      return Time::Duration<TimeUnit>{static_cast<unsigned>(::ASAPInfo_GetDuration(Info, Track))};
     }
 
     void GetProperties(Binary::View data, PropertiesHelper& props) const
@@ -99,7 +97,7 @@ namespace Module::ASAP
       Strings::Array instruments;
       for (int idx = 0;; ++idx)
       {
-        if (const auto ins =
+        if (const auto* const ins =
                 ::ASAPInfo_GetInstrumentName(Info, static_cast<const unsigned char*>(data.Start()), data.Size(), idx))
         {
           instruments.push_back(Strings::OptimizeAscii(ins));
@@ -123,17 +121,17 @@ namespace Module::ASAP
       static_assert(Sound::Sample::CHANNELS == 2, "Incompatible sound channels count");
       Sound::Chunk result(samples);
       const auto fmt = isLE() ? ASAPSampleFormat_S16_L_E : ASAPSampleFormat_S16_B_E;
-      const auto stereo = result.data();
+      auto* const stereo = result.data();
       if (Channels == 2)
       {
-        const int bytes = samples * sizeof(*stereo);
+        const auto bytes = static_cast<int>(samples * sizeof(*stereo));
         CheckError(bytes == ::ASAP_Generate(Module, safe_ptr_cast<unsigned char*>(stereo), bytes, fmt),
                    "ASAP_Generate");
       }
       else
       {
-        const auto mono = safe_ptr_cast<Sound::Sample::Type*>(stereo) + samples;
-        const int bytes = samples * sizeof(*mono);
+        auto* const mono = safe_ptr_cast<Sound::Sample::Type*>(stereo) + samples;
+        const auto bytes = static_cast<int>(samples * sizeof(*mono));
         CheckError(bytes == ::ASAP_Generate(Module, safe_ptr_cast<unsigned char*>(mono), bytes, fmt), "ASAP_Generate");
         std::transform(mono, mono + samples, stereo, [](Sound::Sample::Type val) { return Sound::Sample(val, val); });
       }
@@ -146,7 +144,7 @@ namespace Module::ASAP
     }
 
   private:
-    void CheckError(bool ok, const char* msg)
+    static void CheckError(bool ok, const char* msg)
     {
       if (!ok)
       {
@@ -156,9 +154,9 @@ namespace Module::ASAP
 
   private:
     struct ASAP* const Module;
-    const struct ASAPInfo* Info;
+    const struct ASAPInfo* Info = nullptr;
     int Track;
-    int Channels;
+    int Channels = 0;
   };
 
   const auto FRAME_DURATION = Time::Milliseconds(100);
@@ -184,7 +182,7 @@ namespace Module::ASAP
 
     Sound::Chunk Render() override
     {
-      const auto avail = State->Consume(FRAME_DURATION);
+      const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Target->Apply(Tune->Render(GetSamples(avail)));
     }
 
@@ -257,9 +255,11 @@ namespace Module::ASAP
 
   struct PluginDescription
   {
-    const Char* const Id;
+    const ZXTune::PluginId Id;
     const uint_t ChiptuneCaps;
   };
+
+  using ZXTune::operator""_id;
 
   class MultitrackFactory : public Module::MultitrackFactory
   {
@@ -296,7 +296,7 @@ namespace Module::ASAP
 
   struct MultitrackPluginDescription
   {
-    typedef Formats::Multitrack::Decoder::Ptr (*MultitrackDecoderCreator)();
+    using MultitrackDecoderCreator = Formats::Multitrack::Decoder::Ptr (*)();
 
     PluginDescription Desc;
     const MultitrackDecoderCreator CreateMultitrackDecoder;
@@ -308,7 +308,7 @@ namespace Module::ASAP
     {
       //sap
       {
-        "SAP",
+        "SAP"_id,
         ZXTune::Capabilities::Module::Type::MEMORYDUMP | ZXTune::Capabilities::Module::Device::CO12294,
       },
       &Formats::Multitrack::CreateSAPDecoder,
@@ -353,7 +353,7 @@ namespace Module::ASAP
 
   struct SingletrackPluginDescription
   {
-    typedef Formats::Chiptune::Decoder::Ptr (*ChiptuneDecoderCreator)();
+    using ChiptuneDecoderCreator = Formats::Chiptune::Decoder::Ptr (*)();
 
     PluginDescription Desc;
     const ChiptuneDecoderCreator CreateChiptuneDecoder;
@@ -365,7 +365,7 @@ namespace Module::ASAP
     //rmt
     {
       {
-        "RMT",
+        "RMT"_id,
         ZXTune::Capabilities::Module::Type::MEMORYDUMP | ZXTune::Capabilities::Module::Device::CO12294,
       },
       &Formats::Chiptune::CreateRasterMusicTrackerDecoder

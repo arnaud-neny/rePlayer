@@ -66,7 +66,7 @@ namespace Module::XSF
       return result;
     }
 
-    void Resolve(const String& name, Binary::Container::Ptr data) override
+    void Resolve(StringView name, Binary::Container::Ptr data) override
     {
       Dbg("Resolving dependency '{}'", name);
       auto& file = Files.at(name);
@@ -102,7 +102,6 @@ namespace Module::XSF
         Require(!Files.empty());
         FillStrings();
         Delegate = HolderFactory->CreateMultifileModule(Head, Files, std::move(Properties));
-        Files.clear();
         Head = File();
       }
       return *Delegate;
@@ -131,7 +130,7 @@ namespace Module::XSF
     const XSF::Factory::Ptr HolderFactory;
     mutable Parameters::Container::Ptr Properties;
     mutable File Head;
-    mutable std::map<String, File> Files;
+    mutable FilesMap Files;
 
     mutable Holder::Ptr Delegate;
   };
@@ -175,7 +174,7 @@ namespace Module::XSF
           if (file.Dependencies.empty())
           {
             Dbg("Singlefile");
-            return Delegate->CreateSinglefileModule(std::move(file), std::move(properties));
+            return Delegate->CreateSinglefileModule(file, std::move(properties));
           }
           else
           {
@@ -188,7 +187,7 @@ namespace Module::XSF
       {
         Dbg("Failed to parse");
       }
-      return Module::Holder::Ptr();
+      return {};
     }
 
   private:
@@ -200,4 +199,3 @@ namespace Module::XSF
     return MakePtr<GenericFactory>(std::move(delegate));
   }
 }  // namespace Module::XSF
-

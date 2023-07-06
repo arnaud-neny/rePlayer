@@ -85,11 +85,11 @@ namespace Formats::Packed
         //+0x44
       };
 
-      struct KeyFunc// : public std::unary_function<void, uint8_t>
+      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
       {
         KeyFunc(const uint8_t* /*data*/, std::size_t /*size*/) {}
 
-        KeyFunc() {}
+        KeyFunc() = default;
 
         uint8_t operator()()
         {
@@ -159,7 +159,7 @@ namespace Formats::Packed
 
       static const std::size_t KeyOffset = offsetof(RawHeader, DepackerBody);
 
-      struct KeyFunc// : public std::unary_function<void, uint8_t>
+      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
       {
         KeyFunc(const uint8_t* data, std::size_t size)
           : Index(Key[offsetof(RawHeader, InitialCryptoKeyIndex) - KeyOffset])
@@ -257,11 +257,7 @@ namespace Formats::Packed
         {
           return false;
         }
-        if (GetPackedDataSize())
-        {
-          return true;
-        }
-        return false;
+        return GetPackedDataSize() != 0;
       }
 
       std::size_t GetPackedDataOffset() const
@@ -309,19 +305,17 @@ namespace Formats::Packed
         : IsValid(container.FastCheck())
         , Header(container.GetHeader())
         , Stream(container.GetPackedData(), container.GetPackedDataSize())
-        , Result(new Binary::Dump())
-        , Decoded(*Result)
       {
         if (IsValid && !Stream.Eof())
         {
-          typename Version::KeyFunc keyFunctor = container.GetKeyFunc();
+          auto keyFunctor = container.GetKeyFunc();
           IsValid = DecodeData(keyFunctor);
         }
       }
 
-      std::unique_ptr<Binary::Dump> GetResult()
+      Binary::Container::Ptr GetResult()
       {
-        return IsValid ? std::move(Result) : std::unique_ptr<Binary::Dump>();
+        return IsValid ? Decoded.CaptureResult() : Binary::Container::Ptr();
       }
 
       std::size_t GetUsedSize() const
@@ -333,13 +327,14 @@ namespace Formats::Packed
       template<class KeyFunc>
       bool DecodeData(KeyFunc& keyFunctor)
       {
-        while (!Stream.Eof() && Decoded.size() < MAX_DECODED_SIZE)
+        Decoded = Binary::DataBuilder(MAX_DECODED_SIZE);
+        while (!Stream.Eof() && Decoded.Size() < MAX_DECODED_SIZE)
         {
           const uint_t token = Stream.GetByte();
           if (!token)
           {
             //%00000000 - exit
-            Decoded.push_back(Header.LastByte);
+            Decoded.AddByte(Header.LastByte);
             Simple::KeyFunc noDecode;
             CopyNonPacked(Stream.GetRestBytes(), noDecode);
             return true;
@@ -365,7 +360,7 @@ namespace Formats::Packed
             uint8_t incMarker = 63 + 3;
             for (uint_t len = initCount + 3; len;)
             {
-              std::fill_n(std::back_inserter(Decoded), len, data);
+              Fill(Decoded, len, data);
               if (len != incMarker)
               {
                 break;
@@ -409,7 +404,7 @@ namespace Formats::Packed
         {
           const uint8_t data = Stream.GetByte();
           const uint8_t key = keyFunctor();
-          Decoded.push_back(data ^ key);
+          Decoded.AddByte(data ^ key);
         }
         return len == 0;
       }
@@ -418,8 +413,7 @@ namespace Formats::Packed
       bool IsValid;
       const typename Version::RawHeader& Header;
       ByteStream Stream;
-      std::unique_ptr<Binary::Dump> Result;
-      Binary::Dump& Decoded;
+      Binary::DataBuilder Decoded;
     };
   }  // namespace TurboLZ
 
@@ -445,12 +439,12 @@ namespace Formats::Packed
     {
       if (!Depacker->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       const typename TurboLZ::Container<Version> container(rawData.Start(), rawData.Size());
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       TurboLZ::DataDecoder<Version> decoder(container);
       return CreateContainer(decoder.GetResult(), decoder.GetUsedSize());

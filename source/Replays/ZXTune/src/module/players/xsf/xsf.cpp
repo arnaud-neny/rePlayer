@@ -15,212 +15,213 @@
 #include <make_ptr.h>
 // library includes
 #include <formats/chiptune/emulation/portablesoundformat.h>
-// boost includes
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <strings/conversion.h>
+#include <strings/join.h>
+#include <strings/split.h>
 
-namespace Module
+namespace Module::XSF
 {
-  namespace XSF
+  class FilePath
   {
-    class FilePath
+  private:
+    explicit FilePath(Strings::Array&& rh) noexcept
+      : Components(std::move(rh))
+    {}
+
+  public:
+    explicit FilePath(StringView str)
     {
-    private:
-      explicit FilePath(Strings::Array&& rh) noexcept
-        : Components(std::move(rh))
-      {}
+      Strings::Split(str, R"(/\)"_sv, Components);
+    }
 
-    public:
-      explicit FilePath(const String& str)
+    FilePath RelativeTo(const FilePath& rh) const
+    {
+      static const String PARENT_PATH("..");
+      if (rh.Components.empty())
       {
-        static const String DELIMITERS("/\\");
-        boost::algorithm::split(Components, str, boost::algorithm::is_any_of(DELIMITERS),
-                                boost::algorithm::token_compress_on);
+        return *this;
       }
-
-      FilePath RelativeTo(const FilePath& rh) const
+      Require(!Components.empty());
+      auto newComponents = rh.Components;
+      newComponents.pop_back();
+      auto it = Components.begin();
+      const auto lim = Components.end();
+      while (it != lim && *it == PARENT_PATH)
       {
-        static const String PARENT_PATH("..");
-        if (rh.Components.empty())
+        if (newComponents.empty() || newComponents.back() == PARENT_PATH)
         {
-          return *this;
+          break;
         }
-        Require(!Components.empty());
-        auto newComponents = rh.Components;
         newComponents.pop_back();
-        auto it = Components.begin();
-        const auto lim = Components.end();
-        while (it != lim && *it == PARENT_PATH)
-        {
-          if (newComponents.empty() || newComponents.back() == PARENT_PATH)
-          {
-            break;
-          }
-          newComponents.pop_back();
-        }
-        std::copy(it, lim, std::back_inserter(newComponents));
-        return FilePath(std::move(newComponents));
       }
+      std::copy(it, lim, std::back_inserter(newComponents));
+      return FilePath(std::move(newComponents));
+    }
 
-      String ToString() const
-      {
-        static const String DELIMITER(1, '/');
-        return boost::algorithm::join(Components, DELIMITER);
-      }
-
-    private:
-      Strings::Array Components;
-    };
-
-    class FileBuilder : public Formats::Chiptune::PortableSoundFormat::Builder
+    String ToString() const
     {
-    public:
-      void SetVersion(uint_t ver) override
-      {
-        Result.Version = ver;
-      }
+      return Strings::Join(Components, "/"_sv);
+    }
 
-      void SetReservedSection(Binary::Container::Ptr blob) override
-      {
-        Result.ReservedSection = std::move(blob);
-      }
+  private:
+    Strings::Array Components;
+  };
 
-      void SetPackedProgramSection(Binary::Container::Ptr blob) override
-      {
-        Result.PackedProgramSection = std::move(blob);
-      }
-
-      void SetTitle(String title) override
-      {
-        GetMeta().Title = std::move(title);
-      }
-
-      void SetArtist(String artist) override
-      {
-        GetMeta().Artist = std::move(artist);
-      }
-
-      void SetGame(String game) override
-      {
-        GetMeta().Game = std::move(game);
-      }
-
-      void SetYear(String date) override
-      {
-        GetMeta().Year = std::move(date);
-      }
-
-      void SetGenre(String genre) override
-      {
-        GetMeta().Genre = std::move(genre);
-      }
-
-      void SetComment(String comment) override
-      {
-        GetMeta().Comment = std::move(comment);
-      }
-
-      void SetCopyright(String copyright) override
-      {
-        GetMeta().Copyright = std::move(copyright);
-      }
-
-      void SetDumper(String dumper) override
-      {
-        GetMeta().Dumper = std::move(dumper);
-      }
-
-      void SetLength(Time::Milliseconds duration) override
-      {
-        GetMeta().Duration = duration;
-      }
-
-      void SetFade(Time::Milliseconds fade) override
-      {
-        GetMeta().Fadeout = fade;
-      }
-
-      void SetVolume(float vol) override
-      {
-        GetMeta().Volume = vol;
-      }
-
-      void SetTag(String name, String value) override
-      {
-        if (name == "_refresh")
-        {
-          GetMeta().RefreshRate = std::atoi(value.c_str());
-        }
-        else
-        {
-          GetMeta().Tags.emplace_back(std::move(name), std::move(value));
-        }
-      }
-
-      void SetLibrary(uint_t num, String filename) override
-      {
-        Result.Dependencies.resize(std::max<std::size_t>(Result.Dependencies.size(), num));
-        Result.Dependencies[num - 1] = FilePath(filename).ToString();
-      }
-
-      void MakeDependenciesRelativeTo(const String& filename)
-      {
-        const FilePath root(filename);
-        for (auto& dep : Result.Dependencies)
-        {
-          const FilePath depPath(dep);
-          dep = depPath.RelativeTo(root).ToString();
-        }
-      }
-
-      File CaptureResult()
-      {
-        return std::move(Result);
-      }
-
-    private:
-      MetaInformation& GetMeta()
-      {
-        if (!Meta)
-        {
-          Result.Meta.reset(Meta = new MetaInformation());
-        }
-        return *Meta;
-      }
-
-    private:
-      File Result;
-      MetaInformation* Meta = nullptr;
-    };
-
-    Formats::Chiptune::Container::Ptr Parse(const Binary::Container& rawData, File& file)
+  class FileBuilder
+    : public Formats::Chiptune::PortableSoundFormat::Builder
+    , private Formats::Chiptune::MetaBuilder
+  {
+  public:
+    Formats::Chiptune::MetaBuilder& GetMetaBuilder() override
     {
-      FileBuilder builder;
-      if (auto source = Formats::Chiptune::PortableSoundFormat::Parse(rawData, builder))
+      return *this;
+    }
+
+    void SetVersion(uint_t ver) override
+    {
+      Result.Version = ver;
+    }
+
+    void SetReservedSection(Binary::Container::Ptr blob) override
+    {
+      Result.ReservedSection = std::move(blob);
+    }
+
+    void SetPackedProgramSection(Binary::Container::Ptr blob) override
+    {
+      Result.PackedProgramSection = std::move(blob);
+    }
+
+    void SetYear(StringView date) override
+    {
+      GetMeta().Year = date.to_string();
+    }
+
+    void SetGenre(StringView genre) override
+    {
+      GetMeta().Genre = genre.to_string();
+    }
+
+    void SetCopyright(StringView copyright) override
+    {
+      GetMeta().Copyright = copyright.to_string();
+    }
+
+    void SetDumper(StringView dumper) override
+    {
+      GetMeta().Dumper = dumper.to_string();
+    }
+
+    void SetLength(Time::Milliseconds duration) override
+    {
+      GetMeta().Duration = duration;
+    }
+
+    void SetFade(Time::Milliseconds fade) override
+    {
+      GetMeta().Fadeout = fade;
+    }
+
+    void SetVolume(float vol) override
+    {
+      GetMeta().Volume = vol;
+    }
+
+    void SetTag(StringView name, StringView value) override
+    {
+      if (name == "_refresh"_sv)
       {
-        file = builder.CaptureResult();
-        return source;
+        GetMeta().RefreshRate = Strings::ConvertTo<uint_t>(value);
       }
       else
       {
-        return Formats::Chiptune::Container::Ptr();
+        GetMeta().Tags.emplace_back(name.to_string(), value.to_string());
       }
     }
 
-    Formats::Chiptune::Container::Ptr Parse(const String& name, const Binary::Container& rawData, File& file)
+    void SetLibrary(uint_t num, StringView filename) override
     {
-      FileBuilder builder;
-      if (auto source = Formats::Chiptune::PortableSoundFormat::Parse(rawData, builder))
+      Result.Dependencies.resize(std::max<std::size_t>(Result.Dependencies.size(), num));
+      Result.Dependencies[num - 1] = FilePath(filename).ToString();
+    }
+
+    // MetaBuilder
+    void SetProgram(StringView program) override
+    {
+      GetMeta().Game = program.to_string();
+    }
+
+    void SetTitle(StringView title) override
+    {
+      GetMeta().Title = title.to_string();
+    }
+
+    void SetAuthor(StringView author) override
+    {
+      GetMeta().Artist = author.to_string();
+    }
+    void SetStrings(const Strings::Array& /*strings*/) override {}
+    void SetComment(StringView comment) override
+    {
+      GetMeta().Comment = comment.to_string();
+    }
+
+    void MakeDependenciesRelativeTo(StringView filename)
+    {
+      const FilePath root(filename);
+      for (auto& dep : Result.Dependencies)
       {
-        builder.MakeDependenciesRelativeTo(name);
-        file = builder.CaptureResult();
-        return source;
-      }
-      else
-      {
-        return Formats::Chiptune::Container::Ptr();
+        const FilePath depPath(dep);
+        dep = depPath.RelativeTo(root).ToString();
       }
     }
-  }  // namespace XSF
-}  // namespace Module
+
+    File CaptureResult()
+    {
+      return std::move(Result);
+    }
+
+  private:
+    MetaInformation& GetMeta()
+    {
+      if (!Meta)
+      {
+        Result.Meta.reset(Meta = new MetaInformation());
+      }
+      return *Meta;
+    }
+
+  private:
+    File Result;
+    MetaInformation* Meta = nullptr;
+  };
+
+  Formats::Chiptune::Container::Ptr Parse(const Binary::Container& rawData, File& file)
+  {
+    FileBuilder builder;
+    if (auto source = Formats::Chiptune::PortableSoundFormat::Parse(rawData, builder))
+    {
+      file = builder.CaptureResult();
+      return source;
+    }
+    else
+    {
+      return {};
+    }
+  }
+
+  Formats::Chiptune::Container::Ptr Parse(StringView name, const Binary::Container& rawData, File& file)
+  {
+    FileBuilder builder;
+    if (auto source = Formats::Chiptune::PortableSoundFormat::Parse(rawData, builder))
+    {
+      builder.MakeDependenciesRelativeTo(name);
+      file = builder.CaptureResult();
+      return source;
+    }
+    else
+    {
+      return {};
+    }
+  }
+}  // namespace Module::XSF

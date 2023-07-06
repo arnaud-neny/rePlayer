@@ -18,9 +18,7 @@
 #include <binary/input_stream.h>
 #include <formats/chiptune/container.h>
 #include <math/numeric.h>
-// boost includes
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <strings/split.h>
 
 namespace Formats::Chiptune
 {
@@ -113,8 +111,7 @@ namespace Formats::Chiptune
         const uint_t totalSamples = Stream.Read<le_uint32_t>();
         Stream.Skip(4);
         const uint_t loopSamples = Stream.Read<le_uint32_t>();
-        target.SetTimings(SamplesToTime(totalSamples),
-                          SamplesToTime(loopSamples && totalSamples >= loopSamples ? totalSamples - loopSamples : 0));
+        target.SetTimings(SamplesToTime(totalSamples), SamplesToTime(std::min(totalSamples, loopSamples)));
         const auto dataStart = GetDataOffset(ver);
         const uint_t NO_GD3 = 0x18;
         if (gd3Offset != NO_GD3 && gd3Offset < eof)
@@ -209,8 +206,7 @@ namespace Formats::Chiptune
         target.SetAuthor(DispatchString(authorEn, DispatchString(authorJa, ripper)));
         const auto comment = ReadUTF16(input);
         Strings::Array strings;
-        boost::algorithm::split(strings, comment, boost::algorithm::is_any_of("\r\n"),
-                                boost::algorithm::token_compress_on);
+        Strings::Split(comment, "\r\n"_sv, strings);
         if (!strings.empty())
         {
           target.SetStrings(strings);

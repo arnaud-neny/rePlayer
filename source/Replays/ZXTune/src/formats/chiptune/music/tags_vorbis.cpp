@@ -13,93 +13,74 @@
 // common includes
 #include <byteorder.h>
 // library includes
+#include <strings/casing.h>
 #include <strings/encoding.h>
 #include <strings/trim.h>
 // std includes
 #include <array>
-#include <cctype>
 
-namespace Formats::Chiptune
+namespace Formats::Chiptune::Vorbis
 {
-  namespace Vorbis
+  StringView ReadString(Binary::DataInputStream& payload)
   {
-    StringView ReadString(Binary::DataInputStream& payload)
-    {
-      const std::size_t size = payload.Read<le_uint32_t>();
-      const auto utf8 = safe_ptr_cast<const char*>(payload.ReadData(size).Start());
-      return StringView(utf8, size);
-    }
+    const std::size_t size = payload.Read<le_uint32_t>();
+    const auto* const utf8 = safe_ptr_cast<const char*>(payload.ReadData(size).Start());
+    return {utf8, size};
+  }
 
-    String Decode(StringView str)
-    {
-      // do not trim before- it may break some encodings
-      auto decoded = Strings::ToAutoUtf8(str);
-      auto trimmed = Strings::TrimSpaces(decoded);
-      return decoded.size() == trimmed.size() ? decoded : trimmed.to_string();
-    }
+  String Decode(StringView str)
+  {
+    // do not trim before- it may break some encodings
+    auto decoded = Strings::ToAutoUtf8(str);
+    auto trimmed = Strings::TrimSpaces(decoded);
+    return decoded.size() == trimmed.size() ? decoded : trimmed.to_string();
+  }
 
-    bool CompareTag(StringView str, StringView tag)
+  void ParseCommentField(StringView field, MetaBuilder& target)
+  {
+    const auto eqPos = field.find('=');
+    if (eqPos == StringView::npos)
     {
-      if (str.size() != tag.size())
+      target.SetStrings({Decode(field)});
+      return;
+    }
+    const auto name = field.substr(0, eqPos);
+    const auto value = field.substr(eqPos + 1);
+    Strings::Array strings;
+    if (Strings::EqualNoCaseAscii(name, "TITLE"_sv))
+    {
+      target.SetTitle(Decode(value));
+    }
+    else if (Strings::EqualNoCaseAscii(name, "ARTIST"_sv) || Strings::EqualNoCaseAscii(name, "PERFORMER"_sv))
+    {
+      target.SetAuthor(Decode(value));
+    }
+    else if (Strings::EqualNoCaseAscii(name, "COPYRIGHT"_sv) || Strings::EqualNoCaseAscii(name, "DESCRIPTION"_sv))
+    {
+      strings.emplace_back(Decode(value));
+    }
+    // TODO: meta.SetComment
+    if (!strings.empty())
+    {
+      target.SetStrings(strings);
+    }
+  }
+
+  void ParseComment(Binary::DataInputStream& payload, MetaBuilder& target)
+  {
+    try
+    {
+      /*const auto vendor = */ ReadString(payload);
+      if (uint_t items = payload.Read<le_uint32_t>())
       {
-        return false;
-      }
-      for (std::size_t idx = 0, lim = str.size(); idx != lim; ++idx)
-      {
-        if (std::toupper(str[idx]) != tag[idx])
+        while (items--)
         {
-          return false;
+          ParseCommentField(ReadString(payload), target);
         }
       }
-      return true;
+      Require(1 == payload.ReadByte());
     }
-
-    void ParseCommentField(StringView field, MetaBuilder& target)
-    {
-      const auto eqPos = field.find('=');
-      if (eqPos == StringView::npos)
-      {
-        target.SetStrings({Decode(field)});
-        return;
-      }
-      const auto name = field.substr(0, eqPos);
-      const auto value = field.substr(eqPos + 1);
-      Strings::Array strings;
-      if (CompareTag(name, "TITLE"_sv))
-      {
-        target.SetTitle(Decode(value));
-      }
-      else if (CompareTag(name, "ARTIST"_sv) || CompareTag(name, "PERFORMER"_sv))
-      {
-        target.SetAuthor(Decode(value));
-      }
-      else if (CompareTag(name, "COPYRIGHT"_sv) || CompareTag(name, "DESCRIPTION"_sv))
-      {
-        strings.emplace_back(Decode(value));
-      }
-      // TODO: meta.SetComment
-      if (!strings.empty())
-      {
-        target.SetStrings(strings);
-      }
-    }
-
-    void ParseComment(Binary::DataInputStream& payload, MetaBuilder& target)
-    {
-      try
-      {
-        /*const auto vendor = */ ReadString(payload);
-        if (uint_t items = payload.Read<le_uint32_t>())
-        {
-          while (items--)
-          {
-            ParseCommentField(ReadString(payload), target);
-          }
-        }
-        Require(1 == payload.ReadByte());
-      }
-      catch (const std::exception&)
-      {}
-    }
-  }  // namespace Vorbis
-}  // namespace Formats::Chiptune
+    catch (const std::exception&)
+    {}
+  }
+}  // namespace Formats::Chiptune::Vorbis

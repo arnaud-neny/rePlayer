@@ -18,8 +18,9 @@
 #include <formats/packed/decoders.h>
 #include <formats/packed/zip_supp.h>
 #include <strings/encoding.h>
+#include <strings/map.h>
 // std includes
-#include <map>
+#include <memory>
 #include <numeric>
 
 namespace Formats::Archived
@@ -31,9 +32,9 @@ namespace Formats::Archived
     class File : public Archived::File
     {
     public:
-      File(const Packed::Decoder& decoder, String name, std::size_t size, Binary::Container::Ptr data)
+      File(const Packed::Decoder& decoder, StringView name, std::size_t size, Binary::Container::Ptr data)
         : Decoder(decoder)
-        , Name(std::move(name))
+        , Name(name.to_string())
         , Size(size)
         , Data(std::move(data))
       {}
@@ -112,7 +113,7 @@ namespace Formats::Archived
         if (const auto* header = GetBlock<LocalFileHeader>())
         {
           const auto file = CompressedFile::Create(*header, Stream.GetRestSize());
-          return file.get() ? file->GetPackedSize() : 0;
+          return file ? file->GetPackedSize() : 0;
         }
         else if (const auto* footer = GetBlock<LocalFileFooter>())
         {
@@ -165,7 +166,7 @@ namespace Formats::Archived
       bool IsValid() const
       {
         assert(!IsEof());
-        if (const Packed::Zip::LocalFileHeader* header = Blocks.GetBlock<Packed::Zip::LocalFileHeader>())
+        if (const auto* header = Blocks.GetBlock<Packed::Zip::LocalFileHeader>())
         {
           return header->IsSupported();
         }
@@ -175,27 +176,27 @@ namespace Formats::Archived
       String GetName() const
       {
         assert(!IsEof());
-        if (const Packed::Zip::LocalFileHeader* header = Blocks.GetBlock<Packed::Zip::LocalFileHeader>())
+        if (const auto* header = Blocks.GetBlock<Packed::Zip::LocalFileHeader>())
         {
           const StringView rawName(header->Name, header->NameSize);
           const bool isUtf8 = 0 != (header->Flags & Packed::Zip::FILE_UTF8);
           return isUtf8 ? rawName.to_string() : Strings::ToAutoUtf8(rawName);
         }
         assert(!"Failed to get name");
-        return String();
+        return {};
       }
 
       File::Ptr GetFile() const
       {
         assert(IsValid());
-        const std::unique_ptr<const Packed::Zip::CompressedFile> file = Blocks.GetFile();
-        if (file.get())
+        const auto file = Blocks.GetFile();
+        if (file)
         {
-          const Binary::Container::Ptr data = Data.GetSubcontainer(Blocks.GetOffset(), file->GetPackedSize());
-          return MakePtr<File>(Decoder, GetName(), file->GetUnpackedSize(), data);
+          auto data = Data.GetSubcontainer(Blocks.GetOffset(), file->GetPackedSize());
+          return MakePtr<File>(Decoder, GetName(), file->GetUnpackedSize(), std::move(data));
         }
         assert(!"Failed to get file");
-        return File::Ptr();
+        return {};
       }
 
       void Next()
@@ -239,15 +240,15 @@ namespace Formats::Archived
       void ExploreFiles(const Container::Walker& walker) const override
       {
         FillCache();
-        for (FilesMap::const_iterator it = Files.begin(), lim = Files.end(); it != lim; ++it)
+        for (const auto& entry : Files)
         {
-          walker.OnFile(*it->second);
+          walker.OnFile(*entry.second);
         }
       }
 
-      File::Ptr FindFile(const String& name) const override
+      File::Ptr FindFile(StringView name) const override
       {
-        if (const File::Ptr file = FindCachedFile(name))
+        if (auto file = FindCachedFile(name))
         {
           return file;
         }
@@ -262,23 +263,19 @@ namespace Formats::Archived
     private:
       void FillCache() const
       {
-        FindNonCachedFile(String());
+        FindNonCachedFile({});
       }
 
-      File::Ptr FindCachedFile(const String& name) const
+      File::Ptr FindCachedFile(StringView name) const
       {
-        if (Iter.get())
+        if (Iter)
         {
-          const FilesMap::const_iterator it = Files.find(name);
-          if (it != Files.end())
-          {
-            return it->second;
-          }
+          return Files.Get(name);
         }
-        return File::Ptr();
+        return {};
       }
 
-      File::Ptr FindNonCachedFile(const String& name) const
+      File::Ptr FindNonCachedFile(StringView name) const
       {
         CreateIterator();
         while (!Iter->IsEof())
@@ -291,22 +288,22 @@ namespace Formats::Archived
             continue;
           }
           Dbg("Found file '{}'", fileName);
-          const File::Ptr fileObject = Iter->GetFile();
-          Files.insert(FilesMap::value_type(fileName, fileObject));
+          auto fileObject = Iter->GetFile();
+          Files.emplace(fileName, fileObject);
           Iter->Next();
           if (fileName == name)
           {
             return fileObject;
           }
         }
-        return File::Ptr();
+        return {};
       }
 
       void CreateIterator() const
       {
-        if (!Iter.get())
+        if (!Iter)
         {
-          Iter.reset(new FileIterator(*Decoder, *Delegate));
+          Iter = std::make_unique<FileIterator>(*Decoder, *Delegate);
         }
       }
 
@@ -314,8 +311,7 @@ namespace Formats::Archived
       const Formats::Packed::Decoder::Ptr Decoder;
       const uint_t FilesCount;
       mutable std::unique_ptr<FileIterator> Iter;
-      typedef std::map<String, File::Ptr> FilesMap;
-      mutable FilesMap Files;
+      mutable Strings::ValueMap<File::Ptr> Files;
     };
   }  // namespace Zip
 
@@ -340,14 +336,14 @@ namespace Formats::Archived
     {
       if (!FileDecoder->GetFormat()->Match(data))
       {
-        return Container::Ptr();
+        return {};
       }
 
       uint_t filesCount = 0;
       Zip::BlocksIterator iter(data);
       for (; !iter.IsEof(); iter.Next())
       {
-        if (const Packed::Zip::LocalFileHeader* file = iter.GetBlock<Packed::Zip::LocalFileHeader>())
+        if (const auto* file = iter.GetBlock<Packed::Zip::LocalFileHeader>())
         {
           filesCount += file->IsSupported();
         }
@@ -359,7 +355,7 @@ namespace Formats::Archived
       }
       else
       {
-        return Container::Ptr();
+        return {};
       }
     }
 

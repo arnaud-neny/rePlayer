@@ -23,6 +23,7 @@
 // std includes
 #include <cstring>
 #include <numeric>
+#include <utility>
 
 namespace Module::AYM
 {
@@ -46,12 +47,12 @@ namespace Module::AYM
     return val | MASKS[pos - LETTERS];
   }
 
-  uint_t String2Mask(const String& str)
+  uint_t String2Mask(StringView str)
   {
     return std::accumulate(str.begin(), str.end(), uint_t(0), LetterToMask);
   }
 
-  Devices::AYM::LayoutType String2Layout(const String& str)
+  Devices::AYM::LayoutType String2Layout(StringView str)
   {
     if (str == "ABC")
     {
@@ -92,7 +93,7 @@ namespace Module::AYM
   public:
     ChipParametersImpl(uint_t samplerate, Parameters::Accessor::Ptr params)
       : Samplerate(samplerate)
-      , Params(params)
+      , Params(std::move(params))
     {}
 
     uint_t Version() const override
@@ -242,7 +243,7 @@ namespace Module::AYM
       Parameters::StringType newName;
       if (Params->FindValue(Parameters::ZXTune::Core::AYM::TABLE, newName))
       {
-        const String& subName = ExtractMergedValue(newName);
+        const auto& subName = ExtractMergedValue(newName);
         GetFreqTable(subName, table);
       }
     }
@@ -254,12 +255,12 @@ namespace Module::AYM
       ('a/b', 0) => 'a'
       ('a/b', 1) => 'b'
     */
-    String ExtractMergedValue(const String& val) const
+    StringView ExtractMergedValue(StringView val) const
     {
-      const String::size_type pos = val.find_first_of('/');
-      if (pos != String::npos)
+      const auto pos = val.find_first_of('/');
+      if (pos != val.npos)
       {
-        Require(String::npos == val.find_first_of('/', pos + 1));
+        Require(val.npos == val.find_first_of('/', pos + 1));
         return Index == 0 ? val.substr(0, pos) : val.substr(pos + 1);
       }
       else
@@ -288,4 +289,3 @@ namespace Module::AYM
     return MakePtr<TSTrackParameters>(std::move(params), idx);
   }
 }  // namespace Module::AYM
-

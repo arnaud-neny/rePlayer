@@ -14,35 +14,23 @@
 // library includes
 #include <debug/log.h>
 #include <l10n/api.h>
+#include <strings/map.h>
 // boost includes
 #include <boost/locale/gnu_gettext.hpp>
 #include <boost/locale/util.hpp>
-// std includes
-#include <map>
 
 namespace
 {
   const Debug::Stream Dbg("L10n");
 
-  template<class K, class V>
-  class MapAdapter : public std::map<K, V>
-  {
-  public:
-    const V* Find(const K& key) const
-    {
-      const typename std::map<K, V>::const_iterator it = std::map<K, V>::find(key), limit = std::map<K, V>::end();
-      return it != limit ? &it->second : nullptr;
-    }
-  };
-
-  typedef std::shared_ptr<std::locale> LocalePtr;
+  using LocalePtr = std::shared_ptr<std::locale>;
 
   class DomainVocabulary : public L10n::Vocabulary
   {
   public:
-    DomainVocabulary(LocalePtr locale, String domain)
+    DomainVocabulary(LocalePtr locale, StringView domain)
       : Locale(std::move(locale))
-      , Domain(std::move(domain))
+      , Domain(domain.to_string())
     {
       Dbg("Created vocabulary for domain '{}'", Domain);
     }
@@ -112,7 +100,7 @@ namespace
           SystemLocale.Translation);
     }
 
-    void AddTranslation(const L10n::Translation& trans) override
+    void AddTranslation(L10n::Translation trans) override
     {
       if (trans.Type != TYPE_MO)
       {
@@ -121,27 +109,27 @@ namespace
       using namespace boost::locale;
 
       static const String EMPTY_PATH;
-      gnu_gettext::messages_info& info = Locales[trans.Language];
+      auto& info = Locales[trans.Language];
       info.language = trans.Language;
       info.encoding = SystemLocale.Encoding;
-      info.domains.push_back(gnu_gettext::messages_info::domain(trans.Domain));
+      info.domains.emplace_back(trans.Domain);
       info.callback = &LoadMessage;
       info.paths.assign(&EMPTY_PATH, &EMPTY_PATH + 1);
 
-      const String filename =
+      const auto filename =
           EMPTY_PATH + '/' + trans.Language + '/' + info.locale_category + '/' + trans.Domain + '.' + TYPE_MO;
-      Translations[filename] = trans.Data;
-      Dbg("Added translation {} in {} bytes", filename, trans.Data.size());
+      Dbg("Added translation {} in {} bytes", filename, trans.Data->Size());
+      Translations.emplace(filename, std::move(trans.Data));
     }
 
-    void SelectTranslation(const String& translation) override
+    void SelectTranslation(StringView translation) override
     {
       using namespace boost::locale;
       try
       {
-        if (const gnu_gettext::messages_info* info = Locales.Find(translation))
+        if (const auto* info = Locales.FindPtr(translation))
         {
-          message_format<Char>* const facet = gnu_gettext::create_messages_facet<Char>(*info);
+          auto* const facet = gnu_gettext::create_messages_facet<Char>(*info);
           Require(facet != nullptr);
           *CurrentLocale = std::locale(std::locale::classic(), facet);
           Dbg("Selected translation {}", translation);
@@ -156,7 +144,7 @@ namespace
       Dbg("Selected unknown translation {}", translation);
     }
 
-    L10n::Vocabulary::Ptr GetVocabulary(const String& domain) const override
+    L10n::Vocabulary::Ptr GetVocabulary(StringView domain) const override
     {
       return MakePtr<DomainVocabulary>(CurrentLocale, domain);
     }
@@ -168,26 +156,28 @@ namespace
     }
 
   private:
-    static std::vector<char> LoadMessage(const String& file, const String& encoding)
+    static std::vector<char> LoadMessage(StringView file, StringView encoding)
     {
       const BoostLocaleLibrary& self = Instance();
-      if (const auto* data = self.Translations.Find(file))
+      if (const auto* data = self.Translations.FindPtr(file))
       {
         Dbg("Loading message {} with encoding {}", file, encoding);
-        return std::vector<char>(data->begin(), data->end());
+        const auto* rawStart = static_cast<const char*>((*data)->Start());
+        const auto rawSize = (*data)->Size();
+        return {rawStart, rawStart + rawSize};
       }
       else
       {
         Dbg("Message {} with encoding {} not found", file, encoding);
-        return std::vector<char>();
+        return {};
       }
     }
 
   private:
     const LocaleAttributes SystemLocale;
     const LocalePtr CurrentLocale;
-    MapAdapter<String, Binary::Dump> Translations;
-    MapAdapter<String, boost::locale::gnu_gettext::messages_info> Locales;
+    Strings::ValueMap<Binary::Data::Ptr> Translations;
+    Strings::ValueMap<boost::locale::gnu_gettext::messages_info> Locales;
   };
 }  // namespace
 

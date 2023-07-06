@@ -18,7 +18,7 @@
 #include <make_ptr.h>
 // library includes
 #include <binary/base64.h>
-#include <binary/compression/zlib.h>
+#include <binary/compression/zlib_container.h>
 #include <binary/compression/zlib_stream.h>
 #include <binary/crc.h>
 #include <binary/data_builder.h>
@@ -34,7 +34,7 @@ namespace ZXTune::Zdata
 
   const String PLUGIN_PREFIX("zdata:");
 
-  typedef std::array<uint8_t, 2> SignatureType;
+  using SignatureType = std::array<uint8_t, 2>;
 
   struct UInt24LE
   {
@@ -76,8 +76,8 @@ namespace ZXTune::Zdata
     UInt24LE PackedSize;
   };
 
-  typedef std::array<char, 8> TxtMarker;
-  typedef std::array<char, 16> TxtHeader;
+  using TxtMarker = std::array<char, 8>;
+  using TxtHeader = std::array<char, 16>;
 
   struct Marker
   {
@@ -88,9 +88,9 @@ namespace ZXTune::Zdata
     TxtMarker Encode() const
     {
       const RawMarker in = {SIGNATURE, Value};
-      const auto inData = in.Signature.data();
+      const auto* const inData = in.Signature.data();
       TxtMarker out;
-      const auto outData = out.data();
+      auto* const outData = out.data();
       Binary::Base64::Encode(inData, inData + sizeof(in), outData, outData + out.size());
       return out;
     }
@@ -109,11 +109,11 @@ namespace ZXTune::Zdata
     static Header Decode(const TxtHeader& in)
     {
       RawHeader out;
-      const auto inData = in.data();
-      const auto outData = out.Signature.data();
+      const auto* const inData = in.data();
+      auto* const outData = out.Signature.data();
       Binary::Base64::Decode(inData, inData + in.size(), outData, outData + sizeof(out));
       Require(out.Signature == SIGNATURE);
-      return Header(out.Crc, out.OriginalSize, out.PackedSize);
+      return {out.Crc, out.OriginalSize, out.PackedSize};
     }
 
     void ToRaw(RawHeader& res) const
@@ -158,14 +158,12 @@ namespace ZXTune::Zdata
       return *safe_ptr_cast<const TxtHeader*>(Start);
     }
 
-    const char* GetBody() const
+    StringView GetBody(std::size_t binarySize) const
     {
-      return safe_ptr_cast<const char*>(Start + sizeof(TxtHeader));
-    }
-
-    const char* GetBodyEnd() const
-    {
-      return safe_ptr_cast<const char*>(End);
+      const auto* bodyStart = Start + sizeof(TxtHeader);
+      const auto bodySize = Binary::Base64::CalculateConvertedSize(binarySize);
+      Require(bodyStart + bodySize <= End);
+      return {safe_ptr_cast<const char*>(bodyStart), bodySize};
     }
 
   private:
@@ -175,11 +173,11 @@ namespace ZXTune::Zdata
 
   Layout FindLayout(Binary::View raw, const Marker& marker)
   {
-    const uint8_t* const rawStart = static_cast<const uint8_t*>(raw.Start());
+    const auto* const rawStart = static_cast<const uint8_t*>(raw.Start());
     const uint8_t* const rawEnd = rawStart + raw.Size();
     const TxtMarker lookup = marker.Encode();
     const uint8_t* const res = std::search(rawStart, rawEnd, lookup.begin(), lookup.end());
-    return Layout(res, rawEnd);
+    return {res, rawEnd};
   }
 
   Binary::Container::Ptr Decode(Binary::View raw, const Marker& marker)
@@ -189,24 +187,22 @@ namespace ZXTune::Zdata
       const Layout layout = FindLayout(raw, marker);
       const Header hdr = Header::Decode(layout.GetHeader());
       Dbg("Found container id={}", hdr.Crc);
-      Binary::Dump decoded(hdr.Packed);
-      Binary::Base64::Decode(layout.GetBody(), layout.GetBodyEnd(), decoded.data(), decoded.data() + hdr.Packed);
-      std::unique_ptr<Binary::Dump> unpacked(new Binary::Dump(hdr.Original));
+      const auto decoded = Binary::Base64::Decode(layout.GetBody(hdr.Packed));
       Dbg("Unpack {} => {}", hdr.Packed, hdr.Original);
-      // TODO: use another function
-      Require(hdr.Original == Binary::Compression::Zlib::Decompress(decoded, unpacked->data(), unpacked->size()));
+      auto unpacked = Binary::Compression::Zlib::Decompress(decoded, hdr.Original);
+      Require(hdr.Original == unpacked->Size());
       Require(hdr.Crc == Binary::Crc32(*unpacked));
-      return Binary::CreateContainer(std::move(unpacked));
+      return unpacked;
     }
     catch (const std::exception&)
     {
       Dbg("Failed to decode");
-      return Binary::Container::Ptr();
+      return {};
     }
     catch (const Error& e)
     {
       Dbg("Error: {}", e.ToString());
-      return Binary::Container::Ptr();
+      return {};
     }
   }
 
@@ -219,24 +215,24 @@ namespace ZXTune::Zdata
       Binary::Compression::Zlib::Compress(inputStream, output);
     }
     const auto packedSize = output.Size() - prevOutputSize;
-    return Header(Binary::Crc32(input), inSize, packedSize);
+    return {Binary::Crc32(input), inSize, packedSize};
   }
 
-  Binary::Container::Ptr Convert(const void* input, std::size_t inputSize)
+  Binary::Container::Ptr Convert(Binary::View input)
   {
-    const std::size_t outSize = Binary::Base64::CalculateConvertedSize(inputSize);
-    std::unique_ptr<Binary::Dump> result(new Binary::Dump(outSize));
-    const uint8_t* const in = static_cast<const uint8_t*>(input);
-    char* const out = safe_ptr_cast<char*>(result->data());
-    Binary::Base64::Encode(in, in + inputSize, out, out + outSize);
-    return Binary::CreateContainer(std::move(result));
+    const auto outSize = Binary::Base64::CalculateConvertedSize(input.Size());
+    Binary::DataBuilder builder(outSize);
+    const auto* in = input.As<uint8_t>();
+    auto* out = static_cast<char*>(builder.Allocate(outSize));
+    Binary::Base64::Encode(in, in + input.Size(), out, out + outSize);
+    return builder.CaptureResult();
   }
 }  // namespace ZXTune::Zdata
 
 namespace ZXTune::Zdata
 {
-  const Char ID[] = {'Z', 'D', 'A', 'T', 'A', 0};
-  const Char INFO[] = "Zdata";
+  const auto ID = "ZDATA"_id;
+  const auto INFO = "Zdata"_sv;
   const uint_t CAPS = Capabilities::Category::CONTAINER | Capabilities::Container::Type::ARCHIVE;
 }  // namespace ZXTune::Zdata
 
@@ -248,8 +244,9 @@ namespace ZXTune
     builder.Add<Zdata::RawHeader>();
     const Zdata::Header hdr = Zdata::Compress(input, builder);
     hdr.ToRaw(builder.Get<Zdata::RawHeader>(0));
-    const Binary::Container::Ptr data = Zdata::Convert(builder.Get(0), builder.Size());
-    return CreateLocation(data, Zdata::ID, Strings::PrefixedIndex(Zdata::PLUGIN_PREFIX, hdr.Crc).ToString());
+    auto data = Zdata::Convert(builder.GetView());
+    return CreateLocation(std::move(data), Zdata::ID.to_string(),
+                          Strings::PrefixedIndex(Zdata::PLUGIN_PREFIX, hdr.Crc).ToString());
   }
 }  // namespace ZXTune
 
@@ -260,14 +257,14 @@ namespace ZXTune::Zdata
   public:
     Plugin() = default;
 
-    String Id() const override
+    PluginId Id() const override
     {
       return ID;
     }
 
     String Description() const override
     {
-      return INFO;
+      return INFO.to_string();
     }
 
     uint_t Capabilities() const override
@@ -289,7 +286,7 @@ namespace ZXTune::Zdata
     DataLocation::Ptr TryOpen(const Parameters::Accessor& /*params*/, DataLocation::Ptr location,
                               const Analysis::Path& inPath) const override
     {
-      const String& pathComp = inPath.GetIterator()->Get();
+      const auto& pathComp = inPath.GetIterator()->Get();
       const Strings::PrefixedIndex pathIndex(PLUGIN_PREFIX, pathComp);
       if (pathIndex.IsValid())
       {

@@ -19,8 +19,8 @@
 
 namespace Module
 {
-  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, StreamModel::Ptr model);
-  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, StreamModel::Ptr model);
+  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
+  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
 
   Information::Ptr CreateTimedInfo(Time::Milliseconds duration);
   Information::Ptr CreateTimedInfo(Time::Milliseconds duration, Time::Milliseconds loopDuration);
@@ -56,9 +56,9 @@ namespace Module
       TotalPlayback = {};
     }
 
-    // Set range = 0 to enforce stream end
-    // Returns really consumed
-    Time::Microseconds Consume(Time::Microseconds range);
+    // Consumes and returns min(range, End - Position)
+    Time::Microseconds ConsumeUpTo(Time::Microseconds range);
+    Time::Microseconds ConsumeRest();
 
     // Returns delta to skip
     Time::Microseconds Seek(Time::AtMicrosecond request)
@@ -67,12 +67,12 @@ namespace Module
       if (request < Position)
       {
         Position = request;
-        return Time::Microseconds(request.Get());
+        return Time::Microseconds{request.Get()};
       }
       else
       {
         const auto newPos = Time::AtMicrosecond(request.Get() % Limit.Get());
-        const auto delta = Time::Microseconds(newPos.Get() - Position.Get());
+        const auto delta = newPos - Position;
         Position = newPos;
         return delta;
       }

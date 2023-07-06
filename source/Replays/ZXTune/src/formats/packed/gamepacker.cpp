@@ -22,7 +22,6 @@
 #include <formats/packed.h>
 // std includes
 #include <cstring>
-#include <iterator> // rePlayer
 
 namespace Formats::Packed
 {
@@ -98,7 +97,7 @@ namespace Formats::Packed
           return PackedSource - selfAddr;
         }
 
-        uint_t GetPackedDataSize() const
+        static uint_t GetPackedDataSize()
         {
           return 0;
         }
@@ -182,7 +181,7 @@ namespace Formats::Packed
       std::size_t GetPackedDataSize() const
       {
         const typename Version::RawHeader& header = GetHeader();
-        if (uint_t packed = header.GetPackedDataSize())
+        if (const uint_t packed = header.GetPackedDataSize())
         {
           return packed;
         }
@@ -208,8 +207,6 @@ namespace Formats::Packed
         : IsValid(container.Check())
         , Header(container.GetHeader())
         , Stream(container.GetPackedData(), container.GetPackedDataSize())
-        , Result(new Binary::Dump())
-        , Decoded(*Result)
       {
         if (IsValid && !Stream.Eof())
         {
@@ -217,9 +214,9 @@ namespace Formats::Packed
         }
       }
 
-      std::unique_ptr<Binary::Dump> GetResult()
+      Binary::Container::Ptr GetResult()
       {
-        return IsValid ? std::move(Result) : std::unique_ptr<Binary::Dump>();
+        return IsValid ? Decoded.CaptureResult() : Binary::Container::Ptr();
       }
 
       std::size_t GetUsedSize() const
@@ -230,9 +227,9 @@ namespace Formats::Packed
     private:
       bool DecodeData()
       {
-        Decoded.reserve(Header.GetPackedDataSize() * 2);
+        Decoded = Binary::DataBuilder(Header.GetPackedDataSize() * 2);
 
-        while (!Stream.Eof() && Decoded.size() < MAX_DECODED_SIZE)
+        while (!Stream.Eof() && Decoded.Size() < MAX_DECODED_SIZE)
         {
           const uint8_t byt = Stream.GetByte();
           if (0 == (byt & 128))
@@ -253,7 +250,7 @@ namespace Formats::Packed
             }
             for (; count && !Stream.Eof(); --count)
             {
-              Decoded.push_back(Stream.GetByte());
+              Decoded.AddByte(Stream.GetByte());
             }
             if (count)
             {
@@ -264,7 +261,7 @@ namespace Formats::Packed
           {
             const uint_t data = Stream.GetByte();
             const uint_t len = (byt & 63) + 3;
-            std::fill_n(std::back_inserter(Decoded), len, data);
+            Fill(Decoded, len, data);
           }
         }
         return true;
@@ -274,8 +271,7 @@ namespace Formats::Packed
       bool IsValid;
       const typename Version::RawHeader& Header;
       ByteStream Stream;
-      std::unique_ptr<Binary::Dump> Result;
-      Binary::Dump& Decoded;
+      Binary::DataBuilder Decoded;
     };
   }  // namespace GamePacker
 
@@ -301,13 +297,13 @@ namespace Formats::Packed
     {
       if (!Depacker->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
 
       const GamePacker::Container<Version> container(rawData.Start(), rawData.Size());
       if (!container.Check())
       {
-        return Container::Ptr();
+        return {};
       }
       GamePacker::DataDecoder<Version> decoder(container);
       return CreateContainer(decoder.GetResult(), decoder.GetUsedSize());

@@ -16,6 +16,7 @@
 #include <contract.h>
 #include <make_ptr.h>
 // library includes
+#include <binary/dump.h>
 #include <binary/format_factories.h>
 #include <binary/input_stream.h>
 #include <debug/log.h>
@@ -32,8 +33,8 @@ namespace Formats::Chiptune
   {
     const Debug::Stream Dbg("Formats::Chiptune::YM");
 
-    typedef std::array<uint8_t, 14> RegistersDump;
-    typedef std::array<uint8_t, 4> IdentifierType;
+    using RegistersDump = std::array<uint8_t, 14>;
+    using IdentifierType = std::array<uint8_t, 4>;
 
     const uint_t CLOCKRATE_MIN = 100000;    // 100kHz
     const uint_t CLOCKRATE_MAX = 10000000;  // 10MHz
@@ -125,8 +126,8 @@ namespace Formats::Chiptune
     {
       const uint8_t ID[] = {'Y', 'M', '5', '!', 'L', 'e', 'O', 'n', 'A', 'r', 'D', '!'};
 
-      typedef std::array<uint8_t, 16> RegistersDump;
-      typedef std::array<uint8_t, 4> Footer;
+      using RegistersDump = std::array<uint8_t, 16>;
+      using Footer = std::array<uint8_t, 4>;
 
       struct RawHeader
       {
@@ -203,7 +204,7 @@ namespace Formats::Chiptune
 
       bool FastCheck(Binary::View data)
       {
-        if (const auto hdr = data.As<RawHeader>())
+        if (const auto* const hdr = data.As<RawHeader>())
         {
           const std::size_t hdrLen = hdr->GetDataOffset();
           if (hdrLen + hdr->PackedSize + FOOTER_SIZE > data.Size())
@@ -232,21 +233,22 @@ namespace Formats::Chiptune
     class StubBuilder : public Builder
     {
     public:
-      void SetVersion(const String& /*version*/) override {}
+      MetaBuilder& GetMetaBuilder() override
+      {
+        return GetStubMetaBuilder();
+      }
+
+      void SetVersion(StringView /*version*/) override {}
       void SetChipType(bool /*ym*/) override {}
       void SetStereoMode(uint_t /*mode*/) override {}
       void SetLoop(uint_t /*loop*/) override {}
-      void SetDigitalSample(uint_t /*idx*/, const Binary::Dump& /*data*/) override {}
+      void SetDigitalSample(uint_t /*idx*/, Binary::View /*data*/) override {}
       void SetClockrate(uint64_t /*freq*/) override {}
       void SetIntFreq(uint_t /*freq*/) override {}
-      void SetTitle(const String& /*title*/) override {}
-      void SetAuthor(const String& /*author*/) override {}
-      void SetComment(const String& /*comment*/) override {}
       void SetYear(uint_t /*year*/) override {}
-      void SetProgram(const String& /*program*/) override {}
-      void SetEditor(const String& /*editor*/) override {}
+      void SetEditor(StringView /*editor*/) override {}
 
-      void AddData(const Binary::Dump& /*registers*/) override {}
+      void AddData(Binary::View /*registers*/) override {}
     };
 
     bool FastCheck(const Binary::Container& rawData)
@@ -260,7 +262,7 @@ namespace Formats::Chiptune
     void ParseTransponedMatrix(Binary::View input, std::size_t rows, std::size_t columns, Builder& target)
     {
       Require(rows != 0);
-      const auto data = input.As<uint8_t>();
+      const auto* data = input.As<uint8_t>();
       for (std::size_t row = 0; row != rows; ++row)
       {
         Binary::Dump registers(columns);
@@ -274,23 +276,19 @@ namespace Formats::Chiptune
 
     void ParseMatrix(Binary::View input, std::size_t rows, std::size_t columns, Builder& target)
     {
+      static const uint8_t ZEROES[sizeof(Ver5::RegistersDump)] = {0};
       Require(rows != 0);
-      const auto *cursor = input.As<uint8_t>(), *limit = cursor + input.Size();
-      for (std::size_t row = 0; row != rows; ++row)
+      for (std::size_t row = 0, offset = 0; row != rows; ++row, offset += columns)
       {
-        const uint8_t* const nextCursor = cursor + columns;
-        if (nextCursor <= limit)
+        const auto line = input.SubView(offset, columns);
+        if (line.Size() == columns)
         {
-          const Binary::Dump registers(cursor, nextCursor);
-          target.AddData(registers);
+          target.AddData(line);
         }
         else
         {
-          Binary::Dump registers = cursor < limit ? Binary::Dump(cursor, limit) : Binary::Dump();
-          registers.resize(columns);
-          target.AddData(registers);
+          target.AddData({ZEROES, columns});
         }
-        cursor = nextCursor;
       }
     }
 
@@ -333,9 +331,10 @@ namespace Formats::Chiptune
           target.SetClockrate(header.Clockrate);
           target.SetIntFreq(header.IntFreq);
           target.SetLoop(header.Loop);
-          target.SetTitle(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
-          target.SetAuthor(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
-          target.SetComment(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+          auto& meta = target.GetMetaBuilder();
+          meta.SetTitle(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+          meta.SetAuthor(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+          meta.SetComment(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
 
           const std::size_t dumpOffset = stream.GetPosition();
           const std::size_t dumpSize = size - sizeof(Ver5::Footer) - dumpOffset;
@@ -606,13 +605,14 @@ namespace Formats::Chiptune
           target.SetYear(stream.Read<le_uint16_t>());
         }
         const uint_t unpackedSize = stream.Read<le_uint32_t>();
-        target.SetTitle(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
-        target.SetAuthor(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+        auto& meta = target.GetMetaBuilder();
+        meta.SetTitle(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetAuthor(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
         if (newVersion)
         {
-          target.SetProgram(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+          meta.SetProgram(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
           target.SetEditor(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
-          target.SetComment(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
+          meta.SetComment(Strings::OptimizeAscii(stream.ReadCString(MAX_STRING_SIZE)));
         }
 
         const std::size_t packedOffset = stream.GetPosition();

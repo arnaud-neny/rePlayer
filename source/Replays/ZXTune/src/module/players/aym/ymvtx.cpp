@@ -17,10 +17,10 @@
 #include <make_ptr.h>
 // library includes
 #include <core/core_parameters.h>
+#include <module/players/properties_meta.h>
+#include <strings/conversion.h>
 // std includes
 #include <utility>
-// boost includes
-#include <boost/lexical_cast.hpp>
 
 namespace Module::YMVTX
 {
@@ -54,10 +54,16 @@ namespace Module::YMVTX
   public:
     explicit DataBuilder(AYM::PropertiesHelper& props)
       : Properties(props)
+      , Meta(props)
       , Data(MakePtr<AYM::MutableStreamModel>())
     {}
 
-    void SetVersion(const String& version) override
+    Formats::Chiptune::MetaBuilder& GetMetaBuilder() override
+    {
+      return Meta;
+    }
+
+    void SetVersion(StringView version) override
     {
       Properties.SetVersion(version);
     }
@@ -77,7 +83,7 @@ namespace Module::YMVTX
       Data->SetLoop(loop);
     }
 
-    void SetDigitalSample(uint_t /*idx*/, const Binary::Dump& /*data*/) override
+    void SetDigitalSample(uint_t /*idx*/, Binary::View /*data*/) override
     {
       // TODO:
     }
@@ -95,46 +101,27 @@ namespace Module::YMVTX
       }
     }
 
-    void SetTitle(const String& title) override
-    {
-      Properties.SetTitle(title);
-    }
-
-    void SetAuthor(const String& author) override
-    {
-      Properties.SetAuthor(author);
-    }
-
-    void SetComment(const String& comment) override
-    {
-      Properties.SetComment(comment);
-    }
-
     void SetYear(uint_t year) override
     {
       if (year)
       {
-        Properties.SetDate(boost::lexical_cast<String>(year));
+        Properties.SetDate(Strings::ConvertFrom(year));
       }
     }
 
-    void SetProgram(const String& /*program*/) override
-    {
-      // TODO
-    }
-
-    void SetEditor(const String& editor) override
+    void SetEditor(StringView editor) override
     {
       Properties.SetProgram(editor);
     }
 
-    void AddData(const Binary::Dump& registers) override
+    void AddData(Binary::View registers) override
     {
       auto& data = Data->AddFrame();
-      const uint_t availRegs = std::min<uint_t>(registers.size(), Devices::AYM::Registers::ENV + 1);
+      const uint_t availRegs = std::min<uint_t>(registers.Size(), Devices::AYM::Registers::ENV + 1);
+      const auto* regs = registers.As<uint8_t>();
       for (uint_t reg = 0, mask = 1; reg != availRegs; ++reg, mask <<= 1)
       {
-        const uint8_t val = registers[reg];
+        const uint8_t val = regs[reg];
         if (reg != Devices::AYM::Registers::ENV || val != 0xff)
         {
           data[static_cast<Devices::AYM::Registers::Index>(reg)] = val;
@@ -144,7 +131,7 @@ namespace Module::YMVTX
 
     AYM::StreamModel::Ptr CaptureResult() const
     {
-      return Data->IsEmpty() ? AYM::StreamModel::Ptr() : AYM::StreamModel::Ptr(std::move(Data));
+      return Data->IsEmpty() ? AYM::StreamModel::Ptr() : AYM::StreamModel::Ptr(Data);
     }
 
     Time::Microseconds GetFrameDuration() const
@@ -154,6 +141,7 @@ namespace Module::YMVTX
 
   private:
     AYM::PropertiesHelper& Properties;
+    MetaProperties Meta;
     AYM::MutableStreamModel::Ptr Data;
     Time::Microseconds FrameDuration = AYM::BASE_FRAME_DURATION;
   };

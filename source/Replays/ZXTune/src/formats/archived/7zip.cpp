@@ -19,13 +19,13 @@
 #include <debug/log.h>
 #include <formats/archived.h>
 #include <strings/encoding.h>
+#include <strings/map.h>
 // 3rdparty includes
 #include <3rdparty/lzma/C/7z.h>
 #include <3rdparty/lzma/C/7zCrc.h>
 // std includes
 #include <cstring>
 #include <list>
-#include <map>
 #include <numeric>
 
 namespace Formats::Archived
@@ -92,7 +92,6 @@ namespace Formats::Archived
         : Data(std::move(data))
         , Start(static_cast<const uint8_t*>(Data->Start()))
         , Limit(Data->Size())
-        , Position()
       {
         Read = DoRead;
         Seek = DoSeek;
@@ -142,7 +141,7 @@ namespace Formats::Archived
       const Binary::Data::Ptr Data;
       const uint8_t* const Start;
       const std::size_t Limit;
-      std::size_t Position;
+      std::size_t Position = 0;
     };
 
     class LookupStream : public CLookToRead
@@ -163,7 +162,7 @@ namespace Formats::Archived
     class Archive
     {
     public:
-      typedef std::shared_ptr<const Archive> Ptr;
+      using Ptr = std::shared_ptr<const Archive>;
 
       explicit Archive(Binary::Data::Ptr data)
         : Stream(std::move(data))
@@ -225,13 +224,11 @@ namespace Formats::Archived
       struct UnpackCache
       {
         UInt32 BlockIndex;
-        Byte* OutBuffer;
-        size_t OutBufferSize;
+        Byte* OutBuffer = nullptr;
+        size_t OutBufferSize = 0;
 
         UnpackCache()
           : BlockIndex(~UInt32(0))
-          , OutBuffer(nullptr)
-          , OutBufferSize(0)
         {}
       };
 
@@ -285,7 +282,7 @@ namespace Formats::Archived
       {
         for (const auto& file : Files)
         {
-          Lookup.insert(FilesMap::value_type(file->GetName(), file));
+          Lookup.emplace(file->GetName(), file);
         }
       }
 
@@ -297,10 +294,9 @@ namespace Formats::Archived
         }
       }
 
-      File::Ptr FindFile(const String& name) const override
+      File::Ptr FindFile(StringView name) const override
       {
-        const auto it = Lookup.find(name);
-        return it != Lookup.end() ? it->second : File::Ptr();
+        return Lookup.Get(name);
       }
 
       uint_t CountFiles() const override
@@ -310,8 +306,7 @@ namespace Formats::Archived
 
     private:
       std::vector<File::Ptr> Files;
-      typedef std::map<String, File::Ptr> FilesMap;
-      FilesMap Lookup;
+      Strings::ValueMap<File::Ptr> Lookup;
     };
   }  // namespace SevenZip
 
@@ -337,25 +332,32 @@ namespace Formats::Archived
       const Binary::View data(rawData);
       if (!Format->Match(data))
       {
-        return Container::Ptr();
+        return {};
       }
       const auto& hdr = *data.As<SevenZip::Header>();
       const std::size_t totalSize = sizeof(hdr) + hdr.NextHeaderOffset + hdr.NextHeaderSize;
       auto archiveData = rawData.GetSubcontainer(0, totalSize);
 
-      const SevenZip::Archive::Ptr archive = MakePtr<SevenZip::Archive>(archiveData);
-      const auto totalFiles = archive->GetFilesCount();
-      std::vector<File::Ptr> files;
-      files.reserve(totalFiles);
-      for (uint_t idx = 0; idx < totalFiles; ++idx)
+      try
       {
-        if (archive->IsDir(idx) || 0 == archive->GetFileSize(idx))
+        const SevenZip::Archive::Ptr archive = MakePtr<SevenZip::Archive>(archiveData);
+        const auto totalFiles = archive->GetFilesCount();
+        std::vector<File::Ptr> files;
+        files.reserve(totalFiles);
+        for (uint_t idx = 0; idx < totalFiles; ++idx)
         {
-          continue;
+          if (archive->IsDir(idx) || 0 == archive->GetFileSize(idx))
+          {
+            continue;
+          }
+          files.emplace_back(MakePtr<SevenZip::File>(archive, idx));
         }
-        files.emplace_back(MakePtr<SevenZip::File>(archive, idx));
+        return MakePtr<SevenZip::Container>(std::move(archiveData), std::move(files));
       }
-      return MakePtr<SevenZip::Container>(std::move(archiveData), std::move(files));
+      catch (const std::exception&)
+      {
+        return {};
+      }
     }
 
   private:

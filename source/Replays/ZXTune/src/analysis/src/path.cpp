@@ -14,30 +14,25 @@
 // library includes
 #include <analysis/path.h>
 #include <strings/array.h>
-// boost includes
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <strings/join.h>
+#include <strings/split.h>
 // std includes
-#include <cassert>
+#include <functional>
 
 namespace Analysis
 {
-  Strings::Array SplitPath(const String& str, Char separator)
+  Strings::Array SplitPath(StringView str, Char separator)
   {
-    const String delimiter(1, separator);
     Strings::Array parts;
-    boost::algorithm::split(parts, str, boost::algorithm::is_any_of(delimiter), boost::algorithm::token_compress_on);
-    const Strings::Array::iterator newEnd =
-        std::remove_if(parts.begin(), parts.end(), [](const String& element) { return element.empty(); });
+    Strings::Split(str, separator, parts);
+    const auto newEnd = std::remove_if(parts.begin(), parts.end(), std::mem_fn(&String::empty));
     parts.erase(newEnd, parts.end());
     return parts;
   }
 
   String JoinPath(const Strings::Array& arr, Char separator)
   {
-    const String delimiter(1, separator);
-    return boost::algorithm::join(arr, delimiter);
+    return Strings::Join(arr, StringView(&separator, 1));
   }
 
   template<class It>
@@ -78,25 +73,25 @@ namespace Analysis
       return CreateRangedObjectIteratorAdapter(Components.begin(), Components.end());
     }
 
-    Ptr Append(const String& element) const override
+    Ptr Append(StringView element) const override
     {
-      const Strings::Array& newOne = SplitPath(element, Separator);
+      const auto& newOne = SplitPath(element, Separator);
       Strings::Array result(Components.size() + newOne.size());
       std::copy(newOne.begin(), newOne.end(), std::copy(Components.begin(), Components.end(), result.begin()));
       return CreatePath(Separator, std::move(result));
     }
 
-    Ptr Extract(const String& startPath) const override
+    Ptr Extract(StringView startPath) const override
     {
       const auto& subSplitted = SplitPath(startPath, Separator);
       if (subSplitted.size() > Components.size())
       {
-        return Ptr();
+        return {};
       }
       const auto iters = std::mismatch(subSplitted.begin(), subSplitted.end(), Components.begin());
       if (iters.first != subSplitted.end())
       {
-        return Ptr();
+        return {};
       }
       return CreatePath(Separator, iters.second, Components.end());
     }
@@ -131,7 +126,7 @@ namespace Analysis
 
     String AsString() const override
     {
-      return String();
+      return {};
     }
 
     Iterator::Ptr GetIterator() const override
@@ -139,19 +134,19 @@ namespace Analysis
       return Iterator::CreateStub();
     }
 
-    Ptr Append(const String& element) const override
+    Ptr Append(StringView element) const override
     {
       return ParsePath(element, Separator);
     }
 
-    Ptr Extract(const String& startPath) const override
+    Ptr Extract(StringView startPath) const override
     {
       return startPath.empty() ? MakePtr<EmptyPath>(Separator) : Ptr();
     }
 
     Ptr GetParent() const override
     {
-      return Ptr();
+      return {};
     }
 
   private:
@@ -186,7 +181,7 @@ namespace Analysis
 
 namespace Analysis
 {
-  Path::Ptr ParsePath(const String& str, Char separator)
+  Path::Ptr ParsePath(StringView str, Char separator)
   {
     auto parsed = SplitPath(str, separator);
     return CreatePath(separator, std::move(parsed));

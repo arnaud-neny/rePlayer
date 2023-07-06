@@ -167,11 +167,7 @@ namespace Formats::Packed
           return false;
         }
         const std::size_t usedSize = GetUsedSize();
-        if (usedSize > Size)
-        {
-          return false;
-        }
-        return true;
+        return usedSize <= Size;
       }
 
       std::size_t GetUsedSize() const
@@ -203,8 +199,6 @@ namespace Formats::Packed
         : IsValid(container.FastCheck())
         , Header(container.GetHeader())
         , Stream(Header.Data, Header.SizeOfPacked)
-        , Result(new Binary::Dump())
-        , Decoded(*Result)
       {
         if (IsValid && !Stream.Eof())
         {
@@ -212,18 +206,18 @@ namespace Formats::Packed
         }
       }
 
-      std::unique_ptr<Binary::Dump> GetResult()
+      Binary::Container::Ptr GetResult()
       {
-        return IsValid ? std::move(Result) : std::unique_ptr<Binary::Dump>();
+        return IsValid ? Decoded.CaptureResult() : Binary::Container::Ptr();
       }
 
     private:
       bool DecodeData()
       {
         // The main concern is to decode data as much as possible, skipping defenitely invalid structure
-        Decoded.reserve(2 * Header.SizeOfPacked);
+        Decoded = Binary::DataBuilder(2 * Header.SizeOfPacked);
         // assume that first byte always exists due to header format
-        while (!Stream.Eof() && Decoded.size() < MAX_DECODED_SIZE)
+        while (!Stream.Eof() && Decoded.Size() < MAX_DECODED_SIZE)
         {
           const uint_t data = Stream.GetByte();
           if (0x80 == data)
@@ -243,7 +237,7 @@ namespace Formats::Packed
             assert(len);
             for (; len && !Stream.Eof(); --len)
             {
-              Decoded.push_back(Stream.GetByte());
+              Decoded.AddByte(Stream.GetByte());
             }
             if (len)
             {
@@ -254,7 +248,7 @@ namespace Formats::Packed
           {
             const std::size_t len = (data & 0x3f) + 3;
             const uint8_t filler = Stream.GetByte();
-            std::fill_n(std::back_inserter(Decoded), len, filler);
+            Fill(Decoded, len, filler);
           }
           else
           {
@@ -268,7 +262,7 @@ namespace Formats::Packed
         }
         while (!Stream.Eof())
         {
-          Decoded.push_back(Stream.GetByte());
+          Decoded.AddByte(Stream.GetByte());
         }
         return true;
       }
@@ -277,8 +271,7 @@ namespace Formats::Packed
       bool IsValid;
       const RawHeader& Header;
       ByteStream Stream;
-      std::unique_ptr<Binary::Dump> Result;
-      Binary::Dump& Decoded;
+      Binary::DataBuilder Decoded;
     };
   }  // namespace LZS
 
@@ -303,12 +296,12 @@ namespace Formats::Packed
     {
       if (!Depacker->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       const LZS::Container container(rawData.Start(), rawData.Size());
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       LZS::DataDecoder decoder(container);
       return CreateContainer(decoder.GetResult(), container.GetUsedSize());

@@ -31,6 +31,8 @@
 #include <3rdparty/he/Core/psx.h>
 #include <3rdparty/he/Core/r3000.h>
 #include <3rdparty/he/Core/spu.h>
+// std includes
+#include <utility>
 
 namespace Module::PSF
 {
@@ -65,17 +67,23 @@ namespace Module::PSF
     }
 
   private:
-    bool PreloadFile(const char* path) const
+    bool PreloadFile(StringView path) const
     {
-      if (CachedName != path)
+      if (CachedName == path)
       {
-        if (!Vfs->Find(path, CachedData))
-        {
-          Dbg("Not found '{}'", path);
-          return false;
-        }
+        return true;
+      }
+      if (auto data = Vfs->Find(path))
+      {
         Dbg("Open '{}'", path);
-        CachedName = path;
+        CachedName = path.to_string();
+        CachedData = std::move(data);
+        return true;
+      }
+      else
+      {
+        Dbg("Not found '{}'", path);
+        return false;
       }
       return true;
     }
@@ -145,7 +153,7 @@ namespace Module::PSF
     }
 
   public:
-    std::unique_ptr<uint8_t[]> CreatePSX(int version) const
+    static std::unique_ptr<uint8_t[]> CreatePSX(int version)
     {
       std::unique_ptr<uint8_t[]> res(new uint8_t[::psx_get_state_size(version)]);
       ::psx_clear_state(res.get(), version);
@@ -239,27 +247,27 @@ namespace Module::PSF
 
     void SetRAM(const MemoryRegion& mem)
     {
-      const auto iop = ::psx_get_iop_state(Emu.get());
+      auto* const iop = ::psx_get_iop_state(Emu.get());
       ::iop_upload_to_ram(iop, mem.Start, mem.Data.data(), mem.Data.size());
     }
 
     void SetRegisters(uint32_t pc, uint32_t sp)
     {
-      const auto iop = ::psx_get_iop_state(Emu.get());
-      const auto cpu = ::iop_get_r3000_state(iop);
+      auto* const iop = ::psx_get_iop_state(Emu.get());
+      auto* const cpu = ::iop_get_r3000_state(iop);
       ::r3000_setreg(cpu, R3000_REG_PC, pc);
       ::r3000_setreg(cpu, R3000_REG_GEN + 29, sp);
     }
 
     void SetupIo(PsxVfs::Ptr vfs)
     {
-      Io = VfsIO(vfs);
+      Io = VfsIO(std::move(vfs));
       ::psx_set_readfile(Emu.get(), &ReadCallback, &Io);
     }
 
     static sint32 ReadCallback(void* context, const char* path, sint32 offset, char* buffer, sint32 length)
     {
-      const auto io = static_cast<VfsIO*>(context);
+      auto* const io = static_cast<VfsIO*>(context);
       return io->Read(path, offset, buffer, length);
     }
 
@@ -289,7 +297,7 @@ namespace Module::PSF
 
     Sound::Chunk Render() override
     {
-      const auto avail = State->Consume(FRAME_DURATION);
+      const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Target->Apply(Engine->Render(GetSamples(avail)));
     }
 
@@ -436,7 +444,7 @@ namespace Module::PSF
       return Holder::Create(builder.CaptureResult(file.Version), std::move(properties));
     }
 
-    Holder::Ptr CreateMultifileModule(const XSF::File& file, const std::map<String, XSF::File>& additionalFiles,
+    Holder::Ptr CreateMultifileModule(const XSF::File& file, const XSF::FilesMap& additionalFiles,
                                       Parameters::Container::Ptr properties) const override
     {
       ModuleDataBuilder builder;
@@ -472,8 +480,8 @@ namespace Module::PSF
     */
     static const uint_t MAX_LEVEL = 10;
 
-    static void MergeExe(const XSF::File& data, const std::map<String, XSF::File>& additionalFiles,
-                         ModuleDataBuilder& dst, uint_t level = 1)
+    static void MergeExe(const XSF::File& data, const XSF::FilesMap& additionalFiles, ModuleDataBuilder& dst,
+                         uint_t level = 1)
     {
       auto it = data.Dependencies.begin();
       const auto lim = data.Dependencies.end();
@@ -503,8 +511,8 @@ namespace Module::PSF
     If there are conflicting or redundant filenames, they should be overwritten in memory in the order in which the
     filesystem data was parsed. Later takes priority.
     */
-    static void MergeVfs(const XSF::File& data, const std::map<String, XSF::File>& additionalFiles,
-                         ModuleDataBuilder& dst, uint_t level = 1)
+    static void MergeVfs(const XSF::File& data, const XSF::FilesMap& additionalFiles, ModuleDataBuilder& dst,
+                         uint_t level = 1)
     {
       if (level < MAX_LEVEL)
       {
@@ -516,8 +524,8 @@ namespace Module::PSF
       dst.AddVfs(*data.ReservedSection);
     }
 
-    static void MergeMeta(const XSF::File& data, const std::map<String, XSF::File>& additionalFiles,
-                          ModuleDataBuilder& dst, uint_t level = 1)
+    static void MergeMeta(const XSF::File& data, const XSF::FilesMap& additionalFiles, ModuleDataBuilder& dst,
+                          uint_t level = 1)
     {
       if (level < MAX_LEVEL)
       {

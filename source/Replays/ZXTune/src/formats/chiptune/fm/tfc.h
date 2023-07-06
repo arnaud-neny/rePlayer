@@ -10,45 +10,43 @@
 
 #pragma once
 
+// local includes
+#include "formats/chiptune/builder_meta.h"
 // common includes
 #include <types.h>
 // library includes
 #include <formats/chiptune.h>
 
-namespace Formats
+namespace Formats::Chiptune
 {
-  namespace Chiptune
+  namespace TFC
   {
-    namespace TFC
+    class Builder
     {
-      class Builder
-      {
-      public:
-        typedef std::shared_ptr<Builder> Ptr;
-        virtual ~Builder() = default;
+    public:
+      using Ptr = std::shared_ptr<Builder>;
+      virtual ~Builder() = default;
 
-        virtual void SetVersion(const String& version) = 0;
-        virtual void SetIntFreq(uint_t freq) = 0;
-        virtual void SetTitle(const String& title) = 0;
-        virtual void SetAuthor(const String& author) = 0;
-        virtual void SetComment(const String& comment) = 0;
+      virtual MetaBuilder& GetMetaBuilder() = 0;
 
-        //! building channel->frame
-        virtual void StartChannel(uint_t idx) = 0;
-        virtual void StartFrame() = 0;
-        virtual void SetSkip(uint_t count) = 0;
-        virtual void SetLoop() = 0;
-        virtual void SetSlide(uint_t slide) = 0;
-        virtual void SetKeyOff() = 0;
-        virtual void SetFreq(uint_t freq) = 0;
-        virtual void SetRegister(uint_t reg, uint_t val) = 0;
-        virtual void SetKeyOn() = 0;
-      };
+      virtual void SetVersion(StringView version) = 0;
+      virtual void SetIntFreq(uint_t freq) = 0;
 
-      Formats::Chiptune::Container::Ptr Parse(const Binary::Container& data, Builder& target);
-      Builder& GetStubBuilder();
-    }  // namespace TFC
+      //! building channel->frame
+      virtual void StartChannel(uint_t idx) = 0;
+      virtual void StartFrame() = 0;
+      virtual void SetSkip(uint_t count) = 0;
+      virtual void SetLoop() = 0;
+      virtual void SetSlide(uint_t slide) = 0;
+      virtual void SetKeyOff() = 0;
+      virtual void SetFreq(uint_t freq) = 0;
+      virtual void SetRegister(uint_t reg, uint_t val) = 0;
+      virtual void SetKeyOn() = 0;
+    };
 
-    Decoder::Ptr CreateTFCDecoder();
-  }  // namespace Chiptune
-}  // namespace Formats
+    Formats::Chiptune::Container::Ptr Parse(const Binary::Container& data, Builder& target);
+    Builder& GetStubBuilder();
+  }  // namespace TFC
+
+  Decoder::Ptr CreateTFCDecoder();
+}  // namespace Formats::Chiptune

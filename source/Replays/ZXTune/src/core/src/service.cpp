@@ -22,8 +22,7 @@
 #include <core/service.h>
 #include <debug/log.h>
 #include <module/attributes.h>
-// std includes
-#include <map>
+#include <strings/map.h>
 
 namespace ZXTune
 {
@@ -35,7 +34,7 @@ namespace ZXTune
   public:
     virtual ~LocationSource() = default;
 
-    virtual DataLocation::Ptr OpenLocation(Binary::Container::Ptr data, const String& subpath) const = 0;
+    virtual DataLocation::Ptr OpenLocation(Binary::Container::Ptr data, StringView subpath) const = 0;
   };
 
   class ResolveAdditionalFilesAdapter : public Module::DetectCallbackDelegate
@@ -49,7 +48,7 @@ namespace ZXTune
 
     void ProcessModule(const DataLocation& location, const Plugin& decoder, Module::Holder::Ptr holder) override
     {
-      if (const auto files = dynamic_cast<const Module::AdditionalFiles*>(holder.get()))
+      if (const auto* const files = dynamic_cast<const Module::AdditionalFiles*>(holder.get()))
       {
         const auto path = location.GetPath();
         if (const auto dir = path->GetParent())
@@ -80,7 +79,7 @@ namespace ZXTune
         , Delegate(delegate)
       {}
 
-      Binary::Container::Ptr Get(const String& name) const override
+      Binary::Container::Ptr Get(StringView name) const override
       {
         const auto subpath = Dir->Append(name)->AsString();
         Dbg("Resolve '{}' as '{}'", name, subpath);
@@ -99,7 +98,7 @@ namespace ZXTune
         : Delegate(std::move(delegate))
       {}
 
-      Binary::Container::Ptr Get(const String& name) const override
+      Binary::Container::Ptr Get(StringView name) const override
       {
         auto& cached = Cache[name];
         if (!cached)
@@ -115,7 +114,7 @@ namespace ZXTune
 
     private:
       const std::unique_ptr<const AdditionalFilesSource> Delegate;
-      mutable std::map<String, Binary::Container::Ptr> Cache;
+      mutable Strings::ValueMap<Binary::Container::Ptr> Cache;
     };
 
     class FullpathFilesSource : public Module::AdditionalFilesSource
@@ -126,7 +125,7 @@ namespace ZXTune
         , Data(std::move(data))
       {}
 
-      Binary::Container::Ptr Get(const String& name) const override
+      Binary::Container::Ptr Get(StringView name) const override
       {
         const auto location = Src.OpenLocation(Data, name);
         return location->GetData();
@@ -145,11 +144,10 @@ namespace ZXTune
   {
   public:
     explicit OpenModuleCallback(Parameters::Container::Ptr properties)
-      : DetectCallback()
-      , Properties(std::move(properties))
+      : Properties(std::move(properties))
     {}
 
-    Parameters::Container::Ptr CreateInitialProperties(const String& /*subpath*/) const override
+    Parameters::Container::Ptr CreateInitialProperties(StringView /*subpath*/) const override
     {
       // May be called multiple times, so do not destruct
       return Properties;
@@ -184,17 +182,17 @@ namespace ZXTune
       : Params(std::move(params))
     {}
 
-    Binary::Container::Ptr OpenData(Binary::Container::Ptr data, const String& subpath) const override
+    Binary::Container::Ptr OpenData(Binary::Container::Ptr data, StringView subpath) const override
     {
       return OpenLocation(std::move(data), subpath)->GetData();
     }
 
-    Module::Holder::Ptr OpenModule(Binary::Container::Ptr data, const String& subpath,
+    Module::Holder::Ptr OpenModule(Binary::Container::Ptr data, StringView subpath,
                                    Parameters::Container::Ptr initialProperties) const override
     {
       if (subpath.empty())
       {
-        return OpenModule(*data, std::move(initialProperties));
+        return OpenModule(*data, initialProperties);
       }
       else
       {
@@ -210,7 +208,7 @@ namespace ZXTune
       DetectModules(CreateLocation(data), adapter);
     }
 
-    void OpenModule(Binary::Container::Ptr data, const String& subpath, Module::DetectCallback& callback) const override
+    void OpenModule(Binary::Container::Ptr data, StringView subpath, Module::DetectCallback& callback) const override
     {
       ResolveAdditionalFilesAdapter adapter(*this, data, callback);
       auto location = OpenLocation(std::move(data), subpath);
@@ -221,7 +219,7 @@ namespace ZXTune
     }
 
   private:
-    DataLocation::Ptr OpenLocation(Binary::Container::Ptr data, const String& subpath) const override
+    DataLocation::Ptr OpenLocation(Binary::Container::Ptr data, StringView subpath) const override
     {
       auto resolvedLocation = CreateLocation(std::move(data));
       const auto sourcePath = Analysis::ParsePath(subpath, Module::SUBPATH_DELIMITER);
@@ -243,7 +241,7 @@ namespace ZXTune
       return resolvedLocation;
     }
 
-    DataLocation::Ptr TryToOpenLocation(DataLocation::Ptr location, const Analysis::Path& subPath) const
+    DataLocation::Ptr TryToOpenLocation(const DataLocation::Ptr& location, const Analysis::Path& subPath) const
     {
       for (const auto& plugin : ArchivePlugin::Enumerate())
       {
@@ -255,7 +253,8 @@ namespace ZXTune
       return {};
     }
 
-    Module::Holder::Ptr OpenModule(const Binary::Container& data, Parameters::Container::Ptr initialProperties) const
+    Module::Holder::Ptr OpenModule(const Binary::Container& data,
+                                   const Parameters::Container::Ptr& initialProperties) const
     {
       for (const auto& plugin : PlayerPlugin::Enumerate())
       {
@@ -267,7 +266,7 @@ namespace ZXTune
       throw Error(THIS_LINE, translate("Failed to find module at specified location."));
     }
 
-    void DetectModules(DataLocation::Ptr location, Module::DetectCallback& callback) const
+    void DetectModules(const DataLocation::Ptr& location, Module::DetectCallback& callback) const
     {
       if (!DetectInArchives(location, callback) && !DetectBy(PlayerPlugin::Enumerate(), location, callback))
       {
@@ -283,7 +282,7 @@ namespace ZXTune
         , Delegate(delegate)
         , Progress(useProgress ? Delegate.GetProgress() : nullptr)
       {}
-      Parameters::Container::Ptr CreateInitialProperties(const String& subpath) const override
+      Parameters::Container::Ptr CreateInitialProperties(StringView subpath) const override
       {
         return Delegate.CreateInitialProperties(subpath);
       }
@@ -306,7 +305,7 @@ namespace ZXTune
       void ProcessData(DataLocation::Ptr data) override
       {
         // TODO: proper progress
-        Svc.DetectModules(std::move(data), Delegate);
+        Svc.DetectModules(data, Delegate);
       }
 
     private:
@@ -347,4 +346,3 @@ namespace ZXTune
     return MakePtr<ServiceImpl>(std::move(parameters));
   }
 }  // namespace ZXTune
-

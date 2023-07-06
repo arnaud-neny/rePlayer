@@ -25,7 +25,7 @@ namespace Formats::Packed
 {
   namespace DSK
   {
-    typedef std::array<uint8_t, 34> DiskSignatureType;
+    using DiskSignatureType = std::array<uint8_t, 34>;
 
     const DiskSignatureType DISK_SIGNATURE = {{'M', 'V', ' ', '-', ' ', 'C', 'P', 'C', 'E',  'M',  'U',  ' ',
                                                'D', 'i', 's', 'k', '-', 'F', 'i', 'l', 'e',  '\r', '\n', 'D',
@@ -46,7 +46,7 @@ namespace Formats::Packed
       }
     };
 
-    typedef std::array<uint8_t, 12> TrackSignatureType;
+    using TrackSignatureType = std::array<uint8_t, 12>;
 
     const TrackSignatureType TRACK_SIGNATURE = {{'T', 'r', 'a', 'c', 'k', '-', 'I', 'n', 'f', 'o', '\r', '\n'}};
 
@@ -180,9 +180,8 @@ namespace Formats::Packed
           const std::size_t rawSectorSize = GetSectorDataSize(trackInfo.SectorSize);
           const std::size_t usedSectorSize = GetSectorDataSize(sectorInfo.Size);
           Require(rawSectorSize >= usedSectorSize);
-          const auto sectorData = trackStream.ReadData(rawSectorSize).As<uint8_t>();
-          Target.SetSector(Formats::CHS(sectorInfo.Track, sectorInfo.Side, sectorInfo.Sector),
-                           Binary::Dump(sectorData, sectorData + usedSectorSize));
+          const auto sectorData = trackStream.ReadData(rawSectorSize);
+          Target.SetSector(Formats::CHS(sectorInfo.Track, sectorInfo.Side, sectorInfo.Sector), sectorData);
         }
       }
 
@@ -197,9 +196,9 @@ namespace Formats::Packed
           const TrackInformationBlock::SectorInfo& sectorInfo = trackInfo.Sectors[sector];
           if (const std::size_t sectorSize = sectorInfo.ActualDataSize)
           {
-            const auto sectorData = trackStream.ReadData(sectorSize).As<uint8_t>();
+            const auto* const sectorData = trackStream.ReadData(sectorSize).As<uint8_t>();
             Target.SetSector(Formats::CHS(sectorInfo.Track, sectorInfo.Side, sectorInfo.Sector),
-                             Binary::Dump(sectorData, sectorData + sectorSize));
+                             Binary::View(sectorData, sectorSize));
           }
         }
       }
@@ -258,7 +257,7 @@ namespace Formats::Packed
     {
       if (!Format->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       try
       {
@@ -268,7 +267,7 @@ namespace Formats::Packed
       }
       catch (const std::exception&)
       {
-        return Container::Ptr();
+        return {};
       }
     }
 

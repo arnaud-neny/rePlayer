@@ -25,19 +25,19 @@ namespace Strings
     static const Char FIELD_END;
 
     //! @brief Pointer type
-    typedef std::unique_ptr<const Template> Ptr;
+    using Ptr = std::unique_ptr<const Template>;
     //! @brief Virtual destructor
     virtual ~Template() = default;
     //! @brief Performing instantiation
     virtual String Instantiate(const class FieldsSource& source) const = 0;
 
     //! @brief Factory
-    static Ptr Create(const String& templ);
+    static Ptr Create(StringView templ);
 
     //! @param templ Input string
     //! @param source Fields provider
     //! @param beginMark Placeholders' start marker
     //! @param endMark Placeholders' end marker
-    static String Instantiate(const String& templ, const FieldsSource& source);
+    static String Instantiate(StringView templ, const FieldsSource& source);
   };
 }  // namespace Strings

@@ -26,25 +26,26 @@ namespace Strings
   class PreprocessingTemplate : public Template
   {
   public:
-    explicit PreprocessingTemplate(const String& templ)
+    explicit PreprocessingTemplate(StringView templ)
+      : Value(templ.to_string())
     {
       const std::size_t fieldsAvg = std::count(templ.begin(), templ.end(), FIELD_START);
       FixedStrings.reserve(fieldsAvg);
       Fields.reserve(fieldsAvg);
       Entries.reserve(fieldsAvg * 2);
-      ParseTemplate(templ);
+      ParseTemplate(Value);
     }
 
     String Instantiate(const FieldsSource& src) const override
     {
       Array resultFields(Fields.size());
       std::transform(Fields.begin(), Fields.end(), resultFields.begin(),
-                     [&src](const String& name) { return src.GetFieldValue(name); });
+                     [&src](StringView name) { return src.GetFieldValue(name); });
       return SubstFields(resultFields);
     }
 
   private:
-    void ParseTemplate(const String& templ)
+    void ParseTemplate(StringView templ)
     {
       String::size_type textBegin = 0;
       for (;;)
@@ -64,13 +65,13 @@ namespace Strings
           // add text to set
           auto text = templ.substr(textBegin, fieldBegin - textBegin);
           const auto idx = FixedStrings.size();
-          FixedStrings.emplace_back(std::move(text));
+          FixedStrings.emplace_back(text);
           Entries.emplace_back(idx, false);
         }
         {
           auto field = templ.substr(fieldBegin + 1, fieldEnd - fieldBegin - 1);
           const auto idx = Fields.size();
-          Fields.emplace_back(std::move(field));
+          Fields.emplace_back(field);
           Entries.emplace_back(idx, true);
         }
         textBegin = fieldEnd + 1;
@@ -79,7 +80,7 @@ namespace Strings
       {
         auto restText = templ.substr(textBegin);
         const auto restIdx = FixedStrings.size();
-        FixedStrings.emplace_back(std::move(restText));
+        FixedStrings.emplace_back(restText);
         Entries.emplace_back(restIdx, false);
       }
     }
@@ -89,25 +90,33 @@ namespace Strings
       String res;
       for (const auto& entry : Entries)
       {
-        res += (entry.second ? fields : FixedStrings)[entry.first];
+        if (entry.second)
+        {
+          res += fields[entry.first];
+        }
+        else
+        {
+          res.append(FixedStrings[entry.first]);
+        }
       }
       return res;
     }
 
   private:
-    Array FixedStrings;
-    Array Fields;
-    typedef std::pair<std::size_t, bool> PartEntry;  // index => isField
-    typedef std::vector<PartEntry> PartEntries;
+    const String Value;
+    std::vector<StringView> FixedStrings;
+    std::vector<StringView> Fields;
+    using PartEntry = std::pair<std::size_t, bool>;  // index => isField
+    using PartEntries = std::vector<PartEntry>;
     PartEntries Entries;
   };
 
-  Template::Ptr Template::Create(const String& templ)
+  Template::Ptr Template::Create(StringView templ)
   {
     return MakePtr<PreprocessingTemplate>(templ);
   }
 
-  String Template::Instantiate(const String& templ, const FieldsSource& source)
+  String Template::Instantiate(StringView templ, const FieldsSource& source)
   {
     return PreprocessingTemplate(templ).Instantiate(source);
   }

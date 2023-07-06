@@ -144,12 +144,13 @@ namespace Module::Sid
     SidEngine()
       : Builder("resid")
       , Config(Player.config())
-      , UseFilter()
     {}
 
     void Init(uint_t samplerate, const Parameters::Accessor& params)
     {
-      Parameters::DataType kernal, basic, chargen;
+      Parameters::DataType kernal;
+      Parameters::DataType basic;
+      Parameters::DataType chargen;
       params.FindValue(Parameters::ZXTune::Core::Plugins::SID::KERNAL, kernal);
       params.FindValue(Parameters::ZXTune::Core::Plugins::SID::BASIC, basic);
       params.FindValue(Parameters::ZXTune::Core::Plugins::SID::CHARGEN, chargen);
@@ -212,7 +213,7 @@ namespace Module::Sid
     SidConfig Config;
 
     // cache filter flag
-    bool UseFilter;
+    bool UseFilter = false;
   };
 
   const auto FRAME_DURATION = Time::Milliseconds(100);
@@ -220,7 +221,7 @@ namespace Module::Sid
   class Renderer : public Module::Renderer
   {
   public:
-    Renderer(Model::Ptr tune, uint_t samplerate, Parameters::Accessor::Ptr params)
+    Renderer(Model::Ptr tune, uint_t samplerate, const Parameters::Accessor::Ptr& params)
       : Tune(std::move(tune))
       , State(MakePtr<TimedState>(Tune->GetDuration()))
       , Engine(MakePtr<SidEngine>())
@@ -238,7 +239,7 @@ namespace Module::Sid
 
     Sound::Chunk Render() override
     {
-      const auto avail = State->Consume(FRAME_DURATION);
+      const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Engine->Render(GetSamples(avail));
     }
 
@@ -365,7 +366,7 @@ namespace ZXTune
 {
   void RegisterSIDPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
   {
-    const Char ID[] = {'S', 'I', 'D', 0};
+    const auto ID = "SID"_id;
     auto decoder = Formats::Multitrack::CreateSIDDecoder();
     auto factory = MakePtr<Module::Sid::Factory>();
     {

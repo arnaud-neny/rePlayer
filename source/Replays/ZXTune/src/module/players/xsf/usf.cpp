@@ -82,7 +82,6 @@ namespace Module::USF
   {
   public:
     explicit USFEngine(const ModuleData& data)
-      : Emu()
     {
       SetupSections(data.Sections);
       if (data.Meta)
@@ -109,8 +108,8 @@ namespace Module::USF
       for (uint32_t doneSamples = 0; doneSamples < samples;)
       {
         const auto toRender = std::min<uint32_t>(samples - doneSamples, 1024);
-        const auto dst = safe_ptr_cast<short int*>(&result[doneSamples]);
-        if (const auto res = ::usf_render(Emu.GetRaw(), dst, toRender, nullptr))
+        auto* const dst = safe_ptr_cast<short int*>(&result[doneSamples]);
+        if (const auto* const res = ::usf_render(Emu.GetRaw(), dst, toRender, nullptr))
         {
           throw MakeFormattedError(THIS_LINE, "USF: failed to render: {}", res);
         }
@@ -124,7 +123,7 @@ namespace Module::USF
       for (uint32_t skippedSamples = 0; skippedSamples < samples;)
       {
         const auto toSkip = std::min<uint32_t>(samples - skippedSamples, 1024);
-        if (const auto res = ::usf_render(Emu.GetRaw(), nullptr, toSkip, nullptr))
+        if (const auto* const res = ::usf_render(Emu.GetRaw(), nullptr, toSkip, nullptr))
         {
           throw MakeFormattedError(THIS_LINE, "USF: failed to skip: {}", res);
         }
@@ -163,7 +162,7 @@ namespace Module::USF
     void DetectSoundFrequency()
     {
       int32_t freq = 0;
-      if (const auto res = ::usf_render(Emu.GetRaw(), nullptr, 0, &freq))
+      if (const auto* const res = ::usf_render(Emu.GetRaw(), nullptr, 0, &freq))
       {
         throw MakeFormattedError(THIS_LINE, "USF: failed to detect frequency: {}", res);
       }
@@ -194,7 +193,7 @@ namespace Module::USF
 
     Sound::Chunk Render() override
     {
-      const auto avail = State->Consume(FRAME_DURATION);
+      const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Target->Apply(Engine.Render(GetSamples(avail)));
     }
 
@@ -317,7 +316,7 @@ namespace Module::USF
       return Holder::Create(builder.CaptureResult(), std::move(properties));
     }
 
-    Holder::Ptr CreateMultifileModule(const XSF::File& file, const std::map<String, XSF::File>& additionalFiles,
+    Holder::Ptr CreateMultifileModule(const XSF::File& file, const XSF::FilesMap& additionalFiles,
                                       Parameters::Container::Ptr properties) const override
     {
       ModuleDataBuilder builder;
@@ -342,8 +341,8 @@ namespace Module::USF
     */
     static const uint_t MAX_LEVEL = 10;
 
-    static void MergeSections(const XSF::File& data, const std::map<String, XSF::File>& additionalFiles,
-                              ModuleDataBuilder& dst, uint_t level = 1)
+    static void MergeSections(const XSF::File& data, const XSF::FilesMap& additionalFiles, ModuleDataBuilder& dst,
+                              uint_t level = 1)
     {
       if (!data.Dependencies.empty() && level < MAX_LEVEL)
       {
@@ -352,7 +351,7 @@ namespace Module::USF
       dst.AddSection(data.ReservedSection);
     }
 
-    void MergeMeta(const XSF::File& data, const std::map<String, XSF::File>& additionalFiles, ModuleDataBuilder& dst,
+    void MergeMeta(const XSF::File& data, const XSF::FilesMap& additionalFiles, ModuleDataBuilder& dst,
                    uint_t level = 1) const
     {
       if (level < MAX_LEVEL)

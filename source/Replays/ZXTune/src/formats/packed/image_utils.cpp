@@ -13,7 +13,7 @@
 // common includes
 #include <make_ptr.h>
 // library includes
-#include <binary/container_factories.h>
+#include <binary/data_builder.h>
 // std includes
 #include <map>
 
@@ -33,35 +33,33 @@ namespace Formats
   public:
     SparsedImageBuilder()
       : Sectors(&CompareCHS)
-      , TotalSize()
     {}
 
     void SetGeometry(const CHS& /*geometry*/) override {}
 
-    void SetSector(const CHS& location, Binary::Dump data) override
+    void SetSector(const CHS& location, Binary::View data) override
     {
-      const auto res = Sectors.insert(SectorsMap::value_type(location, std::move(data)));
+      const auto res = Sectors.insert(SectorsMap::value_type(location, data));
       if (res.second)
       {
-        TotalSize += res.first->second.size();
+        TotalSize += res.first->second.Size();
       }
     }
 
     Binary::Container::Ptr GetResult() const override
     {
-      std::unique_ptr<Binary::Dump> result(new Binary::Dump(TotalSize));
-      auto dst = result->begin();
+      Binary::DataBuilder result(TotalSize);
       for (const auto& sec : Sectors)
       {
-        dst = std::copy(sec.second.begin(), sec.second.end(), dst);
+        result.Add(sec.second);
       }
-      return Binary::CreateContainer(std::move(result));
+      return result.CaptureResult();
     }
 
   private:
-    typedef std::map<CHS, Binary::Dump, bool (*)(const CHS&, const CHS&)> SectorsMap;
+    using SectorsMap = std::map<CHS, Binary::View, bool (*)(const CHS&, const CHS&)>;
     SectorsMap Sectors;
-    std::size_t TotalSize;
+    std::size_t TotalSize = 0;
   };
 
   ImageBuilder::Ptr CreateSparsedImageBuilder()

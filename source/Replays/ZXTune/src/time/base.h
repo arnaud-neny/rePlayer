@@ -28,7 +28,7 @@ namespace Time
   using Second = BaseUnit<uint32_t, 1>;
   using Millisecond = BaseUnit<uint32_t, 1000>;
   using Microsecond = BaseUnit<uint64_t, 1000000>;
-  using Nanosecond = BaseUnit<uint64_t, 1000000000ull>;
+  using Nanosecond = BaseUnit<uint64_t, 1000000000uLL>;
 
   struct InstantTag
   {};
@@ -49,8 +49,7 @@ namespace Time
     {}
 
     // from the other types with the same tag and lesser or equal precision
-    template<class OtherUnit,
-             typename std::enable_if<PER_SECOND >= OtherUnit::PER_SECOND, const void*>::type p = nullptr>
+    template<class OtherUnit, std::enable_if_t<PER_SECOND >= OtherUnit::PER_SECOND, const void*> p = nullptr>
     constexpr Base(Base<OtherUnit, Tag> rh)
       : Value(Scale<OtherUnit, Unit>(rh.Get()))
     {}

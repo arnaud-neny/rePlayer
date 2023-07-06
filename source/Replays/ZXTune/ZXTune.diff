@@ -1,0 +1,580 @@
+diff --git "a/external\\zxtune\\include\\source_location.h" "b/source\\Replays\\ZXTune\\include\\source_location.h"
+index d030c26..d38a6d7 100644
+--- "a/external\\zxtune\\include\\source_location.h"
++++ "b/source\\Replays\\ZXTune\\include\\source_location.h"
+@@ -64,17 +64,13 @@ namespace Debug
+   }
+ }  // namespace Debug
+ 
+-template<class C, C... Chars>
+ class SourceFile
+ {
+-  static_assert(sizeof...(Chars) != 0, "Empty SourceFile");
+-  constexpr static const std::array<C, sizeof...(Chars)> Path{Debug::Normalize(Chars)...};
+-
+ public:
+   using TagType = uint32_t;
+ 
+-  constexpr static const auto StaticLocation = basic_string_view<C>{Path};
+-  constexpr static const auto StaticTag = Debug::Hash<TagType>(StaticLocation);
++  const basic_string_view<Char> StaticLocation;
++  const TagType StaticTag = 0;
+ 
+   constexpr auto Location() const
+   {
+@@ -95,12 +91,12 @@ public:
+ 
+     constexpr auto Location() const
+     {
+-      return StaticLocation;
++      return basic_string_view<Char>();
+     }
+ 
+     constexpr TagType Tag() const
+     {
+-      return StaticTag + Value;
++      return 0;
+     }
+ 
+     constexpr auto Line() const
+@@ -127,26 +123,31 @@ namespace Debug
+ #else
+   constexpr auto ROOT = ""_sv;
+ #endif
+-  template<std::size_t Offset, typename C, C Head, C... Tail>
+-  constexpr auto MakeSourceFile()
+-  {
+-    if constexpr (Offset == ROOT.size())
+-    {
+-      static_assert(Head == '/' || Head == '\\', "SOURCES_ROOT should not end with slash");
+-      return SourceFile<C, Tail...>();
+-    }
+-    else
+-    {
+-      static_assert(MatchesPathElement(Head, ROOT[Offset]), "Path outside of SOURCES_ROOT");
+-      return MakeSourceFile<Offset + 1, C, Tail...>();
+-    }
+-  }
++//   template<std::size_t Offset, typename C, C Head, C... Tail>
++//   constexpr auto MakeSourceFile()
++//   {
++//     if constexpr (Offset == ROOT.size())
++//     {
++//       static_assert(Head == '/' || Head == '\\', "SOURCES_ROOT should not end with slash");
++//       return SourceFile<C, Tail...>();
++//     }
++//     else
++//     {
++//       static_assert(MatchesPathElement(Head, ROOT[Offset]), "Path outside of SOURCES_ROOT");
++//       return MakeSourceFile<Offset + 1, C, Tail...>();
++//     }
++//   }
+ }  // namespace Debug
+ 
+-template<typename C, C... Chars>
+-constexpr auto operator"" _source()
++
++// template<typename C, C... Chars>
++// constexpr auto operator"" _source()
++// {
++//   return Debug::MakeSourceFile<0, C, Chars...>();
++// }
++constexpr auto operator"" _source(const char* /*str*/, std::size_t /*size*/) noexcept
+ {
+-  return Debug::MakeSourceFile<0, C, Chars...>();
++  return SourceFile();
+ }
+ 
+ #define ThisFile() DO_LITERAL(__FILE__, _source)
+diff --git "a/external\\zxtune\\include\\string_view.h" "b/source\\Replays\\ZXTune\\include\\string_view.h"
+index 4db1b12..5d3a691 100644
+--- "a/external\\zxtune\\include\\string_view.h"
++++ "b/source\\Replays\\ZXTune\\include\\string_view.h"
+@@ -49,6 +49,10 @@ public:
+     : parent(str.data(), str.size())
+   {}
+ 
++  constexpr basic_string_view(parent::const_iterator begin, parent::const_iterator end) // rePlayer
++    : parent(begin, end)
++  {}
++
+   constexpr basic_string_view<C> substr(std::size_t pos = 0, std::size_t count = parent::npos) const
+   {
+     return basic_string_view<C>(parent::substr(pos, count));
+diff --git "a/external\\zxtune\\src\\binary\\format\\lexic_analysis.cpp" "b/source\\Replays\\ZXTune\\src\\binary\\format\\lexic_analysis.cpp"
+index 6fdea94..bcbafdf 100644
+--- "a/external\\zxtune\\src\\binary\\format\\lexic_analysis.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\binary\\format\\lexic_analysis.cpp"
+@@ -95,13 +95,13 @@ namespace LexicalAnalysis
+       std::vector<const Tokenizer*> candidates(Sources.size());
+       std::transform(Sources.begin(), Sources.end(), candidates.begin(),
+                      [](const Tokenizer::Ptr& obj) { return obj.get(); });
+-      for (const auto* lexemeEnd = lexemeStart + 1; !candidates.empty(); ++lexemeEnd)
++      for (auto lexemeEnd = lexemeStart + 1; !candidates.empty(); ++lexemeEnd) // rePlayer
+       {
+         const StringView lexeme(lexemeStart, lexemeEnd);
+         auto tokens = MakeRWPtr<TokensSet>(lexeme);
+         std::vector<const Tokenizer*> passedCandidates;
+         passedCandidates.reserve(candidates.size());
+-        for (const auto* const tokenizer : candidates)
++        for (const auto tokenizer : candidates) // rePlayer
+         {
+           switch (const TokenType result = tokenizer->Parse(lexeme))
+           {
+diff --git "a/external\\zxtune\\src\\core\\plugin_attrs.h" "b/source\\Replays\\ZXTune\\src\\core\\plugin_attrs.h"
+index 6a44efb..fc68954 100644
+--- "a/external\\zxtune\\src\\core\\plugin_attrs.h"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugin_attrs.h"
+@@ -13,6 +13,12 @@
+ // common includes
+ #include <types.h>
+ 
++// rePlayer beging
++#ifdef OUT
++#   undef OUT
++#endif
++// rePlayer end
++
+ namespace ZXTune
+ {
+   class PluginId : public StringView
+diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
+index 7292590..9075df8 100644
+--- "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
+@@ -34,10 +34,10 @@ namespace ZXTune
+   const ContainerPluginDescription UNARCHIVES[] =
+   {
+     {"ZIP"_id,     &CreateZipDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+-    {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
++//     {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+     {"LHA"_id,     &CreateLhaDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+     {"UMX"_id,     &CreateUMXDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::PLAIN},
+-    {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
++//     {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+   };
+ 
+   const ContainerPluginDescription ZXUNARCHIVES[] =
+diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
+index ff65a41..35daead 100644
+--- "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
+@@ -428,7 +428,7 @@ namespace ZXTune::Raw
+ 
+     void Move(std::size_t step)
+     {
+-      if (!Subdata.unique())
++      if (Subdata.use_count() != 1) // rePlayer
+       {
+         Dbg("Subdata is captured. Duplicate.");
+         Subdata = MakePtr<ScanDataContainer>(Parent->GetData(), Subdata->GetOffset() + step);
+@@ -796,7 +796,7 @@ namespace ZXTune::Raw
+         progress.Report(offset);
+         usedPlugins.SetOffset(offset);
+         const auto detectResult = usedPlugins.Detect(subLocation, callback);
+-        if (!subLocation.unique())
++        if (subLocation.use_count() != 1) // rePlayer
+         {
+           Dbg("Sublocation is captured. Duplicate.");
+           subLocation = MakePtr<ScanDataLocation>(input, offset);
+diff --git "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
+index 64f7fee..e32cc9e 100644
+--- "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
+@@ -45,32 +45,32 @@ namespace ZXTune
+     RegisterFTCSupport(registrator);
+     RegisterCOPSupport(registrator);
+     RegisterTFESupport(registrator);
+-    RegisterXMPPlugins(registrator);
++//     RegisterXMPPlugins(registrator);
+     RegisterET1Support(registrator);
+     RegisterAYCSupport(registrator);
+-    RegisterSPCSupport(registrator);
++//     RegisterSPCSupport(registrator);
+     RegisterMTCSupport(registrator);
+-    RegisterAHXSupport(registrator);
+-    RegisterPSFSupport(registrator);
+-    RegisterUSFSupport(registrator);
+-    RegisterGSFSupport(registrator);
+-    Register2SFSupport(registrator);
+-    RegisterNCSFSupport(registrator);
+-    RegisterSDSFSupport(registrator);
+-    RegisterMP3Plugin(registrator);
+-    RegisterOGGPlugin(registrator);
+-    RegisterWAVPlugin(registrator);
+-    RegisterFLACPlugin(registrator);
+-    RegisterV2MSupport(registrator);
+-    RegisterVGMPlugins(registrator);
+-    RegisterMPTPlugins(registrator);
++//     RegisterAHXSupport(registrator);
++//     RegisterPSFSupport(registrator);
++//     RegisterUSFSupport(registrator);
++//     RegisterGSFSupport(registrator);
++//     Register2SFSupport(registrator);
++//     RegisterNCSFSupport(registrator);
++//     RegisterSDSFSupport(registrator);
++//     RegisterMP3Plugin(registrator);
++//     RegisterOGGPlugin(registrator);
++//     RegisterWAVPlugin(registrator);
++//     RegisterFLACPlugin(registrator);
++//     RegisterV2MSupport(registrator);
++//     RegisterVGMPlugins(registrator);
++//     RegisterMPTPlugins(registrator);
+   }
+ 
+   void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
+   {
+-    RegisterSIDPlugins(players, archives);
+-    RegisterGMEPlugins(players, archives);
+-    RegisterASAPPlugins(players, archives);
+-    RegisterVGMStreamPlugins(players, archives);
++//     RegisterSIDPlugins(players, archives);
++//     RegisterGMEPlugins(players, archives);
++//     RegisterASAPPlugins(players, archives);
++//     RegisterVGMStreamPlugins(players, archives);
+   }
+ }  // namespace ZXTune
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\globaltracker.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
+index 844d70c..4d1ce52 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
+@@ -867,7 +867,7 @@ namespace Formats::Chiptune
+         : StartAddr(hdr.Address)
+       {
+         AddArea(HEADER, 0);
+-        AddArea(PATTERNS, GetStart(hdr.Patterns.front().Offsets.begin(), hdr.Patterns.back().Offsets.end(), StartAddr));
++        AddArea(PATTERNS, GetStart(&hdr.Patterns.front().Offsets[0], &hdr.Patterns.back().Offsets.back() + 1, StartAddr)); // rePlayer
+         AddArea(SAMPLES, GetStart(hdr.SamplesOffsets.begin(), hdr.SamplesOffsets.end(), StartAddr));
+         AddArea(ORNAMENTS, GetStart(hdr.OrnamentsOffsets.begin(), hdr.OrnamentsOffsets.end(), StartAddr));
+         AddArea(END, size);
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
+index 3026667..3e554fe 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
+@@ -255,7 +255,7 @@ namespace Formats::Chiptune
+       explicit SignedHexObject(StringView val)
+       {
+         Require(val.size() == Width + 1);
+-        const auto* it = val.begin();
++        auto it = val.begin(); // rePlayer
+         const SignFlag sign(*it);
+         for (++it; it != val.end(); ++it)
+         {
+@@ -835,7 +835,7 @@ namespace Formats::Chiptune
+     private:
+       uint_t AsInt() const
+       {
+-        const auto* const notePos = std::find(NOTES.begin(), NOTES.end(), Val.substr(0, 2));
++        const auto notePos = std::find(NOTES.begin(), NOTES.end(), Val.substr(0, 2)); // rePlayer
+         Require(notePos != NOTES.end());
+         const uint_t halftone = notePos - NOTES.begin();
+         const char octave = Val[2];
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
+index cbd42d9..fcc61b5 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
+@@ -240,8 +240,8 @@ namespace Formats::Chiptune
+         {
+           const uint_t samIdx = *it;
+           const SampleInfo& info = Source.Samples[samIdx];
+-          Dbg("Sample {}: start=#{:04x} loop=#{:04x} page=#{:02x} size=#{:04x}", samIdx, info.Start, info.Loop,
+-              unsigned(info.Page), info.Size);
++          Dbg("Sample {}: start=#{:04x} loop=#{:04x} page=#{:02x} size=#{:04x}", samIdx, uint_t(info.Start), uint_t(info.Loop), // rePlayer
++              unsigned(info.Page), uint_t(info.Size));
+           if (!ParseSample(samIdx, info, samples))
+           {
+             Dbg(" Stub sample");
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\ay.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\ay.cpp"
+index 69df402..d8698cb 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\ay.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\ay.cpp"
+@@ -462,7 +462,7 @@ namespace Formats::Chiptune
+           dst->Address = it->first;
+           dst->Size = static_cast<uint16_t>(it->second->Size());
+           SetPointer(&dst->Offset, result.Add(*it->second));
+-          Dbg("Stored block {} bytes at {} stored at {}", dst->Size, dst->Address, dst->Offset);
++          Dbg("Stored block {} bytes at {} stored at {}", uint_t(dst->Size), uint_t(dst->Address), uint_t(dst->Offset));
+         }
+         return result.CaptureResult();
+       }
+@@ -564,7 +564,7 @@ namespace Formats::Chiptune
+           const auto& block = data.GetField<EMUL::ModuleBlock>(&moddata.BlocksOffset, blockIdx);
+           const uint16_t blockAddr = block.Address;
+           const std::size_t blockSize = block.Size;
+-          Dbg("Block {} bytes at {} located at {}", blockSize, blockAddr, block.Offset);
++          Dbg("Block {} bytes at {} located at {}", blockSize, uint_t(blockAddr), int_t(block.Offset)); // rePlayer
+           if (const auto blockData = data.GetBlob(&block.Offset, blockSize))
+           {
+             target.AddBlock(blockAddr, blockData);
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\spc.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\spc.cpp"
+index 36fb73f..f7e6200 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\spc.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\spc.cpp"
+@@ -48,7 +48,7 @@ namespace Formats::Chiptune
+     template<std::size_t D>
+     inline StringView GetTrimmed(const std::array<char, D>& str)
+     {
+-      return GetTrimmed(str.begin(), str.end());
++      return GetTrimmed(str.data(), str.data() + str.size()); // rePlayer
+     }
+ 
+     template<std::size_t D>
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\music\\tags_id3.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
+index 4b2c8e6..78c7c35 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
+@@ -20,7 +20,7 @@ namespace Formats::Chiptune::Id3
+ {
+   StringView CutValid(StringView str)
+   {
+-    const auto* const end =
++      const auto end = // rePlayer
+         std::find_if(str.begin(), str.end(), [](Char c) { return c < ' ' && c != '\t' && c != '\r' && c != '\n'; });
+     return {str.begin(), end};
+   }
+diff --git "a/external\\zxtune\\src\\formats\\packed\\compiledasc.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledasc.cpp"
+index 81e7af9..2e4d2ec 100644
+--- "a/external\\zxtune\\src\\formats\\packed\\compiledasc.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledasc.cpp"
+@@ -15,7 +15,7 @@
+ #include <byteorder.h>
+ #include <contract.h>
+ #include <make_ptr.h>
+-#include <static_string.h>
++//#include <static_string.h> // rePlayer
+ // library includes
+ #include <binary/format_factories.h>
+ #include <debug/log.h>
+@@ -113,25 +113,25 @@ namespace Formats::Packed
+       const ParseFunc Parse;
+       const InsertMetaInfoFunc InsertMetaInformation;
+     };
+-
+-    constexpr auto ID_FORMAT =
++    // rePlayer begin
++    const std::string ID_FORMAT =
+         "'A'S'M' 'C'O'M'P'I'L'A'T'I'O'N' 'O'F' "
+         "?{20}"  // title
+         "?{4}"   // any text
+         "?{20}"  // author
+-        ""_ss;
++        ;
+ 
+-    constexpr auto BASE_FORMAT =
++    const std::string BASE_FORMAT =
+         "?{11}"    // unknown
+         "c3??"     // init
+         "c3??"     // play
+-        "c3??"_ss  // silent
++        "c3??"  // silent
+         + ID_FORMAT +
+         //+0x53    init
+         "af"  // xor a
+-        "?{28}"_ss;
++        "?{28}";
+ 
+-    constexpr auto VERSION0_FORMAT = BASE_FORMAT +
++    const std::string VERSION0_FORMAT = BASE_FORMAT +
+                                      //+0x70
+                                      "11??"  // ld de,ModuleAddr
+                                      "42"    // ld b,d
+@@ -140,7 +140,7 @@ namespace Formats::Packed
+                                      "13"    // inc de
+                                      "32??"  // ld (xxx),a
+                                      "cd??"  // call xxxx
+-                                     ""_ss;
++                                     ;
+     const VersionTraits VERSION0 = {
+         sizeof(PlayerVer0),
+         "ASC Sound Master v0.x player",
+@@ -150,7 +150,7 @@ namespace Formats::Packed
+         &Formats::Chiptune::ASCSoundMaster::Ver0::InsertMetaInformation,
+     };
+ 
+-    constexpr auto VERSION1_FORMAT = BASE_FORMAT +
++    const std::string VERSION1_FORMAT = BASE_FORMAT +
+                                      //+0x70
+                                      "11??"  // ld de,ModuleAddr
+                                      "42"    // ld b,d
+@@ -161,7 +161,7 @@ namespace Formats::Packed
+                                      "1a"    // ld a,(de)
+                                      "13"    // inc de
+                                      "32??"  // ld (xxx),a
+-                                     ""_ss;
++                                     "";
+     const VersionTraits VERSION1 = {
+         sizeof(PlayerVer0),
+         "ASC Sound Master v1.x player",
+@@ -171,11 +171,11 @@ namespace Formats::Packed
+         &Formats::Chiptune::ASCSoundMaster::Ver1::InsertMetaInformation,
+     };
+ 
+-    constexpr auto VERSION2_FORMAT =
++    const std::string VERSION2_FORMAT =
+         "?{11}"  // padding
+         "184600"
+         "c3??"
+-        "c3??"_ss
++        "c3??"
+         + ID_FORMAT +
+         //+0x53 init
+         "cd??"
+@@ -183,7 +183,7 @@ namespace Formats::Packed
+         "?{35}"
+         //+123
+         "11??"  // data offset
+-        ""_ss;
++        ;
+     const VersionTraits VERSION2 = {
+         sizeof(PlayerVer2),
+         "ASC Sound Master v2.x player",
+@@ -192,6 +192,7 @@ namespace Formats::Packed
+         &Formats::Chiptune::ASCSoundMaster::Ver1::Parse,
+         &Formats::Chiptune::ASCSoundMaster::Ver1::InsertMetaInformation,
+     };
++    // rePlayer end
+ 
+     bool IsInfoEmpty(Binary::View info)
+     {
+diff --git "a/external\\zxtune\\src\\formats\\packed\\turbolz.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\turbolz.cpp"
+index 7300f08..237fd90 100644
+--- "a/external\\zxtune\\src\\formats\\packed\\turbolz.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\turbolz.cpp"
+@@ -85,7 +85,7 @@ namespace Formats::Packed
+         //+0x44
+       };
+ 
+-      struct KeyFunc : public std::unary_function<void, uint8_t>
++      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
+       {
+         KeyFunc(const uint8_t* /*data*/, std::size_t /*size*/) {}
+ 
+@@ -159,7 +159,7 @@ namespace Formats::Packed
+ 
+       static const std::size_t KeyOffset = offsetof(RawHeader, DepackerBody);
+ 
+-      struct KeyFunc : public std::unary_function<void, uint8_t>
++      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
+       {
+         KeyFunc(const uint8_t* data, std::size_t size)
+           : Index(Key[offsetof(RawHeader, InitialCryptoKeyIndex) - KeyOffset])
+diff --git "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\zxzip_file.cpp"
+index b3cdaa4..b4fb795 100644
+--- "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\zxzip_file.cpp"
+@@ -438,7 +438,7 @@ namespace Formats::Packed
+           LZWTree tree;
+           ResetTree(tree);
+ 
+-          auto* lastFree = tree.begin() + LZWEntry::LIMITER;
++          auto lastFree = tree.begin() + LZWEntry::LIMITER; // rePlayer
+ 
+           uint_t codeSize = 9;
+           uint_t oldCode = stream.GetBits(codeSize);
+diff --git "a/external\\zxtune\\src\\module\\players\\aym\\sqtracker.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\sqtracker.cpp"
+index 8632981..e5ee9f5 100644
+--- "a/external\\zxtune\\src\\module\\players\\aym\\sqtracker.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\sqtracker.cpp"
+@@ -97,7 +97,7 @@ namespace Module::SQTracker
+       }
+     };
+ 
+-    struct PositionHash : std::unary_function<HashedPosition, std::size_t>
++    struct PositionHash// : std::unary_function<HashedPosition, std::size_t> // rePlayer
+     {
+       std::size_t operator()(const HashedPosition& pos) const
+       {
+diff --git "a/external\\zxtune\\src\\parameters\\identifier.h" "b/source\\Replays\\ZXTune\\src\\parameters\\identifier.h"
+index b3fcebb..e00755e 100644
+--- "a/external\\zxtune\\src\\parameters\\identifier.h"
++++ "b/source\\Replays\\ZXTune\\src\\parameters\\identifier.h"
+@@ -121,9 +121,15 @@ namespace Parameters
+     constexpr static const std::array<Char, sizeof...(Symbols)> Storage = {Symbols...};
+   };
+ 
+-  template<typename CharType, CharType... Symbols>
++/*
++  template<StaticIdentifier Symbols>
+   constexpr auto operator"" _id()
+   {
+-    return StaticIdentifier<Symbols...>{};
++    return Symbols;
++  }
++*/
++  constexpr std::string operator"" _id(const char* str, std::size_t)
++  {
++      return str;
+   }
+ }  // namespace Parameters
+diff --git "a/external\\zxtune\\src\\parameters\\src\\convert.cpp" "b/source\\Replays\\ZXTune\\src\\parameters\\src\\convert.cpp"
+index 721122f..591392e 100644
+--- "a/external\\zxtune\\src\\parameters\\src\\convert.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\parameters\\src\\convert.cpp"
+@@ -43,7 +43,7 @@ namespace
+   inline void DataFromString(StringView val, DataType& res)
+   {
+     res.resize((val.size() - 1) / 2);
+-    const auto* src = val.begin();
++    const auto* src = val.data(); // rePlayer
+     for (auto& re : res)
+     {
+       const auto highNibble = FromHex(*++src);
+diff --git "a/external\\zxtune\\src\\strings\\conversion.h" "b/source\\Replays\\ZXTune\\src\\strings\\conversion.h"
+index e520777..08961f3 100644
+--- "a/external\\zxtune\\src\\strings\\conversion.h"
++++ "b/source\\Replays\\ZXTune\\src\\strings\\conversion.h"
+@@ -28,8 +28,8 @@ namespace Strings
+     else
+     {
+       auto result = T();
+-      const auto* const it = str.begin();
+-      const auto* const lim = str.end();
++      const auto* const it = str.data(); // rePlayer
++      const auto* const lim = str.data() + str.size(); // rePlayer
+       const auto res = std::from_chars(it + (it != lim && *it == '+'), lim, result);
+       if (res.ec == std::errc::result_out_of_range)
+       {
+diff --git "a/external\\zxtune\\src\\strings\\format.h" "b/source\\Replays\\ZXTune\\src\\strings\\format.h"
+index 0e9b40e..dd64704 100644
+--- "a/external\\zxtune\\src\\strings\\format.h"
++++ "b/source\\Replays\\ZXTune\\src\\strings\\format.h"
+@@ -26,7 +26,7 @@ namespace Strings
+   template<class S, class... P>
+   String Format(S&& format, P&&... params)
+   {
+-    return fmt::format(std::forward<S>(format), std::forward<P>(params)...);
++    return fmt::vformat(std::forward<S>(format), fmt::make_format_args(std::forward<P>(params)...)); // rePlayer
+   }
+ 
+   String FormatTime(uint_t hours, uint_t minutes, uint_t seconds, uint_t frames);
+diff --git "a/external\\zxtune\\src\\strings\\src\\encoding.cpp" "b/source\\Replays\\ZXTune\\src\\strings\\src\\encoding.cpp"
+index 0f3c38f..945988d 100644
+--- "a/external\\zxtune\\src\\strings\\src\\encoding.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\strings\\src\\encoding.cpp"
+@@ -769,7 +769,7 @@ namespace Strings
+   public:
+     bool Check(StringView str) const override
+     {
+-      for (const auto* it = str.begin(); it != str.end(); ++it)
++      for (auto it = str.begin(); it != str.end(); ++it) // rePlayer
+       {
+         const uint8_t s1 = *it;
+         if (s1 == 0x80 || s1 == 0xa0 || s1 >= 0xf0)
+@@ -805,7 +805,7 @@ namespace Strings
+     {
+       std::vector<uint32_t> result;
+       result.reserve(str.size());
+-      for (const auto* it = str.begin(); it != str.end(); ++it)
++      for (auto it = str.begin(); it != str.end(); ++it) // rePlayer
+       {
+         const uint8_t s1 = *it;
+         if (s1 == 0x5c)
+@@ -921,7 +921,7 @@ namespace Strings
+     Strings::Utf8Builder builder;
+     builder.Reserve(str.size());
+     bool needSwap = false;
+-    for (const auto* it = str.begin(); it != str.end();)
++    for (auto it = str.begin(); it != str.end();) // rePlayer
+     {
+       const uint32_t sym = needSwap ? swapBytes(*it) : (*it);
+       ++it;

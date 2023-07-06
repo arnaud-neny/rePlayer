@@ -16,6 +16,7 @@
 // library includes
 #include <binary/compression/zlib_container.h>
 #include <binary/container_factories.h>
+#include <binary/data_builder.h>
 #include <binary/format_factories.h>
 #include <binary/input_stream.h>
 #include <debug/log.h>
@@ -41,8 +42,8 @@ namespace Formats::Chiptune
 
       explicit DirectoryEntry(Binary::InputStream& stream)
       {
-        const auto nameBegin = stream.PeekRawData(36);
-        const auto nameEnd = std::find(nameBegin, nameBegin + 36, 0);
+        const auto* const nameBegin = stream.PeekRawData(36);
+        const auto* const nameEnd = std::find(nameBegin, nameBegin + 36, 0);
         Name.assign(nameBegin, nameEnd);
         stream.Skip(36);
         Offset = stream.Read<le_uint32_t>();
@@ -70,8 +71,7 @@ namespace Formats::Chiptune
 
       const void* Start() const override
       {
-        Flatten();
-        return Flattened->data();
+        return Merge().Start();
       }
 
       std::size_t Size() const override
@@ -81,12 +81,12 @@ namespace Formats::Chiptune
 
       Ptr GetSubcontainer(std::size_t offset, std::size_t size) const override
       {
-        if (!Flattened)
+        if (!Merged)
         {
           const auto it = Blocks.lower_bound(offset);
           if (it == Blocks.end() || it->first + it->second->Size() <= offset)
           {
-            return Ptr();
+            return {};
           }
           const auto& part = it->second;
           const auto partOffset = offset - it->first;
@@ -99,9 +99,8 @@ namespace Formats::Chiptune
           {
             return part->GetSubcontainer(partOffset, size);
           }
-          Flatten();
         }
-        return Binary::CreateContainer(Flattened, offset, size);
+        return Merge().GetSubcontainer(offset, size);
       }
 
       static Ptr Create(FileBlocks blocks, std::size_t totalSize)
@@ -118,26 +117,25 @@ namespace Formats::Chiptune
       }
 
     private:
-      void Flatten() const
+      const Binary::Container& Merge() const
       {
-        if (!Flattened)
+        if (!Merged)
         {
-          Flattened.reset(new Binary::Dump(TotalSize));
-          uint8_t* dst = Flattened->data();
+          Binary::DataBuilder res(TotalSize);
           for (const auto& blk : Blocks)
           {
-            const auto size = blk.second->Size();
-            std::memcpy(dst, blk.second->Start(), size);
-            dst += size;
+            res.Add(*blk.second);
           }
           Blocks.clear();
+          Merged = res.CaptureResult();
         }
+        return *Merged;
       }
 
     private:
       const std::size_t TotalSize;
       mutable FileBlocks Blocks;
-      mutable std::shared_ptr<Binary::Dump> Flattened;
+      mutable Binary::Container::Ptr Merged;
     };
 
     class Format
@@ -149,11 +147,11 @@ namespace Formats::Chiptune
 
       void Parse(Builder& target)
       {
-        ParseDir(0, "/", target);
+        ParseDir(0, "/"_sv, target);
       }
 
     private:
-      void ParseDir(uint_t depth, String path, Builder& target)
+      void ParseDir(uint_t depth, StringView path, Builder& target)
       {
         Require(depth < 10);
         const uint_t entries = Stream.Read<le_uint32_t>();
@@ -163,7 +161,7 @@ namespace Formats::Chiptune
           const auto entryPos = Stream.GetPosition();
           const DirectoryEntry entry(Stream);
           Dbg("{} (offset={} size={} block={})", entry.Name, entry.Offset, entry.Size, entry.BlockSize);
-          auto entryPath = path + entry.Name;
+          auto entryPath = path.to_string().append(entry.Name);
           Stream.Seek(entry.Offset);
           if (entry.IsDir())
           {
@@ -173,13 +171,13 @@ namespace Formats::Chiptune
           else if (0 == entry.Size)
           {
             // empty file may have zero offset
-            target.OnFile(std::move(entryPath), Binary::Container::Ptr());
+            target.OnFile(entryPath, Binary::Container::Ptr());
           }
           else
           {
             Require(entryPos < entry.Offset);
             auto blocks = ParseFileBlocks(entry.Size, entry.BlockSize);
-            target.OnFile(std::move(entryPath), ScatteredContainer::Create(std::move(blocks), entry.Size));
+            target.OnFile(entryPath, ScatteredContainer::Create(std::move(blocks), entry.Size));
           }
           Stream.Seek(entryPos + DirectoryEntry::RAW_SIZE);
         }
@@ -246,7 +244,7 @@ namespace Formats::Chiptune
 
       Formats::Chiptune::Container::Ptr Decode(const Binary::Container& /*rawData*/) const override
       {
-        return Formats::Chiptune::Container::Ptr();  // TODO
+        return {};  // TODO
       }
 
     private:

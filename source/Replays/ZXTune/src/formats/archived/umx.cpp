@@ -20,11 +20,10 @@
 #include <binary/format_factories.h>
 #include <binary/input_stream.h>
 #include <debug/log.h>
+#include <strings/casing.h>
+#include <strings/map.h>
 // std includes
 #include <array>
-#include <map>
-// boost includes
-#include <boost/algorithm/string/case_conv.hpp>
 
 namespace Formats::Archived
 {
@@ -43,7 +42,7 @@ namespace Formats::Archived
         "??0000 ????"  // imports
         ""_sv;
 
-    typedef std::array<uint8_t, 4> SignatureType;
+    using SignatureType = std::array<uint8_t, 4>;
 
     const SignatureType SIGNATURE = {{0xc1, 0x83, 0x2a, 0x9e}};
 
@@ -68,19 +67,17 @@ namespace Formats::Archived
 
     struct Index
     {
-      int_t Value;
+      int_t Value = 0;
 
-      Index()
-        : Value()
-      {}
+      Index() = default;
     };
 
     struct ClassName
     {
       const String Name;
 
-      explicit ClassName(const String& name)
-        : Name(boost::algorithm::to_lower_copy(name))
+      explicit ClassName(StringView name)
+        : Name(Strings::ToLowerAscii(name))
       {}
 
       bool IsMusic() const
@@ -93,8 +90,8 @@ namespace Formats::Archived
     {
       const String Name;
 
-      explicit Property(const String& name)
-        : Name(boost::algorithm::to_lower_copy(name))
+      explicit Property(StringView name)
+        : Name(Strings::ToLowerAscii(name))
       {}
 
       bool IsLimiter() const
@@ -106,39 +103,32 @@ namespace Formats::Archived
     struct NameEntry
     {
       String Name;
-      uint32_t Flags;
+      uint32_t Flags = 0;
 
-      NameEntry()
-        : Flags()
-      {}
+      NameEntry() = default;
     };
 
     struct ExportEntry
     {
       Index Class;
       Index Super;
-      uint32_t Group;
+      uint32_t Group = 0;
       Index ObjectName;
-      uint32_t ObjectFlags;
+      uint32_t ObjectFlags = 0;
       Index SerialSize;
       Index SerialOffset;
 
-      ExportEntry()
-        : Group()
-        , ObjectFlags()
-      {}
+      ExportEntry() = default;
     };
 
     struct ImportEntry
     {
       Index ClassPackage;
       Index ClassName;
-      uint32_t Package;
+      uint32_t Package = 0;
       Index ObjectName;
 
-      ImportEntry()
-        : Package()
-      {}
+      ImportEntry() = default;
     };
 
     class InputStream
@@ -150,7 +140,6 @@ namespace Formats::Archived
         , Start(static_cast<const uint8_t*>(Data.Start()))
         , Cursor(Start)
         , Limit(Start + Data.Size())
-        , MaxUsedSize()
       {}
 
       // primitives
@@ -233,7 +222,7 @@ namespace Formats::Archived
         Read(res.ObjectName);
       }
 
-      void Read(Property& res)
+      static void Read(Property& res)
       {
         Require(!res.IsLimiter());
         // TODO: implement
@@ -277,7 +266,7 @@ namespace Formats::Archived
       const uint8_t* const Start;
       const uint8_t* Cursor;
       const uint8_t* const Limit;
-      std::size_t MaxUsedSize;
+      std::size_t MaxUsedSize = 0;
     };
 
     class Format
@@ -325,13 +314,13 @@ namespace Formats::Archived
           ReadProperties(stream);
           const ClassName& cls = GetClass(exp.Class);
           Dbg("Entry[{}] data at {} size={} class={}", idx, offset, size, cls.Name);
-          const Binary::Container::Ptr result = cls.IsMusic() ? ExtractMusicData(stream) : stream.ReadRestContainer();
+          auto result = cls.IsMusic() ? ExtractMusicData(stream) : stream.ReadRestContainer();
           UsedSize = std::max(UsedSize, offset + stream.GetMaxUsedSize());
           return result;
         }
         catch (const std::exception&)
         {
-          return Binary::Container::Ptr();
+          return {};
         }
       }
 
@@ -422,14 +411,16 @@ namespace Formats::Archived
         const uint_t version = Header.PackageVersion;
         if (version >= 120)
         {
-          uint32_t flags, aux;
+          uint32_t flags;
+          uint32_t aux;
           stream.Read(format);
           stream.Read(flags);
           stream.Read(aux);
         }
         else if (version >= 100)
         {
-          uint32_t flags, aux;
+          uint32_t flags;
+          uint32_t aux;
           stream.Read(flags);
           stream.Read(format);
           stream.Read(aux);
@@ -462,8 +453,8 @@ namespace Formats::Archived
     class File : public Archived::File
     {
     public:
-      File(String name, Binary::Container::Ptr data)
-        : Name(std::move(name))
+      File(StringView name, Binary::Container::Ptr data)
+        : Name(name.to_string())
         , Data(std::move(data))
       {}
 
@@ -487,7 +478,7 @@ namespace Formats::Archived
       const Binary::Container::Ptr Data;
     };
 
-    typedef std::map<String, Binary::Container::Ptr> NamedDataMap;
+    using NamedDataMap = Strings::ValueMap<Binary::Container::Ptr>;
 
     class Container : public Binary::BaseContainer<Archived::Container>
     {
@@ -506,10 +497,16 @@ namespace Formats::Archived
         }
       }
 
-      File::Ptr FindFile(const String& name) const override
+      File::Ptr FindFile(StringView name) const override
       {
-        const auto it = Files.find(name);
-        return it != Files.end() ? MakePtr<File>(it->first, it->second) : File::Ptr();
+        if (auto data = Files.Get(name))
+        {
+          return MakePtr<File>(name, std::move(data));
+        }
+        else
+        {
+          return {};
+        }
       }
 
       uint_t CountFiles() const override
@@ -543,16 +540,16 @@ namespace Formats::Archived
     {
       if (!Format->Match(data))
       {
-        return Container::Ptr();
+        return {};
       }
       const UMX::Format format(data);
       UMX::NamedDataMap datas;
       for (uint_t idx = 0, lim = format.GetEntriesCount(); idx != lim; ++idx)
       {
-        if (const Binary::Container::Ptr data = format.GetEntryData(idx))
+        if (auto data = format.GetEntryData(idx))
         {
-          const String& name = format.GetEntryName(idx);
-          datas[name] = data;
+          const auto& name = format.GetEntryName(idx);
+          datas.emplace(name, std::move(data));
         }
       }
       if (!datas.empty())
@@ -561,7 +558,7 @@ namespace Formats::Archived
         return MakePtr<UMX::Container>(std::move(archive), std::move(datas));
       }
       UMX::Dbg("No files found");
-      return Container::Ptr();
+      return {};
     }
 
   private:

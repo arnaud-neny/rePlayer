@@ -20,7 +20,7 @@ namespace Devices::AYM
   class RenderState
   {
   public:
-    typedef std::shared_ptr<RenderState> Ptr;
+    using Ptr = std::shared_ptr<RenderState>;
     virtual ~RenderState() = default;
 
     virtual void Reset() = 0;
@@ -108,8 +108,7 @@ namespace Devices::AYM
         const uint8_t newVal = delta[reg] & GetValueMask(reg);
         if (Registers::ENV != reg && Base.Has(reg))
         {
-          uint8_t& base = Base[reg];
-          if (newVal == base)
+          if (newVal == Base[reg])
           {
             Delta.Reset(reg);
             continue;
@@ -127,8 +126,6 @@ namespace Devices::AYM
       : FrameDuration(frameDuration)
       , Builder(std::move(builder))
       , State(std::move(state))
-      , FramesToSkip(0)
-      , NextFrame()
     {
       Reset();
     }
@@ -159,7 +156,7 @@ namespace Devices::AYM
       NextFrame += FrameDuration;
     }
 
-    void GetDump(Binary::Dump& result) const override
+    Binary::Data::Ptr GetDump() override
     {
       if (FramesToSkip)
       {
@@ -168,7 +165,7 @@ namespace Devices::AYM
         Builder->WriteFrame(FramesToSkip, State->GetBase(), delta);
         FramesToSkip = 0;
       }
-      Builder->GetResult(result);
+      return Builder->GetResult();
     }
 
   private:
@@ -190,14 +187,14 @@ namespace Devices::AYM
     const Time::Duration<TimeUnit> FrameDuration;
     const FramedDumpBuilder::Ptr Builder;
     const RenderState::Ptr State;
-    mutable uint_t FramesToSkip;
+    uint_t FramesToSkip = 0;
     Stamp NextFrame;
   };
 
-  Dumper::Ptr CreateDumper(DumperParameters::Ptr params, FramedDumpBuilder::Ptr builder)
+  Dumper::Ptr CreateDumper(const DumperParameters& params, FramedDumpBuilder::Ptr builder)
   {
     RenderState::Ptr state;
-    switch (params->OptimizationLevel())
+    switch (params.OptimizationLevel())
     {
     case DumperParameters::NONE:
       state = MakePtr<NotOptimizedRenderState>();
@@ -205,6 +202,6 @@ namespace Devices::AYM
     default:
       state = MakePtr<OptimizedRenderState>();
     }
-    return MakePtr<FrameDumper>(params->FrameDuration(), builder, state);
+    return MakePtr<FrameDumper>(params.FrameDuration(), std::move(builder), std::move(state));
   }
 }  // namespace Devices::AYM

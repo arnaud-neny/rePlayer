@@ -23,7 +23,6 @@
 #include <formats/packed.h>
 #include <math/numeric.h>
 // std includes
-#include <iterator> // rePlayer
 #include <numeric>
 
 namespace Formats::Packed
@@ -77,7 +76,7 @@ namespace Formats::Packed
       std::size_t GetUsedSizeWithPadding() const
       {
         const std::size_t usefulSize = GetUsedSize();
-        const std::size_t sizeOnDisk = Math::Align<std::size_t>(usefulSize, 256);
+        const auto sizeOnDisk = Math::Align<std::size_t>(usefulSize, 256);
         const std::size_t resultSize = std::min(sizeOnDisk, Size);
         const std::size_t paddingSize = resultSize - usefulSize;
         const std::size_t TRDOS_ENTRY_SIZE = 16;
@@ -207,8 +206,6 @@ namespace Formats::Packed
         : IsValid(container.FastCheck())
         , Header(container.GetHeader())
         , Stream(Header.BitStream, container.GetUsedSize() - 12)
-        , Result(new Binary::Dump())
-        , Decoded(*Result)
       {
         if (IsValid && !Stream.Eof())
         {
@@ -216,25 +213,25 @@ namespace Formats::Packed
         }
       }
 
-      std::unique_ptr<Binary::Dump> GetResult()
+      Binary::Container::Ptr GetResult()
       {
-        return IsValid ? std::move(Result) : std::unique_ptr<Binary::Dump>();
+        return IsValid ? Decoded.CaptureResult() : Binary::Container::Ptr();
       }
 
     private:
       bool DecodeData()
       {
-        Decoded.reserve(Header.DataSize);
+        Decoded = Binary::DataBuilder(Header.DataSize);
 
         // put first byte
-        Decoded.push_back(Stream.GetByte());
+        Decoded.AddByte(Stream.GetByte());
         uint_t refBits = 2;
-        while (!Stream.Eof() && Decoded.size() < MAX_DECODED_SIZE)
+        while (!Stream.Eof() && Decoded.Size() < MAX_DECODED_SIZE)
         {
           //%1 - put byte
           if (Stream.GetBit())
           {
-            Decoded.push_back(Stream.GetByte());
+            Decoded.AddByte(Stream.GetByte());
             continue;
           }
           uint_t len = Stream.GetLen();
@@ -314,7 +311,7 @@ namespace Formats::Packed
               const uint_t count = 2 * (6 + Stream.GetBits(4));
               for (uint_t bytes = 0; bytes < count; ++bytes)
               {
-                Decoded.push_back(Stream.GetByte());
+                Decoded.AddByte(Stream.GetByte());
               }
               continue;
             }
@@ -382,34 +379,33 @@ namespace Formats::Packed
           }
         }
         // put remaining bytes
-        std::copy(Header.LastBytes, std::end(Header.LastBytes), std::back_inserter(Decoded));
+        Decoded.Add(Header.LastBytes);
         return true;
       }
 
       bool CopyByteFromBack(int_t offset)
       {
         assert(offset <= 0);
-        const std::size_t size = Decoded.size();
+        const std::size_t size = Decoded.Size();
         if (uint_t(-offset) > size)
         {
           return false;  // invalid backreference
         }
-        const Binary::Dump::value_type val = Decoded[size + offset];
-        Decoded.push_back(val);
+        const auto val = Decoded.Get<uint8_t>(size + offset);
+        Decoded.AddByte(val);
         return true;
       }
 
       bool CopyBreaked(int_t offset)
       {
-        return CopyByteFromBack(offset) && (Decoded.push_back(Stream.GetByte()), true) && CopyByteFromBack(offset);
+        return CopyByteFromBack(offset) && (Decoded.AddByte(Stream.GetByte()), true) && CopyByteFromBack(offset);
       }
 
     private:
       bool IsValid;
       const RawHeader& Header;
       Hrust1Bitstream Stream;
-      std::unique_ptr<Binary::Dump> Result;
-      Binary::Dump& Decoded;
+      Binary::DataBuilder Decoded;
     };
   }  // namespace Hrust1
 
@@ -434,12 +430,12 @@ namespace Formats::Packed
     {
       if (!Format->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       const Hrust1::Container container(rawData.Start(), rawData.Size());
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       Hrust1::DataDecoder decoder(container);
       return CreateContainer(decoder.GetResult(), container.GetUsedSizeWithPadding());

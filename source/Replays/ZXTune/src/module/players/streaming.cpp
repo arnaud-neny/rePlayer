@@ -27,12 +27,10 @@ namespace Module
   class FramedStreamStateCursor : public State
   {
   public:
-    typedef std::shared_ptr<FramedStreamStateCursor> Ptr;
+    using Ptr = std::shared_ptr<FramedStreamStateCursor>;
 
     explicit FramedStreamStateCursor(FramedStream stream)
-      : Stream(std::move(stream))
-      , CurFrame()
-      , Loops()
+      : Stream(stream)
     {
       Reset();
     }
@@ -88,16 +86,16 @@ namespace Module
 
   private:
     const FramedStream Stream;
-    uint_t CurFrame;
+    uint_t CurFrame = 0;
     Time::Microseconds TotalPlayed;
-    uint_t Loops;
+    uint_t Loops = 0;
   };
 
   class FramedStreamInfo : public Information
   {
   public:
     FramedStreamInfo(FramedStream stream)
-      : Stream(std::move(stream))
+      : Stream(stream)
     {}
 
     Time::Milliseconds Duration() const override
@@ -118,7 +116,7 @@ namespace Module
   {
   public:
     explicit FramedStreamStateIterator(FramedStream stream)
-      : Cursor(MakePtr<FramedStreamStateCursor>(std::move(stream)))
+      : Cursor(MakePtr<FramedStreamStateCursor>(stream))
     {}
 
     // iterator functions
@@ -150,22 +148,22 @@ namespace Module
     const FramedStreamStateCursor::Ptr Cursor;
   };
 
-  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, StreamModel::Ptr model)
+  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
   {
     FramedStream stream;
     stream.FrameDuration = frameDuration;
     stream.TotalFrames = model->GetTotalFrames();
     stream.LoopFrame = model->GetLoopFrame();
-    return MakePtr<FramedStreamInfo>(std::move(stream));
+    return MakePtr<FramedStreamInfo>(stream);
   }
 
-  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, StreamModel::Ptr model)
+  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
   {
     FramedStream stream;
     stream.FrameDuration = frameDuration;
     stream.TotalFrames = model->GetTotalFrames();
     stream.LoopFrame = model->GetLoopFrame();
-    return MakePtr<FramedStreamStateIterator>(std::move(stream));
+    return MakePtr<FramedStreamStateIterator>(stream);
   }
 
   class TimedInfo : public Module::Information
@@ -201,13 +199,25 @@ namespace Module
     return MakePtr<TimedInfo>(duration, loopDuration);
   }
 
-  Time::Microseconds TimedState::Consume(Time::Microseconds range)
+  template<class Unit>
+  auto Modulo(Time::Instant<Unit> pos, Time::Instant<Unit> limit)
   {
-    const auto nextPos = range.Get() ? Position + range : Limit;
-    Position = Time::AtMicrosecond(nextPos.Get() % Limit.Get());
-    Loops += nextPos.Get() / Limit.Get();
-    TotalPlayback += range;
-    return range;
+    return std::make_pair(Time::Instant<Unit>(pos.Get() % limit.Get()), pos.Get() / limit.Get());
+  }
+
+  Time::Microseconds TimedState::ConsumeUpTo(Time::Microseconds range)
+  {
+    const Time::Microseconds avail = Limit - Position;
+    const auto toConsume = std::min(range, avail);
+    const auto delta = Modulo(Position + toConsume, Limit);
+    Position = delta.first;
+    Loops += delta.second;
+    return toConsume;
+  }
+
+  Time::Microseconds TimedState::ConsumeRest()
+  {
+    return ConsumeUpTo(Limit - Position);
   }
 
   Information::Ptr CreateSampledInfo(uint_t samplerate, uint64_t totalSamples)

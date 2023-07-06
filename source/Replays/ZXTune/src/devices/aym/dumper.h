@@ -11,56 +11,52 @@
 #pragma once
 
 // library includes
-#include <binary/dump.h>
+#include <binary/data.h>
 #include <devices/aym.h>
 #include <time/duration.h>
 
 // supporting for AY/YM-based modules
-namespace Devices
+namespace Devices::AYM
 {
-  namespace AYM
+  // Describes dump converter
+  class Dumper : public Device
   {
-    // Describes dump converter
-    class Dumper : public Device
-    {
-    public:
-      typedef std::shared_ptr<Dumper> Ptr;
+  public:
+    using Ptr = std::shared_ptr<Dumper>;
 
-      virtual void GetDump(Binary::Dump& result) const = 0;
+    virtual Binary::Data::Ptr GetDump() = 0;
+  };
+
+  class DumperParameters
+  {
+  public:
+    virtual ~DumperParameters() = default;
+
+    enum Optimization
+    {
+      NONE,
+      NORMAL,
     };
 
-    class DumperParameters
-    {
-    public:
-      typedef std::shared_ptr<const DumperParameters> Ptr;
-      virtual ~DumperParameters() = default;
+    virtual Time::Microseconds FrameDuration() const = 0;
+    virtual Optimization OptimizationLevel() const = 0;
+  };
 
-      enum Optimization
-      {
-        NONE,
-        NORMAL,
-      };
+  Dumper::Ptr CreatePSGDumper(const DumperParameters& params);
+  Dumper::Ptr CreateZX50Dumper(const DumperParameters& params);
+  Dumper::Ptr CreateDebugDumper(const DumperParameters& params);
+  Dumper::Ptr CreateRawStreamDumper(const DumperParameters& params);
 
-      virtual Time::Microseconds FrameDuration() const = 0;
-      virtual Optimization OptimizationLevel() const = 0;
-    };
+  class FYMDumperParameters : public DumperParameters
+  {
+  public:
+    using Ptr = std::shared_ptr<const FYMDumperParameters>;
 
-    Dumper::Ptr CreatePSGDumper(DumperParameters::Ptr params);
-    Dumper::Ptr CreateZX50Dumper(DumperParameters::Ptr params);
-    Dumper::Ptr CreateDebugDumper(DumperParameters::Ptr params);
-    Dumper::Ptr CreateRawStreamDumper(DumperParameters::Ptr params);
+    virtual uint64_t ClockFreq() const = 0;
+    virtual String Title() const = 0;
+    virtual String Author() const = 0;
+    virtual uint_t LoopFrame() const = 0;
+  };
 
-    class FYMDumperParameters : public DumperParameters
-    {
-    public:
-      typedef std::shared_ptr<const FYMDumperParameters> Ptr;
-
-      virtual uint64_t ClockFreq() const = 0;
-      virtual String Title() const = 0;
-      virtual String Author() const = 0;
-      virtual uint_t LoopFrame() const = 0;
-    };
-
-    Dumper::Ptr CreateFYMDumper(FYMDumperParameters::Ptr params);
-  }  // namespace AYM
-}  // namespace Devices
+  Dumper::Ptr CreateFYMDumper(const FYMDumperParameters::Ptr& params);
+}  // namespace Devices::AYM

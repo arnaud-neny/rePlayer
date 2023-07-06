@@ -144,7 +144,7 @@ namespace Formats::Packed
     public:
       virtual ~DataDecoder() = default;
 
-      virtual std::unique_ptr<Binary::Dump> GetDecodedData() = 0;
+      virtual Binary::Container::Ptr GetDecodedData() = 0;
     };
 
     class StoreDataDecoder : public DataDecoder
@@ -156,11 +156,11 @@ namespace Formats::Packed
         assert(STORE == Header.Method);
       }
 
-      std::unique_ptr<Binary::Dump> GetDecodedData() override
+      Binary::Container::Ptr GetDecodedData() override
       {
         const uint_t packedSize = Header.PackedSize;
-        const uint8_t* const sourceData = safe_ptr_cast<const uint8_t*>(&Header + 1);
-        return std::unique_ptr<Binary::Dump>(new Binary::Dump(sourceData, sourceData + packedSize));
+        const auto* const sourceData = safe_ptr_cast<const uint8_t*>(&Header + 1);
+        return Binary::CreateContainer(Binary::View{sourceData, packedSize});
       }
 
     private:
@@ -224,8 +224,6 @@ namespace Formats::Packed
     public:
       Bitstream(const uint8_t* data, std::size_t size)
         : SafeByteStream(data, size)
-        , Bits()
-        , Mask(128)
       {}
 
       bool GetBit()
@@ -267,8 +265,8 @@ namespace Formats::Packed
       }
 
     private:
-      uint_t Bits;
-      uint_t Mask;
+      uint_t Bits = 0;
+      uint_t Mask = 128;
     };
 
     class ImplodeDataDecoder : public DataDecoder
@@ -280,7 +278,7 @@ namespace Formats::Packed
         assert(IMPLODE == Header.Method);
       }
 
-      std::unique_ptr<Binary::Dump> GetDecodedData() override
+      Binary::Container::Ptr GetDecodedData() override
       {
         const std::size_t dataSize = GetSourceFileSize(Header);
         const bool isBigFile = dataSize >= 0x1600;
@@ -315,13 +313,13 @@ namespace Formats::Packed
           const uint_t minMatchLen = isBigTextFile ? 3 : 2;
 
           Bitstream stream(safe_ptr_cast<const uint8_t*>(&Header + 1), Header.PackedSize);
-          Binary::Dump result;
+          Binary::DataBuilder result(2 * Header.PackedSize);
           while (!stream.Eof())
           {
             if (stream.GetBit())
             {
               const uint_t data = isBigTextFile ? stream.ReadByTree(SFT1) : stream.GetBits(8);
-              result.push_back(static_cast<uint8_t>(data));
+              result.AddByte(static_cast<uint8_t>(data));
             }
             else
             {
@@ -335,10 +333,10 @@ namespace Formats::Packed
                 len += stream.GetBits(8);
               }
               len += minMatchLen;
-              if (dist > result.size())
+              if (dist > result.Size())
               {
-                const std::size_t zeroes = std::min<std::size_t>(dist - result.size(), len);
-                std::fill_n(std::back_inserter(result), zeroes, 0);
+                const std::size_t zeroes = std::min<std::size_t>(dist - result.Size(), len);
+                Fill(result, zeroes, 0);
                 len -= zeroes;
               }
               if (len)
@@ -347,9 +345,7 @@ namespace Formats::Packed
               }
             }
           }
-          std::unique_ptr<Binary::Dump> res(new Binary::Dump());
-          res->swap(result);
-          return res;
+          return result.CaptureResult();
         }
         catch (const std::exception&)
         {
@@ -384,7 +380,9 @@ namespace Formats::Packed
         assert(InvertBits(1) == 0x8000);
         assert(InvertBits(0x180) == 0x180);
         assert(InvertBits(0x8000) == 1);
-        uint_t code = 0, codeIncrement = 0, lastBits = 0;
+        uint_t code = 0;
+        uint_t codeIncrement = 0;
+        uint_t lastBits = 0;
         for (auto it = tree.rbegin(), lim = tree.rend(); it != lim; ++it)
         {
           code += codeIncrement;
@@ -406,15 +404,11 @@ namespace Formats::Packed
     {
       static const uint_t LIMITER = 256;
 
-      uint_t Parent;
-      uint8_t Value;
-      bool IsFree;
+      uint_t Parent = 0;
+      uint8_t Value = '\0';
+      bool IsFree = false;
 
-      LZWEntry()
-        : Parent()
-        , Value()
-        , IsFree()
-      {}
+      LZWEntry() = default;
 
       explicit LZWEntry(uint_t value)
         : Parent(LIMITER)
@@ -423,7 +417,7 @@ namespace Formats::Packed
       {}
     };
 
-    typedef std::array<LZWEntry, 8192> LZWTree;
+    using LZWTree = std::array<LZWEntry, 8192>;
 
     class ShrinkDataDecoder : public DataDecoder
     {
@@ -434,21 +428,21 @@ namespace Formats::Packed
         assert(SHRINK == Header.Method);
       }
 
-      std::unique_ptr<Binary::Dump> GetDecodedData() override
+      Binary::Container::Ptr GetDecodedData() override
       {
         try
         {
           Bitstream stream(safe_ptr_cast<const uint8_t*>(&Header + 1), Header.PackedSize);
-          Binary::Dump result;
+          Binary::DataBuilder result(2 * Header.PackedSize);
 
           LZWTree tree;
           ResetTree(tree);
 
-          auto lastFree = tree.begin() + LZWEntry::LIMITER;
+          auto lastFree = tree.begin() + LZWEntry::LIMITER; // rePlayer
 
           uint_t codeSize = 9;
           uint_t oldCode = stream.GetBits(codeSize);
-          result.push_back(static_cast<uint8_t>(oldCode));
+          result.AddByte(static_cast<uint8_t>(oldCode));
           while (!stream.Eof())
           {
             const uint_t code = stream.GetBits(codeSize);
@@ -482,19 +476,18 @@ namespace Formats::Packed
               {
                 substring.front() = substring.back();
               }
-              std::copy(substring.rbegin(), substring.rend(), std::back_inserter(result));
+              std::reverse(substring.begin(), substring.end());
+              result.Add(substring);
               for (++lastFree; lastFree != tree.end() && !lastFree->IsFree; ++lastFree)
               {}
               Require(lastFree != tree.end());
-              lastFree->Value = substring.back();
+              lastFree->Value = substring.front();
               lastFree->Parent = oldCode;
               lastFree->IsFree = false;
               oldCode = code;
             }
           }
-          std::unique_ptr<Binary::Dump> res(new Binary::Dump());
-          res->swap(result);
-          return res;
+          return result.CaptureResult();
         }
         catch (const std::exception&)
         {
@@ -548,7 +541,7 @@ namespace Formats::Packed
       case SHRINK:
         return std::unique_ptr<DataDecoder>(new ShrinkDataDecoder(header));
       default:
-        return std::unique_ptr<DataDecoder>();
+        return {};
       };
     };
 
@@ -561,17 +554,17 @@ namespace Formats::Packed
         , IsValid(container.FastCheck() && Delegate.get())
       {}
 
-      std::unique_ptr<Binary::Dump> GetDecodedData() override
+      Binary::Container::Ptr GetDecodedData() override
       {
         if (!IsValid)
         {
           return {};
         }
-        std::unique_ptr<Binary::Dump> result = Delegate->GetDecodedData();
+        auto result = Delegate->GetDecodedData();
         while (result.get())
         {
           const std::size_t dataSize = GetSourceFileSize(Header);
-          if (dataSize != result->size())
+          if (dataSize != result->Size())
           {
             break;
           }
@@ -615,12 +608,12 @@ namespace Formats::Packed
     {
       if (!Depacker->Match(rawData))
       {
-        return Container::Ptr();
+        return {};
       }
       const ZXZip::Container container(rawData.Start(), rawData.Size());
       if (!container.FastCheck())
       {
-        return Container::Ptr();
+        return {};
       }
       ZXZip::DispatchedDataDecoder decoder(container);
       return CreateContainer(decoder.GetDecodedData(), container.GetUsedSize());

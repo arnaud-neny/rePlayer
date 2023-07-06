@@ -43,16 +43,17 @@ namespace Formats::Chiptune
 
     const std::size_t MIN_FRAMES = 150;  //~3sec
 
-    typedef std::array<uint8_t, 4> SignatureType;
+    using SignatureType = std::array<uint8_t, 4>;
 
     const SignatureType SIGNATURE = {{'T', 'F', 'M', 'D'}};
 
     class StubBuilder : public Builder
     {
     public:
-      void SetTitle(const String& /*title*/) override {}
-      void SetAuthor(const String& /*author*/) override {}
-      void SetComment(const String& /*comment*/) override {}
+      MetaBuilder& GetMetaBuilder() override
+      {
+        return GetStubMetaBuilder();
+      }
 
       void BeginFrames(uint_t /*count*/) override {}
       void SelectChip(uint_t /*idx*/) override {}
@@ -112,15 +113,16 @@ namespace Formats::Chiptune
     {
       if (!FastCheck(data))
       {
-        return Formats::Chiptune::Container::Ptr();
+        return {};
       }
       try
       {
         Binary::InputStream stream(data);
         stream.Read<SignatureType>();
-        target.SetTitle(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        target.SetAuthor(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        target.SetComment(DecodeString(stream.ReadCString(MAX_COMMENT_SIZE)));
+        auto& meta = target.GetMetaBuilder();
+        meta.SetTitle(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetAuthor(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetComment(DecodeString(stream.ReadCString(MAX_COMMENT_SIZE)));
 
         const std::size_t fixedOffset = stream.GetPosition();
         std::size_t totalFrames = 0;
@@ -164,7 +166,7 @@ namespace Formats::Chiptune
       }
       catch (const std::exception&)
       {
-        return Formats::Chiptune::Container::Ptr();
+        return {};
       }
     }
 

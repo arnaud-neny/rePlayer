@@ -13,87 +13,32 @@
 // common includes
 #include <types.h>
 // std includes
-#include <algorithm>
-#include <limits>
+#include <charconv>
 #include <type_traits>
 
-// gcc4.8 for android toolchain does not have std::to_string/std::stoi/etc
 namespace Strings
 {
-  namespace Details
-  {
-    template<class T>
-    struct ConversionTraits;
-
-    template<class T>
-    struct ConversionTraits
-    {
-      static_assert(std::is_integral<T>::value, "TODO");
-
-      static T Parse(StringView& str)
-      {
-        if (str.empty())
-        {
-          return T();
-        }
-        else
-        {
-          T result = T();
-          auto it = str.begin();
-          const auto lim = str.end();
-          const bool hasMinus = std::is_signed<T>::value && *it == '-';
-          if (*it == '-' || *it == '+')
-          {
-            ++it;
-          }
-          for (; it != lim; ++it)
-          {
-            const auto sym = *it;
-            if (sym >= '0' && sym <= '9')
-            {
-              // TODO: handle overflow
-              result = result * 10 + static_cast<T>(sym - '0');
-            }
-            else
-            {
-              break;
-            }
-          }
-          str = StringView(it, lim);
-          return hasMinus ? -result : result;
-        }
-      }
-
-      static String Unparse(T val)
-      {
-        if (!val)
-        {
-          return "0";
-        }
-        else
-        {
-          const bool needMinus = std::is_signed<T>::value && val < 0;
-          String res;
-          res.reserve(std::numeric_limits<T>::digits10);
-          for (T dig = needMinus ? -val : val; dig; dig /= 10)
-          {
-            res += '0' + (dig % 10);
-          }
-          if (needMinus)
-          {
-            res += '-';
-          }
-          std::reverse(res.begin(), res.end());
-          return res;
-        }
-      }
-    };
-  }  // namespace Details
-
   template<class T>
   inline T ParsePartial(StringView& str)
   {
-    return Details::ConversionTraits<T>::Parse(str);
+    if (str.empty())
+    {
+      return T();
+    }
+    else
+    {
+      auto result = T();
+      const auto* const it = str.data(); // rePlayer
+      const auto* const lim = str.data() + str.size(); // rePlayer
+      const auto res = std::from_chars(it + (it != lim && *it == '+'), lim, result);
+      if (res.ec == std::errc::result_out_of_range)
+      {
+        using WiderType = std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
+        return static_cast<T>(ParsePartial<WiderType>(str));
+      }
+      str = {res.ptr, lim};
+      return result;
+    }
   }
 
   // Transactional parsing
@@ -128,6 +73,6 @@ namespace Strings
   template<class T>
   inline String ConvertFrom(T val)
   {
-    return Details::ConversionTraits<T>::Unparse(val);
+    return std::to_string(val);
   }
 }  // namespace Strings

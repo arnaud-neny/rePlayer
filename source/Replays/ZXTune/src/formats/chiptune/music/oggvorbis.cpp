@@ -32,7 +32,7 @@ namespace Formats::Chiptune
   namespace Ogg
   {
     const uint8_t SIGNATURE[] = {'O', 'g', 'g', 'S', 0};
-    const uint64_t UNFINISHED_PAGE_POSITION = ~0ull;
+    const uint64_t UNFINISHED_PAGE_POSITION = ~0uLL;
     const uint_t MAX_SEGMENT_SIZE = 255;
     const uint_t MAX_PAGE_SIZE = 32768;
     const uint_t CONTINUED_PACKET = 1;
@@ -123,14 +123,12 @@ namespace Formats::Chiptune
             const auto totalSize =
                 std::accumulate(Parts.begin(), Parts.end(), std::size_t(0),
                                 [](std::size_t sum, Binary::View part) { return sum + part.Size(); });
-            Buffer.resize(totalSize);
-            auto* target = Buffer.data();
+            Buffer = Binary::DataBuilder(totalSize);
             for (const auto& p : Parts)
             {
-              std::memcpy(target, p.Start(), p.Size());
-              target += p.Size();
+              Buffer.Add(p);
             }
-            return Buffer;
+            return Buffer.GetView();
           }
 
         private:
@@ -139,7 +137,7 @@ namespace Formats::Chiptune
           std::size_t Offset = 0;
           uint64_t Position = 0;
           std::vector<Binary::View> Parts;
-          Binary::Dump Buffer;
+          Binary::DataBuilder Buffer;
         };
         std::vector<StreamData> streams;
         StreamData* currentStream = nullptr;
@@ -171,7 +169,7 @@ namespace Formats::Chiptune
           currentStream->StartPage(Stream.Read<le_uint32_t>());
           /*const auto crc = */ Stream.Read<le_uint32_t>();
           const auto segmentsCount = Stream.ReadByte();
-          const auto segmentsSizes = Stream.PeekRawData(segmentsCount);
+          const auto* const segmentsSizes = Stream.PeekRawData(segmentsCount);
           if (!segmentsSizes)
           {
             Stream.Seek(offset);
@@ -187,7 +185,10 @@ namespace Formats::Chiptune
             currentStream->AddPart(offset, position, Stream.ReadData(std::min(payloadSize, Stream.GetRestSize())));
           }
         }
-        currentStream->Flush(target);
+        if (currentStream)
+        {
+          currentStream->Flush(target);
+        }
         return Stream.GetReadContainer();
       }
 
@@ -340,12 +341,12 @@ namespace Formats::Chiptune
         }
         else
         {
-          return Container::Ptr();
+          return {};
         }
       }
       catch (const std::exception&)
       {
-        return Formats::Chiptune::Container::Ptr();
+        return {};
       }
     }
 
@@ -412,7 +413,7 @@ namespace Formats::Chiptune
         }
         else
         {
-          return Formats::Chiptune::Container::Ptr();
+          return {};
         }
       }
 

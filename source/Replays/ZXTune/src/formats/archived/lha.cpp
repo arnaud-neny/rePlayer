@@ -20,12 +20,12 @@
 #include <formats/packed/lha_supp.h>
 #include <formats/packed/pack_utils.h>
 #include <strings/encoding.h>
+#include <strings/map.h>
 // 3rdparty includes
 #include <3rdparty/lhasa/lib/public/lhasa.h>
 // std includes
 #include <cstring>
 #include <list>
-#include <map>
 #include <numeric>
 
 namespace Formats::Archived
@@ -75,7 +75,7 @@ namespace Formats::Archived
 
       static int Skip(void* handle, size_t bytes)
       {
-        Binary::InputStream* const stream = static_cast<Binary::InputStream*>(handle);
+        auto* const stream = static_cast<Binary::InputStream*>(handle);
         const std::size_t rest = stream->GetRestSize();
         if (rest >= bytes)
         {
@@ -144,8 +144,6 @@ namespace Formats::Archived
         : Data(data)
         , Input(data)
         , Reader(::lha_reader_new(Input.GetStream()), &::lha_reader_free)
-        , Current()
-        , Position()
       {
         Next();
       }
@@ -189,21 +187,21 @@ namespace Formats::Archived
       const Binary::Container& Data;
       const InputStreamWrapper Input;
       const std::shared_ptr<LHAReader> Reader;
-      LHAFileHeader* Current;
-      std::size_t Position;
+      LHAFileHeader* Current = nullptr;
+      std::size_t Position = 0;
     };
 
     class Container : public Binary::BaseContainer<Archived::Container>
     {
     public:
       template<class It>
-      Container(Binary::Container::Ptr data, It begin, It end)
+      Container(Binary::Container::Ptr&& data, It begin, It end)
         : BaseContainer(std::move(data))
       {
         for (It it = begin; it != end; ++it)
         {
-          const File::Ptr file = *it;
-          Files.insert(FilesMap::value_type(file->GetName(), file));
+          const auto file = *it;
+          Files.emplace(file->GetName(), file);
         }
       }
 
@@ -215,10 +213,9 @@ namespace Formats::Archived
         }
       }
 
-      File::Ptr FindFile(const String& name) const override
+      File::Ptr FindFile(StringView name) const override
       {
-        const FilesMap::const_iterator it = Files.find(name);
-        return it != Files.end() ? it->second : File::Ptr();
+        return Files.Get(name);
       }
 
       uint_t CountFiles() const override
@@ -227,8 +224,7 @@ namespace Formats::Archived
       }
 
     private:
-      typedef std::map<String, File::Ptr> FilesMap;
-      FilesMap Files;
+      Strings::ValueMap<File::Ptr> Files;
     };
   }  // namespace Lha
 
@@ -253,7 +249,7 @@ namespace Formats::Archived
     {
       if (!Format->Match(data))
       {
-        return Container::Ptr();
+        return {};
       }
       Lha::FilesIterator iter(data);
       std::list<File::Ptr> files;
@@ -267,12 +263,12 @@ namespace Formats::Archived
       }
       if (const std::size_t totalSize = iter.GetOffset())
       {
-        const Binary::Container::Ptr archive = data.GetSubcontainer(0, totalSize);
-        return MakePtr<Lha::Container>(archive, files.begin(), files.end());
+        auto archive = data.GetSubcontainer(0, totalSize);
+        return MakePtr<Lha::Container>(std::move(archive), files.begin(), files.end());
       }
       else
       {
-        return Container::Ptr();
+        return {};
       }
     }
 
