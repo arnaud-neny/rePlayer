@@ -588,7 +588,7 @@ namespace rePlayer
         // check if we have to do the job
         if (uadeInfo->subsongbytes != 0 || m_lastSubsongIndex != m_subsongIndex)
         {
-            auto subsongIndex = uadeInfo->subsongs.min + m_subsongIndex;
+            auto subsongIndex = m_subsongIndex + m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.min : 0;
             uade_stop(m_uadeState);
             auto buffer = m_stream->Read();
             auto filepath = std::filesystem::path(m_stream->GetName());
@@ -682,8 +682,17 @@ namespace rePlayer
 
     uint32_t ReplayUADE::GetNumSubsongs() const
     {
+        if (m_packagedSubsongNames.IsNotEmpty())
+            return m_packagedSubsongNames.NumItems();
         auto uadeInfo = uade_get_song_info(m_uadeState);
         return uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1);
+    }
+
+    std::string ReplayUADE::GetSubsongTitle() const
+    {
+        if (m_packagedSubsongNames.IsEmpty())
+            return {};
+        return m_packagedSubsongNames[m_subsongIndex];
     }
 
     std::string ReplayUADE::GetExtraInfo() const
@@ -707,7 +716,7 @@ namespace rePlayer
     void ReplayUADE::SetupMetadata(CommandBuffer metadata)
     {
         auto uadeInfo = uade_get_song_info(m_uadeState);
-        auto numSongs = uadeInfo->subsongs.max >= uadeInfo->subsongs.min ? uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1) : 1;
+        auto numSongs = m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.max >= uadeInfo->subsongs.min ? uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1) : 1 : m_packagedSubsongNames.NumItems();
         m_durations = new uint32_t[numSongs];
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongs == numSongs)

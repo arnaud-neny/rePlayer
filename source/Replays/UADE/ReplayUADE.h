@@ -61,6 +61,7 @@ namespace rePlayer
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
+        std::string GetSubsongTitle() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
@@ -100,6 +101,7 @@ namespace rePlayer
         uint64_t m_currentDuration = 0;
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
+        Array<std::string> m_packagedSubsongNames;
         size_t m_dllIndex;
         Array<DllEntry>* m_dllEntries = nullptr;
         static int32_t ms_stereoSeparation;

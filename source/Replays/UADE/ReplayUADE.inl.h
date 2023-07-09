@@ -525,6 +525,84 @@ namespace rePlayer
                 (void)dataSize;
                 assert(0);
             }
+        },
+        {
+            "SMUS-PKG",
+            [](ReplayUADE* replay, const uint8_t*& data, std::filesystem::path& filepath, size_t& dataSize)
+            {
+                replay->m_packagedSubsongNames.Clear();
+                auto* uadeArchive = archive_read_new();
+                archive_read_support_format_7zip(uadeArchive);
+                if (archive_read_open_memory(uadeArchive, data + 8, dataSize - 8) == ARCHIVE_OK)
+                {
+                    archive_entry* entry;
+                    while (archive_read_next_header(uadeArchive, &entry) == ARCHIVE_OK)
+                    {
+                        std::string entryName = archive_entry_pathname(entry);
+                        auto name = ToLower(entryName);
+                        if (strstr(name.c_str(), ".smus") == (name.c_str() + name.size() - 5))
+                        {
+                            if (replay->m_subsongIndex == replay->m_packagedSubsongNames.NumItems())
+                            {
+                                auto fileSize = archive_entry_size(entry);
+                                auto buffer = core::Alloc<uint8_t>(fileSize, 8);
+                                archive_read_data(uadeArchive, buffer, fileSize);
+                                replay->m_tempStream = core::io::StreamMemory::Create(entryName.c_str(), buffer, fileSize, false);
+                                filepath = entryName;
+                                data = buffer;
+                                dataSize = fileSize;
+                            }
+                            entryName.resize(entryName.size() - 5);
+                            replay->m_packagedSubsongNames.Add(entryName);
+                        }
+                        archive_read_data_skip(uadeArchive);
+                    }
+                }
+                archive_read_free(uadeArchive);
+                return eExtension::_smus;
+            },
+            [](ReplayUADE* replay, const uint8_t*& data, const char* filename, size_t& dataSize)
+            {
+                bool isFound = false;
+                auto fileStr = ToLower(filename);
+                if (fileStr.back() == '/')
+                {
+                    data = nullptr;
+                    dataSize = 0;
+                    return true;
+                }
+                auto* uadeArchive = archive_read_new();
+                archive_read_support_format_7zip(uadeArchive);
+                if (archive_read_open_memory(uadeArchive, data + 8, dataSize - 8) == ARCHIVE_OK)
+                {
+                    archive_entry* entry;
+                    while (archive_read_next_header(uadeArchive, &entry) == ARCHIVE_OK)
+                    {
+                        std::string entryName = archive_entry_pathname(entry);
+                        if (ToLower(entryName) == fileStr)
+                        {
+                            auto fileSize = archive_entry_size(entry);
+                            auto buffer = core::Alloc<uint8_t>(fileSize, 8);
+                            archive_read_data(uadeArchive, buffer, fileSize);
+                            replay->m_tempStream = core::io::StreamMemory::Create(entryName.c_str(), buffer, fileSize, false);
+                            data = buffer;
+                            dataSize = fileSize;
+                            isFound = true;
+                            break;
+                        }
+                        archive_read_data_skip(uadeArchive);
+                    }
+                }
+                archive_read_free(uadeArchive);
+                return isFound;
+            },
+            [](ReplayUADE* replay, const uint8_t*& data, size_t& dataSize)
+            {
+                (void)replay;
+                (void)data;
+                (void)dataSize;
+                assert(0);
+            }
         }
     };
 }
