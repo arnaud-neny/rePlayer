@@ -481,6 +481,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kUSF);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Super Nintendo Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kSNSF);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kIFFSmus);
 
         CURL* curl = curl_easy_init();
 
@@ -1110,6 +1112,8 @@ namespace rePlayer
             } archiveBuffer;
             if (replayType == ModlandReplay::kDelitrackerCustom)
                 archiveBuffer.Add("CUST-PKG", sizeof("CUST-PKG") - 1);
+            else if (replayType == ModlandReplay::kIFFSmus)
+                archiveBuffer.Add("SMUS-PKG", sizeof("SMUS-PKG") - 1);
 
             bool hasFailed = false;
             bool isEntryMissing = false;
@@ -1258,6 +1262,8 @@ namespace rePlayer
             type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
             type = { eExtension::_cust, eReplay::UADE };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kIFFSmus && dbSong.item)
+            type = { eExtension::_smus, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
         {
             type = { eExtension::_sid1, eReplay::UADE };
@@ -1444,14 +1450,14 @@ namespace rePlayer
                             continue;
                     }
 
-                    // check for .cust (multiple files to put in a package)
-                    int32_t mergeDelitrackerCustom = -1;
-                    if (currentReplayType == ModlandReplay::kDelitrackerCustom)
+                    // check for .cust or .smus (multiple files to put in a package)
+                    int32_t mergePackages = -1;
+                    if (currentReplayType == ModlandReplay::kDelitrackerCustom || currentReplayType == ModlandReplay::kIFFSmus)
                     {
                         auto str = line;
                         while (*str != '/' && *str != 0)
                             str++;
-                        mergeDelitrackerCustom = *str == '/';
+                        mergePackages = *str == '/';
                     }
 
                     uint32_t item = 0;
@@ -1459,7 +1465,7 @@ namespace rePlayer
                     // packaged songs
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
-                        || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || mergeDelitrackerCustom > 0)
+                        || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || mergePackages > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1489,7 +1495,7 @@ namespace rePlayer
                         m_db.items.Last().next = 0;
                         newSong = oldLine;
                     }
-                    else if (currentReplayType <= ModlandReplay::kDefault || mergeDelitrackerCustom == 0)
+                    else if (currentReplayType <= ModlandReplay::kDefault || mergePackages == 0)
                     {
                         while (*line != 0)
                         {
@@ -1599,6 +1605,11 @@ namespace rePlayer
         {
             m_db.replays.Last().type = ModlandReplay::kDelitrackerCustom;
             m_db.replays.Last().ext.Set(m_db.strings, "cus");
+        }
+        else if (theReplay == "IFF-SMUS")
+        {
+            m_db.replays.Last().type = ModlandReplay::kIFFSmus;
+            m_db.replays.Last().ext.Set(m_db.strings, "smus");
         }
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
         if (m_db.replays.Last().type <= ModlandReplay::kDefault)
