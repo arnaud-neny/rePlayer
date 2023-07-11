@@ -175,6 +175,8 @@ namespace rePlayer
         if (gmeInfo->loop_length > 0)
             m_currentLoopDuration = (gmeInfo->loop_length * kSampleRate) / 1000;
         gme_free_info(gmeInfo);
+        // disable fade, we handle it ourself (and it doesn't work anyway)
+        gme_set_fade(m_emu, -1, 0);
     }
 
     void ReplayGME::ApplySettings(const CommandBuffer metadata)
