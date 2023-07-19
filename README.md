@@ -11,7 +11,7 @@ So I started to write my own player, first to play default modules from the amig
 I've improved it in my spare time, adding more playable formats, a way to handle my database(s), some features I've always wanted in other software...
 
 So now, it's time for me to release it as I think some people can have interest in it.  
-Oh, and occasionally, you can use it as a normal player as it can alsoi play mowadays formats (mp3, wav, ogg...).
+Oh, and occasionally, you can use it as a normal player as it can also play mowadays formats (mp3, wav, ogg...).
 
 ## Getting started
 

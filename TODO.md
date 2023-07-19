@@ -39,3 +39,4 @@
 - single channel export
 - refactor replays using dll loader to avoid duplicated code
 - vgmstream support? https://github.com/vgmstream/vgmstream
+- EUPHONY support: https://github.com/gzaffin/eupmini
