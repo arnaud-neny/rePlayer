@@ -121,7 +121,7 @@ namespace rePlayer
             Array<SmartPtr<ItemType>> m_items;
             Array<ItemID> m_availableIds;
             uint32_t m_numItems = 0;
-            uint32_t m_revison = 0;
+            uint32_t m_revision = 0;
         };
 
     private:

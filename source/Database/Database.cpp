@@ -12,7 +12,7 @@ namespace rePlayer
     template <typename OtherItemType>
     ItemType* Database::Set<ItemType, ItemID>::Add(OtherItemType* item)
     {
-        m_revison++;
+        m_revision++;
         ItemID id;
         if (m_availableIds.IsEmpty())
             id = m_items.Push<ItemID>();
@@ -28,7 +28,7 @@ namespace rePlayer
     template <typename ItemType, typename ItemID>
     void Database::Set<ItemType, ItemID>::Remove(ItemID id)
     {
-        m_revison++;
+        m_revision++;
         assert(m_items[uint32_t(id)].IsValid());
         m_items[uint32_t(id)].Reset();
         m_availableIds.Add(id);
@@ -38,7 +38,7 @@ namespace rePlayer
     template <typename ItemType, typename ItemID>
     Status Database::Set<ItemType, ItemID>::Load(io::File& file)
     {
-        m_revison++;
+        m_revision++;
         m_items.Clear();
         m_availableIds.Clear();
 
@@ -203,10 +203,10 @@ namespace rePlayer
     {
         if (flags.IsEnabled(Flag::kSaveArtists))
         {
-            std::atomic_ref(m_songs.m_revison)++;
-            std::atomic_ref(m_artists.m_revison)++;
+            std::atomic_ref(m_songs.m_revision)++;
+            std::atomic_ref(m_artists.m_revision)++;
         } else if (flags.IsEnabled(Flag::kSaveSongs))
-            std::atomic_ref(m_songs.m_revison)++;
+            std::atomic_ref(m_songs.m_revision)++;
         std::atomic_ref atomicFlags(reinterpret_cast<uint32_t&>(m_flags.value));
         atomicFlags |= flags.value;
     }

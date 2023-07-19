@@ -118,12 +118,12 @@ namespace rePlayer
 
     inline uint32_t Database::SongsRevision() const
     {
-        return m_songs.m_revison;
+        return m_songs.m_revision;
     }
 
     inline uint32_t Database::ArtistsRevision() const
     {
-        return m_artists.m_revison;
+        return m_artists.m_revision;
     }
 
     inline std::string Database::GetTitle(SubsongID subsongId) const
