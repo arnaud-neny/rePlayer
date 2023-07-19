@@ -272,11 +272,11 @@ namespace rePlayer
 
                         // artists
                         ImGui::TableNextColumn();
-                        ImGui::Text("%s", songs.m_db.GetArtists(song->GetId()).c_str());
+                        ImGui::TextUnformatted(songs.m_db.GetArtists(song->GetId()).c_str());
 
                         // extension
                         ImGui::TableNextColumn();
-                        ImGui::Text("%s  ", song->GetType().GetExtension());
+                        ImGui::TextUnformatted(song->GetType().GetExtension());
 
                         // duration
                         ImGui::TableNextColumn();

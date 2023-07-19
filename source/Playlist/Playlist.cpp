@@ -851,7 +851,7 @@ namespace rePlayer
                         ImGui::TableNextColumn();
                         curEntry.DisplayArtists();
                         ImGui::TableNextColumn();
-                        ImGui::Text("%s", song->GetType().GetExtension());
+                        ImGui::TextUnformatted(song->GetType().GetExtension());
                         ImGui::TableNextColumn();
                         {
                             auto subsongDurationCs = song->GetSubsongDurationCs(subsongId.index);

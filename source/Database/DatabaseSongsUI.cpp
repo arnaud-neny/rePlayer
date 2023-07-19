@@ -361,7 +361,7 @@ namespace rePlayer
                     ImGui::TableNextColumn();
                     musicId.DisplayArtists();
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", song->GetType().GetExtension());
+                    ImGui::TextUnformatted(song->GetType().GetExtension());
                     ImGui::TableNextColumn();
                     ImGui::Text("%u", song->GetFileSize());
                     ImGui::TableNextColumn();
