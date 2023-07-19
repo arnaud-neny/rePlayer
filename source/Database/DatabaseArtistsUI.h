@@ -23,13 +23,28 @@ namespace rePlayer
         DatabaseArtistsUI(DatabaseID databaseId, Window& owner);
         virtual ~DatabaseArtistsUI();
 
-        void MakeDirty(bool isDirty = true);
-
         void OnDisplay();
 
     protected:
         virtual void SourcesUI(Artist* selectedArtist);
         virtual void OnSavedChanges(Artist* selectedArtist);
+
+    private:
+        enum TabIDs
+        {
+            kTitle,
+            kArtists,
+            kType,
+            kNumIDs
+        };
+
+        enum class States : uint32_t
+        {
+            kNone = 0,
+            kRemoveArtist = 1 << 0
+        };
+        friend constexpr States& operator|=(States& a, States b);
+        friend constexpr bool operator&&(States a, States b);
 
     private:
         static void OnArtistFilterLoaded(uintptr_t userData, void*, const char*);
@@ -46,6 +61,16 @@ namespace rePlayer
 
         bool SelectMasterArtist(ArtistID artistId);
 
+        // SongUI
+        void SortSongs(bool isDirty);
+        States Selection(int32_t entryIdx, MusicID musicId, Artist* selectedArtist);
+        void RemoveArtist(Artist* selectedArtist);
+
+        // Selection
+        bool Select(int32_t entryIdx, MusicID musicId, bool isSelected);
+        void DragSelection();
+        States SelectionContext(bool isSelected, Artist* selectedArtist);
+
     protected:
         Database& m_db;
         Window& m_owner;
@@ -58,6 +83,19 @@ namespace rePlayer
         int32_t m_selectedCountry = -1;
 
         uint32_t m_dbRevision = 0;
+        uint32_t m_dbSongsRevision = 0;
+
+        struct SongEntry
+        {
+            SongID id;
+            bool isSelected = false;
+
+            bool operator==(SongID otherId) const;
+        };
+        Array<SongEntry> m_songEntries;
+        uint32_t m_numSelectedSongEntries = 0;
+        ArtistID m_selectedArtist;
+        SongID m_lastSelectedSong;
 
         struct
         {
