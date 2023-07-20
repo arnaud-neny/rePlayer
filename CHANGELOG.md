@@ -1,4 +1,4 @@
-v0.8.4:
+v0.8.5:
 - Added ZXTune
 - Added ZX-Art import
 - Updated ZXTune to r5040
@@ -9,6 +9,7 @@ v0.8.4:
 - Updated libcurl to 8.2.0
 - Updated artist tab to display and interact with songs using a table
 - Updated Amiga Music Preservation scanner
+- Disable useless graphics shader detection
 - Bug fixes
 
 v0.7.1:
