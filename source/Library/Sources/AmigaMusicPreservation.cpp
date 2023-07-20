@@ -60,8 +60,7 @@ namespace rePlayer
         } state = kStateInit;
         int32_t stack = 0;
 
-        uint32_t extPos{ 0 };
-        std::string ext[4];
+        std::string ext;
 
         void OnReadNode(TidyDoc doc, TidyNode tnod) final;
     };
@@ -212,8 +211,9 @@ namespace rePlayer
                 {
                     ReadNodeText(doc, child, [this](auto buf, auto size)
                     {
-                        ConvertString(buf, size, ext[extPos]);
-                        extPos = (extPos + 1) & 3;
+                        int32_t modSize;
+                        if (sscanf_s(buf, "%dKb", &modSize) != 1)
+                            ConvertString(buf, size, ext);
                     });
                 }
                 break;
@@ -227,7 +227,7 @@ namespace rePlayer
             stack--;
             if (stack == -2)
             {
-                songs.Last().ext = ext[(extPos + 1) & 3];
+                songs.Last().ext = ext;
                 state = kStateSongs;
             }
         }
@@ -413,8 +413,7 @@ namespace rePlayer
         Array<Song> songs;
         bool hasNextPage;
 
-        uint32_t extPos{ 0 };
-        std::string ext[4];
+        std::string ext;
 
         enum
         {
@@ -470,7 +469,7 @@ namespace rePlayer
                         }
                         else if (strstr(attrValue, "analyzer2.php?idx="))
                         {
-                            songs.Last().ext = ext[(extPos + 1) & 3];
+                            songs.Last().ext = ext;
                             state = kStateSongBegin;
                         }
                     }
@@ -488,8 +487,9 @@ namespace rePlayer
             case kStateArtistBegin:
                 ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
-                    ConvertString(buf, size, ext[extPos]);
-                    extPos = (extPos + 1) & 3;
+                    int32_t modSize;
+                    if (sscanf_s(buf, "%dKb", &modSize) != 1)
+                        ConvertString(buf, size, ext);
                 });
                 break;
             case kStateArtistEnd:
@@ -579,8 +579,13 @@ namespace rePlayer
             song->type = Core::GetReplays().Find(collectedSong.ext.c_str());
             if (song->type.ext == eExtension::Unknown)
             {
-                song->name.String() += ".";
-                song->name.String() += collectedSong.ext;
+                if (collectedSong.ext == "FST")
+                    song->type = { eExtension::_mod, eReplay::OpenMPT };
+                else
+                {
+                    song->name.String() += ".";
+                    song->name.String() += collectedSong.ext;
+                }
             }
             song->sourceIds.Add(songSourceId);
 
@@ -657,8 +662,13 @@ namespace rePlayer
                 song->type = Core::GetReplays().Find(searchSong.ext.c_str());
                 if (song->type.ext == eExtension::Unknown)
                 {
-                    song->name.String() += ".";
-                    song->name.String() += searchSong.ext;
+                    if (searchSong.ext == "FST")
+                        song->type = { eExtension::_mod, eReplay::OpenMPT };
+                    else
+                    {
+                        song->name.String() += ".";
+                        song->name.String() += searchSong.ext;
+                    }
                 }
                 song->sourceIds.Add(SourceID(kID, searchSong.id));
                 for (auto& searchArtist : searchSong.artist)
