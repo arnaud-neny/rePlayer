@@ -114,9 +114,9 @@ namespace rePlayer
                     if (FAILED(D3D12CreateDevice(dxgiAdapter, featureLevel, IID_PPV_ARGS(&m_device))))
                         continue;
 
-                    D3D12_FEATURE_DATA_SHADER_MODEL shaderModel{ D3D_SHADER_MODEL_6_5 };
-                    if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel))) || shaderModel.HighestShaderModel < D3D_SHADER_MODEL_6_5)
-                        m_device.Reset();
+//                     D3D12_FEATURE_DATA_SHADER_MODEL shaderModel{ D3D_SHADER_MODEL_6_5 };
+//                     if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel))) || shaderModel.HighestShaderModel < D3D_SHADER_MODEL_6_5)
+//                         m_device.Reset();
                 }
 
                 dxgiAdapter->Release();
@@ -129,7 +129,10 @@ namespace rePlayer
                 }
             }
             if (m_device.IsInvalid())
+            {
+                MessageBox(nullptr, "Can't initialise DirectX 12", "rePlayer", MB_ICONERROR);
                 return true;
+            }
         }
 
 #if IS_DX12_DEBUG_ENABLED
@@ -172,7 +175,10 @@ namespace rePlayer
 
         // Create the DirectComposition device
         if (DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&m_dcompDevice)) != S_OK)
+        {
+            MessageBox(nullptr, "Can't create a composition device", "rePlayer", MB_ICONERROR);
             return true;
+        }
 
         // Create the render target view descriptor heaps (max 64 entries)
         {
