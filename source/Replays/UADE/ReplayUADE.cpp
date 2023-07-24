@@ -588,7 +588,7 @@ namespace rePlayer
         // check if we have to do the job
         if (uadeInfo->subsongbytes != 0 || m_lastSubsongIndex != m_subsongIndex)
         {
-            auto subsongIndex = m_subsongIndex + m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.min : 0;
+            auto subsongIndex = m_subsongIndex + (m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.min : 0);
             uade_stop(m_uadeState);
             auto buffer = m_stream->Read();
             auto filepath = std::filesystem::path(m_stream->GetName());
