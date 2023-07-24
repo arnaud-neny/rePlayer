@@ -1,4 +1,4 @@
-v0.8.5:
+v0.8.6:
 - Added ZXTune
 - Added ZX-Art import
 - Updated ZXTune to r5040
