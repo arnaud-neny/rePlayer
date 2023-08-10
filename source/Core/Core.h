@@ -3,6 +3,8 @@
 #pragma warning(disable : 26812)
 
 #include <Core/Types.h>
+#include <malloc.h>
+#include <string.h>
 #include <type_traits>
 #include <utility>
 
