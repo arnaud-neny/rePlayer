@@ -1,5 +1,7 @@
 #include "SourceID.h"
 
+#include <stdlib.h>
+
 namespace rePlayer
 {
     const char* const SourceID::sourceNames[] = {
