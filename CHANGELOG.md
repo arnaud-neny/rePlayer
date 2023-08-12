@@ -1,12 +1,11 @@
-v0.8.6:
+v0.8.7:
 - Added ZXTune
 - Added ZX-Art import
 - Updated ZXTune to r5040
 - Updated modland to import packaged IFF-SMUS
 - Updated TagLib to 1.13.1
-- Updated ImGui to 1.89.71
-- Updated libarchive to 3.7.0
-- Updated libcurl to 8.2.0
+- Updated ImGui to 1.89.82
+- Updated libcurl to 8.2.1
 - Updated artist tab to display and interact with songs using a table
 - Updated Amiga Music Preservation scanner
 - Disable useless graphics shader detection

@@ -7,6 +7,7 @@
 - database: add album database
 - modland: source validation (check for removed files)
 - mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)
+- plugins: load on demand (not everything at start)
 - source: don't load on start, just at access (to save memory)
 - support for .cue, .m3u, .pls
 - pure database random play (System::Mode::Random)
