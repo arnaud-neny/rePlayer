@@ -515,9 +515,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="ReplaySidPlay.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\3rdParty\curl\libcurl.dll.a" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ReplaySidPlayBasic.inl" />
     <None Include="ReplaySidPlayKernal.inl" />
   </ItemGroup>

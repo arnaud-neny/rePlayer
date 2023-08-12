@@ -525,11 +525,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\3rdParty\curl\libcurl.dll.a">
-      <Filter>Source Files</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="ReplaySidPlayBasic.inl">
       <Filter>Source Files</Filter>
     </None>

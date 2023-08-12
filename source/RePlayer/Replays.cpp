@@ -9,6 +9,8 @@
 #include <Replays/Replay.h>
 #include <Replays/ReplayPlugin.h>
 
+#include <curl/curl.h>
+
 #include <filesystem>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -225,6 +227,39 @@ namespace rePlayer
                 auto getReplayPlugin = reinterpret_cast<GetReplayPlugin>(GetProcAddress(hModule, "getReplayPlugin"));
                 if (auto replayPlugin = getReplayPlugin())
                 {
+                    replayPlugin->download = [](const char* url)
+                    {
+                        CURL* curl = curl_easy_init();
+
+                        char errorBuffer[CURL_ERROR_SIZE];
+                        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+                        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+                        curl_easy_setopt(curl, CURLOPT_URL, url);
+                        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+
+                        struct Buffer
+                        {
+                            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
+                            {
+                                auto oldSize = buffer->storage.NumItems();
+                                buffer->storage.Resize(oldSize + size * nmemb);
+
+                                memcpy(&buffer->storage[oldSize], data, size * nmemb);
+
+                                return size * nmemb;
+                            }
+                            Array<uint8_t> storage;
+                        } buffer;
+
+                        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
+                        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+                        if (curl_easy_perform(curl) != CURLE_OK)
+                            Log::Error("Replay: can't download \"%s\", curl error \"%s\"\n", url, errorBuffer);
+                        curl_easy_cleanup(curl);
+
+                        return std::move(buffer.storage);
+                    };
+
                     if (m_plugins[int32_t(replayPlugin->replayId)] == nullptr)
                     {
                         replayPlugin->init(SharedContexts::ms_instance, Core::GetSettings());
@@ -232,7 +267,7 @@ namespace rePlayer
                     }
                     else
                     {
-                        Log::Error("Replay: Can't register \"%s\", slot \"%s\" is already used\n", dirEntry.path().filename().string().c_str(), MediaType(eExtension::Unknown, replayPlugin->replayId).GetReplay());
+                        Log::Error("Replay: can't register \"%s\", slot \"%s\" is already used\n", dirEntry.path().filename().string().c_str(), MediaType(eExtension::Unknown, replayPlugin->replayId).GetReplay());
                         FreeLibrary(hModule);
                     }
                 }

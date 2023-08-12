@@ -7,8 +7,6 @@
 #include <IO/File.h>
 #include <ReplayDll.h>
 
-#include <curl/curl.h>
-
 #include "libsidplayfp/config.h"
 #include "libsidplayfp/builders/residfp-builder/residfp.h"
 #include "libsidplayfp/sidplayfp/SidInfo.h"
@@ -521,31 +519,8 @@ namespace rePlayer
             if (sidDatabase == nullptr)
             {
                 ms_sidDatabase = sidDatabase = new SidDatabase();
-
-                CURL* curl = curl_easy_init();
-
-                char errorBuffer[CURL_ERROR_SIZE];
-                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_easy_setopt(curl, CURLOPT_URL, "https://hvsc.de/download/C64Music/DOCUMENTS/Songlengths.md5");
-                curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
-                struct Buffer : public Array<uint8_t>
-                {
-                    static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
-                    {
-                        auto oldSize = buffer->NumItems();
-                        buffer->Resize(oldSize + size * nmemb);
-
-                        memcpy(&(*buffer)[oldSize], data, size * nmemb);
-
-                        return size * nmemb;
-                    }
-                } buffer;
-
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-                if (curl_easy_perform(curl) == CURLE_OK)
+                auto buffer = g_replayPlugin.download("https://hvsc.de/download/C64Music/DOCUMENTS/Songlengths.md5");
+                if (buffer.IsNotEmpty())
                 {
                     std::filesystem::path path = std::filesystem::temp_directory_path();
                     path.replace_filename("siddb.txt");
@@ -556,7 +531,6 @@ namespace rePlayer
                     sidDatabase->open(path.string().c_str());
                     io::File::Delete(path.string().c_str());
                 }
-                curl_easy_cleanup(curl);
             }
 
             auto* durations = settings->GetDurations();

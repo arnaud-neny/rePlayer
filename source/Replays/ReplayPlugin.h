@@ -51,7 +51,9 @@ namespace rePlayer
 
         std::string(*getFileFilter)() = nullptr;
 
-        void (*editMetadata)(ReplayMetadataContext&) = [](ReplayMetadataContext&){};
+        void (*editMetadata)(ReplayMetadataContext&) = [](ReplayMetadataContext&) {};
+
+        Array<uint8_t> (*download)(const char*) = nullptr;
     };
 }
 // namespace rePlayer
