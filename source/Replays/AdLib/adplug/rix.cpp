@@ -1,17 +1,17 @@
 /*
  * Adplug - Replayer for many OPL2/OPL3 audio file formats.
  * Copyright (C) 1999 - 2007 Simon Peter, <dn.tlp@gmx.net>, et al.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -98,12 +98,18 @@ bool CrixPlayer::update()
     play_end = 0;
     // rePlayer end
 
-    int_08h_entry();
+	int_08h_entry();
 	return !play_end;
+}
+
+unsigned int CrixPlayer::getsubsong()
+{
+  return song;
 }
 
 void CrixPlayer::rewind(int subsong)
 {
+  song = subsong;
   I = 0; T = 0;
   mus_block = 0;
   ins_block = 0;
@@ -116,7 +122,7 @@ void CrixPlayer::rewind(int subsong)
   bd_modify = 0;
   sustain = 0;
   play_end = 0;
-  index = 0; 
+  index = 0;
 
   memset(f_buffer,   0,     sizeof(f_buffer));
   memset(a0b0_data2, 0,     sizeof(a0b0_data2));
@@ -224,7 +230,7 @@ inline void CrixPlayer::data_initial()
 inline uint16_t CrixPlayer::ad_initial()
 {
   uint16_t i,j,k = 0;
-  for(i=0;i<25;i++) 
+  for(i=0;i<25;i++)
   {
 		uint32_t res = ((uint32_t)i*24+10000)*52088/250000*0x24000/0x1B503;
 		f_buffer[i*12]=((uint16_t)res+4)>>3;
@@ -257,29 +263,29 @@ inline void CrixPlayer::ad_bop(uint16_t reg,uint16_t value)
   opl->write(reg & 0xff, value & 0xff);
 }
 /*--------------------------------------------------------------*/
-inline void CrixPlayer::int_08h_entry()   
-  {   
-    uint16_t band_sus = 1;   
-    while(band_sus)   
-      {   
-        if(sustain <= 0)   
+inline void CrixPlayer::int_08h_entry()
+  {
+    uint16_t band_sus = 1;
+    while(band_sus)
+      {
+        if(sustain <= 0)
           {
-            band_sus = rix_proc();   
-            if(band_sus) sustain += band_sus; 
+            band_sus = rix_proc();
+            if(band_sus) sustain += band_sus;
             else
-              {   
-                play_end=1;   
-                break;   
-              }   
-          }   
-        else   
-          {   
-            if(band_sus) sustain -= 14; /* aging */   
-            break;   
-          }   
-      }   
-  }   
-/*--------------------------------------------------------------*/ 
+              {
+                play_end=1;
+                break;
+              }
+          }
+        else
+          {
+            if(band_sus) sustain -= 14; /* aging */
+            break;
+          }
+      }
+  }
+/*--------------------------------------------------------------*/
 inline uint16_t CrixPlayer::rix_proc()
 {
   uint8_t ctrl = 0;
