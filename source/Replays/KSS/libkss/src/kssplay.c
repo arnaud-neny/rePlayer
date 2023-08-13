@@ -198,7 +198,7 @@ void KSSPLAY_reset(KSSPLAY *kssplay, uint32_t song, uint32_t cpu_speed) {
   kssplay->fade = 0;
   kssplay->fade_flag = 0;
 
-  kssplay->step_inc = kssplay->vm->clock / kssplay->rate;
+  kssplay->step_inc = (double)kssplay->vm->clock / kssplay->rate;
   kssplay->step_cnt = 0;
   kssplay->decoded_length = 0;
   kssplay->silent = 0;
@@ -456,9 +456,12 @@ static inline void fade_per_ch(KSSPLAY *kssplay, KSSPLAY_PER_CH_OUT *out) {
 static inline void process_vm(KSSPLAY *kssplay) {
   int step_int = (int)kssplay->step_cnt;
   kssplay->step_cnt += kssplay->step_inc;
-  if (step_int > 1) {
+  if (step_int > 0) {
     kssplay->step_cnt -= step_int;
-    VM_exec(kssplay->vm, step_int);
+    //VM_exec might execute more than step_int cycles
+    uint32_t extra_cycles = VM_exec(kssplay->vm, step_int) - step_int;
+    //correct the step_cnt for the extra cycles
+    kssplay->step_cnt -= extra_cycles;
   }
 }
 

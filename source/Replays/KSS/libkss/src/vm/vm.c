@@ -210,7 +210,7 @@ void VM_delete(VM *vm) {
   free(vm);
 }
 
-void VM_exec(VM *vm, uint32_t cycles) { kmz80_exec(&vm->context, cycles); }
+uint32_t VM_exec(VM *vm, uint32_t cycles) { return kmz80_exec(&vm->context, cycles); }
 
 void VM_exec_func(VM *vm, uint32_t func_adr) { exec_setup(vm, func_adr); }
 

@@ -84,7 +84,7 @@ void VM_reset(VM *vm, uint32_t cpu_clk, uint32_t pc, uint32_t play_adr, double v
               uint32_t DA8);
 void VM_init_memory(VM *vm, uint32_t ram_mode, uint32_t offset, uint32_t num, uint8_t *data);
 void VM_init_bank(VM *vm, uint32_t mode, uint32_t num, uint32_t offset, uint8_t *data);
-void VM_exec(VM *vm, uint32_t cycles);
+uint32_t VM_exec(VM *vm, uint32_t cycles);
 void VM_exec_func(VM *vm, uint32_t init_adr);
 void VM_set_clock(VM *vm, uint32_t clock, double vsync_freq);
 void VM_set_wioproc(VM *vm, uint32_t a, VM_WIOPROC p);

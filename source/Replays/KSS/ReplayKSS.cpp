@@ -8,7 +8,7 @@
 
 namespace rePlayer
 {
-    #define LIBKSS_VERSION "LIBKSS 1.1.4"
+    #define LIBKSS_VERSION "LIBKSS 1.2.0"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::KSS,
