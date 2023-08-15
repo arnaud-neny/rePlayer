@@ -70,7 +70,7 @@ namespace rePlayer
     public:
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;
-        void GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, void* curl) const;
+        void GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, void* curl) const;
         ArtistSheet* GetArtist(uint32_t id, void* curl) const;
 
         bool DownloadDatabase();

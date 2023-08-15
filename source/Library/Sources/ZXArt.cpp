@@ -168,7 +168,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         curl_easy_perform(curl);
 
-        GetSongs(results, buffer, curl);
+        GetSongs(results, buffer, true, curl);
 
         curl_easy_cleanup(curl);
     }
@@ -201,7 +201,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         curl_easy_perform(curl);
 
-        GetSongs(collectedSongs, buffer, curl);
+        GetSongs(collectedSongs, buffer, false, curl);
 
         curl_easy_cleanup(curl);
     }
@@ -373,7 +373,7 @@ namespace rePlayer
         return song != m_songs.end() && song->id == id ? const_cast<SongSource*>(song) : nullptr;
     }
 
-    void SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, void* curl) const
+    void SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, void* curl) const
     {
         if (buffer.IsNotEmpty())
         {
@@ -392,11 +392,11 @@ namespace rePlayer
                     if (sourceSong->isDiscarded)
                         state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
                     else
-                        state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kNew : SourceResults::kOwned);
+                        song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable) : state.SetSongStatus(SourceResults::kOwned);
                 }
                 else
                 {
-                    state.SetSongStatus(SourceResults::kNew);
+                    state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable);
                 }
 
                 song->name = zxMusic["title"].get<std::string>();
