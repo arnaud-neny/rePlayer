@@ -169,7 +169,7 @@ cleanup:
 #endif
 
 int LoadTFMXFile(TfmxState* state, TfmxData* mdat_data, TfmxData* sample_data) {
-	return tfmx_loader(state, mdat_data, sample_data);
+    return tfmx_loader(state, mdat_data, sample_data);
 
 /*
     int suffixPos, suffixPosDat, status;
@@ -233,14 +233,14 @@ int LoadTFMXFile(TfmxState* state, TfmxData* mdat_data, TfmxData* sample_data) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static int read_data(void* dest, int size, TfmxData* data) {
-	if (size + data->read_offset > data->size) {
-		size = ((int)data->size) - data->read_offset;
-	}
+    if (size + data->read_offset > data->size) {
+        size = ((int)data->size) - data->read_offset;
+    }
 
-	memcpy(dest, data->data + data->read_offset, size);
-	data->read_offset += size;
+    memcpy(dest, data->data + data->read_offset, size);
+    data->read_offset += size;
 
-	return size;
+    return size;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -353,17 +353,18 @@ static int tfmx_loader(TfmxState* state, TfmxData* mdat_data, TfmxData* smpl_dat
     }
 
     // Now at long last we calc the size of and load the sample file.
-	if (!(state->smplbuf = (void*)malloc(smpl_data->size))) {
+    if (!(state->smplbuf = (void*)malloc(smpl_data->size))) {
         //printf("%s", "LoadTFMX: Error allocating samplebuffer");
-		return -1;
-	}
+        return -1;
+    }
 
-	state->smplbuf_end = state->smplbuf + smpl_data->size - 1;
+    state->smplbuf_end = state->smplbuf + smpl_data->size - 1;
 
-	if (!read_data(state->smplbuf, smpl_data->size, smpl_data)) {
+    if (!read_data(state->smplbuf, smpl_data->size, smpl_data)) {
         //printf("%s", "LoadTFMX: Error reading SMPL file");
-		free(state->smplbuf);
-		return -1;
+        free(state->smplbuf);
+        state->smplbuf = 0;
+        return -1;
     }
 
     /*
@@ -430,5 +431,5 @@ void tfmx_fill_module_info(TfmxState* state, char* t) {
 void tfmx_fill_text_info(TfmxState* state, char* t) {
     for (int i = 0; i < 6; ++i) {
         t += sprintf(t, "%40.40s\n", state->mdat_header.text[i]);
-	}
+    }
 }
