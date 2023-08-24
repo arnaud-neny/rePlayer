@@ -352,11 +352,12 @@ namespace rePlayer
                 {
                     if (endState == Player::kEnded)
                         PlayNextSong();
-                    else if (isPlaying && m_shelvedPlayer.IsInvalid() && m_nextPlayer.IsValid())
+                    else if (isPlaying && m_shelvedPlayer.IsInvalid() && m_nextPlayer.IsValid() && !m_nextPlayer->IsPlaying())
                     {
                         // start the next song without stopping the current one, to have a seamless playback
                         ValidateNextSong();
-                        m_nextPlayer->Play();
+                        if (m_nextPlayer.IsValid())
+                            m_nextPlayer->Play();
                     }
                 }
             }
