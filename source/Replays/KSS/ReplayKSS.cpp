@@ -178,7 +178,7 @@ namespace rePlayer
 
         auto currentPosition = m_currentPosition;
         auto currentDuration = m_currentDuration;
-        if (m_currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
+        if (currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
         {
             numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
             if (numSamples == 0)
