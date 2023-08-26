@@ -39,8 +39,8 @@ namespace core
         template <typename CommandType>
         void Add(const CommandType* command);
 
-        template <typename CommandType>
-        CommandType* Create(size_t commandSize = sizeof(CommandType));
+        template <typename CommandType, typename... Args>
+        CommandType* Create(size_t commandSize = sizeof(CommandType), Args&&... args);
 
         template <typename CommandType>
         void Update(const CommandType* command, bool isRemoved);

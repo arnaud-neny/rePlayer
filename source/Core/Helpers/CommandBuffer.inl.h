@@ -44,8 +44,8 @@ namespace core
         m_commands.Add(command, command->numEntries + 1);
     }
 
-    template <typename CommandType>
-    inline CommandType* CommandBuffer::Create(size_t commandSize)
+    template <typename CommandType, typename... Args>
+    inline CommandType* CommandBuffer::Create(size_t commandSize, Args&&... args)
     {
         for (uint32_t i = 0; i < m_commands.NumItems();)
         {
@@ -55,7 +55,7 @@ namespace core
                 i += m_commands[i].numEntries + 1;
         }
         auto numItems = uint16_t((commandSize + sizeof(Command) - 1) / sizeof(Command));
-        auto command = new (m_commands.Push(numItems)) CommandType();
+        auto command = new (m_commands.Push(numItems)) CommandType(std::forward<Args>(args)...);
         command->numEntries = numItems - 1;
         return command;
     }
