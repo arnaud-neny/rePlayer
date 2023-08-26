@@ -17,7 +17,7 @@
 
 namespace rePlayer
 {
-    #define ZXtuneVersion "r5040"
+    #define ZXtuneVersion "r5050"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::ZXTune,
