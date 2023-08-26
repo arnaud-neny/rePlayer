@@ -30,7 +30,7 @@ namespace rePlayer
 
     SongEndEditor* SongEndEditor::Create(ReplayMetadataContext& context, MusicID musicId)
     {
-        musicId.subsongId.index = context.songIndex;
+        musicId.subsongId.index = context.subsongIndex;
         auto currentSong = musicId.GetSong();
         if (auto replay = Core::GetReplays().Load(musicId.GetStream(), currentSong->Edit()->metadata.Container(), currentSong->Edit()->type))
             return new SongEndEditor(musicId, replay, context.duration);
@@ -156,7 +156,7 @@ namespace rePlayer
                 ImGui::TableNextColumn();
                 if (ImGui::Button("Ok"))
                 {
-                    context.songIndex = m_musicId.subsongId.index;
+                    context.subsongIndex = m_musicId.subsongId.index;
                     context.duration = m_duration;
                     isOpened = false;
                     ImGui::CloseCurrentPopup();

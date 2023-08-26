@@ -92,10 +92,10 @@ namespace rePlayer
             if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
             {
                 context.duration = duration;
-                context.songIndex = i;
+                context.subsongIndex = i;
                 context.isSongEndEditorEnabled = true;
             }
-            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && context.songIndex == i)
+            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && context.subsongIndex == i)
             {
                 milliseconds = context.duration % 1000;
                 seconds = (context.duration / 1000) % 60;

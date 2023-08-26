@@ -8,17 +8,19 @@ namespace rePlayer
 
     struct ReplayMetadataContext
     {
-        ReplayMetadataContext(CommandBuffer commandBuffer);
+        ReplayMetadataContext(CommandBuffer commandBuffer, uint16_t _lastSubsongIndex);
 
         CommandBuffer metadata;
 
         uint32_t duration = 0;
-        int16_t songIndex = 0;
-        bool isSongEndEditorEnabled = false;
+        uint16_t lastSubsongIndex;
+        uint16_t subsongIndex : 15 = 0;
+        uint16_t isSongEndEditorEnabled : 1 = false;
     };
 
-    inline ReplayMetadataContext::ReplayMetadataContext(CommandBuffer commandBuffer)
+    inline ReplayMetadataContext::ReplayMetadataContext(CommandBuffer commandBuffer, uint16_t _lastSubsongIndex)
         : metadata(commandBuffer)
+        , lastSubsongIndex(_lastSubsongIndex)
     {}
 }
 // namespace rePlayer

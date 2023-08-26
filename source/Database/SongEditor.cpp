@@ -530,7 +530,7 @@ namespace rePlayer
             return;
         }
 
-        ReplayMetadataContext context(m_song.edited.metadata.Container());
+        ReplayMetadataContext context(m_song.edited.metadata.Container(), m_song.edited.lastSubsongIndex);
         if (m_songEndEditor && m_songEndEditor->Update(context))
         {
             delete m_songEndEditor;

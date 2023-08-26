@@ -103,10 +103,10 @@ namespace rePlayer
             if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
             {
                 context.duration = duration;
-                context.songIndex = uint16_t(i);
+                context.subsongIndex = uint16_t(i);
                 context.isSongEndEditorEnabled = true;
             }
-            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && uint32_t(context.songIndex) == i)
+            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && uint32_t(context.subsongIndex) == i)
             {
                 duration = context.duration;
                 context.duration = 0;
