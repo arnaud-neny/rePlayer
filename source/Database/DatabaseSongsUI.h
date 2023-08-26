@@ -67,6 +67,7 @@ namespace rePlayer
         void AddToArtist();
         void EditTags();
         bool Discard();
+        void ResetReplay();
 
     private:
         enum TabIDs

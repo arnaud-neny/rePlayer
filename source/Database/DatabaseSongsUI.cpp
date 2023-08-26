@@ -758,6 +758,15 @@ namespace rePlayer
             ImGui::CloseCurrentPopup();
         }
         OnSelectionContext();
+        // Advanced commands (hidden until shift is pressed)
+        if (ImGui::GetIO().KeyShift)
+        {
+            if (ImGui::BeginMenu("Reset replay"))
+            {
+                ResetReplay();
+                ImGui::EndMenu();
+            }
+        }
     }
 
     void DatabaseSongsUI::AddToArtist()
@@ -899,6 +908,34 @@ namespace rePlayer
             return false;
         }
         return true;
+    }
+
+    void DatabaseSongsUI::ResetReplay()
+    {
+        std::string resetLabel;
+        for (auto& entry : m_entries)
+        {
+            if (entry.isSelected)
+            {
+                auto discardSong = m_db[entry.id];
+                resetLabel += "[";
+                resetLabel += discardSong->GetType().GetExtension();
+                resetLabel += "] ";
+                resetLabel += m_db.GetArtists(entry.id.songId);
+                resetLabel += " - ";
+                resetLabel += m_db.GetTitle(entry.id);
+                resetLabel += "\n";
+            }
+        }
+        if (ImGui::Selectable(resetLabel.c_str()))
+        {
+            for (auto& entry : m_entries)
+            {
+                if (entry.isSelected)
+                    m_db[entry.id]->Edit()->type.replay = eReplay::Unknown;
+            }
+            ImGui::CloseCurrentPopup();
+        }
     }
 }
 // namespace rePlayer
