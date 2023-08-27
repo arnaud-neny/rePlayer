@@ -1,3 +1,4 @@
+v0.9.0:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
 - Updated libkss to 1.2.0
