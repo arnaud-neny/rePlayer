@@ -1,6 +1,7 @@
 # rePlayer (another multi-formats music player)
 
 - add in the settings the replay selection for each extension
+- import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
 - async tasks (imports...)

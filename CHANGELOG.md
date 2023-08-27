@@ -1,3 +1,9 @@
+- Added SNDH-Player
+- Updated adplug to 2.3.3.808
+- Updated libkss to 1.2.0
+- Updated ZXTune to r5052
+- Bug fixes
+
 v0.8.7:
 - Added ZXTune
 - Added ZX-Art import
