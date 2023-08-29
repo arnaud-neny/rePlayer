@@ -10,7 +10,7 @@
 	rts
 	dc.b	'DELIRIUM'
 	dc.l	table
-	dc.b	'$VER: PreTracker for UADE 0.1',0
+	dc.b	'$VER: PreTracker for UADE 0.1-1',0
 	dc.b	'$COPYRIGHT: Arnaud Neny & Pink/Abyss',0
 	dc.b	'$LICENSE: GNU LGPL',0
 	even
@@ -36,8 +36,10 @@ SubSongRange	moveq	#0,d0
 	add.l	#90,a0
     moveq	#0,d1
 	move.b	(a0),d1
+	tst.b	d1
+	beq.b	nosubsongs
     subq.l  #1,d1
-	rts
+nosubsongs	rts
 
 InitPlayer	push	all
 	moveq	#0,d0
