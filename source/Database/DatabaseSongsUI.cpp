@@ -932,7 +932,12 @@ namespace rePlayer
             for (auto& entry : m_entries)
             {
                 if (entry.isSelected)
-                    m_db[entry.id]->Edit()->type.replay = eReplay::Unknown;
+                {
+                    auto* song = m_db[entry.id]->Edit();
+                    song->type.replay = eReplay::Unknown;
+                    for (auto& subsong : song->subsongs)
+                        subsong.isPlayed = false;
+                }
             }
             ImGui::CloseCurrentPopup();
         }
