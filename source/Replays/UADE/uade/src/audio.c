@@ -146,9 +146,9 @@ static void check_sound_buffers (void)
 	}
     } else {
 	uadecore_audio_skip += bytes;
-	/* if sound core doesn't report audio output start in 3 seconds from
+	/* if sound core doesn't report audio output start in 15 (virtual) seconds from
 	   the reboot, begin audio output anyway */
-	if (uadecore_audio_skip >= (sound_bytes_per_second * 3)) {
+	if (uadecore_audio_skip >= (sound_bytes_per_second * 15)) {
 	    fprintf(stderr, "involuntary audio output start\n");
 	    uadecore_audio_output = 1;
 	}
