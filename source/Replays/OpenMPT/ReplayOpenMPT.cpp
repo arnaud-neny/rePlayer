@@ -249,26 +249,25 @@ namespace rePlayer
         // Silence trimmer
         if (m_previousSubsongIndex != m_subsongIndex)
         {
-            int16_t samples[1024];
+            StereoSample samples[1024];
             uint64_t silenceStart = 0;
             uint64_t totalSamples = 0;
-            while (auto numSamples = int32_t(openmpt_module_read_mono(m_module, 8000, 1024, samples)))
+            while (auto numSamples = int32_t(openmpt_module_read_interleaved_float_stereo(m_module, kSampleRate, 1024, reinterpret_cast<float*>(samples))))
             {
                 auto currentSample = totalSamples;
                 totalSamples += numSamples;
                 do
                 {
-                    if (samples[numSamples - 1] != 0)
+                    static constexpr float kEpsilon = 1.0f / 32767.0f;
+                    if (fabsf(samples[numSamples - 1].left) > kEpsilon || fabsf(samples[numSamples - 1].right) > kEpsilon)
                     {
                         silenceStart = currentSample + numSamples;
                         break;
                     }
                 } while (--numSamples);
             }
-            if (silenceStart < totalSamples)
-                m_silenceStart = (silenceStart * kSampleRate) / 8000;
-            else
-                m_silenceStart = 0;
+            silenceStart += kSampleRate / 4; // keep 0.25 second of silence
+            m_silenceStart = silenceStart < totalSamples ? silenceStart : 0;
             m_isSilenceTriggered = false;
             m_currentPosition = 0;
             setSubsong();
