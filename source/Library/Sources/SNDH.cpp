@@ -138,8 +138,23 @@ namespace rePlayer
             kStateEnd
         } state = kStateInit;
 
+        static std::string FixUmlaut(std::string txt);
         void OnReadNode(TidyDoc doc, TidyNode tnod) final;
     };
+
+    std::string SourceSNDH::Search::FixUmlaut(std::string txt)
+    {
+        // impossible to make tidy not converting this...
+        for (size_t pos = 0;;)
+        {
+            pos = txt.find("%EF%BF%BD", pos, sizeof("%EF%BF%BD") - 1);
+            if (pos == std::string::npos)
+                break;
+            txt.erase(pos, sizeof("%EF%BF%BD") - 2);
+            txt[pos] = 'ü';
+        }
+        return txt;
+    }
 
     void SourceSNDH::Search::OnReadNode(TidyDoc doc, TidyNode tnod)
     {
@@ -160,7 +175,7 @@ namespace rePlayer
                         if (strstr(attrValue, "/?p=composer&amp;name="))
                         {
                             foundArtists.Push();
-                            foundArtists.Last().first = attrValue + sizeof("/?p=composer&amp;name=") - 1;
+                            foundArtists.Last().first = FixUmlaut(attrValue + sizeof("/?p=composer&amp;name=") - 1);
                             state = kStateArtistName;
                         }
                     }
@@ -177,7 +192,7 @@ namespace rePlayer
                     {
                         if (strstr(attrValue, "/?p=composer&amp;name="))
                         {
-                            foundSongs.Last().artist.first = attrValue + sizeof("/?p=composer&amp;name=") - 1;
+                            foundSongs.Last().artist.first = FixUmlaut(attrValue + sizeof("/?p=composer&amp;name=") - 1);
                             state = kStateSongArtistName;
                         }
                     }
@@ -382,6 +397,7 @@ namespace rePlayer
         Log::Message("SNDH: downloading \"%s\"...", url);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_REFERER, "https://sndh.atari.org/");
 
         struct Buffer : public Array<uint8_t>
         {
@@ -398,7 +414,7 @@ namespace rePlayer
         bool isEntryMissing = false;
         if (curlError == CURLE_OK)
         {
-            if (buffer.Size() < 128)
+            if (buffer.Size() < 128 || strstr(buffer.Items<char>(), "<html>"))
             {
                 isEntryMissing = true;
                 buffer.Reset();
