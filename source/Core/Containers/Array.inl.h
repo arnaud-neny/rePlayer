@@ -757,6 +757,11 @@ namespace core
                         *movedItems++ = std::move(*items);
                 }
                 auto numRemovedItems = uint32_t(items - movedItems);
+                if constexpr (!std::is_trivially_destructible<ItemType>::value)
+                {
+                    while (movedItems != items)
+                        (movedItems++)->~ItemType();
+                }
                 m_numItems = numItems - numRemovedItems;
                 return numRemovedItems;
             }
