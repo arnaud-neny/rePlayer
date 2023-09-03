@@ -1,6 +1,7 @@
 # rePlayer (another multi-formats music player)
 
 - add in the settings the replay selection for each extension
+- investigate htmlcxx (https://sourceforge.net/p/htmlcxx/) as an alternative to tidy
 - import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
@@ -39,6 +40,5 @@
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
 - FurnaceTracker: https://github.com/tildearrow/furnace
 - single channel export
-- refactor replays using dll loader to avoid duplicated code
 - vgmstream support? https://github.com/vgmstream/vgmstream
 - EUPHONY support: https://github.com/gzaffin/eupmini

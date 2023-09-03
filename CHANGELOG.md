@@ -1,7 +1,8 @@
-v0.9.0:
+v0.9.1:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
 - Updated libkss to 1.2.0
+- Update UADE to handle big modules
 - Updated ZXTune to r5052
 - Bug fixes
 
