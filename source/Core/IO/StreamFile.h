@@ -10,6 +10,7 @@ namespace core::io
         friend class SmartPtr<StreamFile>;
     public:
         static SmartPtr<StreamFile> Create(const std::string& filename);
+        static SmartPtr<StreamFile> Create(const std::wstring& filename);
 
         size_t Read(void* buffer, size_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
@@ -30,6 +31,7 @@ namespace core::io
         SmartPtr<Stream> OnClone() final;
 
         static std::wstring Convert(const std::string& name);
+        static std::string Convert(const std::wstring& wName);
 
     private:
         std::string m_name;

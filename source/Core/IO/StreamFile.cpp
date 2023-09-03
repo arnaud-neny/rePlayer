@@ -23,6 +23,19 @@ namespace core::io
         return stream;
     }
 
+    SmartPtr<StreamFile> StreamFile::Create(const std::wstring& filename)
+    {
+        SmartPtr<StreamFile> stream;
+        auto handle = ::CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+            stream.New();
+            stream->m_handle = handle;
+            stream->m_name = Convert(filename);
+        }
+        return stream;
+    }
+
     size_t StreamFile::Read(void* buffer, size_t size)
     {
         if (m_stream.IsValid())
@@ -116,9 +129,17 @@ namespace core::io
     std::wstring StreamFile::Convert(const std::string& name)
     {
         std::wstring wName;
-        wName.resize(::MultiByteToWideChar(CP_UTF8, 0, name.c_str(), -1, NULL, 0));
+        wName.resize(::MultiByteToWideChar(CP_UTF8, 0, name.c_str(), -1, nullptr, 0));
         ::MultiByteToWideChar(CP_UTF8, 0, name.c_str(), -1, wName.data(), int32_t(wName.size()));
         return wName;
+    }
+
+    std::string StreamFile::Convert(const std::wstring& wName)
+    {
+        std::string name;
+        name.resize(::WideCharToMultiByte(CP_UTF8, 0, wName.c_str(), -1, nullptr, 0, nullptr, nullptr));
+        ::WideCharToMultiByte(CP_UTF8, 0, wName.c_str(), -1, name.data(), int32_t(name.size()), nullptr, nullptr);
+        return name;
     }
 }
 // namespace core::io
