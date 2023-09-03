@@ -9,8 +9,6 @@
 
 namespace rePlayer
 {
-    struct DllEntry;
-
     class ReplayUADE : public Replay
     {
     public:
@@ -88,7 +86,6 @@ namespace rePlayer
         static struct uade_file* AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* state);
 
         void BuildMediaType();
-        virtual void SetSettings(int32_t stereoSeparation, int32_t surround, int32_t filter, int32_t isNtsc);
         void SetupMetadata(CommandBuffer metadata);
 
     private:
@@ -102,13 +99,16 @@ namespace rePlayer
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
         Array<std::string> m_packagedSubsongNames;
-        size_t m_dllIndex;
-        Array<DllEntry>* m_dllEntries = nullptr;
-        static int32_t ms_stereoSeparation;
-        static int32_t ms_surround;
-        static int32_t ms_filter;
-        static int32_t ms_isNtsc;
         static ReplayOverride ms_replayOverrides[];
+
+    public:
+        struct Globals
+        {
+            int32_t stereoSeparation;
+            int32_t surround;
+            int32_t filter;
+            int32_t isNtsc;
+        } static ms_globals;
     };
 }
 // namespace rePlayer

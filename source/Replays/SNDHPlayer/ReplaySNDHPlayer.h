@@ -7,13 +7,10 @@
 
 namespace rePlayer
 {
-    struct DllEntry;
-
     class ReplaySNDHPlayer : public Replay
     {
     public:
         static bool Init(SharedContexts* ctx, Window& window);
-        static void Release();
 
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
@@ -71,7 +68,6 @@ namespace rePlayer
         ReplaySNDHPlayer(SndhFile* sndh, CommandBuffer metadata);
 
         int32_t GetTickCountFromSc68() const;
-        virtual void SetSettings(int32_t surround);
         void BuildHash(SndhFile* sndh);
         void BuildDurations(CommandBuffer metadata);
 
@@ -87,9 +83,7 @@ namespace rePlayer
         uint32_t m_hash = 0;
         uint32_t m_activeChannels = 0;
 
-        uint32_t m_dllIndex;
-        Array<DllEntry>* m_dllEntries = nullptr;
-
+    public:
         static int32_t ms_surround;
     };
 }

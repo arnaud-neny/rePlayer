@@ -17,20 +17,17 @@ extern "C"
 #include <uade/uadestate.h>
 #include <include/uadectl.h>
 }
-#include <dllloader.h>
-
 #include <Audio/AudioTypes.inl.h>
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
-#include <IO/File.h>
 #include <Imgui.h>
 #include <ReplayDll.h>
 
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
-        .replayId = eReplay::UADE,
+        .replayId = eReplay::UADE, .isThreadSafe = false,
         .name = "Unix Amiga Delitracker Emulator",
         .about = "UADE 3.0.2\nHeikki Orsila & Michael Doering",
         .settings = "Unix Amiga Delitracker Emulator 3.0.2",
@@ -39,36 +36,20 @@ namespace rePlayer
         .load = ReplayUADE::Load,
         .displaySettings = ReplayUADE::DisplaySettings,
         .getFileFilter = ReplayUADE::GetFileFilters,
-        .editMetadata = ReplayUADE::Settings::Edit
+        .editMetadata = ReplayUADE::Settings::Edit,
+        .globals = &ReplayUADE::ms_globals
     };
-
-    static DllManager* s_dllManager = nullptr;
-    static bool s_isMainModule = false;
-    struct DllEntry
-    {
-        std::wstring path;
-        HMODULE handle;
-        ReplayUADE* replay;
-    };
-    static Array<DllEntry> s_dlls;
-    SharedContexts* s_sharedContexts = nullptr;
-
-    typedef ReplayPlugin* (*GetReplayPlugin)();
 
     bool ReplayUADE::Init(SharedContexts* ctx, Window& window)
     {
-        s_sharedContexts = ctx;
         ctx->Init();
 
         if (&window != nullptr)
         {
-            window.RegisterSerializedData(ms_stereoSeparation, "ReplayUADEStereoSeparation");
-            window.RegisterSerializedData(ms_surround, "ReplayUADESurround");
-            window.RegisterSerializedData(ms_filter, "ReplayUADEFilter");
-            window.RegisterSerializedData(ms_isNtsc, "ReplayUADENtsc");
-
-            s_isMainModule = true;
-            s_dlls.Reserve(8);
+            window.RegisterSerializedData(ms_globals.stereoSeparation, "ReplayUADEStereoSeparation");
+            window.RegisterSerializedData(ms_globals.surround, "ReplayUADESurround");
+            window.RegisterSerializedData(ms_globals.filter, "ReplayUADEFilter");
+            window.RegisterSerializedData(ms_globals.isNtsc, "ReplayUADENtsc");
 
             auto file = fopen("eagleplayer.conf", "rb"); // fopen will fallback on stdioemu_fopen (inside our uade.7z)
             fseek(file, 0, SEEK_END);
@@ -116,13 +97,6 @@ namespace rePlayer
 
     void ReplayUADE::Release()
     {
-        for (auto& dllEntry : s_dlls)
-        {
-            ::FreeLibrary(dllEntry.handle);
-            s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-        }
-        s_dlls = {};
-        delete s_dllManager;
         delete[] g_replayPlugin.extensions;
     }
 
@@ -130,91 +104,6 @@ namespace rePlayer
     {
         if (stream->Read().IsEmpty())
             return nullptr;
-
-        if (s_isMainModule)
-        {
-            // UADE is a hard mess... to make it "thread safe" without rewriting everything, we duplicate the dll per song so all the data are in the module memory space.
-            // Thanx to dll manager for that.
-            // We still have to share some data from the main dll (replayUADE.dll) with the others such as the SharedContext, config params...
-
-            // Load the main dll in memory
-            char* pgrPath;
-            _get_pgmptr(&pgrPath);
-            auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays/UADE.dll";
-            mainPath = mainPath.lexically_normal(); // important for the dll loader
-
-            Array<uint8_t> b;
-            {
-                auto f = io::File::OpenForRead(mainPath.c_str());
-                b.Resize(f.GetSize());
-                f.Read(b.Items(), b.Size());
-            }
-
-            // Create a unique name for it
-            static uint32_t counter = 0;
-            char dllName[32];
-            sprintf(dllName, "UADE%08X.dll", counter++);
-
-            // and load it through the dll manager (created only on the first load)
-            auto freeIndex = s_dlls.NumItems();
-            if (s_dllManager == nullptr)
-            {
-                s_dllManager = new DllManager();
-                s_dllManager->EnableDllRedirection();
-            }
-            else for (uint32_t i = 0; i < s_dlls.NumItems(); i++)
-            {
-                auto& dllEntry = s_dlls[i];
-                if (dllEntry.handle != nullptr)
-                {
-                    if (dllEntry.replay == nullptr)
-                    {
-                        ::FreeLibrary(dllEntry.handle);
-                        s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-                        dllEntry.handle = nullptr;
-                        freeIndex = i;
-                    }
-                }
-                else
-                    freeIndex = i;
-            }
-
-            mainPath.replace_filename(dllName);
-            s_dllManager->SetDllFile(mainPath.c_str(), b.Items(), b.Size());
-
-            auto dllHandle = s_dllManager->LoadLibrary(mainPath.c_str());
-            ReplayUADE* replay = nullptr;
-            if (dllHandle != 0)
-            {
-                // load the song though the new module
-                auto g = reinterpret_cast<GetReplayPlugin>(GetProcAddress(dllHandle, "getReplayPlugin"));
-                Window* w = nullptr;
-                g()->init(s_sharedContexts, reinterpret_cast<Window&>(*w));
-                replay = reinterpret_cast<ReplayUADE*>(g()->load(stream, metadata));
-                if (replay)
-                {
-                    replay->SetSettings(ms_stereoSeparation, ms_surround, ms_filter, ms_isNtsc);
-                    replay->m_dllIndex = freeIndex;
-                    replay->m_dllEntries = &s_dlls;
-                    if (freeIndex == s_dlls.NumItems())
-                        s_dlls.Add({ std::move(mainPath), dllHandle, replay });
-                    else
-                        s_dlls[freeIndex] = { std::move(mainPath), dllHandle, replay };
-                }
-                else
-                {
-                    ::FreeLibrary(dllHandle);
-                    s_dllManager->UnsetDllFile(mainPath.c_str());
-                }
-            }
-            else
-            {
-                auto s = s_dllManager->GetLastError();
-                s.clear();
-            }
-
-            return replay;
-        }
 
         struct uade_config* config = uade_new_config();
         uade_config_set_option(config, UC_ONE_SUBSONG, NULL);
@@ -357,21 +246,13 @@ namespace rePlayer
     bool ReplayUADE::DisplaySettings()
     {
         bool changed = false;
-        changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
+        changed |= ImGui::SliderInt("Stereo", &ms_globals.stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, _countof(surround));
         const char* const filters[] = { "None", "A500", "A1200"};
-        changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
+        changed |= ImGui::Combo("Filter", &ms_globals.filter, filters, _countof(filters));
         const char* const region[] = { "PAL", "NTSC" };
-        changed |= ImGui::Combo("Region", &ms_isNtsc, region, _countof(region));
-        if (changed)
-        {
-            for (auto& dllEntry : s_dlls)
-            {
-                if (dllEntry.replay)
-                    dllEntry.replay->SetSettings(ms_stereoSeparation, ms_surround, ms_filter, ms_isNtsc);
-            }
-        }
+        changed |= ImGui::Combo("Region", &ms_globals.isNtsc, region, _countof(region));
         return changed;
     }
 
@@ -457,13 +338,13 @@ namespace rePlayer
         }
 
         SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
-            ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
+            ms_globals.stereoSeparation, 0, 100, "Stereo Separation %d%%");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
-            ms_surround, "Output: Stereo", "Output: Surround");
+            ms_globals.surround, "Output: Stereo", "Output: Surround");
         ComboOverride("Filter", GETSET(entry, overrideFilter), GETSET(entry, filter),
-            ms_filter, "Filter: None", "Filter: A500", "Filter: A1200");
+            ms_globals.filter, "Filter: None", "Filter: A500", "Filter: A1200");
         ComboOverride("NTSC", GETSET(entry, overrideNtsc), GETSET(entry, ntsc),
-            ms_isNtsc, "Region: PAL", "Region: NTSC");
+            ms_globals.isNtsc, "Region: PAL", "Region: NTSC");
         const float buttonSize = ImGui::GetFrameHeight();
         auto durations = entry->GetDurations();
         for (uint16_t i = 0; i < entry->numSongs; i++)
@@ -518,17 +399,17 @@ namespace rePlayer
         }
     }
 
-    int32_t ReplayUADE::ms_stereoSeparation = 100;
-    int32_t ReplayUADE::ms_surround = 1;
-    int32_t ReplayUADE::ms_filter = 1;
-    int32_t ReplayUADE::ms_isNtsc = 0;
+    ReplayUADE::Globals ReplayUADE::ms_globals = {
+        .stereoSeparation = 100,
+        .surround = 1,
+        .filter = 1,
+        .isNtsc = 0
+    };
 
     ReplayUADE::~ReplayUADE()
     {
         uade_cleanup_state(m_uadeState);
         delete[] m_durations;
-        if (m_dllEntries)
-            (*m_dllEntries)[m_dllIndex].replay = nullptr;
     }
 
     ReplayUADE::ReplayUADE(io::Stream* stream, uade_state* uadeState)
@@ -537,14 +418,6 @@ namespace rePlayer
         , m_uadeState(uadeState)
         , m_surround(kSampleRate)
     {}
-
-    void ReplayUADE::SetSettings(int32_t stereoSeparation, int32_t surround, int32_t filter, int32_t isNtsc)
-    {
-        ms_stereoSeparation = stereoSeparation;
-        ms_surround = surround;
-        ms_filter = filter;
-        ms_isNtsc = isNtsc;
-    }
 
     uint32_t ReplayUADE::Render(StereoSample* output, uint32_t numSamples)
     {
@@ -617,11 +490,12 @@ namespace rePlayer
 
     void ReplayUADE::ApplySettings(const CommandBuffer metadata)
     {
+        auto* globals = static_cast<Globals*>(g_replayPlugin.globals);
         auto settings = metadata.Find<Settings>();
-        m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
-        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+        m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globals->stereoSeparation;
+        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globals->surround);
 
-        auto filter = (settings && settings->overrideFilter) ? settings->filter : ms_filter;
+        auto filter = (settings && settings->overrideFilter) ? settings->filter : globals->filter;
         if (filter == 0)
             m_uadeState->config.no_filter = 1;
         else
@@ -631,7 +505,7 @@ namespace rePlayer
         }
         uade_set_filter_state(m_uadeState, 0);
         uadecore_set_automatic_song_end(1);
-        uadecore_set_ntsc((settings && settings->overrideNtsc) ? settings->ntsc : ms_isNtsc);
+        uadecore_set_ntsc((settings && settings->overrideNtsc) ? settings->ntsc : globals->isNtsc);
 
         if (settings)
         {

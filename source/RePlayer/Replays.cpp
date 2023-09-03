@@ -2,14 +2,18 @@
 #include "Settings.h"
 
 #include <Core/Log.h>
+#include <Core/String.h>
 #include <Helpers/CommandBuffer.h>
 #include <ImGui.h>
 #include <IO/Stream.h>
+#include <IO/StreamFile.h>
 #include <RePlayer/Core.h>
 #include <Replays/Replay.h>
 #include <Replays/ReplayPlugin.h>
 
 #include <curl/curl.h>
+
+#include <dllloader.h>
 
 #include <filesystem>
 
@@ -20,7 +24,7 @@
 
 namespace rePlayer
 {
-    static ReplayPlugin s_dummyPlugin =  { .replayId = eReplay::Unknown };
+    ReplayPlugin g_replayPlugin =  { .replayId = eReplay::Unknown };
 
     int16_t Replays::ms_priorities[uint16_t(eReplay::Count)] = {
         0x7fFF,
@@ -32,31 +36,42 @@ namespace rePlayer
     typedef ReplayPlugin* (*GetReplayPlugin)();
 
     Replays::Replays()
-        : m_plugins{ &s_dummyPlugin, nullptr }
+        : m_plugins{ &g_replayPlugin, nullptr }
+        , m_dllManager(new DllManager())
     {
         LoadPlugins();
         BuildFileFilters();
+
+        m_dllManager->EnableDllRedirection();
     }
 
     Replays::~Replays()
     {
+        FlushDlls();
+        assert(m_dlls.IsEmpty());
+
+        delete m_dllManager;
+
         delete[] m_fileFilters;
 
         for (auto* plugin : m_plugins)
         {
             if (plugin)
+            {
                 plugin->release();
+                free(plugin->dllName);
+            }
         }
         //we should free all the plugin libraries here, but it's crashing after (in the ucrt trying to call an unloaded function)
     }
 
-    Replay* Replays::Load(io::Stream* stream, CommandBuffer metadata, MediaType type) const
+    Replay* Replays::Load(io::Stream* stream, CommandBuffer metadata, MediaType type)
     {
         // default load
         if (auto plugin = m_plugins[int32_t(type.replay)])
         {
             stream->Seek(0, io::Stream::kSeekBegin);
-            if (auto replay = plugin->load(stream, metadata))
+            if (auto replay = Load(plugin, stream, metadata))
                 return replay;
         }
 
@@ -82,7 +97,7 @@ namespace rePlayer
                         if (_strnicmp(extensions, currentExt, nextExt - extensions) == 0)
                         {
                             stream->Seek(0, io::Stream::kSeekBegin);
-                            if (auto replay = plugin->load(stream, metadata))
+                            if (auto replay = Load(plugin, stream, metadata))
                                 return replay;
                             plugins[replayIndex] = nullptr;
                             break;
@@ -103,14 +118,14 @@ namespace rePlayer
             if (auto plugin = plugins[replayIndex])
             {
                 stream->Seek(0, io::Stream::kSeekBegin);
-                if (auto replay = plugin->load(stream, metadata))
+                if (auto replay = Load(plugin, stream, metadata))
                     return replay;
             }
         }
         return nullptr;
     }
 
-    Replayables Replays::Enumerate(io::Stream* stream) const
+    Replayables Replays::Enumerate(io::Stream* stream)
     {
         Replayables replays;
         uint32_t numReplays = 0;
@@ -120,7 +135,7 @@ namespace rePlayer
             if (auto plugin = m_plugins[i])
             {
                 stream->Seek(0, io::Stream::kSeekBegin);
-                if (auto replay = plugin->load(stream, commands))
+                if (auto replay = Load(plugin, stream, commands))
                 {
                     replays[numReplays++] = plugin->replayId;
                     delete replay;
@@ -227,6 +242,7 @@ namespace rePlayer
                 auto getReplayPlugin = reinterpret_cast<GetReplayPlugin>(GetProcAddress(hModule, "getReplayPlugin"));
                 if (auto replayPlugin = getReplayPlugin())
                 {
+                    replayPlugin->dllName = _strdup(dirEntry.path().stem().string().c_str());
                     replayPlugin->download = [](const char* url)
                     {
                         CURL* curl = curl_easy_init();
@@ -365,6 +381,83 @@ namespace rePlayer
         auto fileFiltersCopy = new char[fileFilters.size()];
         memcpy(fileFiltersCopy, fileFilters.c_str(), fileFilters.size());
         m_fileFilters = fileFiltersCopy;
+    }
+
+    Replay* Replays::Load(ReplayPlugin* plugin, io::Stream* stream, CommandBuffer metadata)
+    {
+        if (plugin->isThreadSafe)
+            return plugin->load(stream, metadata);
+
+        FlushDlls();
+
+        char* pgrPath;
+        _get_pgmptr(&pgrPath);
+        auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays" / plugin->dllName;
+        mainPath += ".dll";
+        mainPath = mainPath.lexically_normal(); // important for the dll loader
+
+        auto dllStream = io::StreamFile::Create(mainPath);
+        auto dllData = dllStream->Read();
+
+        char dllName[32];
+        sprintf(dllName, "%s%04X.dll", plugin->dllName, m_dllIdGenerator++);
+
+        mainPath.replace_filename(dllName);
+        m_dllManager->SetDllFile(mainPath.c_str(), dllData.Items(), dllData.Size());
+
+        auto dllHandle = m_dllManager->LoadLibrary(mainPath.c_str());
+        if (dllHandle)
+        {
+            // load the song though the new module
+            auto* replayPlugin = reinterpret_cast<GetReplayPlugin>(GetProcAddress(dllHandle, "getReplayPlugin"))();
+
+            replayPlugin->onDelete = [](Replay* replay)
+            {
+                for (auto& dllEntry : Core::GetReplays().m_dlls)
+                {
+                    if (dllEntry.replay == replay)
+                    {
+                        dllEntry.replay = nullptr;
+                        break;
+                    }
+                }
+            };
+
+            replayPlugin->globals = plugin->globals;
+            Window* w = nullptr;
+            replayPlugin->init(SharedContexts::ms_instance, reinterpret_cast<Window&>(*w));
+            auto replay = replayPlugin->load(stream, metadata);
+            if (replay)
+            {
+                m_dlls.Add({ mainPath, dllHandle, replay });
+                return replay;
+            }
+            else
+            {
+                ::FreeLibrary(dllHandle);
+                m_dllManager->UnsetDllFile(mainPath.c_str());
+            }
+        }
+        else
+        {
+            auto s = m_dllManager->GetLastError();
+            s.clear();
+        }
+        return nullptr;
+    }
+
+    void Replays::FlushDlls()
+    {
+        m_dlls.RemoveIf([this](auto& dllEntry)
+        {
+            if (!dllEntry.replay)
+            {
+                ::FreeLibrary(HMODULE(dllEntry.handle));
+                m_dllManager->UnsetDllFile(dllEntry.path.c_str());
+                return true;
+            }
+            return false;
+        });
     }
 }
 // namespace rePlayer

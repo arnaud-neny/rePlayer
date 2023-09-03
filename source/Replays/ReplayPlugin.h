@@ -27,15 +27,18 @@ namespace rePlayer
 
     struct ReplayPlugin
     {
+        // data filled by the dll for rePlayer
+
         static constexpr uint32_t kMajorVersion = 0;
         static constexpr uint32_t kMinorVersion = 0;
         static constexpr uint32_t kRevision = 0;
 
-        uint32_t revision : 16 { kRevision };
-        uint32_t minorVersion : 8 { kMinorVersion };
-        uint32_t majorVersion : 8 { kMajorVersion };
+        uint32_t revision : 16 = kRevision;
+        uint32_t minorVersion : 8 = kMinorVersion;
+        uint32_t majorVersion : 8 = kMajorVersion;
 
         eReplay replayId;
+        bool isThreadSafe = true;
 
         const char* name = "Unknown";
         const char* extensions = "";
@@ -53,7 +56,16 @@ namespace rePlayer
 
         void (*editMetadata)(ReplayMetadataContext&) = [](ReplayMetadataContext&) {};
 
+        // data filled by rePlayer for the dll
+
+        char* dllName;
+
         Array<uint8_t> (*download)(const char*) = nullptr;
+        void (*onDelete)(Replay*) = [](Replay*) {};
+
+        // shared data from one dll to another dll
+
+        void* globals = nullptr;
     };
 }
 // namespace rePlayer

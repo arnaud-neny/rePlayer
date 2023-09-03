@@ -5,12 +5,9 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/File.h>
 #include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <ReplayDll.h>
-
-#include <dllloader.h>
 
 #include <libarchive/archive.h>
 #include <libarchive/archive_entry.h>
@@ -22,166 +19,30 @@
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
-        .replayId = eReplay::HighlyCompetitive,
+        .replayId = eReplay::HighlyCompetitive, .isThreadSafe = false,
         .name = "Highly Competitive/snsf9x",
         .extensions = "snsf;minisnsf;snsfPk",
         .about = "Highly Competitive/snsf9x 0.05\nChristopher Snowhill & loveemu",
         .settings = "Highly Competitive/snsf9x 0.05",
         .init = ReplayHighlyCompetitive::Init,
-        .release = ReplayHighlyCompetitive::Release,
         .load = ReplayHighlyCompetitive::Load,
         .displaySettings = ReplayHighlyCompetitive::DisplaySettings,
-        .editMetadata = ReplayHighlyCompetitive::Settings::Edit
+        .editMetadata = ReplayHighlyCompetitive::Settings::Edit,
+        .globals = &ReplayHighlyCompetitive::ms_interpolation
     };
-
-    // Dll hook begin
-    static DllManager* s_dllManager = nullptr;
-    static bool s_isMainModule = false;
-    struct DllEntry
-    {
-        std::wstring path;
-        HMODULE handle;
-        ReplayHighlyCompetitive* replay;
-    };
-    static Array<DllEntry> s_dlls;
-    SharedContexts* s_sharedContexts = nullptr;
-
-    typedef ReplayPlugin* (*GetReplayPlugin)();
-    // Dll hook end
 
     bool ReplayHighlyCompetitive::Init(SharedContexts* ctx, Window& window)
     {
-        s_sharedContexts = ctx;
         ctx->Init();
 
         if (&window != nullptr)
-        {
             window.RegisterSerializedData(ms_interpolation, "ReplayHighlyCompetitiveInterpolation");
-
-            s_isMainModule = true;
-            s_dlls.Reserve(8);
-        }
 
         return false;
     }
 
-    void ReplayHighlyCompetitive::Release()
-    {
-        for (auto& dllEntry : s_dlls)
-        {
-            ::FreeLibrary(dllEntry.handle);
-            s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-        }
-        s_dlls = {};
-        delete s_dllManager;
-    }
-
     Replay* ReplayHighlyCompetitive::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        if (s_isMainModule)
-        {
-            uint32_t magic = 0;
-            stream->Read(&magic, sizeof(magic));
-            if (magic != 0x23465350)
-            {
-                auto data = stream->Read();
-                auto* archive = archive_read_new();
-                archive_read_support_format_all(archive);
-                if (archive_read_open_memory(archive, data.Items(), data.Size()) == ARCHIVE_OK)
-                {
-                    archive_entry* entry;
-                    if (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-                        archive_read_data(archive, &magic, 4);
-                }
-                archive_read_free(archive);
-                if (magic != 0x23465350)
-                    return nullptr;
-            }
-            stream->Seek(0, io::Stream::SeekWhence::kSeekBegin);
-
-            // Once again, some static data are here, so keep it thread safe.
-            // Thanx to dll manager for that.
-            // We still have to share some data from the main dll (HighlyCompetitive.dll) with the others such as the SharedContext...
-
-            // Load the main dll in memory
-            char* pgrPath;
-            _get_pgmptr(&pgrPath);
-            auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays/HighlyCompetitive.dll";
-            mainPath = mainPath.lexically_normal(); // important for the dll loader
-
-            Array<uint8_t> b;
-            {
-                auto f = io::File::OpenForRead(mainPath.c_str());
-                b.Resize(f.GetSize());
-                f.Read(b.Items(), b.Size());
-            }
-
-            // Create a unique name for it
-            static uint32_t counter = 0;
-            char dllName[32];
-            sprintf(dllName, "HighlyCompetitive%08X.dll", counter++);
-
-            // and load it through the dll manager (created only on the first load)
-            auto freeIndex = s_dlls.NumItems();
-            if (s_dllManager == nullptr)
-            {
-                s_dllManager = new DllManager();
-                s_dllManager->EnableDllRedirection();
-            }
-            else for (uint32_t i = 0; i < s_dlls.NumItems(); i++)
-            {
-                auto& dllEntry = s_dlls[i];
-                if (dllEntry.handle != nullptr)
-                {
-                    if (dllEntry.replay == nullptr)
-                    {
-                        ::FreeLibrary(dllEntry.handle);
-                        s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-                        dllEntry.handle = nullptr;
-                        freeIndex = i;
-                    }
-                }
-                else
-                    freeIndex = i;
-            }
-
-            mainPath.replace_filename(dllName);
-            s_dllManager->SetDllFile(mainPath.c_str(), b.Items(), b.Size());
-
-            auto dllHandle = s_dllManager->LoadLibrary(mainPath.c_str());
-            ReplayHighlyCompetitive* replay = nullptr;
-            if (dllHandle != 0)
-            {
-                // load the song though the new module
-                auto g = reinterpret_cast<GetReplayPlugin>(GetProcAddress(dllHandle, "getReplayPlugin"));
-                Window* w = nullptr;
-                g()->init(s_sharedContexts, reinterpret_cast<Window&>(*w));
-                replay = reinterpret_cast<ReplayHighlyCompetitive*>(g()->load(stream, metadata));
-                if (replay)
-                {
-                    replay->SetSettings(ms_interpolation);
-                    replay->m_dllIndex = freeIndex;
-                    replay->m_dllEntries = &s_dlls;
-                    if (freeIndex == s_dlls.NumItems())
-                        s_dlls.Add({ std::move(mainPath), dllHandle, replay });
-                    else
-                        s_dlls[freeIndex] = { std::move(mainPath), dllHandle, replay };
-                }
-                else
-                {
-                    ::FreeLibrary(dllHandle);
-                    s_dllManager->UnsetDllFile(mainPath.c_str());
-                }
-            }
-            else
-            {
-                auto s = s_dllManager->GetLastError();
-                s.clear();
-            }
-
-            return replay;
-        }
-
         auto replay = new ReplayHighlyCompetitive(stream);
         return replay->Load(metadata);
     }
@@ -191,14 +52,6 @@ namespace rePlayer
         bool changed = false;
         const char* const interpolation[] = { "none", "linear", "gaussian", "cubic", "sinc" };
         changed |= ImGui::Combo("Interpolation", &ms_interpolation, interpolation, _countof(interpolation));
-        if (changed)
-        {
-            for (auto& dllEntry : s_dlls)
-            {
-                if (dllEntry.replay)
-                    dllEntry.replay->SetSettings(ms_interpolation);
-            }
-        }
         return changed;
     }
 
@@ -590,8 +443,6 @@ namespace rePlayer
     ReplayHighlyCompetitive::~ReplayHighlyCompetitive()
     {
         Snes9xRelease();
-        if (m_dllEntries)
-            (*m_dllEntries)[m_dllIndex].replay = nullptr;
     }
 
     ReplayHighlyCompetitive::ReplayHighlyCompetitive(io::Stream* stream)
@@ -665,11 +516,6 @@ namespace rePlayer
         SetupMetadata(metadata);
 
         return this;
-    }
-
-    void ReplayHighlyCompetitive::SetSettings(int32_t interpolation)
-    {
-        ms_interpolation = interpolation;
     }
 
     uint32_t ReplayHighlyCompetitive::Render(StereoSample* output, uint32_t numSamples)
@@ -748,7 +594,7 @@ namespace rePlayer
                 m_subsongs[i].overriddenDuration = durations[i];
             m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         }
-        Snes9xSetInterpolationMethod((settings && settings->overrideInterpolation) ? settings->interpolation : ms_interpolation);
+        Snes9xSetInterpolationMethod((settings && settings->overrideInterpolation) ? settings->interpolation : *static_cast<int32_t*>(g_replayPlugin.globals));
     }
 
     void ReplayHighlyCompetitive::SetSubsong(uint16_t subsongIndex)

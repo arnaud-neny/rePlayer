@@ -47,7 +47,7 @@ namespace rePlayer
         };
 
     public:
-        virtual ~Replay() {}
+        virtual ~Replay();
 
         virtual uint32_t GetSampleRate() const = 0;
         virtual bool IsSeekable() const { return false; }

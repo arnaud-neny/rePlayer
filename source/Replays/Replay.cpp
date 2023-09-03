@@ -1,4 +1,5 @@
 #include "Replay.h"
+#include "ReplayPlugin.h"
 
 namespace rePlayer
 {
@@ -45,6 +46,13 @@ namespace rePlayer
     const char* const MediaType::GetReplay() const
     {
         return replayNames[static_cast<int32_t>(replay)];
+    }
+
+    extern ReplayPlugin g_replayPlugin;
+
+    Replay::~Replay()
+    {
+        g_replayPlugin.onDelete(this);
     }
 }
 // namespace rePlayer

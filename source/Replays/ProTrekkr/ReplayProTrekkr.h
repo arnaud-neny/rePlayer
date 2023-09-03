@@ -1,18 +1,12 @@
 #pragma once
 
 #include <Replay.h>
-#include <Containers/Array.h>
 
 namespace rePlayer
 {
-    struct DllEntry;
-
     class ReplayProTrekkr : public Replay
     {
     public:
-        static bool Init(SharedContexts* ctx, Window& window);
-        static void Release();
-
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
     public:
@@ -38,8 +32,6 @@ namespace rePlayer
     private:
         SmartPtr<io::Stream> m_stream;
         uint32_t m_duration;
-        uint32_t m_dllIndex;
-        Array<DllEntry>* m_dllEntries = nullptr;
     };
 }
 // namespace rePlayer

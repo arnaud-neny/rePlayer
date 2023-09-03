@@ -4,159 +4,37 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/File.h>
 #include <ReplayDll.h>
-
-#include <dllloader.h>
-
-#include <filesystem>
 
 namespace rePlayer
 {
     #define SndhPlayerVersion "0.71"
 
     ReplayPlugin g_replayPlugin = {
-        .replayId = eReplay::SNDHPlayer,
+        .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,
         .name = "SNDH-Player",
         .extensions = "sndh",
         .about = "SNDH-Player " SndhPlayerVersion "\nCopyright (c) 2023 Arnaud Carré",
         .settings = "SNDH-Player " SndhPlayerVersion,
         .init = ReplaySNDHPlayer::Init,
-        .release = ReplaySNDHPlayer::Release,
         .load = ReplaySNDHPlayer::Load,
         .displaySettings = ReplaySNDHPlayer::DisplaySettings,
-        .editMetadata = ReplaySNDHPlayer::Settings::Edit
+        .editMetadata = ReplaySNDHPlayer::Settings::Edit,
+        .globals = &ReplaySNDHPlayer::ms_surround
     };
-
-    // Dll hook begin
-    static DllManager* s_dllManager = nullptr;
-    static bool s_isMainModule = false;
-    struct DllEntry
-    {
-        std::wstring path;
-        HMODULE handle;
-        ReplaySNDHPlayer* replay;
-    };
-    static Array<DllEntry> s_dlls;
-    SharedContexts* s_sharedContexts = nullptr;
-
-    typedef ReplayPlugin* (*GetReplayPlugin)();
-    // Dll hook end
 
     bool ReplaySNDHPlayer::Init(SharedContexts* ctx, Window& window)
     {
-        s_sharedContexts = ctx;
         ctx->Init();
 
         if (&window != nullptr)
-        {
             window.RegisterSerializedData(ms_surround, "ReplaySNDHPlayerSurround");
-
-            s_isMainModule = true;
-            s_dlls.Reserve(8);
-        }
 
         return false;
     }
 
-    void ReplaySNDHPlayer::Release()
-    {
-        for (auto& dllEntry : s_dlls)
-        {
-            ::FreeLibrary(dllEntry.handle);
-            s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-        }
-        s_dlls = {};
-        delete s_dllManager;
-    }
-
     Replay* ReplaySNDHPlayer::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        if (s_isMainModule)
-        {
-            // Once again, some static data are here, so keep it thread safe.
-            // Thanx to dll manager for that.
-            // We still have to share some data from the main dll (SNDHPlayer.dll) with the others such as the SharedContext...
-
-            // Load the main dll in memory
-            char* pgrPath;
-            _get_pgmptr(&pgrPath);
-            auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays/SNDHPlayer.dll";
-            mainPath = mainPath.lexically_normal(); // important for the dll loader
-
-            Array<uint8_t> b;
-            {
-                auto f = io::File::OpenForRead(mainPath.c_str());
-                b.Resize(f.GetSize());
-                f.Read(b.Items(), b.Size());
-            }
-
-            // Create a unique name for it
-            static uint32_t counter = 0;
-            char dllName[32];
-            sprintf(dllName, "SNDHPlayer%08X.dll", counter++);
-
-            // and load it through the dll manager (created only on the first load)
-            auto freeIndex = s_dlls.NumItems();
-            if (s_dllManager == nullptr)
-            {
-                s_dllManager = new DllManager();
-                s_dllManager->EnableDllRedirection();
-            }
-            else for (uint32_t i = 0; i < s_dlls.NumItems(); i++)
-            {
-                auto& dllEntry = s_dlls[i];
-                if (dllEntry.handle != nullptr)
-                {
-                    if (dllEntry.replay == nullptr)
-                    {
-                        ::FreeLibrary(dllEntry.handle);
-                        s_dllManager->UnsetDllFile(dllEntry.path.c_str());
-                        dllEntry.handle = nullptr;
-                        freeIndex = i;
-                    }
-                }
-                else
-                    freeIndex = i;
-            }
-
-            mainPath.replace_filename(dllName);
-            s_dllManager->SetDllFile(mainPath.c_str(), b.Items(), b.Size());
-
-            auto dllHandle = s_dllManager->LoadLibrary(mainPath.c_str());
-            ReplaySNDHPlayer* replay = nullptr;
-            if (dllHandle != 0)
-            {
-                // load the song though the new module
-                auto g = reinterpret_cast<GetReplayPlugin>(GetProcAddress(dllHandle, "getReplayPlugin"));
-                Window* w = nullptr;
-                g()->init(s_sharedContexts, reinterpret_cast<Window&>(*w));
-                replay = reinterpret_cast<ReplaySNDHPlayer*>(g()->load(stream, metadata));
-                if (replay)
-                {
-                    replay->SetSettings(ms_surround);
-                    replay->m_dllIndex = freeIndex;
-                    replay->m_dllEntries = &s_dlls;
-                    if (freeIndex == s_dlls.NumItems())
-                        s_dlls.Add({ std::move(mainPath), dllHandle, replay });
-                    else
-                        s_dlls[freeIndex] = { std::move(mainPath), dllHandle, replay };
-                }
-                else
-                {
-                    ::FreeLibrary(dllHandle);
-                    s_dllManager->UnsetDllFile(mainPath.c_str());
-                }
-            }
-            else
-            {
-                auto s = s_dllManager->GetLastError();
-                s.clear();
-            }
-
-            return replay;
-        }
-
         auto data = stream->Read();
 
         auto* sndh = new SndhFile();
@@ -172,14 +50,6 @@ namespace rePlayer
         bool changed = false;
         const char* const surround[] = { "Default", "Surround" };
         changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
-        if (changed)
-        {
-            for (auto& dllEntry : s_dlls)
-            {
-                if (dllEntry.replay)
-                    dllEntry.replay->SetSettings(ms_surround);
-            }
-        }
         return changed;
     }
 
@@ -262,8 +132,6 @@ namespace rePlayer
     {
         delete m_sndh;
         delete[] m_durations;
-        if (m_dllEntries)
-            (*m_dllEntries)[m_dllIndex].replay = nullptr;
     }
 
     ReplaySNDHPlayer::ReplaySNDHPlayer(SndhFile* sndh, CommandBuffer metadata)
@@ -346,7 +214,7 @@ namespace rePlayer
     void ReplaySNDHPlayer::ApplySettings(const CommandBuffer metadata)
     {
         auto* settings = metadata.Find<Settings>();
-        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : *static_cast<int32_t*>(g_replayPlugin.globals));
 
         if (settings && settings->NumSubsongs() == GetNumSubsongs())
         {
@@ -474,11 +342,6 @@ namespace rePlayer
         })))
             return s->frames;
         return 0;
-    }
-
-    void ReplaySNDHPlayer::SetSettings(int32_t surround)
-    {
-        ms_surround = surround;
     }
 
     void ReplaySNDHPlayer::BuildHash(SndhFile* sndh)

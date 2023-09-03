@@ -6,13 +6,10 @@
 
 namespace rePlayer
 {
-    struct DllEntry;
-
     class ReplayHighlyCompetitive : public Replay
     {
     public:
         static bool Init(SharedContexts* ctx, Window& window);
-        static void Release();
 
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
@@ -82,7 +79,6 @@ namespace rePlayer
         ReplayHighlyCompetitive(io::Stream* stream);
         ReplayHighlyCompetitive* Load(CommandBuffer metadata);
 
-        virtual void SetSettings(int32_t interpolation);
         void SetupMetadata(CommandBuffer metadata);
 
     private:
@@ -122,9 +118,7 @@ namespace rePlayer
 
         Array<Subsong> m_subsongs;
 
-        size_t m_dllIndex;
-        Array<DllEntry>* m_dllEntries = nullptr;
-
+    public:
         static int32_t ms_interpolation;
     };
 }

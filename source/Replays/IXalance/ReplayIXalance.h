@@ -1,21 +1,14 @@
 #pragma once
 
 #include <Replay.h>
-#include <Containers/Array.h>
-//#include <Containers/SmartPtr.h>
 
 #include "webixs/PlayerIXS.h"
 
 namespace rePlayer
 {
-    struct DllEntry;
-
     class ReplayIXalance : public Replay
     {
     public:
-        static bool Init(SharedContexts* ctx, Window& window);
-        static void Release();
-
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
     public:
@@ -48,9 +41,6 @@ namespace rePlayer
 
         int16_t* m_buffer = nullptr;
         uint m_size = 0;
-
-        uint32_t m_dllIndex;
-        Array<DllEntry>* m_dllEntries = nullptr;
 
         uint32_t m_lastLoop = 0;
     };
