@@ -386,3 +386,6 @@ EXTENSION(lzs)      // ZXTune: ASCLZSPack
 EXTENSION(msp)      // ZXTune: MicrospacePacker
 EXTENSION(td0)      // ZXTune: TeleDisk Image
 EXTENSION(pcd)      // ZXTune: Powerfull Code Decreaser
+EXTENSION(soc)      // UADE: Jochen_Hippel_ST
+EXTENSION(sog)      // UADE: Jochen_Hippel_ST
+EXTENSION(mcmd)     // UADE: JochenHippel

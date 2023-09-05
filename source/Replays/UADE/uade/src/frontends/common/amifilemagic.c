@@ -981,7 +981,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 		 && buf[5] == 0x00 && buf[8] == 0x60 && buf[9] == 0x00
 		 && buf[12] == 0x60 && buf[13] == 0x00 && buf[16] == 0x48
 		 && buf[17] == 0xe7)) {
-    strcpy(pre, "SOG");		/* Hippel */
+    strcpy(pre, "HIP");		/* Hippel */
 
   } else if (buf[0x348] == '.' && buf[0x349] == 'Z' && buf[0x34A] == 'A'
 	     && buf[0x34B] == 'D' && buf[0x34c] == 'S' && buf[0x34d] == '8'
