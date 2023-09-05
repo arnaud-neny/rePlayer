@@ -44,12 +44,28 @@ namespace rePlayer
 
         bool operator!=(MediaType other) const { return ext != other.ext || replay != other.replay; }
 
-        const char* const GetExtension() const;
+        template <typename T = char>
+        const T* const GetExtension() const;
         const char* const GetReplay() const;
+
+        template <typename T = char>
+        static const T* const GetExtension(size_t index);
 
         static const char* const extensionNames[];
         static const size_t extensionLengths[];
         static const char* const replayNames[];
     };
+
+    template <typename T>
+    inline const T* const MediaType::GetExtension() const
+    {
+        return GetExtension<T>(static_cast<size_t>(ext));
+    }
+
+    template <typename T>
+    inline const T* const MediaType::GetExtension(size_t index)
+    {
+        return reinterpret_cast<const T* const>(extensionNames[index]);
+    }
 }
 // namespace rePlayer

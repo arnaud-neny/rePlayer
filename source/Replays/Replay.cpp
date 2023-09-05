@@ -38,11 +38,6 @@ namespace rePlayer
         }
     }
 
-    const char* const MediaType::GetExtension() const
-    {
-        return extensionNames[static_cast<int32_t>(ext)];
-    }
-
     const char* const MediaType::GetReplay() const
     {
         return replayNames[static_cast<int32_t>(replay)];
