@@ -826,7 +826,7 @@ namespace rePlayer
                                 auto mousePos = ImGui::GetMousePos();
                                 auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
                                 auto currentPlayingEntry = insertPos <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : Cue::Entry();
-                                auto selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
+                                auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
                                 for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
                                     m_cue.entries.Insert(insertPos + i, selectedSongs[i])->playlistId = ++m_uniqueIdGenerator;
                                 if (currentPlayingEntry.subsongId.IsValid())
@@ -898,9 +898,9 @@ namespace rePlayer
                 if (!isDatabaseDropped)
                 {
                     //drop at the end of the playlist if only hovering over the table
-                    if (auto payload = ImGui::AcceptDragDropPayload("DATABASE", ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
+                    if (auto* payload = ImGui::AcceptDragDropPayload("DATABASE", ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
                     {
-                        auto selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
+                        auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
                         for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
                             m_cue.entries.Add(selectedSongs[i])->playlistId = ++m_uniqueIdGenerator;
                         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
@@ -1058,7 +1058,7 @@ namespace rePlayer
             if (dt > numEntries - m_lastDraggedEntryIndex - 1)
                 dt = numEntries - m_lastDraggedEntryIndex - 1;
 
-            auto holdEntries = reinterpret_cast<Cue::Entry*>(_alloca(dt * sizeof(Cue::Entry)));
+            auto* holdEntries = reinterpret_cast<Cue::Entry*>(_alloca(dt * sizeof(Cue::Entry)));
             for (uint32_t i = 0; i < dt; i++)
                 holdEntries[i] = m_cue.entries[m_lastDraggedEntryIndex + i + 1];
             std::memmove(m_cue.entries.Items(m_firstDraggedEntryIndex + dt), m_cue.entries.Items(m_firstDraggedEntryIndex), (m_lastDraggedEntryIndex - m_firstDraggedEntryIndex + 1) * sizeof(Cue::Entry));
@@ -1077,7 +1077,7 @@ namespace rePlayer
             if (dt > m_firstDraggedEntryIndex)
                 dt = m_firstDraggedEntryIndex;
 
-            auto holdEntries = reinterpret_cast<Cue::Entry*>(_alloca(dt * sizeof(Cue::Entry)));
+            auto* holdEntries = reinterpret_cast<Cue::Entry*>(_alloca(dt * sizeof(Cue::Entry)));
             for (uint32_t i = 0; i < dt; i++)
                 holdEntries[i] = m_cue.entries[m_firstDraggedEntryIndex - dt + i];
             std::memmove(m_cue.entries.Items(m_firstDraggedEntryIndex - dt), m_cue.entries.Items(m_firstDraggedEntryIndex), (m_lastDraggedEntryIndex - m_firstDraggedEntryIndex + 1) * sizeof(Cue::Entry));
@@ -1108,34 +1108,34 @@ namespace rePlayer
             auto addFile = [&](const std::filesystem::path& path)
             {
                 // add only known extensions (or prefixes)
-                auto extension = path.extension().string();
+                auto extension = path.extension().u8string();
                 if (!isAcceptingAll)
                 {
-                    auto stem = path.stem().string();
+                    auto stem = path.stem().u8string();
                     for (uint16_t i = 0;; i++)
                     {
                         if (i == uint16_t(eExtension::Count))
                         {
                             // look for it the hard way
-                            auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
+                            auto stream = io::StreamFile::Create(reinterpret_cast<const char *>(path.u8string().c_str()));
                             Array<CommandBuffer::Command> commands;
                             if (auto* replay = replays.Load(stream, commands, {}))
                             {
-                                extension = ".";
-                                extension += replay->GetMediaType().GetExtension();
+                                extension = '.';
+                                extension += replay->GetMediaType().GetExtension<char8_t>();
                                 delete replay;
                                 break;
                             }
                             return;
                         }
-                        if (extension.size() > 1 && _stricmp(extension.c_str() + 1, MediaType::extensionNames[i]) == 0)
+                        if (extension.size() > 1 && _stricmp(reinterpret_cast<const char *>(extension.c_str() + 1), MediaType::extensionNames[i]) == 0)
                             break;
-                        if (_strnicmp(MediaType::extensionNames[i], stem.c_str(), MediaType::extensionLengths[i]) == 0)
+                        if (_strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(stem.c_str()), MediaType::extensionLengths[i]) == 0)
                         {
                             if (MediaType::extensionLengths[i] == stem.size() || stem[MediaType::extensionLengths[i]] == '.')
                             {
-                                extension = ".";
-                                extension += MediaType::extensionNames[i];
+                                extension = '.';
+                                extension += MediaType::GetExtension<char8_t>(i);
                                 break;
                             }
                         }
@@ -1165,19 +1165,19 @@ namespace rePlayer
                 else
                 {
                     auto* songSheet = new SongSheet;
-                    songSheet->type = replays.Find(extension.c_str() + 1);
+                    songSheet->type = replays.Find(reinterpret_cast<const char*>(extension.c_str() + 1));
                     if (songSheet->type.ext == eExtension::Unknown)
-                        songSheet->name = path.filename().string().c_str();
-                    else if (_stricmp(path.extension().string().c_str() + 1, songSheet->type.GetExtension()) == 0)
-                        songSheet->name = path.stem().string().c_str();
+                        songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
+                    else if (_stricmp(reinterpret_cast<const char*>(path.extension().u8string().c_str() + 1), songSheet->type.GetExtension()) == 0)
+                        songSheet->name = reinterpret_cast<const char*>(path.stem().u8string().c_str());
                     else
                     {
-                        auto name = path.filename().string();
+                        auto name = path.filename().u8string();
                         auto extSize = songSheet->type.extensionLengths[size_t(songSheet->type.ext)];
-                        if (_strnicmp(name.c_str(), songSheet->type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
-                            songSheet->name = name.c_str() + extSize + 1;
+                        if (_strnicmp(reinterpret_cast<const char*>(name.c_str()), songSheet->type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
+                            songSheet->name = reinterpret_cast<const char*>(name.c_str() + extSize + 1);
                         else
-                            songSheet->name = name.c_str();
+                            songSheet->name = reinterpret_cast<const char*>(name.c_str());
                     }
                     songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
                     songSheet->databaseDay = databaseDay;
