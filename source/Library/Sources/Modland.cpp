@@ -1367,7 +1367,6 @@ namespace rePlayer
         } static ignoreList[] = {
             BuildPathList("Ad Lib/EdLib D01/"),         // adlib multi-files - unplayable
             //BuildPathList("Ad Lib/Herad Music System/"),// adlib - multi-extensions
-            BuildPathList("Hippel ST COSO/"),           // uade issue? (multi-files?) loads but doesn't play
             BuildPathList("HVSC"),                      // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),      // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
             BuildPathList("MusicMaker V8 Old/"),        // uade issue?
