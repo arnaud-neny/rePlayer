@@ -41,7 +41,7 @@ index b56ba49..a844211 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index 29be17c..105329e 100644
+index e265d5d..ba68883 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
 @@ -562,7 +562,7 @@ namespace ImGui
@@ -54,10 +54,10 @@ index 29be17c..105329e 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 87f071f..a862020 100644
+index afb9bf6..5cc8388 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -2199,8 +2199,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+@@ -2201,8 +2201,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
          // One byte is consumed in case of invalid first byte of in_text.
          // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
          // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
@@ -70,7 +70,7 @@ index 87f071f..a862020 100644
      }
  
      return wanted;
-@@ -6108,7 +6110,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
+@@ -6106,7 +6108,9 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -82,10 +82,10 @@ index 87f071f..a862020 100644
      if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
          return false;
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 6e7143d..72a13c0 100644
+index 703f30a..f6b6c7b 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-@@ -2391,7 +2391,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
+@@ -2393,7 +2393,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
  
  // Note: p_data, p_min and p_max are _pointers_ to a memory address holding the data. For a Drag widget, p_min and p_max are optional.
  // Read code of e.g. DragFloat(), DragInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
@@ -94,7 +94,7 @@ index 6e7143d..72a13c0 100644
  {
      ImGuiWindow* window = GetCurrentWindow();
      if (window->SkipItems)
-@@ -2470,7 +2470,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
+@@ -2472,7 +2472,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
      const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
      if (g.LogEnabled)
          LogSetNextTextDecoration("{", "}");

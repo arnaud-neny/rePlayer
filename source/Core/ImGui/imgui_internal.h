@@ -1,4 +1,4 @@
-// dear imgui, v1.89.9 WIP
+// dear imgui, v1.89.9
 // (internal structures/api)
 
 // You may use this file to debug, understand or extend Dear ImGui features but we don't provide any guarantee of forward compatibility.
@@ -895,7 +895,7 @@ enum ImGuiComboFlagsPrivate_
 enum ImGuiSliderFlagsPrivate_
 {
     ImGuiSliderFlags_Vertical               = 1 << 20,  // Should this slider be orientated vertically?
-    ImGuiSliderFlags_ReadOnly               = 1 << 21,
+    ImGuiSliderFlags_ReadOnly               = 1 << 21,  // Consider using g.NextItemData.ItemFlags |= ImGuiItemFlags_ReadOnly instead.
 };
 
 // Extend ImGuiSelectableFlags_
@@ -1862,6 +1862,7 @@ enum ImGuiLocKey : int
     ImGuiLocKey_WindowingPopup,
     ImGuiLocKey_WindowingUntitled,
     ImGuiLocKey_DockingHideTabBar,
+    ImGuiLocKey_DockingHoldShiftToDock,
     ImGuiLocKey_COUNT
 };
 
@@ -2208,6 +2209,7 @@ struct ImGuiContext
     float                   ScrollbarClickDeltaToGrabCenter;    // Distance between mouse and center of grab box, normalized in parent space. Use storage?
     float                   DisabledAlphaBackup;                // Backup for style.Alpha for BeginDisabled()
     short                   DisabledStackSize;
+    short                   LockMarkEdited;
     short                   TooltipOverrideCount;
     ImVector<char>          ClipboardHandlerData;               // If no custom clipboard handler is defined
     ImVector<ImGuiID>       MenusIdSubmittedThisFrame;          // A list of menu IDs that were rendered at least once
@@ -2216,7 +2218,6 @@ struct ImGuiContext
     ImGuiPlatformImeData    PlatformImeData;                    // Data updated by current frame
     ImGuiPlatformImeData    PlatformImeDataPrev;                // Previous frame data (when changing we will call io.SetPlatformImeDataFn
     ImGuiID                 PlatformImeViewport;
-    char                    PlatformLocaleDecimalPoint;         // '.' or *localeconv()->decimal_point
 
     // Extensions
     // FIXME: We could provide an API to register one slot in an array held in ImGuiContext?
@@ -2417,12 +2418,12 @@ struct ImGuiContext
         ScrollbarClickDeltaToGrabCenter = 0.0f;
         DisabledAlphaBackup = 0.0f;
         DisabledStackSize = 0;
+        LockMarkEdited = 0;
         TooltipOverrideCount = 0;
 
         PlatformImeData.InputPos = ImVec2(0.0f, 0.0f);
         PlatformImeDataPrev.InputPos = ImVec2(-1.0f, -1.0f); // Different to ensure initial submission
         PlatformImeViewport = 0;
-        PlatformLocaleDecimalPoint = '.';
 
         DockNodeWindowMenuHandler = NULL;
 
@@ -2856,6 +2857,7 @@ struct IMGUI_API ImGuiTable
     float                       RowPosY1;
     float                       RowPosY2;
     float                       RowMinHeight;               // Height submitted to TableNextRow()
+    float                       RowCellPaddingY;            // Top and bottom padding. Reloaded during row change.
     float                       RowTextBaseline;
     float                       RowIndentOffsetX;
     ImGuiTableRowFlags          RowFlags : 16;              // Current row flags, see ImGuiTableRowFlags_
@@ -2869,9 +2871,8 @@ struct IMGUI_API ImGuiTable
     float                       HostIndentX;
     float                       MinColumnWidth;
     float                       OuterPaddingX;
-    float                       CellPaddingX;               // Padding from each borders
-    float                       CellPaddingY;
-    float                       CellSpacingX1;              // Spacing between non-bordered cells
+    float                       CellPaddingX;               // Padding from each borders. Locked in BeginTable()/Layout.
+    float                       CellSpacingX1;              // Spacing between non-bordered cells. Locked in BeginTable()/Layout.
     float                       CellSpacingX2;
     float                       InnerWidth;                 // User value passed to BeginTable(), see comments at the top of BeginTable() for details.
     float                       ColumnsGivenWidth;          // Sum of current column width
@@ -3550,10 +3551,12 @@ namespace ImGui
     IMGUI_API void          ErrorCheckEndFrameRecover(ImGuiErrorLogCallback log_callback, void* user_data = NULL);
     IMGUI_API void          ErrorCheckEndWindowRecover(ImGuiErrorLogCallback log_callback, void* user_data = NULL);
     IMGUI_API void          ErrorCheckUsingSetCursorPosToExtendParentBoundaries();
+    IMGUI_API void          DebugDrawCursorPos(ImU32 col = IM_COL32(255, 0, 0, 255));
+    IMGUI_API void          DebugDrawLineExtents(ImU32 col = IM_COL32(255, 0, 0, 255));
+    IMGUI_API void          DebugDrawItemRect(ImU32 col = IM_COL32(255, 0, 0, 255));
     IMGUI_API void          DebugLocateItem(ImGuiID target_id);                     // Call sparingly: only 1 at the same time!
     IMGUI_API void          DebugLocateItemOnHover(ImGuiID target_id);              // Only call on reaction to a mouse Hover: because only 1 at the same time!
     IMGUI_API void          DebugLocateItemResolveWithLastItem();
-    inline void             DebugDrawItemRect(ImU32 col = IM_COL32(255,0,0,255))    { ImGuiContext& g = *GImGui; ImGuiWindow* window = g.CurrentWindow; GetForegroundDrawList(window)->AddRect(g.LastItemData.Rect.Min, g.LastItemData.Rect.Max, col); }
     inline void             DebugStartItemPicker()                                  { ImGuiContext& g = *GImGui; g.DebugItemPickerActive = true; }
     IMGUI_API void          ShowFontAtlas(ImFontAtlas* atlas);
     IMGUI_API void          DebugHookIdInfo(ImGuiID id, ImGuiDataType data_type, const void* data_id, const void* data_id_end);
