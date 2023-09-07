@@ -203,7 +203,7 @@ static struct uade_ext_to_format_version etf[] = {
 	{.file_ext = "mso", .format = "Medley"},
 	// Note: Check spelling of MultiTracker, find modules
 	{.file_ext = "mtm", .format = "MultiTracker"},
-	{.file_ext = "mtp2", .format = "Marjo Tom's Player"},  // Major Tom
+	{.file_ext = "mtp2", .format = "Major Tom's Player"},  // Major Tom
 	{.file_ext = "ntp", .format = "NovoTrade Packer"},
 	{.file_ext = "okt", .format = "Oktalyzer"},
 	{.file_ext = "osp", .format = "Synth Pack"},
@@ -1141,12 +1141,14 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
   } else if (buf[0] == 'M' && buf[1] == 'M' && buf[2] == 'D') {
     if (buf[0x3] >= '0' && buf[0x3] < '3') {
       /*move.l mmd_songinfo(a0),a1 */
-      int s = (buf[8] << 24) + (buf[9] << 16) + (buf[0xa] << 8) + buf[0xb];
-      if (((int) buf[s + 767]) & (1 << 6)) {	/* btst #6, msng_flags(a1); */
-	strcpy(pre, "OCTAMED");
-       /*OCTAMED*/} else {
-	strcpy(pre, "MED");
-       /*MED*/}
+      int s = (buf[8] << 24) + (buf[9] << 16) + (buf[0xa] << 8) + buf[0xb] + 767;
+      if (s < bufsize) {
+        if (((int) buf[s]) & (1 << 6)) {	/* btst #6, msng_flags(a1); */
+          strcpy(pre, "OCTAMED");
+        } else {
+          strcpy(pre, "MED");
+        }
+      }
     } else if (buf[0x3] != 'C') {
       strcpy(pre, "MMD3");	/* mmd3 and above */
     }
