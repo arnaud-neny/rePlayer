@@ -321,7 +321,7 @@ namespace rePlayer
             }
 
             song->name = collectedSong.name;
-            song->type = { eExtension::_sndh, eReplay::sc68 };
+            song->type = { eExtension::_sndh, eReplay::SNDHPlayer };
             song->releaseYear = uint16_t(collectedSong.year);
             song->sourceIds.Add(songSourceId);
             song->artistIds.Add(static_cast<ArtistID>(artistIndex));
@@ -355,7 +355,7 @@ namespace rePlayer
             }
 
             song->name = searchedSong.name;
-            song->type = { eExtension::_sndh, eReplay::sc68 };
+            song->type = { eExtension::_sndh, eReplay::SNDHPlayer };
             song->sourceIds.Add(SourceID(kID, searchedSong.id));
 
             if (searchedSong.artist.second != "Unknown Composer")
