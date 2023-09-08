@@ -1386,18 +1386,19 @@ namespace rePlayer
             const char* const path;
             size_t size;
         } static ignoreList[] = {
-            BuildPathList("Ad Lib/EdLib D01/"),         // adlib multi-files - unplayable
-            BuildPathList("HVSC"),                      // just a mirror, conflict with actual modland structure
-            BuildPathList("Ken's Digital Music/"),      // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
-            BuildPathList("MusicMaker V8 Old/"),        // uade issue?
-            BuildPathList("Pollytracker/"),             // c64 player, available as sid
+            BuildPathList("Ad Lib/EdLib D01/"),                     // adlib multi-files - unplayable
+            BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
+            BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
+            BuildPathList("Ken's Digital Music/"),                  // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
+            BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
+            BuildPathList("Pollytracker/"),                         // c64 player, available as sid
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
-            BuildPathList("Stonetracker/"),             // need to add to uade (multi-files & missing library support in uade)
-            BuildPathList("TSS/"),                      // T'Sound System?
+            BuildPathList("Stonetracker/"),                         // need to add to uade (multi-files & missing library support in uade)
+            BuildPathList("TSS/"),                                  // T'Sound System?
             BuildPathList("Tunefish/"),
-            BuildPathList("Zoundmonitor/Samples/"),     // simply ignore this
-            BuildPathList("Zoundmonitor/readme.txt")    // simply ignore this
+            BuildPathList("Zoundmonitor/Samples/"),                 // simply ignore this
+            BuildPathList("Zoundmonitor/readme.txt")                // simply ignore this
         };
 
         auto buf = bufBegin;
