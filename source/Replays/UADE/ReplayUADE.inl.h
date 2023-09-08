@@ -503,6 +503,30 @@ namespace rePlayer
             }
         },
         {
+            "UNDV-MOD",
+            [](ReplayUADE* replay, const uint8_t*& data, std::filesystem::path& filepath, size_t& dataSize)
+            {
+                (void)replay;
+                filepath.replace_filename("uds." + filepath.filename().string());
+                auto smplOfs = *reinterpret_cast<const uint32_t*>(data + 8);
+                dataSize = smplOfs - 12;
+                data += 12;
+                return eExtension::_uds;
+            },
+            [](ReplayUADE* replay, const uint8_t*& data, const char* filename, size_t& dataSize)
+            {
+                (void)replay;
+                if (strnicmp(filename, "smp.", 4) == 0)
+                {
+                    auto offset = *reinterpret_cast<const uint32_t*>(data + 8);
+                    dataSize -= offset;
+                    data += offset;
+                    return true;
+                }
+                return false;
+            }
+        },
+        {
             "CUST-PKG",
             [](ReplayUADE* replay, const uint8_t*& data, std::filesystem::path& filepath, size_t& dataSize)
             {
