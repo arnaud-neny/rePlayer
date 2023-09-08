@@ -1387,7 +1387,7 @@ namespace rePlayer
             BuildPathList("Pollytracker/"),             // c64 player, available as sid
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
-            BuildPathList("Stonetracker/"),             // need to add to uade (multi-files)
+            BuildPathList("Stonetracker/"),             // need to add to uade (multi-files & missing library support in uade)
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
             BuildPathList("Unique Development/"),
