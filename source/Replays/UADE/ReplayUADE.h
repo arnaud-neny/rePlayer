@@ -90,6 +90,7 @@ namespace rePlayer
                 dataSize = *reinterpret_cast<const uint32_t*>(data + 8) - 12;
                 data += 12;
             };
+            const char* player = nullptr;
         };
 
     private:

@@ -107,6 +107,20 @@ namespace rePlayer
         if (stream->Read().IsEmpty())
             return nullptr;
 
+        auto buffer = stream->Read();
+
+        // rePlayer extra formats
+        ReplayOverride* replayOverride = nullptr;
+        auto data = buffer.Items();
+        for (auto& entry : ms_replayOverrides)
+        {
+            if (memcmp(data, entry.header, 8) == 0)
+            {
+                replayOverride = &entry;
+                break;
+            }
+        }
+
         struct uade_config* config = uade_new_config();
         uade_config_set_option(config, UC_ONE_SUBSONG, NULL);
         uade_config_set_option(config, UC_IGNORE_PLAYER_CHECK, NULL);
@@ -118,6 +132,7 @@ namespace rePlayer
         uade_config_set_option(config, UC_BASE_DIR, "");
 
         auto* settings = metadata.Find<Settings>();
+        bool isPlayerSet = false;
         if (settings && settings->overridePlayer)
         {
             auto* globals = static_cast<Globals*>(g_replayPlugin.globals);
@@ -128,10 +143,13 @@ namespace rePlayer
                     std::string str = "/players/";
                     str += globals->strings.Items(globals->players[i].first);
                     uade_config_set_option(config, UC_PLAYER_FILE, str.c_str());
+                    isPlayerSet = true;
                     break;
                 }
             }
         }
+        if (!isPlayerSet && replayOverride && replayOverride->player)
+            uade_config_set_option(config, UC_PLAYER_FILE, replayOverride->player);
 
         uade_state* state = uade_new_state(config);
         free(config);
@@ -141,21 +159,15 @@ namespace rePlayer
         auto replay = new ReplayUADE(stream, state);
         uade_set_amiga_loader(ReplayUADE::AmigaLoader, replay, state);
 
-        auto buffer = stream->Read();
         auto filepath = std::filesystem::path(stream->GetName());
         auto filename = filepath.filename().string();
 
         // rePlayer extra formats
-        auto data = buffer.Items();
         auto dataSize = buffer.Size();
-        for (auto& replayOverride : ms_replayOverrides)
+        if (replayOverride)
         {
-            if (memcmp(data, replayOverride.header, 8) == 0)
-            {
-                replay->m_mediaType.ext = replayOverride.build(replay, data, filepath, dataSize);
-                filename = filepath.filename().string();
-                break;
-            }
+            replay->m_mediaType.ext = replayOverride->build(replay, data, filepath, dataSize);
+            filename = filepath.filename().string();
         }
 
         if (uade_play_from_buffer(filename.c_str(), data, dataSize, -1, state) == 1)
