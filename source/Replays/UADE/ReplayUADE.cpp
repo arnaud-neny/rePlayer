@@ -182,7 +182,7 @@ namespace rePlayer
         return nullptr;
     }
 
-    struct uade_file* ReplayUADE::AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* /*state*/)
+    struct uade_file* ReplayUADE::AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* state)
     {
         auto This = reinterpret_cast<ReplayUADE*>(context);
 
@@ -267,6 +267,11 @@ namespace rePlayer
         filename += name;
         if (auto f = loadFile(filename.c_str(), name))
             return f;
+
+        // special cases
+        if (strstr(name, "smp.set") && strstr(state->song.info.playername, "(soc)"))
+            if (auto f = loadFile("extra/hippel_st.smp.set", name))
+                return f;
 
         Log::Warning("UADE: can't load \"%s\"\n", name);
 
