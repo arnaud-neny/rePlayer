@@ -196,6 +196,13 @@ namespace rePlayer
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_dat, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".ssd") == (name + strlen(name) - 4); }
         },
+        { // uade
+            "TFMX ST",
+            ModlandReplay::kTFMXST,
+            [](std::string& url) { auto ext = strstr(url.data(), "/mdat."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; ext[4] = 'l'; return "MDST-MOD"; },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdst, eReplay::UADE); },
+            [](const char* name) { return strstr(name, "smpl.") != nullptr; }
+        },
         { // sidplay
             "Stereo Sidplayer",
             ModlandReplay::kStereoSidplayer,
@@ -1000,7 +1007,7 @@ namespace rePlayer
                 Log::Message("\"%s\"...", url.c_str());
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 curlError = curl_easy_perform(curl);
-                if (curlError == CURLE_OK)
+                if (curlError == CURLE_OK) // don't check for 404 (or add special case for tfmx st which may have no samples)
                 {
                     songSource->crc = crc32(0L, Z_NULL, 0);
                     songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
@@ -1375,7 +1382,6 @@ namespace rePlayer
             BuildPathList("Renoise Old/"),
             BuildPathList("Startrekker AM/"),           // need to add to uade (multi-files)
             BuildPathList("Stonetracker/"),             // need to add to uade (multi-files)
-            BuildPathList("TFMX ST/"),
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
             BuildPathList("Unique Development/"),

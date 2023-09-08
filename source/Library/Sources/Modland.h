@@ -63,6 +63,7 @@ namespace rePlayer
                 kSynthPack,
                 kThomasHermann,
                 kPaulRobotham,
+                kTFMXST,
                 kStereoSidplayer,
                 kKensAdLibMusic,
                 kAdLibTracker,
