@@ -70,6 +70,8 @@ namespace core
         }
         else if (!isRemoved)
             Add(command);
+        else
+            Remove(command->commandId);
     }
 
     inline void CommandBuffer::Remove(uint16_t commandId)
