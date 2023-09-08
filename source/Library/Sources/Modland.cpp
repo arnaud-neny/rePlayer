@@ -203,6 +203,13 @@ namespace rePlayer
             [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdst, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smpl.") != nullptr; }
         },
+        { // uade
+            "Startrekker AM",
+            ModlandReplay::kStartrekkerAM,
+            [](std::string& url) { url += ".nt"; return "STAM-MOD"; },
+            [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_mod, eReplay::UADE); },
+            [](const char* name) { return strstr(name, ".mod.nt") == (name + strlen(name) - 7); }
+        },
         { // sidplay
             "Stereo Sidplayer",
             ModlandReplay::kStereoSidplayer,
@@ -1380,7 +1387,6 @@ namespace rePlayer
             BuildPathList("Pollytracker/"),             // c64 player, available as sid
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
-            BuildPathList("Startrekker AM/"),           // need to add to uade (multi-files)
             BuildPathList("Stonetracker/"),             // need to add to uade (multi-files)
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
