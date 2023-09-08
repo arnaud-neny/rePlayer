@@ -1387,9 +1387,11 @@ namespace rePlayer
             size_t size;
         } static ignoreList[] = {
             BuildPathList("Ad Lib/EdLib D01/"),                     // adlib multi-files - unplayable
+            BuildPathList("FAC SoundTracker/"),                     // need to do mus2kss for nezplug++
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),                  // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
+            BuildPathList("MoonBlaster/"),                          // need to do msb2kss for nezplug++
             BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
             BuildPathList("Pollytracker/"),                         // c64 player, available as sid
             BuildPathList("Renoise/"),
