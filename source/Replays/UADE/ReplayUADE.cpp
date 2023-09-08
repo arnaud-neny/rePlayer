@@ -90,6 +90,8 @@ namespace rePlayer
             auto ext = new char[extensions.size() + 1];
             memcpy(ext, extensions.c_str(), extensions.size() + 1);
             g_replayPlugin.extensions = ext;
+
+            LoadPlayerNames();
         }
 
         return false;
@@ -114,6 +116,23 @@ namespace rePlayer
         uade_config_set_option(config, UC_SILENCE_TIMEOUT_VALUE, "-1");
 
         uade_config_set_option(config, UC_BASE_DIR, "");
+
+        auto* settings = metadata.Find<Settings>();
+        if (settings && settings->overridePlayer)
+        {
+            auto* globals = static_cast<Globals*>(g_replayPlugin.globals);
+            for (uint32_t i = 1; i < globals->players.NumItems(); i++)
+            {
+                if (globals->players[i].second == settings->data[0])
+                {
+                    std::string str = "/players/";
+                    str += globals->strings.Items(globals->players[i].first);
+                    uade_config_set_option(config, UC_PLAYER_FILE, str.c_str());
+                    break;
+                }
+            }
+        }
+
         uade_state* state = uade_new_state(config);
         free(config);
         if (state == nullptr)
@@ -142,7 +161,7 @@ namespace rePlayer
         if (uade_play_from_buffer(filename.c_str(), data, dataSize, -1, state) == 1)
         {
             replay->BuildMediaType();
-            replay->SetupMetadata(metadata);
+            replay->BuildDurations(metadata);
             return replay;
         }
 
@@ -243,6 +262,49 @@ namespace rePlayer
         return nullptr;
     }
 
+    void ReplayUADE::LoadPlayerNames()
+    {
+        struct uade_config* config = uade_new_config();
+        uade_config_set_option(config, UC_BASE_DIR, "");
+        uade_state* state = uade_new_state(config);
+        free(config);
+
+        // simple hack to load the players: use our state as module
+        uade_detection_info detectionInfo = {};
+        uade_analyze_eagleplayer(&detectionInfo, state, sizeof(uade_state), nullptr, 0, state);
+
+        ms_globals.players.Reserve(state->playerstore->nplayers);
+        ms_globals.players.Add({ 0, 0 });
+        ms_globals.strings.Add("Default", sizeof("Default"));
+        for (size_t i = 0; i < state->playerstore->nplayers; i++)
+        {
+            bool isAlreadyAdded = false;
+            for (auto& player : ms_globals.players)
+            {
+                if (isAlreadyAdded = strcmp(ms_globals.strings.Items(player.first), state->playerstore->players[i].playername) == 0)
+                    break;
+            }
+            if (isAlreadyAdded)
+                continue;
+
+            // http://www.isthe.com/chongo/tech/comp/fnv/
+            constexpr uint32_t fnvOffset = 2166136261ul;
+            constexpr uint32_t fnvPrime = 16777619ul;
+            uint32_t hash = fnvOffset;
+            for (auto* str = state->playerstore->players[i].playername; *str; ++str)
+                hash = static_cast<uint32_t>(static_cast<uint64_t>(hash ^ *str) * fnvPrime);
+
+            ms_globals.players.Add({ ms_globals.strings.NumItems(), hash });
+            ms_globals.strings.Add(state->playerstore->players[i].playername, strlen(state->playerstore->players[i].playername) + 1);
+        }
+        std::sort(ms_globals.players.begin() + 1, ms_globals.players.end(), [](auto& l, auto& r)
+        {
+            return stricmp(ms_globals.strings.Items(l.first), ms_globals.strings.Items(r.first)) < 0;
+        });
+
+        uade_cleanup_state(state);
+    }
+
     bool ReplayUADE::DisplaySettings()
     {
         bool changed = false;
@@ -330,11 +392,20 @@ namespace rePlayer
 
     void ReplayUADE::Settings::Edit(ReplayMetadataContext& context)
     {
-        auto* entry = context.metadata.Find<Settings>();
-        if (entry == nullptr)
+        uint32_t numSubsongs = context.lastSubsongIndex + 1;
+        const auto settingsSize = sizeof(Settings) + (numSubsongs + 1u) * sizeof(uint32_t);
+        auto* entry = new (_alloca(settingsSize)) Settings(numSubsongs);
+        auto* oldEntry = context.metadata.Find<Settings>();
+        if (oldEntry)
         {
-            // ok, we are here because we never played this song in this player
-            entry = context.metadata.Create<Settings>();
+            if (oldEntry->NumSubsongs() && (oldEntry->NumSubsongs() != numSubsongs))
+                oldEntry = nullptr;
+            else
+            {
+                if (oldEntry->overridePlayer)
+                    entry->numEntries++;
+                memcpy(&entry->value, &oldEntry->value, oldEntry->numEntries * sizeof(uint32_t));
+            }
         }
 
         SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
@@ -345,9 +416,59 @@ namespace rePlayer
             ms_globals.filter, "Filter: None", "Filter: A500", "Filter: A1200");
         ComboOverride("NTSC", GETSET(entry, overrideNtsc), GETSET(entry, ntsc),
             ms_globals.isNtsc, "Region: PAL", "Region: NTSC");
+
+        bool isPlayerOverridden = entry->overridePlayer;
+        int32_t playerIndex = 0;
+        {
+            if (isPlayerOverridden)
+            {
+                playerIndex = ms_globals.players.FindIf<int32_t>([entry](auto& player)
+                {
+                    return player.second == entry->data[0];
+                });
+                if (playerIndex < 0)
+                {
+                    isPlayerOverridden = false;
+                    playerIndex = 0;
+                }
+            }
+            ImGui::PushID("Player");
+            if (ImGui::Checkbox("##Checkbox", &isPlayerOverridden))
+                playerIndex = 0;
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!isPlayerOverridden);
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            struct Label
+            {
+                static bool Get(void* data, int idx, const char** outStr)
+                {
+                    auto* This = reinterpret_cast<Label*>(data);
+                    This->str = "Player: ";
+                    This->str += ms_globals.strings.Items(ms_globals.players[idx].first);
+                    *outStr = This->str.c_str();
+                    return true;
+                }
+                std::string str;
+            } label;
+            ImGui::Combo("##Combo", &playerIndex, &Label::Get, &label, ms_globals.players.NumItems());
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Applied only on reload");
+            ImGui::EndDisabled();
+            ImGui::PopID();
+            if (uint32_t(isPlayerOverridden) != entry->overridePlayer)
+            {
+                memmove(entry->data + (isPlayerOverridden ? 1 : 0), entry->GetDurations(), numSubsongs * sizeof(uint32_t));
+                entry->numEntries += isPlayerOverridden ? 1 : -1;
+                entry->overridePlayer = isPlayerOverridden;
+            }
+            if (isPlayerOverridden)
+                entry->data[0] = ms_globals.players[playerIndex].second;
+        }
+
         const float buttonSize = ImGui::GetFrameHeight();
-        auto durations = entry->GetDurations();
-        for (uint16_t i = 0; i < entry->numSongs; i++)
+        auto* durations = entry->GetDurations();
+        bool isZero = true;
+        for (uint16_t i = 0; i < entry->NumSubsongs(); i++)
         {
             ImGui::PushID(i);
             bool isEnabled = durations[i] != 0;
@@ -396,7 +517,16 @@ namespace rePlayer
             ImGui::EndDisabled();
             durations[i] = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
             ImGui::PopID();
+
+            isZero &= durations[i] == 0;
         }
+        if (isZero)
+        {
+            entry->_deprecated1 = 0; // old num subsong entry
+            entry->numEntries -= uint16_t(numSubsongs);
+        }
+
+        context.metadata.Update(entry, isZero && entry->value == 0);
     }
 
     ReplayUADE::Globals ReplayUADE::ms_globals = {
@@ -507,13 +637,18 @@ namespace rePlayer
         uadecore_set_automatic_song_end(1);
         uadecore_set_ntsc((settings && settings->overrideNtsc) ? settings->ntsc : globals->isNtsc);
 
-        if (settings)
+        if (settings && settings->NumSubsongs())
         {
             auto durations = settings->GetDurations();
-            for (uint16_t i = 0; i < settings->numSongs; i++)
+            for (uint32_t i = 0, e = settings->NumSubsongs(); i < e; i++)
                 m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
         }
+        else
+        {
+            for (uint32_t i = 0, e = GetNumSubsongs(); i < e; i++)
+                m_durations[i] = 0;
+        }
+        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
     }
 
     void ReplayUADE::SetSubsong(uint16_t subsongIndex)
@@ -545,6 +680,8 @@ namespace rePlayer
             }
             else if (mediaType.ext == eExtension::_ym)
                 mediaType.ext = eExtension::_ymst;
+            else if (mediaType.ext == eExtension::_mdat && _stricmp(uadeInfo->playername, "TFMX ST") == 0)
+                mediaType.ext = eExtension::_mdst;
             m_mediaType = mediaType;
         }
     }
@@ -559,7 +696,7 @@ namespace rePlayer
         if (m_packagedSubsongNames.IsNotEmpty())
             return m_packagedSubsongNames.NumItems();
         auto uadeInfo = uade_get_song_info(m_uadeState);
-        return uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1);
+        return uint32_t(uadeInfo->subsongs.max >= uadeInfo->subsongs.min ? uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1 : 1);
     }
 
     std::string ReplayUADE::GetSubsongTitle() const
@@ -587,31 +724,23 @@ namespace rePlayer
         return info;
     }
 
-    void ReplayUADE::SetupMetadata(CommandBuffer metadata)
+    void ReplayUADE::BuildDurations(CommandBuffer metadata)
     {
         auto uadeInfo = uade_get_song_info(m_uadeState);
         auto numSongs = m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.max >= uadeInfo->subsongs.min ? uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1) : 1 : m_packagedSubsongNames.NumItems();
         m_durations = new uint32_t[numSongs];
         auto settings = metadata.Find<Settings>();
-        if (settings && settings->numSongs == numSongs)
+        if (settings && settings->NumSubsongs() == numSongs)
         {
-            auto durations = settings->GetDurations();
-            for (uint32_t i = 0; i < settings->numSongs; i++)
+            auto* durations = settings->GetDurations();
+            for (uint32_t i = 0; i < numSongs; i++)
                 m_durations[i] = durations[i];
             m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
         }
         else
         {
-            auto value = settings ? settings->value : 0;
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(int32_t));
-            settings->value = value;
-            settings->numSongs = numSongs;
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < numSongs; i++)
-            {
-                durations[i] = 0;
                 m_durations[i] = 0;
-            }
             m_currentDuration = 0;
         }
     }

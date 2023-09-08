@@ -28,19 +28,31 @@ namespace rePlayer
                 uint32_t value = 0;
                 struct
                 {
-                    uint32_t numSongs : 8;
+                    uint32_t _deprecated1 : 8;
                     uint32_t overrideStereoSeparation : 1;
                     uint32_t stereoSeparation : 7;
                     uint32_t overrideSurround : 1;
                     uint32_t surround : 1;
-                    uint32_t _deprecated : 2;
+                    uint32_t _deprecated2 : 2;
                     uint32_t overrideNtsc : 1;
                     uint32_t ntsc : 1;
                     uint32_t overrideFilter : 1;
                     uint32_t filter : 2;
+                    uint32_t overridePlayer : 1;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            uint32_t data[0];
+
+            Settings() = default;
+            Settings(uint32_t numSubsongs)
+            {
+                numEntries += uint8_t(numSubsongs);
+                for (uint32_t i = 0; i <= numSubsongs; i++)
+                    data[i] = 0;
+            }
+            uint32_t NumSubsongs() const { return numEntries - (overridePlayer ? 2 : 1); }
+
+            uint32_t* GetDurations() { return data + (overridePlayer ? 1 : 0); }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -84,9 +96,10 @@ namespace rePlayer
         ReplayUADE(io::Stream* stream, uade_state* uadeState);
 
         static struct uade_file* AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* state);
+        static void LoadPlayerNames();
 
         void BuildMediaType();
-        void SetupMetadata(CommandBuffer metadata);
+        void BuildDurations(CommandBuffer metadata);
 
     private:
         uint32_t m_lastSubsongIndex = 0;
@@ -104,6 +117,9 @@ namespace rePlayer
     public:
         struct Globals
         {
+            Array<char> strings;
+            Array<std::pair<uint32_t, uint32_t>> players;
+
             int32_t stereoSeparation;
             int32_t surround;
             int32_t filter;
