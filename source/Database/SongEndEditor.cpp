@@ -102,7 +102,7 @@ namespace rePlayer
                     frame = { 127, 127, 0 };
                 m_currentFrameSample = 0;
             }
-            if (m_currentFrameSample != m_numSamples)
+            if (m_currentFrameSample != numSamples)
             {
                 uint32_t currentSample = ReadCurrentSample();
                 uint32_t startFrame = uint32_t((1000ull * m_currentFrameSample) / (sampleRate * numMillisecondsPerPixel));
@@ -293,8 +293,9 @@ namespace rePlayer
                     m_isWaveScrolling = true;
                 }
 
-                auto cursorFrame = m_frames[offset + uint32_t(ImGui::GetMousePos().x - pos.x)];
-                auto time = uint64_t(offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel;
+                auto framePos = Clamp(offset + uint32_t(ImGui::GetMousePos().x - pos.x), 0u, m_frames.NumItems() - 1u);
+                auto cursorFrame = m_frames[framePos];
+                auto time = uint64_t(framePos) * numMillisecondsPerPixel;
                 ImGui::Tooltip("pos: %u:%02u:%03u\nmin: %d\nmax: %d\nrms: %u", time / 60000, (time / 1000) % 60, time % 1000
                     , cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
             }
@@ -306,7 +307,7 @@ namespace rePlayer
                     ImGui::ResetMouseDragDelta(ImGuiMouseButton_Middle);
                 }
                 if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f))
-                    m_duration = uint32_t(uint64_t(offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel);
+                    m_duration = uint32_t(Clamp(offset + uint64_t(ImGui::GetMousePos().x - pos.x), 0ull, m_frames.NumItems() - 1ull) * numMillisecondsPerPixel);
             }
 
             ImDrawList* drawList = ImGui::GetWindowDrawList();
