@@ -210,6 +210,13 @@ namespace rePlayer
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_mod, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".mod.nt") == (name + strlen(name) - 7); }
         },
+        { // uade
+            "Unique Development",
+            ModlandReplay::kUniqueDevelopment,
+            [](std::string& url) { auto ext = strstr(url.data(), "/uds."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "UNDV-MOD"; },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_uds, eReplay::UADE); },
+            [](const char* name) { return strstr(name, "smp.") != nullptr; }
+        },
         { // sidplay
             "Stereo Sidplayer",
             ModlandReplay::kStereoSidplayer,
@@ -1380,7 +1387,6 @@ namespace rePlayer
             size_t size;
         } static ignoreList[] = {
             BuildPathList("Ad Lib/EdLib D01/"),         // adlib multi-files - unplayable
-            //BuildPathList("Ad Lib/Herad Music System/"),// adlib - multi-extensions
             BuildPathList("HVSC"),                      // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),      // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
             BuildPathList("MusicMaker V8 Old/"),        // uade issue?
@@ -1390,7 +1396,6 @@ namespace rePlayer
             BuildPathList("Stonetracker/"),             // need to add to uade (multi-files & missing library support in uade)
             BuildPathList("TSS/"),                      // T'Sound System?
             BuildPathList("Tunefish/"),
-            BuildPathList("Unique Development/"),
             BuildPathList("Zoundmonitor/Samples/"),     // simply ignore this
             BuildPathList("Zoundmonitor/readme.txt")    // simply ignore this
         };

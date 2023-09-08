@@ -65,6 +65,7 @@ namespace rePlayer
                 kPaulRobotham,
                 kTFMXST,
                 kStartrekkerAM,
+                kUniqueDevelopment,
                 kStereoSidplayer,
                 kKensAdLibMusic,
                 kAdLibTracker,
