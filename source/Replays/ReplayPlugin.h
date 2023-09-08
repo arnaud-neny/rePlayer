@@ -29,16 +29,8 @@ namespace rePlayer
     {
         // data filled by the dll for rePlayer
 
-        static constexpr uint32_t kMajorVersion = 0;
-        static constexpr uint32_t kMinorVersion = 0;
-        static constexpr uint32_t kRevision = 0;
-
-        uint32_t revision : 16 = kRevision;
-        uint32_t minorVersion : 8 = kMinorVersion;
-        uint32_t majorVersion : 8 = kMajorVersion;
-
-        eReplay replayId;
-        bool isThreadSafe = true;
+        const eReplay replayId;
+        const bool isThreadSafe = true;
 
         const char* name = "Unknown";
         const char* extensions = "";
