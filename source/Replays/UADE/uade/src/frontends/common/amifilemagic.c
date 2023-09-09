@@ -956,7 +956,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
   }
 
   /* 0x438 == S31_HEADER_LENGTH - 4 */
-  if (((buf[0x438] >= '1' && buf[0x438] <= '3')
+  if (bufsize > 0x43b && (((buf[0x438] >= '1' && buf[0x438] <= '3')
        && (buf[0x439] >= '0' && buf[0x439] <= '9') && buf[0x43a] == 'C'
        && buf[0x43b] == 'H') || ((buf[0x438] >= '2' && buf[0x438] <= '8')
 				 && buf[0x439] == 'C' && buf[0x43a] == 'H'
@@ -965,7 +965,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
       || (buf[0x438] == 'O' && buf[0x439] == 'C' && buf[0x43a] == 'T'
 	  && buf[0x43b] == 'A') || (buf[0x438] == 'C' && buf[0x439] == 'D'
 				    && buf[0x43a] == '8'
-				    && buf[0x43b] == '1')) {
+				    && buf[0x43b] == '1'))) {
     strcpy(pre, "MOD_PC");	/*Multichannel Tracker */
 
   } else if (buf[0x2c] == 'S' && buf[0x2d] == 'C' && buf[0x2e] == 'R'
@@ -983,7 +983,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 		 && buf[17] == 0xe7)) {
     strcpy(pre, "HIP");		/* Hippel */
 
-  } else if (buf[0x348] == '.' && buf[0x349] == 'Z' && buf[0x34A] == 'A'
+  } else if (bufsize > 0x34f && buf[0x348] == '.' && buf[0x349] == 'Z' && buf[0x34A] == 'A'
 	     && buf[0x34B] == 'D' && buf[0x34c] == 'S' && buf[0x34d] == '8'
 	     && buf[0x34e] == '9' && buf[0x34f] == '.') {
     strcpy(pre, "MKII");	/* Mark II */
@@ -1182,7 +1182,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 	     && (buf[5] > '1' && buf[5] < '4')) {
     strcpy(pre, "SYN");		/* Synthesis */
 
-  } else if (buf[0xbc6] == '.' && buf[0xbc7] == 'F' && buf[0xbc8] == 'N'
+  } else if (bufsize > 0xbc9 && buf[0xbc6] == '.' && buf[0xbc7] == 'F' && buf[0xbc8] == 'N'
 	     && buf[0xbc9] == 'L') {
     strcpy(pre, "DM2");		/* Delta 2.0 */
 
@@ -1221,13 +1221,13 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 	     && buf[0x103] == 'T') {
     strcpy(pre, "SKT");		/*Skytpacker */
 
-  } else if ((buf[0x5b8] == 'I' && buf[0x5b9] == 'T' && buf[0x5ba] == '1'
+  } else if ((bufsize > 0x43b && buf[0x5b8] == 'I' && buf[0x5b9] == 'T' && buf[0x5ba] == '1'
 	      && buf[0x5bb] == '0') || (buf[0x5b8] == 'M' && buf[0x5b9] == 'T'
 					&& buf[0x5ba] == 'N'
 					&& buf[0x5bb] == 0x00)) {
     strcpy(pre, "ICE");		/*Ice/Soundtracker 2.6 */
 
-  } else if (buf[0x3b8] == 'K' && buf[0x3b9] == 'R' && buf[0x3ba] == 'I'
+  } else if (bufsize > 0x3bb && buf[0x3b8] == 'K' && buf[0x3b9] == 'R' && buf[0x3ba] == 'I'
 	     && buf[0x3bb] == 'S') {
     strcpy(pre, "KRIS");	/*Kristracker */
 
