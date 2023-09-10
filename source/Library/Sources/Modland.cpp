@@ -261,14 +261,21 @@ namespace rePlayer
 
     inline void SourceModland::Chars::Set(Array<char>& blob, const char* otherString)
     {
-        offset = blob.NumItems();
-        blob.Add(otherString, strlen(otherString) + 1);
+        auto len = strlen(otherString);
+        if (len)
+        {
+            offset = blob.NumItems();
+            blob.Add(otherString, len + 1);
+        }
     }
 
     inline void SourceModland::Chars::Set(Array<char>& blob, const std::string& otherString)
     {
-        offset = blob.NumItems();
-        blob.Add(otherString.c_str(), otherString.size() + 1);
+        if (otherString.size())
+        {
+            offset = blob.NumItems();
+            blob.Add(otherString.c_str(), otherString.size() + 1);
+        }
     }
 
     template <typename T>
@@ -278,12 +285,18 @@ namespace rePlayer
         otherblob.Add(src, strlen(src) + 1);
     }
 
+    template <bool isCaseSensitive>
     inline bool SourceModland::Chars::IsSame(const Array<char>& blob, const char* otherString) const
     {
         auto src = blob.Items() + offset;
         while (*src && *otherString)
         {
-            if (*src != *otherString)
+            if constexpr (isCaseSensitive)
+            {
+                if (*src != *otherString)
+                    return false;
+            }
+            else if (::tolower(*src) != ::tolower(*otherString))
                 return false;
             src++;
             otherString++;
@@ -502,6 +515,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kUSF);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Super Nintendo Sound Format") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kSNSF);
+        if (strstr(m_replays[songSource->replay].name(m_strings), "MoonBlaster") == m_replays[songSource->replay].name(m_strings))
+            return ImportPkSong(sourceId, strstr(m_replays[songSource->replay].name(m_strings), "edit") ? ModlandReplay::kMBMEdit : ModlandReplay::kMBM);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kIFFSmus);
 
@@ -1135,6 +1150,8 @@ namespace rePlayer
                 archiveBuffer.Add("CUST-PKG", sizeof("CUST-PKG") - 1);
             else if (replayType == ModlandReplay::kIFFSmus)
                 archiveBuffer.Add("SMUS-PKG", sizeof("SMUS-PKG") - 1);
+            else if (replayType == ModlandReplay::kMBM || replayType == ModlandReplay::kMBMEdit)
+                archiveBuffer.Add("MBMK-PKG", sizeof("MBMK-PKG") - 1);
 
             bool hasFailed = false;
             bool isEntryMissing = false;
@@ -1281,6 +1298,8 @@ namespace rePlayer
             type = { eExtension::_usfPk, eReplay::LazyUSF };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
             type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMBM || m_db.replays[dbSong.replayId].type == ModlandReplay::kMBMEdit)
+            type = { eExtension::_mbmPk, eReplay::KSS };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
             type = { eExtension::_cust, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kIFFSmus && dbSong.item)
@@ -1380,6 +1399,7 @@ namespace rePlayer
         m_db.replays.Resize(1);
         m_db.artists.Resize(1);
         m_db.songs.Resize(1);
+        m_db.strings.Add('\0');
 
         struct
         {
@@ -1391,7 +1411,6 @@ namespace rePlayer
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),                  // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
-            BuildPathList("MoonBlaster/"),                          // need to do msb2kss for nezplug++
             BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
             BuildPathList("Pollytracker/"),                         // c64 player, available as sid
             BuildPathList("Renoise/"),
@@ -1484,7 +1503,8 @@ namespace rePlayer
                     // packaged songs
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
-                        || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || mergePackages > 0)
+                        || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || currentReplayType == ModlandReplay::kMBM || currentReplayType == ModlandReplay::kMBMEdit
+                        || mergePackages > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1527,7 +1547,7 @@ namespace rePlayer
                         {
                             Log::Warning("Modland: missing extension \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
                         }
-                        else if (!m_db.replays[replayIndex].ext.IsSame(m_db.strings, ext))
+                        else if (!m_db.replays[replayIndex].ext.IsSame<false>(m_db.strings, ext))
                         {
                             Log::Warning("Modland: extension mismatch \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
                             ext = nullptr;
@@ -1616,6 +1636,10 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kUSF;
         else if (theReplay == "Super Nintendo Sound Format")
             m_db.replays.Last().type = ModlandReplay::kSNSF;
+        else if (theReplay == "MoonBlaster")
+            m_db.replays.Last().type = ModlandReplay::kMBM;
+        else if (theReplay == "MoonBlaster (edit mode)")
+            m_db.replays.Last().type = ModlandReplay::kMBMEdit;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         else if (theReplay.starts_with("OctaMED"))
