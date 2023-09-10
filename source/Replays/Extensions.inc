@@ -389,3 +389,4 @@ EXTENSION(pcd)      // ZXTune: Powerfull Code Decreaser
 EXTENSION(soc)      // UADE: Jochen_Hippel_ST
 EXTENSION(sog)      // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)     // UADE: JochenHippel
+EXTENSION(mbmPk)    // KSS

@@ -46,9 +46,11 @@ static int drv_size = sizeof(drv_code);
 static int mbplay = 0;
 static int mbkload = 0;
 static int mbmload = 0;
-static uint8_t mbkdata[0x8038];
-static int mbksize = 0;
-static int cnv_mode = 2;
+// rePlayer begin
+// static uint8_t mbkdata[0x8038];
+// static int mbksize = 0;
+static int cnv_mode = 3;
+// rePlayer end
 static int vsync_ntsc = 1;
 
 static char *memfind(char *buff, int bsize, char *str, int len) {
@@ -142,6 +144,8 @@ int KSS_set_mbmdrv(const uint8_t *mbmdrv, uint32_t size) {
   return mbmdrv_init();
 }
 
+// rePlayer begin
+#if 0
 static char mbkpath[4][512];
 
 /*
@@ -246,11 +250,115 @@ int KSS_set_mbk(const uint8_t *mbkp) {
 
   return 0;
 }
+#endif
 
-static KSS *mbm2kss(const uint8_t *mbmdata, size_t mbmsize, int devtype, int isntsc) {
+// from webNEZ
+static void subShort(uint8_t* buffer, uint8_t offset) {
+  // allow for unaligned memeory access just in case
+  uint16_t s = buffer[0] | ((uint16_t)buffer[1] << 8);
+
+  s -= offset;
+
+  buffer[0] = s & 0xff;
+  buffer[1] = s >> 8;
+}
+
+static uint8_t* convertEdit2UserMode(uint8_t* buffer, size_t* length) {
+  uint8_t* newBuffer;
+  if (buffer[0] == 0xff) {
+    (*length)--;	// remove '0xff' marker
+    newBuffer = malloc(*length);
+    memcpy(newBuffer, buffer + 1, 0x240);	// not counted in below pattern addresses..
+
+    // proper conversion to "user mode" file requires trimming of
+    // "unused data" in multiple instances:
+    // 1) instead of fixed 200 "Position table" entries there must
+    //    only be the "songLen" used ones
+    // 2) Instead of using the fixed maximum of 76 "Pattern Address table"
+    //    entries the highest used "Position table" entry defines the
+    //    number of entries.
+    // 3) there is an extra "song length" byte between the "Position table" entries
+    //    and the "Pattern Address table" - which must be removed
+    // 4) the little endian "Pattern Address table" entries must be adjusted
+    //    to reflect the distance that the data is moved (see above)
+
+    // for a test song that exists in a "edit" as well as in a "user" version
+    // the above adjustments interestingly DID not yield a converted
+    // file with the correct "Pattern Address table" offsets.. (there seems to be
+    // a discrepancy of +10 that I cannot explain so far).. the few songs available
+    // do not seem to be worth the trouble to put more time into reverse engineering..
+
+    // a slight hack is therefore used here: the "edit" mode file layout is
+    // almost correct if this was a 199 length song, so rather than moving
+    // the data around a fake size is used - which is compensated for
+    // by using the actual length in the existing "loop ending" logic
+    // known limitation: the song will play past the songs end if a playtime
+    // is configured manually - the songs cannot be run in looped mode..
+
+    // change songlength to account for fixed number of
+    // "Position table" entries in the "edit mode" file
+
+    newBuffer[0] = 199;
+
+    // only remove (redundant) "edit mode" specific length byte
+
+    memcpy(newBuffer + 0x240, buffer + 0x241 + 1, (*length) - 0x241);
+
+    // adjust "Pattern Address table" entries (for removed length byte)
+
+    for (int i = 0; i < 76; i++) {
+      subShort(newBuffer + 0x240 + i * 2, 1);
+    }
+  }
+  else {
+    newBuffer = buffer;
+  }
+  return newBuffer;
+}
+// rePlayer end
+
+static KSS *mbm2kss(const uint8_t *mbmdata, size_t mbmsize, int devtype, int isntsc, LoadCallback loadCallback, void* loadData) {
   char *kssbuf;
   KSS *kss = 0;
   int tmp = 0;
+
+  // rePlayer begin
+  uint8_t* mbmdata2;
+  uint8_t* mbkdata;
+  size_t mbksize = 0;
+
+  mbmdata2 = convertEdit2UserMode(mbmdata, &mbmsize);
+  if (mbmdata2 != mbmdata) {
+    uint8_t* t = mbmdata;
+    mbmdata = mbmdata2;
+    mbmdata2 = t;
+  }
+
+  if (loadCallback)
+  {
+    char mbkname[13] = "            ";
+    memcpy(mbkname, mbmdata + 0x140, 8);
+    for (int i = 7; i >= 0; i--) {
+      if (mbkname[i] != 0x20) {
+        memcpy(mbkname + i + 1, ".MBK", sizeof(".MBK"));
+        break;
+      }
+    }
+
+    loadCallback(loadData, mbkname, &mbkdata, &mbksize);
+    if (mbksize) {
+      mbksize = 0x8038;
+    }
+  }
+
+  {
+      char title[0x29];
+      memcpy(title, mbmdata + 0x0CF, 0x28);
+      title[0x28] = 0;
+      if (strstr(title, "50H"))
+        isntsc = 0;
+  }
+  // rePlayer end
 
   drv_top[0x4008 - 0x4000] = mbksize ? '\xc3' : '\xc9';
 
@@ -302,6 +410,12 @@ static KSS *mbm2kss(const uint8_t *mbmdata, size_t mbmsize, int devtype, int isn
     free(kssbuf);
   }
 
+  // rePlayer begin
+  if (mbmdata2 != mbmdata) {
+    free(mbmdata);
+  }
+  // rePlayer end
+
   return kss;
 }
 
@@ -309,15 +423,14 @@ int KSS_isMBMdata(uint8_t *data, uint32_t size) {
   return 0; // undecidable.
 }
 
-KSS *KSS_mbm2kss(const uint8_t *data, uint32_t size) {
+KSS *KSS_mbm2kss(const uint8_t *data, uint32_t size, const char* filename, LoadCallback loadCallback, void* loadData) { // rePlayer
 
   if (0<drv_size && !drv_top) {
     mbmdrv_init();
   }
 
   if (drv_top) {
-    load_mbk();
-    return mbm2kss(data, size, cnv_mode, vsync_ntsc);
+    return mbm2kss(data, size, cnv_mode, strstr(filename, "50Hz") == 0 ? 1 : 0, loadCallback, loadData); // rePlayer
   } else {
     return NULL;
   }
@@ -348,8 +461,10 @@ void KSS_get_info_mbmdata(KSS *kss, uint8_t *data, uint32_t size) {
     for (i = 0; i < 0x8; i++)
       kss->extra[offset + i] = data[0x140 + i];
     kss->extra[offset + i] = '\0';
-    if (mbksize == 0)
-      strcat((char *)kss->extra, "\r\n(MBK is not Found)");
+// rePlayer begin
+//     if (mbksize == 0)
+//       strcat((char *)kss->extra, "\r\n(MBK is not Found)");
+// rePlayer end
   }
 
   kss->loop_detectable = 0;

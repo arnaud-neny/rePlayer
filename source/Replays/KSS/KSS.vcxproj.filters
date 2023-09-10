@@ -51,6 +51,9 @@
     <Filter Include="Source Files\libkss\src\vm">
       <UniqueIdentifier>{0c898687-9ba2-47a1-ac45-aefb18face10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3rdParty">
+      <UniqueIdentifier>{87565b31-a881-40af-ad96-c8b9ccb07646}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayKSS.h">
@@ -229,5 +232,10 @@
     <ClCompile Include="libkss\src\kssplay.c">
       <Filter>Source Files\libkss\src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\3rdParty\libarchive\archive.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
   </ItemGroup>
 </Project>

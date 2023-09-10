@@ -78,6 +78,8 @@ typedef struct tagKSS {
 
 } KSS;
 
+typedef void(*LoadCallback)(void*, const char*, const uint8_t**, size_t*); // rePlayer
+
 KSS *KSS_new(uint8_t *data, uint32_t size);
 void KSS_delete(KSS *kss);
 
@@ -117,9 +119,9 @@ KSS *KSS_opx2kss(uint8_t *data, uint32_t size);
 KSS *KSS_mpk1032kss(uint8_t *data, uint32_t size);
 KSS *KSS_mpk1062kss(uint8_t *data, uint32_t size);
 KSS *KSS_kss2kss(uint8_t *data, uint32_t size);
-KSS *KSS_mbm2kss(const uint8_t *data, uint32_t size);
+KSS *KSS_mbm2kss(const uint8_t *data, uint32_t size, const char* filename, LoadCallback loadCallback, void* loadData); // rePlayer
 void KSS_set_mbmparam(int m, int, int s);
-KSS *KSS_bin2kss(uint8_t *data, uint32_t size, const char *filename);
+KSS *KSS_bin2kss(uint8_t *data, uint32_t size, const char *filename, LoadCallback loadCallback, void* loadData); // rePlayer
 int KSS_load_mbk(const char *filename);
 int KSS_autoload_mbk(const char *mbmfile, const char *extra_path, const char *dummy_file);
 

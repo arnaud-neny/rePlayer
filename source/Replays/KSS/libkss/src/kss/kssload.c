@@ -236,7 +236,7 @@ KSS *KSS_load_file(char *fn) {
   }
 #endif /* KSS_ZIP_SUPPORT */
 
-  if ((kss = KSS_bin2kss((uint8_t *)read_buf, length, fn)) == NULL) {
+  if ((kss = KSS_bin2kss((uint8_t *)read_buf, length, fn, NULL, NULL)) == NULL) { // rePlayer
     free(read_buf);
     return NULL;
   }

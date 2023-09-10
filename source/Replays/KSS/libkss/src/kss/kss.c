@@ -227,7 +227,7 @@ static void msx_kanji_fix(unsigned char *title) {
   return;
 }
 
-KSS *KSS_bin2kss(uint8_t *data, uint32_t data_size, const char *filename) {
+KSS *KSS_bin2kss(uint8_t *data, uint32_t data_size, const char *filename, LoadCallback loadCallback, void* loadData) { // rePlayer
   KSS *kss;
   int type;
 
@@ -238,7 +238,7 @@ KSS *KSS_bin2kss(uint8_t *data, uint32_t data_size, const char *filename) {
 
   switch (type) {
   case MBMDATA:
-    kss = KSS_mbm2kss(data, data_size);
+    kss = KSS_mbm2kss(data, data_size, filename, loadCallback, loadData); // rePlayer
     if (kss)
       KSS_get_info_mbmdata(kss, data, data_size);
     break;

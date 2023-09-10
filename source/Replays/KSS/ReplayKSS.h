@@ -49,6 +49,7 @@ namespace rePlayer
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
+        std::string GetSubsongTitle() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
@@ -58,18 +59,25 @@ namespace rePlayer
 
     private:
         ReplayKSS(KSS* kss, CommandBuffer metadata);
+        ReplayKSS(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata);
 
         void SetupMetadata(CommandBuffer metadata);
 
     private:
-        KSS* m_kss;
-        KSSPLAY* m_kssplay;
+        KSS* m_kss = nullptr;
+        KSSPLAY* m_kssplay = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
 
         uint32_t m_durations[256] = { 0 };
 
         int32_t m_loopCount = 0;
+
+        SmartPtr<io::Stream> m_stream;
+        Array<uint32_t> m_subsongs;
+
+        std::string m_title;
+        uint32_t m_currentSubsongIndex = 0xffFFffFF;
 
         static int32_t ms_masterVolume;
         static int32_t ms_devicePan;
