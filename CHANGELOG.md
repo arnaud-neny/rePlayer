@@ -1,9 +1,15 @@
-v0.9.1:
+v0.9.2:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
-- Updated libkss to 1.2.0
-- Update UADE to handle big modules
+- Updated libkss to 1.2.0, fix MBM loader
+- Updated UADE to handle big modules, allow player selection
 - Updated ZXTune to r5052
+- Updated modland to import Hippel ST COSO
+- Updated modland to import MoonBlaster
+- Updated modland to import Startrekker AM
+- Updated modland to import TFMX ST
+- Updated modland to import Unique Development
+- Updated ImGui to 1.89.90
 - Bug fixes
 
 v0.8.7:

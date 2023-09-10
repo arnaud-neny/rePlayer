@@ -42,3 +42,4 @@
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream
 - EUPHONY support: https://github.com/gzaffin/eupmini
+- mus2kss in modland (FAC SoundTracker)
