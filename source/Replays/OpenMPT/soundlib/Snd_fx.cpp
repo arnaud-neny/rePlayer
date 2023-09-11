@@ -326,7 +326,7 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 				for(CHANNELINDEX i = 0; i < GetNumChannels(); i++, m++)
 				{
 					if(m->note == NOTE_NOTECUT || m->note == NOTE_KEYOFF || (m->note == NOTE_FADE && GetNumInstruments())
-						|| (m->IsNote() && !m->IsPortamento()))
+						|| (m->IsNote() && m->instr && !m->IsPortamento()))
 					{
 						memory.chnSettings[i].ticksToRender = GetLengthMemory::IGNORE_CHANNEL;
 					}
@@ -4156,7 +4156,7 @@ void CSoundFile::TonePortamento(CHANNELINDEX nChn, uint16 param)
 		IMixPlugin *plugin = GetChannelInstrumentPlugin(chn);
 		if(plugin != nullptr)
 		{
-			plugin->MidiTonePortamento(delta, chn.GetPluginNote(m_playBehaviour[kITRealNoteMapping], true), chn.pModInstrument->midiPWD, nChn);
+			plugin->MidiTonePortamento(delta, chn.GetPluginNote(true), chn.pModInstrument->midiPWD, nChn);
 		}
 	}
 #endif  // NO_PLUGINS
