@@ -380,13 +380,13 @@
     <None Include="..\CHANGELOG.md" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="3rdParty\curl\libcurl.dll.a">
-      <Filter>3rdParty</Filter>
-    </Library>
     <Library Include="3rdParty\libarchive\archive.lib">
       <Filter>3rdParty</Filter>
     </Library>
     <Library Include="3rdParty\tidy\tidy.lib">
+      <Filter>3rdParty</Filter>
+    </Library>
+    <Library Include="3rdParty\curl\libcurl.dll.a">
       <Filter>3rdParty</Filter>
     </Library>
   </ItemGroup>

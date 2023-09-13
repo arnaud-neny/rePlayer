@@ -852,7 +852,7 @@ namespace rePlayer
         return id;
     }
 
-    std::string SourceModland::SetupUrl(void* curl, SourceSong* songSource) const
+    std::string SourceModland::SetupUrl(CURL* curl, SourceSong* songSource) const
     {
         std::string url("https://modland.com/pub/modules/");
         auto unescape = [&url, curl](const char* str)

@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+typedef struct Curl_easy CURL;
+
 namespace rePlayer
 {
     class SourceZXArt : public Source
@@ -70,8 +72,8 @@ namespace rePlayer
     public:
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;
-        void GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, void* curl) const;
-        ArtistSheet* GetArtist(uint32_t id, void* curl) const;
+        void GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, CURL* curl) const;
+        ArtistSheet* GetArtist(uint32_t id, CURL* curl) const;
 
         bool DownloadDatabase();
 

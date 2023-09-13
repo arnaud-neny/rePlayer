@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+typedef struct Curl_easy CURL;
+
 namespace rePlayer
 {
     class SourceModland : public Source
@@ -160,7 +162,7 @@ namespace rePlayer
 
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const ModlandSong& dbSong);
-        std::string SetupUrl(void* curl, SourceSong* songSource) const;
+        std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
         std::pair<Array<uint8_t>, bool> ImportTFMXSong(SourceID sourceId);
         std::pair<Array<uint8_t>, bool> ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay);
         std::pair<Array<uint8_t>, bool> ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType);

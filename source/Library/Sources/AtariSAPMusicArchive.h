@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+typedef struct Curl_easy CURL;
+
 namespace rePlayer
 {
     class SourceAtariSAPMusicArchive : public Source
@@ -117,7 +119,7 @@ namespace rePlayer
 
         uint16_t FindArtist(const ASMAArtist& dbArtist);
         uint32_t FindSong(const ASMASong& dbSong);
-        std::string SetupUrl(void* curl, SourceSong* songSource) const;
+        std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
 
         bool DownloadDatabase();
         uint32_t FindDatabaseRoot(std::string& filePath);

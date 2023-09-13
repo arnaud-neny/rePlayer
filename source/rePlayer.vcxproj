@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_NO_OLDIES;TAGLIB_STATIC;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\curl;$(SolutionDir)3rdParty\tidy;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -82,7 +82,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_NO_OLDIES;TAGLIB_STATIC;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\curl;$(SolutionDir)3rdParty\tidy;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

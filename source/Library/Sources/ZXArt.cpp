@@ -373,7 +373,7 @@ namespace rePlayer
         return song != m_songs.end() && song->id == id ? const_cast<SongSource*>(song) : nullptr;
     }
 
-    void SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, void* curl) const
+    void SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, CURL* curl) const
     {
         if (buffer.IsNotEmpty())
         {

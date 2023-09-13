@@ -519,7 +519,7 @@ namespace rePlayer
         return id;
     }
 
-    std::string SourceHighVoltageSIDCollection::SetupUrl(void* curl, SourceSong* songSource) const
+    std::string SourceHighVoltageSIDCollection::SetupUrl(CURL* curl, SourceSong* songSource) const
     {
         std::string url("https://hvsc.de/download/C64Music/");
         auto unescape = [&url, curl](const char* str)

@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+typedef struct Curl_easy CURL;
+
 namespace rePlayer
 {
     class SourceHighVoltageSIDCollection : public Source
@@ -91,7 +93,7 @@ namespace rePlayer
 
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const HvscSong& dbSong);
-        std::string SetupUrl(void* curl, SourceSong* songSource) const;
+        std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
 
         bool DownloadDatabase();
         void DecodeDatabase(char* bufBegin, const char* bufEnd);

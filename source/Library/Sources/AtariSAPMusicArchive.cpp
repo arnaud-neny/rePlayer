@@ -600,7 +600,7 @@ namespace rePlayer
         return id;
     }
 
-    std::string SourceAtariSAPMusicArchive::SetupUrl(void* curl, SourceSong* songSource) const
+    std::string SourceAtariSAPMusicArchive::SetupUrl(CURL* curl, SourceSong* songSource) const
     {
         std::string url("https://asma.atari.org/asma/");
         auto unescape = [&url, curl](const char* str)
