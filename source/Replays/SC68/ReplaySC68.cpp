@@ -14,7 +14,7 @@ namespace rePlayer
         .replayId = eReplay::sc68,
         .name = "sc68",
         .extensions = "sc68;sndh;snd",
-        .about = "libsc68 3.0.0a\nCopyright (c) 1998-2015 Benjamin Gerard",
+        .about = "libsc68 3.0.0a\nCopyright (c) 1998-2023 Benjamin Gerard",
         .settings = sc68_versionstr() + 3,
         .init = ReplaySC68::Init,
         .release = ReplaySC68::Release,

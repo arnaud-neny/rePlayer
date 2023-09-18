@@ -63,7 +63,7 @@ static inline int INTENA(const int intena) {
 */
 
 static int68_t _paula_readB(paula_io68_t * const paulaio,
-                            addr68_t const addr)
+			    addr68_t const addr)
 {
   const int i = (u8)addr;
   paula_t * const paula = &paulaio->paula;
@@ -115,7 +115,7 @@ static int68_t _paula_readB(paula_io68_t * const paulaio,
 }
 
 static int68_t _paula_readW(paula_io68_t * const paulaio,
-                            addr68_t const addr)
+			    addr68_t const addr)
 {
   const int i = (u8)addr;
   paula_t * const paula = &paulaio->paula;
@@ -123,16 +123,16 @@ static int68_t _paula_readW(paula_io68_t * const paulaio,
 
   switch (i) {
   case PAULA_DMACONR:
-    v =  paula->dmacon & 0x7fff;
+    v =	 paula->dmacon & 0x7fff;
     break;
   case PAULA_INTENAR:
-    v =  paula->intena & 0x7fff;
+    v =	 paula->intena & 0x7fff;
     break;
   case PAULA_INTREQR:
-    v =  paula->intreq & 0x7fff;
+    v =	 paula->intreq & 0x7fff;
     break;
   case PAULA_ADKCON:
-    v =  paula->adkcon & 0x7fff;
+    v =	 paula->adkcon & 0x7fff;
     break;
   default:
     v = (paula->map[i]<<8) | paula->map[i+1];
@@ -157,7 +157,7 @@ static void paulaio_readL(io68_t * const io)
 {
   io->emu68->bus_data = 0
     |(_paula_readW((paula_io68_t *)io, io->emu68->bus_addr+0)<<16)
-    |(_paula_readW((paula_io68_t *)io, io->emu68->bus_addr+2)    )
+    |(_paula_readW((paula_io68_t *)io, io->emu68->bus_addr+2)	 )
     ;
 }
 
@@ -237,7 +237,7 @@ static void write_intreq(paula_t * const paula, const int intreq)
 }
 
 static void _paula_writeB(paula_io68_t * const paulaio,
-                          addr68_t const addr, const int68_t data)
+			  addr68_t const addr, const int68_t data)
 {
   const int i = (u8)addr;
   paula_t * const paula = &paulaio->paula;
@@ -247,16 +247,16 @@ static void _paula_writeB(paula_io68_t * const paulaio,
 
   case PAULA_INTREQL:
     write_intreq(paula,
-                 ( paula->map[PAULA_INTREQH] << 8 )
-                 |
-                 paula->map[PAULA_INTREQL] );
+		 ( paula->map[PAULA_INTREQH] << 8 )
+		 |
+		 paula->map[PAULA_INTREQL] );
     break;
 
   }
 }
 
 static void _paula_writeW(paula_io68_t * const paulaio,
-                          addr68_t const addr, const int68_t data)
+			  addr68_t const addr, const int68_t data)
 {
   const int i = (u8) addr;
   paula_t * const paula = &paulaio->paula;
@@ -316,21 +316,21 @@ static void _paula_writeW(paula_io68_t * const paulaio,
 static void paulaio_writeB(io68_t * const io)
 {
   _paula_writeB((paula_io68_t *)io,
-                io->emu68->bus_addr, io->emu68->bus_data);
+		io->emu68->bus_addr, io->emu68->bus_data);
 }
 
 static void paulaio_writeW(io68_t * const io)
 {
   _paula_writeW((paula_io68_t *)io,
-                io->emu68->bus_addr, io->emu68->bus_data);
+		io->emu68->bus_addr, io->emu68->bus_data);
 }
 
 static void paulaio_writeL(io68_t * const io)
 {
   _paula_writeW((paula_io68_t *)io,
-                io->emu68->bus_addr+0, io->emu68->bus_data>>16);
+		io->emu68->bus_addr+0, io->emu68->bus_data>>16);
   _paula_writeW((paula_io68_t *)io,
-                io->emu68->bus_addr+2, io->emu68->bus_data);
+		io->emu68->bus_addr+2, io->emu68->bus_data);
 }
 
 static interrupt68_t * paulaio_interrupt(io68_t * const io, cycle68_t cycle)
@@ -382,13 +382,13 @@ io68_t * paulaio_create(emu68_t * const emu68, paula_parms_t * const parms)
     if (paulaio) {
       paula_setup_t setup;
       if (parms) {
-        setup.parms = *parms;
+	setup.parms = *parms;
       } else {
-        setup.parms.engine = PAULA_ENGINE_DEFAULT;
-        setup.parms.hz     = 0;
-        setup.parms.clock  = PAULA_CLOCK_DEFAULT;
+	setup.parms.engine = PAULA_ENGINE_DEFAULT;
+	setup.parms.hz	   = 0;
+	setup.parms.clock  = PAULA_CLOCK_DEFAULT;
       }
-      setup.mem     = emu68->mem;
+      setup.mem	    = emu68->mem;
       setup.log2mem = emu68->log2mem;
       paulaio->io = paula_io;
       paula_setup(&paulaio->paula, &setup);

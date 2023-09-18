@@ -80,7 +80,7 @@
 enum amiga_regs_e {
 
   /** Amiga Vertical/Horizontal electron bean position */
-  PAULA_VHPOSR    = 0x06,
+  PAULA_VHPOSR	  = 0x06,
 
   /**
    * @name Amiga interrupt registers.
@@ -94,21 +94,21 @@ enum amiga_regs_e {
    *  - bit 14  Master interrupt
    * @{
    */
-  PAULA_INTREQR   = 0x1E,       /**< Interruption request read      */
-  PAULA_INTREQRH  = 0x1E,       /**< Interruption request read MSB  */
-  PAULA_INTREQRL  = 0x1F,       /**< Interruption request read LSB  */
+  PAULA_INTREQR	  = 0x1E,	/**< Interruption request read      */
+  PAULA_INTREQRH  = 0x1E,	/**< Interruption request read MSB  */
+  PAULA_INTREQRL  = 0x1F,	/**< Interruption request read LSB  */
 
-  PAULA_INTREQ    = 0x9C,       /**< Interruption request write     */
-  PAULA_INTREQH   = 0x9C,       /**< Interruption request write MSB */
-  PAULA_INTREQL   = 0x9D,       /**< Interruption request write LSB */
+  PAULA_INTREQ	  = 0x9C,	/**< Interruption request write     */
+  PAULA_INTREQH	  = 0x9C,	/**< Interruption request write MSB */
+  PAULA_INTREQL	  = 0x9D,	/**< Interruption request write LSB */
 
-  PAULA_INTENAR   = 0x1C,       /**< Interruption enable read       */
-  PAULA_INTENARH  = 0x1C,       /**< Interruption enable read MSB   */
-  PAULA_INTENARL  = 0x1D,       /**< Interruption enable read LSB   */
+  PAULA_INTENAR	  = 0x1C,	/**< Interruption enable read       */
+  PAULA_INTENARH  = 0x1C,	/**< Interruption enable read MSB   */
+  PAULA_INTENARL  = 0x1D,	/**< Interruption enable read LSB   */
 
-  PAULA_INTENA    = 0x9A,       /**< Interruption enable write      */
-  PAULA_INTENAH   = 0x9A,       /**< Interruption enable write MSB  */
-  PAULA_INTENAL   = 0x9B,       /**< Interruption enable write LSB  */
+  PAULA_INTENA	  = 0x9A,	/**< Interruption enable write      */
+  PAULA_INTENAH	  = 0x9A,	/**< Interruption enable write MSB  */
+  PAULA_INTENAL	  = 0x9B,	/**< Interruption enable write LSB  */
   /**
    * @}
    */
@@ -125,12 +125,12 @@ enum amiga_regs_e {
    *
    * @{
    */
-  PAULA_DMACONR   = 0x02,               /**< DMA control read      */
-  PAULA_DMACONRH  = 0x02,               /**< DMA control read MSB  */
-  PAULA_DMACONRL  = 0x03,               /**< DMA control read LSB  */
-  PAULA_DMACON    = 0x96,               /**< DMA control write     */
-  PAULA_DMACONH   = 0x96,               /**< DMA control write MSB */
-  PAULA_DMACONL   = 0x97,               /**< DMA control write LSB */
+  PAULA_DMACONR	  = 0x02,		/**< DMA control read      */
+  PAULA_DMACONRH  = 0x02,		/**< DMA control read MSB  */
+  PAULA_DMACONRL  = 0x03,		/**< DMA control read LSB  */
+  PAULA_DMACON	  = 0x96,		/**< DMA control write     */
+  PAULA_DMACONH	  = 0x96,		/**< DMA control write MSB */
+  PAULA_DMACONL	  = 0x97,		/**< DMA control write LSB */
   /**
    * @}
    */
@@ -154,8 +154,8 @@ enum amiga_regs_e {
    *
    * @{
    */
-  PAULA_ADKCON    = 0x9E,          /**< Audio, disk, control write. */
-  PAULA_ADKCONR   = 0x10,          /**< Audio, disk, control read.  */
+  PAULA_ADKCON	  = 0x9E,	   /**< Audio, disk, control write. */
+  PAULA_ADKCONR	  = 0x10,	   /**< Audio, disk, control read.  */
   PAULA_ADKCONRH  = PAULA_ADKCONR+0,
   PAULA_ADKCONRL  = PAULA_ADKCONR+1,
   /**
@@ -166,10 +166,10 @@ enum amiga_regs_e {
    * @name Amiga Paula registers.
    * @{
    */
-  PAULA_VOICEA   = 0xA0,        /**< Paula channel A register base. */
-  PAULA_VOICEB   = 0xB0,        /**< Paula channel B register base. */
-  PAULA_VOICEC   = 0xC0,        /**< Paula channel C register base. */
-  PAULA_VOICED   = 0xD0,        /**< Paula channel D register base. */
+  PAULA_VOICEA	 = 0xA0,	/**< Paula channel A register base. */
+  PAULA_VOICEB	 = 0xB0,	/**< Paula channel B register base. */
+  PAULA_VOICEC	 = 0xC0,	/**< Paula channel C register base. */
+  PAULA_VOICED	 = 0xD0,	/**< Paula channel D register base. */
   /**
    * @}
    */
@@ -181,7 +181,7 @@ enum amiga_regs_e {
  * Amiga Paula Clock frequencies.
  */
 enum {
-  PAULA_PAL_FRQ     = 3546895u, /**< Paula PAL clock frequency.     */
+  PAULA_PAL_FRQ	    = 3546895u, /**< Paula PAL clock frequency.     */
   PAULA_NTSC_FRQ    = 3579545u, /**< Paula NTSC clock frequency.    */
 };
 
@@ -200,32 +200,32 @@ typedef int68_t signed_plct_t;
 
 /** Paula voice data structure. */
 typedef struct {
-  plct_t adr;   /**< current sample counter (<<paula_t::ct_fix). */
+  plct_t adr;	/**< current sample counter (<<paula_t::ct_fix). */
   plct_t start; /**< loop address.                               */
-  plct_t end;   /**< end address (<<paula_t::ct_fix).            */
+  plct_t end;	/**< end address (<<paula_t::ct_fix).            */
 } paulav_t;
 
 /** Paula emulator data structure. */
 typedef struct {
-  u8       map[256];   /**< Paula regiters mapping.              */
+  u8	   map[256];   /**< Paula registers mapping.             */
   paulav_t voice[4];   /**< Paula voices (4 channels).           */
-  int      engine;     /**< @ref paula_engine_e "Engine id".     */
-  int      ct_fix;     /**< Fixed precision used by counters in
+  int	   engine;     /**< @ref paula_engine_e "Engine id".     */
+  int	   ct_fix;     /**< Fixed precision used by counters in
                           order to have a natural memory access
                           modulo.                                */
-  int      clock;      /**< Clock type. @see paula_clock_e.      */
+  int	   clock;      /**< Clock type. @see paula_clock_e.      */
   plct_t   clkperspl;  /**< (clock<<paula_t::ct_fix)/hz.         */
-  uint_t   hz;         /**< Sampling rate in hz,                 */
-  int    * chansptr;   /**< Pointer to enabled channels mask.    */
+  uint_t   hz;	       /**< Sampling rate in hz,                 */
+  int	 * chansptr;   /**< Pointer to enabled channels mask.    */
 
   const u8 * mem;      /**< 68K memory buffer.                   */
-  int        log2mem;  /**< 68K memory buffer size (2^log2mem).  */
+  int	     log2mem;  /**< 68K memory buffer size (2^log2mem).  */
 
-  int      dmacon;     /**< Shadow DMACON. */
-  int      intena;     /**< Shadow INTENA. */
-  int      intreq;     /**< Shadow INTREQ. */
-  int      adkcon;     /**< Shadow ADKCON. */
-  int      vhpos;      /**< Shadow VHPOSR. */
+  int	   dmacon;     /**< Shadow DMACON. */
+  int	   intena;     /**< Shadow INTENA. */
+  int	   intreq;     /**< Shadow INTREQ. */
+  int	   adkcon;     /**< Shadow ADKCON. */
+  int	   vhpos;      /**< Shadow VHPOSR. */
 } paula_t;
 
 /**
@@ -237,8 +237,8 @@ typedef struct {
 enum paula_engine_e {
   PAULA_ENGINE_QUERY   = -1, /**< Query current or default paula engine. */
   PAULA_ENGINE_DEFAULT = 0,  /**< Default engine.                        */
-  PAULA_ENGINE_SIMPLE,       /**< Without interpolation.                 */
-  PAULA_ENGINE_LINEAR        /**< With linear interpolation.             */
+  PAULA_ENGINE_SIMPLE,	     /**< Without interpolation.                 */
+  PAULA_ENGINE_LINEAR	     /**< With linear interpolation.             */
 };
 
 /** clock type. */
@@ -252,7 +252,7 @@ enum paula_clock_e {
 /** sampling rate value in hertz. */
 enum paula_hz_e {
   PAULA_HZ_QUERY   = -1, /**< Query current or default sampling rate */
-  PAULA_HZ_DEFAULT = 0   /**< Default sampling rate                  */
+  PAULA_HZ_DEFAULT = 0	 /**< Default sampling rate                  */
 };
 
 /** Paula instance creaation parameters. */
@@ -264,9 +264,9 @@ typedef struct {
 
 /** setup data. */
 typedef struct {
-  paula_parms_t parms;     /**< Paula params.                       */
-  const u8 *    mem;       /**< 68K memory buffer.                  */
-  int           log2mem;   /**< 68K memory buffer size (2^log2mem). */
+  paula_parms_t parms;	   /**< Paula params.                       */
+  const u8 *	mem;	   /**< 68K memory buffer.                  */
+  int		log2mem;   /**< 68K memory buffer size (2^log2mem). */
 } paula_setup_t;
 
 IO68_EXTERN
