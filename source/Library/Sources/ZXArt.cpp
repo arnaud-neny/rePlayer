@@ -399,9 +399,9 @@ namespace rePlayer
                     state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable);
                 }
 
-                song->name = zxMusic["title"].get<std::string>();
+                song->name = ConvertEntities(zxMusic["title"].get<std::string>());
                 if (zxMusic.contains("internalTitle"))
-                    song->name.String() += " / " + zxMusic["internalTitle"].get<std::string>();
+                    song->name.String() += " / " + ConvertEntities(zxMusic["internalTitle"].get<std::string>());
                 if (zxMusic.contains("year"))
                 {
                     uint32_t year = 0;
@@ -418,9 +418,17 @@ namespace rePlayer
                     {
                         return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == authorId;
                     });
-                    song->artistIds.Add(static_cast<ArtistID>(it - collectedSongs.artists.begin()));
+                    auto newArtistId = static_cast<ArtistID>(it - collectedSongs.artists.begin());
                     if (it == collectedSongs.artists.end())
-                        collectedSongs.artists.Add(GetArtist(authorId, curl));
+                    {
+                        if (auto newArtist = GetArtist(authorId, curl))
+                        {
+                            collectedSongs.artists.Add(newArtist);
+                            song->artistIds.Add(newArtistId);
+                        }
+                    }
+                    else
+                        song->artistIds.Add(newArtistId);
                 }
                 collectedSongs.songs.Add(song);
                 collectedSongs.states.Add(state);
@@ -430,8 +438,7 @@ namespace rePlayer
 
     ArtistSheet* SourceZXArt::GetArtist(uint32_t id, CURL* curl) const
     {
-        auto artist = new ArtistSheet();
-        artist->sources.Add(SourceID(kID, id));
+        ArtistSheet* artist = nullptr;
 
         char url[128];
         sprintf(url, "http://zxart.ee/api/export:author/language:eng/filter:authorId=%u", id);
@@ -453,40 +460,46 @@ namespace rePlayer
         if (buffer.IsNotEmpty())
         {
             auto json = nlohmann::json::parse(buffer.begin(), buffer.end());
-            auto& author = json["responseData"]["author"][0];
-            artist->handles.Add(author["title"].get<std::string>());
-            if (author.contains("realName"))
-                artist->realName = author["realName"].get<std::string>();
-            if (author.contains("country"))
+            if (json["totalAmount"].get<uint32_t>() != 0)
             {
-                auto country = author["country"].get<std::string>();
-                if (country != "Information removed")
-                {
-                    auto countryCode = Countries::GetCode(country.c_str());
-                    if (countryCode == 0)
-                        assert(0 && "todo find the right country");
-                    else
-                        artist->countries.Add(countryCode);
-                }
-            }
-            if (author.contains("aliases"))
-            {
-                for (auto& alias : author["aliases"])
-                {
-                    sprintf(url, "http://zxart.ee/api/export:authorAlias/language:eng/filter:authorAliasId=%u", alias.get<uint32_t>());
-                    curl_easy_setopt(curl, CURLOPT_URL, url);
+                artist = new ArtistSheet();
+                artist->sources.Add(SourceID(kID, id));
 
-                    buffer.Clear();
-                    curl_easy_perform(curl);
-
-                    if (buffer.IsNotEmpty())
+                auto& author = json["responseData"]["author"][0];
+                artist->handles.Add(author["title"].get<std::string>());
+                if (author.contains("realName"))
+                    artist->realName = author["realName"].get<std::string>();
+                if (author.contains("country"))
+                {
+                    auto country = author["country"].get<std::string>();
+                    if (country != "Information removed")
                     {
-                        auto jsonAlias = nlohmann::json::parse(buffer.begin(), buffer.end());
-                        auto aliases = jsonAlias["responseData"]["authorAlias"];
-                        for (auto& aliasObject : aliases)
+                        auto countryCode = Countries::GetCode(country.c_str());
+                        if (countryCode == 0)
+                            assert(0 && "todo find the right country");
+                        else
+                            artist->countries.Add(countryCode);
+                    }
+                }
+                if (author.contains("aliases"))
+                {
+                    for (auto& alias : author["aliases"])
+                    {
+                        sprintf(url, "http://zxart.ee/api/export:authorAlias/language:eng/filter:authorAliasId=%u", alias.get<uint32_t>());
+                        curl_easy_setopt(curl, CURLOPT_URL, url);
+
+                        buffer.Clear();
+                        curl_easy_perform(curl);
+
+                        if (buffer.IsNotEmpty())
                         {
-                            if (aliasObject.contains("title"))
-                                artist->handles.Add(aliasObject["title"].get<std::string>());
+                            auto jsonAlias = nlohmann::json::parse(buffer.begin(), buffer.end());
+                            auto aliases = jsonAlias["responseData"]["authorAlias"];
+                            for (auto& aliasObject : aliases)
+                            {
+                                if (aliasObject.contains("title"))
+                                    artist->handles.Add(aliasObject["title"].get<std::string>());
+                            }
                         }
                     }
                 }
