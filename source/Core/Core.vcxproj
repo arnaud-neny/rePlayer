@@ -76,6 +76,7 @@
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Core\RefCounted.cpp" />
     <ClCompile Include="Core\SharedContext.cpp" />
+    <ClCompile Include="Core\String.cpp" />
     <ClCompile Include="Core\Window.cpp" />
     <ClCompile Include="ImGui.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />

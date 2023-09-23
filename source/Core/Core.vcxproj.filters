@@ -275,6 +275,9 @@
     <ClCompile Include="Thread\Semaphore.cpp">
       <Filter>Source Files\Thread</Filter>
     </ClCompile>
+    <ClCompile Include="Core\String.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Containers\Container.natvis">
