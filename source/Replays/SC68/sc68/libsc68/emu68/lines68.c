@@ -29,8 +29,10 @@
 #ifndef EMU68_MONOLITIC
 # error "EMU68_MONOLITIC should be defined when compiling this file."
 #else
-# include "emu68_private.h"
-# include "emu68_api.h"
+// rePlayer begin
+// # include "emu68_private.h"
+// # include "emu68_api.h"
+// rePlayer end
 
 /* Monolitic build: remove all forced inlines */
 # undef  inline
