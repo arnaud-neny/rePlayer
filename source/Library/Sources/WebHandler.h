@@ -144,34 +144,6 @@ namespace rePlayer
             return r;
         }
 
-        static uint32_t ReplaceEntities(const char* src, char* dst)
-        {
-            static const char* entities[] = { "nbsp;", "quot;", "amp;", "apos;", "lt;", "gt;" };
-            static const char ascii[] = { ' ', '"', '&', '\'', '<', '>' };
-
-            for (size_t i = 0; i < _countof(entities); i++)
-            {
-                auto s = src + 1;
-                for (auto c = entities[i];;)
-                {
-                    if (*c == 0)
-                    {
-                        *dst = ascii[i];
-                        return static_cast<uint32_t>(c - entities[i]);
-                    }
-                    else if (*c == *s)
-                    {
-                        c++;
-                        s++;
-                    }
-                    else
-                        break;
-                }
-            }
-            *dst = *src;
-            return 0;
-        }
-
         static void ConvertString(const char* buf, uint32_t size, std::string& output)
         {
             auto str = reinterpret_cast<char*>(_alloca(size + 1));
@@ -189,7 +161,7 @@ namespace rePlayer
                 }
                 else if (buf[i] == '&')
                 {
-                    i += ReplaceEntities(buf + i, dst);
+                    i += ConvertEntity(buf + i, dst);
                 }
                 else
                 {
