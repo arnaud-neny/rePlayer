@@ -93,7 +93,7 @@ namespace rePlayer
 
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const HvscSong& dbSong);
-        std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
+        std::string SetupUrl(CURL* curl, SourceSong* songSource, std::string url) const;
 
         bool DownloadDatabase();
         void DecodeDatabase(char* bufBegin, const char* bufEnd);

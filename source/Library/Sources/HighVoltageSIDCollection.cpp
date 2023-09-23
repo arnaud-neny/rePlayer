@@ -10,6 +10,19 @@
 
 namespace rePlayer
 {
+    static inline int Download(CURL* curl, Array<uint8_t>& buffer)
+    {
+        auto curlError = curl_easy_perform(curl);
+        if (curlError == CURLE_OK)
+        {
+            if (strstr(buffer.Items<char>(), "<!DOCTYPE ") == buffer.Items<char>())
+                return strstr(buffer.Items<char>(sizeof("<!DOCTYPE ")), "404") ? 1 : -1;
+            return 0;
+        }
+        Log::Error("High Voltage SID Collection: %s\n", curl_easy_strerror(curlError));
+        return 1;
+    }
+
     const char* const SourceHighVoltageSIDCollection::ms_filename = MusicPath "HighVoltageSIDCollection" MusicExt;
 
     inline const char* SourceHighVoltageSIDCollection::Chars::operator()(const Array<char>& blob) const
@@ -226,7 +239,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
-        auto url = SetupUrl(curl, songSource);
+        auto url = SetupUrl(curl, songSource, "https://hvsc.de/download/C64Music/");
 
         struct Buffer : public Array<uint8_t>
         {
@@ -239,11 +252,17 @@ namespace rePlayer
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        auto curlError = curl_easy_perform(curl);
         bool isEntryMissing = false;
-        if (curlError == CURLE_OK)
+        int downloadStatus = Download(curl, buffer);
+        if (downloadStatus != 0)
         {
-            if (buffer.IsEmpty())
+            buffer.Clear();
+            url = SetupUrl(curl, songSource, "https://hvsc.etv.cx/C64Music/");
+            downloadStatus = Download(curl, buffer);
+        }
+        if (downloadStatus >= 0)
+        {
+            if (buffer.IsEmpty() || downloadStatus > 0)
             {
                 isEntryMissing = true;
                 buffer.Reset();
@@ -266,7 +285,7 @@ namespace rePlayer
             m_isDirty = true;
         }
         else
-            Log::Error("High Voltage SID Collection: %s\n", curl_easy_strerror(curlError));
+            Log::Error("High Voltage SID Collection: can't connect\n");
 
         curl_easy_cleanup(curl);
 
@@ -519,9 +538,8 @@ namespace rePlayer
         return id;
     }
 
-    std::string SourceHighVoltageSIDCollection::SetupUrl(CURL* curl, SourceSong* songSource) const
+    std::string SourceHighVoltageSIDCollection::SetupUrl(CURL* curl, SourceSong* songSource, std::string url) const
     {
-        std::string url("https://hvsc.de/download/C64Music/");
         auto unescape = [&url, curl](const char* str)
         {
             for (;;)
@@ -580,11 +598,17 @@ namespace rePlayer
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-            curl_easy_perform(curl);
+            int downloadedStatus = Download(curl, buffer);
+            if (downloadedStatus != 0)
+            {
+                buffer.Clear();
+                curl_easy_setopt(curl, CURLOPT_URL, "https://hvsc.etv.cx/C64Music/DOCUMENTS/Songlengths.md5");
+                downloadedStatus = Download(curl, buffer);
+            }
 
             curl_easy_cleanup(curl);
 
-            if (buffer.IsNotEmpty())
+            if (downloadedStatus == 0)
                 DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems());
         }
         return m_db.songs.IsEmpty();
@@ -596,6 +620,7 @@ namespace rePlayer
         m_db.roots.Resize(1);
         m_db.artists.Resize(1);
         m_db.songs.Resize(1);
+        m_db.strings.Add('\0');
 
         auto buf = bufBegin;
         char* lineEnd = nullptr;
