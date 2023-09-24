@@ -1,15 +1,21 @@
-v0.9.2:
+v0.9.3:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
 - Updated libkss to 1.2.0, fix MBM loader
-- Updated UADE to handle big modules, allow player selection
+- Updated libsc68 to 3.0.0.a r702
+- Updated OpenMPT to 0.7.3
+- Updated NEZplug to support FAC SoundTracker
+- Updated UADE to 3.0.3 (and to handle of big modules and to allow player selection)
 - Updated ZXTune to r5052
+- Updated modland to import FAC SoundTracker
 - Updated modland to import Hippel ST COSO
 - Updated modland to import MoonBlaster
 - Updated modland to import Startrekker AM
 - Updated modland to import TFMX ST
 - Updated modland to import Unique Development
 - Updated ImGui to 1.89.90
+- Updated libcurl to 8.3.0
+- Updated zlib to 1.3
 - Bug fixes
 
 v0.8.7:

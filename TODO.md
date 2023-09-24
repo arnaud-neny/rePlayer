@@ -9,7 +9,6 @@
 - database: add album database
 - modland: source validation (check for removed files)
 - mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)
-- plugins: load on demand (not everything at start)
 - source: don't load on start, just at access (to save memory)
 - support for .cue, .m3u, .pls
 - pure database random play (System::Mode::Random)
@@ -39,7 +38,7 @@
 - Bandcamp music player?
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
 - FurnaceTracker: https://github.com/tildearrow/furnace
+- 64klang: https://github.com/hzdgopher/64klang
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream
 - EUPHONY support: https://github.com/gzaffin/eupmini
-- mus2kss in modland (FAC SoundTracker)
