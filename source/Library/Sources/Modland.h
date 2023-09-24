@@ -86,6 +86,7 @@ namespace rePlayer
                 kSNSF,
                 kMBM,
                 kMBMEdit,
+                kFACSoundTracker,
                 kDelitrackerCustom,
                 kIFFSmus
             };

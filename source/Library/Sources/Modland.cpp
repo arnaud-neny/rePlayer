@@ -517,6 +517,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kSNSF);
         if (strstr(m_replays[songSource->replay].name(m_strings), "MoonBlaster") == m_replays[songSource->replay].name(m_strings))
             return ImportPkSong(sourceId, strstr(m_replays[songSource->replay].name(m_strings), "edit") ? ModlandReplay::kMBMEdit : ModlandReplay::kMBM);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "FAC SoundTracker") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kFACSoundTracker);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kIFFSmus);
 
@@ -1152,6 +1154,8 @@ namespace rePlayer
                 archiveBuffer.Add("SMUS-PKG", sizeof("SMUS-PKG") - 1);
             else if (replayType == ModlandReplay::kMBM || replayType == ModlandReplay::kMBMEdit)
                 archiveBuffer.Add("MBMK-PKG", sizeof("MBMK-PKG") - 1);
+            else if (replayType == ModlandReplay::kFACSoundTracker)
+                archiveBuffer.Add("FACS-PKG", sizeof("FACS-PKG") - 1);
 
             bool hasFailed = false;
             bool isEntryMissing = false;
@@ -1300,6 +1304,8 @@ namespace rePlayer
             type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMBM || m_db.replays[dbSong.replayId].type == ModlandReplay::kMBMEdit)
             type = { eExtension::_mbmPk, eReplay::KSS };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kFACSoundTracker)
+            type = { eExtension::_musPk, eReplay::NEZplug };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
             type = { eExtension::_cust, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kIFFSmus && dbSong.item)
@@ -1407,7 +1413,6 @@ namespace rePlayer
             size_t size;
         } static ignoreList[] = {
             BuildPathList("Ad Lib/EdLib D01/"),                     // adlib multi-files - unplayable
-            BuildPathList("FAC SoundTracker/"),                     // need to do mus2kss for nezplug++
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
             BuildPathList("Ken's Digital Music/"),                  // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
@@ -1504,7 +1509,7 @@ namespace rePlayer
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
                         || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || currentReplayType == ModlandReplay::kMBM || currentReplayType == ModlandReplay::kMBMEdit
-                        || mergePackages > 0)
+                        || currentReplayType == ModlandReplay::kFACSoundTracker || mergePackages > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1640,6 +1645,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kMBM;
         else if (theReplay == "MoonBlaster (edit mode)")
             m_db.replays.Last().type = ModlandReplay::kMBMEdit;
+        else if (theReplay == "FAC SoundTracker")
+            m_db.replays.Last().type = ModlandReplay::kFACSoundTracker;
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         else if (theReplay.starts_with("OctaMED"))
