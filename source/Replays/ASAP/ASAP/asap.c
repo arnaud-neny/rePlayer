@@ -1,20 +1,63 @@
-// Generated automatically with "cito". Do not edit.
+// Generated automatically with "fut". Do not edit.
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "asap.h"
 
-static void CiString_Assign(char **str, char *value)
+static void FuString_Assign(char **str, char *value)
 {
 	free(*str);
 	*str = value;
 }
 
-static char *CiString_Substring(const char *str, int len)
+static char *FuString_Substring(const char *str, int len)
 {
 	char *p = malloc(len + 1);
 	memcpy(p, str, len);
 	p[len] = '\0';
 	return p;
+}
+
+typedef void (*FuMethodPtr)(void *);
+typedef struct {
+	size_t count;
+	size_t unitSize;
+	size_t refCount;
+	FuMethodPtr destructor;
+} FuShared;
+
+static void *FuShared_Make(size_t count, size_t unitSize, FuMethodPtr constructor, FuMethodPtr destructor)
+{
+	FuShared *self = (FuShared *) malloc(sizeof(FuShared) + count * unitSize);
+	self->count = count;
+	self->unitSize = unitSize;
+	self->refCount = 1;
+	self->destructor = destructor;
+	if (constructor != NULL) {
+		for (size_t i = 0; i < count; i++)
+			constructor((char *) (self + 1) + i * unitSize);
+	}
+	return self + 1;
+}
+
+static void FuShared_Release(void *ptr)
+{
+	if (ptr == NULL)
+		return;
+	FuShared *self = (FuShared *) ptr - 1;
+	if (--self->refCount != 0)
+		return;
+	if (self->destructor != NULL) {
+		for (size_t i = self->count; i > 0;)
+			self->destructor((char *) ptr + --i * self->unitSize);
+	}
+	free(self);
+}
+
+static void FuShared_Assign(void **ptr, void *value)
+{
+	FuShared_Release(*ptr);
+	*ptr = value;
 }
 
 typedef enum {
@@ -139,8 +182,6 @@ static void PokeyChannel_DoStimer(PokeyChannel *self, int cycle);
 
 static void PokeyChannel_SetMute(PokeyChannel *self, bool enable, int mask, int cycle);
 
-static void PokeyChannel_MuteUltrasound(PokeyChannel *self, int cycle);
-
 static void PokeyChannel_SetAudc(PokeyChannel *self, Pokey *pokey, const PokeyPair *pokeys, int data, int cycle);
 
 static void PokeyChannel_EndFrame(PokeyChannel *self, int cycle);
@@ -155,15 +196,28 @@ struct Pokey {
 	int reloadCycles1;
 	int reloadCycles3;
 	int polyIndex;
-	int deltaBuffer[888];
+	int deltaBufferLength;
+	int *deltaBuffer;
+	int sumDACInputs;
+	int sumDACOutputs;
+	int iirRate;
 	int iirAcc;
+	int trailing;
 };
+static void Pokey_Construct(Pokey *self);
+static void Pokey_Destruct(Pokey *self);
+static const int16_t Pokey_COMPRESSED_SUMS[61] = { 0, 35, 73, 111, 149, 189, 228, 266, 304, 342, 379, 415, 450, 484, 516, 546,
+	575, 602, 628, 652, 674, 695, 715, 733, 750, 766, 782, 796, 809, 822, 834, 846,
+	856, 867, 876, 886, 894, 903, 911, 918, 926, 933, 939, 946, 952, 958, 963, 969,
+	974, 979, 984, 988, 993, 997, 1001, 1005, 1009, 1013, 1016, 1019, 1023 };
 
 static void Pokey_StartFrame(Pokey *self);
 
-static void Pokey_Initialize(Pokey *self);
+static void Pokey_Initialize(Pokey *self, int sampleRate);
 
 static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta);
+
+static void Pokey_AddExternalDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta);
 
 /**
  * Fills <code>DeltaBuffer</code> up to <code>cycleLimit</code> basing on current Audf/Audc/Audctl values.
@@ -193,14 +247,19 @@ struct PokeyPair {
 	int extraPokeyMask;
 	Pokey basePokey;
 	Pokey extraPokey;
+	int sampleRate;
+	int16_t sincLookup[1024][32];
 	int sampleFactor;
 	int sampleOffset;
 	int readySamplesStart;
 	int readySamplesEnd;
 };
 static void PokeyPair_Construct(PokeyPair *self);
+static void PokeyPair_Destruct(PokeyPair *self);
 
-static void PokeyPair_Initialize(PokeyPair *self, bool ntsc, bool stereo);
+static int PokeyPair_GetSampleFactor(const PokeyPair *self, int clock);
+
+static void PokeyPair_Initialize(PokeyPair *self, bool ntsc, bool stereo, int sampleRate);
 
 static int PokeyPair_Poke(PokeyPair *self, int addr, int data, int cycle);
 
@@ -349,6 +408,7 @@ struct ASAP {
 	int silenceCycles;
 	int silenceCyclesCounter;
 	bool gtiaOrCovoxPlayedThisFrame;
+	int currentSampleRate;
 };
 static void ASAP_Construct(ASAP *self);
 static void ASAP_Destruct(ASAP *self);
@@ -371,7 +431,7 @@ static int ASAP_DoFrame(ASAP *self);
 
 static bool ASAP_Do6502Init(ASAP *self, int pc, int a, int x, int y);
 
-static int ASAP_MillisecondsToBlocks(int milliseconds);
+static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds);
 
 static void ASAP_PutLittleEndian(uint8_t *buffer, int offset, int value);
 
@@ -499,7 +559,7 @@ static void FlashPack_PutPoke(FlashPack *self, int address, int value);
 
 static bool FlashPack_Compress(FlashPack *self, ASAPWriter *w);
 
-static const uint8_t CiResource_cm3_obx[2022] = {
+static const uint8_t FuResource_cm3_obx[2022] = {
 	255, 255, 0, 5, 223, 12, 76, 18, 11, 76, 120, 5, 76, 203, 7, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 160, 227, 237, 227, 160, 240, 236, 225,
 	249, 229, 242, 160, 246, 160, 178, 174, 177, 160, 0, 0, 0, 0, 0, 0,
@@ -627,7 +687,7 @@ static const uint8_t CiResource_cm3_obx[2022] = {
 	10, 0, 0, 1, 2, 131, 0, 1, 2, 3, 1, 0, 2, 131, 1, 0,
 	2, 3, 1, 2, 128, 3, 128, 64, 32, 16, 8, 4, 2, 1, 3, 3,
 	3, 3, 7, 11, 15, 19 };
-static const uint8_t CiResource_cmc_obx[2019] = {
+static const uint8_t FuResource_cmc_obx[2019] = {
 	255, 255, 0, 5, 220, 12, 76, 15, 11, 76, 120, 5, 76, 203, 7, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 160, 227, 237, 227, 160, 240, 236, 225,
 	249, 229, 242, 160, 246, 160, 178, 174, 177, 160, 0, 0, 0, 0, 0, 0,
@@ -755,7 +815,7 @@ static const uint8_t CiResource_cmc_obx[2019] = {
 	1, 2, 131, 0, 1, 2, 3, 1, 0, 2, 131, 1, 0, 2, 3, 1,
 	2, 128, 3, 128, 64, 32, 16, 8, 4, 2, 1, 3, 3, 3, 3, 7,
 	11, 15, 19 };
-static const uint8_t CiResource_cmr_obx[2019] = {
+static const uint8_t FuResource_cmr_obx[2019] = {
 	255, 255, 0, 5, 220, 12, 76, 15, 11, 76, 120, 5, 76, 203, 7, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 160, 227, 237, 227, 160, 240, 236, 225,
 	249, 229, 242, 160, 246, 160, 178, 174, 177, 160, 0, 0, 0, 0, 0, 0,
@@ -883,7 +943,7 @@ static const uint8_t CiResource_cmr_obx[2019] = {
 	1, 2, 131, 0, 1, 2, 3, 1, 0, 2, 131, 1, 0, 2, 3, 1,
 	2, 128, 3, 128, 64, 32, 16, 8, 4, 2, 1, 3, 3, 3, 3, 7,
 	11, 15, 19 };
-static const uint8_t CiResource_cms_obx[2757] = {
+static const uint8_t FuResource_cms_obx[2757] = {
 	255, 255, 0, 5, 190, 15, 234, 234, 234, 76, 21, 8, 76, 96, 15, 35,
 	5, 169, 5, 173, 5, 184, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 255,
@@ -1057,7 +1117,7 @@ static const uint8_t CiResource_cms_obx[2757] = {
 	29, 35, 5, 170, 189, 233, 6, 166, 200, 157, 35, 5, 173, 172, 5, 29,
 	38, 5, 170, 189, 233, 6, 166, 200, 157, 38, 5, 202, 16, 221, 96, 168,
 	185, 13, 8, 168, 96 };
-static const uint8_t CiResource_dlt_obx[2125] = {
+static const uint8_t FuResource_dlt_obx[2125] = {
 	255, 255, 0, 4, 70, 12, 255, 241, 228, 215, 203, 192, 181, 170, 161, 152,
 	143, 135, 127, 121, 114, 107, 101, 95, 90, 85, 80, 75, 71, 67, 63, 60,
 	56, 53, 50, 47, 44, 42, 39, 37, 35, 33, 31, 29, 28, 26, 24, 23,
@@ -1191,7 +1251,7 @@ static const uint8_t CiResource_dlt_obx[2125] = {
 	168, 177, 238, 170, 160, 51, 177, 238, 48, 14, 138, 109, 11, 3, 170, 173,
 	31, 3, 141, 55, 3, 76, 60, 12, 138, 109, 31, 3, 141, 55, 3, 174,
 	11, 3, 189, 0, 4, 24, 109, 55, 3, 141, 39, 3, 96 };
-static const uint8_t CiResource_fc_obx[1220] = {
+static const uint8_t FuResource_fc_obx[1220] = {
 	255, 255, 0, 4, 189, 8, 76, 9, 4, 32, 16, 4, 76, 173, 5, 162,
 	0, 160, 10, 32, 25, 5, 162, 8, 189, 172, 8, 157, 0, 210, 157, 16,
 	210, 202, 16, 244, 96, 133, 244, 162, 0, 134, 230, 134, 232, 134, 234, 169,
@@ -1269,7 +1329,7 @@ static const uint8_t CiResource_fc_obx[1220] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 0, 0, 1, 1, 0,
 	0, 255, 255, 31 };
-static const uint8_t CiResource_mpt_obx[2233] = {
+static const uint8_t FuResource_mpt_obx[2233] = {
 	255, 255, 0, 5, 178, 13, 76, 205, 11, 173, 46, 7, 208, 1, 96, 169,
 	0, 141, 28, 14, 238, 29, 14, 173, 23, 14, 205, 187, 13, 144, 80, 206,
 	21, 14, 240, 3, 76, 197, 5, 162, 0, 142, 23, 14, 169, 0, 157, 237,
@@ -1410,7 +1470,7 @@ static const uint8_t CiResource_mpt_obx[2233] = {
 	208, 7, 140, 121, 13, 140, 127, 13, 96, 177, 250, 36, 249, 48, 4, 74,
 	74, 74, 74, 41, 15, 168, 185, 69, 10, 160, 0, 96, 160, 0, 140, 27,
 	14, 140, 26, 14, 136, 140, 25, 14, 96 };
-static const uint8_t CiResource_rmt4_obx[2007] = {
+static const uint8_t FuResource_rmt4_obx[2007] = {
 	255, 255, 144, 3, 96, 11, 128, 0, 128, 32, 128, 64, 0, 192, 128, 128,
 	128, 160, 0, 192, 64, 192, 0, 1, 5, 11, 21, 0, 1, 255, 255, 1,
 	1, 0, 255, 255, 0, 1, 1, 1, 0, 255, 255, 255, 255, 0, 1, 1,
@@ -1537,7 +1597,7 @@ static const uint8_t CiResource_rmt4_obx[2007] = {
 	25, 3, 174, 29, 3, 141, 2, 210, 142, 3, 210, 173, 26, 3, 174, 30,
 	3, 141, 4, 210, 142, 5, 210, 173, 27, 3, 174, 31, 3, 141, 6, 210,
 	142, 7, 210, 140, 8, 210, 96 };
-static const uint8_t CiResource_rmt8_obx[2275] = {
+static const uint8_t FuResource_rmt8_obx[2275] = {
 	255, 255, 144, 3, 108, 12, 128, 0, 128, 32, 128, 64, 0, 192, 128, 128,
 	128, 160, 0, 192, 64, 192, 0, 1, 5, 11, 21, 0, 1, 255, 255, 1,
 	1, 0, 255, 255, 0, 1, 1, 1, 0, 255, 255, 255, 255, 0, 1, 1,
@@ -1681,7 +1741,7 @@ static const uint8_t CiResource_rmt8_obx[2275] = {
 	5, 210, 173, 55, 3, 174, 51, 3, 141, 22, 210, 142, 6, 210, 173, 63,
 	3, 174, 59, 3, 141, 23, 210, 142, 7, 210, 169, 255, 140, 24, 210, 141,
 	8, 210, 96 };
-static const uint8_t CiResource_tm2_obx[3698] = {
+static const uint8_t FuResource_tm2_obx[3698] = {
 	255, 255, 0, 5, 107, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 	1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
@@ -1914,7 +1974,7 @@ static const uint8_t CiResource_tm2_obx[3698] = {
 	0, 6, 157, 56, 8, 169, 0, 157, 184, 8, 157, 32, 9, 157, 8, 9,
 	157, 72, 9, 157, 128, 9, 157, 136, 9, 157, 144, 9, 169, 1, 157, 120,
 	8, 96 };
-static const uint8_t CiResource_tmc_obx[2671] = {
+static const uint8_t FuResource_tmc_obx[2671] = {
 	255, 255, 0, 5, 104, 15, 76, 206, 13, 76, 208, 8, 76, 239, 9, 15,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -2082,7 +2142,7 @@ static const uint8_t CiResource_tmc_obx[2671] = {
 	156, 8, 157, 164, 8, 136, 177, 252, 41, 192, 24, 125, 228, 7, 157, 228,
 	7, 157, 34, 5, 168, 185, 60, 6, 157, 244, 7, 169, 0, 157, 44, 8,
 	157, 100, 8, 157, 108, 8, 157, 148, 8, 169, 1, 157, 188, 7, 96 };
-static const uint8_t CiResource_xexb_obx[183] = {
+static const uint8_t FuResource_xexb_obx[183] = {
 	255, 255, 36, 1, 223, 1, 120, 160, 0, 140, 14, 212, 173, 11, 212, 208,
 	251, 141, 0, 212, 162, 29, 157, 0, 208, 202, 16, 250, 162, 8, 157, 16,
 	210, 157, 0, 210, 202, 16, 247, 169, 3, 141, 31, 210, 141, 0, 210, 169,
@@ -2095,7 +2155,7 @@ static const uint8_t CiResource_xexb_obx[183] = {
 	141, 162, 1, 189, 222, 1, 105, 0, 141, 181, 1, 201, 0, 208, 252, 173,
 	162, 1, 176, 198, 72, 138, 72, 174, 145, 1, 32, 152, 252, 104, 170, 104,
 	238, 186, 1, 64, 156, 131, 76 };
-static const uint8_t CiResource_xexd_obx[117] = {
+static const uint8_t FuResource_xexd_obx[117] = {
 	255, 255, 36, 1, 152, 1, 120, 160, 0, 140, 14, 212, 173, 11, 212, 208,
 	251, 141, 0, 212, 162, 29, 157, 0, 208, 202, 16, 250, 141, 14, 210, 162,
 	8, 157, 16, 210, 157, 0, 210, 202, 16, 247, 169, 3, 141, 31, 210, 141,
@@ -2104,7 +2164,7 @@ static const uint8_t CiResource_xexd_obx[117] = {
 	88, 76, 146, 1, 40, 8, 72, 138, 72, 152, 72, 32, 149, 1, 174, 53,
 	1, 240, 11, 174, 20, 208, 202, 240, 2, 162, 1, 32, 152, 252, 104, 168,
 	104, 170, 104, 64, 76 };
-static const uint8_t CiResource_xexinfo_obx[178] = {
+static const uint8_t FuResource_xexinfo_obx[178] = {
 	255, 255, 112, 252, 221, 252, 65, 80, 252, 173, 11, 212, 208, 251, 141, 5,
 	212, 162, 38, 142, 22, 208, 162, 10, 142, 23, 208, 162, 33, 142, 0, 212,
 	162, 80, 142, 2, 212, 162, 252, 142, 3, 212, 142, 9, 212, 96, 216, 189,
@@ -2122,6 +2182,7 @@ static void ASAP_Construct(ASAP *self)
 {
 	PokeyPair_Construct(&self->pokeys);
 	ASAPInfo_Construct(&self->moduleInfo);
+	self->currentSampleRate = 44100;
 	self->silenceCycles = 0;
 	self->cpu.asap = self;
 }
@@ -2129,6 +2190,7 @@ static void ASAP_Construct(ASAP *self)
 static void ASAP_Destruct(ASAP *self)
 {
 	ASAPInfo_Destruct(&self->moduleInfo);
+	PokeyPair_Destruct(&self->pokeys);
 }
 
 ASAP *ASAP_New(void)
@@ -2145,6 +2207,16 @@ void ASAP_Delete(ASAP *self)
 		return;
 	ASAP_Destruct(self);
 	free(self);
+}
+
+int ASAP_GetSampleRate(const ASAP *self)
+{
+	return self->currentSampleRate;
+}
+
+void ASAP_SetSampleRate(ASAP *self, int sampleRate)
+{
+	self->currentSampleRate = sampleRate;
 }
 
 void ASAP_DetectSilence(ASAP *self, int seconds)
@@ -2214,7 +2286,7 @@ static void ASAP_PokeHardware(ASAP *self, int addr, int data)
 			pokey = &self->pokeys.extraPokey;
 		int delta = data - self->covox[addr];
 		if (delta != 0) {
-			Pokey_AddDelta(pokey, &self->pokeys, self->cpu.cycle, delta << 17);
+			Pokey_AddExternalDelta(pokey, &self->pokeys, self->cpu.cycle, delta << 17);
 			self->covox[addr] = (uint8_t) data;
 			self->gtiaOrCovoxPlayedThisFrame = true;
 		}
@@ -2223,8 +2295,8 @@ static void ASAP_PokeHardware(ASAP *self, int addr, int data)
 		int delta = ((self->consol & 8) - (data & 8)) << 20;
 		if (delta != 0) {
 			int cycle = self->cpu.cycle;
-			Pokey_AddDelta(&self->pokeys.basePokey, &self->pokeys, cycle, delta);
-			Pokey_AddDelta(&self->pokeys.extraPokey, &self->pokeys, cycle, delta);
+			Pokey_AddExternalDelta(&self->pokeys.basePokey, &self->pokeys, cycle, delta);
+			Pokey_AddExternalDelta(&self->pokeys.extraPokey, &self->pokeys, cycle, delta);
 			self->gtiaOrCovoxPlayedThisFrame = true;
 		}
 		self->consol = data;
@@ -2439,7 +2511,7 @@ bool ASAP_PlaySong(ASAP *self, int song, int duration)
 	self->covox[1] = 128;
 	self->covox[2] = 128;
 	self->covox[3] = 128;
-	PokeyPair_Initialize(&self->pokeys, ASAPInfo_IsNtsc(&self->moduleInfo), ASAPInfo_GetChannels(&self->moduleInfo) > 1);
+	PokeyPair_Initialize(&self->pokeys, ASAPInfo_IsNtsc(&self->moduleInfo), ASAPInfo_GetChannels(&self->moduleInfo) > 1, self->currentSampleRate);
 	ASAP_MutePokeyChannels(self, 255);
 	int player = self->moduleInfo.player;
 	int music = ASAPInfo_GetMusicAddress(&self->moduleInfo);
@@ -2505,12 +2577,13 @@ int ASAP_GetBlocksPlayed(const ASAP *self)
 
 int ASAP_GetPosition(const ASAP *self)
 {
-	return self->blocksPlayed * 10 / 441;
+	return self->blocksPlayed * 10 / (self->currentSampleRate / 100);
 }
 
-static int ASAP_MillisecondsToBlocks(int milliseconds)
+static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds)
 {
-	return milliseconds * 441 / 10;
+	int64_t ms = milliseconds;
+	return (int) (ms * self->currentSampleRate / 1000);
 }
 
 bool ASAP_SeekSample(ASAP *self, int block)
@@ -2530,7 +2603,7 @@ bool ASAP_SeekSample(ASAP *self, int block)
 
 bool ASAP_Seek(ASAP *self, int position)
 {
-	return ASAP_SeekSample(self, ASAP_MillisecondsToBlocks(position));
+	return ASAP_SeekSample(self, ASAP_MillisecondsToBlocks(self, position));
 }
 
 static void ASAP_PutLittleEndian(uint8_t *buffer, int offset, int value)
@@ -2566,8 +2639,8 @@ int ASAP_GetWavHeader(const ASAP *self, uint8_t *buffer, ASAPSampleFormat format
 {
 	int use16bit = format != ASAPSampleFormat_U8 ? 1 : 0;
 	int blockSize = ASAPInfo_GetChannels(&self->moduleInfo) << use16bit;
-	int bytesPerSecond = 44100 * blockSize;
-	int totalBlocks = ASAP_MillisecondsToBlocks(self->currentDuration);
+	int bytesPerSecond = self->currentSampleRate * blockSize;
+	int totalBlocks = ASAP_MillisecondsToBlocks(self, self->currentDuration);
 	int nBytes = (totalBlocks - self->blocksPlayed) * blockSize;
 	ASAP_PutLittleEndian(buffer, 8, 1163280727);
 	ASAP_PutLittleEndians(buffer, 12, 544501094, 16);
@@ -2575,7 +2648,7 @@ int ASAP_GetWavHeader(const ASAP *self, uint8_t *buffer, ASAPSampleFormat format
 	buffer[21] = 0;
 	buffer[22] = (uint8_t) ASAPInfo_GetChannels(&self->moduleInfo);
 	buffer[23] = 0;
-	ASAP_PutLittleEndians(buffer, 24, 44100, bytesPerSecond);
+	ASAP_PutLittleEndians(buffer, 24, self->currentSampleRate, bytesPerSecond);
 	buffer[32] = (uint8_t) blockSize;
 	buffer[33] = 0;
 	buffer[34] = (uint8_t) (8 << use16bit);
@@ -2612,7 +2685,7 @@ static int ASAP_GenerateAt(ASAP *self, uint8_t *buffer, int bufferOffset, int bu
 	int blockShift = ASAPInfo_GetChannels(&self->moduleInfo) - (format == ASAPSampleFormat_U8 ? 1 : 0);
 	int bufferBlocks = bufferLen >> blockShift;
 	if (self->currentDuration > 0) {
-		int totalBlocks = ASAP_MillisecondsToBlocks(self->currentDuration);
+		int totalBlocks = ASAP_MillisecondsToBlocks(self, self->currentDuration);
 		if (bufferBlocks > totalBlocks - self->blocksPlayed)
 			bufferBlocks = totalBlocks - self->blocksPlayed;
 	}
@@ -2652,25 +2725,25 @@ static uint8_t const *ASAP6502_GetPlayerRoutine(const ASAPInfo *info)
 {
 	switch (info->type) {
 	case ASAPModuleType_CMC:
-		return CiResource_cmc_obx;
+		return FuResource_cmc_obx;
 	case ASAPModuleType_CM3:
-		return CiResource_cm3_obx;
+		return FuResource_cm3_obx;
 	case ASAPModuleType_CMR:
-		return CiResource_cmr_obx;
+		return FuResource_cmr_obx;
 	case ASAPModuleType_CMS:
-		return CiResource_cms_obx;
+		return FuResource_cms_obx;
 	case ASAPModuleType_DLT:
-		return CiResource_dlt_obx;
+		return FuResource_dlt_obx;
 	case ASAPModuleType_MPT:
-		return CiResource_mpt_obx;
+		return FuResource_mpt_obx;
 	case ASAPModuleType_RMT:
-		return ASAPInfo_GetChannels(info) == 1 ? CiResource_rmt4_obx : CiResource_rmt8_obx;
+		return ASAPInfo_GetChannels(info) == 1 ? FuResource_rmt4_obx : FuResource_rmt8_obx;
 	case ASAPModuleType_TMC:
-		return CiResource_tmc_obx;
+		return FuResource_tmc_obx;
 	case ASAPModuleType_TM2:
-		return CiResource_tm2_obx;
+		return FuResource_tm2_obx;
 	case ASAPModuleType_FC:
-		return CiResource_fc_obx;
+		return FuResource_fc_obx;
 	default:
 		return NULL;
 	}
@@ -3309,7 +3382,7 @@ static bool ASAPInfo_ParseRmt(ASAPInfo *self, uint8_t const *module, int moduleL
 			break;
 		title[titleLen] = (uint8_t) (ASAPInfo_IsValidChar(c) ? c : ' ');
 	}
-	CiString_Assign(&self->title, CiString_Substring((const char *) title, titleLen));
+	FuString_Assign(&self->title, FuString_Substring((const char *) title, titleLen));
 	return true;
 }
 
@@ -3444,7 +3517,7 @@ static bool ASAPInfo_ParseTmc(ASAPInfo *self, uint8_t const *module, int moduleL
 	self->fastplay = 312 / i;
 	uint8_t title[127];
 	int titleLen = ASAPInfo_ParseTmcTitle(title, 0, module, 6);
-	CiString_Assign(&self->title, CiString_Substring((const char *) title, titleLen));
+	FuString_Assign(&self->title, FuString_Substring((const char *) title, titleLen));
 	return true;
 }
 
@@ -3567,7 +3640,7 @@ static bool ASAPInfo_ParseTm2(ASAPInfo *self, uint8_t const *module, int moduleL
 	int titleLen = ASAPInfo_ParseTmcTitle(title, 0, module, 39);
 	titleLen = ASAPInfo_ParseTmcTitle(title, titleLen, module, 71);
 	titleLen = ASAPInfo_ParseTmcTitle(title, titleLen, module, 103);
-	CiString_Assign(&self->title, CiString_Substring((const char *) title, titleLen));
+	FuString_Assign(&self->title, FuString_Substring((const char *) title, titleLen));
 	return true;
 }
 
@@ -3703,7 +3776,7 @@ static char *ASAPInfo_ParseText(uint8_t const *module, int i, int argEnd)
 		return strdup("");
 	if (len == 3 && module[i + 1] == '<' && module[i + 2] == '?' && module[i + 3] == '>')
 		return strdup("");
-	return CiString_Substring((const char *) module + i + 1, len);
+	return FuString_Substring((const char *) module + (i + 1), len);
 }
 
 static bool ASAPInfo_HasStringAt(uint8_t const *module, int moduleIndex, const char *s)
@@ -3803,11 +3876,11 @@ static bool ASAPInfo_ParseSap(ASAPInfo *self, uint8_t const *module, int moduleL
 		if (++moduleIndex + 6 >= moduleLen)
 			return false;
 		if (tagLen == 6 && memcmp(module + lineStart, "AUTHOR", 6) == 0)
-			CiString_Assign(&self->author, ASAPInfo_ParseText(module, argStart, argEnd));
+			FuString_Assign(&self->author, ASAPInfo_ParseText(module, argStart, argEnd));
 		else if (tagLen == 4 && memcmp(module + lineStart, "NAME", 4) == 0)
-			CiString_Assign(&self->title, ASAPInfo_ParseText(module, argStart, argEnd));
+			FuString_Assign(&self->title, ASAPInfo_ParseText(module, argStart, argEnd));
 		else if (tagLen == 4 && memcmp(module + lineStart, "DATE", 4) == 0)
-			CiString_Assign(&self->date, ASAPInfo_ParseText(module, argStart, argEnd));
+			FuString_Assign(&self->date, ASAPInfo_ParseText(module, argStart, argEnd));
 		else if (tagLen == 4 && memcmp(module + lineStart, "TIME", 4) == 0) {
 			if (durationIndex >= 32)
 				return false;
@@ -3818,7 +3891,7 @@ static bool ASAPInfo_ParseSap(ASAPInfo *self, uint8_t const *module, int moduleL
 				argEnd -= 5;
 			}
 			{
-				char *arg = CiString_Substring((const char *) module + argStart, argEnd - argStart);
+				char *arg = FuString_Substring((const char *) module + argStart, argEnd - argStart);
 				if ((self->durations[durationIndex++] = ASAPInfo_ParseDuration(arg)) == -1) {
 					free(arg);
 					return false;
@@ -3991,17 +4064,17 @@ bool ASAPInfo_Load(ASAPInfo *self, const char *filename, uint8_t const *module, 
 		ext -= basename;
 		if (ext > 127)
 			ext = 127;
-		CiString_Assign(&self->filename, CiString_Substring(filename + basename, ext));
+		FuString_Assign(&self->filename, FuString_Substring(filename + basename, ext));
 		ext = ASAPInfo_GetPackedExt(filename);
 	}
 	else {
-		CiString_Assign(&self->filename, strdup(""));
+		FuString_Assign(&self->filename, strdup(""));
 		if ((ext = ASAPInfo_GuessPackedExt(module, moduleLen)) == -1)
 			return false;
 	}
-	CiString_Assign(&self->author, strdup(""));
-	CiString_Assign(&self->title, strdup(""));
-	CiString_Assign(&self->date, strdup(""));
+	FuString_Assign(&self->author, strdup(""));
+	FuString_Assign(&self->title, strdup(""));
+	FuString_Assign(&self->date, strdup(""));
 	self->channels = 1;
 	self->songs = 1;
 	self->defaultSong = 0;
@@ -4072,7 +4145,7 @@ bool ASAPInfo_SetAuthor(ASAPInfo *self, const char *value)
 {
 	if (!ASAPInfo_CheckValidText(value))
 		return false;
-	CiString_Assign(&self->author, strdup(value));
+	FuString_Assign(&self->author, strdup(value));
 	return true;
 }
 
@@ -4085,7 +4158,7 @@ bool ASAPInfo_SetTitle(ASAPInfo *self, const char *value)
 {
 	if (!ASAPInfo_CheckValidText(value))
 		return false;
-	CiString_Assign(&self->title, strdup(value));
+	FuString_Assign(&self->title, strdup(value));
 	return true;
 }
 
@@ -4103,7 +4176,7 @@ bool ASAPInfo_SetDate(ASAPInfo *self, const char *value)
 {
 	if (!ASAPInfo_CheckValidText(value))
 		return false;
-	CiString_Assign(&self->date, strdup(value));
+	FuString_Assign(&self->date, strdup(value));
 	return true;
 }
 
@@ -4225,7 +4298,7 @@ void ASAPInfo_SetNtsc(ASAPInfo *self, bool ntsc)
 	for (int song = 0; song < self->songs; song++) {
 		int64_t duration = self->durations[song];
 		if (duration > 0) {
-			self->durations[song] = (int) (ntsc ? duration * 5956963 / 7159090 : duration * 7159090 / 5956963);
+			self->durations[song] = (int) (ntsc ? duration * 5956963 / 7159090 : (duration * 7159090 / 5956963));
 		}
 	}
 }
@@ -5326,7 +5399,7 @@ static bool ASAPWriter_WriteXexInfo(ASAPWriter *self, const ASAPInfo *info)
 	int titleAddress = otherAddress - authorLen - 8 - titleLen;
 	if (!ASAPWriter_WriteWord(self, titleAddress))
 		return false;
-	if (!ASAPWriter_WriteBytes(self, CiResource_xexinfo_obx, 4, 6))
+	if (!ASAPWriter_WriteBytes(self, FuResource_xexinfo_obx, 4, 6))
 		return false;
 	if (!ASAPWriter_WriteBytes(self, title, 0, titleLen))
 		return false;
@@ -5360,7 +5433,7 @@ static bool ASAPWriter_WriteXexInfo(ASAPWriter *self, const ASAPInfo *info)
 		if (!ASAPWriter_WriteByte(self, 2))
 			return false;
 	}
-	return ASAPWriter_WriteBytes(self, CiResource_xexinfo_obx, 6, 178);
+	return ASAPWriter_WriteBytes(self, FuResource_xexinfo_obx, 6, 178);
 }
 
 static bool ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen)
@@ -5418,7 +5491,7 @@ int ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPInf
 			case ASAPModuleType_SAP_D:
 				if (ASAPInfo_GetPlayerRateScanlines(info) != 312)
 					return -1;
-				if (!ASAPWriter_WriteBytes(self, CiResource_xexd_obx, 2, 117))
+				if (!ASAPWriter_WriteBytes(self, FuResource_xexd_obx, 2, 117))
 					return -1;
 				if (!ASAPWriter_WriteWord(self, initAndPlayer[0]))
 					return -1;
@@ -5442,7 +5515,7 @@ int ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPInf
 			case ASAPModuleType_SAP_S:
 				return -1;
 			default:
-				if (!ASAPWriter_WriteBytes(self, CiResource_xexb_obx, 2, 183))
+				if (!ASAPWriter_WriteBytes(self, FuResource_xexb_obx, 2, 183))
 					return -1;
 				if (!ASAPWriter_WriteWord(self, initAndPlayer[0]))
 					return -1;
@@ -6884,7 +6957,7 @@ static void PokeyChannel_Initialize(PokeyChannel *self)
 	self->periodCycles = 28;
 	self->tickCycle = 8388608;
 	self->timerCycle = 8388608;
-	self->mute = 1;
+	self->mute = 0;
 	self->out = 0;
 	self->delta = 0;
 }
@@ -6947,11 +7020,6 @@ static void PokeyChannel_SetMute(PokeyChannel *self, bool enable, int mask, int 
 	}
 }
 
-static void PokeyChannel_MuteUltrasound(PokeyChannel *self, int cycle)
-{
-	PokeyChannel_SetMute(self, self->periodCycles <= 112 && (self->audc & 176) == 160, 1, cycle);
-}
-
 static void PokeyChannel_SetAudc(PokeyChannel *self, Pokey *pokey, const PokeyPair *pokeys, int data, int cycle)
 {
 	if (self->audc == data)
@@ -6959,16 +7027,15 @@ static void PokeyChannel_SetAudc(PokeyChannel *self, Pokey *pokey, const PokeyPa
 	Pokey_GenerateUntilCycle(pokey, pokeys, cycle);
 	self->audc = data;
 	if ((data & 16) != 0) {
-		data = (data & 15) << 20;
-		if ((self->mute & 4) == 0)
+		data &= 15;
+		if ((self->mute & 2) == 0)
 			Pokey_AddDelta(pokey, pokeys, cycle, self->delta > 0 ? data - self->delta : data);
 		self->delta = data;
 	}
 	else {
-		data = (data & 15) << 20;
-		PokeyChannel_MuteUltrasound(self, cycle);
+		data &= 15;
 		if (self->delta > 0) {
-			if ((self->mute & 4) == 0)
+			if ((self->mute & 2) == 0)
 				Pokey_AddDelta(pokey, pokeys, cycle, data - self->delta);
 			self->delta = data;
 		}
@@ -6983,15 +7050,30 @@ static void PokeyChannel_EndFrame(PokeyChannel *self, int cycle)
 		self->timerCycle -= cycle;
 }
 
-static void Pokey_StartFrame(Pokey *self)
+static void Pokey_Construct(Pokey *self)
 {
-	memset(self->deltaBuffer, 0, sizeof(self->deltaBuffer));
+	self->deltaBuffer = NULL;
 }
 
-static void Pokey_Initialize(Pokey *self)
+static void Pokey_Destruct(Pokey *self)
 {
-	for (int i = 0; i < 4; i++)
-		PokeyChannel_Initialize(&self->channels[i]);
+	FuShared_Release(self->deltaBuffer);
+}
+
+static void Pokey_StartFrame(Pokey *self)
+{
+	memcpy(self->deltaBuffer, self->deltaBuffer + self->trailing, (self->deltaBufferLength - self->trailing) * sizeof(int));
+	memset(self->deltaBuffer + (self->deltaBufferLength - self->trailing), 0, self->trailing * sizeof(int));
+}
+
+static void Pokey_Initialize(Pokey *self, int sampleRate)
+{
+	int64_t sr = sampleRate;
+	self->deltaBufferLength = (int) (sr * 312 * 114 / 1773447 + 32 + 2);
+	FuShared_Assign((void **) &self->deltaBuffer, (int *) FuShared_Make(self->deltaBufferLength, sizeof(int), NULL, NULL));
+	self->trailing = self->deltaBufferLength;
+	for (int c = 0; c < 4; c++)
+		PokeyChannel_Initialize(self->channels + c);
 	self->audctl = 0;
 	self->skctl = 3;
 	self->irqst = 255;
@@ -7001,24 +7083,37 @@ static void Pokey_Initialize(Pokey *self)
 	self->reloadCycles3 = 28;
 	self->polyIndex = 60948015;
 	self->iirAcc = 0;
+	self->iirRate = 264600 / sampleRate;
+	self->sumDACInputs = 0;
 	Pokey_StartFrame(self);
 }
 
 static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta)
 {
+	self->sumDACInputs += delta;
+	int newOutput = Pokey_COMPRESSED_SUMS[self->sumDACInputs] << 16;
+	Pokey_AddExternalDelta(self, pokeys, cycle, newOutput - self->sumDACOutputs);
+	self->sumDACOutputs = newOutput;
+}
+
+static void Pokey_AddExternalDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta)
+{
+	if (delta == 0)
+		return;
 	int i = cycle * pokeys->sampleFactor + pokeys->sampleOffset;
-	int delta2 = (delta >> 16) * (i >> 4 & 65535);
-	i >>= 20;
-	self->deltaBuffer[i] += delta - delta2;
-	self->deltaBuffer[i + 1] += delta2;
+	int fraction = i >> 8 & 1023;
+	i >>= 18;
+	delta >>= 14;
+	for (int j = 0; j < 32; j++)
+		self->deltaBuffer[i + j] += delta * pokeys->sincLookup[fraction][j];
 }
 
 static void Pokey_GenerateUntilCycle(Pokey *self, const PokeyPair *pokeys, int cycleLimit)
 {
 	for (;;) {
 		int cycle = cycleLimit;
-		for (int i = 0; i < 4; i++) {
-			int tickCycle = self->channels[i].tickCycle;
+		for (int c = 0; c < 4; c++) {
+			int tickCycle = self->channels[c].tickCycle;
 			if (cycle > tickCycle)
 				cycle = tickCycle;
 		}
@@ -7058,17 +7153,17 @@ static void Pokey_EndFrame(Pokey *self, const PokeyPair *pokeys, int cycle)
 	int m = (self->audctl & 128) != 0 ? 237615 : 60948015;
 	if (self->polyIndex >= 2 * m)
 		self->polyIndex -= m;
-	for (int i = 0; i < 4; i++) {
-		int tickCycle = self->channels[i].tickCycle;
+	for (int c = 0; c < 4; c++) {
+		int tickCycle = self->channels[c].tickCycle;
 		if (tickCycle != 8388608)
-			self->channels[i].tickCycle = tickCycle - cycle;
+			self->channels[c].tickCycle = tickCycle - cycle;
 	}
 }
 
 static bool Pokey_IsSilent(const Pokey *self)
 {
-	for (int i = 0; i < 4; i++)
-		if ((self->channels[i].audc & 15) != 0)
+	for (int c = 0; c < 4; c++)
+		if ((self->channels[c].audc & 15) != 0)
 			return false;
 	return true;
 }
@@ -7076,17 +7171,17 @@ static bool Pokey_IsSilent(const Pokey *self)
 static void Pokey_Mute(Pokey *self, int mask)
 {
 	for (int i = 0; i < 4; i++)
-		PokeyChannel_SetMute(&self->channels[i], (mask & 1 << i) != 0, 4, 0);
+		PokeyChannel_SetMute(&self->channels[i], (mask & 1 << i) != 0, 2, 0);
 }
 
 static void Pokey_InitMute(Pokey *self, int cycle)
 {
 	bool init = self->init;
 	int audctl = self->audctl;
-	PokeyChannel_SetMute(&self->channels[0], init && (audctl & 64) == 0, 2, cycle);
-	PokeyChannel_SetMute(&self->channels[1], init && (audctl & 80) != 80, 2, cycle);
-	PokeyChannel_SetMute(&self->channels[2], init && (audctl & 32) == 0, 2, cycle);
-	PokeyChannel_SetMute(&self->channels[3], init && (audctl & 40) != 40, 2, cycle);
+	PokeyChannel_SetMute(&self->channels[0], init && (audctl & 64) == 0, 1, cycle);
+	PokeyChannel_SetMute(&self->channels[1], init && (audctl & 80) != 80, 1, cycle);
+	PokeyChannel_SetMute(&self->channels[2], init && (audctl & 32) == 0, 1, cycle);
+	PokeyChannel_SetMute(&self->channels[3], init && (audctl & 40) != 40, 1, cycle);
 }
 
 static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, int cycle)
@@ -7105,7 +7200,6 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		case 16:
 			self->channels[1].periodCycles = self->divCycles * (data + (self->channels[1].audf << 8) + 1);
 			self->reloadCycles1 = self->divCycles * (data + 1);
-			PokeyChannel_MuteUltrasound(&self->channels[1], cycle);
 			break;
 		case 64:
 			self->channels[0].periodCycles = data + 4;
@@ -7113,12 +7207,10 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		case 80:
 			self->channels[1].periodCycles = data + (self->channels[1].audf << 8) + 7;
 			self->reloadCycles1 = data + 4;
-			PokeyChannel_MuteUltrasound(&self->channels[1], cycle);
 			break;
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[0], cycle);
 		break;
 	case 1:
 		PokeyChannel_SetAudc(&self->channels[0], self, pokeys, data, cycle);
@@ -7142,7 +7234,6 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[1], cycle);
 		break;
 	case 3:
 		PokeyChannel_SetAudc(&self->channels[1], self, pokeys, data, cycle);
@@ -7159,7 +7250,6 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		case 8:
 			self->channels[3].periodCycles = self->divCycles * (data + (self->channels[3].audf << 8) + 1);
 			self->reloadCycles3 = self->divCycles * (data + 1);
-			PokeyChannel_MuteUltrasound(&self->channels[3], cycle);
 			break;
 		case 32:
 			self->channels[2].periodCycles = data + 4;
@@ -7167,12 +7257,10 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		case 40:
 			self->channels[3].periodCycles = data + (self->channels[3].audf << 8) + 7;
 			self->reloadCycles3 = data + 4;
-			PokeyChannel_MuteUltrasound(&self->channels[3], cycle);
 			break;
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[2], cycle);
 		break;
 	case 5:
 		PokeyChannel_SetAudc(&self->channels[2], self, pokeys, data, cycle);
@@ -7196,7 +7284,6 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[3], cycle);
 		break;
 	case 7:
 		PokeyChannel_SetAudc(&self->channels[3], self, pokeys, data, cycle);
@@ -7229,8 +7316,6 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[0], cycle);
-		PokeyChannel_MuteUltrasound(&self->channels[1], cycle);
 		switch (data & 40) {
 		case 0:
 			self->channels[2].periodCycles = self->divCycles * (self->channels[2].audf + 1);
@@ -7253,13 +7338,11 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 		default:
 			abort();
 		}
-		PokeyChannel_MuteUltrasound(&self->channels[2], cycle);
-		PokeyChannel_MuteUltrasound(&self->channels[3], cycle);
 		Pokey_InitMute(self, cycle);
 		break;
 	case 9:
-		for (int i = 0; i < 4; i++)
-			PokeyChannel_DoStimer(&self->channels[i], cycle);
+		for (int c = 0; c < 4; c++)
+			PokeyChannel_DoStimer(self->channels + c, cycle);
 		break;
 	case 14:
 		self->irqst |= data ^ 255;
@@ -7290,8 +7373,8 @@ static int Pokey_Poke(Pokey *self, const PokeyPair *pokeys, int addr, int data, 
 			self->polyIndex = ((self->audctl & 128) != 0 ? 237614 : 60948014) - cycle;
 		self->init = init;
 		Pokey_InitMute(self, cycle);
-		PokeyChannel_SetMute(&self->channels[2], (data & 16) != 0, 8, cycle);
-		PokeyChannel_SetMute(&self->channels[3], (data & 16) != 0, 8, cycle);
+		PokeyChannel_SetMute(&self->channels[2], (data & 16) != 0, 4, cycle);
+		PokeyChannel_SetMute(&self->channels[3], (data & 16) != 0, 4, cycle);
 		break;
 	default:
 		break;
@@ -7317,7 +7400,7 @@ static int Pokey_CheckIrq(Pokey *self, int cycle, int nextEventCycle)
 
 static int Pokey_StoreSample(Pokey *self, uint8_t *buffer, int bufferOffset, int i, ASAPSampleFormat format)
 {
-	self->iirAcc += self->deltaBuffer[i] - (self->iirAcc * 3 >> 10);
+	self->iirAcc += self->deltaBuffer[i] - (self->iirRate * self->iirAcc >> 11);
 	int sample = self->iirAcc >> 11;
 	if (sample < -32767)
 		sample = -32767;
@@ -7341,11 +7424,13 @@ static int Pokey_StoreSample(Pokey *self, uint8_t *buffer, int bufferOffset, int
 
 static void Pokey_AccumulateTrailing(Pokey *self, int i)
 {
-	self->iirAcc += self->deltaBuffer[i] + self->deltaBuffer[i + 1];
+	self->trailing = i;
 }
 
 static void PokeyPair_Construct(PokeyPair *self)
 {
+	Pokey_Construct(&self->basePokey);
+	Pokey_Construct(&self->extraPokey);
 	int reg = 511;
 	for (int i = 0; i < 511; i++) {
 		reg = (((reg >> 5 ^ reg) & 1) << 8) + (reg >> 1);
@@ -7356,14 +7441,47 @@ static void PokeyPair_Construct(PokeyPair *self)
 		reg = (((reg >> 5 ^ reg) & 255) << 9) + (reg >> 8);
 		self->poly17Lookup[i] = (uint8_t) (reg >> 1);
 	}
+	for (int i = 0; i < 1024; i++) {
+		double sincSum = 0;
+		double leftSum = 0;
+		double norm = 0;
+		double sinc[31];
+		for (int j = -32; j < 32; j++) {
+			if (j == -16)
+				leftSum = sincSum;
+			else if (j == 15)
+				norm = sincSum;
+			double x = 3.141592653589793 / (1024 * ((j << 10) - i)); // rePlayer fix
+			double s = x == 0 ? 1 : (sin(x) / x);
+			if (j >= -16 && j < 15)
+				sinc[16 + j] = s;
+			sincSum += s;
+		}
+		norm = 16384 / (norm + (1 - sincSum) * 0.5);
+		self->sincLookup[i][0] = (int16_t) round((leftSum + (1 - sincSum) * 0.5) * norm);
+		for (int j = 1; j < 32; j++)
+			self->sincLookup[i][j] = (int16_t) round(sinc[j - 1] * norm);
+	}
 }
 
-static void PokeyPair_Initialize(PokeyPair *self, bool ntsc, bool stereo)
+static void PokeyPair_Destruct(PokeyPair *self)
+{
+	Pokey_Destruct(&self->extraPokey);
+	Pokey_Destruct(&self->basePokey);
+}
+
+static int PokeyPair_GetSampleFactor(const PokeyPair *self, int clock)
+{
+	return ((self->sampleRate << 13) + (clock >> 6)) / (clock >> 5);
+}
+
+static void PokeyPair_Initialize(PokeyPair *self, bool ntsc, bool stereo, int sampleRate)
 {
 	self->extraPokeyMask = stereo ? 16 : 0;
-	Pokey_Initialize(&self->basePokey);
-	Pokey_Initialize(&self->extraPokey);
-	self->sampleFactor = ntsc ? 25837 : 26075;
+	self->sampleRate = sampleRate;
+	Pokey_Initialize(&self->basePokey, sampleRate);
+	Pokey_Initialize(&self->extraPokey, sampleRate);
+	self->sampleFactor = ntsc ? PokeyPair_GetSampleFactor(self, 1789772) : PokeyPair_GetSampleFactor(self, 1773447);
 	self->sampleOffset = 0;
 	self->readySamplesStart = 0;
 	self->readySamplesEnd = 0;
@@ -7410,8 +7528,8 @@ static int PokeyPair_EndFrame(PokeyPair *self, int cycle)
 		Pokey_EndFrame(&self->extraPokey, self, cycle);
 	self->sampleOffset += cycle * self->sampleFactor;
 	self->readySamplesStart = 0;
-	self->readySamplesEnd = self->sampleOffset >> 20;
-	self->sampleOffset &= 1048575;
+	self->readySamplesEnd = self->sampleOffset >> 18;
+	self->sampleOffset &= 262143;
 	return self->readySamplesEnd;
 }
 
@@ -7445,33 +7563,33 @@ static bool PokeyPair_IsSilent(const PokeyPair *self)
 
 const char* ASAPInfo_GetExt(const ASAPInfo* info)
 {
-    switch (info->type)
-    {
-    case ASAPModuleType_SAP_B:
-    case ASAPModuleType_SAP_C:
-    case ASAPModuleType_SAP_D:
-    case ASAPModuleType_SAP_S:
-        return "sap";
-    case ASAPModuleType_CMC:
-        return info->fastplay == 156 ? "dmc" : "cmc";
-    case ASAPModuleType_CM3:
-        return "cm3";
-    case ASAPModuleType_CMR:
-        return "cmr";
-    case ASAPModuleType_CMS:
-        return "cms";
-    case ASAPModuleType_DLT:
-        return "dlt";
-    case ASAPModuleType_MPT:
-        return info->fastplay == 156 ? "mpd" : "mpt";
-    case ASAPModuleType_RMT:
-        return "rmt";
-    case ASAPModuleType_TMC:
-        return "tmc";
-    case ASAPModuleType_TM2:
-        return "tm2";
-    case ASAPModuleType_FC:
-        return "fc";
-    }
+	switch (info->type)
+	{
+	case ASAPModuleType_SAP_B:
+	case ASAPModuleType_SAP_C:
+	case ASAPModuleType_SAP_D:
+	case ASAPModuleType_SAP_S:
+		return "sap";
+	case ASAPModuleType_CMC:
+		return info->fastplay == 156 ? "dmc" : "cmc";
+	case ASAPModuleType_CM3:
+		return "cm3";
+	case ASAPModuleType_CMR:
+		return "cmr";
+	case ASAPModuleType_CMS:
+		return "cms";
+	case ASAPModuleType_DLT:
+		return "dlt";
+	case ASAPModuleType_MPT:
+		return info->fastplay == 156 ? "mpd" : "mpt";
+	case ASAPModuleType_RMT:
+		return "rmt";
+	case ASAPModuleType_TMC:
+		return "tmc";
+	case ASAPModuleType_TM2:
+		return "tm2";
+	case ASAPModuleType_FC:
+		return "fc";
+	}
 	return "";
 }

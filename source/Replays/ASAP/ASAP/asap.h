@@ -1,4 +1,4 @@
-// Generated automatically with "cito". Do not edit.
+// Generated automatically with "fut". Do not edit.
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
@@ -31,9 +31,21 @@ ASAP *ASAP_New(void);
 void ASAP_Delete(ASAP *self);
 
 /**
- * Output sample rate.
+ * Default output sample rate.
  */
 #define ASAP_SAMPLE_RATE 44100
+
+/**
+ * Returns the output sample rate.
+ * @param self This <code>ASAP</code>.
+ */
+int ASAP_GetSampleRate(const ASAP *self);
+
+/**
+ * Sets the output sample rate.
+ * @param self This <code>ASAP</code>.
+ */
+void ASAP_SetSampleRate(ASAP *self, int sampleRate);
 
 /**
  * Enables silence detection.
@@ -132,12 +144,12 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - major part.
  */
-#define ASAPInfo_VERSION_MAJOR 5
+#define ASAPInfo_VERSION_MAJOR 6
 
 /**
  * ASAP version - minor part.
  */
-#define ASAPInfo_VERSION_MINOR 3
+#define ASAPInfo_VERSION_MINOR 0
 
 /**
  * ASAP version - micro part.
@@ -147,7 +159,7 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version as a string.
  */
-#define ASAPInfo_VERSION "5.3.0"
+#define ASAPInfo_VERSION "6.0.0"
 
 /**
  * Years ASAP was created in.
