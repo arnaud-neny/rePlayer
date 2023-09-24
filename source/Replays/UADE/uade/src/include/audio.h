@@ -10,6 +10,7 @@
 #define _UADE_AUDIO_H_
 
 #include "sinctable.h"
+#include "write_audio.h"
 
 #define AUDIO_DEBUG 0
 /* Queue length 256 implies minimum emulated period of 8. This should be
@@ -39,6 +40,8 @@ extern struct audio_channel_data {
     /* Debug variables */
     uaecptr ptend, nextdatpt, nextdatptend, datpt, datptend;
 } audio_channel[4];
+
+extern struct uade_write_audio *write_audio_state;
 
 extern void AUDxDAT (int nr, uae_u16 value);
 extern void AUDxVOL (int nr, uae_u16 value);

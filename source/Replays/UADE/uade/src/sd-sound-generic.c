@@ -20,7 +20,6 @@
 
 uae_u16 sndbuffer[MAX_SOUND_BUF_SIZE / 2];
 uae_u16 *sndbufpt;
-int sndbufsize;
 
 int sound_bytes_per_second;
 
@@ -49,12 +48,6 @@ void init_sound (void)
   int channels;
   int dspbits;
   unsigned int rate;
-  
-  if (currprefs.sound_maxbsiz < 128 || currprefs.sound_maxbsiz > 16384) {
-    fprintf (stderr, "Sound buffer size %d out of range.\n", currprefs.sound_maxbsiz);
-    currprefs.sound_maxbsiz = 8192;
-  }
-  sndbufsize = 8192;
   
   dspbits = currprefs.sound_bits;
   rate    = currprefs.sound_freq;

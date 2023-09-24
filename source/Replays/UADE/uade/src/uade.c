@@ -31,6 +31,8 @@
 
 #include "uadectl.h"
 #include "amigamsg.h"
+#include "state_detection.h"
+#include "uade_logging.h"
 
 #include <uade/uade.h>
 #include <uade/ossupport.h>
@@ -74,37 +76,47 @@ static const int SCORE_POSTPAUSE     = 0x180;
 static const int SCORE_PREPAUSE      = 0x184;
 static const int SCORE_DELIMON       = 0x188;
 static const int SCORE_EXEC_DEBUG    = 0x18C;
-static const int SCORE_VOLUME_TEST   = 0x190;
-static const int SCORE_DMA_WAIT      = 0x194;
+/* REMOVED: static const int SCORE_VOLUME_TEST   = 0x190; */
+/* REMOVED: static const int SCORE_DMA_WAIT      = 0x194; */
 static const int SCORE_MODULECHANGE  = 0x198;
 
-static const int SCORE_INPUT_MSG     = 0x200;
+static const int UADECORE_INPUT_MSG     = 0x200;
 static const int SCORE_MIN_SUBSONG   = 0x204;
 static const int SCORE_MAX_SUBSONG   = 0x208;
 static const int SCORE_CUR_SUBSONG   = 0x20C;
 
-static const int SCORE_OUTPUT_MSG    = 0x300;
+static const int SCORE_INPUT_MSG    = 0x300;
+
+
+static const int MODULE_NAME_ADDR = 0x00400;  /* 1024 bytes reserved */
+
+/* Execbase top is at address $1000. */
+static const int SCORE_ADDR   = 0x01000;
+
+static const int USER_STACK_ADDR   = 0x08500;
+static const int SUPER_STACK_ADDR  = 0x08f00;
+static const int PLAYER_ADDR  = 0x09000;
 
 
 struct uade_ipc uadecore_ipc;
 
 int uadecore_audio_skip;
 int uadecore_audio_output;
+int uadecore_audio_start_slow;
 int uadecore_debug;
 int uadecore_read_size;
 int uadecore_reboot;
 int uadecore_time_critical;
+int uadecore_has_been_booted;
 
 
 static int disable_modulechange;
 static int old_ledstate;
 static int big_endian;
-static int dmawait;
 static int execdebug;
 static int highmem;
 static struct uade_song song;
 static int speed_hack;
-static int voltestboolean;
 
 static char epoptions[256];
 static size_t epoptionsize;
@@ -153,23 +165,29 @@ static int get_info_for_ep(char *dst, char *src, int maxlen)
   return ret;
 }
 
-static int amiga_get_u32(int addr)
+static uae_u32 amiga_get_u32(int addr)
 {
   uae_u32 *ptr;
   int x;
   if (!valid_address(addr, 4)) {
-    fprintf(stderr, "uadecore: Invalid amiga_get_u32 (0x%x).\n", addr);
+		fprintf(stderr, "uadecore: Invalid amiga_get_i32 (0x%x).\n",
+			addr);
     return 0;
   }
   ptr = (uae_u32 *) get_real_address(addr);
   return ntohl(*ptr);
 }
 
+static int amiga_get_i32(int addr)
+{
+	return (int) amiga_get_u32(addr);
+}
+
 static void change_subsong(int subsong)
 {
   song.cur_subsong = subsong;
   uade_put_long(SCORE_SUBSONG, subsong);
-  uadecore_send_amiga_message(AMIGAMSG_SETSUBSONG);
+	uadecore_send_message_to_amiga(AMIGAMSG_SETSUBSONG);
   flush_sound();
 }
 
@@ -177,7 +195,8 @@ static void change_subsong(int subsong)
 static int calc_reloc_size(uae_u32 *src, uae_u32 *end)
 {
   uae_u32 offset;
-  int i, nhunks;
+	int i;
+	int nhunks;
 
   if (ntohl(*src) != 0x000003f3)
     return 0;
@@ -191,11 +210,17 @@ static int calc_reloc_size(uae_u32 *src, uae_u32 *end)
 
   if (src >= end)
     return 0;
-  /* take number of hunks, and apply the undocumented 16-bit mask feature */
+
+	/*
+	 * Take number of hunks, and apply the undocumented 16-bit mask
+	 * feature.
+	 */
   nhunks = ntohl(*src) & 0xffff;
   if (nhunks == 0)
     return 0;
-  src += 3;          /* skip number of hunks, and first & last hunk indexes */
+
+	/* Skip number of hunks, and first & last hunk indices */
+	src += 3;
 
   offset = 0;
 
@@ -205,9 +230,11 @@ static int calc_reloc_size(uae_u32 *src, uae_u32 *end)
     offset += 4 * (ntohl(*src) & 0x00FFFFFF);
     src++;
   }
+
   if (((int) offset) <= 0 || ((int) offset) >= highmem)
     return 0;
-  return ((int) offset);
+
+	return (int) offset;
 }
 
 
@@ -260,6 +287,30 @@ void uadecore_send_debug(const char *fmt, ...)
   if (uade_send_string(UADE_REPLY_MSG, dmsg, &uadecore_ipc)) {
     fprintf(stderr, "uadecore %s:%d: Could not send debug message.\n", __FILE__, __LINE__);
   }
+}
+
+static void uadecore_debug_u32_string(void)
+{
+	uadecore_send_debug("%s: 0x%x",
+			    (char *) get_real_address(0x208),
+			    amiga_get_u32(0x204));
+}
+
+static void uadecore_debug_u32_i32_string(void)
+{
+	uadecore_send_debug("%s: 0x%x %d",
+			    (char *) get_real_address(0x20C),
+			    amiga_get_u32(0x204), amiga_get_i32(0x208));
+}
+
+void uadecore_logging_flush(void)
+{
+// 	uade_logging_flush();
+}
+
+static void uadecore_logging_str(const char *func_name)
+{
+// 	uade_logging_str(func_name);
 }
 
 static int uade_safe_copy(int dst, const void *buf, size_t buflen)
@@ -321,7 +372,7 @@ void uadecore_get_amiga_message(void)
 	int x;
 
 	/* message type from amiga */
-	const int amigamsg = amiga_get_u32(SCORE_INPUT_MSG);
+	const int amigamsg = amiga_get_i32(UADECORE_INPUT_MSG);
 
 	switch (amigamsg) {
 
@@ -330,9 +381,9 @@ void uadecore_get_amiga_message(void)
 		break;
 
 	case AMIGAMSG_SUBSINFO:
-		mins = amiga_get_u32(SCORE_MIN_SUBSONG);
-		maxs = amiga_get_u32(SCORE_MAX_SUBSONG);
-		curs = amiga_get_u32(SCORE_CUR_SUBSONG);
+		mins = amiga_get_i32(SCORE_MIN_SUBSONG);
+		maxs = amiga_get_i32(SCORE_MAX_SUBSONG);
+		curs = amiga_get_i32(SCORE_CUR_SUBSONG);
 		/* Brain damage in TFMX BC Kid Despair */
 		if (maxs < mins) {
 			uadecore_send_debug("Odd subsongs. Eagleplayer reported (min, cur, max) == (%u, %u, %u)", mins, curs, maxs);
@@ -355,22 +406,33 @@ void uadecore_get_amiga_message(void)
 		break;
 
 	case AMIGAMSG_PLAYERNAME:
-		strlcpy(tmpstr, (char *) get_real_address(0x204), sizeof tmpstr);
+		strlcpy(tmpstr, (char *) get_real_address(0x204),
+			sizeof tmpstr);
 		uade_send_string(UADE_REPLY_PLAYERNAME, tmpstr, &uadecore_ipc);
 		break;
 
 	case AMIGAMSG_MODULENAME:
-	strlcpy(tmpstr, (char *) get_real_address(0x204), sizeof tmpstr);
+		strlcpy(tmpstr, (char *) get_real_address(0x204),
+			sizeof tmpstr);
 		uade_send_string(UADE_REPLY_MODULENAME, tmpstr, &uadecore_ipc);
 		break;
 
 	case AMIGAMSG_FORMATNAME:
-		strlcpy(tmpstr, (char *) get_real_address(0x204), sizeof tmpstr);
+		strlcpy(tmpstr, (char *) get_real_address(0x204),
+			sizeof tmpstr);
 		uade_send_string(UADE_REPLY_FORMATNAME, tmpstr, &uadecore_ipc);
 		break;
 
 	case AMIGAMSG_GENERALMSG:
 		uadecore_send_debug((char *) get_real_address(0x204));
+		break;
+
+	case AMIGAMSG_DEBUG_U32_STRING:
+		uadecore_debug_u32_string();
+		break;
+
+	case AMIGAMSG_DEBUG_U32_I32_STRING:
+		uadecore_debug_u32_i32_string();
 		break;
 
 	case AMIGAMSG_CHECKERROR:
@@ -401,7 +463,7 @@ void uadecore_get_amiga_message(void)
 		 * 0x208 and insert the length to 0x20C.
 		 * For example, R-Type (TFMX format) uses this.
 		 */
-		src = amiga_get_u32(0x204);
+		src = amiga_get_i32(0x204);
 		if (!uade_valid_string(src)) {
 			fprintf(stderr, "uadecore: Load name in invalid address range.\n");
 			break;
@@ -418,7 +480,7 @@ void uadecore_get_amiga_message(void)
 			uadecore_send_debug("load: file not found: %s", nameptr);
 			break;
 		}
-		dst = amiga_get_u32(0x208);
+		dst = amiga_get_i32(0x208);
 		len = uade_safe_copy(dst, f->data, f->size);
 		if (len == 0 && f->size > 0)
 			uadecore_send_debug("load: too long a file to copy");
@@ -428,7 +490,7 @@ void uadecore_get_amiga_message(void)
 
 	case AMIGAMSG_READ:
 		/* Used by "mdat.Crystal_Palace-1", for example */
-		src = amiga_get_u32(0x204);
+		src = amiga_get_i32(0x204);
 		if (!uade_valid_string(src)) {
 			fprintf(stderr, "uadecore: Read name in invalid address range.\n");
 			break;
@@ -443,9 +505,9 @@ void uadecore_get_amiga_message(void)
 
 		x = 0;
 		if (f->data != NULL) {
-			dst = amiga_get_u32(0x208);
-			off = amiga_get_u32(0x20C);
-			len = amiga_get_u32(0x210);
+			dst = amiga_get_i32(0x208);
+			off = amiga_get_i32(0x20C);
+			len = amiga_get_i32(0x210);
 			if (off >= f->size) {
 				uadecore_send_debug("read: file offset over the file end");
 			} else {
@@ -466,7 +528,7 @@ void uadecore_get_amiga_message(void)
 
 	case AMIGAMSG_FILESIZE:
 		/* Used by "mdat.Crystal_Palace-1", for example */
-		src = amiga_get_u32(0x204);
+		src = amiga_get_i32(0x204);
 		if (!uade_valid_string(src)) {
 			fprintf(stderr, "uadecore: Filesize name in invalid address range.\n");
 			break;
@@ -474,7 +536,8 @@ void uadecore_get_amiga_message(void)
 		nameptr = (char *) get_real_address(src);
 		f = lookup_amiga_file_cache(nameptr);
 		if (f == NULL) {
-			uadecore_send_debug("filesize: request error: %s", nameptr);
+			uadecore_send_debug("filesize: request error: %s",
+					    nameptr);
 			assert(0);
 			break;
 		}
@@ -487,14 +550,15 @@ void uadecore_get_amiga_message(void)
 					    nameptr, len);
 		} else {
 			/* Note, f->size == -1 if file does not exist */
-			uadecore_send_debug("filesize: file not found: %s", nameptr);
+			uadecore_send_debug("filesize: file not found: %s",
+					    nameptr);
 		}
 		uade_put_long(0x208, len);
 		uade_put_long(0x20C, x);
 		break;
 
 	case AMIGAMSG_TIME_CRITICAL:
-		uadecore_time_critical = amiga_get_u32(0x204) ? 1 : 0;
+		uadecore_time_critical = amiga_get_i32(0x204) ? 1 : 0;
 		if (speed_hack < 0) {
 			/* a negative value forbids use of speed hack */
 			uadecore_time_critical = 0;
@@ -502,9 +566,9 @@ void uadecore_get_amiga_message(void)
 		break;
 
 	case AMIGAMSG_GET_INFO:
-		src = amiga_get_u32(0x204);
-		dst = amiga_get_u32(0x208);
-		len = amiga_get_u32(0x20C);
+		src = amiga_get_i32(0x204);
+		dst = amiga_get_i32(0x208);
+		len = amiga_get_i32(0x20C);
 		if (!uade_valid_string(src)) {
 			fprintf(stderr, "uadecore: get info: Invalid src: 0x%x\n", src);
 			break;
@@ -553,6 +617,25 @@ void uadecore_get_amiga_message(void)
 	case AMIGAMSG_RESERVED_0:
 		/* TODO: Remove if not necessary in the future */
 		uadecore_send_debug("Test message %d", amigamsg);
+		break;
+
+	case AMIGAMSG_STATE_DETECTION_INIT:
+// 		uade_state_detection_init(amiga_get_u32(0x204),
+// 					  amiga_get_u32(0x208));
+		break;
+
+	case AMIGAMSG_STATE_DETECTION_STEP:
+		x = 0;// uade_state_detection_step();
+		uade_put_long(0x204, x);
+		break;
+
+	case AMIGAMSG_TEST_LOGGING:
+		if (strlen((const char *)get_real_address(0x204)) == 0) {
+			fprintf(stderr, "uadecore: Invalid zero length "
+				"log\n");
+		} else {
+			uadecore_logging_str((char *) get_real_address(0x204));
+		}
 		break;
 
 	default:
@@ -654,11 +737,11 @@ void uadecore_handle_r_state(void)
 	assert("uadecore: Invalid size on read command");
 	break;
       }
-      uadecore_read_size = x;
-      if (uadecore_read_size == 0 || uadecore_read_size > MAX_SOUND_BUF_SIZE || (uadecore_read_size & 3) != 0) {
+	  if (x == 0 || x > MAX_SOUND_BUF_SIZE || (x & 3) != 0) {
 	assert(0 && "uadecore: Invalid read size");
 	break;
       }
+      uadecore_read_size = x;
       break;
 
     case UADE_COMMAND_REBOOT:
@@ -697,7 +780,7 @@ void uadecore_handle_r_state(void)
 
 void uadecore_option(int argc, char **argv)
 {
-  int i, j, no_more_opts;
+  int i, j;
   char **s_argv;
   int s_argc;
   int cfg_loaded = 0;
@@ -711,8 +794,6 @@ void uadecore_option(int argc, char **argv)
   big_endian = (htonl(0x1234) == 0x1234);
 
   memset(&song, 0, sizeof(song));
-
-  no_more_opts = 0;
 
   s_argv = malloc(sizeof(argv[0]) * (argc + 1));
   if (!s_argv) {
@@ -844,12 +925,6 @@ static void uade_print_help(enum print_help problemcode, char *progname)
 /* this is called for each played song from newcpu.c/m68k_reset() */
 void uadecore_reset(void)
 {
-  /* don't load anything under 0x1000 (execbase top at $1000) */
-  const int modnameaddr = 0x00400;
-  const int scoreaddr   = 0x01000;
-  const int userstack   = 0x08500;
-  const int superstack  = 0x08f00;
-  const int playeraddr  = 0x09000;
   int relocaddr;
   int modaddr;
   int len;
@@ -858,21 +933,34 @@ void uadecore_reset(void)
   struct uade_file *player;
   struct uade_file *module;
 
-  uint8_t command[UADE_MAX_MESSAGE_SIZE];
-  struct uade_msg *um = (struct uade_msg *) command;
-
   int ret;
+
+  if (uadecore_has_been_booted) {
+	  uae_u8 *guard = get_real_address(SUPER_STACK_ADDR);
+	  if (memcmp(guard, "WALL", 4)) {
+		  fprintf(stderr, "Warning: Supervisor stack may have been "
+			  "breached.\n");
+	  }
+	  guard = get_real_address(USER_STACK_ADDR);
+	  if (memcmp(guard, "WALL", 4)) {
+		  fprintf(stderr, "Warning: User stack may have been "
+			  "breached possibly by the supervisor stack.\n");
+	  }
+  }
 
   invalidate_amiga_file_cache();
 
  nextsong:
 
-  /* IMPORTANT:
-     It seems that certain players don't work totally reliably if memory
-     contains trash from previous songs. To be certain that each song is
-     played from the same initial state of emulator we clear the memory
-     from 0x400 to 'highmem' each time a new song is played */
+  /*
+   * IMPORTANT:
+   * It seems that certain players don't work totally reliably if memory
+   * contains trash from previous songs. To be certain that each song is
+   * played from the same initial state of emulator we clear the memory
+   * from 0x0 to 'highmem' each time a new song is played
+   */
   highmem = 0;
+
   while (highmem < 0x800000) {
     if (!valid_address(0, highmem + 0x10000))
       break;
@@ -884,13 +972,16 @@ void uadecore_reset(void)
     return;
   }
   if (highmem < 0x200000) {
-    fprintf(stderr, "uadecore: Warning: highmem == 0x%x (< 0x200000)!\n", highmem);
+	  fprintf(stderr, "uadecore: Warning: highmem == 0x%x (< 0x200000)!\n",
+		  highmem);
   }
+
   memset(get_real_address(0), 0, highmem);
 
   song.cur_subsong = song.min_subsong = song.max_subsong = 0;
 
-  ret = uade_receive_string(song.scorename, UADE_COMMAND_SCORE, sizeof(song.scorename), &uadecore_ipc);
+  ret = uade_receive_string(song.scorename, UADE_COMMAND_SCORE,
+			    sizeof(song.scorename), &uadecore_ipc);
   if (ret == 0) {
 	quit_program = 1;
 	return;
@@ -931,11 +1022,9 @@ void uadecore_reset(void)
   uadecore_set_automatic_song_end(1);
 
   uade_put_long(SCORE_EXEC_DEBUG, execdebug ? 0x12345678 : 0);
-  uade_put_long(SCORE_VOLUME_TEST, voltestboolean);
-  uade_put_long(SCORE_DMA_WAIT, dmawait);
   uade_put_long(SCORE_MODULECHANGE, disable_modulechange);
 
-  bytesread = uade_safe_copy(playeraddr, player->data, player->size);
+  bytesread = uade_safe_copy(PLAYER_ADDR, player->data, player->size);
   if (bytesread == 0) {
 	  fprintf(stderr, "uadecore: Can not do safe copy for player\n");
 	  goto skiptonextsong;
@@ -945,14 +1034,14 @@ void uadecore_reset(void)
   player = NULL;
 
   /* set player executable address for relocator */
-  uade_put_long(SCORE_PLAYER_ADDR, playeraddr);
-  len = calc_reloc_size((uae_u32 *) get_real_address(playeraddr),
-			(uae_u32 *) get_real_address(playeraddr + bytesread));
+  uade_put_long(SCORE_PLAYER_ADDR, PLAYER_ADDR);
+  len = calc_reloc_size((uae_u32 *) get_real_address(PLAYER_ADDR),
+			(uae_u32 *) get_real_address(PLAYER_ADDR + bytesread));
   if (!len) {
     fprintf(stderr, "uadecore: Problem with reloc calculation.\n");
     goto skiptonextsong;
   }
-  relocaddr  = ((playeraddr + bytesread) & 0x7FFFF000) + 0x4000;
+  relocaddr  = ((PLAYER_ADDR + bytesread) & 0x7FFFF000) + 0x4000;
   /* + 0x4000 for hippel coso (wasseremu) */
   modaddr = ((relocaddr + len) & 0x7FFFF000) + 0x2000;
 
@@ -976,23 +1065,21 @@ void uadecore_reset(void)
 
 	  uade_put_long(SCORE_MODULE_LEN, bytesread);
 
-	  if (!valid_address(modnameaddr, strlen(song.modulename) + 1)) {
+	  if (!valid_address(MODULE_NAME_ADDR, strlen(song.modulename) + 1)) {
 		  fprintf(stderr, "uadecore: Invalid address for modulename.\n");
 		  goto skiptonextsong;
 	  }
 
-	  strlcpy((char *) get_real_address(modnameaddr), song.modulename, 1024);
-	  uade_put_long(SCORE_MODULE_NAME_ADDR, modnameaddr);
+	  strlcpy((char *) get_real_address(MODULE_NAME_ADDR), song.modulename, 1024);
+	  uade_put_long(SCORE_MODULE_NAME_ADDR, MODULE_NAME_ADDR);
   } else {
-	  if (!valid_address(modnameaddr, strlen(song.playername) + 1)) {
+	  if (!valid_address(MODULE_NAME_ADDR, strlen(song.playername) + 1)) {
 		  fprintf(stderr, "uadecore: Invalid address for playername.\n");
 		  goto skiptonextsong;
 	  }
 
-	  strlcpy((char *) get_real_address(modnameaddr), song.playername, 1024);
-	  uade_put_long(SCORE_MODULE_NAME_ADDR, modnameaddr);
-
-	  bytesread = 0;
+	  strlcpy((char *) get_real_address(MODULE_NAME_ADDR), song.playername, 1024);
+	  uade_put_long(SCORE_MODULE_NAME_ADDR, MODULE_NAME_ADDR);
   }
 
   uade_file_free(module);
@@ -1000,15 +1087,15 @@ void uadecore_reset(void)
 
   /* load sound core (score) */
   if ((file = fopen(song.scorename, "rb"))) {
-    bytesread = uade_safe_load(scoreaddr, file, highmem - scoreaddr);
+    bytesread = uade_safe_load(SCORE_ADDR, file, highmem - SCORE_ADDR);
     fclose(file);
   } else {
     fprintf (stderr, "uadecore: Can not load score (%s).\n", song.scorename);
     goto skiptonextsong;
   }
 
-  m68k_areg(regs,7) = scoreaddr;
-  m68k_setpc(scoreaddr);
+  m68k_areg(regs,7) = SCORE_ADDR;
+  m68k_setpc(SCORE_ADDR);
 
   /* obey player format checking */
   uade_put_long(SCORE_FORCE, 0);
@@ -1021,12 +1108,15 @@ void uadecore_reset(void)
   /* pause bits (don't care!), for debugging purposes only */
   uade_put_long(SCORE_PREPAUSE, 0);
   uade_put_long(SCORE_POSTPAUSE, 0);
+
   /* set user and supervisor stack pointers */
-  uade_put_long(SCORE_USER_STACK, userstack);
-  uade_put_long(SCORE_SUPER_STACK, superstack);
+  uade_put_long(SCORE_USER_STACK, USER_STACK_ADDR);
+  uade_put_long(SCORE_SUPER_STACK, SUPER_STACK_ADDR);
+
   /* no message for score */
-  uade_put_long(SCORE_OUTPUT_MSG, 0);
-  if ((userstack - (scoreaddr + bytesread)) < 0x1000)
+  uade_put_long(SCORE_INPUT_MSG, 0);
+
+  if ((USER_STACK_ADDR - (SCORE_ADDR + bytesread)) < 0x1000)
     fprintf(stderr, "uadecore: Amiga stack overrun warning.\n");
 
   flush_sound();
@@ -1041,6 +1131,7 @@ void uadecore_reset(void)
   uadecore_reboot = 0;
 
   uadecore_audio_output = 0;
+  uadecore_audio_start_slow = 0;
   uadecore_audio_skip = 0;
 
   old_ledstate = gui_ledstate;
@@ -1065,6 +1156,7 @@ void uadecore_reset(void)
   set_sound_freq(UADE_DEFAULT_FREQUENCY);
   epoptionsize = 0;
 
+  uadecore_has_been_booted = 1;
   return;
 
  skiptonextsong:
@@ -1164,9 +1256,9 @@ static void uade_safe_get_string(char *dst, int src, int maxlen)
 }
 
 
-void uadecore_send_amiga_message(int msgtype)
+void uadecore_send_message_to_amiga(int msgtype)
 {
-  uade_put_long(SCORE_OUTPUT_MSG, msgtype);
+	uade_put_long(SCORE_INPUT_MSG, msgtype);
 }
 
 
@@ -1199,11 +1291,13 @@ void uadecore_song_end(char *reason, int kill_it)
     quit_program = 1;
     return;
   }
-  /* if audio_output is zero (and thus the client is waiting for the first
-     sound data block from this song), then start audio output so that the
-     clients first sound finishes ASAP and we can go to the next (sub)song.
-     uade must finish the pending sound data request (for the client) even if
-     the sound core crashed */
+	/*
+	 * If audio_output is zero (and thus the client is waiting for the
+	 * first data block from this song), then start audio output so that
+	 * the clients first sound finishes ASAP and we can go to the next
+	 * subsong. uade must finish the pending sound data request (for the
+	 * client) even if the sound core crashed.
+	 */
   uadecore_audio_output = 1;
 }
 

@@ -85,7 +85,7 @@ static struct eagleplayer *get_eagleplayer(const char *extension,
 
 static struct eagleplayerstore *try_playerstore_path(const char *path)
 {
-	char formatsfile[PATH_MAX];
+	char formatsfile[PATH_MAX + 18];
 	snprintf(formatsfile, sizeof formatsfile, "%s/eagleplayer.conf", path);
 	return read_eagleplayer_conf(formatsfile);
 }

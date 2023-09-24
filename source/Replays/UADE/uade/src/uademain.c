@@ -99,8 +99,6 @@ void default_prefs (struct uae_prefs *p)
     p->stereo = 0;
     p->sound_bits = DEFAULT_SOUND_BITS;
     p->sound_freq = DEFAULT_SOUND_FREQ;
-    p->sound_minbsiz = DEFAULT_SOUND_MINB;
-    p->sound_maxbsiz = DEFAULT_SOUND_MAXB;
     p->sound_interpol = 0;
 
     p->gfx_framerate = 1;

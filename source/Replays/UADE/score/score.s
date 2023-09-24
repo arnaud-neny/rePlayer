@@ -5,6 +5,8 @@
 * License: GNU LGPL
 * (relicensing is very possible for open source development reasons)
 
+	include config.i
+
 	include	custom.i
 	include	exec_lib.i
 	include	graphics_lib.i
@@ -20,25 +22,31 @@
 	include	lvo3.0/cia_lib.i
 	include	devices/timer.i
 
+AMIGAMSG_SETSUBSONG	equ	1
+AMIGAMSG_SONG_END	equ	2
+AMIGAMSG_PLAYERNAME	equ	3
+AMIGAMSG_MODULENAME	equ	4
+AMIGAMSG_SUBSINFO	equ	5
+AMIGAMSG_CHECKERROR	equ	6
+AMIGAMSG_SCORECRASH	equ	7
+AMIGAMSG_SCOREDEAD	equ	8
+AMIGAMSG_GENERALMSG	equ	9
+AMIGAMSG_NTSC	equ	10
+AMIGAMSG_FORMATNAME	equ	11
+AMIGAMSG_LOADFILE	equ	12
+AMIGAMSG_READ	equ	13
+AMIGAMSG_FILESIZE	equ	14
+AMIGAMSG_TIME_CRITICAL	equ	15
+AMIGAMSG_GET_INFO	equ	16
+AMIGAMSG_START_OUTPUT	equ	17
+AMIGAMSG_RESERVED_0	equ	18
+AMIGAMSG_STATE_DETECTION_INIT	equ	19
+AMIGAMSG_STATE_DETECTION_STEP	equ	20
+AMIGAMSG_TEST_LOGGING	equ	21
+AMIGAMSG_DEBUG_U32_STRING	equ	22
+AMIGAMSG_DEBUG_U32_I32_STRING	equ	23
 
-UADE_SETSUBSONG	equ	1
-UADE_SONG_END	equ	2
-UADE_PLAYERNAME	equ	3
-UADE_MODULENAME	equ	4
-UADE_SUBSINFO	equ	5
-UADE_CHECKERROR	equ	6
-UADE_SCORECRASH	equ	7
-UADE_SCOREDEAD	equ	8
-UADE_GENERALMSG	equ	9
-UADE_NTSC	equ	10
-UADE_FORMATNAME	equ	11
-UADE_LOADFILE	equ	12
-UADE_READ	equ	13
-UADE_FILESIZE	equ	14
-UADE_TIME_CRITICAL	equ	15
-UADE_GET_INFO	equ	16
-UADE_START_OUTPUT	equ	17
-
+* TODO: look at slack at the end of EXECBASE
 EXECBASE	equ	$0D00
 EXECENTRIES	equ	210
 
@@ -48,6 +56,19 @@ TRAP_VECTOR_4	equ	$90	* play loop uses this for vbi sync
 TRAP_VECTOR_5	equ	$94	* output message trap
 TRAP_VECTOR_6	equ	$98	* bin trap
 
+* Base address of the message in memory that is sent to uade.c
+* uadecore_get_amiga_message(). A message to emulator is sent with:
+*
+*     moveq #msgtype,d0
+*     bsr put_message_by_value
+*
+* To add a new trap on the emulator side, add a new enum to
+* src/include/amigamsg.h. Then use that enum in
+* uade.c:uadecore_get_amiga_message() switch case. The function gets the
+* newly defined message type from the base address defined here.
+UADECORE_INPUT_MSG	equ	$200
+UADECORE_INPUT_MSG_END	equ	$300
+
 * uade.library interface
 UadeTimeCritical	equ	-6
 UadePutString		equ	-12
@@ -55,7 +76,7 @@ UadeGetInfo		equ	-18
 UadeNewGetInfo		equ	-24
 
 EP_OPT_SIZE		equ	256
-	
+
 * $100	mod address
 * $104	mod length
 * $108	player address
@@ -72,8 +93,9 @@ EP_OPT_SIZE		equ	256
 * $184	prepause flag
 * $188	delimon flag
 * $18C	Exec debug flag (enabled if $18c == 0x12345678)
-* $190	volume test flag (enabled if $190 == 0x12345678)
-* $194	dma wait constant (number of raster lines + 0x12340000)
+* $190	unused, used to be volume test flag (enabled if $190 == 0x12345678)
+* $194	unused, used to be dma wait constant
+*       (number of raster lines + 0x12340000)
 * $198	disable EP_ModuleChange
 
 * $200	output message flag + output message
@@ -85,6 +107,36 @@ EP_OPT_SIZE		equ	256
 * $0800 -
 * $0D00	exec base (-6*EXECENTRIES == -6 * 210)
 
+* TODO: Log okprog and default handler offsets
+
+LOG_CALL	macro
+	ifne UADE_TEST_LOGGING
+	bra.b	.labelskipped\@
+.label\@
+	dc.b	\1
+	dc.b	0
+	even
+.labelskipped\@
+	push	a0-a1
+	lea	.label\@(pc),a0
+	move.l	msgptr(pc),a1
+	move.l	#AMIGAMSG_TEST_LOGGING,(a1)+
+	tst.b	(a0)
+	bne.b	.stringmsgloop\@
+	illegal
+.stringmsgloop\@
+	move.b	(a0)+,(a1)+
+	bne.b	.stringmsgloop\@
+	cmp.l	#UADECORE_INPUT_MSG_END,a1
+	bls.b	.no_overflow\@
+	illegal
+.no_overflow\@
+	trap	#5
+	pull	a0-a1
+	endif
+	endm
+
+
 	section	uadesoundcore,code_c
 
 * The org statement acts as a memory poison to catch absolute addressing.
@@ -93,7 +145,9 @@ EP_OPT_SIZE		equ	256
 
 start	* set super stack and user stack
 	move.l	$114,a7
+	move.l	#'WALL',(a7)	/* supervisor stack guard */
 	move.l	$110,a0
+	move.l	#'WALL',(a0)	/* user stack guard */
 	move.l	a0,usp
 
 	move	#$7fff,intena+custom
@@ -113,17 +167,21 @@ start	* set super stack and user stack
 
 	* patch exception vectors
 	move	#8,a0
-	lea	excep(pc),a1
+	lea	default_exception(pc),a1
 exloop	move.l	a1,(a0)+
 	cmp.l	#$100,a0
 	bne.b	exloop
+
+	lea	division_by_zero(pc),a1
+	move.l	a1,$14.w
 
 	move	#0,sr			* switch to user level
 
 	lea	zero_sample(pc),a0	* set zero sample
 	lea	custom,a2
 	moveq	#4-1,d7
-zero_sample_l	clr	aud0vol(a2)
+zero_sample_l
+	clr	aud0vol(a2)
 	move.l	a0,aud0lch(a2)
 	move	#1,aud0len(a2)
 	move	#150,aud0per(a2)
@@ -140,28 +198,29 @@ zero_sample_l	clr	aud0vol(a2)
 	* initialize exec base with failures
 	lea	EXECBASE,a0
 	move.l	a0,4.w
-	lea	exec_exception(pc),a2
+	lea	exec_unimplemented_call(pc),a2
 	move	#EXECENTRIES-1,d7
-dfdf	subq.l	#6,a0
+.exec_jump_table_loop
+	subq.l	#6,a0
 	move	jmpcom(pc),(a0)
 	move.l	a2,2(a0)
-	dbf	d7,dfdf
+	dbf	d7,.exec_jump_table_loop
 
 	* initialize dosbase with failures
 	lea	dos_lib_base(pc),a0
-	lea	dosexception(pc),a2
+	lea	dos_unimplemented_call(pc),a2
 	move	#200-1,d7
-dosdfdf	subq.l	#6,a0
-	move	jsrcom(pc),(a0)
+.dos_jump_table_loop	subq.l	#6,a0
+	move	jmpcom(pc),(a0)
 	move.l	a2,2(a0)
-	dbf	d7,dosdfdf
+	dbf	d7,.dos_jump_table_loop
 
 	move.l	4.w,a6
 	lea	exec_set_int_vector(pc),a0
 	move.l	a0,SetIntVector+2(a6)
 	lea	exec_add_int_server(pc),a0
 	move.l	a0,AddIntServer+2(a6)
-	lea	exec_allocmem(pc),a0
+	lea	exec_alloc_mem(pc),a0
 	move.l	a0,AllocMem+2(a6)
 	lea	myfreemem(pc),a0
 	move.l	a0,FreeMem+2(a6)
@@ -193,7 +252,7 @@ dosdfdf	subq.l	#6,a0
 	move.l	a0,Signal+2(a6)
 	lea	exec_supervisor(pc),a0
 	move.l	a0,Supervisor+2(a6)
-	lea	exec_superstate(pc),a0
+	lea	exec_super_state(pc),a0
 	move.l	a0,SuperState+2(a6)
 	lea	exec_userstate(pc),a0
 	move.l	a0,UserState+2(a6)
@@ -274,33 +333,46 @@ zero_sample	dc	0
 
 test_copperlist	dc.l	$01000200,-2
 
-exec_error_msg	dc.b	'unimplemented exec function: return address:',0
+exec_unimplemented_call
+	lea	.exec_error_msg(pc),a0
+	bra	library_unimplemented_call
+.exec_error_msg
+	dc.b	'unimplemented exec function (return address, offset)',0
 	even
 
-exec_exception	push	all
-	lea	exec_error_msg(pc),a0
-	bsr	put_string
-	move.l	60(a7),d0
-	bsr	put_value
-	pull	all
+library_unimplemented_call
+	move.l	(a7),d0			* return address of the caller
+	move.l	d0,a1
+	move	-2(a1),d1
+	ext.l	d1
+	bsr	put_u32_i32_string
 	illegal
 
-excep	movem.l	d0-d7/a0-a7,$100
+* TODO: A more comprehensive exception vector offset notification system.
+*       Currently it is easy to detect illegal instruction and division by
+*       zero, but not all of them.
+division_by_zero
+	lea	.division_by_zero_msg(pc),a0
+	bsr	put_string
+	bra.b	default_exception
+.division_by_zero_msg	dc.b	'Exception: Division by zero',0
+	even
+
+default_exception	movem.l	d0-d7/a0-a7,$100
 	move	#$7fff,intena+custom
 	move	#$7fff,intreq+custom
 	move	#$7fff,dmacon+custom
 	lea	$100.w,a7
 	bsr	set_message_traps
-	moveq	#UADE_SCORECRASH,d0
+	moveq	#AMIGAMSG_SCORECRASH,d0
 	bsr	put_message_by_value
 	movem.l	$100,d0-d7/a0-a7
-
-exceploop	move	d0,$dff180
-	not	d0
-	bra.b	exceploop
+.default_exception_loop
+	bra	.default_exception_loop
 
 
-contplayer	* initialize messaging trap *
+contplayer
+	* initialize messaging trap *
 	bsr	set_message_traps
 
 	lea	moduleptr(pc),a0
@@ -316,16 +388,20 @@ contplayer	* initialize messaging trap *
 	beq.b	reloc_success
 	lea	reloc_error_msg(pc),a0
 	bsr	put_string
-	moveq	#UADE_SCOREDEAD,d0
+	moveq	#AMIGAMSG_SCOREDEAD,d0
 	bsr	put_message_by_value
 reloc_wait_forever	bra	reloc_wait_forever
 
 reloc_error_msg	dc.b	'reloc error',0
 	even
 
-reloc_success	lea	binbase(pc),a1
+reloc_success
+	lea	binbase(pc),a1
 	move.l	a0,(a1)		* a0 = player code start relocated
 
+	* TODO: Figure player relocator address range vs module address range
+	* and assignment to chippoint based on moduleptr/modulesize.
+	*
 	* allocate space for dynamic memory operations (allocmem,
 	* loadseq, ...)
 	lea	chippoint(pc),a0
@@ -335,21 +411,6 @@ reloc_success	lea	binbase(pc),a1
 	clr.b	d0
 	move.l	d0,(a0)
 
-	* volume test (debug)
-	lea	voltestbit(pc),a0
-	moveq	#0,d0
-	cmp.l	#$12345678,$190.w
-	bne.b	novoltest
-	moveq	#-1,d0
-novoltest	move.l	d0,(a0)
-	* dma wait (debug)
-	cmp	#$1234,$194.w
-	bne.b	nospecialdmawait
-	move.l	$194.w,d0
-	ext.l	d0
-	lea	dmawaitconstant(pc),a0
-	move.l	d0,(a0)
-nospecialdmawait
 	* EP_ModuleChange
 	move.l	$198.w,d0
 	beq.b	noepmc
@@ -362,9 +423,10 @@ noepmc
 	lea	intuiwarn(pc),a1
 	move.l	#$400,d0
 	bsr	init_lib_base
+
 	* initialize intuitionbase functions
 	lea	intuition_lib_base(pc),a6
-	lea	intui_allocremember(pc),a0
+	lea	intuition_alloc_remember(pc),a0
 	move	jmpcom(pc),-$18C(a6)
 	move.l	a0,-$18C+2(a6)
 
@@ -471,6 +533,7 @@ dontsetsubsong
 call_init_volume
 	move.l	volumefunc(pc),d0
 	beq.b	novolfunc
+	LOG_CALL "score:call_init_volume"
 	lea	eaglebase(pc),a5
 	move.l	d0,a0
 	jsr	(a0)
@@ -478,17 +541,23 @@ novolfunc
 	* call initsound
 	bsr	call_init_sound
 
+	* TODO: Remove this in the future. An example for Wothke.
+	* moveq	#AMIGAMSG_RESERVED_0,d0
+	* bsr	put_message_by_value
+
 	* tell the simulator that audio output should start now
-	move.l	#UADE_START_OUTPUT,d0
+	moveq	#AMIGAMSG_START_OUTPUT,d0
 	bsr	put_message_by_value
 
 	* CIA/VBI is initialized here, or start_int is called, if
 	* necessary
 	bsr	set_player_interrupt
 
-playloop	* this is for debugging only
-	bsr	volumetest
+	ifne UADE_STATE_DETECTION
+	bsr	state_detection_init
+	endif
 
+playloop
 	bsr	waittrap		* wait for next frame
 
 	* check input message
@@ -522,9 +591,12 @@ noinputmsgs
 	lea	virginaudioints(pc),a0	* audio ints are virgins again
 	clr.l	(a0)
 
-change_subsong	* call nextsongfunc or prevsongfunc if necessary
+change_subsong
+
+	* call nextsongfunc or prevsongfunc if necessary
 	move.l	adjacentsubfunc(pc),d0
 	beq.b	notadjacentsub
+	LOG_CALL "score:call_adjacentsubfunc"
 	lea	eaglebase(pc),a5
 	move.l	d0,a0
 	jsr	(a0)
@@ -537,11 +609,16 @@ notadjacentsub
 	bsr	call_end_sound
 	bsr	call_init_sound
 	bsr	set_player_interrupt
-adjacentsub	move	#$c000,intena+custom
-dontchangesubs
+adjacentsub
 
-	btst	#6,$bfe001
-	beq.b	end_song
+	move	#$c000,intena+custom
+
+dontchangesubs
+	ifne UADE_STATE_DETECTION
+	bsr	state_detection_step
+	tst.l	d0
+	bne.b	end_song
+	endif
 
 	* check if song has ended, ignore if songendbit ($12C) = 0
 	tst.l	$12C.w
@@ -568,7 +645,8 @@ dont_check_start_int
 	move.l	a1,TRAP_VECTOR_3
 	lea	eaglebase(pc),a5
 	trap	#3
-dontcallintfunc	bra	playloop			* loop back
+dontcallintfunc
+	bra	playloop			* loop back
 
 end_song2
 	bsr	report_song_end
@@ -604,7 +682,7 @@ dontplay	* report that score is dead
 	bsr	set_message_traps
 	move	songendbit(pc),d0
 	bne.b	noscoredeadmsg
-	moveq	#UADE_SCOREDEAD,d0
+	moveq	#AMIGAMSG_SCOREDEAD,d0
 	bsr	put_message_by_value
 noscoredeadmsg
 	* check if this is delimon
@@ -641,7 +719,7 @@ newstop	stop	#$2000
 	rte
 
 * dumps memory to output trap
-bintrap	push	all
+trap_vector_6_bin_trap	push	all
 	cmpi.l	#32,d0
 	ble.b	nottoobig
 	moveq	#32,d0
@@ -671,7 +749,7 @@ endbindumploop	clr.b	(a1)+
 	bsr	put_message
 	pull	all
 	rte
-binmsg	dc.l	UADE_GENERALMSG
+binmsg	dc.l	AMIGAMSG_GENERALMSG
 	dc.b	'MEM '
 binaddr	dcb.b	8,0
 	dc.b	': '
@@ -679,7 +757,8 @@ bindump	dcb.b	100,0
 	even
 
 * outputs constant d0 to output trap
-put_value	push	all
+put_value
+	push	all
 	* d0 has input
 	lea	pollmsgcode(pc),a0
 	bsr	genhexstring
@@ -707,21 +786,11 @@ notalfa	addi.b	#$30,d1
 	pull	all
 	rts
 
-dosexception	lea	dos_lib_base(pc),a0
-	move.l	(a7),a1
-	subq.l	#6,a1
-	sub.l	a1,a0
-	move.l	a0,d0
-	lea	doserrorcode(pc),a0
-	bsr	genhexstring	
-	lea	doserrormsg(pc),a0
-	bsr	put_string
-	illegal
-doserrormsg	dc.b	'non-implemented dos.library function called:'
-	dc.b	' -$'
-doserrorcode	dcb.b	8,0
-	dc.b	' => CRASH',0
-doserrormsge	even
+dos_unimplemented_call
+	lea	.dos_error_msg(pc),a0
+	bra	library_unimplemented_call
+.dos_error_msg	dc.b	'unimplemented dos.library function (return address, offset)',0
+	even
 
 split_module_name
 	move.l	$128.w,d0
@@ -797,6 +866,7 @@ notimerdevcount	rts
 call_start_int	push	all
 	move.l	intfunc(pc),d0
 	bne.b	intfuncexists
+	LOG_CALL "score:call_start_int"
 	move.l	startintfunc(pc),d0
 	beq	dontplay
 	move.l	d0,a0
@@ -809,6 +879,7 @@ intfuncexists	pull	all
 call_stop_int	push	all
 	move.l	stopintfunc(pc),d0
 	beq.b	nostopintfunc
+	LOG_CALL "score:call_stop_int"
 	move.l	d0,a0
 	lea	eaglebase(pc),a5
 	jsr	(a0)
@@ -827,13 +898,16 @@ do_not_disable_player_interrupt
 	rts
 
 
-messagetrap	rte
+* A trap vector that does nothing by itself, but the uade emulator does
+* specific things depending on what is contained in the address pointed to
+* by msgptr pointer.
+trap_vector_5_message_trap	rte
 
 
 inputmessagehandler
 	push	all
 	lea	$300.w,a0
-	cmp.l	#UADE_SETSUBSONG,(a0)
+	cmp.l	#AMIGAMSG_SETSUBSONG,(a0)
 	bne.b	nnsubs
 	move.l	$120.w,d0
 	* call SetSubSong if nextsubsong func is not used
@@ -860,7 +934,7 @@ dontcallsetss	pull	all
 	st	(a0)
 	bra	inputmessagehandled
 nnsubs
-	cmp.l	#UADE_NTSC,(A0)
+	cmp.l	#AMIGAMSG_NTSC,(A0)
 	bne.b	no_ntsc_pal
 	move.l	$124.w,d0
 	andi.l	#1,d0
@@ -892,13 +966,21 @@ input_msg_error	dc.b	'sound core got unknown input message 0x'
 inputmsgcode	dcb.b	9,0
 	even
 
-put_message	move.l	msgptr(pc),a1
-msgloop	tst.l	d0
-	beq.b	endmsgloop
+put_message
+	tst.l	d0
+	bne.b	.nonzero
+	illegal
+.nonzero
+	move.l	msgptr(pc),a1
+.msgloop
 	move.b	(a0)+,(a1)+
 	subq.l	#1,d0
-	bra.b	msgloop
-endmsgloop	trap	#5
+	bne.b	.msgloop
+	cmp.l	#UADECORE_INPUT_MSG_END,a1
+	bls.b	.no_overflow
+	illegal
+.no_overflow
+	trap	#5
 	rts
 
 put_message_by_value
@@ -907,18 +989,43 @@ put_message_by_value
 	trap	#5
 	rts
 
-put_string	push	all
-	bsr	strlen
-	addq.l	#1,d0
+put_string	push	a0-a1
 	move.l	msgptr(pc),a1
-	move.l	#UADE_GENERALMSG,(a1)+
-stringmsgloop	tst.l	d0
-	beq.b	endstringmsgloop
+	move.l	#AMIGAMSG_GENERALMSG,(a1)+
+.stringmsgloop
 	move.b	(a0)+,(a1)+
-	subq.l	#1,d0
-	bra.b	stringmsgloop
-endstringmsgloop	trap	#5
-	pull	all
+	bne.b	.stringmsgloop
+	cmp.l	#UADECORE_INPUT_MSG_END,a1
+	bls.b	.no_overflow
+	illegal
+.no_overflow
+	trap	#5
+	pull	a0-a1
+	rts
+
+put_u32_string
+	push	d0/a0-a1
+	move.l	msgptr(pc),a1
+	move.l	#AMIGAMSG_DEBUG_U32_STRING,(a1)+
+	move.l	d0,(a1)+
+.stringmsgloop
+	move.b	(a0)+,(a1)+
+	bne.b	.stringmsgloop
+	trap	#5
+	pull	d0/a0-a1
+	rts
+
+put_u32_i32_string
+	push	d0-d1/a0-a1
+	move.l	msgptr(pc),a1
+	move.l	#AMIGAMSG_DEBUG_U32_I32_STRING,(a1)+
+	move.l	d0,(a1)+
+	move.l	d1,(a1)+
+.stringmsgloop
+	move.b	(a0)+,(a1)+
+	bne.b	.stringmsgloop
+	trap	#5
+	pull	d0-d1/a0-a1
 	rts
 
 strlen	moveq	#-1,d0
@@ -929,9 +1036,9 @@ strlen	moveq	#-1,d0
 	rts
 
 set_message_traps
-	lea	messagetrap(pc),a0
+	lea	trap_vector_5_message_trap(pc),a0
 	move.l	a0,TRAP_VECTOR_5
-	lea	bintrap(pc),a0
+	lea	trap_vector_6_bin_trap(pc),a0
 	move.l	a0,TRAP_VECTOR_6
 	rts
 
@@ -943,7 +1050,7 @@ dummy_player_header_end
 parse_player_tags
 	move.l	binbase(pc),a0
 	move.l	dummy_player_header_end-dummy_player_header-4(a0),a0
-	
+
 tagloop	move.l	(a0),d0
 	tst.l	d0
 	beq	endtagloop
@@ -1063,7 +1170,7 @@ infoloop	move.l	(a0),d0
 	move.l	#250,d0
 	bsr	strlcpy
 	lea	modulename(pc),a0
-	move.l	#UADE_MODULENAME,(a0)
+	move.l	#AMIGAMSG_MODULENAME,(a0)
 	move.l	#256,d0
 	bsr	put_message
 	pull	all
@@ -1076,7 +1183,7 @@ nodtpmodulename	cmpi.l	#DTP_PlayerName,d0
 	move.l	#25,d0
 	bsr	strlcpy
 	lea	playername(pc),a0
-	move.l	#UADE_PLAYERNAME,(a0)
+	move.l	#AMIGAMSG_PLAYERNAME,(a0)
 	move.l	#32,d0
 	bsr	put_message
 	pull	all
@@ -1092,7 +1199,7 @@ nodtpplayername	cmpi.l	#DTP_FormatName,d0
 	move.l	#250,d0
 	bsr	strlcpy
 	lea	formatname(pc),a0
-	move.l	#UADE_FORMATNAME,(a0)
+	move.l	#AMIGAMSG_FORMATNAME,(a0)
 	move.l	#256,d0
 	bsr	put_message
 	pull	all
@@ -1181,26 +1288,23 @@ endhexloop	pull	d1/a0
 	rts
 
 
-safetybaseroutine
-	push	all
-	lea	safetymsg(pc),a0
-	bsr	put_string
-	move.l	60(a7),d0		* return address
-	subq.l	#6,d0
+eaglebase_unimplemented_call
+	move.l	(a7),d0			* return address
+	move.l	d0,d1
+	subq.l	#6,d1
 	lea	eaglebase(pc),a0
-	sub.l	a0,d0
-	bsr	put_value
-	pull	all
+	sub.l	a0,d1
+	lea	.safetymsg(pc),a0
+	bsr	put_u32_i32_string
 	illegal
-
-safetymsg	dc.b	'fatal error: non-implemented eagleplayer function',0
+.safetymsg	dc.b	'unimplemented eagleplayer function (return address, offset)',0
 	even
 
 init_base	lea	eaglebase(pc),a5
 
-	* set unimplemented ENPP function calls to safetybaseroutine()
+	* set unimplemented ENPP function calls to eaglebase_unimplemented_call
 	move.l	a5,a0
-	lea	safetybaseroutine(pc),a1
+	lea	eaglebase_unimplemented_call(pc),a1
 	moveq	#(eaglebase-eaglesafetybase)/6-1,d0
 dsbl	subq.l	#6,a0
 	move	jsrcom(pc),(a0)
@@ -1226,17 +1330,16 @@ dsbl	subq.l	#6,a0
 	lea	okprog(pc),a0
 	move.l	a0,dtg_AudioAlloc(a5)
 	move.l	a0,dtg_AudioFree(a5)
-	lea	ENPP_AllocAudio(a5),a0
-	lea	enpp_allocaudio(pc),a1
-	move	jmpcom(pc),(a0)+
-	move.l	a1,(a0)+
+	lea	enpp_alloc_audio(pc),a1
+	move	jmpcom(pc),ENPP_AllocAudio(a5)
+	move.l	a1,ENPP_AllocAudio+2(a0)
 
-	lea	get_list_data(pc),a0
+	lea	enpp_get_list_data(pc),a0
 	move.l	a0,dtg_GetListData(a5)
 	move	jmpcom(pc),ENPP_GetListData(a5)
 	move.l	a0,ENPP_GetListData+2(a5)
 
-	lea	endsongfunc(pc),a0
+	lea	enpp_song_end(pc),a0
 	move.l	a0,dtg_SongEnd(a5)
 	move	jmpcom(pc),ENPP_SongEnd(a5)
 	move.l	a0,ENPP_SongEnd+2(a5)
@@ -1252,7 +1355,7 @@ nostartintfunc	move.l	a0,dtg_StartInt(a5)
 	move.l	d0,a0
 nostopintfunc2	move.l	a0,dtg_StopInt(a5)
 
-	lea	settimer(pc),a0
+	lea	enpp_set_timer(pc),a0
 	move.l	a0,dtg_SetTimer(a5)
 	clr	dtg_Timer(a5)
 	lea	ENPP_SetTimer(a5),a1
@@ -1277,7 +1380,7 @@ nostopintfunc2	move.l	a0,dtg_StopInt(a5)
 	lea	dirarray(pc),a0
 	move.l	a0,dtg_DirArrayPtr(a5)
 
-	lea	loadfile(pc),a0
+	lea	enpp_load_file(pc),a0
 	move.l	a0,dtg_LoadFile(a5)
 	lea	ENPP_LoadFile(a5),a1
 	move	jmpcom(pc),(a1)+
@@ -1303,25 +1406,25 @@ nostopintfunc2	move.l	a0,dtg_StopInt(a5)
 	lea	intuition_lib_base(pc),a0
 	move.l	a0,dtg_IntuitionBase(a5)
 
-	lea	amplifier_int(pc),a0
+	lea	enpp_amplifier_int(pc),a0
 	move	jmpcom(pc),ENPP_Amplifier(a5)
 	move.l	a0,ENPP_Amplifier+2(a5)
-	lea	amplifier_dma(pc),a0
+	lea	enpp_amplifier_dma(pc),a0
 	move	jmpcom(pc),ENPP_DMAMask(a5)
 	move.l	a0,ENPP_DMAMask+2(a5)
-	lea	amplifier_adr(pc),a0
+	lea	enpp_amplifier_adr(pc),a0
 	move	jmpcom(pc),ENPP_PokeAdr(a5)
 	move.l	a0,ENPP_PokeAdr+2(a5)
-	lea	amplifier_len(pc),a0
+	lea	enpp_amplifier_len(pc),a0
 	move	jmpcom(pc),ENPP_PokeLen(a5)
 	move.l	a0,ENPP_PokeLen+2(a5)
-	lea	amplifier_per(pc),a0
+	lea	enpp_amplifier_per(pc),a0
 	move	jmpcom(pc),ENPP_PokePer(a5)
 	move.l	a0,ENPP_PokePer+2(a5)
-	lea	amplifier_vol(pc),a0
+	lea	enpp_amplifier_vol(pc),a0
 	move	jmpcom(pc),ENPP_PokeVol(a5)
 	move.l	a0,ENPP_PokeVol+2(a5)
-	lea	amplifier_command(pc),a0
+	lea	enpp_amplifier_command(pc),a0
 	move	jmpcom(pc),ENPP_PokeCommand(a5)
 	move.l	a0,ENPP_PokeCommand+2(a5)
 
@@ -1332,16 +1435,19 @@ nostopintfunc2	move.l	a0,dtg_StopInt(a5)
 	rts
 
 
-enpp_allocaudio	tst.l	d0
+enpp_alloc_audio
+	LOG_CALL	"eagle:ENPP_AllocAudio"
+	tst.l	d0
 	rts
 
 fawarn	dc.b	'ENPP_FindAuthor not implemented',0
 	even
 enpp_find_author
-	push	all
+	LOG_CALL	"eagle:ENPP_FindAuthor"
+	push	a0
 	lea	fawarn(pc),a0
 	bsr	put_string
-	pull	all
+	pull	a0
 	rts
 
 wait_audio_dma	push	d0-d1
@@ -1356,7 +1462,9 @@ wad_nowait	pull	d0-d1
 	rts
 
 
-settimer	push	all
+enpp_set_timer
+	LOG_CALL	"eagle:ENPP_SetTimer"
+	push	all
 	move.l	cia_chip_sel(pc),d0
 	move.l	cia_timer_sel(pc),d1
 	bsr	set_cia_timer_value
@@ -1367,20 +1475,23 @@ settimer	push	all
 set_player_interrupt
 	push	all
 	move.l	intfunc(pc),d0
-	beq.b	try_start_int
+	beq	.try_start_int
+	LOG_CALL "score:set_player_interrupt:use_cia_timer"
 	lea	useciatimer(pc),a0
 	st	(a0)
 	lea	add_ciaa_interrupt(pc),a0
 	move.l	cia_chip_sel(pc),d0
-	beq.b	its_ciaa
+	beq.b	.its_ciaa
 	lea	add_ciab_interrupt(pc),a0
-its_ciaa	lea	tempciabtimerstruct(pc),a1
+.its_ciaa
+	lea	tempciabtimerstruct(pc),a1
 	move.l	intfunc(pc),$12(a1)
 	move.l	cia_timer_sel(pc),d0
 	jsr	(a0)
 	pull	all
 	rts
-try_start_int	move.l	startintfunc(pc),d0
+.try_start_int
+	move.l	startintfunc(pc),d0
 	beq	dontplay
 	* call startint (player initializes own interrupts here)
 	bsr	call_start_int
@@ -1492,7 +1603,9 @@ call_init_player
 	lea	noinitfuncwarn(pc),a0
 	bsr	put_string
 	rts
-hasinitfunction	move.l	d0,a0
+hasinitfunction
+	LOG_CALL "score:call_init_player"
+	move.l	d0,a0
 	jsr	(a0)
 	tst.l	d0
 	beq.b	initwasok
@@ -1526,14 +1639,16 @@ no_dtp_ep_conflict
 	beq.b	do_no_check
 	lea	epcheck3warn(pc),a0
 	bsr	put_string
-do_ep_check	move.l	d0,a0
+do_ep_check
+	LOG_CALL "score:call_check_module"
+	move.l	d0,a0
 	* must be called even when force_by_default is enabled
 	jsr	(a0)
 	tst.l	d0
 	beq.b	song_ok
 	tst.l	$118.w
 	bne.b	song_ok
-	moveq	#UADE_CHECKERROR,d0
+	moveq	#AMIGAMSG_CHECKERROR,d0
 	bsr	put_message_by_value
 .loopforever
 	bra	.loopforever
@@ -1543,6 +1658,7 @@ song_ok	rts
 call_config	lea	eaglebase(pc),a5
 	move.l	configfunc(pc),d0
 	beq.b	noconfig
+	LOG_CALL "score:call_config"
 	move.l	d0,a0
 	jsr	(a0)
 	tst.l	d0
@@ -1552,6 +1668,7 @@ noconfig	rts
 call_extload	* load external data if requested
 	move.l	extloadfunc(pc),d0
 	beq.b	noextloadfunc
+	LOG_CALL "score:call_extload"
 	lea	eaglebase(pc),a5
 	move.l	d0,a0
 	jsr	(a0)
@@ -1564,28 +1681,31 @@ extloaderrmsg	dc.b	'ExtLoad failed',0
 	even
 noextloadfunc	rts
 
-report_song_end	moveq	#UADE_SONG_END,d0
+report_song_end	moveq	#AMIGAMSG_SONG_END,d0
 	bsr	put_message_by_value
 	rts
 
 call_check_subsongs
 	push	all
 	move.l	subsongfunc(pc),d0
-	beq.b	NoSubSongFunc
+	beq.b	.NoSubSongFunc
+	LOG_CALL "score:call_check_subsongs"
 	move.l	d0,a0
 	lea	eaglebase(pc),a5
 	jsr	(a0)
 	lea	subsongrange(pc),a0
 	movem	d0-d1,(a0)
-NoSubSongFunc	move.l	newsubsongarray(pc),d0
-	beq.b	nonewsubsongarr
+.NoSubSongFunc
+	move.l	newsubsongarray(pc),d0
+	beq.b	.nonewsubsongarr
 	move.l	d0,a0
 	movem	(a0),d0-d2   * d0 = default, d1 = min, d2 = max subsong
 	lea	eaglebase(pc),a5
 	move	d0,dtg_SndNum(a5)
 	lea	subsongrange(pc),a1
 	movem	d1-d2,(a1)
-nonewsubsongarr	pull	all
+.nonewsubsongarr
+	pull	all
 	rts
 
 ReportSubSongs	move	minsubsong(pc),d0
@@ -1601,7 +1721,7 @@ ReportSubSongs	move	minsubsong(pc),d0
 	moveq	#16,d0
 	bsr	put_message
 	rts
-subsonginfo	dc.l	UADE_SUBSINFO
+subsonginfo	dc.l	AMIGAMSG_SUBSINFO
 	dc.l	0,0,0
 
 
@@ -1616,27 +1736,31 @@ notnegative	move	d0,(a0)
 nonewsubsong	pull	d0-d1/a0-a2/a5
 	rts
 
-
-call_init_sound	lea	eaglebase(pc),a5
+* TODO: BUG: internar register value is not moved to d1 if initsoundfunc is 0.
+call_init_sound
+	lea	eaglebase(pc),a5
 	move.l	initsoundfunc(pc),d0
-	beq.b	initsoundintena
+	beq.b	.initsoundintena
+	LOG_CALL "score:call_init_sound"
 	move.l	d0,a0
 	move	intenar+custom,d1
 	pushr	d1
 	jsr	(a0)
 	pullr	d1
-initsoundintena	* this hack overcomes fatality in SynTracker deliplayer
+.initsoundintena
+	* this hack overcomes fatality in SynTracker deliplayer
 	* SynTracker does move #$4000,intena+custom in InitSound
 	* function and does not re-enable interrupts
 	move	intenar+custom,d2
 	andi	#$4000,d1
-	beq.b	nointenaproblem
+	beq.b	.nointenaproblem
 	andi	#$4000,d2
-	bne.b	nointenaproblem
+	bne.b	.nointenaproblem
 	lea	intenamsg(pc),a0
 	bsr	put_string
 	move	#$c000,intena+custom	* re-enable intena
-nointenaproblem	tst.l	d0
+.nointenaproblem
+	tst.l	d0
 	rts
 intenamsg	dc.b	'Stupid deliplayer: disables interrupts',0
 	even
@@ -1645,6 +1769,7 @@ intenamsg	dc.b	'Stupid deliplayer: disables interrupts',0
 call_end_sound	push	all
 	move.l	endfunc(pc),d0
 	beq.b	noendsound
+	LOG_CALL "score:call_end_sound"
 	move.l	d0,a0
 	lea	eaglebase(pc),a5
 	jsr	(a0)
@@ -1659,7 +1784,9 @@ noendsound	move	#15,dmacon+custom
 	rts
 
 
-endsongfunc	pushr	a0
+enpp_song_end
+	LOG_CALL	"eagle:ENPP_SongEnd"
+	pushr	a0
 	lea	songendbit(pc),a0
 	st	(a0)
 	pullr	a0
@@ -1672,7 +1799,9 @@ okprog	moveq	#0,d0
 
 *** MIX MODULE SIZE LATER ****
 
-get_list_data	tst.l	d0
+enpp_get_list_data
+	LOG_CALL	"eagle:ENPP_GetListData"
+	tst.l	d0
 	bne.b	dontreturnmodule
 	move.l	moduleptr(pc),a0
 	move.l	modulesize(pc),d0
@@ -1845,13 +1974,15 @@ loadiconerror
 	tst.l	d0
 	rts
 
-loadfilemsg	dc.l	UADE_LOADFILE
+loadfilemsg	dc.l	AMIGAMSG_LOADFILE
 	dc.l	0,0,0,0	* name ptr, dest ptr, size in msgptr(pc)+12
 loadfilemsge
 load_file_overflow_msg	dc.b	'load file list overflow!',0
 	even
 
-loadfile	push	d1-d7/a0-a6
+enpp_load_file
+	LOG_CALL	"eagle:ENPP_LoadFile"
+	push	d1-d7/a0-a6
 	lea	loadfilemsg(pc),a0
 	move.l	dtg_PathArrayPtr(a5),4(a0)
 	move.l	chippoint(pc),d2
@@ -1900,7 +2031,9 @@ loadfileerror	moveq	#0,d0
 
 	include	relocator.s
 
-exec_allocmem	push	d1-d7/a0-a6
+exec_alloc_mem
+	LOG_CALL	"exec:AllocMem"
+	push	d1-d7/a0-a6
 	lea	chippoint(pc),a0
 	move.l	d0,d2
 	move.l	(a0),d0
@@ -1915,7 +2048,8 @@ exec_allocmem	push	d1-d7/a0-a6
 	move.l	d2,d1
 	beq.b	nomemclear
 	move.l	d0,a0
-memclearloop	clr.b	(a0)+
+memclearloop
+	clr.b	(a0)+
 	subq.l	#1,d1
 	bne.b	memclearloop
 nomemclear	pull	d1-d7/a0-a6
@@ -2000,7 +2134,8 @@ dos_ffn_sloop	move.b	(a0)+,d0
 	tst.b	d0
 	bne.b	dos_ffn_sloop
 	move.l	#256,d0
-	bsr	exec_allocmem
+	moveq	#0,d1
+	bsr	exec_alloc_mem
 	move.l	d0,a5
 	lea	curdir(pc),a0
 	move.l	a5,a1
@@ -2030,33 +2165,41 @@ dos_open	push	d1-d7/a0-a6
 	move.l	d1,a0
 	bsr	dos_fixfilename
 	move.l	a0,d1
-	lea	dosopenmsg(pc),a0
+
+	lea	.dosopenmsg(pc),a0
 	move.l	d1,4(a0)
+	clr.l	8(a0)
 	clr.l	12(a0)
-	moveq	#dosopenmsge-dosopenmsg,d0
+	moveq	#.dosopenmsge-.dosopenmsg,d0
 	bsr	put_message
-	move.l	msgptr(pc),a0
+
+	move.l	msgptr(pc),a1
+	lea	.dosopenmsg(pc),a0
+	move.l	4(a1),4(a0)
+	move.l	8(a1),8(a0)
+	move.l	12(a1),12(a0)
 	tst.l	12(a0)
-	bne.b	dos_open_not_fail
+	bne.b	.dos_open_not_fail
 	pull	d1-d7/a0-a6
 	moveq	#0,d0
 	rts
-dos_open_not_fail
+.dos_open_not_fail
 	* get free file index
 	lea	dos_file_list(pc),a2
-filelistloop1	tst.l	(a2)
-	beq.b	fileopenerror
+.filelistloop1
+	tst.l	(a2)
+	beq.b	.fileopenerror
 	tst.l	8(a2)
-	beq.b	usethisfileindex
+	beq.b	.usethisfileindex
 	add	#16,a2
-	bra.b	filelistloop1
-usethisfileindex
+	bra.b	.filelistloop1
+.usethisfileindex
 	* save a2
 	* alloc mem for name
 	move.l	#128,d0
 	moveq	#0,d1
-	bsr	exec_allocmem
-	move.l	msgptr(pc),a0
+	bsr	exec_alloc_mem
+	lea	.dosopenmsg(pc),a0
 	move.l	4(a0),d2	* name
 	move.l	d0,d3		* new name space
 	move.l	8(a0),d4	* filesize
@@ -2071,17 +2214,18 @@ usethisfileindex
 	move.l	d4,12(a2)
 	pull	d1-d7/a0-a6
 	rts
-fileopenerror	lea	tablefullmsg(pc),a0
+.fileopenerror
+	lea	.tablefullmsg(pc),a0
 	bsr	put_string
-	pull	all
+	pull	d1-d7/a0-a6
 	rts
-tablefullmsg	dc.b	'error: file table full',0
+.tablefullmsg	dc.b	'error: file table full',0
 	even
-dosopenmsg	dc.l	UADE_FILESIZE
+.dosopenmsg	dc.l	AMIGAMSG_FILESIZE
 	dc.l	0	* file name ptr
 	dc.l	0	* file length
 	dc.l	0	* file exists (uae returns, see msgptr+12)
-dosopenmsge
+.dosopenmsge
 dos_file_list	dc.l	1,0,0,0		* index, filepos, filenameptr, filesize
 	dc.l	2,0,0,0
 	dc.l	3,0,0,0
@@ -2125,7 +2269,7 @@ seek_done	pull	d1-d7/a0-a6
 	rts
 
 
-dosreadmsg	dc.l	UADE_READ
+dosreadmsg	dc.l	AMIGAMSG_READ
 	* name ptr, dest, offset, length, r. length
 	dc.l	0,0,0,0,0
 dosreadmsge
@@ -2222,21 +2366,12 @@ loadsegsuccess	move.l	a0,d0
 	tst.l	d0
 	rts
 
-
-* volume test is for debugging only
-volumetest	lea	voltestbit(pc),a0
-	tst.l	(a0)
-	beq.b	novoltest2
-	move	#64,aud0vol+custom
-	move	#64,aud1vol+custom
-	move	#64,aud2vol+custom
-	move	#64,aud3vol+custom
-novoltest2	rts
-
 exec_supervisor_msg	dc.b	'warning: supervisor called',0
-exec_superstate_msg	dc.b	'warning: superstate called',0
+exec_super_state_msg	dc.b	'warning: superstate called',0
 	even
-exec_supervisor	push	all
+exec_supervisor
+	LOG_CALL	"exec:Supervisor"
+	push	all
 	lea	exec_supervisor_msg(pc),a0
 	bsr	put_string
 	pull	all
@@ -2244,8 +2379,10 @@ exec_supervisor	push	all
 	trap	#0
 	rts
 
-exec_superstate	push	all
-	lea	exec_superstate_msg(pc),a0
+exec_super_state
+	LOG_CALL	"exec:SuperState"
+	push	all
+	lea	exec_super_state_msg(pc),a0
 	bsr	put_string
 	lea	superstate_kick(pc),a0
 	move.l	a0,TRAP_VECTOR_0
@@ -2257,7 +2394,9 @@ superstate_kick	move.l	a7,d0		* d0 = SSP
 	move.l	usp,a7
 	rts
 
-exec_userstate	move.l	a7,usp
+exec_userstate
+	LOG_CALL	"exec:UserState"
+	move.l	a7,usp
 	move.l	d0,a7
 	move	#0,sr
 	rts
@@ -2269,7 +2408,9 @@ tderrmsg2	dc.b	'OpenDevice: only timer.device UNIT_VBLANK supported',0
 tdmsg1	dc.b	'a device was opened',0
 	even
 
-exec_open_device	push	all
+exec_open_device
+	LOG_CALL	"exec:OpenDevice"
+	push	all
 	push	d0/a1
 	lea	timername1(pc),a1	* timer.device support
 	bsr	strcmp
@@ -2328,7 +2469,9 @@ novblerr	move.l	d0,IO_UNIT(a1)
 doiowarnmsg	dc.b	'warning: doing fake exec.library/DoIO',0
 	even
 
-exec_doio	push	all
+exec_doio
+	LOG_CALL	"exec:DoIO"
+	push	all
 	lea	doiowarnmsg(pc),a0
 	bsr	put_string
 	pull	all
@@ -2342,7 +2485,9 @@ sendioerrmsg2	dc.b	'SendIO(): Unknown IORequest command',0
 sendiomsg1	dc.b	'SendIO(): TR_ADDREQUEST',0
 	even
 
-exec_sendio	push	all
+exec_sendio
+	LOG_CALL	"exec:SendIO"
+	push	all
 	lea	timerioptr(pc),a0
 	move.l	(a0),a0
 	cmp.l	a0,a1
@@ -2391,7 +2536,9 @@ abortiomsg1	dc.b	'AbortIO is not implemented!',0
 getmsgmsg1	dc.b	'getmsg is not properly implemented!',0
 	even
 
-exec_waitio	push	all
+exec_waitio
+	LOG_CALL	"exec:WaitIO"
+	push	all
 	lea	waitiomsg1(pc),a0
 	bsr	put_string
 	pull	all
@@ -2419,7 +2566,9 @@ nogetmsg_1	pull	all
 	rts
 
 * exec.library: _LVOCause (a1 = struct Interrupt *)
-exec_cause	push	all
+exec_cause
+	LOG_CALL	"exec:Cause"
+	push	all
 	move.l	$12(a1),d0
 	beq.b	not_soft_irq
 	move.l	d0,a0
@@ -2442,6 +2591,7 @@ icon_library_name	dc.b	'icon.library',0
 
 exec_old_open_library
 exec_open_library
+	LOG_CALL	"exec:OpenLibrary"
 	push	d1-d7/a0-a6
 	moveq	#0,d0
 	lea	dos_library_name(pc),a0
@@ -2548,17 +2698,21 @@ endlibloop	pull	all
 	rts
 
 
-exec_typeofmem	move.l	a1,d0
-	bmi.b	exec_typeofmem_fail
+exec_typeofmem
+	LOG_CALL	"exec:TypeOfMem"
+	move.l	a1,d0
+	bmi.b	.exec_typeofmem_fail
 	cmpi.l	#$200000,d0
-	bge.b	exec_typeofmem_fail
+	bge.b	.exec_typeofmem_fail
 	moveq	#3,d0			* MEMF_PUBLIC | MEMF_CHIP
 	rts
-exec_typeofmem_fail
+.exec_typeofmem_fail
 	moveq	#0,d0
 	rts
 
-exec_findtask	pushr	a0
+exec_findtask
+	LOG_CALL	"exec:FindTask"
+	pushr	a0
 	lea	findtaskwarn(pc),a0
 	bsr	put_string
 	pullr	a0
@@ -2570,7 +2724,9 @@ allocsigwarn	dc.b	'exec.library/allocsignal() not good',0
 signalwarn	dc.b	'exec.library/Signal() not good',0
 	even
 exec_sig_mask	dc.l	$0000ffff
-exec_allocsignal	pushr	a0
+exec_allocsignal
+	LOG_CALL	"exec:AllocSignal"
+	pushr	a0
 	lea	allocsigwarn(pc),a0
 	bsr	put_string
 	pullr	a0
@@ -2596,15 +2752,18 @@ signalok	bset	d0,d1
 allocsigret	pull	d1/a0
 	rts
 
-exec_signal	pushr	a0
+exec_signal
+	LOG_CALL	"exec:Signal"
+	pushr	a0
 	lea	signalwarn(pc),a0
 	bsr	put_string
 	pullr	a0
 	rts
 
-intui_allocremember
+* intuition_library:AllocRemember
+intuition_alloc_remember
 	move.l	#$666,(a0)	* mark success ;-)
-	bra	exec_allocmem
+	bra	exec_alloc_mem
 
 uade_time_critical
 	push	all
@@ -2615,7 +2774,7 @@ uade_time_critical
 	pull	all
 	rts
 
-uade_tc_msg	dc.l	UADE_TIME_CRITICAL,0
+uade_tc_msg	dc.l	AMIGAMSG_TIME_CRITICAL,0
 
 uade_get_info
 	push	d1-d7/a0-a6
@@ -2660,7 +2819,7 @@ uade_new_get_info
 	move.l	a2,a0
 	moveq	#16,d0
 	bsr	put_message
-	move.l	msgptr(pc),a0
+	move.l	msgptr(pc),a0	* fetch result
 	move.l	12(a0),d0
 	tst.l	d0
 	ble.b	no_info
@@ -2684,7 +2843,7 @@ get_ep_info_loop2
 	bsr	strlen
 
 	move.l	(a2)+,a4	* opt received
-	
+
 	move.l	(a2)+,a5	* opt value
 
 	; We now have eagleopt length in d0 and the eagle option name
@@ -2749,7 +2908,7 @@ invalid_ep_opt
 	bsr	put_string
 	bra	end_get_ep_info_loop2
 
-uade_gi_msg	dc.l	UADE_GET_INFO,0,0,0
+uade_gi_msg	dc.l	AMIGAMSG_GET_INFO,0,0,0
 ep_opt_request	dc.b	'eagleoptions',0
 invalid_ep_opt_msg	dc.b	'invalid ep option received',0
 
@@ -2757,6 +2916,7 @@ ciareswarnmsg	dc.b	'exec.library/OpenDevice: unknown resource',0
 ciaawarnmsg	dc.b	'warning: ciaa resource opened',0
 	even
 exec_open_resource
+	LOG_CALL	"exec:OpenResource"
 	cmp.b	#'c',(a1)
 	bne.b	nociabresource
 	cmp.b	#'i',1(a1)
@@ -2999,7 +3159,9 @@ call_amplifier_init
 	move.l	amplifier_init_func(pc),d0
 	bne.b	is_an_amp
 	rts
-is_an_amp	push	all
+is_an_amp
+	LOG_CALL "score:call_amplifier_init"
+	push	all
 	lea	amplifierwarn(pc),a0
 	bsr	put_string
 	move.l	amplifier_init_func(pc),a0
@@ -3024,7 +3186,8 @@ amp_not_valid_channel
 	pull	all
 	rts
 
-amplifier_dma	push	all
+enpp_amplifier_dma
+	push	all
 	lea	amp_dma(pc),a0
 	andi	#$000f,d1
 	tst	d0
@@ -3038,7 +3201,7 @@ amp_dma_not_neg_2
 	pull	all
 	rts
 
-amplifier_adr	push	all
+enpp_amplifier_adr	push	all
 	bsr	amp_is_valid_channel
 	move.l	d1,d2
 	lsl	#4,d2
@@ -3047,7 +3210,7 @@ amplifier_adr	push	all
 	pull	all
 	rts
 
-amplifier_len	push	all
+enpp_amplifier_len	push	all
 	bsr	amp_is_valid_channel
 	move.l	d1,d2
 	lsl	#4,d2
@@ -3056,7 +3219,7 @@ amplifier_len	push	all
 	pull	all
 	rts
 
-amplifier_per	push	all
+enpp_amplifier_per	push	all
 	bsr	amp_is_valid_channel
 	move.l	d1,d2
 	mulu	#$10,d2
@@ -3065,7 +3228,7 @@ amplifier_per	push	all
 	pull	all
 	rts
 
-amplifier_vol	push	all
+enpp_amplifier_vol	push	all
 	bsr	amp_is_valid_channel
 	move.l	d1,d2
 	lsl	#4,d2
@@ -3078,7 +3241,7 @@ amp_com_unk_msg	dc.b	'unknown ENPP_PokeCommand() command',0
 amp_com_filt_msg	dc.b	'unknown ENPP_PokeCommand() filter command',0
 	even
 
-amplifier_command
+enpp_amplifier_command
 	push	all
 	cmpi.l	#1,d0
 	bne.b	amp_com_unknown
@@ -3105,7 +3268,8 @@ amp_com_unknown	lea	amp_com_unk_msg(pc),a0
 amp_com_end	pull	all
 	rts
 
-amplifier_int	push	all
+enpp_amplifier_int
+	push	all
 	lea	amp_struct(pc),a0
 	moveq	#4-1,d7
 amp_clr_loop	clr.l	amp_changes(a0)
@@ -3126,6 +3290,7 @@ np_init	push	all
 	bsr	put_string
 	move.l	noteplayersetupfunc(pc),d0
 	beq.b	no_np_setup
+	LOG_CALL "score:call_noteplayersetupfunc"
 	move.l	d0,a0
 	jsr	(a0)
 	tst.l	d0
@@ -3341,6 +3506,7 @@ intvecmsg	dc.b	'setintvector(): Tried to set unauthorized interrupt '
 	even
 
 exec_set_int_vector
+	LOG_CALL	"exec:SetIntVector"
 	push	d1-d7/a0-a6
 	cmpi	#7,d0		* validity check
 	blt.b	int_vec_error
@@ -3383,6 +3549,7 @@ addintmsg	dc.b	'addintserver(): Tried to add unauthorized interrupt '
 	even
 
 exec_add_int_server
+	LOG_CALL	"exec:AddIntServer"
 	push	all
 	cmpi.b	#5,d0
 	beq.b	servlevok
@@ -3412,25 +3579,29 @@ mylevel2	move	#$0008,intreq+custom
 	pullr	d0
 	rte
 
-mylevel3	btst	#5,intreqr+custom+1
-	beq.b	is_not_vbi
+mylevel3
+	btst	#5,intreqr+custom+1
+	beq.b	.is_not_vbi
 	push	d0/a0/a5
 	* add frame counter
 	lea	framecount(pc),a0
 	addq.l	#1,(a0)
 	* interrupt server
 	lea	lev3serverlist(pc),a0
-server5loop	move.l	(a0),d0			* interrupt server pointer
-	beq.b	endserver5list
+.server5loop
+	move.l	(a0),d0			* interrupt server pointer
+	beq.b	.endserver5list
 	push	all
 	move.l	4(a0),a1		* interrupt server data pointer
 	move.l	d0,a5
 	jsr	(a5)
 	pull	all
 	addq.l	#8,a0
-	bra.b	server5loop
-endserver5list	pull	d0/a0/a5
-is_not_vbi	move	#$0070,intreq+custom
+	bra.b	.server5loop
+.endserver5list
+	pull	d0/a0/a5
+.is_not_vbi
+	move	#$0070,intreq+custom
 	rte
 
 mylevel4	push	all
@@ -3505,6 +3676,45 @@ mylevel6	move	#$2000,intreq+custom
 	pullr	d0
 	rte
 
+state_detection_init_msg
+	dc.l	AMIGAMSG_STATE_DETECTION_INIT,0,0,0,0
+
+state_detection_init
+	lea	state_detection_init_msg(pc),a0
+	move.l	moduleptr(pc),4(a0)
+	move.l	modulesize(pc),8(a0)
+	* Support for multiple regions is not yet implemented
+	* move.l	playerptr(pc),12(a0)
+	* move.l	playersize(pc),16(a0)
+	moveq	#20,d0
+	bsr	put_message
+	rts
+
+state_detection_step_msg
+	dc.l	AMIGAMSG_STATE_DETECTION_STEP,0
+state_repeat	dc	0
+
+state_detection_step
+	* TODO: don't do state detection if interaction is involved, i.e.
+	*       external subsong change
+	lea	state_detection_step_msg(pc),a0
+	moveq	#8,d0
+	bsr	put_message
+	move.l	msgptr(pc),a0
+	lea	state_repeat(pc),a1
+	move.l	4(a0),d0
+	beq.b	.no_repeat
+	* TODO: Remove LIMIT test
+	addq	#1,(a1)
+	cmp	#1,(a1)  * SET LIMIT
+	blt.b	.no_end
+	moveq	#1,d0
+	rts
+.no_repeat
+	clr	(a1)
+.no_end
+	moveq	#0,d0
+	rts
 
 *		0 1 2 3 4 5 6 7 8 9 A B C D
 irqtab	dc	1,1,1,2,3,3,3,4,4,4,4,5,5,6
@@ -3527,7 +3737,9 @@ oldstructs	dcb.b	$12+16*4,0
 
 lev3serverlist	dcb.l	32,0
 
-* hunk relocator variables
+* Hunk relocator variables. chippoint tracks where the next available free
+* memory starts. This variable is monotonously incremented, i.e. there is no
+* memory freeing.
 chippoint	dc.l	0
 
 binbase	dc.l	0	* contains pointer to relocated player code
@@ -3568,7 +3780,7 @@ load_file_list	dcb.l	64*3,-1
 load_file_list_end
 	dc.l	-1
 
-msgptr	dc.l	$200
+msgptr	dc.l	UADECORE_INPUT_MSG
 messagebit	dc.l	0
 
 nextsongfunc	dc.l	0
@@ -3594,7 +3806,6 @@ cia_timer_base_value	dc	$376b	* PAL 50Hz
 
 useciatimer	dc.l	0
 
-voltestbit	dc.l	0
 modulechange_disabled	dc.l	0
 
 getmsgbit	dc.l	0
@@ -3650,20 +3861,21 @@ debug_info	debuginfo	'uade debug info', debug_info
 	debuginfo	'start int', call_start_int
 	debuginfo	'interrupt', trapcall
 	debuginfo	'amp init', call_amplifier_init
-	debuginfo	'amp interrupt', amplifier_int
-	debuginfo	'amp adr', amplifier_adr
-	debuginfo	'amp per', amplifier_per
-	debuginfo	'amp len', amplifier_len
-	debuginfo	'amp vol', amplifier_vol
+	debuginfo	'amp interrupt', enpp_amplifier_int
+	debuginfo	'amp adr', enpp_amplifier_adr
+	debuginfo	'amp per', enpp_amplifier_per
+	debuginfo	'amp len', enpp_amplifier_len
+	debuginfo	'amp vol', enpp_amplifier_vol
 	debuginfo	'find author', enpp_find_author
 	debuginfo	'relocator', relocator
-	debuginfo	'load file', loadfile
+	debuginfo	'load file', enpp_load_file
 	debuginfo	'audio int', mylevel4
 	debuginfo	'ciaa int', ciaa_interrupt
 	debuginfo	'ciab int', ciab_interrupt
 	debuginfo	'set player interrupt', set_player_interrupt
-	debuginfo	'superstate', exec_superstate
+	debuginfo	'superstate', exec_super_state
 	debuginfo	'change subsong', change_subsong
+	debuginfo	'allocmem', exec_alloc_mem
 	dc.l	0
 
 * dos.library

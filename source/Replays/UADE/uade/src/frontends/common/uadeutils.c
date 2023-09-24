@@ -137,3 +137,14 @@ void uade_file_free(struct uade_file *f)
 	f->size = 0;
 	free(f);
 }
+
+struct uade_file *uade_empty_file(const char *name)
+{
+	struct uade_file *f = calloc(1, sizeof(struct uade_file));
+	if (f == NULL)
+		return NULL;
+	f->name = strdup(name);
+	f->size = 0;
+	f->data = NULL;
+	return f;
+}

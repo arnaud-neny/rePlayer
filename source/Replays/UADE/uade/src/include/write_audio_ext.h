@@ -14,6 +14,7 @@ enum UADEPaulaEventType {
 	PET_LCL = 6,
 	PET_LOOP = 7,
 	PET_OUTPUT = 8,
+	PET_START_BUFFER = 9,
 	PET_MAX_ENUM,  /* This value may change */
 };
 

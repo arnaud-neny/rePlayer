@@ -28,8 +28,6 @@
 #include "sinctable.h"
 
 #include "text_scope.h"
-#include "write_audio.h"
-
 
 struct audio_channel_data audio_channel[4];
 static void (*sample_handler) (void);
@@ -43,7 +41,7 @@ int sound_available;
 
 static int use_text_scope;
 
-static struct uade_write_audio *write_audio_state;
+struct uade_write_audio *write_audio_state;
 
 static int sound_use_filter = FILTER_MODEL_A500;
 
@@ -140,17 +138,46 @@ static void check_sound_buffers (void)
     bytes = ((intptr_t) sndbufpt) - ((intptr_t) sndbuffer);
 
     if (uadecore_audio_output) {
+	/*
+	 * The argument passed for UADE_COMMAND_READ IPC determines how much
+	 * audio data is produced before sending the results back to the
+	 * frontend.
+	 */
 	if (bytes == uadecore_read_size) {
 	    uadecore_check_sound_buffers(uadecore_read_size);
 	    sndbufpt = sndbuffer;
 	}
+	if (uadecore_audio_start_slow <= 1) {
+		char ast[256];
+		snprintf(ast, sizeof(ast), "{'uadecore:audio_start_time': "
+			 "%.2f}",
+			 ((double) uadecore_audio_skip) / (
+				 sound_bytes_per_second));
+		if (uade_send_string(UADE_COMMAND_SEND_UADECORE_LOGS, ast,
+				     &uadecore_ipc)) {
+			fprintf(stderr, "uadecore: Unable to send logs: %s\n",
+				ast);
+			exit(1);
+		}
+		uadecore_audio_start_slow = 2;
+	}
     } else {
 	uadecore_audio_skip += bytes;
-	/* if sound core doesn't report audio output start in 15 (virtual) seconds from
-	   the reboot, begin audio output anyway */
-	if (uadecore_audio_skip >= (sound_bytes_per_second * 15)) {
-	    fprintf(stderr, "involuntary audio output start\n");
-	    uadecore_audio_output = 1;
+	/*
+	 * If sound core doesn't report audio output start in 15 (virtual) seconds from
+	 * the reboot, begin audio output anyway.
+	 */
+	if (uadecore_audio_start_slow == 0 &&
+	    uadecore_audio_skip >= (sound_bytes_per_second * 15)) {
+		fprintf(stderr, "Warning: slow audio output start\n");
+		uadecore_audio_start_slow = 1;
+		if (uade_send_string(UADE_COMMAND_SEND_UADECORE_LOGS,
+				     "{'uadecore:audio_start_slow': True}",
+				     &uadecore_ipc)) {
+			fprintf(stderr, "uadecore: Unable to send logs: "
+				"audio start slow\n");
+			exit(1);
+		}
 	}
 	sndbufpt = sndbuffer;
     }

@@ -224,6 +224,12 @@
     <ClInclude Include="ReplayUADE.inl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="uade\src\include\state_detection.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="uade\src\include\uade_logging.h">
+      <Filter>Source Files\uade\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayUADE.cpp">
@@ -370,17 +376,20 @@
     <ClCompile Include="compat\memmemtest.c">
       <Filter>Source Files\compat</Filter>
     </ClCompile>
-    <ClCompile Include="compat\strlrep.c">
-      <Filter>Source Files\compat</Filter>
-    </ClCompile>
-    <ClCompile Include="compat\strltest.c">
-      <Filter>Source Files\compat</Filter>
-    </ClCompile>
     <ClCompile Include="compat\unlikelytest.c">
       <Filter>Source Files\compat</Filter>
     </ClCompile>
     <ClCompile Include="ReplayUADEWrapper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\state_detection.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="uade\src\uade_logging.c">
+      <Filter>Source Files\uade</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\strlrep.c">
+      <Filter>Source Files\compat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

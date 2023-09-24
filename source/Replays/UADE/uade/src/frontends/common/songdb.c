@@ -208,6 +208,9 @@ static int uade_open_and_lock(const char *filename, int create)
 				  S_IRUSR | S_IWUSR);
 			if (fd < 0)
 				return -1;
+		} else if (errno == EACCES && !create) {
+			// try open read-only to support global conf/db files
+			return open(filename, O_RDONLY);
 		} else {
 			return -1;
 		}
@@ -217,7 +220,7 @@ static int uade_open_and_lock(const char *filename, int create)
 	if (ret) {
 		fprintf(stderr, "uade: Unable to lock song.conf: %s (%s)\n",
 			filename, strerror(errno));
-		uade_atomic_fclose(fd);
+		uade_atomic_close(fd);
 		return -1;
 	}
 #endif
@@ -380,10 +383,7 @@ int uade_read_song_conf(const char *filename, struct uade_state *state)
 
 	state->songdbname[0] = 0;
 
-	fd = uade_open_and_lock(filename, 1);
-	/* open_and_lock() may fail without harm (it's actually supposed to
-	   fail if the process does not have lock (write) permissions to
-	   the song.conf file */
+	fd = uade_open_and_lock(filename, 0);
 
 	f = fopen(filename, "r");
 	if (f == NULL)
@@ -472,7 +472,7 @@ int uade_read_song_conf(const char *filename, struct uade_state *state)
 	qsort(db->songstore, db->nsongs, sizeof db->songstore[0], escompare);
 
 	snprintf(state->songdbname, sizeof(state->songdbname), "%s", filename);
-	return 1;
+	return db->nsongs > 0;
 
       error:
 	if (f)

@@ -131,12 +131,12 @@ struct uade_file *uade_receive_file(struct uade_ipc *ipc)
 
 	if (uade_receive_message(um, sizeof msgdata, ipc) <= 0) {
 		fprintf(stderr, "%s: Can not get meta\n", __func__);
-		return NULL;
+		goto err;
 	}
 	meta = (struct uade_msg_file *) &msgdata;
 	if (meta->msgtype != UADE_COMMAND_FILE) {
 		fprintf(stderr, "%s: Expected UADE_COMMAND_FILE\n", __func__);
-		return NULL;
+		goto err;
 	}
 
 	filesize = htonl(meta->filesize);
@@ -149,7 +149,7 @@ struct uade_file *uade_receive_file(struct uade_ipc *ipc)
 
 	if (!valid_name(meta->filename, sizeof meta->filename)) {
 		fprintf(stderr, "uade_receive_file(): Invalid name\n");
-		return NULL;
+		goto err;
 	}
 	if (meta->filename[0] == 0) {
 		f->name = NULL;
@@ -157,7 +157,7 @@ struct uade_file *uade_receive_file(struct uade_ipc *ipc)
 		f->name = strdup((const char *) meta->filename);
 		if (f->name == NULL) {
 			fprintf(stderr, "uade_receive_file(): No memory for name\n");
-			return NULL;
+			goto err;
 		}
 	}
 	f->data = malloc(filesize);

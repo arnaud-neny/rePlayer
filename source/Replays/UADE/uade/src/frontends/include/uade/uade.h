@@ -173,6 +173,8 @@ struct uade_state;
  */
 void uade_cleanup_state(struct uade_state *state);
 
+void uade_enable_uadecore_log_collection(struct uade_state *state);
+
 /*
  * Return a config structure for setting playback options. The structure is
  * initialized to default values, so calling uade_config_set_defaults() is
@@ -581,6 +583,8 @@ size_t uade_atomic_fwrite(void *ptr, size_t size, size_t nmemb, FILE *stream);
  * Returns NULL on error (out of memory).
  */
 struct uade_file *uade_file(const char *name, const void *data, size_t size);
+/* Creates empty 'struct uade_file' without any data */
+struct uade_file *uade_empty_file(const char *filename);
 
 void uade_file_free(struct uade_file *f);
 

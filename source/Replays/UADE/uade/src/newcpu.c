@@ -676,9 +676,9 @@ void MakeFromSR (void)
 void Exception(int nr, uaecptr oldpc)
 {
     /* trap #5 indicates sound core is sending message for uade */
-    if(nr == (32+5)) {
+    if (nr == (32 + 5))
       uadecore_get_amiga_message();
-    }
+
 #if EXCEPTION_COUNT
     exception_freq[nr]++;
 #endif
@@ -1326,8 +1326,11 @@ void m68k_go (void)
       m68k_run_1 ();
     }
 
+	uadecore_logging_flush();
+
     if (uadecore_reboot && !quit_program) {
-      if (uade_send_short_message(UADE_COMMAND_TOKEN, &uadecore_ipc) < 0) {
+	    if (uade_send_short_message(UADE_COMMAND_TOKEN,
+					&uadecore_ipc) < 0) {
 	assert(0 && "can not send reboot ack token");
 	break;
       }

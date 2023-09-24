@@ -15,7 +15,6 @@
 
 extern uae_u16 sndbuffer[];
 extern uae_u16 *sndbufpt;
-extern int sndbufsize;
 extern int sound_bytes_per_second;
 
 extern void finish_sound_buffer (void);

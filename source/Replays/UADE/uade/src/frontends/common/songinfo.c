@@ -271,7 +271,7 @@ static void process_ptk_mod(char *credits, size_t credits_len, int inst,
 				break;
 			snprintf(tmpstr, sizeof tmpstr, "[%2d] - ", i + 1);
 			strlcat(credits, tmpstr, credits_len);
-			snprintf(tmpstr, 23, "%-23s", buf + 0x14 + (i * 0x1e));
+			snprintf(tmpstr, 24, "%-23s", buf + 0x14 + (i * 0x1e));
 			strlcat(credits, tmpstr, credits_len);
 			snprintf(tmpstr, sizeof tmpstr,
 				 " %6d  %2d  %2d %6d %6d\n",
@@ -311,7 +311,7 @@ static void process_digi_mod(char *credits, size_t credits_len,
 				break;
 			snprintf(tmpstr, sizeof tmpstr, "[%2d] - ", i + 1);
 			strlcat(credits, tmpstr, credits_len);
-			snprintf(tmpstr, 30, "%-30s", buf + 642 + (i * 0x1e));
+			snprintf(tmpstr, 31, "%-30s", buf + 642 + (i * 0x1e));
 			strlcat(credits, tmpstr, credits_len);
 			snprintf(tmpstr, sizeof tmpstr,
 				 " %11d  %2d   %3d %11d %11d\n",

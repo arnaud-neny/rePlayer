@@ -95,6 +95,12 @@ struct uade_song_state {
 	 */
 	int recordsongtime;
 	int recordsubsongtime;
+
+	/*
+	 * Non-zero if logs from sound core sent via
+	 * UADE_COMMAND_UADECORE_SEND_LOGS RPC.
+	 */
+	int collect_logs;
 };
 
 struct fifo;

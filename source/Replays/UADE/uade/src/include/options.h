@@ -50,8 +50,6 @@ struct uae_prefs {
     int stereo;
     int sound_bits;
     int sound_freq;
-    int sound_minbsiz;
-    int sound_maxbsiz;
     int sound_pri_time;
     int sound_pri_cutoff;
     int sound_interpol;

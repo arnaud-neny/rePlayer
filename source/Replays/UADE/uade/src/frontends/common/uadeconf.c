@@ -125,7 +125,7 @@ void uade_config_set_defaults(struct uade_config *uc)
 {
 	memset(uc, 0, sizeof(*uc));
 	strlcpy(uc->basedir.name, UADE_CONFIG_BASE_DIR,	sizeof uc->basedir.name);
-	uc->filter_type = FILTER_MODEL_A500;
+	uade_set_filter_type(uc, NULL);
 	uc->frequency = UADE_DEFAULT_FREQUENCY;
 	uc->gain = 1.0;
 	uc->panning = 0.7;
@@ -361,7 +361,7 @@ int uade_load_initial_song_conf(struct uade_state *state)
 {
 	int loaded = 0;
 	char *home;
-	char tmpname[PATH_MAX];
+	char tmpname[PATH_MAX + 16];
 	struct uade_config *uc = &state->config;
 
 	/* Used for testing */

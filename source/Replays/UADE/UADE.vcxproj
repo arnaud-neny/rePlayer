@@ -150,9 +150,11 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClInclude Include="uade\src\include\osemu.h" />
     <ClInclude Include="uade\src\include\readcpu.h" />
     <ClInclude Include="uade\src\include\sinctable.h" />
+    <ClInclude Include="uade\src\include\state_detection.h" />
     <ClInclude Include="uade\src\include\sysdeps.h" />
     <ClInclude Include="uade\src\include\text_scope.h" />
     <ClInclude Include="uade\src\include\uadectl.h" />
+    <ClInclude Include="uade\src\include\uade_logging.h" />
     <ClInclude Include="uade\src\include\uae.h" />
     <ClInclude Include="uade\src\include\write_audio.h" />
     <ClInclude Include="uade\src\include\write_audio_ext.h" />
@@ -174,10 +176,6 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="compat\strlrep.c" />
-    <ClCompile Include="compat\strltest.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="compat\unlikelytest.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -254,9 +252,17 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     </ClCompile>
     <ClCompile Include="uade\src\sd-sound.c" />
     <ClCompile Include="uade\src\sinctable.c" />
+    <ClCompile Include="uade\src\state_detection.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="uade\src\text_scope.c" />
     <ClCompile Include="uade\src\uade.c" />
     <ClCompile Include="uade\src\uademain.c" />
+    <ClCompile Include="uade\src\uade_logging.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="uade\src\write_audio.c" />
   </ItemGroup>
   <ItemGroup>

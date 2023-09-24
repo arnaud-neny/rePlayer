@@ -26,7 +26,7 @@ void *uade_walk_directories(const char *dirname,
 		return NULL;
 
 	if ((dir = opendir(dirname)) == NULL)
-		return NULL;
+		goto err;
 
 	while ((de = readdir(dir)) != NULL) {
 
@@ -63,6 +63,7 @@ void *uade_walk_directories(const char *dirname,
 	}
 
 	closedir(dir);
+err:
 	free(dename);
 
 	return ret;

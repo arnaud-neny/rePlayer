@@ -61,8 +61,6 @@ static struct cfg_lines opttable[] =
     {"sound_frequency", "" },
     {"sound_bits", "" },
     {"sound_channels", "" },
-    {"sound_min_buff", "" },
-    {"sound_max_buff", "" },
     {"parallel_on_demand", "" },
     {"serial_on_demand", "" },
     {"joyport0", "" },
@@ -160,8 +158,6 @@ void save_options (FILE *f, struct uae_prefs *p)
     fprintf (f, "sound_output=%s\n", soundmode[p->produce_sound]);
     fprintf (f, "sound_channels=%s\n", stereomode1[p->stereo]);
     fprintf (f, "sound_bits=%d\n", p->sound_bits);
-    fprintf (f, "sound_min_buff=%d\n", p->sound_minbsiz);
-    fprintf (f, "sound_max_buff=%d\n", p->sound_maxbsiz);
     fprintf (f, "sound_frequency=%d\n", p->sound_freq);
 
     fprintf (f, "sound_pri_time=%d\n", p->sound_pri_time);
@@ -340,8 +336,6 @@ int cfgfile_parse_option (struct uae_prefs *p, char *option, char *value)
 	|| cfgfile_yesno (option, value, "log_illegal_mem", &p->illegal_mem))
 	return 1;
     if (cfgfile_intval (option, value, "accuracy", &p->emul_accuracy, 1)
-	|| cfgfile_intval (option, value, "sound_min_buff", &p->sound_minbsiz, 1)
-	|| cfgfile_intval (option, value, "sound_max_buff", &p->sound_maxbsiz, 1)
 	|| cfgfile_intval (option, value, "sound_frequency", &p->sound_freq, 1)
 	|| cfgfile_intval (option, value, "sound_bits", &p->sound_bits, 1)
 	|| cfgfile_intval (option, value, "sound_pri_cutoff", &p->sound_pri_cutoff, 1)

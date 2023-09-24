@@ -10,10 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char *paula_event_string[] = {
-	"None", "Vol", "Per", "Dat", "Len", "LCL", "LCH", "Loop"};
-
-
 struct channel_event {
 	enum UADEPaulaEventType active_events[PET_MAX_ENUM];
 	uint16_t event_values[PET_MAX_ENUM];

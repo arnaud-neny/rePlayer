@@ -56,12 +56,13 @@ enum {
 
 
 static int chk_id_offset(unsigned char *buf, size_t bufsize,
-			 const char *patterns[], size_t offset, char *pre);
+			 const char *patterns[], const size_t offset,
+			 char *pre);
 
 
 /* Do not use '\0'. They won't work in patterns */
 static const char *offset_0000_patterns[] = {
-  /* ID: Prefix: Desc: */
+  /* Pairs of values: string id marker, string file extension */
   "DIGI Booster", "DIGI",	/* Digibooster */
   "OKTASONG", "OKT",		/* Oktalyzer */
   "SYNTRACKER", "SYNMOD",	/* Syntracker */
@@ -254,7 +255,8 @@ const struct uade_ext_to_format_version *uade_file_ext_to_format_version(
    returns true if pattern is at buf[offset], otherwrise false
  */
 static int patterntest(const unsigned char *buf, const char *pattern,
-		       size_t offset, size_t bytes, size_t maxlen)
+		       const size_t offset, const size_t bytes,
+		       const size_t maxlen)
 {
   if ((offset + bytes) <= maxlen)
 	  return memcmp(buf + offset, pattern, bytes) == 0;
@@ -504,7 +506,6 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
   int has_slen_sreplen_one = 0;
   int no_slen_sreplen_one = 0;
 
-  int no_slen_has_volume = 0;
   int finetune_used = 0;
 
   size_t calculated_size;
@@ -620,8 +621,6 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
 	  } else {
 	    no_slen_sreplen_zero++;
 	  }
-	  if (vol > 0)
-	    no_slen_has_volume++;
         }
        }
      }
@@ -1234,7 +1233,10 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
   } else if (buf[0] == 'X' && buf[1] == 'P' && buf[2] == 'K' && buf[3] == 'F' &&
 	     read_be_u32(&buf[4]) + 8 == realfilesize &&
 	     buf[8] == 'S' && buf[9] == 'Q' && buf[10] == 'S' && buf[11] == 'H') {
-    fprintf(stderr, "uade: The file is SQSH packed. Please depack first.\n");
+    fprintf(stderr,
+	    "uade: The file is SQSH packed. Please depack first. "
+	    "You may use, for example, amigadepacker: "
+	    "https://gitlab.com/heikkiorsila/amigadepacker");
     strcpy(pre, "packed");
 
   } else if ((modtype = mod15check(buf, bufsize, realfilesize, path)) != 0) {
@@ -1301,7 +1303,8 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
  * TODO: more and less easy check for the rest of the 52 trackerclones
  */
 static int chk_id_offset(unsigned char *buf, size_t bufsize,
-			 const char *patterns[], size_t offset, char *pre)
+			 const char *patterns[], const size_t offset,
+			 char *pre)
 {
 	int i;
 	for (i = 0; patterns[i]; i = i + 2) {

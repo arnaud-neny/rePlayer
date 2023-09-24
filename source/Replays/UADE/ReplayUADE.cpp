@@ -29,8 +29,8 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::UADE, .isThreadSafe = false,
         .name = "Unix Amiga Delitracker Emulator",
-        .about = "UADE 3.0.2\nHeikki Orsila & Michael Doering",
-        .settings = "Unix Amiga Delitracker Emulator 3.0.2",
+        .about = "UADE 3.0.3\nHeikki Orsila & Michael Doering",
+        .settings = "Unix Amiga Delitracker Emulator 3.0.3",
         .init = ReplayUADE::Init,
         .release = ReplayUADE::Release,
         .load = ReplayUADE::Load,
@@ -737,7 +737,7 @@ namespace rePlayer
         info += uadeInfo->playername[0] ? uadeInfo->playername : uadeInfo->detectioninfo.custom ? "Custom" : uadeInfo->detectioninfo.ep->playername;
         info += " (";
         info += uadeInfo->detectioninfo.ext;
-        info += ")\nUADE 3.0.2";
+        info += ")\nUADE 3.0.3";
         return info;
     }
 

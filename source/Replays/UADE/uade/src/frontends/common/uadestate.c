@@ -124,6 +124,12 @@ static void get_string(struct uade_event *event, struct uade_msg *um)
 	strlcpy(event->msg, (char *) um->data, sizeof event->msg);
 }
 
+static void dont_record_playtime(struct uade_state *state)
+{
+	state->song.recordsongtime = 0;
+	state->song.recordsubsongtime = 0;
+}
+
 static void set_end_event(struct uade_event *event, int tailbytes,
 			  int happy, int stopnow,
 			  const char *reason, struct uade_state *state)
@@ -142,6 +148,10 @@ static void set_end_event(struct uade_event *event, int tailbytes,
 	strlcpy(event->songend.reason, reason, sizeof event->songend.reason);
 
 	state->song.endevent = *event;
+
+	if (!happy) {
+		dont_record_playtime(state);
+	}
 }
 
 static void set_state(enum uade_state_symbol newstate, struct uade_state *state)
@@ -153,6 +163,24 @@ static int error_state(struct uade_state *state)
 {
 	set_state(UADE_STATE_ERROR, state);
 	return -1;
+}
+
+void uade_enable_uadecore_log_collection(struct uade_state *state)
+{
+	state->song.collect_logs = 1;
+}
+
+static void handle_send_uadecore_logs(struct uade_state *state,
+				      const struct uade_msg *um)
+{
+	assert(um->msgtype == UADE_COMMAND_SEND_UADECORE_LOGS);
+	const char *logs = (const char *) um->data;
+
+	if (state->song.collect_logs && strlen(logs) > 0)
+		printf("uade_logs: %s\n", logs);
+
+	if (state->config.verbose)
+		fprintf(stderr, "uade_logs: %s\n", logs);
 }
 
 static int receive_message(struct uade_event *event, struct uade_state *state)
@@ -285,8 +313,14 @@ static int receive_message(struct uade_event *event, struct uade_state *state)
 		event->subsongs.max = maxsubsong;
 		break;
 
+	case UADE_COMMAND_SEND_UADECORE_LOGS:
+		event->type = UADE_EVENT_EAGAIN;
+		handle_send_uadecore_logs(state, um);
+		break;
+
 	default:
-		uade_warning("Bad message type from uadecore: %u.\n", (unsigned int) um->msgtype);
+		uade_warning("Bad message type from uadecore: %u.\n",
+			     (unsigned int) um->msgtype);
 		goto error;
 	}
 
@@ -305,6 +339,13 @@ struct uade_file *uade_load_amiga_file(const char *name, const char *playerdir,
 	/* Do not load file names that contain ':' from rmc container */
 	if (strchr(name, ':') == NULL && state->rmc != NULL)
 		return uade_rmc_get_file(state->rmc, name);
+
+	// if file is a directory, just return dummy file (fixes some SunTronic customs, for example zoids.src)
+	struct stat s;
+	if (stat(name, &s) == 0 && s.st_mode & S_IFDIR) {
+		uade_warning("File (%s) is a directory\n", name);
+		return uade_empty_file(name);
+	}
 
 	if (uade_find_amiga_file(fname, sizeof fname, name, playerdir))
 		return NULL;
@@ -454,12 +495,6 @@ static void set_subsong(struct uade_state *state)
 		state->song.info.subsongs.cur = newsubsong;
 		memset(&state->song.endevent, 0, sizeof state->song.endevent);
 	}
-}
-
-static void dont_record_playtime(struct uade_state *state)
-{
-	state->song.recordsongtime = 0;
-	state->song.recordsubsongtime = 0;
 }
 
 /* Called usually after getting song end event */
@@ -711,6 +746,8 @@ static int get_pending_events(struct uade_state *state)
 				uade_warning("Can not flush send file\n");
 				return error_state(state);
 			}
+		} else if (um->msgtype == UADE_COMMAND_SEND_UADECORE_LOGS) {
+			handle_send_uadecore_logs(state, um);
 		}
 	}
 
@@ -1280,6 +1317,7 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 	struct uade_song_state *song = &state->song;
 	struct uade_file *player = NULL;
 
+	playername[0] = 0;
 	memset(song, 0, sizeof song[0]);
 	song->state = UADE_STATE_INVALID;
 
@@ -1320,31 +1358,6 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 
 	uade_debug(state, "Player candidate: %s\n", ep->playername);
 
-	if (state->config.player_file.name[0]) {
-		/* Eagleplayer forced */
-		player = uade_file_load(state->config.player_file.name);
-	} else if (strcmp(ep->playername, "custom") == 0) {
-		/* The song is a custom module, an eagleplayer by itself */
-		player = module;
-		module = NULL;
-	} else {
-		/* Player selected automatically, non-custom song */
-		char playername[PATH_MAX];
-		snprintf(playername, sizeof playername, "%s/players/%s",
-			 state->config.basedir.name, ep->playername);
-		player = uade_file_load(playername);
-	}
-
-	if (player == NULL) {
-		uade_warning("Error: Could not load player\n");
-		goto recoverableerror;
-	}
-
-	/* Player dir may not exist (custom song without filename was passed) */
-	if (player->name != NULL)
-		strlcpy(song->info.playerfname, player->name,
-			sizeof song->info.playerfname);
-
 	/*
 	 * The order of parameter processing is important:
 	 * 1. set eagleplayer attributes
@@ -1359,6 +1372,33 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 			   song->info.modulefname);
 		goto recoverableerror;
 	}
+
+	if (state->config.player_file.name[0]) {
+		/* Eagleplayer forced */
+		player = uade_file_load(state->config.player_file.name);
+	} else if (playername[0]) {
+		/* Player overridden via conf */
+		player = uade_file_load(playername);
+	} else if (strcmp(ep->playername, "custom") == 0) {
+		/* The song is a custom module, an eagleplayer by itself */
+		player = module;
+		module = NULL;
+	} else {
+		/* Player selected automatically, non-custom song */
+		snprintf(playername, sizeof playername, "%s/players/%s",
+			 state->config.basedir.name, ep->playername);
+		player = uade_file_load(playername);
+	}
+
+	if (player == NULL) {
+		uade_warning("Error: Could not load player\n");
+		goto recoverableerror;
+	}
+
+	/* Player dir may not exist (custom song without filename was passed) */
+	if (player->name != NULL)
+		strlcpy(song->info.playerfname, player->name,
+			sizeof song->info.playerfname);
 
 	snprintf(path, sizeof path, "%s/score", state->config.basedir.name);
 	uade_debug(state, "score path %s\n", path);

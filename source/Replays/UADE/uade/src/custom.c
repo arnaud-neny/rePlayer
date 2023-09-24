@@ -439,6 +439,10 @@ static void DMACON (uae_u16 v)
 		cdp->wlen = cdp->len;
 		cdp->data_written = 2;
 		cdp->evtime = eventtab[ev_hsync].evtime - cycles;
+		if (write_audio_state != NULL) {
+			uade_write_audio_set_state(write_audio_state, i,
+						   PET_START_BUFFER, 0);
+		}
 	    }
 	} else {
 	    if (cdp->state == 1 || cdp->state == 5) {
@@ -1270,6 +1274,10 @@ static void hsync_handler (void)
 		    cdp->ptend = cdp->lc + 2 * (cdp->len ? cdp->len : 65536);
 		    cdp->wlen = cdp->len;
 		    cdp->intreq2 = 1;
+		    if (write_audio_state != NULL) {
+			    uade_write_audio_set_state(write_audio_state, nr,
+						       PET_START_BUFFER, 0);
+		    }
 		} else {
 		    cdp->wlen = (cdp->wlen - 1) & 0xFFFF;
 		}
