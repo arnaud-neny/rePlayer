@@ -14,7 +14,7 @@
 #include <player/gymplayer.hpp>
 #include <utils/MemoryLoader.h>
 
-#define LIBVGM_VERSION "@5ad95d6"
+#define LIBVGM_VERSION "@079c4e7"
 
 namespace rePlayer
 {
