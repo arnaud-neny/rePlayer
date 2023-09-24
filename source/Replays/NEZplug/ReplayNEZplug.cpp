@@ -1,17 +1,22 @@
 #include "ReplayNEZplug.h"
 
 #include <Audio/AudioTypes.inl.h>
+#include <Core/Log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
 #include <ReplayDll.h>
+
+#include <libarchive/archive.h>
+#include <libarchive/archive_entry.h>
+#include <filesystem>
 
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::NEZplug,
         .name = "NEZplug++",
-        .extensions = "nsf;nsfe;hes;kss;gbr;gbs;ay;sgc;nsd",
+        .extensions = "nsf;nsfe;hes;kss;gbr;gbs;ay;sgc;nsd;mus",
         .about = "NEZplug++/libnezplug\nCopyright (c) 2019 Mamiya\nCopyright (c) 2020 John Regan",
         .settings = "NEZplug++",
         .init = ReplayNEZplug::Init,
@@ -33,8 +38,35 @@ namespace rePlayer
     Replay* ReplayNEZplug::Load(io::Stream* stream, CommandBuffer metadata)
     {
         auto data = stream->Read();
-        auto* nezplay = NEZNew();
-        auto nezType = NEZLoad(nezplay, data.Items(), uint32_t(data.Size()));
+        if (memcmp(data.Items(), "FACS-PKG", 8) == 0)
+        {
+            auto* archive = archive_read_new();
+            archive_read_support_format_all(archive);
+            uint32_t fileIndex = 0;
+            Array<uint32_t> subsongs;
+            if (archive_read_open_memory(archive, data.Items(8), data.Size() - 8) == ARCHIVE_OK)
+            {
+                archive_entry* entry;
+                while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
+                {
+                    std::filesystem::path entryPath(archive_entry_pathname(entry));
+                    if (_stricmp(entryPath.extension().string().c_str(), ".mus") == 0)
+                        subsongs.Add(fileIndex);
+                    fileIndex++;
+                }
+            }
+            archive_read_free(archive);
+
+            if (subsongs.IsNotEmpty())
+                return new ReplayNEZplug(stream, std::move(subsongs), metadata);
+            return nullptr;
+        }
+
+        auto nezPlay = LoadMUS(data.Items(), data.NumItems(), stream->GetName(), nullptr);
+        if (nezPlay)
+            return new ReplayNEZplug(nezPlay, eExtension::_mus, metadata);
+        nezPlay = NEZNew();
+        auto nezType = NEZLoad(nezPlay, data.Items(), uint32_t(data.Size()));
         if (nezType != NEZ_TYPE_NONE)
         {
             eExtension nezTypeToExt[] = {
@@ -50,9 +82,9 @@ namespace rePlayer
                 eExtension::_nsd,
                 eExtension::_sgc
             };
-            return new ReplayNEZplug(nezplay, nezTypeToExt[nezType], metadata);
+            return new ReplayNEZplug(nezPlay, nezTypeToExt[nezType], metadata);
         }
-        NEZDelete(nezplay);
+        NEZDelete(nezPlay);
 
         return nullptr;
     }
@@ -106,6 +138,19 @@ namespace rePlayer
         SetupMetadata(metadata);
     }
 
+    ReplayNEZplug::ReplayNEZplug(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata)
+        : Replay(eExtension::_musPk, eReplay::NEZplug)
+        , m_nezPlay(NEZNew())
+        , m_stream(stream)
+        , m_subsongs(std::move(subsongs))
+    {
+        NEZSetFrequency(m_nezPlay, kSampleRate);
+        NEZSetChannel(m_nezPlay, 2);
+        NEZSetLength(m_nezPlay, 0);
+
+        SetupMetadata(metadata);
+    }
+
     uint32_t ReplayNEZplug::Render(StereoSample* output, uint32_t numSamples)
     {
         auto currentPosition = m_currentPosition;
@@ -149,7 +194,46 @@ namespace rePlayer
 
     void ReplayNEZplug::ResetPlayback()
     {
-        NEZSetSongNo(m_nezPlay, m_subsongIndex + 1);
+        if (m_subsongs.IsEmpty())
+            NEZSetSongNo(m_nezPlay, m_subsongIndex + 1);
+        else
+        {
+            if (m_subsongIndex != m_currentSubsongIndex)
+            {
+                auto data = m_stream->Read();
+
+                auto* musPk = archive_read_new();
+                archive_read_support_format_all(musPk);
+                archive_read_open_memory(musPk, data.Items(8), data.Size() - 8);
+
+                uint32_t fileIndex = 0;
+                archive_entry* entry;
+                while (archive_read_next_header(musPk, &entry) == ARCHIVE_OK)
+                {
+                    if (fileIndex == m_subsongs[m_subsongIndex])
+                    {
+                        m_title = std::filesystem::path(archive_entry_pathname(entry)).stem().string().c_str();
+                        auto fileSize = archive_entry_size(entry);
+                        Array<uint8_t> unpackedData;
+                        unpackedData.Resize(fileSize);
+                        auto readSize = archive_read_data(musPk, unpackedData.Items(), fileSize);
+                        if (readSize > 0)
+                        {
+                            NEZDelete(m_nezPlay);
+                            m_nezPlay = LoadMUS(unpackedData.Items(), unpackedData.NumItems(), archive_entry_pathname(entry), m_stream);
+                        }
+                        else
+                            Log::Error("NEZplug: can't find subsong %d\n", m_subsongIndex);
+                        break;
+                    }
+                    fileIndex++;
+                }
+                archive_read_free(musPk);
+
+                m_currentSubsongIndex = m_subsongIndex;
+            }
+            NEZSetSongNo(m_nezPlay, 1);
+        }
         NEZReset(m_nezPlay);
 
         m_currentPosition = 0;
@@ -184,29 +268,41 @@ namespace rePlayer
 
     uint32_t ReplayNEZplug::GetNumSubsongs() const
     {
-        return NEZGetSongMaxAbsolute(m_nezPlay);
+        if (m_subsongs.IsEmpty())
+            return NEZGetSongMaxAbsolute(m_nezPlay);
+        return m_subsongs.NumItems();
+    }
+
+    std::string ReplayNEZplug::GetSubsongTitle() const
+    {
+        return m_title;
     }
 
     std::string ReplayNEZplug::GetExtraInfo() const
     {
         std::string metadata;
-        if (m_nezPlay->songinfodata.title)
-            metadata = m_nezPlay->songinfodata.title;
-        if (m_nezPlay->songinfodata.artist)
+        if (m_nezPlay->songinfodata.title && m_nezPlay->songinfodata.title[0])
+        {
+            metadata  = "Title    : ";
+            metadata += m_nezPlay->songinfodata.title;
+        }
+        if (m_nezPlay->songinfodata.artist && m_nezPlay->songinfodata.artist[0])
         {
             if (!metadata.empty())
                 metadata += "\n";
+            metadata += "Artist   : ";
             metadata += m_nezPlay->songinfodata.artist;
         }
-        if (m_nezPlay->songinfodata.copyright)
+        if (m_nezPlay->songinfodata.copyright && m_nezPlay->songinfodata.copyright[0])
         {
             if (!metadata.empty())
                 metadata += "\n";
+            metadata += "Copyright: ";
             metadata += m_nezPlay->songinfodata.copyright;
         }
         if (!metadata.empty())
             metadata += "\n\n";
-        metadata = m_nezPlay->songinfodata.detail;
+        metadata += m_nezPlay->songinfodata.detail;
         return metadata;
     }
 
@@ -233,6 +329,8 @@ namespace rePlayer
             info += "NEZplug sound format";
         else if (m_mediaType.ext == eExtension::_ay)
             info += "ZXAYEMUL";
+        else if (m_mediaType.ext == eExtension::_mus || m_mediaType.ext == eExtension::_musPk)
+            info += "FAC SoundTracker";
         info += "\n";
         info += "NEZplug++";
         return info;
@@ -240,7 +338,7 @@ namespace rePlayer
 
     void ReplayNEZplug::SetupMetadata(CommandBuffer metadata)
     {
-        auto numSongsMinusOne = NEZGetSongMaxAbsolute(m_nezPlay) - 1;
+        auto numSongsMinusOne = GetNumSubsongs() - 1;
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongsMinusOne == numSongsMinusOne)
         {

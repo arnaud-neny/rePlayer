@@ -50,7 +50,7 @@ EXTENSION(bp)       // SoundMon & UAE: SoundMon2.0
 EXTENSION(ym)       // ZXTune: ST-Sound
 EXTENSION(dsym)
 EXTENSION(fmt)
-EXTENSION(mus)      // OpenMPT: ? & Sidplay: ? & UADE: UFO
+EXTENSION(mus)      // OpenMPT: ? & Sidplay: ? & UADE: UFO & NEZplug: FAC SoundTracker
 EXTENSION(stx)
 EXTENSION(symmod)
 EXTENSION(smod)
@@ -390,3 +390,4 @@ EXTENSION(soc)      // UADE: Jochen_Hippel_ST
 EXTENSION(sog)      // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)     // UADE: JochenHippel
 EXTENSION(mbmPk)    // KSS
+EXTENSION(musPk)    // NEZplug: FAC SoundTracker

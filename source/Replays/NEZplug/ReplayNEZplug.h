@@ -50,6 +50,7 @@ namespace rePlayer
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
+        std::string GetSubsongTitle() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
@@ -59,8 +60,11 @@ namespace rePlayer
 
     private:
         ReplayNEZplug(NEZ_PLAY* nezPlay, eExtension extension, CommandBuffer metadata);
+        ReplayNEZplug(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata);
 
         void SetupMetadata(CommandBuffer metadata);
+
+        static NEZ_PLAY* LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamArchive);
 
     private:
         NEZ_PLAY* m_nezPlay;
@@ -68,6 +72,12 @@ namespace rePlayer
         uint64_t m_currentDuration = 0;
 
         uint32_t m_durations[256] = { 0 };
+
+        SmartPtr<io::Stream> m_stream;
+        Array<uint32_t> m_subsongs;
+
+        std::string m_title;
+        uint32_t m_currentSubsongIndex = 0xffFFffFF;
 
         static int32_t ms_gain;
         static int32_t ms_filter;
