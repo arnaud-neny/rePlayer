@@ -20,7 +20,7 @@ namespace rePlayer
             return 0;
         }
         Log::Error("High Voltage SID Collection: %s\n", curl_easy_strerror(curlError));
-        return 1;
+        return -1;
     }
 
     const char* const SourceHighVoltageSIDCollection::ms_filename = MusicPath "HighVoltageSIDCollection" MusicExt;
