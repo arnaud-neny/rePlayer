@@ -4,6 +4,8 @@
 #include <string.h>
 #include "asap.h"
 
+#define strdup _strdup // rePlayer
+
 static void FuString_Assign(char **str, char *value)
 {
 	free(*str);
@@ -4298,7 +4300,7 @@ void ASAPInfo_SetNtsc(ASAPInfo *self, bool ntsc)
 	for (int song = 0; song < self->songs; song++) {
 		int64_t duration = self->durations[song];
 		if (duration > 0) {
-			self->durations[song] = (int) (ntsc ? duration * 5956963 / 7159090 : (duration * 7159090 / 5956963));
+			self->durations[song] = (int) (ntsc ? duration * 5956963 / 7159090 : duration * 7159090 / 5956963);
 		}
 	}
 }
@@ -7085,6 +7087,7 @@ static void Pokey_Initialize(Pokey *self, int sampleRate)
 	self->iirAcc = 0;
 	self->iirRate = 264600 / sampleRate;
 	self->sumDACInputs = 0;
+	self->sumDACOutputs = 0; // rePlayer
 	Pokey_StartFrame(self);
 }
 
@@ -7451,8 +7454,8 @@ static void PokeyPair_Construct(PokeyPair *self)
 				leftSum = sincSum;
 			else if (j == 15)
 				norm = sincSum;
-			double x = 3.141592653589793 / (1024 * ((j << 10) - i)); // rePlayer fix
-			double s = x == 0 ? 1 : (sin(x) / x);
+			double x = 3.141592653589793 / 1024 * ((j << 10) - i);
+			double s = x == 0 ? 1 : sin(x) / x;
 			if (j >= -16 && j < 15)
 				sinc[16 + j] = s;
 			sincSum += s;
