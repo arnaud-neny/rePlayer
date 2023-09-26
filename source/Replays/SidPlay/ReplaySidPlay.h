@@ -43,6 +43,8 @@ namespace rePlayer
 
                     uint32_t overrideSurround : 1;
                     uint32_t surround : 1;
+                    uint32_t overridePowerOnDelay : 1;
+                    uint32_t powerOnDelay : 13;
                 };
             };
             uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
@@ -87,10 +89,11 @@ namespace rePlayer
         SidTune* m_sidTune[2] = { nullptr };
         Surround m_surround;
         bool m_isSidModelForced : 1 = false;
-        bool m_isSidModel8580 : 1;
+        bool m_isSidModel8580 : 1 = ms_isSidModel8580;
         bool m_isClockForced : 1 = false;
-        bool m_isNtsc : 1;
-        bool m_isResampling : 1;
+        bool m_isNtsc : 1 = ms_isNtsc;
+        bool m_isResampling : 1 = ms_isResampling;
+        uint16_t m_powerOnDelay = uint16_t(ms_powerOnDelay);
         uint32_t* m_durations = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
@@ -110,6 +113,7 @@ namespace rePlayer
         static bool ms_isNtsc;
         static bool ms_isResampling;
         static int32_t ms_surround;
+        static int32_t ms_powerOnDelay;
     };
 }
 // namespace rePlayer
