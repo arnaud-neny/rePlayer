@@ -40,7 +40,7 @@
 - UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade  
   Some changes there to improved the loops (score) and some windows port.
 - Highly Quixotic: https://gitlab.com/kode54/highly_quixotic, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_qsf
-- Highly Advanced: https://gitlab.com/kode54/mgba, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_gsf
+- Highly Advanced: https://bitbucket.org/losnoco/cog
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.

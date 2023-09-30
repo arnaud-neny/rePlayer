@@ -1,8 +1,11 @@
-v0.9.3:
+v0.9.4:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
+- Updated ASAP to 6.0.0 (fixed)
+- Updated Highly Advanced (cog 2023-09-30)
 - Updated libkss to 1.2.0, fix MBM loader
 - Updated libsc68 to 3.0.0.a r702
+- Updated libvgm to 079c4e7
 - Updated OpenMPT to 0.7.3
 - Updated NEZplug to support FAC SoundTracker
 - Updated UADE to 3.0.3 (and to handle of big modules and to allow player selection)

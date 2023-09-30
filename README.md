@@ -185,7 +185,7 @@ Or add some comments (and likes) there:
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
 - [Highly Quixotic](https://gitlab.com/kode54/highly_quixotic): QSound arcade audio sound chip and processor emulator library.
-- [Highly Advanced](https://gitlab.com/kode54/mgba): Gameboy Advanced player.
+- [Highly Advanced](https://bitbucket.org/losnoco/cog): Gameboy Advanced player.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - TFMX: library to play Chris Huelsbeck files (customized).
 - [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
