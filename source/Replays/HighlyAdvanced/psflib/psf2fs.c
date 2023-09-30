@@ -1,27 +1,3 @@
-/*
-PSFLIB - PSF2FS implementation
-
-Copyright (c) 2012-2015 Christopher Snowhill
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
 #include "psf2fs.h"
 
 #include <ctype.h>
@@ -329,11 +305,11 @@ static int addarchive(
   // create a source entry for this psf2
   this_source = ( struct SOURCE_FILE * ) malloc( sizeof( struct SOURCE_FILE ) );
   if(!this_source) goto outofmemory;
+  this_source->next = NULL;
   this_source->reserved_data = ( uint8_t * ) malloc( reserved_size );
   if(!this_source->reserved_data) goto outofmemory;
   memcpy(this_source->reserved_data, reserved_data, reserved_size);
   this_source->reserved_size = reserved_size;
-  this_source->next = NULL;
   this_dir = makearchivedir(fs, 0, this_source);
   if(fs->adderror) goto error;
 
@@ -414,7 +390,7 @@ static int virtual_read(struct PSF2FS *fs, struct DIR_ENTRY *entry, int offset, 
       destlen = block_usize;
       // attempt decompress
       r = uncompress((unsigned char *) fs->cacheblock.uncompressed_data, &destlen, (const unsigned char *) entry->source->reserved_data + block_zofs, block_zsize);
-      if(r != Z_OK || destlen != (unsigned long)block_usize) {
+      if(r != Z_OK || destlen != block_usize) {
 //        char s[999];
 //        sprintf(s,"zdata=%02X %02X %02X blockz=%d blocku=%d destlenout=%d", zdata[0], zdata[1], zdata[2], block_zsize, block_usize, destlen);
 //        errormessageadd(fs, s);

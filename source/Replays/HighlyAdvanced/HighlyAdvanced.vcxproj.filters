@@ -631,6 +631,9 @@
     <ClCompile Include="mGBA\src\util\gbk-table.c">
       <Filter>Source Files\mGBA\src\util</Filter>
     </ClCompile>
+    <ClCompile Include="mGBA\src\core\version.c">
+      <Filter>Source Files\mGBA\src\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\3rdParty\libarchive\archive.lib">

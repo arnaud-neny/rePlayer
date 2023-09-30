@@ -224,6 +224,7 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="mGBA\src\core\thread.c" />
     <ClCompile Include="mGBA\src\core\tile-cache.c" />
     <ClCompile Include="mGBA\src\core\timing.c" />
+    <ClCompile Include="mGBA\src\core\version.c" />
     <ClCompile Include="mGBA\src\gba\audio.c" />
     <ClCompile Include="mGBA\src\gba\bios.c" />
     <ClCompile Include="mGBA\src\gba\cart\gpio.c" />

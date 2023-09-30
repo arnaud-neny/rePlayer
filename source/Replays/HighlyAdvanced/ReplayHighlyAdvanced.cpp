@@ -19,7 +19,7 @@ namespace rePlayer
         .replayId = eReplay::HighlyAdvanced,
         .name = "Highly Advanced",
         .extensions = "gsf;minigsf;gsfPk",
-        .about = "Highly Advanced 3.0.23\nChristopher Snowhill",
+        .about = "Highly Advanced 2023-09-30\nChristopher Snowhill",
         .init = ReplayHighlyAdvanced::Init,
         .load = ReplayHighlyAdvanced::Load,
         .editMetadata = ReplayHighlyAdvanced::Settings::Edit
@@ -350,12 +350,12 @@ namespace rePlayer
         if (archive_read_open_memory(archive, data.Items(), data.Size()) != ARCHIVE_OK)
         {
             m_length = kDefaultSongDuration;
-            if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+            if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0) >= 0)
             {
                 auto extPos = m_stream->GetName().find_last_of('.');
                 if (extPos == std::string::npos || _stricmp(m_stream->GetName().c_str() + extPos + 1, "gsflib") != 0)
                 {
-                    if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, GsfLoad, &m_gbaRom, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
+                    if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, GsfLoad, &m_gbaRom, nullptr, nullptr, 0) >= 0)
                     {
                         m_mediaType.ext = m_hasLib ? eExtension::_minigsf : eExtension::_gsf;
                         m_subsongs.Add({ 0, uint32_t(m_length) });
@@ -381,7 +381,7 @@ namespace rePlayer
                     m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
 
                     m_length = kDefaultSongDuration;
-                    if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+                    if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x22, nullptr, nullptr, InfoMetaPSF, this, 0) >= 0)
                     {
                         auto extPos = entryName.find_last_of('.');
                         if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "gsflib") != 0)
@@ -510,7 +510,7 @@ namespace rePlayer
 
             m_stream = io::StreamMemory::Create(m_title.c_str(), unpackedData.Items(), fileSize, true);
 
-            psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, GsfLoad, &m_gbaRom, InfoMetaPSF, this, 0, nullptr, nullptr);
+            psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x22, GsfLoad, &m_gbaRom, InfoMetaPSF, this, 0);
 
             archive_read_free(archive);
         }
@@ -613,7 +613,7 @@ namespace rePlayer
 
     std::string ReplayHighlyAdvanced::GetInfo() const
     {
-        return "6 channels\nGame Boy Advance Sound Format\nHighly Advanced 3.0.23";
+        return "6 channels\nGame Boy Advance Sound Format\nHighly Advanced 2023-09-30";
     }
 
     void ReplayHighlyAdvanced::SetupMetadata(CommandBuffer metadata)
