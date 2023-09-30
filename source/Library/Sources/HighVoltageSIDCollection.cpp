@@ -124,10 +124,13 @@ namespace rePlayer
         for (uint32_t dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
         {
             const auto& dbSong = m_db.songs[dbSongId];
-            std::string dbSongName(dbSong.name(m_db.strings));
             auto songSourceId = FindSong(dbSong);
             if (results.IsSongAvailable(SourceID(kID, songSourceId)))
                 continue;
+
+            std::string dbSongName(dbSong.name(m_db.strings));
+            for (auto* c = dbSongName.data(); c = strchr(c, '_');)
+                *c = ' ';
 
             auto song = new SongSheet();
             auto songSource = GetSongSource(songSourceId);
@@ -152,6 +155,8 @@ namespace rePlayer
                     artistId = results.artists.NumItems();
                     auto artist = new ArtistSheet();
                     artist->handles.Add(m_db.artists[dbSong.artist].name(m_db.strings));
+                    for (auto* c = artist->handles[0].String().data(); c = strchr(c, '_');)
+                        *c = ' ';
                     artist->sources.Add(artistSourceId);
                     results.artists.Add(artist);
                 }
@@ -182,6 +187,8 @@ namespace rePlayer
         {
             const auto& dbSong = m_db.songs[i];
             std::string dbSongName(dbSong.name(m_db.strings));
+            for (auto* c = dbSongName.data(); c = strchr(c, '_');)
+                *c = ' ';
 
             std::string rName = ToLower(dbSongName);
             if (strstr(rName.c_str(), lName.c_str()) == nullptr)
@@ -211,6 +218,8 @@ namespace rePlayer
                     artistId = collectedSongs.artists.NumItems();
                     auto artist = new ArtistSheet();
                     artist->handles.Add(m_db.artists[dbSong.artist].name(m_db.strings));
+                    for (auto* c = artist->handles[0].String().data(); c = strchr(c, '_');)
+                        *c = ' ';
                     artist->sources.Add(artistSourceId);
                     collectedSongs.artists.Add(artist);
                 }
