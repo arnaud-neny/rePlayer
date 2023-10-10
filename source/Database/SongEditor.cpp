@@ -357,12 +357,10 @@ namespace rePlayer
                 ImGui::Tooltip("Move down");
             ImGui::EndDisabled();
             ImGui::SameLine(0, style.ItemInnerSpacing.x);
-            ImGui::BeginDisabled(e <= 1);
             if (ImGui::Button("X", ImVec2(buttonSize, 0.0f)))
                 artistToRemove = i;
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Remove artist");
-            ImGui::EndDisabled();
             ImGui::PopID();
         }
         if (artistToRemove != m_song.edited.artistIds.NumItems())
