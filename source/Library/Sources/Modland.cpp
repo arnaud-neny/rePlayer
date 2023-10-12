@@ -1311,15 +1311,9 @@ namespace rePlayer
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kIFFSmus && dbSong.item)
             type = { eExtension::_smus, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidMon1)
-        {
             type = { eExtension::_sid1, eReplay::UADE };
-            dbSongName.resize(dbSongName.size() - 4);
-        }
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
-        {
-            type = { eExtension::_med, eReplay::OpenMPT };
-            dbSongName.resize(dbSongName.size() - 5);
-        }
+            type = { eExtension::_med, eReplay::UADE };
         else if (dbSong.isExtensionOverriden)
         {
             auto extOffset = dbSongName.find_last_of('.');

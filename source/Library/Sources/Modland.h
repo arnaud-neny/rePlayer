@@ -45,7 +45,7 @@ namespace rePlayer
         {
             enum Type : int32_t
             {
-                kOctaMED = -1,
+                kOctaMED = -2,
                 kSidMon1 = -1,
                 kDefault = 0,
                 kTFMX,
