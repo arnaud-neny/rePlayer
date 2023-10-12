@@ -16,7 +16,7 @@ namespace core
     template <typename TypeStatic>
     void Blob::Delete()
     {
-        reinterpret_cast<TypeStatic*>(this)->~TypeStatic();
+        // we don't call the destructor for a static type, as it's supposed to be a POD
         Free(this);
     }
 }
