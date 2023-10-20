@@ -99,7 +99,7 @@
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
 del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

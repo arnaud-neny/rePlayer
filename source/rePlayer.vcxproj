@@ -107,7 +107,7 @@
     </ProjectReference>
     <PostBuildEvent>
       <Command>del $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --best --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
+$(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
