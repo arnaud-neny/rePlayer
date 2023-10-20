@@ -18,10 +18,7 @@ extern "C"
 
 #include <filesystem>
 
-#include "uade.inl"
-
-#include <libarchive/archive.h>
-#include <libarchive/archive_entry.h>
+#include "data.h"
 
 extern "C" int uade_filesize(size_t * size, const char* pathname)
 {
@@ -169,26 +166,15 @@ extern "C" FILE* stdioemu_fopen(const char* filename, const char*)
     auto fixedFilename = filename;
     while (*fixedFilename == '/')
         fixedFilename++;
-    auto* uadeArchive = archive_read_new();
-    archive_read_support_format_7zip(uadeArchive);
-    if (archive_read_open_memory(uadeArchive, s_uadePackage_data, s_uadePackage_size) == ARCHIVE_OK)
+
+    for (auto& file : s_files)
     {
-        archive_entry* entry;
-        while (archive_read_next_header(uadeArchive, &entry) == ARCHIVE_OK)
+        if (stricmp(file.path, fixedFilename) == 0)
         {
-            std::string entryName = archive_entry_pathname(entry);
-            if (stricmp(entryName.c_str(), fixedFilename) == 0)
-            {
-                auto fileSize = archive_entry_size(entry);
-                auto buffer = core::Alloc<uint8_t>(fileSize, 8);
-                archive_read_data(uadeArchive, buffer, fileSize);
-                stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, buffer, fileSize, false).Detach());
-                break;
-            }
-            archive_read_data_skip(uadeArchive);
+            stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, reinterpret_cast<const uint8_t*>(file.data), file.size, true).Detach());
+            break;
         }
     }
-    archive_read_free(uadeArchive);
     if (stream == nullptr && std::filesystem::exists(filename))
     {
         if (std::filesystem::is_directory(filename))

@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -77,7 +77,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -99,13 +99,75 @@
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
 del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bencode\include\bencodetools\bencode.h" />
     <ClInclude Include="compat\memmemrep.h" />
     <ClInclude Include="compat\strlrep.h" />
+    <ClInclude Include="data.h">
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath)</Outputs>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClInclude</OutputItemType>
+      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClInclude</OutputItemType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
+echo Path=%TARGET_PATH_FOR_SOURCE%
+type nul &gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;%(FullPath)
+echo { &gt;&gt;%(FullPath)
+echo     size_t size;&gt;&gt; %(FullPath)
+echo     const unsigned int* data;&gt;&gt; %(FullPath)
+echo     const char* path;&gt;&gt; %(FullPath)
+echo } static s_files[] = {&gt;&gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=\\!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo };&gt;&gt; %(FullPath)
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
+echo Path=%TARGET_PATH_FOR_SOURCE%
+type nul &gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;%(FullPath)
+echo { &gt;&gt;%(FullPath)
+echo     size_t size;&gt;&gt; %(FullPath)
+echo     const unsigned int* data;&gt;&gt; %(FullPath)
+echo     const char* path;&gt;&gt; %(FullPath)
+echo } static s_files[] = {&gt;&gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=\\!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo };&gt;&gt; %(FullPath)
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+    </ClInclude>
     <ClInclude Include="ReplayUADE.h" />
     <ClInclude Include="ReplayUADE.inl.h" />
     <ClInclude Include="uade\src\cputbl.h" />
@@ -266,21 +328,357 @@ $(SolutionDir)..\tools\upx --best -o $(SolutionDir)..\data\replays\$(TargetFileN
     <ClCompile Include="uade\src\write_audio.c" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="uade.7z">
+    <None Include="data\eagleplayer.conf" />
+    <CustomBuild Include="data\score">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) s_uadePackage &gt; %(RootDir)%(Directory)uade.inl</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) s_uadePackage &gt; %(RootDir)%(Directory)uade.inl</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Binary to c %(Identity)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)uade.inl</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Binary to c %(Identity)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)uade.inl</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClInclude</OutputItemType>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClInclude</OutputItemType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
+type nul &gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;$(ProjectDir)data.h
+echo { &gt;&gt;$(ProjectDir)data.h
+echo     size_t size;&gt;&gt; $(ProjectDir)data.h
+echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
+echo     const char* path;&gt;&gt; $(ProjectDir)data.h
+echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=/!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo };&gt;&gt; $(ProjectDir)data.h
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
+type nul &gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;$(ProjectDir)data.h
+echo { &gt;&gt;$(ProjectDir)data.h
+echo     size_t size;&gt;&gt; $(ProjectDir)data.h
+echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
+echo     const char* path;&gt;&gt; $(ProjectDir)data.h
+echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=/!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo };&gt;&gt; $(ProjectDir)data.h
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data.h</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
     </CustomBuild>
-    <None Include="uade.inl" />
+    <None Include="data\extras\hippel_st.smp.set" />
+    <None Include="data\extras\Samples\ackerbell" />
+    <None Include="data\extras\Samples\analogstring" />
+    <None Include="data\extras\Samples\awcpiano1" />
+    <None Include="data\extras\Samples\backingstr" />
+    <None Include="data\extras\Samples\bass2" />
+    <None Include="data\extras\Samples\bass6" />
+    <None Include="data\extras\Samples\bassdrum 5160" />
+    <None Include="data\extras\Samples\bigbang.smp" />
+    <None Include="data\extras\Samples\blow" />
+    <None Include="data\extras\Samples\bongo1 2206" />
+    <None Include="data\extras\Samples\claps1" />
+    <None Include="data\extras\Samples\detune" />
+    <None Include="data\extras\Samples\digdug" />
+    <None Include="data\extras\Samples\dxtom" />
+    <None Include="data\extras\Samples\electom" />
+    <None Include="data\extras\Samples\funbass" />
+    <None Include="data\extras\Samples\guitar2" />
+    <None Include="data\extras\Samples\hae.smp" />
+    <None Include="data\extras\Samples\hallbrass" />
+    <None Include="data\extras\Samples\heavysynth" />
+    <None Include="data\extras\Samples\heavytom.smp" />
+    <None Include="data\extras\Samples\highhat2" />
+    <None Include="data\extras\Samples\highhat2 2006" />
+    <None Include="data\extras\Samples\highop2" />
+    <None Include="data\extras\Samples\hihat1" />
+    <None Include="data\extras\Samples\hihat2" />
+    <None Include="data\extras\Samples\hooman" />
+    <None Include="data\extras\Samples\korgbass" />
+    <None Include="data\extras\Samples\koto" />
+    <None Include="data\extras\Samples\metalbell" />
+    <None Include="data\extras\Samples\metalkeys" />
+    <None Include="data\extras\Samples\panflute" />
+    <None Include="data\extras\Samples\perco" />
+    <None Include="data\extras\Samples\pingbells" />
+    <None Include="data\extras\Samples\pizza" />
+    <None Include="data\extras\Samples\plunkbass" />
+    <None Include="data\extras\Samples\plunkbass2" />
+    <None Include="data\extras\Samples\popbass" />
+    <None Include="data\extras\Samples\shaker" />
+    <None Include="data\extras\Samples\shamus" />
+    <None Include="data\extras\Samples\sinecz" />
+    <None Include="data\extras\Samples\snare3" />
+    <None Include="data\extras\Samples\snare4" />
+    <None Include="data\extras\Samples\snarehard.smp" />
+    <None Include="data\extras\Samples\strings.ss" />
+    <None Include="data\extras\Samples\strings6" />
+    <None Include="data\extras\Samples\thguitar" />
+    <None Include="data\extras\Samples\tom1" />
+    <None Include="data\extras\Samples\tom2" />
+    <None Include="data\extras\Samples\tom4" />
+    <None Include="data\extras\Samples\woodblock" />
+    <None Include="data\extras\ym.aenigmatica_replay" />
+    <None Include="data\extras\ym.alteredbeast_replay" />
+    <None Include="data\extras\ym.amberstar_replay" />
+    <None Include="data\extras\ym.armalyte_replay" />
+    <None Include="data\extras\ym.big_replay" />
+    <None Include="data\extras\ym.blipblop_replay" />
+    <None Include="data\extras\ym.chipmon2_replay" />
+    <None Include="data\extras\ym.coso mmme_replay" />
+    <None Include="data\extras\ym.coso tfmx old_replay" />
+    <None Include="data\extras\ym.coso tfmx replay" />
+    <None Include="data\extras\ym.crapman1_replay" />
+    <None Include="data\extras\ym.crapman2_replay" />
+    <None Include="data\extras\ym.dyter07_replay" />
+    <None Include="data\extras\ym.fireice_replay" />
+    <None Include="data\extras\ym.gemx_replay" />
+    <None Include="data\extras\ym.ghostbattle_replay" />
+    <None Include="data\extras\ym.harlequin_replay" />
+    <None Include="data\extras\ym.huntforredoct_replay" />
+    <None Include="data\extras\ym.jimpower_replay" />
+    <None Include="data\extras\ym.lastninjaiii_replay" />
+    <None Include="data\extras\ym.lcd_replay" />
+    <None Include="data\extras\ym.mcoder_replay" />
+    <None Include="data\extras\ym.metrocross_replay" />
+    <None Include="data\extras\ym.mmme sid_replay" />
+    <None Include="data\extras\ym.ninjaremix_replay" />
+    <None Include="data\extras\ym.nobuddiesland_replay" />
+    <None Include="data\extras\ym.page_replay" />
+    <None Include="data\extras\ym.periodin3d_replay" />
+    <None Include="data\extras\ym.pshields_replay" />
+    <None Include="data\extras\ym.realms_replay" />
+    <None Include="data\extras\ym.rollingronny_replay" />
+    <None Include="data\extras\ym.shadowdancer_replay" />
+    <None Include="data\extras\ym.sidsound_replay" />
+    <None Include="data\extras\ym.spacecrusade_replay" />
+    <None Include="data\extras\ym.spacegun_replay" />
+    <None Include="data\extras\ym.stos_replay" />
+    <None Include="data\extras\ym.synthiv_replay" />
+    <None Include="data\extras\ym.taodigi_replay" />
+    <None Include="data\extras\ym.taohubbard_replay" />
+    <None Include="data\extras\ym.taoms211_replay" />
+    <None Include="data\extras\ym.tfmx_replay" />
+    <None Include="data\extras\ym.thalion_replay" />
+    <None Include="data\extras\ym.tsdpart1_replay" />
+    <None Include="data\extras\ym.tsdpart2_replay" />
+    <None Include="data\extras\ym.tsdpart4_replay" />
+    <None Include="data\extras\ym.union cuddly_replay" />
+    <None Include="data\extras\ym.utopia_replay" />
+    <None Include="data\extras\ym.vikingchild_replay" />
+    <None Include="data\extras\ym.xbiossound_replay" />
+    <None Include="data\extras\ym.zonewarrior_replay" />
+    <None Include="data\extras\ym.zout_replay" />
+    <None Include="data\players\AbyssHighestExperience" />
+    <None Include="data\players\ActionAmics" />
+    <None Include="data\players\ADPCM_mono" />
+    <None Include="data\players\Alcatraz_Packer" />
+    <None Include="data\players\AM-Composer" />
+    <None Include="data\players\AMOS" />
+    <None Include="data\players\Anders_0land" />
+    <None Include="data\players\Andrew_Parton" />
+    <None Include="data\players\AProSys" />
+    <None Include="data\players\ArtAndMagic" />
+    <None Include="data\players\ArtOfNoise-4V" />
+    <None Include="data\players\ArtOfNoise-8V" />
+    <None Include="data\players\Ashley_Hogg" />
+    <None Include="data\players\AudioSculpture" />
+    <None Include="data\players\BeathovenSynthesizer" />
+    <None Include="data\players\BenDaglish" />
+    <None Include="data\players\BenDaglish-SID" />
+    <None Include="data\players\BladePacker" />
+    <None Include="data\players\ChipTracker" />
+    <None Include="data\players\Cinemaware" />
+    <None Include="data\players\CoreDesign" />
+    <None Include="data\players\CustomMade" />
+    <None Include="data\players\DariusZendeh" />
+    <None Include="data\players\DaveLowe" />
+    <None Include="data\players\DaveLoweNew" />
+    <None Include="data\players\DaveLowe_Deli" />
+    <None Include="data\players\DavidHanney" />
+    <None Include="data\players\DavidWhittaker" />
+    <None Include="data\players\DeltaMusic1.3" />
+    <None Include="data\players\DeltaMusic2.0" />
+    <None Include="data\players\Desire" />
+    <None Include="data\players\DIGI-Booster" />
+    <None Include="data\players\DigitalSonixChrome" />
+    <None Include="data\players\DigitalSoundStudio" />
+    <None Include="data\players\DirkBialluch" />
+    <None Include="data\players\DynamicSynthesizer" />
+    <None Include="data\players\EarAche" />
+    <None Include="data\players\EMS" />
+    <None Include="data\players\EMS-6" />
+    <None Include="data\players\ENV\EaglePlayer\ahx" />
+    <None Include="data\players\ENV\EaglePlayer\ahx.waves" />
+    <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-Hippel_7V.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-Mugician_II.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-PTK-Prowiz.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-S3M.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-TFMX_7V.cfg" />
+    <None Include="data\players\ENV\EaglePlayer\EP-TFMX_Pro.cfg" />
+    <None Include="data\players\FashionTracker" />
+    <None Include="data\players\ForgottenWorlds_Game" />
+    <None Include="data\players\Fred" />
+    <None Include="data\players\FredGray" />
+    <None Include="data\players\FutureComposer-BSI" />
+    <None Include="data\players\FutureComposer1.3" />
+    <None Include="data\players\FutureComposer1.4" />
+    <None Include="data\players\FuturePlayer" />
+    <None Include="data\players\GlueMon" />
+    <None Include="data\players\GMC" />
+    <None Include="data\players\HowieDavies" />
+    <None Include="data\players\ImagesMusicSystem" />
+    <None Include="data\players\Infogrames" />
+    <None Include="data\players\InStereo" />
+    <None Include="data\players\InStereo2.0" />
+    <None Include="data\players\JamCracker" />
+    <None Include="data\players\JankoMrsicFlogel" />
+    <None Include="data\players\Janne_Salmijarvi_Optimizer" />
+    <None Include="data\players\JasonBrooke" />
+    <None Include="data\players\JasonPage" />
+    <None Include="data\players\JeroenTel" />
+    <None Include="data\players\JesperOlsen" />
+    <None Include="data\players\JesperOlsen_EP" />
+    <None Include="data\players\JochenHippel" />
+    <None Include="data\players\JochenHippel-7V" />
+    <None Include="data\players\JochenHippel-CoSo" />
+    <None Include="data\players\JochenHippel_UADE" />
+    <None Include="data\players\Jochen_Hippel_ST" />
+    <None Include="data\players\Kim_Christensen" />
+    <None Include="data\players\KrisHatlelid" />
+    <None Include="data\players\Laxity" />
+    <None Include="data\players\LegglessMusicEditor" />
+    <None Include="data\players\MagneticFieldsPacker" />
+    <None Include="data\players\MajorTom" />
+    <None Include="data\players\ManiacsOfNoise" />
+    <None Include="data\players\MarkII" />
+    <None Include="data\players\Mark_Cooksey" />
+    <None Include="data\players\Mark_Cooksey_Old" />
+    <None Include="data\players\MartinWalker" />
+    <None Include="data\players\Maximum_Effect" />
+    <None Include="data\players\MCMD" />
+    <None Include="data\players\MED" />
+    <None Include="data\players\Medley" />
+    <None Include="data\players\MIDI-Loriciel" />
+    <None Include="data\players\MikeDavies" />
+    <None Include="data\players\MMDC" />
+    <None Include="data\players\Mosh_Packer" />
+    <None Include="data\players\Mugician" />
+    <None Include="data\players\MugicianII" />
+    <None Include="data\players\MultiMedia_Sound" />
+    <None Include="data\players\MusicAssembler" />
+    <None Include="data\players\MusiclineEditor" />
+    <None Include="data\players\MusicMaker-4V" />
+    <None Include="data\players\MusicMaker-8V" />
+    <None Include="data\players\Nick_Pelling_Packer" />
+    <None Include="data\players\NovoTradePacker" />
+    <None Include="data\players\NTSP-system" />
+    <None Include="data\players\Octa-MED" />
+    <None Include="data\players\Oktalyzer" />
+    <None Include="data\players\onEscapee" />
+    <None Include="data\players\PaulRobotham" />
+    <None Include="data\players\PaulShields" />
+    <None Include="data\players\PaulSummers" />
+    <None Include="data\players\Paul_Tonge" />
+    <None Include="data\players\PeterVerswyvelen" />
+    <None Include="data\players\PierreAdane" />
+    <None Include="data\players\Pokeynoise" />
+    <None Include="data\players\PreTracker" />
+    <None Include="data\players\ProfessionalSoundArtists" />
+    <None Include="data\players\Protracker4" />
+    <None Include="data\players\PTK-Prowiz" />
+    <None Include="data\players\PumaTracker" />
+    <None Include="data\players\QuadraComposer" />
+    <None Include="data\players\Quartet" />
+    <None Include="data\players\Quartet_PSG" />
+    <None Include="data\players\Quartet_ST" />
+    <None Include="data\players\RichardJoseph" />
+    <None Include="data\players\RichardJoseph_Player" />
+    <None Include="data\players\RiffRaff" />
+    <None Include="data\players\RobHubbard" />
+    <None Include="data\players\RobHubbard_ST" />
+    <None Include="data\players\ScottJohnston" />
+    <None Include="data\players\SCUMM" />
+    <None Include="data\players\SeanConnolly" />
+    <None Include="data\players\SeanConran" />
+    <None Include="data\players\SIDMon1.0" />
+    <None Include="data\players\SIDMon2.0" />
+    <None Include="data\players\Sierra-AGI" />
+    <None Include="data\players\Silmarils" />
+    <None Include="data\players\SonicArranger" />
+    <None Include="data\players\SonicArranger-pc-all" />
+    <None Include="data\players\SonixMusicDriver" />
+    <None Include="data\players\Sound-FX" />
+    <None Include="data\players\SoundControl" />
+    <None Include="data\players\SoundFactory" />
+    <None Include="data\players\SoundImages" />
+    <None Include="data\players\SoundMaster" />
+    <None Include="data\players\SoundMon2.0" />
+    <None Include="data\players\SoundMon2.2" />
+    <None Include="data\players\SoundPlayer" />
+    <None Include="data\players\SoundProgrammingLanguage" />
+    <None Include="data\players\Soundtracker-IV" />
+    <None Include="data\players\Special-FX" />
+    <None Include="data\players\Special-FX_ST" />
+    <None Include="data\players\SpeedyA1System" />
+    <None Include="data\players\SpeedySystem" />
+    <None Include="data\players\SteveBarrett" />
+    <None Include="data\players\SteveTurner" />
+    <None Include="data\players\SUN-Tronic" />
+    <None Include="data\players\Synth" />
+    <None Include="data\players\SynthDream" />
+    <None Include="data\players\SynthPack" />
+    <None Include="data\players\SynTracker" />
+    <None Include="data\players\S\dummy_file" />
+    <None Include="data\players\TCB_Tracker" />
+    <None Include="data\players\TFMX" />
+    <None Include="data\players\TFMX-7V" />
+    <None Include="data\players\TFMX-7V-TFHD" />
+    <None Include="data\players\TFMX-Pro" />
+    <None Include="data\players\TFMX-Pro-TFHD" />
+    <None Include="data\players\TFMX-TFHD" />
+    <None Include="data\players\TFMX_ST" />
+    <None Include="data\players\TheMusicalEnlightenment" />
+    <None Include="data\players\ThomasHermann" />
+    <None Include="data\players\TimeTracker" />
+    <None Include="data\players\TimFollin" />
+    <None Include="data\players\Titanics_Packer" />
+    <None Include="data\players\TomyTracker" />
+    <None Include="data\players\Tronic" />
+    <None Include="data\players\UFO" />
+    <None Include="data\players\UltimateSoundtracker" />
+    <None Include="data\players\VoodooSupremeSynthesizer" />
+    <None Include="data\players\WallyBeben" />
+    <None Include="data\players\YM-2149" />
+    <None Include="data\players\ZoundMonitor" />
+    <None Include="data\uaerc" />
     <None Include="uade\src\table68k" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg.txt" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\3rdParty\libarchive\archive.lib" />

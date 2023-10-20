@@ -1332,7 +1332,7 @@ dsbl	subq.l	#6,a0
 	move.l	a0,dtg_AudioFree(a5)
 	lea	enpp_alloc_audio(pc),a1
 	move	jmpcom(pc),ENPP_AllocAudio(a5)
-	move.l	a1,ENPP_AllocAudio+2(a0)
+	move.l	a1,ENPP_AllocAudio+2(a5)
 
 	lea	enpp_get_list_data(pc),a0
 	move.l	a0,dtg_GetListData(a5)

@@ -45,6 +45,27 @@
     <Filter Include="3rdParty">
       <UniqueIdentifier>{965cd881-a7b7-4e59-9913-bc40a62a4dcd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\data">
+      <UniqueIdentifier>{4b2063d9-4e34-489b-bab1-a4b08a893bca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\extras">
+      <UniqueIdentifier>{6af2552a-dc11-4741-861e-56e2461993e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\players">
+      <UniqueIdentifier>{54ef8556-b92b-4b56-ae24-a965a0133dff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\extras\Samples">
+      <UniqueIdentifier>{893a2091-be6d-4758-84be-15da6cd5623a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\players\ENV">
+      <UniqueIdentifier>{3fd0de07-7ff7-45a3-bc1d-57f68e217bbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\players\S">
+      <UniqueIdentifier>{fabc3d5e-fa4c-4488-83d1-7cacc449a628}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\data\players\ENV\EaglePlayer">
+      <UniqueIdentifier>{05f0c162-1278-4e5b-a5c4-b278466c50c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayUADE.h">
@@ -230,6 +251,9 @@
     <ClInclude Include="uade\src\include\uade_logging.h">
       <Filter>Source Files\uade\include</Filter>
     </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayUADE.cpp">
@@ -396,8 +420,872 @@
     <None Include="uade\src\table68k">
       <Filter>Source Files\uade</Filter>
     </None>
-    <None Include="uade.inl">
-      <Filter>Source Files</Filter>
+    <None Include="data\eagleplayer.conf">
+      <Filter>Resource Files\data</Filter>
+    </None>
+    <None Include="data\uaerc">
+      <Filter>Resource Files\data</Filter>
+    </None>
+    <None Include="data\extras\hippel_st.smp.set">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.aenigmatica_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.alteredbeast_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.amberstar_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.armalyte_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.big_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.blipblop_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.chipmon2_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.crapman1_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.crapman2_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.dyter07_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.fireice_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.gemx_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.ghostbattle_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.harlequin_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.huntforredoct_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.jimpower_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.lastninjaiii_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.lcd_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.mcoder_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.metrocross_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.ninjaremix_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.nobuddiesland_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.page_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.periodin3d_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.pshields_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.realms_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.rollingronny_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.shadowdancer_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.sidsound_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.spacecrusade_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.spacegun_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.stos_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.synthiv_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.taodigi_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.taohubbard_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.taoms211_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.tfmx_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.thalion_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.tsdpart1_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.tsdpart2_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.tsdpart4_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.utopia_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.vikingchild_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.xbiossound_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.zonewarrior_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.zout_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.coso mmme_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.coso tfmx old_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.coso tfmx replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.mmme sid_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\ym.union cuddly_replay">
+      <Filter>Resource Files\data\extras</Filter>
+    </None>
+    <None Include="data\extras\Samples\ackerbell">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\analogstring">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\awcpiano1">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\backingstr">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\bass2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\bass6">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\bassdrum 5160">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\bigbang.smp">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\blow">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\bongo1 2206">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\claps1">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\detune">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\digdug">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\dxtom">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\electom">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\funbass">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\guitar2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\hae.smp">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\hallbrass">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\heavysynth">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\heavytom.smp">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\highhat2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\highhat2 2006">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\highop2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\hihat1">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\hihat2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\hooman">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\korgbass">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\koto">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\metalbell">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\metalkeys">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\panflute">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\perco">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\pingbells">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\pizza">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\plunkbass">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\plunkbass2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\popbass">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\shaker">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\shamus">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\sinecz">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\snare3">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\snare4">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\snarehard.smp">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\strings.ss">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\strings6">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\thguitar">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\tom1">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\tom2">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\tom4">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\extras\Samples\woodblock">
+      <Filter>Resource Files\data\extras\Samples</Filter>
+    </None>
+    <None Include="data\players\AbyssHighestExperience">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ActionAmics">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ADPCM_mono">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Alcatraz_Packer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\AM-Composer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\AMOS">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Anders_0land">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Andrew_Parton">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\AProSys">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ArtAndMagic">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ArtOfNoise-4V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ArtOfNoise-8V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Ashley_Hogg">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\AudioSculpture">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\BeathovenSynthesizer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\BenDaglish">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\BenDaglish-SID">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\BladePacker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ChipTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Cinemaware">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\CoreDesign">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\CustomMade">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DariusZendeh">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DaveLowe">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DaveLowe_Deli">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DaveLoweNew">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DavidHanney">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DavidWhittaker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DeltaMusic1.3">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DeltaMusic2.0">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Desire">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DIGI-Booster">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DigitalSonixChrome">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DigitalSoundStudio">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DirkBialluch">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\DynamicSynthesizer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\EarAche">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\EMS">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\EMS-6">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FashionTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ForgottenWorlds_Game">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Fred">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FredGray">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FutureComposer-BSI">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FutureComposer1.3">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FutureComposer1.4">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\FuturePlayer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\GlueMon">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\GMC">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\HowieDavies">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ImagesMusicSystem">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Infogrames">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\InStereo">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\InStereo2.0">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JamCracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JankoMrsicFlogel">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Janne_Salmijarvi_Optimizer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JasonBrooke">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JasonPage">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JeroenTel">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JesperOlsen">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JesperOlsen_EP">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Jochen_Hippel_ST">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JochenHippel">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JochenHippel-7V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JochenHippel-CoSo">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\JochenHippel_UADE">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Kim_Christensen">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\KrisHatlelid">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Laxity">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\LegglessMusicEditor">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MagneticFieldsPacker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MajorTom">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ManiacsOfNoise">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Mark_Cooksey">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Mark_Cooksey_Old">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MarkII">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MartinWalker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Maximum_Effect">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MCMD">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MED">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Medley">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MIDI-Loriciel">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MikeDavies">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MMDC">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Mosh_Packer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Mugician">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MugicianII">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MultiMedia_Sound">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MusicAssembler">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MusiclineEditor">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MusicMaker-4V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\MusicMaker-8V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Nick_Pelling_Packer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\NovoTradePacker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\NTSP-system">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Octa-MED">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Oktalyzer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\onEscapee">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Paul_Tonge">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PaulRobotham">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PaulShields">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PaulSummers">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PeterVerswyvelen">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PierreAdane">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Pokeynoise">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PreTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ProfessionalSoundArtists">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PTK-Prowiz">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\PumaTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\QuadraComposer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Quartet">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Quartet_PSG">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Quartet_ST">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\RichardJoseph">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\RichardJoseph_Player">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\RiffRaff">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\RobHubbard">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\RobHubbard_ST">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ScottJohnston">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SCUMM">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SeanConnolly">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SeanConran">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SIDMon1.0">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SIDMon2.0">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Sierra-AGI">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Silmarils">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SonicArranger">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SonicArranger-pc-all">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SonixMusicDriver">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Sound-FX">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundControl">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundFactory">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundImages">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundMaster">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundMon2.0">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundMon2.2">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundPlayer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SoundProgrammingLanguage">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Soundtracker-IV">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Special-FX">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Special-FX_ST">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SpeedyA1System">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SpeedySystem">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SteveBarrett">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SteveTurner">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SUN-Tronic">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Synth">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SynthDream">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SynthPack">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\SynTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TCB_Tracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX-7V">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX-7V-TFHD">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX-Pro">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX-Pro-TFHD">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX-TFHD">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TFMX_ST">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TheMusicalEnlightenment">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ThomasHermann">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TimeTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TimFollin">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Titanics_Packer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\TomyTracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\Tronic">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\UFO">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\UltimateSoundtracker">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\VoodooSupremeSynthesizer">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\WallyBeben">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\YM-2149">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ZoundMonitor">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\ahx">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\ahx.waves">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-Hippel_7V.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-Mugician_II.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-PTK-Prowiz.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-S3M.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-TFMX_7V.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\EP-TFMX_Pro.cfg">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
+    </None>
+    <None Include="data\players\S\dummy_file">
+      <Filter>Resource Files\data\players\S</Filter>
+    </None>
+    <None Include="data\players\Protracker4">
+      <Filter>Resource Files\data\players</Filter>
+    </None>
+    <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg.txt">
+      <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -406,8 +1294,8 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="uade.7z">
-      <Filter>Resource Files</Filter>
+    <CustomBuild Include="data\score">
+      <Filter>Resource Files\data</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

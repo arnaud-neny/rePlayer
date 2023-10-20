@@ -1,0 +1,14 @@
+config_description=UAE
+sound_output=exact
+sound_channels=stereo
+sound_bits=16
+sound_frequency=48000
+sound_pri_time=0
+sound_pri_cutoff=0
+sound_interpol=0
+chipmem_size=16
+cpu_speed=max
+cpu_type=68020
+cpu_compatible=true
+autoconfig=false
+accuracy=2
