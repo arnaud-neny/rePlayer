@@ -60,7 +60,7 @@ namespace rePlayer
         uint64_t m_position = 0;
         uint64_t m_duration = 0;
         Surround m_surround;
-        uint32_t m_stereoSeparation = 1000;
+        uint32_t m_stereoSeparation = 100;
         bool m_hasEnded = false;
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
