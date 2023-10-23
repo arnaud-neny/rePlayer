@@ -521,6 +521,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kFACSoundTracker);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kIFFSmus);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "Euphony") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kEuphony);
 
         CURL* curl = curl_easy_init();
 
@@ -1156,6 +1158,8 @@ namespace rePlayer
                 archiveBuffer.Add("MBMK-PKG", sizeof("MBMK-PKG") - 1);
             else if (replayType == ModlandReplay::kFACSoundTracker)
                 archiveBuffer.Add("FACS-PKG", sizeof("FACS-PKG") - 1);
+            else if (replayType == ModlandReplay::kEuphony)
+                archiveBuffer.Add("EUPH-PKG", sizeof("EUPH-PKG") - 1);
 
             bool hasFailed = false;
             bool isEntryMissing = false;
@@ -1314,6 +1318,8 @@ namespace rePlayer
             type = { eExtension::_sid1, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
             type = { eExtension::_med, eReplay::UADE };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
+            type = { eExtension::_eupPk, eReplay::Euphony };
         else if (dbSong.isExtensionOverriden)
         {
             auto extOffset = dbSongName.find_last_of('.');
@@ -1503,7 +1509,7 @@ namespace rePlayer
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
                         || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || currentReplayType == ModlandReplay::kMBM || currentReplayType == ModlandReplay::kMBMEdit
-                        || currentReplayType == ModlandReplay::kFACSoundTracker || mergePackages > 0)
+                        || currentReplayType == ModlandReplay::kFACSoundTracker || currentReplayType == ModlandReplay::kEuphony || mergePackages > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1655,6 +1661,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kIFFSmus;
             m_db.replays.Last().ext.Set(m_db.strings, "smus");
         }
+        else if (theReplay == "Euphony")
+            m_db.replays.Last().type = ModlandReplay::kEuphony;
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
         if (m_db.replays.Last().type <= ModlandReplay::kDefault)
         {

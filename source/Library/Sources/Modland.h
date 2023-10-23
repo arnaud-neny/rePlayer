@@ -88,7 +88,8 @@ namespace rePlayer
                 kMBMEdit,
                 kFACSoundTracker,
                 kDelitrackerCustom,
-                kIFFSmus
+                kIFFSmus,
+                kEuphony
             };
 
             Chars name;
