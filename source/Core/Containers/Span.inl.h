@@ -135,6 +135,24 @@ namespace core
     }
 
     template <typename ItemType>
+    inline Span<ItemType>& Span<ItemType>::operator=(const Span& otherSpan)
+    {
+        m_items = otherSpan.m_items;
+        m_numItems = otherSpan.m_numItems;
+        return *this;
+    }
+
+    template <typename ItemType>
+    inline Span<ItemType>& Span<ItemType>::operator=(Span&& otherSpan)
+    {
+        m_items = otherSpan.m_items;
+        m_numItems = otherSpan.m_numItems;
+        otherSpan.m_items = nullptr;
+        otherSpan.m_numItems = 0;
+        return *this;
+    }
+
+    template <typename ItemType>
     template <typename SearchType>
     inline const ItemType* Span<ItemType>::Find(const SearchType& searchItem) const
     {

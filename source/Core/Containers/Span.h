@@ -45,8 +45,8 @@ namespace core
         OtherItemType* Items(size_t index = 0) const;
 
         // Modifiers
-        Span& operator=(const Span& otherSpan) = delete;
-        Span& operator=(Span&& otherSpan) = delete;
+        Span& operator=(const Span& otherSpan);
+        Span& operator=(Span&& otherSpan);
 
         //
         template <typename SearchType>
