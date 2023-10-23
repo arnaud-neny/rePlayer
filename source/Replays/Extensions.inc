@@ -391,3 +391,5 @@ EXTENSION(sog)      // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)     // UADE: JochenHippel
 EXTENSION(mbmPk)    // KSS
 EXTENSION(musPk)    // NEZplug: FAC SoundTracker
+EXTENSION(eup)      // Euphony
+EXTENSION(eupPk)    // Euphony
