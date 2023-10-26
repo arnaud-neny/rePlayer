@@ -288,7 +288,7 @@ EXTENSION(ml)       // UADE: MusiclineEditor
 EXTENSION(agi)      // UADE: Sierra-AGI
 EXTENSION(tpu)      // UADE: DirkBialluch
 EXTENSION(qpa)      // UADE: Quartet
-EXTENSION(qts)      // UADE: Quartet_ST
+EXTENSION(qts)      // UADE: Quartet_ST & Quartet
 EXTENSION(miniqsf)  // Highly Quixotic
 EXTENSION(qsfPk)    // Highly Quixotic
 EXTENSION(minigsf)  // Highly Advanced
@@ -393,3 +393,4 @@ EXTENSION(mbmPk)    // KSS
 EXTENSION(musPk)    // NEZplug: FAC SoundTracker
 EXTENSION(eup)      // Euphony
 EXTENSION(eupPk)    // Euphony
+EXTENSION(4v)       // Quartet

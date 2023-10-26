@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{EE14F7A9-1876-4F88-A353-0A1A88BEF8C8}</ProjectGuid>
+    <RootNamespace>Quartet</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;SOXR_LIB;WITH_SOXR=1;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)soxr\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;SOXR_LIB;WITH_SOXR=1;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)soxr\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayQuartet.h" />
+    <ClInclude Include="soxr\src\aliases.h" />
+    <ClInclude Include="soxr\src\ccrw2.h" />
+    <ClInclude Include="soxr\src\cr.h" />
+    <ClInclude Include="soxr\src\data-io.h" />
+    <ClInclude Include="soxr\src\dev32s.h" />
+    <ClInclude Include="soxr\src\dev64s.h" />
+    <ClInclude Include="soxr\src\fft4g.h" />
+    <ClInclude Include="soxr\src\fft4g_cache.h" />
+    <ClInclude Include="soxr\src\fifo.h" />
+    <ClInclude Include="soxr\src\filter.h" />
+    <ClInclude Include="soxr\src\half-coefs.h" />
+    <ClInclude Include="soxr\src\half-fir.h" />
+    <ClInclude Include="soxr\src\internal.h" />
+    <ClInclude Include="soxr\src\math-wrap.h" />
+    <ClInclude Include="soxr\src\pffft-avx.h" />
+    <ClInclude Include="soxr\src\pffft.h" />
+    <ClInclude Include="soxr\src\poly-fir.h" />
+    <ClInclude Include="soxr\src\poly-fir0.h" />
+    <ClInclude Include="soxr\src\rdft.h" />
+    <ClInclude Include="soxr\src\rdft_t.h" />
+    <ClInclude Include="soxr\src\rint-clip.h" />
+    <ClInclude Include="soxr\src\rint.h" />
+    <ClInclude Include="soxr\src\samplerate.h" />
+    <ClInclude Include="soxr\src\soxr-config.h" />
+    <ClInclude Include="soxr\src\soxr-lsr.h" />
+    <ClInclude Include="soxr\src\soxr.h" />
+    <ClInclude Include="soxr\src\std-types.h" />
+    <ClInclude Include="soxr\src\util32s.h" />
+    <ClInclude Include="soxr\src\util64s.h" />
+    <ClInclude Include="soxr\src\vr-coefs.h" />
+    <ClInclude Include="zingzong\src\config.h" />
+    <ClInclude Include="zingzong\src\zingzong.h" />
+    <ClInclude Include="zingzong\src\zz_def.h" />
+    <ClInclude Include="zingzong\src\zz_private.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayQuartet.cpp" />
+    <ClCompile Include="soxr\src\avfft32.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\avfft32s.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr-core.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr.c" />
+    <ClCompile Include="soxr\src\cr32.c" />
+    <ClCompile Include="soxr\src\cr32s.c" />
+    <ClCompile Include="soxr\src\cr64.c" />
+    <ClCompile Include="soxr\src\cr64s.c" />
+    <ClCompile Include="soxr\src\data-io.c" />
+    <ClCompile Include="soxr\src\dbesi0.c" />
+    <ClCompile Include="soxr\src\fft4g.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g32.c" />
+    <ClCompile Include="soxr\src\fft4g32s.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g64.c" />
+    <ClCompile Include="soxr\src\filter.c" />
+    <ClCompile Include="soxr\src\pffft-wrap.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft32.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft32s.c" />
+    <ClCompile Include="soxr\src\pffft64s.c" />
+    <ClCompile Include="soxr\src\soxr-lsr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\soxr.c" />
+    <ClCompile Include="soxr\src\util-simd.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\util32s.c" />
+    <ClCompile Include="soxr\src\util64s.c" />
+    <ClCompile Include="soxr\src\vr-coefs.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="soxr\src\vr32.c" />
+    <ClCompile Include="zingzong\src\mix_common.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_help.c" />
+    <ClCompile Include="zingzong\src\mix_lerp.c" />
+    <ClCompile Include="zingzong\src\mix_none.c" />
+    <ClCompile Include="zingzong\src\mix_qerp.c" />
+    <ClCompile Include="zingzong\src\mix_soxr.c" />
+    <ClCompile Include="zingzong\src\mix_srate.c" />
+    <ClCompile Include="zingzong\src\vfs_file.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\vfs_ice.c" />
+    <ClCompile Include="zingzong\src\zz_bin.c" />
+    <ClCompile Include="zingzong\src\zz_core.c" />
+    <ClCompile Include="zingzong\src\zz_fast.c" />
+    <ClCompile Include="zingzong\src\zz_init.c" />
+    <ClCompile Include="zingzong\src\zz_load.c" />
+    <ClCompile Include="zingzong\src\zz_log.c" />
+    <ClCompile Include="zingzong\src\zz_mem.c" />
+    <ClCompile Include="zingzong\src\zz_mixers.c" />
+    <ClCompile Include="zingzong\src\zz_play.c" />
+    <ClCompile Include="zingzong\src\zz_str.c" />
+    <ClCompile Include="zingzong\src\zz_vfs.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

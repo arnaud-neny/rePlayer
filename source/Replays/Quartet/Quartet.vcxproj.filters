@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\zingzong">
+      <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\soxr">
+      <UniqueIdentifier>{1bb7ecc1-4a9e-432c-8b1b-f527183e44a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayQuartet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zingzong\src\zingzong.h">
+      <Filter>Source Files\zingzong</Filter>
+    </ClInclude>
+    <ClInclude Include="zingzong\src\zz_def.h">
+      <Filter>Source Files\zingzong</Filter>
+    </ClInclude>
+    <ClInclude Include="zingzong\src\zz_private.h">
+      <Filter>Source Files\zingzong</Filter>
+    </ClInclude>
+    <ClInclude Include="zingzong\src\config.h">
+      <Filter>Source Files\zingzong</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\aliases.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\ccrw2.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\cr.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\data-io.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\dev32s.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\dev64s.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\fft4g.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\fft4g_cache.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\fifo.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\filter.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\half-coefs.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\half-fir.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\internal.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\math-wrap.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\pffft.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\pffft-avx.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\poly-fir.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\poly-fir0.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\rdft.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\rdft_t.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\rint.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\rint-clip.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\samplerate.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\soxr.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\soxr-lsr.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\std-types.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\util32s.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\util64s.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\vr-coefs.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr\src\soxr-config.h">
+      <Filter>Source Files\soxr</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayQuartet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_common.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_help.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_lerp.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_none.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_qerp.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_soxr.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\mix_srate.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\vfs_file.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\vfs_ice.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_bin.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_core.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_fast.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_init.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_load.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_log.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_mem.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_mixers.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_play.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_str.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="zingzong\src\zz_vfs.c">
+      <Filter>Source Files\zingzong</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\avfft32.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\avfft32s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr-core.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr32.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr32s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr64.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\cr64s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\data-io.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\dbesi0.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g32.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g32s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\fft4g64.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\filter.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft-wrap.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft32.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft32s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\pffft64s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\soxr.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\soxr-lsr.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\util-simd.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\util32s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\util64s.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\vr-coefs.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr\src\vr32.c">
+      <Filter>Source Files\soxr</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
