@@ -117,12 +117,6 @@
     <Filter Include="Source Files\src\sound">
       <UniqueIdentifier>{3894cb91-b2c2-4cd4-9e60-7973a0277a1b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\src\platform">
-      <UniqueIdentifier>{3b9d98a6-8a48-43f4-b505-fb2841d67419}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src\platform\version">
-      <UniqueIdentifier>{4e03a785-bb5e-4f66-aa0d-6657f0afec82}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\src\analysis">
       <UniqueIdentifier>{929c686e-61f9-4204-97fa-9072c2291a29}</UniqueIdentifier>
     </Filter>
@@ -222,12 +216,6 @@
     <Filter Include="Source Files\3rdparty\z80ex\opcodes">
       <UniqueIdentifier>{4510e7b3-8f8e-47a1-9673-326974d6ee83}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\src\resource">
-      <UniqueIdentifier>{0b83fb1b-851f-48de-8172-eb75adda0e0b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src\resource\src">
-      <UniqueIdentifier>{708e41a8-1698-45d7-a2d0-9334c797f210}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\src\tools">
       <UniqueIdentifier>{85cf39db-ac6d-4fbe-9fc4-212e286f1c49}</UniqueIdentifier>
     </Filter>
@@ -245,30 +233,6 @@
     </Filter>
     <Filter Include="Source Files\3rdparty\lhasa\lib\public">
       <UniqueIdentifier>{84c86a53-2456-4a0f-8787-c45af14e13e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src\platform\src">
-      <UniqueIdentifier>{5dfde8d3-537d-4cab-b438-dcd5d25d00ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src\platform\src\windows">
-      <UniqueIdentifier>{a0ff5d82-f149-4185-8195-4a1cadc3fdb5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost">
-      <UniqueIdentifier>{468a55c9-052d-4da3-abf2-00541826d9f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost\locale">
-      <UniqueIdentifier>{63d82e25-f8bb-4333-a777-fa50b845cbf9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost\locale\encoding">
-      <UniqueIdentifier>{43dff723-6824-40cf-946e-751b93ac7ae2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost\locale\shared">
-      <UniqueIdentifier>{20d87c63-e99f-47b7-81ea-5b4299e216f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost\locale\util">
-      <UniqueIdentifier>{d533d737-061b-4ed4-9738-9ad153f1332f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\boost\locale\win32">
-      <UniqueIdentifier>{1f531011-0d36-4dc4-827f-97adbb075d9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\boost\mpi\collectives">
       <UniqueIdentifier>{157B974D-740F-39F2-A659-A4CB5B77F4DB}</UniqueIdentifier>
@@ -515,9 +479,6 @@
     </Filter>
     <Filter Include="Source Files\boost\preprocessor\slot\detail">
       <UniqueIdentifier>{33038155-423F-3F63-8F0E-3AFFDA3C7D8C}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\boost\locale">
-      <UniqueIdentifier>{664A1199-BB9F-36BB-AD2B-A31E48E46C77}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\boost\config\abi">
       <UniqueIdentifier>{6058F559-CF42-3650-A5F0-1AB823849769}</UniqueIdentifier>
@@ -777,9 +738,6 @@
     <Filter Include="Source Files\boost\mpi\python">
       <UniqueIdentifier>{DA48631E-7F24-3F87-B53D-0EE33058381A}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\boost\locale\boundary">
-      <UniqueIdentifier>{AEE1FFD8-314E-3A2F-B02D-AD14E0FC3074}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\boost\numeric\interval\detail">
       <UniqueIdentifier>{9C5BA642-92D8-3154-A008-5771A066FE51}</UniqueIdentifier>
     </Filter>
@@ -830,9 +788,6 @@
     </Filter>
     <Filter Include="Source Files\boost\algorithm\cxx11">
       <UniqueIdentifier>{444DEC7E-5A9E-3E1A-8EB2-9FAD68D75B62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\boost\locale\util">
-      <UniqueIdentifier>{2ECE4052-BAA3-3C61-884C-29240368BA08}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\boost\mpl\set\aux_">
       <UniqueIdentifier>{75D4C4B3-D1E1-32B9-B2A7-05D956C9E536}</UniqueIdentifier>
@@ -1149,9 +1104,6 @@
     <Filter Include="Source Files\src\module\players\xsf">
       <UniqueIdentifier>{2d4039b0-c3c6-4175-854a-834c1ec775c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\src\platform\version\src">
-      <UniqueIdentifier>{07636adf-96d4-4d74-880f-47989cd74c56}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayZXTune.h">
@@ -1384,9 +1336,6 @@
     </ClInclude>
     <ClInclude Include="boost\numeric\interval\constants.hpp">
       <Filter>Source Files\boost\numeric\interval</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\utf8_codecvt.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\mwcw\basic_bind.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\mwcw</Filter>
@@ -1724,9 +1673,6 @@
     <ClInclude Include="boost\algorithm\find_backward.hpp">
       <Filter>Source Files\boost\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\util\locale_data.hpp">
-      <Filter>Source Files\boost\locale\util</Filter>
-    </ClInclude>
     <ClInclude Include="boost\algorithm\string\std\rope_traits.hpp">
       <Filter>Source Files\boost\algorithm\string\std</Filter>
     </ClInclude>
@@ -1750,9 +1696,6 @@
     </ClInclude>
     <ClInclude Include="boost\config\no_tr1\functional.hpp">
       <Filter>Source Files\boost\config\no_tr1</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\hold_ptr.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\lexical_cast.hpp">
       <Filter>Source Files\boost</Filter>
@@ -2867,9 +2810,6 @@
     <ClInclude Include="boost\smart_ptr\detail\atomic_count_pt.hpp">
       <Filter>Source Files\boost\smart_ptr\detail</Filter>
     </ClInclude>
-    <ClInclude Include="boost\local_function.hpp">
-      <Filter>Source Files\boost</Filter>
-    </ClInclude>
     <ClInclude Include="boost\winapi\get_last_error.hpp">
       <Filter>Source Files\boost\winapi</Filter>
     </ClInclude>
@@ -3650,9 +3590,6 @@
     <ClInclude Include="boost\preprocessor\arithmetic\detail\div_base.hpp">
       <Filter>Source Files\boost\preprocessor\arithmetic\detail</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\encoding_utf.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\date_time\date_clock_device.hpp">
       <Filter>Source Files\boost\date_time</Filter>
     </ClInclude>
@@ -4283,9 +4220,6 @@
     <ClInclude Include="boost\mpl\aux_\preprocessed\msvc70\times.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\msvc70</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\boundary\types.hpp">
-      <Filter>Source Files\boost\locale\boundary</Filter>
-    </ClInclude>
     <ClInclude Include="boost\preprocessor\list\detail\dmc\fold_left.hpp">
       <Filter>Source Files\boost\preprocessor\list\detail\dmc</Filter>
     </ClInclude>
@@ -4306,9 +4240,6 @@
     </ClInclude>
     <ClInclude Include="boost\preprocessor\seq\filter.hpp">
       <Filter>Source Files\boost\preprocessor\seq</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\config.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\multiset\aux_\insert_impl.hpp">
       <Filter>Source Files\boost\mpl\multiset\aux_</Filter>
@@ -4354,9 +4285,6 @@
     </ClInclude>
     <ClInclude Include="boost\implicit_cast.hpp">
       <Filter>Source Files\boost</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\boundary\boundary_point.hpp">
-      <Filter>Source Files\boost\locale\boundary</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\list\aux_\preprocessed\plain\list40.hpp">
       <Filter>Source Files\boost\mpl\list\aux_\preprocessed\plain</Filter>
@@ -4909,9 +4837,6 @@
     </ClInclude>
     <ClInclude Include="boost\exception_ptr.hpp">
       <Filter>Source Files\boost</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\boundary.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\thread\detail\atomic_undef_macros.hpp">
       <Filter>Source Files\boost\thread\detail</Filter>
@@ -5495,9 +5420,6 @@
     <ClInclude Include="boost\range\algorithm\inplace_merge.hpp">
       <Filter>Source Files\boost\range\algorithm</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\date_time.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\concept\requires.hpp">
       <Filter>Source Files\boost\concept</Filter>
     </ClInclude>
@@ -5729,9 +5651,6 @@
     <ClInclude Include="boost\detail\binary_search.hpp">
       <Filter>Source Files\boost\detail</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\util.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\thread\shared_lock_guard.hpp">
       <Filter>Source Files\boost\thread</Filter>
     </ClInclude>
@@ -5761,9 +5680,6 @@
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\no_ttp\shift_right.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\no_ttp</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\utf.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\core\null_deleter.hpp">
       <Filter>Source Files\boost\core</Filter>
@@ -5977,9 +5893,6 @@
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\bcc551\bind_fwd.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\bcc551</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\generic_codecvt.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\preprocessor\variadic\has_opt.hpp">
       <Filter>Source Files\boost\preprocessor\variadic</Filter>
@@ -6283,9 +6196,6 @@
     </ClInclude>
     <ClInclude Include="boost\config\no_tr1\memory.hpp">
       <Filter>Source Files\boost\config\no_tr1</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\gnu_gettext.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\numeric\ublas\assignment.hpp">
       <Filter>Source Files\boost\numeric\ublas</Filter>
@@ -7298,9 +7208,6 @@
     <ClInclude Include="boost\range\detail\combine_no_rvalue.hpp">
       <Filter>Source Files\boost\range\detail</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\date_time_facet.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\bcc_pre590\iter_fold_impl.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\bcc_pre590</Filter>
     </ClInclude>
@@ -7724,9 +7631,6 @@
     <ClInclude Include="boost\mpl\aux_\preprocessed\msvc60\arg.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\msvc60</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\format.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\ratio\mpl\divides.hpp">
       <Filter>Source Files\boost\ratio\mpl</Filter>
     </ClInclude>
@@ -8129,9 +8033,6 @@
     <ClInclude Include="boost\core\snprintf.hpp">
       <Filter>Source Files\boost\core</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\info.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\predef\platform\ios.h">
       <Filter>Source Files\boost\predef\platform</Filter>
     </ClInclude>
@@ -8224,9 +8125,6 @@
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\bcc551\placeholders.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\bcc551</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\message.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\no_ctps\list.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\no_ctps</Filter>
@@ -8525,9 +8423,6 @@
     <ClInclude Include="boost\system\detail\generic_category.hpp">
       <Filter>Source Files\boost\system\detail</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\generator.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\mpl\list\aux_\preprocessed\plain\list30.hpp">
       <Filter>Source Files\boost\mpl\list\aux_\preprocessed\plain</Filter>
     </ClInclude>
@@ -8635,9 +8530,6 @@
     </ClInclude>
     <ClInclude Include="boost\exception\detail\clone_current_exception.hpp">
       <Filter>Source Files\boost\exception\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\util\string.hpp">
-      <Filter>Source Files\boost\locale\util</Filter>
     </ClInclude>
     <ClInclude Include="boost\thread\lockable_traits.hpp">
       <Filter>Source Files\boost\thread</Filter>
@@ -8758,9 +8650,6 @@
     </ClInclude>
     <ClInclude Include="boost\bind\apply.hpp">
       <Filter>Source Files\boost\bind</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\collator.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\preprocessor\repetition\detail\limits\for_256.hpp">
       <Filter>Source Files\boost\preprocessor\repetition\detail\limits</Filter>
@@ -9241,9 +9130,6 @@
     </ClInclude>
     <ClInclude Include="boost\smart_ptr\detail\spinlock_pt.hpp">
       <Filter>Source Files\boost\smart_ptr\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\conversion.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\has_key_impl.hpp">
       <Filter>Source Files\boost\mpl\aux_</Filter>
@@ -10019,9 +9905,6 @@
     <ClInclude Include="boost\type_traits\enable_if.hpp">
       <Filter>Source Files\boost\type_traits</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\localization_backend.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\utility\declval.hpp">
       <Filter>Source Files\boost\utility</Filter>
     </ClInclude>
@@ -10036,9 +9919,6 @@
     </ClInclude>
     <ClInclude Include="boost\algorithm\string\std\slist_traits.hpp">
       <Filter>Source Files\boost\algorithm\string\std</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\encoding.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\begin_end_impl.hpp">
       <Filter>Source Files\boost\mpl\aux_</Filter>
@@ -10133,9 +10013,6 @@
     <ClInclude Include="boost\thread\executors\thread_executor.hpp">
       <Filter>Source Files\boost\thread\executors</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale\time_zone.hpp">
-      <Filter>Source Files\boost\locale</Filter>
-    </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\bcc551\set_c.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\bcc551</Filter>
     </ClInclude>
@@ -10192,9 +10069,6 @@
     </ClInclude>
     <ClInclude Include="boost\preprocessor\facilities\empty.hpp">
       <Filter>Source Files\boost\preprocessor\facilities</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\formatting.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\system\api_config.hpp">
       <Filter>Source Files\boost\system</Filter>
@@ -10330,9 +10204,6 @@
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\plain\modulus.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\plain</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\boundary\segment.hpp">
-      <Filter>Source Files\boost\locale\boundary</Filter>
     </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\msvc70\lambda_no_ctps.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\msvc70</Filter>
@@ -10696,9 +10567,6 @@
     </ClInclude>
     <ClInclude Include="boost\type_traits\is_complete.hpp">
       <Filter>Source Files\boost\type_traits</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\boundary\facets.hpp">
-      <Filter>Source Files\boost\locale\boundary</Filter>
     </ClInclude>
     <ClInclude Include="boost\exception\enable_error_info.hpp">
       <Filter>Source Files\boost\exception</Filter>
@@ -11114,9 +10982,6 @@
     <ClInclude Include="boost\is_placeholder.hpp">
       <Filter>Source Files\boost</Filter>
     </ClInclude>
-    <ClInclude Include="boost\locale.hpp">
-      <Filter>Source Files\boost</Filter>
-    </ClInclude>
     <ClInclude Include="boost\mpl\aux_\preprocessed\no_ttp\advance_forward.hpp">
       <Filter>Source Files\boost\mpl\aux_\preprocessed\no_ttp</Filter>
     </ClInclude>
@@ -11200,9 +11065,6 @@
     </ClInclude>
     <ClInclude Include="boost\operators_v1.hpp">
       <Filter>Source Files\boost</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\boundary\index.hpp">
-      <Filter>Source Files\boost\locale\boundary</Filter>
     </ClInclude>
     <ClInclude Include="boost\preprocessor\iteration\detail\iter\limits\forward4_1024.hpp">
       <Filter>Source Files\boost\preprocessor\iteration\detail\iter\limits</Filter>
@@ -12001,9 +11863,6 @@
     </ClInclude>
     <ClInclude Include="boost\numeric\odeint\iterator\integrate\integrate_const.hpp">
       <Filter>Source Files\boost\numeric\odeint\iterator\integrate</Filter>
-    </ClInclude>
-    <ClInclude Include="boost\locale\encoding_errors.hpp">
-      <Filter>Source Files\boost\locale</Filter>
     </ClInclude>
     <ClInclude Include="boost\numeric\odeint\stepper\generation\generation_runge_kutta_cash_karp54.hpp">
       <Filter>Source Files\boost\numeric\odeint\stepper\generation</Filter>
@@ -13052,24 +12911,6 @@
     <ClInclude Include="src\sound\sound_parameters.h">
       <Filter>Source Files\src\sound</Filter>
     </ClInclude>
-    <ClInclude Include="src\platform\application.h">
-      <Filter>Source Files\src\platform</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\shared_library.h">
-      <Filter>Source Files\src\platform</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\shared_library_adapter.h">
-      <Filter>Source Files\src\platform</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\tools.h">
-      <Filter>Source Files\src\platform</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\api.h">
-      <Filter>Source Files\src\platform\version</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\fields.h">
-      <Filter>Source Files\src\platform\version</Filter>
-    </ClInclude>
     <ClInclude Include="src\analysis\path.h">
       <Filter>Source Files\src\analysis</Filter>
     </ClInclude>
@@ -13448,9 +13289,6 @@
     <ClInclude Include="3rdparty\z80ex\include\z80ex_dasm.h">
       <Filter>Source Files\3rdparty\z80ex\include</Filter>
     </ClInclude>
-    <ClInclude Include="src\resource\api.h">
-      <Filter>Source Files\src\resource</Filter>
-    </ClInclude>
     <ClInclude Include="src\tools\progress_callback_helpers.h">
       <Filter>Source Files\src\tools</Filter>
     </ClInclude>
@@ -13504,51 +13342,6 @@
     </ClInclude>
     <ClInclude Include="3rdparty\lhasa\lib\public\lhasa.h">
       <Filter>Source Files\3rdparty\lhasa\lib\public</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\src\shared_library_common.h">
-      <Filter>Source Files\src\platform\src</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\encoding\conv.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\encoding</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\encoding\wconv_codepage.ipp">
-      <Filter>Source Files\3rdparty\boost\locale\encoding</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\shared\ios_prop.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\shared\mo_hash.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\shared\mo_lambda.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\util\encoding.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\util\gregorian.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\util\numeric.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\util\timezone.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\util\win_codepages.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\win32\all_generator.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\win32\api.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\win32\lcid.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\boost\locale\win32\win_backend.hpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
     </ClInclude>
     <ClInclude Include="boost\chrono\typeof\boost\ratio.hpp">
       <Filter>Source Files\boost\chrono\typeof\boost</Filter>
@@ -13621,21 +13414,6 @@
     </ClInclude>
     <ClInclude Include="src\module\players\xsf\xsf_metainformation.h">
       <Filter>Source Files\src\module\players\xsf</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\src\arch.h">
-      <Filter>Source Files\src\platform\version\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\src\arm.h">
-      <Filter>Source Files\src\platform\version\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\src\os.h">
-      <Filter>Source Files\src\platform\version\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\src\toolset.h">
-      <Filter>Source Files\src\platform\version\src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\platform\version\src\x86.h">
-      <Filter>Source Files\src\platform\version\src</Filter>
     </ClInclude>
     <ClInclude Include="src\strings\casing.h">
       <Filter>Source Files\src\strings</Filter>
@@ -14494,9 +14272,6 @@
     <ClCompile Include="src\formats\archived\7zip.cpp">
       <Filter>Source Files\src\formats\archived</Filter>
     </ClCompile>
-    <ClCompile Include="src\resource\src\resource.cpp">
-      <Filter>Source Files\src\resource\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\tools\src\error.cpp">
       <Filter>Source Files\src\tools\src</Filter>
     </ClCompile>
@@ -14592,69 +14367,6 @@
     </ClCompile>
     <ClCompile Include="3rdparty\lhasa\lib\tree_decode.c">
       <Filter>Source Files\3rdparty\lhasa\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform\src\shared_library_common.cpp">
-      <Filter>Source Files\src\platform\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform\src\windows\shared_library.cpp">
-      <Filter>Source Files\src\platform\src\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform\src\windows\tools.cpp">
-      <Filter>Source Files\src\platform\src\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\encoding\codepage.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\encoding</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\date_time.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\formatting.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\ids.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\localization_backend.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\message.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\shared\mo_lambda.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\shared</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\codecvt_converter.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\default_locale.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\encoding.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\gregorian.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\info.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\util\locale_data.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\util</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\win32\collate.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\win32\converter.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\win32\lcid.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\win32\numeric.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="3rdparty\boost\locale\win32\win_backend.cpp">
-      <Filter>Source Files\3rdparty\boost\locale\win32</Filter>
     </ClCompile>
     <ClCompile Include="3rdparty\fmt\src\fmt.cc">
       <Filter>Source Files\3rdparty\fmt\src</Filter>
@@ -14799,12 +14511,6 @@
     </ClCompile>
     <ClCompile Include="src\module\players\xsf\xsf_metainformation.cpp">
       <Filter>Source Files\src\module\players\xsf</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform\version\src\fields.cpp">
-      <Filter>Source Files\src\platform\version\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform\version\src\version.cpp">
-      <Filter>Source Files\src\platform\version\src</Filter>
     </ClCompile>
     <ClCompile Include="src\strings\src\casing.cpp">
       <Filter>Source Files\src\strings\src</Filter>

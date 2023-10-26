@@ -10,7 +10,6 @@
 #include "core/module_detect.h"
 #include <core/plugins/player_plugin.h>
 #include <core/plugin.h>
-#include <core/service.h>
 #include <module/attributes.h>
 #include <module/track_state.h>
 #include <parameters/container.h>
@@ -69,8 +68,22 @@ namespace rePlayer
     Replay* ReplayZXTune::Load(io::Stream* stream, CommandBuffer metadata)
     {
         (void)metadata;
-        auto data = stream->Read();
-        const Binary::Container::Ptr dataContainer = Binary::CreateContainer({ data.Items(), data.Size() });
+        struct Data : Binary::Data
+        {
+            Data(io::Stream* stream)
+                : m_stream(stream)
+            {}
+            const void* Start() const override
+            {
+                return m_stream->Read().Items();
+            }
+            std::size_t Size() const override
+            {
+                return m_stream->GetSize();
+            }
+            SmartPtr<io::Stream> m_stream;
+        };
+        const Binary::Container::Ptr dataContainer = Binary::CreateContainer(Binary::Data::Ptr(new Data(stream)));
 
         class ModuleDetector : public Module::DetectCallback
         {
@@ -132,8 +145,7 @@ namespace rePlayer
             Array<Subsong> m_subsongs;
         };
         ModuleDetector detectCallback;
-        auto service = ZXTune::Service::Create(Parameters::Container::Create());
-        service->DetectModules(std::move(dataContainer), detectCallback);
+        ms_service->DetectModules(std::move(dataContainer), detectCallback);
         if (detectCallback.m_subsongs.IsNotEmpty())
             return new ReplayZXTune(std::move(detectCallback.m_subsongs));
         return nullptr;
@@ -164,6 +176,7 @@ namespace rePlayer
 
     int32_t ReplayZXTune::ms_stereoSeparation = 100;
     int32_t ReplayZXTune::ms_surround = 1;
+    ZXTune::Service::Ptr ReplayZXTune::ms_service = ZXTune::Service::Create(Parameters::Container::Create());
 
     ReplayZXTune::~ReplayZXTune()
     {}

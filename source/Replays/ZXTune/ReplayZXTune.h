@@ -4,6 +4,7 @@
 #include <Audio/Surround.h>
 
 #include <binary/container_factories.h>
+#include <core/service.h>
 #include <module/holder.h>
 
 namespace rePlayer
@@ -85,6 +86,8 @@ namespace rePlayer
 
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
+
+        static ZXTune::Service::Ptr ms_service;
     };
 }
 // namespace rePlayer
