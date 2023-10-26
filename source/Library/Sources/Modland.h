@@ -101,10 +101,12 @@ namespace rePlayer
         {
             const char* const name;
             ModlandReplay::Type type;
-            const char* (*getHeaderAndUrl)(std::string&);
+            const char* (*getHeaderAndUrl)(CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string&);
             MediaType (*getTypeAndName)(std::string&);
             bool (*isIgnored)(const char*);
             bool (*isMulti)(const char*) = nullptr;
+            bool isKeepingLink = false;
+            uint32_t item = 0;
         };
 
         struct ModlandArtist
@@ -165,11 +167,12 @@ namespace rePlayer
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const ModlandSong& dbSong);
         std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
+        static std::string CleanUrl(CURL* curl, const char* url);
         std::pair<Array<uint8_t>, bool> ImportTFMXSong(SourceID sourceId);
         std::pair<Array<uint8_t>, bool> ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay);
         std::pair<Array<uint8_t>, bool> ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType);
 
-        static const ModlandReplayOverride* const GetReplayOverride(ModlandReplay::Type type);
+        static ModlandReplayOverride* const GetReplayOverride(ModlandReplay::Type type);
         static const ModlandReplayOverride* const GetReplayOverride(const char* name);
         const ModlandReplayOverride* const GetReplayOverride(SourceSong* songSource) const;
 
@@ -206,7 +209,7 @@ namespace rePlayer
         mutable bool m_hasBackup = false;
 
         static const char* const ms_filename;
-        static const ModlandReplayOverride ms_replayOverrides[];
+        static ModlandReplayOverride ms_replayOverrides[];
     };
 }
 // namespace rePlayer
