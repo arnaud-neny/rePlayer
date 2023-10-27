@@ -34,7 +34,7 @@
 - Vorbis: https://github.com/edubart/minivorbis
 - Ayfly: https://github.com/l29ah/ayfly
 - gbsplay: https://github.com/mmitch/gbsplay
-- game-music-emu: https://bitbucket.org/mpyne/game-music-emu
+- game-music-emu: https://github.com/libgme/game-music-emu
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - libvgm: https://github.com/ValleyBell/libvgm
 - UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade  
@@ -56,6 +56,8 @@
 - ZXTune: https://zxtune.bitbucket.io  
   Stripped to use only ZX stuff and "fixed" for MSVC.
 - SNDH-Player: https://github.com/arnaud-carre/sndh-player
+- eupmini: https://github.com/gzaffin/eupmini
+- zingzong: https://github.com/benjihan/zingzong
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

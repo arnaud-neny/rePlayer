@@ -180,7 +180,7 @@ Or add some comments (and likes) there:
 - [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
-- [game-music-emu](https://bitbucket.org/mpyne/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
+- [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
@@ -191,7 +191,7 @@ Or add some comments (and likes) there:
 - [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
-- [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](https://github.com/jprjr/libnezplug) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd.
+- [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
 - [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
 - [vio2sf](https://bitbucket.org/losnoco/vio2sf): Nintendo DS music player.
 - [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
@@ -200,4 +200,6 @@ Or add some comments (and likes) there:
 - [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
 - [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
-- [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene
+- [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
+- [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
+- [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.

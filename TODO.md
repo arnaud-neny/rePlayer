@@ -41,4 +41,3 @@
 - 64klang: https://github.com/hzdgopher/64klang
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream
-- EUPHONY support: https://github.com/gzaffin/eupmini

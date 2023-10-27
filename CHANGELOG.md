@@ -1,3 +1,10 @@
+v0.10.0
+- Added Euphony player
+- Added Quartet player
+- Updated modland to import Euphony
+- Updated libcurl to 8.4.0
+- Bug fixes
+
 v0.9.4:
 - Added SNDH-Player
 - Updated adplug to 2.3.3.808
