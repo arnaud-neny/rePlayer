@@ -1,3 +1,6 @@
+v0.11.0
+- Added Furnace player
+
 v0.10.0
 - Added Euphony player
 - Added Quartet player

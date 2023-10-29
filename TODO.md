@@ -37,7 +37,6 @@
 - Soundcloud music player?
 - Bandcamp music player?
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
-- FurnaceTracker: https://github.com/tildearrow/furnace
 - 64klang: https://github.com/hzdgopher/64klang
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream

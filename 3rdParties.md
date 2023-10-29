@@ -58,6 +58,7 @@
 - SNDH-Player: https://github.com/arnaud-carre/sndh-player
 - eupmini: https://github.com/gzaffin/eupmini
 - zingzong: https://github.com/benjihan/zingzong
+- Furnace: https://github.com/tildearrow/furnace
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler
