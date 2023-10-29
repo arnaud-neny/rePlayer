@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{75FADF6F-4018-4B0D-8A01-ADA7FDC75155}</ProjectGuid>
+    <RootNamespace>Furnace</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)_$(Platform)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.temporaries\Replay_$(ProjectName)_$(Configuration)_$(Platform)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;zlib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="furnace\extern\adpcm\bs_codec.h" />
+    <ClInclude Include="furnace\extern\adpcm\oki_codec.h" />
+    <ClInclude Include="furnace\extern\adpcm\yma_codec.h" />
+    <ClInclude Include="furnace\extern\adpcm\ymb_codec.h" />
+    <ClInclude Include="furnace\extern\adpcm\ymz_codec.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\args.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\chrono.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\color.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\compile.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\core.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\format-inl.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\format.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\os.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\ostream.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\printf.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\ranges.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\std.h" />
+    <ClInclude Include="furnace\extern\fmt\include\fmt\xchar.h" />
+    <ClInclude Include="furnace\extern\Nuked-OPLL\opll.h" />
+    <ClInclude Include="furnace\extern\Nuked-PSG\ympsg.h" />
+    <ClInclude Include="furnace\extern\opl\opl3.h" />
+    <ClInclude Include="furnace\extern\opm\opm.h" />
+    <ClInclude Include="furnace\extern\opn\ym3438.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\defns.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAAAmp.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAAConfig.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAADevice.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAAEnv.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAAFreq.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAAImpl.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAANoise.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAASndC.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\SAASound.h" />
+    <ClInclude Include="furnace\extern\SAASound\src\types.h" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\core\vox\vox.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5504.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5505.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5506.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es550x.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k005289\k005289.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k007232\k007232.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k053260\k053260.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\n163\n163.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\scc\scc.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.hpp" />
+    <ClInclude Include="furnace\src\audio\taAudio.h" />
+    <ClInclude Include="furnace\src\baseutils.h" />
+    <ClInclude Include="furnace\src\engine\blip_buf.h" />
+    <ClInclude Include="furnace\src\engine\brrUtils.h" />
+    <ClInclude Include="furnace\src\engine\bsr.h" />
+    <ClInclude Include="furnace\src\engine\chipUtils.h" />
+    <ClInclude Include="furnace\src\engine\cmdStream.h" />
+    <ClInclude Include="furnace\src\engine\config.h" />
+    <ClInclude Include="furnace\src\engine\dataErrors.h" />
+    <ClInclude Include="furnace\src\engine\defines.h" />
+    <ClInclude Include="furnace\src\engine\dispatch.h" />
+    <ClInclude Include="furnace\src\engine\effect.h" />
+    <ClInclude Include="furnace\src\engine\effect\dummy.h" />
+    <ClInclude Include="furnace\src\engine\engine.h" />
+    <ClInclude Include="furnace\src\engine\export.h" />
+    <ClInclude Include="furnace\src\engine\export\amigaValidation.h" />
+    <ClInclude Include="furnace\src\engine\filter.h" />
+    <ClInclude Include="furnace\src\engine\instrument.h" />
+    <ClInclude Include="furnace\src\engine\macroInt.h" />
+    <ClInclude Include="furnace\src\engine\orders.h" />
+    <ClInclude Include="furnace\src\engine\pattern.h" />
+    <ClInclude Include="furnace\src\engine\platform\amiga.h" />
+    <ClInclude Include="furnace\src\engine\platform\arcade.h" />
+    <ClInclude Include="furnace\src\engine\platform\ay.h" />
+    <ClInclude Include="furnace\src\engine\platform\ay8930.h" />
+    <ClInclude Include="furnace\src\engine\platform\bubsyswsg.h" />
+    <ClInclude Include="furnace\src\engine\platform\c140.h" />
+    <ClInclude Include="furnace\src\engine\platform\c64.h" />
+    <ClInclude Include="furnace\src\engine\platform\dummy.h" />
+    <ClInclude Include="furnace\src\engine\platform\es5506.h" />
+    <ClInclude Include="furnace\src\engine\platform\fds.h" />
+    <ClInclude Include="furnace\src\engine\platform\fmsharedbase.h" />
+    <ClInclude Include="furnace\src\engine\platform\fmshared_OPM.h" />
+    <ClInclude Include="furnace\src\engine\platform\fmshared_OPN.h" />
+    <ClInclude Include="furnace\src\engine\platform\ga20.h" />
+    <ClInclude Include="furnace\src\engine\platform\gb.h" />
+    <ClInclude Include="furnace\src\engine\platform\genesis.h" />
+    <ClInclude Include="furnace\src\engine\platform\genesisext.h" />
+    <ClInclude Include="furnace\src\engine\platform\k007232.h" />
+    <ClInclude Include="furnace\src\engine\platform\k053260.h" />
+    <ClInclude Include="furnace\src\engine\platform\lynx.h" />
+    <ClInclude Include="furnace\src\engine\platform\mmc5.h" />
+    <ClInclude Include="furnace\src\engine\platform\msm5232.h" />
+    <ClInclude Include="furnace\src\engine\platform\msm6258.h" />
+    <ClInclude Include="furnace\src\engine\platform\msm6295.h" />
+    <ClInclude Include="furnace\src\engine\platform\n163.h" />
+    <ClInclude Include="furnace\src\engine\platform\namcowsg.h" />
+    <ClInclude Include="furnace\src\engine\platform\nes.h" />
+    <ClInclude Include="furnace\src\engine\platform\opl.h" />
+    <ClInclude Include="furnace\src\engine\platform\opll.h" />
+    <ClInclude Include="furnace\src\engine\platform\pce.h" />
+    <ClInclude Include="furnace\src\engine\platform\pcmdac.h" />
+    <ClInclude Include="furnace\src\engine\platform\pcspkr.h" />
+    <ClInclude Include="furnace\src\engine\platform\pet.h" />
+    <ClInclude Include="furnace\src\engine\platform\pokemini.h" />
+    <ClInclude Include="furnace\src\engine\platform\pokey.h" />
+    <ClInclude Include="furnace\src\engine\platform\pong.h" />
+    <ClInclude Include="furnace\src\engine\platform\pv1000.h" />
+    <ClInclude Include="furnace\src\engine\platform\qsound.h" />
+    <ClInclude Include="furnace\src\engine\platform\rf5c68.h" />
+    <ClInclude Include="furnace\src\engine\platform\saa.h" />
+    <ClInclude Include="furnace\src\engine\platform\scc.h" />
+    <ClInclude Include="furnace\src\engine\platform\segapcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sm8521.h" />
+    <ClInclude Include="furnace\src\engine\platform\sms.h" />
+    <ClInclude Include="furnace\src\engine\platform\snes.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ay8910.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c140_c219.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\envelope.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\extfilt.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\filter.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\pot.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\sid.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\siddefs.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\spline.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\voice.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\wave.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_d\dsid.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\array.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Dac.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\EnvelopeGenerator.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\ExternalFilter.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter6581.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter8580.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig6581.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig8580.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Integrator6581.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Integrator8580.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\OpAmp.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Potentiometer.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\resample\SincResampler.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\SID.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\sidcxx11.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\sidcxx14.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\siddefs-fp.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Spline.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Voice.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\d65modified.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ga20\iremga20.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\apu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\gb.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\gb_struct_def.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\timing.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\lynx\Mikey.hpp" />
+    <ClInclude Include="furnace\src\engine\platform\sound\namco.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\apu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\common.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\cpu_inline.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\fds.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\mmc5.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_pcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_psg.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\common.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_fds.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_mmc5.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_n106.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_vrc6.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\oki\msm5232.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\oki\okim6258.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\pce_psg.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\AltASAP.hpp" />
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\mzpokeysnd.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\pokey.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\qsound.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\rf5c68.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\saa1099.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\segapcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sm8521.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sn76496.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_common.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_config.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_endian.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_source.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\SPC_DSP.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\su.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\swan.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Oscs.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ted-sound.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\tia\Audio.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\tia\AudioChannel.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\vic20sound.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\vsu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_fm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opn.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opz.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymz280b.h" />
+    <ClInclude Include="furnace\src\engine\platform\su.h" />
+    <ClInclude Include="furnace\src\engine\platform\swan.h" />
+    <ClInclude Include="furnace\src\engine\platform\t6w28.h" />
+    <ClInclude Include="furnace\src\engine\platform\ted.h" />
+    <ClInclude Include="furnace\src\engine\platform\tia.h" />
+    <ClInclude Include="furnace\src\engine\platform\tx81z.h" />
+    <ClInclude Include="furnace\src\engine\platform\vb.h" />
+    <ClInclude Include="furnace\src\engine\platform\vera.h" />
+    <ClInclude Include="furnace\src\engine\platform\vic20.h" />
+    <ClInclude Include="furnace\src\engine\platform\vrc6.h" />
+    <ClInclude Include="furnace\src\engine\platform\x1_010.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2203.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2203ext.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2608.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2608ext.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2610.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2610b.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2610bext.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2610ext.h" />
+    <ClInclude Include="furnace\src\engine\platform\ym2610shared.h" />
+    <ClInclude Include="furnace\src\engine\platform\ymz280b.h" />
+    <ClInclude Include="furnace\src\engine\platform\zxbeeper.h" />
+    <ClInclude Include="furnace\src\engine\platform\zxbeeperquadtone.h" />
+    <ClInclude Include="furnace\src\engine\safeReader.h" />
+    <ClInclude Include="furnace\src\engine\safeWriter.h" />
+    <ClInclude Include="furnace\src\engine\sample.h" />
+    <ClInclude Include="furnace\src\engine\sfWrapper.h" />
+    <ClInclude Include="furnace\src\engine\song.h" />
+    <ClInclude Include="furnace\src\engine\waveSynth.h" />
+    <ClInclude Include="furnace\src\engine\wavetable.h" />
+    <ClInclude Include="furnace\src\engine\winStuff.h" />
+    <ClInclude Include="furnace\src\engine\workPool.h" />
+    <ClInclude Include="furnace\src\engine\zsm.h" />
+    <ClInclude Include="furnace\src\fileutils.h" />
+    <ClInclude Include="furnace\src\fixedQueue.h" />
+    <ClInclude Include="furnace\src\pch.h" />
+    <ClInclude Include="furnace\src\ta-log.h" />
+    <ClInclude Include="furnace\src\ta-utils.h" />
+    <ClInclude Include="furnace\src\utfutils.h" />
+    <ClInclude Include="ReplayFurnace.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="furnace\extern\adpcm\bs_codec.c" />
+    <ClCompile Include="furnace\extern\adpcm\oki_codec.c" />
+    <ClCompile Include="furnace\extern\adpcm\yma_codec.c" />
+    <ClCompile Include="furnace\extern\adpcm\ymb_codec.c" />
+    <ClCompile Include="furnace\extern\adpcm\ymz_codec.c" />
+    <ClCompile Include="furnace\extern\fmt\src\format.cc" />
+    <ClCompile Include="furnace\extern\fmt\src\os.cc" />
+    <ClCompile Include="furnace\extern\Nuked-OPLL\opll.c" />
+    <ClCompile Include="furnace\extern\Nuked-PSG\ympsg.c" />
+    <ClCompile Include="furnace\extern\opl\opl3.c" />
+    <ClCompile Include="furnace\extern\opm\opm.c" />
+    <ClCompile Include="furnace\extern\opn\ym3438.c" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAAAmp.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAAConfig.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAADevice.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAAEnv.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAAFreq.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAAImpl.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAANoise.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAASndC.cpp" />
+    <ClCompile Include="furnace\extern\SAASound\src\SAASound.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\core\vox\vox.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5504.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5505.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5506.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_alu.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_filter.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k005289\k005289.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k007232\k007232.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k053260\k053260.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\n163\n163.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\scc\scc.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.cpp" />
+    <ClCompile Include="furnace\src\audio\abstract.cpp" />
+    <ClCompile Include="furnace\src\audio\midi.cpp" />
+    <ClCompile Include="furnace\src\baseutils.cpp" />
+    <ClCompile Include="furnace\src\engine\blip_buf.c" />
+    <ClCompile Include="furnace\src\engine\brrUtils.c" />
+    <ClCompile Include="furnace\src\engine\cmdStream.cpp" />
+    <ClCompile Include="furnace\src\engine\cmdStreamOps.cpp" />
+    <ClCompile Include="furnace\src\engine\config.cpp" />
+    <ClCompile Include="furnace\src\engine\configEngine.cpp" />
+    <ClCompile Include="furnace\src\engine\dispatchContainer.cpp" />
+    <ClCompile Include="furnace\src\engine\effect\abstract.cpp" />
+    <ClCompile Include="furnace\src\engine\effect\dummy.cpp" />
+    <ClCompile Include="furnace\src\engine\engine.cpp" />
+    <ClCompile Include="furnace\src\engine\export.cpp" />
+    <ClCompile Include="furnace\src\engine\export\abstract.cpp" />
+    <ClCompile Include="furnace\src\engine\export\amigaValidation.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOpsIns.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOpsSample.cpp" />
+    <ClCompile Include="furnace\src\engine\filter.cpp" />
+    <ClCompile Include="furnace\src\engine\instrument.cpp" />
+    <ClCompile Include="furnace\src\engine\macroInt.cpp" />
+    <ClCompile Include="furnace\src\engine\pattern.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\abstract.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\amiga.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\arcade.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ay.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ay8930.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\bubsyswsg.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\c140.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\c64.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\dummy.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\es5506.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\fds.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ga20.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\gb.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\genesis.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\genesisext.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\k007232.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\k053260.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\lynx.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\mmc5.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\msm5232.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\msm6258.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\msm6295.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\n163.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\namcowsg.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\nes.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\opl.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\oplAInterface.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\opll.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pce.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pcmdac.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pcspkr.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pet.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pokemini.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pokey.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pong.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\pv1000.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\qsound.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\rf5c68.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\saa.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\scc.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\segapcm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sm8521.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sms.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\snes.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ay8910.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c140_c219.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\envelope.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\extfilt.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\filter.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\pot.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\sid.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\version.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\voice.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_PST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_PS_.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_P_T.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581__ST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_PST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_PS_.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_P_T.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580__ST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_d\dsid.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\array.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Dac.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\EnvelopeGenerator.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\ExternalFilter.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter6581.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter8580.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig6581.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig8580.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Integrator6581.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Integrator8580.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\OpAmp.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\resample\SincResampler.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\SID.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Spline.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\d65modified.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ga20\iremga20.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\gb\apu.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\gb\timing.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\lynx\Mikey.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\namco.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_pcm.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_psg.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_fds.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_mmc5.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_n106.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_vrc6.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\oki\msm5232.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\oki\okim6258.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\pce_psg.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\pokey\AltASAP.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\pokey\mzpokeysnd.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\qsound.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\rf5c68.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\saa1099.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\segapcm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sm8521.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sn76496.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\snes\SPC_DSP.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\su.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\swan.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ted-sound.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\tia\Audio.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\tia\AudioChannel.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\vic20sound.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\vsu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opn.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opz.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymz280b.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\su.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\swan.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\t6w28.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ted.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\tia.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\tx81z.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\vb.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\vera.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\vic20.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\vrc6.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\x1_010.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2203.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2203ext.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2608.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2608ext.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2608Interface.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2610.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2610b.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2610bext.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2610ext.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ym2610Interface.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\ymz280b.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\zxbeeper.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\zxbeeperquadtone.cpp" />
+    <ClCompile Include="furnace\src\engine\playback.cpp" />
+    <ClCompile Include="furnace\src\engine\safeReader.cpp" />
+    <ClCompile Include="furnace\src\engine\safeWriter.cpp" />
+    <ClCompile Include="furnace\src\engine\sample.cpp" />
+    <ClCompile Include="furnace\src\engine\song.cpp" />
+    <ClCompile Include="furnace\src\engine\sysDef.cpp" />
+    <ClCompile Include="furnace\src\engine\vgmOps.cpp" />
+    <ClCompile Include="furnace\src\engine\waveSynth.cpp" />
+    <ClCompile Include="furnace\src\engine\wavetable.cpp" />
+    <ClCompile Include="furnace\src\engine\wavOps.cpp" />
+    <ClCompile Include="furnace\src\engine\workPool.cpp" />
+    <ClCompile Include="furnace\src\engine\zsm.cpp" />
+    <ClCompile Include="furnace\src\engine\zsmOps.cpp" />
+    <ClCompile Include="furnace\src\fileutils.cpp" />
+    <ClCompile Include="furnace\src\log.cpp" />
+    <ClCompile Include="furnace\src\utfutils.cpp" />
+    <ClCompile Include="ReplayFurnace.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="furnace\extern\SAASound\src\SAAFreq.dat" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

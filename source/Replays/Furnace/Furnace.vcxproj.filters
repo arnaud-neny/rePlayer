@@ -1,0 +1,1552 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\furnace">
+      <UniqueIdentifier>{a12af9fc-9604-4668-b40b-0d9bce43c485}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine">
+      <UniqueIdentifier>{73719a8f-3531-4e3d-9dc0-7cb28573ec50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fmt">
+      <UniqueIdentifier>{b7dc4380-8951-4707-89f2-610b1801ad57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\audio">
+      <UniqueIdentifier>{1b402c57-dac7-4fb8-a64c-601cb3e0ae85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\adpcm">
+      <UniqueIdentifier>{feeefdf5-b2ee-451d-acf4-8e931afc9889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Nuked-OPLL">
+      <UniqueIdentifier>{1707a2af-6dcb-4d0a-b807-a88aed2f2d50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Nuked-PSG">
+      <UniqueIdentifier>{58a4f9b0-f4ab-4bfb-a989-00e32beb0a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\opl">
+      <UniqueIdentifier>{4d331c63-90b2-4758-85c6-7b32c777bd17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\opm">
+      <UniqueIdentifier>{b0e15f22-0368-4d06-8ec4-7d285e803eaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\opn">
+      <UniqueIdentifier>{e2521982-d8d7-456f-bb5e-feaf03f576d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SAASound">
+      <UniqueIdentifier>{b86db243-bd9e-45a5-a155-5cbd5f397c8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu">
+      <UniqueIdentifier>{706635ec-2767-4335-a4c4-4d0c47a7a6ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\core">
+      <UniqueIdentifier>{b1236d98-14a1-4ebb-90fb-77a52e4bbf5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\core\vox">
+      <UniqueIdentifier>{71b159f5-289d-4ae7-b836-f941160f219e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\es550x">
+      <UniqueIdentifier>{3c6a696b-2246-45cf-a7bb-1a6aedb402a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\k005289">
+      <UniqueIdentifier>{d9f0c75a-b76d-47c8-af85-c842bf9175e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\k007232">
+      <UniqueIdentifier>{9cd829ad-f3e9-4e8e-823b-cc8f59107cef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\k053260">
+      <UniqueIdentifier>{0c9270ef-4bb8-4e36-8da3-6a256757f0ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\msm6295">
+      <UniqueIdentifier>{fa5cdd26-e2f7-4017-8b0c-ca0c76a5aa9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\n163">
+      <UniqueIdentifier>{feb8416b-2054-404c-910a-0a8868398684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\scc">
+      <UniqueIdentifier>{137e117a-7ae7-43c4-b282-b975aed3882a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\vrcvi">
+      <UniqueIdentifier>{06247ddf-104b-4f29-bbb3-5af6d8698310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgsound_emu\x1_010">
+      <UniqueIdentifier>{5c3f8bd5-f180-4df4-b634-cff55dabda5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform">
+      <UniqueIdentifier>{e70c9433-c60d-48fe-b272-3c7acd7d2fa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound">
+      <UniqueIdentifier>{fc13509c-5531-480e-9132-0391cfaef889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\gb">
+      <UniqueIdentifier>{acafaf22-ec8a-4987-b134-bbf5174bf553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\nes">
+      <UniqueIdentifier>{36412134-94f3-41f5-a946-c4f087d2ec08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\nes_nsfplay">
+      <UniqueIdentifier>{24ebd63d-0222-4661-939b-08e3f17d78de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\c64">
+      <UniqueIdentifier>{4f377858-24a5-4847-a048-127cf6314e14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\c64_fp">
+      <UniqueIdentifier>{eb88ace3-3ba3-4b0f-b2bf-3070227c1cda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\c64_fp\resample">
+      <UniqueIdentifier>{53c053f9-c448-4044-a457-f8397713054e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\c64_d">
+      <UniqueIdentifier>{8d8b9a12-9a40-4cc1-b646-757a14478062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\tia">
+      <UniqueIdentifier>{005ea340-9129-4408-88f5-11f40e354a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\ymfm">
+      <UniqueIdentifier>{77832d29-1faa-445f-a6a9-d99a5fe3e100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\lynx">
+      <UniqueIdentifier>{5e60494c-7b23-4690-9eb8-c691bc602008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\pokey">
+      <UniqueIdentifier>{ad95fe7a-6a65-475e-bcef-6263c282aa87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\t6w28">
+      <UniqueIdentifier>{8a3ca7fd-02e3-4f65-a943-4981df88163c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\oki">
+      <UniqueIdentifier>{6e56e683-1967-46e2-bc8f-cc9303f820ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\snes">
+      <UniqueIdentifier>{e1db68bc-d90c-4eb6-9d67-c1fdca3f5ca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\ga20">
+      <UniqueIdentifier>{83d549ce-cede-4bed-8ba0-4484712b4798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\export">
+      <UniqueIdentifier>{8fd4e5c1-5035-4f75-9e4f-2bc488f09adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\effect">
+      <UniqueIdentifier>{72efef41-708e-486e-9838-00b35ffba515}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayFurnace.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\ta-utils.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\pch.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\blip_buf.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\brrUtils.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\bsr.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\chipUtils.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\cmdStream.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\config.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\dataErrors.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\defines.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\dispatch.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\effect.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\engine.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\export.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\filter.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\instrument.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\macroInt.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\orders.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\pattern.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\safeReader.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\safeWriter.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\sample.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\sfWrapper.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\song.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\waveSynth.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\wavetable.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\winStuff.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\workPool.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\zsm.h">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\baseutils.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\fileutils.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\fixedQueue.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\ta-log.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\utfutils.h">
+      <Filter>Source Files\furnace</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\args.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\chrono.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\color.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\compile.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\core.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\format.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\format-inl.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\os.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\ostream.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\printf.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\ranges.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\std.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\fmt\include\fmt\xchar.h">
+      <Filter>Source Files\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\audio\taAudio.h">
+      <Filter>Source Files\furnace\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm\bs_codec.h">
+      <Filter>Source Files\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm\oki_codec.h">
+      <Filter>Source Files\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm\yma_codec.h">
+      <Filter>Source Files\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm\ymb_codec.h">
+      <Filter>Source Files\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm\ymz_codec.h">
+      <Filter>Source Files\adpcm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\Nuked-OPLL\opll.h">
+      <Filter>Source Files\Nuked-OPLL</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\Nuked-PSG\ympsg.h">
+      <Filter>Source Files\Nuked-PSG</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\opl\opl3.h">
+      <Filter>Source Files\opl</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\opm\opm.h">
+      <Filter>Source Files\opm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\opn\ym3438.h">
+      <Filter>Source Files\opn</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\core\vox\vox.hpp">
+      <Filter>Source Files\vgsound_emu\core\vox</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es550x.hpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5504.hpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5505.hpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5506.hpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k005289\k005289.hpp">
+      <Filter>Source Files\vgsound_emu\k005289</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k007232\k007232.hpp">
+      <Filter>Source Files\vgsound_emu\k007232</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\k053260\k053260.hpp">
+      <Filter>Source Files\vgsound_emu\k053260</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.hpp">
+      <Filter>Source Files\vgsound_emu\msm6295</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\n163\n163.hpp">
+      <Filter>Source Files\vgsound_emu\n163</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.hpp">
+      <Filter>Source Files\vgsound_emu\x1_010</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.hpp">
+      <Filter>Source Files\vgsound_emu\vrcvi</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\vgsound_emu\src\scc\scc.hpp">
+      <Filter>Source Files\vgsound_emu\scc</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sn76496.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ay8910.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\namco.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\saa1099.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\segapcm.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\apu.h">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\timing.h">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\gb.h">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\gb\gb_struct_def.h">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\pce_psg.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\apu.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\common.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\cpu_inline.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\fds.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\mmc5.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_pcm.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_psg.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\common.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_fds.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_mmc5.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_n106.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_vrc6.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\envelope.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\extfilt.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\filter.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\pot.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\sid.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\siddefs.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\spline.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\voice.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64\wave.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\resample\SincResampler.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\array.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Dac.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\EnvelopeGenerator.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\ExternalFilter.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter6581.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Filter8580.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig6581.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig8580.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Integrator6581.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Integrator8580.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\OpAmp.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Potentiometer.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\SID.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\sidcxx11.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\sidcxx14.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\siddefs-fp.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Spline.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\Voice.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c64_d\dsid.h">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_d</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\tia\Audio.h">
+      <Filter>Source Files\furnace\engine\platform\sound\tia</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\tia\AudioChannel.h">
+      <Filter>Source Files\furnace\engine\platform\sound\tia</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_fm.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opm.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opn.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opz.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\lynx\Mikey.hpp">
+      <Filter>Source Files\furnace\engine\platform\sound\lynx</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\AltASAP.hpp">
+      <Filter>Source Files\furnace\engine\platform\sound\pokey</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\mzpokeysnd.h">
+      <Filter>Source Files\furnace\engine\platform\sound\pokey</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\pokey\pokey.h">
+      <Filter>Source Files\furnace\engine\platform\sound\pokey</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\qsound.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\su.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\swan.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\vic20sound.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\vsu.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymz280b.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.h">
+      <Filter>Source Files\furnace\engine\platform\sound\t6w28</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Oscs.h">
+      <Filter>Source Files\furnace\engine\platform\sound\t6w28</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\rf5c68.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\oki\msm5232.h">
+      <Filter>Source Files\furnace\engine\platform\sound\oki</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\oki\okim6258.h">
+      <Filter>Source Files\furnace\engine\platform\sound\oki</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_common.h">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_config.h">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_endian.h">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_source.h">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\snes\SPC_DSP.h">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ga20\iremga20.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ga20</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\c140_c219.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\d65modified.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sm8521.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ted-sound.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\defns.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAAAmp.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAAConfig.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAADevice.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAAEnv.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAAFreq.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAAImpl.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAANoise.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAASndC.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\SAASound.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\SAASound\src\types.h">
+      <Filter>Source Files\SAASound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\export\amigaValidation.h">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\effect\dummy.h">
+      <Filter>Source Files\furnace\engine\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\amiga.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\arcade.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ay.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ay8930.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\bubsyswsg.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\c64.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\c140.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\dummy.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\es5506.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\fds.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\fmshared_OPM.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\fmshared_OPN.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\fmsharedbase.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ga20.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\gb.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\genesis.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\genesisext.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\k007232.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\k053260.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\lynx.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\mmc5.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\msm5232.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\msm6258.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\msm6295.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\n163.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\namcowsg.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\nes.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\opl.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\opll.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pce.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pcmdac.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pcspkr.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pet.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pokemini.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pokey.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pong.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\pv1000.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\qsound.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\rf5c68.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\saa.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\scc.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\segapcm.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sm8521.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sms.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\snes.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\su.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\swan.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\t6w28.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ted.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\tia.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\tx81z.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\vb.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\vera.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\vic20.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\vrc6.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\x1_010.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2203.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2203ext.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2608.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2608ext.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2610.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2610b.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2610bext.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2610ext.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ym2610shared.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\ymz280b.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\zxbeeper.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\zxbeeperquadtone.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayFurnace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\fmt\src\format.cc">
+      <Filter>Source Files\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\fmt\src\os.cc">
+      <Filter>Source Files\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm\bs_codec.c">
+      <Filter>Source Files\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm\oki_codec.c">
+      <Filter>Source Files\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm\yma_codec.c">
+      <Filter>Source Files\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm\ymb_codec.c">
+      <Filter>Source Files\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm\ymz_codec.c">
+      <Filter>Source Files\adpcm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\Nuked-OPLL\opll.c">
+      <Filter>Source Files\Nuked-OPLL</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\Nuked-PSG\ympsg.c">
+      <Filter>Source Files\Nuked-PSG</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\opl\opl3.c">
+      <Filter>Source Files\opl</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\opm\opm.c">
+      <Filter>Source Files\opm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\opn\ym3438.c">
+      <Filter>Source Files\opn</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\core\vox\vox.cpp">
+      <Filter>Source Files\vgsound_emu\core\vox</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_alu.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_filter.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5504.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5505.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5506.cpp">
+      <Filter>Source Files\vgsound_emu\es550x</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k005289\k005289.cpp">
+      <Filter>Source Files\vgsound_emu\k005289</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k007232\k007232.cpp">
+      <Filter>Source Files\vgsound_emu\k007232</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\k053260\k053260.cpp">
+      <Filter>Source Files\vgsound_emu\k053260</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.cpp">
+      <Filter>Source Files\vgsound_emu\msm6295</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\n163\n163.cpp">
+      <Filter>Source Files\vgsound_emu\n163</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.cpp">
+      <Filter>Source Files\vgsound_emu\x1_010</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.cpp">
+      <Filter>Source Files\vgsound_emu\vrcvi</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\vgsound_emu\src\scc\scc.cpp">
+      <Filter>Source Files\vgsound_emu\scc</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\baseutils.cpp">
+      <Filter>Source Files\furnace</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\fileutils.cpp">
+      <Filter>Source Files\furnace</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\log.cpp">
+      <Filter>Source Files\furnace</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\utfutils.cpp">
+      <Filter>Source Files\furnace</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sn76496.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ay8910.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\namco.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\saa1099.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\segapcm.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\gb\apu.c">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\gb\timing.c">
+      <Filter>Source Files\furnace\engine\platform\sound\gb</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\pce_psg.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_pcm.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_psg.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_fds.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_mmc5.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_n106.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_vrc6.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\envelope.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\extfilt.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\filter.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\pot.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\sid.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\version.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\voice.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581__ST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_P_T.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_PS_.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave6581_PST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580__ST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_P_T.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_PS_.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64\wave8580_PST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\c64</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\resample\SincResampler.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp\resample</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\array.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Dac.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\EnvelopeGenerator.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\ExternalFilter.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter6581.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Filter8580.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig6581.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\FilterModelConfig8580.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Integrator6581.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Integrator8580.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\OpAmp.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\SID.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\Spline.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_fp</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c64_d\dsid.c">
+      <Filter>Source Files\furnace\engine\platform\sound\c64_d</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\tia\Audio.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\tia</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\tia\AudioChannel.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\tia</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opm.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opn.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opz.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\lynx\Mikey.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\lynx</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\pokey\AltASAP.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\pokey</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\pokey\mzpokeysnd.c">
+      <Filter>Source Files\furnace\engine\platform\sound\pokey</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\qsound.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\su.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\swan.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\vic20sound.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\vsu.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymz280b.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\t6w28</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\rf5c68.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\oki\msm5232.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\oki</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\oki\okim6258.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\oki</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\snes\SPC_DSP.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\snes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ga20\iremga20.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ga20</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\c140_c219.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\d65modified.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sm8521.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ted-sound.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\oplAInterface.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2608Interface.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2610Interface.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\blip_buf.c">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\brrUtils.c">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\cmdStream.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\cmdStreamOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\config.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\configEngine.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\dispatchContainer.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\engine.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\export.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOpsIns.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOpsSample.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\filter.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\instrument.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\macroInt.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\pattern.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\playback.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\safeReader.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\safeWriter.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\sample.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\song.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\sysDef.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\vgmOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\waveSynth.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\wavetable.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\wavOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\workPool.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\zsm.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\zsmOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAAAmp.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAAConfig.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAADevice.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAAEnv.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAAFreq.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAAImpl.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAANoise.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAASndC.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\SAASound\src\SAASound.cpp">
+      <Filter>Source Files\SAASound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\export\abstract.cpp">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\export\amigaValidation.cpp">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\effect\abstract.cpp">
+      <Filter>Source Files\furnace\engine\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\effect\dummy.cpp">
+      <Filter>Source Files\furnace\engine\effect</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\abstract.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\amiga.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\arcade.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ay.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ay8930.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\bubsyswsg.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\c64.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\c140.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\dummy.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\es5506.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\fds.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ga20.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\gb.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\genesis.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\genesisext.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\k007232.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\k053260.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\lynx.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\mmc5.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\msm5232.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\msm6258.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\msm6295.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\n163.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\namcowsg.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\nes.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\opl.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\opll.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pce.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pcmdac.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pcspkr.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pet.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pokemini.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pokey.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pong.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\pv1000.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\qsound.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\rf5c68.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\saa.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\scc.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\segapcm.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sm8521.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sms.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\snes.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\su.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\swan.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\t6w28.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ted.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\tia.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\tx81z.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\vb.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\vera.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\vic20.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\vrc6.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\x1_010.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2203.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2203ext.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2608.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2608ext.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2610.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2610b.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2610bext.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ym2610ext.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\ymz280b.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\zxbeeper.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\zxbeeperquadtone.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\audio\abstract.cpp">
+      <Filter>Source Files\furnace\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\audio\midi.cpp">
+      <Filter>Source Files\furnace\audio</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="furnace\extern\SAASound\src\SAAFreq.dat">
+      <Filter>Source Files\SAASound</Filter>
+    </None>
+  </ItemGroup>
+</Project>

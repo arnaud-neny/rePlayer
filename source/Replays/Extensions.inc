@@ -394,3 +394,4 @@ EXTENSION(musPk)    // NEZplug: FAC SoundTracker
 EXTENSION(eup)      // Euphony
 EXTENSION(eupPk)    // Euphony
 EXTENSION(4v)       // Quartet
+EXTENSION(fur)      // Furnace
