@@ -1108,42 +1108,46 @@ namespace rePlayer
             auto addFile = [&](const std::filesystem::path& path)
             {
                 // add only known extensions (or prefixes)
-                auto extension = path.extension().u8string();
-                if (!isAcceptingAll)
+                auto guessedExtension = path.has_extension() ? path.extension().u8string().substr(1) : std::u8string();
+                const auto pathExtension = guessedExtension;
+                const auto pathStem = path.stem().u8string();
                 {
-                    auto stem = path.stem().u8string();
+                    std::u8string prefix;
                     for (uint16_t i = 0;; i++)
                     {
                         if (i == uint16_t(eExtension::Count))
                         {
-                            // look for it the hard way
-                            auto stream = io::StreamFile::Create(reinterpret_cast<const char *>(path.u8string().c_str()));
-                            Array<CommandBuffer::Command> commands;
-                            if (auto* replay = replays.Load(stream, commands, {}))
+                            if (!prefix.empty())
                             {
-                                extension = '.';
-                                extension += replay->GetMediaType().GetExtension<char8_t>();
-                                delete replay;
+                                guessedExtension = prefix;
                                 break;
                             }
-                            return;
+                            if (!isAcceptingAll)
+                            {
+                                // look for it the hard way
+                                auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
+                                Array<CommandBuffer::Command> commands;
+                                if (auto* replay = replays.Load(stream, commands, {}))
+                                {
+                                    guessedExtension = replay->GetMediaType().GetExtension<char8_t>();
+                                    delete replay;
+                                    break;
+                                }
+                                return;
+                            }
                         }
-                        if (extension.size() > 1 && _stricmp(reinterpret_cast<const char *>(extension.c_str() + 1), MediaType::extensionNames[i]) == 0)
+                        if (_stricmp(reinterpret_cast<const char *>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
                             break;
-                        if (_strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(stem.c_str()), MediaType::extensionLengths[i]) == 0)
+                        if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
                         {
-                            if (MediaType::extensionLengths[i] == stem.size() || stem[MediaType::extensionLengths[i]] == '.')
-                            {
-                                extension = '.';
-                                extension += MediaType::GetExtension<char8_t>(i);
-                                break;
-                            }
+                            if (MediaType::extensionLengths[i] == pathStem.size() || pathStem[MediaType::extensionLengths[i]] == '.')
+                                prefix = MediaType::GetExtension<char8_t>(i);
                         }
                     }
                 }
 
                 // add to playlist
-                std::string filename = reinterpret_cast<const char*>(path.u8string().c_str());
+                const std::string filename = reinterpret_cast<const char*>(path.u8string().c_str());
                 if (auto song = m_cue.db.FindSong([&](auto* song)
                 {
                     return _stricmp(m_cue.paths.Items(song->GetSourceId(0).internalId), filename.c_str()) == 0;
@@ -1165,11 +1169,11 @@ namespace rePlayer
                 else
                 {
                     auto* songSheet = new SongSheet;
-                    songSheet->type = replays.Find(reinterpret_cast<const char*>(extension.c_str() + 1));
+                    songSheet->type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
                     if (songSheet->type.ext == eExtension::Unknown)
                         songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
-                    else if (_stricmp(reinterpret_cast<const char*>(path.extension().u8string().c_str() + 1), songSheet->type.GetExtension()) == 0)
-                        songSheet->name = reinterpret_cast<const char*>(path.stem().u8string().c_str());
+                    else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), songSheet->type.GetExtension()) == 0)
+                        songSheet->name = reinterpret_cast<const char*>(pathStem.c_str());
                     else
                     {
                         auto name = path.filename().u8string();
