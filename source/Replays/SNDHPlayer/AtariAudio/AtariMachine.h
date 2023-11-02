@@ -13,7 +13,7 @@
 static	const	uint32_t	RAM_SIZE = 4*1024*1024;
 static	const	uint32_t	RTE_INSTRUCTION_ADDR = 0x500;
 static	const	uint32_t	RESET_INSTRUCTION_ADDR = 0x502;
-static	const	uint32_t	SNDH_UPLOAD_ADDR = 0x10000;		// some SNDH can't play below (ie SynthDream2)
+static	const	uint32_t	SNDH_UPLOAD_ADDR = 0x10002;		// some SNDH can't play below (ie SynthDream2) Also some driver crash if loaded at 64KiB bound ( metal planet by Floopy at 1:44 )
 static	const	uint32_t	GEMDOS_MALLOC_EMUL_BUFFER = RAM_SIZE-0x100000;
 
 

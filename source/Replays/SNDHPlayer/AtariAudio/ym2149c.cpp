@@ -10,9 +10,6 @@
 #include "ym2149c.h"
 #include "ym2149_tables.h"
 
-// fix the high pitch issue with quartet-like STF code where square waves are active at highest frequency (period=0)
-#define	D_DOWNSAMPLE_USE_MAX_VALUE		1
-
 static uint32_t sRndSeed = 1;
 uint16_t stdLibRand()
 {
@@ -22,7 +19,6 @@ uint16_t stdLibRand()
 
 void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
 {
-	InitYmTable(s_ymMixingVolumeTable, sSTReplayTable);
 	for (int v = 0; v < 3; v++)
 	{
 		m_toneCounter[v] = 0;
@@ -72,13 +68,13 @@ void	Ym2149c::WriteReg(int reg, uint8_t value)
 		{
 			const int voice = reg >> 1;
 			m_tonePeriod[voice] = (m_regs[voice * 2 + 1] << 8) | m_regs[voice * 2];
-
+/*
 			// when period change and counter is above, counter will restart at next YM cycle
 			// but there is some delay if you do that on 3 voices using CPU. Simulate this delay
 			// with empirical offset
 			if (m_toneCounter[voice] >= m_tonePeriod[voice])
 				m_toneCounter[voice] = voice * 8;
-
+*/
 			if (m_tonePeriod[voice] <= 1)
 			{
 				if (m_insideTimerIrq)
@@ -183,13 +179,13 @@ uint16_t Ym2149c::Tick()
 // internally update YM chip state machine at 250Khz and average output for each host sample
 Ym2149c::Levels Ym2149c::ComputeNextSample(uint32_t* pSampleDebugInfo)
 {
-#if D_DOWNSAMPLE_USE_MAX_VALUE
 	uint16_t highMask = 0;
 	do
 	{
 		highMask |= Tick();
 		m_innerCycle += m_hostReplayRate;
-	} while (m_innerCycle < m_ymClockOneEighth);
+	}
+	while (m_innerCycle < m_ymClockOneEighth);
 	m_innerCycle -= m_ymClockOneEighth;
 
 	const uint32_t envLevel = m_pCurrentEnv[m_envPos + 32];
@@ -206,32 +202,19 @@ Ym2149c::Levels Ym2149c::ComputeNextSample(uint32_t* pSampleDebugInfo)
 	{
 		levels[i] &= highMask;
 		assert(levels[i] < 0x1000);
-		out.uLevels[i] = s_ymMixingVolumeTable[levels[i]];
+		const uint32_t indexA = ((levels[i] >> 0) & 15) + ((m_tonePeriod[0] > 1) ? 0 : 16);
+		const uint32_t indexB = ((levels[i] >> 4) & 15) + ((m_tonePeriod[1] > 1) ? 0 : 16);
+		const uint32_t indexC = ((levels[i] >> 8) & 15) + ((m_tonePeriod[2] > 1) ? 0 : 16);
+		uint32_t levelA = s_ym2149LogLevels[indexA];
+		uint32_t levelB = s_ym2149LogLevels[indexB];
+		uint32_t levelC = s_ym2149LogLevels[indexC];
+		out.uLevels[i] = levelA + levelB + levelC;
 	}
+
 	out = dcAdjust(out);
-	if (pSampleDebugInfo)
-		*pSampleDebugInfo = s444to888[levels[0]];
-#else
-	// down-sample by averaging samples
-	uint16_t tickLevel;
-	for (;;)
-	{
-		tickLevel = Tick();
-		m_innerCycle += m_hostReplayRate;
-		if (m_innerCycle >= m_ymClockOneEighth)
-			break;
-		m_currentLevel += tickLevel;
-	}
+//	if (pSampleDebugInfo)
+//		*pSampleDebugInfo = (s_ViewVolTab[indexA] << 0) | (s_ViewVolTab[indexB] << 8) | (s_ViewVolTab[indexC] << 16);
 
-	m_innerCycle -= m_ymClockOneEighth;
-	const int beta = (m_innerCycle << 12) / m_hostReplayRate;
-	const int alpha = (1 << 12) - beta;
-
-	m_currentLevel += (tickLevel * alpha) >> 12;
-	m_currentLevel = (m_currentLevel * m_resamplingDividor) >> 12;	// average divide by (250Khz/replayrate)
-	int16_t out = dcAdjust(m_currentLevel);
-	m_currentLevel = (tickLevel * beta) >> 12;	// keep reminder for next call
-#endif
 	return out;
 }
 
