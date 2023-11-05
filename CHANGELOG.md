@@ -1,5 +1,7 @@
-v0.11.0
+v0.11.1
 - Added Furnace player
+- Updated SNDH-Player to 0.72
+- Bug fixes
 
 v0.10.0
 - Added Euphony player
