@@ -105,6 +105,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void ImGuiInit()
 {
+    ImGui_ImplWin32_EnableDpiAwareness();
+
     ImGui::SetAllocatorFunctions([](size_t size, void*) { return core::Alloc(size, 0); }
         , [](void* ptr, void*) { core::Free(ptr); });
     ImGui::CreateContext();
