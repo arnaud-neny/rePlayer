@@ -307,8 +307,6 @@ static void ASAPInfo_Destruct(ASAPInfo *self);
 
 static bool ASAPInfo_IsValidChar(int c);
 
-static bool ASAPInfo_CheckValidChar(int c);
-
 static int ASAPInfo_GetWord(uint8_t const *array, int i);
 
 static bool ASAPInfo_ParseModule(ASAPInfo *self, uint8_t const *module, int moduleLen);
@@ -432,6 +430,8 @@ static int ASAP_Do6502Frame(ASAP *self);
 static int ASAP_DoFrame(ASAP *self);
 
 static bool ASAP_Do6502Init(ASAP *self, int pc, int a, int x, int y);
+
+static bool ASAP_RestartSong(ASAP *self);
 
 static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds);
 
@@ -2497,12 +2497,8 @@ void ASAP_MutePokeyChannels(ASAP *self, int mask)
 	Pokey_Mute(&self->pokeys.extraPokey, mask >> 4);
 }
 
-bool ASAP_PlaySong(ASAP *self, int song, int duration)
+static bool ASAP_RestartSong(ASAP *self)
 {
-	if (song < 0 || song >= ASAPInfo_GetSongs(&self->moduleInfo))
-		return false;
-	self->currentSong = song;
-	self->currentDuration = duration;
 	self->nextPlayerCycle = 8388608;
 	self->blocksPlayed = 0;
 	self->silenceCyclesCounter = self->silenceCycles;
@@ -2519,7 +2515,7 @@ bool ASAP_PlaySong(ASAP *self, int song, int duration)
 	int music = ASAPInfo_GetMusicAddress(&self->moduleInfo);
 	switch (self->moduleInfo.type) {
 	case ASAPModuleType_SAP_B:
-		if (!ASAP_Do6502Init(self, ASAPInfo_GetInitAddress(&self->moduleInfo), song, 0, 0))
+		if (!ASAP_Do6502Init(self, ASAPInfo_GetInitAddress(&self->moduleInfo), self->currentSong, 0, 0))
 			return false;
 		break;
 	case ASAPModuleType_SAP_C:
@@ -2529,47 +2525,56 @@ bool ASAP_PlaySong(ASAP *self, int song, int duration)
 	case ASAPModuleType_CMS:
 		if (!ASAP_Do6502Init(self, player + 3, 112, music, music >> 8))
 			return false;
-		if (!ASAP_Do6502Init(self, player + 3, 0, song, 0))
+		if (!ASAP_Do6502Init(self, player + 3, 0, self->currentSong, 0))
 			return false;
 		break;
 	case ASAPModuleType_SAP_D:
 	case ASAPModuleType_SAP_S:
 		self->cpu.pc = ASAPInfo_GetInitAddress(&self->moduleInfo);
-		self->cpu.a = song;
+		self->cpu.a = self->currentSong;
 		self->cpu.x = 0;
 		self->cpu.y = 0;
 		self->cpu.s = 255;
 		break;
 	case ASAPModuleType_DLT:
-		if (!ASAP_Do6502Init(self, player + 256, 0, 0, self->moduleInfo.songPos[song]))
+		if (!ASAP_Do6502Init(self, player + 256, 0, 0, self->moduleInfo.songPos[self->currentSong]))
 			return false;
 		break;
 	case ASAPModuleType_MPT:
 		if (!ASAP_Do6502Init(self, player, 0, music >> 8, music))
 			return false;
-		if (!ASAP_Do6502Init(self, player, 2, self->moduleInfo.songPos[song], 0))
+		if (!ASAP_Do6502Init(self, player, 2, self->moduleInfo.songPos[self->currentSong], 0))
 			return false;
 		break;
 	case ASAPModuleType_RMT:
-		if (!ASAP_Do6502Init(self, player, self->moduleInfo.songPos[song], music, music >> 8))
+		if (!ASAP_Do6502Init(self, player, self->moduleInfo.songPos[self->currentSong], music, music >> 8))
 			return false;
 		break;
 	case ASAPModuleType_TMC:
 	case ASAPModuleType_TM2:
 		if (!ASAP_Do6502Init(self, player, 112, music >> 8, music))
 			return false;
-		if (!ASAP_Do6502Init(self, player, 0, song, 0))
+		if (!ASAP_Do6502Init(self, player, 0, self->currentSong, 0))
 			return false;
 		self->tmcPerFrameCounter = 1;
 		break;
 	case ASAPModuleType_FC:
-		if (!ASAP_Do6502Init(self, player, song, 0, 0))
+		if (!ASAP_Do6502Init(self, player, self->currentSong, 0, 0))
 			return false;
 		break;
 	}
 	ASAP_MutePokeyChannels(self, 0);
 	self->nextPlayerCycle = 0;
 	return true;
+}
+
+bool ASAP_PlaySong(ASAP *self, int song, int duration)
+{
+	if (song < 0 || song >= ASAPInfo_GetSongs(&self->moduleInfo))
+		return false;
+	self->currentSong = song;
+	self->currentDuration = duration;
+	return ASAP_RestartSong(self);
 }
 
 int ASAP_GetBlocksPlayed(const ASAP *self)
@@ -2591,7 +2596,7 @@ static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds)
 bool ASAP_SeekSample(ASAP *self, int block)
 {
 	if (block < self->blocksPlayed) {
-		if (!ASAP_PlaySong(self, self->currentSong, self->currentDuration))
+		if (!ASAP_RestartSong(self))
 			return false;
 	}
 	while (self->blocksPlayed + self->pokeys.readySamplesEnd < block) {
@@ -2842,13 +2847,6 @@ void ASAPInfo_Delete(ASAPInfo *self)
 static bool ASAPInfo_IsValidChar(int c)
 {
 	return c >= ' ' && c <= '|' && c != '`' && c != '{';
-}
-
-static bool ASAPInfo_CheckValidChar(int c)
-{
-	if (!ASAPInfo_IsValidChar(c))
-		return false;
-	return true;
 }
 
 static int ASAPInfo_GetWord(uint8_t const *array, int i)
@@ -3860,7 +3858,7 @@ static bool ASAPInfo_ParseSap(ASAPInfo *self, uint8_t const *module, int moduleL
 		for (;;) {
 			int c = module[moduleIndex];
 			if (c > ' ') {
-				if (!ASAPInfo_CheckValidChar(c))
+				if (!ASAPInfo_IsValidChar(c))
 					return false;
 				if (argStart < 0)
 					argStart = moduleIndex;
@@ -4131,10 +4129,9 @@ static bool ASAPInfo_CheckValidText(const char *s)
 {
 	if ((int) strlen(s) > 127)
 		return false;
-	for (const char *c = s; *c != '\0'; c++) {
-		if (!ASAPInfo_CheckValidChar(*c))
+	for (const char *c = s; *c != '\0'; c++)
+		if (!ASAPInfo_IsValidChar(*c))
 			return false;
-	}
 	return true;
 }
 
@@ -7087,7 +7084,7 @@ static void Pokey_Initialize(Pokey *self, int sampleRate)
 	self->iirAcc = 0;
 	self->iirRate = 264600 / sampleRate;
 	self->sumDACInputs = 0;
-	self->sumDACOutputs = 0; // rePlayer
+	self->sumDACOutputs = 0;
 	Pokey_StartFrame(self);
 }
 
@@ -7564,6 +7561,7 @@ static bool PokeyPair_IsSilent(const PokeyPair *self)
 	return Pokey_IsSilent(&self->basePokey) && Pokey_IsSilent(&self->extraPokey);
 }
 
+// rePlayer begin
 const char* ASAPInfo_GetExt(const ASAPInfo* info)
 {
 	switch (info->type)
@@ -7596,3 +7594,4 @@ const char* ASAPInfo_GetExt(const ASAPInfo* info)
 	}
 	return "";
 }
+// rePlayer end

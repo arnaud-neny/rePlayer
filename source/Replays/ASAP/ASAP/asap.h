@@ -61,6 +61,7 @@ void ASAP_DetectSilence(ASAP *self, int seconds);
  * @param filename Filename, used to determine the format.
  * @param module Contents of the file.
  * @param moduleLen Length of the file.
+ * @return <code>false</code> on error.
  */
 bool ASAP_Load(ASAP *self, const char *filename, uint8_t const *module, int moduleLen);
 
@@ -82,6 +83,7 @@ void ASAP_MutePokeyChannels(ASAP *self, int mask);
  * @param self This <code>ASAP</code>.
  * @param song Zero-based song index.
  * @param duration Playback time in milliseconds, -1 means infinity.
+ * @return <code>false</code> on error.
  */
 bool ASAP_PlaySong(ASAP *self, int song, int duration);
 
@@ -102,6 +104,7 @@ int ASAP_GetPosition(const ASAP *self);
  * Changes the playback position.
  * @param self This <code>ASAP</code>.
  * @param block The requested absolute position in samples (always 44100 per second, even in stereo).
+ * @return <code>false</code> on error.
  */
 bool ASAP_SeekSample(ASAP *self, int block);
 
@@ -109,6 +112,7 @@ bool ASAP_SeekSample(ASAP *self, int block);
  * Changes the playback position.
  * @param self This <code>ASAP</code>.
  * @param position The requested absolute position in milliseconds.
+ * @return <code>false</code> on error.
  */
 bool ASAP_Seek(ASAP *self, int position);
 
@@ -154,12 +158,12 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - micro part.
  */
-#define ASAPInfo_VERSION_MICRO 0
+#define ASAPInfo_VERSION_MICRO 1
 
 /**
  * ASAP version as a string.
  */
-#define ASAPInfo_VERSION "6.0.0"
+#define ASAPInfo_VERSION "6.0.1"
 
 /**
  * Years ASAP was created in.
@@ -196,6 +200,7 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * Returns the number of milliseconds represented by the given string.
  * @param s Time in the <code>"mm:ss.xxx"</code> format.
+ * @return <code>-1</code> on error.
  */
 int ASAPInfo_ParseDuration(const char *s);
 
@@ -219,6 +224,7 @@ bool ASAPInfo_IsOurExt(const char *ext);
  * @param filename Filename, used to determine the format.
  * @param module Contents of the file.
  * @param moduleLen Length of the file.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_Load(ASAPInfo *self, const char *filename, uint8_t const *module, int moduleLen);
 
@@ -238,6 +244,7 @@ const char *ASAPInfo_GetAuthor(const ASAPInfo *self);
  * An empty string means the author is unknown.
  * @param self This <code>ASAPInfo</code>.
  * @param value New author's name for the current music.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetAuthor(ASAPInfo *self, const char *value);
 
@@ -253,6 +260,7 @@ const char *ASAPInfo_GetTitle(const ASAPInfo *self);
  * An empty string means the title is unknown.
  * @param self This <code>ASAPInfo</code>.
  * @param value New title for the current music.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetTitle(ASAPInfo *self, const char *value);
 
@@ -291,6 +299,7 @@ const char *ASAPInfo_GetDate(const ASAPInfo *self);
  * <p>An empty string means the date is unknown.
  * @param self This <code>ASAPInfo</code>.
  * @param value New music creation date.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetDate(ASAPInfo *self, const char *value);
 
@@ -338,6 +347,7 @@ int ASAPInfo_GetDefaultSong(const ASAPInfo *self);
  * Sets the 0-based index of the "main" song.
  * @param self This <code>ASAPInfo</code>.
  * @param song New default song.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetDefaultSong(ASAPInfo *self, int song);
 
@@ -355,6 +365,7 @@ int ASAPInfo_GetDuration(const ASAPInfo *self, int song);
  * @param self This <code>ASAPInfo</code>.
  * @param song Song to set length of, 0-based.
  * @param duration New length in milliseconds.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetDuration(ASAPInfo *self, int song, int duration);
 
@@ -382,6 +393,7 @@ bool ASAPInfo_GetLoop(const ASAPInfo *self, int song);
  * @param self This <code>ASAPInfo</code>.
  * @param song Song to set as looping, 0-based.
  * @param loop <code>true</code> if the song loops.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetLoop(ASAPInfo *self, int song, bool loop);
 
@@ -435,6 +447,7 @@ int ASAPInfo_GetMusicAddress(const ASAPInfo *self);
  * Use only with <code>ASAPWriter.Write</code>.
  * @param self This <code>ASAPInfo</code>.
  * @param address New music address.
+ * @return <code>false</code> on error.
  */
 bool ASAPInfo_SetMusicAddress(ASAPInfo *self, int address);
 
@@ -476,6 +489,7 @@ int ASAPInfo_GetInstrumentNamesOffset(const ASAPInfo *self, uint8_t const *modul
 /**
  * Returns human-readable description of the filename extension.
  * @param ext Filename extension without the leading dot.
+ * @return <code>NULL</code> on error.
  */
 const char *ASAPInfo_GetExtDescription(const char *ext);
 
@@ -538,10 +552,11 @@ void ASAPWriter_SetOutput(ASAPWriter *self, uint8_t *output, int startIndex, int
  * @param module Contents of the source file.
  * @param moduleLen Length of the source file.
  * @param tag Display information (xex output only).
+ * @return <code>-1</code> on error.
  */
 int ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPInfo *info, uint8_t const *module, int moduleLen, bool tag);
 
-const char* ASAPInfo_GetExt(const ASAPInfo* info);
+const char* ASAPInfo_GetExt(const ASAPInfo* info); // rePlayer
 
 #ifdef __cplusplus
 }
