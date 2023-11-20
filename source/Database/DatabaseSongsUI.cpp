@@ -485,7 +485,7 @@ namespace rePlayer
             auto songIndex = m_export->GetStatus(progress, duration);
             MusicID musicId = m_export->GetMusicId(songIndex);
 
-            ImGui::BeginChild("Labels", ImVec2(320.0f, ImGui::GetFrameHeight() * 3 + ImGui::GetFrameHeightWithSpacing()), false, ImGuiWindowFlags_NoSavedSettings);
+            ImGui::BeginChild("Labels", ImVec2(320.0f, ImGui::GetFrameHeight() * 3 + ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_NoSavedSettings);
             ImGui::Text("ID     : %08X%c", musicId.subsongId.value, musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
             ImGui::Text("Title  : %s", musicId.GetTitle().c_str());
             ImGui::Text(musicId.GetSong()->NumArtistIds() > 1 ? "Artists: %s" : "Artist : %s", musicId.GetArtists().c_str());
@@ -602,7 +602,7 @@ namespace rePlayer
     {
         // Update the selection
         bool isSelected = m_entries[rowIdx].isSelected;
-        if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastFirstRowHeight)))//tbd: using imgui_internal for row height
+        if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//tbd: using imgui_internal for row height
             isSelected = Select(rowIdx, musicId, isSelected);
         // Open song editor with middle button
         if (ImGui::IsItemClicked(ImGuiMouseButton_Middle))

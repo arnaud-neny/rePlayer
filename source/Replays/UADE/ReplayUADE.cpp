@@ -457,13 +457,12 @@ namespace rePlayer
             ImGui::SetNextItemWidth(-FLT_MIN);
             struct Label
             {
-                static bool Get(void* data, int idx, const char** outStr)
+                static const char* Get(void* data, int idx)
                 {
                     auto* This = reinterpret_cast<Label*>(data);
                     This->str = "Player: ";
                     This->str += ms_globals.strings.Items(ms_globals.players[idx].first);
-                    *outStr = This->str.c_str();
-                    return true;
+                    return This->str.c_str();
                 }
                 std::string str;
             } label;

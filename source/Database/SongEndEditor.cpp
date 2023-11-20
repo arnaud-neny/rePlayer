@@ -248,7 +248,7 @@ namespace rePlayer
     {
         auto pos = ImGui::GetCursorScreenPos();
         uint32_t width = 1;
-        if (ImGui::BeginChild("WaveForm", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), false, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysHorizontalScrollbar))
+        if (ImGui::BeginChild("WaveForm", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysHorizontalScrollbar))
         {
             if (ImGui::IsWindowAppearing())
                 ImGui::SetScrollX(0);

@@ -174,7 +174,7 @@ namespace rePlayer
         {
             struct
             {
-                static bool getter(void* data, int32_t index, const char** outText) { *outText = reinterpret_cast<Replays*>(data)->m_settingsPlugins[index]->settings; return true; }
+                static const char* getter(void* data, int32_t index) { return reinterpret_cast<Replays*>(data)->m_settingsPlugins[index]->settings; }
             } cb;
             ImGui::SetNextItemWidth(-FLT_MIN);
             ImGui::Combo("##Replays", &m_selectedSettings, cb.getter, (void*)this, m_numSettings);

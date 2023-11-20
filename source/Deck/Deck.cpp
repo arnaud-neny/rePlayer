@@ -155,10 +155,10 @@ namespace rePlayer
             ImGui::TablePushBackgroundChannel();
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
             draw_list->AddRectFilled(ImVec2(table->BorderX1, table->RowPosY1)
-                , ImVec2(x, table->RowPosY2 + tableInstanceData->LastFirstRowHeight + 1)
+                , ImVec2(x, table->RowPosY2 + tableInstanceData->LastTopHeadersRowHeight + 1)
                 , ImGui::GetColorU32(color1));
             draw_list->AddRectFilled(ImVec2(x, table->RowPosY1)
-                , ImVec2(table->BorderX2, table->RowPosY2 + tableInstanceData->LastFirstRowHeight + 1)
+                , ImVec2(table->BorderX2, table->RowPosY2 + tableInstanceData->LastTopHeadersRowHeight + 1)
                 , ImGui::GetColorU32(color2));
             ImGui::TablePopBackgroundChannel();
 
@@ -391,7 +391,7 @@ namespace rePlayer
 
         // VuMeter
         ImGui::BeginGroup();
-        ImGui::BeginChild("VuMeter", ImVec2(24.0f, m_VuMeterHeight), false, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs);//child window to prevent the hover (then tooltip from histogram)
+        ImGui::BeginChild("VuMeter", ImVec2(24.0f, m_VuMeterHeight), ImGuiChildFlags_None, ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs);//child window to prevent the hover (then tooltip from histogram)
         StereoSample vuValue = {};
         if (isPlayerValid)
             vuValue = player->GetVuMeter();
@@ -604,7 +604,7 @@ namespace rePlayer
             auto window = ImGui::GetCurrentWindow();
             window->AutoFitFramesX = 2;
 
-            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_HorizontalScrollbar))
+            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Border, ImGuiWindowFlags_HorizontalScrollbar))
             {
                 auto metadata = isPlayerValid ? player->GetMetadata() : "";
                 ImGui::TextUnformatted(metadata.c_str());

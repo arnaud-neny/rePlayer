@@ -97,8 +97,8 @@ namespace rePlayer
         bool changed = false;
         struct
         {
-            int32_t index{ 0 };
-            static bool getter(void*, int32_t index, const char** outText) { *outText = ms_settings[index].format; return true; }
+            int32_t index = 0;
+            static const char* getter(void*, int32_t index) { return ms_settings[index].format; }
         } static cb;
         ImGui::Combo("Format", &cb.index, cb.getter, nullptr, _countof(ms_settings));
         if (cb.index != 0)
