@@ -44,6 +44,9 @@ namespace rePlayer
 
     Replay* ReplayTFMX::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() < 8)
+            return nullptr;
+
         TfmxData mdat = {};
         TfmxData smpl = {};
 

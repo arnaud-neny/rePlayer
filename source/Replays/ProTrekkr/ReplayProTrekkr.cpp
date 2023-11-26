@@ -51,7 +51,7 @@ namespace rePlayer
     {
         (void)metadata;
         auto data = stream->Read();
-        if (memcmp(data.Items(), "PROTREK", 7) != 0)
+        if (data.Size() < 8 || memcmp(data.Items(), "PROTREK", 7) != 0)
             return nullptr;
 
         Ptk_InitDriver();

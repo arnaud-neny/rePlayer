@@ -41,6 +41,9 @@ namespace rePlayer
 
     Replay* ReplayKSS::Load(io::Stream* stream, CommandBuffer metadata)
     {
+        if (stream->GetSize() < 8)
+            return nullptr;
+
         auto data = stream->Read();
         if (memcmp(data.Items(), "MBMK-PKG", 8) == 0)
         {

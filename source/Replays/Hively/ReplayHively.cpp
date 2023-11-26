@@ -41,6 +41,9 @@ namespace rePlayer
 
     Replay* ReplayHively::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() < 8)
+            return nullptr;
+
         auto data = stream->Read();
         auto module = hvl_ParseTune(data.Items(), static_cast<uint32_t>(data.Size()), kSampleRate, 2, [](size_t size) { return Alloc(size); }, [](void* ptr) { Free(ptr); });
         if (!module)

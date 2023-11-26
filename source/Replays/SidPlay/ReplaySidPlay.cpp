@@ -71,25 +71,28 @@ namespace rePlayer
             {
                 auto stream = reinterpret_cast<io::Stream*>(loaderData);
                 auto data = stream->Read();
-                auto isInternal = memcmp(data.Items(), "STER-SID", 8) == 0;
-                if (stream->GetName() == fileName)
+                if (data.Size() > 12)
                 {
-                    if (isInternal)
-                        bufferRef.assign(data.Items(12), data.Items(*data.Items<const uint32_t>(8)));
-                    else
-                        bufferRef.assign(data.Items(), data.Items(data.NumItems()));
-                }
-                else if (isInternal)
-                    bufferRef.assign(data.Items(*data.Items<const uint32_t>(8)), data.Items(data.NumItems()));
-                else
-                {
-                    auto file = io::File::OpenForRead(fileName);
-                    if (file.IsValid())
+                    auto isInternal = memcmp(data.Items(), "STER-SID", 8) == 0;
+                    if (stream->GetName() == fileName)
                     {
-                        auto fileSize = file.GetSize();
-                        auto oldSize = bufferRef.size();
-                        bufferRef.resize(oldSize + fileSize);
-                        file.Read(bufferRef.data() + oldSize, fileSize);
+                        if (isInternal)
+                            bufferRef.assign(data.Items(12), data.Items(*data.Items<const uint32_t>(8)));
+                        else
+                            bufferRef.assign(data.Items(), data.Items(data.NumItems()));
+                    }
+                    else if (isInternal)
+                        bufferRef.assign(data.Items(*data.Items<const uint32_t>(8)), data.Items(data.NumItems()));
+                    else
+                    {
+                        auto file = io::File::OpenForRead(fileName);
+                        if (file.IsValid())
+                        {
+                            auto fileSize = file.GetSize();
+                            auto oldSize = bufferRef.size();
+                            bufferRef.resize(oldSize + fileSize);
+                            file.Read(bufferRef.data() + oldSize, fileSize);
+                        }
                     }
                 }
                 if (bufferRef.empty())
