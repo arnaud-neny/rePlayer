@@ -1135,6 +1135,7 @@ namespace rePlayer
                                 }
                                 return;
                             }
+                            break;
                         }
                         if (_stricmp(reinterpret_cast<const char *>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
                             break;
