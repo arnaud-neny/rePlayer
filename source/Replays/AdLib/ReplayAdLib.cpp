@@ -150,6 +150,9 @@ namespace rePlayer
 
     Replay* ReplayAdLib::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() < 8)
+            return nullptr;
+
         COPLprops* core;
         if (ms_surround)
         {
