@@ -69,6 +69,9 @@ namespace rePlayer
     Replay* ReplayZXTune::Load(io::Stream* stream, CommandBuffer metadata)
     {
         (void)metadata;
+        if (stream->GetSize() < 8)
+            return nullptr;
+
         struct Data : Binary::Data
         {
             Data(io::Stream* stream)
