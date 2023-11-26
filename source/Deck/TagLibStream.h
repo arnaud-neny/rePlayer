@@ -42,11 +42,16 @@ namespace rePlayer
 
     inline TagLib::FileName TagLibStream::name() const
     {
-        return TagLib::FileName(m_stream->GetName().c_str());
+        if (m_stream.IsValid())
+            return TagLib::FileName(m_stream->GetName().c_str());
+        return "";
     }
 
     inline TagLib::ByteVector TagLibStream::readBlock(unsigned long length)
     {
+        if (m_stream.IsInvalid())
+            return {};
+
         auto size = m_stream->GetSize();
         auto pos = m_stream->GetPosition();
 
@@ -83,7 +88,8 @@ namespace rePlayer
 
     inline void TagLibStream::seek(long offset, Position p)
     {
-        m_stream->Seek(offset, p == Beginning ? io::Stream::kSeekBegin : p == Current ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd);
+        if (m_stream.IsValid())
+            m_stream->Seek(offset, p == Beginning ? io::Stream::kSeekBegin : p == Current ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd);
     }
 
     inline void TagLibStream::clear()
@@ -91,12 +97,16 @@ namespace rePlayer
 
     inline long TagLibStream::tell() const
     {
-        return long(m_stream->GetPosition());
+        if (m_stream.IsValid())
+            return long(m_stream->GetPosition());
+        return 0;
     }
 
     inline long TagLibStream::length()
     {
-        return long(m_stream->GetSize());
+        if (m_stream.IsValid())
+            return long(m_stream->GetSize());
+        return 0;
     }
 
     inline void TagLibStream::truncate(long /*length*/)
