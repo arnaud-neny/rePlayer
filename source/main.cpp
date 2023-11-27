@@ -312,11 +312,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 
                 Shell_NotifyIcon(NIM_DELETE, &tnid);
             }
-
-            ImGuiRelease();
-
-            s_rePlayer->Release();
         }
+
+        ImGuiRelease();
+
+        s_rePlayer->Release();
 
         rePlayer::Graphics::Destroy();
 
