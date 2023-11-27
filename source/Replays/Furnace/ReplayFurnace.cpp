@@ -35,6 +35,8 @@ namespace rePlayer
             engine->play();
             return new ReplayFurnace(engine);
         }
+        engine->quit();
+        delete engine;
 
         return nullptr;
     }
