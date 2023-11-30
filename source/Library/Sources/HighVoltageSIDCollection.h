@@ -123,8 +123,10 @@ namespace rePlayer
         bool m_areDataDirty = false; // only when a song is not registered (to remove holes)
         mutable bool m_isDirty = false; // save
         mutable bool m_hasBackup = false;
+        uint32_t m_currentUrl = 0;
 
         static const char* const ms_filename;
+        static const char* const ms_urls[];
     };
 }
 // namespace rePlayer

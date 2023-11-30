@@ -10,20 +10,28 @@
 
 namespace rePlayer
 {
-    static inline int Download(CURL* curl, Array<uint8_t>& buffer)
+    static inline int Download(CURL* curl)
     {
         auto curlError = curl_easy_perform(curl);
         if (curlError == CURLE_OK)
         {
-            if (strstr(buffer.Items<char>(), "<!DOCTYPE ") == buffer.Items<char>())
-                return strstr(buffer.Items<char>(sizeof("<!DOCTYPE ")), "404") ? 1 : -1;
             return 0;
+        }
+        else if (curlError == CURLE_HTTP_RETURNED_ERROR)
+        {
+            long responseCode = 0;
+            if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode == 404)
+                return 1;
         }
         Log::Error("High Voltage SID Collection: %s\n", curl_easy_strerror(curlError));
         return -1;
     }
 
     const char* const SourceHighVoltageSIDCollection::ms_filename = MusicPath "HighVoltageSIDCollection" MusicExt;
+    const char* const SourceHighVoltageSIDCollection::ms_urls[] = {
+        "https://hvsc.de/download/C64Music/",
+        "https://hvsc.etv.cx/C64Music/"
+    };
 
     inline const char* SourceHighVoltageSIDCollection::Chars::operator()(const Array<char>& blob) const
     {
@@ -244,11 +252,8 @@ namespace rePlayer
 
         CURL* curl = curl_easy_init();
 
-        char errorBuffer[CURL_ERROR_SIZE];
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-
-        auto url = SetupUrl(curl, songSource, "https://hvsc.de/download/C64Music/");
 
         struct Buffer : public Array<uint8_t>
         {
@@ -262,12 +267,18 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         bool isEntryMissing = false;
-        int downloadStatus = Download(curl, buffer);
-        if (downloadStatus != 0)
+
+        std::string url;
+        int32_t downloadStatus = -1;
+        for (uint32_t i = 0; i < _countof(ms_urls) && downloadStatus != 0; i++)
         {
-            buffer.Clear();
-            url = SetupUrl(curl, songSource, "https://hvsc.etv.cx/C64Music/");
-            downloadStatus = Download(curl, buffer);
+            url = SetupUrl(curl, songSource, ms_urls[m_currentUrl]);
+            downloadStatus = Download(curl);
+            if (downloadStatus != 0)
+            {
+                buffer.Clear();
+                m_currentUrl = (m_currentUrl + 1) % _countof(ms_urls);
+            }
         }
         if (downloadStatus >= 0)
         {
@@ -590,10 +601,8 @@ namespace rePlayer
         {
             CURL* curl = curl_easy_init();
 
-            char errorBuffer[CURL_ERROR_SIZE];
-            curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+            curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_easy_setopt(curl, CURLOPT_URL, "https://hvsc.de/download/C64Music/DOCUMENTS/Songlengths.md5");
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
             struct Buffer : public Array<uint8_t>
@@ -607,17 +616,23 @@ namespace rePlayer
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-            int downloadedStatus = Download(curl, buffer);
-            if (downloadedStatus != 0)
+
+            int32_t downloadStatus = -1;
+            for (uint32_t i = 0; i < _countof(ms_urls) && downloadStatus != 0; i++)
             {
-                buffer.Clear();
-                curl_easy_setopt(curl, CURLOPT_URL, "https://hvsc.etv.cx/C64Music/DOCUMENTS/Songlengths.md5");
-                downloadedStatus = Download(curl, buffer);
+                auto url = std::string(ms_urls[m_currentUrl]) + "DOCUMENTS/Songlengths.md5";
+                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+                downloadStatus = Download(curl);
+                if (downloadStatus != 0)
+                {
+                    buffer.Clear();
+                    m_currentUrl = (m_currentUrl + 1) % _countof(ms_urls);
+                }
             }
 
             curl_easy_cleanup(curl);
 
-            if (downloadedStatus == 0)
+            if (downloadStatus == 0)
                 DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems());
         }
         return m_db.songs.IsEmpty();
