@@ -527,6 +527,8 @@ namespace rePlayer
             {
                 ms_sidDatabase = sidDatabase = new SidDatabase();
                 auto buffer = g_replayPlugin.download("https://hvsc.de/download/C64Music/DOCUMENTS/Songlengths.md5");
+                if (buffer.IsEmpty())
+                    buffer = g_replayPlugin.download("https://hvsc.etv.cx/C64Music/DOCUMENTS/Songlengths.md5");
                 if (buffer.IsNotEmpty())
                 {
                     std::filesystem::path path = std::filesystem::temp_directory_path();
