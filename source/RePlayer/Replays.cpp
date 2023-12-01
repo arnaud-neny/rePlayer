@@ -249,6 +249,7 @@ namespace rePlayer
 
                         char errorBuffer[CURL_ERROR_SIZE];
                         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+                        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
                         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
                         curl_easy_setopt(curl, CURLOPT_URL, url);
                         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
