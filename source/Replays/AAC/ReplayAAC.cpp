@@ -77,7 +77,7 @@ namespace rePlayer
                 if (m_sampleBuffer == nullptr || frameInfo.error > 0)
                     return numSamples - remainingSamples;
                 m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
-                assert(m_samplerate == frameInfo.samplerate && frameInfo.channels == 2);
+                assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
 
                 // compute the bitrate per second
                 auto* bitRate = m_bitRate.free;
@@ -129,7 +129,7 @@ namespace rePlayer
         m_sampleBuffer = m_sampleBuffer + m_remainingSamples - m_numSamples;
         m_remainingSamples = m_numSamples;
 
-        auto numSamples = (uint64_t(timeInMs) * GetSampleRate()) / 1000;
+        auto numSamples = (uint64_t(timeInMs) * m_sampleRate) / 1000;
         auto remainingSamples = uint32_t(numSamples);
         if (numSamples < m_position)
             ResetPlayback();
@@ -152,7 +152,7 @@ namespace rePlayer
                 if (m_sampleBuffer == nullptr || frameInfo.error > 0)
                     break;
                 m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
-                assert(m_samplerate == frameInfo.samplerate && frameInfo.channels == 2);
+                assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
 
                 // compute the bitrate per second
                 auto* bitRate = m_bitRate.free;
@@ -194,7 +194,7 @@ namespace rePlayer
         }
         numSamples -= m_remainingSamples;
 
-        return uint32_t((numSamples * 1000) / GetSampleRate());
+        return uint32_t((numSamples * 1000) / m_sampleRate);
     }
 
     void ReplayAAC::ResetPlayback()
@@ -276,7 +276,7 @@ namespace rePlayer
                 delete replay;
 
                 if (frames)
-                    return uint32_t((frames * 1024 * 1000) / m_samplerate);
+                    return uint32_t((frames * 1024 * 1000) / m_sampleRate);
             }
             else if (memcmp(replay->m_buffer, "ADIF", 4) == 0)
             {
@@ -307,7 +307,7 @@ namespace rePlayer
         std::string info;
         info = "2 channels\n";
         char buf[32];
-        sprintf(buf, "%u kb/s", m_bitRate.average.load());
+        sprintf(buf, "%u kb/s - %uHz", m_bitRate.average.load(), m_sampleRate);
         info += buf;
         info += "\nFAAD " FAADVersion;
         return info;
@@ -343,7 +343,7 @@ namespace rePlayer
         NeAACDecSetConfiguration(m_hDecoder, config);
 
         uint8_t channels;
-        auto bytesUsed = NeAACDecInit(m_hDecoder, m_buffer, m_bytesIntoBuffer, reinterpret_cast<unsigned long*>(&m_samplerate), &channels);
+        auto bytesUsed = NeAACDecInit(m_hDecoder, m_buffer, m_bytesIntoBuffer, reinterpret_cast<unsigned long*>(&m_sampleRate), &channels);
         if (bytesUsed < 0 || channels != 2)
             return false;
 

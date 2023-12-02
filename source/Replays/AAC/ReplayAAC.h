@@ -15,7 +15,7 @@ namespace rePlayer
     public:
         ~ReplayAAC() override;
 
-        uint32_t GetSampleRate() const override { return m_samplerate; }
+        uint32_t GetSampleRate() const override { return m_sampleRate; }
         bool IsSeekable() const override;
 
         uint32_t Render(StereoSample* output, uint32_t numSamples) override;
@@ -61,7 +61,7 @@ namespace rePlayer
         uint32_t m_bytesIntoBuffer;
         uint32_t m_bytesConsumed;
 
-        uint32_t m_samplerate;
+        uint32_t m_sampleRate;
         uint32_t m_position = 0;
 
         StereoSample* m_sampleBuffer;
