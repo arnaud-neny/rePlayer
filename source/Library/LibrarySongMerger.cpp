@@ -51,12 +51,20 @@ namespace rePlayer
                 if (lFileCrc != rFileCrc)
                     return lFileCrc < rFileCrc;
 
-                auto lSourceId = int32_t(l.song->GetSourceId(0).sourceId);
-                auto rSourceId = int32_t(r.song->GetSourceId(0).sourceId);
-                if (lSourceId == SourceID::FileImportID)
-                    lSourceId = -1;
-                if (rSourceId == SourceID::FileImportID)
-                    rSourceId = -1;
+                static int32_t sourceOrder[] = {
+                    4,  // AmigaMusicPreservationSourceID
+                    5,  // TheModArchiveSourceID
+                    6,  // ModlandSourceID
+                    -1, // FileImportID
+                    0,  // HighVoltageSIDCollectionID
+                    1,  // SNDHID
+                    2,  // AtariSAPMusicArchiveID
+                    3,  // ZXArtID
+                };
+                static_assert(_countof(sourceOrder) == SourceID::NumSourceIDs);
+
+                auto lSourceId = sourceOrder[l.song->GetSourceId(0).sourceId];
+                auto rSourceId = sourceOrder[r.song->GetSourceId(0).sourceId];
                 return lSourceId < rSourceId;
             });
 
