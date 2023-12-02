@@ -48,6 +48,7 @@ namespace rePlayer
 
         // Misc
         static uint32_t GetVersion();
+        static const char* const GetLabel();
         static constexpr uint16_t kReferenceDate = 19473; // std::chrono::year(2023) / 4 / 26;
 
     private:

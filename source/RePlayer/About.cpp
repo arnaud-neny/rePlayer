@@ -42,7 +42,7 @@ namespace rePlayer
     {
         ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_None);
 
-        ImGui::Text("rePlayer %u.%u.%u", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
+        ImGui::TextUnformatted(Core::GetLabel());
         ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2023 Arnaud Nény (aka replay/Razor1911)"));
 
         ImGui::TextUnformatted("\nSupported databases:");

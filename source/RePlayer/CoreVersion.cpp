@@ -27,6 +27,15 @@ namespace rePlayer
         return kVersion;
     }
 
+    const char* const Core::GetLabel()
+    {
+        #define REPLAYER_HELPER_STRINGIZE(x) #x
+        #define REPLAYER_STRINGIZE(x) REPLAYER_HELPER_STRINGIZE(x)
+        return "rePlayer " REPLAYER_STRINGIZE(REPLAYER_VERSION_MAJOR) "." REPLAYER_STRINGIZE(REPLAYER_VERSION_MINOR) "." REPLAYER_STRINGIZE(REPLAYER_VERSION_PATCH);
+        #undef REPLAYER_HELPER_STRINGIZE
+        #undef REPLAYER_STRINGIZE
+    }
+
     Status Core::CheckForNewVersion()
     {
         if (IsDebuggerPresent())
