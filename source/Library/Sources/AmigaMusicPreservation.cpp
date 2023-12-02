@@ -711,7 +711,7 @@ namespace rePlayer
         Log::Message("Amiga Music Preservation: downloading \"%s\"...", url);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         struct Buffer : public Array<uint8_t>
         {
