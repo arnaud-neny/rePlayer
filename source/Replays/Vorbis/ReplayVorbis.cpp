@@ -73,7 +73,11 @@ namespace rePlayer
     uint32_t ReplayVorbis::Render(StereoSample* output, uint32_t numSamples)
     {
         float** pcm;
-        auto numReadSamples = ov_read_float(m_vorbis, &pcm, numSamples, nullptr);
+        int64_t numReadSamples;
+        do
+        {
+            numReadSamples = ov_read_float(m_vorbis, &pcm, numSamples, nullptr);
+        } while (numReadSamples == OV_HOLE);
         if (numReadSamples <= 0)
             return 0;
         numSamples = uint32_t(numReadSamples);
@@ -99,20 +103,20 @@ namespace rePlayer
 
     uint32_t ReplayVorbis::Seek(uint32_t timeInMs)
     {
-        if (ov_seekable(m_vorbis))
-        {
-            ogg_int64_t index = timeInMs;
-            index *= GetSampleRate();
-            index /= 1000;
-            ov_pcm_seek(m_vorbis, index);
-            return timeInMs;
-        }
-        return Replay::Seek(timeInMs);
+        ogg_int64_t index = timeInMs;
+        index *= GetSampleRate();
+        index /= 1000;
+        ov_pcm_seek(m_vorbis, index);
+        return timeInMs;
     }
 
     void ReplayVorbis::ResetPlayback()
     {
-        ov_raw_seek(m_vorbis, 0);
+        if (ov_seekable(m_vorbis))
+            ov_raw_seek(m_vorbis, 0);
+        m_stream->Seek(0, io::Stream::kSeekBegin);
+        ov_clear(m_vorbis);
+        ov_open_callbacks(m_stream.Get(), m_vorbis, nullptr, 0, { OnRead, OnSeek, nullptr, OnTell });
     }
 
     void ReplayVorbis::ApplySettings(const CommandBuffer /*metadata*/)
@@ -123,7 +127,10 @@ namespace rePlayer
 
     uint32_t ReplayVorbis::GetDurationMs() const
     {
-        return static_cast<uint32_t>(ov_time_total(m_vorbis, -1) * 1000ull);
+        auto timeTotal = ov_time_total(m_vorbis, -1);
+        if (timeTotal != OV_EINVAL)
+            return static_cast<uint32_t>(timeTotal * 1000ull);
+        return 0;
     }
 
     uint32_t ReplayVorbis::GetNumSubsongs() const
@@ -150,7 +157,7 @@ namespace rePlayer
         auto vi = ov_info(m_vorbis, -1);
         info = vi->channels == 1 ? "1 channel\n" : "2 channels\n";
         char buf[64];
-        sprintf(buf, "%dkb/s - %dhz\n", (vi->bitrate_upper > 0 && vi->bitrate_lower > 0) ? (vi->bitrate_upper + vi->bitrate_lower) / 2000 : (vi->bitrate_nominal / 1000), vi->rate);
+        sprintf(buf, "%d kb/s - %d hz\n", (vi->bitrate_upper > 0 && vi->bitrate_lower > 0) ? (vi->bitrate_upper + vi->bitrate_lower + 1999) / 2000 : ((vi->bitrate_nominal + 999) / 1000), vi->rate);
         info += buf;
         info += "minivorbis 1.3.4/1.3.7";
         return info;
