@@ -106,7 +106,7 @@ namespace rePlayer
                     tail->next = m_bitRate.free;
                     m_bitRate.free = tail;
                 }
-                m_bitRate.average = uint32_t((m_bitRate.numBits * frameInfo.samplerate + 1024 * m_bitRate.numFrames - 1) / (1024 * m_bitRate.numFrames));
+                m_bitRate.average = uint32_t((m_bitRate.numBits * frameInfo.samplerate + 1000 * m_bitRate.numFrames - 1) / (1000 * m_bitRate.numFrames));
             }
             else
             {
@@ -307,7 +307,7 @@ namespace rePlayer
         std::string info;
         info = "2 channels\n";
         char buf[32];
-        sprintf(buf, "%u kb/s - %uHz", m_bitRate.average.load(), m_sampleRate);
+        sprintf(buf, "%u kb/s - %u hz", m_bitRate.average.load(), m_sampleRate);
         info += buf;
         info += "\nFAAD " FAADVersion;
         return info;
