@@ -13,6 +13,7 @@ namespace core
 
         StereoSample* Convert(const int16_t* input, uint32_t numSamples, float scale = 1.0f);
         StereoSample* Convert(const int16_t* inputLeft, const int16_t* inputRight, uint32_t numSamples, float scale = 1.0f);
+        StereoSample* ConvertMono(const float* input, uint32_t numSamples, float scale = 1.0f);
         StereoSample* ConvertMono(const int16_t* input, uint32_t numSamples, float scale = 1.0f);
 
         StereoSample* Convert(Surround& surround, uint32_t numSamples, float scale = 1.0f);

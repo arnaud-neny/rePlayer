@@ -31,6 +31,18 @@ namespace core
         return output;
     }
 
+    inline StereoSample* StereoSample::ConvertMono(const float* input, uint32_t numSamples, float scale)
+    {
+        auto output = this;
+        for (; numSamples; numSamples--)
+        {
+            StereoSample s;
+            s.left = s.right = scale * *input++;
+            *output++ = s;
+        }
+        return output;
+    }
+
     inline StereoSample* StereoSample::ConvertMono(const int16_t* input, uint32_t numSamples, float scale)
     {
         auto output = this;
