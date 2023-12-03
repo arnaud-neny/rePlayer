@@ -21,7 +21,7 @@ namespace rePlayer
         ~ReplayMP3() override;
 
         uint32_t GetSampleRate() const override { return m_mp3->sampleRate; }
-        bool IsSeekable() const override { return true; }
+        bool IsSeekable() const override;
 
         uint32_t Render(StereoSample* output, uint32_t numSamples) override;
         uint32_t Seek(uint32_t timeInMs) override;
@@ -39,13 +39,21 @@ namespace rePlayer
         bool CanLoop() const override { return false; }
 
     private:
-        ReplayMP3(io::Stream* stream, drmp3* mp3);
+        struct StreamData
+        {
+            SmartPtr<io::Stream> stream;
+            bool isSeekable;
+            bool isInit;
+        };
+
+    private:
+        ReplayMP3(StreamData* streamData, drmp3* mp3);
 
         static size_t OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead);
         static drmp3_bool32 OnSeek(void* pUserData, int offset, drmp3_seek_origin origin);
 
     private:
-        SmartPtr<io::Stream> m_stream;
+        StreamData* m_streamData;
         drmp3* m_mp3;
     };
 }
