@@ -546,7 +546,7 @@ namespace rePlayer
             if (m_songs[i] == 0)
                 continue;
             auto& song = SrcSong(m_songs[i]);
-            if (dbSong.name.IsSame(m_db.strings, song.name()))
+            if (dbSong.path.IsSame(m_db.strings, song.name()))
             {
                 if (!m_db.roots[dbSong.root].IsSame(m_db.strings, m_roots[song.root].id, m_roots[song.root].label(m_strings)))
                     continue;
