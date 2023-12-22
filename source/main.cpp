@@ -18,7 +18,8 @@
 #include "resource.h"
 
 //Imgui
-static HWND                 g_hWnd = NULL;
+static HWND g_hWnd = NULL;
+static bool g_isWindows11 = false;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 //
@@ -28,6 +29,18 @@ RePlayer* s_rePlayer = nullptr;
 void OnRePlayerSysCommand(bool isMinimizing)
 {
     s_rePlayer->Enable(!isMinimizing);
+}
+
+static RECT GetTrayRect()
+{
+    NOTIFYICONIDENTIFIER id = { sizeof(id) };
+    id.hWnd = g_hWnd;
+    id.uID = 0x777;
+    id.guidItem = GUID_NULL;
+
+    RECT rect = {};
+    Shell_NotifyIconGetRect(&id, &rect);
+    return rect;
 }
 
 // Win32 message handler
@@ -79,6 +92,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             switch (LOWORD(lParam))
             {
             case WM_MBUTTONUP:
+                // Windows 11 bug: the middle button is returned as left button
                 s_rePlayer->SystrayMouseMiddle(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                 break;
             case WM_LBUTTONUP:
@@ -89,7 +103,16 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 s_rePlayer->SystrayMouseRight(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                 break;
             case NIN_POPUPOPEN:
-                s_rePlayer->SystrayTooltipOpen(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
+                if (g_isWindows11) // Windows 11 bug: wrong anchor point...
+                {
+                    auto rc = GetTrayRect();
+                    POINT pt = { rc.left, rc.top };
+                    SIZE sz = { 96, 32 };
+                    CalculatePopupWindowPosition(&pt, &sz, TPM_CENTERALIGN | TPM_BOTTOMALIGN, nullptr, &rc);
+                    s_rePlayer->SystrayTooltipOpen(rc.right, rc.bottom);
+                }
+                else
+                    s_rePlayer->SystrayTooltipOpen(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                 break;
             case NIN_POPUPCLOSE:
                 s_rePlayer->SystrayTooltipClose(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
@@ -171,6 +194,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
     //_CrtSetAllocHook(MyHook);
 #endif
 
+    {
+        NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
+        OSVERSIONINFOEXW osInfo;
+        *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+        if (NULL != RtlGetVersion) {
+            osInfo.dwOSVersionInfoSize = sizeof(osInfo);
+            RtlGetVersion(&osInfo);
+            g_isWindows11 = osInfo.dwMajorVersion == 10 && osInfo.dwBuildNumber >= 22000;
+        }
+    }
+
     ::OleInitialize(NULL);
 
     if (s_rePlayer = RePlayer::Create())
@@ -226,11 +260,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             tnid.cbSize = sizeof(NOTIFYICONDATA);
             tnid.hWnd = g_hWnd;
             tnid.uID = 0x777;
-            tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+            tnid.uFlags = NIF_MESSAGE | NIF_ICON;
             tnid.uCallbackMessage = WM_USER;
             tnid.hIcon = wc.hIcon;
-            tnid.szTip[0] = ' ';
-            tnid.szTip[1] = 0;
 
             Shell_NotifyIcon(NIM_ADD, &tnid);
             tnid.uVersion = NOTIFYICON_VERSION_4;

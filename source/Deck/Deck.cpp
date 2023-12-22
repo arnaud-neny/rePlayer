@@ -255,8 +255,13 @@ namespace rePlayer
 
     void Deck::OnSystray(int32_t x, int32_t y, SystrayState state)
     {
-        if (m_isSystrayMenuEnabled && state == SystrayState::kMouseButtonRight)
-            return;
+        if (m_isSystrayMenuEnabled)
+        {
+            if (state == SystrayState::kMouseButtonRight
+                || state == SystrayState::kTooltipOpen
+                || state == SystrayState::kTooltipClose)
+                return;
+        }
         if (Core::IsLocked())
             return;
         if (state == SystrayState::kMouseButtonLeft)
@@ -279,6 +284,7 @@ namespace rePlayer
             m_isSystrayBalloonEnabled = true;
         else if (state == SystrayState::kTooltipClose)
             m_isSystrayBalloonEnabled = false;
+        m_isSystrayBalloonEnabled &= !m_isSystrayMenuEnabled;
         m_hSystrayWnd = nullptr;
     }
 
