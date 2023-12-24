@@ -1,3 +1,23 @@
+2.5.1 2023-12-23
+* Check for {g,}od at configure time (#87)
+* residfp: fix a 6581 filter bug where values could actually go negative
+* Sync resid with upstream
+
+
+
+2.5.0 2023-06-02
+* residfp: reworked the combined waveforms model by separating pulldown effect from waveform generation
+* residfp: tweaked the 8580 filter parameters for increased volume and less distortion (#45)
+* Updated to latest resid
+* Use OpenMP to speedup LUTs initialization
+* CIA: minor rework based on chip reverse engineering
+* Use c++17 where available
+* Added sanity check for buffer size
+* Minor mixer optimizations
+* Other minor changes
+
+
+
 2.4.2 2023-01-29
 * Fixed a memory leak
 * Minor fixes
