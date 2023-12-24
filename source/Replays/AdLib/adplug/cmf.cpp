@@ -1,17 +1,17 @@
 /*
  * Adplug - Replayer for many OPL2/OPL3 audio file formats.
  * Copyright (C) 1999 - 2009 Simon Peter, <dn.tlp@gmx.net>, et al.
- *
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -64,7 +64,7 @@
 // so any that aren't overridden are still available for use with these default
 // patches.  The Word Rescue CMFs are good examples of songs that rely on these
 // default patches.
-uint8_t cDefaultPatches[] =
+static const uint8_t cDefaultPatches[] =
 "\x01\x11\x4F\x00\xF1\xD2\x53\x74\x00\x00\x06"
 "\x07\x12\x4F\x00\xF2\xF2\x60\x72\x00\x00\x08"
 "\x31\xA1\x1C\x80\x51\x54\x03\x67\x00\x00\x0E"

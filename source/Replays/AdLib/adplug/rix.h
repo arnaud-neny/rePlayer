@@ -1,17 +1,17 @@
 /*
  * Adplug - Replayer for many OPL2/OPL3 audio file formats.
  * Copyright (C) 1999 - 2006 Simon Peter, <dn.tlp@gmx.net>, et al.
- *
+ * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
+ * 
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -34,13 +34,13 @@ class CrixPlayer: public CPlayer
   bool update();
   void rewind(int subsong);
   float getrefresh();
-  uint32_t getsubsongs();
+  unsigned int getsubsongs();
   unsigned int getsubsong();
 
   std::string gettype()
     { return std::string("Softstar RIX OPL Music Format"); };
 
- protected:
+ protected:	
   int song = 0;
   typedef struct {
     uint8_t v[14];
@@ -66,7 +66,7 @@ class CrixPlayer: public CPlayer
   static const uint8_t ad_C0_offs[18];
   static const uint8_t modify[28];
   static const uint8_t bd_reg_data[124];
-  static uint8_t for40reg[18];
+  uint8_t for40reg[18];
   static const uint16_t mus_time;
   uint32_t I,T;
   uint16_t mus_block;
