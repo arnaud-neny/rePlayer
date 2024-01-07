@@ -81,6 +81,7 @@ namespace rePlayer
         uint64_t m_songEnd = ~0ull;
         uint64_t m_songSeek = 0;
         uint64_t m_songPos = 0;
+        uint32_t m_wavePlayPos = 0;
         uint32_t m_waveFillPos = 0;
         const uint32_t m_numSamples;
         const uint32_t m_numCachedSamples;

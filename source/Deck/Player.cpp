@@ -61,6 +61,7 @@ namespace rePlayer
             m_songSeek = 0;
             m_songPos = 0;
             m_songEnd = ~0ull;
+            m_wavePlayPos = 0;
             m_waveFillPos = m_numCachedSamples;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
@@ -115,6 +116,7 @@ namespace rePlayer
 
             m_songPos = 0;
             m_songEnd = ~0ull;
+            m_wavePlayPos = 0;
             m_waveFillPos = m_numCachedSamples;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
@@ -377,6 +379,7 @@ namespace rePlayer
         if (!isExport)
         {
             Render(m_numCachedSamples, 0);
+            m_wavePlayPos = 0;
             m_waveFillPos = m_numCachedSamples;
             memset(m_waveData + m_waveFillPos, 0, (numSamples - m_numCachedSamples) * sizeof(StereoSample));
 
@@ -464,17 +467,14 @@ namespace rePlayer
                 mmt.u.cb /= sizeof(StereoSample);
                 auto wavePlayPos = mmt.u.cb;
                 auto waveFillPos = m_waveFillPos;
-
-#if 0//fixed size rendering
-                static constexpr uint32_t kWaveBlockSize = 1 << 12;
-                wavePlayPos = wavePlayPos + kWaveBlockSize - 1 + numCachedSamples;
-                wavePlayPos &= ~(kWaveBlockSize - 1);
-                while (waveFillPos < wavePlayPos)
+                if (m_wavePlayPos > wavePlayPos) // loop or something wrong happened; need to detect when waveOut had a failure
                 {
-                    Render(kWaveBlockSize, waveFillPos & numSamplesMask);
-                    waveFillPos += kWaveBlockSize;
+                    m_songSeek += m_wavePlayPos; // simulate a seek to keep track of current time
+                    waveFillPos = (waveFillPos & numSamplesMask) | (wavePlayPos & ~numSamplesMask);
+                    waveFillPos += numCachedSamples;
                 }
-#else
+                m_wavePlayPos = wavePlayPos;
+
                 wavePlayPos = wavePlayPos + numCachedSamples;
                 while (waveFillPos < wavePlayPos)
                 {
@@ -482,7 +482,7 @@ namespace rePlayer
                     Render(count, waveFillPos & numSamplesMask);
                     waveFillPos += count;
                 }
-#endif
+
                 m_waveFillPos = waveFillPos;
 
                 if (m_isSuspending)
