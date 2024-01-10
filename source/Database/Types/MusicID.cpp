@@ -88,6 +88,21 @@ namespace rePlayer
         auto& db = Core::GetDatabase(databaseId);
         auto* song = db[subsongId];
 
+        auto metadata = Core::GetDeck().GetMetadata(*this);
+        bool isTextWrapped = false;
+        if (metadata.size())
+        {
+            auto textSize = ImGui::CalcTextSize(metadata.c_str(), metadata.c_str() + metadata.size());
+            if (textSize.x > 512.0f)
+            {
+                textSize = ImGui::CalcTextSize(metadata.c_str(), metadata.c_str() + metadata.size(), false, 512.0f);
+                textSize.y = 0.0f;
+                ImGui::SetNextWindowSize(textSize);
+                isTextWrapped = true;
+            }
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(512.0f, 2048.0f));
+        }
+
         ImGui::BeginTooltip();
         ImGui::Text("Title  : %s", song->GetName());
         auto subsongName = song->GetSubsongName(subsongId.index);
@@ -112,11 +127,13 @@ namespace rePlayer
         if (song->GetType().replay != eReplay::Unknown)
             ImGui::Text("Replay : %s", Core::GetReplays().GetName(song->GetType().replay));
         ImGui::Text("Source : %s", song->GetSourceName());
-        auto metadata = Core::GetDeck().GetMetadata(*this);
         if (metadata.size())
         {
             ImGui::Separator();
-            ImGui::TextUnformatted(metadata.c_str());
+            if (isTextWrapped)
+                ImGui::TextWrapped(metadata.c_str());
+            else
+                ImGui::TextUnformatted(metadata.c_str());
         }
 
         ImGui::EndTooltip();
