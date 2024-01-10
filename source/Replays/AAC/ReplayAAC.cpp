@@ -24,7 +24,7 @@ namespace rePlayer
 
         stream->Seek(0, io::Stream::kSeekBegin);
 
-        if (replay->Init())
+        if (replay->Init() == Status::kOk)
             return replay;
 
         delete replay;
@@ -140,48 +140,8 @@ namespace rePlayer
         {
             if (m_remainingSamples == 0)
             {
-                if (m_bytesIntoBuffer == 0)
+                if (DecodeFrame() != Status::kOk)
                     break;
-
-                NeAACDecFrameInfo frameInfo;
-                m_sampleBuffer = reinterpret_cast<StereoSample*>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
-
-                AdvanceBuffer(frameInfo.bytesconsumed);
-                FillBuffer();
-
-                if (m_sampleBuffer == nullptr || frameInfo.error > 0)
-                    break;
-                m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
-                assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
-
-                // compute the bitrate per second
-                auto* bitRate = m_bitRate.free;
-                if (bitRate == nullptr)
-                    bitRate = new BitRateData;
-                else
-                {
-                    m_bitRate.free = bitRate->next;
-                    bitRate->next = nullptr;
-                }
-                m_bitRate.head->next = bitRate;
-                m_bitRate.head = bitRate;
-
-                bitRate->numFrames = m_remainingSamples;
-                bitRate->numBits = frameInfo.bytesconsumed * 8;
-                m_bitRate.numFrames += bitRate->numFrames;
-                m_bitRate.numBits += bitRate->numBits;
-                while (m_bitRate.numFrames > frameInfo.samplerate)
-                {
-                    if (m_bitRate.tail->next == nullptr)
-                        break;
-                    auto* tail = m_bitRate.tail;
-                    m_bitRate.tail = tail->next;
-                    m_bitRate.numFrames -= tail->numFrames;
-                    m_bitRate.numBits -= tail->numBits;
-                    tail->next = m_bitRate.free;
-                    m_bitRate.free = tail;
-                }
-                m_bitRate.average = uint32_t((m_bitRate.numBits * frameInfo.samplerate + 1024 * m_bitRate.numFrames - 1) / (1024 * m_bitRate.numFrames));
             }
             else
             {
@@ -313,7 +273,7 @@ namespace rePlayer
         return info;
     }
 
-    bool ReplayAAC::Init()
+    Status ReplayAAC::Init()
     {
         m_stream->Seek(0, io::Stream::kSeekBegin);
 
@@ -345,14 +305,62 @@ namespace rePlayer
         uint8_t channels;
         auto bytesUsed = NeAACDecInit(m_hDecoder, m_buffer, m_bytesIntoBuffer, reinterpret_cast<unsigned long*>(&m_sampleRate), &channels);
         if (bytesUsed < 0 || channels != 2)
-            return false;
+            return Status::kFail;
 
         AdvanceBuffer(bytesUsed);
         FillBuffer();
 
         NeAACDecPostSeekReset(m_hDecoder, 1);
 
-        return true;
+        return DecodeFrame();
+    }
+
+    Status ReplayAAC::DecodeFrame()
+    {
+        if (m_bytesIntoBuffer == 0)
+            return Status::kFail;
+
+        NeAACDecFrameInfo frameInfo;
+        m_sampleBuffer = reinterpret_cast<StereoSample*>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
+
+        AdvanceBuffer(frameInfo.bytesconsumed);
+        FillBuffer();
+
+        if (m_sampleBuffer == nullptr || frameInfo.error > 0)
+            return Status::kFail;
+        m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
+        assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
+
+        // compute the bitrate per second
+        auto* bitRate = m_bitRate.free;
+        if (bitRate == nullptr)
+            bitRate = new BitRateData;
+        else
+        {
+            m_bitRate.free = bitRate->next;
+            bitRate->next = nullptr;
+        }
+        m_bitRate.head->next = bitRate;
+        m_bitRate.head = bitRate;
+
+        bitRate->numFrames = m_remainingSamples;
+        bitRate->numBits = frameInfo.bytesconsumed * 8;
+        m_bitRate.numFrames += bitRate->numFrames;
+        m_bitRate.numBits += bitRate->numBits;
+        while (m_bitRate.numFrames > frameInfo.samplerate)
+        {
+            if (m_bitRate.tail->next == nullptr)
+                break;
+            auto* tail = m_bitRate.tail;
+            m_bitRate.tail = tail->next;
+            m_bitRate.numFrames -= tail->numFrames;
+            m_bitRate.numBits -= tail->numBits;
+            tail->next = m_bitRate.free;
+            m_bitRate.free = tail;
+        }
+        m_bitRate.average = uint32_t((m_bitRate.numBits * frameInfo.samplerate + 1024 * m_bitRate.numFrames - 1) / (1024 * m_bitRate.numFrames));
+
+        return Status::kOk;
     }
 
     void ReplayAAC::AdvanceBuffer(uint32_t bytes)

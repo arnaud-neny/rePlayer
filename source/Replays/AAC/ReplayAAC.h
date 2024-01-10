@@ -44,7 +44,8 @@ namespace rePlayer
     private:
         ReplayAAC(io::Stream* stream);
 
-        bool Init();
+        Status Init();
+        Status DecodeFrame();
         void AdvanceBuffer(uint32_t bytes);
         void FillBuffer();
         void LookForHeader();
