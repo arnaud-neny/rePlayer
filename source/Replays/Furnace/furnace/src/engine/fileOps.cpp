@@ -107,7 +107,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
       delete[] file;
       return false;
     }
-    
+
     if (ds.system[0]==DIV_SYSTEM_YMU759 && ds.version<0x10) {
       ds.vendor=reader.readString((unsigned char)reader.readC());
       ds.carrier=reader.readString((unsigned char)reader.readC());
@@ -902,7 +902,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
             data=new short[length];
             reader.read(data,length*2);
           }
-          
+
 #ifdef TA_BIG_ENDIAN
           // convert to big-endian
           for (int pos=0; pos<length; pos++) {
@@ -915,7 +915,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
           if (scaledLen>0) {
             // resample
             logD("%d: scaling from %d...",i,pitch);
-            
+
             short* newData=new short[scaledLen];
             memset(newData,0,scaledLen*sizeof(short));
             int k=0;
@@ -2582,7 +2582,7 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
         delete[] file;
         return false;
       }
-      
+
       if (ins->readInsData(reader,ds.version)!=DIV_DATA_SUCCESS) {
         lastError="invalid instrument header/data!";
         ds.unload();
@@ -3027,7 +3027,7 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
   short defaultVols[31];
   int sampLens[31];
   // 0=arp, 1=pslide, 2=vib, 3=trem, 4=vslide
-  bool fxUsage[DIV_MAX_CHANS][5];  
+  bool fxUsage[DIV_MAX_CHANS][5];
   SafeReader reader=SafeReader(file,len);
   warnings="";
 
@@ -3035,8 +3035,10 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
   memset(sampLens,0,31*sizeof(int));
   memset(fxUsage,0,DIV_MAX_CHANS*5*sizeof(bool));
 
+  // rePlayer begin
+  DivSong ds;
   try {
-    DivSong ds;
+    // rePlayer end
     ds.tuning=436.0;
     ds.version=DIV_VERSION_MOD;
     ds.linearPitch=0;
@@ -3402,7 +3404,7 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
       ds.subsong[0]->pat[i].effectCols=1;
       ds.subsong[0]->chanShow[i]=false;
     }
-    
+
     // instrument creation
     ds.ins.reserve(insCount);
     for(int i=0; i<insCount; i++) {
@@ -3413,7 +3415,7 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
       ds.ins.push_back(ins);
     }
     ds.insLen=ds.ins.size();
-    
+
     if (active) quitDispatch();
     BUSY_BEGIN_SOFT;
     saveLock.lock();
@@ -3434,9 +3436,11 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
   } catch (EndOfFileException& e) {
     //logE("premature end of file!");
     lastError="incomplete file";
+    ds.unload(); // rePlayer
   } catch (InvalidHeaderException& e) {
     //logE("invalid info header!");
     lastError="invalid info header!";
+    ds.unload(); // rePlayer
   }
   return success;
 }
@@ -3575,7 +3579,7 @@ bool DivEngine::loadS3M(unsigned char* file, size_t len) {
     }
 
     ds.name=reader.readString(28);
-    
+
     reader.readC(); // 0x1a
     if (reader.readC()!=16) {
       logW("type is wrong!");
@@ -3732,12 +3736,12 @@ bool DivEngine::loadS3M(unsigned char* file, size_t len) {
         s->loopStart=reader.readI();
         s->loopEnd=reader.readI();
         defVol[i]=reader.readC();
-        
+
         logV("defVol: %d",defVol[i]);
 
         reader.readC(); // x
       } else {
-        
+
       }
 
       ds.ins.push_back(ins);
@@ -4029,7 +4033,7 @@ bool DivEngine::loadFC(unsigned char* file, size_t len) {
         for (int i=0; i<256; i++) {
           w->data[i]=128;
         }
-        
+
         if (waveLen[i]>0) {
           signed char* waveArray=new signed char[waveLen[i]*2];
           reader.read(waveArray,waveLen[i]*2);
@@ -4173,7 +4177,7 @@ bool DivEngine::loadFC(unsigned char* file, size_t len) {
     for (unsigned int i=0; i<volMacroLen; i++) {
       DivInstrument* ins=new DivInstrument;
       FCMacro& m=volMacros[i];
-      
+
       ins->type=DIV_INS_AMIGA;
       ins->name=fmt::sprintf("Instrument %d",i);
       ins->amiga.useWave=true;
@@ -4436,7 +4440,7 @@ bool DivEngine::loadFTM(unsigned char* file, size_t len) {
     unsigned int hilightA=4;
     unsigned int hilightB=16;
     double customHz=60;
-    
+
     memset(hasSequence,0,256*8*sizeof(bool));
     memset(sequenceIndex,0,256*8);
 
@@ -4478,7 +4482,7 @@ bool DivEngine::loadFTM(unsigned char* file, size_t len) {
       unsigned int blockVersion=(unsigned int)reader.readI();
       unsigned int blockSize=(unsigned int)reader.readI();
       size_t blockStart=reader.tell();
-      
+
       logD("reading block %s (version %d, %d bytes)",blockName,blockVersion,blockSize);
       if (blockName=="PARAMS") {
         // versions 7-9 don't change anything?
@@ -4864,7 +4868,7 @@ bool DivEngine::loadFTM(unsigned char* file, size_t len) {
               pat->data[row][0]=nextNote-1;
               pat->data[row][1]=nextOctave;
             }
-            
+
             unsigned char nextIns=reader.readC();
             if (nextIns<0x40) {
               pat->data[row][2]=nextIns;
@@ -5065,7 +5069,7 @@ bool DivEngine::load(unsigned char* f, size_t slen) {
 
   // step 2: try loading as .fur or .dmf
   if (memcmp(file,DIV_DMF_MAGIC,16)==0) {
-    return loadDMF(file,len); 
+    return loadDMF(file,len);
   } else if (memcmp(file,DIV_FTM_MAGIC,18)==0) {
     return loadFTM(file,len);
   } else if (memcmp(file,DIV_FUR_MAGIC,16)==0) {
@@ -5079,7 +5083,7 @@ bool DivEngine::load(unsigned char* f, size_t slen) {
     delete[] f;
     return true;
   }
-  
+
   // step 4: not a valid file
   logE("not a valid module!");
   lastError="not a compatible song";
@@ -5293,7 +5297,7 @@ SafeWriter* DivEngine::saveFur(bool notPrimary, bool newPatternFormat) {
   w->writeString(song.author,false);
 
   w->writeF(song.tuning);
-  
+
   // compatibility flags
   w->writeC(song.limitSlides);
   w->writeC(song.linearPitch);
@@ -5400,7 +5404,7 @@ SafeWriter* DivEngine::saveFur(bool notPrimary, bool newPatternFormat) {
   // first subsong virtual tempo
   w->writeS(subSong->virtualTempoN);
   w->writeS(subSong->virtualTempoD);
-  
+
   // subsong list
   w->writeString(subSong->name,false);
   w->writeString(subSong->notes,false);
@@ -5900,7 +5904,7 @@ SafeWriter* DivEngine::saveDMF(unsigned char version) {
   w->writeC(curSubSong->hilightB);
 
   int intHz=curSubSong->hz;
-  
+
   w->writeC(curSubSong->timeBase);
   w->writeC(curSubSong->speeds.val[0]);
   w->writeC((curSubSong->speeds.len>=2)?curSubSong->speeds.val[1]:curSubSong->speeds.val[0]);
@@ -6227,7 +6231,7 @@ SafeWriter* DivEngine::saveDMF(unsigned char version) {
     w->write(i->data16,i->length16);
 #endif
   }
-  
+
   saveLock.unlock();
   return w;
 }
