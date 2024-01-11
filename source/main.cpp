@@ -346,11 +346,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             }
         }
 
+        rePlayer::Graphics::Destroy();
+
         ImGuiRelease();
 
         s_rePlayer->Release();
-
-        rePlayer::Graphics::Destroy();
 
         core::SharedContexts::Unregister();
     }

@@ -240,11 +240,17 @@ namespace rePlayer
 
     void GraphicsImpl::Destroy()
     {
+        ImGuiIO& io = ImGui::GetIO();
         if (m_isCrashed)
         {
+            io.BackendRendererUserData = nullptr;
+
             MessageBox(nullptr, "Graphic engine has crashed", "rePlayer", MB_OK);
             return;
         }
+
+        ImGui::DestroyPlatformWindows();
+        io.BackendRendererUserData = nullptr;
 
         delete m_mainWindow;
 
