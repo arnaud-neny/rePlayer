@@ -4,6 +4,7 @@
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 
 // rePlayer
 #include <Database/Types/Countries.h>
@@ -696,7 +697,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<Array<uint8_t>, bool> SourceAmigaMusicPreservation::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceAmigaMusicPreservation::ImportSong(SourceID sourceId, const std::string& path)
     {
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
@@ -725,6 +726,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
@@ -737,7 +739,6 @@ namespace rePlayer
                     m_songs.RemoveAt(song - m_songs);
                     m_isDirty = true;
                 }
-                buffer.Reset();
 
                 Log::Error("Amiga Music Preservation: file \"%s\" not found\n", url);
             }
@@ -787,12 +788,13 @@ namespace rePlayer
                         songAMP->crc = buffer[buffer.Size() - 8] | (buffer[buffer.Size() - 7] << 8) | (buffer[buffer.Size() - 6] << 16) | (buffer[buffer.Size() - 5] << 24);
                         songAMP->size = static_cast<uint32_t>(buffer.Size());
                         m_isDirty = true;
-                    }
 
-                    buffer.Swap(unpackedData);
+                        stream = io::StreamMemory::Create(path, unpackedData.Items(), unpackedData.Size(), false);
+                        unpackedData.Detach();
+                    }
                 }
 
-                if (buffer.IsEmpty())
+                if (stream.IsInvalid())
                     Log::Error("Amiga Music Preservation: failed to process package\n");
                 else
                     Log::Message("Unpacked\n");
@@ -805,7 +807,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceAmigaMusicPreservation::OnArtistUpdate(ArtistSheet* artist)

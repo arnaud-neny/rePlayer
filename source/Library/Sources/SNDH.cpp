@@ -4,6 +4,7 @@
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 
 // zlib
 #include <zlib.h>
@@ -382,7 +383,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<Array<uint8_t>, bool> SourceSNDH::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceSNDH::ImportSong(SourceID sourceId, const std::string& path)
     {
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
@@ -411,13 +412,13 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK)
         {
             if (buffer.Size() < 128 || strstr(buffer.Items<char>(), "<html>"))
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
                 m_isDirty = true;
@@ -431,6 +432,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = static_cast<uint32_t>(buffer.Size());
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
         }
@@ -439,7 +443,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceSNDH::OnArtistUpdate(ArtistSheet* artist)

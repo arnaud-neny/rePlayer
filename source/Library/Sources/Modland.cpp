@@ -4,6 +4,7 @@
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 
 // rePlayer
 #include <RePlayer/Core.h>
@@ -548,43 +549,43 @@ namespace rePlayer
         }
     }
 
-    std::pair<Array<uint8_t>, bool> SourceModland::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportSong(SourceID sourceId, const std::string& path)
     {
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
 
         if (strcmp(m_replays[songSource->replay].name(m_strings), "TFMX") == 0)
-            return ImportTFMXSong(sourceId);
+            return ImportTFMXSong(sourceId, path);
         if (auto* replay = GetReplayOverride(songSource))
-            return ImportMultiSong(sourceId, replay);
+            return ImportMultiSong(sourceId, replay, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "MDX") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kMDX);
+            return ImportPkSong(sourceId, ModlandReplay::kMDX, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Capcom Q-Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kQSF);
+            return ImportPkSong(sourceId, ModlandReplay::kQSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Gameboy Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kGSF);
+            return ImportPkSong(sourceId, ModlandReplay::kGSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Nintendo DS Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::k2SF);
+            return ImportPkSong(sourceId, ModlandReplay::k2SF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Saturn Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kSSF);
+            return ImportPkSong(sourceId, ModlandReplay::kSSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Dreamcast Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kDSF);
+            return ImportPkSong(sourceId, ModlandReplay::kDSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kPSF);
+            return ImportPkSong(sourceId, ModlandReplay::kPSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation 2 Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kPSF2);
+            return ImportPkSong(sourceId, ModlandReplay::kPSF2, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Ultra64 Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kUSF);
+            return ImportPkSong(sourceId, ModlandReplay::kUSF, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Super Nintendo Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kSNSF);
+            return ImportPkSong(sourceId, ModlandReplay::kSNSF, path);
         if (strstr(m_replays[songSource->replay].name(m_strings), "MoonBlaster") == m_replays[songSource->replay].name(m_strings))
-            return ImportPkSong(sourceId, strstr(m_replays[songSource->replay].name(m_strings), "edit") ? ModlandReplay::kMBMEdit : ModlandReplay::kMBM);
+            return ImportPkSong(sourceId, strstr(m_replays[songSource->replay].name(m_strings), "edit") ? ModlandReplay::kMBMEdit : ModlandReplay::kMBM, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "FAC SoundTracker") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kFACSoundTracker);
+            return ImportPkSong(sourceId, ModlandReplay::kFACSoundTracker, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kIFFSmus);
+            return ImportPkSong(sourceId, ModlandReplay::kIFFSmus, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Euphony") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kEuphony);
+            return ImportPkSong(sourceId, ModlandReplay::kEuphony, path);
 
         CURL* curl = curl_easy_init();
 
@@ -606,6 +607,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
@@ -616,11 +618,10 @@ namespace rePlayer
                 {
                     Log::Message("Discarded\n");
                     curl_easy_cleanup(curl);
-                    return ImportPkSong(sourceId, ModlandReplay::kDelitrackerCustom);
+                    return ImportPkSong(sourceId, ModlandReplay::kDelitrackerCustom, path);
                 }
 
                 isEntryMissing = true;
-                buffer.Reset();
                 if (songSource->artists[0])
                     m_areStringsDirty |= --m_artists[songSource->artists[0]].refcount == 0;
                 if (songSource->artists[1])
@@ -637,6 +638,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = buffer.NumItems();
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
             m_isDirty = true;
@@ -646,7 +650,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceModland::OnArtistUpdate(ArtistSheet* artist)
@@ -988,7 +992,7 @@ namespace rePlayer
         return cleanedUrl;
     }
 
-    std::pair<Array<uint8_t>, bool> SourceModland::ImportTFMXSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportTFMXSong(SourceID sourceId, const std::string& path)
     {
         auto* songSource = GetSongSource(sourceId.internalId);
 
@@ -1011,6 +1015,7 @@ namespace rePlayer
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         auto curlError = curl_easy_perform(curl);
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
@@ -1018,7 +1023,6 @@ namespace rePlayer
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 if (songSource->artists[0])
                     m_areStringsDirty |= --m_artists[songSource->artists[0]].refcount == 0;
                 if (songSource->artists[1])
@@ -1055,13 +1059,13 @@ namespace rePlayer
                     songSource->size = static_cast<uint32_t>(buffer.Size());
                     m_isDirty = true;
 
+                    stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                    buffer.Detach();
+
                     Log::Message("OK\n");
                 }
                 else
-                {
-                    buffer.Reset();
                     Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-                }
             }
         }
         else
@@ -1069,10 +1073,10 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
-    std::pair<Array<uint8_t>, bool> SourceModland::ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay)
+    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path)
     {
         if (replay->isKeepingLink && DownloadDatabase())
             return {};
@@ -1100,6 +1104,7 @@ namespace rePlayer
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         auto curlError = curl_easy_perform(curl);
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
@@ -1107,7 +1112,6 @@ namespace rePlayer
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 if (songSource->artists[0])
                     m_areStringsDirty |= --m_artists[songSource->artists[0]].refcount == 0;
                 if (songSource->artists[1])
@@ -1136,27 +1140,24 @@ namespace rePlayer
                     songSource->size = static_cast<uint32_t>(buffer.Size());
                     m_isDirty = true;
 
+                    stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                    buffer.Detach();
+
                     Log::Message("OK\n");
                 }
                 else
-                {
-                    buffer.Reset();
                     Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-                }
             }
         }
         else
-        {
-            buffer.Reset();
             Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-        }
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
-    std::pair<Array<uint8_t>, bool> SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType)
+    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType, const std::string& path)
     {
         if (DownloadDatabase())
             return {};
@@ -1251,6 +1252,7 @@ namespace rePlayer
                 archiveBuffer.Add("EUPH-PKG", sizeof("EUPH-PKG") - 1);
 
             bool hasFailed = false;
+            SmartPtr<io::Stream> stream;
             bool isEntryMissing = false;
 
             auto* archive = archive_write_new();
@@ -1313,11 +1315,14 @@ namespace rePlayer
             assert(r == ARCHIVE_OK);
             archive_entry_free(entry);
 
-            if (hasFailed)
-                archiveBuffer.Reset();
-            else
+            if (!hasFailed)
+            {
+                stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
+                archiveBuffer.Detach();
+
                 Log::Message("OK\n");
-            return { std::move(archiveBuffer), isEntryMissing };
+            }
+            return { stream, isEntryMissing };
         }
 
         if (songSource->artists[0])

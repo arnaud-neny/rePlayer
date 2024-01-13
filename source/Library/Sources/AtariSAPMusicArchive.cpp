@@ -4,6 +4,7 @@
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 #include <JSON/json.hpp>
 
 // rePlayer
@@ -265,7 +266,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<Array<uint8_t>, bool> SourceAtariSAPMusicArchive::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceAtariSAPMusicArchive::ImportSong(SourceID sourceId, const std::string& path)
     {
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
@@ -290,13 +291,13 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 for (uint16_t i = 0; i < songSource->numArtists; i++)
                     m_areStringsDirty |= --m_artists[songSource->artists[i]].refcount == 0;
                 m_areStringsDirty |= --m_roots[songSource->root].refcount == 0;
@@ -312,6 +313,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = buffer.NumItems();
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
             m_isDirty = true;
@@ -321,7 +325,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceAtariSAPMusicArchive::OnArtistUpdate(ArtistSheet* artist)

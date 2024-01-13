@@ -4,6 +4,7 @@
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 #include <JSON/json.hpp>
 
 // rePlayer
@@ -206,7 +207,7 @@ namespace rePlayer
         curl_easy_cleanup(curl);
     }
 
-    std::pair<Array<uint8_t>, bool> SourceZXArt::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceZXArt::ImportSong(SourceID sourceId, const std::string& path)
     {
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
@@ -235,6 +236,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK)
         {
@@ -244,7 +246,6 @@ namespace rePlayer
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
                 m_isDirty = true;
-                buffer.Reset();
 
                 Log::Error("ZX-Art: file \"%s\" not found\n", url);
             }
@@ -255,6 +256,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = static_cast<uint32_t>(buffer.Size());
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
         }
@@ -263,7 +267,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceZXArt::OnArtistUpdate(ArtistSheet* artist)

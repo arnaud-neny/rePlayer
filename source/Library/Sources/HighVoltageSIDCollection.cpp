@@ -1,11 +1,15 @@
 #include "HighVoltageSIDCollection.h"
 
+// Core
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 
+// zlib
 #include <zlib.h>
 
+// curl
 #include <Curl/curl.h>
 
 namespace rePlayer
@@ -245,7 +249,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<Array<uint8_t>, bool> SourceHighVoltageSIDCollection::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceHighVoltageSIDCollection::ImportSong(SourceID sourceId, const std::string& path)
     {
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
@@ -266,6 +270,7 @@ namespace rePlayer
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
 
         std::string url;
@@ -285,7 +290,6 @@ namespace rePlayer
             if (buffer.IsEmpty() || downloadStatus > 0)
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 if (songSource->artist)
                     m_areStringsDirty |= --m_artists[songSource->artist].refcount == 0;
                 new (songSource) SourceSong();
@@ -300,6 +304,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = buffer.NumItems();
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
             m_isDirty = true;
@@ -309,7 +316,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceHighVoltageSIDCollection::OnArtistUpdate(ArtistSheet* artist)

@@ -15,7 +15,7 @@ namespace rePlayer
         void FindArtists(ArtistsCollection& artists, const char* name) final;
         void ImportArtist(SourceID importedArtistID, SourceResults& results) final;
         void FindSongs(const char* name, SourceResults& collectedSongs) final;
-        std::pair<Array<uint8_t>, bool> ImportSong(SourceID sourceId) final;
+        std::pair<SmartPtr<io::Stream>, bool> ImportSong(SourceID sourceId, const std::string& path) final;
         void OnArtistUpdate(ArtistSheet* artist) final;
         void OnSongUpdate(const Song* const song) final;
         void DiscardSong(SourceID sourceId, SongID newSongId) final;
@@ -168,9 +168,9 @@ namespace rePlayer
         uint32_t FindSong(const ModlandSong& dbSong);
         std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
         static std::string CleanUrl(CURL* curl, const char* url);
-        std::pair<Array<uint8_t>, bool> ImportTFMXSong(SourceID sourceId);
-        std::pair<Array<uint8_t>, bool> ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay);
-        std::pair<Array<uint8_t>, bool> ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType);
+        std::pair<SmartPtr<io::Stream>, bool> ImportTFMXSong(SourceID sourceId, const std::string& path);
+        std::pair<SmartPtr<io::Stream>, bool> ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path);
+        std::pair<SmartPtr<io::Stream>, bool> ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType, const std::string& path);
 
         static ModlandReplayOverride* const GetReplayOverride(ModlandReplay::Type type);
         static const ModlandReplayOverride* const GetReplayOverride(const char* name);

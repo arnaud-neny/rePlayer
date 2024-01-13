@@ -1,5 +1,8 @@
 #include "FileImport.h"
 
+// Core
+#include <IO/Stream.h>
+
 namespace rePlayer
 {
     void SourceFileImport::FindArtists(ArtistsCollection& /*artists*/, const char* /*name*/)
@@ -11,7 +14,7 @@ namespace rePlayer
     void SourceFileImport::FindSongs(const char* /*name*/, SourceResults& /*collectedSongs*/)
     {}
 
-    std::pair<Array<uint8_t>, bool> SourceFileImport::ImportSong(SourceID /*sourceId*/)
+    std::pair<SmartPtr<io::Stream>, bool> SourceFileImport::ImportSong(SourceID /*sourceId*/, const std::string& /*path*/)
     {
         return {};
     }

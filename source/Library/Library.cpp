@@ -8,7 +8,6 @@
 #include <ImGui/ImGuiFileDialog.h>
 #include <IO/File.h>
 #include <IO/StreamFile.h>
-#include <IO/StreamMemory.h>
 
 #include <Database/Database.h>
 #include <Database/SongEditor.h>
@@ -101,9 +100,9 @@ namespace rePlayer
             for (uint32_t i = 0; i < songSheet->sourceIds.NumItems(); i++)
             {
                 auto sourceId = songSheet->sourceIds[i];
-                auto module = m_sources[sourceId.sourceId]->ImportSong(sourceId);
-                auto& moduleData = module.first;
-                if (moduleData.IsNotEmpty())
+                auto importedSong = m_sources[sourceId.sourceId]->ImportSong(sourceId, filename);
+                stream = importedSong.first;
+                if (stream.IsValid())
                 {
                     // if the first source wasn't available, the next available becomes the default
                     if (i != 0)
@@ -114,6 +113,7 @@ namespace rePlayer
                     }
 
                     // build the crc of the file
+                    auto moduleData = stream->Read();
                     auto fileSize = static_cast<uint32_t>(moduleData.Size());
                     auto fileCrc = crc32(0L, Z_NULL, 0);
                     fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
@@ -126,16 +126,15 @@ namespace rePlayer
                     }
 
                     // save the downloaded song
-                    auto file = io::File::OpenForWrite(filename.c_str());
-                    file.Write(moduleData.Items(), moduleData.Size());
-
-                    // create the stream from the data
-                    stream = io::StreamMemory::Create(filename, moduleData.Items(), moduleData.Size(), false);
-                    moduleData.Detach();
+                    if (moduleData.IsNotEmpty())
+                    {
+                        auto file = io::File::OpenForWrite(filename.c_str());
+                        file.Write(moduleData.Items(), moduleData.Size());
+                    }
 
                     break;
                 }
-                else if (module.second)
+                else if (importedSong.second)
                 {
                     --i;
                     songSheet->sourceIds.RemoveAt(0);

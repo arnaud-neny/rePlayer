@@ -6,6 +6,7 @@
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
+#include <IO/StreamMemory.h>
 
 // rePlayer
 #include <Library/Sources/XmlHandler.h>
@@ -480,7 +481,7 @@ namespace rePlayer
 #endif
     }
 
-    std::pair<Array<uint8_t>, bool> SourceTheModArchive::ImportSong(SourceID sourceId)
+    std::pair<SmartPtr<io::Stream>, bool> SourceTheModArchive::ImportSong(SourceID sourceId, const std::string& path)
     {
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
@@ -508,13 +509,13 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
+        SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (memcmp(buffer.begin(), "Invalid ID Error", sizeof("Invalid ID Error")) == 0)
             {
                 isEntryMissing = true;
-                buffer.Reset();
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
 
@@ -527,6 +528,9 @@ namespace rePlayer
                 songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
                 songSource->size = static_cast<uint32_t>(buffer.Size());
 
+                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
+                buffer.Detach();
+
                 Log::Message("OK\n");
             }
             m_isDirty = true;
@@ -536,7 +540,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { std::move(buffer), isEntryMissing };
+        return { stream, isEntryMissing };
     }
 
     void SourceTheModArchive::OnArtistUpdate(ArtistSheet* artist)

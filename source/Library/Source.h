@@ -7,6 +7,12 @@
 #include <Database/Types/SourceID.h>
 #include <RePlayer/CoreHeader.h>
 
+namespace core::io
+{
+    class Stream;
+}
+// namespace core::io
+
 namespace rePlayer
 {
     struct SourceResults
@@ -81,7 +87,7 @@ namespace rePlayer
         virtual void FindArtists(ArtistsCollection& artists, const char* name) = 0;
         virtual void ImportArtist(SourceID importedArtistID, SourceResults& results) = 0;
         virtual void FindSongs(const char* name, SourceResults& collectedSongs) = 0;
-        virtual std::pair<Array<uint8_t>, bool> ImportSong(SourceID sourceId) = 0;
+        virtual std::pair<SmartPtr<io::Stream>, bool> ImportSong(SourceID sourceId, const std::string& path) = 0;
         virtual void OnArtistUpdate(ArtistSheet* artist) = 0;
         virtual void OnSongUpdate(const Song* const song) = 0;
         virtual void DiscardSong(SourceID sourceId, SongID newSongId) = 0;
