@@ -7,6 +7,7 @@
 
 #include <Deck/Deck.h>
 #include <Graphics/Graphics.h>
+#include <RePlayer/Core.h>
 #include <RePlayer/RePlayer.h>
 
 #include <ctime>
@@ -260,9 +261,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             tnid.cbSize = sizeof(NOTIFYICONDATA);
             tnid.hWnd = g_hWnd;
             tnid.uID = 0x777;
-            tnid.uFlags = NIF_MESSAGE | NIF_ICON;
+            tnid.uFlags = NIF_MESSAGE | NIF_ICON | (g_isWindows11 ? 0 : NIF_TIP);
             tnid.uCallbackMessage = WM_USER;
             tnid.hIcon = wc.hIcon;
+            if (!g_isWindows11)
+                strcpy_s(tnid.szTip, rePlayer::Core::GetLabel());
 
             Shell_NotifyIcon(NIM_ADD, &tnid);
             tnid.uVersion = NOTIFYICON_VERSION_4;
