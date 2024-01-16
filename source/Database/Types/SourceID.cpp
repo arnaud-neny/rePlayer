@@ -12,7 +12,8 @@ namespace rePlayer
         "High Voltage SID Collection",
         "SNDH - Atari ST YM2149 Archive",
         "Atari SAP Music Archive",
-        "ZX-Art"
+        "ZX-Art",
+        "URL Import"
     };
 
     static_assert(_countof(SourceID::sourceNames) == SourceID::NumSourceIDs);

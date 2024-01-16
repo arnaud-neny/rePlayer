@@ -17,7 +17,7 @@ namespace rePlayer
     class Playlist::DropTarget : public IDropTarget, public ImGui::Callbacks
     {
     public:
-        DropTarget(Playlist& playlist) : m_playlist(playlist) {}
+        DropTarget(Playlist& playlist);
 
         void UpdateDragDropSource(uint8_t dropId);
 
@@ -25,6 +25,7 @@ namespace rePlayer
         bool IsDropped() const { return m_isDropped; }
         bool IsAcceptingAll() const { return m_isAcceptingAll; }
         bool IsOverriding() const { return m_isOverriding; }
+        bool IsUrl() const { return m_isUrl; }
         Array<std::string> AcquireFiles();
 
         ULONG AddRef() override;
@@ -44,10 +45,12 @@ namespace rePlayer
 
     private:
         Playlist& m_playlist;
+        uint32_t m_urlClipboardFormat;
         int32_t m_refCount = 0;
         bool m_isDropped = false;
         bool m_isAcceptingAll = false;
         bool m_isOverriding = false;
+        bool m_isUrl = false;
         uint8_t m_canDrop = 0;
         Array<std::string> m_files;
     };

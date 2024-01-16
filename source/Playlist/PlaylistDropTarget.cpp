@@ -6,9 +6,15 @@
 
 #include <atomic>
 #include <shellapi.h>
+#include <ShlObj.h>
 
 namespace rePlayer
 {
+    Playlist::DropTarget::DropTarget(Playlist& playlist)
+        : m_playlist(playlist)
+        , m_urlClipboardFormat(RegisterClipboardFormat(CFSTR_INETURLW))
+    {}
+
     void Playlist::DropTarget::UpdateDragDropSource(uint8_t dropId)
     {
         if (m_files.IsNotEmpty())
@@ -82,35 +88,55 @@ namespace rePlayer
 
     HRESULT Playlist::DropTarget::DragEnter(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect)
     {
-        FORMATETC fmte = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-        STGMEDIUM stgm;
-
         Array<std::string> files;
+
+        FORMATETC fmte = { CLIPFORMAT(m_urlClipboardFormat), NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+        STGMEDIUM stgm;
         if (SUCCEEDED(pDataObj->GetData(&fmte, &stgm)))
         {
-            HDROP hdrop = (HDROP)stgm.hGlobal; // or reinterpret_cast<HDROP> if preferred
-            UINT file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, NULL, 0);
+            auto* url = reinterpret_cast<const wchar_t*>(GlobalLock(stgm.hGlobal));
 
-            // we can drag more than one file at the same time, so we have to loop here
-            for (UINT i = 0; i < file_count; i++)
-            {
-                UINT numChars = DragQueryFileW(hdrop, i, nullptr, 0);
-                if (numChars > 0)
-                {
-                    std::wstring szFile;
-                    szFile.resize(numChars);
-                    DragQueryFileW(hdrop, i, szFile.data(), numChars + 1);
-                    // convert from unicde to utf-8
-                    std::string filename;
-                    filename.resize(::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, NULL, 0, NULL, NULL));
-                    ::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, filename.data(), int(filename.size()), NULL, NULL);
-                    files.Add(std::move(filename));
-                }
-            }
+            // convert from unicode to utf-8w
+            std::string filename;
+            filename.resize(::WideCharToMultiByte(CP_UTF8, 0, url, -1, NULL, 0, NULL, NULL) - 1);
+            ::WideCharToMultiByte(CP_UTF8, 0, url, -1, filename.data(), int(filename.size()), NULL, NULL);
+            files.Add(std::move(filename));
 
-            // we have to release the data when we're done with it
+            GlobalUnlock(stgm.hGlobal);
             ReleaseStgMedium(&stgm);
 
+            m_isUrl = true;
+        }
+        else
+        {
+            fmte = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+            if (SUCCEEDED(pDataObj->GetData(&fmte, &stgm)))
+            {
+                HDROP hdrop = (HDROP)stgm.hGlobal; // or reinterpret_cast<HDROP> if preferred
+                UINT file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, NULL, 0);
+
+                // we can drag more than one file at the same time, so we have to loop here
+                for (UINT i = 0; i < file_count; i++)
+                {
+                    UINT numChars = DragQueryFileW(hdrop, i, nullptr, 0);
+                    if (numChars > 0)
+                    {
+                        std::wstring szFile;
+                        szFile.resize(numChars);
+                        DragQueryFileW(hdrop, i, szFile.data(), numChars + 1);
+                        // convert from unicode to utf-8
+                        std::string filename;
+                        filename.resize(::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, NULL, 0, NULL, NULL) - 1);
+                        ::WideCharToMultiByte(CP_UTF8, 0, szFile.c_str(), -1, filename.data(), int(filename.size()), NULL, NULL);
+                        files.Add(std::move(filename));
+                    }
+                }
+
+                // we have to release the data when we're done with it
+                ReleaseStgMedium(&stgm);
+
+                m_isUrl = false;
+            }
         }
 
         *pdwEffect &= DROPEFFECT_NONE;

@@ -15,6 +15,7 @@
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
 #include <Deck/Player.h>
+#include <IO/StreamUrl.h>
 #include <Library/Library.h>
 #include <PlayList/PlaylistDropTarget.h>
 #include <PlayList/PlaylistSongsUI.h>
@@ -37,6 +38,9 @@
 #include <algorithm>
 #include <filesystem>
 
+// curl
+#include <curl/curl.h>
+
 namespace rePlayer
 {
     inline Playlist::Cue::Entry& Playlist::Cue::Entry::operator=(const MusicID& musicId)
@@ -54,6 +58,21 @@ namespace rePlayer
     inline bool Playlist::Cue::Entry::IsAvailable() const
     {
         return !GetSong()->IsInvalid();
+    }
+
+    inline bool Playlist::Cue::IsUrl(SourceID sourceId) const
+    {
+        return paths[sourceId.internalId] == 0;
+    }
+
+    inline const char* Playlist::Cue::GetPath(SourceID sourceId, bool isUrl) const
+    {
+        return paths.Items(isUrl ? sourceId.internalId + 1 : sourceId.internalId);
+    }
+
+    inline const char* Playlist::Cue::GetPath(SourceID sourceId) const
+    {
+        return GetPath(sourceId, IsUrl(sourceId));
     }
 
     void Playlist::Summary::Load(io::File& file)
@@ -215,7 +234,10 @@ namespace rePlayer
 
     SmartPtr<core::io::Stream> Playlist::GetStream(Song* song)
     {
-        return io::StreamFile::Create(m_cue.paths.Items(song->GetSourceId(0).internalId));
+        auto sourceId = song->GetSourceId(0);
+        if (m_cue.IsUrl(sourceId))
+            return StreamUrl::Create(m_cue.GetPath(sourceId, true));
+        return io::StreamFile::Create(m_cue.GetPath(sourceId, false));
     }
 
     SmartPtr<core::io::Stream> Playlist::GetStream(const MusicID musicId)
@@ -231,7 +253,8 @@ namespace rePlayer
         {
             auto* dbSong = m_cue.db[musicId.subsongId];
             auto* song = dbSong->Edit();
-            auto stream = io::StreamFile::Create(m_cue.paths.Items(song->sourceIds[0].internalId));
+            auto sourceId = song->sourceIds[0];
+            auto stream = GetStream(dbSong);
             if (stream.IsValid())
             {
                 if (dbSong->GetFileSize() == 0)
@@ -308,12 +331,12 @@ namespace rePlayer
                     {
                         player = Player::Create(musicId, song, replay, stream);
                         player->MarkSongAsNew(hasChanged);
-                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.paths.Items(song->sourceIds[0].internalId));
+                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.GetPath(sourceId));
                     }
                     else
                     {
                         delete replay;
-                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.paths.Items(song->sourceIds[0].internalId));
+                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.GetPath(sourceId));
                     }
 
                     if (hasChanged)
@@ -326,7 +349,7 @@ namespace rePlayer
                         song->subsongs[0].isInvalid = true;
                         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                     }
-                    Log::Error("Can't find a replay for \"%s\"\n", m_cue.paths.Items(song->sourceIds[0].internalId));
+                    Log::Error("Can't find a replay for \"%s\"\n", m_cue.GetPath(sourceId));
                 }
             }
             else
@@ -336,7 +359,7 @@ namespace rePlayer
                     song->subsongs[0].isUnavailable = true;
                     m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                 }
-                Log::Error("Can't open file \"%s\"\n", m_cue.paths.Items(song->sourceIds[0].internalId));
+                Log::Error("Can't open file \"%s\"\n", m_cue.GetPath(sourceId));
             }
         }
         else
@@ -818,7 +841,7 @@ namespace rePlayer
                             {
                                 auto mousePos = ImGui::GetMousePos();
                                 auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
-                                ProcessExternalDranAndDrop(insertPos);
+                                ProcessExternalDragAndDrop(insertPos);
                             }
 
                             if (auto payload = ImGui::AcceptDragDropPayload("DATABASE"))
@@ -1004,7 +1027,7 @@ namespace rePlayer
     void Playlist::OnEndUpdate()
     {
         if (m_dropTarget->IsDropped())
-            ProcessExternalDranAndDrop(m_cue.entries.NumItems<int32_t>());
+            ProcessExternalDragAndDrop(m_cue.entries.NumItems<int32_t>());
 
         m_songs->OnEndUpdate();
     }
@@ -1092,7 +1115,7 @@ namespace rePlayer
         }
     }
 
-    void Playlist::ProcessExternalDranAndDrop(int32_t droppedEntryIndex)
+    void Playlist::ProcessExternalDragAndDrop(int32_t droppedEntryIndex)
     {
         if (m_dropTarget->IsOverriding())
             Clear();
@@ -1103,7 +1126,62 @@ namespace rePlayer
 
         auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
         auto files = m_dropTarget->AcquireFiles();
-        for (auto filename : files)
+        if (m_dropTarget->IsUrl())
+        {
+            auto* curl = curl_easy_init();
+            for (auto& newFile : files)
+            {
+                // add to playlist
+                if (auto song = m_cue.db.FindSong([&](auto* song)
+                {
+                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), newFile.c_str()) == 0;
+                }))
+                {
+                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
+                    {
+                        if (!song->IsSubsongDiscarded(i))
+                        {
+                            MusicID musicId;
+                            musicId.subsongId.songId = song->GetId();
+                            musicId.subsongId.index = i;
+                            musicId.playlistId = ++m_uniqueIdGenerator;
+                            musicId.databaseId = DatabaseID::kPlaylist;
+                            m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                        }
+                    }
+                }
+                else
+                {
+                    // add new song to the playlist database
+                    auto* songSheet = new SongSheet;
+                    int nameSize = 0;
+                    if (auto* name = curl_easy_unescape(curl, newFile.c_str(), int(newFile.size()), &nameSize))
+                    {
+                        songSheet->name = name;
+                        curl_free(name);
+                    }
+                    else
+                        songSheet->name = newFile;
+                    songSheet->sourceIds.Add(SourceID(SourceID::URLImportID, m_cue.paths.NumItems()));
+                    songSheet->databaseDay = databaseDay;
+                    m_cue.paths.Add('\0'); // in that case, first character is zero to identify the path as url
+                    m_cue.paths.Add(newFile.c_str(), newFile.size() + 1);
+                    m_cue.arePathsDirty = true;
+
+                    m_cue.db.AddSong(songSheet);
+
+                    MusicID musicId;
+                    musicId.subsongId.songId = songSheet->id;
+                    musicId.playlistId = ++m_uniqueIdGenerator;
+                    musicId.databaseId = DatabaseID::kPlaylist;
+                    m_cue.entries.Insert(droppedEntryIndex++, musicId);
+
+                    m_cue.db.Raise(Database::Flag::kSaveSongs);
+                }
+            }
+            curl_easy_cleanup(curl);
+        }
+        else for (auto& newFile : files)
         {
             auto addFile = [&](const std::filesystem::path& path)
             {
@@ -1151,7 +1229,7 @@ namespace rePlayer
                 const std::string filename = reinterpret_cast<const char*>(path.u8string().c_str());
                 if (auto song = m_cue.db.FindSong([&](auto* song)
                 {
-                    return _stricmp(m_cue.paths.Items(song->GetSourceId(0).internalId), filename.c_str()) == 0;
+                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), filename.c_str()) == 0;
                 }))
                 {
                     for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
@@ -1276,7 +1354,7 @@ namespace rePlayer
                 m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
             };
 
-            auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(filename.c_str()));
+            auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(newFile.c_str()));
             if (std::filesystem::is_directory(path))
             {
                 for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path))

@@ -8,14 +8,15 @@ namespace rePlayer
     {
         enum eSourceID : uint32_t
         {
-            AmigaMusicPreservationSourceID = 0,
-            TheModArchiveSourceID = 1,
-            ModlandSourceID = 2,
-            FileImportID = 3,
-            HighVoltageSIDCollectionID = 4,
-            SNDHID = 5,
-            AtariSAPMusicArchiveID = 6,
-            ZXArtID = 7,
+            AmigaMusicPreservationSourceID  = 0,
+            TheModArchiveSourceID           = 1,
+            ModlandSourceID                 = 2,
+            FileImportID                    = 3,
+            HighVoltageSIDCollectionID      = 4,
+            SNDHID                          = 5,
+            AtariSAPMusicArchiveID          = 6,
+            ZXArtID                         = 7,
+            URLImportID                     = 8,
 
             NumSourceIDs
         };

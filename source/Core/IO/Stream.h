@@ -27,6 +27,9 @@ namespace core::io
 
         virtual const std::string& GetName() const = 0;
 
+        virtual std::string GetInfo() const { return {}; }
+        virtual std::string GetTitle() const { return {}; }
+
         SmartPtr<Stream> Clone();
 
         // open another stream in the same context as the current one

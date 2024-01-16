@@ -23,6 +23,7 @@
 #include <Library/Sources/Modland.h>
 #include <Library/Sources/SNDH.h>
 #include <Library/Sources/TheModArchive.h>
+#include <Library/Sources/URLImport.h>
 #include <Library/Sources/ZXArt.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
@@ -51,6 +52,7 @@ namespace rePlayer
         m_sources[SourceID::SNDHID] = new SourceSNDH();
         m_sources[SourceID::AtariSAPMusicArchiveID] = new SourceAtariSAPMusicArchive();
         m_sources[SourceID::ZXArtID] = new SourceZXArt();
+        m_sources[SourceID::URLImportID] = new SourceURLImport();
 
         Load();
 
@@ -317,7 +319,7 @@ namespace rePlayer
             auto selectedSources = m_selectedSources;
             for (uint16_t i = 0; i < SourceID::NumSourceIDs; i++)
             {
-                if (i == SourceID::FileImportID)
+                if (i == SourceID::FileImportID || i == SourceID::URLImportID)
                     continue;
                 bool isChecked = selectedSources & (1ull << i);
                 if (ImGui::Checkbox(SourceID::sourceNames[i], &isChecked))

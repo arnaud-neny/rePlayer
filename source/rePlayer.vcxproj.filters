@@ -36,6 +36,9 @@
     <Filter Include="Source Files\Deck">
       <UniqueIdentifier>{8c8628cd-b41e-4edd-98d9-08a7c632197c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{268ba054-7211-4ff0-b48b-e49b84498563}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -159,6 +162,12 @@
       <Filter>Source Files\RePlayer</Filter>
     </ClCompile>
     <ClCompile Include="Library\Sources\ZXArt.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\StreamUrl.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Sources\URLImport.cpp">
       <Filter>Source Files\Library\Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -341,6 +350,12 @@
       <Filter>Source Files\RePlayer</Filter>
     </ClInclude>
     <ClInclude Include="Library\Sources\ZXArt.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\StreamUrl.h">
+      <Filter>Source Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\URLImport.h">
       <Filter>Source Files\Library\Sources</Filter>
     </ClInclude>
   </ItemGroup>

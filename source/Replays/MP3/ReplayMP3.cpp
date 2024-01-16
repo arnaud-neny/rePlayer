@@ -76,6 +76,11 @@ namespace rePlayer
         return m_streamData->isSeekable;
     }
 
+    bool ReplayMP3::IsStreaming() const
+    {
+        return !m_streamData->isSeekable;
+    }
+
     uint32_t ReplayMP3::Render(StereoSample* output, uint32_t numSamples)
     {
         if (m_mp3->channels == 1)
@@ -131,9 +136,18 @@ namespace rePlayer
         return 1;
     }
 
+    std::string ReplayMP3::GetStreamingTitle() const
+    {
+        std::string title;
+        title = m_streamData->stream->GetTitle();
+        return title;
+    }
+
     std::string ReplayMP3::GetExtraInfo() const
     {
-        return {};
+        std::string metadata;
+        metadata = m_streamData->stream->GetInfo();
+        return metadata;
     }
 
     std::string ReplayMP3::GetInfo() const

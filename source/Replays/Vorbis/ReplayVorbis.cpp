@@ -70,6 +70,11 @@ namespace rePlayer
         return ov_seekable(m_vorbis);
     }
 
+    bool ReplayVorbis::IsStreaming() const
+    {
+        return !ov_seekable(m_vorbis);
+    }
+
     uint32_t ReplayVorbis::Render(StereoSample* output, uint32_t numSamples)
     {
         float** pcm;
@@ -138,6 +143,40 @@ namespace rePlayer
         return 1;
     }
 
+    std::string ReplayVorbis::GetStreamingTitle() const
+    {
+        std::string title;
+        if (IsStreaming())
+        {
+            auto comments = ov_comment(m_vorbis, -1);
+            int index = 0;
+            for (auto* comment = vorbis_comment_query(comments, "title", index); comment; comment = vorbis_comment_query(comments, "title", ++index))
+            {
+                if (index)
+                    title += '-';
+                title += comment;
+            }
+        }
+        return title;
+    }
+
+    std::string ReplayVorbis::GetStreamingArtist() const
+    {
+        std::string artist;
+        if (IsStreaming())
+        {
+            auto comments = ov_comment(m_vorbis, -1);
+            int index = 0;
+            for (auto* comment = vorbis_comment_query(comments, "artist", index); comment; comment = vorbis_comment_query(comments, "artist", ++index))
+            {
+                if (index)
+                    artist += " & ";
+                artist += comment;
+            }
+        }
+        return artist;
+    }
+
     std::string ReplayVorbis::GetExtraInfo() const
     {
         std::string info;
@@ -147,6 +186,13 @@ namespace rePlayer
             if (!info.empty())
                 info += "\n";
             info.append(comments->user_comments[i], comments->comment_lengths[i]);
+        }
+        auto streamInfo = m_stream->GetInfo();
+        if (!streamInfo.empty())
+        {
+            if (!info.empty())
+                info += "\n";
+            info += streamInfo;
         }
         return info;
     }

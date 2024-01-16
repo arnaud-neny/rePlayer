@@ -58,6 +58,11 @@ namespace rePlayer
         return m_isSeekable;
     }
 
+    bool ReplayAAC::IsStreaming() const
+    {
+        return !m_isSeekable;
+    }
+
     uint32_t ReplayAAC::Render(StereoSample* output, uint32_t numSamples)
     {
         auto remainingSamples = numSamples;
@@ -257,9 +262,18 @@ namespace rePlayer
         return 1;
     }
 
+    std::string ReplayAAC::GetStreamingTitle() const
+    {
+        std::string title;
+        title = m_stream->GetTitle();
+        return title;
+    }
+
     std::string ReplayAAC::GetExtraInfo() const
     {
-        return {};
+        std::string metadata;
+        metadata = m_stream->GetInfo();
+        return metadata;
     }
 
     std::string ReplayAAC::GetInfo() const

@@ -51,6 +51,7 @@ namespace rePlayer
 
         virtual uint32_t GetSampleRate() const = 0;
         virtual bool IsSeekable() const { return false; }
+        virtual bool IsStreaming() const { return false; }
 
         virtual uint32_t Render(StereoSample* output, uint32_t numSamples) = 0;
         virtual uint32_t Seek(uint32_t timeInMs) { ResetPlayback(); return 0 * timeInMs; }
@@ -64,6 +65,8 @@ namespace rePlayer
         virtual uint32_t GetDurationMs() const = 0;
         virtual uint32_t GetNumSubsongs() const = 0;
         virtual std::string GetSubsongTitle() const { return {}; }
+        virtual std::string GetStreamingTitle() const { return {}; }
+        virtual std::string GetStreamingArtist() const { return {}; }
         virtual std::string GetExtraInfo() const = 0;
         virtual std::string GetInfo() const = 0;
 

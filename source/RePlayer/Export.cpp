@@ -103,6 +103,12 @@ namespace rePlayer
                 stream = Core::GetLibrary().GetStream(entry.song);
             if (auto replay = Core::GetReplays().Load(stream, entry.songSheet->metadata.Container(), entry.songSheet->type))
             {
+                if (replay->IsStreaming())
+                {
+                    // we won't export stream as it never ends and works only realtime
+                    delete replay;
+                    continue;
+                }
                 auto player = Player::Create(entry.id, entry.songSheet, replay, stream, true);
 
                 auto maxFrames = (uint64_t(entry.songSheet->subsongs[entry.id.subsongId.index].durationCs) * replay->GetSampleRate()) / 100ull;

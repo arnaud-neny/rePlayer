@@ -42,6 +42,8 @@ namespace rePlayer
         SongSheet* GetSong() const;
         const SubsongSheet& GetSubsong() const;
         uint32_t GetPlaybackTimeInMs() const;
+        std::string GetTitle() const;
+        std::string GetArtists() const;
         std::string GetMetadata() const;
         std::string GetInfo() const;
         MediaType GetMediaType() const;

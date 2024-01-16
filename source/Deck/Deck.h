@@ -83,7 +83,7 @@ namespace rePlayer
         template <typename DrawCallback>
         bool DrawClippedText(const std::string& text, DrawCallback&& drawCallback);
         bool DrawClippedText(const std::string& text) { return DrawClippedText(text, [](const ImVec2& /*min*/, const ImVec2& /*max*/) {}); }
-        void DrawClippedArtists(MusicID musicId);
+        void DrawClippedArtists(Player* player);
 
         void DisplayInfoAndOscilloscope(Player* player);
 

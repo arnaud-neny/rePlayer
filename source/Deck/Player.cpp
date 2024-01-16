@@ -49,6 +49,11 @@ namespace rePlayer
 
     void Player::Play()
     {
+        if (m_replay->IsStreaming() && !m_song->subsongs[m_id.subsongId.index].isPlayed)
+        {
+            m_song->subsongs[m_id.subsongId.index].isPlayed = true;
+            m_id.MarkForSave();
+        }
         if (m_status == Status::Paused)
         {
             m_status = Status::Playing;
@@ -172,6 +177,28 @@ namespace rePlayer
             return uint32_t((1000ull * (m_songEnd + m_songSeek)) / m_replay->GetSampleRate());
         }
         return 0;
+    }
+
+    std::string Player::GetTitle() const
+    {
+        auto streamingTitle = m_replay->GetStreamingTitle();
+        auto defaultTitle = m_id.GetTitle();
+        if (streamingTitle.empty())
+            return defaultTitle;
+        if (defaultTitle.empty())
+            return streamingTitle;
+        return defaultTitle + " / " + streamingTitle;
+    }
+
+    std::string Player::GetArtists() const
+    {
+        auto streamingArtist = m_replay->GetStreamingArtist();
+        auto defaultArtists = m_id.GetArtists();
+        if (streamingArtist.empty())
+            return defaultArtists;
+        if (defaultArtists.empty())
+            return streamingArtist;
+        return defaultArtists + " / " + streamingArtist;
     }
 
     std::string Player::GetMetadata() const

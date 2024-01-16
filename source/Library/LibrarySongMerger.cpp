@@ -55,11 +55,12 @@ namespace rePlayer
                     4,  // AmigaMusicPreservationSourceID
                     5,  // TheModArchiveSourceID
                     6,  // ModlandSourceID
-                    -1, // FileImportID
+                    -2, // FileImportID
                     0,  // HighVoltageSIDCollectionID
                     1,  // SNDHID
                     2,  // AtariSAPMusicArchiveID
                     3,  // ZXArtID
+                    -1  // UrlImportID
                 };
                 static_assert(_countof(sourceOrder) == SourceID::NumSourceIDs);
 

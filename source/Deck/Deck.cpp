@@ -437,7 +437,7 @@ namespace rePlayer
             song = player->GetSong();
             const auto subsongId = musicId.subsongId;
 
-            std::string title = musicId.GetTitle();
+            std::string title = player->GetTitle();
             if (DrawClippedText(title))
             {
                 auto metadata = player->GetMetadata();
@@ -445,7 +445,7 @@ namespace rePlayer
                     ImGui::Tooltip(metadata.c_str());
             }
 
-            DrawClippedArtists(musicId);
+            DrawClippedArtists(player);
 
             DisplayInfoAndOscilloscope(player);
 
@@ -610,10 +610,13 @@ namespace rePlayer
             auto window = ImGui::GetCurrentWindow();
             window->AutoFitFramesX = 2;
 
-            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Border, ImGuiWindowFlags_HorizontalScrollbar))
+            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Border, 0))
             {
                 auto metadata = isPlayerValid ? player->GetMetadata() : "";
-                ImGui::TextUnformatted(metadata.c_str());
+                // input text so we can select and copy text
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetColorU32(ImGuiCol_ChildBg));
+                ImGui::InputTextMultiline("##Metadata", const_cast<char*>(metadata.c_str()), metadata.size() + 1, ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_ReadOnly);
+                ImGui::PopStyleColor();
             }
             ImGui::EndChild();
         }
@@ -804,12 +807,12 @@ namespace rePlayer
         return isHoovered;
     }
 
-    void Deck::DrawClippedArtists(MusicID musicId)
+    void Deck::DrawClippedArtists(Player* player)
     {
         bool isHoovered{ false };
         auto& style = ImGui::GetStyle();
 
-        std::string text = musicId.GetArtists();
+        std::string text = player->GetArtists();
 
         auto textSize = ImGui::CalcTextSize(text.c_str());
         //ImGui::InvisibleButton(label, ImVec2(-1.0f, textSize.y + style.FramePadding.y * 2));
@@ -854,11 +857,12 @@ namespace rePlayer
 
         if (isHoovered)
         {
-            auto* song = musicId.GetSong();
+            auto musicId = player->GetId();
+            auto* song = player->GetSong();
             auto mousePos = ImGui::GetMousePos().x;
-            for (uint16_t i = 0; i < song->NumArtistIds(); i++)
+            for (uint16_t i = 0; i < song->artistIds.NumItems(); i++)
             {
-                auto artist = musicId.GetArtist(song->GetArtistId(i));
+                auto artist = musicId.GetArtist(song->artistIds[i]);
                 if (i != 0)
                     textPos.x += ImGui::CalcTextSize(" & ").x;
                 auto nextTextPos = textPos.x + ImGui::CalcTextSize(artist->GetHandle()).x;
@@ -908,7 +912,7 @@ namespace rePlayer
             if (auto* player = m_currentPlayer.Get())
             {
                 const auto musicId = player->GetId();
-                std::string title = musicId.GetTitle();
+                std::string title = player->GetTitle();
                 ImGui::TextUnformatted("Title  :");
                 ImGui::SameLine();
                 ImGui::TextUnformatted(title.c_str());

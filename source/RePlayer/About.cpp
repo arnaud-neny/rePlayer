@@ -48,7 +48,7 @@ namespace rePlayer
         ImGui::TextUnformatted("\nSupported databases:");
         for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
         {
-            if (i != SourceID::FileImportID)
+            if (i != SourceID::FileImportID && i != SourceID::URLImportID)
             {
                 ImGui::Bullet();
                 ImGui::TextUnformatted(SourceID::sourceNames[i]);

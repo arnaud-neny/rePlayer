@@ -17,6 +17,7 @@ namespace rePlayer
 
         uint32_t GetSampleRate() const override { return m_sampleRate; }
         bool IsSeekable() const override;
+        bool IsStreaming() const override;
 
         uint32_t Render(StereoSample* output, uint32_t numSamples) override;
         uint32_t Seek(uint32_t timeInMs) override;
@@ -28,6 +29,7 @@ namespace rePlayer
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
+        std::string GetStreamingTitle() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 

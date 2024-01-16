@@ -63,7 +63,7 @@ namespace rePlayer
         SongsUI* m_songs = nullptr;
 
         Source* m_sources[SourceID::NumSourceIDs];
-        static constexpr uint64_t kSelectableSources = ((1ull << SourceID::NumSourceIDs) - 1ull) & ~(1ull << SourceID::FileImportID);
+        static constexpr uint64_t kSelectableSources = ((1ull << SourceID::NumSourceIDs) - 1ull) & ~((1ull << SourceID::FileImportID) | (1ull << SourceID::URLImportID));
         uint64_t m_selectedSources = (1ull << SourceID::AmigaMusicPreservationSourceID) | (1ull << SourceID::TheModArchiveSourceID) | (1ull << SourceID::ModlandSourceID);
 
         bool m_hasSongsBackup = false;

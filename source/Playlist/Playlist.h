@@ -69,6 +69,10 @@ namespace rePlayer
             Array<char> paths; // paths are indexed in the sourceID of the song
             Array<Entry> entries;
             bool arePathsDirty = false;
+
+            bool IsUrl(SourceID sourceId) const;
+            const char* GetPath(SourceID sourceId, bool isUrl) const;
+            const char* GetPath(SourceID sourceId) const;
         };
 
         static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
@@ -94,7 +98,7 @@ namespace rePlayer
 
         void MoveSelection(uint32_t draggedEntryIndex);
 
-        void ProcessExternalDranAndDrop(int32_t droppedEntryIndex);
+        void ProcessExternalDragAndDrop(int32_t droppedEntryIndex);
 
         Status LoadPlaylist(io::File& file, Cue& cue);
         void SavePlaylist(io::File& file, const Cue& cue);

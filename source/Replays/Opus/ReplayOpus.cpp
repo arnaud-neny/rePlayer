@@ -63,6 +63,11 @@ namespace rePlayer
         return op_seekable(m_opus) != 0;
     }
 
+    bool ReplayOpus::IsStreaming() const
+    {
+        return op_seekable(m_opus) == 0;
+    }
+
     uint32_t ReplayOpus::Render(StereoSample* output, uint32_t numSamples)
     {
         auto remainingSamples = numSamples;
@@ -175,9 +180,58 @@ namespace rePlayer
         return 1;
     }
 
+    std::string ReplayOpus::GetStreamingTitle() const
+    {
+        std::string title;
+        if (IsStreaming())
+        {
+            auto tags = op_tags(m_opus, -1);
+            int index = 0;
+            for (auto* tag = opus_tags_query(tags, "title", index); tag; tag = opus_tags_query(tags, "title", ++index))
+            {
+                if (index)
+                    title += '-';
+                title += tag;
+            }
+        }
+        return title;
+    }
+
+    std::string ReplayOpus::GetStreamingArtist() const
+    {
+        std::string artist;
+        if (IsStreaming())
+        {
+            auto tags = op_tags(m_opus, -1);
+            int index = 0;
+            for (auto* tag = opus_tags_query(tags, "artist", index); tag; tag = opus_tags_query(tags, "artist", ++index))
+            {
+                if (index)
+                    artist += " & ";
+                artist += tag;
+            }
+        }
+        return artist;
+    }
+
     std::string ReplayOpus::GetExtraInfo() const
     {
-        return m_metadata;
+        std::string info;
+        auto tags = op_tags(m_opus, -1);
+        for (int32_t i = 0; i < tags->comments; i++)
+        {
+            if (!info.empty())
+                info += "\n";
+            info.append(tags->user_comments[i], tags->comment_lengths[i]);
+        }
+        auto streamInfo = m_stream->GetInfo();
+        if (!streamInfo.empty())
+        {
+            if (!info.empty())
+                info += "\n";
+            info += streamInfo;
+        }
+        return info;
     }
 
     std::string ReplayOpus::GetInfo() const
