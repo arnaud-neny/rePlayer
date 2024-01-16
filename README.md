@@ -108,6 +108,7 @@ Buttons to load, save or clear the playlist.
 And a button to sort (by type, artists, duration, type or random/shuffle).  
 Note 1: if you drag and drop files in there, the playlist will have a sidebar with buttons which open a database like the library managing all these files. It's almost working the same way as the library.
 Note 2: while drag and dropping files, keep Ctrl pressed to force all files in the playlist (by default, they are filtered by their extension or prefix). Keep Shift pressed and the current playlist is cleared. You can also drop on the deck.
+Note 3: you can drag and drop url. On load, it will download the song or stream the online radio.
 
 ## The settings
 
@@ -204,3 +205,5 @@ Or add some comments (and likes) there:
 - [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
 - [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
+- [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
+- [Opus](https://opus-codec.org): Opus Interactive Audio Codec.

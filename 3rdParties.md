@@ -19,7 +19,7 @@
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - HivelyTracker: https://github.com/pete-gordon/hivelytracker  
   With minor changes.
-- SoundMon: http://www.brianpostma.com (unfortunately down now)  
+- SoundMon: Brian Postma website is gone.  
   Partially rewritten and fixed from original code.
 - StSound: https://github.com/arnaud-carre/StSound
 - FutureComposer: https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder
@@ -59,6 +59,8 @@
 - eupmini: https://github.com/gzaffin/eupmini
 - zingzong: https://github.com/benjihan/zingzong
 - Furnace: https://github.com/tildearrow/furnace
+- FAAD2: https://github.com/knik0/faad2
+- Opus: https://opus-codec.org
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

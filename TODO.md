@@ -1,6 +1,9 @@
 # rePlayer (another multi-formats music player)
 
-- add in the settings the replay selection for each extension
+- add the replay selection for each extension in the global settings
+- add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
+- replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
+- add a project to make rePlayer as a lib/dll (so people can use the replays too): rePlayback (stripped from database and ui)
 - investigate htmlcxx (https://sourceforge.net/p/htmlcxx/) as an alternative to tidy
 - import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
@@ -26,6 +29,7 @@
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://www.exotica.org.uk/ importer?
+- http://janeway.exotica.org.uk/search.php importer
 - https://www.modules.pl/ importer?
 - https://www.demozoo.org/ importer?
 - https://www.zophar.net/ importer?
@@ -37,6 +41,9 @@
 - Soundcloud music player?
 - Bandcamp music player?
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
+- 4klang: https://github.com/hzdgopher/4klang
 - 64klang: https://github.com/hzdgopher/64klang
+- sointu: https://github.com/vsariola/sointu
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream
+- wavpack: https://github.com/dbry/WavPack

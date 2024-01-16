@@ -1,11 +1,24 @@
+v0.12.0
+- Added Advanced Audio Coding
+- Added Opus
+- Updated adplug to 2.3.3.818
+- Updated ASAP to 6.0.1
+- Updated libsc68 to 3.0.0a r705
+- Updated libsidplay to 2.6.0
+- Updated libcurl to 8.5.0
+- Updated ImGui to 1.90
+- Updated TinyXML-2 to 10.0.0
+- Ability to play directly from an URL (drag and drop from the browser), including streaming (online radios)
+- Bug fixes
+
 v0.11.1
-- Added Furnace player
+- Added Furnace
 - Updated SNDH-Player to 0.72
 - Bug fixes
 
 v0.10.0
-- Added Euphony player
-- Added Quartet player
+- Added Euphony
+- Added Quartet
 - Updated modland to import Euphony
 - Updated libcurl to 8.4.0
 - Bug fixes
@@ -16,7 +29,7 @@ v0.9.4:
 - Updated ASAP to 6.0.0 (fixed)
 - Updated Highly Advanced (cog 2023-09-30)
 - Updated libkss to 1.2.0, fix MBM loader
-- Updated libsc68 to 3.0.0.a r702
+- Updated libsc68 to 3.0.0a r702
 - Updated libvgm to 079c4e7
 - Updated OpenMPT to 0.7.3
 - Updated NEZplug to support FAC SoundTracker
