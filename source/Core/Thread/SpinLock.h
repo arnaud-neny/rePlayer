@@ -5,14 +5,14 @@
 
 namespace core::thread
 {
-    class alignas(64) SpinLock
+    class SpinLock
     {
     public:
         void Lock();
         void Unlock();
 
     protected:
-        std::atomic<uint32_t> m_state = 0;
+        alignas(64) std::atomic<uint32_t> m_state = 0;
     };
 
     class ScopedSpinLock
