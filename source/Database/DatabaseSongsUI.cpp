@@ -893,7 +893,8 @@ namespace rePlayer
                 discardLabel += "\n";
             }
         }
-        if (ImGui::Selectable(discardLabel.c_str()))
+        auto pos = ImGui::GetCursorPos();
+        if (ImGui::Selectable("##DiscardList", false, 0, ImGui::CalcTextSize(discardLabel.c_str(), discardLabel.c_str() + discardLabel.size())))
         {
             for (auto& entry : m_entries)
             {
@@ -907,6 +908,8 @@ namespace rePlayer
             ImGui::CloseCurrentPopup();
             return false;
         }
+        ImGui::SetCursorPos(pos);
+        ImGui::TextUnformatted(discardLabel.c_str(), discardLabel.c_str() + discardLabel.size());
         return true;
     }
 
@@ -927,7 +930,8 @@ namespace rePlayer
                 resetLabel += "\n";
             }
         }
-        if (ImGui::Selectable(resetLabel.c_str()))
+        auto pos = ImGui::GetCursorPos();
+        if (ImGui::Selectable("##ResetList", false, 0, ImGui::CalcTextSize(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size())))
         {
             for (auto& entry : m_entries)
             {
@@ -941,6 +945,8 @@ namespace rePlayer
             }
             ImGui::CloseCurrentPopup();
         }
+        ImGui::SetCursorPos(pos);
+        ImGui::TextUnformatted(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size());
     }
 }
 // namespace rePlayer
