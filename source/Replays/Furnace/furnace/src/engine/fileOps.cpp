@@ -3035,10 +3035,8 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
   memset(sampLens,0,31*sizeof(int));
   memset(fxUsage,0,DIV_MAX_CHANS*5*sizeof(bool));
 
-  // rePlayer begin
-  DivSong ds;
   try {
-    // rePlayer end
+    DivSong ds;
     ds.tuning=436.0;
     ds.version=DIV_VERSION_MOD;
     ds.linearPitch=0;
@@ -3436,11 +3434,9 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
   } catch (EndOfFileException& e) {
     //logE("premature end of file!");
     lastError="incomplete file";
-    ds.unload(); // rePlayer
   } catch (InvalidHeaderException& e) {
     //logE("invalid info header!");
     lastError="invalid info header!";
-    ds.unload(); // rePlayer
   }
   return success;
 }
@@ -4596,11 +4592,11 @@ bool DivEngine::loadFTM(unsigned char* file, size_t len) {
         ds.systemName="NES";
       } else if (blockName=="HEADER") {
         CHECK_BLOCK_VERSION(4);
-        unsigned char totalSongs=reader.readC();
+        unsigned char totalSongs=blockVersion>=2?reader.readC():0; // rePlayer
         logV("%d songs:",totalSongs+1);
         ds.subsong.reserve(totalSongs);
         for (int i=0; i<=totalSongs; i++) {
-          String subSongName=reader.readString();
+          String subSongName=blockVersion>=3?reader.readString():""; // rePlayer
           ds.subsong.push_back(new DivSubSong);
           ds.subsong[i]->name=subSongName;
           ds.subsong[i]->hilightA=hilightA;
@@ -4847,7 +4843,7 @@ bool DivEngine::loadFTM(unsigned char* file, size_t len) {
           DivPattern* pat=ds.subsong[subs]->pat[ch].getPattern(patNum,true);
           for (int i=0; i<numRows; i++) {
             unsigned int row=0;
-            if (blockVersion>=2 && blockVersion<6) { // row index
+            if (ds.version!=0x200 && blockVersion<6) { // row index // rePlayer
               row=reader.readI();
             } else {
               row=reader.readC();
@@ -5074,7 +5070,8 @@ bool DivEngine::load(unsigned char* f, size_t slen) {
     return loadFTM(file,len);
   } else if (memcmp(file,DIV_FUR_MAGIC,16)==0) {
     return loadFur(file,len);
-  } else if (memcmp(file,DIV_FC13_MAGIC,4)==0 || memcmp(file,DIV_FC14_MAGIC,4)==0) {
+  // rePlayer begin
+  }/* else if (memcmp(file,DIV_FC13_MAGIC,4)==0 || memcmp(file,DIV_FC14_MAGIC,4)==0) {
     return loadFC(file,len);
   }
 
@@ -5082,7 +5079,8 @@ bool DivEngine::load(unsigned char* f, size_t slen) {
   if (loadMod(f,slen)) {
     delete[] f;
     return true;
-  }
+  }*/
+  // rePlayer end
 
   // step 4: not a valid file
   logE("not a valid module!");

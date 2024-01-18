@@ -397,3 +397,4 @@ EXTENSION(4v)       // Quartet
 EXTENSION(fur)      // Furnace
 EXTENSION(aac)      // AAC
 EXTENSION(opus)     // Opus
+EXTENSION(ftm)      // Famitracker

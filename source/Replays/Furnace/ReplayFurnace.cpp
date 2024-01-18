@@ -16,7 +16,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
-        .extensions = "fur",
+        .extensions = "fur;dmf;ftm",
         .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2023 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
@@ -48,7 +48,7 @@ namespace rePlayer
     }
 
     ReplayFurnace::ReplayFurnace(DivEngine* engine)
-        : Replay(engine->song.isDMF ? eExtension::_dmf : eExtension::_fur, eReplay::Furnace)
+        : Replay(engine->song.isDMF ? eExtension::_dmf : (engine->song.version == DIV_VERSION_FTM ? eExtension::_ftm : eExtension::_fur), eReplay::Furnace)
         , m_engine(engine)
     {}
 
@@ -178,9 +178,14 @@ namespace rePlayer
         sprintf(buf, "%d", m_engine->getTotalChannelCount());
         info = buf;
         info += " channels\n";
-        info += m_engine->song.isDMF ? "DefleMask v" : "Furnace v";
-        sprintf(buf, "%d", m_engine->song.version);
-        info += buf;
+        if (m_engine->song.version == DIV_VERSION_FTM)
+            info += "Famitracker";
+        else
+        {
+            info += m_engine->song.isDMF ? "DefleMask v" : "Furnace v";
+            sprintf(buf, "%d", m_engine->song.version);
+            info += buf;
+        }
         info += "\nFurnace " DIV_VERSION;
         return info;
     }
