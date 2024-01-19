@@ -1,4 +1,4 @@
-v0.12.0
+v0.12.1:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
@@ -11,12 +11,12 @@ v0.12.0
 - Ability to play directly from an URL (drag and drop from the browser), including streaming (online radios)
 - Bug fixes
 
-v0.11.1
+v0.11.1:
 - Added Furnace
 - Updated SNDH-Player to 0.72
 - Bug fixes
 
-v0.10.0
+v0.10.0:
 - Added Euphony
 - Added Quartet
 - Updated modland to import Euphony

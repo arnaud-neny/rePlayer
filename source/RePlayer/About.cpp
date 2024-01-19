@@ -43,7 +43,7 @@ namespace rePlayer
         ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_None);
 
         ImGui::TextUnformatted(Core::GetLabel());
-        ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2023 Arnaud Nény (aka replay/Razor1911)"));
+        ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2024 Arnaud Nény (aka replay/Razor1911)"));
 
         ImGui::TextUnformatted("\nSupported databases:");
         for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
@@ -58,13 +58,13 @@ namespace rePlayer
         ImGui::TextUnformatted("\nSystem 3rd parties:");
         ImGui::Bullet();
         ImGui::TextUnformatted("Dear ImGui " IMGUI_VERSION "\n"
-            "Copyright (c) 2014-2023 Omar Cornut");
+            "Copyright (c) 2014-2024 Omar Cornut");
         ImGui::Bullet();
         ImGui::TextUnformatted("stb\n"
             "Copyright (c) 2017 Sean Barrett");
         ImGui::Bullet();
         ImGui::TextUnformatted("ImGuiFileDialog " IMGUIFILEDIALOG_VERSION "\n"
-            "Copyright (c) 2018-2022 Stephane Cuillerdier (aka Aiekick)");
+            "Copyright (c) 2018-2023 Stephane Cuillerdier (aka Aiekick)");
         ImGui::Bullet();
         ImGui::TextUnformatted("Curl " LIBCURL_VERSION "\n"
             "Copyright (c) " LIBCURL_COPYRIGHT);
