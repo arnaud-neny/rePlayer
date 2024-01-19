@@ -135,9 +135,12 @@ namespace rePlayer
                     {
                         auto chainIt = chain->GetIterator();
                         chainIt->Next();
-                        firstInChain = chainIt->Get();
-                        if (firstInChain == "HRUST1")
-                            firstInChain = "bin";
+                        if (chainIt->IsValid())
+                        {
+                            firstInChain = chainIt->Get();
+                            if (firstInChain == "HRUST1")
+                                firstInChain = "bin";
+                        }
                     }
                     subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
                 }
