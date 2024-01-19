@@ -263,7 +263,7 @@ namespace rePlayer
                     song->fileSize = uint32_t(moduleData.Size());
                     auto fileCrc = crc32(0L, Z_NULL, 0);
                     song->fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
-                    song->subsongs[0].isDirty = true;
+                    song->subsongs[0].isDirty = moduleData.IsNotEmpty();
                 }
 
                 auto metadata(song->metadata);
