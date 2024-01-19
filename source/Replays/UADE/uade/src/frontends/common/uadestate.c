@@ -1353,8 +1353,27 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 	uade_lookup_song(module, state);
 
 	ep = get_eagleplayer(module, state);
-	if (ep == NULL)
-		goto fatalerror;
+	// rePlayer begin
+	if (ep == NULL || state->config.player_file.name[0])
+    {
+		if (state->config.player_file.name[0]) {
+			size_t n0 = strlen(state->config.player_file.name);
+			for (size_t i = 0; i < state->playerstore->nplayers; i++) {
+				const char* n = strstr(state->config.player_file.name, state->playerstore->players[i].playername);
+				if (n) {
+					if (n0 - (n - state->config.player_file.name) == strlen(state->playerstore->players[i].playername)) {
+						ep = state->playerstore->players + i;
+						state->song.info.detectioninfo.ep = ep;
+						strcpy(state->song.info.detectioninfo.ext, ep->extensions[0]);
+						break;
+					}
+				}
+			}
+		}
+        if (ep == NULL)
+            goto fatalerror;
+    }
+    // rePlayer end
 
 	uade_debug(state, "Player candidate: %s\n", ep->playername);
 
