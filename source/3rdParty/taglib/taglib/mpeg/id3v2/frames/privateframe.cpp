@@ -24,11 +24,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorlist.h>
-#include <id3v2tag.h>
-#include <tdebug.h>
-
 #include "privateframe.h"
+
+#include "tbytevectorlist.h"
+#include "tdebug.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -47,21 +47,18 @@ public:
 
 PrivateFrame::PrivateFrame() :
   Frame("PRIV"),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
 }
 
 PrivateFrame::PrivateFrame(const ByteVector &data) :
   Frame(data),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
   Frame::setData(data);
 }
 
-PrivateFrame::~PrivateFrame()
-{
-  delete d;
-}
+PrivateFrame::~PrivateFrame() = default;
 
 String PrivateFrame::toString() const
 {
@@ -101,7 +98,7 @@ void PrivateFrame::parseFields(const ByteVector &data)
 
   // Owner identifier is assumed to be Latin1
 
-  const int byteAlign =  1;
+  constexpr int byteAlign =  1;
   const int endOfOwner = data.find(textDelimiter(String::Latin1), 0, byteAlign);
 
   d->owner =  String(data.mid(0, endOfOwner));
@@ -125,7 +122,7 @@ ByteVector PrivateFrame::renderFields() const
 
 PrivateFrame::PrivateFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
   parseFields(fieldData(data));
 }

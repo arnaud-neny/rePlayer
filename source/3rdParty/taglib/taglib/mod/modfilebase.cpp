@@ -23,12 +23,16 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
-#include "tdebug.h"
 #include "modfilebase.h"
 
 using namespace TagLib;
 using namespace Mod;
+
+class Mod::FileBase::FileBasePrivate
+{
+};
+
+Mod::FileBase::~FileBase() = default;
 
 Mod::FileBase::FileBase(FileName file) : TagLib::File(file)
 {
@@ -41,7 +45,7 @@ Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 void Mod::FileBase::writeString(const String &s, unsigned long size, char padding)
 {
   ByteVector data(s.data(String::Latin1));
-  data.resize(size, padding);
+  data.resize(static_cast<unsigned int>(size), padding);
   writeBlock(data);
 }
 
@@ -73,7 +77,7 @@ void Mod::FileBase::writeU16L(unsigned short number)
 
 void Mod::FileBase::writeU32L(unsigned long number)
 {
-  writeBlock(ByteVector::fromUInt(number, false));
+  writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(number), false));
 }
 
 void Mod::FileBase::writeU16B(unsigned short number)
@@ -83,7 +87,7 @@ void Mod::FileBase::writeU16B(unsigned short number)
 
 void Mod::FileBase::writeU32B(unsigned long number)
 {
-  writeBlock(ByteVector::fromUInt(number, true));
+  writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(number), true));
 }
 
 bool Mod::FileBase::readByte(unsigned char &byte)

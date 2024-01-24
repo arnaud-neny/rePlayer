@@ -23,31 +23,22 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-
 #include "flacproperties.h"
-#include "flacfile.h"
+
+#include "tstring.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 
 class FLAC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    bitsPerSample(0),
-    channels(0),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int bitsPerSample;
-  int channels;
-  unsigned long long sampleFrames;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int bitsPerSample { 0 };
+  int channels { 0 };
+  unsigned long long sampleFrames { 0 };
   ByteVector signature;
 };
 
@@ -55,34 +46,14 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style) :
+FLAC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(data, streamLength);
 }
 
-FLAC::Properties::Properties(File *, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("FLAC::Properties::Properties() - This constructor is no longer used.");
-}
-
-FLAC::Properties::~Properties()
-{
-  delete d;
-}
-
-int FLAC::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int FLAC::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+FLAC::Properties::~Properties() = default;
 
 int FLAC::Properties::lengthInMilliseconds() const
 {
@@ -104,11 +75,6 @@ int FLAC::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-int FLAC::Properties::sampleWidth() const
-{
-  return bitsPerSample();
-}
-
 int FLAC::Properties::channels() const
 {
   return d->channels;
@@ -128,7 +94,7 @@ ByteVector FLAC::Properties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::Properties::read(const ByteVector &data, long streamLength)
+void FLAC::Properties::read(const ByteVector &data, offset_t streamLength)
 {
   if(data.size() < 18) {
     debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
@@ -166,7 +132,7 @@ void FLAC::Properties::read(const ByteVector &data, long streamLength)
   d->sampleFrames = (hi << 32) | lo;
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
-    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }

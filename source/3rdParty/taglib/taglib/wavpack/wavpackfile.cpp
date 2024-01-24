@@ -27,18 +27,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tdebug.h>
-#include <tagunion.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
 #include "wavpackfile.h"
-#include "id3v1tag.h"
-#include "id3v2header.h"
-#include "apetag.h"
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagunion.h"
+#include "tagutils.h"
 #include "apefooter.h"
+#include "apetag.h"
+#include "id3v1tag.h"
 
 using namespace TagLib;
 
@@ -50,25 +47,14 @@ namespace
 class WavPack::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    APELocation(-1),
-    APESize(0),
-    ID3v1Location(-1),
-    properties(0) {}
+  offset_t APELocation { -1 };
+  long APESize { 0 };
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
-
-  long APELocation;
-  long APESize;
-
-  long ID3v1Location;
+  offset_t ID3v1Location { -1 };
 
   TagUnion tag;
 
-  Properties *properties;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +66,7 @@ bool WavPack::File::isSupported(IOStream *stream)
   // A WavPack file has to start with "wvpk".
 
   const ByteVector id = Utils::readHeader(stream, 4, false);
-  return (id == "wvpk");
+  return id == "wvpk";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +75,7 @@ bool WavPack::File::isSupported(IOStream *stream)
 
 WavPack::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -97,16 +83,13 @@ WavPack::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 WavPack::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-WavPack::File::~File()
-{
-  delete d;
-}
+WavPack::File::~File() = default;
 
 TagLib::Tag *WavPack::File::tag() const
 {
@@ -133,7 +116,7 @@ PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 
 WavPack::Properties *WavPack::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool WavPack::File::save()
@@ -186,7 +169,7 @@ bool WavPack::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->APESize;
 
     d->APESize = data.size();
   }
@@ -221,10 +204,10 @@ APE::Tag *WavPack::File::APETag(bool create)
 void WavPack::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(WavID3v1Index, 0);
+    d->tag.set(WavID3v1Index, nullptr);
 
   if(tags & APE)
-    d->tag.set(WavAPEIndex, 0);
+    d->tag.set(WavAPEIndex, nullptr);
 
   if(!ID3v1Tag())
     APETag(true);
@@ -232,12 +215,12 @@ void WavPack::File::strip(int tags)
 
 bool WavPack::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool WavPack::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,7 +253,7 @@ void WavPack::File::read(bool readProperties)
 
   if(readProperties) {
 
-    long streamLength;
+    offset_t streamLength;
 
     if(d->APELocation >= 0)
       streamLength = d->APELocation;
@@ -279,6 +262,6 @@ void WavPack::File::read(bool readProperties)
     else
       streamLength = length();
 
-    d->properties = new Properties(this, streamLength);
+    d->properties = std::make_unique<Properties>(this, streamLength);
   }
 }

@@ -23,8 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "modtag.h"
+
+#include <utility>
+
 #include "tstringlist.h"
 #include "tpropertymap.h"
 
@@ -34,24 +36,17 @@ using namespace Mod;
 class Mod::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-  {
-  }
-
   String title;
   String comment;
   String trackerName;
 };
 
 Mod::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-Mod::Tag::~Tag()
-{
-  delete d;
-}
+Mod::Tag::~Tag() = default;
 
 String Mod::Tag::title() const
 {
@@ -133,41 +128,41 @@ PropertyMap Mod::Tag::properties() const
   PropertyMap properties;
   properties["TITLE"] = d->title;
   properties["COMMENT"] = d->comment;
-  if(!(d->trackerName.isEmpty()))
+  if(!d->trackerName.isEmpty())
     properties["TRACKERNAME"] = d->trackerName;
   return properties;
 }
 
 PropertyMap Mod::Tag::setProperties(const PropertyMap &origProps)
 {
-  PropertyMap properties(origProps);
-  properties.removeEmpty();
+  PropertyMap props(origProps);
+  props.removeEmpty();
   StringList oneValueSet;
-  if(properties.contains("TITLE")) {
-    d->title = properties["TITLE"].front();
+  if(props.contains("TITLE")) {
+    d->title = props["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
     d->title.clear();
 
-  if(properties.contains("COMMENT")) {
-    d->comment = properties["COMMENT"].front();
+  if(props.contains("COMMENT")) {
+    d->comment = props["COMMENT"].front();
     oneValueSet.append("COMMENT");
   } else
     d->comment.clear();
 
-  if(properties.contains("TRACKERNAME")) {
-    d->trackerName = properties["TRACKERNAME"].front();
+  if(props.contains("TRACKERNAME")) {
+    d->trackerName = props["TRACKERNAME"].front();
     oneValueSet.append("TRACKERNAME");
   } else
     d->trackerName.clear();
 
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
-  for(StringList::ConstIterator it = oneValueSet.begin(); it != oneValueSet.end(); ++it) {
-    if(properties[*it].size() == 1)
-      properties.erase(*it);
+  for(const auto &entry : std::as_const(oneValueSet)) {
+    if(props[entry].size() == 1)
+      props.erase(entry);
     else
-      properties[*it].erase( properties[*it].begin() );
+      props[entry].erase(props[entry].begin());
   }
-  return properties;
+  return props;
 }

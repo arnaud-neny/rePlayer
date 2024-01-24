@@ -23,9 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-
 #include "popularimeterframe.h"
+#include "tstringlist.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -33,10 +32,9 @@ using namespace ID3v2;
 class PopularimeterFrame::PopularimeterFramePrivate
 {
 public:
-  PopularimeterFramePrivate() : rating(0), counter(0) {}
   String email;
-  int rating;
-  unsigned int counter;
+  int rating { 0 };
+  unsigned int counter { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,25 +43,27 @@ public:
 
 PopularimeterFrame::PopularimeterFrame() :
   Frame("POPM"),
-  d(new PopularimeterFramePrivate())
+  d(std::make_unique<PopularimeterFramePrivate>())
 {
 }
 
 PopularimeterFrame::PopularimeterFrame(const ByteVector &data) :
   Frame(data),
-  d(new PopularimeterFramePrivate())
+  d(std::make_unique<PopularimeterFramePrivate>())
 {
   setData(data);
 }
 
-PopularimeterFrame::~PopularimeterFrame()
-{
-  delete d;
-}
+PopularimeterFrame::~PopularimeterFrame() = default;
 
 String PopularimeterFrame::toString() const
 {
   return d->email + " rating=" + String::number(d->rating) + " counter=" + String::number(d->counter);
+}
+
+StringList PopularimeterFrame::toStringList() const
+{
+  return {d->email, String::number(d->rating), String::number(d->counter)};
 }
 
 String PopularimeterFrame::email() const
@@ -134,7 +134,7 @@ ByteVector PopularimeterFrame::renderFields() const
 
 PopularimeterFrame::PopularimeterFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new PopularimeterFramePrivate())
+  d(std::make_unique<PopularimeterFramePrivate>())
 {
   parseFields(fieldData(data));
 }

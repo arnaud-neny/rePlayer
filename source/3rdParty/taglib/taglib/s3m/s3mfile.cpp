@@ -25,12 +25,11 @@
 
 
 #include "s3mfile.h"
+
 #include "tstringlist.h"
 #include "tdebug.h"
-#include "modfileprivate.h"
 #include "tpropertymap.h"
-
-#include <iostream>
+#include "modfileprivate.h"
 
 using namespace TagLib;
 using namespace S3M;
@@ -50,7 +49,7 @@ public:
 S3M::File::File(FileName file, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
@@ -59,16 +58,13 @@ S3M::File::File(FileName file, bool readProperties,
 S3M::File::File(IOStream *stream, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
 }
 
-S3M::File::~File()
-{
-  delete d;
-}
+S3M::File::~File() = default;
 
 Mod::Tag *S3M::File::tag() const
 {

@@ -23,7 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "modproperties.h"
 
 using namespace TagLib;
@@ -32,43 +31,18 @@ using namespace Mod;
 class Mod::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    channels(0),
-    instrumentCount(0),
-    lengthInPatterns(0)
-  {
-  }
-
-  int           channels;
-  unsigned int  instrumentCount;
-  unsigned char lengthInPatterns;
+  int channels { 0 };
+  unsigned int instrumentCount { 0 };
+  unsigned char lengthInPatterns { 0 };
 };
 
 Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-Mod::Properties::~Properties()
-{
-  delete d;
-}
-
-int Mod::Properties::length() const
-{
-  return 0;
-}
-
-int Mod::Properties::lengthInSeconds() const
-{
-  return 0;
-}
-
-int Mod::Properties::lengthInMilliseconds() const
-{
-  return 0;
-}
+Mod::Properties::~Properties() = default;
 
 int Mod::Properties::bitrate() const
 {

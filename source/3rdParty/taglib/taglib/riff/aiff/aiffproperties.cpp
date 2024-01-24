@@ -23,68 +23,40 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include "aifffile.h"
 #include "aiffproperties.h"
+
+#include "tdebug.h"
+#include "aifffile.h"
 
 using namespace TagLib;
 
 class RIFF::AIFF::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    bitsPerSample(0),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int bitsPerSample;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int bitsPerSample { 0 };
 
   ByteVector compressionType;
   String compressionName;
 
-  unsigned int sampleFrames;
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
-}
-
 RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-RIFF::AIFF::Properties::~Properties()
-{
-  delete d;
-}
-
-int RIFF::AIFF::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int RIFF::AIFF::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+RIFF::AIFF::Properties::~Properties() = default;
 
 int RIFF::AIFF::Properties::lengthInMilliseconds() const
 {
@@ -111,11 +83,6 @@ int RIFF::AIFF::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-int RIFF::AIFF::Properties::sampleWidth() const
-{
-  return bitsPerSample();
-}
-
 unsigned int RIFF::AIFF::Properties::sampleFrames() const
 {
   return d->sampleFrames;
@@ -123,7 +90,7 @@ unsigned int RIFF::AIFF::Properties::sampleFrames() const
 
 bool RIFF::AIFF::Properties::isAiffC() const
 {
-  return (!d->compressionType.isEmpty());
+  return !d->compressionType.isEmpty();
 }
 
 ByteVector RIFF::AIFF::Properties::compressionType() const
@@ -145,8 +112,7 @@ void RIFF::AIFF::Properties::read(File *file)
   ByteVector data;
   unsigned int streamLength = 0;
   for(unsigned int i = 0; i < file->chunkCount(); i++) {
-    const ByteVector name = file->chunkName(i);
-    if(name == "COMM") {
+    if(const ByteVector name = file->chunkName(i); name == "COMM") {
       if(data.isEmpty())
         data = file->chunkData(i);
       else
@@ -174,12 +140,12 @@ void RIFF::AIFF::Properties::read(File *file)
   d->sampleFrames  = data.toUInt(2U);
   d->bitsPerSample = data.toShort(6U);
 
-  const long double sampleRate = data.toFloat80BE(8);
-  if(sampleRate >= 1.0)
-    d->sampleRate = static_cast<int>(sampleRate + 0.5);
+  const long double smplRate = data.toFloat80BE(8);
+  if(smplRate >= 1.0)
+    d->sampleRate = static_cast<int>(smplRate + 0.5);
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
-    const double length = d->sampleFrames * 1000.0 / sampleRate;
+    const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / smplRate;
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }

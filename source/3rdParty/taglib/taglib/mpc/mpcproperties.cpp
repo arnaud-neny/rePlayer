@@ -23,12 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <bitset>
-#include <math.h>
-
 #include "mpcproperties.h"
+
+#include <array>
+#include <cmath>
+
+#include "tdebug.h"
+#include "tstring.h"
 #include "mpcfile.h"
 
 using namespace TagLib;
@@ -36,46 +37,26 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    version(0),
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    totalFrames(0),
-    sampleFrames(0),
-    trackGain(0),
-    trackPeak(0),
-    albumGain(0),
-    albumPeak(0) {}
-
-  int version;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  unsigned int totalFrames;
-  unsigned int sampleFrames;
-  int trackGain;
-  int trackPeak;
-  int albumGain;
-  int albumPeak;
+  int version { 0 };
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  unsigned int totalFrames { 0 };
+  unsigned long sampleFrames { 0 };
+  int trackGain { 0 };
+  int trackPeak { 0 };
+  int albumGain { 0 };
+  int albumPeak { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) :
+MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  readSV7(data, streamLength);
-}
-
-MPC::Properties::Properties(File *file, long streamLength, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   ByteVector magic = file->readBlock(4);
   if(magic == "MPCK") {
@@ -88,20 +69,7 @@ MPC::Properties::Properties(File *file, long streamLength, ReadStyle style) :
   }
 }
 
-MPC::Properties::~Properties()
-{
-  delete d;
-}
-
-int MPC::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int MPC::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+MPC::Properties::~Properties() = default;
 
 int MPC::Properties::lengthInMilliseconds() const
 {
@@ -133,7 +101,7 @@ unsigned int MPC::Properties::totalFrames() const
   return d->totalFrames;
 }
 
-unsigned int MPC::Properties::sampleFrames() const
+unsigned long MPC::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -182,7 +150,7 @@ namespace
       tmp = b[0];
       size = (size << 7) | (tmp & 0x7F);
       sizeLength++;
-    } while((tmp & 0x80));
+    } while(tmp & 0x80);
     return size;
   }
 
@@ -194,16 +162,16 @@ namespace
     do {
       tmp = data[pos++];
       size = (size << 7) | (tmp & 0x7F);
-    } while((tmp & 0x80) && (pos < data.size()));
+    } while((tmp & 0x80) && pos < data.size());
     return size;
   }
 
   // This array looks weird, but the same as original MusePack code found at:
   // https://www.musepack.net/index.php?pg=src
-  const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
+  constexpr std::array sftable { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 }  // namespace
 
-void MPC::Properties::readSV8(File *file, long streamLength)
+void MPC::Properties::readSV8(File *file, offset_t streamLength)
 {
   bool readSH = false, readRG = false;
 
@@ -253,14 +221,13 @@ void MPC::Properties::readSV8(File *file, long streamLength)
       }
 
       const unsigned short flags = data.toUShort(pos, true);
-      pos += 2;
 
       d->sampleRate = sftable[(flags >> 13) & 0x07];
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      const unsigned int frameCount = d->sampleFrames - begSilence;
-      if(frameCount > 0 && d->sampleRate > 0) {
-        const double length = frameCount * 1000.0 / d->sampleRate;
+      if(const auto frameCount = d->sampleFrames - begSilence;
+         frameCount > 0 && d->sampleRate > 0) {
+        const auto length = static_cast<double>(frameCount) * 1000.0 / d->sampleRate;
         d->length  = static_cast<int>(length + 0.5);
         d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
       }
@@ -276,8 +243,7 @@ void MPC::Properties::readSV8(File *file, long streamLength)
 
       readRG = true;
 
-      const int replayGainVersion = data[0];
-      if(replayGainVersion == 1) {
+      if(const int replayGainVersion = data[0]; replayGainVersion == 1) {
         d->trackGain = data.toShort(1, true);
         d->trackPeak = data.toShort(3, true);
         d->albumGain = data.toShort(5, true);
@@ -295,7 +261,7 @@ void MPC::Properties::readSV8(File *file, long streamLength)
   }
 }
 
-void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
+void MPC::Properties::readSV7(const ByteVector &data, offset_t streamLength)
 {
   if(data.startsWith("MP+")) {
     if(data.size() < 4)
@@ -320,13 +286,13 @@ void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
 
     // convert gain info
     if(d->trackGain != 0) {
-      int tmp = static_cast<int>((64.82 - static_cast<short>(d->trackGain) / 100.) * 256. + .5);
+      auto tmp = static_cast<int>((64.82 - static_cast<short>(d->trackGain) / 100.) * 256. + .5);
       if(tmp >= (1 << 16) || tmp < 0) tmp = 0;
       d->trackGain = tmp;
     }
 
     if(d->albumGain != 0) {
-      int tmp = static_cast<int>((64.82 - d->albumGain / 100.) * 256. + .5);
+      auto tmp = static_cast<int>((64.82 - d->albumGain / 100.) * 256. + .5);
       if(tmp >= (1 << 16) || tmp < 0) tmp = 0;
       d->albumGain = tmp;
     }
@@ -337,8 +303,7 @@ void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
     if (d->albumPeak != 0)
       d->albumPeak = static_cast<int>(log10(static_cast<double>(d->albumPeak)) * 20 * 256 + .5);
 
-    bool trueGapless = (gapless >> 31) & 0x0001;
-    if(trueGapless) {
+    if((gapless >> 31) & 0x0001) {
       unsigned int lastFrameSamples = (gapless >> 20) & 0x07FF;
       d->sampleFrames = d->totalFrames * 1152 - lastFrameSamples;
     }
@@ -362,7 +327,7 @@ void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
   }
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
-    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length = static_cast<int>(length + 0.5);
 
     if(d->bitrate == 0)

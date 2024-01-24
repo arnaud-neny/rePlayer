@@ -23,12 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
-#include <tdebug.h>
-
-#include "id3v2tag.h"
 #include "uniquefileidentifierframe.h"
+
+#include <utility>
+
+#include "tbytevectorlist.h"
+#include "tpropertymap.h"
+#include "tdebug.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -46,23 +48,20 @@ public:
 
 UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data) :
   ID3v2::Frame(data),
-  d(new UniqueFileIdentifierFramePrivate())
+  d(std::make_unique<UniqueFileIdentifierFramePrivate>())
 {
   setData(data);
 }
 
 UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const String &owner, const ByteVector &id) :
   ID3v2::Frame("UFID"),
-  d(new UniqueFileIdentifierFramePrivate())
+  d(std::make_unique<UniqueFileIdentifierFramePrivate>())
 {
   d->owner = owner;
   d->identifier = id;
 }
 
-UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame()
-{
-  delete d;
-}
+UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame() = default;
 
 String UniqueFileIdentifierFrame::owner() const
 {
@@ -96,25 +95,20 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
     map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
   }
   else {
-    map.unsupportedData().append(frameID() + String("/") + d->owner);
+    map.addUnsupportedData(frameID() + String("/") + d->owner);
   }
   return map;
 }
 
 UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::Tag *tag, const String &o) // static
 {
-  ID3v2::FrameList comments = tag->frameList("UFID");
-
-  for(ID3v2::FrameList::ConstIterator it = comments.begin();
-      it != comments.end();
-      ++it)
-  {
-    UniqueFileIdentifierFrame *frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
+  for(const auto &comment : std::as_const(tag->frameList("UFID"))) {
+    auto frame = dynamic_cast<UniqueFileIdentifierFrame *>(comment);
     if(frame && frame->owner() == o)
       return frame;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
@@ -142,7 +136,7 @@ ByteVector UniqueFileIdentifierFrame::renderFields() const
 
 UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new UniqueFileIdentifierFramePrivate())
+  d(std::make_unique<UniqueFileIdentifierFramePrivate>())
 {
   parseFields(fieldData(data));
 }

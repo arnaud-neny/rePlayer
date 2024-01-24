@@ -23,18 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <taglib.h>
-#include <tdebug.h>
-#include <trefcounter.h>
-
-#include "asfattribute.h"
-#include "asffile.h"
 #include "asfpicture.h"
+
+#include "asffile.h"
 #include "asfutils.h"
 
 using namespace TagLib;
 
-class ASF::Picture::PicturePrivate : public RefCounter
+class ASF::Picture::PicturePrivate
 {
 public:
   bool valid;
@@ -49,22 +45,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Picture::Picture() :
-  d(new PicturePrivate())
+  d(std::make_shared<PicturePrivate>())
 {
   d->valid = true;
 }
 
-ASF::Picture::Picture(const Picture& other) :
-  d(other.d)
-{
-  d->ref();
-}
-
-ASF::Picture::~Picture()
-{
-  if(d->deref())
-    delete d;
-}
+ASF::Picture::Picture(const Picture &) = default;
+ASF::Picture::~Picture() = default;
 
 bool ASF::Picture::isValid() const
 {
@@ -118,13 +105,9 @@ int ASF::Picture::dataSize() const
     d->picture.size();
 }
 
-ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
-{
-  Picture(other).swap(*this);
-  return *this;
-}
+ASF::Picture &ASF::Picture::operator=(const ASF::Picture &) = default;
 
-void ASF::Picture::swap(Picture &other)
+void ASF::Picture::swap(Picture &other) noexcept
 {
   using std::swap;
 

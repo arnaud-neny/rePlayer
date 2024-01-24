@@ -27,20 +27,13 @@
 
 using namespace TagLib;
 
-class ByteVectorListPrivate
+class ByteVectorList::ByteVectorListPrivate
 {
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
-
-ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
-                                     int byteAlign)
-{
-  return split(v, pattern, byteAlign, 0);
-}
 
 ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
                                      int byteAlign, int max)
@@ -70,33 +63,61 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList::ByteVectorList()
-{
+ByteVectorList::ByteVectorList() = default;
 
+ByteVectorList::~ByteVectorList() = default;
+
+ByteVectorList::ByteVectorList(const ByteVectorList &l) :
+  List<ByteVector>(l)
+{
+  *d = *l.d;
 }
 
-ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
+ByteVectorList::ByteVectorList(std::initializer_list<ByteVector> init) :
+  List<ByteVector>(init)
 {
-
 }
 
-ByteVectorList::~ByteVectorList()
+ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
 {
+  if(this == &l)
+    return *this;
 
+  List<ByteVector>::operator=(l);
+  *d = *l.d;
+  return *this;
+}
+
+ByteVectorList &ByteVectorList::operator=(std::initializer_list<ByteVector> init)
+{
+  List<ByteVector>::operator=(init);
+  return *this;
 }
 
 ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {
   ByteVector v;
 
-  ConstIterator it = begin();
-
-  while(it != end()) {
+  for(auto it = begin(); it != end(); ++it) {
     v.append(*it);
-    it++;
-    if(it != end())
+    if(std::next(it) != end())
       v.append(separator);
   }
 
   return v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// related functions
+////////////////////////////////////////////////////////////////////////////////
+
+std::ostream &operator<<(std::ostream &s, const ByteVectorList &l)
+{
+  for(auto it = l.begin(); it != l.end(); ++it) {
+    if(it != l.begin()) {
+      s << ' ';
+    }
+    s << *it;
+  }
+  return s;
 }

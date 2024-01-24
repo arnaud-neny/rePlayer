@@ -26,6 +26,8 @@
 #ifndef TAGLIB_RIFFUTILS_H
 #define TAGLIB_RIFFUTILS_H
 
+#include "tbytevector.h"
+
 // THIS FILE IS NOT A PART OF THE TAGLIB API
 
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
@@ -42,13 +44,7 @@ namespace TagLib
         if(name.size() != 4)
           return false;
 
-        for(ByteVector::ConstIterator it = name.begin(); it != name.end(); ++it) {
-          const int c = static_cast<unsigned char>(*it);
-          if(c < 32 || 127 < c)
-            return false;
-        }
-
-        return true;
+        return std::none_of(name.begin(), name.end(), [](unsigned char c) { return c < 32 || 127 < c; });
       }
 
     }  // namespace

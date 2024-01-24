@@ -23,12 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tiostream.h"
+
 #ifdef _WIN32
 # include <windows.h>
-# include <tstring.h>
+# include "tstring.h"
 #endif
-
-#include "tiostream.h"
 
 using namespace TagLib;
 
@@ -38,55 +38,37 @@ namespace
 {
   std::wstring ansiToUnicode(const char *str)
   {
-    const int len = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+    const int len = MultiByteToWideChar(CP_ACP, 0, str, -1, nullptr, 0);
     if(len == 0)
       return std::wstring();
 
     std::wstring wstr(len - 1, L'\0');
-    MultiByteToWideChar(CP_ACP, 0, str, -1, &wstr[0], len);
+    MultiByteToWideChar(CP_ACP, 0, str, -1, wstr.data(), len);
 
     return wstr;
   }
-}
-
-// m_name is no longer used, but kept for backward compatibility.
+} // namespace
 
 FileName::FileName(const wchar_t *name) :
-  m_name(),
   m_wname(name)
 {
 }
 
 FileName::FileName(const char *name) :
-  m_name(),
   m_wname(ansiToUnicode(name))
 {
 }
 
-FileName::FileName(const FileName &name) :
-  m_name(),
-  m_wname(name.m_wname)
-{
-}
+FileName::FileName(const FileName &) = default;
 
 FileName::operator const wchar_t *() const
 {
   return m_wname.c_str();
 }
 
-FileName::operator const char *() const
-{
-  return m_name.c_str();
-}
-
 const std::wstring &FileName::wstr() const
 {
   return m_wname;
-}
-
-const std::string &FileName::str() const
-{
-  return m_name;
 }
 
 String FileName::toString() const
@@ -96,19 +78,18 @@ String FileName::toString() const
 
 #endif  // _WIN32
 
+class IOStream::IOStreamPrivate
+{
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-IOStream::IOStream()
-{
-}
+IOStream::IOStream() = default;
 
-IOStream::~IOStream()
-{
-}
+IOStream::~IOStream() = default;
 
 void IOStream::clear()
 {
 }
-

@@ -27,12 +27,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
 #include "opusfile.h"
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
 using namespace TagLib;
 using namespace TagLib::Ogg;
@@ -40,18 +39,8 @@ using namespace TagLib::Ogg;
 class Opus::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    comment(0),
-    properties(0) {}
-
-  ~FilePrivate()
-  {
-    delete comment;
-    delete properties;
-  }
-
-  Ogg::XiphComment *comment;
-  Properties *properties;
+  std::unique_ptr<Ogg::XiphComment> comment;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +52,7 @@ bool Ogg::Opus::File::isSupported(IOStream *stream)
   // An Opus file has IDs "OggS" and "OpusHead" somewhere.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
-  return (buffer.find("OggS") >= 0 && buffer.find("OpusHead") >= 0);
+  return buffer.find("OggS") >= 0 && buffer.find("OpusHead") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +61,7 @@ bool Ogg::Opus::File::isSupported(IOStream *stream)
 
 Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   Ogg::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -80,20 +69,17 @@ Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 Opus::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   Ogg::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-Opus::File::~File()
-{
-  delete d;
-}
+Opus::File::~File() = default;
 
 Ogg::XiphComment *Opus::File::tag() const
 {
-  return d->comment;
+  return d->comment.get();
 }
 
 PropertyMap Opus::File::properties() const
@@ -108,13 +94,13 @@ PropertyMap Opus::File::setProperties(const PropertyMap &properties)
 
 Opus::Properties *Opus::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool Opus::File::save()
 {
   if(!d->comment)
-    d->comment = new Ogg::XiphComment();
+    d->comment = std::make_unique<Ogg::XiphComment>();
 
   setPacket(1, ByteVector("OpusTags", 8) + d->comment->render(false));
 
@@ -143,8 +129,8 @@ void Opus::File::read(bool readProperties)
     return;
   }
 
-  d->comment = new Ogg::XiphComment(commentHeaderData.mid(8));
+  d->comment = std::make_unique<Ogg::XiphComment>(commentHeaderData.mid(8));
 
   if(readProperties)
-    d->properties = new Properties(this);
+    d->properties = std::make_unique<Properties>(this);
 }

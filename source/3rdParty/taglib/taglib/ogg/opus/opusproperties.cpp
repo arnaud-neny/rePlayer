@@ -27,12 +27,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-
-#include <oggpageheader.h>
-
 #include "opusproperties.h"
+
+#include "tstring.h"
+#include "tdebug.h"
+#include "oggpageheader.h"
 #include "opusfile.h"
 
 using namespace TagLib;
@@ -41,18 +40,11 @@ using namespace TagLib::Ogg;
 class Opus::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    inputSampleRate(0),
-    channels(0),
-    opusVersion(0) {}
-
-  int length;
-  int bitrate;
-  int inputSampleRate;
-  int channels;
-  int opusVersion;
+  int length { 0 };
+  int bitrate { 0 };
+  int inputSampleRate { 0 };
+  int channels { 0 };
+  int opusVersion { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,25 +53,12 @@ public:
 
 Opus::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-Opus::Properties::~Properties()
-{
-  delete d;
-}
-
-int Opus::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int Ogg::Opus::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+Opus::Properties::~Properties() = default;
 
 int Ogg::Opus::Properties::lengthInMilliseconds() const
 {
@@ -143,13 +122,13 @@ void Opus::Properties::read(File *file)
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
   d->inputSampleRate = data.toUInt(pos, false);
-  pos += 4;
+  // pos += 4;
 
   // *Output Gain* (16 bits, signed, little endian)
-  pos += 2;
+  // pos += 2;
 
   // *Channel Mapping Family* (8 bits, unsigned)
-  pos += 1;
+  // pos += 1;
 
   const Ogg::PageHeader *first = file->firstPageHeader();
   const Ogg::PageHeader *last  = file->lastPageHeader();
@@ -159,11 +138,9 @@ void Opus::Properties::read(File *file)
     const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0) {
-      const long long frameCount = (end - start - preSkip);
-
-      if(frameCount > 0) {
-        const double length = frameCount * 1000.0 / 48000.0;
-        long fileLengthWithoutOverhead = file->length();
+      if(const long long frameCount = end - start - preSkip; frameCount > 0) {
+        const auto length = static_cast<double>(frameCount) * 1000.0 / 48000.0;
+        offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the two mandatory header packets, see "3. Packet Organization"
         // in https://tools.ietf.org/html/rfc7845.html
         for (unsigned int i = 0; i < 2; ++i) {

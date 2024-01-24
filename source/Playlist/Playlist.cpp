@@ -1282,7 +1282,7 @@ namespace rePlayer
                                 songSheet->name.String() += '/';
 
                                 // get id3v2 tags to check if we have a disc number
-                                TagLib::MPEG::File fMpeg(&fStream, TagLib::ID3v2::FrameFactory::instance());
+                                TagLib::MPEG::File fMpeg(&fStream, true, TagLib::MPEG::Properties::Average, TagLib::ID3v2::FrameFactory::instance());
                                 if (auto* id3v2Tag = fMpeg.ID3v2Tag())
                                 {
                                     auto properties = id3v2Tag->properties();

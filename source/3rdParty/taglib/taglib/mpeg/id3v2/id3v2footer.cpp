@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "id3v2footer.h"
+
 #include "id3v2header.h"
 
 using namespace TagLib;
@@ -33,14 +34,9 @@ class Footer::FooterPrivate
 {
 };
 
-Footer::Footer() :
-  d(0)
-{
-}
+Footer::Footer() = default;
 
-Footer::~Footer()
-{
-}
+Footer::~Footer() = default;
 
 unsigned int Footer::size()
 {

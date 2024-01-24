@@ -1,6 +1,9 @@
 /***************************************************************************
-    copyright            : (C) 2013 by Tsuda Kageyu
-    email                : tsuda.kageyu@gmail.com
+    copyright            : (C) 2020 by Kevin Andre
+    email                : hyperquantum@gmail.com
+
+    copyright            : (C) 2023 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,74 +26,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "tversionnumber.h"
 
-#include "trefcounter.h"
+#include "tstring.h"
+#include "taglib.h"
 
-#if defined(HAVE_GCC_ATOMIC)
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
-# define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
-#elif defined(HAVE_WIN_ATOMIC)
-# if !defined(NOMINMAX)
-#   define NOMINMAX
-# endif
-# include <windows.h>
-# define ATOMIC_INT long
-# define ATOMIC_INC(x) InterlockedIncrement(&x)
-# define ATOMIC_DEC(x) InterlockedDecrement(&x)
-#elif defined(HAVE_MAC_ATOMIC)
-# include <libkern/OSAtomic.h>
-# define ATOMIC_INT int32_t
-# define ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-# define ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-#elif defined(HAVE_IA64_ATOMIC)
-# include <ia64intrin.h>
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#else
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) (++x)
-# define ATOMIC_DEC(x) (--x)
-#endif
+using namespace TagLib;
 
-namespace TagLib
+////////////////////////////////////////////////////////////////////////////////
+// public methods
+////////////////////////////////////////////////////////////////////////////////
+
+String VersionNumber::toString() const
 {
+  return String::number(majorVersion()) + '.' +
+         String::number(minorVersion()) + '.' +
+         String::number(patchVersion());
+}
 
-  class RefCounter::RefCounterPrivate
-  {
-  public:
-    RefCounterPrivate() :
-      refCount(1) {}
+////////////////////////////////////////////////////////////////////////////////
+// related functions
+////////////////////////////////////////////////////////////////////////////////
 
-    volatile ATOMIC_INT refCount;
-  };
-
-  RefCounter::RefCounter() :
-    d(new RefCounterPrivate())
-  {
-  }
-
-  RefCounter::~RefCounter()
-  {
-    delete d;
-  }
-
-  void RefCounter::ref()
-  {
-    ATOMIC_INC(d->refCount);
-  }
-
-  bool RefCounter::deref()
-  {
-    return (ATOMIC_DEC(d->refCount) == 0);
-  }
-
-  int RefCounter::count() const
-  {
-    return static_cast<int>(d->refCount);
-  }
-}  // namespace TagLib
+VersionNumber TagLib::runtimeVersion()
+{
+  return VersionNumber(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION);
+}

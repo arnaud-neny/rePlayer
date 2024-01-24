@@ -27,10 +27,13 @@
  ***************************************************************************/
 
 #include "urllinkframe.h"
+
+#include <utility>
+
+#include "tdebug.h"
+#include "tstringlist.h"
+#include "tpropertymap.h"
 #include "id3v2tag.h"
-#include <tdebug.h>
-#include <tstringlist.h>
-#include <tpropertymap.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -44,8 +47,7 @@ public:
 class UserUrlLinkFrame::UserUrlLinkFramePrivate
 {
 public:
-  UserUrlLinkFramePrivate() : textEncoding(String::Latin1) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String description;
 };
 
@@ -55,15 +57,12 @@ public:
 
 UrlLinkFrame::UrlLinkFrame(const ByteVector &data) :
   Frame(data),
-  d(new UrlLinkFramePrivate())
+  d(std::make_unique<UrlLinkFramePrivate>())
 {
   setData(data);
 }
 
-UrlLinkFrame::~UrlLinkFrame()
-{
-  delete d;
-}
+UrlLinkFrame::~UrlLinkFrame() = default;
 
 void UrlLinkFrame::setUrl(const String &s)
 {
@@ -91,7 +90,7 @@ PropertyMap UrlLinkFrame::asProperties() const
   PropertyMap map;
   if(key.isEmpty())
     // unknown W*** frame - this normally shouldn't happen
-    map.unsupportedData().append(frameID());
+    map.addUnsupportedData(frameID());
   else
     map.insert(key, url());
   return map;
@@ -113,7 +112,7 @@ ByteVector UrlLinkFrame::renderFields() const
 
 UrlLinkFrame::UrlLinkFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new UrlLinkFramePrivate())
+  d(std::make_unique<UrlLinkFramePrivate>())
 {
   parseFields(fieldData(data));
 }
@@ -124,22 +123,19 @@ UrlLinkFrame::UrlLinkFrame(const ByteVector &data, Header *h) :
 
 UserUrlLinkFrame::UserUrlLinkFrame(String::Type encoding) :
   UrlLinkFrame("WXXX"),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 UserUrlLinkFrame::UserUrlLinkFrame(const ByteVector &data) :
   UrlLinkFrame(data),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   setData(data);
 }
 
-UserUrlLinkFrame::~UserUrlLinkFrame()
-{
-  delete d;
-}
+UserUrlLinkFrame::~UserUrlLinkFrame() = default;
 
 String UserUrlLinkFrame::toString() const
 {
@@ -177,15 +173,14 @@ PropertyMap UserUrlLinkFrame::asProperties() const
   return map;
 }
 
-UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &description) // static
+UserUrlLinkFrame *UserUrlLinkFrame::find(const ID3v2::Tag *tag, const String &description) // static
 {
-  FrameList l = tag->frameList("WXXX");
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
-    UserUrlLinkFrame *f = dynamic_cast<UserUrlLinkFrame *>(*it);
+  for(const auto &frame : std::as_const(tag->frameList("WXXX"))) {
+    auto f = dynamic_cast<UserUrlLinkFrame *>(frame);
     if(f && f->description() == description)
       return f;
   }
-  return 0;
+  return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +235,7 @@ ByteVector UserUrlLinkFrame::renderFields() const
 
 UserUrlLinkFrame::UserUrlLinkFrame(const ByteVector &data, Header *h) :
   UrlLinkFrame(data, h),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   parseFields(fieldData(data));
 }

@@ -23,38 +23,48 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "tpropertymap.h"
+
+#include <utility>
+
 using namespace TagLib;
 
-
-PropertyMap::PropertyMap()
+class PropertyMap::PropertyMapPrivate
 {
+public:
+    StringList unsupported;
+};
+
+PropertyMap::PropertyMap() :
+  d(std::make_unique<PropertyMapPrivate>())
+{
+
 }
 
-PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m), unsupported(m.unsupported)
+PropertyMap::PropertyMap(const PropertyMap &m) :
+  SimplePropertyMap(m),
+  d(std::make_unique<PropertyMapPrivate>())
 {
+  *d = *m.d;
 }
 
-PropertyMap::PropertyMap(const SimplePropertyMap &m)
+PropertyMap::PropertyMap(const SimplePropertyMap &m) :
+  d(std::make_unique<PropertyMapPrivate>())
 {
-  for(SimplePropertyMap::ConstIterator it = m.begin(); it != m.end(); ++it){
-    String key = it->first.upper();
+  for(const auto &[key, val] : m) {
     if(!key.isEmpty())
-      insert(it->first, it->second);
+      insert(key.upper(), val);
     else
-      unsupported.append(it->first);
+      d->unsupported.append(key.upper());
   }
 }
 
-PropertyMap::~PropertyMap()
-{
-}
+PropertyMap::~PropertyMap() = default;
 
 bool PropertyMap::insert(const String &key, const StringList &values)
 {
   String realKey = key.upper();
-  Iterator result = SimplePropertyMap::find(realKey);
+  auto result = SimplePropertyMap::find(realKey);
   if(result == end())
     SimplePropertyMap::insert(realKey, values);
   else
@@ -87,13 +97,8 @@ bool PropertyMap::contains(const String &key) const
 
 bool PropertyMap::contains(const PropertyMap &other) const
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
-    if(!SimplePropertyMap::contains(it->first))
-      return false;
-    if ((*this)[it->first] != it->second)
-      return false;
-  }
-  return true;
+  return std::all_of(other.begin(), other.end(),
+    [this](const auto &o) { return contains(o.first) && (*this)[o.first] == o.second; });
 }
 
 PropertyMap &PropertyMap::erase(const String &key)
@@ -104,16 +109,16 @@ PropertyMap &PropertyMap::erase(const String &key)
 
 PropertyMap &PropertyMap::erase(const PropertyMap &other)
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it)
-    erase(it->first);
+  for(const auto &[property, _] : other)
+    erase(property);
   return *this;
 }
 
 PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
-  for(PropertyMap::ConstIterator it = other.begin(); it != other.end(); ++it)
-    insert(it->first, it->second);
-  unsupported.append(other.unsupported);
+  for(const auto &[property, val] : other)
+    insert(property, val);
+  d->unsupported.append(other.d->unsupported);
   return *this;
 }
 
@@ -135,17 +140,17 @@ StringList &PropertyMap::operator[](const String &key)
 
 bool PropertyMap::operator==(const PropertyMap &other) const
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
-    ConstIterator thisFind = find(it->first);
-    if( thisFind == end() || (thisFind->second != it->second) )
+  for(const auto &[property, val] : other) {
+    if(auto thisFind = find(property);
+       thisFind == end() || thisFind->second != val)
       return false;
   }
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    ConstIterator otherFind = other.find(it->first);
-    if( otherFind == other.end() || (otherFind->second != it->second) )
+  for(const auto &[property, val] : *this) {
+    if(auto otherFind = other.find(property);
+       otherFind == other.end() || otherFind->second != val)
       return false;
   }
-  return unsupported == other.unsupported;
+  return d->unsupported == other.d->unsupported;
 }
 
 bool PropertyMap::operator!=(const PropertyMap &other) const
@@ -157,31 +162,41 @@ String PropertyMap::toString() const
 {
   String ret;
 
-  for(ConstIterator it = begin(); it != end(); ++it)
-    ret += it->first+"="+it->second.toString(", ") + "\n";
-  if(!unsupported.isEmpty())
-    ret += "Unsupported Data: " + unsupported.toString(", ") + "\n";
+  for(const auto &[property, val] : *this)
+    ret += property + "=" + val.toString(", ") + "\n";
+  if(!d->unsupported.isEmpty())
+    ret += "Unsupported Data: " + d->unsupported.toString(", ") + "\n";
   return ret;
 }
 
 void PropertyMap::removeEmpty()
 {
   PropertyMap m;
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    if(!it->second.isEmpty())
-      m.insert(it->first, it->second);
+  for(const auto &[property, val] : std::as_const(*this)) {
+    if(!val.isEmpty())
+      m.insert(property, val);
   }
   *this = m;
 }
 
-StringList &PropertyMap::unsupportedData()
-{
-  return unsupported;
-}
-
 const StringList &PropertyMap::unsupportedData() const
 {
-  return unsupported;
+  return d->unsupported;
+}
+
+void PropertyMap::addUnsupportedData(const String &key)
+{
+  d->unsupported.append(key);
+}
+
+PropertyMap &PropertyMap::operator=(const PropertyMap &other)
+{
+  if(this == &other)
+    return *this;
+
+  SimplePropertyMap::operator=(other);
+  *d = *other.d;
+  return *this;
 }
 
 #ifdef _MSC_VER
@@ -190,5 +205,9 @@ const StringList &PropertyMap::unsupportedData() const
 // Ogg::FieldListMap is used because this will instantiate the same template
 // Map<String, StringList>. Therefore this template is instantiated here
 // and declared extern in the headers using it.
-template class TagLib::Map<TagLib::String, TagLib::StringList>;
+// Suppress warning "needs to have dll-interface to be used by clients",
+// in the template, TAGLIB_EXPORT cannot be used on the members, therefore
+// the private implemenation is exported too, but not accessible by clients.
+#pragma warning(suppress: 4251)
+template class TAGLIB_EXPORT TagLib::Map<TagLib::String, TagLib::StringList>;
 #endif

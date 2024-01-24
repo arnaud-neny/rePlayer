@@ -23,9 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include "wavfile.h"
 #include "wavproperties.h"
+
+#include "tdebug.h"
+#include "wavfile.h"
 
 using namespace TagLib;
 
@@ -43,63 +44,27 @@ namespace
 class RIFF::WAV::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    format(0),
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    bitsPerSample(0),
-    sampleFrames(0) {}
-
-  int format;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int bitsPerSample;
-  unsigned int sampleFrames;
+  int format { 0 };
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int bitsPerSample { 0 };
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
-}
-
-RIFF::WAV::Properties::Properties(const ByteVector &, unsigned int, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
-}
-
 TagLib::RIFF::WAV::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-RIFF::WAV::Properties::~Properties()
-{
-  delete d;
-}
-
-int RIFF::WAV::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int RIFF::WAV::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+RIFF::WAV::Properties::~Properties() = default;
 
 int RIFF::WAV::Properties::lengthInMilliseconds() const
 {
@@ -126,11 +91,6 @@ int RIFF::WAV::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-int RIFF::WAV::Properties::sampleWidth() const
-{
-  return bitsPerSample();
-}
-
 unsigned int RIFF::WAV::Properties::sampleFrames() const
 {
   return d->sampleFrames;
@@ -152,8 +112,7 @@ void RIFF::WAV::Properties::read(File *file)
   unsigned int totalSamples = 0;
 
   for(unsigned int i = 0; i < file->chunkCount(); ++i) {
-    const ByteVector name = file->chunkName(i);
-    if(name == "fmt ") {
+    if(const ByteVector name = file->chunkName(i); name == "fmt ") {
       if(data.isEmpty())
         data = file->chunkData(i);
       else
@@ -207,13 +166,12 @@ void RIFF::WAV::Properties::read(File *file)
     d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
-    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
   else {
-    const unsigned int byteRate = data.toUInt(8, false);
-    if(byteRate > 0) {
+    if(const unsigned int byteRate = data.toUInt(8, false); byteRate > 0) {
       d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
       d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
     }

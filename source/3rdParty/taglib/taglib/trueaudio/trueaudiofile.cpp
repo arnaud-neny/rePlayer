@@ -27,18 +27,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tdebug.h>
-#include <tagunion.h>
-#include <tstringlist.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
 #include "trueaudiofile.h"
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagunion.h"
+#include "tagutils.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
-#include "id3v2header.h"
 
 using namespace TagLib;
 
@@ -51,26 +47,19 @@ class TrueAudio::File::FilePrivate
 {
 public:
   FilePrivate(const ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
-    ID3v2FrameFactory(frameFactory),
-    ID3v2Location(-1),
-    ID3v2OriginalSize(0),
-    ID3v1Location(-1),
-    properties(0) {}
-
-  ~FilePrivate()
+    ID3v2FrameFactory(frameFactory)
   {
-    delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long ID3v2Location;
-  long ID3v2OriginalSize;
+  offset_t ID3v2Location { -1 };
+  long ID3v2OriginalSize { 0 };
 
-  long ID3v1Location;
+  offset_t ID3v1Location { -1 };
 
   TagUnion tag;
 
-  Properties *properties;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,16 +71,19 @@ bool TrueAudio::File::isSupported(IOStream *stream)
   // A TrueAudio file has to start with "TTA". An ID3v2 tag may precede.
 
   const ByteVector id = Utils::readHeader(stream, 3, true);
-  return (id == "TTA");
+  return id == "TTA";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+TrueAudio::File::File(FileName file, bool readProperties,
+                      Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);
@@ -100,15 +92,18 @@ TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle)
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                       bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+TrueAudio::File::File(IOStream *stream, bool readProperties,
+                      Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);
@@ -117,16 +112,13 @@ TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadSty
 TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
                       bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-TrueAudio::File::~File()
-{
-  delete d;
-}
+TrueAudio::File::~File() = default;
 
 TagLib::Tag *TrueAudio::File::tag() const
 {
@@ -153,12 +145,7 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const
 {
-  return d->properties;
-}
-
-void TrueAudio::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
+  return d->properties.get();
 }
 
 bool TrueAudio::File::save()
@@ -181,7 +168,7 @@ bool TrueAudio::File::save()
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
     d->ID3v2OriginalSize = data.size();
   }
@@ -236,16 +223,17 @@ ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 
 ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, create,
+                                   d->ID3v2FrameFactory);
 }
 
 void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(TrueAudioID3v1Index, 0);
+    d->tag.set(TrueAudioID3v1Index, nullptr);
 
   if(tags & ID3v2)
-    d->tag.set(TrueAudioID3v2Index, 0);
+    d->tag.set(TrueAudioID3v2Index, nullptr);
 
   if(!ID3v1Tag())
     ID3v2Tag(true);
@@ -253,12 +241,12 @@ void TrueAudio::File::strip(int tags)
 
 bool TrueAudio::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool TrueAudio::File::hasID3v2Tag() const
 {
-  return (d->ID3v2Location >= 0);
+  return d->ID3v2Location >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,7 +278,7 @@ void TrueAudio::File::read(bool readProperties)
 
   if(readProperties) {
 
-    long streamLength;
+    offset_t streamLength;
 
     if(d->ID3v1Location >= 0)
       streamLength = d->ID3v1Location;
@@ -299,12 +287,12 @@ void TrueAudio::File::read(bool readProperties)
 
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      streamLength -= (d->ID3v2Location + d->ID3v2OriginalSize);
+      streamLength -= d->ID3v2Location + d->ID3v2OriginalSize;
     }
     else {
       seek(0);
     }
 
-    d->properties = new Properties(readBlock(TrueAudio::HeaderSize), streamLength);
+    d->properties = std::make_unique<Properties>(readBlock(TrueAudio::HeaderSize), streamLength);
   }
 }

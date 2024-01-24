@@ -23,32 +23,19 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <bitset>
-
-#include <tstring.h>
-#include <tdebug.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
 #include "vorbisfile.h"
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
 using namespace TagLib;
 
 class Vorbis::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    comment(0),
-    properties(0) {}
-
-  ~FilePrivate()
-  {
-    delete comment;
-    delete properties;
-  }
-
-  Ogg::XiphComment *comment;
-  Properties *properties;
+  std::unique_ptr<Ogg::XiphComment> comment;
+  std::unique_ptr<Properties> properties;
 };
 
 namespace TagLib {
@@ -56,7 +43,7 @@ namespace TagLib {
    * Vorbis headers can be found with one type ID byte and the string "vorbis" in
    * an Ogg stream.  0x03 indicates the comment header.
    */
-  static const char vorbisCommentHeaderID[] = { 0x03, 'v', 'o', 'r', 'b', 'i', 's', 0 };
+  static constexpr char vorbisCommentHeaderID[] = { 0x03, 'v', 'o', 'r', 'b', 'i', 's', 0 };
 } // namespace TagLib
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +55,7 @@ bool Vorbis::File::isSupported(IOStream *stream)
   // An Ogg Vorbis file has IDs "OggS" and "\x01vorbis" somewhere.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
-  return (buffer.find("OggS") >= 0 && buffer.find("\x01vorbis") >= 0);
+  return buffer.find("OggS") >= 0 && buffer.find("\x01vorbis") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +64,7 @@ bool Vorbis::File::isSupported(IOStream *stream)
 
 Vorbis::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   Ogg::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -85,20 +72,17 @@ Vorbis::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 Vorbis::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   Ogg::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-Vorbis::File::~File()
-{
-  delete d;
-}
+Vorbis::File::~File() = default;
 
 Ogg::XiphComment *Vorbis::File::tag() const
 {
-  return d->comment;
+  return d->comment.get();
 }
 
 PropertyMap Vorbis::File::properties() const
@@ -113,7 +97,7 @@ PropertyMap Vorbis::File::setProperties(const PropertyMap &properties)
 
 Vorbis::Properties *Vorbis::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool Vorbis::File::save()
@@ -121,7 +105,7 @@ bool Vorbis::File::save()
   ByteVector v(vorbisCommentHeaderID);
 
   if(!d->comment)
-    d->comment = new Ogg::XiphComment();
+    d->comment = std::make_unique<Ogg::XiphComment>();
   v.append(d->comment->render());
 
   setPacket(1, v);
@@ -143,8 +127,8 @@ void Vorbis::File::read(bool readProperties)
     return;
   }
 
-  d->comment = new Ogg::XiphComment(commentHeaderData.mid(7));
+  d->comment = std::make_unique<Ogg::XiphComment>(commentHeaderData.mid(7));
 
   if(readProperties)
-    d->properties = new Properties(this);
+    d->properties = std::make_unique<Properties>(this);
 }

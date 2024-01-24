@@ -25,8 +25,8 @@
 
 #include "attachedpictureframe.h"
 
-#include <tstringlist.h>
-#include <tdebug.h>
+#include "tstringlist.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -34,12 +34,9 @@ using namespace ID3v2;
 class AttachedPictureFrame::AttachedPictureFramePrivate
 {
 public:
-  AttachedPictureFramePrivate() : textEncoding(String::Latin1),
-                                  type(AttachedPictureFrame::Other) {}
-
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String mimeType;
-  AttachedPictureFrame::Type type;
+  AttachedPictureFrame::Type type { AttachedPictureFrame::Other };
   String description;
   ByteVector data;
 };
@@ -50,26 +47,28 @@ public:
 
 AttachedPictureFrame::AttachedPictureFrame() :
   Frame("APIC"),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
 }
 
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data) :
   Frame(data),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
   setData(data);
 }
 
-AttachedPictureFrame::~AttachedPictureFrame()
-{
-  delete d;
-}
+AttachedPictureFrame::~AttachedPictureFrame() = default;
 
 String AttachedPictureFrame::toString() const
 {
   String s = "[" + d->mimeType + "]";
   return d->description.isEmpty() ? s : d->description + " " + s;
+}
+
+StringList AttachedPictureFrame::toStringList() const
+{
+  return {d->description, d->mimeType};
 }
 
 String::Type AttachedPictureFrame::textEncoding() const
@@ -173,7 +172,7 @@ ByteVector AttachedPictureFrame::renderFields() const
 
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
   parseFields(fieldData(data));
 }
@@ -193,7 +192,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
 
   int pos = 1;
 
-  String fixedString = String(data.mid(pos, 3), String::Latin1);
+  auto fixedString = String(data.mid(pos, 3), String::Latin1);
   pos += 3;
   // convert fixed string image type to mime string
   if (fixedString.upper() == "JPG") {
@@ -219,7 +218,7 @@ AttachedPictureFrameV22::AttachedPictureFrameV22(const ByteVector &data, Header 
   parseFields(fieldData(data));
 
   // now set the v2.4 header
-  Frame::Header *newHeader = new Frame::Header("APIC");
+  auto newHeader = new Frame::Header("APIC");
   newHeader->setFrameSize(h->frameSize());
   setHeader(newHeader, true);
 }

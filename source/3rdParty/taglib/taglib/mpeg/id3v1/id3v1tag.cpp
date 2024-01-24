@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tfile.h>
-
 #include "id3v1tag.h"
+
+#include "tdebug.h"
+#include "tfile.h"
 #include "id3v1genres.h"
 
 using namespace TagLib;
@@ -41,31 +41,29 @@ namespace
 class ID3v1::Tag::TagPrivate
 {
 public:
-  TagPrivate() :
-    file(0),
-    tagOffset(0),
-    track(0),
-    genre(255) {}
-
-  File *file;
-  long tagOffset;
+  File *file { nullptr };
+  offset_t tagOffset { 0 };
 
   String title;
   String artist;
   String album;
   String year;
   String comment;
-  unsigned char track;
-  unsigned char genre;
+  unsigned char track { 0 };
+  unsigned char genre { 255 };
+};
+
+class ID3v1::StringHandler::StringHandlerPrivate
+{
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-StringHandler::StringHandler()
-{
-}
+StringHandler::StringHandler() = default;
+
+StringHandler::~StringHandler() = default;
 
 String ID3v1::StringHandler::parse(const ByteVector &data) const
 {
@@ -84,12 +82,12 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v1::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-ID3v1::Tag::Tag(File *file, long tagOffset) :
-  d(new TagPrivate())
+ID3v1::Tag::Tag(File *file, offset_t tagOffset) :
+  d(std::make_unique<TagPrivate>())
 {
   d->file = file;
   d->tagOffset = tagOffset;
@@ -97,10 +95,7 @@ ID3v1::Tag::Tag(File *file, long tagOffset) :
   read();
 }
 
-ID3v1::Tag::~Tag()
-{
-  delete d;
-}
+ID3v1::Tag::~Tag() = default;
 
 ByteVector ID3v1::Tag::render() const
 {
@@ -221,10 +216,9 @@ void ID3v1::Tag::read()
   if(d->file && d->file->isValid()) {
     d->file->seek(d->tagOffset);
     // read the tag -- always 128 bytes
-    const ByteVector data = d->file->readBlock(128);
-
     // some initial sanity checking
-    if(data.size() == 128 && data.startsWith("TAG"))
+    if(const ByteVector data = d->file->readBlock(128);
+       data.size() == 128 && data.startsWith("TAG"))
       parse(data);
     else
       debug("ID3v1 tag is not valid or could not be read at the specified offset.");

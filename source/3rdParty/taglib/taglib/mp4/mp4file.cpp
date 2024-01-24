@@ -23,52 +23,31 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstring.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
-#include "mp4atom.h"
-#include "mp4tag.h"
 #include "mp4file.h"
 
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
+
+#include "mp4itemfactory.h"
+
 using namespace TagLib;
-
-namespace
-{
-  bool checkValid(const MP4::AtomList &list)
-  {
-    for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
-
-      if((*it)->length == 0)
-        return false;
-
-      if(!checkValid((*it)->children))
-        return false;
-    }
-
-    return true;
-  }
-}  // namespace
 
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    tag(0),
-    atoms(0),
-    properties(0) {}
-
-  ~FilePrivate()
+  FilePrivate(const MP4::ItemFactory *mp4ItemFactory)
+        : itemFactory(mp4ItemFactory ? mp4ItemFactory
+                                     : MP4::ItemFactory::instance())
   {
-    delete atoms;
-    delete tag;
-    delete properties;
   }
 
-  MP4::Tag        *tag;
-  MP4::Atoms      *atoms;
-  MP4::Properties *properties;
+  ~FilePrivate() = default;
+
+  const ItemFactory *itemFactory;
+  std::unique_ptr<MP4::Tag> tag;
+  std::unique_ptr<MP4::Atoms> atoms;
+  std::unique_ptr<MP4::Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,31 +66,29 @@ bool MP4::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle,
+                ItemFactory *itemFactory) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(itemFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle,
+                ItemFactory *itemFactory) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(itemFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-MP4::File::~File()
-{
-  delete d;
-}
+MP4::File::~File() = default;
 
-MP4::Tag *
-MP4::File::tag() const
+MP4::Tag *MP4::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 PropertyMap MP4::File::properties() const
@@ -129,10 +106,9 @@ PropertyMap MP4::File::setProperties(const PropertyMap &properties)
   return d->tag->setProperties(properties);
 }
 
-MP4::Properties *
-MP4::File::audioProperties() const
+MP4::Properties *MP4::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 void
@@ -141,8 +117,8 @@ MP4::File::read(bool readProperties)
   if(!isValid())
     return;
 
-  d->atoms = new Atoms(this);
-  if(!checkValid(d->atoms->atoms)) {
+  d->atoms = std::make_unique<Atoms>(this);
+  if(!d->atoms->checkRootLevelAtoms()) {
     setValid(false);
     return;
   }
@@ -153,9 +129,9 @@ MP4::File::read(bool readProperties)
     return;
   }
 
-  d->tag = new Tag(this, d->atoms);
+  d->tag = std::make_unique<Tag>(this, d->atoms.get(), d->itemFactory);
   if(readProperties) {
-    d->properties = new Properties(this, d->atoms);
+    d->properties = std::make_unique<Properties>(this, d->atoms.get());
   }
 }
 
@@ -198,5 +174,5 @@ MP4::File::strip(int tags)
 bool
 MP4::File::hasMP4Tag() const
 {
-  return (d->atoms->find("moov", "udta", "meta", "ilst") != 0);
+  return d->atoms->find("moov", "udta", "meta", "ilst") != nullptr;
 }

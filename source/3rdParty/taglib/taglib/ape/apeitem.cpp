@@ -23,10 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorlist.h>
-#include <tdebug.h>
-
 #include "apeitem.h"
+
+#include <utility>
+#include <numeric>
+
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace APE;
@@ -34,15 +36,11 @@ using namespace APE;
 class APE::Item::ItemPrivate
 {
 public:
-  ItemPrivate() :
-    type(Text),
-    readOnly(false) {}
-
-  Item::ItemTypes type;
+  Item::ItemTypes type { Text };
   String key;
   ByteVector value;
   StringList text;
-  bool readOnly;
+  bool readOnly { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,26 +48,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Item::Item() :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
-}
-
-APE::Item::Item(const String &key, const String &value) :
-  d(new ItemPrivate())
-{
-  d->key = key;
-  d->text.append(value);
 }
 
 APE::Item::Item(const String &key, const StringList &values) :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
   d->key = key;
   d->text = values;
 }
 
 APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
   d->key = key;
   if(binary) {
@@ -82,14 +73,11 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
 }
 
 APE::Item::Item(const Item &item) :
-  d(new ItemPrivate(*item.d))
+  d(std::make_unique<ItemPrivate>(*item.d))
 {
 }
 
-APE::Item::~Item()
-{
-  delete d;
-}
+APE::Item::~Item() = default;
 
 Item &APE::Item::operator=(const Item &item)
 {
@@ -97,7 +85,7 @@ Item &APE::Item::operator=(const Item &item)
   return *this;
 }
 
-void APE::Item::swap(Item &item)
+void APE::Item::swap(Item &item) noexcept
 {
   using std::swap;
 
@@ -141,14 +129,6 @@ void APE::Item::setBinaryData(const ByteVector &value)
   d->text.clear();
 }
 
-ByteVector APE::Item::value() const
-{
-  // This seems incorrect as it won't be actually rendering the value to keep it
-  // up to date.
-
-  return d->value;
-}
-
 void APE::Item::setKey(const String &key)
 {
   d->key = key;
@@ -161,10 +141,10 @@ void APE::Item::setValue(const String &value)
   d->value.clear();
 }
 
-void APE::Item::setValues(const StringList &value)
+void APE::Item::setValues(const StringList &values)
 {
   d->type = Text;
-  d->text = value;
+  d->text = values;
   d->value.clear();
 }
 
@@ -188,12 +168,10 @@ int APE::Item::size() const
   switch(d->type) {
     case Text:
       if(!d->text.isEmpty()) {
-        StringList::ConstIterator it = d->text.begin();
-
-        result += it->data(String::UTF8).size();
-        it++;
-        for(; it != d->text.end(); ++it)
-          result += 1 + it->data(String::UTF8).size();
+        result = std::accumulate(d->text.cbegin(), d->text.cend(), result,
+            [](int sz, const String &t) {
+          return sz + 1 + t.data(String::UTF8).size();
+        }) - 1;
       }
       break;
 
@@ -203,11 +181,6 @@ int APE::Item::size() const
       break;
   }
   return result;
-}
-
-StringList APE::Item::toStringList() const
-{
-  return d->text;
 }
 
 StringList APE::Item::values() const
@@ -254,45 +227,44 @@ void APE::Item::parse(const ByteVector &data)
 
   d->key = String(&data[8], String::Latin1);
 
-  const ByteVector value = data.mid(8 + d->key.size() + 1, valueLength);
+  const ByteVector val = data.mid(8 + d->key.size() + 1, valueLength);
 
   setReadOnly(flags & 1);
   setType(static_cast<ItemTypes>((flags >> 1) & 3));
 
   if(Text == d->type)
-    d->text = StringList(ByteVectorList::split(value, '\0'), String::UTF8);
+    d->text = StringList(ByteVectorList::split(val, '\0'), String::UTF8);
   else
-    d->value = value;
+    d->value = val;
 }
 
 ByteVector APE::Item::render() const
 {
   ByteVector data;
-  unsigned int flags = ((d->readOnly) ? 1 : 0) | (d->type << 1);
-  ByteVector value;
+  unsigned int flags = (d->readOnly ? 1 : 0) | (d->type << 1);
+  ByteVector val;
 
   if(isEmpty())
     return data;
 
   if(d->type == Text) {
-    StringList::ConstIterator it = d->text.begin();
+    auto it = d->text.cbegin();
 
-    value.append(it->data(String::UTF8));
-    it++;
-    for(; it != d->text.end(); ++it) {
-      value.append('\0');
-      value.append(it->data(String::UTF8));
+    val.append(it->data(String::UTF8));
+    for(it = std::next(it); it != d->text.cend(); ++it) {
+      val.append('\0');
+      val.append(it->data(String::UTF8));
     }
-    d->value = value;
+    d->value = val;
   }
   else
-    value.append(d->value);
+    val.append(d->value);
 
-  data.append(ByteVector::fromUInt(value.size(), false));
+  data.append(ByteVector::fromUInt(val.size(), false));
   data.append(ByteVector::fromUInt(flags, false));
   data.append(d->key.data(String::Latin1));
   data.append(ByteVector('\0'));
-  data.append(value);
+  data.append(val);
 
   return data;
 }

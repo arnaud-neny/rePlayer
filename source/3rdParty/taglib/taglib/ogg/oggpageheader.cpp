@@ -23,13 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "oggpageheader.h"
+
 #include <bitset>
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <taglib.h>
-
-#include "oggpageheader.h"
+#include "tdebug.h"
+#include "tstring.h"
 #include "oggfile.h"
 
 using namespace TagLib;
@@ -37,46 +36,31 @@ using namespace TagLib;
 class Ogg::PageHeader::PageHeaderPrivate
 {
 public:
-  PageHeaderPrivate() :
-    isValid(false),
-    firstPacketContinued(false),
-    lastPacketCompleted(false),
-    firstPageOfStream(false),
-    lastPageOfStream(false),
-    absoluteGranularPosition(0),
-    streamSerialNumber(0),
-    pageSequenceNumber(-1),
-    size(0),
-    dataSize(0) {}
-
-  bool isValid;
+  bool isValid { false };
   List<int> packetSizes;
-  bool firstPacketContinued;
-  bool lastPacketCompleted;
-  bool firstPageOfStream;
-  bool lastPageOfStream;
-  long long absoluteGranularPosition;
-  unsigned int streamSerialNumber;
-  int pageSequenceNumber;
-  int size;
-  int dataSize;
+  bool firstPacketContinued { false };
+  bool lastPacketCompleted { false };
+  bool firstPageOfStream { false };
+  bool lastPageOfStream { false };
+  long long absoluteGranularPosition { 0 };
+  unsigned int streamSerialNumber { 0 };
+  int pageSequenceNumber { -1 };
+  int size { 0 };
+  int dataSize { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::PageHeader::PageHeader(Ogg::File *file, long pageOffset) :
-  d(new PageHeaderPrivate())
+Ogg::PageHeader::PageHeader(Ogg::File *file, offset_t pageOffset) :
+  d(std::make_unique<PageHeaderPrivate>())
 {
   if(file && pageOffset >= 0)
     read(file, pageOffset);
 }
 
-Ogg::PageHeader::~PageHeader()
-{
-  delete d;
-}
+Ogg::PageHeader::~PageHeader() = default;
 
 bool Ogg::PageHeader::isValid() const
 {
@@ -225,7 +209,7 @@ ByteVector Ogg::PageHeader::render() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::PageHeader::read(Ogg::File *file, long pageOffset)
+void Ogg::PageHeader::read(Ogg::File *file, offset_t pageOffset)
 {
   file->seek(pageOffset);
 
@@ -295,16 +279,16 @@ ByteVector Ogg::PageHeader::lacingValues() const
 {
   ByteVector data;
 
-  for(List<int>::ConstIterator it = d->packetSizes.begin(); it != d->packetSizes.end(); ++it) {
+  for(auto it = d->packetSizes.cbegin(); it != d->packetSizes.cend(); ++it) {
 
     // The size of a packet in an Ogg page is indicated by a series of "lacing
     // values" where the sum of the values is the packet size in bytes.  Each of
     // these values is a byte.  A value of less than 255 (0xff) indicates the end
     // of the packet.
 
-    data.resize(data.size() + (*it / 255), '\xff');
+    data.resize(data.size() + *it / 255, '\xff');
 
-    if(it != --d->packetSizes.end() || d->lastPacketCompleted)
+    if(it != std::prev(d->packetSizes.cend()) || d->lastPacketCompleted)
       data.append(static_cast<unsigned char>(*it % 255));
   }
 

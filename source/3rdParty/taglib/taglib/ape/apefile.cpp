@@ -31,16 +31,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tdebug.h>
-#include <tagunion.h>
-#include <id3v1tag.h>
-#include <id3v2header.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
-
 #include "apefile.h"
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "id3v1tag.h"
+#include "id3v2header.h"
+#include "tagunion.h"
+#include "tagutils.h"
 #include "apetag.h"
 #include "apefooter.h"
 
@@ -54,33 +52,18 @@ namespace
 class APE::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    APELocation(-1),
-    APESize(0),
-    ID3v1Location(-1),
-    ID3v2Header(0),
-    ID3v2Location(-1),
-    ID3v2Size(0),
-    properties(0) {}
+  offset_t APELocation { -1 };
+  long APESize { 0 };
 
-  ~FilePrivate()
-  {
-    delete ID3v2Header;
-    delete properties;
-  }
+  offset_t ID3v1Location { -1 };
 
-  long APELocation;
-  long APESize;
-
-  long ID3v1Location;
-
-  ID3v2::Header *ID3v2Header;
-  long ID3v2Location;
-  long ID3v2Size;
+  std::unique_ptr<ID3v2::Header> ID3v2Header;
+  offset_t ID3v2Location { -1 };
+  long ID3v2Size { 0 };
 
   TagUnion tag;
 
-  Properties *properties;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +75,7 @@ bool APE::File::isSupported(IOStream *stream)
   // An APE file has an ID "MAC " somewhere. An ID3v2 tag may precede.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true);
-  return (buffer.find("MAC ") >= 0);
+  return buffer.find("MAC ") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +84,7 @@ bool APE::File::isSupported(IOStream *stream)
 
 APE::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -109,16 +92,13 @@ APE::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 APE::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-APE::File::~File()
-{
-  delete d;
-}
+APE::File::~File() = default;
 
 TagLib::Tag *APE::File::tag() const
 {
@@ -145,7 +125,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
 
 APE::Properties *APE::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool APE::File::save()
@@ -198,7 +178,7 @@ bool APE::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->APESize;
 
     d->APESize = data.size();
   }
@@ -233,10 +213,10 @@ APE::Tag *APE::File::APETag(bool create)
 void APE::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(ApeID3v1Index, 0);
+    d->tag.set(ApeID3v1Index, nullptr);
 
   if(tags & APE)
-    d->tag.set(ApeAPEIndex, 0);
+    d->tag.set(ApeAPEIndex, nullptr);
 
   if(!ID3v1Tag())
     APETag(true);
@@ -244,12 +224,12 @@ void APE::File::strip(int tags)
 
 bool APE::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 bool APE::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +244,7 @@ void APE::File::read(bool readProperties)
 
   if(d->ID3v2Location >= 0) {
     seek(d->ID3v2Location);
-    d->ID3v2Header = new ID3v2::Header(readBlock(ID3v2::Header::size()));
+    d->ID3v2Header = std::make_unique<ID3v2::Header>(readBlock(ID3v2::Header::size()));
     d->ID3v2Size = d->ID3v2Header->completeTagSize();
   }
 
@@ -292,7 +272,7 @@ void APE::File::read(bool readProperties)
 
   if(readProperties) {
 
-    long streamLength;
+    offset_t streamLength;
 
     if(d->APELocation >= 0)
       streamLength = d->APELocation;
@@ -303,12 +283,12 @@ void APE::File::read(bool readProperties)
 
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2Size);
-      streamLength -= (d->ID3v2Location + d->ID3v2Size);
+      streamLength -= d->ID3v2Location + d->ID3v2Size;
     }
     else {
       seek(0);
     }
 
-    d->properties = new Properties(this, streamLength);
+    d->properties = std::make_unique<Properties>(this, streamLength);
   }
 }

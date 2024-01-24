@@ -27,70 +27,39 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <bitset>
-#include "id3v2tag.h"
 #include "apeproperties.h"
+
+#include "tdebug.h"
 #include "apefile.h"
-#include "apetag.h"
 #include "apefooter.h"
+#include "apetag.h"
 
 using namespace TagLib;
 
 class APE::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    version(0),
-    bitsPerSample(0),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int version;
-  int bitsPerSample;
-  unsigned int sampleFrames;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int version { 0 };
+  int bitsPerSample { 0 };
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Properties::Properties(File *, ReadStyle style) :
+APE::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("APE::Properties::Properties() -- This constructor is no longer used.");
-}
-
-APE::Properties::Properties(File *file, long streamLength, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file, streamLength);
 }
 
-APE::Properties::~Properties()
-{
-  delete d;
-}
-
-int APE::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int APE::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+APE::Properties::~Properties() = default;
 
 int APE::Properties::lengthInMilliseconds() const
 {
@@ -142,25 +111,25 @@ namespace
   }
 } // namespace
 
-void APE::Properties::read(File *file, long streamLength)
+void APE::Properties::read(File *file, offset_t streamLength)
 {
   // First, we assume that the file pointer is set at the first descriptor.
-  long offset = file->tell();
-  int version = headerVersion(file->readBlock(6));
+  offset_t offset = file->tell();
+  int vers = headerVersion(file->readBlock(6));
 
   // Next, we look for the descriptor.
-  if(version < 0) {
+  if(vers < 0) {
     offset = file->find("MAC ", offset);
     file->seek(offset);
-    version = headerVersion(file->readBlock(6));
+    vers = headerVersion(file->readBlock(6));
   }
 
-  if(version < 0) {
+  if(vers < 0) {
     debug("APE::Properties::read() -- APE descriptor not found");
     return;
   }
 
-  d->version = version;
+  d->version = vers;
 
   if(d->version >= 3980)
     analyzeCurrent(file);
@@ -168,7 +137,7 @@ void APE::Properties::read(File *file, long streamLength)
     analyzeOld(file);
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
-    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
@@ -184,9 +153,8 @@ void APE::Properties::analyzeCurrent(File *file)
     return;
   }
 
-  const unsigned int descriptorBytes = descriptor.toUInt(0, false);
-
-  if((descriptorBytes - 52) > 0)
+  if(const unsigned int descriptorBytes = descriptor.toUInt(0, false);
+     descriptorBytes - 52 > 0)
     file->seek(descriptorBytes - 52, File::Current);
 
   // Read the header

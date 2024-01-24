@@ -26,10 +26,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstringlist.h>
-
 #include "generalencapsulatedobjectframe.h"
+
+#include "tdebug.h"
+#include "tstringlist.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -37,9 +37,7 @@ using namespace ID3v2;
 class GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFramePrivate
 {
 public:
-  GeneralEncapsulatedObjectFramePrivate() : textEncoding(String::Latin1) {}
-
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String mimeType;
   String fileName;
   String description;
@@ -52,21 +50,18 @@ public:
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame() :
   Frame("GEOB"),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
 }
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame(const ByteVector &data) :
   Frame(data),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
   setData(data);
 }
 
-GeneralEncapsulatedObjectFrame::~GeneralEncapsulatedObjectFrame()
-{
-  delete d;
-}
+GeneralEncapsulatedObjectFrame::~GeneralEncapsulatedObjectFrame() = default;
 
 String GeneralEncapsulatedObjectFrame::toString() const
 {
@@ -79,6 +74,11 @@ String GeneralEncapsulatedObjectFrame::toString() const
     text += " \"" + d->description + "\"";
 
   return text;
+}
+
+StringList GeneralEncapsulatedObjectFrame::toStringList() const
+{
+  return {d->description, d->fileName, d->mimeType};
 }
 
 String::Type GeneralEncapsulatedObjectFrame::textEncoding() const
@@ -181,7 +181,7 @@ ByteVector GeneralEncapsulatedObjectFrame::renderFields() const
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
   parseFields(fieldData(data));
 }

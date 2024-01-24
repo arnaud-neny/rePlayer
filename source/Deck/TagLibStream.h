@@ -16,18 +16,18 @@ namespace rePlayer
         virtual ~TagLibStream();
 
         TagLib::FileName name() const;
-        TagLib::ByteVector readBlock(unsigned long length);
+        TagLib::ByteVector readBlock(size_t length);
 
         void writeBlock(const TagLib::ByteVector &data);
-        void insert(const TagLib::ByteVector &data, unsigned long start = 0, unsigned long replace = 0);
-        void removeBlock(unsigned long start = 0, unsigned long length = 0);
+        void insert(const TagLib::ByteVector &data, TagLib::offset_t start = 0, size_t replace = 0);
+        void removeBlock(TagLib::offset_t start = 0, size_t length = 0);
         bool readOnly() const;
         bool isOpen() const;
-        void seek(long offset, Position p = Beginning);
+        void seek(TagLib::offset_t offset, Position p = Beginning);
         void clear();
-        long tell() const;
-        long length();
-        void truncate(long length);
+        TagLib::offset_t tell() const;
+        TagLib::offset_t length();
+        void truncate(TagLib::offset_t length);
 
     private:
         core::SmartPtr<io::Stream> m_stream;
@@ -47,7 +47,7 @@ namespace rePlayer
         return "";
     }
 
-    inline TagLib::ByteVector TagLibStream::readBlock(unsigned long length)
+    inline TagLib::ByteVector TagLibStream::readBlock(size_t length)
     {
         if (m_stream.IsInvalid())
             return {};
@@ -57,7 +57,7 @@ namespace rePlayer
 
         auto currentLength = pos < size ? size - pos : 0;
         if (currentLength < length)
-            length = (unsigned long)currentLength;
+            length = currentLength;
         if (length == 0)
             return TagLib::ByteVector();
 
@@ -70,10 +70,10 @@ namespace rePlayer
     inline void TagLibStream::writeBlock(const TagLib::ByteVector& /*data*/)
     {}
 
-    inline void TagLibStream::insert(const TagLib::ByteVector& /*data*/, unsigned long /*start*/, unsigned long /*replace*/)
+    inline void TagLibStream::insert(const TagLib::ByteVector& /*data*/, TagLib::offset_t /*start*/, size_t /*replace*/)
     {}
 
-    inline void TagLibStream::removeBlock(unsigned long /*start*/, unsigned long /*length*/)
+    inline void TagLibStream::removeBlock(TagLib::offset_t /*start*/, size_t /*length*/)
     {}
 
     inline bool TagLibStream::readOnly() const
@@ -86,7 +86,7 @@ namespace rePlayer
         return true;
     }
 
-    inline void TagLibStream::seek(long offset, Position p)
+    inline void TagLibStream::seek(TagLib::offset_t offset, Position p)
     {
         if (m_stream.IsValid())
             m_stream->Seek(offset, p == Beginning ? io::Stream::kSeekBegin : p == Current ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd);
@@ -95,21 +95,21 @@ namespace rePlayer
     inline void TagLibStream::clear()
     {}
 
-    inline long TagLibStream::tell() const
+    inline TagLib::offset_t TagLibStream::tell() const
     {
         if (m_stream.IsValid())
             return long(m_stream->GetPosition());
         return 0;
     }
 
-    inline long TagLibStream::length()
+    inline TagLib::offset_t TagLibStream::length()
     {
         if (m_stream.IsValid())
-            return long(m_stream->GetSize());
+            return m_stream->GetSize();
         return 0;
     }
 
-    inline void TagLibStream::truncate(long /*length*/)
+    inline void TagLibStream::truncate(TagLib::offset_t /*length*/)
     {}
 }
 // namespace rePlayer

@@ -8,9 +8,6 @@
     <Filter Include="Source Files\3rdparty">
       <UniqueIdentifier>{c6f1220a-b46f-4f95-92e1-32bfb3f01763}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\3rdparty\utf8-cpp">
-      <UniqueIdentifier>{f8814b96-8650-487c-b872-e9b2b4fb10dc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\taglib">
       <UniqueIdentifier>{7e27c627-0e9d-42ef-be22-6bc5b4c66386}</UniqueIdentifier>
     </Filter>
@@ -86,14 +83,20 @@
     <Filter Include="Source Files\taglib\xm">
       <UniqueIdentifier>{d3b1de8d-842b-46ec-93c4-a63ea1c1ddef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\taglib\dsdiff">
+      <UniqueIdentifier>{c14423ed-0b15-46c2-ad7e-3e63498b8258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\taglib\dsf">
+      <UniqueIdentifier>{da7ae8c5-af51-4273-a604-2e49f62c8397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rdparty\utfcpp">
+      <UniqueIdentifier>{f8814b96-8650-487c-b872-e9b2b4fb10dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3rdparty\utfcpp\utf8">
+      <UniqueIdentifier>{f675e9f8-7add-4a33-8942-0beecf6fa8ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\utf8-cpp\checked.h">
-      <Filter>Source Files\3rdparty\utf8-cpp</Filter>
-    </ClInclude>
-    <ClInclude Include="3rdparty\utf8-cpp\core.h">
-      <Filter>Source Files\3rdparty\utf8-cpp</Filter>
-    </ClInclude>
     <ClInclude Include="taglib\audioproperties.h">
       <Filter>Source Files\taglib</Filter>
     </ClInclude>
@@ -101,9 +104,6 @@
       <Filter>Source Files\taglib</Filter>
     </ClInclude>
     <ClInclude Include="taglib\tag.h">
-      <Filter>Source Files\taglib</Filter>
-    </ClInclude>
-    <ClInclude Include="taglib\taglib_config.h">
       <Filter>Source Files\taglib</Filter>
     </ClInclude>
     <ClInclude Include="taglib\taglib_export.h">
@@ -400,9 +400,6 @@
     <ClInclude Include="taglib\toolkit\tpropertymap.h">
       <Filter>Source Files\taglib\toolkit</Filter>
     </ClInclude>
-    <ClInclude Include="taglib\toolkit\trefcounter.h">
-      <Filter>Source Files\taglib\toolkit</Filter>
-    </ClInclude>
     <ClInclude Include="taglib\toolkit\tstring.h">
       <Filter>Source Files\taglib\toolkit</Filter>
     </ClInclude>
@@ -432,6 +429,51 @@
     </ClInclude>
     <ClInclude Include="taglib\xm\xmproperties.h">
       <Filter>Source Files\taglib\xm</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\dsdiff\dsdiffdiintag.h">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\dsdiff\dsdifffile.h">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\dsdiff\dsdiffproperties.h">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\dsf\dsffile.h">
+      <Filter>Source Files\taglib\dsf</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\dsf\dsfproperties.h">
+      <Filter>Source Files\taglib\dsf</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4itemfactory.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\toolkit\tpicturetype.h">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\toolkit\tvariant.h">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\toolkit\tversionnumber.h">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8.h">
+      <Filter>Source Files\3rdparty\utfcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\checked.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\core.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\cpp11.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\cpp17.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\unchecked.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -711,9 +753,6 @@
     <ClCompile Include="taglib\toolkit\tpropertymap.cpp">
       <Filter>Source Files\taglib\toolkit</Filter>
     </ClCompile>
-    <ClCompile Include="taglib\toolkit\trefcounter.cpp">
-      <Filter>Source Files\taglib\toolkit</Filter>
-    </ClCompile>
     <ClCompile Include="taglib\toolkit\tstring.cpp">
       <Filter>Source Files\taglib\toolkit</Filter>
     </ClCompile>
@@ -741,8 +780,38 @@
     <ClCompile Include="taglib\xm\xmproperties.cpp">
       <Filter>Source Files\taglib\xm</Filter>
     </ClCompile>
+    <ClCompile Include="taglib\dsdiff\dsdiffdiintag.cpp">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\dsdiff\dsdifffile.cpp">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\dsdiff\dsdiffproperties.cpp">
+      <Filter>Source Files\taglib\dsdiff</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\dsf\dsffile.cpp">
+      <Filter>Source Files\taglib\dsf</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\dsf\dsfproperties.cpp">
+      <Filter>Source Files\taglib\dsf</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\mp4\mp4itemfactory.cpp">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\toolkit\tpicturetype.cpp">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\toolkit\tvariant.cpp">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\toolkit\tversionnumber.cpp">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="taglib\toolkit\propertymapping.dox">
+      <Filter>Source Files\taglib\toolkit</Filter>
+    </None>
   </ItemGroup>
 </Project>

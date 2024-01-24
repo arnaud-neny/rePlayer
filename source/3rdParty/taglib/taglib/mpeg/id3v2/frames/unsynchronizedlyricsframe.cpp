@@ -27,10 +27,13 @@
  ***************************************************************************/
 
 #include "unsynchronizedlyricsframe.h"
-#include <tbytevectorlist.h>
-#include <id3v2tag.h>
-#include <tdebug.h>
-#include <tpropertymap.h>
+
+#include <utility>
+
+#include "tbytevectorlist.h"
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -38,8 +41,7 @@ using namespace ID3v2;
 class UnsynchronizedLyricsFrame::UnsynchronizedLyricsFramePrivate
 {
 public:
-  UnsynchronizedLyricsFramePrivate() : textEncoding(String::Latin1) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   ByteVector language;
   String description;
   String text;
@@ -51,22 +53,19 @@ public:
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(String::Type encoding) :
   Frame("USLT"),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data) :
   Frame(data),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   setData(data);
 }
 
-UnsynchronizedLyricsFrame::~UnsynchronizedLyricsFrame()
-{
-  delete d;
-}
+UnsynchronizedLyricsFrame::~UnsynchronizedLyricsFrame() = default;
 
 String UnsynchronizedLyricsFrame::toString() const
 {
@@ -127,14 +126,12 @@ PropertyMap UnsynchronizedLyricsFrame::asProperties() const
 
 UnsynchronizedLyricsFrame *UnsynchronizedLyricsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  ID3v2::FrameList lyrics = tag->frameList("USLT");
-
-  for(ID3v2::FrameList::ConstIterator it = lyrics.begin(); it != lyrics.end(); ++it){
-    UnsynchronizedLyricsFrame *frame = dynamic_cast<UnsynchronizedLyricsFrame *>(*it);
+  for(const auto &lyrics : std::as_const(tag->frameList("USLT"))) {
+    auto frame = dynamic_cast<UnsynchronizedLyricsFrame *>(lyrics);
     if(frame && frame->description() == d)
       return frame;
   }
-  return 0;
+  return nullptr;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
@@ -153,10 +150,9 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
   int byteAlign
     = d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8 ? 1 : 2;
 
-  ByteVectorList l =
-    ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign, 2);
-
-  if(l.size() == 2) {
+  if(ByteVectorList l =
+      ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign, 2);
+     l.size() == 2) {
     if(d->textEncoding == String::Latin1) {
       d->description = Tag::latin1StringHandler()->parse(l.front());
       d->text = Tag::latin1StringHandler()->parse(l.back());
@@ -192,7 +188,7 @@ ByteVector UnsynchronizedLyricsFrame::renderFields() const
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   parseFields(fieldData(data));
 }

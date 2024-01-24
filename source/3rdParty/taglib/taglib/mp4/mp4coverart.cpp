@@ -23,20 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <taglib.h>
-#include <tdebug.h>
-#include "trefcounter.h"
 #include "mp4coverart.h"
 
 using namespace TagLib;
 
-class MP4::CoverArt::CoverArtPrivate : public RefCounter
+class MP4::CoverArt::CoverArtPrivate
 {
 public:
-  CoverArtPrivate() :
-    format(MP4::CoverArt::JPEG) {}
-
-  Format format;
+  Format format { MP4::CoverArt::JPEG };
   ByteVector data;
 };
 
@@ -45,39 +39,24 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MP4::CoverArt::CoverArt(Format format, const ByteVector &data) :
-  d(new CoverArtPrivate())
+  d(std::make_shared<CoverArtPrivate>())
 {
   d->format = format;
   d->data = data;
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item) :
-  d(item.d)
-{
-  d->ref();
-}
-
-MP4::CoverArt &
-MP4::CoverArt::operator=(const CoverArt &item)
-{
-  CoverArt(item).swap(*this);
-  return *this;
-}
+MP4::CoverArt::CoverArt(const CoverArt &) = default;
+MP4::CoverArt &MP4::CoverArt::operator=(const CoverArt &) = default;
 
 void
-MP4::CoverArt::swap(CoverArt &item)
+MP4::CoverArt::swap(CoverArt &item) noexcept
 {
   using std::swap;
 
   swap(d, item.d);
 }
 
-MP4::CoverArt::~CoverArt()
-{
-  if(d->deref()) {
-    delete d;
-  }
-}
+MP4::CoverArt::~CoverArt() = default;
 
 MP4::CoverArt::Format
 MP4::CoverArt::format() const

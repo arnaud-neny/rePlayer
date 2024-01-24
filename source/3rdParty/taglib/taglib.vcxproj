@@ -11,8 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\utf8-cpp\checked.h" />
-    <ClInclude Include="3rdparty\utf8-cpp\core.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8\checked.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8\core.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8\cpp11.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8\cpp17.h" />
+    <ClInclude Include="3rdparty\utfcpp\utf8\unchecked.h" />
     <ClInclude Include="taglib\ape\apefile.h" />
     <ClInclude Include="taglib\ape\apefooter.h" />
     <ClInclude Include="taglib\ape\apeitem.h" />
@@ -25,6 +29,11 @@
     <ClInclude Include="taglib\asf\asftag.h" />
     <ClInclude Include="taglib\asf\asfutils.h" />
     <ClInclude Include="taglib\audioproperties.h" />
+    <ClInclude Include="taglib\dsdiff\dsdiffdiintag.h" />
+    <ClInclude Include="taglib\dsdiff\dsdifffile.h" />
+    <ClInclude Include="taglib\dsdiff\dsdiffproperties.h" />
+    <ClInclude Include="taglib\dsf\dsffile.h" />
+    <ClInclude Include="taglib\dsf\dsfproperties.h" />
     <ClInclude Include="taglib\fileref.h" />
     <ClInclude Include="taglib\flac\flacfile.h" />
     <ClInclude Include="taglib\flac\flacmetadatablock.h" />
@@ -42,6 +51,7 @@
     <ClInclude Include="taglib\mp4\mp4coverart.h" />
     <ClInclude Include="taglib\mp4\mp4file.h" />
     <ClInclude Include="taglib\mp4\mp4item.h" />
+    <ClInclude Include="taglib\mp4\mp4itemfactory.h" />
     <ClInclude Include="taglib\mp4\mp4properties.h" />
     <ClInclude Include="taglib\mp4\mp4tag.h" />
     <ClInclude Include="taglib\mpc\mpcfile.h" />
@@ -99,7 +109,6 @@
     <ClInclude Include="taglib\s3m\s3mfile.h" />
     <ClInclude Include="taglib\s3m\s3mproperties.h" />
     <ClInclude Include="taglib\tag.h" />
-    <ClInclude Include="taglib\taglib_config.h" />
     <ClInclude Include="taglib\taglib_export.h" />
     <ClInclude Include="taglib\tagunion.h" />
     <ClInclude Include="taglib\tagutils.h" />
@@ -114,11 +123,13 @@
     <ClInclude Include="taglib\toolkit\tiostream.h" />
     <ClInclude Include="taglib\toolkit\tlist.h" />
     <ClInclude Include="taglib\toolkit\tmap.h" />
+    <ClInclude Include="taglib\toolkit\tpicturetype.h" />
     <ClInclude Include="taglib\toolkit\tpropertymap.h" />
-    <ClInclude Include="taglib\toolkit\trefcounter.h" />
     <ClInclude Include="taglib\toolkit\tstring.h" />
     <ClInclude Include="taglib\toolkit\tstringlist.h" />
     <ClInclude Include="taglib\toolkit\tutils.h" />
+    <ClInclude Include="taglib\toolkit\tvariant.h" />
+    <ClInclude Include="taglib\toolkit\tversionnumber.h" />
     <ClInclude Include="taglib\toolkit\tzlib.h" />
     <ClInclude Include="taglib\trueaudio\trueaudiofile.h" />
     <ClInclude Include="taglib\trueaudio\trueaudioproperties.h" />
@@ -139,6 +150,11 @@
     <ClCompile Include="taglib\asf\asfproperties.cpp" />
     <ClCompile Include="taglib\asf\asftag.cpp" />
     <ClCompile Include="taglib\audioproperties.cpp" />
+    <ClCompile Include="taglib\dsdiff\dsdiffdiintag.cpp" />
+    <ClCompile Include="taglib\dsdiff\dsdifffile.cpp" />
+    <ClCompile Include="taglib\dsdiff\dsdiffproperties.cpp" />
+    <ClCompile Include="taglib\dsf\dsffile.cpp" />
+    <ClCompile Include="taglib\dsf\dsfproperties.cpp" />
     <ClCompile Include="taglib\fileref.cpp" />
     <ClCompile Include="taglib\flac\flacfile.cpp" />
     <ClCompile Include="taglib\flac\flacmetadatablock.cpp" />
@@ -155,6 +171,7 @@
     <ClCompile Include="taglib\mp4\mp4coverart.cpp" />
     <ClCompile Include="taglib\mp4\mp4file.cpp" />
     <ClCompile Include="taglib\mp4\mp4item.cpp" />
+    <ClCompile Include="taglib\mp4\mp4itemfactory.cpp" />
     <ClCompile Include="taglib\mp4\mp4properties.cpp" />
     <ClCompile Include="taglib\mp4\mp4tag.cpp" />
     <ClCompile Include="taglib\mpc\mpcfile.cpp" />
@@ -219,10 +236,12 @@
     <ClCompile Include="taglib\toolkit\tfile.cpp" />
     <ClCompile Include="taglib\toolkit\tfilestream.cpp" />
     <ClCompile Include="taglib\toolkit\tiostream.cpp" />
+    <ClCompile Include="taglib\toolkit\tpicturetype.cpp" />
     <ClCompile Include="taglib\toolkit\tpropertymap.cpp" />
-    <ClCompile Include="taglib\toolkit\trefcounter.cpp" />
     <ClCompile Include="taglib\toolkit\tstring.cpp" />
     <ClCompile Include="taglib\toolkit\tstringlist.cpp" />
+    <ClCompile Include="taglib\toolkit\tvariant.cpp" />
+    <ClCompile Include="taglib\toolkit\tversionnumber.cpp" />
     <ClCompile Include="taglib\toolkit\tzlib.cpp" />
     <ClCompile Include="taglib\trueaudio\trueaudiofile.cpp" />
     <ClCompile Include="taglib\trueaudio\trueaudioproperties.cpp" />
@@ -233,6 +252,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="taglib\toolkit\propertymapping.dox" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -285,7 +305,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -307,7 +327,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

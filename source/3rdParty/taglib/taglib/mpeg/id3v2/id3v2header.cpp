@@ -23,13 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <iostream>
+#include "id3v2header.h"
+
+#include <algorithm>
 #include <bitset>
 
-#include <tstring.h>
-#include <tdebug.h>
-
-#include "id3v2header.h"
+#include "tstring.h"
+#include "tdebug.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
 
@@ -39,24 +39,15 @@ using namespace ID3v2;
 class Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() :
-    majorVersion(4),
-    revisionNumber(0),
-    unsynchronisation(false),
-    extendedHeader(false),
-    experimentalIndicator(false),
-    footerPresent(false),
-    tagSize(0) {}
+  unsigned int majorVersion { 4 };
+  unsigned int revisionNumber { 0 };
 
-  unsigned int majorVersion;
-  unsigned int revisionNumber;
+  bool unsynchronisation { false };
+  bool extendedHeader { false };
+  bool experimentalIndicator { false };
+  bool footerPresent { false };
 
-  bool unsynchronisation;
-  bool extendedHeader;
-  bool experimentalIndicator;
-  bool footerPresent;
-
-  unsigned int tagSize;
+  unsigned int tagSize { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,20 +69,17 @@ ByteVector Header::fileIdentifier()
 ////////////////////////////////////////////////////////////////////////////////
 
 Header::Header() :
-  d(new HeaderPrivate())
+  d(std::make_unique<HeaderPrivate>())
 {
 }
 
 Header::Header(const ByteVector &data) :
-  d(new HeaderPrivate())
+  d(std::make_unique<HeaderPrivate>())
 {
   parse(data);
 }
 
-Header::~Header()
-{
-  delete d;
-}
+Header::~Header() = default;
 
 unsigned int Header::majorVersion() const
 {
@@ -202,7 +190,7 @@ void Header::parse(const ByteVector &data)
   // note that we're doing things a little out of order here -- the size is
   // later in the bytestream than the version
 
-  ByteVector sizeData = data.mid(6, 4);
+  const ByteVector sizeData = data.mid(6, 4);
 
   if(sizeData.size() != 4) {
     d->tagSize = 0;
@@ -210,12 +198,11 @@ void Header::parse(const ByteVector &data)
     return;
   }
 
-  for(ByteVector::ConstIterator it = sizeData.begin(); it != sizeData.end(); it++) {
-    if(static_cast<unsigned char>(*it) >= 128) {
-      d->tagSize = 0;
-      debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
-      return;
-    }
+  if(std::any_of(sizeData.cbegin(), sizeData.cend(),
+      [](unsigned char size) { return size >= 128; })) {
+    d->tagSize = 0;
+    debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
+    return;
   }
 
   // The first three bytes, data[0..2], are the File Identifier, "ID3". (structure 3.1 "file identifier")

@@ -27,56 +27,37 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <bitset>
-
 #include "trueaudioproperties.h"
-#include "trueaudiofile.h"
+
+#include "tdebug.h"
+#include "tstring.h"
 
 using namespace TagLib;
 
 class TrueAudio::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    version(0),
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    bitsPerSample(0),
-    sampleFrames(0) {}
-
-  int version;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int bitsPerSample;
-  unsigned int sampleFrames;
+  int version { 0 };
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int bitsPerSample { 0 };
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) :
+TrueAudio::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(data, streamLength);
 }
 
-TrueAudio::Properties::~Properties()
-{
-  delete d;
-}
-
-int TrueAudio::Properties::length() const
-{
-  return lengthInSeconds();
-}
+TrueAudio::Properties::~Properties() = default;
 
 int TrueAudio::Properties::lengthInSeconds() const
 {
@@ -122,7 +103,7 @@ int TrueAudio::Properties::ttaVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::Properties::read(const ByteVector &data, long streamLength)
+void TrueAudio::Properties::read(const ByteVector &data, offset_t streamLength)
 {
   if(data.size() < 4) {
     debug("TrueAudio::Properties::read() -- data is too short.");
@@ -160,10 +141,9 @@ void TrueAudio::Properties::read(const ByteVector &data, long streamLength)
     pos += 4;
 
     d->sampleFrames = data.toUInt(pos, false);
-    pos += 4;
 
     if(d->sampleFrames > 0 && d->sampleRate > 0) {
-      const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+      const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
       d->length  = static_cast<int>(length + 0.5);
       d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
     }

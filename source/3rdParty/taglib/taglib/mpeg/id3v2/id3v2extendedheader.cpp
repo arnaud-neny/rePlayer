@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "id3v2extendedheader.h"
+
 #include "id3v2synchdata.h"
 
 using namespace TagLib;
@@ -32,9 +33,7 @@ using namespace ID3v2;
 class ExtendedHeader::ExtendedHeaderPrivate
 {
 public:
-  ExtendedHeaderPrivate() : size(0) {}
-
-  unsigned int size;
+  unsigned int size { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,14 +41,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ExtendedHeader::ExtendedHeader() :
-  d(new ExtendedHeaderPrivate())
+  d(std::make_unique<ExtendedHeaderPrivate>())
 {
 }
 
-ExtendedHeader::~ExtendedHeader()
-{
-  delete d;
-}
+ExtendedHeader::~ExtendedHeader() = default;
 
 unsigned int ExtendedHeader::size() const
 {

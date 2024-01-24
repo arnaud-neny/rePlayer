@@ -23,8 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstring.h>
 #include "asfproperties.h"
 
 using namespace TagLib;
@@ -32,24 +30,15 @@ using namespace TagLib;
 class ASF::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    bitsPerSample(0),
-    codec(ASF::Properties::Unknown),
-    encrypted(false) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int bitsPerSample;
-  ASF::Properties::Codec codec;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int bitsPerSample { 0 };
+  ASF::Properties::Codec codec { ASF::Properties::Unknown };
   String codecName;
   String codecDescription;
-  bool encrypted;
+  bool encrypted { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,24 +47,11 @@ public:
 
 ASF::Properties::Properties() :
   AudioProperties(AudioProperties::Average),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-ASF::Properties::~Properties()
-{
-  delete d;
-}
-
-int ASF::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
-int ASF::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
+ASF::Properties::~Properties() = default;
 
 int ASF::Properties::lengthInMilliseconds() const
 {
@@ -125,11 +101,6 @@ bool ASF::Properties::isEncrypted() const
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
-
-void ASF::Properties::setLength(int /*length*/)
-{
-  debug("ASF::Properties::setLength() -- This method is deprecated. Do not use.");
-}
 
 void ASF::Properties::setLengthInMilliseconds(int value)
 {
