@@ -10,6 +10,7 @@
 
 // local includes
 #include "module/players/streaming.h"
+#include "module/players/stream_model.h"
 // common includes
 #include <make_ptr.h>
 // std includes
@@ -22,6 +23,14 @@ namespace Module
     uint_t TotalFrames = 0;
     uint_t LoopFrame = 0;
     Time::Microseconds FrameDuration;
+
+    void Sanitize()
+    {
+      if (LoopFrame >= TotalFrames)
+      {
+        LoopFrame = 0;
+      }
+    }
   };
 
   class FramedStreamStateCursor : public State
@@ -148,21 +157,23 @@ namespace Module
     const FramedStreamStateCursor::Ptr Cursor;
   };
 
-  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
+  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel& model)
   {
     FramedStream stream;
     stream.FrameDuration = frameDuration;
-    stream.TotalFrames = model->GetTotalFrames();
-    stream.LoopFrame = model->GetLoopFrame();
+    stream.TotalFrames = model.GetTotalFrames();
+    stream.LoopFrame = model.GetLoopFrame();
+    stream.Sanitize();
     return MakePtr<FramedStreamInfo>(stream);
   }
 
-  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
+  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel& model)
   {
     FramedStream stream;
     stream.FrameDuration = frameDuration;
-    stream.TotalFrames = model->GetTotalFrames();
-    stream.LoopFrame = model->GetLoopFrame();
+    stream.TotalFrames = model.GetTotalFrames();
+    stream.LoopFrame = model.GetLoopFrame();
+    stream.Sanitize();
     return MakePtr<FramedStreamStateIterator>(stream);
   }
 

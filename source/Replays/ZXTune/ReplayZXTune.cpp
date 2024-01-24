@@ -17,13 +17,13 @@
 
 namespace rePlayer
 {
-    #define ZXtuneVersion "r5052"
+    #define ZXtuneVersion "r5056+"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::ZXTune,
         .name = "ZXTune",
         .extensions = "",
-        .about = "ZXTune " ZXtuneVersion "\nCopyright(c) 2023 Vitamin/CAIG",
+        .about = "ZXTune " ZXtuneVersion "\nCopyright(c) 2024 Vitamin/CAIG",
         .settings = "ZXTune " ZXtuneVersion,
         .init = ReplayZXTune::Init,
         .release = ReplayZXTune::Release,

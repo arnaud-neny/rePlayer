@@ -313,7 +313,7 @@ namespace Formats::Chiptune
           ParseTransponedMatrix(src, lines, columns, target);
           if (Ver3b::FastCheck(data, size))
           {
-            const uint_t loop = stream.Read<be_uint32_t>();
+            const uint_t loop = stream.Read<le_uint32_t>(); // rePlayer
             target.SetLoop(loop);
           }
           return CreateCalculatingCrcContainer(stream.GetReadContainer(), dumpOffset, matrixSize);
