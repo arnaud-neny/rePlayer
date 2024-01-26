@@ -13,7 +13,6 @@ format; button input and graphics are not supported) and Gameboy Video
 Game Music dumps (.VGM/.VGZ format).
 
 Homepage/Repo:   https://github.com/mmitch/gbsplay/
-Email contact:   <gbsplay-dev@lists.uguu.de>
 Bug reports:     please send new bugs to the mailing list
                  or use the issue tracker at
                  https://github.com/mmitch/gbsplay/issues
@@ -32,7 +31,7 @@ the following parts:
 ## License
 
 ```
-(C) 2003-2021 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
+(C) 2003-2022 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
                  Christian Garbs <mitch@cgarbs.de>
                  Maximilian Rehkopf <otakon@gmx.net>
                  Vegard Nossum <vegardno@ifi.uio.no>
