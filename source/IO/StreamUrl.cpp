@@ -502,12 +502,19 @@ namespace rePlayer
     void StreamUrl::ExtractMetadata()
     {
         std::string title;
-        auto* tag = strstr(m_metadata.c_str(), "StreamTitle='");
-        if (tag)
+        auto first = m_metadata.find("StreamTitle='");
+        if (first != m_metadata.npos)
         {
-            auto lastChar = m_metadata.find_first_of('\'', (tag - m_metadata.c_str()) + sizeof("StreamTitle='") - 1);
-            if (lastChar != m_metadata.npos)
-                title.append(tag + sizeof("StreamTitle='") - 1, m_metadata.c_str() + lastChar);
+            first += sizeof("StreamTitle='") - 1;
+            auto last = m_metadata.find("\';", first);
+            if (last != m_metadata.npos)
+                title.append(m_metadata.c_str() + first, m_metadata.c_str() + last);
+            else
+            {
+                last = m_metadata.rfind('\'');
+                if (last != m_metadata.npos)
+                    title.append(m_metadata.c_str() + first, m_metadata.c_str() + last);
+            }
         }
 
         thread::ScopedSpinLock lock(m_spinLock);
