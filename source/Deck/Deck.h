@@ -128,6 +128,7 @@ namespace rePlayer
         Serialized<uint32_t> m_saveFrequency = { "AutoSave", 15 * 60 };
         float m_saveTime = 0.0f;
 
+        float m_currentMaxTextSize = 0.0f;
         float m_maxTextSize = 0.0f;
         float m_textTime = 0.0f;
         float m_systrayPos[2];
