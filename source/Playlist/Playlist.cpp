@@ -659,6 +659,8 @@ namespace rePlayer
 
         m_dropTarget->UpdateDragDropSource(0);
 
+        ButtonUrl();
+        ImGui::SameLine();
         ButtonLoad();
         ImGui::SameLine();
         ButtonSave();
@@ -673,7 +675,7 @@ namespace rePlayer
 
         int32_t numColumns = m_cue.db.NumSongs() == 0 ? 1 : m_openedTab != OpenedTab::kNone ? 3 : 2;
         ImGuiTableFlags resizeFlags = numColumns < 3 ? ImGuiTableFlags_NoBordersInBody : ImGuiTableFlags_Resizable;
-        if (ImGui::BeginTable("tabs", numColumns, resizeFlags | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoSavedSettings))
+        if (ImGui::BeginTable("tabs", numColumns, resizeFlags | ImGuiTableFlags_NoPadOuterX))
         {
             ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthStretch, 0.0f, 0);
             if (numColumns > 1)
@@ -1120,252 +1122,13 @@ namespace rePlayer
         if (m_dropTarget->IsOverriding())
             Clear();
 
-        auto& replays = Core::GetReplays();
         auto currentPlayingEntry = droppedEntryIndex <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : MusicID();
-        bool isAcceptingAll = m_dropTarget->IsAcceptingAll();
 
-        auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
         auto files = m_dropTarget->AcquireFiles();
         if (m_dropTarget->IsUrl())
-        {
-            auto* curl = curl_easy_init();
-            for (auto& newFile : files)
-            {
-                // add to playlist
-                if (auto song = m_cue.db.FindSong([&](auto* song)
-                {
-                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), newFile.c_str()) == 0;
-                }))
-                {
-                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                    {
-                        if (!song->IsSubsongDiscarded(i))
-                        {
-                            MusicID musicId;
-                            musicId.subsongId.songId = song->GetId();
-                            musicId.subsongId.index = i;
-                            musicId.playlistId = ++m_uniqueIdGenerator;
-                            musicId.databaseId = DatabaseID::kPlaylist;
-                            m_cue.entries.Insert(droppedEntryIndex++, musicId);
-                        }
-                    }
-                }
-                else
-                {
-                    // add new song to the playlist database
-                    auto* songSheet = new SongSheet;
-                    int nameSize = 0;
-                    if (auto* name = curl_easy_unescape(curl, newFile.c_str(), int(newFile.size()), &nameSize))
-                    {
-                        songSheet->name = name;
-                        curl_free(name);
-                    }
-                    else
-                        songSheet->name = newFile;
-                    songSheet->sourceIds.Add(SourceID(SourceID::URLImportID, m_cue.paths.NumItems()));
-                    songSheet->databaseDay = databaseDay;
-                    m_cue.paths.Add('\0'); // in that case, first character is zero to identify the path as url
-                    m_cue.paths.Add(newFile.c_str(), newFile.size() + 1);
-                    m_cue.arePathsDirty = true;
-
-                    m_cue.db.AddSong(songSheet);
-
-                    MusicID musicId;
-                    musicId.subsongId.songId = songSheet->id;
-                    musicId.playlistId = ++m_uniqueIdGenerator;
-                    musicId.databaseId = DatabaseID::kPlaylist;
-                    m_cue.entries.Insert(droppedEntryIndex++, musicId);
-
-                    m_cue.db.Raise(Database::Flag::kSaveSongs);
-                }
-            }
-            curl_easy_cleanup(curl);
-        }
-        else for (auto& newFile : files)
-        {
-            auto addFile = [&](const std::filesystem::path& path)
-            {
-                // add only known extensions (or prefixes)
-                auto guessedExtension = path.has_extension() ? path.extension().u8string().substr(1) : std::u8string();
-                const auto pathExtension = guessedExtension;
-                const auto pathStem = path.stem().u8string();
-                {
-                    std::u8string prefix;
-                    for (uint16_t i = 0;; i++)
-                    {
-                        if (i == uint16_t(eExtension::Count))
-                        {
-                            if (!prefix.empty())
-                            {
-                                guessedExtension = prefix;
-                                break;
-                            }
-                            if (!isAcceptingAll)
-                            {
-                                // look for it the hard way
-                                auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
-                                Array<CommandBuffer::Command> commands;
-                                if (auto* replay = replays.Load(stream, commands, {}))
-                                {
-                                    guessedExtension = replay->GetMediaType().GetExtension<char8_t>();
-                                    delete replay;
-                                    break;
-                                }
-                                return;
-                            }
-                            break;
-                        }
-                        if (_stricmp(reinterpret_cast<const char *>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
-                            break;
-                        if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
-                        {
-                            if (MediaType::extensionLengths[i] == pathStem.size() || pathStem[MediaType::extensionLengths[i]] == '.')
-                                prefix = MediaType::GetExtension<char8_t>(i);
-                        }
-                    }
-                }
-
-                // add to playlist
-                const std::string filename = reinterpret_cast<const char*>(path.u8string().c_str());
-                if (auto song = m_cue.db.FindSong([&](auto* song)
-                {
-                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), filename.c_str()) == 0;
-                }))
-                {
-                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                    {
-                        if (!song->IsSubsongDiscarded(i))
-                        {
-                            MusicID musicId;
-                            musicId.subsongId.songId = song->GetId();
-                            musicId.subsongId.index = i;
-                            musicId.playlistId = ++m_uniqueIdGenerator;
-                            musicId.databaseId = DatabaseID::kPlaylist;
-                            m_cue.entries.Insert(droppedEntryIndex++, musicId);
-                        }
-                    }
-                }
-                else
-                {
-                    auto* songSheet = new SongSheet;
-                    songSheet->type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
-                    if (songSheet->type.ext == eExtension::Unknown)
-                        songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
-                    else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), songSheet->type.GetExtension()) == 0)
-                        songSheet->name = reinterpret_cast<const char*>(pathStem.c_str());
-                    else
-                    {
-                        auto name = path.filename().u8string();
-                        auto extSize = songSheet->type.extensionLengths[size_t(songSheet->type.ext)];
-                        if (_strnicmp(reinterpret_cast<const char*>(name.c_str()), songSheet->type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
-                            songSheet->name = reinterpret_cast<const char*>(name.c_str() + extSize + 1);
-                        else
-                            songSheet->name = reinterpret_cast<const char*>(name.c_str());
-                    }
-                    songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
-                    songSheet->databaseDay = databaseDay;
-                    m_cue.paths.Add(filename.c_str(), filename.size() + 1);
-                    m_cue.arePathsDirty = true;
-
-                    m_cue.db.AddSong(songSheet);
-
-                    // TODO: make this async
-                    TagLib::FileStream fStream(path.c_str(), true);
-                    TagLib::FileRef f(&fStream);
-                    if (auto* tag = f.tag())
-                    {
-                        if (!tag->title().isEmpty())
-                        {
-                            if (!tag->album().isEmpty())
-                            {
-                                songSheet->name = tag->album().toCString(true);
-                                songSheet->name.String() += '/';
-
-                                // get id3v2 tags to check if we have a disc number
-                                TagLib::MPEG::File fMpeg(&fStream, true, TagLib::MPEG::Properties::Average, TagLib::ID3v2::FrameFactory::instance());
-                                if (auto* id3v2Tag = fMpeg.ID3v2Tag())
-                                {
-                                    auto properties = id3v2Tag->properties();
-                                    for (auto it = properties.begin(), e = properties.end(); it != e; it++)
-                                    {
-                                        if (_stricmp(it->first.toCString(), "discnumber") == 0)
-                                        {
-                                            uint32_t disc = 0;
-                                            if (sscanf_s(it->second[0].toCString(), "%u", &disc) == 1)
-                                            {
-                                                char buf[16];
-                                                sprintf(buf, "%u ", disc);
-                                                songSheet->name.String() += buf;
-                                            }
-                                            else if (!it->second[0].isEmpty()) // weird format?
-                                            {
-                                                songSheet->name.String() += it->second[0].toCString();
-                                                songSheet->name.String() += ' ';
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (tag->track())
-                                {
-                                    char buf[16];
-                                    sprintf(buf, "%02u ", tag->track());
-                                    songSheet->name.String() += buf;
-                                }
-                                songSheet->name.String() += tag->title().toCString(true);
-                            }
-                            else
-                                songSheet->name = tag->title().toCString(true);
-                        }
-                        songSheet->releaseYear = uint16_t(tag->year());
-
-                        if (!tag->artist().isEmpty())
-                        {
-                            Artist* dbArtist = nullptr;
-                            auto artistTag = tag->artist();
-                            auto artistName = artistTag.toCString(true);
-                            for (auto* artist : m_cue.db.Artists())
-                            {
-                                if (strcmp(artistName, artist->GetHandle()) == 0)
-                                {
-                                    dbArtist = artist;
-                                    break;
-                                }
-                            }
-                            if (dbArtist == nullptr)
-                            {
-                                auto* artistSheet = new ArtistSheet;
-                                artistSheet->handles.Add(artistName);
-                                dbArtist = m_cue.db.AddArtist(artistSheet);
-                            }
-                            songSheet->artistIds.Add(dbArtist->GetId());
-                            dbArtist->Edit()->numSongs++;
-                        }
-                    }
-
-                    MusicID musicId;
-                    musicId.subsongId.songId = songSheet->id;
-                    musicId.playlistId = ++m_uniqueIdGenerator;
-                    musicId.databaseId = DatabaseID::kPlaylist;
-                    m_cue.entries.Insert(droppedEntryIndex++, musicId);
-                }
-
-                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-            };
-
-            auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(newFile.c_str()));
-            if (std::filesystem::is_directory(path))
-            {
-                for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path))
-                {
-                    if (!dir_entry.is_directory())
-                        addFile(dir_entry.path());
-                }
-            }
-            else
-                addFile(path);
-        }
+            AddUrls(files, droppedEntryIndex);
+        else
+            AddFiles(files, droppedEntryIndex, m_dropTarget->IsAcceptingAll());
 
         if (currentPlayingEntry.subsongId.IsValid())
             m_currentEntryIndex = m_cue.entries.Find<uint32_t>(currentPlayingEntry.playlistId);
@@ -1422,6 +1185,42 @@ namespace rePlayer
         cue.db.SaveSongs(file);
         cue.db.SaveArtists(file);
         file.Write<uint32_t>(cue.paths);
+    }
+
+    void Playlist::ButtonUrl()
+    {
+        if (ImGui::Button("Url"))
+            ImGui::OpenPopup("UrlPopup");
+        if (ImGui::BeginPopup("UrlPopup"))
+        {
+            ImGui::Text("Enter the list of URLs to import");
+            if (ImGui::InputTextMultiline("##url", &m_inputUrls, ImVec2(-FLT_MIN, 0.0f)))
+            {
+                m_urls.Clear();
+                if (!m_inputUrls.empty())
+                {
+                    std::string::size_type cpos = 0;
+                    do
+                    {
+                        auto npos = m_inputUrls.find_first_of("\r\n", cpos);
+                        if (cpos != npos)
+                            m_urls.Add(m_inputUrls.substr(cpos, npos - cpos));
+                        if (npos != std::string::npos)
+                            cpos = m_inputUrls.find_first_not_of("\r\n", npos);
+                        else
+                            break;
+                    } while (cpos != std::string::npos);
+                }
+            }
+            ImGui::BeginDisabled(m_urls.IsEmpty());
+            if (ImGui::Button("Add to playlist"))
+            {
+                AddUrls(m_urls, m_cue.entries.NumItems());
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndDisabled();
+            ImGui::EndPopup();
+        }
     }
 
     void Playlist::ButtonLoad()
@@ -1597,6 +1396,254 @@ namespace rePlayer
             ImGui::EndPopup();
         }
         ImGui::EndDisabled();
+    }
+
+    void Playlist::AddFiles(const Array<std::string>& files, int32_t droppedEntryIndex, bool isAcceptingAll)
+    {
+        auto& replays = Core::GetReplays();
+        auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
+        for (auto& newFile : files)
+        {
+            auto addFile = [&](const std::filesystem::path& path)
+            {
+                // add only known extensions (or prefixes)
+                auto guessedExtension = path.has_extension() ? path.extension().u8string().substr(1) : std::u8string();
+                const auto pathExtension = guessedExtension;
+                const auto pathStem = path.stem().u8string();
+                {
+                    std::u8string prefix;
+                    for (uint16_t i = 0;; i++)
+                    {
+                        if (i == uint16_t(eExtension::Count))
+                        {
+                            if (!prefix.empty())
+                            {
+                                guessedExtension = prefix;
+                                break;
+                            }
+                            if (!isAcceptingAll)
+                            {
+                                // look for it the hard way
+                                auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
+                                Array<CommandBuffer::Command> commands;
+                                if (auto* replay = replays.Load(stream, commands, {}))
+                                {
+                                    guessedExtension = replay->GetMediaType().GetExtension<char8_t>();
+                                    delete replay;
+                                    break;
+                                }
+                                return;
+                            }
+                            break;
+                        }
+                        if (_stricmp(reinterpret_cast<const char*>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
+                            break;
+                        if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
+                        {
+                            if (MediaType::extensionLengths[i] == pathStem.size() || pathStem[MediaType::extensionLengths[i]] == '.')
+                                prefix = MediaType::GetExtension<char8_t>(i);
+                        }
+                    }
+                }
+
+                // add to playlist
+                const std::string filename = reinterpret_cast<const char*>(path.u8string().c_str());
+                if (auto song = m_cue.db.FindSong([&](auto* song)
+                {
+                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), filename.c_str()) == 0;
+                }))
+                {
+                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
+                    {
+                        if (!song->IsSubsongDiscarded(i))
+                        {
+                            MusicID musicId;
+                            musicId.subsongId.songId = song->GetId();
+                            musicId.subsongId.index = i;
+                            musicId.playlistId = ++m_uniqueIdGenerator;
+                            musicId.databaseId = DatabaseID::kPlaylist;
+                            m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                        }
+                    }
+                }
+                else
+                {
+                    auto* songSheet = new SongSheet;
+                    songSheet->type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
+                    if (songSheet->type.ext == eExtension::Unknown)
+                        songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
+                    else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), songSheet->type.GetExtension()) == 0)
+                        songSheet->name = reinterpret_cast<const char*>(pathStem.c_str());
+                    else
+                    {
+                        auto name = path.filename().u8string();
+                        auto extSize = songSheet->type.extensionLengths[size_t(songSheet->type.ext)];
+                        if (_strnicmp(reinterpret_cast<const char*>(name.c_str()), songSheet->type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
+                            songSheet->name = reinterpret_cast<const char*>(name.c_str() + extSize + 1);
+                        else
+                            songSheet->name = reinterpret_cast<const char*>(name.c_str());
+                    }
+                    songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.NumItems()));
+                    songSheet->databaseDay = databaseDay;
+                    m_cue.paths.Add(filename.c_str(), filename.size() + 1);
+                    m_cue.arePathsDirty = true;
+
+                    m_cue.db.AddSong(songSheet);
+
+                    // TODO: make this async
+                    TagLib::FileStream fStream(path.c_str(), true);
+                    TagLib::FileRef f(&fStream);
+                    if (auto* tag = f.tag())
+                    {
+                        if (!tag->title().isEmpty())
+                        {
+                            if (!tag->album().isEmpty())
+                            {
+                                songSheet->name = tag->album().toCString(true);
+                                songSheet->name.String() += '/';
+
+                                // get id3v2 tags to check if we have a disc number
+                                TagLib::MPEG::File fMpeg(&fStream, true, TagLib::MPEG::Properties::Average, TagLib::ID3v2::FrameFactory::instance());
+                                if (auto* id3v2Tag = fMpeg.ID3v2Tag())
+                                {
+                                    auto properties = id3v2Tag->properties();
+                                    for (auto it = properties.begin(), e = properties.end(); it != e; it++)
+                                    {
+                                        if (_stricmp(it->first.toCString(), "discnumber") == 0)
+                                        {
+                                            uint32_t disc = 0;
+                                            if (sscanf_s(it->second[0].toCString(), "%u", &disc) == 1)
+                                            {
+                                                char buf[16];
+                                                sprintf(buf, "%u ", disc);
+                                                songSheet->name.String() += buf;
+                                            }
+                                            else if (!it->second[0].isEmpty()) // weird format?
+                                            {
+                                                songSheet->name.String() += it->second[0].toCString();
+                                                songSheet->name.String() += ' ';
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (tag->track())
+                                {
+                                    char buf[16];
+                                    sprintf(buf, "%02u ", tag->track());
+                                    songSheet->name.String() += buf;
+                                }
+                                songSheet->name.String() += tag->title().toCString(true);
+                            }
+                            else
+                                songSheet->name = tag->title().toCString(true);
+                        }
+                        songSheet->releaseYear = uint16_t(tag->year());
+
+                        if (!tag->artist().isEmpty())
+                        {
+                            Artist* dbArtist = nullptr;
+                            auto artistTag = tag->artist();
+                            auto artistName = artistTag.toCString(true);
+                            for (auto* artist : m_cue.db.Artists())
+                            {
+                                if (strcmp(artistName, artist->GetHandle()) == 0)
+                                {
+                                    dbArtist = artist;
+                                    break;
+                                }
+                            }
+                            if (dbArtist == nullptr)
+                            {
+                                auto* artistSheet = new ArtistSheet;
+                                artistSheet->handles.Add(artistName);
+                                dbArtist = m_cue.db.AddArtist(artistSheet);
+                            }
+                            songSheet->artistIds.Add(dbArtist->GetId());
+                            dbArtist->Edit()->numSongs++;
+                        }
+                    }
+
+                    MusicID musicId;
+                    musicId.subsongId.songId = songSheet->id;
+                    musicId.playlistId = ++m_uniqueIdGenerator;
+                    musicId.databaseId = DatabaseID::kPlaylist;
+                    m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                }
+
+                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+            };
+
+            auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(newFile.c_str()));
+            if (std::filesystem::is_directory(path))
+            {
+                for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path))
+                {
+                    if (!dir_entry.is_directory())
+                        addFile(dir_entry.path());
+                }
+            }
+            else
+                addFile(path);
+        }
+    }
+
+    void Playlist::AddUrls(const Array<std::string>& urls, int32_t droppedEntryIndex)
+    {
+        auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
+        auto* curl = curl_easy_init();
+        for (auto& url : urls)
+        {
+            // add to playlist
+            if (auto song = m_cue.db.FindSong([&](auto* song)
+            {
+                return _stricmp(m_cue.GetPath(song->GetSourceId(0)), url.c_str()) == 0;
+            }))
+            {
+                for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
+                {
+                    if (!song->IsSubsongDiscarded(i))
+                    {
+                        MusicID musicId;
+                        musicId.subsongId.songId = song->GetId();
+                        musicId.subsongId.index = i;
+                        musicId.playlistId = ++m_uniqueIdGenerator;
+                        musicId.databaseId = DatabaseID::kPlaylist;
+                        m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                    }
+                }
+            }
+            else
+            {
+                // add new song to the playlist database
+                auto* songSheet = new SongSheet;
+                int nameSize = 0;
+                if (auto* name = curl_easy_unescape(curl, url.c_str(), int(url.size()), &nameSize))
+                {
+                    songSheet->name = name;
+                    curl_free(name);
+                }
+                else
+                    songSheet->name = url;
+                songSheet->sourceIds.Add(SourceID(SourceID::URLImportID, m_cue.paths.NumItems()));
+                songSheet->databaseDay = databaseDay;
+                m_cue.paths.Add('\0'); // in that case, first character is zero to identify the path as url
+                m_cue.paths.Add(url.c_str(), url.size() + 1);
+                m_cue.arePathsDirty = true;
+
+                m_cue.db.AddSong(songSheet);
+
+                MusicID musicId;
+                musicId.subsongId.songId = songSheet->id;
+                musicId.playlistId = ++m_uniqueIdGenerator;
+                musicId.databaseId = DatabaseID::kPlaylist;
+                m_cue.entries.Insert(droppedEntryIndex++, musicId);
+
+                m_cue.db.Raise(Database::Flag::kSaveSongs);
+            }
+        }
+        curl_easy_cleanup(curl);
     }
 
     std::string Playlist::GetPlaylistFilename(const std::string& name)

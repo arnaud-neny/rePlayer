@@ -103,10 +103,14 @@ namespace rePlayer
         Status LoadPlaylist(io::File& file, Cue& cue);
         void SavePlaylist(io::File& file, const Cue& cue);
 
+        void ButtonUrl();
         void ButtonLoad();
         void ButtonSave();
         void ButtonClear();
         void ButtonSort();
+
+        void AddFiles(const Array<std::string>& files, int32_t droppedEntryIndex, bool isAcceptingAll);
+        void AddUrls(const Array<std::string>& urls, int32_t droppedEntryIndex);
 
         static std::string GetPlaylistFilename(const std::string& name);
         void SavePlaylistsToc();
@@ -130,6 +134,9 @@ namespace rePlayer
         int32_t m_oldCurrentEntryIndex = -1;
         int32_t m_currentEntryIndex = -1;
         bool m_isCurrentEntryFocus = true;
+
+        std::string m_inputUrls;
+        Array<std::string> m_urls;
 
         enum class OpenedTab : uint8_t
         {
