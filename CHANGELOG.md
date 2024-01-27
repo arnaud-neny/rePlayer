@@ -1,8 +1,9 @@
-v0.12.2:
+v0.12.3:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
 - Updated ASAP to 6.0.1
+- Updated gbsplay to 0.0.95
 - Updated libsc68 to 3.0.0a r705
 - Updated libsidplay to 2.6.0
 - Updated UADE with Jochen Hippel ST player 1.3
@@ -11,7 +12,7 @@ v0.12.2:
 - Updated ImGui to 1.90.1
 - Updated TagLib to 2.0
 - Updated TinyXML-2 to 10.0.0
-- Ability to play directly from an URL (drag and drop from the browser), including streaming (online radios)
+- Ability to play directly from an URL (drag and drop from the browser or import), including streaming (online radios)
 - Bug fixes
 
 v0.11.1:
