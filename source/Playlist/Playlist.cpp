@@ -196,7 +196,7 @@ namespace rePlayer
                             cue.entries[numEntries] = cue.entries[i];
                         numEntries++;
                     }
-                    if (numEntries == 0)
+                    if (numEntries == 0 && db.NumSongs() == 0)
                     {
                         io::File::Delete(filename.c_str());
                         m_playlists.RemoveAt(playlistIndex--);
