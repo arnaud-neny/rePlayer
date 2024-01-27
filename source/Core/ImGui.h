@@ -8,6 +8,7 @@
 namespace ImGui
 {
     bool InputText(const char* label, std::string* str, ImGuiInputTextFlags flags = 0);
+    bool InputTextMultiline(const char* label, std::string* str, const ImVec2& size = ImVec2(0.0f, 0.0f), ImGuiInputTextFlags flags = 0);
 
     template <typename... Arguments>
     inline void Tooltip(Arguments&&... args)
