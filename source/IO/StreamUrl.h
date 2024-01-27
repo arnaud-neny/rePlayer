@@ -80,7 +80,8 @@ namespace rePlayer
             kStart,
             kDownload,
             kCancel,
-            kEnd
+            kEnd,
+            kFailed
         } m_state = State::kStart;
         enum class Type : uint8_t
         {

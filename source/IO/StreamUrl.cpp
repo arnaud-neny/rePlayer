@@ -43,7 +43,7 @@ namespace rePlayer
                 {
                     ::Sleep(1);
                     chunkSize = atomicHead - tail;
-                    if (std::atomic_ref(m_state) == State::kEnd)
+                    if (std::atomic_ref(m_state) >= State::kEnd)
                     {
                         m_tail = atomicHead;
                         return size - remainingSize;
@@ -78,7 +78,7 @@ namespace rePlayer
                 auto availableSize = atomicHead - tail;
                 for (; availableSize == 0;)
                 {
-                    if (std::atomic_ref(m_state) == State::kEnd && atomicHead == tail)
+                    if (std::atomic_ref(m_state) >= State::kEnd && atomicHead == tail)
                     {
                         m_tail = tail;
                         return size - remainingSize;
@@ -103,6 +103,8 @@ namespace rePlayer
 
     Status StreamUrl::Seek(int64_t offset, SeekWhence whence)
     {
+        if (std::atomic_ref(m_state) == State::kFailed)
+            return Status::kFail;
         if (m_type != Type::kDownload)
         {
             if (whence == SeekWhence::kSeekBegin && offset == 0)
@@ -136,11 +138,11 @@ namespace rePlayer
                 offset += m_tail;
             else if (whence == SeekWhence::kSeekEnd)
             {
-                while (std::atomic_ref(m_state) != State::kEnd)
+                while (std::atomic_ref(m_state) < State::kEnd)
                     ::Sleep(1);
                 offset += m_head;
             }
-            while (offset > int64_t(std::atomic_ref(m_head)) && std::atomic_ref(m_state) != State::kEnd)
+            while (offset > int64_t(std::atomic_ref(m_head)) && std::atomic_ref(m_state) < State::kEnd)
                 ::Sleep(1);
             if (offset >= 0 && offset <= int64_t(std::atomic_ref(m_head)))
             {
@@ -155,7 +157,7 @@ namespace rePlayer
     {
         if (m_type == Type::kStreaming)
             return 0;
-        while (std::atomic_ref(m_state) != State::kEnd)
+        while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
         return m_head;
     }
@@ -275,7 +277,7 @@ namespace rePlayer
         if (m_type == Type::kStreaming)
             return nullptr;
 
-        while (std::atomic_ref(m_state) != State::kEnd)
+        while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
 
         SmartPtr<StreamUrl> stream(kAllocate, m_url, true);
@@ -286,7 +288,7 @@ namespace rePlayer
         stream->m_icyUrl = m_icyUrl;
         stream->m_metadata = m_metadata;
         stream->m_head = m_head;
-        stream->m_state = State::kEnd;
+        stream->m_state = m_state;
         stream->m_type = m_type;
         stream->m_data = m_data;
         return stream;
@@ -297,7 +299,7 @@ namespace rePlayer
         if (m_type == Type::kStreaming)
             return { nullptr, 0ull };
 
-        while (std::atomic_ref(m_state) != State::kEnd)
+        while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
         return { m_data.Items(), m_head };
     }
@@ -317,17 +319,18 @@ namespace rePlayer
         auto* This = reinterpret_cast<StreamUrl*>(lpdwParam);
         CURLcode curlCode;
         curlCode = curl_easy_perform(This->m_curl);
-        assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR);
+        assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST);
 
-        std::atomic_ref(This->m_state) = State::kEnd;
+        if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
+            std::atomic_ref(This->m_state) = State::kEnd;
+        else
+            std::atomic_ref(This->m_state) = State::kFailed;
 
         return 0;
     }
 
     size_t StreamUrl::OnCurlHeader(const char* buffer, size_t size, size_t count, StreamUrl* stream)
     {
-        static std::string headers;
-        headers += buffer;
         size *= count;
         if (size)
         {
