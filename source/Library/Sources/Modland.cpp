@@ -345,7 +345,7 @@ namespace rePlayer
     inline void SourceModland::Chars::Copy(const Array<char>& blob, Array<T>& otherblob) const
     {
         auto src = blob.Items() + offset;
-        otherblob.Add(src, strlen(src) + 1);
+        otherblob.Copy(src, strlen(src) + 1);
     }
 
     template <bool isCaseSensitive>
@@ -806,8 +806,8 @@ namespace rePlayer
                         }
 
                         songs[i] = data.NumItems();
-                        data.Add(song, offsetof(SourceSong, name));
-                        data.Add(song->name, strlen(song->name) + 1);
+                        data.Copy(song, offsetof(SourceSong, name));
+                        data.Copy(song->name, strlen(song->name) + 1);
                         data.Resize((data.NumItems() + alignof(SourceSong) - 1) & ~(alignof(SourceSong) - 1));
                     }
                     // store the new blob
@@ -1099,7 +1099,7 @@ namespace rePlayer
                 return size * nmemb;
             }
         } buffer;
-        buffer.Add(replay->getHeaderAndUrl(curl, replay, *this, url), 8);
+        buffer.Copy(replay->getHeaderAndUrl(curl, replay, *this, url), 8);
         buffer.Push(4); // reserve second file offset space
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
@@ -1241,15 +1241,15 @@ namespace rePlayer
                 }
             } archiveBuffer;
             if (replayType == ModlandReplay::kDelitrackerCustom)
-                archiveBuffer.Add("CUST-PKG", sizeof("CUST-PKG") - 1);
+                archiveBuffer.Copy("CUST-PKG", sizeof("CUST-PKG") - 1);
             else if (replayType == ModlandReplay::kIFFSmus)
-                archiveBuffer.Add("SMUS-PKG", sizeof("SMUS-PKG") - 1);
+                archiveBuffer.Copy("SMUS-PKG", sizeof("SMUS-PKG") - 1);
             else if (replayType == ModlandReplay::kMBM || replayType == ModlandReplay::kMBMEdit)
-                archiveBuffer.Add("MBMK-PKG", sizeof("MBMK-PKG") - 1);
+                archiveBuffer.Copy("MBMK-PKG", sizeof("MBMK-PKG") - 1);
             else if (replayType == ModlandReplay::kFACSoundTracker)
-                archiveBuffer.Add("FACS-PKG", sizeof("FACS-PKG") - 1);
+                archiveBuffer.Copy("FACS-PKG", sizeof("FACS-PKG") - 1);
             else if (replayType == ModlandReplay::kEuphony)
-                archiveBuffer.Add("EUPH-PKG", sizeof("EUPH-PKG") - 1);
+                archiveBuffer.Copy("EUPH-PKG", sizeof("EUPH-PKG") - 1);
 
             bool hasFailed = false;
             SmartPtr<io::Stream> stream;

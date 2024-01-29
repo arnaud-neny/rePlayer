@@ -73,17 +73,12 @@ namespace core
         BlobArray& operator=(const Span<ItemType>& otherSpan) requires (storage == Blob::kIsDynamic);
 
         ItemType* Push() requires (storage == Blob::kIsDynamic);
-        template <typename OtherItemType = ItemType>
-        ItemType* Add(const OtherItemType& otherItem) requires (storage == Blob::kIsDynamic);
-        template <typename OtherItemType = ItemType>
-        ItemType* Add(OtherItemType&& otherItem) requires (storage == Blob::kIsDynamic);
-        template <typename OtherItemType>
-        ItemType* Add(const OtherItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic);
+        ItemType* Add(const ItemType& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Add(ItemType&& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Add(const ItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic);
 
-        template <typename OtherItemType>
-        ItemType* Insert(size_t index, const OtherItemType& otherItem) requires (storage == Blob::kIsDynamic);
-        template <typename OtherItemType>
-        ItemType* Insert(size_t index, OtherItemType&& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Insert(size_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Insert(size_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic);
 
         void RemoveAt(size_t index, size_t numItemsToRemove = 1) requires (storage == Blob::kIsDynamic);
         template <typename SearchType>

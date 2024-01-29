@@ -145,7 +145,7 @@ namespace rePlayer
     void Playlist::Enqueue(MusicID musicId)
     {
         musicId.playlistId = ++m_uniqueIdGenerator;
-        m_cue.entries.Add(musicId);
+        m_cue.entries.Add({ musicId });
         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
     }
 
@@ -853,7 +853,7 @@ namespace rePlayer
                                 auto currentPlayingEntry = insertPos <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : Cue::Entry();
                                 auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
                                 for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
-                                    m_cue.entries.Insert(insertPos + i, selectedSongs[i])->playlistId = ++m_uniqueIdGenerator;
+                                    m_cue.entries.Insert(insertPos + i, { selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
                                 if (currentPlayingEntry.subsongId.IsValid())
                                     m_currentEntryIndex = m_cue.entries.Find<int32_t>(currentPlayingEntry.playlistId);
                                 m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
@@ -927,7 +927,7 @@ namespace rePlayer
                     {
                         auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
                         for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
-                            m_cue.entries.Add(selectedSongs[i])->playlistId = ++m_uniqueIdGenerator;
+                            m_cue.entries.Add({ selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
                         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                     }
                 }
@@ -1462,7 +1462,7 @@ namespace rePlayer
                             musicId.subsongId.index = i;
                             musicId.playlistId = ++m_uniqueIdGenerator;
                             musicId.databaseId = DatabaseID::kPlaylist;
-                            m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                            m_cue.entries.Insert(droppedEntryIndex++, { musicId });
                         }
                     }
                 }
@@ -1569,7 +1569,7 @@ namespace rePlayer
                     musicId.subsongId.songId = songSheet->id;
                     musicId.playlistId = ++m_uniqueIdGenerator;
                     musicId.databaseId = DatabaseID::kPlaylist;
-                    m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                    m_cue.entries.Insert(droppedEntryIndex++, { musicId });
                 }
 
                 m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
@@ -1610,7 +1610,7 @@ namespace rePlayer
                         musicId.subsongId.index = i;
                         musicId.playlistId = ++m_uniqueIdGenerator;
                         musicId.databaseId = DatabaseID::kPlaylist;
-                        m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                        m_cue.entries.Insert(droppedEntryIndex++, { musicId });
                     }
                 }
             }
@@ -1638,7 +1638,7 @@ namespace rePlayer
                 musicId.subsongId.songId = songSheet->id;
                 musicId.playlistId = ++m_uniqueIdGenerator;
                 musicId.databaseId = DatabaseID::kPlaylist;
-                m_cue.entries.Insert(droppedEntryIndex++, musicId);
+                m_cue.entries.Insert(droppedEntryIndex++, { musicId });
 
                 m_cue.db.Raise(Database::Flag::kSaveSongs);
             }

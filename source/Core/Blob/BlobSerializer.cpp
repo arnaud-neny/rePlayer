@@ -73,11 +73,11 @@ namespace core
                     if (newDataOffset - dataOffset < sizeof(uint16_t))
                         newDataOffset = (dataOffset + currentPatch.alignment * 2 - 1) & ~(currentPatch.alignment - 1);
 
-                    mainPatch.buffer.Add(zero, newDataOffset - dataOffset - sizeof(uint16_t));
-                    mainPatch.buffer.Add(&currentPatch.numItems, sizeof(uint16_t));
+                    mainPatch.buffer.Copy(zero, newDataOffset - dataOffset - sizeof(uint16_t));
+                    mainPatch.buffer.Copy(&currentPatch.numItems, sizeof(uint16_t));
                 }
                 else
-                    mainPatch.buffer.Add(zero, newDataOffset - dataOffset);
+                    mainPatch.buffer.Copy(zero, newDataOffset - dataOffset);
                 dataOffset = uint16_t(newDataOffset);
 
                 currentPatch.position = dataOffset;

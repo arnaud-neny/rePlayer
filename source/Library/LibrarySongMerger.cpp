@@ -27,7 +27,7 @@ namespace rePlayer
             for (auto& entry : songs.m_entries)
             {
                 if (entry.isSelected && m_entries.Find(entry.id.songId) == nullptr)
-                    m_entries.Add(songs.m_db[entry.id]);
+                    m_entries.Add({ songs.m_db[entry.id] });
             }
         }
 

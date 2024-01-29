@@ -186,7 +186,7 @@ namespace rePlayer
                             {
                                 if (!song->IsSubsongDiscarded(i))
                                 {
-                                    m_entries.Add(SubsongID(songId, i));
+                                    m_entries.Add({ SubsongID(songId, i) });
                                     oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
                                     {
                                         if (oldEntry.isSelected)
@@ -208,7 +208,7 @@ namespace rePlayer
                                 {
                                     if (!song->IsSubsongDiscarded(i))
                                     {
-                                        m_entries.Add(SubsongID(songId, i));
+                                        m_entries.Add({ SubsongID(songId, i) });
                                         oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
                                         {
                                             if (oldEntry.isSelected)
@@ -230,7 +230,7 @@ namespace rePlayer
                             {
                                 if (!song->IsSubsongDiscarded(i))
                                 {
-                                    m_entries.Add(SubsongID(songId, i));
+                                    m_entries.Add({ SubsongID(songId, i) });
                                     oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
                                     {
                                         if (oldEntry.isSelected)
@@ -265,7 +265,7 @@ namespace rePlayer
                             {
                                 if (!song->IsSubsongDiscarded(i))
                                 {
-                                    m_entries.Add(SubsongID(songId, i));
+                                    m_entries.Add({ SubsongID(songId, i) });
                                     oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
                                     {
                                         if (oldEntry.isSelected)
@@ -292,7 +292,7 @@ namespace rePlayer
                     {
                         if (!song->IsSubsongDiscarded(i))
                         {
-                            m_entries.Add(SubsongID(songId, i));
+                            m_entries.Add({ SubsongID(songId, i) });
                             oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
                             {
                                 if (oldEntry.isSelected)

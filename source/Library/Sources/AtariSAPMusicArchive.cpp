@@ -46,7 +46,7 @@ namespace rePlayer
     inline void SourceAtariSAPMusicArchive::Chars::Copy(const Array<char>& blob, Array<T>& otherblob) const
     {
         auto src = blob.Items() + offset;
-        otherblob.Add(src, strlen(src) + 1);
+        otherblob.Copy(src, strlen(src) + 1);
     }
 
     inline bool SourceAtariSAPMusicArchive::Chars::IsSame(const Array<char>& blob, const char* otherString) const
@@ -496,8 +496,8 @@ namespace rePlayer
                         }
 
                         songs[i] = data.NumItems();
-                        data.Add(song, offsetof(SourceSong, artists) + song->numArtists * sizeof(uint16_t));
-                        data.Add(song->name(), strlen(song->name()) + 1);
+                        data.Copy(song, offsetof(SourceSong, artists) + song->numArtists * sizeof(uint16_t));
+                        data.Copy(song->name(), strlen(song->name()) + 1);
                         data.Resize((data.NumItems() + alignof(SourceSong) - 1) & ~(alignof(SourceSong) - 1));
                     }
                     // store the new blob

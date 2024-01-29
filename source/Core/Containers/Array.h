@@ -52,23 +52,23 @@ namespace core
         ReturnType Push(uint32_t numItems = 1);
         ItemType Pop(size_t numItems = 1);
 
-        template <typename OtherItemType = ItemType, typename ReturnType = ItemType*>
-        ReturnType Add(const OtherItemType& otherItem);
-        template <typename OtherItemType = ItemType, typename ReturnType = ItemType*>
-        ReturnType Add(OtherItemType&& otherItem);
-        template <typename OtherItemType, typename ReturnType = ItemType*>
-        ReturnType Add(const OtherItemType* otherItems, size_t numOtherItems);
+        template <typename ReturnType = ItemType*>
+        ReturnType Add(const ItemType& otherItem);
+        template <typename ReturnType = ItemType*>
+        ReturnType Add(ItemType&& otherItem);
+        template <typename ReturnType = ItemType*>
+        ReturnType Add(const ItemType* otherItems, size_t numOtherItems);
         template <typename ReturnType = ItemType*>
         ReturnType Add(const ItemType& otherItem, size_t numOtherItems);
 
         std::pair<ItemType*, bool> AddOnce(const ItemType& otherItem);
 
-        template <typename OtherItemType = ItemType>
-        ItemType* Insert(size_t index, const OtherItemType& otherItem);
-        template <typename OtherItemType = ItemType>
-        ItemType* Insert(size_t index, OtherItemType&& otherItem);
-        template <typename OtherItemType = ItemType>
-        ItemType* Insert(size_t index, const OtherItemType* otherItems, size_t numOtherItems);
+        ItemType* Insert(size_t index, const ItemType& otherItem);
+        ItemType* Insert(size_t index, ItemType&& otherItem);
+        ItemType* Insert(size_t index, const ItemType* otherItems, size_t numOtherItems);
+
+        template <typename OtherItemType, typename ReturnType = ItemType*>
+        ReturnType Copy(const OtherItemType* otherItems, size_t size);
 
         void RemoveAtFast(size_t index, size_t numItemsToRemove = 1);
         void RemoveAt(size_t index, size_t numItemsToRemove = 1);

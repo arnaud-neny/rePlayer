@@ -553,7 +553,7 @@ namespace rePlayer
                     {
                         if (artistId == selectedArtistId)
                         {
-                            m_songEntries.Add(song->GetId());
+                            m_songEntries.Add({ song->GetId() });
                             break;
                         }
                     }
@@ -573,7 +573,7 @@ namespace rePlayer
                     {
                         if (artistId == selectedArtistId)
                         {
-                            m_songEntries.Add(song->GetId());
+                            m_songEntries.Add({ song->GetId() });
                             oldEntries.Remove(song->GetId(), 0, [&](auto& oldEntry)
                             {
                                 if (oldEntry.isSelected)

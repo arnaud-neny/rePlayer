@@ -144,22 +144,19 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    template <typename OtherItemType>
-    inline ItemType* BlobArray<ItemType, storage>::Add(const OtherItemType& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Add(const ItemType& otherItem) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Add(otherItem);
     }
 
     template <typename ItemType, Blob::Storage storage>
-    template <typename OtherItemType>
-    inline ItemType* BlobArray<ItemType, storage>::Add(OtherItemType&& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Add(ItemType&& otherItem) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Add(std::move(otherItem));
     }
 
     template <typename ItemType, Blob::Storage storage>
-    template <typename OtherItemType>
-    inline ItemType* BlobArray<ItemType, storage>::Add(const OtherItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Add(const ItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Add(otherItems, numOtherItems);
     }
@@ -171,17 +168,15 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    template <typename OtherItemType>
-    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, const OtherItemType& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Insert(index, otherItem);
     }
 
     template <typename ItemType, Blob::Storage storage>
-    template <typename OtherItemType>
-    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, OtherItemType&& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic)
     {
-        return m_handle.Insert(index, std::forward<OtherItemType>(otherItem));
+        return m_handle.Insert(index, std::forward<ItemType>(otherItem));
     }
 
     template <typename ItemType, Blob::Storage storage>

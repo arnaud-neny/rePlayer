@@ -58,7 +58,7 @@ namespace rePlayer
     inline void SourceHighVoltageSIDCollection::Chars::Copy(const Array<char>& blob, Array<T>& otherblob) const
     {
         auto src = blob.Items() + offset;
-        otherblob.Add(src, strlen(src) + 1);
+        otherblob.Copy(src, strlen(src) + 1);
     }
 
     inline bool SourceHighVoltageSIDCollection::Chars::IsSame(const Array<char>& blob, const char* otherString) const
@@ -80,7 +80,7 @@ namespace rePlayer
         m_roots.Push();
         m_songs.Push();
         m_strings.Add('\0'); // 0 == empty string == invalid offset
-        m_data.Add(&m_areStringsDirty, 4); // add 4 zeros
+        m_data.Copy(&m_areStringsDirty, 4); // add 4 zeros
     }
 
     SourceHighVoltageSIDCollection::~SourceHighVoltageSIDCollection()
@@ -465,8 +465,8 @@ namespace rePlayer
                         }
 
                         songs[i] = data.NumItems();
-                        data.Add(song, offsetof(SourceSong, name));
-                        data.Add(song->name, strlen(song->name) + 1);
+                        data.Copy(song, offsetof(SourceSong, name));
+                        data.Copy(song->name, strlen(song->name) + 1);
                         data.Resize((data.NumItems() + alignof(SourceSong) - 1) & ~(alignof(SourceSong) - 1));
                     }
                     // store the new blob
