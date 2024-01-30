@@ -102,7 +102,10 @@ namespace core::io
     {
         std::filesystem::path path(m_name);
         path.replace_filename(filename);
-        return Create(path.string());
+        auto stream = Create(path.string());
+        if (stream.IsInvalid())
+            stream = Create(filename);
+        return stream;
     }
 
     const Span<const uint8_t> StreamFile::Read()
