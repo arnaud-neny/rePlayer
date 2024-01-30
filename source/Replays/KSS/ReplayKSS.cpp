@@ -5,7 +5,6 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/StreamFile.h>
 #include <ReplayDll.h>
 
 #include <libarchive/archive.h>
@@ -73,9 +72,7 @@ namespace rePlayer
             static void load(void* userData, const char* name, const uint8_t** buffer, size_t* size)
             {
                 auto* This = reinterpret_cast<Loader*>(userData);
-                std::filesystem::path streamName(This->stream->GetName());
-                streamName.replace_filename(name);
-                This->newStream = io::StreamFile::Create(streamName.string());
+                This->newStream = This->stream->Open(name);
                 if (This->newStream)
                 {
                     auto data = This->newStream->Read();

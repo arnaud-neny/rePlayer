@@ -64,7 +64,7 @@ namespace rePlayer
 
         void SetupMetadata(CommandBuffer metadata);
 
-        static NEZ_PLAY* LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamArchive);
+        static NEZ_PLAY* LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamDefault, io::Stream* streamArchive);
 
     private:
         NEZ_PLAY* m_nezPlay;

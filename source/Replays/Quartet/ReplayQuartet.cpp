@@ -4,7 +4,6 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <ReplayDll.h>
 
@@ -326,7 +325,7 @@ namespace rePlayer
             fileHandle->stream = io::StreamMemory::Create(uri, data.Items(offset), data.NumItems() - offset, true);
         }
         else
-            fileHandle->stream = io::StreamFile::Create(uri);
+            fileHandle->stream = ms_driver.stream->Open(uri);
         return fileHandle;
     }
 

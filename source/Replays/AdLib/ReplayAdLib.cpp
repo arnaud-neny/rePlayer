@@ -4,7 +4,6 @@
 #include <Audio/AudioTypes.inl.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <Imgui.h>
 #include <ReplayDll.h>
@@ -111,7 +110,7 @@ namespace rePlayer
             {
                 if (!m_otherProvider)
                 {
-                    auto stream = io::StreamFile::Create(filename);
+                    auto stream = m_stream->Open(filename);
                     if (stream)
                         m_otherProvider = new RawFileProvider(stream);
                 }

@@ -184,6 +184,17 @@ namespace rePlayer
 
     struct uade_file* ReplayUADE::AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* state)
     {
+        // check if name is a directory
+        auto nameLen = strlen(name);
+        if (name[nameLen - 1] == '/')
+        {
+            struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
+            f->name = strdup(name);
+            f->size = 0;
+            f->data = (char*)malloc(0);
+            return f;
+        }
+
         auto This = reinterpret_cast<ReplayUADE*>(context);
 
         auto loadFile = [](const char* name, const char* originalName)
@@ -208,8 +219,7 @@ namespace rePlayer
         auto buffer = This->m_stream->Read();
         auto data = buffer.Items();
         auto dataSize = buffer.Size();
-        auto originalPath = std::filesystem::path(This->m_stream->GetName());
-        if (originalPath.filename().string() == name)
+        if (This->m_stream->GetName().ends_with(name))
         {
             for (auto& replayOverride : ms_replayOverrides)
             {
@@ -258,9 +268,16 @@ namespace rePlayer
             }
         }
 
-        originalPath.replace_filename(name);
-        if (auto f = loadFile(originalPath.string().c_str(), name))
+        // load from the current stream
+        if (auto newStream = This->m_stream->Open(name))
+        {
+            struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
+            f->name = strdup(name);
+            f->size = newStream->GetSize();
+            f->data = (char*)malloc(f->size);
+            newStream->Read(f->data, f->size);
             return f;
+        }
 
         // check some extras
         std::string filename = "extras/";

@@ -1,6 +1,5 @@
 #include "ReplayUADE.h"
 
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <Thread/Mutex.h>
 
@@ -22,13 +21,9 @@ extern "C"
 
 extern "C" int uade_filesize(size_t * size, const char* pathname)
 {
-    std::error_code ec;
-    auto filesize = std::filesystem::file_size(pathname, ec);
-    if (ec)
-        return -1;
-    if (size)
-        *size = filesize;
-    return 0;
+    (void)size; (void)pathname;
+    assert(0 && "Not implemented");
+    return -1;
 }
 
 extern "C" char* uade_dirname(char* dst, char* src, size_t maxlen)
@@ -174,13 +169,6 @@ extern "C" FILE* stdioemu_fopen(const char* filename, const char*)
             stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, reinterpret_cast<const uint8_t*>(file.data), file.size, true).Detach());
             break;
         }
-    }
-    if (stream == nullptr && std::filesystem::exists(filename))
-    {
-        if (std::filesystem::is_directory(filename))
-            stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, nullptr, 0, false).Detach());
-        else
-            stream = reinterpret_cast<FILE*>(core::io::StreamFile::Create(filename).Detach());
     }
 
     return stream;

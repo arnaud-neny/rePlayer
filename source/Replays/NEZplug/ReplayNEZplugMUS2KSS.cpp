@@ -2,12 +2,10 @@
 
 #include <Core/Log.h>
 #include <Core/String.h>
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 
 #include <libarchive/archive.h>
 #include <libarchive/archive_entry.h>
-#include <filesystem>
 
 namespace rePlayer
 {
@@ -52,7 +50,7 @@ namespace rePlayer
         return data + size;
     }
 
-    NEZ_PLAY* ReplayNEZplug::LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamArchive)
+    NEZ_PLAY* ReplayNEZplug::LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamDefault, io::Stream* streamArchive)
     {
         if (size < 0x4007)
             return nullptr;
@@ -293,14 +291,11 @@ namespace rePlayer
             }
             else
             {
-                std::filesystem::path streamName(filename);
-                streamName.replace_filename(drumKitName);
-                drumStreams[0] = io::StreamFile::Create(streamName.string());
+                drumStreams[0] = streamDefault->Open(drumKitName);
                 if (drumStreams[0] && drumStreams[0]->Read().NumItems() >= 0x4007)
                 {
                     drumKitExt[4] = '2';
-                    streamName.replace_filename(drumKitName);
-                    drumStreams[1] = io::StreamFile::Create(streamName.string());
+                    drumStreams[1] = streamDefault->Open(drumKitName);
                     if (drumStreams[1] && drumStreams[1]->Read().NumItems() < 0x4007)
                         drumStreams[1].Reset();
                 }

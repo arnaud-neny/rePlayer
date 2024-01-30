@@ -5,7 +5,6 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/StreamFile.h>
 #include <ReplayDll.h>
 
 extern "C"
@@ -44,17 +43,23 @@ namespace rePlayer
 
     Replay* ReplayTFMX::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        if (stream->GetSize() < 8)
+        if (stream->GetSize() < 10)
             return nullptr;
 
         TfmxData mdat = {};
         TfmxData smpl = {};
 
         auto data = stream->Read();
-        SmartPtr< io::StreamFile> smplStream;
+        SmartPtr< io::Stream> smplStream;
         bool isSplit = false;
         if (memcmp(data.Items(), "TFMX-MOD", 8) != 0)
         {
+            if (strncmp("TFMX-SONG", data.Items<const char>(), 9)
+                && strncmp("TFMX_SONG", data.Items<const char>(), 9)
+                && _strnicmp("TFMXSONG", data.Items<const char>(), 8)
+                && _strnicmp("TFMX ", data.Items<const char>(), 5))
+                return nullptr;
+
             isSplit = true;
             mdat = { const_cast<uint8_t*>(data.Items()), data.Size(), 0 };
 
@@ -69,13 +74,13 @@ namespace rePlayer
                 auto smplName = mdatName;
                 smplName.replace_filename(name);
                 smplName += mdatName.extension();
-                smplStream = io::StreamFile::Create(reinterpret_cast<const char*>(smplName.u8string().c_str()));
+                smplStream = stream->Open(reinterpret_cast<const char*>(smplName.u8string().c_str()));
             }
             if (smplStream.IsInvalid())
             {
                 auto smplName = mdatName;
                 smplName.replace_extension("smpl");
-                smplStream = io::StreamFile::Create(reinterpret_cast<const char*>(smplName.u8string().c_str()));
+                smplStream = stream->Open(reinterpret_cast<const char*>(smplName.u8string().c_str()));
             }
             if (smplStream.IsValid())
             {

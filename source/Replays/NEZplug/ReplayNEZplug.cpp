@@ -65,7 +65,7 @@ namespace rePlayer
             return nullptr;
         }
 
-        auto nezPlay = LoadMUS(data.Items(), data.NumItems(), stream->GetName(), nullptr);
+        auto nezPlay = LoadMUS(data.Items(), data.NumItems(), stream->GetName(), stream, nullptr);
         if (nezPlay)
             return new ReplayNEZplug(nezPlay, eExtension::_mus, metadata);
         nezPlay = NEZNew();
@@ -223,7 +223,7 @@ namespace rePlayer
                         if (readSize > 0)
                         {
                             NEZDelete(m_nezPlay);
-                            m_nezPlay = LoadMUS(unpackedData.Items(), unpackedData.NumItems(), archive_entry_pathname(entry), m_stream);
+                            m_nezPlay = LoadMUS(unpackedData.Items(), unpackedData.NumItems(), archive_entry_pathname(entry), nullptr, m_stream);
                         }
                         else
                             Log::Error("NEZplug: can't find subsong %d\n", m_subsongIndex);

@@ -6,7 +6,6 @@
 #include <Containers/Array.inl.h>
 #include <Core/String.h>
 #include <Imgui.h>
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <ReplayDll.h>
 
@@ -135,7 +134,7 @@ namespace rePlayer
             archive_read_free(archive);
             return stream;
         }
-        return io::StreamFile::Create(uri).Detach();
+        return This->m_stream->Open(uri).Detach();
     }
 
     size_t ReplayHighlyAdvanced::ReadPSF(void* buffer, size_t size, size_t count, void* handle)

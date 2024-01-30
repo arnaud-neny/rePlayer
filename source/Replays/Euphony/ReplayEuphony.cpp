@@ -3,7 +3,6 @@
 #include <Audio/Audiotypes.inl.h>
 #include <Core/String.h>
 #include <Imgui.h>
-#include <IO/StreamFile.h>
 #include <IO/StreamMemory.h>
 #include <ReplayDll.h>
 
@@ -153,12 +152,10 @@ namespace rePlayer
             {
                 if (subsongIndex < 0)
                 {
-                    std::filesystem::path fn1(m_stream->GetName());
-                    fn1.replace_filename(fn0);
+                    std::filesystem::path fn1(fn0);
                     fn1.replace_extension(".fmb");
-                    if (std::filesystem::exists(fn1))
+                    if (auto fmbStream = m_stream->Open(fn1.string()))
                     {
-                        auto fmbStream = core::io::StreamFile::Create(fn1.wstring());
                         auto fmbData = fmbStream->Read();
                         for (size_t n = 0; n < (fmbData.Size() - 8) / 48; n++)
                             device->setFmInstrumentParameter(int(n), fmbData.Items(8 + 48 * n));
@@ -206,12 +203,10 @@ namespace rePlayer
             {
                 if (subsongIndex < 0)
                 {
-                    std::filesystem::path fn1(m_stream->GetName());
-                    fn1.replace_filename(fn0);
+                    std::filesystem::path fn1(fn0);
                     fn1.replace_extension(".pmb");
-                    if (std::filesystem::exists(fn1))
+                    if (auto pmbStream = m_stream->Open(fn1.string()))
                     {
-                        auto pmbStream = core::io::StreamFile::Create(fn1.wstring());
                         auto pmbData = pmbStream->Read();
                         device->setPcmInstrumentParameters(pmbData.Items(), pmbData.Size());
                     }
