@@ -1,4 +1,4 @@
-v0.12.3:
+v0.12.4:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
