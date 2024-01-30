@@ -44,6 +44,8 @@ namespace rePlayer
 
         SmartPtr<Stream> OnClone() final;
 
+        std::string Escape(const std::string& url, size_t startPos);
+
         void Close();
 
         static uint32_t ThreadFunc(uint32_t* lpdwParam);
@@ -93,6 +95,8 @@ namespace rePlayer
         Array<uint8_t> m_data;
         std::mutex m_mutex;
         mutable thread::SpinLock m_spinLock;
+
+        Array<SmartPtr<StreamUrl>> m_links;
     };
 }
 // namespace rePlayer
