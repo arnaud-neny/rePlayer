@@ -542,17 +542,22 @@ static void player_DoAllMacros(TfmxState* state) {
 static void player_ChannelOff(TfmxState* state, int i) {
     struct Cdb* c;
 
-    c = &state->cdb[i & 0xF];
-    if (!c->SfxFlag) {
-        c->hw->mode = 0;
-        c->AddBeginTime = c->AddBeginReset = c->MacroRun =
-            /*c->SIDSize=c->ArpRun=*/0;
-        c->NewStyleMacro = 0xFF;
-        c->SaveAddr = c->CurVol = c->hw->vol = 0;
-        c->SaveLen = c->CurrLength = 1;
-        c->hw->loop = &player_LoopOff;
-        c->hw->c = c;
+    if (i & 0xF < 8)
+    {
+        c = &state->cdb[i & 0xF];
+        if (!c->SfxFlag) {
+            c->hw->mode = 0;
+            c->AddBeginTime = c->AddBeginReset = c->MacroRun =
+                /*c->SIDSize=c->ArpRun=*/0;
+            c->NewStyleMacro = 0xFF;
+            c->SaveAddr = c->CurVol = c->hw->vol = 0;
+            c->SaveLen = c->CurrLength = 1;
+            c->hw->loop = &player_LoopOff;
+            c->hw->c = c;
+        }
     }
+    else
+        state->hasUnsuportedCommands = 1; // broken or unsupported format
 }
 
 static void player_DoFade(TfmxState* state, int sp, int dv) {
