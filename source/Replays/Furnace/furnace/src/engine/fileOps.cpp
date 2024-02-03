@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,8 +184,10 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
       ds.snNoLowPeriods=true;
       ds.disableSampleMacro=true;
       ds.preNoteNoEffect=true;
+      ds.oldDPCM=true;
       ds.delayBehavior=0;
       ds.jumpTreatment=2;
+      ds.oldAlwaysSetVolume=true;
 
       // 1.1 compat flags
       if (ds.version>24) {
@@ -342,7 +344,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
       ds.insLen=16;
     }
     logI("reading instruments (%d)...",ds.insLen);
-    ds.ins.reserve(ds.insLen);
+    if (ds.insLen>0) ds.ins.reserve(ds.insLen);
     for (int i=0; i<ds.insLen; i++) {
       DivInstrument* ins=new DivInstrument;
       unsigned char mode=0;
@@ -600,6 +602,8 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
         }
 
         if (ds.system[0]==DIV_SYSTEM_C64_6581 || ds.system[0]==DIV_SYSTEM_C64_8580) {
+          bool volIsCutoff=false;
+
           ins->c64.triOn=reader.readC();
           ins->c64.sawOn=reader.readC();
           ins->c64.pulseOn=reader.readC();
@@ -616,9 +620,9 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
           ins->c64.oscSync=reader.readC();
           ins->c64.toFilter=reader.readC();
           if (ds.version<0x11) {
-            ins->c64.volIsCutoff=reader.readI();
+            volIsCutoff=reader.readI();
           } else {
-            ins->c64.volIsCutoff=reader.readC();
+            volIsCutoff=reader.readC();
           }
           ins->c64.initFilter=reader.readC();
 
@@ -630,10 +634,16 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
           ins->c64.ch3off=reader.readC();
 
           // weird storage
-          if (ins->c64.volIsCutoff) {
-            for (int j=0; j<ins->std.volMacro.len; j++) {
-              ins->std.volMacro.val[j]-=18;
+          if (volIsCutoff) {
+            // move to alg (new cutoff)
+            ins->std.algMacro.len=ins->std.volMacro.len;
+            ins->std.algMacro.loop=ins->std.volMacro.loop;
+            ins->std.algMacro.rel=ins->std.volMacro.rel;
+            for (int j=0; j<ins->std.algMacro.len; j++) {
+              ins->std.algMacro.val[j]=-(ins->std.volMacro.val[j]-18);
             }
+            ins->std.volMacro.len=0;
+            memset(ins->std.volMacro.val,0,256*sizeof(int));
           }
           for (int j=0; j<ins->std.dutyMacro.len; j++) {
             ins->std.dutyMacro.val[j]-=12;
@@ -670,7 +680,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
     if (ds.version>0x0b) {
       ds.waveLen=(unsigned char)reader.readC();
       logI("reading wavetables (%d)...",ds.waveLen);
-      ds.wave.reserve(ds.waveLen);
+      if (ds.waveLen>0) ds.wave.reserve(ds.waveLen);
       for (int i=0; i<ds.waveLen; i++) {
         DivWavetable* wave=new DivWavetable;
         wave->len=(unsigned char)reader.readI();
@@ -840,7 +850,7 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
       // it appears this byte stored the YMU759 sample rate
       ymuSampleRate=reader.readC();
     }
-    ds.sample.reserve(ds.sampleLen);
+    if (ds.sampleLen>0) ds.sample.reserve(ds.sampleLen);
     for (int i=0; i<ds.sampleLen; i++) {
       DivSample* sample=new DivSample;
       int length=reader.readI();
@@ -1053,9 +1063,11 @@ bool DivEngine::loadDMF(unsigned char* file, size_t len) {
       ds.systemFlags[0].set("dpcmMode",false);
     }
 
-    // C64 no key priority
+    // C64 no key priority, reset time and multiply relative
     if (ds.system[0]==DIV_SYSTEM_C64_8580 || ds.system[0]==DIV_SYSTEM_C64_6581) {
       ds.systemFlags[0].set("keyPriority",false);
+      ds.systemFlags[0].set("initResetTime",1);
+      ds.systemFlags[0].set("multiplyRel",true);
     }
 
     // OPM broken pitch
@@ -1856,6 +1868,18 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
     if (ds.version<168) {
       ds.preNoteNoEffect=true;
     }
+    if (ds.version<183) {
+      ds.oldDPCM=true;
+    }
+    if (ds.version<184) {
+      ds.resetArpPhaseOnNewNote=false;
+    }
+    if (ds.version<188) {
+      ds.ceilVolumeScaling=false;
+    }
+    if (ds.version<191) {
+      ds.oldAlwaysSetVolume=true;
+    }
     ds.isDMF=false;
 
     reader.readS(); // reserved
@@ -1946,6 +1970,7 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
     }
 
     logD("systems:");
+    ds.systemLen=0;
     for (int i=0; i<DIV_MAX_CHIPS; i++) {
       unsigned char sysID=reader.readC();
       ds.system[i]=systemFromFileFur(sysID);
@@ -1965,6 +1990,13 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
     if (tchans>DIV_MAX_CHANS) {
       tchans=DIV_MAX_CHANS;
       logW("too many channels!");
+    }
+    logV("system len: %d",ds.systemLen);
+    if (ds.systemLen<1) {
+      logE("zero chips!");
+      lastError="zero chips!";
+      delete[] file;
+      return false;
     }
 
     // system volume
@@ -2157,7 +2189,14 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
 
     if (ds.version>=39) {
       for (int i=0; i<tchans; i++) {
-        subSong->chanShow[i]=reader.readC();
+        if (ds.version<189) {
+          subSong->chanShow[i]=reader.readC();
+          subSong->chanShowChanOsc[i]=subSong->chanShow[i];
+        } else {
+          unsigned char tempchar=reader.readC();
+          subSong->chanShow[i]=tempchar&1;
+          subSong->chanShowChanOsc[i]=(tempchar&2);
+        }
       }
 
       for (int i=0; i<tchans; i++) {
@@ -2354,7 +2393,7 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
 
       // patchbay
       unsigned int conns=reader.readI();
-      ds.patchbay.reserve(conns);
+      if (conns>0) ds.patchbay.reserve(conns);
       for (unsigned int i=0; i<conns; i++) {
         ds.patchbay.push_back((unsigned int)reader.readI());
       }
@@ -2374,7 +2413,27 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
       } else {
         reader.readC();
       }
-      for (int i=0; i<5; i++) {
+      if (ds.version>=183) {
+        ds.oldDPCM=reader.readC();
+      } else {
+        reader.readC();
+      }
+      if (ds.version>=184) {
+        ds.resetArpPhaseOnNewNote=reader.readC();
+      } else {
+        reader.readC();
+      }
+      if (ds.version>=188) {
+        ds.ceilVolumeScaling=reader.readC();
+      } else {
+        reader.readC();
+      }
+      if (ds.version>=191) {
+        ds.oldAlwaysSetVolume=reader.readC();
+      } else {
+        reader.readC();
+      }
+      for (int i=0; i<1; i++) {
         reader.readC();
       }
     }
@@ -2545,7 +2604,14 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
         }
 
         for (int i=0; i<tchans; i++) {
-          subSong->chanShow[i]=reader.readC();
+          if (ds.version<189) {
+            subSong->chanShow[i]=reader.readC();
+            subSong->chanShowChanOsc[i]=subSong->chanShow[i];
+          } else {
+            unsigned char tempchar=reader.readC();
+            subSong->chanShow[i]=tempchar&1;
+            subSong->chanShowChanOsc[i]=tempchar&2;
+          }
         }
 
         for (int i=0; i<tchans; i++) {
@@ -2991,6 +3057,25 @@ bool DivEngine::loadFur(unsigned char* file, size_t len) {
       }
     }
 
+    // C64 1Exy compat
+    if (ds.version<186) {
+      for (int i=0; i<ds.systemLen; i++) {
+        if (ds.system[i]==DIV_SYSTEM_C64_8580 || ds.system[i]==DIV_SYSTEM_C64_6581) {
+          ds.systemFlags[i].set("no1EUpdate",true);
+        }
+      }
+    }
+
+    // C64 original reset time and multiply relative
+    if (ds.version<187) {
+      for (int i=0; i<ds.systemLen; i++) {
+        if (ds.system[i]==DIV_SYSTEM_C64_8580 || ds.system[i]==DIV_SYSTEM_C64_6581) {
+          ds.systemFlags[i].set("initResetTime",1);
+          ds.systemFlags[i].set("multiplyRel",true);
+        }
+      }
+    }
+
     if (active) quitDispatch();
     BUSY_BEGIN_SOFT;
     saveLock.lock();
@@ -3132,8 +3217,8 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
     ds.sampleLen=ds.sample.size();
 
     // orders
-    ds.subsong[0]->ordersLen=ordCount=reader.readC();
-    if (ds.subsong[0]->ordersLen<1 || ds.subsong[0]->ordersLen>127) {
+    ds.subsong[0]->ordersLen=ordCount=(unsigned char)reader.readC();
+    if (ds.subsong[0]->ordersLen<1 || ds.subsong[0]->ordersLen>128) {
       logD("invalid order count!");
       throw EndOfFileException(&reader,reader.tell());
     }
@@ -3395,12 +3480,14 @@ bool DivEngine::loadMod(unsigned char* file, size_t len) {
     }
     for(int i=0; i<chCount; i++) {
       ds.subsong[0]->chanShow[i]=true;
+      ds.subsong[0]->chanShowChanOsc[i]=true;
       ds.subsong[0]->chanName[i]=fmt::sprintf("Channel %d",i+1);
       ds.subsong[0]->chanShortName[i]=fmt::sprintf("C%d",i+1);
     }
     for(int i=chCount; i<ds.systemLen*4; i++) {
       ds.subsong[0]->pat[i].effectCols=1;
       ds.subsong[0]->chanShow[i]=false;
+      ds.subsong[0]->chanShowChanOsc[i]=false;
     }
 
     // instrument creation
@@ -5350,7 +5437,10 @@ SafeWriter* DivEngine::saveFur(bool notPrimary, bool newPatternFormat) {
   }
 
   for (int i=0; i<chans; i++) {
-    w->writeC(subSong->chanShow[i]);
+    w->writeC(
+      (subSong->chanShow[i]?1:0)|
+      (subSong->chanShowChanOsc[i]?2:0)
+    );
   }
 
   for (int i=0; i<chans; i++) {
@@ -5440,7 +5530,11 @@ SafeWriter* DivEngine::saveFur(bool notPrimary, bool newPatternFormat) {
   w->writeC(song.brokenPortaLegato);
   w->writeC(song.brokenFMOff);
   w->writeC(song.preNoteNoEffect);
-  for (int i=0; i<5; i++) {
+  w->writeC(song.oldDPCM);
+  w->writeC(song.resetArpPhaseOnNewNote);
+  w->writeC(song.ceilVolumeScaling);
+  w->writeC(song.oldAlwaysSetVolume);
+  for (int i=0; i<1; i++) {
     w->writeC(0);
   }
 
@@ -5505,7 +5599,10 @@ SafeWriter* DivEngine::saveFur(bool notPrimary, bool newPatternFormat) {
     }
 
     for (int i=0; i<chans; i++) {
-      w->writeC(subSong->chanShow[i]);
+      w->writeC(
+        (subSong->chanShow[i]?1:0)|
+        (subSong->chanShowChanOsc[i]?2:0)
+      );
     }
 
     for (int i=0; i<chans; i++) {
@@ -6035,21 +6132,41 @@ SafeWriter* DivEngine::saveDMF(unsigned char version) {
         }
       }
     } else { // STD
+      bool volIsCutoff=false;
+
       if (sys!=DIV_SYSTEM_GB) {
         int realVolMacroLen=i->std.volMacro.len;
         if (realVolMacroLen>127) realVolMacroLen=127;
-        w->writeC(realVolMacroLen);
-        if ((sys==DIV_SYSTEM_C64_6581 || sys==DIV_SYSTEM_C64_8580) && i->c64.volIsCutoff) {
-          for (int j=0; j<realVolMacroLen; j++) {
-            w->writeI(i->std.volMacro.val[j]+18);
+        if (sys==DIV_SYSTEM_C64_6581 || sys==DIV_SYSTEM_C64_8580) {
+          if (i->std.algMacro.len>0) volIsCutoff=true;
+          if (volIsCutoff) {
+            if (i->std.volMacro.len>0) {
+              addWarning(".dmf only supports volume or cutoff macro in C64, but not both. volume macro will be lost.");
+            }
+            realVolMacroLen=i->std.algMacro.len;
+            if (realVolMacroLen>127) realVolMacroLen=127;
+            w->writeC(realVolMacroLen);
+            for (int j=0; j<realVolMacroLen; j++) {
+              w->writeI((-i->std.algMacro.val[j])+18);
+            }
+          } else {
+            w->writeC(realVolMacroLen);
+            for (int j=0; j<realVolMacroLen; j++) {
+              w->writeI(i->std.volMacro.val[j]);
+            }
           }
         } else {
+          w->writeC(realVolMacroLen);
           for (int j=0; j<realVolMacroLen; j++) {
             w->writeI(i->std.volMacro.val[j]);
           }
         }
         if (realVolMacroLen>0) {
-          w->writeC(i->std.volMacro.loop);
+          if (volIsCutoff) {
+            w->writeC(i->std.algMacro.loop);
+          } else {
+            w->writeC(i->std.volMacro.loop);
+          }
         }
       }
 
@@ -6140,7 +6257,7 @@ SafeWriter* DivEngine::saveDMF(unsigned char version) {
         w->writeC(i->c64.oscSync);
 
         w->writeC(i->c64.toFilter);
-        w->writeC(i->c64.volIsCutoff);
+        w->writeC(volIsCutoff);
         w->writeC(i->c64.initFilter);
 
         w->writeC(i->c64.res);
@@ -6234,3 +6351,354 @@ SafeWriter* DivEngine::saveDMF(unsigned char version) {
   return w;
 }
 
+static const char* trueFalse[2]={
+  "no", "yes"
+};
+
+static const char* gbEnvDir[2]={
+  "down", "up"
+};
+
+static const char* notes[12]={
+  "C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"
+};
+
+static const char* notesNegative[12]={
+  "c_", "c+", "d_", "d+", "e_", "f_", "f+", "g_", "g+", "a_", "a+", "b_"
+};
+
+static const char* sampleLoopModes[4]={
+  "forward", "backward", "ping-pong", "invalid"
+};
+
+void writeTextMacro(SafeWriter* w, DivInstrumentMacro& m, const char* name, bool& wroteMacroHeader) {
+  if ((m.open&6)==0 && m.len<1) return;
+  if (!wroteMacroHeader) {
+    w->writeText("- macros:\n");
+    wroteMacroHeader=true;
+  }
+  w->writeText(fmt::sprintf("  - %s:",name));
+  int len=m.len;
+  switch (m.open&6) {
+    case 2:
+      len=16;
+      w->writeText(" [ADSR]");
+      break;
+    case 4:
+      len=16;
+      w->writeText(" [LFO]");
+      break;
+  }
+  if (m.mode) {
+    w->writeText(fmt::sprintf(" [MODE %d]",m.mode));
+  }
+  if (m.delay>0) {
+    w->writeText(fmt::sprintf(" [DELAY %d]",m.delay));
+  }
+  if (m.speed>1) {
+    w->writeText(fmt::sprintf(" [SPEED %d]",m.speed));
+  }
+  for (int i=0; i<len; i++) {
+    if (i==m.loop) {
+      w->writeText(" |");
+    }
+    if (i==m.rel) {
+      w->writeText(" /");
+    }
+    w->writeText(fmt::sprintf(" %d",m.val[i]));
+  }
+  w->writeText("\n");
+}
+
+SafeWriter* DivEngine::saveText(bool separatePatterns) {
+  saveLock.lock();
+
+  SafeWriter* w=new SafeWriter;
+  w->init();
+
+  w->writeText(fmt::sprintf("# Furnace Text Export\n\ngenerated by Furnace %s (%d)\n\n# Song Information\n\n",DIV_VERSION,DIV_ENGINE_VERSION));
+  w->writeText(fmt::sprintf("- name: %s\n",song.name));
+  w->writeText(fmt::sprintf("- author: %s\n",song.author));
+  w->writeText(fmt::sprintf("- album: %s\n",song.category));
+  w->writeText(fmt::sprintf("- system: %s\n",song.systemName));
+  w->writeText(fmt::sprintf("- tuning: %g\n\n",song.tuning));
+
+  w->writeText(fmt::sprintf("- instruments: %d\n",song.insLen));
+  w->writeText(fmt::sprintf("- wavetables: %d\n",song.waveLen));
+  w->writeText(fmt::sprintf("- samples: %d\n\n",song.sampleLen));
+
+  w->writeText("# Sound Chips\n\n");
+
+  for (int i=0; i<song.systemLen; i++) {
+    w->writeText(fmt::sprintf("- %s\n",getSystemName(song.system[i])));
+    w->writeText(fmt::sprintf("  - id: %.2X\n",(int)song.system[i]));
+    w->writeText(fmt::sprintf("  - volume: %g\n",song.systemVol[i]));
+    w->writeText(fmt::sprintf("  - panning: %g\n",song.systemPan[i]));
+    w->writeText(fmt::sprintf("  - front/rear: %g\n",song.systemPanFR[i]));
+
+    String sysFlags=song.systemFlags[i].toString();
+
+    if (!sysFlags.empty()) {
+      w->writeText(fmt::sprintf("  - flags:\n```\n%s\n```\n",sysFlags));
+    }
+  }
+
+  if (!song.notes.empty()) {
+    w->writeText("\n# Song Comments\n\n");
+    w->writeText(song.notes);
+  }
+
+  w->writeText("\n# Instruments\n\n");
+
+  for (int i=0; i<song.insLen; i++) {
+    DivInstrument* ins=song.ins[i];
+
+    w->writeText(fmt::sprintf("## %.2X: %s\n\n",i,ins->name));
+
+    w->writeText(fmt::sprintf("- type: %d\n",(int)ins->type));
+
+    if (ins->type==DIV_INS_FM || ins->type==DIV_INS_OPL || ins->type==DIV_INS_OPLL || ins->type==DIV_INS_OPZ || ins->type==DIV_INS_OPL_DRUMS || ins->type==DIV_INS_OPM || ins->type==DIV_INS_ESFM) {
+      w->writeText("- FM parameters:\n");
+      w->writeText(fmt::sprintf("  - ALG: %d\n",ins->fm.alg));
+      w->writeText(fmt::sprintf("  - FB: %d\n",ins->fm.fb));
+      w->writeText(fmt::sprintf("  - FMS: %d\n",ins->fm.fms));
+      w->writeText(fmt::sprintf("  - AMS: %d\n",ins->fm.ams));
+      w->writeText(fmt::sprintf("  - FMS2: %d\n",ins->fm.fms2));
+      w->writeText(fmt::sprintf("  - AMS2: %d\n",ins->fm.ams2));
+      w->writeText(fmt::sprintf("  - operators: %d\n",ins->fm.ops));
+      w->writeText(fmt::sprintf("  - OPLL patch: %d\n",ins->fm.opllPreset));
+      w->writeText(fmt::sprintf("  - fixed drum freq: %s\n",trueFalse[ins->fm.fixedDrums?1:0]));
+      w->writeText(fmt::sprintf("  - kick freq: %.4X\n",ins->fm.kickFreq));
+      w->writeText(fmt::sprintf("  - snare/hat freq: %.4X\n",ins->fm.snareHatFreq));
+      w->writeText(fmt::sprintf("  - tom/top freq: %.4X\n",ins->fm.tomTopFreq));
+
+      for (int j=0; j<ins->fm.ops; j++) {
+        DivInstrumentFM::Operator& op=ins->fm.op[j];
+
+        w->writeText(fmt::sprintf("  - operator %d:\n",j));
+        w->writeText(fmt::sprintf("    - enabled: %s\n",trueFalse[op.enable?1:0]));
+        w->writeText(fmt::sprintf("    - AM: %d\n",op.am));
+        w->writeText(fmt::sprintf("    - AR: %d\n",op.ar));
+        w->writeText(fmt::sprintf("    - DR: %d\n",op.dr));
+        w->writeText(fmt::sprintf("    - MULT: %d\n",op.mult));
+        w->writeText(fmt::sprintf("    - RR: %d\n",op.rr));
+        w->writeText(fmt::sprintf("    - SL: %d\n",op.sl));
+        w->writeText(fmt::sprintf("    - TL: %d\n",op.tl));
+        w->writeText(fmt::sprintf("    - DT2: %d\n",op.dt2));
+        w->writeText(fmt::sprintf("    - RS: %d\n",op.rs));
+        w->writeText(fmt::sprintf("    - DT: %d\n",op.dt));
+        w->writeText(fmt::sprintf("    - D2R: %d\n",op.d2r));
+        w->writeText(fmt::sprintf("    - SSG-EG: %d\n",op.ssgEnv));
+        w->writeText(fmt::sprintf("    - DAM: %d\n",op.dam));
+        w->writeText(fmt::sprintf("    - DVB: %d\n",op.dvb));
+        w->writeText(fmt::sprintf("    - EGT: %d\n",op.egt));
+        w->writeText(fmt::sprintf("    - KSL: %d\n",op.ksl));
+        w->writeText(fmt::sprintf("    - SUS: %d\n",op.sus));
+        w->writeText(fmt::sprintf("    - VIB: %d\n",op.vib));
+        w->writeText(fmt::sprintf("    - WS: %d\n",op.ws));
+        w->writeText(fmt::sprintf("    - KSR: %d\n",op.ksr));
+        w->writeText(fmt::sprintf("    - TL volume scale: %d\n",op.kvs));
+      }
+    }
+
+    if (ins->type==DIV_INS_ESFM) {
+      w->writeText("- ESFM parameters:\n");
+      w->writeText(fmt::sprintf("  - noise mode: %d\n",ins->esfm.noise));
+
+      for (int j=0; j<ins->fm.ops; j++) {
+        DivInstrumentESFM::Operator& opE=ins->esfm.op[j];
+
+        w->writeText(fmt::sprintf("  - operator %d:\n",j));
+        w->writeText(fmt::sprintf("    - DL: %d\n",opE.delay));
+        w->writeText(fmt::sprintf("    - OL: %d\n",opE.outLvl));
+        w->writeText(fmt::sprintf("    - MI: %d\n",opE.modIn));
+        w->writeText(fmt::sprintf("    - output left: %s\n",trueFalse[opE.left?1:0]));
+        w->writeText(fmt::sprintf("    - output right: %s\n",trueFalse[opE.right?1:0]));
+        w->writeText(fmt::sprintf("    - CT: %d\n",opE.ct));
+        w->writeText(fmt::sprintf("    - DT: %d\n",opE.dt));
+        w->writeText(fmt::sprintf("    - fixed frequency: %s\n",trueFalse[opE.fixed?1:0]));
+      }
+    }
+
+    if (ins->type==DIV_INS_GB) {
+      w->writeText("- Game Boy parameters:\n");
+      w->writeText(fmt::sprintf("  - volume: %d\n",ins->gb.envVol));
+      w->writeText(fmt::sprintf("  - direction: %s\n",gbEnvDir[ins->gb.envDir?1:0]));
+      w->writeText(fmt::sprintf("  - length: %d\n",ins->gb.envLen));
+      w->writeText(fmt::sprintf("  - sound length: %d\n",ins->gb.soundLen));
+      w->writeText(fmt::sprintf("  - use software envelope: %s\n",trueFalse[ins->gb.softEnv?1:0]));
+      w->writeText(fmt::sprintf("  - always initialize: %s\n",trueFalse[ins->gb.softEnv?1:0]));
+      if (ins->gb.hwSeqLen>0) {
+        w->writeText("  - hardware sequence:\n");
+        for (int j=0; j<ins->gb.hwSeqLen; j++) {
+          w->writeText(fmt::sprintf("    - %d: %.2X %.4X\n",j,ins->gb.hwSeq[j].cmd,ins->gb.hwSeq[j].data));
+        }
+      }
+    }
+
+    bool header=false;
+    writeTextMacro(w,ins->std.volMacro,"vol",header);
+    writeTextMacro(w,ins->std.arpMacro,"arp",header);
+    writeTextMacro(w,ins->std.dutyMacro,"duty",header);
+    writeTextMacro(w,ins->std.waveMacro,"wave",header);
+    writeTextMacro(w,ins->std.pitchMacro,"pitch",header);
+    writeTextMacro(w,ins->std.panLMacro,"panL",header);
+    writeTextMacro(w,ins->std.panRMacro,"panR",header);
+    writeTextMacro(w,ins->std.phaseResetMacro,"phaseReset",header);
+    writeTextMacro(w,ins->std.ex1Macro,"ex1",header);
+    writeTextMacro(w,ins->std.ex2Macro,"ex2",header);
+    writeTextMacro(w,ins->std.ex3Macro,"ex3",header);
+    writeTextMacro(w,ins->std.ex4Macro,"ex4",header);
+    writeTextMacro(w,ins->std.ex5Macro,"ex5",header);
+    writeTextMacro(w,ins->std.ex6Macro,"ex6",header);
+    writeTextMacro(w,ins->std.ex7Macro,"ex7",header);
+    writeTextMacro(w,ins->std.ex8Macro,"ex8",header);
+    writeTextMacro(w,ins->std.algMacro,"alg",header);
+    writeTextMacro(w,ins->std.fbMacro,"fb",header);
+    writeTextMacro(w,ins->std.fmsMacro,"fms",header);
+    writeTextMacro(w,ins->std.amsMacro,"ams",header);
+
+    // TODO: the rest
+    w->writeText("\n");
+  }
+
+  w->writeText("\n# Wavetables\n\n");
+
+  for (int i=0; i<song.waveLen; i++) {
+    DivWavetable* wave=song.wave[i];
+
+    w->writeText(fmt::sprintf("- %d (%dx%d):",i,wave->len+1,wave->max+1));
+    for (int j=0; j<=wave->len; j++) {
+      w->writeText(fmt::sprintf(" %d",wave->data[j]));
+    }
+    w->writeText("\n");
+  }
+
+  w->writeText("\n# Samples\n\n");
+
+  for (int i=0; i<song.sampleLen; i++) {
+    DivSample* sample=song.sample[i];
+
+    w->writeText(fmt::sprintf("## %.2X: %s\n\n",i,sample->name));
+
+    w->writeText(fmt::sprintf("- format: %d\n",(int)sample->depth));
+    w->writeText(fmt::sprintf("- data length: %d\n",sample->getCurBufLen()));
+    w->writeText(fmt::sprintf("- samples: %d\n",sample->samples));
+    w->writeText(fmt::sprintf("- rate: %d\n",sample->centerRate));
+    w->writeText(fmt::sprintf("- compat rate: %d\n",sample->rate));
+    w->writeText(fmt::sprintf("- loop: %s\n",trueFalse[sample->loop?1:0]));
+    if (sample->loop) {
+      w->writeText(fmt::sprintf("  - start: %d\n",sample->loopStart));
+      w->writeText(fmt::sprintf("  - end: %d\n",sample->loopEnd));
+      w->writeText(fmt::sprintf("  - mode: %s\n",sampleLoopModes[sample->loopMode&3]));
+    }
+    w->writeText(fmt::sprintf("- BRR emphasis: %s\n",trueFalse[sample->brrEmphasis?1:0]));
+    w->writeText(fmt::sprintf("- dither: %s\n",trueFalse[sample->dither?1:0]));
+
+    // TODO' render matrix
+    unsigned char* buf=(unsigned char*)sample->getCurBuf();
+    unsigned int bufLen=sample->getCurBufLen();
+    w->writeText("\n```");
+    for (unsigned int i=0; i<bufLen; i++) {
+      if ((i&15)==0) w->writeText(fmt::sprintf("\n%.8X:",i));
+      w->writeText(fmt::sprintf(" %.2X",buf[i]));
+    }
+    w->writeText("\n```\n\n");
+  }
+
+  w->writeText("\n# Subsongs\n\n");
+
+  for (size_t i=0; i<song.subsong.size(); i++) {
+    DivSubSong* s=song.subsong[i];
+    w->writeText(fmt::sprintf("## %d: %s\n\n",(int)i,s->name));
+
+    w->writeText(fmt::sprintf("- tick rate: %g\n",s->hz));
+    w->writeText(fmt::sprintf("- speeds:"));
+    for (int j=0; j<s->speeds.len; j++) {
+      w->writeText(fmt::sprintf(" %d",s->speeds.val[j]));
+    }
+    w->writeText("\n");
+    w->writeText(fmt::sprintf("- virtual tempo: %d/%d\n",s->virtualTempoN,s->virtualTempoD));
+    w->writeText(fmt::sprintf("- time base: %d\n",s->timeBase));
+    w->writeText(fmt::sprintf("- pattern length: %d\n",s->patLen));
+    w->writeText(fmt::sprintf("\norders:\n```\n"));
+
+    for (int j=0; j<s->ordersLen; j++) {
+      w->writeText(fmt::sprintf("%.2X |",j));
+      for (int k=0; k<chans; k++) {
+        w->writeText(fmt::sprintf(" %.2X",s->orders.ord[k][j]));
+      }
+      w->writeText("\n");
+    }
+    w->writeText("```\n\n## Patterns\n\n");
+
+    if (separatePatterns) {
+      w->writeText("TODO: separate patterns\n\n");
+    } else {
+      for (int j=0; j<s->ordersLen; j++) {
+        w->writeText(fmt::sprintf("----- ORDER %.2X\n",j));
+
+        for (int k=0; k<s->patLen; k++) {
+          w->writeText(fmt::sprintf("%.2X ",k));
+
+          for (int l=0; l<chans; l++) {
+            DivPattern* p=s->pat[l].getPattern(s->orders.ord[l][j],false);
+
+            int note=p->data[k][0];
+            int octave=p->data[k][1];
+
+            if (note==0 && octave==0) {
+              w->writeText("|... ");
+            } else if (note==100) {
+              w->writeText("|OFF ");
+            } else if (note==101) {
+              w->writeText("|=== ");
+            } else if (note==102) {
+              w->writeText("|REL ");
+            } else if ((octave>9 && octave<250) || note>12) {
+              w->writeText("|??? ");
+            } else {
+              if (octave>=128) octave-=256;
+              if (note>11) {
+                note-=12;
+                octave++;
+              }
+              w->writeText(fmt::sprintf("|%s%d ",(octave<0)?notesNegative[note]:notes[note],(octave<0)?(-octave):octave));
+            }
+
+            if (p->data[k][2]==-1) {
+              w->writeText(".. ");
+            } else {
+              w->writeText(fmt::sprintf("%.2X ",p->data[k][2]&0xff));
+            }
+
+            if (p->data[k][3]==-1) {
+              w->writeText("..");
+            } else {
+              w->writeText(fmt::sprintf("%.2X",p->data[k][3]&0xff));
+            }
+
+            for (int m=0; m<s->pat[l].effectCols; m++) {
+              if (p->data[k][4+(m<<1)]==-1) {
+                w->writeText(" ..");
+              } else {
+                w->writeText(fmt::sprintf(" %.2X",p->data[k][4+(m<<1)]&0xff));
+              }
+              if (p->data[k][5+(m<<1)]==-1) {
+                w->writeText("..");
+              } else {
+                w->writeText(fmt::sprintf("%.2X",p->data[k][5+(m<<1)]&0xff));
+              }
+            }
+          }
+
+          w->writeText("\n");
+        }
+      }
+    }
+
+  }
+
+  saveLock.unlock();
+  return w;
+}

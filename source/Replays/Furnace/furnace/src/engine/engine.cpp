@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
     case 0x82:
       return "82xx: Set panning (right channel)";
     case 0x88:
-      return "88xx: Set panning (rear channels; x: left; y: right)";
+      return "88xy: Set panning (rear channels; x: left; y: right)";
       break;
     case 0x89:
       return "89xx: Set panning (rear left channel)";
@@ -129,6 +129,8 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
       return "F5xx: Disable macro (see manual)";
     case 0xf6:
       return "F6xx: Enable macro (see manual)";
+    case 0xf7:
+      return "F7xx: Restart macro (see manual)";
     case 0xf8:
       return "F8xx: Single tick volume slide up";
     case 0xf9:
@@ -148,6 +150,10 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
         }
         iter=sysDef->postEffectHandlers.find(effect);
         if (iter!=sysDef->postEffectHandlers.end()) {
+          return iter->second.description;
+        }
+        iter=sysDef->preEffectHandlers.find(effect);
+        if (iter!=sysDef->preEffectHandlers.end()) {
           return iter->second.description;
         }
       }
@@ -541,6 +547,7 @@ void DivEngine::initSongWithDesc(const char* description, bool inBase64, bool ol
 
   // extra attributes
   song.subsong[0]->hz=c.getDouble("tickRate",60.0);
+  song.author=getConfString("defaultAuthorName","");
 }
 
 void DivEngine::createNew(const char* description, String sysName, bool inBase64) {
@@ -1076,7 +1083,7 @@ bool DivEngine::addSystem(DivSystem which) {
           song.patchbay.push_back((i<<20)|j);
         }
       } else {
-        song.patchbay.reserve(outs);
+        if (outs>0) song.patchbay.reserve(outs);
         for (unsigned int j=0; j<outs; j++) {
           song.patchbay.push_back((i<<20)|(j<<16)|j);
         }
@@ -1184,11 +1191,11 @@ bool DivEngine::swapSystem(int src, int dest, bool preserveOrder) {
 
     // prepare swap list
     int index=0;
-    swapList.reserve(song.systemLen);
+    if (song.systemLen>0) swapList.reserve(song.systemLen);
     for (int i=0; i<song.systemLen; i++) {
       chanList.clear();
       const int channelCount=getChannelCount(song.system[i]);
-      chanList.reserve(channelCount);
+      if (channelCount>0) chanList.reserve(channelCount);
       for (int j=0; j<channelCount; j++) {
         chanList.push_back(index);
         index++;
@@ -1366,6 +1373,9 @@ DivInstrument* DivEngine::getIns(int index, DivInstrumentType fallbackType) {
       case DIV_INS_OPL_DRUMS:
         return &song.nullInsOPLDrums;
         break;
+      case DIV_INS_ESFM:
+        return &song.nullInsESFM;
+        break;
       default:
         break;
     }
@@ -1412,6 +1422,16 @@ unsigned short DivEngine::getChanPan(int ch) {
 void* DivEngine::getDispatchChanState(int ch) {
   if (ch<0 || ch>=chans) return NULL;
   return disCont[dispatchOfChan[ch]].dispatch->getChanState(dispatchChanOfChan[ch]);
+}
+
+DivChannelPair DivEngine::getChanPaired(int ch) {
+  if (ch<0 || ch>=chans) return DivChannelPair();
+  return disCont[dispatchOfChan[ch]].dispatch->getPaired(dispatchChanOfChan[ch]);
+}
+
+DivChannelModeHints DivEngine::getChanModeHints(int ch) {
+  if (ch<0 || ch>=chans) return DivChannelModeHints();
+  return disCont[dispatchOfChan[ch]].dispatch->getModeHints(dispatchChanOfChan[ch]);
 }
 
 unsigned char* DivEngine::getRegisterPool(int sys, int& size, int& depth) {
@@ -1504,6 +1524,11 @@ void DivEngine::playSub(bool preserveDrift, int goalRow) {
   while (playing && curOrder<goal) {
     if (nextTick(preserveDrift)) {
       skipping=false;
+      cmdStream.clear();
+      for (int i=0; i<song.systemLen; i++) disCont[i].dispatch->setSkipRegisterWrites(false);
+      if (goal>0 || goalRow>0) {
+        for (int i=0; i<song.systemLen; i++) disCont[i].dispatch->forceIns();
+      }
       return;
     }
     if (!preserveDrift) {
@@ -1515,6 +1540,11 @@ void DivEngine::playSub(bool preserveDrift, int goalRow) {
   while (playing && (curRow<goalRow || ticks>1)) {
     if (nextTick(preserveDrift)) {
       skipping=false;
+      cmdStream.clear();
+      for (int i=0; i<song.systemLen; i++) disCont[i].dispatch->setSkipRegisterWrites(false);
+      if (goal>0 || goalRow>0) {
+        for (int i=0; i<song.systemLen; i++) disCont[i].dispatch->forceIns();
+      }
       return;
     }
     if (!preserveDrift) {
@@ -1908,11 +1938,13 @@ void DivEngine::recalcChans() {
   memset(isInsTypePossible,0,DIV_INS_MAX*sizeof(bool));
   for (int i=0; i<song.systemLen; i++) {
     int chanCount=getChannelCount(song.system[i]);
+    int firstChan=chans;
     chans+=chanCount;
     for (int j=0; j<chanCount; j++) {
       sysOfChan[chanIndex]=song.system[i];
       dispatchOfChan[chanIndex]=i;
       dispatchChanOfChan[chanIndex]=j;
+      dispatchFirstChan[chanIndex]=firstChan;
       chanIndex++;
 
       if (sysDefs[song.system[i]]!=NULL) {
@@ -2158,6 +2190,13 @@ int DivEngine::getMaxVolumeChan(int ch) {
   return chan[ch].volMax>>8;
 }
 
+int DivEngine::mapVelocity(int ch, float vel) {
+  if (ch<0) return 0;
+  if (ch>=chans) return 0;
+  if (disCont[dispatchOfChan[ch]].dispatch==NULL) return 0;
+  return disCont[dispatchOfChan[ch]].dispatch->mapVelocity(dispatchChanOfChan[ch],vel);
+}
+
 unsigned char DivEngine::getOrder() {
   return prevOrder;
 }
@@ -2295,6 +2334,65 @@ void DivEngine::unmuteAll() {
   BUSY_END;
 }
 
+void DivEngine::dumpSongInfo() {
+  printf(
+    "SONG INFORMATION\n"
+    "- name: %s\n"
+    "- author: %s\n"
+    "- album: %s\n"
+    "- system: %s\n"
+    "- %d ins, %d waves, %d samples\n"
+    "<<<\n%s\n>>>\n\n",
+    song.name.c_str(),
+    song.author.c_str(),
+    song.category.c_str(),
+    song.systemName.c_str(),
+    song.insLen,
+    song.waveLen,
+    song.sampleLen,
+    song.notes.c_str()
+  );
+
+  printf("SUB-SONGS\n");
+  int index=0;
+  for (DivSubSong* i: song.subsong) {
+    printf(
+      "=== %d: %s\n"
+      "<<<\n%s\n>>>\n",
+      index,
+      i->name.c_str(),
+      i->notes.c_str()
+    );
+    index++;
+  }
+
+  if (!song.ins.empty()) {
+    printf("\nINSTRUMENTS\n");
+    index=0;
+    for (DivInstrument* i: song.ins) {
+      printf(
+        "- %d: %s\n",
+        index,
+        i->name.c_str()
+      );
+      index++;
+    }
+  }
+
+  if (!song.sample.empty()) {
+    printf("\nSAMPLES\n");
+    index=0;
+    for (DivSample* i: song.sample) {
+      printf(
+        "- %d: %s\n",
+        index,
+        i->name.c_str()
+      );
+      index++;
+    }
+  }
+}
+
 int DivEngine::addInstrument(int refChan, DivInstrumentType fallbackType) {
   if (song.ins.size()>=256) return -1;
   BUSY_BEGIN;
@@ -2315,6 +2413,9 @@ int DivEngine::addInstrument(int refChan, DivInstrumentType fallbackType) {
       break;
     case DIV_INS_OPL_DRUMS:
       *ins=song.nullInsOPLDrums;
+      break;
+    case DIV_INS_ESFM:
+      *ins=song.nullInsESFM;
       break;
     default:
       break;
@@ -3094,7 +3195,7 @@ void DivEngine::noteOff(int chan) {
   BUSY_END;
 }
 
-void DivEngine::autoNoteOn(int ch, int ins, int note, int vol) {
+bool DivEngine::autoNoteOn(int ch, int ins, int note, int vol) {
   bool isViable[DIV_MAX_CHANS];
   bool canPlayAnyway=false;
   bool notInViableChannel=false;
@@ -3130,7 +3231,7 @@ void DivEngine::autoNoteOn(int ch, int ins, int note, int vol) {
     }
   }
 
-  if (!canPlayAnyway) return;
+  if (!canPlayAnyway) return false;
 
   // 2. find a free channel
   do {
@@ -3138,7 +3239,7 @@ void DivEngine::autoNoteOn(int ch, int ins, int note, int vol) {
       chan[finalChan].midiNote=note;
       chan[finalChan].midiAge=midiAgeCounter++;
       pendingNotes.push_back(DivNoteEvent(finalChan,ins,note,vol,true));
-      return;
+      return true;
     }
     if (++finalChan>=chans) {
       finalChan=0;
@@ -3159,6 +3260,7 @@ void DivEngine::autoNoteOn(int ch, int ins, int note, int vol) {
   chan[candidate].midiNote=note;
   chan[candidate].midiAge=midiAgeCounter++;
   pendingNotes.push_back(DivNoteEvent(candidate,ins,note,vol,true));
+  return true;
 }
 
 void DivEngine::autoNoteOff(int ch, int note, int vol) {
@@ -3201,10 +3303,11 @@ void DivEngine::setOrder(unsigned char order) {
   BUSY_END;
 }
 
-void DivEngine::updateSysFlags(int system, bool restart) {
+void DivEngine::updateSysFlags(int system, bool restart, bool render) {
   BUSY_BEGIN_SOFT;
   disCont[system].dispatch->setFlags(song.systemFlags[system]);
   disCont[system].setRates(got.rate);
+  if (render) renderSamples();
 
   // patchbay
   if (song.patchbayAuto) {
@@ -3275,7 +3378,7 @@ bool DivEngine::switchMaster(bool full) {
   if (initAudioBackend()) {
     for (int i=0; i<song.systemLen; i++) {
       disCont[i].setRates(got.rate);
-      disCont[i].setQuality(lowQuality);
+      disCont[i].setQuality(lowQuality,dcHiPass);
     }
     if (!output->setRun(true)) {
       logE("error while activating audio!");
@@ -3297,8 +3400,20 @@ void DivEngine::setMidiDirect(bool value) {
   midiIsDirect=value;
 }
 
+void DivEngine::setMidiDirectProgram(bool value) {
+  midiIsDirectProgram=value;
+}
+
+void DivEngine::setMidiVolExp(float value) {
+  midiVolExp=value;
+}
+
 void DivEngine::setMidiCallback(std::function<int(const TAMidiMessage&)> what) {
   midiCallback=what;
+}
+
+void DivEngine::setMidiDebug(bool enable) {
+  midiDebug=enable;
 }
 
 bool DivEngine::sendMidiMessage(TAMidiMessage& msg) {
@@ -3361,6 +3476,12 @@ void DivEngine::rescanAudioDevices() {
   audioDevs.clear();
   if (output!=NULL) {
     audioDevs=output->listAudioDevices();
+  }
+}
+
+void DivEngine::rescanMidiDevices() {
+  if (output!=NULL) {
+    logV("re-scanning midi...");
     if (output->midiIn!=NULL) {
       midiIns=output->midiIn->listDevices();
     }
@@ -3374,10 +3495,14 @@ void DivEngine::initDispatch(bool isRender) {
   BUSY_BEGIN;
   logV("initializing dispatch...");
   if (isRender) logI("render cores set");
+
+  lowQuality=getConfInt("audioQuality",0);
+  dcHiPass=getConfInt("audioHiPass",1);
+
   for (int i=0; i<song.systemLen; i++) {
     disCont[i].init(song.system[i],this,getChannelCount(song.system[i]),got.rate,song.systemFlags[i],isRender);
     disCont[i].setRates(got.rate);
-    disCont[i].setQuality(lowQuality);
+    disCont[i].setQuality(lowQuality,dcHiPass);
   }
   if (song.patchbayAuto) {
     saveLock.lock();
@@ -3456,7 +3581,6 @@ bool DivEngine::initAudioBackend() {
   }
 #endif
 
-  lowQuality=getConfInt("audioQuality",0);
   forceMono=getConfInt("forceMono",0);
   clampSamples=getConfInt("clampSamples",0);
   lowLatency=getConfInt("lowLatency",0);
@@ -3620,7 +3744,8 @@ bool DivEngine::deinitAudioBackend(bool dueToSwitchMaster) {
   return true;
 }
 
-void DivEngine::preInit() {
+bool DivEngine::preInit(bool noSafeMode) {
+  bool wantSafe=false;
   // register systems
   if (!systemsRegistered) registerSystems();
 
@@ -3628,6 +3753,17 @@ void DivEngine::preInit() {
   // init config
   initConfDir();
   logD("config path: %s",configPath.c_str());
+
+  // TODO: re-enable with a better approach
+  // see issue #1581
+  /*
+  if (!noSafeMode) {
+    String safeModePath=configPath+DIR_SEPARATOR_STR+"safemode";
+    if (touchFile(safeModePath.c_str())==-EEXIST) {
+      wantSafe=true;
+    }
+  }
+  */
 
   String logPath=configPath+DIR_SEPARATOR_STR+"furnace.log";
   startLogFile(logPath.c_str());
@@ -3643,6 +3779,21 @@ void DivEngine::preInit() {
     SDL_SetHint("SDL_HINT_AUDIODRIVER",audioDriver.c_str());
   }
 #endif
+
+  if (wantSafe) {
+    logW("requesting safe mode.");
+  }
+
+  return wantSafe;
+}
+
+void DivEngine::everythingOK() {
+  // TODO: re-enable with a better approach
+  // see issue #1581
+  /*
+  String safeModePath=configPath+DIR_SEPARATOR_STR+"safemode";
+  deleteFile(safeModePath.c_str());
+  */
 }
 
 bool DivEngine::init() {
@@ -3687,6 +3838,7 @@ bool DivEngine::init() {
     logE("not enough memory!");
     return false;
   }
+  blip_set_dc(samp_bb,0);
 
   samp_bbOut=new short[32768];
 

@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,9 @@ enum DivSystem {
   DIV_SYSTEM_K053260,
   DIV_SYSTEM_TED,
   DIV_SYSTEM_C140,
-  DIV_SYSTEM_C219
+  DIV_SYSTEM_C219,
+  DIV_SYSTEM_ESFM,
+  DIV_SYSTEM_POWERNOISE,
 };
 
 enum DivEffectType: unsigned short {
@@ -164,6 +166,7 @@ struct DivSubSong {
   DivChannelData pat[DIV_MAX_CHANS];
 
   bool chanShow[DIV_MAX_CHANS];
+  bool chanShowChanOsc[DIV_MAX_CHANS];
   unsigned char chanCollapse[DIV_MAX_CHANS];
   String chanName[DIV_MAX_CHANS];
   String chanShortName[DIV_MAX_CHANS];
@@ -184,6 +187,7 @@ struct DivSubSong {
     ordersLen(1) {
     for (int i=0; i<DIV_MAX_CHANS; i++) {
       chanShow[i]=true;
+      chanShowChanOsc[i]=true;
       chanCollapse[i]=0;
     }
   }
@@ -377,6 +381,10 @@ struct DivSong {
   bool brokenPortaLegato;
   bool brokenFMOff;
   bool preNoteNoEffect;
+  bool oldDPCM;
+  bool resetArpPhaseOnNewNote;
+  bool ceilVolumeScaling;
+  bool oldAlwaysSetVolume;
 
   std::vector<DivInstrument*> ins;
   std::vector<DivWavetable*> wave;
@@ -392,7 +400,7 @@ struct DivSong {
 
   std::vector<DivEffectStorage> effects;
 
-  DivInstrument nullIns, nullInsOPLL, nullInsOPL, nullInsOPLDrums, nullInsQSound;
+  DivInstrument nullIns, nullInsOPLL, nullInsOPL, nullInsOPLDrums, nullInsQSound, nullInsESFM;
   DivWavetable nullWave;
   DivSample nullSample;
 
@@ -496,7 +504,11 @@ struct DivSong {
     patchbayAuto(true),
     brokenPortaLegato(false),
     brokenFMOff(false),
-    preNoteNoEffect(false) {
+    preNoteNoEffect(false),
+    oldDPCM(false),
+    resetArpPhaseOnNewNote(false),
+    ceilVolumeScaling(false),
+    oldAlwaysSetVolume(false) {
     for (int i=0; i<DIV_MAX_CHIPS; i++) {
       system[i]=DIV_SYSTEM_NULL;
       systemVol[i]=1.0;
@@ -599,6 +611,49 @@ struct DivSong {
     nullInsOPLDrums.fm.op[3].mult=2;
 
     nullInsQSound.std.panLMacro.mode=true;
+
+    // ESFM default instrument - port of OPN default instrument
+    nullInsESFM.esfm.noise=0;
+    nullInsESFM.esfm.op[0].outLvl=0;
+    nullInsESFM.esfm.op[0].modIn=4;
+    nullInsESFM.esfm.op[0].dt=2;
+    nullInsESFM.fm.op[0].tl=42;
+    nullInsESFM.fm.op[0].ar=15;
+    nullInsESFM.fm.op[0].dr=3;
+    nullInsESFM.fm.op[0].sl=15;
+    nullInsESFM.fm.op[0].rr=3;
+    nullInsESFM.fm.op[0].mult=5;
+
+    nullInsESFM.esfm.op[1].outLvl=0;
+    nullInsESFM.esfm.op[1].modIn=7;
+    nullInsESFM.esfm.op[1].dt=-3;
+    nullInsESFM.fm.op[1].tl=18;
+    nullInsESFM.fm.op[1].ar=15;
+    nullInsESFM.fm.op[1].dr=3;
+    nullInsESFM.fm.op[1].sl=15;
+    nullInsESFM.fm.op[1].rr=4;
+    nullInsESFM.fm.op[1].mult=1;
+
+    nullInsESFM.esfm.op[2].outLvl=0;
+    nullInsESFM.esfm.op[2].modIn=7;
+    nullInsESFM.esfm.op[2].dt=2;
+    nullInsESFM.fm.op[2].tl=48;
+    nullInsESFM.fm.op[2].ar=15;
+    nullInsESFM.fm.op[2].dr=2;
+    nullInsESFM.fm.op[2].sl=11;
+    nullInsESFM.fm.op[2].rr=1;
+    nullInsESFM.fm.op[2].mult=1;
+    nullInsESFM.fm.op[2].sus=1;
+
+    nullInsESFM.esfm.op[3].outLvl=7;
+    nullInsESFM.esfm.op[3].modIn=7;
+    nullInsESFM.esfm.op[3].dt=-3;
+    nullInsESFM.fm.op[3].tl=0;
+    nullInsESFM.fm.op[3].ar=15;
+    nullInsESFM.fm.op[3].dr=3;
+    nullInsESFM.fm.op[3].sl=15;
+    nullInsESFM.fm.op[3].rr=9;
+    nullInsESFM.fm.op[3].mult=1;
   }
 };
 

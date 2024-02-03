@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,10 +57,12 @@ class DivPlatformVB: public DivDispatch {
   int tempR;
   unsigned char modulation;
   bool modType;
+  bool romMode;
   signed char modTable[32];
   VSU* vb;
   unsigned char regPool[0x600];
   void updateWave(int ch);
+  void updateROMWaves();
   void writeEnv(int ch, bool upperByteToo=false);
   friend void putDispatchChip(void*,int);
   friend void putDispatchChan(void*,int,int);

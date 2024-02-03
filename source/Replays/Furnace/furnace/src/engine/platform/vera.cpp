@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,10 +70,18 @@ void DivPlatformVERA::acquire(short** buf, size_t len) {
         if (!isMuted[16]) {
           // TODO stereo samples once DivSample has a support for it
           if (chan[16].pcm.depth16) {
-            tmp_l=s->data16[chan[16].pcm.pos];
+            if (chan[16].pcm.pos<s->samples) {
+              tmp_l=s->data16[chan[16].pcm.pos];
+            } else {
+              tmp_l=0;
+            }
             tmp_r=tmp_l;
           } else {
-            tmp_l=s->data8[chan[16].pcm.pos];
+            if (chan[16].pcm.pos<s->samples) {
+              tmp_l=s->data8[chan[16].pcm.pos];
+            } else {
+              tmp_l=0;
+            }
             tmp_r=tmp_l;
           }
           if (!(chan[16].pan&1)) tmp_l=0;
@@ -136,6 +144,7 @@ void DivPlatformVERA::reset() {
   }
   chan[16].vol=15;
   chan[16].pan=3;
+  lastCenterRate=-1;
 }
 
 int DivPlatformVERA::calcNoteFreq(int ch, int note) {
@@ -218,11 +227,12 @@ void DivPlatformVERA::tick(bool sysTick) {
     double off=65536.0;
     if (chan[16].pcm.sample>=0 && chan[16].pcm.sample<parent->song.sampleLen) {
       DivSample* s=parent->getSample(chan[16].pcm.sample);
-      if (s->centerRate<1) {
-        off=65536.0;
-      } else {
+      lastCenterRate=s->centerRate;
+      if (s->centerRate>=1) {
         off=65536.0*(s->centerRate/8363.0);
       }
+    } else if (lastCenterRate>=1) {
+      off=65536.0*(lastCenterRate/8363.0);
     }
     chan[16].freq=parent->calcFreq(chan[16].baseFreq,chan[16].pitch,chan[16].fixedArp?chan[16].baseNoteOverride:chan[16].arpOff,chan[16].fixedArp,false,8,chan[16].pitch2,chipClock,off);
     if (chan[16].freq>128) chan[16].freq=128;
@@ -289,10 +299,15 @@ int DivPlatformVERA::dispatch(DivCommand c) {
       if (c.chan<16) {
         rWriteLo(c.chan,2,chan[c.chan].vol);
       } else {
+        DivInstrument* ins=parent->getIns(chan[16].ins,DIV_INS_VERA);
         if (c.value!=DIV_NOTE_NULL) {
-          DivInstrument* ins=parent->getIns(chan[16].ins,DIV_INS_VERA);
           chan[16].pcm.sample=ins->amiga.getSample(c.value);
+          chan[16].sampleNote=c.value;
           c.value=ins->amiga.getFreq(c.value);
+          chan[16].sampleNoteDelta=c.value-chan[c.chan].sampleNote;
+        } else if (chan[c.chan].sampleNote!=DIV_NOTE_NULL) {
+          chan[16].pcm.sample=ins->amiga.getSample(chan[c.chan].sampleNote);
+          c.value=ins->amiga.getFreq(chan[c.chan].sampleNote);
         }
         if (chan[16].pcm.sample<0 || chan[16].pcm.sample>=parent->song.sampleLen) {
           chan[16].pcm.sample=-1;
@@ -361,7 +376,7 @@ int DivPlatformVERA::dispatch(DivCommand c) {
       chan[c.chan].freqChanged=true;
       break;
     case DIV_CMD_NOTE_PORTA: {
-      int destFreq=calcNoteFreq(c.chan,c.value2);
+      int destFreq=calcNoteFreq(c.chan,c.value2+chan[c.chan].sampleNoteDelta);
       bool return2=false;
       if (destFreq>chan[c.chan].baseFreq) {
         chan[c.chan].baseFreq+=c.value;
@@ -384,7 +399,7 @@ int DivPlatformVERA::dispatch(DivCommand c) {
       break;
     }
     case DIV_CMD_LEGATO:
-      chan[c.chan].baseFreq=calcNoteFreq(c.chan,c.value+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val):(0)));
+      chan[c.chan].baseFreq=calcNoteFreq(c.chan,c.value+chan[c.chan].sampleNoteDelta+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val):(0)));
       chan[c.chan].freqChanged=true;
       chan[c.chan].note=c.value;
       break;
@@ -424,11 +439,11 @@ int DivPlatformVERA::dispatch(DivCommand c) {
     case DIV_CMD_MACRO_ON:
       chan[c.chan].std.mask(c.value,false);
       break;
+    case DIV_CMD_MACRO_RESTART:
+      chan[c.chan].std.restart(c.value);
+      break;
     case DIV_CMD_EXTERNAL:
       rWriteZSMSync(c.value);
-      break;
-    case DIV_ALWAYS_SET_VOLUME:
-      return 0;
       break;
     default:
       break;
@@ -458,6 +473,10 @@ unsigned char* DivPlatformVERA::getRegisterPool() {
 
 int DivPlatformVERA::getRegisterPoolSize() {
   return 67;
+}
+
+bool DivPlatformVERA::getLegacyAlwaysSetVolume() {
+  return false;
 }
 
 void DivPlatformVERA::muteChannel(int ch, bool mute) {

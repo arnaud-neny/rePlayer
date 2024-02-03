@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -406,7 +406,12 @@ int DivPlatformAY8930::dispatch(DivCommand c) {
         if (ins->type==DIV_INS_AMIGA || ins->amiga.useSample) {
           if (c.value!=DIV_NOTE_NULL) {
             chan[c.chan].dac.sample=ins->amiga.getSample(c.value);
+            chan[c.chan].sampleNote=c.value;
             c.value=ins->amiga.getFreq(c.value);
+            chan[c.chan].sampleNoteDelta=c.value-chan[c.chan].sampleNote;
+          } else if (chan[c.chan].sampleNote!=DIV_NOTE_NULL) {
+            chan[c.chan].dac.sample=ins->amiga.getSample(chan[c.chan].sampleNote);
+            c.value=ins->amiga.getFreq(chan[c.chan].sampleNote);
           }
           if (chan[c.chan].dac.sample<0 || chan[c.chan].dac.sample>=parent->song.sampleLen) {
             chan[c.chan].dac.sample=-1;
@@ -458,6 +463,8 @@ int DivPlatformAY8930::dispatch(DivCommand c) {
         break;
       }
       if (c.value!=DIV_NOTE_NULL) {
+        chan[c.chan].sampleNote=DIV_NOTE_NULL;
+        chan[c.chan].sampleNoteDelta=0;
         chan[c.chan].baseFreq=NOTE_PERIODIC(c.value);
         chan[c.chan].freqChanged=true;
         chan[c.chan].note=c.value;
@@ -520,7 +527,7 @@ int DivPlatformAY8930::dispatch(DivCommand c) {
       break;
     }
     case DIV_CMD_NOTE_PORTA: {
-      int destFreq=NOTE_PERIODIC(c.value2);
+      int destFreq=NOTE_PERIODIC(c.value2+chan[c.chan].sampleNoteDelta);
       bool return2=false;
       if (destFreq>chan[c.chan].baseFreq) {
         chan[c.chan].baseFreq+=c.value;
@@ -543,7 +550,7 @@ int DivPlatformAY8930::dispatch(DivCommand c) {
       break;
     }
     case DIV_CMD_LEGATO: {
-      chan[c.chan].baseFreq=NOTE_PERIODIC(c.value);
+      chan[c.chan].baseFreq=NOTE_PERIODIC(c.value+chan[c.chan].sampleNoteDelta);
       chan[c.chan].freqChanged=true;
       break;
     }
@@ -653,8 +660,8 @@ int DivPlatformAY8930::dispatch(DivCommand c) {
     case DIV_CMD_MACRO_ON:
       chan[c.chan].std.mask(c.value,false);
       break;
-    case DIV_ALWAYS_SET_VOLUME:
-      return 0;
+    case DIV_CMD_MACRO_RESTART:
+      chan[c.chan].std.restart(c.value);
       break;
     case DIV_CMD_GET_VOLMAX:
       return 31;
@@ -718,6 +725,10 @@ DivDispatchOscBuffer* DivPlatformAY8930::getOscBuffer(int ch) {
   return oscBuf[ch];
 }
 
+int DivPlatformAY8930::mapVelocity(int ch, float vel) {
+  return round(31.0*pow(vel,0.22));
+}
+
 unsigned char* DivPlatformAY8930::getRegisterPool() {
   return regPool;
 }
@@ -772,6 +783,10 @@ int DivPlatformAY8930::getOutputCount() {
 
 bool DivPlatformAY8930::keyOffAffectsArp(int ch) {
   return true;
+}
+
+bool DivPlatformAY8930::getLegacyAlwaysSetVolume() {
+  return false;
 }
 
 void DivPlatformAY8930::notifyInsDeletion(void* ins) {

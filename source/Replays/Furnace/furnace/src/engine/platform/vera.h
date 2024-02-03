@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,13 +30,13 @@ class DivPlatformVERA: public DivDispatch {
   protected:
     struct Channel: public SharedChannel<int> {
       unsigned char pan;
-      unsigned accum;
+      unsigned int accum;
       int noiseval;
 
       struct PCMChannel {
         int sample;
-        unsigned pos;
-        unsigned len;
+        unsigned int pos;
+        unsigned int len;
         unsigned char freq;
         bool depth16;
         PCMChannel(): sample(-1), pos(0), len(0), freq(0), depth16(false) {}
@@ -54,6 +54,7 @@ class DivPlatformVERA: public DivDispatch {
     unsigned char regPool[69];
     struct VERA_PSG* psg;
     struct VERA_PCM* pcm;
+    int lastCenterRate;
   
     int calcNoteFreq(int ch, int note);
     friend void putDispatchChip(void*,int);
@@ -72,6 +73,7 @@ class DivPlatformVERA: public DivDispatch {
     void tick(bool sysTick=true);
     void muteChannel(int ch, bool mute);
     void setFlags(const DivConfig& flags);
+    bool getLegacyAlwaysSetVolume();
     void notifyInsDeletion(void* ins);
     float getPostAmp();
     int getOutputCount();

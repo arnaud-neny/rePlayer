@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -343,6 +343,10 @@ void DivPlatformNES::tick(bool sysTick) {
           } else {
             rWrite(0x4010,calcDPCMRate(dacRate)|(goingToLoop?0x40:0));
           }
+          if (nextDPCMDelta>=0) {
+            rWrite(0x4011,nextDPCMDelta);
+            nextDPCMDelta=-1;
+          }
           rWrite(0x4012,(dpcmAddr>>6)&0xff);
           rWrite(0x4013,dpcmLen&0xff);
           rWrite(0x4015,31);
@@ -373,11 +377,45 @@ int DivPlatformNES::dispatch(DivCommand c) {
   switch (c.cmd) {
     case DIV_CMD_NOTE_ON:
       if (c.chan==4) { // PCM
-        DivInstrument* ins=parent->getIns(chan[c.chan].ins,DIV_INS_STD);
-        if (ins->type==DIV_INS_AMIGA) {
+        DivInstrument* ins=parent->getIns(chan[c.chan].ins,DIV_INS_NES);
+        if (ins->type==DIV_INS_AMIGA || (ins->type==DIV_INS_NES && !parent->song.oldDPCM)) {
+          if (ins->type==DIV_INS_NES) {
+            if (!dpcmMode) {
+              dpcmMode=true;
+              if (dumpWrites) addWrite(0xffff0002,0);
+              dacSample=-1;
+              rWrite(0x4015,15);
+              rWrite(0x4010,0);
+              rWrite(0x4012,0);
+              rWrite(0x4013,0);
+              rWrite(0x4015,31);
+            }
+
+            if (ins->amiga.useNoteMap) {
+              nextDPCMFreq=ins->amiga.getDPCMFreq(c.value);
+              if (nextDPCMFreq<0 || nextDPCMFreq>15) nextDPCMFreq=lastDPCMFreq;
+              lastDPCMFreq=nextDPCMFreq;
+              nextDPCMDelta=ins->amiga.getDPCMDelta(c.value);
+            } else {
+              if (c.value==DIV_NOTE_NULL) {
+                nextDPCMFreq=lastDPCMFreq;
+              } else {
+                nextDPCMFreq=c.value&15;
+              }
+            }
+          }
           if (c.value!=DIV_NOTE_NULL) {
             dacSample=ins->amiga.getSample(c.value);
-            c.value=ins->amiga.getFreq(c.value);
+            if (ins->type==DIV_INS_AMIGA) {
+              chan[c.chan].sampleNote=c.value;
+              c.value=ins->amiga.getFreq(c.value);
+              chan[c.chan].sampleNoteDelta=c.value-chan[c.chan].sampleNote;
+            }
+          } else if (chan[c.chan].sampleNote!=DIV_NOTE_NULL) {
+            dacSample=ins->amiga.getSample(chan[c.chan].sampleNote);
+            if (ins->type==DIV_INS_AMIGA) {
+              c.value=ins->amiga.getFreq(chan[c.chan].sampleNote);
+            }
           }
           if (dacSample<0 || dacSample>=parent->song.sampleLen) {
             dacSample=-1;
@@ -452,7 +490,7 @@ int DivPlatformNES::dispatch(DivCommand c) {
       }
       chan[c.chan].active=true;
       chan[c.chan].keyOn=true;
-      chan[c.chan].macroInit(parent->getIns(chan[c.chan].ins,DIV_INS_STD));
+      chan[c.chan].macroInit(parent->getIns(chan[c.chan].ins,DIV_INS_NES));
       if (!parent->song.brokenOutVol && !chan[c.chan].std.vol.will) {
         chan[c.chan].outVol=chan[c.chan].vol;
       }
@@ -504,7 +542,7 @@ int DivPlatformNES::dispatch(DivCommand c) {
       chan[c.chan].freqChanged=true;
       break;
     case DIV_CMD_NOTE_PORTA: {
-      int destFreq=(c.chan==4)?(parent->calcBaseFreq(1,1,c.value2,false)):(NOTE_PERIODIC(c.value2));
+      int destFreq=(c.chan==4)?(parent->calcBaseFreq(1,1,c.value2+chan[c.chan].sampleNoteDelta,false)):(NOTE_PERIODIC(c.value2));
       bool return2=false;
       if (destFreq>chan[c.chan].baseFreq) {
         chan[c.chan].baseFreq+=c.value;
@@ -605,7 +643,7 @@ int DivPlatformNES::dispatch(DivCommand c) {
     case DIV_CMD_LEGATO:
       if (c.chan==3) break;
       if (c.chan==4) {
-        chan[c.chan].baseFreq=parent->calcBaseFreq(1,1,c.value+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val):(0)),false);
+        chan[c.chan].baseFreq=parent->calcBaseFreq(1,1,c.value+chan[c.chan].sampleNoteDelta+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val):(0)),false);
       } else {
         chan[c.chan].baseFreq=NOTE_PERIODIC(c.value+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val):(0)));
       }
@@ -614,7 +652,7 @@ int DivPlatformNES::dispatch(DivCommand c) {
       break;
     case DIV_CMD_PRE_PORTA:
       if (chan[c.chan].active && c.value2) {
-        if (parent->song.resetMacroOnPorta) chan[c.chan].macroInit(parent->getIns(chan[c.chan].ins,DIV_INS_STD));
+        if (parent->song.resetMacroOnPorta) chan[c.chan].macroInit(parent->getIns(chan[c.chan].ins,DIV_INS_NES));
       }
       if (!chan[c.chan].inPorta && c.value && !parent->song.brokenPortaArp && chan[c.chan].std.arp.will && !NEW_ARP_STRAT) chan[c.chan].baseFreq=NOTE_PERIODIC(chan[c.chan].note);
       chan[c.chan].inPorta=c.value;
@@ -628,8 +666,8 @@ int DivPlatformNES::dispatch(DivCommand c) {
     case DIV_CMD_MACRO_ON:
       chan[c.chan].std.mask(c.value,false);
       break;
-    case DIV_ALWAYS_SET_VOLUME:
-      return 1;
+    case DIV_CMD_MACRO_RESTART:
+      chan[c.chan].std.restart(c.value);
       break;
     default:
       break;
@@ -700,6 +738,8 @@ void DivPlatformNES::reset() {
   goingToLoop=false;
   countMode=false;
   nextDPCMFreq=-1;
+  nextDPCMDelta=-1;
+  lastDPCMFreq=15;
   linearCount=255;
 
   if (useNP) {

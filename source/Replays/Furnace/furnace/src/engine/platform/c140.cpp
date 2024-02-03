@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2023 tildearrow and contributors
+ * Copyright (C) 2021-2024 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -271,6 +271,14 @@ void DivPlatformC140::tick(bool sysTick) {
             }
           }
         } else {
+          switch (bankType) {
+            case 0:
+              bank=((bank&8)<<2)|(bank&7);
+              break;
+            case 1:
+              bank=((bank&0x18)<<1)|(bank&7);
+              break;
+          }
           rWrite(0x04+(i<<4),bank);
         }
         rWrite(0x06+(i<<4),(start>>8)&0xff);
@@ -312,7 +320,9 @@ int DivPlatformC140::dispatch(DivCommand c) {
       chan[c.chan].macroPanMul=ins->type==DIV_INS_AMIGA?127:255;
       if (c.value!=DIV_NOTE_NULL) {
         chan[c.chan].sample=ins->amiga.getSample(c.value);
+        chan[c.chan].sampleNote=c.value;
         c.value=ins->amiga.getFreq(c.value);
+        chan[c.chan].sampleNoteDelta=c.value-chan[c.chan].sampleNote;
       }
       if (c.value!=DIV_NOTE_NULL) {
         chan[c.chan].baseFreq=NOTE_FREQUENCY(c.value);
@@ -385,7 +395,7 @@ int DivPlatformC140::dispatch(DivCommand c) {
       chan[c.chan].freqChanged=true;
       break;
     case DIV_CMD_NOTE_PORTA: {
-      int destFreq=NOTE_FREQUENCY(c.value2);
+      int destFreq=NOTE_FREQUENCY(c.value2+chan[c.chan].sampleNoteDelta);
       bool return2=false;
       if (destFreq>chan[c.chan].baseFreq) {
         chan[c.chan].baseFreq+=c.value;
@@ -408,7 +418,7 @@ int DivPlatformC140::dispatch(DivCommand c) {
       break;
     }
     case DIV_CMD_LEGATO: {
-      chan[c.chan].baseFreq=NOTE_FREQUENCY(c.value+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val-12):(0)));
+      chan[c.chan].baseFreq=NOTE_FREQUENCY(c.value+chan[c.chan].sampleNoteDelta+((HACKY_LEGATO_MESS)?(chan[c.chan].std.arp.val-12):(0)));
       chan[c.chan].freqChanged=true;
       chan[c.chan].note=c.value;
       break;
@@ -433,8 +443,8 @@ int DivPlatformC140::dispatch(DivCommand c) {
     case DIV_CMD_MACRO_ON:
       chan[c.chan].std.mask(c.value,false);
       break;
-    case DIV_ALWAYS_SET_VOLUME:
-      return 1;
+    case DIV_CMD_MACRO_RESTART:
+      chan[c.chan].std.restart(c.value);
       break;
     default:
       break;
@@ -548,7 +558,15 @@ const void* DivPlatformC140::getSampleMem(int index) {
 }
 
 size_t DivPlatformC140::getSampleMemCapacity(int index) {
-  return index == 0 ? (is219?524288:16777216) : 0;
+  if (index!=0) return 0;
+  if (is219) return 524288;
+  switch (bankType) {
+    case 0:
+      return 2097152;
+    case 1:
+      return 4194304;
+  }
+  return 16777216;
 }
 
 size_t DivPlatformC140::getSampleMemUsage(int index) {
@@ -562,7 +580,7 @@ bool DivPlatformC140::isSampleLoaded(int index, int sample) {
 }
 
 void DivPlatformC140::renderSamples(int sysID) {
-  memset(sampleMem,0,getSampleMemCapacity());
+  memset(sampleMem,0,is219?524288:16777216);
   memset(sampleOff,0,256*sizeof(unsigned int));
   memset(sampleLoaded,0,256*sizeof(bool));
 
@@ -701,6 +719,10 @@ void DivPlatformC140::setFlags(const DivConfig& flags) {
     CHECK_CUSTOM_CLOCK;
     rate=chipClock/192;
   }
+  bankType=flags.getInt("bankType",0);
+  if (!is219) {
+    c140_bank_type(&c140,bankType);
+  }
   for (int i=0; i<totalChans; i++) {
     oscBuf[i]->rate=rate;
   }
@@ -710,12 +732,13 @@ int DivPlatformC140::init(DivEngine* p, int channels, int sugRate, const DivConf
   parent=p;
   dumpWrites=false;
   skipRegisterWrites=false;
+  bankType=2;
 
   for (int i=0; i<totalChans; i++) {
     isMuted[i]=false;
     oscBuf[i]=new DivDispatchOscBuffer;
   }
-  sampleMem=new unsigned char[getSampleMemCapacity()];
+  sampleMem=new unsigned char[is219?524288:16777216];
   sampleMemLen=0;
   if (is219) {
     c219_init(&c219);

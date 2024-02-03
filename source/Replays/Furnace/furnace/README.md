@@ -31,6 +31,7 @@ for other operating systems, you may [build the source](#developer-info).
     - YM3812 (OPL2)
     - YMF262 (OPL3) with full 4-op support!
     - Y8950 (OPL with ADPCM)
+  - ESS ESFM (like OPL3 but with more features)
   - square wave chips:
     - AY-3-8910/YM2149(F) used in several computers and game consoles
     - Commodore VIC used in the VIC-20
@@ -80,11 +81,13 @@ for other operating systems, you may [build the source](#developer-info).
   - Casio PV-1000
   - TIA used in Atari 2600
   - POKEY used in Atari 8-bit computers
-  - Game Boy
+  - **Game Boy**
+    - including SOFTWARE ENVELOPES (zombie mode)
   - Virtual Boy
   - modern/fantasy:
     - Commander X16 VERA
     - tildearrow Sound Unit
+    - PowerNoise
     - Generic PCM DAC
 - mix and match sound chips!
   - over 200 ready to use presets from computers, game consoles and arcade boards...
@@ -360,7 +363,7 @@ you should only save as .dmf if you're really sure, because the DefleMask format
 ---
 # footnotes
 
-copyright (C) 2021-2023 tildearrow and contributors.
+copyright (C) 2021-2024 tildearrow and contributors.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 

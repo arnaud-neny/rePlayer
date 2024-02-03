@@ -1,6 +1,11 @@
 // Furnace is generated from original repository using:
 // cmake .. -DBUILD_GUI=OFF -DUSE_RTMIDI=OFF -DUSE_SDL2=OFF -DUSE_SNDFILE=OFF -DUSE_BACKWARD=OFF -DWITH_JACK=OFF -DWITH_PORTAUDIO=OFF -DWITH_DEMOS=OFF -DWITH_INSTRUMENTS=OFF -DWITH_WAVETABLES=OFF
-// plus some minor changes to avoid memory leak and useless libraries
+// plus some minor changes to avoid memory leak and useless libraries:
+// - configEngine.cpp
+// - engine.cpp
+// - engine.h
+// - fileOps.cpp
+// - fileutills.cpp
 #include "ReplayFurnace.h"
 
 #include <Audio/Audiotypes.inl.h>
@@ -17,7 +22,7 @@ namespace rePlayer
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
         .extensions = "fur;dmf;ftm",
-        .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2023 tildearrow and contributors",
+        .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2024 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
 

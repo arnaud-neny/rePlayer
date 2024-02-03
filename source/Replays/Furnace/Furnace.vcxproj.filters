@@ -135,6 +135,27 @@
     <Filter Include="Source Files\furnace\engine\effect">
       <UniqueIdentifier>{72efef41-708e-486e-9838-00b35ffba515}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\YMF276-LLE">
+      <UniqueIdentifier>{c365fb3b-e193-41ca-b43a-2c0508519754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\YM3812-LLE">
+      <UniqueIdentifier>{977dba20-0582-4e67-8a79-141d6291ac8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\YMF262-LLE">
+      <UniqueIdentifier>{ba7cc314-d90a-48ba-aa38-1bbf423c60b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ESFMu">
+      <UniqueIdentifier>{e2402ac9-933a-4eae-a50b-380ec78ed6ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pwrnoise">
+      <UniqueIdentifier>{18e16917-9a95-4916-a093-4e4400a54b2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IconFontCppHeaders">
+      <UniqueIdentifier>{c5814cbc-db43-431e-b7ec-3b4656aa25c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\icon">
+      <UniqueIdentifier>{3f88746c-9fae-4529-95ec-3839f3c054ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayFurnace.h">
@@ -869,6 +890,39 @@
     <ClInclude Include="furnace\src\engine\platform\zxbeeperquadtone.h">
       <Filter>Source Files\furnace\engine\platform</Filter>
     </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_opl.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_pcm.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\esfm.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\powernoise.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YMF276-LLE\fmopn2.h">
+      <Filter>Source Files\YMF276-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM3812-LLE\fmopl2.h">
+      <Filter>Source Files\YM3812-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YMF262-LLE\fmopl3.h">
+      <Filter>Source Files\YMF262-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\ESFMu\esfm.h">
+      <Filter>Source Files\ESFMu</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\pwrnoise\pwrnoise.h">
+      <Filter>Source Files\pwrnoise</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\IconFontCppHeaders\IconsFontAwesome4.h">
+      <Filter>Source Files\IconFontCppHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\icon\furIcons.h">
+      <Filter>Source Files\furnace\icon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFurnace.cpp">
@@ -1542,6 +1596,39 @@
     </ClCompile>
     <ClCompile Include="furnace\src\audio\midi.cpp">
       <Filter>Source Files\furnace\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opl.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_pcm.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\esfm.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\powernoise.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\pitchTable.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YMF276-LLE\fmopn2.c">
+      <Filter>Source Files\YMF276-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YM3812-LLE\fmopl2.c">
+      <Filter>Source Files\YM3812-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YMF262-LLE\fmopl3.c">
+      <Filter>Source Files\YMF262-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\ESFMu\esfm.c">
+      <Filter>Source Files\ESFMu</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\ESFMu\esfm_registers.c">
+      <Filter>Source Files\ESFMu</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\pwrnoise\pwrnoise.c">
+      <Filter>Source Files\pwrnoise</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
