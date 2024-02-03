@@ -1,14 +1,18 @@
-v0.12.4:
+v0.12.5:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
 - Updated ASAP to 6.0.1
+- Updated Furnace to 0.6.1
 - Updated gbsplay to 0.0.95
 - Updated libsc68 to 3.0.0a r705
 - Updated libsidplay to 2.6.0
 - Updated UADE with Jochen Hippel ST player 1.3
 - Updated ZXTune to r5056+
-- Updated libcurl to 8.5.0
+- Updated dr_flac to 0.12.42
+- Updated dr_mp3 to 0.6.38
+- Updated dr_wav to 0.13.15
+- Updated libcurl to 8.6.0
 - Updated ImGui to 1.90.1
 - Updated TagLib to 2.0
 - Updated TinyXML-2 to 10.0.0
