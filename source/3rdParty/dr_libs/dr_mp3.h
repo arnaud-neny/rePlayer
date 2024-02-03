@@ -1,6 +1,6 @@
 /*
 MP3 audio decoder. Choice of public domain or MIT-0. See license statements at the end of this file.
-dr_mp3 - v0.6.35 - 2022-05-22
+dr_mp3 - v0.6.38 - 2023-11-02
 
 David Reid - mackron@gmail.com
 
@@ -95,7 +95,7 @@ extern "C" {
 
 #define DRMP3_VERSION_MAJOR     0
 #define DRMP3_VERSION_MINOR     6
-#define DRMP3_VERSION_REVISION  35
+#define DRMP3_VERSION_REVISION  38
 #define DRMP3_VERSION_STRING    DRMP3_XSTRINGIFY(DRMP3_VERSION_MAJOR) "." DRMP3_XSTRINGIFY(DRMP3_VERSION_MINOR) "." DRMP3_XSTRINGIFY(DRMP3_VERSION_REVISION)
 
 #include <stddef.h> /* For size_t. */
@@ -355,7 +355,7 @@ typedef struct
 typedef struct
 {
     drmp3dec decoder;
-    drmp3dec_frame_info frameInfo;
+    drmp3dec_frame_info frameInfo; // rePlayer
     drmp3_uint32 channels;
     drmp3_uint32 sampleRate;
     drmp3_read_proc onRead;
@@ -714,7 +714,7 @@ static int drmp3_have_simd(void)
 
 #endif
 
-#if defined(__ARM_ARCH) && (__ARM_ARCH >= 6) && !defined(__aarch64__) && !defined(_M_ARM64)
+#if defined(__ARM_ARCH) && (__ARM_ARCH >= 6) && !defined(__aarch64__) && !defined(_M_ARM64) && !defined(__ARM_ARCH_6M__)
 #define DRMP3_HAVE_ARMV6 1
 static __inline__ __attribute__((always_inline)) drmp3_int32 drmp3_clip_int16_arm(drmp3_int32 a)
 {
@@ -2702,13 +2702,17 @@ static drmp3_uint32 drmp3_decode_next_frame_ex__callbacks(drmp3* pMP3, drmp3d_sa
         DRMP3_ASSERT(pMP3->pData != NULL);
         DRMP3_ASSERT(pMP3->dataCapacity > 0);
 
+        /* Do a runtime check here to try silencing a false-positive from clang-analyzer. */
+        if (pMP3->pData == NULL) {
+            return 0;
+        }
+
         pcmFramesRead = drmp3dec_decode_frame(&pMP3->decoder, pMP3->pData + pMP3->dataConsumed, (int)pMP3->dataSize, pPCMFrames, &info);    /* <-- Safe size_t -> int conversion thanks to the check above. */
 
         /* Consume the data. */
         if (info.frame_bytes > 0) {
             pMP3->dataConsumed += (size_t)info.frame_bytes;
             pMP3->dataSize     -= (size_t)info.frame_bytes;
-            pMP3->frameInfo     = info;
         }
 
         /* pcmFramesRead will be equal to 0 if decoding failed. If it is zero and info.frame_bytes > 0 then we have successfully decoded the frame. */
@@ -2777,7 +2781,7 @@ static drmp3_uint32 drmp3_decode_next_frame_ex__memory(drmp3* pMP3, drmp3d_sampl
             pMP3->pcmFramesRemainingInMP3Frame = pcmFramesRead;
             pMP3->mp3FrameChannels             = info.channels;
             pMP3->mp3FrameSampleRate           = info.hz;
-            pMP3->frameInfo                    = info;
+            pMP3->frameInfo                    = info; // rePlayer
             break;
         } else if (info.frame_bytes > 0) {
             /* No frames were read, but it looks like we skipped past one. Read the next MP3 frame. */
@@ -4493,7 +4497,16 @@ counts rather than sample counts.
 /*
 REVISION HISTORY
 ================
-v0.6.35 - 2022-05-22
+v0.6.38 - 2023-11-02
+  - Fix build for ARMv6-M.
+
+v0.6.37 - 2023-07-07
+  - Silence a static analysis warning.
+
+v0.6.36 - 2023-06-17
+  - Fix an incorrect date in revision history. No functional change.
+
+v0.6.35 - 2023-05-22
   - Minor code restructure. No functional change.
 
 v0.6.34 - 2022-09-17
