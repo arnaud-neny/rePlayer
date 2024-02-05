@@ -934,7 +934,7 @@ namespace rePlayer
                 ImGui::SameLine();
                 auto playbackTime = player->GetPlaybackTimeInMs();
                 auto durationCs = player->GetSong()->subsongs[musicId.subsongId.index].durationCs;
-                auto duration = Max(1u, durationCs, playbackTime);
+                auto duration = Max(1u, durationCs * 10, playbackTime);
                 if (m_mode == Mode::Solo)
                 {
                     if (m_seekPos >= 0)
