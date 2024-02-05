@@ -243,6 +243,7 @@ COUNTRY(784, "United Arab Emirates", "ae", "are")
 COUNTRY(826, "United Kingdom", "gb", "gbr")
 COUNTRY(827, "Scotland", "gb", "gbr")//fake iso: I incremented the previous iso
 COUNTRY(828, "Isle of Wight", "im", "imn")//fake iso: I incremented the previous iso
+COUNTRY(829, "Northern Ireland", "gb", "gbr")//fake iso: I incremented the previous iso
 COUNTRY(840, "USA", "us", "usa")
 COUNTRY(840, "United States", "us", "usa")
 COUNTRY(840, "United States of America", "us", "usa")
