@@ -228,10 +228,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="gme\gme\Ym2612_Nuked.cpp" />
     <ClCompile Include="ReplayGME.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="gme\gme\gme_types.h.in" />
-    <None Include="gme\gme\libgme.pc.in" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

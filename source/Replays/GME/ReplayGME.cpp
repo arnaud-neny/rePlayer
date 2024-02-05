@@ -11,12 +11,15 @@
 
 namespace rePlayer
 {
+    static_assert(GME_VERSION == 0x000700);
+    #define GME_VERSION_STRING "0.6.3+" // @6cd4bdb
+
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::GME,
         .name = "Game-Music-Emu",
         .extensions = "ay;gbs;gym;hes;kss;nsf;nsfe;sap;spc;rsn;vgm;vgz",
-        .about = "Game-Music-Emu 0.7.0 @6cd4bdb" "\nShay Green & Michael Pyne",
-        .settings = "Game-Music-Emu 0.7.0 @6cd4bdb",
+        .about = "Game-Music-Emu " GME_VERSION_STRING "\nShay Green & Michael Pyne",
+        .settings = "Game-Music-Emu " GME_VERSION_STRING,
         .init = ReplayGME::Init,
         .load = ReplayGME::Load,
         .displaySettings = ReplayGME::DisplaySettings,
@@ -247,7 +250,7 @@ namespace rePlayer
         else
             info = "1 channel\n";
         info += gmeInfo->system;
-        info += "\nGame-Music-Emu 0.7.0 @6cd4bdb";
+        info += "\nGame-Music-Emu " GME_VERSION_STRING;
         gme_free_info(gmeInfo);
         return info;
     }

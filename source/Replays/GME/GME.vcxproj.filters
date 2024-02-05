@@ -386,12 +386,4 @@
       <Filter>Source Files\gme\ext</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="gme\gme\gme_types.h.in">
-      <Filter>Source Files\gme</Filter>
-    </None>
-    <None Include="gme\gme\libgme.pc.in">
-      <Filter>Source Files\gme</Filter>
-    </None>
-  </ItemGroup>
 </Project>
