@@ -171,7 +171,7 @@ Or add some comments (and likes) there:
 ### Replays 3rd parties:
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [HivelyTracker](https://github.com/pete-gordon/hivelytracker): ahx-thx-hvl formats.
-- [SoundMon](http://www.brianpostma.com): Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
+- SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
 - [StSound](https://github.com/arnaud-carre/StSound): ym files.
 - [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).

@@ -1,4 +1,4 @@
-v0.12.5:
+v0.12.6:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
@@ -7,6 +7,7 @@ v0.12.5:
 - Updated gbsplay to 0.0.95
 - Updated libsc68 to 3.0.0a r705
 - Updated libsidplay to 2.6.0
+- Updated ProTrekkr to 2.6.4
 - Updated UADE with Jochen Hippel ST player 1.3
 - Updated ZXTune to r5056+
 - Updated dr_flac to 0.12.42
