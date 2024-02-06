@@ -19,8 +19,9 @@
 #include "resource.h"
 
 //Imgui
-static HWND g_hWnd = NULL;
-static bool g_isWindows11 = false;
+static HWND s_hWnd = nullptr;
+static HICON s_hIcon = nullptr;
+static bool s_isWindows11 = false;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 //
@@ -35,13 +36,31 @@ void OnRePlayerSysCommand(bool isMinimizing)
 static RECT GetTrayRect()
 {
     NOTIFYICONIDENTIFIER id = { sizeof(id) };
-    id.hWnd = g_hWnd;
+    id.hWnd = s_hWnd;
     id.uID = 0x777;
     id.guidItem = GUID_NULL;
 
     RECT rect = {};
     Shell_NotifyIconGetRect(&id, &rect);
     return rect;
+}
+
+static void CreateSystrayIcon()
+{
+    NOTIFYICONDATA tnid = {};
+
+    tnid.cbSize = sizeof(NOTIFYICONDATA);
+    tnid.hWnd = s_hWnd;
+    tnid.uID = 0x777;
+    tnid.uFlags = NIF_MESSAGE | NIF_ICON | (s_isWindows11 ? 0 : NIF_TIP);
+    tnid.uCallbackMessage = WM_USER;
+    tnid.hIcon = s_hIcon;
+    if (!s_isWindows11)
+        strcpy_s(tnid.szTip, rePlayer::Core::GetLabel());
+
+    Shell_NotifyIcon(NIM_ADD, &tnid);
+    tnid.uVersion = NOTIFYICON_VERSION_4;
+    Shell_NotifyIcon(NIM_SETVERSION, &tnid);
 }
 
 // Win32 message handler
@@ -54,9 +73,13 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     if (core::Log::IsEnabled())
         core::Log::Message("Win32: %04x %08llx %08llx\n", msg, wParam, lParam);
 */
+    static UINT s_taskbarRestart = 0;
 
     switch (msg)
     {
+    case WM_CREATE:
+        s_taskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
+        break;
     case WM_SYSCOMMAND:
         if (wParam == SC_KEYMENU) // Disable ALT application menu
             return 0;
@@ -104,7 +127,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 s_rePlayer->SystrayMouseRight(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                 break;
             case NIN_POPUPOPEN:
-                if (g_isWindows11) // Windows 11 bug: wrong anchor point...
+                if (s_isWindows11) // Windows 11 bug: wrong anchor point...
                 {
                     auto rc = GetTrayRect();
                     POINT pt = { rc.left, rc.top };
@@ -123,6 +146,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
         }
         return 0;
+    default:
+        if (msg == s_taskbarRestart)
+            CreateSystrayIcon();
     }
     return ::DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -165,7 +191,7 @@ void ImGuiInit()
     style.PopupBorderSize = 0.f;
     style.PopupRounding = 0.f;
 
-    ImGui_ImplWin32_Init(g_hWnd);
+    ImGui_ImplWin32_Init(s_hWnd);
 }
 
 void ImGuiRelease()
@@ -202,7 +228,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         if (NULL != RtlGetVersion) {
             osInfo.dwOSVersionInfoSize = sizeof(osInfo);
             RtlGetVersion(&osInfo);
-            g_isWindows11 = osInfo.dwMajorVersion == 10 && osInfo.dwBuildNumber >= 22000;
+            s_isWindows11 = osInfo.dwMajorVersion == 10 && osInfo.dwBuildNumber >= 22000;
         }
     }
 
@@ -211,16 +237,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
     if (s_rePlayer = RePlayer::Create())
     {
         // Create application window
-        WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, hInstance, LoadIcon(hInstance, MAKEINTRESOURCEA(IDI_MAINICON)), nullptr, nullptr, nullptr, "rePlayer", nullptr };
+        WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, hInstance, s_hIcon = LoadIcon(hInstance, MAKEINTRESOURCEA(IDI_MAINICON)), nullptr, nullptr, nullptr, "rePlayer", nullptr };
         ::RegisterClassEx(&wc);
-        g_hWnd = ::CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
+        s_hWnd = ::CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
 
         ImGuiInit();
 
         core::SharedContexts::Register();
 
         //
-        if (rePlayer::Graphics::Init(g_hWnd))
+        if (rePlayer::Graphics::Init(s_hWnd))
             return -1;
 
 #if 0
@@ -244,8 +270,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         RECT rc;
         if (::EnumDisplayMonitors(NULL, nullptr, Test::proc, reinterpret_cast<LPARAM>(&rc)))
         {
-            ::SetWindowLong(g_hWnd, GWL_STYLE, WS_OVERLAPPED);
-            ::SetWindowPos(g_hWnd, HWND_TOP,//HWND_TOPMOST,
+            ::SetWindowLong(s_hWnd, GWL_STYLE, WS_OVERLAPPED);
+            ::SetWindowPos(s_hWnd, HWND_TOP,//HWND_TOPMOST,
                 rc.left,
                 rc.top,
                 rc.right - rc.left,
@@ -255,33 +281,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 #endif
 
         // Taskbar Icon begin
-        {
-            NOTIFYICONDATA tnid = {};
-
-            tnid.cbSize = sizeof(NOTIFYICONDATA);
-            tnid.hWnd = g_hWnd;
-            tnid.uID = 0x777;
-            tnid.uFlags = NIF_MESSAGE | NIF_ICON | (g_isWindows11 ? 0 : NIF_TIP);
-            tnid.uCallbackMessage = WM_USER;
-            tnid.hIcon = wc.hIcon;
-            if (!g_isWindows11)
-                strcpy_s(tnid.szTip, rePlayer::Core::GetLabel());
-
-            Shell_NotifyIcon(NIM_ADD, &tnid);
-            tnid.uVersion = NOTIFYICON_VERSION_4;
-            Shell_NotifyIcon(NIM_SETVERSION, &tnid);
-        }
+        CreateSystrayIcon();
 
         // Show the window
-        auto mainWindowExStyle = ::GetWindowLong(g_hWnd, GWL_EXSTYLE);
-        ::SetWindowLong(g_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
-        ::ShowWindow(g_hWnd, SW_SHOWDEFAULT);
-        ::UpdateWindow(g_hWnd);
+        auto mainWindowExStyle = ::GetWindowLong(s_hWnd, GWL_EXSTYLE);
+        ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+        ::ShowWindow(s_hWnd, SW_SHOWDEFAULT);
+        ::UpdateWindow(s_hWnd);
 
 /*
-        LONG cur_style = GetWindowLong(g_hWnd, GWL_EXSTYLE);
-        SetWindowLong(g_hWnd, GWL_EXSTYLE, cur_style | WS_EX_TRANSPARENT | WS_EX_LAYERED);//let the hwnd messaged passthrough our app as POC
-        SetWindowPos(g_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);//and let the hwnd always on top to be displayed :)
+        LONG cur_style = GetWindowLong(s_hWnd, GWL_EXSTYLE);
+        SetWindowLong(s_hWnd, GWL_EXSTYLE, cur_style | WS_EX_TRANSPARENT | WS_EX_LAYERED);//let the hwnd messaged passthrough our app as POC
+        SetWindowPos(s_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);//and let the hwnd always on top to be displayed :)
 */
 
         std::srand(static_cast<uint32_t>(std::time(0) & 0xffFFffFF));
@@ -321,11 +332,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 /*
                 if (!ImGui::GetCurrentContext()->HoveredWindow)
                 {
-                    ::SetWindowLong(g_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+                    ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
                 }
                 else
                 {
-                    ::SetWindowLong(g_hWnd, GWL_EXSTYLE, mainWindowExStyle);
+                    ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle);
                 }
 */
 
@@ -342,7 +353,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 NOTIFYICONDATA tnid = {};
 
                 tnid.cbSize = sizeof(NOTIFYICONDATA);
-                tnid.hWnd = g_hWnd;
+                tnid.hWnd = s_hWnd;
                 tnid.uID = 0x777;
 
                 Shell_NotifyIcon(NIM_DELETE, &tnid);
