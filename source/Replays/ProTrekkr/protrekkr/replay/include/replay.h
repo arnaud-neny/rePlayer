@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@
 #include "../sounddriver/include/sounddriver_linux.h"
 #elif defined(__MACOSX__)
 #include "../sounddriver/include/sounddriver_macosx.h"
-#elif defined(__AROS__)
+#elif defined(__AROS__) || defined(__MORPHOS__)
 #include "../sounddriver/include/sounddriver_aros.h"
 #elif defined(__AMIGAOS4__)
 #include "../sounddriver/include/sounddriver_aos4.h"

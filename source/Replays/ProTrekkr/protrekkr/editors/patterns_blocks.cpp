@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1332,7 +1332,6 @@ void Randomize_Block(int Position, int step)
     }
 }
 
-
 // ------------------------------------------------------
 // Fill a selected block with first row data
 void Fill_Block(int Position, int step)
@@ -2314,7 +2313,7 @@ void Reset_Track(int Position, int Track)
 }
 
 // ------------------------------------------------------
-// Copy the data & structure of a track into anoter
+// Copy the data & structure of a track into another
 void Copy_Track(int Position, int Track_Src, int Track_Dst)
 {
     int i;

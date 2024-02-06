@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -667,7 +667,6 @@ unsigned int Player_LE[MAX_TRACKS][MAX_POLYPHONY];
 unsigned int Player_LL[MAX_TRACKS][MAX_POLYPHONY];
 unsigned int Player_NS[MAX_TRACKS][MAX_POLYPHONY];
 
-
 #if defined(PTK_LIMITER_MASTER) || defined(PTK_LIMITER_TRACKS)
 #define MAS_COMPRESSOR_SECONDS 0.1f
 #define MAS_COMPRESSOR_SIZE (int) (MAS_COMPRESSOR_SECONDS * MIX_RATE)
@@ -1052,7 +1051,6 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 
 #if !defined(__STAND_ALONE__)
-
             // Pre-record
             Scope_Dats_LeftRight[0][pos_scope] = clamp_left_value;
             Scope_Dats_LeftRight[1][pos_scope] = clamp_right_value;
@@ -1076,7 +1074,6 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             pos_scope_latency = pos_scope - (AUDIO_Latency / 4);
             if(pos_scope_latency < 0) pos_scope_latency = (AUDIO_Latency / 2) + pos_scope_latency;
 #endif
-
         }
 
         if(local_curr_ramp_vol <= 0.0f)
@@ -2035,13 +2032,6 @@ void PTKEXPORT Ptk_Play(void)
 #endif
 }
 
-#if defined(__PSP__)
-extern "C"
-{
-    void me_sceKernelDcacheWritebackInvalidateAll(void);
-}
-#endif
-
 // ------------------------------------------------------
 // Stop replaying
 extern int AUDIO_Play_Flag;
@@ -2050,11 +2040,10 @@ void PTKEXPORT Ptk_Stop(void)
 {
 #if defined(__PSP__)
     // Thanks to MIPS, that machine really sucks
-    volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset) | 0x40000000);
+    volatile int *ptr_Done_Reset = (int *) (((int) &Done_Reset));
     *ptr_Done_Reset = FALSE;
-    volatile float *ptr_local_ramp_vol = (float *) (((int) &local_ramp_vol) | 0x40000000);
-    volatile float *ptr_local_curr_ramp_vol = (float *) (((int) &local_curr_ramp_vol) | 0x40000000);
-    me_sceKernelDcacheWritebackInvalidateAll();
+    volatile float *ptr_local_ramp_vol = (float *) (((int) &local_ramp_vol));
+    volatile float *ptr_local_curr_ramp_vol = (float *) (((int) &local_curr_ramp_vol));
     sceKernelDcacheWritebackInvalidateAll();
     while(*ptr_Done_Reset == FALSE && AUDIO_Play_Flag && *ptr_local_curr_ramp_vol != 0.0f)
     {

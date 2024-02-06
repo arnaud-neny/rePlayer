@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -70,6 +70,7 @@ extern SynthParameters PARASynth[128];
 
 extern int Beveled;
 char AutoBackup;
+char AutoReload;
 
 int Mod_Length;
 int Mod_Simulate;

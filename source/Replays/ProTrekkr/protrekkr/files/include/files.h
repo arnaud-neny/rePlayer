@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
 #include <include/variables.h>
 #include <replay/include/replay.h>
 
-#if defined(__AROS__)
+#if defined(__AROS__) || defined(__MORPHOS__)
 #include <stdint.h>
 #include <string.h>
 #define int32 int32_t
