@@ -1164,13 +1164,16 @@ namespace rePlayer
             auto file = io::File::OpenForWrite(ms_artistsFilename);
             if (file.IsValid())
             {
-                // todo: remove validation
-                for (auto* artist : m_db.Artists())
-                    ValidateArtist(artist);
-
                 file.Write(kMusicFileStamp);
                 m_db.SaveArtists(file);
             }
+        }
+
+        // todo: remove validation
+        if (saveFlags.value)
+        {
+            for (auto* artist : m_db.Artists())
+                ValidateArtist(artist);
         }
 
         for (auto source : m_sources)
@@ -1183,11 +1186,21 @@ namespace rePlayer
         for (auto* song : m_db.Songs())
         {
             for (auto songArtistId : song->ArtistIds())
+            {
                 if (songArtistId == artist->GetId())
                     numSongs++;
+
+                auto* otherArtist = m_db[songArtistId];
+                if (otherArtist == nullptr)
+                    numSongs = 0;
+            }
         }
 
-        assert(numSongs == artist->NumSongs());
+        if (numSongs != artist->NumSongs())
+        {
+            Log::Error("Artist %d (%s) validation failed!", uint32_t(artist->GetId()), artist->GetHandle(0));
+            assert(0);
+        }
     }
 }
 // namespace rePlayer
