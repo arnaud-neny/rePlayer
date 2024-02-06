@@ -2,11 +2,11 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
     <Type Name="core::BlobArray&lt;*,0&gt;">
-        <DisplayString>numItems = {m_handle.highNumItems * 256 + m_handle.lowNumItems} static</DisplayString>
+        <DisplayString>numItems = {m_handle.numItems &lt; 7 ? m_handle.numItems : ((uint16_t*)(uintptr_t(this) + m_handle.offset))[-1]} static</DisplayString>
         <Expand>
             <ArrayItems>
-                <Size>m_handle.highNumItems * 256 + m_handle.lowNumItems</Size>
-                <ValuePointer>($T1*)(((uint8_t*)this) + m_handle.highOffset * 256 + m_handle.lowOffset)</ValuePointer>
+                <Size>m_handle.numItems &lt; 7 ? m_handle.numItems : ((uint16_t*)(uintptr_t(this) + m_handle.offset))[-1]</Size>
+                <ValuePointer>($T1*)(((uint8_t*)this) + m_handle.offset)</ValuePointer>
             </ArrayItems>
         </Expand>
     </Type>
@@ -22,7 +22,7 @@
     </Type>
 
     <Type Name="core::BlobString&lt;0&gt;">
-        <DisplayString>{((char*)this) + m_handle.highOffset * 256 + m_handle.lowOffset} static</DisplayString>
+        <DisplayString>{((char*)this) + m_handle.offset} static</DisplayString>
     </Type>
 
     <Type Name="core::BlobString&lt;1&gt;">
