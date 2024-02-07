@@ -1635,6 +1635,7 @@ bool IGFD::FileInfos::FinalizeFileTypeParsing(const size_t& vMaxDotToExtract) {
 
 IGFD::FileManager::FileManager() {
     fsRoot = std::string(1u, PATH_SEP);
+    m_FileSystemName = typeid(FILE_SYSTEM_OVERRIDE).name();
     // std::make_unique is not available un cpp11
     m_FileSystemPtr = std::unique_ptr<FILE_SYSTEM_OVERRIDE>(new FILE_SYSTEM_OVERRIDE());
     //m_FileSystemPtr = std::make_unique<FILE_SYSTEM_OVERRIDE>();
@@ -1941,7 +1942,7 @@ void IGFD::FileManager::ScanDir(const FileDialogInternal& vFileDialogInternal, c
 
         ClearFileLists();
 
-        const auto& files = m_FileSystemPtr->ScanDirectory(vPath);
+        const auto& files = m_FileSystemPtr->ScanDirectory(path); // rePlayer
         for (const auto& file : files) {
             m_AddFile(vFileDialogInternal, path, file.fileNameExt, file.fileType);
         }
