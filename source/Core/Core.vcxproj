@@ -61,6 +61,7 @@
     <ClInclude Include="Thread\Mutex.inl.h" />
     <ClInclude Include="Thread\Semaphore.h" />
     <ClInclude Include="Thread\SpinLock.h" />
+    <ClInclude Include="Thread\Thread.h" />
     <ClInclude Include="Xml\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +94,7 @@
     <ClCompile Include="IO\StreamMemory.cpp" />
     <ClCompile Include="Thread\Mutex.cpp" />
     <ClCompile Include="Thread\Semaphore.cpp" />
+    <ClCompile Include="Thread\Thread.cpp" />
     <ClCompile Include="Xml\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>

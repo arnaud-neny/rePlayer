@@ -190,6 +190,9 @@
     <ClInclude Include="JSON\json_fwd.hpp">
       <Filter>Source Files\JSON</Filter>
     </ClInclude>
+    <ClInclude Include="Thread\Thread.h">
+      <Filter>Source Files\Thread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Containers\SmartPtr.inl.h">
@@ -277,6 +280,9 @@
     </ClCompile>
     <ClCompile Include="Core\String.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\Thread.cpp">
+      <Filter>Source Files\Thread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
