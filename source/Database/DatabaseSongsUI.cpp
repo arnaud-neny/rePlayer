@@ -1,10 +1,9 @@
-#include "DatabaseSongsUI.h"
-
 // Core
 #include <ImGui.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <ImGui/imgui_internal.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <Database/Database.h>
@@ -13,11 +12,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Export.h>
 
-// Windows
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#include "DatabaseSongsUI.h"
 
 // stl
 #include <algorithm>
@@ -48,7 +43,7 @@ namespace rePlayer
         {
             m_export->Cancel();
             while (!m_export->IsDone())
-                ::Sleep(1);
+                thread::Sleep(1);
             delete m_export;
         }
         delete m_songFilter;
