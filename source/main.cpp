@@ -11,6 +11,8 @@
 #include <RePlayer/RePlayer.h>
 
 #include <ctime>
+#include <shellapi.h>
+#include <winternl.h>
 
 #if _DEBUG
 //#include <crtdbg.h>

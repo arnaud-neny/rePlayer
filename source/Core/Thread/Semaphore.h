@@ -12,6 +12,7 @@ namespace core::thread
 
         void Signal(uint32_t numEvents = 1);
         void Wait();
+        void Wait(uint32_t timeoutInMs);
 
     private:
         Semaphore(const Semaphore&) = delete;

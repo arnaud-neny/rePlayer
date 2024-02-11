@@ -1,8 +1,5 @@
 #include "Semaphore.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
 #include <windows.h>
 
 namespace core::thread
@@ -26,6 +23,11 @@ namespace core::thread
     void Semaphore::Wait()
     {
         ::WaitForSingleObject(reinterpret_cast<HANDLE>(m_handle), INFINITE);
+    }
+
+    void Semaphore::Wait(uint32_t timeoutInMs)
+    {
+        ::WaitForSingleObject(reinterpret_cast<HANDLE>(m_handle), timeoutInMs);
     }
 }
 // namespace core::thread
