@@ -1,14 +1,9 @@
 #pragma once
 
 #include <Core.h>
-#include <string>
+#include <Containers/Array.h>
 
-namespace core
-{
-    template <typename ItemType>
-    class Array;
-}
-// namespace core
+#include <string>
 
 namespace core::io
 {
