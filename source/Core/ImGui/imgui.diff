@@ -41,7 +41,7 @@ index d556cba..676f65f 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index 110db60..758c080 100644
+index e99a84e..7a3c8aa 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
 @@ -580,7 +580,7 @@ namespace ImGui
@@ -54,10 +54,10 @@ index 110db60..758c080 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 5635f19..8529ea6 100644
+index 1a02470..034b120 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -2235,8 +2235,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+@@ -2241,8 +2241,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
          // One byte is consumed in case of invalid first byte of in_text.
          // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
          // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
@@ -70,7 +70,7 @@ index 5635f19..8529ea6 100644
      }
  
      return wanted;
-@@ -6171,7 +6173,9 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
+@@ -6177,7 +6179,9 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -82,7 +82,7 @@ index 5635f19..8529ea6 100644
      if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
          return false;
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 6cfeeda..9a758a6 100644
+index 0b5dc5b..2c29462 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 @@ -2419,7 +2419,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
@@ -104,7 +104,7 @@ index 6cfeeda..9a758a6 100644
      if (label_size.x > 0.0f)
          RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-index 924f2f1..b3bdf3c 100644
+index b14ae1a..3092038 100644
 --- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
 @@ -999,21 +999,26 @@ struct ImGui_ImplWin32_ViewportData
