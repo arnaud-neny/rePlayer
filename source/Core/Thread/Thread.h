@@ -10,5 +10,14 @@ namespace core::thread
     void SpinPause();
     void SpinMonitor(const void* ptr);
     void SpinWait();
+
+    enum class ID
+    {
+        kUnknown,
+        kMain,
+        kWorker
+    };
+    ID GetCurrentId();
+    void SetCurrentId(ID id);
 }
 // namespace core::thread

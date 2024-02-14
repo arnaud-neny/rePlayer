@@ -5,11 +5,13 @@
 #include <intrin.h>
 
 #ifdef Yield
-#undef Yield
+#   undef Yield
 #endif
 
 namespace core::thread
 {
+    static thread_local ID s_id = ID::kUnknown;
+
     void Sleep(uint32_t milliseconds)
     {
         ::Sleep(milliseconds);
@@ -33,6 +35,16 @@ namespace core::thread
     void SpinWait()
     {
         _mm_mwait(0, 0);
+    }
+
+    ID GetCurrentId()
+    {
+        return s_id;
+    }
+
+    void SetCurrentId(ID id)
+    {
+        s_id = id;
     }
 }
 // namespace core::thread
