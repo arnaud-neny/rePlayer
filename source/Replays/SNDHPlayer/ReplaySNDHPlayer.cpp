@@ -60,9 +60,13 @@ namespace rePlayer
         const auto settingsSize = sizeof(Settings) + (context.lastSubsongIndex + 1) * sizeof(uint32_t);
         auto* dummy = new (_alloca(settingsSize)) Settings(context.lastSubsongIndex);
         auto* entry = context.metadata.Find<Settings>(dummy);
-        if (entry->NumSubsongs() != context.lastSubsongIndex + 1u)
+        if (!entry || entry->NumSubsongs() != context.lastSubsongIndex + 1u)
         {
-            context.metadata.Remove(entry->commandId);
+            if (entry)
+            {
+                dummy->value = entry->value;
+                context.metadata.Remove(entry->commandId);
+            }
             entry = dummy;
         }
 
