@@ -1,6 +1,5 @@
 .vs/
-/.temporaries
-/bin
+/.output
 *.vcxproj.user
 *.aps
 /data/rePlayer.exe
