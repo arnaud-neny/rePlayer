@@ -31,6 +31,16 @@ namespace rePlayer
                     uint32_t surround : 1;
                 };
             };
+            uint32_t durations[0];
+
+            Settings() = default;
+            Settings(uint32_t lastSubsong)
+            {
+                numEntries += uint16_t(lastSubsong + 1);
+                for (uint32_t i = 0; i <= lastSubsong; i++)
+                    durations[i] = 0;
+            }
+            uint32_t NumSubsongs() const { return numEntries - 1; }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -57,6 +67,7 @@ namespace rePlayer
 
     private:
         static constexpr uint32_t kSampleRate = 48000;
+        static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
         struct Subsong
         {
@@ -65,10 +76,13 @@ namespace rePlayer
             Binary::Data::Ptr data;
             Module::Holder::Ptr holder;
             MediaType type = { eExtension::Unknown, eReplay::ZXTune };
+            uint32_t duration = 0;
         };
 
     private:
-        ReplayZXTune(Array<Subsong>&& subsongs);
+        ReplayZXTune(Array<Subsong>&& subsongs, CommandBuffer metadata);
+
+        void BuildDurations(CommandBuffer metadata);
 
     private:
         Array<Subsong> m_subsongs;
@@ -82,6 +96,9 @@ namespace rePlayer
         int32_t m_stereoSeparation;
 
         uint32_t m_channels = 0;
+
+        uint64_t m_currentPosition = 0;
+        uint64_t m_currentDuration = 0;
 
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;

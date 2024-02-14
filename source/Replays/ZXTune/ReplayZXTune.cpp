@@ -68,7 +68,6 @@ namespace rePlayer
 
     Replay* ReplayZXTune::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        (void)metadata;
         if (stream->GetSize() < 8)
             return nullptr;
 
@@ -156,7 +155,7 @@ namespace rePlayer
         static const auto service = ZXTune::Service::Create(Parameters::Container::Create());
         service->DetectModules(std::move(dataContainer), detectCallback);
         if (detectCallback.m_subsongs.IsNotEmpty())
-            return new ReplayZXTune(std::move(detectCallback.m_subsongs));
+            return new ReplayZXTune(std::move(detectCallback.m_subsongs), metadata);
         return nullptr;
     }
 
@@ -172,15 +171,81 @@ namespace rePlayer
 
     void ReplayZXTune::Settings::Edit(ReplayMetadataContext& context)
     {
-        Settings dummy;
-        auto* entry = context.metadata.Find(&dummy);
+        const auto settingsSize = sizeof(Settings) + (context.lastSubsongIndex + 1) * sizeof(uint32_t);
+        auto* dummy = new (_alloca(settingsSize)) Settings(context.lastSubsongIndex);
+        auto* entry = context.metadata.Find<Settings>();
+        if (!entry || entry->NumSubsongs() != context.lastSubsongIndex + 1u)
+        {
+            if (entry)
+            {
+                dummy->value = entry->value;
+                context.metadata.Remove(entry->commandId);
+            }
+            entry = dummy;
+        }
 
         SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
             ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Stereo", "Output: Surround");
 
-        context.metadata.Update(entry, entry->value == 0);
+        const float buttonSize = ImGui::GetFrameHeight();
+        auto* durations = entry->durations;
+        bool isZero = entry->value == 0;
+        for (uint16_t i = 0; i <= context.lastSubsongIndex; i++)
+        {
+            ImGui::PushID(i);
+            bool isEnabled = durations[i] != 0;
+            uint32_t duration = isEnabled ? durations[i] : kDefaultSongDuration;
+            auto pos = ImGui::GetCursorPosX();
+            if (ImGui::Checkbox("##Checkbox", &isEnabled))
+                duration = kDefaultSongDuration;
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!isEnabled);
+            char txt[64];
+            sprintf(txt, "Subsong #%d Duration", i + 1);
+            auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
+            ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
+            ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, txt, ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
+            int32_t milliseconds = duration % 1000;
+            int32_t seconds = (duration / 1000) % 60;
+            int32_t minutes = duration / 60000;
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
+            ImGui::SetNextItemWidth(width / 3.0f);
+            ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
+            ImGui::SetNextItemWidth(width / 2.0f);
+            ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
+            ImGui::SetNextItemWidth(width);
+            ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
+            {
+                context.duration = duration;
+                context.subsongIndex = i;
+                context.isSongEndEditorEnabled = true;
+            }
+            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && context.subsongIndex == i)
+            {
+                milliseconds = context.duration % 1000;
+                seconds = (context.duration / 1000) % 60;
+                minutes = context.duration / 60000;
+                context.duration = 0;
+            }
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Open Waveform Viewer");
+            ImGui::EndDisabled();
+            durations[i] = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
+            ImGui::PopID();
+
+            isZero &= durations[i] == 0;
+        }
+
+        context.metadata.Update(entry, isZero);
     }
 
     int32_t ReplayZXTune::ms_stereoSeparation = 100;
@@ -189,22 +254,37 @@ namespace rePlayer
     ReplayZXTune::~ReplayZXTune()
     {}
 
-    ReplayZXTune::ReplayZXTune(Array<Subsong>&& subsongs)
+    ReplayZXTune::ReplayZXTune(Array<Subsong>&& subsongs, CommandBuffer metadata)
         : Replay(subsongs[0].type)
         , m_subsongs(std::move(subsongs))
         , m_renderer(m_subsongs[0].holder->CreateRenderer(kSampleRate, m_subsongs[0].holder->GetModuleProperties()))
         , m_surround(kSampleRate)
-    {}
+    {
+        BuildDurations(metadata);
+    }
 
     uint32_t ReplayZXTune::Render(StereoSample* output, uint32_t numSamples)
     {
+        auto currentPosition = m_currentPosition;
+        auto currentDuration = m_currentDuration;
+        if (currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
+        {
+            numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
+            if (numSamples == 0)
+            {
+                m_currentPosition = 0;
+                return 0;
+            }
+        }
+        m_currentPosition = currentPosition + numSamples;
+
         auto remainingSamples = numSamples;
         while (remainingSamples)
         {
             if (m_availableSamples == 0)
             {
                 auto loopCount = m_renderer->GetState()->LoopCount();
-                if (m_loopCount != loopCount)
+                if (currentDuration == 0 && m_loopCount != loopCount)
                 {
                     if (remainingSamples == numSamples)
                         m_loopCount = loopCount;
@@ -229,26 +309,41 @@ namespace rePlayer
             m_availableSamples -= samplesToCopy;
             remainingSamples -= samplesToCopy;
         }
-
+        if (currentDuration)
+            m_currentPosition -= remainingSamples;
         return numSamples - remainingSamples;
     }
 
     uint32_t ReplayZXTune::Seek(uint32_t timeInMs)
     {
         m_renderer->SetPosition(Time::Instant<Time::Millisecond>(timeInMs));
-        return m_renderer->GetState()->At().CastTo<Time::Millisecond>().Get();
+        auto currentPosition = m_renderer->GetState()->At().CastTo<Time::Millisecond>().Get();
+        m_currentPosition = (uint64_t(currentPosition) * kSampleRate) / 1000ull;
+        m_availableSamples = 0;
+        m_loopCount = 0;
+        return currentPosition;
     }
 
     void ReplayZXTune::ResetPlayback()
     {
         m_renderer = m_subsongs[m_subsongIndex].holder->CreateRenderer(kSampleRate, m_subsongs[m_subsongIndex].holder->GetModuleProperties());
         m_availableSamples = 0;
+        m_loopCount = 0;
         m_surround.Reset();
+        m_currentPosition = 0;
+        m_currentDuration = (uint64_t(m_subsongs[m_subsongIndex].duration) * kSampleRate) / 1000;
     }
 
     void ReplayZXTune::ApplySettings(const CommandBuffer metadata)
     {
         auto settings = metadata.Find<Settings>();
+        if (settings && settings->NumSubsongs() == GetNumSubsongs())
+        {
+            auto* durations = settings->durations;
+            for (uint32_t i = 0, e = GetNumSubsongs(); i < e; i++)
+                m_subsongs[i].duration = durations[i];
+            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+        }
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
     }
@@ -352,6 +447,24 @@ namespace rePlayer
         info += m_subsongs[m_subsongIndex].decoderDescription;
         info += "\nZXTune " ZXtuneVersion;
         return info;
+    }
+
+    void ReplayZXTune::BuildDurations(CommandBuffer metadata)
+    {
+        uint32_t numSubsongs = GetNumSubsongs();
+        auto settings = metadata.Find<Settings>();
+        if (settings && settings->NumSubsongs() == numSubsongs)
+        {
+            for (uint32_t i = 0; i < numSubsongs; i++)
+                m_subsongs[i].duration = settings->durations[i];
+        }
+        else
+        {
+            metadata.Remove(Settings::kCommandId);
+            for (uint16_t i = 0; i < numSubsongs; i++)
+                m_subsongs[i].duration = 0;
+        }
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
     }
 }
 // namespace rePlayer
