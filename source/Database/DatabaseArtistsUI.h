@@ -101,8 +101,8 @@ namespace rePlayer
         {
             ImGuiTextFilter* filter;
             Array<ArtistID> artists;
-            Artist* masterArtist = nullptr;
-            Artist* mergedArtist = nullptr;
+            ArtistID masterArtistId;
+            ArtistID mergedArtistId;
             bool isActive = false;
         } m_artistMerger;
     };

@@ -173,20 +173,21 @@ namespace rePlayer
             }
             ImGui::EndTable();
 
-            if (m_artistMerger.isActive && m_artistMerger.masterArtist != nullptr)
+            if (m_artistMerger.isActive && m_artistMerger.masterArtistId != ArtistID::Invalid)
                 ImGui::OpenPopup("Merge Artist");
             ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
             if (ImGui::BeginPopupModal("Merge Artist", NULL, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                ImGui::Text("Discard: %s / %04X\nTarget: %s / %04X", m_artistMerger.mergedArtist->GetHandle(), static_cast<uint32_t>(m_artistMerger.mergedArtist->GetId())
-                    , m_artistMerger.masterArtist->GetHandle(), static_cast<uint32_t>(m_artistMerger.masterArtist->GetId()));
+                auto mergedArtistId = m_artistMerger.mergedArtistId;
+                auto masterArtistId = m_artistMerger.masterArtistId;
+                auto* masterArtist = m_db[masterArtistId];
+                auto* mergedArtist = m_db[mergedArtistId];
+                ImGui::Text("Discard: %s / %04X\nTarget: %s / %04X", mergedArtist->GetHandle(), static_cast<uint32_t>(mergedArtistId)
+                    , masterArtist->GetHandle(), static_cast<uint32_t>(masterArtistId));
                 if (ImGui::Button("Proceed", ImVec2(120, 0)))
                 {
                     auto* songs = m_db.GetSongsUI();
-                    auto* mergedArtist = m_artistMerger.mergedArtist;
-                    auto* masterArtist = m_artistMerger.masterArtist->Edit();
-                    auto mergedArtistId = mergedArtist->GetId();
-                    auto masterArtistId = masterArtist->id;
+                    auto* masterArtistSheet = masterArtist->Edit();
 
                     for (auto* song : m_db.Songs())
                     {
@@ -199,7 +200,7 @@ namespace rePlayer
                             {
                                 if (dupArtistPos != song->NumArtistIds())
                                 {
-                                    masterArtist->numSongs--;
+                                    masterArtistSheet->numSongs--;
                                     auto* songSheet = song->Edit();
                                     songSheet->artistIds.RemoveAt(i);
                                     break;
@@ -218,7 +219,7 @@ namespace rePlayer
                                 }
                                 else
                                 {
-                                    masterArtist->numSongs++;
+                                    masterArtistSheet->numSongs++;
                                     dupArtistPos = i;
                                     auto* songSheet = song->Edit();
                                     songSheet->artistIds[i] = masterArtistId;
@@ -232,43 +233,43 @@ namespace rePlayer
                         }
                     }
 
-                    if (masterArtist->realName.IsEmpty())
-                        masterArtist->realName = mergedArtist->GetRealName();
-                    for (size_t j = 0, mergedSize = mergedArtist->NumHandles(), masterSize = masterArtist->handles.NumItems(); j < mergedSize; j++)
+                    if (masterArtistSheet->realName.IsEmpty())
+                        masterArtistSheet->realName = mergedArtist->GetRealName();
+                    for (size_t j = 0, mergedSize = mergedArtist->NumHandles(), masterSize = masterArtistSheet->handles.NumItems(); j < mergedSize; j++)
                     {
                         for (size_t i = 0;;)
                         {
-                            if (strcmp(mergedArtist->GetHandle(j), masterArtist->handles[i].Items()) == 0)
+                            if (strcmp(mergedArtist->GetHandle(j), masterArtistSheet->handles[i].Items()) == 0)
                                 break;
                             if (++i == masterSize)
                             {
-                                masterArtist->handles.Add(mergedArtist->GetHandle(j));
+                                masterArtistSheet->handles.Add(mergedArtist->GetHandle(j));
                                 break;
                             }
                         }
                     }
-                    for (size_t j = 0, mergedSize = mergedArtist->NumCountries(), masterSize = masterArtist->countries.NumItems(); j < mergedSize; j++)
+                    for (size_t j = 0, mergedSize = mergedArtist->NumCountries(), masterSize = masterArtistSheet->countries.NumItems(); j < mergedSize; j++)
                     {
                         for (size_t i = 0;;)
                         {
-                            if (mergedArtist->GetCountry(j) == masterArtist->countries[i])
+                            if (mergedArtist->GetCountry(j) == masterArtistSheet->countries[i])
                                 break;
                             if (++i == masterSize)
                             {
-                                masterArtist->countries.Add(mergedArtist->GetCountry(j));
+                                masterArtistSheet->countries.Add(mergedArtist->GetCountry(j));
                                 break;
                             }
                         }
                     }
-                    for (size_t j = 0, mergedSize = mergedArtist->NumGroups(), masterSize = masterArtist->groups.NumItems(); j < mergedSize; j++)
+                    for (size_t j = 0, mergedSize = mergedArtist->NumGroups(), masterSize = masterArtistSheet->groups.NumItems(); j < mergedSize; j++)
                     {
                         for (size_t i = 0;;)
                         {
-                            if (strcmp(mergedArtist->GetGroup(j), masterArtist->groups[i].Items()) == 0)
+                            if (strcmp(mergedArtist->GetGroup(j), masterArtistSheet->groups[i].Items()) == 0)
                                 break;
                             if (++i == masterSize)
                             {
-                                masterArtist->groups.Add(mergedArtist->GetGroup(j));
+                                masterArtistSheet->groups.Add(mergedArtist->GetGroup(j));
                                 break;
                             }
                         }
@@ -276,7 +277,7 @@ namespace rePlayer
                     if (m_databaseId == DatabaseID::kLibrary)
                     {
                         for (auto& source : mergedArtist->Sources())
-                            masterArtist->sources.Add(source);
+                            masterArtistSheet->sources.Add(source);
                     }
 
                     m_db.RemoveArtist(mergedArtist->GetId());
@@ -285,14 +286,14 @@ namespace rePlayer
 
                     m_selectedArtistCopy = {};
                     m_selectedCountry = -1;
-                    m_artistMerger.masterArtist = nullptr;
+                    m_artistMerger.masterArtistId = ArtistID::Invalid;
                     ImGui::CloseCurrentPopup();
                 }
                 ImGui::SetItemDefaultFocus();
                 ImGui::SameLine();
                 if (ImGui::Button("Cancel", ImVec2(120, 0)))
                 {
-                    m_artistMerger.masterArtist = nullptr;
+                    m_artistMerger.masterArtistId = ArtistID::Invalid;
                     ImGui::CloseCurrentPopup();
                 }
                 ImGui::EndPopup();
@@ -517,8 +518,8 @@ namespace rePlayer
             ImGui::PopStyleColor(3);
             if (ImGui::BeginPopupContextItem("MergeArtist"))
             {
-                m_artistMerger.mergedArtist = selectedArtist;
-                if (SelectMasterArtist(selectedArtist->GetId()))
+                m_artistMerger.mergedArtistId = selectedArtist->GetId();
+                if (SelectMasterArtist(m_artistMerger.mergedArtistId))
                     ImGui::CloseCurrentPopup();
                 ImGui::EndPopup();
             }
@@ -673,11 +674,11 @@ namespace rePlayer
                     label += artist->GetSource(0).GetName();
                 }
                 if (ImGui::MenuItem(label.c_str()))
-                    m_artistMerger.masterArtist = artist;
+                    m_artistMerger.masterArtistId = artist->GetId();
             }
         }
 
-        return m_artistMerger.masterArtist != nullptr;
+        return m_artistMerger.masterArtistId != ArtistID::Invalid;
     }
 
     void DatabaseArtistsUI::SortSongs(bool isDirty)
