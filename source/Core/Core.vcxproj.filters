@@ -193,6 +193,9 @@
     <ClInclude Include="Thread\Thread.h">
       <Filter>Source Files\Thread</Filter>
     </ClInclude>
+    <ClInclude Include="Thread\Workers.h">
+      <Filter>Source Files\Thread</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Containers\SmartPtr.inl.h">
@@ -282,6 +285,9 @@
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="Thread\Thread.cpp">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\Workers.cpp">
       <Filter>Source Files\Thread</Filter>
     </ClCompile>
   </ItemGroup>
