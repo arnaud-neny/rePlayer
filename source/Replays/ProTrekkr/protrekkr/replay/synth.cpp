@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2022 Franck Charlet.
+// Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1118,7 +1118,7 @@ float CSynth::GetSample(short *Left_Samples,
     }
 
 // ------------------------------------------------
-// Oscillator 3
+// Oscillator 3 (sub)
 
 #if defined(PTK_SYNTH_OSC3)
     if(Data.OSC3_SWITCH)

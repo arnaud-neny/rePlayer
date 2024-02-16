@@ -11,7 +11,7 @@ int AUDIO_Play_Flag;
 char artist[20];
 char style[20];
 char SampleName[128][16][64];
-char Midiprg[128];
+int Midiprg[128];
 char nameins[128][20];
 
 int Chan_Midi_Prg[MAX_TRACKS];

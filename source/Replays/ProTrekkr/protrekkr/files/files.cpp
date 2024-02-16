@@ -171,6 +171,7 @@ int Load_Ptk(ReplayerFile replayerFile)
     int Reverb_Resonance = FALSE;
     int Tb303_Scaling = FALSE;
     int Track_Srnd = FALSE;
+    int Long_Midi_Prg = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -218,6 +219,8 @@ int Load_Ptk(ReplayerFile replayerFile)
 
         switch(extension[7])
         {
+            case 'Q':
+                Long_Midi_Prg = TRUE;
             case 'P':
                 Track_Srnd = TRUE;
             case 'O':
@@ -456,7 +459,18 @@ Read_Mod_File:
         for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
         {
             Read_Mod_Data(&nameins[swrite], sizeof(char), 20, in);
-            Read_Mod_Data(&Midiprg[swrite], sizeof(char), 1, in);
+
+            if(Long_Midi_Prg)
+            {
+                Read_Mod_Data_Swap(&Midiprg[swrite], sizeof(int), 1, in);
+            }
+            else
+            {
+                char OldMidiPrg;
+
+                Read_Mod_Data(&OldMidiPrg, sizeof(char), 1, in);
+                Midiprg[swrite] = OldMidiPrg;
+            }
 
             Read_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
@@ -1305,7 +1319,7 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 rtrim_string(nameins[swrite], 20);
                 Write_Mod_Data(nameins[swrite], sizeof(char), 20, in);
-                Write_Mod_Data(&Midiprg[swrite], sizeof(char), 1, in);
+                Write_Mod_Data_Swap(&Midiprg[swrite], sizeof(int), 1, in);
 
                 Write_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
@@ -1665,7 +1679,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKP");
+        sprintf(extension, "PROTREKQ");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);

@@ -855,7 +855,7 @@ int delay_time;
     extern signed char c_midiin;
     extern signed char c_midiout;
     int plx;
-    char Midiprg[128];
+    int Midiprg[128];
     int LastProgram[MAX_TRACKS];
     int wait_level;
     char nameins[128][20];
@@ -2560,6 +2560,17 @@ void Sp_Player(void)
                     pl_dat_row[i] = *(RawPatterns + efactor + PATTERN_FXDATA + (i * 2));
 
 #if defined(PTK_303)
+
+#if !defined(__STAND_ALONE__)
+                    // Check if the user is recording 303 effects
+                    // In that case we don't read the row data
+                    if(!sr_isrecording)
+#endif
+                    {
+                        live303(pl_eff_row[i], pl_dat_row[i]);
+
+                    }
+
                     // 303 are always available
                     // since they aren't "really" bounded to any track
                     if(pl_eff_row[i] == 0x31)
@@ -2573,24 +2584,15 @@ void Sp_Player(void)
                         Fire303(pl_dat_row[i], 1);
                     }
 #endif
+
                 }
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
                 // Check if the user is recording 303 effects
                 // In that case we don't read the row data
                 if(!sr_isrecording)
-#endif
-#if defined(PTK_303)
                 {
-                    for(i = 0; i < Channels_Effects[ct]; i++)
-                    {
-                        live303(pl_eff_row[i], pl_dat_row[i]);
-                    }
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-                    if(!sr_isrecording) Actualize_303_Ed(0);
-#endif
-
+                    Actualize_303_Ed(0);
                 }
 #endif
 
@@ -2645,12 +2647,12 @@ void Sp_Player(void)
                     {
                         if((pl_pan_row == 0x90 && pl_eff_row[i] < 128) && c_midiout != -1)
                         {
-                            Midi_Send(176 + Chan_Midi_Prg[ct], pl_eff_row[i], pl_dat_row[i]);
+                            Midi_Send(0xb0 + Chan_Midi_Prg[ct], pl_eff_row[i], pl_dat_row[i]);
                         }
 
                         if((pl_eff_row[i] == 0x80 && pl_dat_row[i] < 128) && c_midiout != -1)
                         {
-                            Midi_Send(176 + Chan_Midi_Prg[ct], 0, pl_dat_row[i]);
+                            Midi_Send(0xb0 + Chan_Midi_Prg[ct], 0, pl_dat_row[i]);
                         }
                     }
 #endif
@@ -4432,14 +4434,15 @@ void Play_Instrument(int channel, int sub_channel)
                 // Set the midi program if it was modified
                 if(LastProgram[Chan_Midi_Prg[channel]] != Midiprg[associated_sample])
                 {
-                    Midi_Send(192 + Chan_Midi_Prg[channel], Midiprg[associated_sample], 127);
+                    Midi_Send(0xb0 + Chan_Midi_Prg[channel], 0, Midiprg[associated_sample] / 128);
+                    Midi_Send(0xc0 + Chan_Midi_Prg[channel], Midiprg[associated_sample] & 0x7f, 127);
                     LastProgram[Chan_Midi_Prg[channel]] = Midiprg[associated_sample];
                 }
 
                 // Send the note to the midi device
                 float veloc = vol * mas_vol * local_mas_vol * local_ramp_vol;
 
-                Midi_Send(144 + Chan_Midi_Prg[channel], mnote, (int) (veloc * 127));
+                Midi_Send(0x90 + Chan_Midi_Prg[channel], mnote, (int) (veloc * 127));
                 if(midi_sub_channel < 0) Midi_Current_Notes[Chan_Midi_Prg[channel]][(-midi_sub_channel) - 1] = mnote;
                 else Midi_Current_Notes[Chan_Midi_Prg[channel]][midi_sub_channel - 1] = mnote;
             }
@@ -4457,7 +4460,8 @@ void Do_Effects_Tick_0(void)
 {
 
 #if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE) || defined(PTK_SHUFFLE) || \
-    defined(PTK_FX_SETREVCUTO) || defined(PTK_FX_SETREVRESO)
+    defined(PTK_FX_SETREVCUTO) || defined(PTK_FX_SETREVRESO) || defined(PTK_FX_SETBPM) || defined(PTK_FX_SETSPEED)
+
     int i;
     int j;
     int pltr_eff_row[MAX_FX];
@@ -4552,6 +4556,49 @@ void Do_Effects_Tick_0(void)
                     break;
 #endif
 
+#if defined(PTK_LIMITER_TRACKS)
+                case 0x29:
+
+                    Compress_Track[trackef] = pltr_dat_row[j] & TRUE;
+
+#if !defined(__STAND_ALONE__)
+                    if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                    {
+                        Display_Track_Compressor_Status(trackef);
+                    }
+#endif
+
+                    break;
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
+                case 0x2a:
+                    Mas_Compressor_Set_Variables_Track(trackef, pltr_dat_row[j] / 255.0f * 100.0f, mas_comp_ratio_Track[trackef]);
+
+#if !defined(__STAND_ALONE__)
+                    if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                    {
+                        Display_Track_Compressor(trackef);
+                    }
+#endif
+
+                    break;
+#endif
+
+#if defined(PTK_LIMITER_TRACKS)
+                case 0x2b:
+                    Mas_Compressor_Set_Variables_Track(trackef, mas_threshold_Track[trackef], pltr_dat_row[j] / 255.0f * 100.0f);
+
+#if !defined(__STAND_ALONE__)
+                    if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                    {
+                        Display_Track_Compressor(trackef);
+                    }
+#endif
+
+                    break;
+#endif
+
 #if defined(PTK_FX_SETBPM)
                 // $f0 Set BPM
                 case 0xf0:
@@ -4603,7 +4650,7 @@ void Do_Effects_Tick_0(void)
         }
     }
 
-#endif  // defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE)
+#endif  // defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE) etc.
 
 }
 
@@ -4782,7 +4829,8 @@ void Do_Effects_Ticks_X(void)
     defined(PTK_FX_FINEPITCHUP) || defined(PTK_FX_FINEPITCHDOWN) || \
     defined(PTK_FX_SENDTODELAYCOMMAND) || defined(PTK_FX_SENDTOREVERBCOMMAND) || \
     defined(PTK_FX_SETDISTORTIONTHRESHOLD) || defined(PTK_FX_SETDISTORTIONCLAMP) || \
-    defined(PTK_FX_SETFILTERRESONANCE) || defined(PTK_FX_SWITCHFLANGER)
+    defined(PTK_FX_SETFILTERRESONANCE) || defined(PTK_FX_SWITCHFLANGER) || \
+    defined(PTK_FX_TRACK_FILTER_LFO)
 
             // Only at tick 0 but after instruments data
             if(PosInTick == 0)
@@ -5737,14 +5785,20 @@ void live303(int pltr_eff_row, int pltr_dat_row)
         case 0x3c: tb303[1].accent = pltr_dat_row / 2; break;
         case 0x3d: tb303[0].tune = pltr_dat_row / 2; break;
         case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
-        case 0x41:
-        {
-            tb303engine[0].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
-        }
-        case 0x42:
-        {
-            tb303engine[1].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
-        }
+        case 0x3f:
+            if(pltr_dat_row < 1) pltr_dat_row = 1;
+            if(pltr_dat_row > 16) pltr_dat_row = 16;
+            tb303[0].scale = pltr_dat_row;
+            tb303engine[0].tbCurMultiple = tb303[0].scale;
+            break;
+        case 0x40:
+            if(pltr_dat_row < 1) pltr_dat_row = 1;
+            if(pltr_dat_row > 16) pltr_dat_row = 16;
+            tb303[1].scale = pltr_dat_row;
+            tb303engine[1].tbCurMultiple = tb303[1].scale;
+            break;
+        case 0x41: tb303engine[0].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
+        case 0x42: tb303engine[1].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
     }
 }
 
@@ -5755,139 +5809,172 @@ void Fire303(unsigned char number, int unit)
     switch(number)
     {
         case 0x00:  tb303engine[unit].tbPattern = tb303[unit].selectedpattern;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa1:  tb303engine[unit].tbPattern = 0;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa2:  tb303engine[unit].tbPattern = 1;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa3:  tb303engine[unit].tbPattern = 2;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa4:  tb303engine[unit].tbPattern = 3;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa5:  tb303engine[unit].tbPattern = 4;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa6:  tb303engine[unit].tbPattern = 5;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa7:  tb303engine[unit].tbPattern = 6;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xa8:  tb303engine[unit].tbPattern = 7;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb1:  tb303engine[unit].tbPattern = 8;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb2:  tb303engine[unit].tbPattern = 9;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb3:  tb303engine[unit].tbPattern = 10;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb4:  tb303engine[unit].tbPattern = 11;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb5:  tb303engine[unit].tbPattern = 12;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb6:  tb303engine[unit].tbPattern = 13;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb7:  tb303engine[unit].tbPattern = 14;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xb8:  tb303engine[unit].tbPattern = 15;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc1:  tb303engine[unit].tbPattern = 16;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc2:  tb303engine[unit].tbPattern = 17;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc3:  tb303engine[unit].tbPattern = 18;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc4:  tb303engine[unit].tbPattern = 19;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc5:  tb303engine[unit].tbPattern = 20;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc6:  tb303engine[unit].tbPattern = 21;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc7:  tb303engine[unit].tbPattern = 22;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xc8:  tb303engine[unit].tbPattern = 23;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd1:  tb303engine[unit].tbPattern = 24;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd2:  tb303engine[unit].tbPattern = 25;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd3:  tb303engine[unit].tbPattern = 26;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd4:  tb303engine[unit].tbPattern = 27;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd5:  tb303engine[unit].tbPattern = 28;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd6:  tb303engine[unit].tbPattern = 29;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd7:  tb303engine[unit].tbPattern = 30;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
         case 0xd8:  tb303engine[unit].tbPattern = 31;
-                    tb303engine[unit].RampVolume = 1.0f; tb303engine[unit].tbTargetRealVolume = 1.0f;
+                    tb303engine[unit].RampVolume = 1.0f;
+                    tb303engine[unit].tbTargetRealVolume = 1.0f;
                     tb303engine[unit].tbCurMultiple = tb303[unit].scale;
                     break;
-
-        default: // No Fire
+        default:
+            // No Fire
             tb303engine[unit].tbLine = 255;
             tb303engine[unit].RampVolume = 0.0f;
             tb303engine[unit].tbTargetRealVolume = 0.0f;
