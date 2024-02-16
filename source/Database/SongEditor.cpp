@@ -94,7 +94,7 @@ namespace rePlayer
                 m_song.original.artistIds = currentSong->ArtistIds();
                 m_song.edited.artistIds = m_song.original.artistIds;
             }
-            if (m_song.original.lastSubsongIndex != currentSong->GetLastSubsongIndex())
+            if (m_song.original.lastSubsongIndex != currentSong->GetLastSubsongIndex() || m_song.original.subsongs[0].isInvalid != currentSong->IsInvalid())
             {
                 currentSong->CopySubsongsTo(&m_song.original);
                 currentSong->CopySubsongsTo(&m_song.edited);
@@ -450,7 +450,16 @@ namespace rePlayer
                 if (ImGui::Checkbox(Tag::Name(i), &isChecked))
                     m_song.edited.tags.Enable(1ull << i, isChecked);
             }
-
+            for (uint32_t i = Tag::kNumTags; i < ((Tag::kNumTags + 3) & ~3); i++)
+                ImGui::TableNextColumn();
+            ImGui::PushStyleColor(ImGuiCol_Text, 0xff0000ff);
+            ImGui::PushStyleColor(ImGuiCol_CheckMark, 0xff0000ff);
+            bool isChecked = m_song.edited.subsongs[0].isInvalid;
+            if (ImGui::Checkbox("Invalid", &isChecked))
+                m_song.edited.subsongs[0].isInvalid = isChecked;
+            ImGui::PopStyleColor(2);
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Tagged as invalid will clear all subsongs data");
             ImGui::EndTable();
         }
     }
@@ -617,6 +626,7 @@ namespace rePlayer
         auto areSubsongsUpdated = false;
         if (isEnabled)
         {
+            areSubsongsUpdated = currentSong->IsInvalid() != m_song.edited.subsongs[0].isInvalid;
             for (uint16_t i = 0; !areSubsongsUpdated && i <= currentSong->GetLastSubsongIndex(); i++)
             {
                 areSubsongsUpdated |= currentSong->GetSubsongName(i) != m_song.edited.subsongs[i].name;
@@ -711,17 +721,39 @@ namespace rePlayer
             currentSongEdit->metadata = m_song.edited.metadata;
             currentSongEdit->sourceIds = m_song.edited.sourceIds;
 
-            if (areSubsongsUpdated) for (uint16_t i = 0; i <= m_song.edited.lastSubsongIndex; i++)
+            if (areSubsongsUpdated)
             {
-                if (m_song.edited.subsongs[i].isDiscarded && !currentSongEdit->subsongs[i].isDiscarded)
+                if (m_song.edited.subsongs[0].isInvalid && !m_song.original.subsongs[0].isInvalid)
+                {
+                    m_song.edited.subsongs.Resize(1);
+                    m_song.edited.subsongs[0].name = {};
+                    m_song.edited.subsongs[0].isDiscarded = false;
+                    m_song.edited.subsongs[0].rating = 0;
+                    m_song.edited.subsongs[0].state = SubsongState::Undefined;
+                    m_song.edited.subsongs[0].isInvalid = true;
+                    m_song.edited.lastSubsongIndex = 0;
+
+                    currentSongEdit->subsongs[0].durationCs = 0;
+                    currentSongEdit->subsongs[0].isInvalid = true;
+                }
+                for (uint16_t i = 0; i <= m_song.edited.lastSubsongIndex; i++)
+                {
+                    if (m_song.edited.subsongs[i].isDiscarded && !currentSongEdit->subsongs[i].isDiscarded)
+                    {
+                        SubsongID subsongIdToRemove(currentSongEdit->id, i);
+                        Core::Discard(MusicID(subsongIdToRemove, m_musicId.databaseId));
+                    }
+                    currentSongEdit->subsongs[i].isDiscarded = m_song.edited.subsongs[i].isDiscarded;
+                    currentSongEdit->subsongs[i].name = m_song.edited.subsongs[i].name;
+                    currentSongEdit->subsongs[i].rating = m_song.edited.subsongs[i].rating;
+                    currentSongEdit->subsongs[i].state = m_song.edited.subsongs[i].state;
+                }
+                for (uint16_t i = m_song.edited.lastSubsongIndex + 1; i <= currentSongEdit->lastSubsongIndex; i++)
                 {
                     SubsongID subsongIdToRemove(currentSongEdit->id, i);
                     Core::Discard(MusicID(subsongIdToRemove, m_musicId.databaseId));
                 }
-                currentSongEdit->subsongs[i].isDiscarded = m_song.edited.subsongs[i].isDiscarded;
-                currentSongEdit->subsongs[i].name = m_song.edited.subsongs[i].name;
-                currentSongEdit->subsongs[i].rating = m_song.edited.subsongs[i].rating;
-                currentSongEdit->subsongs[i].state = m_song.edited.subsongs[i].state;
+                currentSongEdit->lastSubsongIndex = m_song.edited.lastSubsongIndex;
             }
 
             if (areMetadataUpdated)
