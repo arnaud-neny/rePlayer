@@ -1,13 +1,14 @@
-#include "Player.h"
-
 // Core
 #include <Core/String.h>
 #include <Imgui.h>
 #include <Imgui/imgui_internal.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <RePlayer/Core.h>
 #include <Deck/Deck.h>
+
+#include "Player.h"
 
 // TagLib
 #include <fileref.h>
@@ -15,9 +16,6 @@
 #include "TagLibStream.h"
 
 // Windows
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
 #include <windows.h>
 #include <mmeapi.h>
 #include <Mmreg.h>
@@ -26,6 +24,7 @@
 // stl
 #include <atomic>
 #include <bit>
+#include <chrono>
 
 namespace rePlayer
 {
@@ -352,14 +351,12 @@ namespace rePlayer
 
     Player::~Player()
     {
-        if (m_threadHandle)
-        {
-            Stop();
-            m_isRunning = false;
-            ResumeThread();
-            WaitForSingleObject(m_threadHandle, INFINITE);
-            CloseHandle(m_threadHandle);
-        }
+        Stop();
+        std::atomic_ref(m_isWaiting).store(false);
+        std::atomic_ref(m_isRunning).store(false);
+        m_semaphore.Signal();
+        while (!std::atomic_ref(m_isJobDone).load())
+            thread::Sleep(0);
 
         if (m_wave->outHandle)
             waveOutClose(m_wave->outHandle);
@@ -414,11 +411,16 @@ namespace rePlayer
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
             m_status = Status::Paused;
 
-            m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
-            if (m_threadHandle == 0)
-                return true;
+            Core::AddJob([this]()
+            {
+                auto threadHandle = ::GetCurrentThread();
+                auto threadPriority = ::GetThreadPriority(threadHandle);
+                ::SetThreadPriority(threadHandle, THREAD_PRIORITY_TIME_CRITICAL);// THREAD_PRIORITY_HIGHEST);
 
-            SetThreadPriority(m_threadHandle, THREAD_PRIORITY_TIME_CRITICAL);// THREAD_PRIORITY_HIGHEST);
+                ThreadUpdate();
+
+                ::SetThreadPriority(threadHandle, threadPriority);
+            });
 
             // read stream tags if there is any
             TagLibStream tagLibStream(stream->Clone());
@@ -472,54 +474,43 @@ namespace rePlayer
         return false;
     }
 
-    uint32_t Player::ThreadFunc(uint32_t* lpdwParam)
-    {
-        auto player = reinterpret_cast<Player*>(lpdwParam);
-        player->ThreadUpdate();
-        return 0;
-    }
-
     void Player::ThreadUpdate()
     {
         auto numSamples = m_numSamples;
         auto numCachedSamples = m_numCachedSamples;
         auto numSamplesMask = numSamples - 1;
-        while (m_isRunning)
+        while (std::atomic_ref(m_isRunning).load())
         {
-            if (!m_isSuspended)
+            auto startTime = std::chrono::high_resolution_clock::now();
+
+            MMTIME mmt{};
+            mmt.wType = TIME_BYTES;
+            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
+            mmt.u.cb /= sizeof(StereoSample);
+            auto wavePlayPos = mmt.u.cb;
+            auto waveFillPos = m_waveFillPos;
+            if (m_wavePlayPos > wavePlayPos) // loop or something wrong happened; need to detect when waveOut had a failure
             {
-                MMTIME mmt{};
-                mmt.wType = TIME_BYTES;
-                waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-                mmt.u.cb /= sizeof(StereoSample);
-                auto wavePlayPos = mmt.u.cb;
-                auto waveFillPos = m_waveFillPos;
-                if (m_wavePlayPos > wavePlayPos) // loop or something wrong happened; need to detect when waveOut had a failure
-                {
-                    m_songSeek += m_wavePlayPos; // simulate a seek to keep track of current time
-                    waveFillPos = (waveFillPos & numSamplesMask) | (wavePlayPos & ~numSamplesMask);
-                    waveFillPos += numCachedSamples;
-                }
-                m_wavePlayPos = wavePlayPos;
-
-                wavePlayPos = wavePlayPos + numCachedSamples;
-                while (waveFillPos < wavePlayPos)
-                {
-                    auto count = Min(numSamples - (waveFillPos & numSamplesMask), wavePlayPos - waveFillPos);
-                    Render(count, waveFillPos & numSamplesMask);
-                    waveFillPos += count;
-                }
-
-                m_waveFillPos = waveFillPos;
-
-                if (m_isSuspending)
-                {
-                    std::atomic_ref isSuspended(m_isSuspended);
-                    isSuspended.store(true);
-                }
+                m_songSeek += m_wavePlayPos; // simulate a seek to keep track of current time
+                waveFillPos = (waveFillPos & numSamplesMask) | (wavePlayPos & ~numSamplesMask);
+                waveFillPos += numCachedSamples;
             }
-            Sleep(5);
+            m_wavePlayPos = wavePlayPos;
+
+            wavePlayPos = wavePlayPos + numCachedSamples;
+            while (waveFillPos < wavePlayPos)
+            {
+                auto count = Min(numSamples - (waveFillPos & numSamplesMask), wavePlayPos - waveFillPos);
+                Render(count, waveFillPos & numSamplesMask);
+                waveFillPos += count;
+            }
+
+            m_waveFillPos = waveFillPos;
+
+            auto timeSpent = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
+            m_semaphore.Wait(std::atomic_ref(m_isWaiting).load() ? INFINITE : (timeSpent < 5) ? uint32_t(5 - timeSpent) : 0);
         }
+        std::atomic_ref(m_isJobDone).store(true);
     }
 
     void Player::Render(uint32_t numSamples, uint32_t waveFillPos)
@@ -671,25 +662,13 @@ namespace rePlayer
 
     void Player::ResumeThread()
     {
-        if (m_isSuspended)
-        {
-            m_isSuspended = false;
-            m_isSuspending = false;
-            ::ResumeThread(m_threadHandle);
-        }
+        std::atomic_ref(m_isWaiting).store(false);
+        m_semaphore.Signal();
     }
 
     void Player::SuspendThread()
     {
-        if (!m_isSuspended)
-        {
-            //we don't want to suspend the thread while we call waveOutGetPosition or it will deadlock with the main thread
-            m_isSuspending = true;
-            std::atomic_ref isSuspended(m_isSuspended);
-            while (isSuspended.load() == false)
-                Sleep(0);
-            ::SuspendThread(m_threadHandle);
-        }
+        std::atomic_ref(m_isWaiting).store(true);
     }
 }
 // namespace rePlayer

@@ -36,19 +36,17 @@ namespace rePlayer
         };
 
     private:
-        static uint32_t ThreadFunc(uint32_t* lpdwParam);
         void Update();
         bool IsCancelled() const;
 
     private:
-        void* m_threadHandle = nullptr;
-
         Array<Entry> m_songs;
 
         uint32_t m_currentEntry = 0;
         float m_progress = 0.0f;
         uint32_t m_duration = 0;
-        uint32_t m_isCancelled = 0;
+        bool m_isCancelled = false;
+        bool m_isJobDone = false;
     };
 
     inline uint32_t Export::NumSongs() const

@@ -1,7 +1,6 @@
-#include "Core.h"
-
 // Core
 #include <Core/Log.h>
+#include <Core/Thread/Workers.h>
 
 // rePlayer
 #include <Database/Database.h>
@@ -18,6 +17,8 @@
 
 // stl
 #include <atomic>
+
+#include "Core.h"
 
 namespace rePlayer
 {
@@ -62,6 +63,7 @@ namespace rePlayer
 
     Core::~Core()
     {
+        m_workers->Flush();
         m_library->Save();
         m_playlist->Save();
 
@@ -74,6 +76,21 @@ namespace rePlayer
         delete m_about;
         for (auto* db : m_db)
             delete db;
+
+        delete m_workers;
+
+        while (m_songsStack.items)
+        {
+            auto* next = m_songsStack.items->next;
+            delete m_songsStack.items;
+            m_songsStack.items = next;
+        }
+        while (m_artistsStack.items)
+        {
+            auto* next = m_artistsStack.items->next;
+            delete m_artistsStack.items;
+            m_artistsStack.items = next;
+        }
     }
 
     void Core::Release()
@@ -92,6 +109,8 @@ namespace rePlayer
     {
         if (m_deck == nullptr)
         {
+            m_workers = new thread::Workers(8, 16, L"rePlayer");
+
             for (auto& db : m_db)
                 db = new Database();
             m_deck = new Deck();
@@ -108,6 +127,8 @@ namespace rePlayer
 
     Status Core::UpdateFrame()
     {
+        m_workers->Update();
+
         Reconcile();
 
         return m_deck->UpdateFrame();

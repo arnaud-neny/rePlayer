@@ -1,11 +1,15 @@
-#include "LibraryArtistsUI.h"
-
+// Core
 #include <ImGui.h>
 #include <IO/File.h>
 
+// rePlayer
 #include <Database/Database.h>
 #include <Library/LibrarySongsUI.h>
+#include <RePlayer/Core.h>
 
+#include "LibraryArtistsUI.h"
+
+// stl
 #include <ctime>
 
 namespace rePlayer
@@ -52,12 +56,22 @@ namespace rePlayer
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.8f, 1.0f));
             if (ImGui::Button("Import", ImVec2(-FLT_MIN, 0)))
             {
-                auto& libary = GetLibrary();
-                libary.m_imports = {};
-                for (auto& source : selectedArtist->Sources())
-                    libary.ImportArtist(source.id);
-                libary.m_importArtists.isOpened = true;
-                libary.m_imports.isOpened = &libary.m_importArtists.isOpened;
+                auto& library = GetLibrary();
+                library.m_imports = {};
+                library.m_isBusy = true;
+                library.m_importArtists.isOpened = true;
+                Core::AddJob([&library, selectedArtist]()
+                {
+                    SourceResults sourceResults;
+                    for (auto& source : selectedArtist->Sources())
+                        library.ImportArtist(source.id, sourceResults);
+                    Core::FromJob([&library, sourceResults = std::move(sourceResults)]()
+                    {
+                        library.m_imports.isOpened = &library.m_importArtists.isOpened;
+                        library.m_imports.sourceResults = std::move(sourceResults);
+                        library.m_isBusy = false;
+                    });
+                });
             }
             ImGui::PopStyleColor(3);
         }

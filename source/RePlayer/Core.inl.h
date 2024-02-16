@@ -44,15 +44,6 @@ namespace rePlayer
         return *ms_instance->m_songEditor;
     }
 
-    template <typename ItemID>
-    inline void Core::OnNewProxy(ItemID id)
-    {
-        if constexpr (std::is_same<ItemID, SongID>::value)
-            ms_instance->m_songsStack.items.Add(id);
-        else
-            ms_instance->m_artistsStack.items.Add(id);
-    }
-
     inline void Core::Lock()
     {
         ms_instance->m_isLocked++;

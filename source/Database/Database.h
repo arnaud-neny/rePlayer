@@ -2,6 +2,7 @@
 
 #include <Containers/Array.h>
 #include <Containers/SmartPtr.h>
+#include <Thread/SpinLock.h>
 
 #include "Types/Artist.h"
 #include "Types/MusicID.h"
@@ -101,6 +102,9 @@ namespace rePlayer
         template <typename ItemID, typename ItemType>
         void Update(ItemID id, ItemType* item);
 
+        void Freeze();
+        void UnFreeze();
+
     private:
         template <typename ItemType, typename ItemID>
         struct Set
@@ -113,6 +117,9 @@ namespace rePlayer
             ItemType* Add(OtherItemType* item);
             void Remove(ItemID id);
 
+            template <typename OtherItemType>
+            ItemType* AddFrozen(OtherItemType* item);
+
             Status Load(io::File& file);
             void Save(io::File& file);
 
@@ -122,15 +129,40 @@ namespace rePlayer
             Array<ItemID> m_availableIds;
             uint32_t m_numItems = 0;
             uint32_t m_revision = 0;
+            uint32_t m_frozenIndex = 0;
+            thread::SpinLock m_spinLock;
+        };
+
+        struct Command
+        {
+            enum Type
+            {
+                kAddSong,
+                kRemoveSong,
+                kAddArtist,
+                kRemoveArtist
+            } type;
+            union
+            {
+                Song* song;
+                SongID songId;
+                Artist* artist;
+                ArtistID artistId;
+            };
+            Command* next = nullptr;
         };
 
     private:
         Set<Song, SongID> m_songs;
         Set<Artist, ArtistID> m_artists;
         Flag m_flags = Flag::kNone;
+        uint32_t m_numFreeze = 0;
 
         DatabaseSongsUI* m_songsUI = nullptr;
         DatabaseArtistsUI* m_artistsUI = nullptr;
+
+        Command m_commandTail;
+        Command* m_commandHead = &m_commandTail;
     };
 }
 // namespace rePlayer

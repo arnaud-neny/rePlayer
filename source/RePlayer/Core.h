@@ -3,6 +3,14 @@
 #include <Database/Types/MusicID.h>
 #include <RePlayer/RePlayer.h>
 
+#include <functional>
+
+namespace core::thread
+{
+    class Workers;
+}
+// namespace core::thread
+
 namespace rePlayer
 {
     using namespace core;
@@ -32,6 +40,10 @@ namespace rePlayer
         static void Unlock();
         static bool IsLocked();
 
+        // job
+        static void AddJob(const std::function<void()>& callback);
+        static void FromJob(const std::function<void()>& callback);
+
         // Jukebox
         static About& GetAbout();
         static Database& GetDatabase(DatabaseID databaseId);
@@ -55,7 +67,17 @@ namespace rePlayer
         template <typename ItemID>
         struct Stack
         {
-            Array<ItemID> items;
+            static constexpr uintptr_t kBusy = ~uintptr_t(0);
+            struct Node
+            {
+                ItemID id;
+                union
+                {
+                    uintptr_t busy = kBusy;
+                    Node* next;
+                };
+            };
+            Node* items = nullptr;
 
             void Reconcile();
         };
@@ -99,6 +121,8 @@ namespace rePlayer
         Settings* m_settings = nullptr;
         SongEditor* m_songEditor = nullptr;
         Database* m_db[int32_t(rePlayer::DatabaseID::kCount)];
+
+        thread::Workers* m_workers = nullptr;
 
         Stack<SongID> m_songsStack;
         Stack<ArtistID> m_artistsStack;

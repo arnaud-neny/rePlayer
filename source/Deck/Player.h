@@ -4,6 +4,7 @@
 #include <Core/RefCounted.h>
 #include <Database/Types/MusicID.h>
 #include <Replays/Replay.h>
+#include <Thread/Semaphore.h>
 
 namespace rePlayer
 {
@@ -62,7 +63,6 @@ namespace rePlayer
 
         bool Init(io::Stream* stream, bool isExport);
 
-        static uint32_t ThreadFunc(uint32_t* lpdwParam);
         void ThreadUpdate();
 
         void Render(uint32_t numSamples, uint32_t waveFillPos);
@@ -79,6 +79,8 @@ namespace rePlayer
 
         Wave* m_wave = nullptr;
 
+        thread::Semaphore m_semaphore;
+
         StereoSample* m_waveData = nullptr;
         uint64_t m_songEnd = ~0ull;
         uint64_t m_songSeek = 0;
@@ -88,15 +90,13 @@ namespace rePlayer
         const uint32_t m_numSamples;
         const uint32_t m_numCachedSamples;
 
-        void* m_threadHandle = nullptr;
-
         int32_t m_numLoops = 0;
         uint32_t m_remainingFadeOut;
         uint32_t m_fadeOutSilence = 0;
         float m_fadeOutRatio;
-        bool m_isSuspended = true;
-        bool m_isSuspending = true;
+        bool m_isWaiting = true;
         bool m_isRunning = true;
+        bool m_isJobDone = false;
         bool m_isNewSong = false;
         bool m_hasSeeked = false;
         enum class Status : uint8_t

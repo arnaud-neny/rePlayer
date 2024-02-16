@@ -1,19 +1,17 @@
-#include "SongEndEditor.h"
-
 // core
 #include <Imgui.h>
 #include <Core/Log.h>
 #include <IO/Stream.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/Replay.h>
 
+#include "SongEndEditor.h"
+
 // Windows
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
 #include <windows.h>
 #include <mmeapi.h>
 #include <Mmreg.h>
@@ -52,9 +50,15 @@ namespace rePlayer
         m_samples.Resize(m_numSamples);
         memset(m_samples.Items(), 0, m_samples.Size());
 
-        m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
-        if (m_threadHandle == 0)
-            Render();
+        Core::AddJob([this]()
+        {
+            while (std::atomic_ref(m_isRunning).load())
+            {
+                Render();
+                m_semaphore.Wait();
+            }
+            std::atomic_ref(m_isJobDone).store(true);
+        });
 
         OpenAudio();
 
@@ -63,7 +67,7 @@ namespace rePlayer
 
     SongEndEditor::~SongEndEditor()
     {
-        m_isRunning = false;
+        std::atomic_ref(m_isRunning).store(false);
         m_semaphore.Signal();
 
         if (m_wave->outHandle)
@@ -73,11 +77,8 @@ namespace rePlayer
             waveOutClose(m_wave->outHandle);
         }
 
-        if (m_threadHandle)
-        {
-            WaitForSingleObject(m_threadHandle, INFINITE);
-            CloseHandle(m_threadHandle);
-        }
+        while (!std::atomic_ref(m_isJobDone).load())
+            thread::Sleep(0);
 
         delete m_replay;
         delete m_wave;
@@ -182,7 +183,7 @@ namespace rePlayer
         uint32_t preNumSamples = remainingSamples;
         auto* waveform = m_samples.Items(m_currentSample);
         auto replay = m_replay;
-        while (remainingSamples && m_isRunning)
+        while (remainingSamples && std::atomic_ref(m_isRunning).load())
         {
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
             if ((numSamples | preNumSamples) == 0)
@@ -231,17 +232,6 @@ namespace rePlayer
         waveOutPrepareHeader(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
         waveOutPause(m_wave->outHandle);
         waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
-    }
-
-    uint32_t SongEndEditor::ThreadFunc(uint32_t* lpdwParam)
-    {
-        auto* This = reinterpret_cast<SongEndEditor*>(lpdwParam);
-        while (This->m_isRunning)
-        {
-            This->Render();
-            This->m_semaphore.Wait();
-        }
-        return 0;
     }
 
     uint32_t SongEndEditor::WaveformUI()

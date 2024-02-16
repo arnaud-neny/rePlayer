@@ -1,5 +1,4 @@
-#include "Library.h"
-
+// Core
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
@@ -9,6 +8,7 @@
 #include <IO/File.h>
 #include <IO/StreamFile.h>
 
+// rePlayer
 #include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Database/Types/Countries.h>
@@ -28,8 +28,12 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 
+#include "Library.h"
+
+// zlib
 #include <zlib.h>
 
+// stl
 #include <algorithm>
 #include <chrono>
 
@@ -271,6 +275,8 @@ namespace rePlayer
 
     void Library::OnDisplay()
     {
+        m_busyColor = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
+
         if (ImGui::BeginTabBar("LibraryBar", ImGuiTabBarFlags_None))
         {
             ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
@@ -298,6 +304,10 @@ namespace rePlayer
     void Library::OnEndUpdate()
     {
         m_songs->OnEndUpdate();
+        if (m_isBusy)
+            m_busyTime += ImGui::GetIO().DeltaTime;
+        else
+            m_busyTime = 0.0f;
     }
 
     void Library::SourceSelection()
@@ -367,16 +377,21 @@ namespace rePlayer
             {
                 std::string filters = "All Files (*.*){.*},";
                 filters += Core::GetReplays().GetFileFilters();
-                ImGuiFileDialog::Instance()->OpenDialog("ImportFiles", "Import Files", filters.c_str(), m_lastFileDialogPath, 0, nullptr, ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_Modal);
+                ImGuiFileDialog::Instance()->OpenDialog("ImportFiles", "Import Files", filters.c_str(), m_lastFileDialogPath, 0, nullptr, ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_NoDialog);
 
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
         }
-        if (m_importArtists.isOpened)
+        auto isImportFilesOpened = ImGuiFileDialog::Instance()->IsOpened("ImportFiles");
+        if (isImportFilesOpened)
+            ImGui::OpenPopup("Import Files");
+        else if (m_importArtists.isOpened)
             ImGui::OpenPopup("Import Artists");
         else if (m_importSongs.isOpened)
             ImGui::OpenPopup("Import Songs");
+
+        ImGui::BeginDisabled(m_isBusy);
 
         UpdateImportArtists();
 
@@ -384,6 +399,8 @@ namespace rePlayer
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
         if (ImGui::BeginPopupModal("Import Songs", &m_importSongs.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
+            ImGui::BeginBusy(m_isBusy);
+
             if (ImGui::BeginTable("Toolbar", 2, ImGuiTableFlags_SizingStretchProp))
             {
                 ImGui::TableNextColumn();
@@ -394,12 +411,22 @@ namespace rePlayer
                 if (ImGui::InputText("##Search", &m_importSongs.searchName, ImGuiInputTextFlags_EnterReturnsTrue))
                 {
                     m_imports = {};
-                    for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
+                    m_isBusy = true;
+                    Core::AddJob([this]()
                     {
-                        if (m_selectedSources & (1ull << i))
-                            m_sources[i]->FindSongs(m_importSongs.searchName.c_str(), m_imports.sourceResults);
-                    }
-                    m_imports.isOpened = &m_importSongs.isOpened;
+                        SourceResults sourceResults;
+                        for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
+                        {
+                            if (m_selectedSources & (1ull << i))
+                                m_sources[i]->FindSongs(m_importSongs.searchName.c_str(), sourceResults);
+                        }
+                        Core::FromJob([this, sourceResults = std::move(sourceResults)]()
+                        {
+                            m_imports.isOpened = &m_importSongs.isOpened;
+                            m_imports.sourceResults = std::move(sourceResults);
+                            m_isBusy = false;
+                        });
+                    });
                 }
                 ImGui::TableNextColumn();
                 SourceSelection();
@@ -408,83 +435,114 @@ namespace rePlayer
 
             ProcessImports();
 
+            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+
             ImGui::EndPopup();
         }
 
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
-        if (ImGuiFileDialog::Instance()->Display("ImportFiles"))
+        ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
+        if (ImGui::BeginPopupModal("Import Files", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
-            if (ImGuiFileDialog::Instance()->IsOk())
+            ImGui::BeginBusy(m_isBusy);
+            if (ImGuiFileDialog::Instance()->Display("ImportFiles", ImGuiWindowFlags_NoCollapse, ImVec2(0, 0), ImVec2(0, 0)))
             {
-                for (auto& path : ImGuiFileDialog::Instance()->GetSelection())
+                if (ImGuiFileDialog::Instance()->IsOk())
                 {
-                    auto stream = io::StreamFile::Create(path.second.c_str());
-                    if (stream.IsInvalid())
-                        continue;
-
-                    auto fileSize = static_cast<uint32_t>(stream->GetSize());
-                    if (fileSize == 0)
-                        continue;
-
-                    auto moduleData = stream->Read();
-
-                    // search if it has already been added
-                    auto fileCrc = crc32(0L, Z_NULL, 0);
-                    fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
-                    for (auto* song : m_db.Songs())
+                    // database will be updated in the worker, so freeze it to avoid concurrency
+                    m_db.Freeze();
+                    m_isBusy = true;
+                    Core::AddJob([this]()
                     {
-                        if (song->GetFileSize() == fileSize && song->GetFileCrc() == fileCrc)
+                        for (auto& path : ImGuiFileDialog::Instance()->GetSelection())
                         {
-                            auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
-                            Array<uint8_t> otherData;
-                            otherData.Resize(file.GetSize());
-                            file.Read(otherData.Items(), otherData.Size());
-                            if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
+                            auto stream = io::StreamFile::Create(path.second.c_str());
+                            if (stream.IsInvalid())
+                                continue;
+
+                            auto fileSize = static_cast<uint32_t>(stream->GetSize());
+                            if (fileSize == 0)
+                                continue;
+
+                            auto moduleData = stream->Read();
+
+                            // search if it has already been added
+                            auto fileCrc = crc32(0L, Z_NULL, 0);
+                            fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
+                            for (auto* song : m_db.Songs())
                             {
-                                Log::Error("File \"%s\" already imported as \"[%s]%s\"\n", path.second.c_str(), song->GetType().GetExtension(), m_db.GetTitleAndArtists(song->GetId()).c_str());
+                                if (song->GetFileSize() == fileSize && song->GetFileCrc() == fileCrc)
+                                {
+                                    auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
+                                    Array<uint8_t> otherData;
+                                    otherData.Resize(file.GetSize());
+                                    file.Read(otherData.Items(), otherData.Size());
+                                    if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
+                                    {
+                                        Core::FromJob([this, path, song = SmartPtr<Song>(song)]()
+                                        {
+                                            Log::Warning("File \"%s\" already imported as \"[%s]%s\"\n", path.second.c_str(), song->GetType().GetExtension(), m_db.GetTitleAndArtists(song->GetId()).c_str());
+                                        });
 
-                                stream.Reset();
-                                break;
+                                        stream.Reset();
+                                        break;
+                                    }
+                                }
                             }
+
+                            if (stream.IsInvalid())
+                                continue;
+
+                            Core::FromJob([path]()
+                            {
+                                Log::Message("Import: \"%s\"\n", path.second.c_str());
+                            });
+
+                            auto* song = new SongSheet;
+                            auto* dbSong = m_db.AddSong(song);
+
+                            // guess the song type
+                            std::string songName = path.first.c_str();
+                            auto extOffset = songName.find_last_of('.');
+                            if (extOffset != songName.npos)
+                            {
+                                song->type = { songName.c_str() + extOffset + 1, eReplay::Unknown };
+                                if (song->type.ext != eExtension::Unknown)
+                                    songName.resize(extOffset);
+                            }
+                            song->name = songName;
+
+                            // build the crc of the file
+                            song->fileSize = fileSize;
+                            song->fileCrc = fileCrc;
+
+                            // null source
+                            song->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
+
+                            // save file
+                            auto file = io::File::OpenForWrite(m_songs->GetFullpath(dbSong).c_str());
+                            file.Write(moduleData.Items(), moduleData.Size());
+
+                            m_db.Raise(Database::Flag::kSaveSongs);
                         }
-                    }
-
-                    if (stream.IsInvalid())
-                        continue;
-
-                    Log::Message("Import: \"%s\"\n", path.second.c_str());
-
-                    auto* song = new SongSheet;
-                    auto* dbSong = m_db.AddSong(song);
-
-                    // guess the song type
-                    std::string songName = path.first.c_str();
-                    auto extOffset = songName.find_last_of('.');
-                    if (extOffset != songName.npos)
-                    {
-                        song->type = { songName.c_str() + extOffset + 1, eReplay::Unknown };
-                        if (song->type.ext != eExtension::Unknown)
-                            songName.resize(extOffset);
-                    }
-                    song->name = songName;
-
-                    // build the crc of the file
-                    song->fileSize = fileSize;
-                    song->fileCrc = fileCrc;
-
-                    // null source
-                    song->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
-
-                    // save file
-                    auto file = io::File::OpenForWrite(m_songs->GetFullpath(dbSong).c_str());
-                    file.Write(moduleData.Items(), moduleData.Size());
-
-                    m_db.Raise(Database::Flag::kSaveSongs);
+                        Core::FromJob([this]()
+                        {
+                            m_db.UnFreeze();
+                            ImGuiFileDialog::Instance()->Close();
+                            m_isBusy = false;
+                        });
+                    });
                 }
+                else
+                    ImGuiFileDialog::Instance()->Close();
+                m_lastFileDialogPath = ImGuiFileDialog::Instance()->GetCurrentPath();
             }
-            m_lastFileDialogPath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            ImGuiFileDialog::Instance()->Close();
+            if (!ImGuiFileDialog::Instance()->IsOpened())
+                ImGui::CloseCurrentPopup();
+            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+            ImGui::EndPopup();
         }
+        ImGui::EndDisabled();
     }
 
     void Library::UpdateImportArtists()
@@ -493,10 +551,14 @@ namespace rePlayer
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
         if (ImGui::BeginPopupModal("Import Artists", &m_importArtists.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
+            ImGui::BeginBusy(m_isBusy);
+
             if (m_imports.sourceResults.songs.IsEmpty())
                 FindArtists();
             else
                 ProcessImports();
+
+            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
 
             ImGui::EndPopup();
         }
@@ -513,50 +575,58 @@ namespace rePlayer
             ImGui::SetNextItemWidth(-1.0f);
             if (ImGui::InputText("##Search", &m_importArtists.searchName, ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                Source::ArtistsCollection collection;
-                for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
+                m_isBusy = true;
+                Core::AddJob([this]()
                 {
-                    if (m_selectedSources & (1ull << i))
-                        m_sources[i]->FindArtists(collection, m_importArtists.searchName.c_str());
-                }
-                std::sort(collection.matches.begin(), collection.matches.end(), [this](auto& l, auto& r)
-                {
-                    return _stricmp(l.name.c_str(), r.name.c_str()) < 0;
-                });
-                std::sort(collection.alternatives.begin(), collection.alternatives.end(), [this](auto& l, auto& r)
-                {
-                    return _stricmp(l.name.c_str(), r.name.c_str()) < 0;
-                });
-                m_importArtists.artists = std::move(collection.matches);
-                m_importArtists.artists.Reserve(collection.alternatives.NumItems());
-                for (auto& artist : collection.alternatives)
-                    m_importArtists.artists.Add(std::move(artist));
-                m_importArtists.states.Resize(m_importArtists.artists.NumItems());
-
-                m_importArtists.lastSelected = -1;
-
-                for (uint32_t i = 0, e = m_importArtists.artists.NumItems(); i < e; i++)
-                {
-                    auto& importArtist = m_importArtists.artists[i];
-                    auto& state = m_importArtists.states[i];
-                    state.isSelected = false;
-                    state.isImported = false;
-                    state.id = ArtistID::Invalid;
-
-                    for (auto* dbArtist : m_db.Artists())
+                    Source::ArtistsCollection collection;
+                    for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
                     {
-                        for (auto& source : dbArtist->Sources())
+                        if (m_selectedSources & (1ull << i))
+                            m_sources[i]->FindArtists(collection, m_importArtists.searchName.c_str());
+                    }
+                    std::sort(collection.matches.begin(), collection.matches.end(), [this](auto& l, auto& r)
+                    {
+                        return _stricmp(l.name.c_str(), r.name.c_str()) < 0;
+                    });
+                    std::sort(collection.alternatives.begin(), collection.alternatives.end(), [this](auto& l, auto& r)
+                    {
+                        return _stricmp(l.name.c_str(), r.name.c_str()) < 0;
+                    });
+                    Core::FromJob([this, collection = std::move(collection)]()
+                    {
+                        m_importArtists.artists = std::move(collection.matches);
+                        m_importArtists.artists.Reserve(collection.alternatives.NumItems());
+                        for (auto& artist : collection.alternatives)
+                            m_importArtists.artists.Add(std::move(artist));
+                        m_importArtists.states.Resize(m_importArtists.artists.NumItems());
+
+                        m_importArtists.lastSelected = -1;
+
+                        for (uint32_t i = 0, e = m_importArtists.artists.NumItems(); i < e; i++)
                         {
-                            if (importArtist.id == source.id)
+                            auto& importArtist = m_importArtists.artists[i];
+                            auto& state = m_importArtists.states[i];
+                            state.isSelected = false;
+                            state.isImported = false;
+                            state.id = ArtistID::Invalid;
+
+                            for (auto* dbArtist : m_db.Artists())
                             {
-                                state.id = dbArtist->GetId();
-                                break;
+                                for (auto& source : dbArtist->Sources())
+                                {
+                                    if (importArtist.id == source.id)
+                                    {
+                                        state.id = dbArtist->GetId();
+                                        break;
+                                    }
+                                }
+                                if (state.id != ArtistID::Invalid)
+                                    break;
                             }
                         }
-                        if (state.id != ArtistID::Invalid)
-                            break;
-                    }
-                }
+                        m_isBusy = false;
+                    });
+                });
             }
             ImGui::TableNextColumn();
             SourceSelection();
@@ -712,20 +782,30 @@ namespace rePlayer
             if (ImGui::Button("Import", ImVec2(-1.0f, 0.0f)))
             {
                 m_imports = {};
-                for (uint32_t i = 0; i < m_importArtists.artists.NumItems(); i++)
+                m_isBusy = true;
+                Core::AddJob([this]()
                 {
-                    if (m_importArtists.states[i].isImported)
-                        ImportArtist(m_importArtists.artists[i].id);
-                }
-                m_imports.isOpened = &m_importArtists.isOpened;
+                    SourceResults sourceResults;
+                    for (uint32_t i = 0; i < m_importArtists.artists.NumItems(); i++)
+                    {
+                        if (m_importArtists.states[i].isImported)
+                            ImportArtist(m_importArtists.artists[i].id, sourceResults);
+                    }
+                    Core::FromJob([this, sourceResults = std::move(sourceResults)]()
+                    {
+                        m_imports.isOpened = &m_importArtists.isOpened;
+                        m_imports.sourceResults = std::move(sourceResults);
+                        m_isBusy = false;
+                    });
+                });
             }
             ImGui::EndDisabled();
         }
     }
 
-    void Library::ImportArtist(SourceID artistId)
+    void Library::ImportArtist(SourceID artistId, SourceResults& sourceResults)
     {
-        m_sources[artistId.sourceId]->ImportArtist(artistId, m_imports.sourceResults);
+        m_sources[artistId.sourceId]->ImportArtist(artistId, sourceResults);
     }
 
     void Library::ProcessImports()

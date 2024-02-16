@@ -29,7 +29,7 @@ namespace rePlayer
 
         // serialize
         static StaticType* Load(io::File& file);
-        StaticType* Save(io::File& file) const;
+        void Save(io::File& file) const;
 
         static constexpr int16_t kReconcileDelay = 300;
 

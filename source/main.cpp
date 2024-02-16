@@ -4,6 +4,7 @@
 #include <Imgui.h>
 #include <ImGui/imgui_internal.h>
 #include <ImGui/imgui_impl_win32.h>
+#include <Thread/Thread.h>
 
 #include <Deck/Deck.h>
 #include <Graphics/Graphics.h>
@@ -216,6 +217,8 @@ static int MyHook(int allocType, void* userData, size_t size,
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 {
+    core::thread::SetCurrentId(core::thread::ID::kMain);
+
 #if _DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     //_CrtSetBreakAlloc(146143);

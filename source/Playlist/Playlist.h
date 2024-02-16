@@ -88,6 +88,8 @@ namespace rePlayer
             void Save(io::File& file);
         };
 
+        struct AddFilesContext;
+
         class DropTarget;
         class SongsUI;
 
@@ -109,7 +111,8 @@ namespace rePlayer
         void ButtonClear();
         void ButtonSort();
 
-        void AddFiles(const Array<std::string>& files, int32_t droppedEntryIndex, bool isAcceptingAll);
+        void AddFiles(int32_t droppedEntryIndex, bool isAcceptingAll);
+        void UpdateFiles();
         void AddUrls(const Array<std::string>& urls, int32_t droppedEntryIndex);
 
         static std::string GetPlaylistFilename(const std::string& name);
@@ -130,6 +133,7 @@ namespace rePlayer
         uint32_t m_firstDraggedEntryIndex = 0xffFFffFF;
         uint32_t m_lastDraggedEntryIndex = 0;
         uint32_t m_draggedEntryIndex = 0;
+        AddFilesContext* m_addFilesContext = nullptr;
 
         int32_t m_oldCurrentEntryIndex = -1;
         int32_t m_currentEntryIndex = -1;

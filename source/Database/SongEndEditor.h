@@ -36,8 +36,6 @@ namespace rePlayer
         uint32_t ReadCurrentSample();
         void OpenAudio();
 
-        static uint32_t ThreadFunc(uint32_t* lpdwParam);
-
         uint32_t WaveformUI();
         void PlaybackUI();
         void ScaleUI(uint32_t width);
@@ -57,11 +55,11 @@ namespace rePlayer
         uint32_t m_numSamples = 0;
         bool m_isPlaying = false;
         bool m_isRunning = true;
+        bool m_isJobDone = false;
         bool m_isWaveScrolling = false;
         float m_waveScroll = 0.0f;
         uint32_t m_waveStartPosition = 0;
         Wave* m_wave = nullptr;
-        void* m_threadHandle = nullptr;
         thread::Semaphore m_semaphore;
     };
 }

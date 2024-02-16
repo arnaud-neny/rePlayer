@@ -46,7 +46,7 @@ namespace rePlayer
 
         void UpdateImportArtists();
         void FindArtists();
-        void ImportArtist(SourceID artistID);
+        void ImportArtist(SourceID artistID, SourceResults& sourceResults);
 
         void ProcessImports();
 
@@ -68,6 +68,10 @@ namespace rePlayer
 
         bool m_hasSongsBackup = false;
         bool m_hasArtistsBackup = false;
+
+        bool m_isBusy = false;
+        float m_busyTime = 0.0f;
+        uint32_t m_busyColor;
 
         struct ImportArtists
         {

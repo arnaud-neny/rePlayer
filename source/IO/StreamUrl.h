@@ -48,7 +48,7 @@ namespace rePlayer
 
         void Close();
 
-        static uint32_t ThreadFunc(uint32_t* lpdwParam);
+        void Update();
         static size_t OnCurlHeader(const char* buffer, size_t size, size_t count, StreamUrl* radio);
         static size_t OnCurlWrite(const uint8_t* data, size_t size, size_t count, StreamUrl* radio);
         void ExtractMetadata();
@@ -67,8 +67,6 @@ namespace rePlayer
         std::string m_metadata;
 
         std::string m_title;
-
-        void* m_threadHandle = nullptr;
 
         uint64_t m_tail = 0;
         uint64_t m_head = 0;
@@ -91,6 +89,7 @@ namespace rePlayer
             kDownload,
             kStreaming
         } m_type = Type::kUnknown;
+        bool m_isJobDone;
 
         Array<uint8_t> m_data;
         std::mutex m_mutex;

@@ -128,7 +128,11 @@ namespace rePlayer
                     m_metadataSize = 0;
                     m_chunkSize = 0;
                     m_isReadingChunk = true;
-                    m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
+                    m_isJobDone = false;
+                    Core::AddJob([this]()
+                    {
+                        Update();
+                    });
                     while (std::atomic_ref(m_state) < State::kDownload)
                         ::Sleep(1);
                 }
@@ -286,6 +290,7 @@ namespace rePlayer
 
     StreamUrl::StreamUrl(const std::string& url, bool isClone)
         : m_url(url)
+        , m_isJobDone(isClone)
     {
         if (isClone)
             return;
@@ -319,7 +324,10 @@ namespace rePlayer
         curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, OnCurlWrite);
         curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, this);
 
-        m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
+        Core::AddJob([this]()
+        {
+            Update();
+        });
         while (std::atomic_ref(m_state) < State::kDownload)
             ::Sleep(1);
     }
@@ -389,27 +397,23 @@ namespace rePlayer
 
     void StreamUrl::Close()
     {
-        if (m_threadHandle)
-        {
-            std::atomic_ref(this->m_state) = State::kCancel;
-            WaitForSingleObject(m_threadHandle, INFINITE);
-            CloseHandle(m_threadHandle);
-        }
+        std::atomic_ref(this->m_state).store(State::kCancel);
+        while (!std::atomic_ref(m_isJobDone).load())
+            ::Sleep(1);
     }
 
-    uint32_t StreamUrl::ThreadFunc(uint32_t* lpdwParam)
+    void StreamUrl::Update()
     {
-        auto* This = reinterpret_cast<StreamUrl*>(lpdwParam);
         CURLcode curlCode;
-        curlCode = curl_easy_perform(This->m_curl);
+        curlCode = curl_easy_perform(m_curl);
         assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST || curlCode == CURLE_URL_MALFORMAT);
 
         if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
-            std::atomic_ref(This->m_state) = State::kEnd;
+            std::atomic_ref(m_state).store(State::kEnd);
         else
-            std::atomic_ref(This->m_state) = State::kFailed;
+            std::atomic_ref(m_state).store(State::kFailed);
 
-        return 0;
+        std::atomic_ref(m_isJobDone).store(true);
     }
 
     size_t StreamUrl::OnCurlHeader(const char* buffer, size_t size, size_t count, StreamUrl* stream)

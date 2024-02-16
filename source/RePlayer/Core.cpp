@@ -1,7 +1,14 @@
-#include "Core.h"
+// Core
+#include <Core/Thread/Workers.h>
 
+// rePlayer
 #include <Database/Database.h>
 #include <Playlist/Playlist.h>
+
+#include "Core.h"
+
+// stl
+#include <atomic>
 
 namespace rePlayer
 {
@@ -17,16 +24,51 @@ namespace rePlayer
         ms_instance->m_playlist->Discard(musicId);
     }
 
+    void Core::AddJob(const std::function<void()>& callback)
+    {
+        ms_instance->m_workers->AddJob(callback);
+    }
+
+    void Core::FromJob(const std::function<void()>& callback)
+    {
+        ms_instance->m_workers->FromJob(callback);
+    }
+
     template <typename ItemID>
-    void Core::Stack<ItemID>::Reconcile()
+    void Core::OnNewProxy(ItemID id)
+    {
+        auto* item = new Stack<ItemID>::Node;
+        item->id = id;
+        if constexpr (std::is_same<ItemID, SongID>::value)
+        {
+            std::atomic_ref(item->next).exchange(std::atomic_ref(ms_instance->m_songsStack.items).exchange(item));
+        }
+        else
+        {
+            std::atomic_ref(item->next).exchange(std::atomic_ref(ms_instance->m_artistsStack.items).exchange(item));
+        }
+    }
+
+    template void Core::OnNewProxy(SongID id);
+    template void Core::OnNewProxy(ArtistID id);
+
+    template <typename ItemType>
+    void Core::Stack<ItemType>::Reconcile()
     {
         // as items can become proxies, we need to clean up the unused proxies
         // rather than parsing all the database, the proxies are registered in these stacks
         // and as soon as nothing else other than the database is owning the proxy
         // we kill the proxy (item is converted back to a blob) to save memory
-        for (uint32_t i = 0; i < items.NumItems();)
+        auto* item = std::atomic_ref(items).exchange(nullptr);
+        Node* root = nullptr;
+        Node* last = nullptr;
+        while (item)
         {
-            auto id = items[i];
+            auto id = item->id;
+
+            Node node;
+            while (std::atomic_ref(item->busy).compare_exchange_strong(node.busy, kBusy));
+
             uint32_t numReconciled = 0;
             for (auto* dbPtr : ms_instance->m_db)
             {
@@ -47,10 +89,18 @@ namespace rePlayer
                     numReconciled++;
             }
             if (numReconciled == int32_t(DatabaseID::kCount))
-                items.RemoveAtFast(i);
+                delete item;
             else
-                i++;
+            {
+                item->next = root;
+                root = item;
+                if (!last)
+                    last = item;
+            }
+            item = node.next;
         }
+        if (root)
+            last->next = std::atomic_ref(items).exchange(root);
     }
 
     void Core::Reconcile()

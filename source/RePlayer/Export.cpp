@@ -1,8 +1,7 @@
-#include "Export.h"
-
 // core
 #include <Core/String.h>
 #include <IO/File.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <Deck/Player.h>
@@ -11,18 +10,14 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 
+#include "Export.h"
+
 // dr_wav
 #define DR_WAV_IMPLEMENTATION
 #define DRWAV_MALLOC(sz) core::Alloc((sz))
 #define DRWAV_REALLOC(p, sz) core::Realloc((p), (sz))
 #define DRWAV_FREE(p) core::Free((p))
 #include <dr_wav.h>
-
-// Windows
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
 
 // stl
 #include <atomic>
@@ -34,11 +29,8 @@ namespace rePlayer
 
     Export::~Export()
     {
-        if (m_threadHandle != 0)
-        {
-            ::WaitForSingleObject(m_threadHandle, INFINITE);
-            ::CloseHandle(m_threadHandle);
-        }
+        while (!std::atomic_ref(m_isJobDone).load())
+            thread::Sleep(0);
     }
 
     void Export::Enqueue(MusicID musicId)
@@ -52,18 +44,17 @@ namespace rePlayer
         if (m_songs.IsEmpty())
             return false;
 
-        m_threadHandle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)ThreadFunc, this, 0, nullptr);
-        if (m_threadHandle == 0)
+        Core::AddJob([this]()
         {
             Update();
-            return false;
-        }
+            std::atomic_ref(m_isJobDone).store(true);
+        });
         return true;
     }
 
     void Export::Cancel()
     {
-        std::atomic_ref(m_isCancelled).store(1);
+        std::atomic_ref(m_isCancelled).store(true);
     }
 
     uint32_t Export::GetStatus(float& progress, uint32_t& duration) const
@@ -76,14 +67,7 @@ namespace rePlayer
 
     bool Export::IsDone()
     {
-        return ::WaitForSingleObject(m_threadHandle, 0) != WAIT_TIMEOUT;
-    }
-
-    uint32_t Export::ThreadFunc(uint32_t* lpdwParam)
-    {
-        auto* This = reinterpret_cast<Export*>(lpdwParam);
-        This->Update();
-        return 0;
+        return std::atomic_ref(m_isJobDone).load();
     }
 
     void Export::Update()

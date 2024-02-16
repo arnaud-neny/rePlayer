@@ -1,9 +1,14 @@
-#include "Database.h"
+// Core
+#include <IO/File.h>
+#include <Thread/Thread.h>
 
+// rePlayer
 #include <Database/DatabaseSongsUI.h>
 #include <Database/Types/Proxy.inl.h>
-#include <IO/File.h>
 
+#include "Database.h"
+
+// stl
 #include <atomic>
 
 namespace rePlayer
@@ -12,7 +17,7 @@ namespace rePlayer
     template <typename OtherItemType>
     ItemType* Database::Set<ItemType, ItemID>::Add(OtherItemType* item)
     {
-        m_revision++;
+        std::atomic_ref(m_revision)++;
         ItemID id;
         if (m_availableIds.IsEmpty())
             id = m_items.Push<ItemID>();
@@ -28,11 +33,28 @@ namespace rePlayer
     template <typename ItemType, typename ItemID>
     void Database::Set<ItemType, ItemID>::Remove(ItemID id)
     {
-        m_revision++;
+        std::atomic_ref(m_revision)++;
         assert(m_items[uint32_t(id)].IsValid());
         m_items[uint32_t(id)].Reset();
         m_availableIds.Add(id);
         m_numItems--;
+    }
+
+    template <typename ItemType, typename ItemID>
+    template <typename OtherItemType>
+    ItemType* Database::Set<ItemType, ItemID>::AddFrozen(OtherItemType* item)
+    {
+        ItemID id;
+        m_spinLock.Lock();
+        if (m_availableIds.IsEmpty())
+            id = ItemID(m_frozenIndex++);
+        else
+            id = m_availableIds.Pop();
+        m_spinLock.Unlock();
+        item->id = id;
+        auto newItem = ItemType::Create(item);
+        newItem->AddRef();
+        return newItem;
     }
 
     template <typename ItemType, typename ItemID>
@@ -75,7 +97,7 @@ namespace rePlayer
         for (auto& item : m_items)
         {
             if (item.IsValid())
-                item = item->Save(file);
+                item->Save(file);
         }
     }
 
@@ -161,22 +183,56 @@ namespace rePlayer
 
     Song* Database::AddSong(SongSheet* song)
     {
-        return m_songs.Add(song);
+        if (m_numFreeze == 0)
+        {
+            assert(thread::GetCurrentId() == thread::ID::kMain);
+            return m_songs.Add(song);
+        }
+        auto* command = new Command;
+        command->type = Command::kAddSong;
+        command->song = m_songs.AddFrozen(song);
+        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        return command->song;
     }
 
     void Database::RemoveSong(SongID songId)
     {
-        m_songs.Remove(songId);
+        if (m_numFreeze == 0)
+        {
+            assert(thread::GetCurrentId() == thread::ID::kMain);
+            return m_songs.Remove(songId);
+        }
+        auto* command = new Command;
+        command->type = Command::kRemoveSong;
+        command->songId = songId;
+        command->next = std::atomic_ref(m_commandHead).exchange(command);
     }
 
     Artist* Database::AddArtist(ArtistSheet* artist)
     {
-        return m_artists.Add(artist);
+        if (m_numFreeze == 0)
+        {
+            assert(thread::GetCurrentId() == thread::ID::kMain);
+            return m_artists.Add(artist);
+        }
+        auto* command = new Command;
+        command->type = Command::kAddArtist;
+        command->artist = m_artists.AddFrozen(artist);
+        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        return command->artist;
     }
 
     void Database::RemoveArtist(ArtistID artistId)
     {
-        m_artists.Remove(artistId);
+        if (m_numFreeze == 0)
+        {
+            assert(thread::GetCurrentId() == thread::ID::kMain);
+            return m_artists.Remove(artistId);
+        }
+        auto* command = new Command;
+        command->type = Command::kRemoveArtist;
+        command->artistId = artistId;
+        command->next = std::atomic_ref(m_commandHead).exchange(command);
     }
 
     Status Database::LoadSongs(io::File& file)
@@ -220,6 +276,60 @@ namespace rePlayer
     void Database::TrackSubsong(SubsongID subsongId)
     {
         m_songsUI->TrackSubsong(subsongId);
+    }
+
+    void Database::Freeze()
+    {
+        assert(thread::GetCurrentId() == thread::ID::kMain);
+        if (m_numFreeze++ == 0)
+        {
+            m_songs.m_frozenIndex = m_songs.m_items.NumItems();
+            m_artists.m_frozenIndex = m_artists.m_items.NumItems();
+        }
+    }
+
+    void Database::UnFreeze()
+    {
+        assert(thread::GetCurrentId() == thread::ID::kMain);
+        if (--m_numFreeze == 0)
+        {
+            if (m_songs.m_frozenIndex != m_songs.m_items.NumItems())
+            {
+                m_songs.m_items.Resize(m_songs.m_frozenIndex);
+                std::atomic_ref(m_songs.m_revision)++;
+            }
+            if (m_artists.m_frozenIndex != m_artists.m_frozenIndex)
+            {
+                m_artists.m_items.Resize(m_artists.m_frozenIndex);
+                std::atomic_ref(m_artists.m_revision)++;
+            }
+            auto* commands = m_commandTail.next;
+            while (commands)
+            {
+                auto* next = commands->next;
+                switch (commands->type)
+                {
+                    case Command::kAddSong:
+                        m_songs.m_items[uint32_t(commands->song->GetId())].Attach(commands->song);
+                        m_songs.m_numItems++;
+                        break;
+                    case Command::kRemoveSong:
+                        m_songs.Remove(commands->songId);
+                        break;
+                    case Command::kAddArtist:
+                        m_artists.m_items[uint32_t(commands->artist->GetId())].Attach(commands->artist);
+                        m_artists.m_numItems++;
+                        break;
+                    case Command::kRemoveArtist:
+                        m_artists.Remove(commands->artistId);
+                        break;
+                }
+                delete commands;
+                commands = next;
+            }
+            m_commandTail.next = nullptr;
+            m_commandHead = &m_commandTail;
+        }
     }
 }
 // namespace rePlayer
