@@ -250,6 +250,26 @@ namespace rePlayer
             m_nextPlayer->ApplySettings();
     }
 
+    inline constexpr Deck::ClippedTextFlags operator&(Deck::ClippedTextFlags a, Deck::ClippedTextFlags b)
+    {
+        return Deck::ClippedTextFlags(uint8_t(a) & uint8_t(b));
+    }
+
+    inline constexpr Deck::ClippedTextFlags operator|(Deck::ClippedTextFlags a, Deck::ClippedTextFlags b)
+    {
+        return Deck::ClippedTextFlags(uint8_t(a) | uint8_t(b));
+    }
+
+    inline constexpr Deck::ClippedTextFlags& operator|=(Deck::ClippedTextFlags& a, Deck::ClippedTextFlags b)
+    {
+        return a = a | b;
+    }
+
+    inline constexpr bool operator!(Deck::ClippedTextFlags a)
+    {
+        return a == Deck::ClippedTextFlags::kNone;
+    }
+
     void Deck::OnSystray(int32_t x, int32_t y, SystrayState state)
     {
         if (m_isSystrayMenuEnabled)
@@ -436,7 +456,7 @@ namespace rePlayer
             const auto subsongId = musicId.subsongId;
 
             std::string title = player->GetTitle();
-            if (DrawClippedText(title))
+            if (!!(DrawClippedText(title) & ClippedTextFlags::kIsHoovered))
             {
                 auto metadata = player->GetMetadata();
                 if (metadata.size())
@@ -763,13 +783,14 @@ namespace rePlayer
     }
 
     template <typename DrawCallback>
-    bool Deck::DrawClippedText(const std::string& text, DrawCallback&& drawCallback)
+    Deck::ClippedTextFlags Deck::DrawClippedText(const std::string& text, bool isScrolling, DrawCallback&& drawCallback)
     {
-        bool isHoovered{ false };
+        ClippedTextFlags flags = ClippedTextFlags::kNone;
         auto& style = ImGui::GetStyle();
 
         auto textSize = ImGui::CalcTextSize(text.c_str());
-        m_currentMaxTextSize = Max(m_currentMaxTextSize, textSize.x);
+        if (isScrolling)
+            m_currentMaxTextSize = Max(m_currentMaxTextSize, textSize.x);
         //ImGui::InvisibleButton(label, ImVec2(-1.0f, textSize.y + style.FramePadding.y * 2));
         //it's a hooverable ImGui::Dummy because we want to move the window while dragging this widget
         ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -779,7 +800,8 @@ namespace rePlayer
             const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
             ImGui::ItemSize(size);
             ImGui::ItemAdd(bb, 0);
-            isHoovered = ImGui::ItemHoverable(bb, 0, 0);
+            if (ImGui::ItemHoverable(bb, 0, 0))
+                flags |= ClippedTextFlags::kIsHoovered;
         }
 
         const ImVec2 p0 = ImGui::GetItemRectMin();
@@ -787,22 +809,27 @@ namespace rePlayer
 
         ImVec2 textPos = ImVec2(p0.x + style.FramePadding.x, p0.y + style.FramePadding.y);
         auto titleWidth = p1.x - p0.x - style.FramePadding.x * 2;
-        m_maxTextSize = Max(m_maxTextSize, textSize.x);
         if (titleWidth < textSize.x)
+            flags |= ClippedTextFlags::kIsClipped;
+        if (isScrolling)
         {
-            static constexpr float kPixelPerSecond = 4.0f;
-            static constexpr float kPi = 3.14159265f;
-            float period = (m_maxTextSize - titleWidth) / kPixelPerSecond;
-            float dt = fmodf(m_textTime, 2.0f + period);
-            if (dt <= 1.0f)
-                dt = 0.f;
-            else if (dt < 1.0f + period * 0.5)
-                dt = 2.0f * kPi * (dt - 1.0f) / period;
-            else if (dt < 2.0f + period * 0.5)
-                dt = kPi;
-            else
-                dt = 2.0f * kPi * (dt - 2.0f) / period;
-            textPos.x -= (textSize.x - titleWidth) * (0.5f - cosf(dt) * 0.5f);
+            m_maxTextSize = Max(m_maxTextSize, textSize.x);
+            if (!!(flags & ClippedTextFlags::kIsClipped))
+            {
+                static constexpr float kPixelPerSecond = 4.0f;
+                static constexpr float kPi = 3.14159265f;
+                float period = (m_maxTextSize - titleWidth) / kPixelPerSecond;
+                float dt = fmodf(m_textTime, 2.0f + period);
+                if (dt <= 1.0f)
+                    dt = 0.f;
+                else if (dt < 1.0f + period * 0.5)
+                    dt = 2.0f * kPi * (dt - 1.0f) / period;
+                else if (dt < 2.0f + period * 0.5)
+                    dt = kPi;
+                else
+                    dt = 2.0f * kPi * (dt - 2.0f) / period;
+                textPos.x -= (textSize.x - titleWidth) * (0.5f - cosf(dt) * 0.5f);
+            }
         }
 
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -810,12 +837,12 @@ namespace rePlayer
         draw_list->AddRectFilled(p0, p1, ImGui::GetColorU32(ImGuiCol_FrameBg));
         std::forward<DrawCallback>(drawCallback)(p0, p1);
         draw_list->AddText(ImGui::GetFont(), ImGui::GetFontSize(), textPos, ImGui::GetColorU32(ImGuiCol_Text), text.c_str(), NULL, 0.0f, &clip_rect);
-        return isHoovered;
+        return flags;
     }
 
     void Deck::DrawClippedArtists(Player* player)
     {
-        bool isHoovered{ false };
+        bool isHoovered = false;
         auto& style = ImGui::GetStyle();
 
         std::string text = player->GetArtists();
@@ -888,10 +915,16 @@ namespace rePlayer
         auto info = player->GetInfo();
         if (info.empty())
             info = "            /\\\n     <-  rePlayer  ->\n            \\/";
-        DrawClippedText(info, [player](const ImVec2& min, const ImVec2& max)
+        auto flags = DrawClippedText(info, false, [player](const ImVec2& min, const ImVec2& max)
         {
             player->DrawOscilloscope(min.x, min.y, max.x, max.y);
         });
+        if (flags == (ClippedTextFlags::kIsClipped | ClippedTextFlags::kIsHoovered))
+        {
+            ImGui::BeginTooltip();
+            ImGui::TextUnformatted(info.c_str(), info.c_str() + info.size());
+            ImGui::EndTooltip();
+        }
     }
 
     void Deck::UpdateSystray()

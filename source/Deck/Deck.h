@@ -66,6 +66,17 @@ namespace rePlayer
             IsEnabled = true
         };
 
+        enum class ClippedTextFlags : uint8_t
+        {
+            kNone = 0,
+            kIsHoovered = 1 << 0,
+            kIsClipped = 1 << 1
+        };
+        friend constexpr ClippedTextFlags operator&(ClippedTextFlags a, ClippedTextFlags b);
+        friend constexpr ClippedTextFlags operator|(ClippedTextFlags a, ClippedTextFlags b);
+        friend constexpr ClippedTextFlags& operator|=(ClippedTextFlags& a, ClippedTextFlags b);
+        friend constexpr bool operator!(ClippedTextFlags a);
+
     private:
         void OnBeginUpdate() override;
         std::string OnGetWindowTitle() override;
@@ -81,8 +92,8 @@ namespace rePlayer
         void Play(Tracking isTrackingEnabled = Tracking::IsEnabled);
 
         template <typename DrawCallback>
-        bool DrawClippedText(const std::string& text, DrawCallback&& drawCallback);
-        bool DrawClippedText(const std::string& text) { return DrawClippedText(text, [](const ImVec2& /*min*/, const ImVec2& /*max*/) {}); }
+        ClippedTextFlags DrawClippedText(const std::string& text, bool isScrolling, DrawCallback&& drawCallback);
+        ClippedTextFlags DrawClippedText(const std::string& text) { return DrawClippedText(text, true, [](const ImVec2& /*min*/, const ImVec2& /*max*/) {}); }
         void DrawClippedArtists(Player* player);
 
         void DisplayInfoAndOscilloscope(Player* player);
