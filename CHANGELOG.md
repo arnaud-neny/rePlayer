@@ -1,4 +1,4 @@
-v0.12.6:
+v0.12.7:
 - Added Advanced Audio Coding
 - Added Opus
 - Updated adplug to 2.3.3.818
@@ -7,17 +7,19 @@ v0.12.6:
 - Updated gbsplay to 0.0.95
 - Updated libsc68 to 3.0.0a r705
 - Updated libsidplay to 2.6.0
-- Updated ProTrekkr to 2.6.4
+- Updated ProTrekkr to 2.6.5
 - Updated UADE with Jochen Hippel ST player 1.3
 - Updated ZXTune to r5056+
 - Updated dr_flac to 0.12.42
 - Updated dr_mp3 to 0.6.38
 - Updated dr_wav to 0.13.15
+- Updated ImGui to 1.90.3
+- Updated ImGuiFileDialog to 0.6.6.1 fixed
 - Updated libcurl to 8.6.0
-- Updated ImGui to 1.90.1
 - Updated TagLib to 2.0
 - Updated TinyXML-2 to 10.0.0
 - Ability to play directly from an URL (drag and drop from the browser or import), including streaming (online radios)
+- New job system to remove blocking tasks (removed interface freezes, asynchronous files check, less thread creation/deletion spam...)
 - Bug fixes
 
 v0.11.1:
