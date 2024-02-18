@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\include">
+      <UniqueIdentifier>{6938490e-87c3-4d91-acdb-35148a6a5b70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{2aa64190-8781-4ea2-bf36-ed4d798344c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cli">
+      <UniqueIdentifier>{a1a26c86-82ec-42cf-831c-ce2b5b10d610}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayWavPack.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\wavpack.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\decorr_tables.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unpack3.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\wavpack_local.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\wavpack_version.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="cli\md5.h">
+      <Filter>Source Files\cli</Filter>
+    </ClInclude>
+    <ClInclude Include="cli\utils.h">
+      <Filter>Source Files\cli</Filter>
+    </ClInclude>
+    <ClInclude Include="cli\win32_unicode_support.h">
+      <Filter>Source Files\cli</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayWavPack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\decorr_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entropy_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\extra1.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\extra2.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\open_filename.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\open_legacy.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\open_raw.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\open_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pack.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pack_dns.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pack_dsd.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pack_floats.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pack_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\read_words.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tag_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tags.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack_dsd.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack_floats.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack_seek.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack_utils.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack3.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack3_open.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unpack3_seek.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\write_words.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\aiff.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\aiff_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\caff.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\caff_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\dsdiff.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\dsdiff_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\dsf.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\dsf_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\import_id3.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\md5.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\riff.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\riff_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\utils.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wave64.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wave64_write.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wavpack.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\win32_unicode_support.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wvgain.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wvparser.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wvtag.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wvtest.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\wvunpack.c">
+      <Filter>Source Files\cli</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\pack_x64.asm">
+      <Filter>Source Files\src</Filter>
+    </None>
+    <None Include="src\pack_x86.asm">
+      <Filter>Source Files\src</Filter>
+    </None>
+    <None Include="src\unpack_x64.asm">
+      <Filter>Source Files\src</Filter>
+    </None>
+    <None Include="src\unpack_x86.asm">
+      <Filter>Source Files\src</Filter>
+    </None>
+  </ItemGroup>
+</Project>
