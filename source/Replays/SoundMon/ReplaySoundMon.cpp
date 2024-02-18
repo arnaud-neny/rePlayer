@@ -34,6 +34,8 @@ namespace rePlayer
 
     Replay* ReplaySoundMon::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024)
+            return nullptr;
         auto data = stream->Read();
         auto module = SoundMon::Module::Load(data.Items(), data.Size());
         if (!module)

@@ -45,6 +45,8 @@ namespace rePlayer
 
     Replay* ReplayVGM::Load(io::Stream* stream, CommandBuffer metadata)
     {
+        if (stream->GetSize() > 1024 * 1024 * 128)
+            return nullptr;
         auto settings = metadata.Find<Settings>();
 
         auto* droPlayer = new DROPlayer;

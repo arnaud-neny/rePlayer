@@ -24,9 +24,9 @@ namespace rePlayer
 
     Replay* ReplayEuphony::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        auto eupbuf = stream->Read();
-        if (eupbuf.Size() < 8)
+        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 64)
             return nullptr;
+        auto eupbuf = stream->Read();
         if (memcmp(eupbuf.Items(), "EUPH-PKG", 8) == 0)
         {
             auto* archive = archive_read_new();

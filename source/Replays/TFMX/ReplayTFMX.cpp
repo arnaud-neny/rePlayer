@@ -43,7 +43,7 @@ namespace rePlayer
 
     Replay* ReplayTFMX::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        if (stream->GetSize() < 10)
+        if (stream->GetSize() < 10 || stream->GetSize() > 1024 * 1024 * 16)
             return nullptr;
 
         TfmxData mdat = {};

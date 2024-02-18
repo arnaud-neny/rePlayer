@@ -149,7 +149,7 @@ namespace rePlayer
 
     Replay* ReplayAdLib::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        if (stream->GetSize() < 8)
+        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024)
             return nullptr;
 
         COPLprops* core;

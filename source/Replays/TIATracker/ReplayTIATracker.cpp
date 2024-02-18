@@ -31,6 +31,8 @@ namespace rePlayer
 
     Replay* ReplayTIATracker::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024 * 128)
+            return nullptr;
         auto data = stream->Read();
 
         if (QJsonObject::accept(data.begin(), data.end()))

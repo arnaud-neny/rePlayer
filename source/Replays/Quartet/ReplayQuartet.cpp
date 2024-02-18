@@ -43,9 +43,9 @@ namespace rePlayer
 
     Replay* ReplayQuartet::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        auto data = stream->Read();
-        if (data.Size() < 8)
+        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 128)
             return nullptr;
+        auto data = stream->Read();
         stream->Seek(0, io::Stream::kSeekBegin);
         ms_driver.isInternalQts = memcmp(data.Items(), "QTST-MOD", 8) == 0;
         ms_driver.stream = stream;

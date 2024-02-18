@@ -33,7 +33,8 @@ namespace rePlayer
 
     Replay* ReplayAyfly::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-
+        if (stream->GetSize() > 1024 * 1024)
+            return nullptr;
         auto data = stream->Read();
         auto song = reinterpret_cast<AYSongInfo*>(ay_initsongindirect(const_cast<uint8_t*>(data.Items()), kSampleRate, unsigned long(data.Size())));
         if (!song)

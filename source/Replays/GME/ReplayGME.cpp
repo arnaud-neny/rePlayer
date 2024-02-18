@@ -38,6 +38,8 @@ namespace rePlayer
 
     Replay* ReplayGME::Load(io::Stream* stream, CommandBuffer metadata)
     {
+        if (stream->GetSize() > 1024 * 1024 * 128)
+            return nullptr;
         auto data = stream->Read();
         Music_Emu* emu;
         if (gme_open_data(data.Items(), long(data.Size()), &emu, kSampleRate))

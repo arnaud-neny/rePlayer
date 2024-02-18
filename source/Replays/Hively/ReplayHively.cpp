@@ -41,7 +41,7 @@ namespace rePlayer
 
     Replay* ReplayHively::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        if (stream->GetSize() < 8)
+        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 128)
             return nullptr;
 
         auto data = stream->Read();

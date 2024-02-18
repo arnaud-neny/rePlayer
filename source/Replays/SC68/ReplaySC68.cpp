@@ -59,6 +59,8 @@ namespace rePlayer
 
     Replay* ReplaySC68::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024 * 128)
+            return nullptr;
         ApplySettings();
 
         sc68_create_t create = {};

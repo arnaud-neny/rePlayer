@@ -32,6 +32,8 @@ namespace rePlayer
 
     Replay* ReplayStSound::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024)
+            return nullptr;
         auto module = new CYmMusic(kSampleRate);
         auto data = stream->Read();
         if (!module->loadMemory(const_cast<uint8_t*>(data.Items()), static_cast<ymu32>(data.Size())))

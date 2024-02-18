@@ -33,6 +33,8 @@ namespace rePlayer
 
     Replay* ReplayV2::Load(io::Stream* stream, CommandBuffer metadata)
     {
+        if (stream->GetSize() < 4 || stream->GetSize() > 1024 * 1024 * 256)
+            return nullptr;
         auto data = stream->Read();
         if (data.Size() < 4 || data[2] != 0 || data[3] != 0)
             return nullptr;

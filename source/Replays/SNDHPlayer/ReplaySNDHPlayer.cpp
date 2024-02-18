@@ -35,9 +35,9 @@ namespace rePlayer
 
     Replay* ReplaySNDHPlayer::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        auto data = stream->Read();
-        if (data.Size() < 8)
+        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024)
             return nullptr;
+        auto data = stream->Read();
 
         auto* sndh = new SndhFile();
         if (sndh->Load(data.Items(), int(data.Size()), kSampleRate))

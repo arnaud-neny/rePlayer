@@ -33,6 +33,8 @@ namespace rePlayer
 
     Replay* ReplayASAP::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024)
+            return nullptr;
         auto song = ASAP_New();
         auto data = stream->Read();
         if (!ASAP_Load(song, stream->GetName().c_str(), data.Items(), static_cast<int>(data.Size())))

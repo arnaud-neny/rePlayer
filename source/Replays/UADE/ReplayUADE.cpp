@@ -104,7 +104,7 @@ namespace rePlayer
 
     Replay* ReplayUADE::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        if (stream->Read().IsEmpty())
+        if (stream->GetSize() < 16 || stream->GetSize() > 1024 * 1024 * 128)
             return nullptr;
 
         auto buffer = stream->Read();

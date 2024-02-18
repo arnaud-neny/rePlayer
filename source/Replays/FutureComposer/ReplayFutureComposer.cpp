@@ -35,6 +35,8 @@ namespace rePlayer
 
     Replay* ReplayFutureComposer::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        if (stream->GetSize() > 1024 * 1024)
+            return nullptr;
         auto decoder = fc14dec_new();
         fc14dec_mixer_init(decoder, kSampleRate, 16, 2, 0);
         auto data = stream->Read();
