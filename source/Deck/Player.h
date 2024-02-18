@@ -94,6 +94,7 @@ namespace rePlayer
         uint32_t m_remainingFadeOut;
         uint32_t m_fadeOutSilence = 0;
         float m_fadeOutRatio;
+        uint32_t m_waitTime = 0;
         bool m_isWaiting = true;
         bool m_isRunning = true;
         bool m_isJobDone = false;

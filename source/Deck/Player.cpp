@@ -508,7 +508,11 @@ namespace rePlayer
             m_waveFillPos = waveFillPos;
 
             auto timeSpent = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startTime).count();
-            m_semaphore.Wait(std::atomic_ref(m_isWaiting).load() ? INFINITE : (timeSpent < 5) ? uint32_t(5 - timeSpent) : 0);
+            auto waitTime = std::atomic_ref(m_isWaiting).load() ? INFINITE : (timeSpent < 5) ? uint32_t(5 - timeSpent) : 0;
+            std::atomic_ref(m_waitTime).store(waitTime);
+            m_semaphore.Wait(waitTime);
+            if (waitTime == INFINITE)
+                std::atomic_ref(m_waitTime).store(0);
         }
         std::atomic_ref(m_isJobDone).store(true);
     }
@@ -669,6 +673,8 @@ namespace rePlayer
     void Player::SuspendThread()
     {
         std::atomic_ref(m_isWaiting).store(true);
+        while (std::atomic_ref(m_waitTime).load() != INFINITE)
+            thread::Sleep(0);
     }
 }
 // namespace rePlayer
