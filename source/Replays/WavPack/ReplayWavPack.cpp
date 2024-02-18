@@ -128,11 +128,14 @@ namespace rePlayer
 
     uint32_t ReplayWavPack::Seek(uint32_t timeInMs)
     {
+        auto numSamples = (int64_t(timeInMs) * GetSampleRate()) / 1000ll;
+        WavpackSeekSample64(m_context, numSamples);
         return timeInMs;
     }
 
     void ReplayWavPack::ResetPlayback()
     {
+        WavpackSeekSample(m_context, 0);
     }
 
     void ReplayWavPack::ApplySettings(const CommandBuffer /*metadata*/)
