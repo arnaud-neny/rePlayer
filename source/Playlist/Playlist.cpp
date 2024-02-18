@@ -101,6 +101,7 @@ namespace rePlayer
             std::string artist;
         };
         Array<Entry> entries;
+        Array<std::string> failedEntries;
 
         int32_t droppedEntryIndex;
 
@@ -1471,7 +1472,12 @@ namespace rePlayer
                     else
                         type.replay = eReplay::Unknown;
                     if (!isAcceptingAll && type.replay == eReplay::Unknown)
+                    {
+                        addFilesContext->Lock();
+                        addFilesContext->failedEntries.Add(stream->GetName());
+                        addFilesContext->Unlock();
                         return;
+                    }
 
                     // create the song sheet and add it to the playlist
                     auto* songSheet = new SongSheet;
@@ -1580,8 +1586,12 @@ namespace rePlayer
         {
             addFilesContext->Lock();
             auto entries = std::move(addFilesContext->entries);
+            auto failedEntries = std::move(addFilesContext->failedEntries);
             auto isDone = addFilesContext->m_isDone;
             addFilesContext->Unlock();
+
+            for (auto& failedEntry : failedEntries)
+                Log::Warning("Playlist: can't find replay for \"%s\"\n", failedEntry.c_str());
 
             auto currentPlayingEntry = addFilesContext->droppedEntryIndex <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : MusicID();
             for (uint32_t entryIndex = 0; entryIndex < entries.NumItems(); entryIndex++)
