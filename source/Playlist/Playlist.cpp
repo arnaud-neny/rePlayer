@@ -42,6 +42,8 @@
 // curl
 #include <curl/curl.h>
 
+#define IS_FILECRC_ENABLED 0
+
 namespace rePlayer
 {
     inline Playlist::Cue::Entry& Playlist::Cue::Entry::operator=(const MusicID& musicId)
@@ -279,7 +281,7 @@ namespace rePlayer
             auto stream = GetStream(dbSong);
             if (stream.IsValid())
             {
-                if (dbSong->GetFileSize() == 0)
+                if (dbSong->GetFileSize() == 0 && IS_FILECRC_ENABLED)
                 {
                     auto streamSize = stream->GetSize();
                     song->fileSize = uint32_t(streamSize);
@@ -1490,6 +1492,7 @@ namespace rePlayer
                     if (replay != nullptr)
                     {
                         songSheet->type = replay->GetMediaType();
+                        if (IS_FILECRC_ENABLED)
                         {
                             auto streamSize = stream->GetSize();
                             songSheet->fileSize = uint32_t(streamSize);
