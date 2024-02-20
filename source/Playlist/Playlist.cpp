@@ -106,6 +106,7 @@ namespace rePlayer
         int32_t droppedEntryIndex;
 
         bool m_isDone = false;
+        uint16_t m_time = 0;
 
         AddFilesContext* next = nullptr;
     };
@@ -673,7 +674,14 @@ namespace rePlayer
             duration += entry.GetSong()->GetSubsongDurationCs(entry.subsongId.index);
         duration /= 100;
         char title[128];
-        sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60);
+        if (m_addFilesContext)
+        {
+            const char wait[] = "|/-\\";
+            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d %c###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60, wait[m_addFilesContext->m_time >> 14]);
+            m_addFilesContext->m_time += uint16_t(11 * ImGui::GetIO().DeltaTime * ((1 << 14) - 1));
+        }
+        else
+            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60);
 
         ImGui::SetNextWindowPos(ImVec2(16.0f, 188.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(430.0f, 480.0f), ImGuiCond_FirstUseEver);
@@ -1632,6 +1640,11 @@ namespace rePlayer
 
             for (auto& failedEntry : failedEntries)
                 Log::Warning("Playlist: can't find replay for \"%s\"\n", failedEntry.c_str());
+
+            // instead of checking every place where we change the entries (and update the droppedEntryIndex), just clamp or dropped index
+            // maybe one day, I'll refactor that and make it clean
+            if (addFilesContext->droppedEntryIndex > m_cue.entries.NumItems<int32_t>())
+                addFilesContext->droppedEntryIndex = m_cue.entries.NumItems<int32_t>();
 
             auto currentPlayingEntry = addFilesContext->droppedEntryIndex <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : MusicID();
             for (uint32_t entryIndex = 0; entryIndex < entries.NumItems(); entryIndex++)
