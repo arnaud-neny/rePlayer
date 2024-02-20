@@ -61,6 +61,8 @@
 - Furnace: https://github.com/tildearrow/furnace
 - FAAD2: https://github.com/knik0/faad2
 - Opus: https://opus-codec.org
+- WavPack: https://github.com/dbry/WavPack
+- Direct Stream Digital: https://github.com/Sound-Linux-More/sacd
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

@@ -208,3 +208,5 @@ Or add some comments (and likes) there:
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
 - [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
+- [WavPack](https://github.com/dbry/WavPack): Hybrid Lossless Wavefile Compressor.
+- [Direct Stream Digital](https://github.com/Sound-Linux-More/sacd): Plays Philips DSDIFF and Sony DSF files, heavily inspired by SACD Decoder from Robert Tari.

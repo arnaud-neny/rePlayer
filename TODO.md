@@ -8,7 +8,6 @@
 - import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
-- async tasks (imports...)
 - database: add album database
 - modland: source validation (check for removed files)
 - mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)
@@ -25,7 +24,6 @@
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
 - multi-threaded load/import (with main screens lock)
-- thread helper/wrappers (sleep, yield...)
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://www.exotica.org.uk/ importer?
@@ -46,4 +44,3 @@
 - sointu: https://github.com/vsariola/sointu
 - single channel export
 - vgmstream support? https://github.com/vgmstream/vgmstream
-- wavpack: https://github.com/dbry/WavPack

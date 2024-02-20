@@ -1,3 +1,9 @@
+v0.13.0 (Khatchadour's Release):
+- Added Direct Stream Digital
+- Added WavePack
+- Updated ProTrekkr to 2.6.6
+- Bug fixes
+
 v0.12.7:
 - Added Advanced Audio Coding
 - Added Opus
