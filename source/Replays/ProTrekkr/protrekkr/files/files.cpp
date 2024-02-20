@@ -208,7 +208,7 @@ int Load_Ptk(ReplayerFile replayerFile)
     {
 
 #if !defined(__WINAMP__)
-        Status_Box("Attempting to load the song file...");
+        Status_Box("Attempting To Load The Song File...");
 #endif
 
         Song_Playing = FALSE;
@@ -281,7 +281,7 @@ int Load_Ptk(ReplayerFile replayerFile)
 Read_Mod_File:
 
 #if !defined(__WINAMP__)
-        Status_Box("Loading song -> Header...");
+        Status_Box("Loading Song -> Header...");
 #endif
         Free_Samples();
 
@@ -454,7 +454,7 @@ Read_Mod_File:
         }
 
 #if !defined(__WINAMP__)
-        Status_Box("Loading song -> Sample data...");
+        Status_Box("Loading Song -> Sample Data...");
 #endif
         for(int swrite = 0; swrite < MAX_INSTRS; swrite++)
         {
@@ -558,7 +558,7 @@ Read_Mod_File:
         }
 
 #if !defined(__WINAMP__)
-        Status_Box("Loading song -> Track info, patterns and sequences...");
+        Status_Box("Loading Song -> Track Info, Patterns And Sequences...");   
 #endif
 
         Set_Default_Channels_Polyphony();
@@ -629,7 +629,7 @@ Read_Mod_File:
         Read_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
         Read_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
 
-        Read_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+        Read_Mod_Data_Swap(&shuffle_amount, sizeof(int), 1, in);
 
         // Load the new reverb data
         if(New_Reverb)
@@ -788,7 +788,7 @@ Read_Mod_File:
         Init_Tracker_Context_After_ModLoad();
 
 #if !defined(__WINAMP__)
-        Status_Box("Module loaded sucessfully.");
+        Status_Box("Module Loaded Successfully.");
 #endif
 
     }
@@ -796,7 +796,7 @@ Read_Mod_File:
     {
 
 #if !defined(__WINAMP__)
-        Status_Box("Module loading failed. (Possible cause: file not found)");
+        Status_Box("Module Loading Failed. (Possible Cause: File Not Found)");
 #endif
 
         return(FALSE);
@@ -1161,13 +1161,13 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
     {
         if(NewFormat)
         {
-            sprintf(Temph, "Saving '%s.ptp' song in modules directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptp' Song In Modules Directory...", FileName);
             Status_Box(Temph);
             sprintf(Temph, "%s" SLASH "%s.ptp", Dir_Mods, FileName);
         }
         else
         {
-            sprintf(Temph, "Saving '%s.ptk' song in modules directory...", FileName);
+            sprintf(Temph, "Saving '%s.ptk' Song In Modules Directory...", FileName);
             Status_Box(Temph);
             sprintf(Temph, "%s" SLASH "%s.ptk", Dir_Mods, FileName);
         }
@@ -1409,7 +1409,7 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             Write_Mod_Data_Swap(&rchorus_delay, sizeof(int), 1, in);
             Write_Mod_Data_Swap(&lchorus_feedback, sizeof(float), 1, in);
             Write_Mod_Data_Swap(&rchorus_feedback, sizeof(float), 1, in);
-            Write_Mod_Data_Swap(&shuffle, sizeof(int), 1, in);
+            Write_Mod_Data_Swap(&shuffle_amount, sizeof(int), 1, in);
 
             // Save the reverb data
             Save_Reverb_Data(Write_Mod_Data, Write_Mod_Data_Swap, in);
@@ -1518,20 +1518,20 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 char name[128];
                 if(NewFormat)
                 {
-                    sprintf(name, "Module '%s.ptp' saved succesfully.", FileName);
+                    sprintf(name, "Module '%s.ptp' Saved Successfully.", FileName);
                 }
                 else
                 {
-                    sprintf(name, "Module '%s.ptk' saved succesfully.", FileName);
+                    sprintf(name, "Module '%s.ptk' Saved Successfully.", FileName);
                 }
                 Status_Box(name);
             }
         }
-        if(!Ok_Memory) Status_Box("Not enough memory.");
+        if(!Ok_Memory) Status_Box("Not Enough Memory.");
     }
     else
     {
-        if(!Simulate) Status_Box("Module save failed.");
+        if(!Simulate) Status_Box("Module Saving Failed.");   
     }
 
     return(Mod_Length);
@@ -1656,7 +1656,7 @@ int Pack_Module(char *FileName)
 
     if(!strlen(FileName))
     {
-        sprintf(name, "Can't save module without a name...");
+        sprintf(name, "Can't Save A Module Without A Name...");
         Status_Box(name);
         return(FALSE);
     }
@@ -1684,11 +1684,11 @@ int Pack_Module(char *FileName)
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
         fclose(output);
-        sprintf(name, "Module '%s.ptk' saved succesfully.", FileName);
+        sprintf(name, "Module '%s.ptk' Saved Successfully.", FileName);
     }
     else
     {
-        sprintf(name, "Module save failed.");
+        sprintf(name, "Module Saving Failed.");
     }
     if(Final_Mem_Out) free(Final_Mem_Out);
     if(Final_Mem) free(Final_Mem);
@@ -1885,7 +1885,7 @@ int Calc_Length(void)
     int have_break = 255;
     int PosTicks;
     int shuffle_switch;
-    int shuffle_stp = shuffle;
+    int shuffle_stp = shuffle_amount;
     double len;
     int nbr_ticks;
     int Samples;
@@ -1895,8 +1895,8 @@ int Calc_Length(void)
 
     shuffle_switch = -1;
     Samples = (int) ((60 * MIX_RATE) / (Beats_Per_Min * Ticks_Per_Beat));
-    if(shuffle_switch == 1) shuffle_stp = -((Samples * shuffle) / 200);
-    else shuffle_stp = (Samples * shuffle) / 200;
+    if(shuffle_switch == 1) shuffle_stp = -((Samples * shuffle_amount) / 200);
+    else shuffle_stp = (Samples * shuffle_amount) / 200;
 
     PosTicks = 0;
     nbr_ticks = 0;
@@ -1997,11 +1997,11 @@ int Calc_Length(void)
 
                 if(shuffle_switch == 1)
                 {
-                    shuffle_stp = -((Samples * shuffle) / 200);
+                    shuffle_stp = -((Samples * shuffle_amount) / 200);
                 }
                 else
                 {
-                    shuffle_stp = (Samples * shuffle) / 200;
+                    shuffle_stp = (Samples * shuffle_amount) / 200;
                 }
                 len += PosTicks - 1;
 

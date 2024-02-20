@@ -87,8 +87,10 @@ class skin_file
 };
 
 extern list <skin_file> skin_files;
-#if !defined(__REPLAYER__)
+#if defined(__MACOSX_PPC__)
 extern SDL_Surface *POINTER;
+#endif
+#if !defined(__REPLAYER__)
 extern REQUESTER Exit_Requester;
 #endif
 

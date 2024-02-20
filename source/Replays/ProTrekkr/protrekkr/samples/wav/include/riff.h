@@ -1,5 +1,5 @@
 /*
-   This file is part of the Buzé base Buzz-library.
+   This file is part of the Buzï¿½ base Buzz-library.
 
    Please refer to LICENSE.TXT for details regarding usage.
 */
@@ -179,13 +179,11 @@ struct WaveFormat_Chunk
 
     dBOOLEAN VerifyValidity()
     {
-        return header.ckID == FourCC("fmt ") &&
+        return (header.ckID == FourCC("fmt ")) &&
                (data.nChannels == 1 || data.nChannels == 2) &&
-                data.nAvgBytesPerSec == (data.nChannels *
-                                         data.nSamplesPerSec *
-                                         data.nBitsPerSample) / 8 &&
-                data.nBlockAlign == (data.nChannels * data.nBitsPerSample) / 8 ||
-                data.nBitsPerSample == 12;
+                (data.nAvgBytesPerSec == ((data.nChannels * data.nSamplesPerSec * data.nBitsPerSample) / 8)) &&
+                (data.nBlockAlign == ((data.nChannels * data.nBitsPerSample) / 8)) ||
+                (data.nBitsPerSample == 12);
     }
 };
 

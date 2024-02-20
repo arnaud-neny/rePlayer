@@ -607,7 +607,7 @@ int glide;
 float Sample_Vol[MAX_INSTRS];
 unsigned int SubCounter;
 unsigned int SamplesPerSub;
-int shuffle;
+int shuffle_amount;
 
 #if defined(PTK_SHUFFLE)
 int shufflestep;
@@ -861,7 +861,6 @@ int delay_time;
     char nameins[128][20];
     char SampleName[128][16][64];
     unsigned char nPatterns = 1;
-    void Actualize_303_Ed(char gode);
     extern char sr_isrecording;
     extern int32 sed_range_start;
     extern int32 sed_range_end;
@@ -948,9 +947,8 @@ void Reset_Values(void);
 // Audio mixer
 Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 {
-#if defined(__MACOSX__) || defined(__REPLAYER__)
+#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__) || defined(__REPLAYER__)
     float *pSamples_flt = (float *) Buffer;
-    short *pSamples_int = (short *) Buffer;
 #else
     short *pSamples = (short *) Buffer;
 #endif
@@ -967,8 +965,8 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
     {
 #endif
 
-#if defined(__MACOSX__)
-        for(i = Len - 1; i >= 0; i -= AUDIO_16Bits ? 4 : 8)
+#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__)
+        for(i = Len - 1; i >= 0; i -= 8)
 #elif defined(__REPLAYER__)
         for (; numSamples; --numSamples)
 #else
@@ -1003,18 +1001,10 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
                            (Metronome_Dats[(metronome_internal_counter_int * 2)] & 0xff);
                 Right_Dat = Left_Dat;
 
-#if defined(__MACOSX__)
-                if(AUDIO_16Bits)
-                {
-                    left_value += Left_Dat;
-                    right_value += Right_Dat;
-                }
-                else
-                {
-                    // ([1.0..-1.0f])
-                    left_float += (float) (Left_Dat) / 32767.0f;
-                    right_float += (float) (Right_Dat) / 32767.0f;
-                }
+#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__)
+                // ([1.0..-1.0f])
+                left_float += (float) (Left_Dat) / 32767.0f;
+                right_float += (float) (Right_Dat) / 32767.0f;
 #else
                 left_value += Left_Dat;
                 right_value += Right_Dat;
@@ -1031,17 +1021,9 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 #endif
 
-#if defined(__MACOSX__)
-            if(AUDIO_16Bits)
-            {
-                *pSamples_int++ = left_value;
-                *pSamples_int++ = right_value;
-            }
-            else
-            {
-                *pSamples_flt++ = left_float;
-                *pSamples_flt++ = right_float;
-            }
+#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__)
+            *pSamples_flt++ = left_float;
+            *pSamples_flt++ = right_float;
 #elif defined (__REPLAYER__)
             *pSamples_flt++ = left_float;
             *pSamples_flt++ = right_float;
@@ -1073,6 +1055,7 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
             if(pos_scope >= (AUDIO_Latency / 2)) pos_scope = 0;
             pos_scope_latency = pos_scope - (AUDIO_Latency / 4);
             if(pos_scope_latency < 0) pos_scope_latency = (AUDIO_Latency / 2) + pos_scope_latency;
+            if(pos_scope_latency < 0) pos_scope_latency = 0;
 #endif
         }
 
@@ -1701,7 +1684,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&lchorus_feedback, sizeof(float));
         Mod_Dat_Read(&rchorus_feedback, sizeof(float));
 
-        Mod_Dat_Read(&shuffle, sizeof(int));
+        Mod_Dat_Read(&shuffle_amount, sizeof(int));
 
         // Reading track part sequence
         for(int tps_pos = 0; tps_pos < Song_Length; tps_pos++)
@@ -1839,17 +1822,8 @@ void PTKEXPORT Ptk_SetPosition(int new_position)
     if(new_position >= Song_Length) new_position = Song_Length - 1;
     if(new_position < 0) new_position = 0;
 
-/*#if !defined(__WINAMP__)
-    Song_Playing_Pattern = 0;
-#endif*/
-
     Song_Position = new_position;
     Pattern_Line = 0;
-    //Song_Position_Visual = new_position;
-    //PosInTick = 0;
-    //PosInTick_Delay = 0;
-    //SubCounter = 0;
-    //Subicounter = 0;
 
 #if defined(PTK_FX_PATTERNLOOP)
     // No repeat loop
@@ -2055,7 +2029,7 @@ void PTKEXPORT Ptk_Stop(void)
     {
         local_ramp_vol = 0.0f;
 
-#if defined(__MACOSX__) || defined(__LINUX__) || defined(__AROS__) || defined(__AMIGAOS4__)
+#if defined(__MACOSX_PPC__) || defined(__LINUX__) || defined(__AROS__) || defined(__AMIGAOS4__)
         usleep(10);
 #endif
 #if defined(__WIN32__)
@@ -2093,7 +2067,7 @@ void Pre_Song_Init(void)
     sprintf(style, "Anything Goes");
 #endif
 
-    shuffle = 0;
+    shuffle_amount = 0;
 
     for(int ini = 0; ini < MAX_TRACKS; ini++)
     {
@@ -2170,6 +2144,7 @@ void Pre_Song_Init(void)
     tb303engine[0].reset();
     tb303engine[1].reset();
 #endif
+
     for(i = 0; i < MAX_INSTRS; i++)
     {
         Sample_Vol[i] = 1.0f;
@@ -2430,9 +2405,11 @@ void Post_Song_Init(void)
         Delays_Pos_Sound_Buffer[i].Line = 0;
         Delays_Pos_Sound_Buffer[i].Pos = 0;
         Delays_Pos_Sound_Buffer[i].SamplesPerTick = 0;
+
 #if defined(PTK_SHUFFLE)
         Delays_Pos_Sound_Buffer[i].shufflestep = 0;
 #endif
+
     }
 }
 
@@ -2444,6 +2421,7 @@ void Record_Delay_Event()
 #if defined(PTK_SHUFFLE)
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].shufflestep = shufflestep;
 #endif
+
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].SamplesPerTick = SamplesPerTick;
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Line = Pattern_Line;
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Pos = Song_Position;
@@ -2503,14 +2481,21 @@ void Sp_Player(void)
     int i;
     int j;
     int trigger_note_off;
+    int ct;
+    int fired_303_1;
+    int fired_303_2;
+
 #if defined(PTK_SYNTH) || defined(PTK_INSTRUMENTS)
     float dest_volume;
 #endif
+
     int toffset;
     int free_sub_channel;
+
 #if defined(PTK_FX_SETVOLUME)
     int no_fx3;
 #endif
+
     int Glide_Synth[MAX_POLYPHONY];
 
 #if defined(PTK_TRACKFILTERS)
@@ -2539,10 +2524,75 @@ void Sp_Player(void)
             Patbreak_Line = 255;
 #endif
 
-            for(int ct = 0; ct < Songtracks; ct++)
+#if defined(PTK_303)
+            fired_303_1 = FALSE;
+            fired_303_2 = FALSE;
+
+            for(ct = 0; ct < Songtracks; ct++)
             {
                 int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
 
+                // Was a note off (always available even if channels are turned off)
+                trigger_note_off = FALSE;
+                for(i = 0; i < Channels_MultiNotes[ct]; i++)
+                {
+                    pl_note[i] = *(RawPatterns + efactor + PATTERN_NOTE1 + (i * 2));
+                    if(pl_note[i] == 120)
+                    {
+                        trigger_note_off = TRUE;
+                    }
+                }
+
+                // Store the effects
+                for(i = 0; i < Channels_Effects[ct]; i++)
+                {
+                    pl_eff_row[i] = *(RawPatterns + efactor + PATTERN_FX + (i * 2));
+                    pl_dat_row[i] = *(RawPatterns + efactor + PATTERN_FXDATA + (i * 2));
+
+#if !defined(__STAND_ALONE__)
+                    // Check if the user is recording 303 effects
+                    // In that case we don't read the row data
+                    if(!sr_isrecording)
+#endif
+                    {
+                        live303(pl_eff_row[i], pl_dat_row[i]);
+                    }
+
+                    // 303 are always available
+                    // since they aren't "really" bounded to any track
+                    if(pl_eff_row[i] == 0x31)
+                    {
+                        track3031 = ct;
+                        Fire303(pl_dat_row[i], 0);
+                        fired_303_1 = TRUE;
+                    }
+                    if(pl_eff_row[i] == 0x32)
+                    {
+                        track3032 = ct;
+                        Fire303(pl_dat_row[i], 1);
+                        fired_303_2 = TRUE;
+                   }
+                }
+
+#if defined(PTK_303)
+                // There was a note off on any notes slot and no 303 was fired,
+                // see if a 303 is running on that track
+                if(trigger_note_off && (!fired_303_1 || !fired_303_2))
+                {
+                    noteoff303(ct);
+                }
+#endif
+
+            }
+
+            Go303();
+
+#endif
+
+            for(ct = 0; ct < Songtracks; ct++)
+            {
+                int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
+                
                 // Store the notes & instruments numbers
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
@@ -2552,49 +2602,12 @@ void Sp_Player(void)
 
                 pl_vol_row = *(RawPatterns + efactor + PATTERN_VOLUME);
                 pl_pan_row = *(RawPatterns + efactor + PATTERN_PANNING);
-
-                // Store the effects
+                
                 for(i = 0; i < Channels_Effects[ct]; i++)
                 {
                     pl_eff_row[i] = *(RawPatterns + efactor + PATTERN_FX + (i * 2));
                     pl_dat_row[i] = *(RawPatterns + efactor + PATTERN_FXDATA + (i * 2));
-
-#if defined(PTK_303)
-
-#if !defined(__STAND_ALONE__)
-                    // Check if the user is recording 303 effects
-                    // In that case we don't read the row data
-                    if(!sr_isrecording)
-#endif
-                    {
-                        live303(pl_eff_row[i], pl_dat_row[i]);
-
-                    }
-
-                    // 303 are always available
-                    // since they aren't "really" bounded to any track
-                    if(pl_eff_row[i] == 0x31)
-                    {
-                        track3031 = ct;
-                        Fire303(pl_dat_row[i], 0);
-                    }
-                    if(pl_eff_row[i] == 0x32)
-                    {
-                        track3032 = ct;
-                        Fire303(pl_dat_row[i], 1);
-                    }
-#endif
-
                 }
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-                // Check if the user is recording 303 effects
-                // In that case we don't read the row data
-                if(!sr_isrecording)
-                {
-                    Actualize_303_Ed(0);
-                }
-#endif
 
 #if defined(PTK_VOLUME_COLUMN) || defined(PTK_FX_SETVOLUME)
                 for(i = 0; i < Channels_Effects[ct]; i++)
@@ -2634,6 +2647,14 @@ void Sp_Player(void)
                 {
                     TPan[ct] = (float) pl_pan_row * 0.0078125f;
                     ComputeStereo(ct);
+
+#if !defined(__STAND_ALONE__)
+                    if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                    {
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_SET_PANNING;
+                    }
+#endif
+
                 }
 
                 // Don't check those fx if the channel isn't active
@@ -2685,7 +2706,7 @@ void Sp_Player(void)
                 glide = 0;
                 for(i = 0; i < Channels_Effects[ct]; i++)
                 {
-                    if(pl_eff_row[i] == 9) toffset = pl_dat_row[i];
+                    if(pl_eff_row[i] == 0x9) toffset = pl_dat_row[i];
                     else if(pl_eff_row[i] == 5) glide = 1;
                 }
 
@@ -2801,12 +2822,10 @@ void Sp_Player(void)
                 }
 
                 // Was a note off (always available even if channels are turned off)
-                trigger_note_off = FALSE;
                 for(i = 0; i < Channels_MultiNotes[ct]; i++)
                 {
                     if(pl_note[i] == 120)
                     {
-                        trigger_note_off = TRUE;
                         if(Note_Sub_Channels[ct][i] != -1)
                         {
                             j = Reserved_Sub_Channels[ct][i];
@@ -2840,29 +2859,15 @@ void Sp_Player(void)
                     }
                 }
 
-#if defined(PTK_303)
-                // There was a note off on any notes slot,
-                // see if a 303 is running on that track
-                if(trigger_note_off)
-                {
-                    noteoff303(ct);
-                }
-#endif
-
 #if defined(PTK_FX_PATTERNLOOP)
-            if(Chan_Active_State[Song_Position][ct])
-            {
-                Do_Pattern_Loop(ct);
-            }
+                if(Chan_Active_State[Song_Position][ct])
+                {
+                    Do_Pattern_Loop(ct);
+                }
 #endif
 
 
             } // Channels loop
-
-
-#if defined(PTK_303)
-            Go303();
-#endif
 
         } // Pos in tick == 0
 
@@ -4460,7 +4465,8 @@ void Do_Effects_Tick_0(void)
 {
 
 #if defined(PTK_FX_ARPEGGIO) || defined(PTK_FX_VIBRATO) || defined(PTK_FX_REVERSE) || defined(PTK_SHUFFLE) || \
-    defined(PTK_FX_SETREVCUTO) || defined(PTK_FX_SETREVRESO) || defined(PTK_FX_SETBPM) || defined(PTK_FX_SETSPEED)
+    defined(PTK_FX_SETREVCUTO) || defined(PTK_FX_SETREVRESO) || defined(PTK_LIMITER_TRACKS) || defined(PTK_FX_SETBPM) || \
+    defined(PTK_FX_SETSPEED)
 
     int i;
     int j;
@@ -4517,12 +4523,13 @@ void Do_Effects_Tick_0(void)
 
 #if defined(PTK_SHUFFLE)
                 case 0x25:
-                    shuffle = (int) ((float) pltr_dat_row[j] * 0.39216f);
+                    shuffle_amount = (int) ((float) pltr_dat_row[j] * 0.39216f);
                     Update_Shuffle();
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
                     gui_bpm_action = TRUE;
 #endif
+
                     break;
 #endif
 
@@ -4534,7 +4541,7 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__)
                     if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
                     {
-                        Display_Reverb_Cutoff();
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_REVERB_FILTER;
                     }
 #endif
 
@@ -4549,7 +4556,7 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__)
                     if(userscreen == USER_SCREEN_FX_SETUP_EDIT)
                     {
-                        Display_Reverb_Resonance();
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_REVERB_FILTER;
                     }
 #endif
 
@@ -4564,7 +4571,7 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__)
                     if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
                     {
-                        Display_Track_Compressor_Status(trackef);
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_COMPRESSOR;
                     }
 #endif
 
@@ -4578,7 +4585,7 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__)
                     if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
                     {
-                        Display_Track_Compressor(trackef);
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_COMPRESSOR;
                     }
 #endif
 
@@ -4592,7 +4599,7 @@ void Do_Effects_Tick_0(void)
 #if !defined(__STAND_ALONE__)
                     if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
                     {
-                        Display_Track_Compressor(trackef);
+                        gui_action_external |= GUI_UPDATE_EXTERNAL_COMPRESSOR;
                     }
 #endif
 
@@ -4829,8 +4836,8 @@ void Do_Effects_Ticks_X(void)
     defined(PTK_FX_FINEPITCHUP) || defined(PTK_FX_FINEPITCHDOWN) || \
     defined(PTK_FX_SENDTODELAYCOMMAND) || defined(PTK_FX_SENDTOREVERBCOMMAND) || \
     defined(PTK_FX_SETDISTORTIONTHRESHOLD) || defined(PTK_FX_SETDISTORTIONCLAMP) || \
-    defined(PTK_FX_SETFILTERRESONANCE) || defined(PTK_FX_SWITCHFLANGER) || \
-    defined(PTK_FX_TRACK_FILTER_LFO)
+    defined(PTK_FX_SETCUTOFF) || defined(PTK_FX_SETFILTERRESONANCE) || defined(PTK_FX_SWITCHFLANGER) || \
+    defined(PTK_FX_TRACK_FILTER_LFO) || defined(PTK_FX_SETFILTERTYPE)
 
             // Only at tick 0 but after instruments data
             if(PosInTick == 0)
@@ -4891,6 +4898,14 @@ void Do_Effects_Ticks_X(void)
                     // $11 Send to reverb Command
                     case 0x11:
                         DSend[trackef] = (float) pltr_dat_row[k] / 255.0f;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_SEND_TO_REVERB;
+                        }
+#endif
+
                         break;
 #endif
 
@@ -4898,6 +4913,14 @@ void Do_Effects_Ticks_X(void)
                     // $12 Set distortion Threshold
                     case 0x12:
                         DThreshold[trackef] = (float) pltr_dat_row[k] * 128.0f;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_DISTO_THRESHOLD;
+                        }
+#endif
+
                         break;
 #endif
 
@@ -4905,6 +4928,29 @@ void Do_Effects_Ticks_X(void)
                     // $13 Set distortion clamp
                     case 0x13:
                         DClamp[trackef] = (float) pltr_dat_row[k] * 128.0f;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_DISTO_CLAMP;
+                        }
+#endif
+
+                        break;
+#endif
+
+#if defined(PTK_FX_SETCUTOFF)
+                    // $08 Set filter cutoff
+                    case 0x8:
+                        TCut[trackef] = (float) pltr_dat_row[k] / 2.0f;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_CUTOFF;
+                        }
+#endif
+
                         break;
 #endif
 
@@ -4912,6 +4958,14 @@ void Do_Effects_Ticks_X(void)
                     // $14 Set filter resonance
                     case 0x14:
                         FRez[trackef] = (int) (pltr_dat_row[k] / 2);
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_RESONANCE;
+                        }
+#endif
+
                         break;
 #endif
 
@@ -4919,6 +4973,14 @@ void Do_Effects_Ticks_X(void)
                     // $24 Switch flanger on/off
                     case 0x24:
                         FLANGER_ON[trackef] = (int) pltr_dat_row[k] & 1;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FLANGER;
+                        }
+#endif
+
                         break;
 #endif
 
@@ -4926,9 +4988,38 @@ void Do_Effects_Ticks_X(void)
                     // $28 Switch track filter on/off
                     case 0x28:
                         LFO_ON[trackef] = (int) pltr_dat_row[k] & 1;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_LFO;
+                        }
+#endif
+
                         break;
 #endif
+
+#if defined(PTK_FX_SETFILTERTYPE)
+                    // $15 Set filter Type
+                    case 0x15:
+                        if(pltr_dat_row[k] <= MAX_FILTER)
+                        {
+                            FType[trackef] = (int) pltr_dat_row[k];
+
+#if !defined(__STAND_ALONE__)
+                            if(userscreen == USER_SCREEN_TRACK_EDIT)
+                            {
+                                gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_TYPE;
+                            }
+#endif
+                        
+                        }
+                        break;
+#endif
+
+
                 }
+
             }
 
 #endif
@@ -5014,13 +5105,6 @@ void Do_Effects_Ticks_X(void)
                     break;
 #endif
 
-#if defined(PTK_FX_SETCUTOFF)
-                // $08 SetCutOff
-                case 0x8:
-                    TCut[trackef] = (float) pltr_dat_row[k] / 2.0f;
-                    break;
-#endif
-
 #if defined(PTK_FX_SETRANDOMCUTOFF)
                 // $0a SetRandomCutOff
                 case 0xa:
@@ -5030,6 +5114,14 @@ void Do_Effects_Ticks_X(void)
 
                         if(TCut[trackef] < 1) TCut[trackef] = 1;
                         if(TCut[trackef] > 127) TCut[trackef] = 127;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_CUTOFF;
+                        }
+#endif
+                    
                     }
                     break;
 #endif
@@ -5041,6 +5133,14 @@ void Do_Effects_Ticks_X(void)
                     {
                         TCut[trackef] += pltr_dat_row[k];
                         if(TCut[trackef] > 127) TCut[trackef] = 127;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_CUTOFF;
+                        }
+#endif
+
                     }
                     break;
 #endif
@@ -5052,6 +5152,14 @@ void Do_Effects_Ticks_X(void)
                     {
                         TCut[trackef] -= pltr_dat_row[k];
                         if(TCut[trackef] < 1) TCut[trackef] = 1;
+
+#if !defined(__STAND_ALONE__)
+                        if(userscreen == USER_SCREEN_TRACK_EDIT)
+                        {
+                            gui_action_external |= GUI_UPDATE_EXTERNAL_FILTER_CUTOFF;
+                        }
+#endif
+
                     }
                     break;
 #endif
@@ -5121,13 +5229,6 @@ void Do_Effects_Ticks_X(void)
                                                 Pattern_Line);
                         }
                     }
-                    break;
-#endif
-
-#if defined(PTK_FX_SETFILTERTYPE)
-                // $15 Set filter Type
-                case 0x15:
-                    if(pltr_dat_row[k] <= MAX_FILTER) FType[trackef] = (int) pltr_dat_row[k];
                     break;
 #endif
 
@@ -5462,18 +5563,8 @@ void Get_Player_Values(void)
     right_float_render = right_float;
 #endif
 
-    // It looks like the maximum range for OSS is -8192 +8192
-    // (higher than that will produce heavily saturated signals
-    //  i don't know if it's a bug from Linux mixer/Driver or anything)
-
-    // It looks like they (hopefully) fixed their shit so this nasty hack is no longer required.
-/*    #if defined(__LINUX__) && !defined(__FREEBSD__)
-        left_value = (int) (left_float * 8192.0f);
-        right_value = (int) (right_float * 8192.0f);
-    #else*/
-        left_value = (int) (left_float * 32767.0f);
-        right_value = (int) (right_float * 32767.0f);
-//    #endif
+    left_value = (int) (left_float * 32767.0f);
+    right_value = (int) (right_float * 32767.0f);
 }
 
 // ------------------------------------------------------
@@ -5771,40 +5862,145 @@ float filter2px(int stereo, int ch, float input, float f, float q)
 #if defined(PTK_303)
 void live303(int pltr_eff_row, int pltr_dat_row)
 {
+
+#if !defined(__STAND_ALONE__)
+    int change_303_unit = 0;
+    int change_303_param = 0;
+#endif
+
     switch(pltr_eff_row)
     {
-        case 0x33: tb303[0].cutoff = pltr_dat_row / 2; break;
-        case 0x34: tb303[1].cutoff = pltr_dat_row / 2; break;
-        case 0x35: tb303[0].resonance = pltr_dat_row / 2; break;
-        case 0x36: tb303[1].resonance = pltr_dat_row / 2; break;
-        case 0x37: tb303[0].envmod = pltr_dat_row / 2; break;
-        case 0x38: tb303[1].envmod = pltr_dat_row / 2; break;
-        case 0x39: tb303[0].decay = pltr_dat_row / 2; break;
-        case 0x3a: tb303[1].decay = pltr_dat_row / 2; break;
-        case 0x3b: tb303[0].accent = pltr_dat_row / 2; break;
-        case 0x3c: tb303[1].accent = pltr_dat_row / 2; break;
-        case 0x3d: tb303[0].tune = pltr_dat_row / 2; break;
-        case 0x3e: tb303[1].tune = pltr_dat_row / 2; break;
+        case 0x33:
+            tb303[0].cutoff = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_CUTOFF;
+#endif
+
+            break;
+        case 0x34:
+            tb303[1].cutoff = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_CUTOFF;
+#endif
+
+            break;
+        case 0x35:
+            tb303[0].resonance = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_RESONANCE;
+#endif
+
+            break;
+        case 0x36:
+            tb303[1].resonance = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_RESONANCE;
+#endif
+
+            break;
+        case 0x37:
+            tb303[0].envmod = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_ENVMOD;
+#endif
+
+            break;
+        case 0x38:
+            tb303[1].envmod = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_ENVMOD;
+#endif
+
+            break;
+        case 0x39:
+            tb303[0].decay = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_DECAY;
+#endif
+
+            break;
+        case 0x3a:
+            tb303[1].decay = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_DECAY;
+#endif
+
+            break;
+        case 0x3b:
+            tb303[0].accent = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_ACCENT;
+#endif
+
+            break;
+        case 0x3c:
+            tb303[1].accent = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_ACCENT;
+#endif
+
+            break;
+        case 0x3d:
+            tb303[0].tune = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_TUNE;
+#endif
+
+            break;
+        case 0x3e:
+            tb303[1].tune = pltr_dat_row / 2;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_TUNE;
+#endif
+
+            break;
         case 0x3f:
             if(pltr_dat_row < 1) pltr_dat_row = 1;
             if(pltr_dat_row > 16) pltr_dat_row = 16;
             tb303[0].scale = pltr_dat_row;
             tb303engine[0].tbCurMultiple = tb303[0].scale;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_1_SCALE;
+#endif
+
             break;
         case 0x40:
             if(pltr_dat_row < 1) pltr_dat_row = 1;
             if(pltr_dat_row > 16) pltr_dat_row = 16;
             tb303[1].scale = pltr_dat_row;
             tb303engine[1].tbCurMultiple = tb303[1].scale;
+
+#if !defined(__STAND_ALONE__)
+            gui_action_external_303 = GUI_UPDATE_EXTERNAL_303_2_SCALE;
+#endif
+
             break;
-        case 0x41: tb303engine[0].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
-        case 0x42: tb303engine[1].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f; break;
+        case 0x41:
+            tb303engine[0].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f;
+            break;
+        case 0x42:
+            tb303engine[1].tbTargetRealVolume = ((float) pltr_dat_row) / 255.0f;
+            break;
     }
 }
 
 void Fire303(unsigned char number, int unit)
 {
     tb303engine[unit].tbLine = 0;
+    tb303engine[unit].Note_Off = FALSE;
 
     switch(number)
     {
@@ -5980,10 +6176,6 @@ void Fire303(unsigned char number, int unit)
             tb303engine[unit].tbTargetRealVolume = 0.0f;
             break;
     }
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-    if(!sr_isrecording) Actualize_303_Ed(0);
-#endif
 }
 
 void noteoff303(char strack)
@@ -6000,7 +6192,7 @@ void noteoff303(char strack)
     }
 }
 
-void Go303(void)
+void Go303()
 {
     if(tb303engine[0].tbPattern != 255)
     {
@@ -6008,23 +6200,28 @@ void Go303(void)
         if(tb303engine[0].tbCurMultiple >= tb303[0].scale)
         {
             tb303engine[0].tbCurMultiple = 0;
-            tb303engine[0].tbNoteOn(tb303[0].tone[tb303engine[0].tbPattern][tb303engine[0].tbLine], &tb303[0]);
+            if(!tb303engine[0].Note_Off)
+            {
+                tb303engine[0].tbNoteOn(tb303[0].tone[tb303engine[0].tbPattern][tb303engine[0].tbLine], &tb303[0]);
+            }
             tb303engine[0].tbLine++;
             // End of pattern
             if(tb303engine[0].tbLine == tb303[0].patternlength[tb303engine[0].tbPattern]) tb303engine[0].tbLine = 0;
         }
     }
-
     if(tb303engine[1].tbPattern != 255)
     {
         tb303engine[1].tbCurMultiple++;
         if(tb303engine[1].tbCurMultiple >= tb303[1].scale)
         {
             tb303engine[1].tbCurMultiple = 0;
-            tb303engine[1].tbNoteOn(tb303[1].tone[tb303engine[1].tbPattern][tb303engine[1].tbLine], &tb303[1]);
+            if(!tb303engine[1].Note_Off)
+            {
+                tb303engine[1].tbNoteOn(tb303[1].tone[tb303engine[1].tbPattern][tb303engine[1].tbLine], &tb303[1]);
+            }
             tb303engine[1].tbLine++;
             // End of pattern
-            if(tb303engine[1].tbLine == tb303[1].patternlength[tb303engine[1].tbPattern]) tb303engine[1].tbLine = 0;
+            if(tb303engine[1].tbLine == tb303[1].patternlength[tb303engine[1].tbPattern]) tb303engine[1].tbLine = 0; 
         }
     }
 }
@@ -6720,7 +6917,7 @@ float do_eq(LPEQSTATE es, float sample, int Left)
 #if defined(PTK_SHUFFLE)
 void Update_Shuffle(void)
 {
-    if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle) / 200);
-    else shufflestep = (SamplesPerTick * shuffle) / 200;
+    if(shuffleswitch == 1) shufflestep = -((SamplesPerTick * shuffle_amount) / 200);
+    else shufflestep = (SamplesPerTick * shuffle_amount) / 200;
 }
 #endif
