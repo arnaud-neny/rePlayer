@@ -324,7 +324,7 @@ EXTENSION(ssfPk)    // Highly Theoretical
 EXTENSION(minidsf)  // Highly Theoretical
 EXTENSION(dsfPk)    // Highly Theoretical
 EXTENSION(ssf)      // Highly Theoretical
-EXTENSION(dsf)      // Highly Theoretical
+EXTENSION(dsf)      // Highly Theoretical & DSD
 EXTENSION(gsf)      // Highly Advanced
 EXTENSION(2sf)      // vio2sf
 EXTENSION(minipsf)  // Highly Experimental
@@ -399,3 +399,4 @@ EXTENSION(aac)      // AAC
 EXTENSION(opus)     // Opus
 EXTENSION(ftm)      // Famitracker
 EXTENSION(wv)       // WavPack
+EXTENSION(dff)      // DSD

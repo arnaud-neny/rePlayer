@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libdsd2pcm">
+      <UniqueIdentifier>{542e7bfe-3e10-4f48-805c-7fd3c8ca5684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libdstdec">
+      <UniqueIdentifier>{113f8f3f-5117-4f0b-b7e9-c856050727db}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayDSD.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libdsd2pcm\upsampler.h">
+      <Filter>Source Files\libdsd2pcm</Filter>
+    </ClInclude>
+    <ClInclude Include="libdsd2pcm\dither.h">
+      <Filter>Source Files\libdsd2pcm</Filter>
+    </ClInclude>
+    <ClInclude Include="libdsd2pcm\dsd_pcm_converter_hq.h">
+      <Filter>Source Files\libdsd2pcm</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\dst_decoder.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\ac_data.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\dst_defs.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\dst_consts.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\frame_reader.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\coded_table.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+    <ClInclude Include="libdstdec\str_data.h">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayDSD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libdsd2pcm\upsampler.cpp">
+      <Filter>Source Files\libdsd2pcm</Filter>
+    </ClCompile>
+    <ClCompile Include="libdsd2pcm\dsd_pcm_converter_hq.cpp">
+      <Filter>Source Files\libdsd2pcm</Filter>
+    </ClCompile>
+    <ClCompile Include="libdstdec\dst_decoder.cpp">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClCompile>
+    <ClCompile Include="libdstdec\ac_data.cpp">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClCompile>
+    <ClCompile Include="libdstdec\frame_reader.cpp">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClCompile>
+    <ClCompile Include="libdstdec\coded_table.cpp">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClCompile>
+    <ClCompile Include="libdstdec\str_data.cpp">
+      <Filter>Source Files\libdstdec</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
