@@ -280,11 +280,18 @@ namespace rePlayer
             {
                 if (dbSong->GetFileSize() == 0)
                 {
-                    auto moduleData = stream->Read();
-                    song->fileSize = uint32_t(moduleData.Size());
+                    auto streamSize = stream->GetSize();
+                    song->fileSize = uint32_t(streamSize);
                     auto fileCrc = crc32(0L, Z_NULL, 0);
-                    song->fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
-                    song->subsongs[0].isDirty = moduleData.IsNotEmpty();
+                    auto* moduleData = core::Alloc<uint8_t>(65536);
+                    for (uint64_t s = 0; s < streamSize; s += 65536)
+                    {
+                        auto readSize = stream->Read(moduleData, 65536);
+                        fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                    }
+                    core::Free(moduleData);
+                    song->fileCrc = fileCrc;
+                    song->subsongs[0].isDirty = streamSize != 0;
                 }
 
                 auto metadata(song->metadata);
@@ -1461,17 +1468,8 @@ namespace rePlayer
                     MediaType type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
                     auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
                     Array<CommandBuffer::Command> commands;
-                    if (auto* replay = replays.Load(stream, commands, type))
-                    {
-                        auto mediaType = replay->GetMediaType();
-                        if (mediaType.ext != eExtension::Unknown)
-                            type.ext = mediaType.ext;
-                        type.replay = mediaType.replay;
-                        delete replay;
-                    }
-                    else
-                        type.replay = eReplay::Unknown;
-                    if (!isAcceptingAll && type.replay == eReplay::Unknown)
+                    auto* replay = replays.Load(stream, commands, type);
+                    if (!isAcceptingAll && replay == nullptr)
                     {
                         addFilesContext->Lock();
                         addFilesContext->failedEntries.Add(stream->GetName());
@@ -1481,7 +1479,49 @@ namespace rePlayer
 
                     // create the song sheet and add it to the playlist
                     auto* songSheet = new SongSheet;
-                    songSheet->type = type;
+                    if (replay != nullptr)
+                    {
+                        songSheet->type = replay->GetMediaType();
+                        {
+                            auto streamSize = stream->GetSize();
+                            songSheet->fileSize = uint32_t(streamSize);
+                            auto fileCrc = crc32(0L, Z_NULL, 0);
+                            auto* moduleData = core::Alloc<uint8_t>(65536);
+                            for (uint64_t s = 0; s < streamSize; s += 65536)
+                            {
+                                auto readSize = stream->Read(moduleData, 65536);
+                                fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                            }
+                            core::Free(moduleData);
+                            songSheet->fileCrc = fileCrc;
+                        }
+                        auto numSubsongs = replay->GetNumSubsongs();
+                        songSheet->subsongs.Resize(numSubsongs);
+                        songSheet->lastSubsongIndex = uint16_t(numSubsongs - 1);
+                        for (uint16_t i = 0; i < numSubsongs; i++)
+                        {
+                            replay->SetSubsong(i);
+
+                            auto& subsong = songSheet->subsongs[i];
+                            subsong.Clear();
+                            subsong.durationCs = replay->GetDurationMs() / 10;
+                            subsong.isDirty = false;
+                            if (numSubsongs > 1)
+                            {
+                                subsong.name = replay->GetSubsongTitle();
+                                if (subsong.name.IsEmpty())
+                                {
+                                    char txt[32];
+                                    sprintf(txt, "subsong %u of %u", i + 1, numSubsongs);
+                                    subsong.name = txt;
+                                }
+                            }
+                        }
+
+                        delete replay;
+                    }
+                    else
+                        songSheet->type = type;
                     if (type.ext == eExtension::Unknown)
                         songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
                     else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), type.GetExtension()) == 0)
@@ -1647,11 +1687,15 @@ namespace rePlayer
                         dbArtist->Edit()->numSongs++;
                     }
 
-                    MusicID musicId;
-                    musicId.subsongId.songId = songSheet->id;
-                    musicId.playlistId = ++m_uniqueIdGenerator;
-                    musicId.databaseId = DatabaseID::kPlaylist;
-                    m_cue.entries.Insert(addFilesContext->droppedEntryIndex++, { musicId });
+                    for (uint16_t i = 0, e = songSheet->lastSubsongIndex; i <= e; i++)
+                    {
+                        MusicID musicId;
+                        musicId.subsongId.songId = songSheet->id;
+                        musicId.subsongId.index = i;
+                        musicId.playlistId = ++m_uniqueIdGenerator;
+                        musicId.databaseId = DatabaseID::kPlaylist;
+                        m_cue.entries.Insert(addFilesContext->droppedEntryIndex++, { musicId });
+                    }
 
                     m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                 }
