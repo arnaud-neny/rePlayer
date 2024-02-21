@@ -284,6 +284,17 @@ namespace rePlayer
         filename += name;
         if (auto f = loadFile(filename.c_str(), name))
             return f;
+        if (strchr(name, ' '))
+        {
+            // some songs are trying to load some extras and sometimes an underscore becomes a space
+            for (auto* c = filename.data() + sizeof("extras/") - 1; *c; ++c)
+            {
+                if (*c == ' ')
+                    *c = '_';
+            }
+            if (auto f = loadFile(filename.c_str(), name))
+                return f;
+        }
 
         // special cases
         if (strstr(name, "smp.set") && strstr(state->song.info.playername, "(soc)"))
