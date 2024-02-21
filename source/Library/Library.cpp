@@ -33,6 +33,9 @@
 // zlib
 #include <zlib.h>
 
+// Windows
+#include <Shlobj.h>
+
 // stl
 #include <algorithm>
 #include <chrono>
@@ -377,7 +380,38 @@ namespace rePlayer
             {
                 std::string filters = "All Files (*.*){.*},";
                 filters += Core::GetReplays().GetFileFilters();
-                ImGuiFileDialog::Instance()->OpenDialog("ImportFiles", "Import Files", filters.c_str(), m_lastFileDialogPath, 0, nullptr, ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_NoDialog);
+                IGFD::FileDialogConfig fileDialogConfig;
+                fileDialogConfig.path = m_lastFileDialogPath;
+                fileDialogConfig.countSelectionMax = 0;
+                fileDialogConfig.flags = ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_NoDialog;
+                auto* fileDialog = ImGuiFileDialog::Instance();
+                fileDialog->OpenDialog("ImportFiles", "Import Files", filters.c_str(), fileDialogConfig);
+                auto* groupName = reinterpret_cast<const char*>(ICON_IGFD_SHORTCUTS " Places");
+                if (fileDialog->GetPlacesGroupPtr(groupName) == nullptr)
+                {
+                    fileDialog->AddPlacesGroup(groupName,1 , false);
+                    auto* places = fileDialog->GetPlacesGroupPtr(groupName);
+                    auto addKnownFolderAsPlace = [places](const GUID& knownFolder, const char* folderLabel, const char8_t* folderIcon)
+                    {
+                        PWSTR path = nullptr;
+                        HRESULT hr = SHGetKnownFolderPath(knownFolder, 0, NULL, &path);
+                        if (SUCCEEDED(hr))
+                        {
+                            IGFD::FileStyle style;
+                            style.icon = reinterpret_cast<const char*>(folderIcon);
+                            auto placePath = IGFD::Utils::UTF8Encode(path);
+                            places->AddPlace(folderLabel, placePath, false, style);
+                        }
+                        ::CoTaskMemFree(path);
+                    };
+                    addKnownFolderAsPlace(FOLDERID_Desktop, "Desktop", ICON_IGFD_DESKTOP);
+                    addKnownFolderAsPlace(FOLDERID_Startup, "Startup", ICON_IGFD_HOME);
+                    places->AddPlaceSeparator(3.0f);
+                    addKnownFolderAsPlace(FOLDERID_Downloads, "Downloads", ICON_IGFD_DOWNLOADS);
+                    addKnownFolderAsPlace(FOLDERID_Pictures, "Pictures", ICON_IGFD_PICTURE);
+                    addKnownFolderAsPlace(FOLDERID_Music, "Music", ICON_IGFD_MUSIC);
+                    addKnownFolderAsPlace(FOLDERID_Videos, "Videos", ICON_IGFD_FILM);
+                }
 
                 ImGui::CloseCurrentPopup();
             }

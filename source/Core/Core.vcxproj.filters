@@ -196,6 +196,12 @@
     <ClInclude Include="Thread\Workers.h">
       <Filter>Source Files\Thread</Filter>
     </ClInclude>
+    <ClInclude Include="ImGui\ImGuiFileDialogIcons.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\ImGuiFileDialogIcons.inl.h">
+      <Filter>Source Files\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Containers\SmartPtr.inl.h">

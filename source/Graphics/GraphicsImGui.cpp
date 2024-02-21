@@ -1,10 +1,11 @@
-#include "Graphics.h"
+#include <Imgui.h>
+#include <ImGui/ImGuiFileDialogIcons.inl.h>
+
 //#include "font.h"
+#include "Graphics.h"
 #include "GraphicsFontLog.h"
 #include "GraphicsImGui.h"
 #include "MediaIcons.h"
-
-#include <Imgui.h>
 
 namespace rePlayer
 {
@@ -183,7 +184,11 @@ namespace rePlayer
         int32_t rectIds[_countof(widths)];
         for (uint32_t i = 0; i < _countof(widths); i++)
             rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xE000 + i), widths[i], 15, float(widths[i]), ImVec2(0, -1));
-
+        static const ImWchar iconsRange[] = { ICON_MIN_IGFD, ICON_MAX_IGFD, 0 };
+        ImFontConfig iconsConfig;
+        iconsConfig.MergeMode = true;
+        iconsConfig.PixelSnapH = true;
+        io.Fonts->AddFontFromMemoryCompressedBase85TTF(FONT_ICON_BUFFER_NAME_IGFD, 13.0f, &iconsConfig, iconsRange);
 /*
         {
             ImFontConfig fontConfig;
@@ -222,6 +227,13 @@ namespace rePlayer
                 }
             }
             mediaIconsOffset += widths[i];
+        }
+
+        // I don't like unaligned icons
+        for (auto& glyph : font->Glyphs)
+        {
+            if (glyph.Codepoint >= ICON_MIN_IGFD && glyph.Codepoint <= ICON_MAX_IGFD)
+                glyph.AdvanceX = 15.0f;
         }
 
         //temporary: create the heap

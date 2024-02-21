@@ -44,6 +44,8 @@
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\ImGuiFileDialog.h" />
     <ClInclude Include="ImGui\ImGuiFileDialogConfig.h" />
+    <ClInclude Include="ImGui\ImGuiFileDialogIcons.h" />
+    <ClInclude Include="ImGui\ImGuiFileDialogIcons.inl.h" />
     <ClInclude Include="ImGui\imgui_callbacks.h" />
     <ClInclude Include="ImGui\imgui_impl_win32.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
@@ -82,7 +84,10 @@
     <ClCompile Include="Core\Window.cpp" />
     <ClCompile Include="ImGui.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
-    <ClCompile Include="ImGui\ImGuiFileDialog.cpp" />
+    <ClCompile Include="ImGui\ImGuiFileDialog.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="ImGui\imgui_callbacks.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />

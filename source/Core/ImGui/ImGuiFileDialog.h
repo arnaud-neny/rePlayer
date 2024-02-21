@@ -15,7 +15,7 @@
 /*
 MIT License
 
-Copyright (c) 2018-2023 Stephane Cuillerdier (aka aiekick)
+Copyright (c) 2018-2024 Stephane Cuillerdier (aka aiekick)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,7 @@ SOFTWARE.
 
 /*
 // generated with "Text to ASCII Art Generator (TAAG)"
-// https://patorjk.com/software/taag/#p=display&h=1&v=0&f=Big&t=ImGuiFileDialog%0Av0.6.5
-
+// https://patorjk.com/software/taag/#p=display&h=1&v=0&f=Big&t=ImGuiFileDialog%0Av0.6.7
   _____              _____         _  ______  _  _        _____   _         _
  |_   _|            / ____|       (_)|  ____|(_)| |      |  __ \ (_)       | |
    | |   _ __ ___  | |  __  _   _  _ | |__    _ | |  ___ | |  | | _   __ _ | |  ___    __ _
@@ -52,13 +51,12 @@ SOFTWARE.
  |_____||_| |_| |_| \_____| \__,_||_||_|     |_||_| \___||_____/ |_| \__,_||_| \___/  \__, |
                                                                                        __/ |
                                                                                       |___/
-                                  ___      __      __    __
-                                 / _ \    / /     / /   /_ |
-                         __   __| | | |  / /_    / /_    | |
-                         \ \ / /| | | | | '_ \  | '_ \   | |
-                          \ V / | |_| |_| (_) |_| (_) |_ | |
-                           \_/   \___/(_)\___/(_)\___/(_)|_|
-
+                                  ___      __    ______
+                                 / _ \    / /   |____  |
+                         __   __| | | |  / /_       / /
+                         \ \ / /| | | | | '_ \     / /
+                          \ V / | |_| |_| (_) |_  / /
+                           \_/   \___/(_)\___/(_)/_/
 
 github repo : https://github.com/aiekick/ImGuiFileDialog
 this section is the content of the ReadMe.md file
@@ -74,7 +72,7 @@ solutions.
 
 ## ImGui Supported Version
 
-ImGuiFileDialog follow the master and docking branch of ImGui . currently ImGui 1.90.1 WIP
+ImGuiFileDialog follow the master and docking branch of ImGui . currently ImGui 1.90.4 WIP
 
 ## Structure
 
@@ -127,28 +125,27 @@ included in the Lib_Only branch for your convenience.
     - 0 => Infinite
     - 1 => One file (default)
     - n => n files
-- Compatible with MacOs, Linux, Windows
-    - Windows version can list drives
+- Compatible with MacOs, Linux, Windows, Emscripten, Android
 - Supports modal or standard dialog types
 - Select files or directories
 - Filter groups and custom filter names
 - can ignore filter Case for file searching
 - Keyboard navigation (arrows, backspace, enter)
 - Exploring by entering characters (case insensitive)
-- Directory bookmarks
+- Custom places (bookmarks, system devices, whatever you want)
 - Directory manual entry (right click on any path element)
 - Optional 'Confirm to Overwrite" dialog if file exists
 - Thumbnails Display (agnostic way for compatibility with any backend, sucessfully tested with OpenGl and Vulkan)
 - The dialog can be embedded in another user frame than the standard or modal dialog
 - Can tune validation buttons (placements, widths, inversion)
 - Can quick select a parrallel directory of a path, in the path composer (when you clikc on a / you have a popup)
-- regex support for filters, collection of filters and filestyle (the regex is recognized when between (( and )) in a
-filter)
+- regex support for filters, collection of filters and filestyle (the regex is recognized when between (( and )) in a filter)
 - multi layer extentions like : .a.b.c .json.cpp .vcxproj.filters etc..
-- advanced behavior regarding asterisk based filter. like : .* .*.* .vcx.* .*.filters .vcs*.filt.* etc.. (internally
-regex is used)
-- result modes GetFilePathName, GetFileName and GetSelection (overwrite file ext, keep file, add ext if no user ext
-exist)
+- advanced behavior regarding asterisk based filter. like : .* .*.* .vcx.* .*.filters .vcs*.filt.* etc.. (internally regex is used)
+- result modes GetFilePathName, GetFileName and GetSelection (overwrite file ext, keep file, add ext if no user ext exist)
+- you can use your own FileSystem Api
+    - by default Api Dirent and std::filesystem are defined
+    - you can override GetDrieveList for specify by ex on android other fs, like local and SDCards
 
 ################################################################
 ## Filter format
@@ -160,8 +157,8 @@ A filter is recognized only if he respects theses rules :
 1) a regex must be in (( and ))
 2) a , will separate filters except if between a ( and )
 3) name{filter1, filter2} is a special form for collection filters
-3.1) the name can be composed of what you want except { and }
-3.2) a filter can be a regex
+   - the name can be composed of what you want except { and }
+   - a filter can be a regex
 4) the filters cannot integrate these chars '(' ')' '{' '}' ' ' except for a regex with respect to rule 1)
 5) the filters cannot integrate a ','
 
@@ -198,7 +195,9 @@ void drawGui()
 {
   // open Dialog Simple
   if (ImGui::Button("Open File Dialog"))
-    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", config);
 
   // display
   if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
@@ -232,8 +231,11 @@ ImGuiFileDialogFlags_Modal
 you can use it like that :
 
 ```cpp
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp",
-    ".", 1, nullptr, ImGuiFileDialogFlags_Modal);
+IGFD::FileDialogConfig config;
+config.path = ".";
+config.countSelectionMax = 1;
+config.flags = ImGuiFileDialogFlags_Modal;
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", config);
 ```
 
 ################################################################
@@ -243,7 +245,9 @@ ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp
 To have a directory chooser, set the file extension filter to nullptr:
 
 ```cpp
-ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, ".");
+IGFD::FileDialogConfig config;
+config.path = ".";
+ImGuiFileDialog::Instance()->OpenDialog("ChooseDirDlgKey", "Choose a Directory", nullptr, config);
 ```
 
 In this mode you can select any directory with one click and open a directory with a double-click.
@@ -287,10 +291,16 @@ the user cant validate the dialog
 void drawGui()
 {
   // open Dialog with Pane
-  if (ImGui::Button("Open File Dialog with a custom pane"))
-    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp",
-            ".", "", std::bind(&InfosPane, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), 350, 1,
-UserDatas("InfosPane"));
+  if (ImGui::Button("Open File Dialog with a custom pane")) {
+	IGFD::FileDialogConfig config;
+	config.path = ".";
+	config.countSelectionMax = 1;
+	config.sidePane = std::bind(&InfosPane, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	config.sidePaneWidth = 350.0f;
+	config.useDatas = UserDatas("InfosPane");
+	config.flags = ImGuiFileDialogFlags_Modal;
+    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", config);
+  }
 
   // display and action if ok
   if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
@@ -381,16 +391,13 @@ samples :
 
 ```cpp
 // define style by file extention and Add an icon for .png files
-ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".png", ImVec4(0.0f, 1.0f, 1.0f, 0.9f),
-ICON_IGFD_FILE_PIC, font1); ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".gif",
-ImVec4(0.0f, 1.0f, 0.5f, 0.9f), "[GIF]");
+ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".png", ImVec4(0.0f, 1.0f, 1.0f, 0.9f),,ICON_IGFD_FILE_PIC, font1); 
+ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".gif", ImVec4(0.0f, 1.0f, 0.5f, 0.9f), "[GIF]");
 
 // define style for all directories
-ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, "", ImVec4(0.5f, 1.0f, 0.9f, 0.9f),
-ICON_IGFD_FOLDER);
+ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, "", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), ICON_IGFD_FOLDER);
 // can be for a specific directory
-ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, ".git", ImVec4(0.5f, 1.0f, 0.9f, 0.9f),
-ICON_IGFD_FOLDER);
+ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, ".git", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), ICON_IGFD_FOLDER);
 
 // define style for all files
 ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeFile, "", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), ICON_IGFD_FILE);
@@ -472,10 +479,12 @@ for filter names.
 this code :
 
 ```cpp
-const char *filters = "Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp},Image files (*.png *.gif *.jpg
-*.jpeg){.png,.gif,.jpg,.jpeg},.md"; ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", ICON_IMFDLG_FOLDER_OPEN
-" Choose a File", filters, ".");
+const char *filters = "Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp},Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg},.md";
+IGFD::FileDialogConfig config;
+config.path = ".";
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", ICON_IMFDLG_FOLDER_OPEN " Choose a File", filters, config);
 ```
+
 
 will produce :
 ![alt text](https://github.com/aiekick/ImGuiFileDialog/blob/master/doc/filters.gif)
@@ -493,13 +502,24 @@ You can define in OpenDialog call the count file you want to select :
 See the define at the end of these funcs after path.
 
 ```cpp
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".*,.cpp,.h,.hpp", ".");
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose 1 File", ".*,.cpp,.h,.hpp", ".", 1);
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose 5 File", ".*,.cpp,.h,.hpp", ".", 5);
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose many File", ".*,.cpp,.h,.hpp", ".", 0);
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png,.jpg",
-   ".", "", std::bind(&InfosPane, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), 350, 1,
-"SaveFile"); // 1 file
+IGFD::FileDialogConfig config; config.path = ".";
+
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".*,.cpp,.h,.hpp", config);
+
+config.countSelectionMax = 1;
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose 1 File", ".*,.cpp,.h,.hpp", config);
+
+config.countSelectionMax = 5;
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose 5 File", ".*,.cpp,.h,.hpp", config);
+
+config.countSelectionMax = 0;
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose many File", ".*,.cpp,.h,.hpp", config);
+
+config.countSelectionMax = 1;
+config.sidePane = std::bind(&InfosPane, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+config.sidePaneWidth = 350.0f;
+config.useDatas = UserDatas("SaveFile");
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png,.jpg", config); // 1 file
 ```
 
 ![alt text](https://github.com/aiekick/ImGuiFileDialog/blob/master/doc/multiSelection.gif)
@@ -541,47 +561,6 @@ As you see the current item is flashed by default for 1 second. You can define t
 ```cpp
 ImGuiFileDialog::Instance()->SetFlashingAttenuationInSeconds(1.0f);
 ```
-
-################################################################
-## Bookmarks
-################################################################
-
-You can create/edit/call path bookmarks and load/save them.
-
-Activate this feature by uncommenting: `#define USE_BOOKMARK` in your custom config file (CustomImGuiFileDialogConfig.h)
-
-More customization options:
-
-```cpp
-#define bookmarkPaneWith 150.0f => width of the bookmark pane
-#define IMGUI_TOGGLE_BUTTON ToggleButton => customize the Toggled button (button stamp must be : (const char* label,
-bool *toggle) #define bookmarksButtonString "Bookmark" => the text in the toggle button #define
-bookmarksButtonHelpString "Bookmark" => the helper text when mouse over the button #define addBookmarkButtonString "+"
-=> the button for add a bookmark #define removeBookmarkButtonString "-" => the button for remove the selected bookmark
-```
-
-* You can select each bookmark to edit the displayed name corresponding to a path
-* Double-click on the label to apply the bookmark
-
-![bookmarks.gif](https://github.com/aiekick/ImGuiFileDialog/blob/master/doc/bookmarks.gif)
-
-You can also serialize/deserialize bookmarks (for example to load/save from/to a file):
-```cpp
-Load => ImGuiFileDialog::Instance()->DeserializeBookmarks(bookmarString);
-Save => std::string bookmarkString = ImGuiFileDialog::Instance()->SerializeBookmarks();
-```
-(please see example code for details)
-
-you can also add/remove bookmark by code :
-and in this case, you can also avoid serialization of code based bookmark
-
-```cpp
-Add => ImGuiFileDialog::Instance()->AddBookmark(bookmark_name, bookmark_path);
-Remove => ImGuiFileDialog::Instance()->RemoveBookmark(bookmark_name);
-Save => std::string bookmarkString = ImGuiFileDialog::Instance()->SerializeBookmarks(true); // true for prevent
-serialization of code based bookmarks
-```
-
 ################################################################
 ## Path Edition :
 ################################################################
@@ -608,17 +587,20 @@ behavior. (by design! :) )
 Example code For Standard Dialog :
 
 ```cpp
+IGFD::FileDialogConfig config;
+config.path = ".";
+config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
 ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey",
-    ICON_IGFD_SAVE " Choose a File", filters,
-    ".", "", 1, nullptr, ImGuiFileDialogFlags_ConfirmOverwrite);
+    ICON_IGFD_SAVE " Choose a File", filters, config);
 ```
 
 Example code For Modal Dialog :
 
 ```cpp
-ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey",
-    ICON_IGFD_SAVE " Choose a File", filters,
-    ".", "", 1, nullptr, ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_ConfirmOverwrite);
+IGFD::FileDialogConfig config;
+config.path = ".";
+config.flags = ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_ConfirmOverwrite;
+ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", ICON_IGFD_SAVE " Choose a File", filters, config);
 ```
 
 This dialog will only verify the file in the file field, not with `GetSelection()`.
@@ -769,16 +751,19 @@ ex :
 ```cpp
 ImGuiFileDialog fileDialog;
 
-// open dialog; in this case, Bookmark, directory creation are disabled with, and also the file input field is readonly.
-// btw you can do what you want
-fileDialog.OpenDialog("embedded", "Select File", ".*", "", -1, nullptr,
-    ImGuiFileDialogFlags_NoDialog |
-    ImGuiFileDialogFlags_DisableBookmarkMode |
+// open dialog; in this case, Place, directory creation are disabled with, and also the file input field is readonly.
+// btw you can od what you want
+IGFD::FileDialogConfig config;
+config.path = ".";
+config.countSelectionMax = -1;
+config.flags = ImGuiFileDialogFlags_NoDialog |
+    ImGuiFileDialogFlags_DisablePlaceMode |
     ImGuiFileDialogFlags_DisableCreateDirectoryButton |
     ImGuiFileDialogFlags_ReadOnlyFileNameField);
+fileDialog.OpenDialog("embedded", "Select File", ".*", config);
 // then display, here
-// to note, when embedded the ImVec2(0,0) (MinSize) do nothing, only the ImVec2(0,350) (MaxSize) can size the dialog
-frame fileDialog.Display("embedded", ImGuiWindowFlags_NoCollapse, ImVec2(0,0), ImVec2(0,350)))
+// to note, when embedded the ImVec2(0,0) (MinSize) do nothing, only the ImVec2(0,350) (MaxSize) can size the dialog frame
+fileDialog.Display("embedded", ImGuiWindowFlags_NoCollapse, ImVec2(0,0), ImVec2(0,350)))
 ```
 the result :
 
@@ -1004,6 +989,122 @@ by ex for android, emscripten, or boost
 you can check the DemoApp who is using an override for the Boost::filesystem
 
 ################################################################
+## Modify file infos during scan by a callback
+################################################################
+
+in some case, it can be unsefull for modify file infos
+so you can define your callback and attached it in the FileDialogConfig struct in the field userFileAttributes
+
+the callback stamp is :
+```cpp
+bool (IGFD::FileInfos* vFileInfosPtr, IGFD::UserDatas vUserDatas)
+```
+if the callback is returning false, the file is ignored, so not displayed by the dailog
+
+example in the gltf separated files : (see the branch DemoApp for example use)
+
+A gltf file can have data description and datas files separated.
+in this case only the file with description will be shown in the dialog, so with not the full size of all attached datas
+
+With the file format .gltf who is containing datas in a separate .bin
+
+syntax :
+```cpp
+config.userFileAttributes = [](IGFD::FileInfos* vFileInfosPtr, IGFD::UserDatas vUserDatas) -> bool {
+    if (vFileInfosPtr != nullptr) {
+        // this demo not take into account .gltf who have data insise. besauce keepd easy just for demo
+        if (vFileInfosPtr->SearchForExt(".gltf", true)) {
+            auto bin_file_path_name = vFileInfosPtr->filePath + IGFD::Utils::GetPathSeparator() + vFileInfosPtr->fileNameLevels[0] + ".bin";
+            struct stat statInfos   = {};
+            char timebuf[100];
+            int result = stat(bin_file_path_name.c_str(), &statInfos);
+            if (!result) {
+                vFileInfosPtr->fileSize = (size_t)statInfos.st_size;
+            } else {
+                // no bin, so escaped.
+                // normally we must parse the file and check the uri for get the buffer file
+                // but here we keep the example as easy for demo.
+                return false;
+            }
+        }
+    }
+    return true;
+};
+```
+
+you can also display a tootlip for a file displayed when the mouse is over a dedicated column
+
+you juste need to set your message for the FileDialogConfig.tooltipMessage
+and specify the column in FileDialogConfig.tooltipColumn
+
+ex code from the DemoApp branch for display the decomposition of gltf total size
+
+syntax :
+```cpp
+vFileInfosPtr->tooltipMessage = toStr("%s : %s\n%s : %s",             //
+    (vFileInfosPtr->fileNameLevels[0] + ".gltf").c_str(),             //
+    IGFD::Utils::FormatFileSize(vFileInfosPtr->fileSize).c_str(),     //
+    (vFileInfosPtr->fileNameLevels[0] + ".bin").c_str(),              //
+    IGFD::Utils::FormatFileSize((size_t)statInfos.st_size).c_str());  //
+vFileInfosPtr->tooltipColumn  = 1;
+```
+
+################################################################
+## Places
+################################################################
+
+the Places system is a generic way for add custom links in the left side pane
+
+you can organize them by groups
+
+The bookmarks and devices are now groups in the left side pane.
+
+for using it you need to
+```cpp
+#define USE_PLACES_FEATURE
+
+// for have default bookmark editable groups
+#define USE_PLACES_BOOKMARKS
+
+// for have default groups for system devices (returned by the IFileSystem interface)
+#define USE_PLACES_DEVICES
+```
+
+see the config file for more customization
+
+you can also add your custom groups editable or not like what is done
+the DemoApp branch with the "quick access" paths of win10
+
+You must add a group first, then add a place to it :
+
+```cpp
+// you must add a group first, specifu display order, and say :
+// if the user can add or remove palce like (bookmarks)
+// if the group is opened by default
+ImGuiFileDialog::Instance()->AddPlacesGroup(group_name, display_order, can_be_user_edited, opened_by_default);
+// then you must get the group
+auto places_ptr = ImGuiFileDialog::Instance()->GetPlacesGroupPtr(group_name);
+if (places_ptr != nullptr) {
+    // then add a place to the group
+    // you msut specify the place name, the palce path, say if the palce can be serialized, and sepcify the style
+    // for the moment the style support only the icon, can be extended if user needed in futur
+    places_ptr->AddPlace(place_name, place_path, can_be_saved, style);
+    // you can also add a separator
+    places_ptr->AddPlaceSeparator(separator_thickness);
+}
+```
+
+for editable group :
+* You can select each place to edit the displayed name corresponding to a path
+* Double-click on the label to apply the place
+
+You can also serialize/deserialize groups and places (for example to load/save from/to a file):
+```cpp
+Load => ImGuiFileDialog::Instance()->DeserializePlaces(placesString);
+Save => std::string placesString = ImGuiFileDialog::Instance()->SerializePlaces();
+```
+
+################################################################
 ## How to Integrate ImGuiFileDialog in your project
 ################################################################
 
@@ -1042,20 +1143,15 @@ Sample code with cimgui :
 ImGuiFileDialog *cfileDialog = IGFD_Create();
 
 // open dialog
-if (igButton("Open File", buttonSize))
-{
+if (igButton("Open File", buttonSize)) {
+    IGFD_FileDialog_Config config = IGFD_FileDialog_Config_Get();
+    config.path = ".";
+    config.flags = ImGuiFileDialogFlags_ConfirmOverwrite; // ImGuiFileDialogFlags
     IGFD_OpenDialog(cfiledialog,
-        "filedlg",                              // dialog key (make it possible to have different treatment reagrding
-the dialog key "Open a File",                          // dialog title "c files(*.c *.h){.c,.h}",              // dialog
-filter syntax : simple => .h,.c,.pp, etc and collections : text1{filter0,filter1,filter2},
-text2{filter0,filter1,filter2}, etc..
-        ".",                                    // base directory for files scan
-        "",                                     // base filename
-        0,                                      // a fucntion for display a right pane if you want
-        0.0f,                                   // base width of the pane
-        0,                                      // count selection : 0 infinite, 1 one file (default), n (n files)
-        "User data !",                          // some user datas
-        ImGuiFileDialogFlags_ConfirmOverwrite); // ImGuiFileDialogFlags
+        "filedlg",                              // dialog key (make it possible to have different treatment reagrding the dialog key
+        "Open a File",                          // dialog title
+        "c files(*.c *.h){.c,.h}",              // dialog filter syntax : simple => .h,.c,.pp, etc and collections : text1{filter0,filter1,filter2}, text2{filter0,filter1,filter2}, etc..
+        config); 								// the file dialog config
 }
 
 ImGuiIO* ioptr = igGetIO();
@@ -1122,8 +1218,8 @@ The Custom Icon Font (in CustomFont.cpp and CustomFont.h) was made with ImGuiFon
 
 #pragma region IGFD VERSION
 
-// compatible with 1.90.1 WIP
-#define IMGUIFILEDIALOG_VERSION "v0.6.6.1"
+// compatible with 1.90.4 WIP
+#define IMGUIFILEDIALOG_VERSION "v0.6.7"
 
 #pragma endregion
 
@@ -1170,7 +1266,7 @@ enum ImGuiFileDialogFlags_ {
     ImGuiFileDialogFlags_CaseInsensitiveExtention = (1 << 8),      // the file extentions treatments will not take into account the case
     ImGuiFileDialogFlags_Modal = (1 << 9),                         // modal
     ImGuiFileDialogFlags_DisableThumbnailMode = (1 << 10),         // disable the thumbnail mode
-    ImGuiFileDialogFlags_DisableBookmarkMode = (1 << 11),          // disable the bookmark mode
+    ImGuiFileDialogFlags_DisablePlaceMode = (1 << 11),          // disable the place mode
     ImGuiFileDialogFlags_DisableQuickPathSelection = (1 << 12),    // disable the quick path selection
 
     // default behavior when no flags is defined. seems to be the more common cases
@@ -1279,6 +1375,7 @@ struct IGFD_Thumbnail_Info {
 #include <regex>
 #include <array>
 #include <mutex>
+#include <condition_variable>
 #include <thread>
 #include <cfloat>
 #include <memory>
@@ -1430,10 +1527,14 @@ public:
     static void SetBuffer(char* vBuffer, size_t vBufferLen, const std::string& vStr);
     static std::string UTF8Encode(const std::wstring& wstr);
     static std::wstring UTF8Decode(const std::string& str);
+    static std::vector<std::string> SplitStringToVector(const std::string& vText, const std::string& vDelimiterPattern, const bool& vPushEmpty);
     static std::vector<std::string> SplitStringToVector(const std::string& vText, const char& vDelimiter, const bool& vPushEmpty);
     static std::string LowerCaseString(const std::string& vString);  // turn all text in lower case for search facilitie
     static size_t GetCharCountInString(const std::string& vString, const char& vChar);
     static size_t GetLastCharPosWithMinCharCount(const std::string& vString, const char& vChar, const size_t& vMinCharCount);
+    static std::string GetPathSeparator(); // return the slash for any OS ( \\ win, / unix)
+    static std::string RoundNumber(double vvalue, int n);  // custom rounding number
+    static std::string FormatFileSize(size_t vByteSize);   // format file size field
 };
 
 #pragma endregion
@@ -1599,11 +1700,18 @@ public:
     // 10 level max are sufficient i guess. the others levels will be checked if countExtDot > 1
     std::array<std::string, EXT_MAX_LEVEL> fileExtLevels;
     std::array<std::string, EXT_MAX_LEVEL> fileExtLevels_optimized;  // optimized for search => insensitivecase
+    // same for file name, can be sued in userFileAttributesFun
+    std::array<std::string, EXT_MAX_LEVEL> fileNameLevels;
+    std::array<std::string, EXT_MAX_LEVEL> fileNameLevels_optimized;  // optimized for search => insensitivecase
     size_t countExtDot = 0U;                                         // count dots in file extention. this count will give the levels in fileExtLevels
     FileType fileType;                                               // fileType
     std::string filePath;                                            // path of the file
-    std::string fileNameExt;                                         // filename of the file (file name + extention) (but no pat
+    std::string fileName;                                            // file name only
+    std::string fileNameExt;                                         // filename of the file (file name + extention) (but no path)
     std::string fileNameExt_optimized;                               // optimized for search => insensitivecase
+    std::string deviceInfos;                                         // quick infos to display after name for devices
+    std::string tooltipMessage;                                      // message to display on the tooltip, is not empty
+    int32_t tooltipColumn = -1;                                      // the tooltip will appears only when the mouse is over the tooltipColumn if > -1
     size_t fileSize = 0U;                                            // for sorting operations
     std::string formatedFileSize;                                    // file size formated (10 o, 10 ko, 10 mo, 10 go)
     std::string fileModifDate;                                       // file user defined format of the date (data + time by default)
@@ -1627,6 +1735,8 @@ public:
 
 #pragma region FILE SYSTEM INTERFACE
 
+typedef std::pair<std::string, std::string> PathDisplayedName;
+
 class IFileSystem {
 public:
     virtual ~IFileSystem() = default;
@@ -1638,14 +1748,14 @@ public:
     virtual bool IsFileExist(const std::string& vName) = 0;
     // say if a directory was created, return false if vName is invalid or alreayd exist
     virtual bool CreateDirectoryIfNotExist(const std::string& vName) = 0;
-    // extract the component of a file apth name, like path, name, ext
+    // extract the component of a file path name, like path, name, ext
     virtual IGFD::Utils::PathStruct ParsePathFileName(const std::string& vPathFileName) = 0;
     // will return a list of files inside a path
     virtual std::vector<IGFD::FileInfos> ScanDirectory(const std::string& vPath) = 0;
     // say if the path is well a directory
     virtual bool IsDirectory(const std::string& vFilePathName) = 0;
-    // return a drive list on windows, bu can be used on android or linux for give to the suer a list of root dir
-    virtual std::vector<std::string> GetDrivesList() = 0;
+    // return a device list (<path, device name>) on windows, but can be used on other platforms for give to the user a list of devices paths.
+    virtual std::vector<IGFD::PathDisplayedName> GetDevicesList() = 0;
 };
 
 #pragma endregion
@@ -1702,7 +1812,6 @@ public:
         defaultSortOrderFilename, defaultSortOrderType, defaultSortOrderSize, defaultSortOrderDate};
 #endif
     SortingFieldEnum sortingField = SortingFieldEnum::FIELD_FILENAME;  // detail view sorting column
-    bool showDrives = false;                                           // drives are shown (only on os windows)
 
     std::string dLGpath;               // base path set by user when OpenDialog was called
     std::string dLGDefaultFileName;    // base default file path name set by user when OpenDialog was called
@@ -1716,9 +1825,7 @@ public:
 #else
 private:
 #endif
-    static std::string m_RoundNumber(double vvalue, int n);                        // custom rounding number
-    static std::string m_FormatFileSize(size_t vByteSize);                         // format file size field
-    static void m_CompleteFileInfos(const std::shared_ptr<FileInfos>& FileInfos);  // set time and date infos of a file (detail view mode)
+    static void m_CompleteFileInfos(const std::shared_ptr<FileInfos>& vInfos);     // set time and date infos of a file (detail view mode)
     void m_RemoveFileNameInSelection(const std::string& vFileName);                // selection : remove a file name
     void m_m_AddFileNameInSelection(const std::string& vFileName, bool vSetLastSelectionFileName);  // selection : add a file name
     void m_AddFile(const FileDialogInternal& vFileDialogInternal,
@@ -1740,6 +1847,7 @@ private:
     void m_SortFields(const FileDialogInternal& vFileDialogInternal,
         std::vector<std::shared_ptr<FileInfos>>& vFileInfosList,
         std::vector<std::shared_ptr<FileInfos>>& vFileInfosFilteredList);  // will sort a column
+    bool m_CompleteFileInfosWithUserFileAttirbutes(const FileDialogInternal& vFileDialogInternal, const std::shared_ptr<FileInfos>& vInfos);
 
 public:
     FileManager();
@@ -1802,6 +1910,20 @@ public:
 
 typedef void* UserDatas;
 typedef std::function<void(const char*, UserDatas, bool*)> PaneFun;  // side pane function binding
+typedef std::function<bool(FileInfos*, UserDatas)> UserFileAttributesFun;  // custom file Attributes call back, reject file if false
+
+struct IGFD_API FileDialogConfig {
+    std::string path;                                        // path
+    std::string fileName;                                    // defaut file name
+    std::string filePathName;                                // if not empty, the filename and the path will be obtained from filePathName
+    int32_t countSelectionMax  = 1;                          // count selection max
+    UserDatas userDatas        = nullptr;                    // user datas (can be retrieved in pane)
+    ImGuiFileDialogFlags flags = ImGuiFileDialogFlags_None;  // ImGuiFileDialogFlags
+    PaneFun sidePane;                                        // side pane callback
+    float sidePaneWidth = 250.0f;                            // side pane width
+    UserFileAttributesFun userFileAttributes;                // user file Attibutes callback
+};
+
 class IGFD_API FileDialogInternal {
 public:
     FileManager fileManager;      // the file manager
@@ -1821,20 +1943,27 @@ public:
     bool fileListViewIsActive = false;                          // when list view is active
     std::string dLGkey;                                         // the dialog key
     std::string dLGtitle;                                       // the dialog title
-    ImGuiFileDialogFlags dLGflags = ImGuiFileDialogFlags_None;  // default dialog flag
-    UserDatas dLGuserDatas = nullptr;                           // the user datas passed to a dialog
-    PaneFun dLGoptionsPane = nullptr;                           // the user side pane
-    float dLGoptionsPaneWidth = 0.0f;                           // the user side pane width
     bool needToExitDialog = false;                              // we need to exit the dialog
     bool puUseCustomLocale = false;                             // custom user locale
     int localeCategory = LC_ALL;                                // locale category to use
     std::string localeBegin;                                    // the locale who will be applied at start of the display dialog
     std::string localeEnd;                                      // the locale who will be applaied at end of the display dialog
 
+private:
+    FileDialogConfig m_DialogConfig;
+
 public:
     void NewFrame();           // new frame, so maybe neded to do somethings, like reset events
     void EndFrame();           // end frame, so maybe neded to do somethings fater all
     void ResetForNewDialog();  // reset what is needed to reset for the openging of a new dialog
+
+    void configureDialog(                  // open simple dialog
+        const std::string& vKey,           // key dialog
+        const std::string& vTitle,         // title
+        const char* vFilters,              // filters, if null, will display only directories
+        const FileDialogConfig& vConfig);  // FileDialogConfig
+    const FileDialogConfig& getDialogConfig() const;
+    FileDialogConfig& getDialogConfigRef();
 };
 
 #pragma endregion
@@ -1868,6 +1997,7 @@ private:
     std::shared_ptr<std::thread> m_ThumbnailGenerationThread = nullptr;
     std::list<std::shared_ptr<FileInfos>> m_ThumbnailFileDatasToGet;  // base container
     std::mutex m_ThumbnailFileDatasToGetMutex;
+    std::condition_variable m_ThumbnailFileDatasToGetCv;
     std::list<std::shared_ptr<FileInfos>> m_ThumbnailToCreate;  // base container
     std::mutex m_ThumbnailToCreateMutex;
     std::list<IGFD_Thumbnail_Info> m_ThumbnailToDestroy;  // base container
@@ -1905,48 +2035,70 @@ public:
 
 #pragma endregion
 
-#pragma region BookMarkFeature
+#pragma region PlacesFeature
 
-class IGFD_API BookMarkFeature {
+class IGFD_API PlacesFeature {
 protected:
-    BookMarkFeature();
+    PlacesFeature();
 
-#ifdef USE_BOOKMARK
+#ifdef USE_PLACES_FEATURE
 private:
-    struct BookmarkStruct {
-        std::string name;  // name of the bookmark
+    struct PlaceStruct {
+        std::string name;  // name of the place
+        // todo: the path could be relative, better if the app is moved but place path can be outside of the app
+        std::string path;  // absolute path of the place
+        bool canBeSaved = true;  // defined by code, can be used for prevent serialization / deserialization
+        FileStyle style;
+        float thickness = 0.0f; // when more than 0.0f, is a separator
+    };
 
-        // todo: the path could be relative, better if the app is movedn but bookmarked path can be outside of the app
-        std::string path;  // absolute path of the bookmarked directory
-
-        bool defined_by_code = false;  // defined by code, can be used for rpevent serialization / deserialization
+    struct GroupStruct {
+        bool canBeSaved                              = false;  // defined by code, can be used for prevent serialization / deserialization
+        size_t displayOrder                          = 0U;     // the display order will be usedf first, then alphanumeric
+        bool defaultOpened                           = false;  // the group is opened by default
+        bool canBeEdited                             = false;  // will show +/- button for add/remove place in the group
+        char editBuffer[MAX_FILE_DIALOG_NAME_BUFFER] = "";     // temp buffer for name edition
+        int32_t selectedPlaceForEdition              = -1;
+        ImGuiTreeNodeFlags collapsingHeaderFlag      = ImGuiTreeNodeFlags_None;
+        ImGuiListClipper clipper;           // the list clipper of the grou
+        std::string name;                   // the group name, will be displayed
+        std::vector<PlaceStruct> places;    // the places (name + path)
+        bool AddPlace(                      // add a place by code
+            const std::string& vPlaceName,  // place name
+            const std::string& vPlacePath,  // place path
+            const bool& vCanBeSaved,        // prevent serialization
+            const FileStyle& vStyle = {});  // style
+        void AddPlaceSeparator(const float& vThickness = 1.0f);
+        bool RemovePlace(                    // remove a place by code, return true if succeed
+            const std::string& vPlaceName);  // place name to remove
     };
 
 private:
-    ImGuiListClipper m_BookmarkClipper;
-    std::vector<BookmarkStruct> m_Bookmarks;
-    char m_BookmarkEditBuffer[MAX_FILE_DIALOG_NAME_BUFFER] = "";
+    std::unordered_map<std::string, std::shared_ptr<GroupStruct>> m_Groups;
+    std::map<size_t, std::weak_ptr<GroupStruct> > m_OrderedGroups;
 
 protected:
-    float m_BookmarkWidth = 200.0f;
-    bool m_BookmarkPaneShown = false;
+    float m_PlacesPaneWidth = 200.0f;
+    bool m_PlacesPaneShown = false;
 
 protected:
-    void m_DrawBookmarkButton();                                                            // draw bookmark button
-    bool m_DrawBookmarkPane(FileDialogInternal& vFileDialogInternal, const ImVec2& vSize);  // draw bookmark Pane
+    void m_InitPlaces(FileDialogInternal& vFileDialogInternal);
+    void m_DrawPlacesButton();                                                            // draw place button
+    bool m_DrawPlacesPane(FileDialogInternal& vFileDialogInternal, const ImVec2& vSize);  // draw place Pane
 
 public:
-    std::string SerializeBookmarks(                            // serialize bookmarks : return bookmark buffer to save in a file
-        const bool& vDontSerializeCodeBasedBookmarks = true);  // for avoid serialization of bookmarks added by code
-    void DeserializeBookmarks(                                 // deserialize bookmarks : load bookmark buffer to load in the dialog (saved from
-        const std::string& vBookmarks);                        // previous use with SerializeBookmarks()) bookmark buffer to load
-    void AddBookmark(                                          // add a bookmark by code
-        const std::string& vBookMarkName,                      // bookmark name
-        const std::string& vBookMarkPath);                     // bookmark path
-    bool RemoveBookmark(                                       // remove a bookmark by code, return true if succeed
-        const std::string& vBookMarkName);                     // bookmark name to remove
-
-#endif  // USE_BOOKMARK
+    std::string SerializePlaces(                                    // serialize place : return place buffer to save in a file
+        const bool& vForceSerialisationForAll = true);              // for avoid serialization of places with flag 'canBeSaved to false'
+    void DeserializePlaces(                                         // deserialize place : load place buffer to load in the dialog (saved from
+        const std::string& vPlaces);                                // previous use with SerializePlaces()) place buffer to load
+    bool AddPlacesGroup(                                            // add a group
+        const std::string& vGroupName,                              // the group name
+        const size_t& vDisplayOrder,                                // the display roder of the group
+        const bool& vCanBeEdited     = false,                       // let the user add/remove place in the group
+        const bool& vOpenedByDefault = true);                      // hte group is opened by default
+    bool RemovePlacesGroup(const std::string& vGroupName);          // remove the group
+    GroupStruct* GetPlacesGroupPtr(const std::string& vGroupName);  // get the group, if not existed, will be created
+#endif  // USE_PLACES_FEATURE
 };
 
 #pragma endregion
@@ -1995,7 +2147,7 @@ public:
 
 #pragma region FileDialog
 
-class IGFD_API FileDialog : public BookMarkFeature, public KeyExplorerFeature, public ThumbnailFeature {
+class IGFD_API FileDialog : public PlacesFeature, public KeyExplorerFeature, public ThumbnailFeature {
 protected:
     FileDialogInternal m_FileDialogInternal;
     ImGuiListClipper m_FileListClipper;
@@ -2018,55 +2170,15 @@ public:
     }
 
 public:
-    FileDialog();           // ImGuiFileDialog Constructor. can be used for have many dialog at same time (not possible with
-                            // singleton)
+    FileDialog();           // ImGuiFileDialog Constructor. can be used for have many dialog at same time (not possible with singleton)
     virtual ~FileDialog();  // ImGuiFileDialog Destructor
 
-    virtual  // todo : need to refactor all theses function to maybe just one
-        //  standard dialog
-        void
-        OpenDialog(                             // open simple dialog (path and fileName can be specified)
-            const std::string& vKey,            // key dialog
-            const std::string& vTitle,          // title
-            const char* vFilters,               // filters
-            const std::string& vPath,           // path
-            const std::string& vFileName,       // defaut file name
-            const int& vCountSelectionMax = 1,  // count selection max
-            UserDatas vUserDatas = nullptr,     // user datas (can be retrieved in pane)
-            ImGuiFileDialogFlags vFlags = 0);   // ImGuiFileDialogFlags
-
-    void OpenDialog(                        // open simple dialog (path and filename are obtained from filePathName)
-        const std::string& vKey,            // key dialog
-        const std::string& vTitle,          // title
-        const char* vFilters,               // filters
-        const std::string& vFilePathName,   // file path name (will be decompsoed in path and fileName)
-        const int& vCountSelectionMax = 1,  // count selection max
-        UserDatas vUserDatas = nullptr,     // user datas (can be retrieved in pane)
-        ImGuiFileDialogFlags vFlags = 0);   // ImGuiFileDialogFlags
-
-    // with pane
-    void OpenDialogWithPane(                   // open dialog with custom right pane (path and fileName can be specified)
-        const std::string& vKey,               // key dialog
-        const std::string& vTitle,             // title
-        const char* vFilters,                  // filters
-        const std::string& vPath,              // path
-        const std::string& vFileName,          // defaut file name
-        const PaneFun& vSidePane,              // side pane
-        const float& vSidePaneWidth = 250.0f,  // side pane width
-        const int& vCountSelectionMax = 1,     // count selection max
-        UserDatas vUserDatas = nullptr,        // user datas (can be retrieved in pane)
-        ImGuiFileDialogFlags vFlags = 0);      // ImGuiFileDialogFlags
-
-    void OpenDialogWithPane(                   // open dialog with custom right pane (path and filename are obtained from filePathName)
-        const std::string& vKey,               // key dialog
-        const std::string& vTitle,             // title
-        const char* vFilters,                  // filters
-        const std::string& vFilePathName,      // file path name (will be decompsoed in path and fileName)
-        const PaneFun& vSidePane,              // side pane
-        const float& vSidePaneWidth = 250.0f,  // side pane width
-        const int& vCountSelectionMax = 1,     // count selection max
-        UserDatas vUserDatas = nullptr,        // user datas (can be retrieved in pane)
-        ImGuiFileDialogFlags vFlags = 0);      // ImGuiFileDialogFlags
+    //  standard dialog
+    virtual void OpenDialog(                    // open simple dialog
+        const std::string& vKey,                // key dialog
+        const std::string& vTitle,              // title
+        const char* vFilters,                   // filters, if null, will display only directories
+        const FileDialogConfig& vConfig = {});  // FileDialogConfig
 
     // Display / Close dialog form
     bool Display(                                               // Display the dialog. return true if a result was obtained (Ok or not)
@@ -2132,9 +2244,9 @@ protected:
                                                      // if needed (if defined with flag)
 
     // dialog parts
-    virtual void m_DrawHeader();   // draw header part of the dialog (bookmark btn, dir creation, path composer, search
+    virtual void m_DrawHeader();   // draw header part of the dialog (place btn, dir creation, path composer, search
                                    // bar)
-    virtual void m_DrawContent();  // draw content part of the dialog (bookmark pane, file list, side pane)
+    virtual void m_DrawContent();  // draw content part of the dialog (place pane, file list, side pane)
     virtual bool m_DrawFooter();   // draw footer part of the dialog (file field, fitler combobox, ok/cancel btn's)
 
     // widgets components
@@ -2164,6 +2276,8 @@ protected:
         std::string& vOutStr,
         ImFont** vOutFont);                                               // begin style apply of filter with color an icon if any
     void m_EndFileColorIconStyle(const bool& vShowColor, ImFont* vFont);  // end style apply of filter
+
+    void m_DisplayFileInfosTooltip(const int32_t& vRowIdx, const int32_t& vColumnIdx, std::shared_ptr<FileInfos> vFileInfos);
 };
 
 #pragma endregion
@@ -2204,6 +2318,20 @@ typedef struct IGFD_Selection_Pair IGFD_Selection_Pair;
 typedef struct IGFD_Selection IGFD_Selection;
 #endif  // __cplusplus
 
+typedef void (*IGFD_PaneFun)(const char*, void*, bool*);  // callback fucntion for display the pane
+
+struct IGFD_FileDialog_Config {
+    const char* path;              // path
+    const char* fileName;          // defaut file name
+    const char* filePathName;      // if not empty, the filename and the path will be obtained from filePathName
+    int32_t countSelectionMax;     // count selection max
+    void* userDatas;               // user datas (can be retrieved in pane)
+    IGFD_PaneFun sidePane;         // side pane callback
+    float sidePaneWidth;  // side pane width};
+    ImGuiFileDialogFlags flags;    // ImGuiFileDialogFlags
+};
+IGFD_C_API IGFD_FileDialog_Config IGFD_FileDialog_Config_Get();  // return an initialized IGFD_FileDialog_Config
+
 struct IGFD_Selection_Pair {
     char* fileName;
     char* filePathName;
@@ -2224,58 +2352,17 @@ IGFD_C_API void IGFD_Selection_DestroyContent(IGFD_Selection* vSelection);  // d
 IGFD_C_API ImGuiFileDialog* IGFD_Create(void);               // create the filedialog context
 IGFD_C_API void IGFD_Destroy(ImGuiFileDialog* vContextPtr);  // destroy the filedialog context
 
-typedef void (*IGFD_PaneFun)(const char*, void*, bool*);  // callback fucntion for display the pane
-
 #ifdef USE_THUMBNAILS
 typedef void (*IGFD_CreateThumbnailFun)(IGFD_Thumbnail_Info*);   // callback function for create thumbnail texture
 typedef void (*IGFD_DestroyThumbnailFun)(IGFD_Thumbnail_Info*);  // callback fucntion for destroy thumbnail texture
 #endif                                                           // USE_THUMBNAILS
 
-IGFD_C_API void IGFD_OpenDialog(   // open a standard dialog
-    ImGuiFileDialog* vContextPtr,  // ImGuiFileDialog context
-    const char* vKey,              // key dialog
-    const char* vTitle,            // title
-    const char* vFilters,          // filters/filter collections. set it to null for directory mode
-    const char* vPath,             // path
-    const char* vFileName,         // defaut file name
-    const int vCountSelectionMax,  // count selection max
-    void* vUserDatas,              // user datas (can be retrieved in pane)
-    ImGuiFileDialogFlags vFlags);  // ImGuiFileDialogFlags
-
-IGFD_C_API void IGFD_OpenDialog2(  // open a standard dialog
-    ImGuiFileDialog* vContextPtr,  // ImGuiFileDialog context
-    const char* vKey,              // key dialog
-    const char* vTitle,            // title
-    const char* vFilters,          // filters/filter collections. set it to null for directory mode
-    const char* vFilePathName,     // defaut file path name (path and filename witl be extracted from it)
-    const int vCountSelectionMax,  // count selection max
-    void* vUserDatas,              // user datas (can be retrieved in pane)
-    ImGuiFileDialogFlags vFlags);  // ImGuiFileDialogFlags
-
-IGFD_C_API void IGFD_OpenDialogWithPane(  // open a standard dialog with pane
-    ImGuiFileDialog* vContextPtr,         // ImGuiFileDialog context
-    const char* vKey,                     // key dialog
-    const char* vTitle,                   // title
-    const char* vFilters,                 // filters/filter collections. set it to null for directory mode
-    const char* vPath,                    // path
-    const char* vFileName,                // defaut file name
-    const IGFD_PaneFun vSidePane,         // side pane
-    const float vSidePaneWidth,           // side pane base width
-    const int vCountSelectionMax,         // count selection max
-    void* vUserDatas,                     // user datas (can be retrieved in pane)
-    ImGuiFileDialogFlags vFlags);         // ImGuiFileDialogFlags
-
-IGFD_C_API void IGFD_OpenDialogWithPane2(  // open a standard dialog with pane
-    ImGuiFileDialog* vContextPtr,          // ImGuiFileDialog context
-    const char* vKey,                      // key dialog
-    const char* vTitle,                    // title
-    const char* vFilters,                  // filters/filter collections. set it to null for directory mode
-    const char* vFilePathName,             // defaut file name (path and filename witl be extracted from it)
-    const IGFD_PaneFun vSidePane,          // side pane
-    const float vSidePaneWidth,            // side pane base width
-    const int vCountSelectionMax,          // count selection max
-    void* vUserDatas,                      // user datas (can be retrieved in pane)
-    ImGuiFileDialogFlags vFlags);          // ImGuiFileDialogFlags
+IGFD_C_API void IGFD_OpenDialog(            // open a standard dialog
+    ImGuiFileDialog* vContextPtr,           // ImGuiFileDialog context
+    const char* vKey,                       // key dialog
+    const char* vTitle,                     // title
+    const char* vFilters,                   // filters/filter collections. set it to null for directory mode
+    const IGFD_FileDialog_Config vConfig);  // config
 
 IGFD_C_API bool IGFD_DisplayDialog(  // Display the dialog
     ImGuiFileDialog* vContextPtr,    // ImGuiFileDialog context
@@ -2369,25 +2456,40 @@ IGFD_C_API void IGFD_SetFlashingAttenuationInSeconds(  // set the flashing time 
     float vAttenValue);                                // set the attenuation (from flashed to not flashed) in seconds
 #endif
 
-#ifdef USE_BOOKMARK
-IGFD_C_API char* IGFD_SerializeBookmarks(    // serialize bookmarks : return bookmark buffer to save in a file, WARNINGS
+#ifdef USE_PLACES_FEATURE
+IGFD_C_API char* IGFD_SerializePlaces(    // serialize place : return place buffer to save in a file, WARNINGS
                                              // you are responsible to free it
     ImGuiFileDialog* vContextPtr,            // ImGuiFileDialog context
-    bool vDontSerializeCodeBasedBookmarks);  // for avoid serialization of bookmarks added by code
+    bool vDontSerializeCodeBasedPlaces);  // for avoid serialization of place added by code
 
-IGFD_C_API void IGFD_DeserializeBookmarks(  // deserialize bookmarks : load bookmar buffer to load in the dialog (saved
-                                            // from previous use with SerializeBookmarks())
+IGFD_C_API void IGFD_DeserializePlaces(  // deserialize place : load bookmar buffer to load in the dialog (saved
+                                            // from previous use with SerializePlaces())
     ImGuiFileDialog* vContextPtr,           // ImGuiFileDialog context
-    const char* vBookmarks);                // bookmark buffer to load
+    const char* vPlaces);                // place buffer to load
 
-IGFD_C_API void IGFD_AddBookmark(  // add a bookmark by code
-    ImGuiFileDialog* vContextPtr,  // ImGuiFileDialog context
-    const char* vBookMarkName,     // bookmark name
-    const char* vBookMarkPath);    // bookmark path
-
-IGFD_C_API void IGFD_RemoveBookmark(  // remove a bookmark by code, return true if succeed
+IGFD_C_API bool IGFD_AddPlacesGroup(  // add a places group by code
     ImGuiFileDialog* vContextPtr,     // ImGuiFileDialog context
-    const char* vBookMarkName);       // bookmark name to remove
+    const char* vGroupName,           // the group name
+    size_t vDisplayOrder,             // the display roder of the group
+    bool vCanBeEdited);               // let the user add/remove place in the group
+
+IGFD_C_API bool IGFD_RemovePlacesGroup(  // remove a place group by code, return true if succeed
+    ImGuiFileDialog* vContextPtr,        // ImGuiFileDialog context
+    const char* vGroupName);             // place name to remove
+
+IGFD_C_API bool IGFD_AddPlace(     // add a place by code
+    ImGuiFileDialog* vContextPtr,  // ImGuiFileDialog context
+    const char* vGroupName,        // the group name
+    const char* vPlaceName,        // place name
+    const char* vPlacePath,        // place path
+    bool vCanBeSaved,              // place can be saved
+    const char* vIconText);        // wanted text or icon of the file with extention filter (can be used with font icon)
+
+IGFD_C_API bool IGFD_RemovePlace(  // remove a place by code, return true if succeed
+    ImGuiFileDialog* vContextPtr,  // ImGuiFileDialog context
+    const char* vGroupName,        // the group name
+    const char* vPlaceName);       // place name to remove
+
 #endif
 
 #ifdef USE_THUMBNAILS
