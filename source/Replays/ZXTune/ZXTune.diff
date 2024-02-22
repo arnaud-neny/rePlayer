@@ -138,6 +138,20 @@ index 6a44efb..fc68954 100644
  namespace ZXTune
  {
    class PluginId : public StringView
+diff --git "a/external\\zxtune\\src\\core\\plugins\\enumerator.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\enumerator.cpp"
+index 657fc8f..998dc63 100644
+--- "a/external\\zxtune\\src\\core\\plugins\\enumerator.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\enumerator.cpp"
+@@ -59,8 +59,7 @@ namespace ZXTune
+       Players.reserve(256);
+       const Time::Timer timer;
+       ZXTune::RegisterArchivePlugins(*this);
+-      ZXTune::RegisterMultitrackPlayerPlugins(*this, *this);
+-      ZXTune::RegisterPlayerPlugins(*this);
++      ZXTune::RegisterPlayerPlugins(*this, *this);
+       EnumeratorDbg("Registered {} archives and {} players for {}ms", Archives.size(), Players.size(),
+                     timer.Elapsed<Time::Millisecond>().Get());
+     }
 diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
 index 7292590..9075df8 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
@@ -156,7 +170,7 @@ index 7292590..9075df8 100644
  
    const ContainerPluginDescription ZXUNARCHIVES[] =
 diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
-index ff65a41..35daead 100644
+index e8e6ce9..78a00ab 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
 @@ -428,7 +428,7 @@ namespace ZXTune::Raw
@@ -178,20 +192,50 @@ index ff65a41..35daead 100644
            Dbg("Sublocation is captured. Duplicate.");
            subLocation = MakePtr<ScanDataLocation>(input, offset);
 diff --git "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
-index 64f7fee..e32cc9e 100644
+index 64f7fee..8fcfa65 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
-@@ -45,32 +45,32 @@ namespace ZXTune
-     RegisterFTCSupport(registrator);
-     RegisterCOPSupport(registrator);
-     RegisterTFESupport(registrator);
+@@ -13,64 +13,113 @@
+ 
+ namespace ZXTune
+ {
+-  void RegisterPlayerPlugins(PlayerPluginsRegistrator& registrator)
+-  {
+-    // try TS & AY first
+-    RegisterTSSupport(registrator);
+-    RegisterAYSupport(registrator);
+-    RegisterPT3Support(registrator);
+-    RegisterPT2Support(registrator);
+-    RegisterSTCSupport(registrator);
+-    RegisterST1Support(registrator);
+-    RegisterST3Support(registrator);
+-    RegisterASCSupport(registrator);
+-    RegisterSTPSupport(registrator);
+-    RegisterTXTSupport(registrator);
+-    RegisterPSGSupport(registrator);
+-    RegisterPDTSupport(registrator);
+-    RegisterCHISupport(registrator);
+-    RegisterSTRSupport(registrator);
+-    RegisterDSTSupport(registrator);
+-    RegisterSQDSupport(registrator);
+-    RegisterDMMSupport(registrator);
+-    RegisterPSMSupport(registrator);
+-    RegisterGTRSupport(registrator);
+-    RegisterPT1Support(registrator);
+-    RegisterVTXSupport(registrator);
+-    RegisterYMSupport(registrator);
+-    RegisterTFDSupport(registrator);
+-    RegisterTFCSupport(registrator);
+-    RegisterSQTSupport(registrator);
+-    RegisterPSCSupport(registrator);
+-    RegisterFTCSupport(registrator);
+-    RegisterCOPSupport(registrator);
+-    RegisterTFESupport(registrator);
 -    RegisterXMPPlugins(registrator);
-+//     RegisterXMPPlugins(registrator);
-     RegisterET1Support(registrator);
-     RegisterAYCSupport(registrator);
+-    RegisterET1Support(registrator);
+-    RegisterAYCSupport(registrator);
 -    RegisterSPCSupport(registrator);
-+//     RegisterSPCSupport(registrator);
-     RegisterMTCSupport(registrator);
+-    RegisterMTCSupport(registrator);
 -    RegisterAHXSupport(registrator);
 -    RegisterPSFSupport(registrator);
 -    RegisterUSFSupport(registrator);
@@ -206,33 +250,186 @@ index 64f7fee..e32cc9e 100644
 -    RegisterV2MSupport(registrator);
 -    RegisterVGMPlugins(registrator);
 -    RegisterMPTPlugins(registrator);
-+//     RegisterAHXSupport(registrator);
-+//     RegisterPSFSupport(registrator);
-+//     RegisterUSFSupport(registrator);
-+//     RegisterGSFSupport(registrator);
-+//     Register2SFSupport(registrator);
-+//     RegisterNCSFSupport(registrator);
-+//     RegisterSDSFSupport(registrator);
-+//     RegisterMP3Plugin(registrator);
-+//     RegisterOGGPlugin(registrator);
-+//     RegisterWAVPlugin(registrator);
-+//     RegisterFLACPlugin(registrator);
-+//     RegisterV2MSupport(registrator);
-+//     RegisterVGMPlugins(registrator);
-+//     RegisterMPTPlugins(registrator);
-   }
+-  }
++  void RegisterTSSupport(PlayerPluginsRegistrator& players);
++  void RegisterAYSupport(PlayerPluginsRegistrator& players);
++  void RegisterPSGSupport(PlayerPluginsRegistrator& players);
++  void RegisterSTCSupport(PlayerPluginsRegistrator& players);
++  void RegisterST1Support(PlayerPluginsRegistrator& players);
++  void RegisterST3Support(PlayerPluginsRegistrator& players);
++  void RegisterPT2Support(PlayerPluginsRegistrator& players);
++  void RegisterPT3Support(PlayerPluginsRegistrator& players);
++  void RegisterASCSupport(PlayerPluginsRegistrator& players);
++  void RegisterSTPSupport(PlayerPluginsRegistrator& players);
++  void RegisterTXTSupport(PlayerPluginsRegistrator& players);
++  void RegisterPDTSupport(PlayerPluginsRegistrator& players);
++  void RegisterCHISupport(PlayerPluginsRegistrator& players);
++  void RegisterSTRSupport(PlayerPluginsRegistrator& players);
++  void RegisterDSTSupport(PlayerPluginsRegistrator& players);
++  void RegisterSQDSupport(PlayerPluginsRegistrator& players);
++  void RegisterDMMSupport(PlayerPluginsRegistrator& players);
++  void RegisterPSMSupport(PlayerPluginsRegistrator& players);
++  void RegisterGTRSupport(PlayerPluginsRegistrator& players);
++  void RegisterPT1Support(PlayerPluginsRegistrator& players);
++  void RegisterVTXSupport(PlayerPluginsRegistrator& players);
++  void RegisterYMSupport(PlayerPluginsRegistrator& players);
++  void RegisterTFDSupport(PlayerPluginsRegistrator& players);
++  void RegisterTFCSupport(PlayerPluginsRegistrator& players);
++  void RegisterSQTSupport(PlayerPluginsRegistrator& players);
++  void RegisterPSCSupport(PlayerPluginsRegistrator& players);
++  void RegisterFTCSupport(PlayerPluginsRegistrator& players);
++  void RegisterCOPSupport(PlayerPluginsRegistrator& players);
++  void RegisterTFESupport(PlayerPluginsRegistrator& players);
++  void RegisterXMPPlugins(PlayerPluginsRegistrator& players);
++  void RegisterSIDPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
++  void RegisterET1Support(PlayerPluginsRegistrator& players);
++  void RegisterAYCSupport(PlayerPluginsRegistrator& players);
++  void RegisterSPCSupport(PlayerPluginsRegistrator& players);
++  void RegisterMTCSupport(PlayerPluginsRegistrator& players);
++  void RegisterGMEPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
++  void RegisterAHXSupport(PlayerPluginsRegistrator& players);
++  void RegisterPSFSupport(PlayerPluginsRegistrator& players);
++  void RegisterUSFSupport(PlayerPluginsRegistrator& players);
++  void RegisterGSFSupport(PlayerPluginsRegistrator& players);
++  void Register2SFSupport(PlayerPluginsRegistrator& players);
++  void RegisterNCSFSupport(PlayerPluginsRegistrator& players);
++  void RegisterSDSFSupport(PlayerPluginsRegistrator& players);
++  void RegisterASAPPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
++  void RegisterMP3Plugin(PlayerPluginsRegistrator& players);
++  void RegisterOGGPlugin(PlayerPluginsRegistrator& players);
++  void RegisterWAVPlugin(PlayerPluginsRegistrator& players);
++  void RegisterFLACPlugin(PlayerPluginsRegistrator& players);
++  void RegisterV2MSupport(PlayerPluginsRegistrator& players);
++  void RegisterVGMPlugins(PlayerPluginsRegistrator& players);
++  void RegisterMPTPlugins(PlayerPluginsRegistrator& players);
++  void RegisterVGMStreamPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
  
-   void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
+-  void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
++  void RegisterPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
    {
 -    RegisterSIDPlugins(players, archives);
 -    RegisterGMEPlugins(players, archives);
 -    RegisterASAPPlugins(players, archives);
 -    RegisterVGMStreamPlugins(players, archives);
-+//     RegisterSIDPlugins(players, archives);
-+//     RegisterGMEPlugins(players, archives);
-+//     RegisterASAPPlugins(players, archives);
-+//     RegisterVGMStreamPlugins(players, archives);
++    // try TS & AY first
++    RegisterTSSupport(players);
++    RegisterAYSupport(players);
++    RegisterPT3Support(players);
++    RegisterPT2Support(players);
++    RegisterSTCSupport(players);
++    RegisterST1Support(players);
++    RegisterST3Support(players);
++    RegisterASCSupport(players);
++    RegisterSTPSupport(players);
++    RegisterTXTSupport(players);
++    RegisterPSGSupport(players);
++    RegisterPDTSupport(players);
++    RegisterCHISupport(players);
++    RegisterSTRSupport(players);
++    RegisterDSTSupport(players);
++    RegisterSQDSupport(players);
++    RegisterDMMSupport(players);
++    RegisterPSMSupport(players);
++    RegisterGTRSupport(players);
++    RegisterPT1Support(players);
++    RegisterVTXSupport(players);
++    RegisterYMSupport(players);
++    RegisterTFDSupport(players);
++    RegisterTFCSupport(players);
++    RegisterSQTSupport(players);
++    RegisterPSCSupport(players);
++    RegisterFTCSupport(players);
++    RegisterCOPSupport(players);
++    RegisterTFESupport(players);
++//    RegisterXMPPlugins(players);
++    RegisterET1Support(players);
++    RegisterAYCSupport(players);
++//    RegisterSPCSupport(players);
++    RegisterMTCSupport(players);
++//    RegisterAHXSupport(players);
++//    RegisterPSFSupport(players);
++//    RegisterUSFSupport(players);
++//    RegisterGSFSupport(players);
++//    Register2SFSupport(players);
++//    RegisterNCSFSupport(players);
++//    RegisterSDSFSupport(players);
++//    RegisterMP3Plugin(players);
++//    RegisterOGGPlugin(players);
++//    RegisterFLACPlugin(players);
++//    RegisterVGMPlugins(players);
++//    RegisterMPTPlugins(players);
++//    RegisterSIDPlugins(players, archives);
++//    RegisterGMEPlugins(players, archives);
++//    RegisterASAPPlugins(players, archives);
++//    RegisterVGMStreamPlugins(players, archives);
++//    RegisterV2MSupport(players);
++//    RegisterWAVPlugin(players);  // wav after VGMStream
    }
+ }  // namespace ZXTune
+diff --git "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.h" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.h"
+index 5a416f3..93e3281 100644
+--- "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.h"
++++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.h"
+@@ -15,59 +15,5 @@ namespace ZXTune
+   class PlayerPluginsRegistrator;
+   class ArchivePluginsRegistrator;
+ 
+-  void RegisterTSSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterAYSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPSGSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSTCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterST1Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterST3Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterPT2Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterPT3Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterASCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSTPSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterTXTSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPDTSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterCHISupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSTRSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterDSTSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSQDSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterDMMSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPSMSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterGTRSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPT1Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterVTXSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterYMSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterTFDSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterTFCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSQTSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPSCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterFTCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterCOPSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterTFESupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterXMPPlugins(PlayerPluginsRegistrator& registrator);
+-  void RegisterSIDPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
+-  void RegisterET1Support(PlayerPluginsRegistrator& registrator);
+-  void RegisterAYCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSPCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterMTCSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterGMEPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
+-  void RegisterAHXSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterPSFSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterUSFSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterGSFSupport(PlayerPluginsRegistrator& registrator);
+-  void Register2SFSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterNCSFSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterSDSFSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterASAPPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
+-  void RegisterMP3Plugin(PlayerPluginsRegistrator& registrator);
+-  void RegisterOGGPlugin(PlayerPluginsRegistrator& registrator);
+-  void RegisterWAVPlugin(PlayerPluginsRegistrator& registrator);
+-  void RegisterFLACPlugin(PlayerPluginsRegistrator& registrator);
+-  void RegisterV2MSupport(PlayerPluginsRegistrator& registrator);
+-  void RegisterVGMPlugins(PlayerPluginsRegistrator& registrator);
+-  void RegisterMPTPlugins(PlayerPluginsRegistrator& registrator);
+-  void RegisterVGMStreamPlugins(PlayerPluginsRegistrator& registrator, ArchivePluginsRegistrator& archives);
+-
+-  void RegisterPlayerPlugins(PlayerPluginsRegistrator& registrator);
+-  void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
++  void RegisterPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
  }  // namespace ZXTune
 diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\globaltracker.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
 index 844d70c..4d1ce52 100644
@@ -269,6 +466,19 @@ index 3026667..3e554fe 100644
          Require(notePos != NOTES.end());
          const uint_t halftone = notePos - NOTES.begin();
          const char octave = Val[2];
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
+index 2fbb53e..fb3fb57 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
+@@ -313,7 +313,7 @@ namespace Formats::Chiptune
+           ParseTransponedMatrix(src, lines, columns, target);
+           if (Ver3b::FastCheck(data, size))
+           {
+-            const uint_t loop = stream.Read<be_uint32_t>();
++            const uint_t loop = stream.Read<le_uint32_t>(); // rePlayer
+             target.SetLoop(loop);
+           }
+           return CreateCalculatingCrcContainer(stream.GetReadContainer(), dumpOffset, matrixSize);
 diff --git "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
 index cbd42d9..fcc61b5 100644
 --- "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
@@ -436,28 +646,6 @@ index 81e7af9..2e4d2ec 100644
  
      bool IsInfoEmpty(Binary::View info)
      {
-diff --git "a/external\\zxtune\\src\\formats\\packed\\turbolz.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\turbolz.cpp"
-index 7300f08..237fd90 100644
---- "a/external\\zxtune\\src\\formats\\packed\\turbolz.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\turbolz.cpp"
-@@ -85,7 +85,7 @@ namespace Formats::Packed
-         //+0x44
-       };
- 
--      struct KeyFunc : public std::unary_function<void, uint8_t>
-+      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
-       {
-         KeyFunc(const uint8_t* /*data*/, std::size_t /*size*/) {}
- 
-@@ -159,7 +159,7 @@ namespace Formats::Packed
- 
-       static const std::size_t KeyOffset = offsetof(RawHeader, DepackerBody);
- 
--      struct KeyFunc : public std::unary_function<void, uint8_t>
-+      struct KeyFunc// : public std::unary_function<void, uint8_t> // rePlayer
-       {
-         KeyFunc(const uint8_t* data, std::size_t size)
-           : Index(Key[offsetof(RawHeader, InitialCryptoKeyIndex) - KeyOffset])
 diff --git "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\zxzip_file.cpp"
 index b3cdaa4..b4fb795 100644
 --- "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp"
@@ -471,19 +659,231 @@ index b3cdaa4..b4fb795 100644
  
            uint_t codeSize = 9;
            uint_t oldCode = stream.GetBits(codeSize);
-diff --git "a/external\\zxtune\\src\\module\\players\\aym\\sqtracker.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\sqtracker.cpp"
-index 8632981..e5ee9f5 100644
---- "a/external\\zxtune\\src\\module\\players\\aym\\sqtracker.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\sqtracker.cpp"
-@@ -97,7 +97,7 @@ namespace Module::SQTracker
-       }
-     };
+diff --git "a/external\\zxtune\\src\\module\\players\\streaming.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.cpp"
+index 5d54d3e..a526d17 100644
+--- "a/external\\zxtune\\src\\module\\players\\streaming.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.cpp"
+@@ -10,6 +10,7 @@
  
--    struct PositionHash : std::unary_function<HashedPosition, std::size_t>
-+    struct PositionHash// : std::unary_function<HashedPosition, std::size_t> // rePlayer
-     {
-       std::size_t operator()(const HashedPosition& pos) const
+ // local includes
+ #include "module/players/streaming.h"
++#include "module/players/stream_model.h"
+ // common includes
+ #include <make_ptr.h>
+ // std includes
+@@ -22,6 +23,14 @@ namespace Module
+     uint_t TotalFrames = 0;
+     uint_t LoopFrame = 0;
+     Time::Microseconds FrameDuration;
++
++    void Sanitize()
++    {
++      if (LoopFrame >= TotalFrames)
++      {
++        LoopFrame = 0;
++      }
++    }
+   };
+ 
+   class FramedStreamStateCursor : public State
+@@ -148,21 +157,23 @@ namespace Module
+     const FramedStreamStateCursor::Ptr Cursor;
+   };
+ 
+-  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
++  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel& model)
+   {
+     FramedStream stream;
+     stream.FrameDuration = frameDuration;
+-    stream.TotalFrames = model->GetTotalFrames();
+-    stream.LoopFrame = model->GetLoopFrame();
++    stream.TotalFrames = model.GetTotalFrames();
++    stream.LoopFrame = model.GetLoopFrame();
++    stream.Sanitize();
+     return MakePtr<FramedStreamInfo>(stream);
+   }
+ 
+-  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
++  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel& model)
+   {
+     FramedStream stream;
+     stream.FrameDuration = frameDuration;
+-    stream.TotalFrames = model->GetTotalFrames();
+-    stream.LoopFrame = model->GetLoopFrame();
++    stream.TotalFrames = model.GetTotalFrames();
++    stream.LoopFrame = model.GetLoopFrame();
++    stream.Sanitize();
+     return MakePtr<FramedStreamStateIterator>(stream);
+   }
+ 
+diff --git "a/external\\zxtune\\src\\module\\players\\streaming.h" "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.h"
+index 56f63db..1b06fbb 100644
+--- "a/external\\zxtune\\src\\module\\players\\streaming.h"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.h"
+@@ -12,15 +12,15 @@
+ 
+ // local includes
+ #include "module/players/iterator.h"
+-#include "module/players/stream_model.h"
+ // library includes
+ #include <module/information.h>
+ #include <time/duration.h>
+ 
+ namespace Module
+ {
+-  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
+-  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
++  class StreamModel;
++  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel& model);
++  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel& model);
+ 
+   Information::Ptr CreateTimedInfo(Time::Milliseconds duration);
+   Information::Ptr CreateTimedInfo(Time::Milliseconds duration, Time::Milliseconds loopDuration);
+diff --git "a/external\\zxtune\\src\\module\\players\\aym\\aym_base.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base.cpp"
+index 8e07f05..fc78545 100644
+--- "a/external\\zxtune\\src\\module\\players\\aym\\aym_base.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base.cpp"
+@@ -97,7 +97,7 @@ namespace Module
+       }
+       else
        {
+-        return CreateStreamInfo(Tune->GetFrameDuration(), Tune->FindStreamModel());
++        return CreateStreamInfo(Tune->GetFrameDuration(), *Tune->FindStreamModel());
+       }
+     }
+ 
+diff --git "a/external\\zxtune\\src\\module\\players\\aym\\aym_base_stream.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base_stream.cpp"
+index 3e57202..9ec441c 100644
+--- "a/external\\zxtune\\src\\module\\players\\aym\\aym_base_stream.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base_stream.cpp"
+@@ -85,7 +85,7 @@ namespace Module::AYM
+ 
+     DataIterator::Ptr CreateDataIterator(TrackParameters::Ptr /*trackParams*/) const override
+     {
+-      auto iter = CreateStreamStateIterator(FrameDuration, Data);
++      auto iter = CreateStreamStateIterator(FrameDuration, *Data);
+       return MakePtr<StreamDataIterator>(std::move(iter), Data);
+     }
+ 
+diff --git "a/external\\zxtune\\src\\module\\players\\aym\\turbosound.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\turbosound.cpp"
+index 3ea65bd..2dc2120 100644
+--- "a/external\\zxtune\\src\\module\\players\\aym\\turbosound.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\turbosound.cpp"
+@@ -389,7 +389,7 @@ namespace Module::TurboSound
+       }
+       else
+       {
+-        return CreateStreamInfo(Tune->GetFrameDuration(), Tune->FindStreamModel());
++        return CreateStreamInfo(Tune->GetFrameDuration(), *Tune->FindStreamModel());
+       }
+     }
+ 
+diff --git "a/external\\zxtune\\src\\module\\players\\tfm\\tfm_base_stream.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
+index c1905d9..a86b0e4 100644
+--- "a/external\\zxtune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
+@@ -69,7 +69,7 @@ namespace Module::TFM
+ 
+     Information::Ptr GetInformation() const override
+     {
+-      return CreateStreamInfo(FrameDuration, Data);
++      return CreateStreamInfo(FrameDuration, *Data);
+     }
+ 
+     Parameters::Accessor::Ptr GetProperties() const override
+@@ -79,7 +79,7 @@ namespace Module::TFM
+ 
+     TFM::DataIterator::Ptr CreateDataIterator() const override
+     {
+-      auto iter = CreateStreamStateIterator(FrameDuration, Data);
++      auto iter = CreateStreamStateIterator(FrameDuration, *Data);
+       return MakePtr<StreamDataIterator>(std::move(iter), Data);
+     }
+ 
+diff --git "a/external\\zxtune\\src\\module\\players\\xsf\\gsf_rom.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\xsf\\gsf_rom.cpp"
+index d485284..9476d71 100644
+--- "a/external\\zxtune\\src\\module\\players\\xsf\\gsf_rom.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\module\\players\\xsf\\gsf_rom.cpp"
+@@ -18,6 +18,7 @@
+ 
+ namespace Module::GSF
+ {
++  // Some details at https://github.com/loveemu/gsfopt/blob/master/src/gsfopt.cpp
+   class RomParser : public Formats::Chiptune::GameBoyAdvanceSoundFormat::Builder
+   {
+   public:
+@@ -27,15 +28,68 @@ namespace Module::GSF
+ 
+     void SetEntryPoint(uint32_t addr) override
+     {
+-      if (addr && !Rom.EntryPoint)
++      if (addr)
+       {
+-        Rom.EntryPoint = addr;
++        addr = FixEntrypoint(addr);
++        Require(addr == EWRAM_START || addr == PAKROM_START);
++        if (!Rom.EntryPoint)
++        {
++          Rom.EntryPoint = addr;
++        }
++        else
++        {
++          Require(Rom.EntryPoint == addr);
++        }
+       }
+     }
+ 
+     void SetRom(uint32_t address, Binary::View content) override
+     {
+-      Rom.Content.Update(address & 0x1fffffff, content);
++      const auto entryArea = GetArea(Rom.EntryPoint);
++      Require(entryArea != Area::Unknown);
++      const auto realAddress = Rom.EntryPoint + (address & static_cast<uint32_t>(entryArea));
++      Rom.Content.Update(realAddress, content);
++    }
++
++  private:
++    // https://www.coranac.com/tonc/text/hardware.htm
++    static constexpr uint32_t EWRAM_START = 0x02000000;
++    static constexpr uint32_t EWRAM_SIZE = 0x40000;
++    static constexpr uint32_t PAKROM_START = 0x08000000;
++    static constexpr uint32_t PAKROM_SIZE = 0x02000000;
++
++    static uint32_t FixEntrypoint(uint32_t addr)
++    {
++      switch (addr)
++      {
++      case 0x80000000:  // Crash Bandicoot 2
++        return PAKROM_START;
++      default:
++        return addr;
++      }
++    }
++
++    enum class Area : uint32_t
++    {
++      Unknown,
++      Multiboot = EWRAM_SIZE - 1,
++      Rom = PAKROM_SIZE - 1
++    };
++
++    static Area GetArea(uint32_t addr)
++    {
++      if (addr >= EWRAM_START && addr < EWRAM_START + EWRAM_SIZE)
++      {
++        return Area::Multiboot;
++      }
++      else if (addr >= PAKROM_START && addr < PAKROM_START + PAKROM_SIZE)
++      {
++        return Area::Rom;
++      }
++      else
++      {
++        return Area::Unknown;
++      }
+     }
+ 
+   private:
 diff --git "a/external\\zxtune\\src\\parameters\\identifier.h" "b/source\\Replays\\ZXTune\\src\\parameters\\identifier.h"
 index b3fcebb..e00755e 100644
 --- "a/external\\zxtune\\src\\parameters\\identifier.h"
@@ -547,6 +947,17 @@ index 0e9b40e..dd64704 100644
    }
  
    String FormatTime(uint_t hours, uint_t minutes, uint_t seconds, uint_t frames);
+diff --git "a/external\\zxtune\\src\\strings\\prefixed_index.h" "b/source\\Replays\\ZXTune\\src\\strings\\prefixed_index.h"
+index d6ddaa4..73daeb8 100644
+--- "a/external\\zxtune\\src\\strings\\prefixed_index.h"
++++ "b/source\\Replays\\ZXTune\\src\\strings\\prefixed_index.h"
+@@ -49,4 +49,4 @@ namespace Strings
+     const bool Valid;
+     const std::size_t Index;
+   };
+-}  // namespace Strings
++}  // namespace Strings
+\ No newline at end of file
 diff --git "a/external\\zxtune\\src\\strings\\src\\encoding.cpp" "b/source\\Replays\\ZXTune\\src\\strings\\src\\encoding.cpp"
 index 0f3c38f..945988d 100644
 --- "a/external\\zxtune\\src\\strings\\src\\encoding.cpp"
@@ -578,3 +989,14 @@ index 0f3c38f..945988d 100644
      {
        const uint32_t sym = needSwap ? swapBytes(*it) : (*it);
        ++it;
+diff --git "a/external\\zxtune\\src\\strings\\src\\prefixed_index.cpp" "b/source\\Replays\\ZXTune\\src\\strings\\src\\prefixed_index.cpp"
+index 33f549c..3ff215f 100644
+--- "a/external\\zxtune\\src\\strings\\src\\prefixed_index.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\strings\\src\\prefixed_index.cpp"
+@@ -35,4 +35,4 @@ namespace Strings
+   {
+     return PrefixedIndex(prefix.to_string() + ConvertFrom(index), true, index);
+   }
+-}  // namespace Strings
++}  // namespace Strings
+\ No newline at end of file
