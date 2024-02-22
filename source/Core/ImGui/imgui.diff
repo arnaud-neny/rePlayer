@@ -41,7 +41,7 @@ index d556cba..676f65f 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index e99a84e..7a3c8aa 100644
+index c2df670..dbd6fa0 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
 @@ -580,7 +580,7 @@ namespace ImGui
@@ -54,7 +54,7 @@ index e99a84e..7a3c8aa 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 1a02470..034b120 100644
+index 602fde6..fd79b06 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
 @@ -2241,8 +2241,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
@@ -70,7 +70,7 @@ index 1a02470..034b120 100644
      }
  
      return wanted;
-@@ -6177,7 +6179,9 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
+@@ -6181,7 +6183,9 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -82,7 +82,7 @@ index 1a02470..034b120 100644
      if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
          return false;
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 0b5dc5b..2c29462 100644
+index 1ddf4c7..778e772 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 @@ -2419,7 +2419,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
