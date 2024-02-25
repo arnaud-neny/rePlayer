@@ -15,6 +15,12 @@ namespace core
         return stbsp_snprintf(buf, N, fmt, std::forward<Arguments>(args)...);
     }
 
+    template <typename... Arguments>
+    inline int32_t sprintf(char *buf, size_t bufSize, char const* fmt, Arguments... args)
+    {
+        return stbsp_snprintf(buf, int(bufSize), fmt, std::forward<Arguments>(args)...);
+    }
+
     inline std::string ToLower(const std::string& src)
     {
         std::string dst;
