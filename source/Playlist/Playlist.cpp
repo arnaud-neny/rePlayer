@@ -1612,15 +1612,16 @@ namespace rePlayer
                 };
 
                 auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(newFile.c_str()));
-                if (std::filesystem::is_directory(path))
+                std::error_code ec;
+                if (std::filesystem::is_directory(path, ec))
                 {
-                    for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path))
+                    for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path, ec))
                     {
-                        if (dir_entry.is_regular_file())
+                        if (dir_entry.is_regular_file(ec))
                             addFile(dir_entry.path());
                     }
                 }
-                else if (std::filesystem::is_regular_file(path))
+                else if (std::filesystem::is_regular_file(path, ec))
                     addFile(path);
             }
 
