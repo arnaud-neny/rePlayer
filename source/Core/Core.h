@@ -42,9 +42,9 @@ namespace core
         return reinterpret_cast<T*>(ReAlloc(ptr, size, alignof(T)));
     }
 
-    inline void Free(void* ptr)
+    inline void Free(const void* ptr)
     {
-        _aligned_free(ptr);
+        _aligned_free(const_cast<void*>(ptr));
     }
 
     /**
