@@ -363,7 +363,7 @@ namespace rePlayer
         return changed;
     }
 
-    std::string ReplayUADE::GetFileFilters()
+    Array<std::pair<std::string, std::string>> ReplayUADE::GetFileFilters()
     {
         auto file = fopen("eagleplayer.conf", "rb"); // fopen will fallback on stdioemu_fopen (inside our uade.7z)
         fseek(file, 0, SEEK_END);
@@ -375,64 +375,40 @@ namespace rePlayer
         auto buf = conf.Items();
         auto end = buf + conf.NumItems();
 
-        std::string fileFilter;
+        Array<std::pair<std::string, std::string>> fileFilters;
         while (buf < end)
         {
-            if (!fileFilter.empty())
-                fileFilter += ",";
+            auto& fileFilter = fileFilters.Push<std::pair<std::string, std::string>&>();
+
             // eagleplayer name
             auto txt = buf;
             while (*txt != 9)
             {
-                fileFilter += *txt;
+                fileFilter.first += *txt;
                 txt++;
             }
-            fileFilter += " (*.";
             buf = strstr(txt + 1, "prefixes=") + sizeof("prefixes=") - 1;
             txt = buf;
-            uint32_t count = 0;
             do
             {
                 if (*txt == ',')
                 {
                     *txt++;
-                    if (++count == 5)
-                    {
-                        fileFilter += ";...";
-                        break;
-                    }
-                    else
-                        fileFilter += ";*.";
+                    fileFilter.second += ";";
                 }
                 while (*txt != ',' && *txt != 9 && *txt != 0xa && *txt != 0xd)
                 {
-                    fileFilter += *txt;
+                    fileFilter.second += *txt;
                     txt++;
                 }
             } while (*txt != 9 && *txt != 0xa && *txt != 0xd);
-            fileFilter += "){.";
-            txt = buf;
-            do
-            {
-                if (*txt == ',')
-                {
-                    *txt++;
-                    fileFilter += ",.";
-                }
-                while (*txt != ',' && *txt != 9 && *txt != 0xa && *txt != 0xd)
-                {
-                    fileFilter += *txt;
-                    txt++;
-                }
-            } while (*txt != 9 && *txt != 0xa && *txt != 0xd);
-            fileFilter += "}";
             while (*txt != 0xa)
                 txt++;
             buf = txt + 1;
         }
-        fileFilter += ",TFMX-MOD (*.tfx;*.tfm){.tfx,.tfm}";
-        fileFilter += ",YMST (*.ymst){.ymst}";
-        return fileFilter;
+        fileFilters.Add({ "TFMX-MOD", "tfx;tfm" });
+        fileFilters.Add({ "YMST", "ymst" });
+        return fileFilters;
     }
 
     void ReplayUADE::Settings::Edit(ReplayMetadataContext& context)

@@ -19,7 +19,7 @@ namespace rePlayer
 
         static bool DisplaySettings();
 
-        static std::string GetFileFilters();
+        static Array<std::pair<std::string, std::string>> GetFileFilters();
 
         struct Settings : public Command<Settings, eReplay::UADE>
         {

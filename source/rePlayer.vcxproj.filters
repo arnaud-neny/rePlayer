@@ -39,6 +39,9 @@
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{268ba054-7211-4ff0-b48b-e49b84498563}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{784d96b5-210a-46c7-8e89-05a87f7cf265}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -169,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Library\Sources\URLImport.cpp">
       <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\FileSelector.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +363,9 @@
     </ClInclude>
     <ClInclude Include="Library\Sources\URLImport.h">
       <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\FileSelector.h">
+      <Filter>Source Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

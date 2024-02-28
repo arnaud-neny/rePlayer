@@ -17,7 +17,7 @@ namespace rePlayer
 
         static bool DisplaySettings();
 
-        static std::string GetFileFilters();
+        static Array<std::pair<std::string, std::string>> GetFileFilters();
 
     public:
         ~ReplayAdLib() override;

@@ -143,5 +143,11 @@ namespace rePlayer
 #define ImGuiIconMediaLoopPlaylist "\xee\x80\x86"
 #define ImGuiIconMediaLoopSingle "\xee\x80\x87"
 #define ImGuiIconMediaMenu "\xee\x80\x88"
+#define ImGuiIconPrev "\xee\x80\x89"
+#define ImGuiIconNext "\xee\x80\x8a"
+#define ImGuiIconRefresh "\xee\x80\x87"
+#define ImGuiIconFolder "\xee\x80\x8b"
+#define ImGuiIconFile "\xee\x80\x8c"
+#define ImGuiIconDrive "\xee\x80\x8d"
 
 #include "Core.inl.h"

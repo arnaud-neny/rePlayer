@@ -154,6 +154,7 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
     <ClCompile Include="RePlayer\CoreVersion.cpp" />
     <ClCompile Include="RePlayer\Replays.cpp" />
     <ClCompile Include="RePlayer\Settings.cpp" />
+    <ClCompile Include="UI\FileSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Database\Database.h" />
@@ -218,6 +219,7 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
     <ClInclude Include="RePlayer\Settings.h" />
     <ClInclude Include="RePlayer\Version.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="UI\FileSelector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

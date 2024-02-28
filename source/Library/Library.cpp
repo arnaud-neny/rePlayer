@@ -4,7 +4,6 @@
 #include <Core/Window.inl.h>
 #include <Imgui.h>
 #include <ImGui/imgui_internal.h>//ImGui::GetCurrentTable for first row height
-#include <ImGui/ImGuiFileDialog.h>
 #include <IO/File.h>
 #include <IO/StreamFile.h>
 
@@ -27,6 +26,7 @@
 #include <Library/Sources/ZXArt.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/FileSelector.h>
 
 #include "Library.h"
 
@@ -362,67 +362,39 @@ namespace rePlayer
 
     void Library::UpdateImports()
     {
+        bool isImportArtistsOpened = false;
+        bool isImportSongsOpened = false;
+        bool isImportFilesOpened = false;
         if (ImGui::BeginPopup("Import"))
         {
             if (ImGui::Selectable("Artists"))
             {
                 m_imports = {};
-                m_importArtists.isOpened = true;
+                m_importArtists.isOpened = isImportArtistsOpened = true;
+                Core::Lock();
                 ImGui::CloseCurrentPopup();
             }
             if (ImGui::Selectable("Songs"))
             {
                 m_imports = {};
-                m_importSongs.isOpened = true;
+                m_importSongs.isOpened = isImportSongsOpened = true;
+                Core::Lock();
                 ImGui::CloseCurrentPopup();
             }
             if (ImGui::Selectable("Files"))
             {
-                std::string filters = "All Files (*.*){.*},";
-                filters += Core::GetReplays().GetFileFilters();
-                IGFD::FileDialogConfig fileDialogConfig;
-                fileDialogConfig.path = m_lastFileDialogPath;
-                fileDialogConfig.countSelectionMax = 0;
-                fileDialogConfig.flags = ImGuiFileDialogFlags_DisableCreateDirectoryButton | ImGuiFileDialogFlags_NoDialog;
-                auto* fileDialog = ImGuiFileDialog::Instance();
-                fileDialog->OpenDialog("ImportFiles", "Import Files", filters.c_str(), fileDialogConfig);
-                auto* groupName = reinterpret_cast<const char*>(ICON_IGFD_SHORTCUTS " Places");
-                if (fileDialog->GetPlacesGroupPtr(groupName) == nullptr)
-                {
-                    fileDialog->AddPlacesGroup(groupName,1 , false);
-                    auto* places = fileDialog->GetPlacesGroupPtr(groupName);
-                    auto addKnownFolderAsPlace = [places](const GUID& knownFolder, const char* folderLabel, const char8_t* folderIcon)
-                    {
-                        PWSTR path = nullptr;
-                        HRESULT hr = SHGetKnownFolderPath(knownFolder, 0, NULL, &path);
-                        if (SUCCEEDED(hr))
-                        {
-                            IGFD::FileStyle style;
-                            style.icon = reinterpret_cast<const char*>(folderIcon);
-                            auto placePath = IGFD::Utils::UTF8Encode(path);
-                            places->AddPlace(folderLabel, placePath, false, style);
-                        }
-                        ::CoTaskMemFree(path);
-                    };
-                    addKnownFolderAsPlace(FOLDERID_Desktop, "Desktop", ICON_IGFD_DESKTOP);
-                    addKnownFolderAsPlace(FOLDERID_Startup, "Startup", ICON_IGFD_HOME);
-                    places->AddPlaceSeparator(3.0f);
-                    addKnownFolderAsPlace(FOLDERID_Downloads, "Downloads", ICON_IGFD_DOWNLOADS);
-                    addKnownFolderAsPlace(FOLDERID_Pictures, "Pictures", ICON_IGFD_PICTURE);
-                    addKnownFolderAsPlace(FOLDERID_Music, "Music", ICON_IGFD_MUSIC);
-                    addKnownFolderAsPlace(FOLDERID_Videos, "Videos", ICON_IGFD_FILM);
-                }
-
+                FileSelector::Open(m_lastFileDialogPath);
+                isImportFilesOpened = true;
+                Core::Lock();
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
         }
-        auto isImportFilesOpened = ImGuiFileDialog::Instance()->IsOpened("ImportFiles");
         if (isImportFilesOpened)
             ImGui::OpenPopup("Import Files");
-        else if (m_importArtists.isOpened)
+        if (isImportArtistsOpened)
             ImGui::OpenPopup("Import Artists");
-        else if (m_importSongs.isOpened)
+        else if (isImportSongsOpened)
             ImGui::OpenPopup("Import Songs");
 
         ImGui::BeginDisabled(m_isBusy);
@@ -431,6 +403,7 @@ namespace rePlayer
 
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
+        isImportSongsOpened = m_importSongs.isOpened;
         if (ImGui::BeginPopupModal("Import Songs", &m_importSongs.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
             ImGui::BeginBusy(m_isBusy);
@@ -473,108 +446,110 @@ namespace rePlayer
 
             ImGui::EndPopup();
         }
+        if (isImportArtistsOpened && !m_importSongs.isOpened)
+            Core::Unlock();
 
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
-        if (ImGui::BeginPopupModal("Import Files", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
+        isImportFilesOpened = FileSelector::IsOpened();
+        if (ImGui::BeginPopupModal("Import Files", &isImportFilesOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
             ImGui::BeginBusy(m_isBusy);
-            if (ImGuiFileDialog::Instance()->Display("ImportFiles", ImGuiWindowFlags_NoCollapse, ImVec2(0, 0), ImVec2(0, 0)))
+            if (auto files = FileSelector::Display())
             {
-                if (ImGuiFileDialog::Instance()->IsOk())
+                // database will be updated in the worker, so freeze it to avoid concurrency
+                m_db.Freeze();
+                m_isBusy = true;
+                Core::AddJob([this, files = std::move(files.value())]()
                 {
-                    // database will be updated in the worker, so freeze it to avoid concurrency
-                    m_db.Freeze();
-                    m_isBusy = true;
-                    Core::AddJob([this]()
+                    for (auto& path : files)
                     {
-                        for (auto& path : ImGuiFileDialog::Instance()->GetSelection())
+                        auto filename = path.u8string();
+                        auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(filename.c_str()));
+                        if (stream.IsInvalid())
+                            continue;
+
+                        auto fileSize = static_cast<uint32_t>(stream->GetSize());
+                        if (fileSize == 0)
+                            continue;
+
+                        auto moduleData = stream->Read();
+
+                        // search if it has already been added
+                        auto fileCrc = crc32(0L, Z_NULL, 0);
+                        fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
+                        for (auto* song : m_db.Songs())
                         {
-                            auto stream = io::StreamFile::Create(path.second.c_str());
-                            if (stream.IsInvalid())
-                                continue;
-
-                            auto fileSize = static_cast<uint32_t>(stream->GetSize());
-                            if (fileSize == 0)
-                                continue;
-
-                            auto moduleData = stream->Read();
-
-                            // search if it has already been added
-                            auto fileCrc = crc32(0L, Z_NULL, 0);
-                            fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
-                            for (auto* song : m_db.Songs())
+                            if (song->GetFileSize() == fileSize && song->GetFileCrc() == fileCrc)
                             {
-                                if (song->GetFileSize() == fileSize && song->GetFileCrc() == fileCrc)
+                                auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
+                                Array<uint8_t> otherData;
+                                otherData.Resize(file.GetSize());
+                                file.Read(otherData.Items(), otherData.Size());
+                                if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
                                 {
-                                    auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
-                                    Array<uint8_t> otherData;
-                                    otherData.Resize(file.GetSize());
-                                    file.Read(otherData.Items(), otherData.Size());
-                                    if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
+                                    Core::FromJob([this, filename, song = SmartPtr<Song>(song)]()
                                     {
-                                        Core::FromJob([this, path, song = SmartPtr<Song>(song)]()
-                                        {
-                                            Log::Warning("File \"%s\" already imported as \"[%s]%s\"\n", path.second.c_str(), song->GetType().GetExtension(), m_db.GetTitleAndArtists(song->GetId()).c_str());
-                                        });
+                                        Log::Warning("File \"%s\" already imported as \"[%s]%s\"\n", reinterpret_cast<const char*>(filename.c_str()), song->GetType().GetExtension(), m_db.GetTitleAndArtists(song->GetId()).c_str());
+                                    });
 
-                                        stream.Reset();
-                                        break;
-                                    }
+                                    stream.Reset();
+                                    break;
                                 }
                             }
-
-                            if (stream.IsInvalid())
-                                continue;
-
-                            Core::FromJob([path]()
-                            {
-                                Log::Message("Import: \"%s\"\n", path.second.c_str());
-                            });
-
-                            auto* song = new SongSheet;
-                            auto* dbSong = m_db.AddSong(song);
-
-                            // guess the song type
-                            std::string songName = path.first.c_str();
-                            auto extOffset = songName.find_last_of('.');
-                            if (extOffset != songName.npos)
-                            {
-                                song->type = { songName.c_str() + extOffset + 1, eReplay::Unknown };
-                                if (song->type.ext != eExtension::Unknown)
-                                    songName.resize(extOffset);
-                            }
-                            song->name = songName;
-
-                            // build the crc of the file
-                            song->fileSize = fileSize;
-                            song->fileCrc = fileCrc;
-
-                            // null source
-                            song->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
-
-                            // save file
-                            auto file = io::File::OpenForWrite(m_songs->GetFullpath(dbSong).c_str());
-                            file.Write(moduleData.Items(), moduleData.Size());
-
-                            m_db.Raise(Database::Flag::kSaveSongs);
                         }
-                        Core::FromJob([this]()
+
+                        if (stream.IsInvalid())
+                            continue;
+
+                        Core::FromJob([filename]()
                         {
-                            m_db.UnFreeze();
-                            ImGuiFileDialog::Instance()->Close();
-                            m_isBusy = false;
+                            Log::Message("Import: \"%s\"\n", reinterpret_cast<const char*>(filename.c_str()));
                         });
+
+                        auto* song = new SongSheet;
+                        auto* dbSong = m_db.AddSong(song);
+
+                        // guess the song type
+                        std::string songName = reinterpret_cast<const char*>(path.filename().u8string().c_str());
+                        auto extOffset = songName.find_last_of('.');
+                        if (extOffset != songName.npos)
+                        {
+                            song->type = { songName.c_str() + extOffset + 1, eReplay::Unknown };
+                            if (song->type.ext != eExtension::Unknown)
+                                songName.resize(extOffset);
+                        }
+                        song->name = songName;
+
+                        // build the crc of the file
+                        song->fileSize = fileSize;
+                        song->fileCrc = fileCrc;
+
+                        // null source
+                        song->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
+
+                        // save file
+                        auto file = io::File::OpenForWrite(m_songs->GetFullpath(dbSong).c_str());
+                        file.Write(moduleData.Items(), moduleData.Size());
+
+                        m_db.Raise(Database::Flag::kSaveSongs);
+                    }
+                    Core::FromJob([this]()
+                    {
+                        m_db.UnFreeze();
+                        m_lastFileDialogPath = FileSelector::Close();
+                        Core::Unlock();
+                        m_isBusy = false;
                     });
-                }
-                else
-                    ImGuiFileDialog::Instance()->Close();
-                m_lastFileDialogPath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                });
             }
-            if (!ImGuiFileDialog::Instance()->IsOpened())
-                ImGui::CloseCurrentPopup();
             ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
             ImGui::EndPopup();
+        }
+        if (!isImportFilesOpened && FileSelector::IsOpened())
+        {
+            m_lastFileDialogPath = FileSelector::Close();
+            Core::Unlock();
         }
         ImGui::EndDisabled();
     }
@@ -583,6 +558,7 @@ namespace rePlayer
     {
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
+        auto isImportArtistsOpened = m_importArtists.isOpened;
         if (ImGui::BeginPopupModal("Import Artists", &m_importArtists.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
             ImGui::BeginBusy(m_isBusy);
@@ -596,6 +572,8 @@ namespace rePlayer
 
             ImGui::EndPopup();
         }
+        if (isImportArtistsOpened && !m_importArtists.isOpened)
+            Core::Unlock();
     }
 
     void Library::FindArtists()
@@ -720,7 +698,6 @@ namespace rePlayer
                                 std::swap(start, end);
                             for (; start <= end; start++)
                                 m_importArtists.states[start].isSelected = true;
-                            state.isSelected = true;
                         }
                         else
                         {

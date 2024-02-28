@@ -6,7 +6,6 @@
 
 #include <Core/String.h>
 #include <Imgui.h>
-#include <ImGui/ImGuiFileDialog.h>
 #include <Xml/tinyxml2.h>
 
 // curl
@@ -62,9 +61,6 @@ namespace rePlayer
         ImGui::Bullet();
         ImGui::TextUnformatted("stb\n"
             "Copyright (c) 2017 Sean Barrett");
-        ImGui::Bullet();
-        ImGui::TextUnformatted("ImGuiFileDialog " IMGUIFILEDIALOG_VERSION "\n"
-            "Copyright (c) 2018-2023 Stephane Cuillerdier (aka Aiekick)");
         ImGui::Bullet();
         ImGui::TextUnformatted("Curl " LIBCURL_VERSION "\n"
             "Copyright (c) " LIBCURL_COPYRIGHT);

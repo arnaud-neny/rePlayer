@@ -37,7 +37,6 @@ namespace rePlayer
         , m_dllManager(new DllManager())
     {
         LoadPlugins();
-        BuildFileFilters();
 
         m_dllManager->EnableDllRedirection();
     }
@@ -49,7 +48,7 @@ namespace rePlayer
 
         delete m_dllManager;
 
-        delete[] m_fileFilters;
+        core::Free(m_fileFilters->data);
 
         for (auto* plugin : m_plugins)
         {
@@ -192,9 +191,11 @@ namespace rePlayer
         }
     }
 
-    const char* const Replays::GetFileFilters() const
+    const Replays::FileFilters& Replays::GetFileFilters() const
     {
-        return m_fileFilters;
+        if (m_fileFilters == nullptr)
+            const_cast<Replays*>(this)->BuildFileFilters();
+        return *m_fileFilters;
     }
 
     void Replays::EditMetadata(eReplay replayId, ReplayMetadataContext& context) const
@@ -327,58 +328,111 @@ namespace rePlayer
 
     void Replays::BuildFileFilters()
     {
-        std::string fileFilters;
-        uint16_t i = 1;
-        for (; i < uint16_t(eReplay::Count) - 1; i++)
+        Array<char> data;
+        Array<uint32_t> filters;
+
         {
-            if (auto plugin = m_sortedPlugins[i])
+            data.Add("All Files (*.*)", sizeof("All Files (*.*)"));
+            data.Resize((data.NumItems() + alignof(uint32_t) - 1) & ~(alignof(uint32_t) - 1));
+            auto filterOffset = data.Push<uint32_t>(sizeof(FileFilters::Filter));
+            filters.Add(filterOffset);
+            auto* filter = data.Items<FileFilters::Filter>(filterOffset);
+            filter->nameOffset = 0;
+            filter->numExtensions = 0;
+        }
+
+        for (uint16_t i = 1; i < uint16_t(eReplay::Count) - 1; i++)
+        {
+            auto buildFileFilter = [&](const char* name, const char* exts)
             {
-                if (!fileFilters.empty())
-                    fileFilters += ',';
-                if (plugin->getFileFilter)
-                    fileFilters += plugin->getFileFilter();
-                else
+                auto nameSize = uint32_t(strlen(name));
+                auto nameOffset = data.Push<uint32_t>(nameSize);
+                memcpy(data.Items(nameOffset), name, nameSize);
+                data.Add(" (", 2);
+
+                Array<FileFilters::Extension> extensions;
+                for (;;)
                 {
-                    fileFilters += plugin->name;
-                    fileFilters += " (";
-                    std::string filter = "{";
-                    int32_t count = 0;
-                    for (auto exts = plugin->extensions;;)
+                    auto ext = exts;
+                    while (*exts && *exts != ';')
+                        ++exts;
+
+                    auto* extension = extensions.Push();
+                    extension->size = exts - ext;
+
+                    if (extensions.NumItems() < 5)
                     {
-                        auto ext = exts;
-                        while (*exts && *exts != ';')
-                            ++exts;
-
-                        if (count < 5)
+                        data.Add("*.", 2);
+                        extension->offset = data.NumItems();
+                        if (*exts)
                         {
-                            fileFilters += "*.";
-                            fileFilters.insert(fileFilters.end(), ext, exts);
-                        }
-
-                        filter += ".";
-                        filter.insert(filter.end(), ext, exts);
-
-                        if (*exts++ == 0)
-                            break;
-
-                        if (++count >= 5)
-                        {
-                            if (count == 5)
-                                fileFilters += ";...";
+                            data.Add(ext, extension->size + 1);
+                            exts++;
                         }
                         else
-                            fileFilters += ';';
-                        filter += ',';
+                        {
+                            data.Add(ext, extension->size);
+                            data.Add(")", 2);
+                            break;
+                        }
                     }
-                    fileFilters += ')';
-                    filter += '}';
-                    fileFilters += filter;
+                    else
+                    {
+                        if (extensions.NumItems() == 5)
+                            data.Add("...)", sizeof("...)"));
+                        extension->offset = data.NumItems();
+                        data.Add(ext, extension->size);
+                        if (*exts)
+                            exts++;
+                        else
+                            break;
+                    }
+                }
+                data.Resize((data.NumItems() + alignof(uint32_t) - 1) & ~(alignof(uint32_t) - 1));
+                auto filterOffset = data.Push<uint32_t>(sizeof(FileFilters::Filter));
+                filters.Add(filterOffset);
+                auto* filter = data.Items<FileFilters::Filter>(filterOffset);
+                filter->nameOffset = nameOffset;
+                filter->numExtensions = extensions.NumItems();
+                data.Add(extensions.Items<char>(), extensions.Size());
+            };
+
+            if (auto plugin = m_sortedPlugins[i])
+            {
+                if (plugin->getFileFilter)
+                {
+                    auto pluginFilters = plugin->getFileFilter();
+
+                    std::string superFilter;
+                    for (auto& pluginFilter : pluginFilters)
+                    {
+                        if (!superFilter.empty())
+                            superFilter += ";";
+                        superFilter += pluginFilter.second;
+                    }
+                    buildFileFilter(plugin->name, superFilter.c_str());
+
+                    for (auto& pluginFilter : pluginFilters)
+                    {
+                        std::string name = plugin->name;
+                        name += ": ";
+                        name += pluginFilter.first;
+                        buildFileFilter(name.c_str(), pluginFilter.second.c_str());
+                    }
+                }
+                else
+                {
+                    buildFileFilter(plugin->name, plugin->extensions);
                 }
             }
         }
-        auto fileFiltersCopy = new char[fileFilters.size()];
-        memcpy(fileFiltersCopy, fileFilters.c_str(), fileFilters.size());
-        m_fileFilters = fileFiltersCopy;
+        data.Resize((data.NumItems() + alignof(FileFilters) - 1) & ~(alignof(FileFilters) - 1));
+        auto fileFiltersOffset = data.Push<uint32_t>(sizeof(FileFilters) - sizeof(uint32_t));
+        data.Add(filters.Items<char>(), filters.Size());
+        auto* fileFilters = data.Items<FileFilters>(fileFiltersOffset);
+        fileFilters->data = data.Detach();
+        fileFilters->numFilters = filters.NumItems();
+        m_fileFilters = fileFilters;
     }
 
     Replay* Replays::Load(ReplayPlugin* plugin, io::Stream* stream, CommandBuffer metadata)

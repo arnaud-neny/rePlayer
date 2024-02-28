@@ -193,33 +193,21 @@ namespace rePlayer
         return changed;
     }
 
-    std::string ReplayAdLib::GetFileFilters()
+    Array<std::pair<std::string, std::string>> ReplayAdLib::GetFileFilters()
     {
-        std::string fileFilter;
+        Array<std::pair<std::string, std::string>> fileFilters;
         for (auto& desc : CAdPlug::players)
         {
-            if (!fileFilter.empty())
-                fileFilter += ",";
-            fileFilter += desc->filetype;
-            fileFilter += " (";
+            auto& fileFilter = fileFilters.Push<std::pair<std::string, std::string>&>();
+            fileFilter.first = desc->filetype;
             for (uint32_t i = 0; desc->get_extension(i); i++)
             {
                 if (i != 0)
-                    fileFilter += ";*";
-                else
-                    fileFilter += "*";
-                fileFilter += desc->get_extension(i);
+                    fileFilter.second += ";";
+                fileFilter.second += desc->get_extension(i) + 1;
             }
-            fileFilter += "){";
-            for (uint32_t i = 0; desc->get_extension(i); i++)
-            {
-                if (i != 0)
-                    fileFilter += ",";
-                fileFilter += desc->get_extension(i);
-            }
-            fileFilter += "}";
         }
-        return fileFilter;
+        return fileFilters;
     }
 
     int32_t ReplayAdLib::ms_surround{ 0 };

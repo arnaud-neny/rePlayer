@@ -44,7 +44,7 @@ namespace rePlayer
 
         bool (*displaySettings)() = [](){ return false; };
 
-        std::string(*getFileFilter)() = nullptr;
+        Array<std::pair<std::string, std::string>> (*getFileFilter)() = nullptr;
 
         void (*editMetadata)(ReplayMetadataContext&) = [](ReplayMetadataContext&) {};
 
