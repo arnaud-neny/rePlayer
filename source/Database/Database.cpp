@@ -191,7 +191,7 @@ namespace rePlayer
         auto* command = new Command;
         command->type = Command::kAddSong;
         command->song = m_songs.AddFrozen(song);
-        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        std::atomic_ref(m_commandHead).exchange(command)->next = command;
         return command->song;
     }
 
@@ -205,7 +205,7 @@ namespace rePlayer
         auto* command = new Command;
         command->type = Command::kRemoveSong;
         command->songId = songId;
-        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        std::atomic_ref(m_commandHead).exchange(command)->next = command;
     }
 
     Artist* Database::AddArtist(ArtistSheet* artist)
@@ -218,7 +218,7 @@ namespace rePlayer
         auto* command = new Command;
         command->type = Command::kAddArtist;
         command->artist = m_artists.AddFrozen(artist);
-        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        std::atomic_ref(m_commandHead).exchange(command)->next = command;
         return command->artist;
     }
 
@@ -232,7 +232,7 @@ namespace rePlayer
         auto* command = new Command;
         command->type = Command::kRemoveArtist;
         command->artistId = artistId;
-        command->next = std::atomic_ref(m_commandHead).exchange(command);
+        std::atomic_ref(m_commandHead).exchange(command)->next = command;
     }
 
     Status Database::LoadSongs(io::File& file)
