@@ -136,7 +136,7 @@ public:
 
 	void	unLoad(void);
 	ymbool	isSeekable(void);
-	ymbool	update(ymsample *pBuffer,ymint nbSample);
+	ymbool	update(ymsample *pBuffer,ymint nbSample,bool bStereo);
 	ymu32	getPos(void);
 	ymu32	getLoop(void);
 	ymu32	getMusicTime(void);
@@ -157,6 +157,8 @@ public:
 	ymint		GetNbFrame()		const	{ return nbFrame; }
 	ymint		GetStreamInc()		const	{ return streamInc; }
 	const ymu8*	GetDataStream()		const	{ return pDataStream; }
+	const ymFile_t getSongType()	const { return songType; }
+	const int getNbVoice()	const { return nbVoice; }
 
 
 //-------------------------------------------------------------
@@ -245,10 +247,10 @@ private:
 // YM-Universal-Tracker
 //-------------------------------------------------------------
 	void	ymTrackerInit(int volMaxPercent);
-	void	ymTrackerUpdate(ymsample *pBuffer,int nbSample);
+	void	ymTrackerUpdate(ymsample *pBuffer,int nbSample,bool bStereo);
 	void	ymTrackerDesInterleave(void);
 	void	ymTrackerPlayer(ymTrackerVoice_t *pVoice);
-	void	ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,ymsample *pBuffer,int nbs);
+	void	ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,ymsample *pBuffer,int nbs,bool bStereo);
 
 	int			nbVoice;
 	ymTrackerVoice_t	ymTrackerVoice[MAX_VOICE];

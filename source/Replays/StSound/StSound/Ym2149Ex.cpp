@@ -169,7 +169,7 @@ ymu32 CYm2149Ex::toneStepCompute(ymu8 rHigh,ymu8 rLow)
 
 	ymint per = rHigh&15;
 	per = (per<<8)+rLow;
-	if (per<=5) 
+	if (per<=5)
 	{
 		return 0;
 	}
@@ -258,14 +258,20 @@ void	CYm2149Ex::reset(void)
 	envPhase = 0;
 	envPos = 0;
 
-	m_dcAdjust.Reset();
+	m_dcAdjust[0].Reset();
+	m_dcAdjust[1].Reset();
+	m_dcAdjust[2].Reset();
 
 	memset(specialEffect,0,sizeof(specialEffect));
 
 	syncBuzzerStop();
 
-	m_lowPassFilter[0] = 0;
-	m_lowPassFilter[1] = 0;
+	m_lowPassFilter[0][0] = 0;
+	m_lowPassFilter[0][1] = 0;
+	m_lowPassFilter[1][0] = 0;
+	m_lowPassFilter[1][1] = 0;
+	m_lowPassFilter[2][0] = 0;
+	m_lowPassFilter[2][1] = 0;
 
 }
 
@@ -316,18 +322,19 @@ void	CYm2149Ex::sidVolumeCompute(ymint voice,ymint *pVol)
 		}
 }
 
-int CYm2149Ex::LowPassFilter(int in)
+int CYm2149Ex::LowPassFilter(int in,int index)
 {
-	const int out = (m_lowPassFilter[0]>>2) + (m_lowPassFilter[1]>>1) + (in>>2);
-	m_lowPassFilter[0] = m_lowPassFilter[1];
-	m_lowPassFilter[1] = in;
+	const int out = (m_lowPassFilter[index][0]>>2) + (m_lowPassFilter[index][1]>>1) + (in>>2);
+	m_lowPassFilter[index][0] = m_lowPassFilter[index][1];
+	m_lowPassFilter[index][1] = in;
 	return out;
 }
 
-ymsample CYm2149Ex::nextSample(void)
+CYm2149Ex::ymsamples CYm2149Ex::nextSample(void)
 {
-ymint vol;
+ymint vol0,vol1,vol2;
 ymint bt,bn;
+ymsamples samples;
 
 		if (noisePos&0xffff0000)
 		{
@@ -346,11 +353,11 @@ ymint bt,bn;
 	// Tone+noise+env+DAC for three voices !
 	//---------------------------------------------------
 		bt = ((((yms32)posA)>>31) | mixerTA) & (bn | mixerNA);
-		vol  = (*pVolA)&bt;
+		vol0  = (*pVolA)&bt;
 		bt = ((((yms32)posB)>>31) | mixerTB) & (bn | mixerNB);
-		vol += (*pVolB)&bt;
+		vol1 = (*pVolB)&bt;
 		bt = ((((yms32)posC)>>31) | mixerTC) & (bn | mixerNC);
-		vol += (*pVolC)&bt;
+		vol2 = (*pVolC)&bt;
 
 	//---------------------------------------------------
 	// Inc
@@ -383,9 +390,16 @@ ymint bt,bn;
 	//---------------------------------------------------
 	// Normalize process
 	//---------------------------------------------------
-		m_dcAdjust.AddSample(vol);
-		const int in = vol - m_dcAdjust.GetDcLevel();
-		return (m_bFilter) ? LowPassFilter(in) : in;
+		m_dcAdjust[0].AddSample(vol0+vol1+vol2);
+		m_dcAdjust[1].AddSample(vol0+vol2);
+		m_dcAdjust[2].AddSample(vol1);
+		const int in0 = vol0+vol1+vol2 - m_dcAdjust[0].GetDcLevel();
+		samples.mono = (m_bFilter) ? LowPassFilter(in0,0) : in0;
+		const int in1 = vol0+vol2 - m_dcAdjust[1].GetDcLevel();
+		samples.left = (m_bFilter) ? LowPassFilter(in1,1) : in1;
+		const int in2 = vol1 - m_dcAdjust[2].GetDcLevel();
+		samples.right = (m_bFilter) ? LowPassFilter(in2,2) : in2;
+		return samples;
 }
 
 
@@ -464,7 +478,7 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 			else
 				pVolA = &volA;
 			break;
-		
+
 		case 9:
 			registers[9] = data&31;
 			volB = ymVolumeTable[data&15];
@@ -473,7 +487,7 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 			else
 				pVolB = &volB;
 			break;
-		
+
 		case 10:
 			registers[10] = data&31;
 			volC = ymVolumeTable[data&15];
@@ -503,17 +517,31 @@ void	CYm2149Ex::writeRegister(ymint reg,ymint data)
 		}
 }
 
-void	CYm2149Ex::update(ymsample *pSampleBuffer,ymint nbSample)
+void	CYm2149Ex::update(ymsample *pSampleBuffer,ymint nbSample,bool bStereo)
 {
 
 		ymsample *pBuffer = pSampleBuffer;
+		ymsamples samples;
 		if (nbSample>0)
 		{
-			do
+			if (bStereo)
 			{
-				*pBuffer++ = nextSample();
+				do
+				{
+					samples = nextSample();
+					*pBuffer++ = samples.left;
+					*pBuffer++ = samples.right;
+				} while (--nbSample);
 			}
-			while (--nbSample);
+			else
+			{
+				do
+				{
+					samples = nextSample();
+					*pBuffer++ = samples.mono;
+					*pBuffer++ = samples.mono;
+				} while (--nbSample);
+			}
 		}
 
 }

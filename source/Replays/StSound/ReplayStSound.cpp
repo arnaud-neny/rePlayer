@@ -26,6 +26,7 @@ namespace rePlayer
         ctx->Init();
 
         window.RegisterSerializedData(ms_isLowpassFilterEnabled, "ReplayStSoundLowpassFilter");
+        window.RegisterSerializedData(ms_surround, "ReplayStSoundSurround");
 
         return false;
     }
@@ -52,6 +53,8 @@ namespace rePlayer
         int32_t index = ms_isLowpassFilterEnabled ? 1 : 0;
         changed |= ImGui::Combo("Lowpass filter", &index, filter, _countof(filter));
         ms_isLowpassFilterEnabled = index != 0;
+        const char* const surround[] = { "Default", "Surround" };
+        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         return changed;
     }
 
@@ -62,11 +65,14 @@ namespace rePlayer
 
         ComboOverride("LowPassFilter", GETSET(entry, overrideLowPassFilter), GETSET(entry, lowPassFilter),
             ms_isLowpassFilterEnabled, "No filter", "Low-pass filter");
+        ComboOverride("Output", GETSET(entry, overrideSurround), GETSET(entry, surround),
+            ms_surround, "Output: Default", "Output: Surround");
 
         context.metadata.Update(entry, entry->value == 0);
     }
 
     bool ReplayStSound::ms_isLowpassFilterEnabled = true;
+    int32_t ReplayStSound::ms_surround = 0;
 
     ReplayStSound::~ReplayStSound()
     {
@@ -76,6 +82,7 @@ namespace rePlayer
     ReplayStSound::ReplayStSound(CYmMusic* module)
         : Replay(eExtension::_ym, eReplay::StSound)
         , m_module(module)
+        , m_surround(kSampleRate)
     {
         module->setLoopMode(YMTRUE);
     }
@@ -95,13 +102,14 @@ namespace rePlayer
         const uint32_t bufferSize = kSampleRate / 50;
 
         auto numSamplesLeft = numSamples;
+        auto isStereo = m_surround.IsEnabled();
         while (numSamplesLeft)
         {
             auto numSamplesToUpdate = Min(bufferSize, numSamplesLeft);
-            auto samples = reinterpret_cast<ymsample*>(output + numSamples) - numSamplesToUpdate;
-            m_module->update(samples, numSamplesToUpdate);
+            auto samples = reinterpret_cast<ymsample*>(output + numSamplesToUpdate) - numSamplesToUpdate * 2;
+            m_module->update(samples, numSamplesToUpdate, isStereo);
+            output = output->Convert(m_surround, samples, numSamplesToUpdate, 100, isStereo ? 1.333f : 1.0f);
             numSamplesLeft -= numSamplesToUpdate;
-            output = output->ConvertMono(samples, numSamplesToUpdate);
             loop = m_module->getLoop();
             if (m_loop != loop)
                 break;
@@ -114,7 +122,10 @@ namespace rePlayer
     uint32_t ReplayStSound::Seek(uint32_t timeInMs)
     {
         if (m_module->isSeekable())
+        {
+            m_surround.Reset();
             return m_module->setMusicTime(timeInMs);
+        }
         return Replay::Seek(timeInMs);
     }
 
@@ -123,12 +134,14 @@ namespace rePlayer
     {
         m_module->stop();
         m_module->play();
+        m_surround.Reset();
     }
 
     void ReplayStSound::ApplySettings(const CommandBuffer metadata)
     {
         auto settings = metadata.Find<Settings>();
         m_module->setLowpassFilter((settings && settings->overrideLowPassFilter) ? settings->lowPassFilter != 0 : ms_isLowpassFilterEnabled);
+        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
     }
 
     void ReplayStSound::SetSubsong(uint16_t /*subsongIndex*/)
@@ -174,7 +187,25 @@ namespace rePlayer
 
     std::string ReplayStSound::GetInfo() const
     {
-        std::string info = "1 channel\n";
+        std::string info;
+
+        auto songType = m_module->getSongType();
+        if ((songType >= YM_MIX1) && (songType < YM_MIXMAX))
+            info = "1 channel\n";
+        else if ((songType >= YM_TRACKER1) && (songType < YM_TRACKERMAX))
+        {
+            auto nbVoice = m_module->getNbVoice();
+            if (nbVoice == 1)
+                info = "1 channel\n";
+            else
+            {
+                char buf[16];
+                sprintf(buf, "%d channels\n", nbVoice);
+                info = buf;
+            }
+        }
+        else
+            info = "3 channels\n";
 
         ymMusicInfo_t ymMusicInfo;
         m_module->getMusicInfo(&ymMusicInfo);

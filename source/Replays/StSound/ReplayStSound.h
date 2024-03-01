@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Replay.inl.h>
+#include <Audio/Surround.h>
 
 class CYmMusic;
 
@@ -24,6 +25,8 @@ namespace rePlayer
                 {
                     uint32_t overrideLowPassFilter : 1;
                     uint32_t lowPassFilter : 1;
+                    uint32_t overrideSurround : 1;
+                    uint32_t surround : 1;
                 };
             };
 
@@ -59,6 +62,8 @@ namespace rePlayer
         CYmMusic* m_module;
         uint32_t m_loop = 0;
         static bool ms_isLowpassFilterEnabled;
+        Surround m_surround;
+        static int32_t ms_surround;
     };
 }
 // namespace rePlayer

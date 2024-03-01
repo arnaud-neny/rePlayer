@@ -51,7 +51,7 @@ static	const ymint	mfpPrediv[8] = {0,4,10,16,50,64,100,200};
 
 
 CYmMusic::CYmMusic(ymint _replayRate) :
-    ymChip(ATARI_CLOCK, 1, _replayRate)
+	ymChip(ATARI_CLOCK, 1, _replayRate)
 {
 	pBigMalloc = NULL;
 	pSongName = NULL;
@@ -243,10 +243,10 @@ const char	*CYmMusic::getLastError(void)
 
 void	bufferClear(ymsample *pBuffer,ymint nbSample)
 {
-		memset((void*)pBuffer,0,nbSample*sizeof(ymsample));
+		memset((void*)pBuffer,0,nbSample*sizeof(ymsample)*2);
 }
 
-ymbool	CYmMusic::update(ymsample *sampleBuffer,ymint nbSample)
+ymbool	CYmMusic::update(ymsample *sampleBuffer,ymint nbSample,bool bStereo)
 {
 ymint sampleToCompute;
 ymint	vblNbSample;
@@ -271,7 +271,7 @@ ymint	vblNbSample;
 		}
 		else if ((songType >= YM_TRACKER1) && (songType<YM_TRACKERMAX))
 		{
-			ymTrackerUpdate(sampleBuffer,nbSample);
+			ymTrackerUpdate(sampleBuffer,nbSample,bStereo);
 		}
 		else
 		{
@@ -292,8 +292,8 @@ ymint	vblNbSample;
 				}
 				if (sampleToCompute>0)
 				{
-					ymChip.update(pOut,sampleToCompute);	// YM Emulation.
-					pOut += sampleToCompute;
+					ymChip.update(pOut,sampleToCompute,bStereo);	// YM Emulation.
+					pOut += sampleToCompute*2;
 				}
 				nbs -= sampleToCompute;
 			}
@@ -637,6 +637,7 @@ void	CYmMusic::stDigitMix(ymsample *pWrite16,ymint nbs)
 			sa += (((sb-sa)*frac)>>12);
 #endif
 			*pWrite16++ = sa;
+			*pWrite16++ = sa;
 
 			currentPos += currentPente;
 			if (currentPos>=currentSampleLength)
@@ -724,7 +725,7 @@ ymTrackerLine_t *pLine;
 
 		pLine = (ymTrackerLine_t*)pDataStream;
 		pLine += (currentFrame*nbVoice);
-	  	for (i=0;i<nbVoice;i++)
+		for (i=0;i<nbVoice;i++)
 		{
 			ymint n;
 			pVoice[i].sampleFreq = ((ymint)pLine->freqHigh<<8) | pLine->freqLow;
@@ -765,7 +766,7 @@ ymTrackerLine_t *pLine;
 }
 
 
-void	CYmMusic::ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,ymsample *pBuffer,ymint nbs)
+void	CYmMusic::ymTrackerVoiceAdd(ymTrackerVoice_t *pVoice,ymsample *pBuffer,ymint nbs,bool bStereo)
 {
 ymsample *pVolumeTab;
 ymu8 *pSample;
@@ -801,6 +802,10 @@ double	step;
 			va += (((vb-va)*frac)>>YMTPREC);
 #endif
 			(*pBuffer++) += va;
+			if (bStereo)
+				pBuffer++;
+			else
+				(*pBuffer++) += va;
 
 			samplePos += sampleInc;
 			if (samplePos>=sampleEnd)
@@ -820,13 +825,13 @@ double	step;
 		pVoice->samplePos = samplePos;
 }
 
-void	CYmMusic::ymTrackerUpdate(ymsample *pBuffer,ymint nbSample)
+void	CYmMusic::ymTrackerUpdate(ymsample *pBuffer,ymint nbSample,bool bStereo)
 {
 ymint i;
 ymint _nbs;
 
 		// Clear les buffers.
-		memset(pBuffer,0,sizeof(ymsample)*nbSample);
+		memset(pBuffer,0,sizeof(ymsample)*nbSample*2);
 		if (bMusicOver) return;
 
 		do
@@ -846,9 +851,9 @@ ymint _nbs;
 				// Genere les samples.
 				for (i=0;i<nbVoice;i++)
 				{
-					ymTrackerVoiceAdd(&ymTrackerVoice[i],pBuffer,_nbs);
+					ymTrackerVoiceAdd(&ymTrackerVoice[i],pBuffer+(bStereo?i&1:0),_nbs,bStereo);
 				}
-				pBuffer += _nbs;
+				pBuffer += _nbs*2;
 				nbSample -= _nbs;
 			}
 		}

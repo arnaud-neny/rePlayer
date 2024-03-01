@@ -97,7 +97,7 @@ public:
 		~CYm2149Ex();
 
 		void	reset(void);
-		void	update(ymsample *pSampleBuffer,ymint nbSample);
+		void	update(ymsample *pSampleBuffer,ymint nbSample,bool bStereo);
 
 		void	setClock(ymu32 _clock);
 		void	writeRegister(ymint reg,ymint value);
@@ -113,12 +113,18 @@ public:
 		void	setFilter(ymbool bFilter)		{ m_bFilter = bFilter; }
 
 private:
+		struct ymsamples
+		{
+			ymsample mono;
+			ymsample left;
+			ymsample right;
+		};
 
-		CDcAdjuster		m_dcAdjust;
+		CDcAdjuster		m_dcAdjust[3];
 
 		ymu32	frameCycle;
 		ymu32	cyclePerSample;
-		inline	ymsample nextSample(void);
+		inline	ymsamples nextSample(void);
 		ymu32 toneStepCompute(ymu8 rHigh,ymu8 rLow);
 		ymu32 noiseStepCompute(ymu8 rNoise);
 		ymu32 envStepCompute(ymu8 rHigh,ymu8 rLow);
@@ -128,7 +134,7 @@ private:
 		ymu32	rndCompute(void);
 
 		void	sidVolumeCompute(ymint voice,ymint *pVol);
-		inline int		LowPassFilter(int in);
+		inline int		LowPassFilter(int in,int index);
 
 		ymint	replayFrequency;
 		ymu32	internalClock;
@@ -161,7 +167,7 @@ private:
 		ymu32	syncBuzzerPhase;
 		ymint	syncBuzzerShape;
 
-		int		m_lowPassFilter[2];
+		int		m_lowPassFilter[3][2];
 		ymbool	m_bFilter;
 };
 
