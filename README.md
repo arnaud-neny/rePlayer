@@ -159,7 +159,6 @@ Or add some comments (and likes) there:
 ### System 3rd parties:
 - [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
 - [stb](https://github.com/nothings/stb): for the optimized sprintf.
-- [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog): a file dialog for ImGui.
 - [Curl](https://curl.se): library for transferring data with URLs.
 - [Tidy Html](https://www.html-tidy.org): to correct and cleanup html (for better parsing).
 - [TinyXML-2](https://github.com/leethomason/tinyxml2): to parse xml.

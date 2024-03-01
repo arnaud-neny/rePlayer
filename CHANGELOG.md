@@ -1,9 +1,9 @@
-v0.13.1 (Khatchadour's Release):
+v0.13.2 (Khatchadour's Release):
 - Added Direct Stream Digital
 - Added WavePack
 - Updated ProTrekkr to 2.6.6
 - Updated ImGui to 1.90.4
-- Updated ImGuiFileDialog to 0.6.7 fixed with icons
+- Removed ImGuiFileDialog
 - Bug fixes
 
 v0.12.7:
@@ -30,7 +30,7 @@ v0.12.7:
 - New job system to remove blocking tasks (removed interface freezes, asynchronous files check, less thread creation/deletion spam...)
 - Bug fixes
 
-v0.11.1:
+v0.11.1 (Speedvicio's Release):
 - Added Furnace
 - Updated SNDH-Player to 0.72
 - Bug fixes

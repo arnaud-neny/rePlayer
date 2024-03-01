@@ -5,7 +5,6 @@
   To merge newer versions, replace imgui files in source\Core\ImGui and run batch DiffApplyImGui.bat (this will apply our changes to ImGui).  
   Then copy the imgui folder in rePlayer\external and run batch DiffMakeImGui.bat (this will create a patch file from the new version).
 - stb (sprintf): https://github.com/nothings/stb
-- ImGuiFileDialog: https://github.com/aiekick/ImGuiFileDialog
 - Curl: https://curl.se/windows
 - Tidy Html: https://www.html-tidy.org/developer
 - TinyXML-2: https://github.com/leethomason/tinyxml2
