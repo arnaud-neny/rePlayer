@@ -48,7 +48,8 @@ namespace rePlayer
 
         delete m_dllManager;
 
-        core::Free(m_fileFilters->data);
+        if (m_fileFilters)
+            core::Free(m_fileFilters->data);
 
         for (auto* plugin : m_plugins)
         {
