@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** DSDPACK ****                            //
 //         Lossless DSD (Direct Stream Digital) Audio Compressor          //
-//                Copyright (c) 2013 - 2016 David Bryant.                 //
+//                Copyright (c) 2013 - 2024 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -27,10 +27,8 @@ static int init_dsd_block_high (WavpackStream *wps, WavpackMetadata *wpmd);
 static int decode_fast (WavpackStream *wps, int32_t *output, int sample_count);
 static int decode_high (WavpackStream *wps, int32_t *output, int sample_count);
 
-int init_dsd_block (WavpackContext *wpc, WavpackMetadata *wpmd)
+int init_dsd_block (WavpackStream *wps, WavpackMetadata *wpmd)
 {
-    WavpackStream *wps = wpc->streams [wpc->current_stream];
-
     if (wpmd->byte_length < 2)
         return FALSE;
 
@@ -40,7 +38,12 @@ int init_dsd_block (WavpackContext *wpc, WavpackMetadata *wpmd)
     if (*wps->dsd.byteptr > 31)
         return FALSE;
 
-    wpc->dsd_multiplier = 1U << *wps->dsd.byteptr++;
+    // safe to cast away const on stream 0 only
+    if (!wps->stream_index)
+        ((WavpackContext *)wps->wpc)->dsd_multiplier = 1U << *wps->dsd.byteptr++;
+    else
+        wps->dsd.byteptr++;
+
     wps->dsd.mode = *wps->dsd.byteptr++;
 
     if (!wps->dsd.mode) {
@@ -60,9 +63,8 @@ int init_dsd_block (WavpackContext *wpc, WavpackMetadata *wpmd)
         return FALSE;
 }
 
-int32_t unpack_dsd_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count)
+int32_t unpack_dsd_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_count)
 {
-    WavpackStream *wps = wpc->streams [wpc->current_stream];
     uint32_t flags = wps->wphdr.flags;
 
     // don't attempt to decode past the end of the block, but watch out for overflow!
@@ -91,11 +93,18 @@ int32_t unpack_dsd_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sampl
         }
         else if (!decode_high (wps, buffer, sample_count))
             wps->mute_error = TRUE;
+
+        // If we just finished this block, then it's time to check if the applicable checksum matches. Like
+        // other decoding errors, this is indicated by setting the mute_error flag.
+
+        if (wps->sample_index + sample_count == GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples &&
+            !wps->mute_error && wps->crc != wps->wphdr.crc)
+                wps->mute_error = TRUE;
     }
 
     if (wps->mute_error) {
         int samples_to_null;
-        if (wpc->reduced_channels == 1 || wpc->config.num_channels == 1 || (flags & MONO_FLAG))
+        if (wps->wpc->reduced_channels == 1 || wps->wpc->config.num_channels == 1 || (flags & MONO_FLAG))
             samples_to_null = sample_count;
         else
             samples_to_null = sample_count * 2;

@@ -14,7 +14,7 @@ namespace rePlayer
         .replayId = eReplay::WavPack,
         .name = "WavPack",
         .extensions = "wv",
-        .about = "WavPack " PACKAGE_VERSION "\nCopyright (c) 1998-2022 David Bryant",
+        .about = "WavPack " PACKAGE_VERSION "\nCopyright (c) 1998-2024 David Bryant",
         .load = ReplayWavPack::Load
     };
 

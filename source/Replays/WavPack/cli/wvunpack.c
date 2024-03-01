@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2022 David Bryant.                 //
+//                Copyright (c) 1998 - 2024 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@
 
 static const char *sign_on = "\n"
 " WVUNPACK  Hybrid Lossless Audio Decompressor  %s Version %s\n"
-" Copyright (c) 1998 - 2022 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2024 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVUNPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -95,6 +95,9 @@ static const char *usage =
 "          -q  = quiet (keep console output to a minimum)\n"
 "          -s  = display summary information only to stdout (no audio decode)\n"
 "          -ss = display super summary (including tags) to stdout (no decode)\n"
+#ifdef ENABLE_THREADS
+"          --threads = use multiple threads for faster operation\n"
+#endif
 "          -v  = verify source data only (no output file created)\n"
 "          -vv = quick verify (no output, version 5+ files only)\n"
 "          --help = complete help\n\n"
@@ -179,6 +182,10 @@ static const char *help =
 "                          start decoding at specified sample/time\n"
 "                           (specifying a '-' makes sample/time relative to end)\n"
 "    -t                    copy input file's time stamp to output file(s)\n"
+#ifdef ENABLE_THREADS
+"    --threads[=n]         use multiple threads for faster operation, optional\n"
+"                           'n' must be 1 - 12, 1 = single thread only\n"
+#endif
 "    --until=[+|-][sample|hh:mm:ss.ss]\n"
 "                          stop decoding at specified sample/time\n"
 "                           (adding '+' makes sample/time relative to '--skip'\n"
@@ -231,9 +238,10 @@ static struct {
 int debug_logging_mode;
 
 static int overwrite_all, delete_source, raw_decode, raw_pcm, normalize_floats, no_utf8_convert, no_audio_decode, file_info, summary,
-    ignore_wvc, quiet_mode, calc_md5, copy_time, blind_decode, decode_format, format_specified, caf_be, aif_le, set_console_title;
+    ignore_wvc, quiet_mode, calc_md5, copy_time, blind_decode, decode_format, format_specified, caf_be, aif_le, set_console_title,
+    worker_threads;
 
-static int num_files, file_index, outbuf_k;
+static int num_files, file_index;
 
 static struct sample_time_index {
     int value_is_time, value_is_relative, value_is_valid;
@@ -260,10 +268,6 @@ static void display_progress (double file_progress);
 static void TextToUTF8 (void *string, int len);
 #endif
 
-#define WAVPACK_NO_ERROR    0
-#define WAVPACK_SOFT_ERROR  1
-#define WAVPACK_HARD_ERROR  2
-
 // The "main" function for the command-line WavPack decompressor. Note that on Windows
 // this is actually a static function that is called from the "real" main() defined
 // immediately afterward that converts the wchar argument list into UTF-8 strings
@@ -285,7 +289,8 @@ int main(int argc, char **argv)
 #if defined(_WIN32)
     if (!GetModuleFileName (NULL, selfname, sizeof (selfname)))
 #endif
-    strncpy (selfname, *argv, sizeof (selfname));
+    strncpy (selfname, *argv, sizeof (selfname) - 1);
+    selfname [sizeof (selfname) - 1] = '\0';
 
     if (filespec_name (selfname)) {
         char *filename = filespec_name (selfname);
@@ -380,6 +385,23 @@ int main(int argc, char **argv)
                     error_line ("invalid --until parameter!");
                     ++error_count;
                 }
+            }
+            else if (!strncmp (long_option, "threads", 7)) {            // --threads
+#ifdef ENABLE_THREADS
+                if (isdigit (*long_param)) {
+                    // "worker_threads" doesn't include main thread, so subtract 1 from user value
+                    worker_threads = strtol (long_param, &long_param, 10) - 1;
+
+                    if (worker_threads < 0 || worker_threads > 11) {
+                        error_line ("specified thread count must be 1 - 12!");
+                        ++error_count;
+                    }
+                }
+                else
+                    worker_threads = 4;             // 4 is a good default for 5.1
+#else
+                error_line ("warning: --threads not enabled, ignoring option!");
+#endif
             }
             else if (!strcmp (long_option, "caf-be")) {                 // --caf-be
                 decode_format = WP_FORMAT_CAF;
@@ -488,15 +510,6 @@ int main(int argc, char **argv)
                     case 'S': case 's':
                         no_audio_decode = 1;
                         ++summary;
-                        break;
-
-                    case 'K': case 'k':
-                        outbuf_k = strtol (++argcp, &argcp, 10);
-
-                        if (outbuf_k < 1 || outbuf_k > 16384)       // range-check for reasonable values
-                            outbuf_k = 0;
-
-                        --argcp;
                         break;
 
                     case 'M': case 'm':
@@ -1169,7 +1182,7 @@ static int quick_verify_file (char *infilename, int verbose)
     double dtime, progress = -1.0;
     WavpackHeader wphdr, wphdr_c;
     unsigned char *block_buffer;
-    FILE *infile, *infile_c;
+    FILE *infile, *infile_c = NULL;
     uint32_t bytes_skipped;
 
 #if defined(__WATCOMC__)
@@ -1586,6 +1599,9 @@ static int unpack_file (char *infilename, char *outfilename, int add_extension)
         open_flags |= OPEN_DSD_AS_PCM | OPEN_ALT_TYPES;
     else
         open_flags |= OPEN_DSD_NATIVE | OPEN_ALT_TYPES;
+
+    if (worker_threads)
+        open_flags |= worker_threads << OPEN_THREADS_SHFT;
 
     wpc = WavpackOpenFileInput (infilename, error, open_flags, 0);
 
@@ -2070,15 +2086,15 @@ static int unpack_file (char *infilename, char *outfilename, int add_extension)
     return result;
 }
 
-#define TEMP_BUFFER_SAMPLES 4096L   // composite samples in temporary buffer used during unpacking
+#define TEMP_BUFFER_SAMPLES 4096L   // composite samples in temporary buffer used during unpacking (single-threaded)
 
 static int unpack_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsigned char *md5_digest, int64_t *sample_count)
 {
     unsigned char *output_buffer = NULL, *output_pointer = NULL, *new_channel_order = NULL;
     int bps = WavpackGetBytesPerSample (wpc), num_channels = WavpackGetNumChannels (wpc);
+    uint32_t output_buffer_size = 0, temp_buffer_samples = TEMP_BUFFER_SAMPLES, bcount;
     int64_t until_samples_total = *sample_count, total_unpacked_samples = 0;
     int bytes_per_sample = bps * num_channels, result = WAVPACK_NO_ERROR;
-    uint32_t output_buffer_size = 0, bcount;
     double progress = -1.0;
     int32_t *temp_buffer;
     MD5_CTX md5_context;
@@ -2086,12 +2102,18 @@ static int unpack_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsigned
     if (md5_digest)
         MD5_Init (&md5_context);
 
-    if (outfile) {
-        if (outbuf_k)
-            output_buffer_size = outbuf_k * 1024;
+    if (worker_threads) {
+        if (num_channels <= 2)
+            temp_buffer_samples = (worker_threads + 1) * 48000;
         else
-            output_buffer_size = 1024 * 256;
+            temp_buffer_samples = 48000;
 
+        while (temp_buffer_samples * num_channels > 8388608 / sizeof (int32_t))
+            temp_buffer_samples >>= 1;
+    }
+
+    if (outfile) {
+        output_buffer_size = temp_buffer_samples * bytes_per_sample;
         output_pointer = output_buffer = malloc (output_buffer_size);
 
         if (!output_buffer) {
@@ -2114,7 +2136,7 @@ static int unpack_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsigned
         }
     }
 
-    temp_buffer = malloc (TEMP_BUFFER_SAMPLES * num_channels * sizeof (temp_buffer [0]));
+    temp_buffer = malloc (temp_buffer_samples * num_channels * sizeof (temp_buffer [0]));
 
     while (result == WAVPACK_NO_ERROR) {
         uint32_t samples_to_unpack, samples_unpacked;
@@ -2122,11 +2144,11 @@ static int unpack_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsigned
         if (output_buffer) {
             samples_to_unpack = (output_buffer_size - (uint32_t)(output_pointer - output_buffer)) / bytes_per_sample;
 
-            if (samples_to_unpack > TEMP_BUFFER_SAMPLES)
-                samples_to_unpack = TEMP_BUFFER_SAMPLES;
+            if (samples_to_unpack > temp_buffer_samples)
+                samples_to_unpack = temp_buffer_samples;
         }
         else
-            samples_to_unpack = TEMP_BUFFER_SAMPLES;
+            samples_to_unpack = temp_buffer_samples;
 
         if (until_samples_total && samples_to_unpack > until_samples_total - total_unpacked_samples)
             samples_to_unpack = (uint32_t) (until_samples_total - total_unpacked_samples);
@@ -2229,7 +2251,7 @@ static const unsigned char bit_reverse_table [] = {
 static int unpack_dsd_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsigned char *md5_digest, int64_t *sample_count)
 {
     unsigned char *output_buffer = NULL, *new_channel_order = NULL;
-    int num_channels = WavpackGetNumChannels (wpc), result = WAVPACK_NO_ERROR;
+    int num_channels = WavpackGetNumChannels (wpc), result = WAVPACK_NO_ERROR, dsd_blocks = 1;
     int64_t until_samples_total = *sample_count, total_unpacked_samples = 0;
     uint32_t output_buffer_size = 0, bcount;
     double progress = -1.0;
@@ -2238,6 +2260,9 @@ static int unpack_dsd_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsi
 
     if (md5_digest)
         MD5_Init (&md5_context);
+
+    if (worker_threads && num_channels <= 2)
+        dsd_blocks = (worker_threads + 1) * 12;
 
     output_buffer_size = DSD_BLOCKSIZE * num_channels;
     output_buffer = malloc (output_buffer_size);
@@ -2261,10 +2286,11 @@ static int unpack_dsd_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsi
         }
     }
 
-    temp_buffer = malloc (DSD_BLOCKSIZE * num_channels * sizeof (temp_buffer [0]));
+    temp_buffer = malloc (DSD_BLOCKSIZE * dsd_blocks * num_channels * sizeof (temp_buffer [0]));
 
     while (result == WAVPACK_NO_ERROR) {
-        uint32_t samples_to_unpack = DSD_BLOCKSIZE, samples_unpacked;
+        uint32_t samples_to_unpack = DSD_BLOCKSIZE * dsd_blocks, samples_unpacked;
+        int32_t *sptr = temp_buffer;
 
         if (until_samples_total && samples_to_unpack > until_samples_total - total_unpacked_samples)
             samples_to_unpack = (uint32_t) (until_samples_total - total_unpacked_samples);
@@ -2272,12 +2298,15 @@ static int unpack_dsd_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsi
         samples_unpacked = WavpackUnpackSamples (wpc, temp_buffer, samples_to_unpack);
         total_unpacked_samples += samples_unpacked;
 
+        if (!samples_unpacked)
+            break;
+
         if (new_channel_order)
             unreorder_channels (temp_buffer, new_channel_order, num_channels, samples_unpacked);
 
-        if (samples_unpacked) {
+        while (samples_unpacked) {
+            uint32_t samples_this_block = samples_unpacked > DSD_BLOCKSIZE ? DSD_BLOCKSIZE : samples_unpacked;
             unsigned char *dptr = output_buffer;
-            int32_t *sptr = temp_buffer;
 
             if (qmode & QMODE_DSD_IN_BLOCKS) {
                 int cc = num_channels;
@@ -2286,36 +2315,42 @@ static int unpack_dsd_audio (WavpackContext *wpc, FILE *outfile, int qmode, unsi
                     uint32_t si;
 
                     for (si = 0; si < DSD_BLOCKSIZE; si++, sptr += num_channels)
-                        if (si < samples_unpacked)
+                        if (si < samples_this_block)
                             *dptr++ = (qmode & QMODE_DSD_LSB_FIRST) ? bit_reverse_table [*sptr & 0xff] : *sptr;
                         else
                             *dptr++ = 0;
 
-                    sptr -= (DSD_BLOCKSIZE * num_channels) - 1;
+                    if (cc)
+                        sptr -= (DSD_BLOCKSIZE * num_channels) - 1;
+                    else
+                        sptr -= num_channels - 1;
                 }
 
-                samples_unpacked = DSD_BLOCKSIZE;   // make sure we MD5 and write the whole block even if partial (last)
+                samples_this_block = DSD_BLOCKSIZE;   // make sure we MD5 and write the whole block even if partial (last)
             }
             else {
-                int scount = samples_unpacked * num_channels;
+                int scount = samples_this_block * num_channels;
 
                 while (scount--)
                     *dptr++ = *sptr++;
             }
 
             if (md5_digest)
-                MD5_Update (&md5_context, output_buffer, samples_unpacked * num_channels);
+                MD5_Update (&md5_context, output_buffer, samples_this_block * num_channels);
 
-            if (outfile && (!DoWriteFile (outfile, output_buffer, samples_unpacked * num_channels, &bcount) ||
-                bcount != samples_unpacked * num_channels)) {
+            if (outfile && (!DoWriteFile (outfile, output_buffer, samples_this_block * num_channels, &bcount) ||
+                bcount != samples_this_block * num_channels)) {
                     error_line ("can't write .WAV data, disk probably full!");
                     DoTruncateFile (outfile);
                     result = WAVPACK_HARD_ERROR;
                     break;
                 }
+
+            if (samples_this_block < samples_unpacked)
+                samples_unpacked -= samples_this_block;
+            else
+                samples_unpacked = 0;
         }
-        else
-            break;
 
         if (check_break ()) {
 #if defined(_WIN32)
@@ -3343,7 +3378,7 @@ static void UTF8ToAnsi (char *string, int len)
     int max_chars = (int) strlen (string);
 #if defined (_WIN32)
     wchar_t *temp = malloc ((max_chars + 1) * 2);
-    int act_chars = UTF8ToWideChar (string, temp);
+    int act_chars = UTF8ToWideChar ((unsigned char *) string, temp);
 
     while (act_chars) {
         memset (string, 0, len);

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2022 David Bryant.                 //
+//                Copyright (c) 1998 - 2024 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,9 @@
 // utilities and the self-extraction module.
 
 #if defined(_WIN32)
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500 /* for GetConsoleWindow() */
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <io.h>
@@ -578,10 +580,12 @@ void finish_line (void)
 
     if (hConIn && GetConsoleScreenBufferInfo (hConIn, &coninfo) &&
         (coninfo.dwCursorPosition.X || coninfo.dwCursorPosition.Y)) {
-            unsigned char spaces = coninfo.dwSize.X - coninfo.dwCursorPosition.X;
-
-            while (spaces--)
-                fputc (' ', stderr);
+            DWORD spaces = coninfo.dwSize.X - coninfo.dwCursorPosition.X, written;
+            COORD cpos;
+            cpos.X = coninfo.dwCursorPosition.X;
+            cpos.Y = coninfo.dwCursorPosition.Y;
+            FillConsoleOutputCharacter (hConIn, ' ', spaces, cpos, &written);
+            fprintf (stderr, "\n");
     }
     else
         fprintf (stderr, "                                \n");

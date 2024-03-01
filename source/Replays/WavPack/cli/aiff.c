@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2022 David Bryant.                 //
+//                Copyright (c) 1998 - 2024 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -22,10 +22,6 @@
 #include "utils.h"
 #include "md5.h"
 
-#define WAVPACK_NO_ERROR    0
-#define WAVPACK_SOFT_ERROR  1
-#define WAVPACK_HARD_ERROR  2
-
 #pragma pack(push,2)
 typedef struct {
     uint16_t numChannels;
@@ -34,7 +30,7 @@ typedef struct {
     uint16_t sampleRateExponent;
     uint64_t sampleRateMantissa;
     char compressionType [4];
-    char compressionName [256-22];
+    char compressionName [512];
 } CommonChunk;
 #pragma pack(pop)
 
@@ -257,7 +253,7 @@ int ParseAiffHeaderConfig (FILE *infile, char *infilename, char *fourcc, Wavpack
             int bytes_per_frame;
 
             if (!common_chunks || chunk_header.ckSize < sizeof (sound_chunk)      ||
-                (!version_chunks && aiff_chunk_header.formType [3] == 'C')        ||
+             /* (!version_chunks && aiff_chunk_header.formType [3] == 'C')        || */
                 !DoReadFile (infile, &sound_chunk, sizeof (sound_chunk), &bcount) ||
                 bcount != sizeof (sound_chunk)) {
                     error_line ("%s is not a valid .AIF%c file!", infilename, aiff_chunk_header.formType [3]);
@@ -271,12 +267,30 @@ int ParseAiffHeaderConfig (FILE *infile, char *infilename, char *fourcc, Wavpack
 
             WavpackBigEndianToNative (&sound_chunk, SoundChunkFormat);
 
-            if (sound_chunk.offset || sound_chunk.blockSize) {
-                error_line ("%s is an unsupported .AIF%c format!", infilename, aiff_chunk_header.formType [3]);
-                return WAVPACK_SOFT_ERROR;
+            // The "offset" and "blockSize" fields are normally zero, and we don't handle any kind of crazy
+            // alignment rules. However, we CAN handle a simple small "offset" (by adding it to the sound
+            // chunk) and a "blockSize" that matches the actual block size (can't complain about that).
+
+            if (sound_chunk.offset > 65536 || (sound_chunk.blockSize != 0 &&
+                sound_chunk.blockSize != config->bytes_per_sample * config->num_channels)) {
+                    error_line ("%s is an unsupported .AIF%c format!", infilename, aiff_chunk_header.formType [3]);
+                    return WAVPACK_SOFT_ERROR;
             }
 
-            data_chunk_size = chunk_header.ckSize - sizeof (sound_chunk);
+            if (sound_chunk.offset) {
+                unsigned char *offset_data = malloc (sound_chunk.offset);
+
+                if (!DoReadFile (infile, offset_data, sound_chunk.offset, &bcount) || bcount != sound_chunk.offset ||
+                    (!(config->qmode & QMODE_NO_STORE_WRAPPER) && !WavpackAddWrapper (wpc, offset_data, sound_chunk.offset))) {
+                        error_line ("%s", WavpackGetErrorMessage (wpc));
+                        free (offset_data);
+                        return WAVPACK_SOFT_ERROR;
+                }
+
+                free (offset_data);
+            }
+
+            data_chunk_size = chunk_header.ckSize - sizeof (sound_chunk) - sound_chunk.offset;
             bytes_per_frame = config->bytes_per_sample * config->num_channels;
 
             if (infilesize && !(config->qmode & QMODE_IGNORE_LENGTH) && infilesize - data_chunk_size > 16777216) {
