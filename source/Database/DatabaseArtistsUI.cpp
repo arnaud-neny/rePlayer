@@ -237,41 +237,41 @@ namespace rePlayer
                         masterArtistSheet->realName = mergedArtist->GetRealName();
                     for (size_t j = 0, mergedSize = mergedArtist->NumHandles(), masterSize = masterArtistSheet->handles.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;;)
+                        for (size_t i = 0;; ++i)
                         {
-                            if (strcmp(mergedArtist->GetHandle(j), masterArtistSheet->handles[i].Items()) == 0)
-                                break;
-                            if (++i == masterSize)
+                            if (i == masterSize)
                             {
                                 masterArtistSheet->handles.Add(mergedArtist->GetHandle(j));
                                 break;
                             }
+                            if (strcmp(mergedArtist->GetHandle(j), masterArtistSheet->handles[i].Items()) == 0)
+                                break;
                         }
                     }
                     for (size_t j = 0, mergedSize = mergedArtist->NumCountries(), masterSize = masterArtistSheet->countries.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;;)
+                        for (size_t i = 0;; ++i)
                         {
-                            if (mergedArtist->GetCountry(j) == masterArtistSheet->countries[i])
-                                break;
-                            if (++i == masterSize)
+                            if (i == masterSize)
                             {
                                 masterArtistSheet->countries.Add(mergedArtist->GetCountry(j));
                                 break;
                             }
+                            if (mergedArtist->GetCountry(j) == masterArtistSheet->countries[i])
+                                break;
                         }
                     }
                     for (size_t j = 0, mergedSize = mergedArtist->NumGroups(), masterSize = masterArtistSheet->groups.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;;)
+                        for (size_t i = 0;; ++i)
                         {
-                            if (strcmp(mergedArtist->GetGroup(j), masterArtistSheet->groups[i].Items()) == 0)
-                                break;
-                            if (++i == masterSize)
+                            if (i == masterSize)
                             {
                                 masterArtistSheet->groups.Add(mergedArtist->GetGroup(j));
                                 break;
                             }
+                            if (strcmp(mergedArtist->GetGroup(j), masterArtistSheet->groups[i].Items()) == 0)
+                                break;
                         }
                     }
                     if (m_databaseId == DatabaseID::kLibrary)
