@@ -1,7 +1,8 @@
-v0.13.2 (Khatchadour's Release):
+v0.13.3 (Khatchadour's Release):
 - Added Direct Stream Digital
 - Added WavePack
 - Updated ProTrekkr to 2.6.6
+- Updated StSound with surround
 - Updated ImGui to 1.90.4
 - Removed ImGuiFileDialog
 - Bug fixes
