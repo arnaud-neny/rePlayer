@@ -446,7 +446,7 @@ namespace rePlayer
 
             ImGui::EndPopup();
         }
-        if (isImportArtistsOpened && !m_importSongs.isOpened)
+        if (isImportSongsOpened && !m_importSongs.isOpened)
             Core::Unlock();
 
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
