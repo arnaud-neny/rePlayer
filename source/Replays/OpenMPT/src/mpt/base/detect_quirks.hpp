@@ -37,7 +37,7 @@
 
 
 
-#if MPT_COMPILER_MSVC && MPT_MSVC_AT_LEAST(2022, 6) && MPT_ARCH_AARCH64
+#if MPT_COMPILER_MSVC && MPT_MSVC_AT_LEAST(2022, 6) && MPT_MSVC_BEFORE(2022, 8) && MPT_ARCH_AARCH64
 // VS2022 17.6.0 ARM64 gets confused about alignment in std::bit_cast (or equivalent code),
 // causing an ICE.
 // See <https://developercommunity.visualstudio.com/t/ICE-when-compiling-for-ARM64-due-to-alig/10367205>.
@@ -266,7 +266,7 @@
 #elif MPT_LIBCXX_GNU
 #define MPT_LIBCXX_QUIRK_NO_CHRONO_DATE_PARSE
 #endif
-#if MPT_LIBCXX_MS && (MPT_MSVC_BEFORE(2022, 7) || !MPT_COMPILER_MSVC)
+#if MPT_LIBCXX_MS && (MPT_MSVC_BEFORE(2022, 9) || !MPT_COMPILER_MSVC)
 // Causes massive memory leaks.
 // See
 // <https://developercommunity.visualstudio.com/t/stdchronoget-tzdb-list-memory-leak/1644641>

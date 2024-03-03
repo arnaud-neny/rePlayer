@@ -1115,7 +1115,7 @@ double module_impl::set_position_seconds( double seconds ) {
 				subsong = &subsongs[i];
 				break;
 			}
-			base_seconds += subsong->duration;
+			base_seconds += subsongs[i].duration;
 		}
 		seconds -= base_seconds;
 	} else {
@@ -1889,16 +1889,16 @@ std::string module_impl::ctl_get_text( std::string_view ctl, bool throw_if_unkno
 	// rePlayer begin
 	} else if (ctl == "vblank") {
 		switch (m_ctl_vblank) {
-			case -1:
-				return "auto";
-			case 0:
-				return "disable";
-			case 1:
-				return "enable";
-			default:
-				return std::string();
+		case -1:
+			return "auto";
+		case 0:
+			return "disable";
+		case 1:
+			return "enable";
+		default:
+			return std::string();
 		}
-	// rePlayer end
+		// rePlayer end
 	} else {
 		MPT_ASSERT_NOTREACHED();
 		return std::string();

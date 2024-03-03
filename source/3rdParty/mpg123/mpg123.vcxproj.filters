@@ -7,6 +7,12 @@
     <Filter Include="compat">
       <UniqueIdentifier>{817ad378-1ba8-4a88-8f3a-bbe8e62a3466}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{25c40178-477f-48ce-840d-fdba9e7c9c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{4e3aa243-eac4-4eab-b3cb-1463808b23de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\libmpg123\dct64.c">
@@ -91,6 +97,33 @@
     </ClInclude>
     <ClInclude Include="src\compat\wpathconv.h">
       <Filter>compat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\abi_align.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\debug.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\sample.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\swap_bytes_impl.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\true.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\fmt123.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\mpg123.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\out123.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\syn123.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
