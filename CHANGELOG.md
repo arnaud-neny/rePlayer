@@ -1,4 +1,4 @@
-v0.13.3 (Khatchadour's Release):
+v0.13.4 (Khatchadour's Release):
 - Added Direct Stream Digital
 - Added WavePack
 - Updated ProTrekkr to 2.6.6
