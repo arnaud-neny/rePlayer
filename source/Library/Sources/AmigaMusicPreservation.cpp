@@ -59,7 +59,8 @@ namespace rePlayer
             kStateArtistGroup,
             kStateSongs,
             kStateSong = 0x10,
-            kStateSongArtists
+            kStateSongArtistsBegin,
+            kStateSongArtistsEnd
         } state = kStateInit;
         int32_t stack = 0;
 
@@ -94,7 +95,7 @@ namespace rePlayer
                         if (xmlStrstr(propChild->content, BAD_CAST"newresult.php?request=groupid&search="))
                             state = kStateArtistGroup;
                     }
-                    else if (state == kStateSongArtists)
+                    else if (state == kStateSongArtistsBegin || state == kStateSongArtistsEnd)
                     {
                         if (xmlStrstr(propChild->content, BAD_CAST"detail.php?view="))
                         {
@@ -179,14 +180,16 @@ namespace rePlayer
                 break;
             case kStateSong:
                 ConvertString(node->content, songs.Last().name);
-                state = kStateSongArtists;
+                state = kStateSongArtistsBegin;
                 break;
-            case kStateSongArtists:
+            case kStateSongArtistsBegin:
                 if (stack == 0)
                 {
                     int32_t modSize;
                     if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
                         ConvertString(node->content, ext);
+                    else
+                        state = kStateSongArtistsEnd;
                 }
                 break;
             default:
@@ -359,6 +362,7 @@ namespace rePlayer
             kStateSongBegin = kStateInit,
             kStateSongEnd,
             kStateArtistBegin,
+            kStateArtistContinue,
             kStateArtistEnd,
         } state = kStateInit;
 
@@ -386,7 +390,7 @@ namespace rePlayer
                             state = kStateSongEnd;
                         }
                     }
-                    else if (state == kStateArtistBegin)
+                    else if (state == kStateArtistBegin || state == kStateArtistContinue)
                     {
                         uint32_t id;
                         if (sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id) == 1)
@@ -414,6 +418,8 @@ namespace rePlayer
                     int32_t modSize;
                     if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
                         ConvertString(node->content, ext);
+                    else
+                        state = kStateArtistContinue;
                 }
                 break;
             case kStateArtistEnd:
