@@ -17,9 +17,6 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{0abdd168-fbfb-4c39-8c87-a69293547762}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Xml">
-      <UniqueIdentifier>{3f315e83-2873-41de-bd52-b4ab49d1cd86}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{c769f356-7db2-4ee3-afd4-e322ca80bfb1}</UniqueIdentifier>
     </Filter>
@@ -90,9 +87,6 @@
     </ClInclude>
     <ClInclude Include="Core.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Xml\tinyxml2.h">
-      <Filter>Source Files\Xml</Filter>
     </ClInclude>
     <ClInclude Include="Core\Window.h">
       <Filter>Source Files\Core</Filter>
@@ -235,9 +229,6 @@
     </ClCompile>
     <ClCompile Include="ImGui.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Xml\tinyxml2.cpp">
-      <Filter>Source Files\Xml</Filter>
     </ClCompile>
     <ClCompile Include="Core\Window.cpp">
       <Filter>Source Files\Core</Filter>

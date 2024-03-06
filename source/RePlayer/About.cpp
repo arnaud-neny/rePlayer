@@ -6,7 +6,6 @@
 
 #include <Core/String.h>
 #include <Imgui.h>
-#include <Xml/tinyxml2.h>
 
 // curl
 #include <curl/curl.h>
@@ -14,11 +13,11 @@
 // libarchive
 #include <libarchive/archive.h>
 
+// libxml
+#include <libxml/xmlversion.h>
+
 // TagLib
 #include <toolkit/taglib.h>
-
-// tidy
-#include <Tidy/tidy.h>
 
 namespace rePlayer
 {
@@ -65,11 +64,8 @@ namespace rePlayer
         ImGui::TextUnformatted("Curl " LIBCURL_VERSION "\n"
             "Copyright (c) " LIBCURL_COPYRIGHT);
         ImGui::Bullet();
-        ImGui::Text("Tidy Html %s\n"
-            "Copyright (c) 1998-2016 World Wide Web Consortium & Dave Raggett", tidyLibraryVersion());
-        ImGui::Bullet();
-        ImGui::Text("TinyXML-2 %u.%u.%u\n"
-            "Copyright (c) Lee Thomason", TINYXML2_MAJOR_VERSION, TINYXML2_MINOR_VERSION, TINYXML2_PATCH_VERSION);
+        ImGui::Text("libxml2 " LIBXML_DOTTED_VERSION "\n"
+            "Copyright (c) 1998-2012 Daniel Veillard");
         ImGui::Bullet();
         ImGui::TextUnformatted("libarchive " ARCHIVE_VERSION_ONLY_STRING);
         ImGui::Bullet();

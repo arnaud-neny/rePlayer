@@ -1,8 +1,6 @@
-#include "ZXArt.h"
-#include "WebHandler.h"
-
 // Core
 #include <Core/Log.h>
+#include <Core/String.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
 #include <JSON/json.hpp>
@@ -11,6 +9,10 @@
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include "ZXArt.h"
+
+// curl
+#include <Curl/curl.h>
 
 // zlib
 #include <zlib.h>
@@ -409,7 +411,7 @@ namespace rePlayer
                 if (zxMusic.contains("year"))
                 {
                     uint32_t year = 0;
-                    sscanf(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
+                    sscanf_s(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
                     song->releaseYear = uint16_t(year);
                 }
                 song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
@@ -566,7 +568,7 @@ namespace rePlayer
 
                         auto* artist = m_db.artists.Push();
                         artist->id = author["id"].get<uint32_t>();
-                        sscanf(author["tunesQuantity"].get<std::string>().c_str(), "%u", &artist->numSongs);
+                        sscanf_s(author["tunesQuantity"].get<std::string>().c_str(), "%u", &artist->numSongs);
 
                         auto title = author["title"].get<std::string>();
                         artist->handles.Set(m_db.strings, title);

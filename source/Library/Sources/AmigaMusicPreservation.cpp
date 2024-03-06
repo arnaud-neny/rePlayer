@@ -1,6 +1,3 @@
-#include "AmigaMusicPreservation.h"
-#include "WebHandler.h"
-
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
@@ -10,6 +7,8 @@
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include "AmigaMusicPreservation.h"
+#include "WebHandler.h"
 
 // zlib
 #include <zlib.h>
@@ -46,12 +45,15 @@ namespace rePlayer
         {
             kStateInit = 0,
             kStateArtistHandleBegin = kStateInit,
+            kStateArtistHandleStep,
             kStateArtistHandleEnd,
             kStateArtistNameBegin,
+            kStateArtistNameStep,
             kStateArtistNameEnd,
             kStateArtistCountries,
             kStateArtistCountry,
             kStateArtistExHandlesBegin,
+            kStateArtistExHandlesStep,
             kStateArtistExHandlesEnd,
             kStateArtistGroups,
             kStateArtistGroup,
@@ -63,111 +65,90 @@ namespace rePlayer
 
         std::string ext;
 
-        void OnReadNode(TidyDoc doc, TidyNode tnod) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
-    void SourceAmigaMusicPreservation::Collector::OnReadNode(TidyDoc doc, TidyNode tnod)
+    void SourceAmigaMusicPreservation::Collector::OnReadNode(xmlNode* node)
     {
         if (state & kStateSong)
             stack++;
-        TidyNode child;
-        for (child = tidyGetChild(tnod); child; child = tidyGetNext(child))
+        for (; node; node = node->next)
         {
-            ctmbstr name = tidyNodeGetName(child);
-            if (name)
+            if (node->type == XML_ELEMENT_NODE)
             {
-                for (TidyAttr attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr))
+                if (state == kStateArtistHandleStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
+                    state = kStateArtistHandleEnd;
+                else if (state == kStateArtistNameStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
+                    state = kStateArtistNameEnd;
+                else if (state == kStateArtistExHandlesStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
+                    state = kStateArtistExHandlesEnd;
+                else for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
                 {
-                    auto attrValue = tidyAttrValue(attr);
-                    if (!attrValue)
-                        continue;
-
                     if (state == kStateArtistCountry)
                     {
-                        if (strstr(name, "img"))
-                        {
-                            auto attrName = tidyAttrName(attr);
-                            if (attrName && strstr(attrName, "title"))
-                                artist.countries.Add(attrValue);
-                        }
+                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"title"))
+                            artist.countries.Add((const char*)propChild->content);
                     }
                     else if (state == kStateArtistGroups)
                     {
-                        if (strstr(attrValue, "newresult.php?request=groupid&amp;search="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"newresult.php?request=groupid&search="))
                             state = kStateArtistGroup;
                     }
                     else if (state == kStateSongArtists)
                     {
-                        if (strstr(attrValue, "detail.php?view="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"detail.php?view="))
                         {
                             uint32_t id;
-                            sscanf_s(attrValue, "detail.php?view=%u", &id);
+                            sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id);
                             songs.Last().artists.Add(id);
                         }
                     }
                     else if (state == kStateSongs)
                     {
-                        if (strstr(attrValue, "downmod.php?index="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"downmod.php?index="))
                         {
                             songs.Add(SourceAmigaMusicPreservation::CollectorSong());
                             stack = 0;
                             state = kStateSong;
-                            sscanf_s(attrValue, "downmod.php?index=%u", &songs.Last().id);
+                            sscanf_s((const char*)propChild->content, "downmod.php?index=%u", &songs.Last().id);
                         }
                     }
                 }
             }
-            else switch (state)
+            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
             {
             case kStateArtistHandleBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Handle:"))
-                        state = kStateArtistHandleEnd;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
+                    state = kStateArtistHandleStep;
                 break;
             case kStateArtistHandleEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     std::string str;
-                    ConvertString(buf, size, str);
+                    ConvertString(node->content, str);
                     artist.handles.Add(std::move(str));
-                });
+                }
                 state = kStateArtistNameBegin;
                 break;
             case kStateArtistNameBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Real&nbsp;Name:"))
-                        state = kStateArtistNameEnd;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Real\xc2\xa0Name:"))
+                    state = kStateArtistNameStep;
                 break;
             case kStateArtistNameEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, artist.name);
-                });
+                ConvertString(node->content, artist.name);
                 state = kStateArtistCountries;
                 break;
             case kStateArtistCountries:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Lived") && strstr(buf, "in:"))
-                        state = kStateArtistCountry;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Lived\xc2\xa0in:"))
+                    state = kStateArtistCountry;
                 break;
             case kStateArtistCountry:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Ex.Handles:"))
-                        state = kStateArtistExHandlesEnd;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Ex.Handles:"))
+                    state = kStateArtistExHandlesStep;
                 break;
             case kStateArtistExHandlesEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     std::string str;
-                    ConvertString(buf, size, str);
+                    ConvertString(node->content, str);
                     auto txt = str.data();
                     while (1)
                     {
@@ -181,47 +162,37 @@ namespace rePlayer
                         else
                             break;
                     }
-                });
+                }
                 state = kStateArtistGroups;
                 break;
             case kStateArtistGroups:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Modules:"))
-                        state = kStateSongs;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Modules:"))
+                    state = kStateSongs;
                 break;
             case kStateArtistGroup:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     std::string str;
-                    ConvertString(buf, size, str);
+                    ConvertString(node->content, str);
                     artist.groups.Add(std::move(str));
-                });
+                }
                 state = kStateArtistGroups;
                 break;
             case kStateSong:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, songs.Last().name);
-                });
+                ConvertString(node->content, songs.Last().name);
                 state = kStateSongArtists;
                 break;
             case kStateSongArtists:
                 if (stack == 0)
                 {
-                    ReadNodeText(doc, child, [this](auto buf, auto size)
-                    {
-                        int32_t modSize;
-                        if (sscanf_s(buf, "%dKb", &modSize) != 1)
-                            ConvertString(buf, size, ext);
-                    });
+                    int32_t modSize;
+                    if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
+                        ConvertString(node->content, ext);
                 }
                 break;
             default:
                 break;
             }
-            OnReadNode(doc, child);
+            OnReadNode(node->children);
         }
         if (state & kStateSong)
         {
@@ -253,137 +224,103 @@ namespace rePlayer
             kStateArtistGroup
         } state = kStateInit;
 
-        void OnReadNode(TidyDoc doc, TidyNode tnod) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
-    void SourceAmigaMusicPreservation::SearchArtist::OnReadNode(TidyDoc doc, TidyNode tnod)
+    void SourceAmigaMusicPreservation::SearchArtist::OnReadNode(xmlNode* node)
     {
-        TidyNode child;
-        for (child = tidyGetChild(tnod); child; child = tidyGetNext(child))
+        for (; node; node = node->next)
         {
-            ctmbstr name = tidyNodeGetName(child);
-            if (name)
+            if (node->type == XML_ELEMENT_NODE)
             {
-                for (TidyAttr attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr))
+                for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
                 {
-                    auto attrValue = tidyAttrValue(attr);
-                    if (!attrValue)
-                        continue;
-
                     if (state == kStateArtistHandleBegin)
                     {
-                        if (strstr(name, "img"))
-                        {
-                            auto attrName = tidyAttrName(attr);
-                            if (attrName && strstr(attrName, "src"))
-                                hasNextPage |= strcmp(attrValue, "images/right.gif") == 0;
-                        }
+                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"src"))
+                            hasNextPage |= xmlStrcmp(propChild->content, BAD_CAST"images/right.gif") == 0;
                     }
                     else if (state == kStateArtistHandleEnd)
                     {
-                        if (strstr(attrValue, "detail.php?view="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"detail.php?view="))
                         {
                             uint32_t id;
-                            sscanf_s(attrValue, "detail.php?view=%u", &id);
+                            sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id);
                             artists.Last().id = SourceID(kID, id);
                         }
                     }
                     else if (state == kStateArtistCountry)
                     {
-                        if (strstr(name, "img"))
+                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"title"))
                         {
-                            auto attrName = tidyAttrName(attr);
-                            if (attrName && strstr(attrName, "title"))
+                            if (isFirstEntry)
                             {
-                                if (isFirstEntry)
-                                {
-                                    artists.Last().description += "\nCountries: ";
-                                    isFirstEntry = false;
-                                }
-                                else
-                                    artists.Last().description += ", ";
-                                artists.Last().description += attrValue;
+                                artists.Last().description += "\nCountries: ";
+                                isFirstEntry = false;
                             }
+                            else
+                                artists.Last().description += ", ";
+                            artists.Last().description += (const char*)propChild->content;
                         }
                     }
                     else if (state == kStateArtistGroups)
                     {
-                        if (strstr(attrValue, "newresult.php?request=groupid&amp;search="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"newresult.php?request=groupid&search="))
                             state = kStateArtistGroup;
                     }
                 }
             }
-            else switch (state)
+            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
             {
             case kStateArtistHandleBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
                 {
-                    if (strstr(buf, "Handle:"))
-                    {
-                        artists.Push();
-                        state = kStateArtistHandleEnd;
-                    }
-                });
+                    artists.Push();
+                    state = kStateArtistHandleEnd;
+                }
                 break;
             case kStateArtistHandleEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, artists.Last().name);
-                });
+                ConvertString(node->content, artists.Last().name);
                 state = kStateArtistNameBegin;
                 break;
             case kStateArtistNameBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Real Name:"))
-                        state = kStateArtistNameEnd;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Real Name:"))
+                    state = kStateArtistNameEnd;
                 break;
             case kStateArtistNameEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     std::string str;
-                    ConvertString(buf, size, str);
+                    ConvertString(node->content, str);
                     artists.Last().description += "Real Name: ";
                     artists.Last().description += str;
-                });
+                }
                 state = kStateArtistCountries;
                 break;
             case kStateArtistCountries:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Country:"))
                 {
-                    if (strstr(buf, "Country:"))
-                    {
-                        isFirstEntry = true;
-                        state = kStateArtistCountry;
-                    }
-                });
+                    isFirstEntry = true;
+                    state = kStateArtistCountry;
+                }
                 break;
             case kStateArtistCountry:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Groups:"))
                 {
-                    if (strstr(buf, "Groups:"))
-                    {
-                        isFirstEntry = true;
-                        state = kStateArtistGroups;
-                    }
-                });
+                    isFirstEntry = true;
+                    state = kStateArtistGroups;
+                }
                 break;
             case kStateArtistGroups:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
                 {
-                    if (strstr(buf, "Handle:"))
-                    {
-                        artists.Push();
-                        state = kStateArtistHandleEnd;
-                    }
-                });
+                    artists.Push();
+                    state = kStateArtistHandleEnd;
+                }
                 break;
             case kStateArtistGroup:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     std::string str;
-                    ConvertString(buf, size, str);
+                    ConvertString(node->content, str);
                     if (isFirstEntry)
                     {
                         artists.Last().description += "\nGroups   : ";
@@ -392,13 +329,13 @@ namespace rePlayer
                     else
                         artists.Last().description += "\n         : ";
                     artists.Last().description += str;
-                });
+                }
                 state = kStateArtistGroups;
                 break;
             default:
                 break;
             }
-            OnReadNode(doc, child);
+            OnReadNode(node->children);
         }
     }
 
@@ -425,34 +362,24 @@ namespace rePlayer
             kStateArtistEnd,
         } state = kStateInit;
 
-        void OnReadNode(TidyDoc doc, TidyNode tnod) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
-    void SourceAmigaMusicPreservation::SearchSong::OnReadNode(TidyDoc doc, TidyNode tnod)
+    void SourceAmigaMusicPreservation::SearchSong::OnReadNode(xmlNode* node)
     {
-        TidyNode child;
-        for (child = tidyGetChild(tnod); child; child = tidyGetNext(child))
+        for (; node; node = node->next)
         {
-            ctmbstr name = tidyNodeGetName(child);
-            if (name)
+            if (node->type == XML_ELEMENT_NODE)
             {
-                for (TidyAttr attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr))
+                for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
                 {
-                    auto attrValue = tidyAttrValue(attr);
-                    if (!attrValue)
-                        continue;
-
                     if (state == kStateSongBegin)
                     {
-                        if (songs.IsEmpty() && strstr(name, "img"))
-                        {
-                            auto attrName = tidyAttrName(attr);
-                            if (attrName && strstr(attrName, "src"))
-                                hasNextPage |= strcmp(attrValue, "images/right.gif") == 0;
-                        }
+                        if (songs.IsEmpty() && xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"src"))
+                            hasNextPage |= xmlStrcmp(propChild->content, BAD_CAST"images/right.gif") == 0;
 
                         uint32_t id;
-                        if (sscanf_s(attrValue, "downmod.php?index=%u", &id))
+                        if (sscanf_s((const char*)propChild->content, "downmod.php?index=%u", &id) == 1)
                         {
                             songs.Push();
                             songs.Last().id = id;
@@ -462,13 +389,13 @@ namespace rePlayer
                     else if (state == kStateArtistBegin)
                     {
                         uint32_t id;
-                        if (sscanf_s(attrValue, "detail.php?view=%u", &id))
+                        if (sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id) == 1)
                         {
                             songs.Last().artist.Push();
                             songs.Last().artist.Last().first = id;
                             state = kStateArtistEnd;
                         }
-                        else if (strstr(attrValue, "analyzer2.php?idx="))
+                        else if (xmlStrstr(propChild->content, BAD_CAST"analyzer2.php?idx="))
                         {
                             songs.Last().ext = ext;
                             state = kStateSongBegin;
@@ -476,34 +403,27 @@ namespace rePlayer
                     }
                 }
             }
-            else switch (state)
+            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
             {
             case kStateSongEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, songs.Last().name);
-                });
+                ConvertString(node->content, songs.Last().name);
                 state = kStateArtistBegin;
                 break;
             case kStateArtistBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
                 {
                     int32_t modSize;
-                    if (sscanf_s(buf, "%dKb", &modSize) != 1)
-                        ConvertString(buf, size, ext);
-                });
+                    if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
+                        ConvertString(node->content, ext);
+                }
                 break;
             case kStateArtistEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, songs.Last().artist.Last().second);
-                });
+                ConvertString(node->content, songs.Last().artist.Last().second);
                 state = kStateArtistBegin;
                 break;
             default:
                 break;
             }
-            OnReadNode(doc, child);
+            OnReadNode(node->children);
         }
     }
 
@@ -598,7 +518,7 @@ namespace rePlayer
                 {
                     artistIndex = results.artists.NumItems<int32_t>();
 
-                    auto createArtist = [artistSourceId](uint32_t artistId, const Collector& collector)
+                    auto createArtist = [artistSourceId](const Collector& collector)
                     {
                         auto* rplArtist = new ArtistSheet();
                         if (collector.artist.name != "n/a" && collector.artist.name != "currently not public")
@@ -620,7 +540,7 @@ namespace rePlayer
                         return rplArtist;
                     };
 
-                    auto* rplArtist = createArtist(artistId, artistId == importedArtistID.internalId ? collector : Collect(artistId));
+                    auto* rplArtist = createArtist(artistId == importedArtistID.internalId ? collector : Collect(artistId));
                     results.artists.Add(rplArtist);
                 }
                 if (artistId == importedArtistID.internalId)//main artist

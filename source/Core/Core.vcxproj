@@ -61,7 +61,6 @@
     <ClInclude Include="Thread\SpinLock.h" />
     <ClInclude Include="Thread\Thread.h" />
     <ClInclude Include="Thread\Workers.h" />
-    <ClInclude Include="Xml\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Blob\Blob.inl.h" />
@@ -94,7 +93,6 @@
     <ClCompile Include="Thread\Semaphore.cpp" />
     <ClCompile Include="Thread\Thread.cpp" />
     <ClCompile Include="Thread\Workers.cpp" />
-    <ClCompile Include="Xml\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Blob\Blob.natvis" />

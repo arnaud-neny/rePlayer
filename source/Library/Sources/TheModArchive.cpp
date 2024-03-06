@@ -1,8 +1,3 @@
-#include "TheModArchive.h"
-#if __has_include("TheModArchiveKey.h")
-#include "TheModArchiveKey.h"
-#endif
-
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
@@ -12,6 +7,10 @@
 #include <Library/Sources/XmlHandler.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include "TheModArchive.h"
+#if __has_include("TheModArchiveKey.h")
+#include "TheModArchiveKey.h"
+#endif
 
 // zlib
 #include <zlib.h>
@@ -39,50 +38,50 @@ namespace rePlayer
         uint32_t mainArtistId = 0;
         std::string name;
 
-        void OnReadXml(const XMLDocument& doc) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
-    void SourceTheModArchive::Collector::OnReadXml(const XMLDocument& doc)
+    void SourceTheModArchive::Collector::OnReadNode(xmlNode* node)
     {
-        auto root = doc.FirstChildElement("modarchive");
+        auto* root = FindNode(node, "modarchive");
         if (!root)
             return;
 
         uint32_t numSongs = 0;
-        if (auto node = root->FirstChildElement("results"))
-            numSongs = node->UnsignedText();
+        if (node = FindChildNode(root, "results"))
+            numSongs = UnsignedText(node);
 
-        if (auto node = root->FirstChildElement("totalpages"))
-            numPages = node->UnsignedText();
+        if (node = FindChildNode(root, "totalpages"))
+            numPages = UnsignedText(node);
 
-        for (auto moduleNode = root->FirstChildElement("module"); moduleNode; moduleNode = moduleNode->NextSiblingElement("module"))
+        for (auto* moduleNode = FindChildNode(root, "module"); moduleNode; moduleNode = NextNode(moduleNode, "module"))
         {
             Song song;
 
-            song.id = moduleNode->FirstChildElement("id")->UnsignedText(0);
+            song.id = UnsignedText(FindChildNode(moduleNode, "id"));
             if (song.id != 0) // sometimes, modarchive returns empty ids... (eg: artist "reed")
             {
-                song.type = Core::GetReplays().Find(GetText(moduleNode->FirstChildElement("format")).c_str());
-                song.name = GetText(moduleNode->FirstChildElement("songtitle"));
+                song.type = Core::GetReplays().Find(Text(FindChildNode(moduleNode, "format")).c_str());
+                song.name = Text(FindChildNode(moduleNode, "songtitle"));
                 song.name += "@";
-                song.name += GetText(moduleNode->FirstChildElement("filename"));
+                song.name += Text(FindChildNode(moduleNode, "filename"));
 
-                auto artistsNode = moduleNode->FirstChildElement("artist_info");
-                for (auto node = artistsNode->FirstChildElement("artist"); node; node = node->NextSiblingElement("artist"))
+                auto* artistsNode = FindChildNode(moduleNode, "artist_info");
+                for (node = FindChildNode(artistsNode, "artist"); node; node = NextNode(node, "artist"))
                 {
                     std::pair<uint32_t, std::string> artist;
-                    artist.first = node->FirstChildElement("id")->UnsignedText();
-                    artist.second = GetText(node->FirstChildElement("alias"));
+                    artist.first = UnsignedText(FindChildNode(node, "id"));
+                    artist.second = Text(FindChildNode(node, "alias"));
                     if (artist.first == mainArtistId)
                         song.artists.Insert(0, std::move(artist));
                     else
                         song.artists.Add(std::move(artist));
                 }
-                for (auto node = artistsNode->FirstChildElement("guessed_artist"); node; node = node->NextSiblingElement("guessed_artist"))
+                for (node = FindChildNode(artistsNode, "guessed_artist"); node; node = NextNode(node, "guessed_artist"))
                 {
                     std::pair<uint32_t, std::string> artist;
                     artist.first = 0xffFFff;
-                    artist.second = GetText(node->FirstChildElement("alias"));
+                    artist.second = Text(FindChildNode(node, "alias"));
                     if (artist.second == name)
                         song.artists.Insert(0, std::move(artist));
                     else
@@ -103,29 +102,29 @@ namespace rePlayer
 
         uint32_t numPages = 0;
 
-        void OnReadXml(const XMLDocument& doc);
+        void OnReadNode(xmlNode* node);
     };
 
-    void SourceTheModArchive::SearchArtist::OnReadXml(const XMLDocument& doc)
+    void SourceTheModArchive::SearchArtist::OnReadNode(xmlNode* node)
     {
-        auto root = doc.FirstChildElement("modarchive");
+        auto root = FindNode(node, "modarchive");
         if (!root)
             return;
 
         uint32_t numArtists = 0;
-        if (auto node = root->FirstChildElement("results"))
-            numArtists = node->UnsignedText();
+        if (node = FindChildNode(root, "results"))
+            numArtists = UnsignedText(node);
 
-        if (auto node = root->FirstChildElement("totalpages"))
-            numPages = node->UnsignedText();
+        if (node = FindChildNode(root, "totalpages"))
+            numPages = UnsignedText(node);
 
-        if (auto itemsNode = root->FirstChildElement("items"))
+        if (auto* itemsNode = FindChildNode(root, "items"))
         {
-            for (auto itemNode = itemsNode->FirstChildElement("item"); itemNode; itemNode = itemNode->NextSiblingElement("item"))
+            for (auto* itemNode = FindChildNode(itemsNode, "item"); itemNode; itemNode = NextNode(itemNode, "item"))
             {
                 artists.Push();
-                artists.Last().id = SourceID(kID, itemNode->FirstChildElement("id")->UnsignedText(0));
-                artists.Last().name= GetText(itemNode->FirstChildElement("alias"));
+                artists.Last().id = SourceID(kID, UnsignedText(FindChildNode(itemNode, "id")));
+                artists.Last().name = Text(FindChildNode(itemNode, "alias"));
                 artists.Last().description = "Our Roster";
 
                 numArtists--;
@@ -140,29 +139,29 @@ namespace rePlayer
 
         uint32_t numPages = 0;
 
-        void OnReadXml(const XMLDocument& doc);
+        void OnReadNode(xmlNode* node);
     };
 
-    void SourceTheModArchive::SearchGuessedArtist::OnReadXml(const XMLDocument& doc)
+    void SourceTheModArchive::SearchGuessedArtist::OnReadNode(xmlNode* node)
     {
-        auto root = doc.FirstChildElement("modarchive");
+        auto* root = FindNode(node, "modarchive");
         if (!root)
             return;
 
         uint32_t numResults = 0;
-        if (auto node = root->FirstChildElement("results"))
-            numResults = node->UnsignedText();
+        if (node = FindChildNode(root, "results"))
+            numResults = UnsignedText(node);
 
-        if (auto node = root->FirstChildElement("totalpages"))
-            numPages = node->UnsignedText();
+        if (node = FindChildNode(root, "totalpages"))
+            numPages = UnsignedText(node);
 
-        for (auto moduleNode = root->FirstChildElement("module"); moduleNode; moduleNode = moduleNode->NextSiblingElement("module"))
+        for (auto moduleNode = FindChildNode(root, "module"); moduleNode; moduleNode = NextNode(moduleNode, "module"))
         {
-            auto artistsNode = moduleNode->FirstChildElement("artist_info");
+            auto artistsNode = FindChildNode(moduleNode, "artist_info");
             if (artistsNode)
             {
-                for (auto node = artistsNode->FirstChildElement("guessed_artist"); node; node = node->NextSiblingElement("guessed_artist"))
-                    artists.AddOnce(GetText(node->FirstChildElement("alias")));
+                for (node = FindChildNode(artistsNode, "guessed_artist"); node; node = NextNode(node, "guessed_artist"))
+                    artists.AddOnce(Text(FindChildNode(node, "alias")));
             }
             numResults--;
         }
@@ -187,49 +186,48 @@ namespace rePlayer
 
         uint32_t numPages = 0;
 
-        void OnReadXml(const XMLDocument& doc);
+        void OnReadNode(xmlNode* node);
     };
 
-    void SourceTheModArchive::SearchSong::OnReadXml(const XMLDocument& doc)
+    void SourceTheModArchive::SearchSong::OnReadNode(xmlNode* node)
     {
-        auto root = doc.FirstChildElement("modarchive");
+        auto* root = FindNode(node, "modarchive");
         if (!root)
             return;
 
         uint32_t numSongs = 0;
-        if (auto node = root->FirstChildElement("results"))
-            numSongs = node->UnsignedText();
+        if (node = FindChildNode(root, "results"))
+            numSongs = UnsignedText(node);
 
-        if (auto node = root->FirstChildElement("totalpages"))
-            numPages = node->UnsignedText();
-
-        for (auto moduleNode = root->FirstChildElement("module"); moduleNode; moduleNode = moduleNode->NextSiblingElement("module"))
+        if (node = FindChildNode(root, "totalpages"))
+            numPages = UnsignedText(node);
+        for (auto* moduleNode = FindChildNode(root, "module"); moduleNode; moduleNode = NextNode(moduleNode, "module"))
         {
             Song song;
 
-            song.type = Core::GetReplays().Find(GetText(moduleNode->FirstChildElement("format")).c_str());
-            song.id = moduleNode->FirstChildElement("id")->UnsignedText(0);
-            song.name = GetText(moduleNode->FirstChildElement("songtitle"));
+            song.type = Core::GetReplays().Find(Text(FindChildNode(moduleNode, "format")).c_str());
+            song.id = UnsignedText(FindChildNode(moduleNode, "id"));
+            song.name = Text(FindChildNode(moduleNode, "songtitle"));
 
             std::string lName = ToLower(song.name);
             song.name += "@";
-            song.name += GetText(moduleNode->FirstChildElement("filename"));
+            song.name += Text(FindChildNode(moduleNode, "filename"));
 
-            auto artistsNode = moduleNode->FirstChildElement("artist_info");
+            auto* artistsNode = FindChildNode(moduleNode, "artist_info");
             if (artistsNode)
             {
-                for (auto node = artistsNode->FirstChildElement("artist"); node; node = node->NextSiblingElement("artist"))
+                for (node = FindChildNode(artistsNode, "artist"); node; node = NextNode(node, "artist"))
                 {
                     std::pair<uint32_t, std::string> artist;
-                    artist.first = node->FirstChildElement("id")->UnsignedText();
-                    artist.second = GetText(node->FirstChildElement("alias"));
+                    artist.first = UnsignedText(FindChildNode(node, "id"));
+                    artist.second = Text(FindChildNode(node, "alias"));
                     song.artists.Add(std::move(artist));
                 }
-                for (auto node = artistsNode->FirstChildElement("guessed_artist"); node; node = node->NextSiblingElement("guessed_artist"))
+                for (node = FindChildNode(artistsNode, "guessed_artist"); node; node = NextNode(node, "guessed_artist"))
                 {
                     std::pair<uint32_t, std::string> artist;
                     artist.first = 0xffFFff;
-                    artist.second = GetText(node->FirstChildElement("alias"));
+                    artist.second = Text(FindChildNode(node, "alias"));
                     song.artists.Add(std::move(artist));
                 }
             }

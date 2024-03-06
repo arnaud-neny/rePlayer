@@ -1,10 +1,11 @@
-#include "SNDH.h"
-#include "WebHandler.h"
-
 // Core
 #include <Core/Log.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
+
+// rePlayer
+#include "SNDH.h"
+#include "WebHandler.h"
 
 // zlib
 #include <zlib.h>
@@ -34,33 +35,30 @@ namespace rePlayer
             kStateSongID,
             kStateSongName,
             kStateSongYearBegin,
+            kStateSongYearStep,
             kStateSongYearEnd,
             kStateEnd
         } state = kStateInit;
 
-        void OnReadNode(TidyDoc doc, TidyNode tnod) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
-    void SourceSNDH::Collector::OnReadNode(TidyDoc doc, TidyNode tnod)
+    void SourceSNDH::Collector::OnReadNode(xmlNode* node)
     {
-        TidyNode child;
-        for (child = tidyGetChild(tnod); child; child = tidyGetNext(child))
+        for (; node; node = node->next)
         {
-            ctmbstr name = tidyNodeGetName(child);
-            if (name)
+            if (node->type == XML_ELEMENT_NODE)
             {
-                for (TidyAttr attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr))
+                if (state == kStateSongYearStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
+                    state = kStateSongYearEnd;
+                else for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
                 {
-                    auto attrValue = tidyAttrValue(attr);
-                    if (!attrValue)
-                        continue;
-
                     if (state == kStateSongID)
                     {
-                        if (strstr(attrValue, "/?ID="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"/?ID="))
                         {
                             songs.Push();
-                            sscanf_s(attrValue, "/?ID=%u", &songs.Last().id);
+                            sscanf_s((const char*)propChild->content, "/?ID=%u", &songs.Last().id);
                             state = kStateSongName;
                         }
                     }
@@ -69,37 +67,24 @@ namespace rePlayer
             else switch (state)
             {
             case kStateSongBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"SNDH-files in listing"))
                 {
-                    if (strstr(buf, "SNDH-files in listing"))
-                    {
-                        uint32_t numArtists = 0;
-                        if (sscanf_s(buf, "%u SNDH-files in listing", &numSongs) == 1)
-                            songs.Reserve(numSongs);
-                        state = kStateSongID;
-                    }
-                });
+                    if (sscanf_s((const char*)node->content, "%u SNDH-files in listing", &numSongs) == 1)
+                        songs.Reserve(numSongs);
+                    state = kStateSongID;
+                }
                 break;
             case kStateSongName:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, songs.Last().name);
-                    state = kStateSongYearBegin;
-                });
+                ConvertString(node->content, songs.Last().name);
+                state = kStateSongYearBegin;
                 break;
             case kStateSongYearBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (strstr(buf, "Hertz"))
-                        state = kStateSongYearEnd;
-                });
+                if (xmlStrstr(node->content, BAD_CAST"Hertz"))
+                    state = kStateSongYearStep;
                 break;
             case kStateSongYearEnd:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    if (!strstr(buf, "n/a"))
-                        sscanf_s(buf, "%u", &songs.Last().year);
-                });
+                if (!xmlStrstr(node->content, BAD_CAST"n/a"))
+                    sscanf_s((const char*)node->content, "%u", &songs.Last().year);
                 state = numSongs == songs.NumItems() ? kStateEnd : kStateSongID;
                 break;
             default:
@@ -107,7 +92,7 @@ namespace rePlayer
             }
             if (state == kStateEnd)
                 return;
-            OnReadNode(doc, child);
+            OnReadNode(node->children);
         }
     }
 
@@ -133,6 +118,7 @@ namespace rePlayer
             kStateArtistName,
             kStateSongsBegin,
             kStateSongID,
+            kStateSongStep,
             kStateSongName,
             kStateSongArtistUrl,
             kStateSongArtistName,
@@ -140,7 +126,7 @@ namespace rePlayer
         } state = kStateInit;
 
         static std::string FixUmlaut(std::string txt);
-        void OnReadNode(TidyDoc doc, TidyNode tnod) final;
+        void OnReadNode(xmlNode* node) final;
     };
 
     std::string SourceSNDH::Search::FixUmlaut(std::string txt)
@@ -148,52 +134,48 @@ namespace rePlayer
         // impossible to make tidy not converting this...
         for (size_t pos = 0;;)
         {
-            pos = txt.find("%EF%BF%BD", pos, sizeof("%EF%BF%BD") - 1);
+            pos = txt.find("%C3%BC", pos, sizeof("%C3%BC") - 1);
             if (pos == std::string::npos)
                 break;
-            txt.erase(pos, sizeof("%EF%BF%BD") - 2);
+            txt.erase(pos, sizeof("%C3%BC") - 2);
             txt[pos] = 'ü';
         }
         return txt;
     }
 
-    void SourceSNDH::Search::OnReadNode(TidyDoc doc, TidyNode tnod)
+    void SourceSNDH::Search::OnReadNode(xmlNode* node)
     {
-        TidyNode child;
-        for (child = tidyGetChild(tnod); child; child = tidyGetNext(child))
+        for (; node; node = node->next)
         {
-            ctmbstr name = tidyNodeGetName(child);
-            if (name)
+            if (node->type == XML_ELEMENT_NODE)
             {
-                for (TidyAttr attr = tidyAttrFirst(child); attr; attr = tidyAttrNext(attr))
+                if (state == kStateSongStep && xmlStrcmp(node->name, BAD_CAST"a") == 0)
+                    state = kStateSongName;
+                else for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
                 {
-                    auto attrValue = tidyAttrValue(attr);
-                    if (!attrValue)
-                        continue;
-
                     if (state == kStateArtistUrl)
                     {
-                        if (strstr(attrValue, "/?p=composer&amp;name="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"/?p=composer&name="))
                         {
                             foundArtists.Push();
-                            foundArtists.Last().first = FixUmlaut(attrValue + sizeof("/?p=composer&amp;name=") - 1);
+                            foundArtists.Last().first = FixUmlaut(Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1).c_str());//FixUmlaut((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
                             state = kStateArtistName;
                         }
                     }
                     else if (state == kStateSongID)
                     {
-                        if (strstr(attrValue, "dl.php?ID="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"dl.php?ID="))
                         {
                             foundSongs.Push();
-                            sscanf_s(attrValue, "dl.php?ID=%u", &foundSongs.Last().id);
-                            state = kStateSongName;
+                            sscanf_s((const char*)propChild->content, "dl.php?ID=%u", &foundSongs.Last().id);
+                            state = kStateSongStep;
                         }
                     }
                     else if (state == kStateSongArtistUrl)
                     {
-                        if (strstr(attrValue, "/?p=composer&amp;name="))
+                        if (xmlStrstr(propChild->content, BAD_CAST"/?p=composer&name="))
                         {
-                            foundSongs.Last().artist.first = FixUmlaut(attrValue + sizeof("/?p=composer&amp;name=") - 1);
+                            foundSongs.Last().artist.first = FixUmlaut(Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1).c_str());//FixUmlaut((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
                             state = kStateSongArtistName;
                         }
                     }
@@ -202,62 +184,48 @@ namespace rePlayer
             else switch (state)
             {
             case kStateArtistsBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Composers found ("))
                 {
-                    if (strstr(buf, "Composers found ("))
+                    if (sscanf_s((const char*)node->content, "Composers found (%u)", &numArtists) == 1 && numArtists > 0)
                     {
-                        if (sscanf_s(buf, "Composers found (%u)", &numArtists) == 1 && numArtists > 0)
-                        {
-                            foundArtists.Reserve(numArtists);
-                            state = kStateArtistUrl;
-                        }
-                        else
-                            state = kStateSongsBegin;
+                        foundArtists.Reserve(numArtists);
+                        state = kStateArtistUrl;
                     }
-                });
+                    else
+                        state = kStateSongsBegin;
+                }
                 break;
             case kStateArtistName:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, foundArtists.Last().second);
-                    state = foundArtists.NumItems() == numArtists ? kStateSongsBegin : kStateArtistUrl;
-                });
+                ConvertString(node->content, foundArtists.Last().second);
+                foundArtists.Last().second = foundArtists.Last().second;
+                state = foundArtists.NumItems() == numArtists ? kStateSongsBegin : kStateArtistUrl;
                 break;
             case kStateSongsBegin:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
+                if (xmlStrstr(node->content, BAD_CAST"Tunes found ("))
                 {
-                    if (strstr(buf, "Tunes found ("))
+                    if (sscanf_s((const char*)node->content, "Tunes found (%u)", &numSongs) == 1 && numSongs > 0)
                     {
-                        if (sscanf_s(buf, "Tunes found (%u)", &numSongs) == 1 && numSongs > 0)
-                        {
-                            foundSongs.Reserve(numSongs);
-                            state = kStateSongID;
-                        }
-                        else
-                            state = kStateEnd;
+                        foundSongs.Reserve(numSongs);
+                        state = kStateSongID;
                     }
-                });
+                    else
+                        state = kStateEnd;
+                }
                 break;
             case kStateSongName:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, foundSongs.Last().name);
-                    state = kStateSongArtistUrl;
-                });
+                ConvertString(node->content, foundSongs.Last().name);
+                state = kStateSongArtistUrl;
                 break;
             case kStateSongArtistName:
-                ReadNodeText(doc, child, [this](auto buf, auto size)
-                {
-                    ConvertString(buf, size, foundSongs.Last().artist.second);
-                    state = foundSongs.NumItems() == numSongs ? kStateEnd : kStateSongID;
-                });
+                ConvertString(node->content, foundSongs.Last().artist.second);
+                state = foundSongs.NumItems() == numSongs ? kStateEnd : kStateSongID;
                 break;
             default:
                 break;
             }
             if (state == kStateEnd)
                 return;
-            OnReadNode(doc, child);
+            OnReadNode(node->children);
         }
     }
 

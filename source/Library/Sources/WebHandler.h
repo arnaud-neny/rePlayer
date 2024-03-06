@@ -1,40 +1,43 @@
 #pragma once
 
+// Core
 #include <Core/Log.h>
 #include <Core/String.h>
-#include <Curl/curl.h>
-#include <Tidy/tidy.h>
-#include <Tidy/tidybuffio.h>
 
+// rePlayer
 #include <Replayer/Core.h>
 
-#include <stdint.h>
-#include <string>
+// curl
+#include <Curl/curl.h>
+
+// libxml
+#include <libxml/HTMLparser.h>
 
 namespace rePlayer
 {
     class WebHandler
     {
     public:
-        virtual void OnReadNode(TidyDoc doc, TidyNode tnod) = 0;
-
-        virtual void OnCurlInit(TidyBuffer& docbuf) {}
+        virtual void OnReadNode(xmlNode* node) = 0;
 
         WebHandler()
-            : curl{ curl_easy_init() }
+            : curl(curl_easy_init())
         {}
         WebHandler(const WebHandler& other)
-            : curl{ curl_easy_init() }
-        {}
+            : curl(curl_easy_init())
+        {
+            (void)other;
+        }
         WebHandler(WebHandler&& other)
-            : curl{ other.curl }
-            , isInitialized{ other.isInitialized }
+            : curl(other.curl)
+            , isInitialized(other.isInitialized)
         {
             other.curl = curl_easy_init();
             other.isInitialized = false;
         }
         WebHandler& operator=(const WebHandler& other)
         {
+            (void)other;
             curl_easy_cleanup(curl);
             curl = curl_easy_init();
             isInitialized = false;
@@ -60,21 +63,7 @@ namespace rePlayer
             char url[1024];
             sprintf(url, std::forward<Arguments>(args)...);
 
-            TidyBuffer docbuf = { 0 };
-            TidyBuffer tidy_errbuf = { 0 };
-
-            tidySetMallocCall([](size_t len) { return Alloc(len); });
-            tidySetReallocCall([](void* buf, size_t len) { return Realloc(buf, len); });
-            tidySetFreeCall([](void* buf) { Free(buf); });
-            auto tdoc = tidyCreate();
-            tidyOptSetBool(tdoc, TidyForceOutput, yes);
-            tidyOptSetInt(tdoc, TidyOutCharEncoding, TidyEncUtf8);
-            tidyOptSetBool(tdoc, TidyQuoteAmpersand, no);
-            tidyOptSetBool(tdoc, TidyQuoteMarks, no);
-            tidyOptSetBool(tdoc, TidyQuoteNbsp, yes);
-            tidyOptSetBool(tdoc, TidyPreserveEntities, no);
-            tidyOptSetInt(tdoc, TidyWrapLen, 0);
-            tidyBufInit(&docbuf);
+            Array<char> buffer;
 
             char errorBuffer[CURL_ERROR_SIZE];
             if (!isInitialized)
@@ -87,16 +76,14 @@ namespace rePlayer
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 
                 curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
                 curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
-
-                OnCurlInit(docbuf);
             }
             else
             {
                 curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &docbuf);
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             }
 
             curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -104,30 +91,18 @@ namespace rePlayer
             auto curlErr = curl_easy_perform(curl);
             if (curlErr == CURLE_OK)
             {
-                tidySetErrorBuffer(tdoc, &tidy_errbuf);
-
-                auto tidyErr = tidyParseBuffer(tdoc, &docbuf);
-                if (tidyErr >= 0)
+                if (auto* doc = htmlReadMemory(buffer.Items(), buffer.NumItems(), nullptr, nullptr, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING))
                 {
-                    tidyErr = tidyCleanAndRepair(tdoc);
-                    if (tidyErr >= 0)
-                    {
-                        tidyErr = tidyRunDiagnostics(tdoc);
-                        if (tidyErr >= 0)
-                        {
-                            OnReadNode(tdoc, tidyGetRoot(tdoc));
-                        }
-                    }
-                }
+                    OnReadNode(xmlDocGetRootElement(doc));
 
-                if (tidy_errbuf.allocator)
-                    tidyBufFree(&tidy_errbuf);
+                    xmlFreeDoc(doc);
+                }
+                else
+                    Log::Error("libxml: can't parse html (%s)\n", url);
+                xmlResetLastError();
             }
             else
                 Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), url);
-
-            tidyBufFree(&docbuf);
-            tidyRelease(tdoc);
         }
 
         std::string Escape(const char* buf)
@@ -138,50 +113,40 @@ namespace rePlayer
             return newBuf;
         }
 
-        static size_t WriteCallback(char* in, size_t size, size_t nmemb, TidyBuffer* out)
+        static size_t WriteCallback(char* in, size_t size, size_t nmemb, Array<char>* out)
         {
-            size_t r;
-            r = size * nmemb;
-            tidyBufAppend(out, in, static_cast<uint32_t>(r));
-            return r;
+            size *= nmemb;
+            out->Add(in, size);
+            return size;
         }
 
-        static void ConvertString(const char* buf, uint32_t size, std::string& output)
+        static void ConvertString(const xmlChar* text, std::string& output)
         {
-            auto str = reinterpret_cast<char*>(_alloca(size + 1));
-            auto dst = str;
+            auto* buf = reinterpret_cast<const char*>(text);
+            auto size = strlen(buf);
+            auto* str = reinterpret_cast<char*>(_alloca(size + 1));
+            auto* dst = str;
+            auto* spc = str - 1;
             for (uint32_t i = 0; i < size; i++, dst++)
             {
-                if (buf[i] == -96)
+                if (buf[i] == -62 && buf[i + 1] == -96)
                 {
                     *dst = ' ';
+                    i++;
                 }
                 else if (buf[i] == '\r' || buf[i] == '\n')
                 {
-                    *dst = 0;
                     break;
-                }
-                else if (buf[i] == '&')
-                {
-                    i += ConvertEntity(buf + i, dst);
                 }
                 else
                 {
+                    if (buf[i] != ' ')
+                        spc = dst;
                     *dst = buf[i];
                 }
             }
-            str[size] = 0;
+            spc[1] = 0;
             output = str;
-        }
-
-        template <typename Predicate>
-        static void ReadNodeText(TidyDoc doc, TidyNode tnod, Predicate&& predicate)
-        {
-            TidyBuffer buf;
-            tidyBufInit(&buf);
-            tidyNodeGetText(doc, tnod, &buf);
-            predicate(reinterpret_cast<char*>(buf.bp), buf.size);
-            tidyBufFree(&buf);
         }
 
         CURL* curl;
