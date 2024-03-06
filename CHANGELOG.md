@@ -1,10 +1,15 @@
 v0.13.4 (Khatchadour's Release):
 - Added Direct Stream Digital
 - Added WavePack
+- Added libxml2
+- Updated OpenMPT to 0.7.4
+- Updated Opus to 1.5.1
 - Updated ProTrekkr to 2.6.6
 - Updated StSound with surround
 - Updated ImGui to 1.90.4
 - Removed ImGuiFileDialog
+- Removed Tidy Html
+- Removed TinyXML-2
 - Bug fixes
 
 v0.12.7:

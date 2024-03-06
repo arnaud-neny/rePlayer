@@ -6,8 +6,7 @@
   Then copy the imgui folder in rePlayer\external and run batch DiffMakeImGui.bat (this will create a patch file from the new version).
 - stb (sprintf): https://github.com/nothings/stb
 - Curl: https://curl.se/windows
-- Tidy Html: https://www.html-tidy.org/developer
-- TinyXML-2: https://github.com/leethomason/tinyxml2
+- libxml2: https://gitlab.gnome.org/GNOME/libxml2
 - libarchive: https://github.com/libarchive/libarchive
 - TagLib: https://taglib.org
 - dllloader: https://github.com/tapika/dllloader

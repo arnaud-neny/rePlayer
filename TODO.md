@@ -4,7 +4,6 @@
 - add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
 - add a project to make rePlayer as a lib/dll (so people can use the replays too): rePlayback (stripped from database and ui)
-- investigate htmlcxx (https://sourceforge.net/p/htmlcxx/) as an alternative to tidy
 - import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback

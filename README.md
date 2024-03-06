@@ -160,8 +160,7 @@ Or add some comments (and likes) there:
 - [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
 - [stb](https://github.com/nothings/stb): for the optimized sprintf.
 - [Curl](https://curl.se): library for transferring data with URLs.
-- [Tidy Html](https://www.html-tidy.org): to correct and cleanup html (for better parsing).
-- [TinyXML-2](https://github.com/leethomason/tinyxml2): to parse xml.
+- [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
 - [TagLib](https://taglib.org): to read tag from music formats.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
