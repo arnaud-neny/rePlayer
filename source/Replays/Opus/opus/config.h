@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(_M_IX86) || defined(_M_X64)
 /* Can always compile SSE intrinsics (no special compiler flags necessary) */
+#define OPUS_X86_MAY_HAVE_AVX2
 #define OPUS_X86_MAY_HAVE_SSE
 #define OPUS_X86_MAY_HAVE_SSE2
 #define OPUS_X86_MAY_HAVE_SSE4_1
@@ -51,6 +52,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #endif
 #if defined(__AVX__)
 #define OPUS_X86_PRESUME_SSE4_1 1
+#endif
+#if defined(__AVX2__)
+#define OPUS_X86_PRESUME_AVX2 1
 #endif
 
 #if !defined(OPUS_X86_PRESUME_SSE4_1) || !defined(OPUS_X86_PRESUME_SSE2) || !defined(OPUS_X86_PRESUME_SSE)

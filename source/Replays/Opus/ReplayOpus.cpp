@@ -13,7 +13,7 @@ namespace rePlayer
         .replayId = eReplay::Opus,
         .name = "Opus",
         .extensions = "opus",
-        .about = "Opus " PACKAGE_VERSION "\nCopyright (c) 2001-2011 Xiph.Org, Skype Limited, Octasic\n"
+        .about = "Opus " PACKAGE_VERSION "\nCopyright (c) 2001-2023 Xiph.Org, Skype Limited, Octasic\n"
                     "Jean - Marc Valin, Timothy B.Terriberry\n"
                     "CSIRO, Gregory Maxwell, Mark Borgerding\n"
                     "Erik de Castro Lopo",

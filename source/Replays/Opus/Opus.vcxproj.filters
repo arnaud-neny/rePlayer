@@ -42,6 +42,9 @@
     <Filter Include="Source Files\opus\celt\x86">
       <UniqueIdentifier>{0988b3ab-d593-40cd-8bec-4aa55d859153}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\opus\silk\float\x86">
+      <UniqueIdentifier>{a1144be3-4e16-4e9b-a60d-6db4f8eb778f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayOpus.h">
@@ -273,6 +276,9 @@
       <Filter>Source Files\opus\celt\x86</Filter>
     </ClInclude>
     <ClInclude Include="opus\celt\x86\x86cpu.h">
+      <Filter>Source Files\opus\celt\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="opus\celt\x86\x86_arch_macros.h">
       <Filter>Source Files\opus\celt\x86</Filter>
     </ClInclude>
   </ItemGroup>
@@ -753,6 +759,18 @@
     </ClCompile>
     <ClCompile Include="opus\celt\x86\x86cpu.c">
       <Filter>Source Files\opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="opus\celt\x86\pitch_avx.c">
+      <Filter>Source Files\opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="opus\silk\x86\NSQ_del_dec_avx2.c">
+      <Filter>Source Files\opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="opus\silk\float\x86\inner_product_FLP_avx2.c">
+      <Filter>Source Files\opus\silk\float\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="opus\src\extensions.c">
+      <Filter>Source Files\opus\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
