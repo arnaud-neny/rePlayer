@@ -13,7 +13,8 @@ namespace rePlayer
         "SNDH - Atari ST YM2149 Archive",
         "Atari SAP Music Archive",
         "ZX-Art",
-        "URL Import"
+        "URL Import",
+        "VGMRips"
     };
 
     static_assert(_countof(SourceID::sourceNames) == SourceID::NumSourceIDs);

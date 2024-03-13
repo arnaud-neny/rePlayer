@@ -17,6 +17,7 @@ namespace rePlayer
             AtariSAPMusicArchiveID          = 6,
             ZXArtID                         = 7,
             URLImportID                     = 8,
+            VGMRipsID                       = 9,
 
             NumSourceIDs
         };

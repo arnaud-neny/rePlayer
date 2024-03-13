@@ -23,6 +23,7 @@
 #include <Library/Sources/SNDH.h>
 #include <Library/Sources/TheModArchive.h>
 #include <Library/Sources/URLImport.h>
+#include <Library/Sources/VGMRips.h>
 #include <Library/Sources/ZXArt.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
@@ -60,6 +61,7 @@ namespace rePlayer
         m_sources[SourceID::AtariSAPMusicArchiveID] = new SourceAtariSAPMusicArchive();
         m_sources[SourceID::ZXArtID] = new SourceZXArt();
         m_sources[SourceID::URLImportID] = new SourceURLImport();
+        m_sources[SourceID::VGMRipsID] = new SourceVGMRips();
 
         Load();
 
@@ -1224,6 +1226,9 @@ namespace rePlayer
 
     void Library::Save()
     {
+        if (m_isBusy)
+            return;
+
         auto saveFlags = m_db.Fetch();
 
         if (saveFlags.IsEnabled(Database::Flag::kSaveSongs))

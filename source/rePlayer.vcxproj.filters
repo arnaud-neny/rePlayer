@@ -176,6 +176,9 @@
     <ClCompile Include="UI\FileSelector.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Sources\VGMRips.cpp">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -366,6 +369,9 @@
     </ClInclude>
     <ClInclude Include="UI\FileSelector.h">
       <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Sources\VGMRips.h">
+      <Filter>Source Files\Library\Sources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

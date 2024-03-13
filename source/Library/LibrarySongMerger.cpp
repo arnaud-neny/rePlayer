@@ -52,14 +52,15 @@ namespace rePlayer
                     return lFileCrc < rFileCrc;
 
                 static int32_t sourceOrder[] = {
-                    4,  // AmigaMusicPreservationSourceID
-                    5,  // TheModArchiveSourceID
-                    6,  // ModlandSourceID
+                    65536,  // AmigaMusicPreservationSourceID
+                    65537,  // TheModArchiveSourceID
+                    65538,  // ModlandSourceID
                     -2, // FileImportID
                     0,  // HighVoltageSIDCollectionID
                     1,  // SNDHID
                     2,  // AtariSAPMusicArchiveID
                     3,  // ZXArtID
+                    4,  // VGMRips
                     -1  // UrlImportID
                 };
                 static_assert(_countof(sourceOrder) == SourceID::NumSourceIDs);
