@@ -46,12 +46,12 @@ namespace rePlayer
 
     inline void Core::Lock()
     {
-        ms_instance->m_isLocked++;
+        ms_instance->m_isLocked = true;
     }
 
     inline void Core::Unlock()
     {
-        ms_instance->m_isLocked--;
+        ms_instance->m_isLocked = false;
     }
 
     inline bool Core::IsLocked()

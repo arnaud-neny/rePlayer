@@ -127,7 +127,8 @@ namespace rePlayer
         Stack<SongID> m_songsStack;
         Stack<ArtistID> m_artistsStack;
 
-        uint32_t m_isLocked = 0;
+        // get rid of this (systray popup shenanigans)
+        bool m_isLocked = false;
 
         static Core* ms_instance;
     };
