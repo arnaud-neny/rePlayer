@@ -47,6 +47,12 @@ namespace core
         _aligned_free(const_cast<void*>(ptr));
     }
 
+    template <typename T1, typename T2>
+    inline constexpr T1 AlignUp(T1 size, T2 alignment)
+    {
+        return T1((size + alignment - 1) & ~(alignment - 1));
+    }
+
     /**
     * Maths
     */
