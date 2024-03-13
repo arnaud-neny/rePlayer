@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+#include <Thread/SpinLock.h>
+
 typedef struct Curl_easy CURL;
 
 namespace rePlayer
@@ -124,6 +126,8 @@ namespace rePlayer
         mutable bool m_isDirty = false; // save
         mutable bool m_hasBackup = false;
         uint32_t m_currentUrl = 0;
+
+        thread::SpinLock m_mutex;
 
         static const char* const ms_filename;
         static const char* const ms_urls[];

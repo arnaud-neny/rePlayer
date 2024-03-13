@@ -625,6 +625,7 @@ namespace rePlayer
 
     std::pair<SmartPtr<io::Stream>, bool> SourceAmigaMusicPreservation::ImportSong(SourceID sourceId, const std::string& path)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
@@ -773,6 +774,7 @@ namespace rePlayer
 
     void SourceAmigaMusicPreservation::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -785,6 +787,7 @@ namespace rePlayer
 
     void SourceAmigaMusicPreservation::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -836,6 +839,7 @@ namespace rePlayer
         {
             return song.id < id;
         });
+        thread::ScopedSpinLock lock(m_mutex);
         return m_songs.Insert(song - m_songs, SongSource(id));
     }
 

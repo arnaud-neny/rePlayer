@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+#include <Thread/SpinLock.h>
+
 typedef struct Curl_easy CURL;
 
 namespace rePlayer
@@ -87,6 +89,8 @@ namespace rePlayer
         Array<SongSource> m_songs;
         mutable bool m_isDirty = false;
         mutable bool m_hasBackup = false;
+
+        thread::SpinLock m_mutex;
 
         static const char* const ms_filename;
     };

@@ -211,6 +211,7 @@ namespace rePlayer
 
     std::pair<SmartPtr<io::Stream>, bool> SourceZXArt::ImportSong(SourceID sourceId, const std::string& path)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
@@ -247,7 +248,6 @@ namespace rePlayer
                 isEntryMissing = true;
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
-                m_isDirty = true;
 
                 Log::Error("ZX-Art: file \"%s\" not found\n", url);
             }
@@ -263,6 +263,7 @@ namespace rePlayer
 
                 Log::Message("OK\n");
             }
+            m_isDirty = true;
         }
         else
             Log::Error("ZX-Art: %s\n", curl_easy_strerror(curlError));
@@ -304,6 +305,7 @@ namespace rePlayer
 
     void SourceZXArt::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -316,6 +318,7 @@ namespace rePlayer
 
     void SourceZXArt::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -367,6 +370,7 @@ namespace rePlayer
         {
             return song.id < id;
         });
+        thread::ScopedSpinLock lock(m_mutex);
         return m_songs.Insert(song - m_songs, SongSource(id));
     }
 

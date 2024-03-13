@@ -408,8 +408,11 @@ namespace rePlayer
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        if (DownloadDatabase())
-            return;
+        {
+            thread::ScopedSpinLock lock(m_mutex);
+            if (DownloadDatabase())
+                return;
+        }
 
         uint16_t dbImportedArtistId = 0;
         {
@@ -487,8 +490,11 @@ namespace rePlayer
 
     void SourceModland::FindSongs(const char* name, SourceResults& collectedSongs)
     {
-        if (DownloadDatabase())
-            return;
+        {
+            thread::ScopedSpinLock lock(m_mutex);
+            if (DownloadDatabase())
+                return;
+        }
 
         std::string lName = ToLower(name);
 
@@ -551,6 +557,7 @@ namespace rePlayer
 
     std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportSong(SourceID sourceId, const std::string& path)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
 
@@ -677,6 +684,7 @@ namespace rePlayer
 
     void SourceModland::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
@@ -686,6 +694,7 @@ namespace rePlayer
 
     void SourceModland::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID && newSongId != SongID::Invalid);
         auto songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
@@ -838,6 +847,7 @@ namespace rePlayer
                 return uint16_t(i);
         }
         // add a new one
+        thread::ScopedSpinLock lock(m_mutex);
         SourceArtist* artist;
         if (m_availableArtistIds.IsEmpty())
             artist = m_artists.Push();
@@ -884,6 +894,7 @@ namespace rePlayer
             }
         }
         // add a new one
+        thread::ScopedSpinLock lock(m_mutex);
         uint32_t id = m_availableSongIds.IsEmpty() ? m_songs.Push<uint32_t>() : m_availableSongIds.Pop();
         m_songs[id] = m_data.NumItems();
         auto* songSource = new (m_data.Push(offsetof(SourceSong, name))) SourceSong();

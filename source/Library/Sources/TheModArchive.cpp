@@ -481,6 +481,7 @@ namespace rePlayer
 
     std::pair<SmartPtr<io::Stream>, bool> SourceTheModArchive::ImportSong(SourceID sourceId, const std::string& path)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
@@ -566,6 +567,7 @@ namespace rePlayer
 
     void SourceTheModArchive::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -578,6 +580,7 @@ namespace rePlayer
 
     void SourceTheModArchive::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -680,6 +683,7 @@ namespace rePlayer
         {
             return song.id < id;
         });
+        thread::ScopedSpinLock lock(m_mutex);
         return m_songs.Insert(song - m_songs, SongSource(id));
     }
 
@@ -702,6 +706,7 @@ namespace rePlayer
         });
         if (guessedArtist == nullptr)
         {
+            thread::ScopedSpinLock lock(m_mutex);
             if (m_availableArtistIds.value != 0xffFFffFF)
             {
                 guessedArtist = m_guessedArtists.Items(m_availableArtistIds.nextId);

@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+#include <Thread/SpinLock.h>
+
 typedef struct Curl_easy CURL;
 
 namespace rePlayer
@@ -154,6 +156,8 @@ namespace rePlayer
         bool m_areDataDirty = false; // only when a song is not registered (to remove holes)
         mutable bool m_isDirty = false; // save
         mutable bool m_hasBackup = false;
+
+        thread::SpinLock m_mutex;
 
         static const char* const ms_filename;
     };

@@ -2,6 +2,8 @@
 
 #include "../Source.h"
 
+#include <Thread/SpinLock.h>
+
 namespace rePlayer
 {
     class SourceSNDH : public Source
@@ -78,6 +80,8 @@ namespace rePlayer
         bool m_areStringsDirty = false; // only when a string has been removed (to remove holes)
         mutable bool m_isDirty = false;
         mutable bool m_hasBackup = false;
+
+        thread::SpinLock m_mutex;
 
         static const char* const ms_filename;
     };

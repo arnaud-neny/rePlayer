@@ -350,6 +350,7 @@ namespace rePlayer
 
     void SourceAtariSAPMusicArchive::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
@@ -359,6 +360,7 @@ namespace rePlayer
 
     void SourceAtariSAPMusicArchive::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID && newSongId != SongID::Invalid);
         auto songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
@@ -532,6 +534,7 @@ namespace rePlayer
                 return uint16_t(i);
         }
         // add a new one
+        thread::ScopedSpinLock lock(m_mutex);
         SourceArtist* artist;
         if (m_availableArtistIds.IsEmpty())
             artist = m_artists.Push();
@@ -570,6 +573,7 @@ namespace rePlayer
         }
 
         // add a new one
+        thread::ScopedSpinLock lock(m_mutex);
         uint32_t id = m_availableSongIds.IsEmpty() ? m_songs.Push<uint32_t>() : m_availableSongIds.Pop();
         m_songs[id] = m_data.NumItems();
         auto* songSource = new (m_data.Push(offsetof(SourceSong, artists) + dbSong.numArtists * sizeof(uint16_t))) SourceSong();

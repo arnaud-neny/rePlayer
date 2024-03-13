@@ -353,6 +353,7 @@ namespace rePlayer
 
     std::pair<SmartPtr<io::Stream>, bool> SourceSNDH::ImportSong(SourceID sourceId, const std::string& path)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
@@ -389,7 +390,6 @@ namespace rePlayer
                 isEntryMissing = true;
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
-                m_isDirty = true;
 
                 Log::Error("SNDH: file \"%s\" not found\n", url);
             }
@@ -405,6 +405,7 @@ namespace rePlayer
 
                 Log::Message("OK\n");
             }
+            m_isDirty = true;
         }
         else
             Log::Error("SNDH: %s\n", curl_easy_strerror(curlError));
@@ -436,6 +437,7 @@ namespace rePlayer
 
     void SourceSNDH::DiscardSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -448,6 +450,7 @@ namespace rePlayer
 
     void SourceSNDH::InvalidateSong(SourceID sourceId, SongID newSongId)
     {
+        thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto foundSong = FindSong(sourceId.internalId);
         if (foundSong)
@@ -558,6 +561,7 @@ namespace rePlayer
         {
             return song.id < id;
         });
+        thread::ScopedSpinLock lock(m_mutex);
         return m_songs.Insert(song - m_songs, SongSource(id));
     }
 
@@ -580,6 +584,7 @@ namespace rePlayer
         });
         if (artist == nullptr)
         {
+            thread::ScopedSpinLock lock(m_mutex);
             if (m_availableArtistIds.value != 0xffFFffFF)
             {
                 artist = m_artists.Items(m_availableArtistIds.nextId);
