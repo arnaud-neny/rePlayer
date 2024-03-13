@@ -9,6 +9,12 @@
 
 namespace core
 {
+    template <uint32_t N1, uint32_t N2>
+    inline int32_t sprintf(char(&buf)[N1], const char(&fmt)[N2])
+    {
+        return strcpy_s(buf, fmt);
+    }
+
     template <uint32_t N, typename... Arguments>
     inline int32_t sprintf(char(&buf)[N], char const* fmt, Arguments... args)
     {
