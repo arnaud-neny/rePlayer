@@ -61,7 +61,7 @@ namespace rePlayer
         void Fetch(Arguments&&... args)
         {
             char url[1024];
-            sprintf(url, std::forward<Arguments>(args)...);
+            core::sprintf(url, std::forward<Arguments>(args)...);
 
             Array<char> buffer;
 
