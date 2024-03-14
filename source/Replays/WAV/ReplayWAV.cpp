@@ -23,7 +23,11 @@ namespace rePlayer
             delete wav;
             return nullptr;
         }
-        if (wav->channels != 2)
+        if (wav->channels != 2 || (wav->translatedFormatTag != DR_WAVE_FORMAT_PCM
+            && wav->translatedFormatTag != DR_WAVE_FORMAT_ADPCM && wav->translatedFormatTag != DR_WAVE_FORMAT_DVI_ADPCM
+            && wav->translatedFormatTag != DR_WAVE_FORMAT_IEEE_FLOAT
+            && wav->translatedFormatTag != DR_WAVE_FORMAT_ALAW
+            && wav->translatedFormatTag != DR_WAVE_FORMAT_MULAW))
         {
             drwav_uninit(wav);
             delete wav;
