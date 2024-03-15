@@ -1,0 +1,2824 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\vgmstream">
+      <UniqueIdentifier>{c94e112a-e60e-4547-9366-6b67458da415}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src">
+      <UniqueIdentifier>{605877bc-a8c9-464d-8755-a01273283719}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src\base">
+      <UniqueIdentifier>{a444667d-cf75-4cfb-aef7-e198e74cf306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src\coding">
+      <UniqueIdentifier>{5855021a-f62d-43b2-b674-e4d90a21101c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src\layout">
+      <UniqueIdentifier>{61693c36-9ee3-47ae-8720-d789610e0ecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src\meta">
+      <UniqueIdentifier>{d3960951-7fca-4015-ab0b-16a006243685}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vgmstream\src\util">
+      <UniqueIdentifier>{0f9f25bf-9c40-4392-939e-ea046fbf80eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libg719_decode">
+      <UniqueIdentifier>{0a930671-4427-4b9e-b497-c6e11ab51237}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libg719_decode\reference_code">
+      <UniqueIdentifier>{c25b8f2c-00f0-4a2a-9d18-18c08f18ac24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libg719_decode\reference_code\common">
+      <UniqueIdentifier>{2e278cd3-8001-4c57-a0da-57e33a892293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libg719_decode\reference_code\decoder">
+      <UniqueIdentifier>{50b974d6-f9d3-4a38-b8c7-7226b8f643fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libg719_decode\reference_code\include">
+      <UniqueIdentifier>{609f4650-afb9-4ed9-bc73-d9d3089c06a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\celt-0.6.1">
+      <UniqueIdentifier>{c50f407c-21df-4935-94d2-63b39f06fc78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\celt-0.11.0">
+      <UniqueIdentifier>{5c49efe7-6fd7-47a7-ab0a-6ac0558ba381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\speex">
+      <UniqueIdentifier>{f14bedf6-9261-4d3e-88be-0474a89c0c47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\speex\include">
+      <UniqueIdentifier>{0034c136-fc88-4b6b-b3e8-194665e9ff26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LibAtrac9">
+      <UniqueIdentifier>{261471d5-f2a7-4d7f-aa42-d86efaf41bb0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayVGMStream.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\version.h">
+      <Filter>Source Files\vgmstream</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\api.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\streamfile.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\streamtypes.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\vgmstream.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\vgmstream_types.h">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\decode.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\mixing.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\mixing_fades.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\mixing_priv.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\plugins.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\render.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\acm_decoder_libacm.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lib_data.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lzxpcm.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\coding.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\coding_utils_samples.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\compresswave_decoder_lib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\ea_mt_decoder_utk.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\g72x_state.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_aes.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_lib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_lib_data.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\hca_decoder_clhca.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\ice_decoder_icelib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\mpeg_decoder.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\nwa_decoder.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\relic_decoder_lib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib_data.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib_ops.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_data_fsb.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_data_wwise.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_decoder.h">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\layout\layout.h">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\9tav_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\adx_keys.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ahx_keys.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\aix_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\awc_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\bar_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\bgw_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\bnsf_keys.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\deblock_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ea_eaac_opus_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ea_eaac_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ea_schl_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\encrypted_bgm_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\encrypted_mc161_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\fsb_encrypted_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\fsb_interleave_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\fsb_keys.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\fsb5_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\hca_bf.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\hca_keys.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\hca_keys_awb.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\idtech_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\jstm_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\kma9_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ktsr_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\lp_ap_lep_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\lrmd_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\meta.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\mta2_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\mul_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\mups_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\nus3bank_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ogg_vorbis_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\opus_interleave_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ppst_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\riff_ogg_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\sab_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\sfh_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\sqex_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\sscf_encrypted.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\str_wav_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\txth_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_bao_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_ckd_cwav_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_lyn_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_sb_garbage_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_sb_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\vsv_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xavs_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xnb_lz4mg.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xnb_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xvag_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xwb_xsb.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\xwma_konami_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\zsnd_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\bitstream_lsb.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\bitstream_msb.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\channel_mappings.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\chunks.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\cipher_blowfish.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\companion_files.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\cri_keys.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\cri_utf.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\endianness.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\layout_utils.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\log.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\m2_psb.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\miniz.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\paths.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_get.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_get_nibbles.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_put.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_sf.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_text.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\samples_ops.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\sf_utils.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\text_reader.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\g719.h">
+      <Filter>Source Files\libg719_decode</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\reference_code\include\cnst.h">
+      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\reference_code\include\complxop.h">
+      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\reference_code\include\proto.h">
+      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\reference_code\include\rom.h">
+      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libg719_decode\reference_code\include\state.h">
+      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\_kiss_fft_guts.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\arch.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\bands.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\celt.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\celt_header.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\celt_types.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\cwrs.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\ecintrin.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\entcode.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\entdec.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\entenc.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_c5x.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_c6x.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_generic.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\float_cast.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\kfft_double.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\kfft_single.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\kiss_fft.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\kiss_fftr.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\laplace.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\mathops.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\mdct.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\mfrngcod.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\modes.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\os_support.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\pitch.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\psy.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\quant_bands.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\rate.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\stack_alloc.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.6.1\libcelt\vq.h">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\_kiss_fft_guts.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\arch.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\bands.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\celt.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\celt_header.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\celt_types.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\cwrs.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\ecintrin.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\entcode.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\entdec.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\entenc.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_c5x.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_c6x.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_generic.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\float_cast.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\kiss_fft.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\laplace.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\mathops.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\mdct.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\mfrngcod.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\modes.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\os_support.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\pitch.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\plc.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\quant_bands.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\rate.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\stack_alloc.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="celt-0.11.0\libcelt\vq.h">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\_kiss_fft_guts.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\arch.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\cb_search.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\cb_search_arm4.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\cb_search_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\cb_search_sse.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fftwrap.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\filters.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\filters_arm4.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\filters_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\filters_sse.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fixed_arm4.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fixed_arm5e.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fixed_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fixed_debug.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\fixed_generic.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\kiss_fft.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\kiss_fftr.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\lpc.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\lpc_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\lsp.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\lsp_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\ltp.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\ltp_arm4.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\ltp_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\ltp_sse.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\math_approx.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\misc_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\modes.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\nb_celp.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\os_support.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\quant_lsp.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\quant_lsp_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\sb_celp.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\smallft.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\stack_alloc.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vbr.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vorbis_psy.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vq.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vq_arm4.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vq_bfin.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\libspeex\vq_sse.h">
+      <Filter>Source Files\speex</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex_bits.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex_callbacks.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex_header.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex_stereo.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="speex\include\speex\speex_types.h">
+      <Filter>Source Files\speex\include</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\band_extension.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\bit_allocation.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\bit_reader.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\decinit.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\decoder.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\error_codes.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\huffCodes.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\imdct.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\libatrac9.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\quantization.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\scale_factors.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\structures.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\tables.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\unpack.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+    <ClInclude Include="LibAtrac9\src\utility.h">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayVGMStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\formats.c">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\streamfile.c">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util.c">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\vgmstream.c">
+      <Filter>Source Files\vgmstream\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\decode.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\info.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\mixing.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\mixing_commands.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\mixing_macros.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\plugins.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\render.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\seek.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\acm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\acm_decoder_decode.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\acm_decoder_util.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\adx_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\asf_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\atrac9_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\celt_fsb_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\circus_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\circus_decoder_lib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\coding_utils.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\compresswave_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\compresswave_decoder_lib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\derf_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\dsa_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ea_mt_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ea_xa_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ea_xas_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\fadpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_custom_mp4.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_custom_opus.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_utils.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\g719_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\g721_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder_aes.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder_lib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\hca_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\hca_decoder_clhca.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ice_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ice_decoder_icelib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ima_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\imuse_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\l5_555_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\lsf_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mc3_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mp4_aac_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_ahx.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_awc.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_ealayer3.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_eamp3.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mpeg_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\msadpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mta2_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\mtaf_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\nds_procyon_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ngc_afc_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ngc_dsp_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ngc_dtk_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\nwa_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ogg_vorbis_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\oki_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\pcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\psv_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\psx_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ptadpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\relic_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\relic_decoder_lib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\relic_decoder_mixfft.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\sassc_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\sdx2_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\speex_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\tac_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\tac_decoder_lib.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\tantalus_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\tgcadpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ubi_adpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vadpcm_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_awc.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_fsb.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_ogl.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_sk.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_vid1.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_wwise.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\wady_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ws_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\xa_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\xmd_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\yamaha_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_adm.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ast.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_awc.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_caf.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_dec.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_1snh.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_schl.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_sns.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_swvr.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_wve_ad10.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_wve_au00.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_filp.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_gsb.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_h4m.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_halpst.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_hwas.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ivaud.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_mul.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_mxch.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ps2_iab.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_rws.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_sthd.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_str_snds.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_thp.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_tt_ad.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ubi_sce.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vgs.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vid1.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vs.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vs_square.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vs_str.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_ws_aud.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_wsi.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_xa.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_xa_aiff.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_xvag.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_xvas.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_xwav.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\flat.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\interleave.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\layered.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\segmented.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\2dx9.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\9tav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\208.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\a2m.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aac_triace.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aax.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\acb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\acm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\acx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adp_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adp_qd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adp_wildfire.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adpcm_capcom.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ads.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ads_midway.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\adx_monster.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\afc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\agsc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ahv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ahx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aif_asobo.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aifc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aix.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\akb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\alp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ao.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\apc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\apple_caff.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\asf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ast.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ast_mmv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ast_mv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\astb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\atsl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\atx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\aus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\awb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\awc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\awd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\baf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bar.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bcstm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bfstm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bfwav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bg00.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bgw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bigrp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bik.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bkhd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bmp_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bnk_relic.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bnk_sony.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bns.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bnsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\brstm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\btsnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bw_mp3_riff.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bwav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\caf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ck.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\compresswave.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cpk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\csb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\csmp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cstr.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cxs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dc_asd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dc_idvi.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dc_kcey.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dcs_wav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\deblock_streamfile.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dec.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\derf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\diva.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dmsg_segh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dsb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_1snh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_schl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_schl_fixed.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_swvr.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_wve_ad10.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_wve_au00.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ego_dic.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\encrypted.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\esf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\exakt_sc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\excitebots.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\exst.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ezw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fag.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fda.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ffdl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ffmpeg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ffw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\filp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\flx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fsb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fsb_encrypted.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fsb5.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fsb5_fev.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\fwse.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\g1l.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gca.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gcsw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gcub.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\genh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ghs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gin.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gsnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\h4m.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\halpst.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hca.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hd3_bd3.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hgc1.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\his.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hxd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\idsp_ie.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\idtech.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ifs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ikm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ild.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ima.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\imc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\imuse.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ios_psnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\isb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ish_isd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ivag.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ivaud.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ivb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\jstm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\kat.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\kma9.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\knon.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\kraw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ktac.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ktsc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ktsr.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ktss.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\kwb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lopu_fb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lp_ap_lep.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lpcm_fb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lpcm_shade.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lrmd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\lsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mattel_hyperscan.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\maxis_xa.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mc3.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mca.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mib_mih.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mjb_mjh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mn_str.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mogg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mp4.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mp4_faac.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mpeg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msa.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msb_msh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msf_banpresto.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msf_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msf_tamasoft.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mss.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mta2.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mtaf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mul.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mups.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mus_acm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mus_krome.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mus_vc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\musc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\musx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\myspd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\naac.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\naomi_adpcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nds_hwas.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nds_rrds.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nds_strm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nds_strm_ffta2.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_adpdtk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_mpds.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_std.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_ygo.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_ffcc_str.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_lps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_nst_dsp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_pdt.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_sck_dsp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_ssm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ngc_str_cauldron.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nub.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nus3audio.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nus3bank.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nwa.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nwav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nxa1.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nxap.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nxof.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ogg_opus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ogg_vorbis.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ogl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ogv_3rdeye.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\omu.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\opus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\otm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\p3d.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pasx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pc_ast.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pc_mxst.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pcm_sre.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pcm_success.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\piff_tpcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pona.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pos.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ppst.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps_headerless.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_2pfs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_adm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_ass.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_b1s.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_bmdx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_gbts.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_gcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_hsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_iab.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_joe.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_kces.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_mcg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_mic.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_mihb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_p2bt.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_pcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_rnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_snd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_sps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_va3.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_vas.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_vbk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_vds_vdm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_vgv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_vms.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_wmus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2_xa30.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps3_past.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\psb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\psf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pwb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rad.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_int.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_pcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_rsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_s14_sss.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_snds.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\raw_wavm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\redspark.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rfrm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\riff.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rkv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rs03.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rsd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rstm_rockstar.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rwax.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rws_80d.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rws_809.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rwsd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\rxws.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\s3v.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sab.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sadf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sadl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sat_baka.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sat_dvi.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sat_sap.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sbk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\scd_pcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sd9.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sdf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sdrh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sdt.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\seb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\seg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sfh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sfl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sgxd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\silence.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sk_aud.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sl3.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sli.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\smc_smh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\smk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\smp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\smpl.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\smv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\snds.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sndx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sndz.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\spm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sps_n1.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\spsd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\spt_spd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sqex_scd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sqex_sead.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\squeak.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sscf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sscf_encrypted.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sspf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sspr.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ster.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sthd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\stma.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\str_sega.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\str_snds.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\str_wav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\strm_abylight.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sts.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\svag_kcet.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\svag_snk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\svg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\svs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\swav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\tac.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\tgc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\thp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\tt_ad.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\txth.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\txtp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_bao.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_ckd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_ckd_cwav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_hx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_jade.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_lyn.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_raki.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_sb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ue4opus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\utk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vab.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vag.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vai.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vgs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vgs_ps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vid1.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vis.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\voi.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vpk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vs_square.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vs_str.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vsf_tta.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vsv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vxn.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wady.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\waf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wave.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wave_segmented.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wavebatch.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wbk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wii_ras.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wii_sng.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wpd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ws_aud.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wsi.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wv2.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wv6.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wvs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wwise.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wxd_wxh.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xa.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xa_04sw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xa_xa30.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xa2_acclaim.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xau.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xau_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xavs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xma.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xma_ue3.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xmd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xmu.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xnb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xopus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xpcm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xps.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xsh_xsd_xss.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xss.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xssb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xvag.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xvas.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwav.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwc.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwma.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwma_konami.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xwv_valve.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ydsp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ymf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\zsd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\zsnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\zwdsp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\zwv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\chunks.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\cipher_blowfish.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\companion_files.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\cri_keys.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\cri_utf.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\layout_utils.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\log.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\m2_psb.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\miniz.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\paths.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\reader.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\samples_ops.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\sf_utils.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\text_reader.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\g719.c">
+      <Filter>Source Files\libg719_decode</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\bitalloc.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\bitstream.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\codesearch.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\common_rom.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\complxop.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\dct.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\idx2code.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\interleave_spectrum.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\recovernorm.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\reordvct.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\common\weight.c">
+      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\decode_frame.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_init.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_rom.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnf.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnobitsbfm.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\dqcoefs.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\fill_spectrum.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\flvqdec.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\hdeclvq.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\hdecnrm.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\trans_inv.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\unpackc.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libg719_decode\reference_code\decoder\window_ola.c">
+      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\bands.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\celt.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\cwrs.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\entcode.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\entdec.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\entenc.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\header.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\kfft_single.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\kiss_fft.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\kiss_fftr.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\laplace.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\mdct.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\modes.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\pitch.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\psy.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\quant_bands.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\rangedec.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\rangeenc.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\rate.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\vq.c">
+      <Filter>Source Files\celt-0.6.1</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\bands.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\celt.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\cwrs.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entcode.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entdec.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entenc.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\header.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\kiss_fft.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\laplace.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\mathops.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\mdct.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\modes.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\pitch.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\plc.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\quant_bands.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\rate.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\static_modes_fixed.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\static_modes_float.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\vq.c">
+      <Filter>Source Files\celt-0.11.0</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\window.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\bits.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\cb_search.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_5_64_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_5_256_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_8_128_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_10_16_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_10_32_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_20_32_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\filters.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\gain_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\gain_table_lbr.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\hexc_10_32_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\hexc_table.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\high_lsp_tables.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\kiss_fft.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\kiss_fftr.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lpc.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lsp.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lsp_tables_nb.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\ltp.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\modes.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\modes_wb.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\nb_celp.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\quant_lsp.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\sb_celp.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\smallft.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex_callbacks.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex_header.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\stereo.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vbr.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vorbis_psy.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vq.c">
+      <Filter>Source Files\speex</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\band_extension.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\bit_allocation.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\bit_reader.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\decinit.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\decoder.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\huffCodes.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\imdct.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\libatrac9.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\quantization.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\scale_factors.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\tables.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\unpack.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+    <ClCompile Include="LibAtrac9\src\utility.c">
+      <Filter>Source Files\LibAtrac9</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="speex\include\speex\speex_config_types.h.in">
+      <Filter>Source Files\speex\include</Filter>
+    </None>
+  </ItemGroup>
+</Project>

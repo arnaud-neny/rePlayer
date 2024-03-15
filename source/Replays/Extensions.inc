@@ -149,7 +149,7 @@ EXTENSION(mdx)
 EXTENSION(mdxPk)
 EXTENSION(s98)
 EXTENSION(aps)      // UADE: AProSys
-EXTENSION(ast)      // UADE: ActionAmics
+EXTENSION(ast)      // UADE: ActionAmics & vgmstream: Nintendo AST
 EXTENSION(adpcm)    // UADE: ADPCM_mono
 EXTENSION(amc)      // UADE: AM-Composer
 EXTENSION(abk)      // UADE: AMOS
@@ -400,3 +400,18 @@ EXTENSION(opus)     // Opus
 EXTENSION(ftm)      // Famitracker
 EXTENSION(wv)       // WavPack
 EXTENSION(dff)      // DSD
+EXTENSION(adx)      // vgmstream: CRI ADX
+EXTENSION(lwav)     // vgmstream: RIFF Wave
+EXTENSION(asf)      // vgmstream: Electronic Arts SCHl
+EXTENSION(genh)     // vgmstream: GENH Generic
+EXTENSION(wma)      // vgmstream: FFmpeg
+EXTENSION(brstm)    // vgmstream: Nintendo RSTM
+EXTENSION(dsp)      // vgmstream: Nintendo THP
+EXTENSION(bns)      // vgmstream: Nintendo BNS
+EXTENSION(rwav)     // vgmstream: Nintendo RWAV
+EXTENSION(afc)      // vgmstream: Nintendo AFC
+EXTENSION(hca)      // vgmstream: CRI HCA
+EXTENSION(bcstm)    // vgmstream: Nintendo CSTM
+EXTENSION(bcwav)    // vgmstream: Nintendo CWAV
+EXTENSION(msf)      // vgmstream: Sony MSF
+EXTENSION(scd)      // vgmstream: Square Enix SCD

@@ -1,0 +1,1191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{4007ED45-E807-4BB3-A91E-5FDEAC112166}</ProjectGuid>
+    <RootNamespace>VGMStream</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;vorbis.lib;mpg123.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;vorbis.lib;mpg123.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="celt-0.11.0\libcelt\arch.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\bands.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\celt.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\celt_header.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\celt_types.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\cwrs.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\ecintrin.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\entcode.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\entdec.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\entenc.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_c5x.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_c6x.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\fixed_generic.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\float_cast.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\kiss_fft.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\laplace.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\mathops.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\mdct.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\mfrngcod.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\modes.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\os_support.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\pitch.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\plc.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\quant_bands.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\rate.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\stack_alloc.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\vq.h" />
+    <ClInclude Include="celt-0.11.0\libcelt\_kiss_fft_guts.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\arch.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\bands.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\celt.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\celt_header.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\celt_types.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\cwrs.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\ecintrin.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\entcode.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\entdec.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\entenc.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_c5x.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_c6x.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\fixed_generic.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\float_cast.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\kfft_double.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\kfft_single.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\kiss_fft.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\kiss_fftr.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\laplace.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\mathops.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\mdct.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\mfrngcod.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\modes.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\os_support.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\pitch.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\psy.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\quant_bands.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\rate.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\stack_alloc.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\vq.h" />
+    <ClInclude Include="celt-0.6.1\libcelt\_kiss_fft_guts.h" />
+    <ClInclude Include="LibAtrac9\src\band_extension.h" />
+    <ClInclude Include="LibAtrac9\src\bit_allocation.h" />
+    <ClInclude Include="LibAtrac9\src\bit_reader.h" />
+    <ClInclude Include="LibAtrac9\src\decinit.h" />
+    <ClInclude Include="LibAtrac9\src\decoder.h" />
+    <ClInclude Include="LibAtrac9\src\error_codes.h" />
+    <ClInclude Include="LibAtrac9\src\huffCodes.h" />
+    <ClInclude Include="LibAtrac9\src\imdct.h" />
+    <ClInclude Include="LibAtrac9\src\libatrac9.h" />
+    <ClInclude Include="LibAtrac9\src\quantization.h" />
+    <ClInclude Include="LibAtrac9\src\scale_factors.h" />
+    <ClInclude Include="LibAtrac9\src\structures.h" />
+    <ClInclude Include="LibAtrac9\src\tables.h" />
+    <ClInclude Include="LibAtrac9\src\unpack.h" />
+    <ClInclude Include="LibAtrac9\src\utility.h" />
+    <ClInclude Include="libg719_decode\g719.h" />
+    <ClInclude Include="libg719_decode\reference_code\include\cnst.h" />
+    <ClInclude Include="libg719_decode\reference_code\include\complxop.h" />
+    <ClInclude Include="libg719_decode\reference_code\include\proto.h" />
+    <ClInclude Include="libg719_decode\reference_code\include\rom.h" />
+    <ClInclude Include="libg719_decode\reference_code\include\state.h" />
+    <ClInclude Include="ReplayVGMStream.h" />
+    <ClInclude Include="speex\include\speex\speex.h" />
+    <ClInclude Include="speex\include\speex\speex_bits.h" />
+    <ClInclude Include="speex\include\speex\speex_callbacks.h" />
+    <ClInclude Include="speex\include\speex\speex_header.h" />
+    <ClInclude Include="speex\include\speex\speex_stereo.h" />
+    <ClInclude Include="speex\include\speex\speex_types.h" />
+    <ClInclude Include="speex\libspeex\arch.h" />
+    <ClInclude Include="speex\libspeex\bfin.h" />
+    <ClInclude Include="speex\libspeex\cb_search.h" />
+    <ClInclude Include="speex\libspeex\cb_search_arm4.h" />
+    <ClInclude Include="speex\libspeex\cb_search_bfin.h" />
+    <ClInclude Include="speex\libspeex\cb_search_sse.h" />
+    <ClInclude Include="speex\libspeex\fftwrap.h" />
+    <ClInclude Include="speex\libspeex\filters.h" />
+    <ClInclude Include="speex\libspeex\filters_arm4.h" />
+    <ClInclude Include="speex\libspeex\filters_bfin.h" />
+    <ClInclude Include="speex\libspeex\filters_sse.h" />
+    <ClInclude Include="speex\libspeex\fixed_arm4.h" />
+    <ClInclude Include="speex\libspeex\fixed_arm5e.h" />
+    <ClInclude Include="speex\libspeex\fixed_bfin.h" />
+    <ClInclude Include="speex\libspeex\fixed_debug.h" />
+    <ClInclude Include="speex\libspeex\fixed_generic.h" />
+    <ClInclude Include="speex\libspeex\kiss_fft.h" />
+    <ClInclude Include="speex\libspeex\kiss_fftr.h" />
+    <ClInclude Include="speex\libspeex\lpc.h" />
+    <ClInclude Include="speex\libspeex\lpc_bfin.h" />
+    <ClInclude Include="speex\libspeex\lsp.h" />
+    <ClInclude Include="speex\libspeex\lsp_bfin.h" />
+    <ClInclude Include="speex\libspeex\ltp.h" />
+    <ClInclude Include="speex\libspeex\ltp_arm4.h" />
+    <ClInclude Include="speex\libspeex\ltp_bfin.h" />
+    <ClInclude Include="speex\libspeex\ltp_sse.h" />
+    <ClInclude Include="speex\libspeex\math_approx.h" />
+    <ClInclude Include="speex\libspeex\misc_bfin.h" />
+    <ClInclude Include="speex\libspeex\modes.h" />
+    <ClInclude Include="speex\libspeex\nb_celp.h" />
+    <ClInclude Include="speex\libspeex\os_support.h" />
+    <ClInclude Include="speex\libspeex\quant_lsp.h" />
+    <ClInclude Include="speex\libspeex\quant_lsp_bfin.h" />
+    <ClInclude Include="speex\libspeex\sb_celp.h" />
+    <ClInclude Include="speex\libspeex\smallft.h" />
+    <ClInclude Include="speex\libspeex\stack_alloc.h" />
+    <ClInclude Include="speex\libspeex\vbr.h" />
+    <ClInclude Include="speex\libspeex\vorbis_psy.h" />
+    <ClInclude Include="speex\libspeex\vq.h" />
+    <ClInclude Include="speex\libspeex\vq_arm4.h" />
+    <ClInclude Include="speex\libspeex\vq_bfin.h" />
+    <ClInclude Include="speex\libspeex\vq_sse.h" />
+    <ClInclude Include="speex\libspeex\_kiss_fft_guts.h" />
+    <ClInclude Include="vgmstream\src\api.h" />
+    <ClInclude Include="vgmstream\src\base\decode.h" />
+    <ClInclude Include="vgmstream\src\base\mixing.h" />
+    <ClInclude Include="vgmstream\src\base\mixing_fades.h" />
+    <ClInclude Include="vgmstream\src\base\mixing_priv.h" />
+    <ClInclude Include="vgmstream\src\base\plugins.h" />
+    <ClInclude Include="vgmstream\src\base\render.h" />
+    <ClInclude Include="vgmstream\src\coding\acm_decoder_libacm.h" />
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lib.h" />
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lib_data.h" />
+    <ClInclude Include="vgmstream\src\coding\circus_decoder_lzxpcm.h" />
+    <ClInclude Include="vgmstream\src\coding\coding.h" />
+    <ClInclude Include="vgmstream\src\coding\coding_utils_samples.h" />
+    <ClInclude Include="vgmstream\src\coding\compresswave_decoder_lib.h" />
+    <ClInclude Include="vgmstream\src\coding\ea_mt_decoder_utk.h" />
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_aes.h" />
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_lib.h" />
+    <ClInclude Include="vgmstream\src\coding\g7221_decoder_lib_data.h" />
+    <ClInclude Include="vgmstream\src\coding\g72x_state.h" />
+    <ClInclude Include="vgmstream\src\coding\hca_decoder_clhca.h" />
+    <ClInclude Include="vgmstream\src\coding\ice_decoder_icelib.h" />
+    <ClInclude Include="vgmstream\src\coding\mpeg_decoder.h" />
+    <ClInclude Include="vgmstream\src\coding\nwa_decoder.h" />
+    <ClInclude Include="vgmstream\src\coding\relic_decoder_lib.h" />
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib.h" />
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib_data.h" />
+    <ClInclude Include="vgmstream\src\coding\tac_decoder_lib_ops.h" />
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_data_fsb.h" />
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_data_wwise.h" />
+    <ClInclude Include="vgmstream\src\coding\vorbis_custom_decoder.h" />
+    <ClInclude Include="vgmstream\src\layout\layout.h" />
+    <ClInclude Include="vgmstream\src\meta\9tav_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\adx_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\ahx_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\aix_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\awc_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\bar_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\bgw_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\bnsf_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\deblock_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ea_eaac_opus_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ea_eaac_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ea_schl_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\encrypted_bgm_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\encrypted_mc161_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\fsb5_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\fsb_encrypted_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\fsb_interleave_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\fsb_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\hca_bf.h" />
+    <ClInclude Include="vgmstream\src\meta\hca_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\hca_keys_awb.h" />
+    <ClInclude Include="vgmstream\src\meta\idtech_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\jstm_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\kma9_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ktsr_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\lp_ap_lep_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\lrmd_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\meta.h" />
+    <ClInclude Include="vgmstream\src\meta\mta2_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\mul_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\mups_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\nus3bank_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ogg_vorbis_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\opus_interleave_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ppst_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\riff_ogg_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\sab_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\sfh_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\sqex_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\sscf_encrypted.h" />
+    <ClInclude Include="vgmstream\src\meta\str_wav_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\txth_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_bao_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_ckd_cwav_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_lyn_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_sb_garbage_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_sb_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\vsv_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\xavs_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\xnb_lz4mg.h" />
+    <ClInclude Include="vgmstream\src\meta\xnb_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\xvag_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\xwb_xsb.h" />
+    <ClInclude Include="vgmstream\src\meta\xwma_konami_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\zsnd_streamfile.h" />
+    <ClInclude Include="vgmstream\src\streamfile.h" />
+    <ClInclude Include="vgmstream\src\streamtypes.h" />
+    <ClInclude Include="vgmstream\src\util.h" />
+    <ClInclude Include="vgmstream\src\util\bitstream_lsb.h" />
+    <ClInclude Include="vgmstream\src\util\bitstream_msb.h" />
+    <ClInclude Include="vgmstream\src\util\channel_mappings.h" />
+    <ClInclude Include="vgmstream\src\util\chunks.h" />
+    <ClInclude Include="vgmstream\src\util\cipher_blowfish.h" />
+    <ClInclude Include="vgmstream\src\util\companion_files.h" />
+    <ClInclude Include="vgmstream\src\util\cri_keys.h" />
+    <ClInclude Include="vgmstream\src\util\cri_utf.h" />
+    <ClInclude Include="vgmstream\src\util\endianness.h" />
+    <ClInclude Include="vgmstream\src\util\layout_utils.h" />
+    <ClInclude Include="vgmstream\src\util\log.h" />
+    <ClInclude Include="vgmstream\src\util\m2_psb.h" />
+    <ClInclude Include="vgmstream\src\util\miniz.h" />
+    <ClInclude Include="vgmstream\src\util\paths.h" />
+    <ClInclude Include="vgmstream\src\util\reader_get.h" />
+    <ClInclude Include="vgmstream\src\util\reader_get_nibbles.h" />
+    <ClInclude Include="vgmstream\src\util\reader_put.h" />
+    <ClInclude Include="vgmstream\src\util\reader_sf.h" />
+    <ClInclude Include="vgmstream\src\util\reader_text.h" />
+    <ClInclude Include="vgmstream\src\util\samples_ops.h" />
+    <ClInclude Include="vgmstream\src\util\sf_utils.h" />
+    <ClInclude Include="vgmstream\src\util\text_reader.h" />
+    <ClInclude Include="vgmstream\src\vgmstream.h" />
+    <ClInclude Include="vgmstream\src\vgmstream_types.h" />
+    <ClInclude Include="vgmstream\version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="celt-0.11.0\libcelt\bands.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\celt.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\cwrs.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entcode.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entdec.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\entenc.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\header.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\kiss_fft.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\laplace.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\mathops.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\mdct.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\modes.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\pitch.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\plc.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\quant_bands.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\rate.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\static_modes_fixed.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\static_modes_float.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="celt-0.11.0\libcelt\vq.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="celt-0.6.1\libcelt\bands.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\celt.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\cwrs.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\entcode.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\entdec.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\entenc.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\header.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\kfft_single.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\kiss_fft.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\kiss_fftr.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\laplace.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\mdct.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\modes.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\pitch.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\psy.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\quant_bands.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\rangedec.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\rangeenc.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\rate.c" />
+    <ClCompile Include="celt-0.6.1\libcelt\vq.c" />
+    <ClCompile Include="LibAtrac9\src\band_extension.c" />
+    <ClCompile Include="LibAtrac9\src\bit_allocation.c" />
+    <ClCompile Include="LibAtrac9\src\bit_reader.c" />
+    <ClCompile Include="LibAtrac9\src\decinit.c" />
+    <ClCompile Include="LibAtrac9\src\decoder.c" />
+    <ClCompile Include="LibAtrac9\src\huffCodes.c" />
+    <ClCompile Include="LibAtrac9\src\imdct.c" />
+    <ClCompile Include="LibAtrac9\src\libatrac9.c" />
+    <ClCompile Include="LibAtrac9\src\quantization.c" />
+    <ClCompile Include="LibAtrac9\src\scale_factors.c" />
+    <ClCompile Include="LibAtrac9\src\tables.c" />
+    <ClCompile Include="LibAtrac9\src\unpack.c" />
+    <ClCompile Include="LibAtrac9\src\utility.c" />
+    <ClCompile Include="libg719_decode\g719.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\bitalloc.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\bitstream.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\codesearch.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\common_rom.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\complxop.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\dct.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\idx2code.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\interleave_spectrum.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\recovernorm.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\reordvct.c" />
+    <ClCompile Include="libg719_decode\reference_code\common\weight.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_init.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_rom.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\decode_frame.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnf.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnobitsbfm.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\dqcoefs.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\fill_spectrum.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\flvqdec.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\hdeclvq.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\hdecnrm.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\trans_inv.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\unpackc.c" />
+    <ClCompile Include="libg719_decode\reference_code\decoder\window_ola.c" />
+    <ClCompile Include="ReplayVGMStream.cpp" />
+    <ClCompile Include="speex\libspeex\bits.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\cb_search.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_10_16_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_10_32_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_20_32_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_5_256_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_5_64_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\exc_8_128_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\filters.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\gain_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\gain_table_lbr.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\hexc_10_32_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\hexc_table.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\high_lsp_tables.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\kiss_fft.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\kiss_fftr.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lpc.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lsp.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\lsp_tables_nb.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\ltp.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\modes.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\modes_wb.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\nb_celp.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\quant_lsp.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\sb_celp.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\smallft.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex_callbacks.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\speex_header.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\stereo.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vbr.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vorbis_psy.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\vq.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="speex\libspeex\window.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\decode.c" />
+    <ClCompile Include="vgmstream\src\base\info.c" />
+    <ClCompile Include="vgmstream\src\base\mixing.c" />
+    <ClCompile Include="vgmstream\src\base\mixing_commands.c" />
+    <ClCompile Include="vgmstream\src\base\mixing_macros.c" />
+    <ClCompile Include="vgmstream\src\base\plugins.c" />
+    <ClCompile Include="vgmstream\src\base\render.c" />
+    <ClCompile Include="vgmstream\src\base\seek.c" />
+    <ClCompile Include="vgmstream\src\coding\acm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\acm_decoder_decode.c" />
+    <ClCompile Include="vgmstream\src\coding\acm_decoder_util.c" />
+    <ClCompile Include="vgmstream\src\coding\adx_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\asf_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\atrac9_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\celt_fsb_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\circus_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\circus_decoder_lib.c" />
+    <ClCompile Include="vgmstream\src\coding\coding_utils.c" />
+    <ClCompile Include="vgmstream\src\coding\compresswave_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\compresswave_decoder_lib.c" />
+    <ClCompile Include="vgmstream\src\coding\derf_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\dsa_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ea_mt_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ea_xas_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ea_xa_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\fadpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_custom_mp4.c" />
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_custom_opus.c" />
+    <ClCompile Include="vgmstream\src\coding\ffmpeg_decoder_utils.c" />
+    <ClCompile Include="vgmstream\src\coding\g719_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\g721_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder_aes.c" />
+    <ClCompile Include="vgmstream\src\coding\g7221_decoder_lib.c" />
+    <ClCompile Include="vgmstream\src\coding\hca_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\hca_decoder_clhca.c" />
+    <ClCompile Include="vgmstream\src\coding\ice_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ice_decoder_icelib.c" />
+    <ClCompile Include="vgmstream\src\coding\ima_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\imuse_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\l5_555_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\lsf_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\mc3_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\mp4_aac_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_ahx.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_awc.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_ealayer3.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_custom_utils_eamp3.c" />
+    <ClCompile Include="vgmstream\src\coding\mpeg_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\msadpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\mta2_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\mtaf_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\nds_procyon_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ngc_afc_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ngc_dsp_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ngc_dtk_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\nwa_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ogg_vorbis_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\oki_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\pcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\psv_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\psx_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ptadpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\relic_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\relic_decoder_lib.c" />
+    <ClCompile Include="vgmstream\src\coding\relic_decoder_mixfft.c" />
+    <ClCompile Include="vgmstream\src\coding\sassc_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\sdx2_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\speex_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\tac_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\tac_decoder_lib.c" />
+    <ClCompile Include="vgmstream\src\coding\tantalus_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\tgcadpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ubi_adpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\vadpcm_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_awc.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_fsb.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_ogl.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_sk.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_vid1.c" />
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils_wwise.c" />
+    <ClCompile Include="vgmstream\src\coding\wady_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\ws_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\xa_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\xmd_decoder.c" />
+    <ClCompile Include="vgmstream\src\coding\yamaha_decoder.c" />
+    <ClCompile Include="vgmstream\src\formats.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_adm.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ast.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_awc.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_caf.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_dec.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_1snh.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_schl.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_sns.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_swvr.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_wve_ad10.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ea_wve_au00.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_filp.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_gsb.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_h4m.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_halpst.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_hwas.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ivaud.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_mul.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_mxch.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ps2_iab.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_rws.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_sthd.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_str_snds.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_thp.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_tt_ad.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ubi_sce.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_vgs.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_vid1.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_vs.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_vs_square.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_vs_str.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_wsi.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_ws_aud.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_xa.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_xa_aiff.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_xvag.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_xvas.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_xwav.c" />
+    <ClCompile Include="vgmstream\src\layout\flat.c" />
+    <ClCompile Include="vgmstream\src\layout\interleave.c" />
+    <ClCompile Include="vgmstream\src\layout\layered.c" />
+    <ClCompile Include="vgmstream\src\layout\segmented.c" />
+    <ClCompile Include="vgmstream\src\meta\208.c" />
+    <ClCompile Include="vgmstream\src\meta\2dx9.c" />
+    <ClCompile Include="vgmstream\src\meta\9tav.c" />
+    <ClCompile Include="vgmstream\src\meta\a2m.c" />
+    <ClCompile Include="vgmstream\src\meta\aac_triace.c" />
+    <ClCompile Include="vgmstream\src\meta\aax.c" />
+    <ClCompile Include="vgmstream\src\meta\acb.c" />
+    <ClCompile Include="vgmstream\src\meta\acm.c" />
+    <ClCompile Include="vgmstream\src\meta\acx.c" />
+    <ClCompile Include="vgmstream\src\meta\adm.c" />
+    <ClCompile Include="vgmstream\src\meta\adpcm_capcom.c" />
+    <ClCompile Include="vgmstream\src\meta\adp_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\adp_qd.c" />
+    <ClCompile Include="vgmstream\src\meta\adp_wildfire.c" />
+    <ClCompile Include="vgmstream\src\meta\ads.c" />
+    <ClCompile Include="vgmstream\src\meta\ads_midway.c" />
+    <ClCompile Include="vgmstream\src\meta\adx.c" />
+    <ClCompile Include="vgmstream\src\meta\adx_monster.c" />
+    <ClCompile Include="vgmstream\src\meta\afc.c" />
+    <ClCompile Include="vgmstream\src\meta\agsc.c" />
+    <ClCompile Include="vgmstream\src\meta\ahv.c" />
+    <ClCompile Include="vgmstream\src\meta\ahx.c" />
+    <ClCompile Include="vgmstream\src\meta\aifc.c" />
+    <ClCompile Include="vgmstream\src\meta\aif_asobo.c" />
+    <ClCompile Include="vgmstream\src\meta\aix.c" />
+    <ClCompile Include="vgmstream\src\meta\akb.c" />
+    <ClCompile Include="vgmstream\src\meta\alp.c" />
+    <ClCompile Include="vgmstream\src\meta\ao.c" />
+    <ClCompile Include="vgmstream\src\meta\apc.c" />
+    <ClCompile Include="vgmstream\src\meta\apple_caff.c" />
+    <ClCompile Include="vgmstream\src\meta\asf.c" />
+    <ClCompile Include="vgmstream\src\meta\ast.c" />
+    <ClCompile Include="vgmstream\src\meta\astb.c" />
+    <ClCompile Include="vgmstream\src\meta\ast_mmv.c" />
+    <ClCompile Include="vgmstream\src\meta\ast_mv.c" />
+    <ClCompile Include="vgmstream\src\meta\atsl.c" />
+    <ClCompile Include="vgmstream\src\meta\atx.c" />
+    <ClCompile Include="vgmstream\src\meta\aus.c" />
+    <ClCompile Include="vgmstream\src\meta\awb.c" />
+    <ClCompile Include="vgmstream\src\meta\awc.c" />
+    <ClCompile Include="vgmstream\src\meta\awd.c" />
+    <ClCompile Include="vgmstream\src\meta\baf.c" />
+    <ClCompile Include="vgmstream\src\meta\bar.c" />
+    <ClCompile Include="vgmstream\src\meta\bcstm.c" />
+    <ClCompile Include="vgmstream\src\meta\bfstm.c" />
+    <ClCompile Include="vgmstream\src\meta\bfwav.c" />
+    <ClCompile Include="vgmstream\src\meta\bg00.c" />
+    <ClCompile Include="vgmstream\src\meta\bgw.c" />
+    <ClCompile Include="vgmstream\src\meta\bigrp.c" />
+    <ClCompile Include="vgmstream\src\meta\bik.c" />
+    <ClCompile Include="vgmstream\src\meta\bkhd.c" />
+    <ClCompile Include="vgmstream\src\meta\bmp_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\bnk_relic.c" />
+    <ClCompile Include="vgmstream\src\meta\bnk_sony.c" />
+    <ClCompile Include="vgmstream\src\meta\bns.c" />
+    <ClCompile Include="vgmstream\src\meta\bnsf.c" />
+    <ClCompile Include="vgmstream\src\meta\brstm.c" />
+    <ClCompile Include="vgmstream\src\meta\bsf.c" />
+    <ClCompile Include="vgmstream\src\meta\btsnd.c" />
+    <ClCompile Include="vgmstream\src\meta\bwav.c" />
+    <ClCompile Include="vgmstream\src\meta\bw_mp3_riff.c" />
+    <ClCompile Include="vgmstream\src\meta\caf.c" />
+    <ClCompile Include="vgmstream\src\meta\ck.c" />
+    <ClCompile Include="vgmstream\src\meta\compresswave.c" />
+    <ClCompile Include="vgmstream\src\meta\cpk.c" />
+    <ClCompile Include="vgmstream\src\meta\cps.c" />
+    <ClCompile Include="vgmstream\src\meta\csb.c" />
+    <ClCompile Include="vgmstream\src\meta\csmp.c" />
+    <ClCompile Include="vgmstream\src\meta\cstr.c" />
+    <ClCompile Include="vgmstream\src\meta\cxs.c" />
+    <ClCompile Include="vgmstream\src\meta\dcs_wav.c" />
+    <ClCompile Include="vgmstream\src\meta\dc_asd.c" />
+    <ClCompile Include="vgmstream\src\meta\dc_idvi.c" />
+    <ClCompile Include="vgmstream\src\meta\dc_kcey.c" />
+    <ClCompile Include="vgmstream\src\meta\deblock_streamfile.c" />
+    <ClCompile Include="vgmstream\src\meta\dec.c" />
+    <ClCompile Include="vgmstream\src\meta\derf.c" />
+    <ClCompile Include="vgmstream\src\meta\diva.c" />
+    <ClCompile Include="vgmstream\src\meta\dmsg_segh.c" />
+    <ClCompile Include="vgmstream\src\meta\dsb.c" />
+    <ClCompile Include="vgmstream\src\meta\dsf.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_1snh.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_eaac.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_schl.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_schl_fixed.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_swvr.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_wve_ad10.c" />
+    <ClCompile Include="vgmstream\src\meta\ea_wve_au00.c" />
+    <ClCompile Include="vgmstream\src\meta\ego_dic.c" />
+    <ClCompile Include="vgmstream\src\meta\encrypted.c" />
+    <ClCompile Include="vgmstream\src\meta\esf.c" />
+    <ClCompile Include="vgmstream\src\meta\exakt_sc.c" />
+    <ClCompile Include="vgmstream\src\meta\excitebots.c" />
+    <ClCompile Include="vgmstream\src\meta\exst.c" />
+    <ClCompile Include="vgmstream\src\meta\ezw.c" />
+    <ClCompile Include="vgmstream\src\meta\fag.c" />
+    <ClCompile Include="vgmstream\src\meta\fda.c" />
+    <ClCompile Include="vgmstream\src\meta\ffdl.c" />
+    <ClCompile Include="vgmstream\src\meta\ffmpeg.c" />
+    <ClCompile Include="vgmstream\src\meta\ffw.c" />
+    <ClCompile Include="vgmstream\src\meta\filp.c" />
+    <ClCompile Include="vgmstream\src\meta\flx.c" />
+    <ClCompile Include="vgmstream\src\meta\fsb.c" />
+    <ClCompile Include="vgmstream\src\meta\fsb5.c" />
+    <ClCompile Include="vgmstream\src\meta\fsb5_fev.c" />
+    <ClCompile Include="vgmstream\src\meta\fsb_encrypted.c" />
+    <ClCompile Include="vgmstream\src\meta\fwse.c" />
+    <ClCompile Include="vgmstream\src\meta\g1l.c" />
+    <ClCompile Include="vgmstream\src\meta\gca.c" />
+    <ClCompile Include="vgmstream\src\meta\gcsw.c" />
+    <ClCompile Include="vgmstream\src\meta\gcub.c" />
+    <ClCompile Include="vgmstream\src\meta\genh.c" />
+    <ClCompile Include="vgmstream\src\meta\ghs.c" />
+    <ClCompile Include="vgmstream\src\meta\gin.c" />
+    <ClCompile Include="vgmstream\src\meta\gsnd.c" />
+    <ClCompile Include="vgmstream\src\meta\h4m.c" />
+    <ClCompile Include="vgmstream\src\meta\halpst.c" />
+    <ClCompile Include="vgmstream\src\meta\hca.c" />
+    <ClCompile Include="vgmstream\src\meta\hd3_bd3.c" />
+    <ClCompile Include="vgmstream\src\meta\hgc1.c" />
+    <ClCompile Include="vgmstream\src\meta\his.c" />
+    <ClCompile Include="vgmstream\src\meta\hxd.c" />
+    <ClCompile Include="vgmstream\src\meta\idsp_ie.c" />
+    <ClCompile Include="vgmstream\src\meta\idtech.c" />
+    <ClCompile Include="vgmstream\src\meta\ifs.c" />
+    <ClCompile Include="vgmstream\src\meta\ikm.c" />
+    <ClCompile Include="vgmstream\src\meta\ild.c" />
+    <ClCompile Include="vgmstream\src\meta\ima.c" />
+    <ClCompile Include="vgmstream\src\meta\imc.c" />
+    <ClCompile Include="vgmstream\src\meta\imuse.c" />
+    <ClCompile Include="vgmstream\src\meta\ios_psnd.c" />
+    <ClCompile Include="vgmstream\src\meta\isb.c" />
+    <ClCompile Include="vgmstream\src\meta\ish_isd.c" />
+    <ClCompile Include="vgmstream\src\meta\ivag.c" />
+    <ClCompile Include="vgmstream\src\meta\ivaud.c" />
+    <ClCompile Include="vgmstream\src\meta\ivb.c" />
+    <ClCompile Include="vgmstream\src\meta\jstm.c" />
+    <ClCompile Include="vgmstream\src\meta\kat.c" />
+    <ClCompile Include="vgmstream\src\meta\kma9.c" />
+    <ClCompile Include="vgmstream\src\meta\knon.c" />
+    <ClCompile Include="vgmstream\src\meta\kraw.c" />
+    <ClCompile Include="vgmstream\src\meta\ktac.c" />
+    <ClCompile Include="vgmstream\src\meta\ktsc.c" />
+    <ClCompile Include="vgmstream\src\meta\ktsr.c" />
+    <ClCompile Include="vgmstream\src\meta\ktss.c" />
+    <ClCompile Include="vgmstream\src\meta\kwb.c" />
+    <ClCompile Include="vgmstream\src\meta\lopu_fb.c" />
+    <ClCompile Include="vgmstream\src\meta\lpcm_fb.c" />
+    <ClCompile Include="vgmstream\src\meta\lpcm_shade.c" />
+    <ClCompile Include="vgmstream\src\meta\lp_ap_lep.c" />
+    <ClCompile Include="vgmstream\src\meta\lrmd.c" />
+    <ClCompile Include="vgmstream\src\meta\lsf.c" />
+    <ClCompile Include="vgmstream\src\meta\mattel_hyperscan.c" />
+    <ClCompile Include="vgmstream\src\meta\maxis_xa.c" />
+    <ClCompile Include="vgmstream\src\meta\mc3.c" />
+    <ClCompile Include="vgmstream\src\meta\mca.c" />
+    <ClCompile Include="vgmstream\src\meta\mib_mih.c" />
+    <ClCompile Include="vgmstream\src\meta\mjb_mjh.c" />
+    <ClCompile Include="vgmstream\src\meta\mn_str.c" />
+    <ClCompile Include="vgmstream\src\meta\mogg.c" />
+    <ClCompile Include="vgmstream\src\meta\mp4.c" />
+    <ClCompile Include="vgmstream\src\meta\mp4_faac.c" />
+    <ClCompile Include="vgmstream\src\meta\mpeg.c" />
+    <ClCompile Include="vgmstream\src\meta\msa.c" />
+    <ClCompile Include="vgmstream\src\meta\msb_msh.c" />
+    <ClCompile Include="vgmstream\src\meta\msf.c" />
+    <ClCompile Include="vgmstream\src\meta\msf_banpresto.c" />
+    <ClCompile Include="vgmstream\src\meta\msf_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\msf_tamasoft.c" />
+    <ClCompile Include="vgmstream\src\meta\mss.c" />
+    <ClCompile Include="vgmstream\src\meta\msv.c" />
+    <ClCompile Include="vgmstream\src\meta\mta2.c" />
+    <ClCompile Include="vgmstream\src\meta\mtaf.c" />
+    <ClCompile Include="vgmstream\src\meta\mul.c" />
+    <ClCompile Include="vgmstream\src\meta\mups.c" />
+    <ClCompile Include="vgmstream\src\meta\musc.c" />
+    <ClCompile Include="vgmstream\src\meta\musx.c" />
+    <ClCompile Include="vgmstream\src\meta\mus_acm.c" />
+    <ClCompile Include="vgmstream\src\meta\mus_krome.c" />
+    <ClCompile Include="vgmstream\src\meta\mus_vc.c" />
+    <ClCompile Include="vgmstream\src\meta\myspd.c" />
+    <ClCompile Include="vgmstream\src\meta\naac.c" />
+    <ClCompile Include="vgmstream\src\meta\naomi_adpcm.c" />
+    <ClCompile Include="vgmstream\src\meta\nds_hwas.c" />
+    <ClCompile Include="vgmstream\src\meta\nds_rrds.c" />
+    <ClCompile Include="vgmstream\src\meta\nds_strm.c" />
+    <ClCompile Include="vgmstream\src\meta\nds_strm_ffta2.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_adpdtk.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_mpds.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_std.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_dsp_ygo.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_ffcc_str.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_lps.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_nst_dsp.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_pdt.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_sck_dsp.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_ssm.c" />
+    <ClCompile Include="vgmstream\src\meta\ngc_str_cauldron.c" />
+    <ClCompile Include="vgmstream\src\meta\nps.c" />
+    <ClCompile Include="vgmstream\src\meta\nub.c" />
+    <ClCompile Include="vgmstream\src\meta\nus3audio.c" />
+    <ClCompile Include="vgmstream\src\meta\nus3bank.c" />
+    <ClCompile Include="vgmstream\src\meta\nwa.c" />
+    <ClCompile Include="vgmstream\src\meta\nwav.c" />
+    <ClCompile Include="vgmstream\src\meta\nxa1.c" />
+    <ClCompile Include="vgmstream\src\meta\nxap.c" />
+    <ClCompile Include="vgmstream\src\meta\nxof.c" />
+    <ClCompile Include="vgmstream\src\meta\ogg_opus.c" />
+    <ClCompile Include="vgmstream\src\meta\ogg_vorbis.c" />
+    <ClCompile Include="vgmstream\src\meta\ogl.c" />
+    <ClCompile Include="vgmstream\src\meta\ogv_3rdeye.c" />
+    <ClCompile Include="vgmstream\src\meta\omu.c" />
+    <ClCompile Include="vgmstream\src\meta\opus.c" />
+    <ClCompile Include="vgmstream\src\meta\otm.c" />
+    <ClCompile Include="vgmstream\src\meta\p3d.c" />
+    <ClCompile Include="vgmstream\src\meta\pasx.c" />
+    <ClCompile Include="vgmstream\src\meta\pcm_sre.c" />
+    <ClCompile Include="vgmstream\src\meta\pcm_success.c" />
+    <ClCompile Include="vgmstream\src\meta\pc_ast.c" />
+    <ClCompile Include="vgmstream\src\meta\pc_mxst.c" />
+    <ClCompile Include="vgmstream\src\meta\piff_tpcm.c" />
+    <ClCompile Include="vgmstream\src\meta\pona.c" />
+    <ClCompile Include="vgmstream\src\meta\pos.c" />
+    <ClCompile Include="vgmstream\src\meta\ppst.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_2pfs.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_adm.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_ass.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_b1s.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_bmdx.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_gbts.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_gcm.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_hsf.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_iab.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_joe.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_kces.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_mcg.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_mic.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_mihb.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_p2bt.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_pcm.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_rnd.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_snd.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_sps.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_va3.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_vas.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_vbk.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_vds_vdm.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_vgv.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_vms.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_wmus.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2_xa30.c" />
+    <ClCompile Include="vgmstream\src\meta\ps3_past.c" />
+    <ClCompile Include="vgmstream\src\meta\psb.c" />
+    <ClCompile Include="vgmstream\src\meta\psf.c" />
+    <ClCompile Include="vgmstream\src\meta\ps_headerless.c" />
+    <ClCompile Include="vgmstream\src\meta\pwb.c" />
+    <ClCompile Include="vgmstream\src\meta\rad.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_int.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_pcm.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_rsf.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_s14_sss.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_snds.c" />
+    <ClCompile Include="vgmstream\src\meta\raw_wavm.c" />
+    <ClCompile Include="vgmstream\src\meta\redspark.c" />
+    <ClCompile Include="vgmstream\src\meta\rfrm.c" />
+    <ClCompile Include="vgmstream\src\meta\riff.c" />
+    <ClCompile Include="vgmstream\src\meta\rkv.c" />
+    <ClCompile Include="vgmstream\src\meta\rs03.c" />
+    <ClCompile Include="vgmstream\src\meta\rsd.c" />
+    <ClCompile Include="vgmstream\src\meta\rstm_rockstar.c" />
+    <ClCompile Include="vgmstream\src\meta\rwax.c" />
+    <ClCompile Include="vgmstream\src\meta\rwsd.c" />
+    <ClCompile Include="vgmstream\src\meta\rws_809.c" />
+    <ClCompile Include="vgmstream\src\meta\rws_80d.c" />
+    <ClCompile Include="vgmstream\src\meta\rxws.c" />
+    <ClCompile Include="vgmstream\src\meta\s3v.c" />
+    <ClCompile Include="vgmstream\src\meta\sab.c" />
+    <ClCompile Include="vgmstream\src\meta\sadf.c" />
+    <ClCompile Include="vgmstream\src\meta\sadl.c" />
+    <ClCompile Include="vgmstream\src\meta\sat_baka.c" />
+    <ClCompile Include="vgmstream\src\meta\sat_dvi.c" />
+    <ClCompile Include="vgmstream\src\meta\sat_sap.c" />
+    <ClCompile Include="vgmstream\src\meta\sbk.c" />
+    <ClCompile Include="vgmstream\src\meta\scd_pcm.c" />
+    <ClCompile Include="vgmstream\src\meta\sd9.c" />
+    <ClCompile Include="vgmstream\src\meta\sdf.c" />
+    <ClCompile Include="vgmstream\src\meta\sdrh.c" />
+    <ClCompile Include="vgmstream\src\meta\sdt.c" />
+    <ClCompile Include="vgmstream\src\meta\seb.c" />
+    <ClCompile Include="vgmstream\src\meta\seg.c" />
+    <ClCompile Include="vgmstream\src\meta\sfh.c" />
+    <ClCompile Include="vgmstream\src\meta\sfl.c" />
+    <ClCompile Include="vgmstream\src\meta\sgxd.c" />
+    <ClCompile Include="vgmstream\src\meta\silence.c" />
+    <ClCompile Include="vgmstream\src\meta\sk_aud.c" />
+    <ClCompile Include="vgmstream\src\meta\sl3.c" />
+    <ClCompile Include="vgmstream\src\meta\sli.c" />
+    <ClCompile Include="vgmstream\src\meta\smc_smh.c" />
+    <ClCompile Include="vgmstream\src\meta\smk.c" />
+    <ClCompile Include="vgmstream\src\meta\smp.c" />
+    <ClCompile Include="vgmstream\src\meta\smpl.c" />
+    <ClCompile Include="vgmstream\src\meta\smv.c" />
+    <ClCompile Include="vgmstream\src\meta\snds.c" />
+    <ClCompile Include="vgmstream\src\meta\sndx.c" />
+    <ClCompile Include="vgmstream\src\meta\sndz.c" />
+    <ClCompile Include="vgmstream\src\meta\spm.c" />
+    <ClCompile Include="vgmstream\src\meta\spsd.c" />
+    <ClCompile Include="vgmstream\src\meta\sps_n1.c" />
+    <ClCompile Include="vgmstream\src\meta\spt_spd.c" />
+    <ClCompile Include="vgmstream\src\meta\sqex_scd.c" />
+    <ClCompile Include="vgmstream\src\meta\sqex_sead.c" />
+    <ClCompile Include="vgmstream\src\meta\squeak.c" />
+    <ClCompile Include="vgmstream\src\meta\sscf.c" />
+    <ClCompile Include="vgmstream\src\meta\sscf_encrypted.c" />
+    <ClCompile Include="vgmstream\src\meta\sspf.c" />
+    <ClCompile Include="vgmstream\src\meta\sspr.c" />
+    <ClCompile Include="vgmstream\src\meta\ster.c" />
+    <ClCompile Include="vgmstream\src\meta\sthd.c" />
+    <ClCompile Include="vgmstream\src\meta\stma.c" />
+    <ClCompile Include="vgmstream\src\meta\strm_abylight.c" />
+    <ClCompile Include="vgmstream\src\meta\str_sega.c" />
+    <ClCompile Include="vgmstream\src\meta\str_snds.c" />
+    <ClCompile Include="vgmstream\src\meta\str_wav.c" />
+    <ClCompile Include="vgmstream\src\meta\sts.c" />
+    <ClCompile Include="vgmstream\src\meta\svag_kcet.c" />
+    <ClCompile Include="vgmstream\src\meta\svag_snk.c" />
+    <ClCompile Include="vgmstream\src\meta\svg.c" />
+    <ClCompile Include="vgmstream\src\meta\svs.c" />
+    <ClCompile Include="vgmstream\src\meta\swav.c" />
+    <ClCompile Include="vgmstream\src\meta\tac.c" />
+    <ClCompile Include="vgmstream\src\meta\tgc.c" />
+    <ClCompile Include="vgmstream\src\meta\thp.c" />
+    <ClCompile Include="vgmstream\src\meta\tt_ad.c" />
+    <ClCompile Include="vgmstream\src\meta\txth.c" />
+    <ClCompile Include="vgmstream\src\meta\txtp.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_bao.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_ckd.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_ckd_cwav.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_hx.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_jade.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_lyn.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_raki.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_sb.c" />
+    <ClCompile Include="vgmstream\src\meta\ue4opus.c" />
+    <ClCompile Include="vgmstream\src\meta\utk.c" />
+    <ClCompile Include="vgmstream\src\meta\vab.c" />
+    <ClCompile Include="vgmstream\src\meta\vag.c" />
+    <ClCompile Include="vgmstream\src\meta\vai.c" />
+    <ClCompile Include="vgmstream\src\meta\vgs.c" />
+    <ClCompile Include="vgmstream\src\meta\vgs_ps.c" />
+    <ClCompile Include="vgmstream\src\meta\vid1.c" />
+    <ClCompile Include="vgmstream\src\meta\vis.c" />
+    <ClCompile Include="vgmstream\src\meta\voi.c" />
+    <ClCompile Include="vgmstream\src\meta\vpk.c" />
+    <ClCompile Include="vgmstream\src\meta\vs.c" />
+    <ClCompile Include="vgmstream\src\meta\vsf.c" />
+    <ClCompile Include="vgmstream\src\meta\vsf_tta.c" />
+    <ClCompile Include="vgmstream\src\meta\vsv.c" />
+    <ClCompile Include="vgmstream\src\meta\vs_square.c" />
+    <ClCompile Include="vgmstream\src\meta\vs_str.c" />
+    <ClCompile Include="vgmstream\src\meta\vxn.c" />
+    <ClCompile Include="vgmstream\src\meta\wady.c" />
+    <ClCompile Include="vgmstream\src\meta\waf.c" />
+    <ClCompile Include="vgmstream\src\meta\wave.c" />
+    <ClCompile Include="vgmstream\src\meta\wavebatch.c" />
+    <ClCompile Include="vgmstream\src\meta\wave_segmented.c" />
+    <ClCompile Include="vgmstream\src\meta\wb.c" />
+    <ClCompile Include="vgmstream\src\meta\wbk.c" />
+    <ClCompile Include="vgmstream\src\meta\wii_ras.c" />
+    <ClCompile Include="vgmstream\src\meta\wii_sng.c" />
+    <ClCompile Include="vgmstream\src\meta\wpd.c" />
+    <ClCompile Include="vgmstream\src\meta\wsi.c" />
+    <ClCompile Include="vgmstream\src\meta\ws_aud.c" />
+    <ClCompile Include="vgmstream\src\meta\wv2.c" />
+    <ClCompile Include="vgmstream\src\meta\wv6.c" />
+    <ClCompile Include="vgmstream\src\meta\wvs.c" />
+    <ClCompile Include="vgmstream\src\meta\wwise.c" />
+    <ClCompile Include="vgmstream\src\meta\wxd_wxh.c" />
+    <ClCompile Include="vgmstream\src\meta\xa.c" />
+    <ClCompile Include="vgmstream\src\meta\xa2_acclaim.c" />
+    <ClCompile Include="vgmstream\src\meta\xau.c" />
+    <ClCompile Include="vgmstream\src\meta\xau_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\xavs.c" />
+    <ClCompile Include="vgmstream\src\meta\xa_04sw.c" />
+    <ClCompile Include="vgmstream\src\meta\xa_xa30.c" />
+    <ClCompile Include="vgmstream\src\meta\xma.c" />
+    <ClCompile Include="vgmstream\src\meta\xma_ue3.c" />
+    <ClCompile Include="vgmstream\src\meta\xmd.c" />
+    <ClCompile Include="vgmstream\src\meta\xmu.c" />
+    <ClCompile Include="vgmstream\src\meta\xnb.c" />
+    <ClCompile Include="vgmstream\src\meta\xopus.c" />
+    <ClCompile Include="vgmstream\src\meta\xpcm.c" />
+    <ClCompile Include="vgmstream\src\meta\xps.c" />
+    <ClCompile Include="vgmstream\src\meta\xsh_xsd_xss.c" />
+    <ClCompile Include="vgmstream\src\meta\xss.c" />
+    <ClCompile Include="vgmstream\src\meta\xssb.c" />
+    <ClCompile Include="vgmstream\src\meta\xvag.c" />
+    <ClCompile Include="vgmstream\src\meta\xvas.c" />
+    <ClCompile Include="vgmstream\src\meta\xwav.c" />
+    <ClCompile Include="vgmstream\src\meta\xwb.c" />
+    <ClCompile Include="vgmstream\src\meta\xwc.c" />
+    <ClCompile Include="vgmstream\src\meta\xwma.c" />
+    <ClCompile Include="vgmstream\src\meta\xwma_konami.c" />
+    <ClCompile Include="vgmstream\src\meta\xwv_valve.c" />
+    <ClCompile Include="vgmstream\src\meta\ydsp.c" />
+    <ClCompile Include="vgmstream\src\meta\ymf.c" />
+    <ClCompile Include="vgmstream\src\meta\zsd.c" />
+    <ClCompile Include="vgmstream\src\meta\zsnd.c" />
+    <ClCompile Include="vgmstream\src\meta\zwdsp.c" />
+    <ClCompile Include="vgmstream\src\meta\zwv.c" />
+    <ClCompile Include="vgmstream\src\streamfile.c" />
+    <ClCompile Include="vgmstream\src\util.c" />
+    <ClCompile Include="vgmstream\src\util\chunks.c" />
+    <ClCompile Include="vgmstream\src\util\cipher_blowfish.c" />
+    <ClCompile Include="vgmstream\src\util\companion_files.c" />
+    <ClCompile Include="vgmstream\src\util\cri_keys.c" />
+    <ClCompile Include="vgmstream\src\util\cri_utf.c" />
+    <ClCompile Include="vgmstream\src\util\layout_utils.c" />
+    <ClCompile Include="vgmstream\src\util\log.c" />
+    <ClCompile Include="vgmstream\src\util\m2_psb.c" />
+    <ClCompile Include="vgmstream\src\util\miniz.c" />
+    <ClCompile Include="vgmstream\src\util\paths.c" />
+    <ClCompile Include="vgmstream\src\util\reader.c" />
+    <ClCompile Include="vgmstream\src\util\samples_ops.c" />
+    <ClCompile Include="vgmstream\src\util\sf_utils.c" />
+    <ClCompile Include="vgmstream\src\util\text_reader.c" />
+    <ClCompile Include="vgmstream\src\vgmstream.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="speex\include\speex\speex_config_types.h.in" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
