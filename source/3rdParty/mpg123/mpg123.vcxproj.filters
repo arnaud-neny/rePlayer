@@ -90,6 +90,9 @@
     <ClCompile Include="src\compat\compat_str.c">
       <Filter>compat</Filter>
     </ClCompile>
+    <ClCompile Include="src\libmpg123\lfs_wrap.c">
+      <Filter>libmpg123</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\compat\compat.h">
@@ -124,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="src\include\syn123.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\lfs_wrap.h">
+      <Filter>libmpg123</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
