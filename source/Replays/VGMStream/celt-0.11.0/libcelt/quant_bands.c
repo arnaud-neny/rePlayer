@@ -171,7 +171,7 @@ static int quant_coarse_energy_impl(const CELTMode *m, int start, int end,
    celt_word16 beta;
 
    if (tell+3 <= budget)
-      ec_enc_bit_logp(enc, intra, 3);
+      ec_enc_bit_logp_0110(enc, intra, 3);
    if (intra)
    {
       coef = 0;
@@ -237,12 +237,12 @@ static int quant_coarse_energy_impl(const CELTMode *m, int start, int end,
          else if(budget-tell >= 2)
          {
             qi = IMAX(-1, IMIN(qi, 1));
-            ec_enc_icdf(enc, 2*qi^-(qi<0), small_energy_icdf, 2);
+            ec_enc_icdf_0110(enc, 2*qi^-(qi<0), small_energy_icdf, 2);
          }
          else if(budget-tell >= 1)
          {
             qi = IMIN(0, qi);
-            ec_enc_bit_logp(enc, -qi, 1);
+            ec_enc_bit_logp_0110(enc, -qi, 1);
          }
          else
             qi = -1;
@@ -458,12 +458,12 @@ void unquant_coarse_energy_0110(const CELTMode *m, int start, int end, celt_word
          }
          else if(budget-tell>=2)
          {
-            qi = ec_dec_icdf(dec, small_energy_icdf, 2);
+            qi = ec_dec_icdf_0110(dec, small_energy_icdf, 2);
             qi = (qi>>1)^-(qi&1);
          }
          else if(budget-tell>=1)
          {
-            qi = -ec_dec_bit_logp(dec, 1);
+            qi = -ec_dec_bit_logp_0110(dec, 1);
          }
          else
             qi = -1;
@@ -553,7 +553,7 @@ void log2Amp(const CELTMode *m, int start, int end,
    } while (++c < C);
 }
 
-void amp2Log2(const CELTMode *m, int effEnd, int end,
+void amp2Log2_0110(const CELTMode *m, int effEnd, int end,
       celt_ener *bandE, celt_word16 *bandLogE, int _C)
 {
    int c, i;

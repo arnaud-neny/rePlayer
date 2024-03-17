@@ -40,7 +40,7 @@
 
 
 
-void _celt_lpc(
+void _celt_lpc_0110(
       celt_word16       *_lpc, /* out: [0...p-1] LPC coefficients      */
 const celt_word32 *ac,  /* in:  [0...p] autocorrelation values  */
 int          p
@@ -143,7 +143,7 @@ void iir(const celt_word32 *x,
    }
 }
 
-void _celt_autocorr(
+void _celt_autocorr_0110(
                    const celt_word16 *x,   /*  in: [0...n-1] samples x   */
                    celt_word32       *ac,  /* out: [0...lag-1] ac values */
                    const celt_word16       *window,

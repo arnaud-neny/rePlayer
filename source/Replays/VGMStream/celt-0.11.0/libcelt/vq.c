@@ -393,7 +393,7 @@ void renormalise_vector_0110(celt_norm *X, int N, celt_word16 gain)
    /*return celt_sqrt(E);*/
 }
 
-int stereo_itheta(celt_norm *X, celt_norm *Y, int stereo, int N)
+int stereo_itheta_0110(celt_norm *X, celt_norm *Y, int stereo, int N)
 {
    int i;
    int itheta;

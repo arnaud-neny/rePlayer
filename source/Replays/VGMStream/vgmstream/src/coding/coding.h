@@ -619,6 +619,10 @@ void ffmpeg_set_force_seek(ffmpeg_codec_data* data);
 void ffmpeg_set_invert_floats(ffmpeg_codec_data* data);
 const char* ffmpeg_get_metadata_value(ffmpeg_codec_data* data, const char* key);
 
+// rePlayer begin
+const char* ffmpeg_get_format_name(ffmpeg_codec_data* data);
+// rePlayer end
+
 int32_t ffmpeg_get_samples(ffmpeg_codec_data* data);
 int ffmpeg_get_sample_rate(ffmpeg_codec_data* data);
 int ffmpeg_get_channels(ffmpeg_codec_data* data);

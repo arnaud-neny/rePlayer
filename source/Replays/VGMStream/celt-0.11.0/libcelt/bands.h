@@ -69,7 +69,7 @@ void denormalise_bands_0110(const CELTMode *m, const celt_norm * restrict X, cel
 #define SPREAD_NORMAL     (2)
 #define SPREAD_AGGRESSIVE (3)
 
-int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
+int spreading_decision_0110(const CELTMode *m, celt_norm *X, int *average,
       int last_decision, int *hf_average, int *tapset_decision, int update_hf,
       int end, int _C, int M);
 
@@ -77,7 +77,7 @@ int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
 void measure_norm_mse(const CELTMode *m, float *X, float *X0, float *bandE, float *bandE0, int M, int N, int C);
 #endif
 
-void haar1(celt_norm *X, int N0, int stride);
+void haar1_0110(celt_norm *X, int N0, int stride);
 
 /** Quantisation/encoding of the residual spectrum
  * @param m Mode data 
@@ -85,7 +85,7 @@ void haar1(celt_norm *X, int N0, int stride);
  * @param total_bits Total number of bits that can be used for the frame (including the ones already spent)
  * @param enc Entropy encoder
  */
-void quant_all_bands(int encode, const CELTMode *m, int start, int end,
+void quant_all_bands_0110(int encode, const CELTMode *m, int start, int end,
       celt_norm * X, celt_norm * Y, unsigned char *collapse_masks, const celt_ener *bandE, int *pulses,
       int time_domain, int fold, int dual_stereo, int intensity, int *tf_res, int resynth,
       celt_int32 total_bits, celt_int32 balance, ec_ctx *ec, int M, int codedBands, ec_uint32 *seed);
@@ -93,7 +93,7 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
 
 void stereo_decision(const CELTMode *m, celt_norm * restrict X, int *stereo_mode, int len, int M);
 
-void anti_collapse(const CELTMode *m, celt_norm *_X, unsigned char *collapse_masks, int LM, int C, int CC, int size,
+void anti_collapse_0110(const CELTMode *m, celt_norm *_X, unsigned char *collapse_masks, int LM, int C, int CC, int size,
       int start, int end, celt_word16 *logE, celt_word16 *prev1logE,
       celt_word16 *prev2logE, int *pulses, celt_uint32 seed);
 

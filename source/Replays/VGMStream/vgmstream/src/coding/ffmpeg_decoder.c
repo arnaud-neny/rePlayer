@@ -1065,6 +1065,16 @@ const char* ffmpeg_get_metadata_value(ffmpeg_codec_data* data, const char* key) 
     return avde->value;
 }
 
+// rePlayer begin
+const char* ffmpeg_get_format_name(ffmpeg_codec_data* data)
+{
+    if (!data)
+        return NULL;
+
+    return data->formatCtx->iformat->long_name;
+}
+// rePlayer end
+
 int32_t ffmpeg_get_samples(ffmpeg_codec_data* data) {
     if (!data)
         return 0;

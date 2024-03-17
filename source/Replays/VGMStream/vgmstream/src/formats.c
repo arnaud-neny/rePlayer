@@ -25,7 +25,7 @@ static const char* extension_list[] = {
     "2dx9",
     "2pfs",
     "3do",
-    "3ds", //txth/reserved [F1 2011 (3DS)] 
+    "3ds", //txth/reserved [F1 2011 (3DS)]
     "4", //for Game.com audio
     "8", //txth/reserved [Gungage (PS1)]
     "800",
@@ -1465,6 +1465,18 @@ void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t ou
 
     strncpy(out, description, out_size);
 }
+
+// rePlayer begin
+void get_vgmstream_ffmpeg_format(VGMSTREAM* vgmstream, char* out, size_t out_size)
+{
+#ifdef VGM_USE_FFMPEG
+    const char* format;
+    format = ffmpeg_get_format_name(vgmstream->codec_data);
+    if (format)
+        strncpy(out, format, out_size);
+#endif
+}
+// rePlayer end
 
 static const char* get_layout_name(layout_t layout_type) {
     int i, list_length;

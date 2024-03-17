@@ -250,7 +250,7 @@ EXPORT int celt_encoder_ctl_0110(CELTEncoder * st, int request, ...);
 
 /* Decoder stuff */
 
-EXPORT int celt_decoder_get_size(int channels);
+EXPORT int celt_decoder_get_size_0110(int channels);
 
 EXPORT int celt_decoder_get_size_custom(const CELTMode *mode, int channels);
 
@@ -274,7 +274,7 @@ EXPORT CELTDecoder *celt_decoder_create(int sampling_rate, int channels, int *er
  */
 EXPORT CELTDecoder *celt_decoder_create_custom_0110(const CELTMode *mode, int channels, int *error);
 
-EXPORT CELTDecoder *celt_decoder_init(CELTDecoder *st, int sampling_rate, int channels, int *error);
+EXPORT CELTDecoder *celt_decoder_init_0110(CELTDecoder *st, int sampling_rate, int channels, int *error);
 
 EXPORT CELTDecoder *celt_decoder_init_custom(CELTDecoder *st, const CELTMode *mode, int channels, int *error);
 

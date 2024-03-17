@@ -32,8 +32,6 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -54,12 +52,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_FFMPEG;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;HAVE_AV_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\opus\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)ffmpeg;$(ProjectDir)ffmpeg\compat\atomics\win32;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -68,7 +66,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;vorbis.lib;mpg123.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;opus.lib;vorbis.lib;mpg123.lib;Bcrypt.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -77,12 +75,12 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_FFMPEG;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;HAVE_AV_CONFIG_H;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\opus\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)ffmpeg;$(ProjectDir)ffmpeg\compat\atomics\win32;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -93,7 +91,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;vorbis.lib;mpg123.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;opus.lib;vorbis.lib;mpg123.lib;Bcrypt.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -162,6 +160,279 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="celt-0.6.1\libcelt\stack_alloc.h" />
     <ClInclude Include="celt-0.6.1\libcelt\vq.h" />
     <ClInclude Include="celt-0.6.1\libcelt\_kiss_fft_guts.h" />
+    <ClInclude Include="ffmpeg\compat\atomics\win32\stdatomic.h" />
+    <ClInclude Include="ffmpeg\compat\va_copy.h" />
+    <ClInclude Include="ffmpeg\config.h" />
+    <ClInclude Include="ffmpeg\config_components.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aac.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacdectab.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacps.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacpsdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacps_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacsbr.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aacsbrdata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aactab.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aac_ac3_parser.h" />
+    <ClInclude Include="ffmpeg\libavcodec\aac_defines.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3dec.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3dec_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3defs.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3dsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3tab.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3_channel_layout_tab.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3_parser.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ac3_parser_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\adpcm.h" />
+    <ClInclude Include="ffmpeg\libavcodec\adpcm_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\adts_header.h" />
+    <ClInclude Include="ffmpeg\libavcodec\adts_parser.h" />
+    <ClInclude Include="ffmpeg\libavcodec\alacdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\alac_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\atrac.h" />
+    <ClInclude Include="ffmpeg\libavcodec\atrac3data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\atrac3plus.h" />
+    <ClInclude Include="ffmpeg\libavcodec\atrac3plus_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\audiodsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\avcodec.h" />
+    <ClInclude Include="ffmpeg\libavcodec\avfft.h" />
+    <ClInclude Include="ffmpeg\libavcodec\blockdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\bsf.h" />
+    <ClInclude Include="ffmpeg\libavcodec\bsf_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\bswapdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\bytestream.h" />
+    <ClInclude Include="ffmpeg\libavcodec\cbrt_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\cbrt_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\codec.h" />
+    <ClInclude Include="ffmpeg\libavcodec\codec_desc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\codec_id.h" />
+    <ClInclude Include="ffmpeg\libavcodec\codec_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\codec_par.h" />
+    <ClInclude Include="ffmpeg\libavcodec\dct.h" />
+    <ClInclude Include="ffmpeg\libavcodec\dct32.h" />
+    <ClInclude Include="ffmpeg\libavcodec\decode.h" />
+    <ClInclude Include="ffmpeg\libavcodec\defs.h" />
+    <ClInclude Include="ffmpeg\libavcodec\dirac.h" />
+    <ClInclude Include="ffmpeg\libavcodec\eac3_data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\encode.h" />
+    <ClInclude Include="ffmpeg\libavcodec\error_resilience.h" />
+    <ClInclude Include="ffmpeg\libavcodec\fdctdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\fft-internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\fft.h" />
+    <ClInclude Include="ffmpeg\libavcodec\flac.h" />
+    <ClInclude Include="ffmpeg\libavcodec\flacdata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\flacdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\fmtconvert.h" />
+    <ClInclude Include="ffmpeg\libavcodec\frame_thread_encoder.h" />
+    <ClInclude Include="ffmpeg\libavcodec\get_bits.h" />
+    <ClInclude Include="ffmpeg\libavcodec\golomb.h" />
+    <ClInclude Include="ffmpeg\libavcodec\h263dsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\h264chroma.h" />
+    <ClInclude Include="ffmpeg\libavcodec\hevc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\hpeldsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\hwaccels.h" />
+    <ClInclude Include="ffmpeg\libavcodec\hwconfig.h" />
+    <ClInclude Include="ffmpeg\libavcodec\idctdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\kbdwin.h" />
+    <ClInclude Include="ffmpeg\libavcodec\libopus.h" />
+    <ClInclude Include="ffmpeg\libavcodec\lossless_audiodsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\lpc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mathops.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mdct15.h" />
+    <ClInclude Include="ffmpeg\libavcodec\me_cmp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mlp_parse.h" />
+    <ClInclude Include="ffmpeg\libavcodec\motion_est.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpc7data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpc8data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpc8huff.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpcdata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpeg12.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpeg12data.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpeg4audio.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpeg4audio_sample_rates.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudio.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudiodata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudiodecheader.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudiodec_common_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudiodsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudiotabs.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegaudio_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegpicture.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegutils.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegvideo.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegvideodsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\mpegvideoencdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\options_table.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opus.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opusdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opustab.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opus_celt.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opus_pvq.h" />
+    <ClInclude Include="ffmpeg\libavcodec\opus_rc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\packet.h" />
+    <ClInclude Include="ffmpeg\libavcodec\packet_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\parser.h" />
+    <ClInclude Include="ffmpeg\libavcodec\pcm_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\pixblockdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\png.h" />
+    <ClInclude Include="ffmpeg\libavcodec\pngdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\profiles.h" />
+    <ClInclude Include="ffmpeg\libavcodec\pthread_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\put_bits.h" />
+    <ClInclude Include="ffmpeg\libavcodec\qpeldsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\ratecontrol.h" />
+    <ClInclude Include="ffmpeg\libavcodec\raw.h" />
+    <ClInclude Include="ffmpeg\libavcodec\rdft.h" />
+    <ClInclude Include="ffmpeg\libavcodec\rl.h" />
+    <ClInclude Include="ffmpeg\libavcodec\sbr.h" />
+    <ClInclude Include="ffmpeg\libavcodec\sbrdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\sinewin.h" />
+    <ClInclude Include="ffmpeg\libavcodec\sinewin_tablegen.h" />
+    <ClInclude Include="ffmpeg\libavcodec\startcode.h" />
+    <ClInclude Include="ffmpeg\libavcodec\tableprint.h" />
+    <ClInclude Include="ffmpeg\libavcodec\tak.h" />
+    <ClInclude Include="ffmpeg\libavcodec\takdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\thread.h" />
+    <ClInclude Include="ffmpeg\libavcodec\threadframe.h" />
+    <ClInclude Include="ffmpeg\libavcodec\to_upper4.h" />
+    <ClInclude Include="ffmpeg\libavcodec\unary.h" />
+    <ClInclude Include="ffmpeg\libavcodec\version_major.h" />
+    <ClInclude Include="ffmpeg\libavcodec\videodsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\vlc.h" />
+    <ClInclude Include="ffmpeg\libavcodec\vorbis.h" />
+    <ClInclude Include="ffmpeg\libavcodec\vorbisdsp.h" />
+    <ClInclude Include="ffmpeg\libavcodec\vorbis_parser.h" />
+    <ClInclude Include="ffmpeg\libavcodec\vorbis_parser_internal.h" />
+    <ClInclude Include="ffmpeg\libavcodec\wma.h" />
+    <ClInclude Include="ffmpeg\libavcodec\wmadata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\wmaprodata.h" />
+    <ClInclude Include="ffmpeg\libavcodec\wma_common.h" />
+    <ClInclude Include="ffmpeg\libavcodec\wma_freqs.h" />
+    <ClInclude Include="ffmpeg\libavcodec\x86\fft.h" />
+    <ClInclude Include="ffmpeg\libavcodec\x86\mathops.h" />
+    <ClInclude Include="ffmpeg\libavcodec\xiph.h" />
+    <ClInclude Include="ffmpeg\libavformat\apetag.h" />
+    <ClInclude Include="ffmpeg\libavformat\asf.h" />
+    <ClInclude Include="ffmpeg\libavformat\asfcrypt.h" />
+    <ClInclude Include="ffmpeg\libavformat\avformat.h" />
+    <ClInclude Include="ffmpeg\libavformat\avio.h" />
+    <ClInclude Include="ffmpeg\libavformat\avio_internal.h" />
+    <ClInclude Include="ffmpeg\libavformat\avlanguage.h" />
+    <ClInclude Include="ffmpeg\libavformat\caf.h" />
+    <ClInclude Include="ffmpeg\libavformat\demux.h" />
+    <ClInclude Include="ffmpeg\libavformat\dovi_isom.h" />
+    <ClInclude Include="ffmpeg\libavformat\dv.h" />
+    <ClInclude Include="ffmpeg\libavformat\flac_picture.h" />
+    <ClInclude Include="ffmpeg\libavformat\id3v1.h" />
+    <ClInclude Include="ffmpeg\libavformat\id3v2.h" />
+    <ClInclude Include="ffmpeg\libavformat\img2.h" />
+    <ClInclude Include="ffmpeg\libavformat\internal.h" />
+    <ClInclude Include="ffmpeg\libavformat\isom.h" />
+    <ClInclude Include="ffmpeg\libavformat\metadata.h" />
+    <ClInclude Include="ffmpeg\libavformat\mov_chan.h" />
+    <ClInclude Include="ffmpeg\libavformat\mux.h" />
+    <ClInclude Include="ffmpeg\libavformat\oggdec.h" />
+    <ClInclude Include="ffmpeg\libavformat\oma.h" />
+    <ClInclude Include="ffmpeg\libavformat\options_table.h" />
+    <ClInclude Include="ffmpeg\libavformat\os_support.h" />
+    <ClInclude Include="ffmpeg\libavformat\pcm.h" />
+    <ClInclude Include="ffmpeg\libavformat\qtpalette.h" />
+    <ClInclude Include="ffmpeg\libavformat\rawdec.h" />
+    <ClInclude Include="ffmpeg\libavformat\replaygain.h" />
+    <ClInclude Include="ffmpeg\libavformat\riff.h" />
+    <ClInclude Include="ffmpeg\libavformat\spdif.h" />
+    <ClInclude Include="ffmpeg\libavformat\url.h" />
+    <ClInclude Include="ffmpeg\libavformat\version_major.h" />
+    <ClInclude Include="ffmpeg\libavformat\vorbiscomment.h" />
+    <ClInclude Include="ffmpeg\libavformat\w64.h" />
+    <ClInclude Include="ffmpeg\libavutil\aes.h" />
+    <ClInclude Include="ffmpeg\libavutil\aes_ctr.h" />
+    <ClInclude Include="ffmpeg\libavutil\aes_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\attributes.h" />
+    <ClInclude Include="ffmpeg\libavutil\audio_fifo.h" />
+    <ClInclude Include="ffmpeg\libavutil\avassert.h" />
+    <ClInclude Include="ffmpeg\libavutil\avconfig.h" />
+    <ClInclude Include="ffmpeg\libavutil\avstring.h" />
+    <ClInclude Include="ffmpeg\libavutil\avutil.h" />
+    <ClInclude Include="ffmpeg\libavutil\base64.h" />
+    <ClInclude Include="ffmpeg\libavutil\bprint.h" />
+    <ClInclude Include="ffmpeg\libavutil\bswap.h" />
+    <ClInclude Include="ffmpeg\libavutil\buffer.h" />
+    <ClInclude Include="ffmpeg\libavutil\buffer_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\channel_layout.h" />
+    <ClInclude Include="ffmpeg\libavutil\common.h" />
+    <ClInclude Include="ffmpeg\libavutil\cpu.h" />
+    <ClInclude Include="ffmpeg\libavutil\cpu_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\crc.h" />
+    <ClInclude Include="ffmpeg\libavutil\des.h" />
+    <ClInclude Include="ffmpeg\libavutil\dict.h" />
+    <ClInclude Include="ffmpeg\libavutil\display.h" />
+    <ClInclude Include="ffmpeg\libavutil\dovi_meta.h" />
+    <ClInclude Include="ffmpeg\libavutil\downmix_info.h" />
+    <ClInclude Include="ffmpeg\libavutil\dynarray.h" />
+    <ClInclude Include="ffmpeg\libavutil\encryption_info.h" />
+    <ClInclude Include="ffmpeg\libavutil\error.h" />
+    <ClInclude Include="ffmpeg\libavutil\eval.h" />
+    <ClInclude Include="ffmpeg\libavutil\ffmath.h" />
+    <ClInclude Include="ffmpeg\libavutil\fifo.h" />
+    <ClInclude Include="ffmpeg\libavutil\fixed_dsp.h" />
+    <ClInclude Include="ffmpeg\libavutil\float_dsp.h" />
+    <ClInclude Include="ffmpeg\libavutil\frame.h" />
+    <ClInclude Include="ffmpeg\libavutil\hwcontext.h" />
+    <ClInclude Include="ffmpeg\libavutil\hwcontext_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\imgutils.h" />
+    <ClInclude Include="ffmpeg\libavutil\imgutils_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\intfloat.h" />
+    <ClInclude Include="ffmpeg\libavutil\intmath.h" />
+    <ClInclude Include="ffmpeg\libavutil\intreadwrite.h" />
+    <ClInclude Include="ffmpeg\libavutil\lfg.h" />
+    <ClInclude Include="ffmpeg\libavutil\libm.h" />
+    <ClInclude Include="ffmpeg\libavutil\lls.h" />
+    <ClInclude Include="ffmpeg\libavutil\log.h" />
+    <ClInclude Include="ffmpeg\libavutil\macros.h" />
+    <ClInclude Include="ffmpeg\libavutil\mastering_display_metadata.h" />
+    <ClInclude Include="ffmpeg\libavutil\mathematics.h" />
+    <ClInclude Include="ffmpeg\libavutil\md5.h" />
+    <ClInclude Include="ffmpeg\libavutil\mem.h" />
+    <ClInclude Include="ffmpeg\libavutil\mem_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\opt.h" />
+    <ClInclude Include="ffmpeg\libavutil\parseutils.h" />
+    <ClInclude Include="ffmpeg\libavutil\pixdesc.h" />
+    <ClInclude Include="ffmpeg\libavutil\pixfmt.h" />
+    <ClInclude Include="ffmpeg\libavutil\qsort.h" />
+    <ClInclude Include="ffmpeg\libavutil\random_seed.h" />
+    <ClInclude Include="ffmpeg\libavutil\rational.h" />
+    <ClInclude Include="ffmpeg\libavutil\rc4.h" />
+    <ClInclude Include="ffmpeg\libavutil\replaygain.h" />
+    <ClInclude Include="ffmpeg\libavutil\reverse.h" />
+    <ClInclude Include="ffmpeg\libavutil\samplefmt.h" />
+    <ClInclude Include="ffmpeg\libavutil\sha.h" />
+    <ClInclude Include="ffmpeg\libavutil\softfloat.h" />
+    <ClInclude Include="ffmpeg\libavutil\softfloat_tables.h" />
+    <ClInclude Include="ffmpeg\libavutil\spherical.h" />
+    <ClInclude Include="ffmpeg\libavutil\stereo3d.h" />
+    <ClInclude Include="ffmpeg\libavutil\thread.h" />
+    <ClInclude Include="ffmpeg\libavutil\time.h" />
+    <ClInclude Include="ffmpeg\libavutil\timecode.h" />
+    <ClInclude Include="ffmpeg\libavutil\timer.h" />
+    <ClInclude Include="ffmpeg\libavutil\timestamp.h" />
+    <ClInclude Include="ffmpeg\libavutil\time_internal.h" />
+    <ClInclude Include="ffmpeg\libavutil\uuid.h" />
+    <ClInclude Include="ffmpeg\libavutil\version.h" />
+    <ClInclude Include="ffmpeg\libavutil\wchar_filename.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\asm.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\bswap.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\cpu.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\emms.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\intmath.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\intreadwrite.h" />
+    <ClInclude Include="ffmpeg\libavutil\x86\timer.h" />
+    <ClInclude Include="ffmpeg\libswresample\swresample.h" />
+    <ClInclude Include="ffmpeg\libswresample\version.h" />
+    <ClInclude Include="ffmpeg\libswresample\version_major.h" />
     <ClInclude Include="LibAtrac9\src\band_extension.h" />
     <ClInclude Include="LibAtrac9\src\bit_allocation.h" />
     <ClInclude Include="LibAtrac9\src\bit_reader.h" />
@@ -445,6 +716,322 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="celt-0.6.1\libcelt\rangeenc.c" />
     <ClCompile Include="celt-0.6.1\libcelt\rate.c" />
     <ClCompile Include="celt-0.6.1\libcelt\vq.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacdec_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\aacps.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacpsdata.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\aacpsdsp_template.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacps_common.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacsbr.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aacsbr_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\aactab.c" />
+    <ClCompile Include="ffmpeg\libavcodec\aac_ac3_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3dec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\ac3dec_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3dec_float.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3dsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3tab.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3_channel_layout_tab.c" />
+    <ClCompile Include="ffmpeg\libavcodec\ac3_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\adpcm.c" />
+    <ClCompile Include="ffmpeg\libavcodec\adpcm_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\adts_header.c" />
+    <ClCompile Include="ffmpeg\libavcodec\adts_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\alac.c" />
+    <ClCompile Include="ffmpeg\libavcodec\alacdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\alac_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\allcodecs.c" />
+    <ClCompile Include="ffmpeg\libavcodec\apedec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\atrac.c" />
+    <ClCompile Include="ffmpeg\libavcodec\atrac3.c" />
+    <ClCompile Include="ffmpeg\libavcodec\atrac3plus.c" />
+    <ClCompile Include="ffmpeg\libavcodec\atrac3plusdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\atrac3plusdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\audiodsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\avcodec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\avpacket.c" />
+    <ClCompile Include="ffmpeg\libavcodec\binkaudio.c" />
+    <ClCompile Include="ffmpeg\libavcodec\bitstream.c" />
+    <ClCompile Include="ffmpeg\libavcodec\bitstream_filters.c" />
+    <ClCompile Include="ffmpeg\libavcodec\bsf.c" />
+    <ClCompile Include="ffmpeg\libavcodec\bsf_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\bswapdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\cbrt_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\codec_desc.c" />
+    <ClCompile Include="ffmpeg\libavcodec\codec_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\codec_par.c" />
+    <ClCompile Include="ffmpeg\libavcodec\dct.c" />
+    <ClCompile Include="ffmpeg\libavcodec\dct32_fixed.c" />
+    <ClCompile Include="ffmpeg\libavcodec\dct32_float.c" />
+    <ClCompile Include="ffmpeg\libavcodec\dct32_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\decode.c" />
+    <ClCompile Include="ffmpeg\libavcodec\dirac.c" />
+    <ClCompile Include="ffmpeg\libavcodec\eac3dec.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\eac3_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\encode.c" />
+    <ClCompile Include="ffmpeg\libavcodec\fft_template.c" />
+    <ClCompile Include="ffmpeg\libavcodec\flac.c" />
+    <ClCompile Include="ffmpeg\libavcodec\flacdata.c" />
+    <ClCompile Include="ffmpeg\libavcodec\flacdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\flacdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\flacdsp_lpc_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\flacdsp_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\flac_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\fmtconvert.c" />
+    <ClCompile Include="ffmpeg\libavcodec\get_buffer.c" />
+    <ClCompile Include="ffmpeg\libavcodec\golomb.c" />
+    <ClCompile Include="ffmpeg\libavcodec\kbdwin.c" />
+    <ClCompile Include="ffmpeg\libavcodec\libopus.c" />
+    <ClCompile Include="ffmpeg\libavcodec\libopusdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\lossless_audiodsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mathtables.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mdct15.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mdct_template.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpc.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpc7.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpc8.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpeg12framerate.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpeg4audio.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpeg4audio_sample_rates.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudio.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodata.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodecheader.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_common.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_fixed.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_float.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_fixed.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_float.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudiotabs.c" />
+    <ClCompile Include="ffmpeg\libavcodec\mpegaudio_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\options.c" />
+    <ClCompile Include="ffmpeg\libavcodec\opus.c" />
+    <ClCompile Include="ffmpeg\libavcodec\opustab.c" />
+    <ClCompile Include="ffmpeg\libavcodec\opus_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\opus_rc.c" />
+    <ClCompile Include="ffmpeg\libavcodec\parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\parsers.c" />
+    <ClCompile Include="ffmpeg\libavcodec\parser_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\pcm.c" />
+    <ClCompile Include="ffmpeg\libavcodec\profiles.c" />
+    <ClCompile Include="ffmpeg\libavcodec\raw.c" />
+    <ClCompile Include="ffmpeg\libavcodec\rdft.c" />
+    <ClCompile Include="ffmpeg\libavcodec\sbrdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\sbrdsp_template.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavcodec\sinewin_tablegen.c" />
+    <ClCompile Include="ffmpeg\libavcodec\smacker.c" />
+    <ClCompile Include="ffmpeg\libavcodec\tak.c" />
+    <ClCompile Include="ffmpeg\libavcodec\takdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\takdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\tak_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\to_upper4.c" />
+    <ClCompile Include="ffmpeg\libavcodec\utils.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vlc.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vorbis.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vorbisdec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vorbisdsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vorbis_data.c" />
+    <ClCompile Include="ffmpeg\libavcodec\vorbis_parser.c" />
+    <ClCompile Include="ffmpeg\libavcodec\wma.c" />
+    <ClCompile Include="ffmpeg\libavcodec\wmadec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\wmaprodec.c" />
+    <ClCompile Include="ffmpeg\libavcodec\wma_common.c" />
+    <ClCompile Include="ffmpeg\libavcodec\wma_freqs.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\aacpsdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\ac3dsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\alacdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\audiodsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\bswapdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\dct_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\fft_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\flacdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\fmtconvert_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\lossless_audiodsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\mdct15_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\mpegaudiodsp.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\sbrdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\takdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\x86\vorbisdsp_init.c" />
+    <ClCompile Include="ffmpeg\libavcodec\xiph.c" />
+    <ClCompile Include="ffmpeg\libavcodec\xma_parser.c" />
+    <ClCompile Include="ffmpeg\libavformat\aacdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\ac3dec.c" />
+    <ClCompile Include="ffmpeg\libavformat\allformats.c" />
+    <ClCompile Include="ffmpeg\libavformat\ape.c" />
+    <ClCompile Include="ffmpeg\libavformat\apetag.c" />
+    <ClCompile Include="ffmpeg\libavformat\asf.c" />
+    <ClCompile Include="ffmpeg\libavformat\asfcrypt.c" />
+    <ClCompile Include="ffmpeg\libavformat\asfdec_f.c" />
+    <ClCompile Include="ffmpeg\libavformat\asf_tags.c" />
+    <ClCompile Include="ffmpeg\libavformat\avformat.c" />
+    <ClCompile Include="ffmpeg\libavformat\avio.c" />
+    <ClCompile Include="ffmpeg\libavformat\aviobuf.c" />
+    <ClCompile Include="ffmpeg\libavformat\avlanguage.c" />
+    <ClCompile Include="ffmpeg\libavformat\bink.c" />
+    <ClCompile Include="ffmpeg\libavformat\binka.c" />
+    <ClCompile Include="ffmpeg\libavformat\caf.c" />
+    <ClCompile Include="ffmpeg\libavformat\cafdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\demux.c" />
+    <ClCompile Include="ffmpeg\libavformat\demuxer_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavformat\demux_utils.c" />
+    <ClCompile Include="ffmpeg\libavformat\dovi_isom.c" />
+    <ClCompile Include="ffmpeg\libavformat\dump.c" />
+    <ClCompile Include="ffmpeg\libavformat\flacdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\flac_picture.c" />
+    <ClCompile Include="ffmpeg\libavformat\format.c" />
+    <ClCompile Include="ffmpeg\libavformat\id3v1.c" />
+    <ClCompile Include="ffmpeg\libavformat\id3v2.c" />
+    <ClCompile Include="ffmpeg\libavformat\img2.c" />
+    <ClCompile Include="ffmpeg\libavformat\isom.c" />
+    <ClCompile Include="ffmpeg\libavformat\isom_tags.c" />
+    <ClCompile Include="ffmpeg\libavformat\metadata.c" />
+    <ClCompile Include="ffmpeg\libavformat\mov.c" />
+    <ClCompile Include="ffmpeg\libavformat\mov_chan.c" />
+    <ClCompile Include="ffmpeg\libavformat\mov_esds.c" />
+    <ClCompile Include="ffmpeg\libavformat\mp3dec.c" />
+    <ClCompile Include="ffmpeg\libavformat\mpc.c" />
+    <ClCompile Include="ffmpeg\libavformat\mpc8.c" />
+    <ClCompile Include="ffmpeg\libavformat\muxer_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavformat\mux_utils.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsecelt.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsedirac.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparseflac.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparseogm.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparseopus.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparseskeleton.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsespeex.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsetheora.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsevorbis.c" />
+    <ClCompile Include="ffmpeg\libavformat\oggparsevp8.c" />
+    <ClCompile Include="ffmpeg\libavformat\oma.c" />
+    <ClCompile Include="ffmpeg\libavformat\omadec.c" />
+    <ClCompile Include="ffmpeg\libavformat\options.c" />
+    <ClCompile Include="ffmpeg\libavformat\pcm.c" />
+    <ClCompile Include="ffmpeg\libavformat\protocols.c" />
+    <ClCompile Include="ffmpeg\libavformat\protocol_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ffmpeg\libavformat\qtpalette.c" />
+    <ClCompile Include="ffmpeg\libavformat\rawdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\replaygain.c" />
+    <ClCompile Include="ffmpeg\libavformat\riff.c" />
+    <ClCompile Include="ffmpeg\libavformat\riffdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\seek.c" />
+    <ClCompile Include="ffmpeg\libavformat\smacker.c" />
+    <ClCompile Include="ffmpeg\libavformat\spdif.c" />
+    <ClCompile Include="ffmpeg\libavformat\spdifdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\takdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\utils.c" />
+    <ClCompile Include="ffmpeg\libavformat\vorbiscomment.c" />
+    <ClCompile Include="ffmpeg\libavformat\w64.c" />
+    <ClCompile Include="ffmpeg\libavformat\wavdec.c" />
+    <ClCompile Include="ffmpeg\libavformat\xmv.c" />
+    <ClCompile Include="ffmpeg\libavformat\xwma.c" />
+    <ClCompile Include="ffmpeg\libavutil\aes.c" />
+    <ClCompile Include="ffmpeg\libavutil\aes_ctr.c" />
+    <ClCompile Include="ffmpeg\libavutil\audio_fifo.c" />
+    <ClCompile Include="ffmpeg\libavutil\avsscanf.c" />
+    <ClCompile Include="ffmpeg\libavutil\avstring.c" />
+    <ClCompile Include="ffmpeg\libavutil\base64.c" />
+    <ClCompile Include="ffmpeg\libavutil\bprint.c" />
+    <ClCompile Include="ffmpeg\libavutil\buffer.c" />
+    <ClCompile Include="ffmpeg\libavutil\channel_layout.c" />
+    <ClCompile Include="ffmpeg\libavutil\cpu.c" />
+    <ClCompile Include="ffmpeg\libavutil\crc.c" />
+    <ClCompile Include="ffmpeg\libavutil\des.c" />
+    <ClCompile Include="ffmpeg\libavutil\dict.c" />
+    <ClCompile Include="ffmpeg\libavutil\display.c" />
+    <ClCompile Include="ffmpeg\libavutil\dovi_meta.c" />
+    <ClCompile Include="ffmpeg\libavutil\downmix_info.c" />
+    <ClCompile Include="ffmpeg\libavutil\encryption_info.c" />
+    <ClCompile Include="ffmpeg\libavutil\error.c" />
+    <ClCompile Include="ffmpeg\libavutil\eval.c" />
+    <ClCompile Include="ffmpeg\libavutil\fifo.c" />
+    <ClCompile Include="ffmpeg\libavutil\fixed_dsp.c" />
+    <ClCompile Include="ffmpeg\libavutil\float_dsp.c" />
+    <ClCompile Include="ffmpeg\libavutil\frame.c" />
+    <ClCompile Include="ffmpeg\libavutil\hwcontext.c" />
+    <ClCompile Include="ffmpeg\libavutil\imgutils.c" />
+    <ClCompile Include="ffmpeg\libavutil\lfg.c" />
+    <ClCompile Include="ffmpeg\libavutil\log.c" />
+    <ClCompile Include="ffmpeg\libavutil\log2_tab.c" />
+    <ClCompile Include="ffmpeg\libavutil\mastering_display_metadata.c" />
+    <ClCompile Include="ffmpeg\libavutil\mathematics.c" />
+    <ClCompile Include="ffmpeg\libavutil\md5.c" />
+    <ClCompile Include="ffmpeg\libavutil\mem.c" />
+    <ClCompile Include="ffmpeg\libavutil\opt.c" />
+    <ClCompile Include="ffmpeg\libavutil\parseutils.c" />
+    <ClCompile Include="ffmpeg\libavutil\pixdesc.c" />
+    <ClCompile Include="ffmpeg\libavutil\random_seed.c" />
+    <ClCompile Include="ffmpeg\libavutil\rational.c" />
+    <ClCompile Include="ffmpeg\libavutil\rc4.c" />
+    <ClCompile Include="ffmpeg\libavutil\reverse.c" />
+    <ClCompile Include="ffmpeg\libavutil\samplefmt.c" />
+    <ClCompile Include="ffmpeg\libavutil\sha.c" />
+    <ClCompile Include="ffmpeg\libavutil\spherical.c" />
+    <ClCompile Include="ffmpeg\libavutil\stereo3d.c" />
+    <ClCompile Include="ffmpeg\libavutil\time.c" />
+    <ClCompile Include="ffmpeg\libavutil\timecode.c" />
+    <ClCompile Include="ffmpeg\libavutil\utils.c" />
+    <ClCompile Include="ffmpeg\libavutil\uuid.c" />
+    <ClCompile Include="ffmpeg\libavutil\x86\cpu.c" />
+    <ClCompile Include="ffmpeg\libavutil\x86\fixed_dsp_init.c" />
+    <ClCompile Include="ffmpeg\libavutil\x86\float_dsp_init.c" />
+    <ClCompile Include="ffmpeg\libavutil\x86\imgutils_init.c" />
     <ClCompile Include="LibAtrac9\src\band_extension.c" />
     <ClCompile Include="LibAtrac9\src\bit_allocation.c" />
     <ClCompile Include="LibAtrac9\src\bit_reader.c" />
@@ -1186,6 +1773,4 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <None Include="speex\include\speex\speex_config_types.h.in" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
 </Project>

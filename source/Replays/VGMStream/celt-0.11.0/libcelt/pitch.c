@@ -103,7 +103,7 @@ static void find_best_pitch(celt_word32 *xcorr, celt_word32 maxcorr, celt_word16
 }
 
 #include "plc.h"
-void pitch_downsample(celt_sig * restrict x[], celt_word16 * restrict x_lp,
+void pitch_downsample_0110(celt_sig * restrict x[], celt_word16 * restrict x_lp,
       int len, int _C)
 {
    int i;
@@ -121,7 +121,7 @@ void pitch_downsample(celt_sig * restrict x[], celt_word16 * restrict x_lp,
       x_lp[0] += SHR32(HALF32(HALF32(x[1][1])+x[1][0]), SIG_SHIFT+3);
    }
 
-   _celt_autocorr(x_lp, ac, NULL, 0,
+   _celt_autocorr_0110(x_lp, ac, NULL, 0,
                   4, len>>1);
 
    /* Noise floor -40 dB */
@@ -141,7 +141,7 @@ void pitch_downsample(celt_sig * restrict x[], celt_word16 * restrict x_lp,
 #endif
    }
 
-   _celt_lpc(lpc, ac, 4);
+   _celt_lpc_0110(lpc, ac, 4);
    for (i=0;i<4;i++)
    {
       tmp = MULT16_16_Q15(QCONST16(.9f,15), tmp);
@@ -155,7 +155,7 @@ void pitch_downsample(celt_sig * restrict x[], celt_word16 * restrict x_lp,
 
 }
 
-void pitch_search(const celt_word16 * restrict x_lp, celt_word16 * restrict y,
+void pitch_search_0110(const celt_word16 * restrict x_lp, celt_word16 * restrict y,
                   int len, int max_pitch, int *pitch)
 {
    int i, j;

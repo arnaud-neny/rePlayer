@@ -59,7 +59,7 @@ void ec_encode_0110(ec_enc *_this,unsigned _fl,unsigned _fh,unsigned _ft);
 void ec_encode_bin_0110(ec_enc *_this,unsigned _fl,unsigned _fh,unsigned _bits);
 
 /* Encode a bit that has a 1/(1<<_logp) probability of being a one */
-void ec_enc_bit_logp(ec_enc *_this,int _val,unsigned _logp);
+void ec_enc_bit_logp_0110(ec_enc *_this,int _val,unsigned _logp);
 
 /*Encodes a symbol given an "inverse" CDF table.
   _s:    The index of the symbol to encode.
@@ -68,7 +68,7 @@ void ec_enc_bit_logp(ec_enc *_this,int _val,unsigned _logp);
          The values must be monotonically non-increasing, and the last value
           must be 0.
   _ftb: The number of bits of precision in the cumulative distribution.*/
-void ec_enc_icdf(ec_enc *_this,int _s,const unsigned char *_icdf,unsigned _ftb);
+void ec_enc_icdf_0110(ec_enc *_this,int _s,const unsigned char *_icdf,unsigned _ftb);
 
 /*Encodes a raw unsigned integer in the stream.
   _fl: The integer to encode.
@@ -90,7 +90,7 @@ void ec_enc_bits_0110(ec_enc *_this,ec_uint32 _fl,unsigned _ftb);
   _size: The number of bytes in the new buffer.
          This must be large enough to contain the bits already written, and
           must be no larger than the existing size.*/
-void ec_enc_shrink(ec_enc *_this,ec_uint32 _size);
+void ec_enc_shrink_0110(ec_enc *_this,ec_uint32 _size);
 
 /*Indicates that there are no more symbols to encode.
   All reamining output bytes are flushed to the output buffer.

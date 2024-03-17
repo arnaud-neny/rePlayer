@@ -1,3 +1,8 @@
+// vgmstream customed files:
+// - coding/coding.h
+// - coding/ffmpeg_decoder.c
+// - formats.c
+// - vgmstream.h
 #include "ReplayVGMStream.h"
 
 #include <Core/String.h>
@@ -14,7 +19,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGMStream,
         .name = "vgmstream",
-        .extensions = "adx;afc;asf;ast;bcstm;bcwav;bns;brstm;dsp;genh;hca;lwav;msf;rwav;scd;wma",
+        .extensions = "adx;afc;asf;ast;at3;bcstm;bcwav;bns;brstm;dsp;genh;hca;lwav;msf;oma;rwav;scd;tak;wma;xma",
         .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2019 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
             "Thealexbarney, CyberBotX, et al\n"
@@ -40,6 +45,10 @@ namespace rePlayer
 
         if (auto* vgmstream = init_vgmstream_from_STREAMFILE(streamFile))
         {
+            char coding[128] = {};
+            get_vgmstream_coding_description(vgmstream, coding, sizeof(coding));
+            char format[128] = {};
+            get_vgmstream_ffmpeg_format(vgmstream, format, sizeof(format));
             auto ext = eExtension::Unknown;
             switch (vgmstream->meta_type)
             {
@@ -50,6 +59,8 @@ namespace rePlayer
                 ext = eExtension::_afc; break;
             case meta_AST:
                 ext = eExtension::_ast; break;
+            case meta_BINK:
+                ext = eExtension::_bik; break;
             case meta_BNS:
                 ext = eExtension::_bns; break;
             case meta_CSTM:
@@ -58,8 +69,14 @@ namespace rePlayer
                 ext = eExtension::_bcwav; break;
             case meta_EA_SCHL:
                 ext = eExtension::_asf; break;
-//             case meta_FFMPEG:
-//                 ext = eExtension::_wma; break;
+            case meta_FFMPEG:
+                if (strcmp(coding, "Windows Media Audio 2") == 0)
+                    ext = eExtension::_wma;
+                else if (strcmp(coding, "TAK (Tom's lossless Audio Kompressor)") == 0)
+                    ext = eExtension::_tak;
+                else if (strstr(coding, "ATRAC3+") && strcmp(format, "Sony OpenMG audio") == 0)
+                    ext = eExtension::_oma;
+                break;
             case meta_GENH:
                 ext = eExtension::_genh; break;
             case meta_HCA:
@@ -68,6 +85,9 @@ namespace rePlayer
                 ext = eExtension::_msf; break;
             case meta_RIFF_WAVE:
                 ext = vgmstream->coding_type == coding_XBOX_IMA ? eExtension::_lwav : eExtension::_wav; break;
+            case meta_RIFF_WAVE_smpl:
+                ext = strstr(coding, "ATRAC3+") ? eExtension::_at3 : eExtension::_wav; break;
+                break;
             case meta_RSTM:
                 ext = eExtension::_brstm; break;
             case meta_RWAV:
@@ -76,6 +96,8 @@ namespace rePlayer
                 ext = eExtension::_scd; break;
             case meta_THP:
                 ext = eExtension::_dsp; break;
+            case meta_XMA_RIFF:
+                ext = eExtension::_xma; break;
             }
             return new ReplayVGMStream(streamFile, vgmstream, ext);
         }
@@ -248,6 +270,17 @@ namespace rePlayer
                 info += '\n';
             info += temp;
         }
+        if (m_vgmstream->meta_type == meta_FFMPEG)
+        {
+            get_vgmstream_ffmpeg_format(m_vgmstream, temp, sizeof(temp));
+            if (temp[0])
+            {
+                if (!info.empty() && info.back() != '\n')
+                    info += '\n';
+                info += "FFmpeg format: ";
+                info += temp;
+            }
+        }
 
         return info;
     }
@@ -263,7 +296,10 @@ namespace rePlayer
             sprintf(buf, "%d channels\n", m_vgmstream->channels);
             info = buf;
         }
-        get_vgmstream_meta_description(m_vgmstream, buf, sizeof(buf));
+        if (m_vgmstream->meta_type != meta_FFMPEG)
+            get_vgmstream_meta_description(m_vgmstream, buf, sizeof(buf));
+        else
+            get_vgmstream_ffmpeg_format(m_vgmstream, buf, sizeof(buf));
         info += buf;
         info += "/";
         get_vgmstream_coding_description(m_vgmstream, buf, sizeof(buf));

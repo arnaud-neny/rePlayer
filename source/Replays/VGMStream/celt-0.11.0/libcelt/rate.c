@@ -359,11 +359,11 @@ static inline int interp_bits2pulses(const CELTMode *m, int start, int end, int 
                fluctuating in and out.*/
             if (band_bits > ((j<prev?7:9)*band_width<<LM<<BITRES)>>4)
             {
-               ec_enc_bit_logp(ec, 1, 1);
+               ec_enc_bit_logp_0110(ec, 1, 1);
                break;
             }
-            ec_enc_bit_logp(ec, 0, 1);
-         } else if (ec_dec_bit_logp(ec, 1)) {
+            ec_enc_bit_logp_0110(ec, 0, 1);
+         } else if (ec_dec_bit_logp_0110(ec, 1)) {
             break;
          }
          /*We used a bit to skip this band.*/
@@ -408,9 +408,9 @@ static inline int interp_bits2pulses(const CELTMode *m, int start, int end, int 
    if (dual_stereo_rsv > 0)
    {
       if (encode)
-         ec_enc_bit_logp(ec, *dual_stereo, 1);
+         ec_enc_bit_logp_0110(ec, *dual_stereo, 1);
       else
-         *dual_stereo = ec_dec_bit_logp(ec, 1);
+         *dual_stereo = ec_dec_bit_logp_0110(ec, 1);
    }
    else
       *dual_stereo = 0;
@@ -493,7 +493,7 @@ static inline int interp_bits2pulses(const CELTMode *m, int start, int end, int 
       }
 
       /* Fine energy can't take advantage of the re-balancing in
-          quant_all_bands().
+          quant_all_bands_0110().
          Instead, do the re-balancing here.*/
       if(excess > 0)
       {
@@ -511,7 +511,7 @@ static inline int interp_bits2pulses(const CELTMode *m, int start, int end, int 
       celt_assert(ebits[j] >= 0);
    }
    /* Save any remaining bits over the cap for the rebalancing in
-       quant_all_bands(). */
+       quant_all_bands_0110(). */
    *_balance = balance;
 
    /* The skipped bands use all their bits for fine energy. */

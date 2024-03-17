@@ -399,4 +399,7 @@ void get_vgmstream_layout_description(VGMSTREAM* vgmstream, char* out, size_t ou
 void get_vgmstream_meta_description(VGMSTREAM* vgmstream, char* out, size_t out_size);
 
 void setup_state_vgmstream(VGMSTREAM* vgmstream);
+
+// rePlayer
+void get_vgmstream_ffmpeg_format(VGMSTREAM* vgmstream, char* out, size_t out_size);
 #endif

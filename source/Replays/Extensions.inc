@@ -415,3 +415,8 @@ EXTENSION(bcstm)    // vgmstream: Nintendo CSTM
 EXTENSION(bcwav)    // vgmstream: Nintendo CWAV
 EXTENSION(msf)      // vgmstream: Sony MSF
 EXTENSION(scd)      // vgmstream: Square Enix SCD
+EXTENSION(xma)      // vgmstream: Microsoft XMA RIFF
+EXTENSION(bik)      // vgmstream: RAD Game Tools Bink
+EXTENSION(tak)      // vgmstream: Tom's lossless Audio Kompressor
+EXTENSION(oma)      // vgmstream: Sony OpenMG audio
+EXTENSION(at3)      // vgmstream: ATRAC3+

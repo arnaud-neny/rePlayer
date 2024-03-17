@@ -75,7 +75,7 @@ unsigned ec_decode_bin_0110(ec_dec *_this,unsigned _bits);
 void ec_dec_update_0110(ec_dec *_this,unsigned _fl,unsigned _fh,unsigned _ft);
 
 /* Decode a bit that has a 1/(1<<_logp) probability of being a one */
-int ec_dec_bit_logp(ec_dec *_this,unsigned _logp);
+int ec_dec_bit_logp_0110(ec_dec *_this,unsigned _logp);
 
 /*Decodes a symbol given an "inverse" CDF table.
   No call to ec_dec_update_0110() is necessary after this call.
@@ -85,7 +85,7 @@ int ec_dec_bit_logp(ec_dec *_this,unsigned _logp);
           must be 0.
   _ftb: The number of bits of precision in the cumulative distribution.
   Return: The decoded symbol s.*/
-int ec_dec_icdf(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb);
+int ec_dec_icdf_0110(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb);
 
 /*Extracts a raw unsigned integer with a non-power-of-2 range from the stream.
   The bits must have been encoded with ec_enc_uint_0110().

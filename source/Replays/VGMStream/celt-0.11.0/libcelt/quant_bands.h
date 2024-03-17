@@ -39,7 +39,7 @@
 #include "entdec.h"
 #include "mathops.h"
 
-void amp2Log2(const CELTMode *m, int effEnd, int end,
+void amp2Log2_0110(const CELTMode *m, int effEnd, int end,
       celt_ener *bandE, celt_word16 *bandLogE, int _C);
 
 void log2Amp(const CELTMode *m, int start, int end,

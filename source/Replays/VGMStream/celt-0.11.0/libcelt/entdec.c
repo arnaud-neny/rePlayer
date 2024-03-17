@@ -172,7 +172,7 @@ void ec_dec_update_0110(ec_dec *_this,unsigned _fl,unsigned _fh,unsigned _ft){
 }
 
 /*The probability of having a "one" is 1/(1<<_logp).*/
-int ec_dec_bit_logp(ec_dec *_this,unsigned _logp){
+int ec_dec_bit_logp_0110(ec_dec *_this,unsigned _logp){
   ec_uint32 r;
   ec_uint32 d;
   ec_uint32 s;
@@ -187,7 +187,7 @@ int ec_dec_bit_logp(ec_dec *_this,unsigned _logp){
   return ret;
 }
 
-int ec_dec_icdf(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb){
+int ec_dec_icdf_0110(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb){
   ec_uint32 r;
   ec_uint32 d;
   ec_uint32 s;

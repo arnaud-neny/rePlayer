@@ -212,7 +212,7 @@ void denormalise_bands_0110(const CELTMode *m, const celt_norm * restrict X, cel
 }
 
 /* This prevents energy collapse for transients with multiple short MDCTs */
-void anti_collapse(const CELTMode *m, celt_norm *_X, unsigned char *collapse_masks, int LM, int C, int CC, int size,
+void anti_collapse_0110(const CELTMode *m, celt_norm *_X, unsigned char *collapse_masks, int LM, int C, int CC, int size,
       int start, int end, celt_word16 *logE, celt_word16 *prev1logE,
       celt_word16 *prev2logE, int *pulses, celt_uint32 seed)
 {
@@ -400,7 +400,7 @@ static void stereo_merge(celt_norm *X, celt_norm *Y, celt_word16 mid, int N)
 }
 
 /* Decide whether we should spread the pulses in the current frame */
-int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
+int spreading_decision_0110(const CELTMode *m, celt_norm *X, int *average,
       int last_decision, int *hf_average, int *tapset_decision, int update_hf,
       int end, int _C, int M)
 {
@@ -591,7 +591,7 @@ static void interleave_hadamard(celt_norm *X, int N0, int stride, int hadamard)
    RESTORE_STACK;
 }
 
-void haar1(celt_norm *X, int N0, int stride)
+void haar1_0110(celt_norm *X, int N0, int stride)
 {
    int i, j;
    N0 >>= 1;
@@ -712,9 +712,9 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
            0,1,1,1,2,3,3,3,2,3,3,3,2,3,3,3
          };
          if (encode)
-            haar1(X, N>>k, 1<<k);
+            haar1_0110(X, N>>k, 1<<k);
          if (lowband)
-            haar1(lowband, N>>k, 1<<k);
+            haar1_0110(lowband, N>>k, 1<<k);
          fill = bit_interleave_table[fill&0xF]|bit_interleave_table[fill>>4]<<2;
       }
       B>>=recombine;
@@ -724,9 +724,9 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
       while ((N_B&1) == 0 && tf_change<0)
       {
          if (encode)
-            haar1(X, N_B, B);
+            haar1_0110(X, N_B, B);
          if (lowband)
-            haar1(lowband, N_B, B);
+            haar1_0110(lowband, N_B, B);
          fill |= fill<<B;
          B <<= 1;
          N_B >>= 1;
@@ -785,7 +785,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
             side and mid. With just that parameter, we can re-scale both
             mid and side because we know that 1) they have unit norm and
             2) they are orthogonal. */
-         itheta = stereo_itheta(X, Y, stereo, N);
+         itheta = stereo_itheta_0110(X, Y, stereo, N);
       }
       tell = ec_tell_frac(ec);
       if (qn!=1)
@@ -881,9 +881,9 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
          if (b>2<<BITRES && *remaining_bits > 2<<BITRES)
          {
             if (encode)
-               ec_enc_bit_logp(ec, inv, 2);
+               ec_enc_bit_logp_0110(ec, inv, 2);
             else
-               inv = ec_dec_bit_logp(ec, 2);
+               inv = ec_dec_bit_logp_0110(ec, 2);
          } else
             inv = 0;
          itheta = 0;
@@ -1126,7 +1126,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
             B >>= 1;
             N_B <<= 1;
             cm |= cm>>B;
-            haar1(X, N_B, B);
+            haar1_0110(X, N_B, B);
          }
 
          for (k=0;k<recombine;k++)
@@ -1136,7 +1136,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
               0xC0,0xC3,0xCC,0xCF,0xF0,0xF3,0xFC,0xFF
             };
             cm = bit_deinterleave_table[cm];
-            haar1(X, N0>>k, 1<<k);
+            haar1_0110(X, N0>>k, 1<<k);
          }
          B<<=recombine;
 
@@ -1155,7 +1155,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
    return cm;
 }
 
-void quant_all_bands(int encode, const CELTMode *m, int start, int end,
+void quant_all_bands_0110(int encode, const CELTMode *m, int start, int end,
       celt_norm *_X, celt_norm *_Y, unsigned char *collapse_masks, const celt_ener *bandE, int *pulses,
       int shortBlocks, int spread, int dual_stereo, int intensity, int *tf_res, int resynth,
       celt_int32 total_bits, celt_int32 balance, ec_ctx *ec, int LM, int codedBands, ec_uint32 *seed)

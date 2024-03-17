@@ -157,7 +157,7 @@ void ec_encode_bin_0110(ec_enc *_this,unsigned _fl,unsigned _fh,unsigned _bits){
 }
 
 /*The probability of having a "one" is 1/(1<<_logp).*/
-void ec_enc_bit_logp(ec_enc *_this,int _val,unsigned _logp){
+void ec_enc_bit_logp_0110(ec_enc *_this,int _val,unsigned _logp){
   ec_uint32 r;
   ec_uint32 s;
   ec_uint32 l;
@@ -170,7 +170,7 @@ void ec_enc_bit_logp(ec_enc *_this,int _val,unsigned _logp){
   ec_enc_normalize(_this);
 }
 
-void ec_enc_icdf(ec_enc *_this,int _s,const unsigned char *_icdf,unsigned _ftb){
+void ec_enc_icdf_0110(ec_enc *_this,int _s,const unsigned char *_icdf,unsigned _ftb){
   ec_uint32 r;
   r=_this->rng>>_ftb;
   if(_s>0){
@@ -219,7 +219,7 @@ void ec_enc_bits_0110(ec_enc *_this,ec_uint32 _fl,unsigned _bits){
   _this->nbits_total+=_bits;
 }
 
-void ec_enc_shrink(ec_enc *_this,ec_uint32 _size){
+void ec_enc_shrink_0110(ec_enc *_this,ec_uint32 _size){
   celt_assert(_this->offs+_this->end_offs<=_size);
   CELT_MOVE(_this->buf+_size-_this->end_offs,
    _this->buf+_this->storage-_this->end_offs,_this->end_offs);
