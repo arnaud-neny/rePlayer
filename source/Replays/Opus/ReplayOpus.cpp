@@ -4,7 +4,7 @@
 #include <Core/Window.inl.h>
 #include <ReplayDll.h>
 
-#include "opus/version.h"
+#include "../3rdParty/opus/version.h"
 #include "opusfile/src/internal.h"
 
 namespace rePlayer
