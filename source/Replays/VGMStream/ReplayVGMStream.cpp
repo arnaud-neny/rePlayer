@@ -19,7 +19,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGMStream,
         .name = "vgmstream",
-        .extensions = "adx;afc;asf;ast;at3;bcstm;bcwav;bns;brstm;dsp;genh;hca;lwav;msf;oma;rwav;scd;tak;wma;xma",
+        .extensions = "adx;afc;asf;ast;at3;bcstm;bcwav;bns;brstm;dsp;genh;hca;lwav;msf;oma;pos;rwav;scd;tak;wma;xma",
         .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2019 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
             "Thealexbarney, CyberBotX, et al\n"
@@ -85,6 +85,8 @@ namespace rePlayer
                 ext = eExtension::_msf; break;
             case meta_RIFF_WAVE:
                 ext = vgmstream->coding_type == coding_XBOX_IMA ? eExtension::_lwav : eExtension::_wav; break;
+            case meta_RIFF_WAVE_POS:
+                ext = eExtension::_pos; break;
             case meta_RIFF_WAVE_smpl:
                 ext = strstr(coding, "ATRAC3+") ? eExtension::_at3 : eExtension::_wav; break;
                 break;

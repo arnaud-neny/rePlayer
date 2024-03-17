@@ -420,3 +420,4 @@ EXTENSION(bik)      // vgmstream: RAD Game Tools Bink
 EXTENSION(tak)      // vgmstream: Tom's lossless Audio Kompressor
 EXTENSION(oma)      // vgmstream: Sony OpenMG audio
 EXTENSION(at3)      // vgmstream: ATRAC3+
+EXTENSION(pos)      // vgmstream: loop assist
