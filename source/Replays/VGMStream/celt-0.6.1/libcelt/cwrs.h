@@ -38,9 +38,6 @@
 
 int log2_frac_0061(ec_uint32 val, int frac);
 
-/* Whether the CWRS codebook will fit into 32 bits */
-int fits_in32(int _n, int _m);
-
 void get_required_bits_0061(celt_int16_t *bits, int N, int K, int frac);
 
 void encode_pulses_0061(int *_y, int N, int K, ec_enc *enc);

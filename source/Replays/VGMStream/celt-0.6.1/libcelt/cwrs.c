@@ -323,7 +323,7 @@ static celt_uint32_t isqrt36(celt_uint64_t _val){
 
 /*Determines if V(N,K) fits in a 32-bit unsigned integer.
   N and K are themselves limited to 15 bits.*/
-int fits_in32(int _n, int _k)
+static int fits_in32(int _n, int _k)
 {
    static const celt_int16_t maxN[15] = {
       32767, 32767, 32767, 1476, 283, 109,  60,  40,

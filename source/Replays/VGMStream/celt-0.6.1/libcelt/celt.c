@@ -291,7 +291,7 @@ static void compute_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t * re
    {
       const mdct_lookup *lookup = MDCT(mode);
       const int overlap = OVERLAP(mode);
-      mdct_forward(lookup, in, out, mode->window, overlap);
+      mdct_forward_0061(lookup, in, out, mode->window, overlap);
    } else if (!shortBlocks) {
       const mdct_lookup *lookup = MDCT(mode);
       const int overlap = OVERLAP(mode);
@@ -307,7 +307,7 @@ static void compute_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t * re
          int j;
          for (j=0;j<N+overlap;j++)
             x[j] = in[C*j+c];
-         mdct_forward(lookup, x, tmp, mode->window, overlap);
+         mdct_forward_0061(lookup, x, tmp, mode->window, overlap);
          /* Interleaving the sub-frames */
          for (j=0;j<N;j++)
             out[j+c*N] = tmp[j];
@@ -331,7 +331,7 @@ static void compute_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t * re
             int j;
             for (j=0;j<N+overlap;j++)
                x[j] = in[C*(b*N+j)+c];
-            mdct_forward(lookup, x, tmp, mode->window, overlap);
+            mdct_forward_0061(lookup, x, tmp, mode->window, overlap);
             /* Interleaving the sub-frames */
             for (j=0;j<N;j++)
                out[(j*B+b)+c*N*B] = tmp[j];
@@ -355,7 +355,7 @@ static void compute_inv_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t 
       int j;
       if (transient_shift==0 && C==1 && !shortBlocks) {
          const mdct_lookup *lookup = MDCT(mode);
-         mdct_backward(lookup, X, out_mem+C*(MAX_PERIOD-N-N4), mode->window, overlap);
+         mdct_backward_0061(lookup, X, out_mem+C*(MAX_PERIOD-N-N4), mode->window, overlap);
       } else if (!shortBlocks) {
          const mdct_lookup *lookup = MDCT(mode);
          VARDECL(celt_word32_t, x);
@@ -368,7 +368,7 @@ static void compute_inv_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t 
             tmp[j] = X[j+c*N];
          /* Prevents problems from the imdct doing the overlap-add */
          CELT_MEMSET(x+N4, 0, N);
-         mdct_backward(lookup, tmp, x, mode->window, overlap);
+         mdct_backward_0061(lookup, tmp, x, mode->window, overlap);
          celt_assert(transient_shift == 0);
          /* The first and last part would need to be set to zero if we actually
             wanted to use them. */
@@ -396,7 +396,7 @@ static void compute_inv_mdcts(const CELTMode *mode, int shortBlocks, celt_sig_t 
             /* De-interleaving the sub-frames */
             for (j=0;j<N2;j++)
                tmp[j] = X[(j*B+b)+c*N2*B];
-            mdct_backward(lookup, tmp, x+N4+N2*b, mode->window, overlap);
+            mdct_backward_0061(lookup, tmp, x+N4+N2*b, mode->window, overlap);
          }
          if (transient_shift > 0)
          {

@@ -423,11 +423,11 @@ CELTMode *celt_mode_create_0061(celt_int32_t Fs, int channels, int frame_size, i
    }
 #endif
 
-   mdct_init(&mode->mdct, 2*mode->mdctSize);
+   mdct_init_0061(&mode->mdct, 2*mode->mdctSize);
    mode->fft = pitch_state_alloc(MAX_PERIOD);
 
    mode->shortMdctSize = mode->mdctSize/mode->nbShortMdcts;
-   mdct_init(&mode->shortMdct, 2*mode->shortMdctSize);
+   mdct_init_0061(&mode->shortMdct, 2*mode->shortMdctSize);
    mode->shortWindow = mode->window;
    mode->prob = quant_prob_alloc(mode);
    if ((mode->mdct.trig==NULL) || (mode->mdct.kfft==NULL) || (mode->fft==NULL) ||
@@ -492,8 +492,8 @@ void celt_mode_destroy_0061(CELTMode *mode)
    psydecay_clear(&mode->psy);
 #endif
 #endif
-   mdct_clear(&mode->mdct);
-   mdct_clear(&mode->shortMdct);
+   mdct_clear_0061(&mode->mdct);
+   mdct_clear_0061(&mode->shortMdct);
    pitch_state_free(mode->fft);
    quant_prob_free(mode->prob);
    mode->marker_end = MODEFREED;
