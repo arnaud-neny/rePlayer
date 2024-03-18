@@ -1470,10 +1470,12 @@ void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t ou
 void get_vgmstream_ffmpeg_format(VGMSTREAM* vgmstream, char* out, size_t out_size)
 {
 #ifdef VGM_USE_FFMPEG
-    const char* format;
-    format = ffmpeg_get_format_name(vgmstream->codec_data);
-    if (format)
-        strncpy(out, format, out_size);
+    if (vgmstream->coding_type == coding_FFmpeg) {
+        const char* format;
+        format = ffmpeg_get_format_name(vgmstream->codec_data);
+        if (format)
+            strncpy(out, format, out_size);
+    }
 #endif
 }
 // rePlayer end

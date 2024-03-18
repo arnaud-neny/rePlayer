@@ -19,7 +19,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGMStream,
         .name = "vgmstream",
-        .extensions = "adx;afc;asf;ast;at3;bcstm;bcwav;bns;brstm;dsp;genh;hca;lwav;msf;oma;pos;rwav;scd;tak;wma;xma",
+        .extensions = "aax;ads;adx;afc;asf;ast;at3;aus;bcstm;bcwav;bns;brstm;dsp;emff;fsb;genh;hca;int;lwav;mib;msf;mtaf;mul;musc;mwv;oma;pos;rstm;rwav;scd;sng;ss2;sts;tak;vag;vgs;vpk;wac;wam;wma;xa;xma;xvag",
         .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2019 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
             "Thealexbarney, CyberBotX, et al\n"
@@ -52,13 +52,20 @@ namespace rePlayer
             auto ext = eExtension::Unknown;
             switch (vgmstream->meta_type)
             {
+            case meta_AAX:
+                ext = eExtension::_aax; break;
+            case meta_ADS:
+                ext = vgmstream->loop_flag ? eExtension::_ads : eExtension::_ss2; break;
             case meta_ADX_03:
             case meta_ADX_04:
+            case meta_ADX_05:
                 ext = eExtension::_adx; break;
             case meta_AFC:
                 ext = eExtension::_afc; break;
             case meta_AST:
                 ext = eExtension::_ast; break;
+            case meta_AUS:
+                ext = eExtension::_aus; break;
             case meta_BINK:
                 ext = eExtension::_bik; break;
             case meta_BNS:
@@ -68,7 +75,9 @@ namespace rePlayer
             case meta_CWAV:
                 ext = eExtension::_bcwav; break;
             case meta_EA_SCHL:
-                ext = eExtension::_asf; break;
+                ext = (vgmstream->coding_type == coding_EA_XA_int || vgmstream->coding_type == coding_EA_MT || vgmstream->coding_type == coding_EA_XA_V2) ? eExtension:: _sng : eExtension::_asf; break;
+            case meta_EXST:
+                ext = eExtension::_sts; break;
             case meta_FFMPEG:
                 if (strcmp(coding, "Windows Media Audio 2") == 0)
                     ext = eExtension::_wma;
@@ -77,19 +86,40 @@ namespace rePlayer
                 else if (strstr(coding, "ATRAC3+") && strcmp(format, "Sony OpenMG audio") == 0)
                     ext = eExtension::_oma;
                 break;
+            case meta_FSB1:
+            case meta_FSB2:
+            case meta_FSB3:
+            case meta_FSB4:
+            case meta_FSB5:
+                ext = eExtension::_fsb; break;
             case meta_GENH:
                 ext = eExtension::_genh; break;
             case meta_HCA:
                 ext = eExtension::_hca; break;
+            case meta_MIB_MIH:
+                ext = eExtension::_mib; break;
             case meta_MSF:
                 ext = eExtension::_msf; break;
+            case meta_MTAF:
+                ext = eExtension::_mtaf; break;
+            case meta_MUL:
+                ext = vgmstream->coding_type == coding_PSX ? eExtension::_emff : eExtension::_mul; break;
+            case meta_MUSC:
+                ext = eExtension::_musc; break;
+            case meta_PS_HEADERLESS:
+                ext = eExtension::_mib; break;
+            case meta_RAW_INT:
+                ext = eExtension::_int; break;
             case meta_RIFF_WAVE:
-                ext = vgmstream->coding_type == coding_XBOX_IMA ? eExtension::_lwav : eExtension::_wav; break;
+                ext = vgmstream->coding_type == coding_XBOX_IMA ? eExtension::_lwav : vgmstream->coding_type == coding_L5_555 ? eExtension::_mwv : eExtension::_wav; break;
+            case meta_RIFF_WAVE_MWV:
+                ext = eExtension::_mwv; break;
             case meta_RIFF_WAVE_POS:
                 ext = eExtension::_pos; break;
             case meta_RIFF_WAVE_smpl:
                 ext = strstr(coding, "ATRAC3+") ? eExtension::_at3 : eExtension::_wav; break;
-                break;
+            case meta_RSTM_ROCKSTAR:
+                ext = eExtension::_rstm; break;
             case meta_RSTM:
                 ext = eExtension::_brstm; break;
             case meta_RWAV:
@@ -98,8 +128,21 @@ namespace rePlayer
                 ext = eExtension::_scd; break;
             case meta_THP:
                 ext = eExtension::_dsp; break;
+            case meta_UBI_JADE:
+                ext = vgmstream->loop_flag ? eExtension::_wam : eExtension::_wac; break;
+            case meta_VAG:
+            case meta_VAG_custom:
+                ext = eExtension::_vag; break;
+            case meta_VGS:
+                ext = eExtension::_vgs; break;
+            case meta_VPK:
+                ext = eExtension::_vpk; break;
+            case meta_XA:
+                ext = eExtension::_xa; break;
             case meta_XMA_RIFF:
                 ext = eExtension::_xma; break;
+            case meta_XVAG:
+                ext = eExtension::_xvag; break;
             }
             return new ReplayVGMStream(streamFile, vgmstream, ext);
         }

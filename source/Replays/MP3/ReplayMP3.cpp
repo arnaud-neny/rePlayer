@@ -11,7 +11,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::MP3,
         .name = "MPEG-3",
-        .extensions = "mp3",
+        .extensions = "mp2;mp3",
         .about = "dr_mp3 " DRMP3_VERSION_STRING "\nCopyright (c) 2020 David Reid",
         .load = ReplayMP3::Load
     };
@@ -50,7 +50,7 @@ namespace rePlayer
     }
 
     ReplayMP3::ReplayMP3(StreamData* streamData, drmp3* mp3)
-        : Replay(eExtension::_mp3, eReplay::MP3)
+        : Replay(mp3->frameInfo.layer == 2 ? eExtension::_mp2 : eExtension::_mp3, eReplay::MP3)
         , m_streamData(streamData)
         , m_mp3(mp3)
     {}

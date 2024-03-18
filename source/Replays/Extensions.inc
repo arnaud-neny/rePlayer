@@ -61,7 +61,7 @@ EXTENSION(v2m)
 EXTENSION(sndh)
 EXTENSION(sc68)
 EXTENSION(hsc)
-EXTENSION(sng)      // Adlib: ? : UADE: ZoundMonitor
+EXTENSION(sng)      // Adlib: ? : & UADE: ZoundMonitor & VGMStream: Electronic Arts SCHl
 EXTENSION(wlf)
 EXTENSION(adlib)
 EXTENSION(a2m)
@@ -122,7 +122,7 @@ EXTENSION(tmc)
 EXTENSION(tm8)
 EXTENSION(tm2)
 EXTENSION(tfm)
-EXTENSION(mp3)
+EXTENSION(mp3)      // MP3 & VGMStream
 EXTENSION(flac)
 EXTENSION(ogg)
 EXTENSION(ay)       // Ayfly & GME & NEZplug & ZXTune: AY/Emul
@@ -149,7 +149,7 @@ EXTENSION(mdx)
 EXTENSION(mdxPk)
 EXTENSION(s98)
 EXTENSION(aps)      // UADE: AProSys
-EXTENSION(ast)      // UADE: ActionAmics & vgmstream: Nintendo AST
+EXTENSION(ast)      // UADE: ActionAmics & VGMStream: Nintendo AST
 EXTENSION(adpcm)    // UADE: ADPCM_mono
 EXTENSION(amc)      // UADE: AM-Composer
 EXTENSION(abk)      // UADE: AMOS
@@ -400,24 +400,46 @@ EXTENSION(opus)     // Opus
 EXTENSION(ftm)      // Famitracker
 EXTENSION(wv)       // WavPack
 EXTENSION(dff)      // DSD
-EXTENSION(adx)      // vgmstream: CRI ADX
-EXTENSION(lwav)     // vgmstream: RIFF Wave
-EXTENSION(asf)      // vgmstream: Electronic Arts SCHl
-EXTENSION(genh)     // vgmstream: GENH Generic
-EXTENSION(wma)      // vgmstream: FFmpeg
-EXTENSION(brstm)    // vgmstream: Nintendo RSTM
-EXTENSION(dsp)      // vgmstream: Nintendo THP
-EXTENSION(bns)      // vgmstream: Nintendo BNS
-EXTENSION(rwav)     // vgmstream: Nintendo RWAV
-EXTENSION(afc)      // vgmstream: Nintendo AFC
-EXTENSION(hca)      // vgmstream: CRI HCA
-EXTENSION(bcstm)    // vgmstream: Nintendo CSTM
-EXTENSION(bcwav)    // vgmstream: Nintendo CWAV
-EXTENSION(msf)      // vgmstream: Sony MSF
-EXTENSION(scd)      // vgmstream: Square Enix SCD
-EXTENSION(xma)      // vgmstream: Microsoft XMA RIFF
-EXTENSION(bik)      // vgmstream: RAD Game Tools Bink
-EXTENSION(tak)      // vgmstream: Tom's lossless Audio Kompressor
-EXTENSION(oma)      // vgmstream: Sony OpenMG audio
-EXTENSION(at3)      // vgmstream: ATRAC3+
-EXTENSION(pos)      // vgmstream: loop assist
+EXTENSION(adx)      // VGMStream: CRI ADX
+EXTENSION(lwav)     // VGMStream: RIFF Wave (XBOX)
+EXTENSION(asf)      // VGMStream: Electronic Arts SCHl
+EXTENSION(genh)     // VGMStream: GENH Generic
+EXTENSION(wma)      // VGMStream: FFmpeg
+EXTENSION(brstm)    // VGMStream: Nintendo RSTM
+EXTENSION(dsp)      // VGMStream: Nintendo THP
+EXTENSION(bns)      // VGMStream: Nintendo BNS
+EXTENSION(rwav)     // VGMStream: Nintendo RWAV
+EXTENSION(afc)      // VGMStream: Nintendo AFC
+EXTENSION(hca)      // VGMStream: CRI HCA
+EXTENSION(bcstm)    // VGMStream: Nintendo CSTM
+EXTENSION(bcwav)    // VGMStream: Nintendo CWAV
+EXTENSION(msf)      // VGMStream: Sony MSF
+EXTENSION(scd)      // VGMStream: Square Enix SCD
+EXTENSION(xma)      // VGMStream: Microsoft XMA RIFF
+EXTENSION(bik)      // VGMStream: RAD Game Tools Bink
+EXTENSION(tak)      // VGMStream: Tom's lossless Audio Kompressor
+EXTENSION(oma)      // VGMStream: Sony OpenMG audio
+EXTENSION(at3)      // VGMStream: ATRAC3+
+EXTENSION(pos)      // VGMStream: loop assist
+EXTENSION(mib)      // VGMStream: Headerless PS-ADPCM raw
+EXTENSION(xa)       // VGMStream: Sony XA
+EXTENSION(wam)      // VGMStream: Ubisoft Jade RIFF
+EXTENSION(wac)      // VGMStream: Ubisoft Jade RIFF
+EXTENSION(rstm)     // VGMStream: Rockstar Games RSTM
+EXTENSION(fsb)      // VGMStream: FMOD FSB1-2-3-4-5
+EXTENSION(mwv)      // VGMStream: RIFF Wave (Level 5)
+EXTENSION(ads)      // VGMStream: Sony ADS
+EXTENSION(vag)      // VGMStream: Sony VAG
+EXTENSION(ss2)      // VGMStream: Sony ADS
+EXTENSION(vpk)      // VGMStream: SCE America VPK
+EXTENSION(vgs)      // VGMStream: Guitar Hero VGS
+EXTENSION(emff)     // VGMStream: Crystal Dynamics .MUL
+EXTENSION(mul)      // VGMStream: Crystal Dynamics .MUL
+EXTENSION(musc)     // VGMStream: Krome MUSC
+EXTENSION(aus)      // VGMStream: Capcom AUS
+EXTENSION(mtaf)     // VGMStream: Konami MTAF
+EXTENSION(mp2)      // MP3 & VGMStream
+EXTENSION(int)      // VGMStream: PS2 .int raw
+EXTENSION(sts)      // VGMStream: Sony EXST
+EXTENSION(aax)      // VGMStream: CRI AAX
+EXTENSION(xvag)     // VGMStream: Sony XVAG
