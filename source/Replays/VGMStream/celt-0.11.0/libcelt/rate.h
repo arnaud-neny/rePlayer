@@ -49,7 +49,7 @@
 #include "cwrs.h"
 #include "modes.h"
 
-void compute_pulse_cache(CELTMode *m, int LM);
+void compute_pulse_cache_0110(CELTMode *m, int LM);
 
 static inline int get_pulses(int i)
 {

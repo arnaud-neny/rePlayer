@@ -61,7 +61,7 @@ typedef struct ec_ctx         ec_dec;
 
 
 /*The entropy encoder/decoder context.
-  We use the same structure for both, so that common functions like ec_tell()
+  We use the same structure for both, so that common functions like ec_tell_0110()
    can be used on either one.*/
 struct ec_ctx{
    /*Buffered input/output.*/
@@ -96,19 +96,19 @@ struct ec_ctx{
 
 
 /*Shared functions.*/
-static inline void ec_reset(ec_ctx *_this){
+static inline void ec_reset_0110(ec_ctx *_this){
   _this->offs=_this->end_offs=0;
 }
 
-static inline ec_uint32 ec_range_bytes(ec_ctx *_this){
+static inline ec_uint32 ec_range_bytes_0110(ec_ctx *_this){
   return _this->offs;
 }
 
-static inline unsigned char *ec_get_buffer(ec_ctx *_this){
+static inline unsigned char *ec_get_buffer_0110(ec_ctx *_this){
   return _this->buf;
 }
 
-static inline int ec_get_error(ec_ctx *_this){
+static inline int ec_get_error_0110(ec_ctx *_this){
   return _this->error;
 }
 
@@ -118,7 +118,7 @@ static inline int ec_get_error(ec_ctx *_this){
   Return: The number of bits.
           This will always be slightly larger than the exact value (e.g., all
            rounding error is in the positive direction).*/
-static inline int ec_tell(ec_ctx *_this){
+static inline int ec_tell_0110(ec_ctx *_this){
   return _this->nbits_total-EC_ILOG(_this->rng);
 }
 
@@ -128,8 +128,8 @@ static inline int ec_tell(ec_ctx *_this){
   Return: The number of bits scaled by 2**BITRES.
           This will always be slightly larger than the exact value (e.g., all
            rounding error is in the positive direction).*/
-ec_uint32 ec_tell_frac(ec_ctx *_this);
+ec_uint32 ec_tell_frac_0110(ec_ctx *_this);
 
-int ec_ilog(ec_uint32 _v);
+int ec_ilog_0110(ec_uint32 _v);
 
 #endif

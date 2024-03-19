@@ -413,9 +413,9 @@ CELTMode *celt_mode_create_0110(celt_int32 Fs, int frame_size, int *error)
       logN[i] = log2_frac_0110(mode->eBands[i+1]-mode->eBands[i], BITRES);
    mode->logN = logN;
 
-   compute_pulse_cache(mode, mode->maxLM);
+   compute_pulse_cache_0110(mode, mode->maxLM);
 
-   clt_mdct_init(&mode->mdct, 2*mode->shortMdctSize*mode->nbShortMdcts, mode->maxLM);
+   clt_mdct_init_0110(&mode->mdct, 2*mode->shortMdctSize*mode->nbShortMdcts, mode->maxLM);
    if ((mode->mdct.trig==NULL)
 #ifndef ENABLE_TI_DSPLIB55
          || (mode->mdct.kfft==NULL)
@@ -460,7 +460,7 @@ void celt_mode_destroy_0110(CELTMode *mode)
    celt_free((celt_int16*)mode->cache.index);
    celt_free((unsigned char*)mode->cache.bits);
    celt_free((unsigned char*)mode->cache.caps);
-   clt_mdct_clear(&mode->mdct);
+   clt_mdct_clear_0110(&mode->mdct);
 
    celt_free((CELTMode *)mode);
 #endif

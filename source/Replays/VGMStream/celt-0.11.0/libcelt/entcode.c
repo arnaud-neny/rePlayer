@@ -38,7 +38,7 @@
 
 
 #if !defined(EC_CLZ)
-int ec_ilog(ec_uint32 _v){
+int ec_ilog_0110(ec_uint32 _v){
   /*On a Pentium M, this branchless version tested as the fastest on
      1,000,000,000 random 32-bit integers, edging out a similar version with
      branches, and a 256-entry LUT version.*/
@@ -63,7 +63,7 @@ int ec_ilog(ec_uint32 _v){
 #endif
 
 
-ec_uint32 ec_tell_frac(ec_ctx *_this){
+ec_uint32 ec_tell_frac_0110(ec_ctx *_this){
   ec_uint32 nbits;
   ec_uint32 r;
   int       l;

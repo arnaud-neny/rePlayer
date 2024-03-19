@@ -75,7 +75,7 @@ static int fits_in32(int _n, int _k)
    }
 }
 
-void compute_pulse_cache(CELTMode *m, int LM)
+void compute_pulse_cache_0110(CELTMode *m, int LM)
 {
    int C;
    int i;

@@ -63,7 +63,7 @@
 
 #ifdef CUSTOM_MODES
 
-void clt_mdct_init(mdct_lookup *l,int N, int maxshift)
+void clt_mdct_init_0110(mdct_lookup *l,int N, int maxshift)
 {
    int i;
    int N4, N2;
@@ -96,7 +96,7 @@ void clt_mdct_init(mdct_lookup *l,int N, int maxshift)
 #endif
 }
 
-void clt_mdct_clear(mdct_lookup *l)
+void clt_mdct_clear_0110(mdct_lookup *l)
 {
    int i;
    for (i=0;i<=l->maxshift;i++)
@@ -106,7 +106,7 @@ void clt_mdct_clear(mdct_lookup *l)
 
 #endif /* CUSTOM_MODES */
 
-void clt_mdct_forward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar * restrict out, const celt_word16 *window, int overlap, int shift)
+void clt_mdct_forward_0110(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar * restrict out, const celt_word16 *window, int overlap, int shift)
 {
    int i;
    int N, N2, N4;
@@ -210,7 +210,7 @@ void clt_mdct_forward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar
 }
 
 
-void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar * restrict out, const celt_word16 * restrict window, int overlap, int shift)
+void clt_mdct_backward_0110(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar * restrict out, const celt_word16 * restrict window, int overlap, int shift)
 {
    int i;
    int N, N2, N4;

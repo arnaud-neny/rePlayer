@@ -218,7 +218,7 @@ static int quant_coarse_energy_impl(const CELTMode *m, int start, int end,
          qi0 = qi;
          /* If we don't have enough bits to encode all the energy, just assume
              something safe. */
-         tell = ec_tell(enc);
+         tell = ec_tell_0110(enc);
          bits_left = budget-tell-3*C*(end-i);
          if (i!=start && bits_left < 30)
          {
@@ -282,7 +282,7 @@ void quant_coarse_energy_0110(const CELTMode *m, int start, int end, int effEnd,
    else
       *delayedIntra = 0;
 
-   tell = ec_tell(enc);
+   tell = ec_tell_0110(enc);
    if (tell+3 > budget)
       two_pass = intra = 0;
 
@@ -316,16 +316,16 @@ void quant_coarse_energy_0110(const CELTMode *m, int start, int end, int effEnd,
       int badness2;
       VARDECL(unsigned char, intra_bits);
 
-      tell_intra = ec_tell_frac(enc);
+      tell_intra = ec_tell_frac_0110(enc);
 
       enc_intra_state = *enc;
 
-      nstart_bytes = ec_range_bytes(&enc_start_state);
-      nintra_bytes = ec_range_bytes(&enc_intra_state);
+      nstart_bytes = ec_range_bytes_0110(&enc_start_state);
+      nintra_bytes = ec_range_bytes_0110(&enc_intra_state);
       ALLOC(intra_bits, nintra_bytes-nstart_bytes, unsigned char);
       /* Copy bits from intra bit-stream */
       CELT_COPY(intra_bits,
-            ec_get_buffer(&enc_intra_state) + nstart_bytes,
+            ec_get_buffer_0110(&enc_intra_state) + nstart_bytes,
             nintra_bytes - nstart_bytes);
 
       *enc = enc_start_state;
@@ -333,11 +333,11 @@ void quant_coarse_energy_0110(const CELTMode *m, int start, int end, int effEnd,
       badness2 = quant_coarse_energy_impl(m, start, end, eBands, oldEBands, budget,
             tell, e_prob_model[LM][intra], error, enc, C, LM, 0, max_decay);
 
-      if (two_pass && (badness1 < badness2 || (badness1 == badness2 && ec_tell_frac(enc) > tell_intra)))
+      if (two_pass && (badness1 < badness2 || (badness1 == badness2 && ec_tell_frac_0110(enc) > tell_intra)))
       {
          *enc = enc_intra_state;
          /* Copy intra bits to bit-stream */
-         CELT_COPY(ec_get_buffer(&enc_intra_state) + nstart_bytes,
+         CELT_COPY(ec_get_buffer_0110(&enc_intra_state) + nstart_bytes,
                intra_bits, nintra_bytes - nstart_bytes);
          CELT_COPY(oldEBands, oldEBands_intra, C*end);
          CELT_COPY(error, error_intra, C*end);
@@ -448,7 +448,7 @@ void unquant_coarse_energy_0110(const CELTMode *m, int start, int end, celt_word
          int qi;
          celt_word32 q;
          celt_word32 tmp;
-         tell = ec_tell(dec);
+         tell = ec_tell_0110(dec);
          if(budget-tell>=15)
          {
             int pi;
@@ -533,7 +533,7 @@ void unquant_energy_finalise_0110(const CELTMode *m, int start, int end, celt_wo
    }
 }
 
-void log2Amp(const CELTMode *m, int start, int end,
+void log2Amp_0110(const CELTMode *m, int start, int end,
       celt_ener *eBands, celt_word16 *oldEBands, int _C)
 {
    int c, i;

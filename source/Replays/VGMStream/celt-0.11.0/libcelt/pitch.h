@@ -47,7 +47,7 @@ void pitch_downsample_0110(celt_sig * restrict x[], celt_word16 * restrict x_lp,
 void pitch_search_0110(const celt_word16 * restrict x_lp, celt_word16 * restrict y,
                   int len, int max_pitch, int *pitch);
 
-celt_word16 remove_doubling(celt_word16 *x, int maxperiod, int minperiod,
+celt_word16 remove_doubling_0110(celt_word16 *x, int maxperiod, int minperiod,
       int N, int *T0, int prev_period, celt_word16 prev_gain);
 
 #endif

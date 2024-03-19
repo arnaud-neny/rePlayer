@@ -42,7 +42,7 @@
 void amp2Log2_0110(const CELTMode *m, int effEnd, int end,
       celt_ener *bandE, celt_word16 *bandLogE, int _C);
 
-void log2Amp(const CELTMode *m, int start, int end,
+void log2Amp_0110(const CELTMode *m, int start, int end,
       celt_ener *eBands, celt_word16 *oldEBands, int _C);
 
 unsigned char *quant_prob_alloc(const CELTMode *m);

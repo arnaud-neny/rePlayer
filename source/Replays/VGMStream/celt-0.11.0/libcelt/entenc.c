@@ -123,7 +123,7 @@ void ec_enc_init_0110(ec_enc *_this,unsigned char *_buf,ec_uint32 _size){
   _this->end_offs=0;
   _this->end_window=0;
   _this->nend_bits=0;
-  /*This is the offset from which ec_tell() will subtract partial bits.*/
+  /*This is the offset from which ec_tell_0110() will subtract partial bits.*/
   _this->nbits_total=EC_CODE_BITS+1;
   _this->offs=0;
   _this->rng=EC_CODE_TOP;

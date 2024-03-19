@@ -89,7 +89,7 @@ static inline unsigned char *ec_byte_get_buffer(ec_byte_buffer *_b){
    return _b->buf;
 }
 
-int ec_ilog(ec_uint32 _v);
+int ec_ilog_0110(ec_uint32 _v);
 int ec_ilog64(ec_uint64 _v);
 
 #endif

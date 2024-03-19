@@ -81,7 +81,7 @@
 
 
 /*Count leading zeros.
-  This macro should only be used for implementing ec_ilog(), if it is defined.
+  This macro should only be used for implementing ec_ilog_0110(), if it is defined.
   All other code should use EC_ILOG() instead.*/
 #if defined(_MSC_VER)
 # include <intrin.h>
@@ -115,7 +115,7 @@ static __inline int ec_bsr(unsigned long _x){
   When we need to, it can be special cased.*/
 # define EC_ILOG(_x) (EC_CLZ0-EC_CLZ(_x))
 #else
-# define EC_ILOG(_x) (ec_ilog(_x))
+# define EC_ILOG(_x) (ec_ilog_0110(_x))
 #endif
 
 #endif

@@ -81,7 +81,7 @@
 
 
 /*Count leading zeros.
-  This macro should only be used for implementing ec_ilog(), if it is defined.
+  This macro should only be used for implementing ec_ilog_0110(), if it is defined.
   All other code should use EC_ILOG() instead.*/
 #ifdef __GNUC_PREREQ
 #if __GNUC_PREREQ(3,4)
@@ -105,7 +105,7 @@
 #include "dsplib.h"
 #define EC_ILOG(x) (31 - _lnorm(x))
 #else
-# define EC_ILOG(_x) (ec_ilog(_x))
+# define EC_ILOG(_x) (ec_ilog_0110(_x))
 #endif
 
 #ifdef __GNUC_PREREQ

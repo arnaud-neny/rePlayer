@@ -66,7 +66,7 @@
   End of stream is handled by writing out the smallest number of bits that
    ensures that the stream will be correctly decoded regardless of the value of
    any subsequent bits.
-  ec_tell() can be used to determine how many bits were needed to decode
+  ec_tell_0110() can be used to determine how many bits were needed to decode
    all the symbols thus far; other data can be packed in the remaining bits of
    the input buffer.
   @PHDTHESIS{Pas76,
@@ -142,7 +142,7 @@ void ec_dec_init_0110(ec_dec *_this,unsigned char *_buf,ec_uint32 _storage){
   _this->error=0;
   /*Normalize the interval.*/
   ec_dec_normalize(_this);
-  /*This is the offset from which ec_tell() will subtract partial bits.
+  /*This is the offset from which ec_tell_0110() will subtract partial bits.
     This must be after the initial ec_dec_normalize(), or you will have to
      compensate for the bits that are read there.*/
   _this->nbits_total=EC_CODE_BITS+1;

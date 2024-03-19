@@ -787,7 +787,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
             2) they are orthogonal. */
          itheta = stereo_itheta_0110(X, Y, stereo, N);
       }
-      tell = ec_tell_frac(ec);
+      tell = ec_tell_frac_0110(ec);
       if (qn!=1)
       {
          if (encode)
@@ -888,7 +888,7 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
             inv = 0;
          itheta = 0;
       }
-      qalloc = ec_tell_frac(ec) - tell;
+      qalloc = ec_tell_frac_0110(ec) - tell;
       b -= qalloc;
 
       orig_fill = fill;
@@ -1199,7 +1199,7 @@ void quant_all_bands_0110(int encode, const CELTMode *m, int start, int end,
       else
          Y = NULL;
       N = M*eBands[i+1]-M*eBands[i];
-      tell = ec_tell_frac(ec);
+      tell = ec_tell_frac_0110(ec);
 
       /* Compute how many bits we want to allocate to this band */
       if (i != start)

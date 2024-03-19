@@ -41,7 +41,7 @@
 
 
 
-int ec_ilog(ec_uint32 _v){
+int ec_ilog_0110(ec_uint32 _v){
 #if defined(EC_CLZ)
   return EC_CLZ0-EC_CLZ(_v);
 #else
