@@ -129,6 +129,8 @@ int mdx_open(t_mdxmini* data, void* buf, size_t bufsize, int freq, pdx_load load
     return -1;
   }
     /* load mdx file */
+  if (bufsize > 128 * 65536)//TBD
+      return -1;
 
     data->mdx = mdx_open_mdx(buf, bufsize);
     if ( !data->mdx )
