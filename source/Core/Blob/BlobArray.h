@@ -4,6 +4,7 @@
 #include <Blob/BlobSerializer.h>
 #include <Containers/Array.h>
 #include <Containers/Span.h>
+#include <IO/File.h>
 
 namespace core
 {
@@ -96,6 +97,8 @@ namespace core
 
         // Serialization
         void Store(BlobSerializer& s) const requires (storage == Blob::kIsDynamic);
+        void Load(io::File& file) requires (storage == Blob::kIsDynamic);
+        void Save(io::File& file) const requires (storage == Blob::kIsDynamic);
 
     private:
         Type m_handle = {};

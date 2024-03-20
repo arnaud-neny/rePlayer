@@ -29,6 +29,43 @@ namespace rePlayer
         return s;
     }
 
+    void SongSheet::Load(io::File& file)
+    {
+        file.Read(id);
+        file.Read(fileSize);
+        file.Read(fileCrc);
+        file.Read(tags);
+        file.Read(lastSubsongIndex);
+        file.Read(type);
+        name.Load(file);
+        artistIds.Load(file);
+        sourceIds.Load(file);
+        metadata.Load(file);
+        file.Read(releaseYear);
+        file.Read(databaseDay);
+        subsongs.Resize(lastSubsongIndex + 1);
+        for (uint16_t i = 0; i <= lastSubsongIndex; i++)
+            subsongs[i].Load(file);
+    }
+
+    void SongSheet::Save(io::File& file) const
+    {
+        file.Write(id);
+        file.Write(fileSize);
+        file.Write(fileCrc);
+        file.Write(tags);
+        file.Write(lastSubsongIndex);
+        file.Write(type);
+        name.Save(file);
+        artistIds.Save(file);
+        sourceIds.Save(file);
+        metadata.Save(file);
+        file.Write(releaseYear);
+        file.Write(databaseDay);
+        for (uint16_t i = 0; i <= lastSubsongIndex; i++)
+            subsongs[i].Save(file);
+    }
+
     void SongSheet::AddRef()
     {
         std::atomic_ref(refCount)++;

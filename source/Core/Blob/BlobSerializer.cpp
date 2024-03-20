@@ -42,24 +42,32 @@ namespace core
         m_currentPatch = m_patches[m_currentPatch].previousPatch;
     }
 
-    void BlobSerializer::Save(io::File& file)
+    Status BlobSerializer::Save(io::File& file)
     {
         Commit();
-        auto size = m_patches[0].buffer.Size() - sizeof(Blob);
-        file.WriteAs<uint16_t>(size);
-        file.Write(m_patches[0].buffer.Items() + sizeof(Blob), size);
+        if (m_isValid)
+        {
+            auto size = m_patches[0].buffer.Size() - sizeof(Blob);
+            file.WriteAs<uint16_t>(size);
+            file.Write(m_patches[0].buffer.Items() + sizeof(Blob), size);
+            return Status::kOk;
+        }
+        return Status::kFail;
     }
 
     const Span<uint8_t> BlobSerializer::Buffer()
     {
         Commit();
-        return { m_patches[0].buffer.Items() + sizeof(Blob), m_patches[0].buffer.Size() - sizeof(Blob) };
+        if (m_isValid)
+            return { m_patches[0].buffer.Items() + sizeof(Blob), m_patches[0].buffer.Size() - sizeof(Blob) };
+        return { nullptr, nullptr };
     }
 
     void BlobSerializer::Commit()
     {
         if (m_patches.NumItems() > 1)
         {
+            m_isValid = true;
             assert(m_currentPatch == 0);
             auto& mainPatch = m_patches[0];
             uint16_t dataOffset = mainPatch.buffer.NumItems<uint16_t>();
@@ -83,12 +91,18 @@ namespace core
                 currentPatch.position = dataOffset;
                 auto patch = reinterpret_cast<uint16_t*>(mainPatch.buffer.Items() + m_patches[currentPatch.previousPatch].position + currentPatch.offset);
                 auto offset = currentPatch.position - m_patches[currentPatch.previousPatch].position - currentPatch.offset;
-                assert(offset < (1 << 13)); // blob array offset is stored on 13 bits
+                if (offset >= (1 << 13))
+                {
+                    m_isValid = false;
+                    break;
+                }
                 patch[0] |= offset;
                 dataOffset += currentPatch.buffer.NumItems<uint16_t>();
 
                 mainPatch.buffer.Add(currentPatch.buffer.Items(), currentPatch.buffer.Size());
             }
+            if (m_patches.Size() >= 65536)
+                m_isValid = false;
             m_patches.Resize(1);
         }
     }

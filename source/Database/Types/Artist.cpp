@@ -85,6 +85,28 @@ namespace rePlayer
         return s;
     }
 
+    void ArtistSheet::Load(io::File& file)
+    {
+        file.Read(id);
+        file.Read(numSongs);
+        realName.Load(file);
+        handles.Load(file);
+        countries.Load(file);
+        groups.Load(file);
+        sources.Load(file);
+    }
+
+    void ArtistSheet::Save(io::File& file) const
+    {
+        file.Write(id);
+        file.Write(numSongs);
+        realName.Save(file);
+        handles.Save(file);
+        countries.Save(file);
+        groups.Save(file);
+        sources.Save(file);
+    }
+
     void ArtistSheet::AddRef()
     {
         std::atomic_ref(refCount)++;

@@ -47,6 +47,8 @@ namespace rePlayer
     struct SongSheet : public SongData<Blob::kIsDynamic>
     {
         BlobSerializer Serialize() const;
+        void Load(io::File& file);
+        void Save(io::File& file) const;
 
         // refcount
         void AddRef();

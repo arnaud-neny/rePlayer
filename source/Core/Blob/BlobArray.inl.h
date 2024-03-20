@@ -247,5 +247,31 @@ namespace core
             s.Pop();
         }
     }
+
+    template <typename ItemType, Blob::Storage storage>
+    inline void BlobArray<ItemType, storage>::Load(io::File& file) requires (storage == Blob::kIsDynamic)
+    {
+        if constexpr (requires { &m_handle[0].Load; })
+        {
+            m_handle.Resize(file.Read<uint32_t>());
+            for (auto& item : m_handle)
+                item.Load(file);
+        }
+        else
+            file.Read<uint32_t>(m_handle);
+    }
+
+    template <typename ItemType, Blob::Storage storage>
+    inline void BlobArray<ItemType, storage>::Save(io::File& file) const requires (storage == Blob::kIsDynamic)
+    {
+        if constexpr (requires { &m_handle[0].Save; })
+        {
+            file.WriteAs<uint32_t>(m_handle.NumItems());
+            for (auto& item : m_handle)
+                item.Save(file);
+        }
+        else
+            file.Write<uint32_t>(m_handle);
+    }
 }
 // namespace core

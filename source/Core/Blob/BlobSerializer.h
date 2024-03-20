@@ -27,7 +27,7 @@ namespace core
         void Push(size_t patchOffset, size_t numItems = ~0ull);
         void Pop();
 
-        void Save(io::File& file);
+        Status Save(io::File& file);
 
         const Span<uint8_t> Buffer();
 
@@ -36,6 +36,7 @@ namespace core
 
     private:
         uint16_t m_currentPatch = 0;
+        bool m_isValid = false;
 
         struct Patch
         {

@@ -112,5 +112,17 @@ namespace core
             s.Pop();
         }
     }
+
+    template <Blob::Storage storage>
+    inline void BlobString<storage>::Load(io::File& file) requires (storage == Blob::kIsDynamic)
+    {
+        file.Read(m_handle);
+    }
+
+    template <Blob::Storage storage>
+    inline void BlobString<storage>::Save(io::File& file) const requires (storage == Blob::kIsDynamic)
+    {
+        file.Write(m_handle);
+    }
 }
 // namespace core

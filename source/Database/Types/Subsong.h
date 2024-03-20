@@ -49,6 +49,8 @@ namespace rePlayer
         SubsongData& operator=(const SubsongData<Blob::kIsDynamic>& otherSubsongData) requires (storage == Blob::kIsDynamic);
         void Clear();
         void Store(BlobSerializer& s) const requires (storage == Blob::kIsDynamic);
+        void Load(io::File& file) requires (storage == Blob::kIsDynamic);
+        void Save(io::File& file) const requires (storage == Blob::kIsDynamic);
     };
 
     template <Blob::Storage storage>
@@ -95,6 +97,22 @@ namespace rePlayer
         s.Store(durationCs);
         s.Store(initializer);
         s.Store(name);
+    }
+
+    template <Blob::Storage storage>
+    void SubsongData<storage>::Load(io::File& file) requires (storage == Blob::kIsDynamic)
+    {
+        file.Read(durationCs);
+        file.Read(initializer);
+        name.Load(file);
+    }
+
+    template <Blob::Storage storage>
+    void SubsongData<storage>::Save(io::File& file) const requires (storage == Blob::kIsDynamic)
+    {
+        file.Write(durationCs);
+        file.Write(initializer);
+        name.Save(file);
     }
 
     typedef SubsongData<Blob::kIsDynamic> SubsongSheet;

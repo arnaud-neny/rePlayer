@@ -65,9 +65,15 @@ namespace rePlayer
         if (proxy->refCount == 1 && proxy->buffer->refCount == 1 && proxy->reconcileDelay-- <= 0)
         {
             auto s = proxy->buffer->Serialize();
-            auto* blob = Blob::New<StaticType>(s.Buffer().Size());
-            memcpy(static_cast<Blob*>(blob) + 1, s.Buffer().Items(), s.Buffer().Size());
-            return blob;
+            auto buffer = s.Buffer();
+            if (buffer.IsNotEmpty())
+            {
+                auto* blob = Blob::New<StaticType>(buffer.Size());
+                memcpy(static_cast<Blob*>(blob) + 1, buffer.Items(), buffer.Size());
+                return blob;
+            }
+            else
+                return reinterpret_cast<StaticType*>(this); // keep it always as proxy
         }
 
         return nullptr; // can't reconcile
@@ -95,9 +101,25 @@ namespace rePlayer
     template <typename StaticType, typename DynamicType>
     inline StaticType* Proxy<StaticType, DynamicType>::Load(io::File& file)
     {
-        auto size = file.Read<uint16_t>();
-        auto* blob = Blob::New<StaticType>(size);
-        file.Read(static_cast<Blob*>(blob) + 1, size);
+        StaticType* blob;
+        if (auto size = file.Read<uint16_t>())
+        {
+            blob = Blob::New<StaticType>(size);
+            file.Read(static_cast<Blob*>(blob) + 1, size);
+        }
+        else
+        {
+            auto* edited = new DynamicType();
+            edited->Load(file);
+
+            blob = Blob::New<StaticType>(sizeof(StaticType));
+            blob->id = edited->id;
+
+            auto* proxy = reinterpret_cast<Info*>(blob);
+            proxy->dataSize = 0;
+            proxy->buffer = edited;
+            edited->refCount++;
+        }
         return blob;
     }
 
@@ -110,7 +132,11 @@ namespace rePlayer
             auto* edited = Dynamic();
 
             auto s = edited->Serialize();
-            s.Save(file);
+            if (s.Save(file) == Status::kFail)
+            {
+                file.WriteAs<uint16_t>(0);
+                edited->Save(file);
+            }
         }
         else
         {
