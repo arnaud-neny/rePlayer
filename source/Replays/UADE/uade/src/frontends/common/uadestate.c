@@ -10,6 +10,7 @@
 #include <uade/ossupport.h>
 #include <uade/options.h>
 #include <uade/rmc.h>
+#include "uadectl.h"
 
 //#include <arpa/inet.h>
 #include <assert.h>
@@ -1492,6 +1493,12 @@ static int uade_play_internal(struct uade_file *module, int subsong,
 		default:
 			if (!song->info.detectioninfo.ep || strcmp(song->info.detectioninfo.ep->playername, "PreTracker"))
             {
+				// rePlayer begin
+				// force quit on uade to avoid deadlocks
+				state->song.state = UADE_STATE_INVALID;
+                uae_quit();
+				uadecore_reboot = 1;
+                // rePlayer end
                 uade_warning("uade_get_event returned %s which is not handled before playloop.\n", uade_event_name(&event));
                 goto fatalerror;
             }
