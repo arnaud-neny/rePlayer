@@ -34,15 +34,21 @@ namespace rePlayer
     struct MusicID
     {
         SubsongID subsongId;
-        PlaylistID playlistId : 31 = PlaylistID::kInvalid;
-        DatabaseID databaseId : 1 = DatabaseID::kLibrary;
+        union
+        {
+            uint32_t playlistValue = 0;
+            struct
+            {
+                PlaylistID playlistId : 31;
+                DatabaseID databaseId : 1;
+            };
+        };
 
         MusicID() = default;
         MusicID(SubsongID otherSubsongId, DatabaseID otherDatabaseId);
 
-        bool operator==(MusicID other) const;
-
-        uint64_t GetId() const;
+        constexpr bool operator==(MusicID other) const;
+        constexpr bool operator<(MusicID other) const;
 
         bool IsValid() const;
 

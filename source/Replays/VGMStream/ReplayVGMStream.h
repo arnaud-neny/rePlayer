@@ -18,6 +18,9 @@ namespace rePlayer
         };
 
     public:
+        static bool Init(SharedContexts* ctx, Window& window);
+        static void Release();
+
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
     private:
@@ -40,7 +43,7 @@ namespace rePlayer
         void ResetPlayback() override;
 
         void ApplySettings(const CommandBuffer metadata) override;
-        void SetSubsong(uint16_t subsongIndex) override;
+        void SetSubsong(uint32_t subsongIndex) override;
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
@@ -48,7 +51,7 @@ namespace rePlayer
         std::string GetInfo() const override;
 
     private:
-        ReplayVGMStream(StreamFile* streamFile, VGMSTREAM* vgmstream, eExtension ext);
+        ReplayVGMStream(StreamFile* streamFile, VGMSTREAM* vgmstream, MediaType mediaType);
 
     private:
         StreamFile* m_streamFile;

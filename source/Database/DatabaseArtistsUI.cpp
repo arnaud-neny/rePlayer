@@ -615,7 +615,7 @@ namespace rePlayer
                     musicId.subsongId.songId = m_songEntries[i].id;
                     Song* song = m_db[musicId.subsongId];
 
-                    ImGui::PushID(musicId.subsongId.value);
+                    ImGui::PushID(reinterpret_cast<void*>(musicId.subsongId.Value()));
                     ImGui::TableNextColumn();
                     states |= Selection(i, musicId, selectedArtist);
                     ImGui::SameLine(0.0f, 0.0f);//no spacing

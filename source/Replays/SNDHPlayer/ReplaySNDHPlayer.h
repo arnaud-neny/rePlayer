@@ -53,7 +53,7 @@ namespace rePlayer
         void ResetPlayback() override;
 
         void ApplySettings(const CommandBuffer metadata) override;
-        void SetSubsong(uint16_t subsongIndex) override;
+        void SetSubsong(uint32_t subsongIndex) override;
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;

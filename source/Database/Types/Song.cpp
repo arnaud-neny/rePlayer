@@ -270,5 +270,18 @@ namespace rePlayer
                 song->subsongs[i] = subsongs[i];
         }
     }
+
+    void Song::Patch(uint32_t version)
+    {
+        if (version == 0)
+        {
+            struct MediaType0
+            {
+                eExtension ext : 9{ eExtension::Unknown };
+                eReplay replay : 7{ eReplay::Unknown };
+            };
+            type = MediaType(reinterpret_cast<MediaType0&>(type).ext, reinterpret_cast<MediaType0&>(type).replay);
+        }
+    }
 }
 // namespace rePlayer

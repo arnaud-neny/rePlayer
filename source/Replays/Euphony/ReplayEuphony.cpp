@@ -363,7 +363,7 @@ namespace rePlayer
         (void)metadata;
     }
 
-    void ReplayEuphony::SetSubsong(uint16_t subsongIndex)
+    void ReplayEuphony::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

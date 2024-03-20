@@ -164,7 +164,7 @@ namespace rePlayer
     void ReplayOpus::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayOpus::SetSubsong(uint16_t)
+    void ReplayOpus::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayOpus::GetDurationMs() const

@@ -141,7 +141,7 @@ namespace rePlayer
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
     }
 
-    void ReplayAyfly::SetSubsong(uint16_t subsongIndex)
+    void ReplayAyfly::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         m_song->CurrentSong = subsongIndex;

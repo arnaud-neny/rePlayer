@@ -141,7 +141,7 @@ namespace rePlayer
     void ReplayWavPack::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayWavPack::SetSubsong(uint16_t)
+    void ReplayWavPack::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayWavPack::GetDurationMs() const

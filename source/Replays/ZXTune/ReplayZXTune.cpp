@@ -348,7 +348,7 @@ namespace rePlayer
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
     }
 
-    void ReplayZXTune::SetSubsong(uint16_t subsongIndex)
+    void ReplayZXTune::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

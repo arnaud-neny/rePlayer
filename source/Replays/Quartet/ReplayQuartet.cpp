@@ -226,7 +226,7 @@ namespace rePlayer
         m_player->ms_max = m_duration ? m_duration : ZZ_EOF;
     }
 
-    void ReplayQuartet::SetSubsong(uint16_t subsongIndex)
+    void ReplayQuartet::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

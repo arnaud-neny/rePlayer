@@ -97,7 +97,7 @@ namespace rePlayer
     void ReplayIXalance::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayIXalance::SetSubsong(uint16_t)
+    void ReplayIXalance::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayIXalance::GetDurationMs() const

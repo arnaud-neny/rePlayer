@@ -75,14 +75,13 @@ namespace rePlayer
             const char* GetPath(SourceID sourceId) const;
         };
 
-        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
+        static constexpr uint64_t kVersion0 = uint64_t(kMusicFileStamp) | (0ull << 32);
+        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (1ull << 32);
         struct Summary
         {
             uint32_t numSubsongs = 0;
             int32_t currentSong = -1;
             std::string name;
-
-            static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
 
             void Load(io::File& file);
             void Save(io::File& file);
@@ -102,7 +101,7 @@ namespace rePlayer
 
         void ProcessExternalDragAndDrop(int32_t droppedEntryIndex);
 
-        Status LoadPlaylist(io::File& file, Cue& cue);
+        Status LoadPlaylist(io::File& file, Cue& cue, uint64_t version);
         void SavePlaylist(io::File& file, const Cue& cue);
 
         void ButtonUrl();

@@ -526,7 +526,7 @@ namespace rePlayer
         }
     }
 
-    void ReplayHighlyExperimental::SetSubsong(uint16_t subsongIndex)
+    void ReplayHighlyExperimental::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -190,7 +190,7 @@ namespace rePlayer
         }
     }
 
-    void ReplayGBSPlay::SetSubsong(uint16_t subsongIndex)
+    void ReplayGBSPlay::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

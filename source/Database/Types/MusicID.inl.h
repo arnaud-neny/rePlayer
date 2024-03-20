@@ -15,14 +15,14 @@ namespace rePlayer
         , databaseId(otherDatabaseId)
     {}
 
-    inline bool MusicID::operator==(MusicID other) const
+    inline constexpr bool MusicID::operator==(MusicID other) const
     {
         return playlistId == other.playlistId;
     }
 
-    inline uint64_t MusicID::GetId() const
+    inline constexpr bool MusicID::operator<(MusicID other) const
     {
-        return (uint64_t(subsongId.value) << 32) | uint64_t(playlistId);
+        return playlistId < other.playlistId;
     }
 }
 // namespace rePlayer

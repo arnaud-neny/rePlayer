@@ -436,7 +436,7 @@ namespace rePlayer
     void ReplayHighlyQuixotic::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayHighlyQuixotic::SetSubsong(uint16_t subsongIndex)
+    void ReplayHighlyQuixotic::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

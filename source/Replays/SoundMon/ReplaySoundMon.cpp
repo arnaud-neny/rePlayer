@@ -109,7 +109,7 @@ namespace rePlayer
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
     }
 
-    void ReplaySoundMon::SetSubsong(uint16_t subsongIndex)
+    void ReplaySoundMon::SetSubsong(uint32_t subsongIndex)
     {
         m_player->SetSubsong(static_cast<uint8_t>(subsongIndex));
     }

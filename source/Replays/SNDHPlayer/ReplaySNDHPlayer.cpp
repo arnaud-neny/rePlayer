@@ -231,7 +231,7 @@ namespace rePlayer
         }
     }
 
-    void ReplaySNDHPlayer::SetSubsong(uint16_t subsongIndex)
+    void ReplaySNDHPlayer::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

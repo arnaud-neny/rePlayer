@@ -85,7 +85,7 @@ namespace rePlayer
     void ReplayWAV::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayWAV::SetSubsong(uint16_t)
+    void ReplayWAV::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayWAV::GetDurationMs() const

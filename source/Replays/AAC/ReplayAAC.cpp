@@ -183,7 +183,7 @@ namespace rePlayer
     void ReplayAAC::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayAAC::SetSubsong(uint16_t)
+    void ReplayAAC::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayAAC::GetDurationMs() const

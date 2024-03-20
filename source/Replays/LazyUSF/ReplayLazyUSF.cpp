@@ -436,7 +436,7 @@ namespace rePlayer
         }
     }
 
-    void ReplayLazyUSF::SetSubsong(uint16_t subsongIndex)
+    void ReplayLazyUSF::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -125,7 +125,8 @@ namespace rePlayer
         auto file = io::File::OpenForRead(ms_fileName);
         if (file.IsValid())
         {
-            if (file.Read<uint64_t>() == Summary::kVersion)
+            auto version = file.Read<uint64_t>();
+            if (version <= kVersion)
             {
                 m_cue.entries.Resize(file.Read<uint32_t>());
                 m_oldCurrentEntryIndex = m_currentEntryIndex = file.Read<int32_t>();
@@ -134,7 +135,7 @@ namespace rePlayer
                 for (auto& summary : m_playlists)
                     summary.Load(file);
 
-                auto status = LoadPlaylist(file, m_cue);
+                auto status = LoadPlaylist(file, m_cue, version);
                 if (status == Status::kOk && m_currentEntryIndex >= 0)
                     m_cue.entries[m_currentEntryIndex].Track();
             }
@@ -207,7 +208,8 @@ namespace rePlayer
                     Cue cue(db);
 
                     cue.entries.Resize(summary.numSubsongs);
-                    if (file.Read<uint64_t>() != kVersion || LoadPlaylist(file, cue) != Status::kOk)
+                    auto version = file.Read<uint64_t>();
+                    if (version <= kVersion || LoadPlaylist(file, cue, version) != Status::kOk)
                         continue;
                     file = io::File(); // close file
 
@@ -1168,12 +1170,31 @@ namespace rePlayer
             AddFiles(droppedEntryIndex, m_dropTarget->IsAcceptingAll());
     }
 
-    Status Playlist::LoadPlaylist(io::File& file, Cue& cue)
+    Status Playlist::LoadPlaylist(io::File& file, Cue& cue, uint64_t version)
     {
         for (uint32_t i = 0, e = cue.entries.NumItems(); i < e; i++)
         {
             SubsongID subsongId;
-            file.Read(subsongId.value);
+            if (version == kVersion0)
+            {
+                union
+                {
+                    uint32_t value = 0;
+                    struct
+                    {
+                        uint32_t index : 8;
+                        SongID songId : 24;
+                    };
+                } oldSubsongId;
+                file.Read(oldSubsongId.value);
+                subsongId.index = oldSubsongId.index;
+                subsongId.songId = oldSubsongId.songId;
+            }
+            else
+            {
+                file.Read(subsongId.songId);
+                file.Read(subsongId.index);
+            }
             cue.entries[i] = {};
             cue.entries[i].subsongId = subsongId;
             cue.entries[i].playlistId = ++m_uniqueIdGenerator;
@@ -1202,7 +1223,10 @@ namespace rePlayer
     void Playlist::SavePlaylist(io::File& file, const Cue& cue)
     {
         for (auto& entry : cue.entries)
-            file.Write(entry.subsongId.value);
+        {
+            file.Write(entry.subsongId.songId);
+            file.Write(entry.subsongId.index);
+        }
 
         for (uint32_t i = 0, e = cue.entries.NumItems(); i < e;)
         {
@@ -1283,8 +1307,9 @@ namespace rePlayer
                             m_lastSelectedEntry = PlaylistID::kInvalid;
                             m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
 
-                            if (file.Read<uint64_t>() == kVersion)
-                                LoadPlaylist(file, m_cue);
+                            auto version = file.Read<uint64_t>();
+                            if (version <= kVersion)
+                                LoadPlaylist(file, m_cue, version);
                             else
                                 assert(0 && "file read error");
 
@@ -1419,7 +1444,7 @@ namespace rePlayer
                                 if (d != 0)
                                     return d < 0;
                             }
-                        return l.GetId() < r.GetId();
+                            return l < r;
                         });
                     }
                     m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
@@ -1818,7 +1843,7 @@ namespace rePlayer
         auto file = io::File::OpenForWrite(ms_fileName);
         if (file.IsValid())
         {
-            file.Write(Summary::kVersion);
+            file.Write(kVersion);
 
             file.WriteAs<uint32_t>(m_cue.entries.NumItems());
             file.Write(m_currentEntryIndex);

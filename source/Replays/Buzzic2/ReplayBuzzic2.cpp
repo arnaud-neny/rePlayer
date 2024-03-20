@@ -49,7 +49,7 @@ namespace rePlayer
     {
     }
 
-    void ReplayBuzzic2::SetSubsong(uint16_t subsongIndex)
+    void ReplayBuzzic2::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
     }

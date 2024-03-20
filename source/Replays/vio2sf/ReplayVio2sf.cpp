@@ -629,7 +629,7 @@ namespace rePlayer
         m_ndsState.dwInterpolation = (settings && settings->overrideInterpolation) ? settings->interpolation : ms_interpolation;
     }
 
-    void ReplayVio2sf::SetSubsong(uint16_t subsongIndex)
+    void ReplayVio2sf::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

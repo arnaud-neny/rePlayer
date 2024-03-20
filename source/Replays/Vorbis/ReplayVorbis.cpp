@@ -127,7 +127,7 @@ namespace rePlayer
     void ReplayVorbis::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayVorbis::SetSubsong(uint16_t)
+    void ReplayVorbis::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayVorbis::GetDurationMs() const

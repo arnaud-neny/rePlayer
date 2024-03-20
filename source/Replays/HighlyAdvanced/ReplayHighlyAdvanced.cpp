@@ -567,7 +567,7 @@ namespace rePlayer
         }
     }
 
-    void ReplayHighlyAdvanced::SetSubsong(uint16_t subsongIndex)
+    void ReplayHighlyAdvanced::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -101,7 +101,7 @@ namespace rePlayer
     void ReplayProTrekkr::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayProTrekkr::SetSubsong(uint16_t /*subsongIndex*/)
+    void ReplayProTrekkr::SetSubsong(uint32_t /*subsongIndex*/)
     {}
 
     uint32_t ReplayProTrekkr::GetDurationMs() const

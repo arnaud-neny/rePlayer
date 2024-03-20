@@ -11,7 +11,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::MP3,
         .name = "MPEG-3",
-        .extensions = "mp2;mp3",
+        .extensions = "mp2;mp3;aix",
         .about = "dr_mp3 " DRMP3_VERSION_STRING "\nCopyright (c) 2020 David Reid",
         .load = ReplayMP3::Load
     };
@@ -121,7 +121,7 @@ namespace rePlayer
     void ReplayMP3::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayMP3::SetSubsong(uint16_t)
+    void ReplayMP3::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayMP3::GetDurationMs() const

@@ -307,7 +307,7 @@ namespace rePlayer
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globalSettings->surround);
     }
 
-    void ReplayOpenMPT::SetSubsong(uint16_t subsongIndex)
+    void ReplayOpenMPT::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

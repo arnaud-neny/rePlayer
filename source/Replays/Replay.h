@@ -59,7 +59,7 @@ namespace rePlayer
         virtual void ResetPlayback() = 0;
 
         virtual void ApplySettings(const CommandBuffer metadata) = 0;
-        virtual void SetSubsong(uint16_t subsongIndex) = 0;
+        virtual void SetSubsong(uint32_t subsongIndex) = 0;
 
         MediaType GetMediaType() const { return m_mediaType; }
         virtual uint32_t GetDurationMs() const = 0;

@@ -251,7 +251,7 @@ namespace rePlayer
         m_state->plugin_cfg.over = (settings && settings->overrideResampling) ? settings->resampling : ms_resampling;
     }
 
-    void ReplayTFMX::SetSubsong(uint16_t subsongIndex)
+    void ReplayTFMX::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

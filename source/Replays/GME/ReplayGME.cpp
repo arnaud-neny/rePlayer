@@ -199,7 +199,7 @@ namespace rePlayer
         }
     }
 
-    void ReplayGME::SetSubsong(uint16_t subsongIndex)
+    void ReplayGME::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

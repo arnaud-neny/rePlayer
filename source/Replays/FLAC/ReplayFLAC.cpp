@@ -91,7 +91,7 @@ namespace rePlayer
     void ReplayFLAC::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayFLAC::SetSubsong(uint16_t)
+    void ReplayFLAC::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayFLAC::GetDurationMs() const

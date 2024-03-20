@@ -340,7 +340,7 @@ namespace rePlayer
     {
     }
 
-    void ReplayAdLib::SetSubsong(uint16_t subsongIndex)
+    void ReplayAdLib::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         m_player->rewind(subsongIndex);

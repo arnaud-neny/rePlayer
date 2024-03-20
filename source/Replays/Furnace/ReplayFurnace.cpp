@@ -115,7 +115,7 @@ namespace rePlayer
         (void)metadata;
     }
 
-    void ReplayFurnace::SetSubsong(uint16_t subsongIndex)
+    void ReplayFurnace::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

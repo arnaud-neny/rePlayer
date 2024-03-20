@@ -290,7 +290,7 @@ namespace rePlayer
             && settings->duration) ? (uint64_t(settings->duration) * kSampleRate) / 1000 : 0;
     }
 
-    void ReplayVGM::SetSubsong(uint16_t subsongIndex)
+    void ReplayVGM::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -344,7 +344,7 @@ namespace rePlayer
                     auto musicId = MusicID(m_entries[rowIdx].id, m_databaseId);
                     Song* song = m_db[musicId.subsongId];
 
-                    ImGui::PushID(musicId.subsongId.value);
+                    ImGui::PushID(reinterpret_cast<void*>(musicId.subsongId.Value()));
                     ImGui::TableNextColumn();
 
                     SetRowBackground(rowIdx, song, musicId.subsongId, currentPlayingSong);
@@ -481,7 +481,7 @@ namespace rePlayer
             MusicID musicId = m_export->GetMusicId(songIndex);
 
             ImGui::BeginChild("Labels", ImVec2(320.0f, ImGui::GetFrameHeight() * 3 + ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_NoSavedSettings);
-            ImGui::Text("ID     : %08X%c", musicId.subsongId.value, musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
+            ImGui::Text("ID     : %016llX%c", musicId.subsongId.Value(), musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
             ImGui::Text("Title  : %s", musicId.GetTitle().c_str());
             ImGui::Text(musicId.GetSong()->NumArtistIds() > 1 ? "Artists: %s" : "Artist : %s", musicId.GetArtists().c_str());
             ImGui::Text("Replay : %s", musicId.GetSong()->GetType().GetReplay());
@@ -560,7 +560,7 @@ namespace rePlayer
                     if (delta)
                         return (sortSpec.SortDirection == ImGuiSortDirection_Ascending) ? delta < 0 : delta > 0;
                 }
-                return l.id.value < r.id.value;
+                return l.id < r.id;
             });
 
             sortsSpecs->SpecsDirty = false;

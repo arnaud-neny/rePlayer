@@ -247,7 +247,7 @@ namespace rePlayer
         }
     }
 
-    void ReplaySC68::SetSubsong(uint16_t subsongIndex)
+    void ReplaySC68::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

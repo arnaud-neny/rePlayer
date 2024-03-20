@@ -594,7 +594,7 @@ namespace rePlayer
     void ReplayDSD::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayDSD::SetSubsong(uint16_t)
+    void ReplayDSD::SetSubsong(uint32_t)
     {}
 
     uint32_t ReplayDSD::GetDurationMs() const

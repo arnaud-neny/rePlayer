@@ -258,7 +258,7 @@ namespace rePlayer
         NEZGain(m_nezPlay, (settings && settings->overrideGain) ? settings->gain : ms_gain);
     }
 
-    void ReplayNEZplug::SetSubsong(uint16_t subsongIndex)
+    void ReplayNEZplug::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

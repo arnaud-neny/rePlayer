@@ -110,7 +110,7 @@ namespace rePlayer
                     filename += "][";
                 }
                 char buf[32];
-                sprintf(buf, "%08X%c].wav", entry.id.subsongId.value, entry.id.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
+                sprintf(buf, "%016llX%c].wav", entry.id.subsongId.Value(), entry.id.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
                 filename += buf;
                 io::File::CleanFilename(filename.data());
 

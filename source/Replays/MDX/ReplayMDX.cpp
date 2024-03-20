@@ -292,7 +292,7 @@ namespace rePlayer
         mdx_set_max_loop(&m_mdx, 1 + m_loops);
     }
 
-    void ReplayMDX::SetSubsong(uint16_t subsongIndex)
+    void ReplayMDX::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

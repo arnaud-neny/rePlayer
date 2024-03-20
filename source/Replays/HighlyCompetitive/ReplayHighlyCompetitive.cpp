@@ -596,7 +596,7 @@ namespace rePlayer
         Snes9xSetInterpolationMethod((settings && settings->overrideInterpolation) ? settings->interpolation : *static_cast<int32_t*>(g_replayPlugin.globals));
     }
 
-    void ReplayHighlyCompetitive::SetSubsong(uint16_t subsongIndex)
+    void ReplayHighlyCompetitive::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -671,7 +671,7 @@ namespace rePlayer
         m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
     }
 
-    void ReplayUADE::SetSubsong(uint16_t subsongIndex)
+    void ReplayUADE::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

@@ -131,7 +131,7 @@ namespace rePlayer
     void ReplayV2::ApplySettings(const CommandBuffer /*metadata*/)
     {}
 
-    void ReplayV2::SetSubsong(uint16_t /*subsongIndex*/)
+    void ReplayV2::SetSubsong(uint32_t /*subsongIndex*/)
     {
         m_player->Play();
     }

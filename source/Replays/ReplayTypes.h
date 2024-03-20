@@ -28,12 +28,12 @@ namespace rePlayer
 #undef EXTENSION
         Count
     };
-    static_assert(uint16_t(eExtension::Count) <= 512);
+    static_assert(uint16_t(eExtension::Count) <= 1024);
 
     struct MediaType
     {
-        eExtension ext : 9{ eExtension::Unknown };
-        eReplay replay : 7{ eReplay::Unknown };
+        eExtension ext : 10{ eExtension::Unknown };
+        eReplay replay : 6{ eReplay::Unknown };
 
         MediaType() = default;
         MediaType(eExtension otherExt, eReplay otherReplay)

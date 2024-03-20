@@ -360,7 +360,7 @@ namespace rePlayer
         m_kssplay->silent_limit = ms_silence * 1000;
     }
 
-    void ReplayKSS::SetSubsong(uint16_t subsongIndex)
+    void ReplayKSS::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();

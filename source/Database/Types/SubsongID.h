@@ -8,24 +8,19 @@ namespace rePlayer
 
     struct SubsongID
     {
-        union
-        {
-            uint32_t value = 0;
-            struct
-            {
-                uint32_t index : 8;
-                SongID songId : 24;
-            };
-        };
+        SongID songId = SongID::Invalid;
+        uint32_t index = 0;
 
-        bool IsValid() const;
-        bool IsInvalid() const;
+        constexpr bool IsValid() const;
+        constexpr bool IsInvalid() const;
+
+        constexpr uint64_t Value() const;
 
         constexpr bool operator==(SubsongID other) const;
         constexpr bool operator<(SubsongID other) const;
 
         constexpr SubsongID() = default;
-        constexpr SubsongID(SongID newSongId, uint16_t newIndex);
+        constexpr SubsongID(SongID newSongId, uint32_t newIndex);
 
         std::size_t operator()(SubsongID const& subsongId) const noexcept;
     };

@@ -167,7 +167,7 @@ namespace rePlayer
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
     }
 
-    void ReplayTIATracker::SetSubsong(uint16_t subsongIndex)
+    void ReplayTIATracker::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
     }

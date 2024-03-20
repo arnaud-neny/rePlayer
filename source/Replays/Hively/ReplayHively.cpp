@@ -176,7 +176,7 @@ namespace rePlayer
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
     }
 
-    void ReplayHively::SetSubsong(uint16_t subsongIndex)
+    void ReplayHively::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         hvl_InitSubsong(m_module, subsongIndex);

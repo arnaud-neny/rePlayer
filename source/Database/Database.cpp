@@ -64,7 +64,8 @@ namespace rePlayer
         m_items.Clear();
         m_availableIds.Clear();
 
-        if (file.Read<uint32_t>() != ItemType::kVersion)
+        auto version = file.Read<uint32_t>();
+        if (version > ItemType::kVersion)
         {
             assert(0 && "file read error");
             return Status::kFail;
@@ -84,6 +85,14 @@ namespace rePlayer
                 m_availableIds.Add(static_cast<ItemID>(nextId));
             }
             m_items.Add(item);
+        }
+        if (version != ItemType::kVersion)
+        {
+            for (uint32_t i = 0, n = m_items.NumItems(); i < n; i++)
+            {
+                if (m_items[i])
+                    m_items[i]->Patch(version);
+            }
         }
 
         return Status::kOk;
