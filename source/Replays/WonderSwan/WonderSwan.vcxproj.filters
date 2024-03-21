@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\in_wsr">
+      <UniqueIdentifier>{023b41ae-e1d4-4fe0-b81c-688983630a6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\in_wsr\nec">
+      <UniqueIdentifier>{701f9d2c-4a17-4254-8cdd-1433e474d33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mednafen">
+      <UniqueIdentifier>{78396e89-db89-40e1-aecc-fd9142ee9a9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mednafen\sound">
+      <UniqueIdentifier>{d8feb85b-6cfe-458c-bca6-83fd19761714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mednafen\wsan">
+      <UniqueIdentifier>{a6cf4bb3-109b-4773-a25e-b95132a95089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wsr_player_common">
+      <UniqueIdentifier>{f0ffb0a4-b2a9-440a-85c8-096ea54a5e92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oswan">
+      <UniqueIdentifier>{34084713-8628-425c-982b-0f92215c8c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oswan\nec">
+      <UniqueIdentifier>{13de7407-46f8-4a25-acca-738b2e1cf11b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\foo_input_wsr">
+      <UniqueIdentifier>{1e6ed978-2c45-4d50-913c-e857a5fc4e3e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayWonderSwan.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\ws_audio.h">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\ws_initialIo.h">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\ws_io.h">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\ws_memory.h">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\wsr_player.h">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\nec\nec.h">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\nec\necea.h">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\nec\necinstr.h">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\nec\necintrf.h">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="in_wsr\nec\necmodrm.h">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\error.h">
+      <Filter>Source Files\mednafen</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\math_ops.h">
+      <Filter>Source Files\mednafen</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\types.h">
+      <Filter>Source Files\mednafen</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\sound\Blip_Buffer.h">
+      <Filter>Source Files\mednafen\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\comm.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\debug.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\eeprom.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\gfx.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\interrupt.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\memory.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\rtc.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\sound.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\v30mz.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\v30mz-private.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="mednafen\wswan\wswan.h">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClInclude>
+    <ClInclude Include="wsr_player_common\wsr_player_common.h">
+      <Filter>Source Files\wsr_player_common</Filter>
+    </ClInclude>
+    <ClInclude Include="wsr_player_common\wsr_player_intf.h">
+      <Filter>Source Files\wsr_player_common</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\nec\nec.h">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\nec\necea.h">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\nec\necinstr.h">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\nec\necintrf.h">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\nec\necmodrm.h">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\audio.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\config.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\draw.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\gpu.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\initialIo.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\input.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\io.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\keycode.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\log.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\mapviewer.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\oswan.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\rom.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\segment.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\segmentM.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\witch.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="oswan\ws.h">
+      <Filter>Source Files\oswan</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\extended_m3u_playlist.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\pfc.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\int_types.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string_conv.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\array.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\alloc.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\primitives.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\traits.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\bit_array.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\pfc-lite.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\targetver.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string-interface.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string-lite.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\mem_block.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string-compare.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string-part.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\string_base.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+    <ClInclude Include="foo_input_wsr\pocket_char_ops.h">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayWonderSwan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="in_wsr\ws_audio.c">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="in_wsr\ws_io.c">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="in_wsr\ws_memory.c">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="in_wsr\wsr_player.c">
+      <Filter>Source Files\in_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="in_wsr\nec\nec.c">
+      <Filter>Source Files\in_wsr\nec</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\error.cpp">
+      <Filter>Source Files\mednafen</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wsr_player.cpp">
+      <Filter>Source Files\mednafen</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\sound\Blip_Buffer.cpp">
+      <Filter>Source Files\mednafen\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\comm.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\debug.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\eeprom.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\gfx.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\interrupt.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\main.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\memory.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\rtc.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\sound.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\tcache.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="mednafen\wswan\v30mz.cpp">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\nec\nec.cpp">
+      <Filter>Source Files\oswan\nec</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\audio.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\config.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\draw.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\gpu.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\input.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\io.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\log.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\mapviewer.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\oswan.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\rom.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\witch.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\ws.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="oswan\wsr_player.cpp">
+      <Filter>Source Files\oswan</Filter>
+    </ClCompile>
+    <ClCompile Include="foo_input_wsr\extended_m3u_playlist.cpp">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="foo_input_wsr\pfc.cpp">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="foo_input_wsr\string_conv.cpp">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClCompile>
+    <ClCompile Include="foo_input_wsr\utf8.cpp">
+      <Filter>Source Files\foo_input_wsr</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mednafen\wswan\start.inc">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </None>
+    <None Include="mednafen\wswan\v30mz-ea.inc">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </None>
+    <None Include="mednafen\wswan\v30mz-modrm.inc">
+      <Filter>Source Files\mednafen\wsan</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -939,3 +939,4 @@ EXTENSION(zsd)          // VGMStream: Z-Axis ZSND
 EXTENSION(zss)          // VGMStream
 EXTENSION(zwdsp)        // VGMStream
 EXTENSION(zwv)          // VGMStream
+EXTENSION(wsr)          // WonderSwan
