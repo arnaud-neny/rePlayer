@@ -42,7 +42,7 @@ namespace rePlayer
         &in_wsr::g_wsr_player_api
     };
 
-#define WONDERSWAN "WonderSwan 0.30"
+    #define WONDERSWAN "WonderSwan 0.30"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::WonderSwan, .isThreadSafe = false,
@@ -81,13 +81,15 @@ namespace rePlayer
             return nullptr;
 
         auto* globals = static_cast<Globals*>(g_replayPlugin.globals);
+        auto settings = metadata.Find<Settings>();
+        auto core = (settings && settings->overrideCore) ? CoreSwan(settings->core) : globals->core;
+
         stream->Seek(0, io::Stream::kSeekBegin);
         auto buffer = stream->Read();
-        if (s_coreSwan[int(globals->core)]->pLoadWSR(buffer.Items(), unsigned(buffer.Size())))
+        if (s_coreSwan[int(core)]->pLoadWSR(buffer.Items(), unsigned(buffer.Size())))
         {
             Array<std::string> titles;
             uint32_t oldValue = 0;
-            auto settings = metadata.Find<Settings>();
             if (settings)
             {
                 if (settings->NumSubsongs() == 1 && settings->subsongs[0] == 0 && settings->subsongs[1] == 0 && settings->subsongs[2] == 0 && settings->subsongs[3] == 0
@@ -108,14 +110,14 @@ namespace rePlayer
                 static constexpr uint32_t kBufSamples = sizeof(buf) / sizeof(int16_t) / 2;
                 for (uint32_t i = 0; i < 256; i++)
                 {
-                    s_coreSwan[int(globals->core)]->pResetWSR(i);
-                    s_coreSwan[int(globals->core)]->pSetFrequency(kSampleRate);
+                    s_coreSwan[int(core)]->pResetWSR(i);
+                    s_coreSwan[int(core)]->pSetFrequency(kSampleRate);
 
                     uint64_t smp = 0;
                     auto numSamples = (kSampleRate * 4) & ~(kBufSamples - 1); // around 4 seconds check
                     while (numSamples)
                     {
-                        s_coreSwan[int(globals->core)]->pUpdateWSR(buf, sizeof(buf), kBufSamples);
+                        s_coreSwan[int(core)]->pUpdateWSR(buf, sizeof(buf), kBufSamples);
                         if (numSamples == ((kSampleRate * 4) & ~(kBufSamples - 1)))
                             smp = buf[0];
                         numSamples -= kBufSamples;
@@ -135,7 +137,7 @@ namespace rePlayer
                 }
                 if (numSubsongs == 0)
                 {
-                    s_coreSwan[int(globals->core)]->pCloseWSR();
+                    s_coreSwan[int(core)]->pCloseWSR();
                     return nullptr;
                 }
                 titles.Resize(numSubsongs);
@@ -204,7 +206,7 @@ namespace rePlayer
                 }
             }
 
-            return new ReplayWonderSwan(globals->core, metadata, std::move(titles));
+            return new ReplayWonderSwan(core, metadata, std::move(titles));
         }
         return nullptr;
     }
