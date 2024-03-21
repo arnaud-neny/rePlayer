@@ -1502,6 +1502,8 @@ namespace rePlayer
                     // load it to find the proper replay (and final extension)
                     MediaType type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
                     auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
+                    if (stream.IsInvalid())
+                        return;
                     Array<CommandBuffer::Command> commands;
                     auto* replay = replays.Load(stream, commands, type);
                     if (!isAcceptingAll && replay == nullptr)
@@ -1553,6 +1555,7 @@ namespace rePlayer
                                 }
                             }
                         }
+                        songSheet->metadata.Container() = commands;
 
                         delete replay;
                     }
