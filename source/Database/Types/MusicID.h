@@ -64,7 +64,7 @@ namespace rePlayer
         void Track() const;
 
         // Helpers
-        SmartPtr<core::io::Stream> GetStream();
+        SmartPtr<core::io::Stream> GetStream() const;
 
         // ImGui
 

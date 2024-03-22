@@ -52,7 +52,7 @@ namespace rePlayer
         Core::GetDatabase(databaseId).TrackSubsong(subsongId);
     }
 
-    SmartPtr<core::io::Stream> MusicID::GetStream()
+    SmartPtr<core::io::Stream> MusicID::GetStream() const
     {
         SmartPtr<core::io::Stream> stream;
         if (databaseId == DatabaseID::kPlaylist)
