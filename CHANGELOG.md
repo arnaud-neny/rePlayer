@@ -1,4 +1,13 @@
-v0.13.4 (Khatchadour's Release):
+v0.14.0:
+- Added vgmstream
+- Added WonderSwan
+- Added VGMRips import
+- Updated libvgm to 223b6f9
+- Updated OpenMPT to 0.7.5
+- Updated SNDH-Player to 0.74
+- Bug fixes
+
+v0.13.5 (Khatchadour's Release):
 - Added Direct Stream Digital
 - Added WavePack
 - Added libxml2

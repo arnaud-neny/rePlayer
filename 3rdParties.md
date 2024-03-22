@@ -1,66 +1,68 @@
 # rePlayer (another multi-formats music player)
 
 ## General purpose libraries:
+- Curl: https://curl.se/windows
 - Dear ImGui: https://github.com/ocornut/imgui/tree/docking  
   To merge newer versions, replace imgui files in source\Core\ImGui and run batch DiffApplyImGui.bat (this will apply our changes to ImGui).  
   Then copy the imgui folder in rePlayer\external and run batch DiffMakeImGui.bat (this will create a patch file from the new version).
-- stb (sprintf): https://github.com/nothings/stb
-- Curl: https://curl.se/windows
-- libxml2: https://gitlab.gnome.org/GNOME/libxml2
-- libarchive: https://github.com/libarchive/libarchive
-- TagLib: https://taglib.org
 - dllloader: https://github.com/tapika/dllloader
 - JSON for Modern C++: https://github.com/nlohmann/json
+- stb (sprintf): https://github.com/nothings/stb
+- libarchive: https://github.com/libarchive/libarchive
+- libxml2: https://gitlab.gnome.org/GNOME/libxml2
+- TagLib: https://taglib.org
 
 ## Replays Libraries:
-- OpenMPT: https://lib.openmpt.org/libopenmpt  
-  Some changes have been made to manually change the protracker timings (cia or vblank).
-- HivelyTracker: https://github.com/pete-gordon/hivelytracker  
-  With minor changes.
-- SoundMon: Brian Postma website is gone.  
-  Partially rewritten and fixed from original code.
-- StSound: https://github.com/arnaud-carre/StSound
-- FutureComposer: https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder
-- SidPlay: https://github.com/libsidplayfp/libsidplayfp
+- adplug: https://github.com/adplug/adplug
+- ASAP: http://asap.sourceforge.net
+- Ayfly: https://github.com/l29ah/ayfly
+- Buzzic 2: https://www.pouet.net/prod.php?which=54407
+- Direct Stream Digital: https://github.com/Sound-Linux-More/sacd
+- dr_libs (MP3/FLAC/WAV): https://github.com/mackron/dr_libs
+- eupmini: https://github.com/gzaffin/eupmini
+- FAAD2: https://github.com/knik0/faad2
 - Farbrausch ViruZ II: https://github.com/farbrausch/fr_public  
   Made the x86 version available as "emulation" as it renders closer to the original than the C version.
-- sc68: https://sourceforge.net/projects/sc68
-- adplug: https://github.com/adplug/adplug  
-  Patched some players for continuous play and loop/end detection.
-- ASAP: http://asap.sourceforge.net
-- dr_libs (MP3/FLAC/WAV): https://github.com/mackron/dr_libs
-- Vorbis: https://github.com/edubart/minivorbis
-- Ayfly: https://github.com/l29ah/ayfly
-- gbsplay: https://github.com/mmitch/gbsplay
+- Furnace: https://github.com/tildearrow/furnace
+- FutureComposer: https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder
 - game-music-emu: https://github.com/libgme/game-music-emu
-- mdxmini: https://github.com/mistydemeo/mdxmini
-- libvgm: https://github.com/ValleyBell/libvgm
-- UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade  
-  Some changes there to improved the loops (score) and some windows port.
-- Highly Quixotic: https://gitlab.com/kode54/highly_quixotic, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_qsf
+- gbsplay: https://github.com/mmitch/gbsplay
 - Highly Advanced: https://bitbucket.org/losnoco/cog
-- ProTrekkr: https://github.com/hitchhikr/protrekkr
+- Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
+- Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib
+- Highly Quixotic: https://gitlab.com/kode54/highly_quixotic, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_qsf
+- Highly Theoretical: https://bitbucket.org/losnoco/highly_theoretical and https://bitbucket.org/losnoco/psflib
+- HivelyTracker: https://github.com/pete-gordon/hivelytracker  
+  With minor changes.
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.
+- LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
+- libvgm: https://github.com/ValleyBell/libvgm
+- mdxmini: https://github.com/mistydemeo/mdxmini
+- OpenMPT: https://lib.openmpt.org/libopenmpt  
+  Some changes have been made to manually change the protracker timings (cia or vblank).
+- Opus: https://opus-codec.org
+- ProTrekkr: https://github.com/hitchhikr/protrekkr
+- sc68: https://sourceforge.net/projects/sc68
+- SidPlay: https://github.com/libsidplayfp/libsidplayfp
+- SNDH-Player: https://github.com/arnaud-carre/sndh-player
+- SoundMon: Brian Postma website is gone.  
+  Partially rewritten and fixed from original code.
+- StSound: https://github.com/arnaud-carre/StSound  
+  Patched some players for continuous play and loop/end detection, added stereo support.
 - TIATracker: https://bitbucket.org/kylearan/tiatracker
+- UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade
+- vgmstream: https://github.com/vgmstream/vgmstream
 - vio2sf: https://bitbucket.org/losnoco/vio2sf and https://bitbucket.org/losnoco/psflib
-- Highly Theoretical: https://bitbucket.org/losnoco/highly_theoretical and https://bitbucket.org/losnoco/psflib
-- Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib
-- LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
-- Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
-- Buzzic 2: https://www.pouet.net/prod.php?which=54407
+- Vorbis: https://github.com/edubart/minivorbis  
+  Some changes there to improved the loops (score) and some windows port.
+- WavPack: https://github.com/dbry/WavPack
+- zingzong: https://github.com/benjihan/zingzong
 - ZXTune: https://zxtune.bitbucket.io  
   Stripped to use only ZX stuff and "fixed" for MSVC.
-- SNDH-Player: https://github.com/arnaud-carre/sndh-player
-- eupmini: https://github.com/gzaffin/eupmini
-- zingzong: https://github.com/benjihan/zingzong
-- Furnace: https://github.com/tildearrow/furnace
-- FAAD2: https://github.com/knik0/faad2
-- Opus: https://opus-codec.org
-- WavPack: https://github.com/dbry/WavPack
-- Direct Stream Digital: https://github.com/Sound-Linux-More/sacd
+- WonderSwan: https://foobar2000.xrea.jp/?Input+64bit#f44897bc
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler

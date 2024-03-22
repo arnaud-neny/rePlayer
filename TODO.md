@@ -30,7 +30,7 @@
 - https://www.modules.pl/ importer?
 - https://www.demozoo.org/ importer?
 - https://www.zophar.net/ importer?
-- https://vgmrips.net/ importer?
+- https://vgm.hcs64.com/ importer?
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
 - check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
 - check NostalgicPlayer for more players: https://github.com/neumatho/NostalgicPlayer
@@ -42,4 +42,3 @@
 - 64klang: https://github.com/hzdgopher/64klang
 - sointu: https://github.com/vsariola/sointu
 - single channel export
-- vgmstream support? https://github.com/vgmstream/vgmstream
