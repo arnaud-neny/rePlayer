@@ -65,6 +65,10 @@ namespace rePlayer
 
     void SongEditor::OnDisplay()
     {
+        m_busyColor = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
+        ImGui::BeginDisabled(m_isBusy);
+        ImGui::BeginBusy(m_isBusy);
+
         auto window = ImGui::GetCurrentWindow();
         window->AutoFitFramesX = 2;
 
@@ -224,6 +228,17 @@ namespace rePlayer
             ImGui::EndTable();
         }
         ImGui::EndDisabled();
+
+        ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+        ImGui::EndDisabled();
+    }
+
+    void SongEditor::OnEndUpdate()
+    {
+        if (m_isBusy)
+            m_busyTime += ImGui::GetIO().DeltaTime;
+        else
+            m_busyTime = 0.0f;
     }
 
     void SongEditor::EditSubsongs()
@@ -477,9 +492,17 @@ namespace rePlayer
             ImGui::TableNextColumn();
             if (ImGui::Button("Scan") && m_playables[0] == eReplay::Unknown)
             {
-                SmartPtr<core::io::Stream> stream = m_musicId.GetStream();
-                if (stream.IsValid())
-                    m_playables = replays.Enumerate(stream);
+                m_isBusy = true;
+                Core::AddJob([this, &replays, musicId = m_musicId]()
+                {
+                    SmartPtr<core::io::Stream> stream = musicId.GetStream();
+                    Core::FromJob([this, musicId, playables = stream.IsValid() ? replays.Enumerate(stream) : Replayables()]()
+                    {
+                        m_isBusy = false;
+                        if (m_musicId == musicId)
+                            m_playables = playables;
+                    });
+                });
             }
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Scan for all matching replays\nThey will be displayed first");

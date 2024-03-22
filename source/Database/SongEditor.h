@@ -19,6 +19,7 @@ namespace rePlayer
     private:
         std::string OnGetWindowTitle() override;
         void OnDisplay() override;
+        void OnEndUpdate() override;
 
         void EditSubsongs();
         void EditSubsong(SubsongData<Blob::kIsDynamic>& subsong, uint32_t numValidSubsongs);
@@ -45,6 +46,10 @@ namespace rePlayer
         eExtension m_mappedExtensions[int32_t(eExtension::Count)];
 
         SongEndEditor* m_songEndEditor = nullptr;
+
+        bool m_isBusy = false;
+        float m_busyTime = 0.0f;
+        uint32_t m_busyColor;
     };
 }
 // namespace rePlayer
