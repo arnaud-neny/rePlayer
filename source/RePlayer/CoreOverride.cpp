@@ -63,6 +63,7 @@ namespace rePlayer
 
     Core::~Core()
     {
+        m_playlist->Flush();
         m_workers->Flush();
         m_library->Save();
         m_playlist->Save();

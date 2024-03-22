@@ -29,6 +29,7 @@ namespace rePlayer
         Playlist();
         ~Playlist();
 
+        void Flush();
         void Save();
 
         void Clear();

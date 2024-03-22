@@ -108,6 +108,7 @@ namespace rePlayer
         int32_t droppedEntryIndex;
 
         bool m_isDone = false;
+        bool m_isCancel = false;
         uint16_t m_time = 0;
 
         AddFilesContext* next = nullptr;
@@ -1647,10 +1648,14 @@ namespace rePlayer
                     {
                         if (dir_entry.is_regular_file(ec))
                             addFile(dir_entry.path());
+                        if (addFilesContext->m_isCancel)
+                            break;
                     }
                 }
                 else if (std::filesystem::is_regular_file(path, ec))
                     addFile(path);
+                if (addFilesContext->m_isCancel)
+                    break;
             }
 
             addFilesContext->Lock();
@@ -1831,6 +1836,14 @@ namespace rePlayer
         filename += name;
         filename += MusicExt;
         return filename;
+    }
+
+    void Playlist::Flush()
+    {
+        for (auto* addFilesContext = m_addFilesContext; addFilesContext; addFilesContext = addFilesContext->next)
+            addFilesContext->m_isCancel = true;
+        while (m_addFilesContext)
+            UpdateFiles();
     }
 
     void Playlist::Save()
