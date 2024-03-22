@@ -183,6 +183,15 @@ VGMPlayer::VGMPlayer() :
 			else if (devID == DEVID_SCSP)
 				devOpts.coreOpts = OPT_SCSP_BYPASS_DSP;
 			_devOptMap[devID][chipID] = optID;
+			_optDevMap[optID] = (size_t)-1;
+		}
+	}
+	{
+		UINT8 vgmChip;
+		for (vgmChip = 0x00; vgmChip < _CHIP_COUNT; vgmChip ++)
+		{
+			for (chipID = 0; chipID < 2; chipID ++)
+				_vdDevMap[vgmChip][chipID] = (size_t)-1;
 		}
 	}
 	
@@ -737,6 +746,11 @@ UINT8 VGMPlayer::SetSampleRate(UINT32 sampleRate)
 	return 0x00;
 }
 
+double VGMPlayer::GetPlaybackSpeed(void) const
+{
+	return _playOpts.genOpts.pbSpeed / (double)0x10000;
+}
+
 UINT8 VGMPlayer::SetPlaybackSpeed(double speed)
 {
 	_playOpts.genOpts.pbSpeed = (UINT32)(0x10000 * speed);
@@ -747,21 +761,19 @@ UINT8 VGMPlayer::SetPlaybackSpeed(double speed)
 
 void VGMPlayer::RefreshTSRates(void)
 {
-	_tsMult = _outSmplRate;
 	_ttMult = 1;
-	_tsDiv = _ttDiv = 44100;
+	_tsDiv = 44100;
 	if (_playOpts.playbackHz && _fileHdr.recordHz)
 	{
-		_tsMult *= _fileHdr.recordHz;
 		_ttMult *= _fileHdr.recordHz;
 		_tsDiv *= _playOpts.playbackHz;
 	}
 	if (_playOpts.genOpts.pbSpeed != 0 && _playOpts.genOpts.pbSpeed != 0x10000)
 	{
-		_tsMult *= 0x10000;
 		_ttMult *= 0x10000;
 		_tsDiv *= _playOpts.genOpts.pbSpeed;
 	}
+	_tsMult = _ttMult * _outSmplRate;
 	if (_tsMult != _lastTsMult ||
 	    _tsDiv != _lastTsDiv)
 	{
@@ -1087,7 +1099,10 @@ UINT16 VGMPlayer::GetChipVolume(UINT8 chipType, UINT8 chipID, UINT8 isLinked) co
 		}
 	}
 	
-	if (chipType == 0x1C)	// C140/C219
+	// additional patches for adjusted volume scale in sound cores
+	if (chipType == 0x19)	// K051649
+		vol = vol * 8 / 5;
+	else if (chipType == 0x1C)	// C140/C219
 		vol = (vol * 2 + 1) / 3;
 	return vol;
 }
@@ -1355,6 +1370,7 @@ void VGMPlayer::InitDevices(void)
 		chipDev.chipType = sdCfg.type;
 		chipDev.chipID = chipID;
 		chipDev.optID = _devOptMap[chipType][chipID];
+		chipDev.cfgID = curChip;
 		chipDev.base.defInf.dataPtr = NULL;
 		chipDev.base.linkDev = NULL;
 		
@@ -1570,6 +1586,7 @@ void VGMPlayer::InitDevices(void)
 	{
 		CHIP_DEVICE& chipDev = _devices[curChip];
 		DEV_INFO* devInf = &chipDev.base.defInf;
+		const PLR_DEV_OPTS* devOpts = (chipDev.optID != (size_t)-1) ? &_devOpts[chipDev.optID] : NULL;
 		VGM_BASEDEV* clDev;
 		
 		if (devInf->devDef->SetLogCB != NULL)
@@ -1579,8 +1596,9 @@ void VGMPlayer::InitDevices(void)
 		for (clDev = &chipDev.base; clDev != NULL; clDev = clDev->linkDev, linkCntr ++)
 		{
 			UINT16 chipVol = GetChipVolume(chipDev.vgmChipType, chipDev.chipID, linkCntr);
+			UINT8 resmplMode = (devOpts != NULL) ? devOpts->resmplMode : RSMODE_LINEAR;
 			
-			Resmpl_SetVals(&clDev->resmpl, 0xFF, chipVol, _outSmplRate);
+			Resmpl_SetVals(&clDev->resmpl, resmplMode, chipVol, _outSmplRate);
 			Resmpl_DevConnect(&clDev->resmpl, &clDev->defInf);
 			Resmpl_Init(&clDev->resmpl);
 		}

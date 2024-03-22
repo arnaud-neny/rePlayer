@@ -14,7 +14,7 @@
 #include <player/gymplayer.hpp>
 #include <utils/MemoryLoader.h>
 
-#define LIBVGM_VERSION "@079c4e7"
+#define LIBVGM_VERSION "@223b6f9"
 
 namespace rePlayer
 {
@@ -316,7 +316,7 @@ namespace rePlayer
     {
         m_player->SetLoopCount(1);
         m_player->Reset();
-        auto duration = uint32_t(m_player->GetTotalTime(true) * 1000ull);
+        auto duration = uint32_t(m_player->GetTotalTime(PLAYTIME_LOOP_INCL | PLAYTIME_TIME_FILE) * 1000ull);
         m_player->SetLoopCount(0);
         m_player->Reset();
         return duration;

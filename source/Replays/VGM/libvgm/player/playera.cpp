@@ -192,8 +192,8 @@ double PlayerA::GetPlaybackSpeed(void) const
 void PlayerA::SetPlaybackSpeed(double speed)
 {
 	_config.pbSpeed = speed;
-	if (_player != NULL)
-		_player->SetPlaybackSpeed(_config.pbSpeed);
+	for (size_t curPlr = 0; curPlr < _avbPlrs.size(); curPlr++)
+		_avbPlrs[curPlr]->SetPlaybackSpeed(_config.pbSpeed);
 	return;
 }
 
@@ -257,8 +257,9 @@ void PlayerA::SetConfiguration(const PlayerA::Config& config)
 	double oldPbSpeed = _config.pbSpeed;
 	
 	_config = config;
-	if (_player != NULL && oldPbSpeed != _config.pbSpeed)
-		_player->SetPlaybackSpeed(_config.pbSpeed);
+	SetMasterVolume(_config.masterVol);
+	if (oldPbSpeed != _config.pbSpeed)
+		SetPlaybackSpeed(_config.pbSpeed);	// refresh in all players
 	return;
 }
 
@@ -300,29 +301,44 @@ UINT32 PlayerA::GetCurPos(UINT8 unit) const
 	return _player->GetCurPos(unit);
 }
 
-double PlayerA::GetCurTime(UINT8 includeLoops) const
+double PlayerA::GetCurTime(UINT8 flags) const
 {
 	if (_player == NULL)
 		return -1.0;
+	
 	// using samples here, as it may be more accurate than the (possibly low-resolution) ticks
-	double ticks = _player->Sample2Second(_player->GetCurPos(PLAYPOS_SAMPLE));
-	if (! includeLoops)
-	{
-		UINT32 curLoop = _player->GetCurLoop();
-		if (curLoop > 0)
-			ticks -= _player->Tick2Second(_player->GetLoopTicks() * curLoop);
-	}
-	return ticks;
+	double secs = _player->Sample2Second(_player->GetCurPos(PLAYPOS_SAMPLE));
+	UINT32 curLoop = _player->GetCurLoop();
+	if (! (flags & PLAYTIME_LOOP_INCL) && curLoop > 0)
+		secs -= _player->Tick2Second(_player->GetLoopTicks() * curLoop);
+	
+	if (! (flags & PLAYTIME_TIME_PBK))
+		secs *= _player->GetPlaybackSpeed();
+	return secs;
 }
 
-double PlayerA::GetTotalTime(UINT8 includeLoops) const
+double PlayerA::GetTotalTime(UINT8 flags) const
 {
 	if (_player == NULL)
 		return -1.0;
-	if (includeLoops)
-		return _player->Tick2Second(_player->GetTotalPlayTicks(_config.loopCount));
+	
+	double secs;
+	if (flags & PLAYTIME_LOOP_INCL)
+		secs = _player->Tick2Second(_player->GetTotalPlayTicks(_config.loopCount));
 	else
-		return _player->Tick2Second(_player->GetTotalPlayTicks(1));
+		secs = _player->Tick2Second(_player->GetTotalPlayTicks(1));
+	if (secs < 0.0)	// indicates infinite runtime
+		return secs;
+	
+	// Fade and silence time are unaffected by playback speed and thus must be applied before speed scaling.
+	if ((flags & PLAYTIME_WITH_FADE) && _player->GetLoopTicks() > 0)
+		secs += _player->Sample2Second(GetFadeSamples());
+	if (flags & PLAYTIME_WITH_SLNC)
+		secs += _player->Sample2Second(GetEndSilenceSamples());
+	
+	if (! (flags & PLAYTIME_TIME_PBK))
+		secs *= _player->GetPlaybackSpeed();
+	return secs;
 }
 
 UINT32 PlayerA::GetCurLoop(void) const
@@ -373,6 +389,10 @@ UINT8 PlayerA::LoadFile(DATA_LOADER* dLoad)
 	FindPlayerEngine();
 	if (_player == NULL)
 		return 0xFF;
+	
+	// set the configuration so that the configuration is loaded properly
+	_player->SetSampleRate(_smplRate);
+	_player->SetPlaybackSpeed(_config.pbSpeed);
 	
 	UINT8 retVal = _player->LoadFile(dLoad);
 	if (retVal >= 0x80)
