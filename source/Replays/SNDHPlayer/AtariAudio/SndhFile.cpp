@@ -91,9 +91,11 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 	const char* read8 = (const char*)m_rawBuffer;
 	if (m_rawSize > 16)
 	{
-		if (0 == strncmp(read8 + 12, "SNDH", 4))
+		if ((0x60 == read8[0]) && (0 == strncmp(read8 + 12, "SNDH", 4)))
 		{
-			const int headerSize = Read16(read8+2) + 2;
+			int headerSize = Read16(read8 + 2) + 2; // suppose it's bra.w
+			if (read8[1])
+				headerSize = read8[1] + 2;			// but maybe it's bra.s
 			const char* readEnd = read8 + headerSize;
 
 			m_playerRate = 50;

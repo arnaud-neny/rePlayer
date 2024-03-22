@@ -8,7 +8,7 @@
 
 namespace rePlayer
 {
-    #define SndhPlayerVersion "0.72"
+    #define SndhPlayerVersion "0.74"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,

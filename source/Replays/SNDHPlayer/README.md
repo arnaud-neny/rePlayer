@@ -5,6 +5,8 @@ ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twit
 
 # Versions
 
+- v0.74 : fix crash when loading some SNDH files
+- v0.73 : uninitialized vars potential crash fixed
 - v0.72 : "low level buzzers" support
 - v0.71 : minor fixes for some sndh musics
 - v0.70 : un-predictable YM square tone edges as on real hardware

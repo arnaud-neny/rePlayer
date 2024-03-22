@@ -271,6 +271,20 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 		}
 	}
 	break;
+		case 38:
+		{
+			// XBios(38) -> execute callback code in supervisor
+			// we just simulate a "jsr callback"
+			uint32_t callbackAddr = m68k_read_memory_32(a7 + 2);
+
+			// push PC on stack (so future RTS will get back right after the TRAP)
+			uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+			a7 -= 4;
+			m68k_write_memory_32(a7, pc);
+			m68k_set_reg(M68K_REG_SP, a7);
+			m68k_set_reg(M68K_REG_PC, callbackAddr);
+		}
+		break;
 	default:
 		assert(false);	// unsupported XBIOS function
 		break;
@@ -324,6 +338,10 @@ void	AtariMachine::Startup(uint32_t hostReplayRate)
 
 	memWrite16(RESET_INSTRUCTION_ADDR, 0x4e70);			// 4e70=reset instruction
 	memWrite16(RTE_INSTRUCTION_ADDR, 0x4e73);			// 4e73=rte
+
+	// some SNDH setup MFP registers with values from OS, with timer C running!
+	// so by default, set the timer C handler to RTE, just in case
+	m68k_write_memory_32(0x114, RTE_INSTRUCTION_ADDR);
 
 	gCurrentMachine = NULL;
 }
