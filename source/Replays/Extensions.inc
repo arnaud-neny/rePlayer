@@ -940,3 +940,4 @@ EXTENSION(zss)          // VGMStream
 EXTENSION(zwdsp)        // VGMStream
 EXTENSION(zwv)          // VGMStream
 EXTENSION(wsr)          // WonderSwan
+EXTENSION(org)          // Organya
