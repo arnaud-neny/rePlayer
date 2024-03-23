@@ -87,11 +87,17 @@ namespace rePlayer
             D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
         SmartPtr<ID3DBlob> blob;
-        if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) != S_OK)
+        if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) < S_OK)
+        {
+            MessageBox(nullptr, "ImGui: serialize root signature", "rePlayer", MB_ICONERROR);
             return false;
+        }
 
-        Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature));
-
+        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature)) < S_OK)
+        {
+            MessageBox(nullptr, "ImGui: root signature", "rePlayer", MB_ICONERROR);
+            return false;
+        }
         return true;
     }
 
@@ -168,7 +174,12 @@ namespace rePlayer
 */
         }
 
-        return Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) == S_OK;
+        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) < S_OK)
+        {
+            MessageBox(nullptr, "ImGui: pipeline state", "rePlayer", MB_ICONERROR);
+            return false;
+        }
+        return true;
     }
 
     bool GraphicsImGui::CreateTextureFont()
@@ -228,8 +239,11 @@ namespace rePlayer
         heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
         heapDesc.NumDescriptors = 1;
         heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        if (Graphics::GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mSrvDescHeap)) != S_OK)
+        if (Graphics::GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mSrvDescHeap)) < S_OK)
+        {
+            MessageBox(nullptr, "ImGui: descriptor heap", "rePlayer", MB_ICONERROR);
             return false;
+        }
 
         mFontSrvCpuDescHandle = mSrvDescHeap->GetCPUDescriptorHandleForHeapStart();
         mFontSrvGpuDescHandle = mSrvDescHeap->GetGPUDescriptorHandleForHeapStart();
@@ -468,7 +482,7 @@ namespace rePlayer
                 desc.SampleDesc.Count = 1;
                 desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
                 desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->vertexBuffer)) != S_OK)
+                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->vertexBuffer)) < S_OK)
                     return;
             }
             if (frameResources->indexBuffer == nullptr || frameResources->indexBufferSize < totalIdxCount)
@@ -489,16 +503,16 @@ namespace rePlayer
                 desc.SampleDesc.Count = 1;
                 desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
                 desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->indexBuffer)) != S_OK)
+                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->indexBuffer)) < S_OK)
                     return;
             }
 
             // Upload vertex/index data into a single contiguous GPU buffer
             void* vtxResource, *idxResource;
             D3D12_RANGE range{};
-            if (frameResources->vertexBuffer->Map(0, &range, &vtxResource) != S_OK)
+            if (frameResources->vertexBuffer->Map(0, &range, &vtxResource) < S_OK)
                 return;
-            if (frameResources->indexBuffer->Map(0, &range, &idxResource) != S_OK)
+            if (frameResources->indexBuffer->Map(0, &range, &idxResource) < S_OK)
                 return;
             auto vtxDst = reinterpret_cast<ImDrawVert*>(vtxResource);
             auto idxDst = reinterpret_cast<ImDrawIdx*>(idxResource);

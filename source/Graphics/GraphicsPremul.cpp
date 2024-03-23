@@ -49,11 +49,17 @@ namespace rePlayer
             D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
         SmartPtr<ID3DBlob> blob;
-        if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) != S_OK)
+        if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) < S_OK)
+        {
+            MessageBox(nullptr, "Premul: serialize root signature", "rePlayer", MB_ICONERROR);
             return false;
+        }
 
-        Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature));
-
+        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature)) < S_OK)
+        {
+            MessageBox(nullptr, "Premul: root signature", "rePlayer", MB_ICONERROR);
+            return false;
+        }
         return true;
     }
 
@@ -119,7 +125,12 @@ namespace rePlayer
 */
         }
 
-        return Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) == S_OK;
+        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) < S_OK)
+        {
+            MessageBox(nullptr, "Premul: pipeline state", "rePlayer", MB_ICONERROR);
+            return false;
+        }
+        return true;
     }
 
     // Render function

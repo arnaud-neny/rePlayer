@@ -87,7 +87,7 @@ namespace rePlayer
         // NOTE: Enabling the debug layer after device creation will invalidate the active device.
         {
             SmartPtr<ID3D12Debug> dx12Debug;
-            if (D3D12GetDebugInterface(IID_PPV_ARGS(&dx12Debug)) == S_OK)
+            if (D3D12GetDebugInterface(IID_PPV_ARGS(&dx12Debug)) >= S_OK)
             {
                 dx12Debug->EnableDebugLayer();
 
@@ -130,7 +130,7 @@ namespace rePlayer
             }
             if (m_device.IsInvalid())
             {
-                MessageBox(nullptr, "Can't initialise DirectX 12", "rePlayer", MB_ICONERROR);
+                MessageBox(nullptr, "D3D12: device error", "rePlayer", MB_ICONERROR);
                 return true;
             }
         }
@@ -138,7 +138,7 @@ namespace rePlayer
 #if IS_DX12_DEBUG_ENABLED
         {
             SmartPtr<ID3D12InfoQueue> infoQueue;
-            if (m_device->QueryInterface(IID_PPV_ARGS(&infoQueue)) == S_OK)
+            if (m_device->QueryInterface(IID_PPV_ARGS(&infoQueue)) >= S_OK)
             {
                 // Suppress whole categories of messages.
                 //D3D12_MESSAGE_CATEGORY categories[] = {};
@@ -174,9 +174,9 @@ namespace rePlayer
 #endif
 
         // Create the DirectComposition device
-        if (DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&m_dcompDevice)) != S_OK)
+        if (DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&m_dcompDevice)) < S_OK)
         {
-            MessageBox(nullptr, "Can't create a composition device", "rePlayer", MB_ICONERROR);
+            MessageBox(nullptr, "DComp: device errror", "rePlayer", MB_ICONERROR);
             return true;
         }
 
@@ -187,8 +187,11 @@ namespace rePlayer
             desc.NumDescriptors = 64;
             desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
             desc.NodeMask = 1;
-            if (m_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvDescriptorHeap)) != S_OK)
+            if (m_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvDescriptorHeap)) < S_OK)
+            {
+                MessageBox(nullptr, "D3D12: RTV descriptor heap", "rePlayer", MB_ICONERROR);
                 return true;
+            }
         }
 
         // Create ImGui Renderer
@@ -258,7 +261,7 @@ namespace rePlayer
 
 #if IS_DX12_DEBUG_ENABLED
         SmartPtr<IDXGIDebug1> dxgiDebug;
-        if (DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug)) == S_OK)
+        if (DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug)) >= S_OK)
         {
             dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, (DXGI_DEBUG_RLO_FLAGS)(DXGI_DEBUG_RLO_DETAIL + DXGI_DEBUG_RLO_IGNORE_INTERNAL));
         }
