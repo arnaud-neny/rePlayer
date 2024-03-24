@@ -76,6 +76,7 @@ namespace rePlayer
                 kAdLibTracker,
                 kAdLibSierra,
                 kAdLibVisualComposer,
+                kKensDigitalMusic,
                 kMDX,
                 kQSF,
                 kGSF,

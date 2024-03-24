@@ -314,7 +314,14 @@ namespace rePlayer
             [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "standard.bnk"; return "VICO-ADB"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_rol, eReplay::AdLib); },
             [](const char* name) { return strstr(name, "standard.bnk") != nullptr; }
-        }
+        },
+        { // ken
+            "Ken's Digital Music",
+            ModlandReplay::kKensDigitalMusic,
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "waves.kwv"; return "KENS-KDM"; },
+            [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_kdm, eReplay::Ken); },
+            [](const char* name) { return strstr(name, "waves.kwv") != nullptr; }
+        },
     };
 
     inline const char* SourceModland::Chars::operator()(const Array<char>& blob) const
@@ -1520,7 +1527,6 @@ namespace rePlayer
             BuildPathList("Ad Lib/EdLib D01/"),                     // adlib multi-files - unplayable
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
-            BuildPathList("Ken's Digital Music/"),                  // http://advsys.net/ken/kdmsongs.zip <- win32 c + asm player
             BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
             BuildPathList("Pollytracker/"),                         // c64 player, available as sid
             BuildPathList("Renoise/"),
