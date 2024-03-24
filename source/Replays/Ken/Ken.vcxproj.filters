@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\ken">
+      <UniqueIdentifier>{1306d3d3-9e94-4668-b616-0fc9b1cea628}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayKen.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ken\ken.h">
+      <Filter>Source Files\ken</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayKen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ken\adlibemu.c">
+      <Filter>Source Files\ken</Filter>
+    </ClCompile>
+    <ClCompile Include="ken\KDMENG.c">
+      <Filter>Source Files\ken</Filter>
+    </ClCompile>
+    <ClCompile Include="ken\KSMENG.c">
+      <Filter>Source Files\ken</Filter>
+    </ClCompile>
+    <ClCompile Include="ken\smsndeng.c">
+      <Filter>Source Files\ken</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

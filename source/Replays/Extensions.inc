@@ -71,7 +71,7 @@ EXTENSION(cmf)
 EXTENSION(d00)
 EXTENSION(dfm)
 EXTENSION(hsp)
-EXTENSION(ksm)
+EXTENSION(ksm)          // Adlib: Ken's Silverman & Ken
 EXTENSION(mad)          // Adlib & VGMStream: Electronic Arts SCHl
 EXTENSION(ims)          // Adlib: Midi/IMS & UADE: ImagesMusicSystem
 EXTENSION(mdi)
@@ -259,7 +259,7 @@ EXTENSION(spl)          // UADE: SoundProgrammingLanguage
 EXTENSION(sc)           // UADE: SoundControl & VGMStream
 EXTENSION(psf)          // UADE: SoundFactory & Highly Experimental & VGMStream
 EXTENSION(tw)           // UADE: SoundImages
-EXTENSION(sm)           // UADE: SoundMaster
+EXTENSION(sm)           // UADE: SoundMaster & Ken
 EXTENSION(sm2)          // UADE: SoundMaster & VGMStream
 EXTENSION(sm3)          // UADE: SoundMaster & VGMStream: Ubisoft SBx
 EXTENSION(smpro)        // UADE: SoundMaster
@@ -941,3 +941,4 @@ EXTENSION(zwdsp)        // VGMStream
 EXTENSION(zwv)          // VGMStream
 EXTENSION(wsr)          // WonderSwan
 EXTENSION(org)          // Organya
+EXTENSION(kdm)          // Ken
