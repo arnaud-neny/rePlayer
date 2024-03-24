@@ -262,6 +262,16 @@ namespace rePlayer
 
     uint32_t ReplayKen::Seek(uint32_t timeInMs)
     {
+        auto ext = m_mediaType.ext;
+        if (ext == eExtension::_kdm)
+            kdmseek(timeInMs);
+        else if (ext == eExtension::_ksm)
+            ksmseek(timeInMs);
+        else
+            smsndseek(timeInMs);
+        m_surround.Reset();
+        m_hasLooped = 0;
+        m_remainingSamples = 0;
         return timeInMs;
     }
 
