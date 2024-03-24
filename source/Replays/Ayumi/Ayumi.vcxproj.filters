@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\ayumi">
+      <UniqueIdentifier>{3f0b91e8-daa0-491f-b4ec-9d8d8d3e7155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\webAyumi">
+      <UniqueIdentifier>{acd2cdbe-a0ca-4d03-857a-a056f1dbd74f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayAyumi.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ayumi\ayumi.h">
+      <Filter>Source Files\ayumi</Filter>
+    </ClInclude>
+    <ClInclude Include="ayumi\load_text.h">
+      <Filter>Source Files\ayumi</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayAyumi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ayumi\ayumi.c">
+      <Filter>Source Files\ayumi</Filter>
+    </ClCompile>
+    <ClCompile Include="webAyumi\FXM.c">
+      <Filter>Source Files\webAyumi</Filter>
+    </ClCompile>
+    <ClCompile Include="ayumi\load_text.c">
+      <Filter>Source Files\ayumi</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

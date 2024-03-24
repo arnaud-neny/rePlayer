@@ -942,3 +942,5 @@ EXTENSION(zwv)          // VGMStream
 EXTENSION(wsr)          // WonderSwan
 EXTENSION(org)          // Organya
 EXTENSION(kdm)          // Ken
+EXTENSION(amad)         // Ayumi
+EXTENSION(fxm)          // Ayumi
