@@ -295,8 +295,9 @@ void adlibinit(long samplerate, long numspeakers, long bytespersample);
 void adlib0(long index, long value);
 void adlibgetsample(void *sndptr, long numsamples);
 
-unsigned long note[8192], musicstatus, count, countstop, loopcnt;
-unsigned int nownote, numnotes, speed = 240, numchans, firstime = 1;
+static unsigned long note[8192], musicstatus, count, countstop, loopcnt;
+static unsigned int nownote, numnotes = 0, numchans, firstime = 1;
+unsigned int speed = 240;
 static unsigned int drumstat;
 static unsigned long chanage[18];
 static unsigned char inst[256][11], chanfreq[18], chantrack[18];
@@ -418,8 +419,9 @@ long ksmload (Loader* loader)
 	if (loader->Read(loader,trchan,16)) return 0;
 	if (loader->Read(loader,trprio,16)) return 0;
 	if (loader->Read(loader,trvol,16)) return 0;
-	if (loader->Read(loader,&numnotes,2) || numnotes <= 0 || numnotes > (sizeof(note)/4)) return 0;
+	if (loader->Read(loader,&numnotes,2)||(numnotes==0)||(numnotes>(sizeof(note)/4))) return 0;
 	if (loader->Read(loader,note,numnotes<<2)) return 0;
+	for (i=0;i<numnotes;i++) if (trquant[(note[i]>>8)&15]==0) return 0;
 	if (!trchan[11]) { drumstat = 0; numchans = 9; adlib0(0xbd,drumstat); }
 	if (trchan[11] == 1)
 	{
