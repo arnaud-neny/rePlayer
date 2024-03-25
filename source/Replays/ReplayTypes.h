@@ -32,8 +32,15 @@ namespace rePlayer
 
     struct MediaType
     {
-        eExtension ext : 10{ eExtension::Unknown };
-        eReplay replay : 6{ eReplay::Unknown };
+        union
+        {
+            uint16_t value = 0;
+            struct
+            {
+                eExtension ext : 10;
+                eReplay replay : 6;
+            };
+        };
 
         MediaType() = default;
         MediaType(eExtension otherExt, eReplay otherReplay)
@@ -42,7 +49,8 @@ namespace rePlayer
         {}
         MediaType(const char* const otherExt, eReplay otherReplay);
 
-        bool operator!=(MediaType other) const { return ext != other.ext || replay != other.replay; }
+        bool operator==(MediaType other) const { return value == other.value; }
+        bool operator!=(MediaType other) const { return value != other.value; }
 
         template <typename T = char>
         const T* const GetExtension() const;
