@@ -9,6 +9,7 @@
 #include <IO/File.h>
 #include <IO/StreamFile.h>
 #include <Thread/SpinLock.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <Database/Database.h>
@@ -100,16 +101,32 @@ namespace rePlayer
         {
             std::string path;
             SongSheet* song;
-            std::string artist;
         };
         Array<Entry> entries;
+        struct EntryToScan
+        {
+            std::string path;
+            PlaylistID playlistId;
+            MediaType type;
+        };
+        Array<EntryToScan> entriesToScan;
+        struct EntryToUpdate
+        {
+            SongSheet* song;
+            std::string artist;
+            PlaylistID playlistId;
+        };
+        Array<EntryToUpdate> entriesToUpdate;
+
         Array<std::string> failedEntries;
 
         int32_t droppedEntryIndex;
+        std::atomic<uint32_t> numEntries = 0;
 
-        bool m_isDone = false;
-        bool m_isCancel = false;
-        uint16_t m_time = 0;
+        bool isAcceptingAll = false;
+        bool isDone = false;
+        bool isCancel = false;
+        uint16_t time = 0;
 
         AddFilesContext* next = nullptr;
     };
@@ -682,8 +699,8 @@ namespace rePlayer
         if (m_addFilesContext)
         {
             const char wait[] = "|/-\\";
-            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d %c###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60, wait[m_addFilesContext->m_time >> 14]);
-            m_addFilesContext->m_time += uint16_t(11 * ImGui::GetIO().DeltaTime * ((1 << 14) - 1));
+            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d %c###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60, wait[m_addFilesContext->time >> 14]);
+            m_addFilesContext->time += uint16_t(11 * ImGui::GetIO().DeltaTime * ((1 << 14) - 1));
         }
         else
             sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60);
@@ -1464,10 +1481,11 @@ namespace rePlayer
         auto* addFilesContext = new AddFilesContext;
         addFilesContext->files = m_dropTarget->AcquireFiles();
         addFilesContext->droppedEntryIndex = droppedEntryIndex;
+        addFilesContext->isAcceptingAll = isAcceptingAll;
         addFilesContext->next = m_addFilesContext;
         m_addFilesContext = addFilesContext;
 
-        Core::AddJob([this, addFilesContext, isAcceptingAll]()
+        Core::AddJob([this, addFilesContext]()
         {
             auto& replays = Core::GetReplays();
             auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());
@@ -1500,68 +1518,18 @@ namespace rePlayer
                         }
                     }
 
-                    // load it to find the proper replay (and final extension)
                     MediaType type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
-                    auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(path.u8string().c_str()));
-                    if (stream.IsInvalid())
-                        return;
-                    Array<CommandBuffer::Command> commands;
-                    auto* replay = replays.Load(stream, commands, type);
-                    if (!isAcceptingAll && replay == nullptr)
+                    if (!addFilesContext->isAcceptingAll && type.value == 0)
                     {
                         addFilesContext->Lock();
-                        addFilesContext->failedEntries.Add(stream->GetName());
+                        addFilesContext->failedEntries.Add(reinterpret_cast<const char*>(path.u8string().c_str()));
                         addFilesContext->Unlock();
                         return;
                     }
+                    addFilesContext->numEntries++;
 
-                    // create the song sheet and add it to the playlist
                     auto* songSheet = new SongSheet;
-                    if (replay != nullptr)
-                    {
-                        songSheet->type = replay->GetMediaType();
-                        if (IS_FILECRC_ENABLED)
-                        {
-                            auto streamSize = stream->GetSize();
-                            songSheet->fileSize = uint32_t(streamSize);
-                            auto fileCrc = crc32(0L, Z_NULL, 0);
-                            auto* moduleData = core::Alloc<uint8_t>(65536);
-                            for (uint64_t s = 0; s < streamSize; s += 65536)
-                            {
-                                auto readSize = stream->Read(moduleData, 65536);
-                                fileCrc = crc32_z(fileCrc, moduleData, readSize);
-                            }
-                            core::Free(moduleData);
-                            songSheet->fileCrc = fileCrc;
-                        }
-                        auto numSubsongs = replay->GetNumSubsongs();
-                        songSheet->subsongs.Resize(numSubsongs);
-                        songSheet->lastSubsongIndex = uint16_t(numSubsongs - 1);
-                        for (uint16_t i = 0; i < numSubsongs; i++)
-                        {
-                            replay->SetSubsong(i);
-
-                            auto& subsong = songSheet->subsongs[i];
-                            subsong.Clear();
-                            subsong.durationCs = replay->GetDurationMs() / 10;
-                            subsong.isDirty = false;
-                            if (numSubsongs > 1)
-                            {
-                                subsong.name = replay->GetSubsongTitle();
-                                if (subsong.name.IsEmpty())
-                                {
-                                    char txt[32];
-                                    sprintf(txt, "subsong %u of %u", i + 1, numSubsongs);
-                                    subsong.name = txt;
-                                }
-                            }
-                        }
-                        songSheet->metadata.Container() = commands;
-
-                        delete replay;
-                    }
-                    else
-                        songSheet->type = type;
+                    songSheet->type = type;
                     if (type.ext == eExtension::Unknown)
                         songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
                     else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), type.GetExtension()) == 0)
@@ -1576,67 +1544,10 @@ namespace rePlayer
                             songSheet->name = reinterpret_cast<const char*>(name.c_str());
                     }
                     songSheet->databaseDay = databaseDay;
-
-                    std::string artist;
-                    TagLib::FileStream fStream(path.c_str(), true);
-                    TagLib::FileRef f(&fStream);
-                    if (auto* tag = f.tag())
-                    {
-                        if (!tag->title().isEmpty())
-                        {
-                            if (!tag->album().isEmpty())
-                            {
-                                songSheet->name = tag->album().toCString(true);
-                                songSheet->name.String() += '/';
-
-                                // get id3v2 tags to check if we have a disc number
-                                TagLib::MPEG::File fMpeg(&fStream, true, TagLib::MPEG::Properties::Average, TagLib::ID3v2::FrameFactory::instance());
-                                if (auto* id3v2Tag = fMpeg.ID3v2Tag())
-                                {
-                                    auto properties = id3v2Tag->properties();
-                                    for (auto it = properties.begin(), e = properties.end(); it != e; it++)
-                                    {
-                                        if (_stricmp(it->first.toCString(), "discnumber") == 0)
-                                        {
-                                            uint32_t disc = 0;
-                                            if (sscanf_s(it->second[0].toCString(), "%u", &disc) == 1)
-                                            {
-                                                char buf[16];
-                                                sprintf(buf, "%u ", disc);
-                                                songSheet->name.String() += buf;
-                                            }
-                                            else if (!it->second[0].isEmpty()) // weird format?
-                                            {
-                                                songSheet->name.String() += it->second[0].toCString();
-                                                songSheet->name.String() += ' ';
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (tag->track())
-                                {
-                                    char buf[16];
-                                    sprintf(buf, "%02u ", tag->track());
-                                    songSheet->name.String() += buf;
-                                }
-                                songSheet->name.String() += tag->title().toCString(true);
-                            }
-                            else
-                                songSheet->name = tag->title().toCString(true);
-                        }
-                        songSheet->releaseYear = uint16_t(tag->year());
-
-                        if (!tag->artist().isEmpty())
-                        {
-                            auto artistTag = tag->artist();
-                            artist = artistTag.toCString(true);
-                        }
-                    }
+                    songSheet->subsongs.Resize(1);
 
                     addFilesContext->Lock();
-                    addFilesContext->entries.Add({ reinterpret_cast<const char*>(path.u8string().c_str()), songSheet, artist });
+                    addFilesContext->entries.Add({ reinterpret_cast<const char*>(path.u8string().c_str()), songSheet });
                     addFilesContext->Unlock();
                 };
 
@@ -1648,18 +1559,158 @@ namespace rePlayer
                     {
                         if (dir_entry.is_regular_file(ec))
                             addFile(dir_entry.path());
-                        if (addFilesContext->m_isCancel)
+                        if (addFilesContext->isCancel)
                             break;
                     }
                 }
                 else if (std::filesystem::is_regular_file(path, ec))
                     addFile(path);
-                if (addFilesContext->m_isCancel)
+                if (addFilesContext->isCancel)
                     break;
+            }
+            while (addFilesContext->numEntries.load() && !addFilesContext->isCancel)
+            {
+                addFilesContext->Lock();
+                auto entriesToScan = std::move(addFilesContext->entriesToScan);
+                addFilesContext->Unlock();
+                if (entriesToScan.IsEmpty())
+                    thread::Sleep(1);
+
+                for (auto& entry : entriesToScan)
+                {
+                    if (addFilesContext->isCancel)
+                        break;
+
+                    addFilesContext->numEntries--;
+                    auto stream = io::StreamFile::Create(entry.path);
+                    if (stream.IsInvalid())
+                    {
+                        addFilesContext->Lock();
+                        addFilesContext->entriesToUpdate.Add({ nullptr, "!", entry.playlistId});
+                        addFilesContext->Unlock();
+                    }
+                    else
+                    {
+                        Array<CommandBuffer::Command> commands;
+                        if (auto* replay = replays.Load(stream, commands, entry.type))
+                        {
+                            auto* songSheet = new SongSheet;
+                            songSheet->type = replay->GetMediaType();
+                            auto streamSize = stream->GetSize();
+                            songSheet->fileSize = uint32_t(streamSize);
+                            if (IS_FILECRC_ENABLED)
+                            {
+                                auto fileCrc = crc32(0L, Z_NULL, 0);
+                                auto* moduleData = core::Alloc<uint8_t>(65536);
+                                for (uint64_t s = 0; s < streamSize; s += 65536)
+                                {
+                                    auto readSize = stream->Read(moduleData, 65536);
+                                    fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                                }
+                                core::Free(moduleData);
+                                songSheet->fileCrc = fileCrc;
+                            }
+                            auto numSubsongs = replay->GetNumSubsongs();
+                            songSheet->subsongs.Resize(numSubsongs);
+                            songSheet->lastSubsongIndex = uint16_t(numSubsongs - 1);
+                            for (uint16_t i = 0; i < numSubsongs; i++)
+                            {
+                                replay->SetSubsong(i);
+
+                                auto& subsong = songSheet->subsongs[i];
+                                subsong.Clear();
+                                subsong.durationCs = replay->GetDurationMs() / 10;
+                                subsong.isDirty = false;
+                                if (numSubsongs > 1)
+                                {
+                                    subsong.name = replay->GetSubsongTitle();
+                                    if (subsong.name.IsEmpty())
+                                    {
+                                        char txt[32];
+                                        sprintf(txt, "subsong %u of %u", i + 1, numSubsongs);
+                                        subsong.name = txt;
+                                    }
+                                }
+                            }
+                            songSheet->metadata.Container() = commands;
+
+                            delete replay;
+                            stream.Reset();
+
+                            std::string artist;
+                            TagLib::FileStream fStream(entry.path.c_str(), true);
+                            TagLib::FileRef f(&fStream);
+                            if (auto* tag = f.tag())
+                            {
+                                if (!tag->title().isEmpty())
+                                {
+                                    if (!tag->album().isEmpty())
+                                    {
+                                        songSheet->name = tag->album().toCString(true);
+                                        songSheet->name.String() += '/';
+
+                                        // get id3v2 tags to check if we have a disc number
+                                        TagLib::MPEG::File fMpeg(&fStream, true, TagLib::MPEG::Properties::Average, TagLib::ID3v2::FrameFactory::instance());
+                                        if (auto* id3v2Tag = fMpeg.ID3v2Tag())
+                                        {
+                                            auto properties = id3v2Tag->properties();
+                                            for (auto it = properties.begin(), e = properties.end(); it != e; it++)
+                                            {
+                                                if (_stricmp(it->first.toCString(), "discnumber") == 0)
+                                                {
+                                                    uint32_t disc = 0;
+                                                    if (sscanf_s(it->second[0].toCString(), "%u", &disc) == 1)
+                                                    {
+                                                        char buf[16];
+                                                        sprintf(buf, "%u ", disc);
+                                                        songSheet->name.String() += buf;
+                                                    }
+                                                    else if (!it->second[0].isEmpty()) // weird format?
+                                                    {
+                                                        songSheet->name.String() += it->second[0].toCString();
+                                                        songSheet->name.String() += ' ';
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (tag->track())
+                                        {
+                                            char buf[16];
+                                            sprintf(buf, "%02u ", tag->track());
+                                            songSheet->name.String() += buf;
+                                        }
+                                        songSheet->name.String() += tag->title().toCString(true);
+                                    }
+                                    else
+                                        songSheet->name = tag->title().toCString(true);
+                                }
+                                songSheet->releaseYear = uint16_t(tag->year());
+
+                                if (!tag->artist().isEmpty())
+                                {
+                                    auto artistTag = tag->artist();
+                                    artist = artistTag.toCString(true);
+                                }
+                            }
+
+                            addFilesContext->Lock();
+                            addFilesContext->entriesToUpdate.Add({ songSheet, artist, entry.playlistId });
+                            addFilesContext->Unlock();
+                        }
+                        else
+                        {
+                            addFilesContext->Lock();
+                            addFilesContext->entriesToUpdate.Add({ nullptr, {}, entry.playlistId });
+                            addFilesContext->Unlock();
+                        }
+                    }
+                }
             }
 
             addFilesContext->Lock();
-            addFilesContext->m_isDone = true;
+            addFilesContext->isDone = true;
             addFilesContext->Unlock();
         });
     }
@@ -1671,8 +1722,9 @@ namespace rePlayer
         {
             addFilesContext->Lock();
             auto entries = std::move(addFilesContext->entries);
+            auto entriesToUpdate = std::move(addFilesContext->entriesToUpdate);
             auto failedEntries = std::move(addFilesContext->failedEntries);
-            auto isDone = addFilesContext->m_isDone;
+            auto isDone = addFilesContext->isDone;
             addFilesContext->Unlock();
 
             for (auto& failedEntry : failedEntries)
@@ -1705,6 +1757,7 @@ namespace rePlayer
                         }
                     }
                     entries[entryIndex].song->Release();
+                    addFilesContext->numEntries--;
                 }
                 else
                 {
@@ -1715,40 +1768,88 @@ namespace rePlayer
 
                     m_cue.db.AddSong(songSheet);
 
-                    if (!entries[entryIndex].artist.empty())
+                    MusicID musicId;
+                    musicId.subsongId.songId = songSheet->id;
+                    musicId.playlistId = ++m_uniqueIdGenerator;
+                    musicId.databaseId = DatabaseID::kPlaylist;
+                    m_cue.entries.Insert(addFilesContext->droppedEntryIndex++, { musicId });
+
+                    m_cue.db.Raise(Database::Flag::kSaveSongs);
+
+                    addFilesContext->Lock();
+                    addFilesContext->entriesToScan.Add({ filename, musicId.playlistId, songSheet->type });
+                    addFilesContext->Unlock();
+                }
+            }
+            for (auto& entryToUpdate : entriesToUpdate)
+            {
+                if (auto* entry = m_cue.entries.FindIf([&entryToUpdate](auto& entry)
+                {
+                    return entry == entryToUpdate.playlistId;
+                }))
+                {
+                    auto* songSheet = entry->GetSong()->Edit();
+                    if (entryToUpdate.song == nullptr)
                     {
-                        Artist* dbArtist = nullptr;
-                        auto* artistName = entries[entryIndex].artist.c_str();
-                        for (auto* artist : m_cue.db.Artists())
+                        songSheet->subsongs[0].isInvalid = 1;
+                        if (entryToUpdate.artist.empty())
+                            Log::Warning("Playlist: can't find replay for \"%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]));
+                        else
+                            Log::Warning("Playlist: can't opened \"%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]));
+                    }
+                    else
+                    {
+                        if (!entryToUpdate.artist.empty() && songSheet->artistIds.IsEmpty())
                         {
-                            if (strcmp(artistName, artist->GetHandle()) == 0)
+                            Artist* dbArtist = nullptr;
+                            auto* artistName = entryToUpdate.artist.c_str();
+                            for (auto* artist : m_cue.db.Artists())
                             {
-                                dbArtist = artist;
-                                break;
+                                if (strcmp(artistName, artist->GetHandle()) == 0)
+                                {
+                                    dbArtist = artist;
+                                    break;
+                                }
+                            }
+                            if (dbArtist == nullptr)
+                            {
+                                auto* artistSheet = new ArtistSheet;
+                                artistSheet->handles.Add(artistName);
+                                dbArtist = m_cue.db.AddArtist(artistSheet);
+                            }
+                            songSheet->artistIds.Add(dbArtist->GetId());
+                            dbArtist->Edit()->numSongs++;
+                        }
+
+                        if (songSheet->subsongs[0].isDirty)
+                        {
+                            auto playlistIndex = entry - m_cue.entries;
+                            songSheet->fileSize = entryToUpdate.song->fileSize;
+                            songSheet->fileCrc = entryToUpdate.song->fileCrc;
+                            songSheet->lastSubsongIndex = entryToUpdate.song->lastSubsongIndex;
+                            songSheet->type = entryToUpdate.song->type;
+                            if (entryToUpdate.song->name.IsNotEmpty())
+                                songSheet->name = entryToUpdate.song->name;
+                            songSheet->metadata = entryToUpdate.song->metadata;
+                            songSheet->releaseYear = entryToUpdate.song->releaseYear;
+                            songSheet->subsongs = entryToUpdate.song->subsongs;
+                            for (uint16_t i = 1, e = songSheet->lastSubsongIndex; i <= e; i++)
+                            {
+                                MusicID musicId;
+                                musicId.subsongId.songId = songSheet->id;
+                                musicId.subsongId.index = i;
+                                musicId.playlistId = ++m_uniqueIdGenerator;
+                                musicId.databaseId = DatabaseID::kPlaylist;
+                                m_cue.entries.Insert(++playlistIndex, { musicId });
                             }
                         }
-                        if (dbArtist == nullptr)
-                        {
-                            auto* artistSheet = new ArtistSheet;
-                            artistSheet->handles.Add(artistName);
-                            dbArtist = m_cue.db.AddArtist(artistSheet);
-                        }
-                        songSheet->artistIds.Add(dbArtist->GetId());
-                        dbArtist->Edit()->numSongs++;
-                    }
-
-                    for (uint16_t i = 0, e = songSheet->lastSubsongIndex; i <= e; i++)
-                    {
-                        MusicID musicId;
-                        musicId.subsongId.songId = songSheet->id;
-                        musicId.subsongId.index = i;
-                        musicId.playlistId = ++m_uniqueIdGenerator;
-                        musicId.databaseId = DatabaseID::kPlaylist;
-                        m_cue.entries.Insert(addFilesContext->droppedEntryIndex++, { musicId });
+                        delete entryToUpdate.song;
                     }
 
                     m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                 }
+                else if (entryToUpdate.song)
+                    delete entryToUpdate.song;
             }
             if (currentPlayingEntry.subsongId.IsValid())
                 m_currentEntryIndex = m_cue.entries.Find<uint32_t>(currentPlayingEntry.playlistId);
@@ -1841,7 +1942,7 @@ namespace rePlayer
     void Playlist::Flush()
     {
         for (auto* addFilesContext = m_addFilesContext; addFilesContext; addFilesContext = addFilesContext->next)
-            addFilesContext->m_isCancel = true;
+            addFilesContext->isCancel = true;
         while (m_addFilesContext)
             UpdateFiles();
     }
