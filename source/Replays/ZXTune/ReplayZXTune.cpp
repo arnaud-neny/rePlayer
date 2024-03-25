@@ -51,6 +51,8 @@ namespace rePlayer
                     buffer += char(::tolower(plugin->Id()[i]));
             }
         }
+        // add alternate extensions
+        buffer += ";emul";
         // add archives extensions
         buffer += ";szx;zip;scl;hrp;fdi;bin;p;hbt;hrm;dsq;esv;tlz;tlzp;trs;cc3;gam;gamplus;lzs;msp;td0;pcd";
 
