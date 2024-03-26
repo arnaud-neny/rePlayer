@@ -162,5 +162,14 @@ namespace core
         }
         return f0 - l0;
     }
+
+    std::pair<const char*, double> GetSizeFormat(uint64_t size)
+    {
+        if (size < 1024ull * 1024ull)
+            return { "KB", 1024.0 };
+        else if (size < 1024ull * 1024ull * 1024ull)
+            return { "MB", 1024.0 * 1024.0 };
+        return { "GB", 1024.0 * 1024.0 * 1024.0 };
+    }
 }
 // namespace core
