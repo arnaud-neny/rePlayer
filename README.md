@@ -217,5 +217,5 @@ Or add some comments (and likes) there:
 - [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
 - [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
 
-## Know issues
+## Known issues:
 - Doesn't work on Intel® HD Graphics 4600 (fails in root signature or pipeline state creation, but without the hardware, I can't pinpoint the cause)
