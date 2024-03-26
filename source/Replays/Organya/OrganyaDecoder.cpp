@@ -409,6 +409,15 @@ namespace Organya
             cur_beat = 0;
             total_beats = 0;
             loop_count = old_loop_count = 0;
+            for (auto& i : ins)
+            {
+                i.phaseacc = 0;
+                i.phaseinc = 0;
+                i.cur_vol = 0;
+                i.cur_pan = 0;
+                i.cur_length = 0;
+                i.cur_wavesize = 0;
+            }
         }
 
         std::vector<float> Synth()
