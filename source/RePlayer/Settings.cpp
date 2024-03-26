@@ -23,9 +23,11 @@ namespace rePlayer
 
     void Settings::OnDisplay()
     {
+        ImGui::BeginChild("Settings", ImVec2(ImGui::CalcTextSize("00000     00000     00000     00000     00000").x, 0), ImGuiChildFlags_AutoResizeY);
         Core::GetDeck().DisplaySettings();
         if (Core::GetReplays().DisplaySettings())
             Core::GetDeck().ChangedSettings();
+        ImGui::EndChild();
     }
 }
 // namespace rePlayer

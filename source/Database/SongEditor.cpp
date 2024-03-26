@@ -59,7 +59,7 @@ namespace rePlayer
     {
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(0.0f, 300.0f), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSizeConstraints(ImVec2(-1.0f, 300.0f), ImVec2(-1.0f, FLT_MAX));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(-FLT_MIN, 300.0f), ImVec2(-FLT_MIN, FLT_MAX));
         return "Song Editor";
     }
 
@@ -156,7 +156,7 @@ namespace rePlayer
 
         // edit the song
         ImGui::BeginDisabled(currentSong == nullptr);
-        if (ImGui::BeginTable("song", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoBordersInBody))
+        if (ImGui::BeginTable("song", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoBordersInBody, ImVec2(ImGui::CalcTextSize("000000000000 id000000c | 0000.0000 | 0000/00/00 | Release Year 000000").x, 0.0f)))
         {
             ImGui::TableNextColumn();
             ImGui::TextUnformatted("Info:");
@@ -164,9 +164,10 @@ namespace rePlayer
             if (currentSong)
             {
                 auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(currentSong->GetDatabaseDay() + Core::kReferenceDate)));
-                ImGui::Text("id%06X%c | %.2fKB | %04d/%02u/%02u | Release Year", static_cast<uint32_t>(m_musicId.subsongId.songId)
+                auto sizeFormat = GetSizeFormat(currentSong->GetFileSize());
+                ImGui::Text("id%06X%c | %.2f%s | %04d/%02u/%02u | Release Year", static_cast<uint32_t>(m_musicId.subsongId.songId)
                     , m_musicId.databaseId == DatabaseID::kPlaylist ? 'P' : 'L'
-                    , currentSong->GetFileSize() / 1024.0f
+                    , currentSong->GetFileSize() / sizeFormat.second, sizeFormat.first
                     , int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
                 ImGui::SameLine();
                 ImGui::SetNextItemWidth(-FLT_MIN);

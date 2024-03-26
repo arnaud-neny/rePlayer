@@ -186,6 +186,8 @@ namespace rePlayer
 
     Status Deck::UpdateFrame()
     {
+        ImGui::GetIO().FontGlobalScale = m_scale;
+
         auto windowStates = m_windowStates;
         Window::Update(windowStates);
 
@@ -236,6 +238,7 @@ namespace rePlayer
                 }
             }
             ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
+            ImGui::SliderFloat("Scale", &m_scale, 1.0f, 4.0f, "%1.2f", ImGuiSliderFlags_AlwaysClamp);
             Log::DisplaySettings();
         }
     }

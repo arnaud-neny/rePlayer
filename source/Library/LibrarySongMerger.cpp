@@ -302,7 +302,8 @@ namespace rePlayer
 
                         // file size
                         ImGui::TableNextColumn();
-                        ImGui::Text("%.2fKB  ", song->GetFileSize() / 1024.0f);
+                        auto sizeFormat = GetSizeFormat(song->GetFileSize());
+                        ImGui::Text("%.2f%s  ", song->GetFileSize() / sizeFormat.second, sizeFormat.first);
 
                         // file crc
                         ImGui::TableNextColumn();

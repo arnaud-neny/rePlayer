@@ -133,6 +133,7 @@ namespace rePlayer
         float m_VuMeterHeight = 100.f;
 
         Serialized<float> m_blendingFactor = { "Blending", 0.8f };
+        Serialized<float> m_scale = { "Scale", 1.0f };
 
         int64_t m_seekPos = -1;
 
