@@ -1,3 +1,10 @@
+v0.15.0:
+- Added Ayumi
+- Added Ken
+- Added Organya
+- Updated OpenMPT to 0.7.6
+- Resizable UI
+
 v0.14.0:
 - Added vgmstream
 - Added WonderSwan

@@ -140,74 +140,82 @@ Middle click will turn on/off the invert States flag.
 
 Here are the actual web sites you can import from (and thank you for all these repositories):
 - [Amiga Music Preservation](https://amp.dascene.net): one of the best organized amiga music repository.
-- [The Mod Archive](https://modarchive.org): a huge module repository.
-- [Modland](http://modland.com/pub/modules): a multi-formats repository organized by format.
-- [High Voltage SID Collection](https://hvsc.de): an exclusive Commodore 64 repository.
-- [SNDH](https://sndh.atari.org): Atari ST YM2149 archive.
 - [ASMA](https://asma.atari.org): Atari SAP Music Archive.
-- [ZX-Art](https://zxart.ee): Large collection of 8-bit ZX Spectrum software, games, demoscene, chiptune music and pixel art graphics, sorted by demoparties, authors and years.
+- [High Voltage SID Collection](https://hvsc.de): an exclusive Commodore 64 repository.
+- [Modland](http://modland.com/pub/modules): a multi-formats repository organized by format.
+- [SNDH](https://sndh.atari.org): Atari ST YM2149 archive.
+- [The Mod Archive](https://modarchive.org): a huge module repository.
 - [VGMRips](https://vgmrips.net): the biggest and most active site for retro Video Game Music rips.
+- [ZX-Art](https://zxart.ee): Large collection of 8-bit ZX Spectrum software, games, demoscene, chiptune music and pixel art graphics, sorted by demoparties, authors and years.
 
 You can chat about some of these on the [Demozoo](https://discord.io/demozoo) discord server in the modland channel.
 
 Or add some comments (and likes) there:
 - [pouet](https://www.pouet.net/prod.php?which=94326)
 - [demozoo](https://demozoo.org/productions/323598)
-- [me](https://twitter.com/ArnaudNeny)
+- [twitter/x](https://twitter.com/ArnaudNeny)
+- [mastodon](https://mastodon.gamedev.place/@arnaud)
+- [bluesky](https://bsky.app/profile/replayer.bsky.social)
 
 ## Third Parties
 
 ### System 3rd parties:
-- [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
-- [stb](https://github.com/nothings/stb): for the optimized sprintf.
 - [Curl](https://curl.se): library for transferring data with URLs.
-- [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.
-- [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
-- [TagLib](https://taglib.org): to read tag from music formats.
+- [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
 - [JSON](https://github.com/nlohmann/json): JSON for Modern C++.
+- [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
+- [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.
+- [stb](https://github.com/nothings/stb): for the optimized sprintf.
+- [TagLib](https://taglib.org): to read tag from music formats.
 
 ### Replays 3rd parties:
-- [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
-- [HivelyTracker](https://github.com/pete-gordon/hivelytracker): ahx-thx-hvl formats.
-- SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
-- [StSound](https://github.com/arnaud-carre/StSound): ym files.
-- [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
-- [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
-- [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
-- [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
-- [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
-- [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
-- [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
-- [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
-- [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
-- [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
-- [Highly Quixotic](https://gitlab.com/kode54/highly_quixotic): QSound arcade audio sound chip and processor emulator library.
-- [Highly Advanced](https://bitbucket.org/losnoco/cog): Gameboy Advanced player.
-- [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
-- TFMX: library to play Chris Huelsbeck files (customized).
-- [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
-- [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
-- [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
-- [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
-- [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
-- [vio2sf](https://bitbucket.org/losnoco/vio2sf): Nintendo DS music player.
-- [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
-- [Highly Experimental](https://bitbucket.org/losnoco/highly_experimental): Playstation and Playstation 2 music player.
-- [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
-- [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
+- [Ayumi](http://sovietov.com/app/ayumi/ayumi.html): Highly precise emulation of AY-3-8910 and YM2149 sound chips. webAyumi for amad & fxm backend.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
-- [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
-- [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
-- [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
-- [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
-- [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
-- [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
-- [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
-- [WavPack](https://github.com/dbry/WavPack): Hybrid Lossless Wavefile Compressor.
 - [Direct Stream Digital](https://github.com/Sound-Linux-More/sacd): Plays Philips DSDIFF and Sony DSF files, heavily inspired by SACD Decoder from Robert Tari.
+- [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.
+- [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
+- [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
+- [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
+- [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
+- [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
+- [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
+- [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
+- [Highly Advanced](https://bitbucket.org/losnoco/cog): Gameboy Advanced player.
+- [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
+- [Highly Experimental](https://bitbucket.org/losnoco/highly_experimental): Playstation and Playstation 2 music player.
+- [Highly Quixotic](https://gitlab.com/kode54/highly_quixotic): QSound arcade audio sound chip and processor emulator library.
+- [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
+- [HivelyTracker](https://github.com/pete-gordon/hivelytracker): ahx-thx-hvl formats.
+- [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
+- [Ken](http://advsys.net/ken): in_ken plays all Ken Silverman's formats.
+- [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
+- [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
+- [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
+- [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
+- [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
+- [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
+- [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
+- [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
+- [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
+- [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
+- [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
+- [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
+- SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
+- [StSound](https://github.com/arnaud-carre/StSound): ym files.
+- TFMX: library to play Chris Huelsbeck files (customized).
+- [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
+- [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
 - [vgmstream](https://github.com/vgmstream/vgmstream): A library for playback of various streamed audio formats used in video games.
+- [vio2sf](https://bitbucket.org/losnoco/vio2sf): Nintendo DS music player.
+- [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
+- [WavPack](https://github.com/dbry/WavPack): Hybrid Lossless Wavefile Compressor.
 - [WonderSwan](https://foobar2000.xrea.jp/?Input+64bit#f44897bc): aka foo_input_wsr. You can play the song data of BANDAI's Wonder Swan.
+- [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
+- [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
+
+## Know issues
+- Doesn't work on Intel® HD Graphics 4600 (fails in root signature or pipeline state creation, but without the hardware, I can't pinpoint the cause)

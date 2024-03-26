@@ -16,6 +16,7 @@
 - adplug: https://github.com/adplug/adplug
 - ASAP: http://asap.sourceforge.net
 - Ayfly: https://github.com/l29ah/ayfly
+- Ayumi: https://github.com/true-grue/ayumi & https://bitbucket.org/wothke/webayumi
 - Buzzic 2: https://www.pouet.net/prod.php?which=54407
 - Direct Stream Digital: https://github.com/Sound-Linux-More/sacd
 - dr_libs (MP3/FLAC/WAV): https://github.com/mackron/dr_libs
@@ -36,6 +37,7 @@
   With minor changes.
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.
+- Ken: http://advsys.net/ken/ & https://bitbucket.org/wothke/webken
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
@@ -44,6 +46,7 @@
 - OpenMPT: https://lib.openmpt.org/libopenmpt  
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org
+- Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp
