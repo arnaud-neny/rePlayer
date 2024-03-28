@@ -1419,12 +1419,12 @@ namespace rePlayer
                         currentPlayerId = m_cue.entries[m_currentEntryIndex];
                     if (i == 5)
                     {
-                        for (uint32_t entryIdx = 0, count = m_cue.entries.NumItems(); entryIdx < count; entryIdx++)
+                        for (uint32_t entryIdx = ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, count = m_cue.entries.NumItems(); entryIdx < count; entryIdx++)
                             std::swap(m_cue.entries[entryIdx], m_cue.entries[entryIdx + std::rand() % (count - entryIdx)]);
                     }
                     else if (i == 6)
                     {
-                        for (int32_t n = 0, j = m_cue.entries.NumItems<int32_t>() - 1; n < j; n++, j--)
+                        for (int32_t n = ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, j = m_cue.entries.NumItems<int32_t>() - 1; n < j; n++, j--)
                             std::swap(m_cue.entries[n], m_cue.entries[j]);
                     }
                     else
@@ -1436,7 +1436,7 @@ namespace rePlayer
                             {3, 1, 0, 2, 4},
                             {4, 1, 0, 2, 3}
                         };
-                        std::sort(m_cue.entries.begin(), m_cue.entries.end(), [this, i](const MusicID& l, const MusicID& r)
+                        std::sort(m_cue.entries.begin() + (ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0), m_cue.entries.end(), [this, i](const MusicID& l, const MusicID& r)
                         {
                             for (uint32_t sortIdx = 0; sortIdx < 6; sortIdx++)
                             {
