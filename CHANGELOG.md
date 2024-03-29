@@ -1,8 +1,10 @@
-v0.15.1:
+v0.15.2:
 - Added Ayumi
 - Added Ken
 - Added Organya
+- Updated libsidplay to 2.7.0
 - Updated OpenMPT to 0.7.6
+- Playlist sort from current playing position while pressing Ctrl
 - Resizable UI
 
 v0.14.0:
