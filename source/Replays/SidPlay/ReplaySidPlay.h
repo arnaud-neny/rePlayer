@@ -45,6 +45,8 @@ namespace rePlayer
                     uint32_t surround : 1;
                     uint32_t overridePowerOnDelay : 1;
                     uint32_t powerOnDelay : 13;
+                    uint32_t overrideCombinedWaveforms : 1;
+                    uint32_t combinedWaveforms : 2;
                 };
             };
             uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
@@ -114,6 +116,7 @@ namespace rePlayer
         static bool ms_isResampling;
         static int32_t ms_surround;
         static int32_t ms_powerOnDelay;
+        static int32_t ms_combinedWaveforms;
     };
 }
 // namespace rePlayer

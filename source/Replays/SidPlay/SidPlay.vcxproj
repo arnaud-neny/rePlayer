@@ -115,6 +115,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig6581.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\FilterModelConfig8580.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator6581.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator8580.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.h" />

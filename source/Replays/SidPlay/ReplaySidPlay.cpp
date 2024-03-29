@@ -57,6 +57,7 @@ namespace rePlayer
         window.RegisterSerializedData(ms_isResampling, "ReplaySidPlayResampling");
         window.RegisterSerializedData(ms_surround, "ReplaySidPlaySurround");
         window.RegisterSerializedData(ms_powerOnDelay, "ReplaySidPlayPowerOnDelay");
+        window.RegisterSerializedData(ms_combinedWaveforms, "ReplaySidPlayCombinedWaveforms");
 
         return false;
     }
@@ -144,6 +145,10 @@ namespace rePlayer
         changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         {
+            const char* const combinedWaveforms[] = { "Average", "Weak", "Strong" };
+            changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, _countof(combinedWaveforms));
+        }
+        {
             const char* const surround[] = { "Default", "Surround" };
             changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
         }
@@ -173,6 +178,8 @@ namespace rePlayer
             ms_isNtsc, "Clock Speed: PAL", "Clock Speed: NTSC");
         ComboOverride("SidSampling", GETSET(entry, overrideResampling), GETSET(entry, resampling),
             ms_isResampling, "Sampling: Interpolate", "Sampling: Resample");
+        ComboOverride("SidCW", GETSET(entry, overrideCombinedWaveforms), GETSET(entry, combinedWaveforms),
+            ms_combinedWaveforms, "Combined Waveforms: Average", "Combined Waveforms: Weak", "Combined Waveforms: Strong");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Default", "Output: Surround");
         Durations(context, entry->GetDurations(), entry->numSongs, "Subsong #%d Duration");
@@ -195,6 +202,7 @@ namespace rePlayer
     bool ReplaySidPlay::ms_isResampling = false;
     int32_t ReplaySidPlay::ms_surround = 1;
     int32_t ReplaySidPlay::ms_powerOnDelay = 32;
+    int32_t ReplaySidPlay::ms_combinedWaveforms = SidConfig::AVERAGE;
 
     void ReplaySidPlay::Release()
     {
@@ -390,6 +398,7 @@ namespace rePlayer
             m_residfpBuilder[sidIndex]->filter((settings && settings->overrideEnableFilter) ? settings->filterEnabled : ms_isFilterEnabled);
             m_residfpBuilder[sidIndex]->filter6581Curve(((settings && settings->overrideFilter6581) ? settings->filter6581 : ms_filter6581) / 100.0f);
             m_residfpBuilder[sidIndex]->filter8580Curve(((settings && settings->overrideFilter8580) ? settings->filter8580 : ms_filter8580) / 100.0f);
+            m_residfpBuilder[sidIndex]->combinedWaveformsStrength(SidConfig::sid_cw_t((settings && settings->overrideCombinedWaveforms) ? settings->combinedWaveforms : ms_combinedWaveforms));
 
             if (m_currentPosition == 0 && (m_isSidModelForced != isSidModelForced || m_isSidModel8580 != isSidModel8580 || m_isClockForced != isClockForced || m_isNtsc != isNtsc || m_powerOnDelay != powerOnDelay))
             {

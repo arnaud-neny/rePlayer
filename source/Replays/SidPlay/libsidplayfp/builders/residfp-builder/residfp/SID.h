@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2016 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004 Dag Lem <resid@nimrod.no>
  *
@@ -64,25 +64,25 @@ private:
     Filter* filter;
 
     /// Filter used, if model is set to 6581
-    std::unique_ptr<Filter6581> const filter6581;
+    Filter6581* const filter6581;
 
     /// Filter used, if model is set to 8580
-    std::unique_ptr<Filter8580> const filter8580;
+    Filter8580* const filter8580;
 
     /**
      * External filter that provides high-pass and low-pass filtering
      * to adjust sound tone slightly.
      */
-    std::unique_ptr<ExternalFilter> const externalFilter;
+    ExternalFilter* const externalFilter;
 
     /// Resampler used by audio generation code.
     std::unique_ptr<Resampler> resampler;
 
     /// Paddle X register support
-    std::unique_ptr<Potentiometer> const potX;
+    Potentiometer* const potX;
 
     /// Paddle Y register support
-    std::unique_ptr<Potentiometer> const potY;
+    Potentiometer* const potY;
 
     /// SID voices
     std::unique_ptr<Voice> voice[3];
@@ -101,6 +101,9 @@ private:
 
     /// Currently active chip model.
     ChipModel model;
+
+    /// Currently selected combined waveforms strength.
+    CombinedWaveforms cws;
 
     /// Last written value
     unsigned char busValue;
@@ -161,6 +164,14 @@ public:
      * Get currently emulated chip model.
      */
     ChipModel getChipModel() const { return model; }
+
+    /**
+     * Set combined waveforms strength.
+     *
+     * @param cws strength of combined waveforms
+     * @throw SIDError
+     */
+    void setCombinedWaveforms(CombinedWaveforms cws);
 
     /**
      * SID reset.
@@ -271,6 +282,13 @@ public:
     void setFilter6581Curve(double filterCurve);
 
     /**
+    * Set filter range parameter for 6581 model
+    *
+    * @see Filter6581::setFilterRange(double)
+    */
+    void setFilter6581Range ( double adjustment );
+
+    /**
      * Set filter curve parameter for 8580 model.
      *
      * @see Filter8580::setFilterCurve(double)
@@ -317,12 +335,11 @@ void SID::ageBusValue(unsigned int n)
 RESID_INLINE
 int SID::output() const
 {
-    const int v1 = voice[0]->output(voice[2]->wave());
-    const int v2 = voice[1]->output(voice[0]->wave());
-    const int v3 = voice[2]->output(voice[1]->wave());
+    const float v1 = voice[0]->output(voice[2]->wave());
+    const float v2 = voice[1]->output(voice[0]->wave());
+    const float v3 = voice[2]->output(voice[1]->wave());
 
-    const int input = (scaleFactor * static_cast<unsigned int>(filter->clock(v1, v2, v3))) / 2;
-
+    const int input = static_cast<int>(filter->clock(v1, v2, v3));
     return externalFilter->clock(input);
 }
 
@@ -353,7 +370,7 @@ int SID::clock(unsigned int cycles, short* buf)
 
                 if (unlikely(resampler->input(output())))
                 {
-                    buf[s++] = resampler->getOutput();
+                    buf[s++] = resampler->getOutput(scaleFactor);
                 }
             }
 
