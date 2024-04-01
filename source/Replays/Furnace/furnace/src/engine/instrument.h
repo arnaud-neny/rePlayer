@@ -88,6 +88,10 @@ enum DivInstrumentType: unsigned short {
   DIV_INS_ESFM=55,
   DIV_INS_POWERNOISE=56,
   DIV_INS_POWERNOISE_SLOPE=57,
+  DIV_INS_DAVE=58,
+  DIV_INS_NDS=59,
+  DIV_INS_GBA_DMA=60,
+  DIV_INS_GBA_MINMOD=61,
   DIV_INS_MAX,
   DIV_INS_NULL
 };
@@ -328,6 +332,9 @@ struct DivInstrumentSTD {
       damMacro(DIV_MACRO_OP_DAM), dvbMacro(DIV_MACRO_OP_DVB), egtMacro(DIV_MACRO_OP_EGT), kslMacro(DIV_MACRO_OP_KSL),
       susMacro(DIV_MACRO_OP_SUS), vibMacro(DIV_MACRO_OP_VIB), wsMacro(DIV_MACRO_OP_WS), ksrMacro(DIV_MACRO_OP_KSR) {}
   } opMacros[4];
+
+  DivInstrumentMacro* macroByType(DivMacroType type);
+
   DivInstrumentSTD():
     volMacro(DIV_MACRO_VOL,true),
     arpMacro(DIV_MACRO_ARP),
@@ -377,7 +384,7 @@ struct DivInstrumentSTD {
 
 struct DivInstrumentGB {
   unsigned char envVol, envDir, envLen, soundLen, hwSeqLen;
-  bool softEnv, alwaysInit;
+  bool softEnv, alwaysInit, doubleWave;
   enum HWSeqCommands: unsigned char {
     DIV_GB_HWCMD_ENVELOPE=0,
     DIV_GB_HWCMD_SWEEP,
@@ -405,7 +412,8 @@ struct DivInstrumentGB {
     soundLen(64),
     hwSeqLen(0),
     softEnv(false),
-    alwaysInit(false) {
+    alwaysInit(false),
+    doubleWave(false) {
     memset(hwSeq,0,256*sizeof(HWSeqCommandGB));
   }
 };
@@ -906,15 +914,9 @@ struct DivInstrument {
   DivDataErrors readInsDataNew(SafeReader& reader, short version, bool fui, DivSong* song);
 
   void convertC64SpecialMacro();
-  
-  /**
-   * save the instrument to a SafeWriter.
-   * @param w the SafeWriter in question.
-   */
-  void putInsData(SafeWriter* w);
 
   /**
-   * save the instrument to a SafeWriter using new format.
+   * save the instrument to a SafeWriter.
    * @param w the SafeWriter in question.
    */
   void putInsData2(SafeWriter* w, bool fui=false, const DivSong* song=NULL, bool insName=true);
@@ -930,12 +932,11 @@ struct DivInstrument {
   /**
    * save this instrument to a file.
    * @param path file path.
-   * @param oldFormat whether to save in legacy Furnace ins format.
    * @param song if new format, a DivSong to read wavetables and samples.
    * @param writeInsName whether to write the instrument name or not. ignored if old format.
    * @return whether it was successful.
    */
-  bool save(const char* path, bool oldFormat=false, DivSong* song=NULL, bool writeInsName=true);
+  bool save(const char* path, DivSong* song=NULL, bool writeInsName=true);
 
   /**
    * save this instrument to a file in .dmp format.

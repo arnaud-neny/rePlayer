@@ -46,7 +46,7 @@
 void DivEngine::initConfDir() {
 #if 1 // rePlayer begin
 #elif _WIN32 // rePlayer end
-  // maybe move this function in here instead?
+    // maybe move this function in here instead?
   configPath=getWinConfigPath();
 #elif defined(IS_MOBILE)
   configPath=SDL_GetPrefPath("tildearrow","furnace");

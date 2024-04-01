@@ -1776,6 +1776,14 @@ ESFM_process_feedback(esfm_chip *chip)
 			phase_acc = (uint32_t)(slot->in.phase_acc - phase_offset * 28);
 			eg_output = slot->in.eg_output;
 
+			if (chip->fast_mode) {
+				phase_feedback = (slot->in.fb_out0 + slot->in.fb_out1) >> 2;
+				slot->in.fb_out1 = slot->in.fb_out0;
+				phase = phase_feedback >> mod_in_shift;
+				phase += phase_acc >> 9;
+				wave_out = slot->in.fb_out0 = ESFM_envelope_wavegen(waveform, phase, eg_output);
+				phase_acc += phase_offset;
+			} else {
 			// ASM optimizaions!
 #if defined(__GNUC__) && defined(__x86_64__)
 			asm (
@@ -1908,47 +1916,46 @@ ESFM_process_feedback(esfm_chip *chip)
 				  [i]      "m"   (iter_counter)
 				: "cc", "ax", "bx", "cx", "di"
 			);
-#elif defined(__GNUC__) && defined(__arm__) && 0 // TODO: FIX
+#elif defined(__GNUC__) && defined(__arm__)
 			asm (
-				"ldr     r3, =%[sinrom]             \n\t"
-				"ldrb    r0, %[wave]                \n\t"
-				"add     r3, r3, r0, lsl #11        \n\t"
-				"mov     r4, #0                     \n\t"
-				"mov     %[out], #0                 \n\t"
-				"ldr     r5, =0x1fff<<1             \n\t"
-				"ldr     r6, =0xff<<1               \n\t"
-				"mov     r2, #29                    \n"
+				"movs    r3, #0                     \n\t"
+				"movs    %[out], #0                 \n\t"
+				"ldr     r8, =0x1fff                \n\t"
+				"movs    r2, #29                    \n"
 				"1:                                 \n\t"
 				// phase_feedback = (wave_out + wave_last) >> 2;
-				"add     %[p_fb], %[out], r4        \n\t"
-				"asr     %[p_fb], %[p_fb], #2       \n\t"
+				"adds    %[p_fb], %[out], r3        \n\t"
+				"asrs    %[p_fb], %[p_fb], #2       \n\t"
 				// wave_last = wave_out
-				"mov     r4, %[out]                 \n\t"
+				"mov     r3, %[out]                 \n\t"
 				// phase = phase_feedback >> mod_in_shift;
 				"asr     r0, %[p_fb], %[mod_in]     \n\t"
 				// phase += phase_acc >> 9;
 				"add     r0, r0, %[p_acc], asr #9   \n\t"
 				// lookup = logsinrom[(waveform << 10) | (phase & 0x3ff)];
-				"lsl     r0, r0, #22                \n\t"
-				"add     r0, r3, r0, lsr #21        \n\t"
-				"ldrsh   r1, [r0]                   \n\t"
+				"lsls    r0, r0, #22                \n\t"
+				"lsrs    r0, r0, #21                \n\t"
+				"ldrsh   r1, [%[sinrom], r0]        \n\t"
 				// level = (lookup & 0x1fff) + (envelope << 3);
-				"and     r0, r5, r1, lsl #1         \n\t"
-				"add     r0, r0, %[eg_out], lsl #4  \n\t"
+				"and     r0, r8, r1                 \n\t"
+				"add     r0, r0, %[eg_out], lsl #3  \n\t"
 				// if (level > 0x1fff) level = 0x1fff;
-				"cmp     r0, r5                     \n\t"
-				"movhi   r0, r5                     \n\t"
+				"cmp     r0, r8                     \n\t"
+				"it      hi                         \n\t"
+				"movhi   r0, r8                     \n\t"
 				// wave_out = exprom[level & 0xff] >> (level >> 8);
-				"lsr     %[out], r0, #9             \n\t"
-				"and     r0, r0, r6                 \n\t"
+				"lsrs    %[out], r0, #8             \n\t"
+				"ands    r0, r0, #255               \n\t"
+				"lsls    r0, r0, #1                 \n\t"
 				"ldrh    r0, [%[exprom], r0]        \n\t"
 				"lsr     %[out], r0, %[out]         \n\t"
 				// if (lookup & 0x8000) wave_out = -wave_out;
 				// in other words, lookup is negative
 				"tst     r1, r1                     \n\t"
+				"it      mi                         \n\t"
 				"negmi   %[out], %[out]             \n\t"
 				// phase_acc += phase_offset
-				"add     %[p_acc], %[p_acc], %[p_off]\n\t"
+				"adds    %[p_acc], %[p_acc], %[p_off]\n\t"
 				// loop
 				"subs    r2, r2, #1                 \n\t"
 				"bne     1b                         \n\t"
@@ -1957,11 +1964,10 @@ ESFM_process_feedback(esfm_chip *chip)
 				  [out]    "=&r" (wave_out)
 				: [p_off]  "r"   (phase_offset),
 				  [mod_in] "r"   (mod_in_shift),
-				  [wave]   "m"   (waveform),
 				  [eg_out] "r"   (eg_output),
-				  [sinrom] "i"   (logsinrom),
+				  [sinrom] "r"   (logsinrom + waveform * 1024),
 				  [exprom] "r"   (exprom)
-				: "cc", "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+				: "cc", "r0", "r1", "r2", "r3", "r8"
 			);
 #else
 			wave_out = 0;
@@ -1976,6 +1982,7 @@ ESFM_process_feedback(esfm_chip *chip)
 				phase_acc += phase_offset;
 			}
 #endif
+			}
 
 			// TODO: Figure out - is this how the ESFM chip does it, like the
 			// patent literally says? (it's really hacky...)

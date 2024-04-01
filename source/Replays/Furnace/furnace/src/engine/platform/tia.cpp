@@ -389,4 +389,9 @@ int DivPlatformTIA::init(DivEngine* p, int channels, int sugRate, const DivConfi
 }
 
 void DivPlatformTIA::quit() {
+  // rePlayer begin
+  for (int i = 0; i < 2; i++) {
+    delete oscBuf[i];
+  }
+  // rePlayer end
 }

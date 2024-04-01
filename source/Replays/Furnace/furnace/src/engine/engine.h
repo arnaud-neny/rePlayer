@@ -52,10 +52,10 @@ class DivWorkPool;
 #define EXTERN_BUSY_BEGIN_SOFT e->softLocked=true; e->isBusy.lock();
 #define EXTERN_BUSY_END e->isBusy.unlock(); e->softLocked=false;
 
-//#define DIV_UNSTABLE
+#define DIV_UNSTABLE
 
-#define DIV_VERSION "0.6.1"
-#define DIV_ENGINE_VERSION 192
+#define DIV_VERSION "0.6.2"
+#define DIV_ENGINE_VERSION 197
 // for imports
 #define DIV_VERSION_MOD 0xff01
 #define DIV_VERSION_FC 0xff02
@@ -100,11 +100,11 @@ enum DivMIDIModes {
 struct DivChannelState {
   std::vector<DivDelayedCommand> delayed;
   int note, oldNote, lastIns, pitch, portaSpeed, portaNote;
-  int volume, volSpeed, cut, rowDelay, volMax;
+  int volume, volSpeed, cut, legatoDelay, legatoTarget, rowDelay, volMax;
   int delayOrder, delayRow, retrigSpeed, retrigTick;
   int vibratoDepth, vibratoRate, vibratoPos, vibratoPosGiant, vibratoDir, vibratoFine;
   int tremoloDepth, tremoloRate, tremoloPos;
-  unsigned char arp, arpStage, arpTicks, panL, panR, panRL, panRR, lastVibrato, lastPorta;
+  unsigned char arp, arpStage, arpTicks, panL, panR, panRL, panRR, lastVibrato, lastPorta, cutType;
   bool doNote, legato, portaStop, keyOn, keyOff, nowYouCanStop, stopOnOff, releasing;
   bool arpYield, delayLocked, inPorta, scheduledSlideReset, shorthandPorta, wasShorthandPorta, noteOnInhibit, resetArp;
   bool wentThroughNote, goneThroughNote;
@@ -123,6 +123,8 @@ struct DivChannelState {
     volume(0x7f00),
     volSpeed(0),
     cut(-1),
+    legatoDelay(-1),
+    legatoTarget(0),
     rowDelay(0),
     volMax(0),
     delayOrder(0),
@@ -147,6 +149,7 @@ struct DivChannelState {
     panRR(0),
     lastVibrato(0),
     lastPorta(0),
+    cutType(0),
     doNote(false),
     legato(false),
     portaStop(false),
@@ -427,14 +430,16 @@ class DivEngine {
   float midiVolExp;
   int softLockCount;
 public: // rePlayer begin
-  int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, nextSpeed, elapsedBars, elapsedBeats, curSpeed;
+    int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, nextSpeed, elapsedBars, elapsedBeats, curSpeed;
 private: // rePlayer end
-  size_t curSubSongIndex;
+    size_t curSubSongIndex;
   size_t bufferPos;
   double divider;
   int cycles;
   double clockDrift;
   int midiClockCycles;
+  int numTimesPlayed;
+  int crossedPatterns;
   double midiClockDrift;
   int midiTimeCycles;
   double midiTimeDrift;
@@ -443,6 +448,7 @@ private: // rePlayer end
   int curMidiTimePiece, curMidiTimeCode;
   unsigned char extValue, pendingMetroTick;
   DivGroovePattern speeds;
+  short virtualTempoN, virtualTempoD;
   short tempoAccum;
   DivStatusView view;
   DivHaltPositions haltOn;
@@ -544,10 +550,10 @@ private: // rePlayer end
   void testFunction();
 
   bool loadDMF(unsigned char* file, size_t len);
-  bool loadFur(unsigned char* file, size_t len);
+  bool loadFur(unsigned char* file, size_t len, int variantID=0);
   bool loadMod(unsigned char* file, size_t len);
   bool loadS3M(unsigned char* file, size_t len);
-  bool loadFTM(unsigned char* file, size_t len);
+  bool loadFTM(unsigned char* file, size_t len, bool dnft, bool dnftSig, bool eft);
   bool loadFC(unsigned char* file, size_t len);
 
   void loadDMP(SafeReader& reader, std::vector<DivInstrument*>& ret, String& stripPath);
@@ -585,6 +591,8 @@ private: // rePlayer end
 
   // change song (UNSAFE)
   void changeSong(size_t songIndex);
+
+  void swapSystemUnsafe(int src, int dest, bool preserveOrder=true);
 
   // move an asset
   void moveAsset(std::vector<DivAssetDir>& dir, int before, int after);
@@ -630,9 +638,13 @@ private: // rePlayer end
     void createNew(const char* description, String sysName, bool inBase64=true);
     void createNewFromDefaults();
     // load a file.
-    bool load(unsigned char* f, size_t length);
+    bool load(unsigned char* f, size_t length, const char* nameHint=NULL);
     // play a binary command stream.
     bool playStream(unsigned char* f, size_t length);
+    // get the playing stream.
+    DivCSPlayer* getStreamPlayer();
+    // destroy command stream player.
+    bool killStream();
     // save as .dmf.
     SafeWriter* saveDMF(unsigned char version);
     // save as .fur.
@@ -651,7 +663,7 @@ private: // rePlayer end
     // dump to ZSM.
     SafeWriter* saveZSM(unsigned int zsmrate=60, bool loop=true, bool optimize=true);
     // dump command stream.
-    SafeWriter* saveCommand(bool binary=false);
+    SafeWriter* saveCommand();
     // export to text
     SafeWriter* saveText(bool separatePatterns=true);
     // export to an audio file
@@ -738,6 +750,9 @@ private: // rePlayer end
 
     // find song loop position
     void walkSong(int& loopOrder, int& loopRow, int& loopEnd);
+
+    // set number of times the song has played
+    void setNumTimesPlayed(int count);
 
     // play (returns whether successful)
     bool play();
@@ -885,6 +900,13 @@ private: // rePlayer end
 
     // get current Hz
     float getCurHz();
+
+    // get virtual tempo
+    short getVirtualTempoN();
+    short getVirtualTempoD();
+
+    // tell engine about virtual tempo changes
+    void virtualTempoChanged();
 
     // get time
     int getTotalTicks(); // 1/1000000th of a second
@@ -1157,10 +1179,13 @@ private: // rePlayer end
     void delUnusedSamples();
 
     // change system
-    void changeSystem(int index, DivSystem which, bool preserveOrder=true);
+    bool changeSystem(int index, DivSystem which, bool preserveOrder=true);
 
     // add system
     bool addSystem(DivSystem which);
+
+    // duplicate system
+    bool duplicateSystem(int index, bool pat=true, bool end=false);
 
     // remove system
     bool removeSystem(int index, bool preserveOrder=true);
@@ -1245,7 +1270,7 @@ private: // rePlayer end
     void everythingOK();
 
     // terminate the engine.
-    bool quit();
+    bool quit(bool saveConfig=true);
 
     unsigned char* yrw801ROM;
     unsigned char* tg100ROM;
@@ -1307,6 +1332,8 @@ private: // rePlayer end
       cycles(0),
       clockDrift(0),
       midiClockCycles(0),
+      numTimesPlayed(0),
+      crossedPatterns(0),
       midiClockDrift(0),
       midiTimeCycles(0),
       midiTimeDrift(0),
@@ -1326,6 +1353,8 @@ private: // rePlayer end
       curMidiTimeCode(0),
       extValue(0),
       pendingMetroTick(0),
+      virtualTempoN(150),
+      virtualTempoD(150),
       tempoAccum(0),
       view(DIV_STATUS_NOTHING),
       haltOn(DIV_HALT_NONE),

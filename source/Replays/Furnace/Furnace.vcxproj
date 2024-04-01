@@ -103,6 +103,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="furnace\extern\adpcm-xq\adpcm-lib.h" />
     <ClInclude Include="furnace\extern\adpcm\bs_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\oki_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\yma_codec.h" />
@@ -172,6 +173,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\engine.h" />
     <ClInclude Include="furnace\src\engine\export.h" />
     <ClInclude Include="furnace\src\engine\export\amigaValidation.h" />
+    <ClInclude Include="furnace\src\engine\fileOps\fileOpsCommon.h" />
     <ClInclude Include="furnace\src\engine\filter.h" />
     <ClInclude Include="furnace\src\engine\instrument.h" />
     <ClInclude Include="furnace\src\engine\macroInt.h" />
@@ -184,6 +186,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\bubsyswsg.h" />
     <ClInclude Include="furnace\src\engine\platform\c140.h" />
     <ClInclude Include="furnace\src\engine\platform\c64.h" />
+    <ClInclude Include="furnace\src\engine\platform\dave.h" />
     <ClInclude Include="furnace\src\engine\platform\dummy.h" />
     <ClInclude Include="furnace\src\engine\platform\es5506.h" />
     <ClInclude Include="furnace\src\engine\platform\esfm.h" />
@@ -193,6 +196,8 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\fmshared_OPN.h" />
     <ClInclude Include="furnace\src\engine\platform\ga20.h" />
     <ClInclude Include="furnace\src\engine\platform\gb.h" />
+    <ClInclude Include="furnace\src\engine\platform\gbadma.h" />
+    <ClInclude Include="furnace\src\engine\platform\gbaminmod.h" />
     <ClInclude Include="furnace\src\engine\platform\genesis.h" />
     <ClInclude Include="furnace\src\engine\platform\genesisext.h" />
     <ClInclude Include="furnace\src\engine\platform\k007232.h" />
@@ -204,6 +209,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\msm6295.h" />
     <ClInclude Include="furnace\src\engine\platform\n163.h" />
     <ClInclude Include="furnace\src\engine\platform\namcowsg.h" />
+    <ClInclude Include="furnace\src\engine\platform\nds.h" />
     <ClInclude Include="furnace\src\engine\platform\nes.h" />
     <ClInclude Include="furnace\src\engine\platform\opl.h" />
     <ClInclude Include="furnace\src\engine\platform\opll.h" />
@@ -260,6 +266,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\d65modified.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\dave\dave.hpp" />
     <ClInclude Include="furnace\src\engine\platform\sound\ga20\iremga20.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\gb\apu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\gb\gb.h" />
@@ -267,6 +274,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\gb\timing.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\lynx\Mikey.hpp" />
     <ClInclude Include="furnace\src\engine\platform\sound\namco.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nds.hpp" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\apu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\common.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\cpu_inline.h" />
@@ -274,6 +282,8 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\nes\mmc5.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_pcm.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_psg.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\common.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.h" />
@@ -360,6 +370,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="ReplayFurnace.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="furnace\extern\adpcm-xq\adpcm-lib.c" />
     <ClCompile Include="furnace\extern\adpcm\bs_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\oki_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\yma_codec.c" />
@@ -418,9 +429,16 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\export.cpp" />
     <ClCompile Include="furnace\src\engine\export\abstract.cpp" />
     <ClCompile Include="furnace\src\engine\export\amigaValidation.cpp" />
-    <ClCompile Include="furnace\src\engine\fileOps.cpp" />
     <ClCompile Include="furnace\src\engine\fileOpsIns.cpp" />
     <ClCompile Include="furnace\src\engine\fileOpsSample.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\dmf.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\fc.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\fileOpsCommon.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\ftm.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\fur.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\mod.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\s3m.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\text.cpp" />
     <ClCompile Include="furnace\src\engine\filter.cpp" />
     <ClCompile Include="furnace\src\engine\instrument.cpp" />
     <ClCompile Include="furnace\src\engine\macroInt.cpp" />
@@ -434,12 +452,15 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\bubsyswsg.cpp" />
     <ClCompile Include="furnace\src\engine\platform\c140.cpp" />
     <ClCompile Include="furnace\src\engine\platform\c64.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\dave.cpp" />
     <ClCompile Include="furnace\src\engine\platform\dummy.cpp" />
     <ClCompile Include="furnace\src\engine\platform\es5506.cpp" />
     <ClCompile Include="furnace\src\engine\platform\esfm.cpp" />
     <ClCompile Include="furnace\src\engine\platform\fds.cpp" />
     <ClCompile Include="furnace\src\engine\platform\ga20.cpp" />
     <ClCompile Include="furnace\src\engine\platform\gb.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\gbadma.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\gbaminmod.cpp" />
     <ClCompile Include="furnace\src\engine\platform\genesis.cpp" />
     <ClCompile Include="furnace\src\engine\platform\genesisext.cpp" />
     <ClCompile Include="furnace\src\engine\platform\k007232.cpp" />
@@ -451,6 +472,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\msm6295.cpp" />
     <ClCompile Include="furnace\src\engine\platform\n163.cpp" />
     <ClCompile Include="furnace\src\engine\platform\namcowsg.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\nds.cpp" />
     <ClCompile Include="furnace\src\engine\platform\nes.cpp" />
     <ClCompile Include="furnace\src\engine\platform\opl.cpp" />
     <ClCompile Include="furnace\src\engine\platform\oplAInterface.cpp" />
@@ -510,16 +532,20 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformCalculator.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\c64_fp\WaveformGenerator.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\d65modified.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\dave\dave.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ga20\iremga20.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\gb\apu.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\gb\timing.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\lynx\Mikey.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\namco.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nds.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_pcm.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_psg.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_dmc.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_fds.cpp" />

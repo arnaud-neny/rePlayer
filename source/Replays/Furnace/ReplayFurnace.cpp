@@ -4,8 +4,11 @@
 // - configEngine.cpp
 // - engine.cpp
 // - engine.h
-// - fileOps.cpp
-// - fileutills.cpp
+// - fileOpsCommon.cpp
+// - fileutils.cpp
+// - ftm.cpp
+// - nes.cpp
+// - tia.cpp
 #include "ReplayFurnace.h"
 
 #include <Audio/Audiotypes.inl.h>
@@ -21,7 +24,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
-        .extensions = "fur;dmf;ftm",
+        .extensions = "fur;dmf;ftm;dnm;0cc;eft",
         .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2024 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
@@ -33,14 +36,14 @@ namespace rePlayer
         stream->Read(data, size);
         auto* engine = new DivEngine;
         engine->preInit();
-        if (engine->load(data, size) && engine->init())
+        if (engine->load(data, size, stream->GetName().c_str()) && engine->init())
         {
             engine->initDispatch(true);
             engine->renderSamplesP();
             engine->play();
-            return new ReplayFurnace(engine);
+            return new ReplayFurnace(engine, stream->GetName().c_str());
         }
-        engine->quit();
+        engine->quit(false);
         delete engine;
 
         return nullptr;
@@ -48,12 +51,12 @@ namespace rePlayer
 
     ReplayFurnace::~ReplayFurnace()
     {
-        m_engine->quit();
+        m_engine->quit(false);
         delete m_engine;
     }
 
-    ReplayFurnace::ReplayFurnace(DivEngine* engine)
-        : Replay(engine->song.isDMF ? eExtension::_dmf : (engine->song.version == DIV_VERSION_FTM ? eExtension::_ftm : eExtension::_fur), eReplay::Furnace)
+    ReplayFurnace::ReplayFurnace(DivEngine* engine, const char* name)
+        : Replay(engine->song.isDMF ? eExtension::_dmf : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur), eReplay::Furnace)
         , m_engine(engine)
     {}
 
@@ -193,6 +196,21 @@ namespace rePlayer
         }
         info += "\nFurnace " DIV_VERSION;
         return info;
+    }
+
+    eExtension ReplayFurnace::GetFamitrackerExtension(const char* name)
+    {
+        auto c = strrchr(name, '.');
+        if (c)
+        {
+            if (_stricmp(c + 1, "dnm") == 0)
+                return eExtension::_dnm;
+            else if(_stricmp(c + 1, "0cc") == 0)
+                return eExtension::_0cc;
+            else if (_stricmp(c + 1, "eft") == 0)
+                return eExtension::_eft;
+        }
+        return eExtension::_ftm;
     }
 }
 // namespace rePlayer

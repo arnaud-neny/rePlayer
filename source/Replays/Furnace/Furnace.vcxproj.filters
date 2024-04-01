@@ -156,6 +156,15 @@
     <Filter Include="Source Files\furnace\icon">
       <UniqueIdentifier>{3f88746c-9fae-4529-95ec-3839f3c054ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\furnace\engine\fileOps">
+      <UniqueIdentifier>{fdbff43a-bc44-480b-a2ef-82844aa32ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\dave">
+      <UniqueIdentifier>{d5a06d2d-1220-4a08-bb11-c2df154321a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\adpcm-xq">
+      <UniqueIdentifier>{31285aa2-5ff5-4be7-936e-1897ec659238}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayFurnace.h">
@@ -923,6 +932,36 @@
     <ClInclude Include="furnace\src\icon\furIcons.h">
       <Filter>Source Files\furnace\icon</Filter>
     </ClInclude>
+    <ClInclude Include="furnace\src\engine\fileOps\fileOpsCommon.h">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\dave\dave.hpp">
+      <Filter>Source Files\furnace\engine\platform\sound\dave</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.h">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\nds.hpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\dave.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\gbadma.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\gbaminmod.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\nds.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm-xq\adpcm-lib.h">
+      <Filter>Source Files\adpcm-xq</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFurnace.cpp">
@@ -1297,9 +1336,6 @@
     <ClCompile Include="furnace\src\engine\export.cpp">
       <Filter>Source Files\furnace\engine</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\src\engine\fileOps.cpp">
-      <Filter>Source Files\furnace\engine</Filter>
-    </ClCompile>
     <ClCompile Include="furnace\src\engine\fileOpsIns.cpp">
       <Filter>Source Files\furnace\engine</Filter>
     </ClCompile>
@@ -1629,6 +1665,57 @@
     </ClCompile>
     <ClCompile Include="furnace\extern\pwrnoise\pwrnoise.c">
       <Filter>Source Files\pwrnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\dmf.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\fc.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\fileOpsCommon.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\ftm.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\fur.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\mod.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\s3m.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\text.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\dave\dave.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\dave</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nds.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\dave.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\gbadma.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\gbaminmod.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\nds.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm-xq\adpcm-lib.c">
+      <Filter>Source Files\adpcm-xq</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

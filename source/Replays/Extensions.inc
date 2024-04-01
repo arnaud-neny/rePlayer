@@ -397,7 +397,7 @@ EXTENSION(4v)           // Quartet
 EXTENSION(fur)          // Furnace
 EXTENSION(aac)          // AAC
 EXTENSION(opus)         // Opus
-EXTENSION(ftm)          // Famitracker
+EXTENSION(ftm)          // Furnace: Famitracker
 EXTENSION(wv)           // WavPack
 EXTENSION(dff)          // DSD
 EXTENSION(208)          // VGMStream
@@ -944,3 +944,6 @@ EXTENSION(org)          // Organya
 EXTENSION(kdm)          // Ken
 EXTENSION(amad)         // Ayumi
 EXTENSION(fxm)          // Ayumi
+EXTENSION(dnm)          // Furnace: Dn-FamiTracker
+EXTENSION(0cc)          // Furnace: 0CC-FamiTracker
+EXTENSION(eft)          // Furnace: E-FamiTracker
