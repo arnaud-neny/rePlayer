@@ -38,7 +38,8 @@
 - Soundcloud music player?
 - Bandcamp music player?
 - FamiTracker: https://github.com/Dn-Programming-Core-Management/Dn-FamiTracker (or older: https://github.com/HertzDevil/0CC-FamiTracker, or original: https://github.com/HertzDevil/famitracker-all)
-- 4klang: https://github.com/hzdgopher/4klang
-- 64klang: https://github.com/hzdgopher/64klang
-- sointu: https://github.com/vsariola/sointu
+- 4klang: https://github.com/hzdgopher/4klang missing official file format
+- 64klang: https://github.com/hzdgopher/64klang missing official file format
+- sointu: https://github.com/vsariola/sointu annoying language
+- WaveSabre: https://github.com/logicomacorp/WaveSabre missing official file format
 - single channel export

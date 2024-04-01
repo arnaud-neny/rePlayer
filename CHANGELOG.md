@@ -1,9 +1,11 @@
-v0.15.2:
+v0.15.3:
 - Added Ayumi
 - Added Ken
 - Added Organya
+- Updated Furnace to 0.6.2
 - Updated libsidplay to 2.7.0
 - Updated OpenMPT to 0.7.6
+- Updated libcurl to 8.7.0
 - Playlist sort from current playing position while pressing Ctrl
 - Resizable UI
 
