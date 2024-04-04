@@ -2,6 +2,7 @@
 
 #include <Core/Types.h>
 #include <atomic>
+#include <thread>
 
 namespace core::thread
 {
@@ -11,8 +12,19 @@ namespace core::thread
         void Lock();
         void Unlock();
 
-    protected:
-        alignas(64) std::atomic<uint32_t> m_state = 0;
+    private:
+        union State
+        {
+            uint64_t value = 0;
+            struct
+            {
+                uint32_t count;
+                std::thread::id threadId;
+            };
+        };
+
+    private:
+        alignas(64) std::atomic<uint64_t> m_state = 0;
     };
 
     class ScopedSpinLock
