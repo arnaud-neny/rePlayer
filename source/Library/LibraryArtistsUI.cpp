@@ -59,7 +59,7 @@ namespace rePlayer
                 auto& library = GetLibrary();
                 library.m_imports = {};
                 library.m_isBusy = true;
-                library.m_importArtists.isOpened = true;
+                library.m_importArtists.isOpened = library.m_importArtists.isExternal = true;
                 Core::AddJob([&library, selectedArtist]()
                 {
                     SourceResults sourceResults;

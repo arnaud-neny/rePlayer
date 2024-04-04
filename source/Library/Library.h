@@ -86,6 +86,7 @@ namespace rePlayer
             Array<State> states;
             int lastSelected = -1;
             bool isOpened = false;
+            bool isExternal = false;
         } m_importArtists;
 
         struct

@@ -364,7 +364,7 @@ namespace rePlayer
 
     void Library::UpdateImports()
     {
-        bool isImportArtistsOpened = false;
+        bool isImportArtistsOpened = m_importArtists.isExternal;
         bool isImportSongsOpened = false;
         bool isImportFilesOpened = false;
         if (ImGui::BeginPopup("Import"))
@@ -394,8 +394,11 @@ namespace rePlayer
         }
         if (isImportFilesOpened)
             ImGui::OpenPopup("Import Files");
-        if (isImportArtistsOpened)
+        else if (isImportArtistsOpened)
+        {
             ImGui::OpenPopup("Import Artists");
+            m_importArtists.isExternal = false;
+        }
         else if (isImportSongsOpened)
             ImGui::OpenPopup("Import Songs");
 
