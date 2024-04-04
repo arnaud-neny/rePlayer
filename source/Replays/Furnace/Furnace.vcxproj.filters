@@ -428,12 +428,6 @@
     <ClInclude Include="furnace\src\engine\platform\sound\nes\mmc5.h">
       <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_pcm.h">
-      <Filter>Source Files\furnace\engine\platform\sound</Filter>
-    </ClInclude>
-    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_psg.h">
-      <Filter>Source Files\furnace\engine\platform\sound</Filter>
-    </ClInclude>
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\common.h">
       <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
     </ClInclude>
@@ -962,6 +956,12 @@
     <ClInclude Include="furnace\extern\adpcm-xq\adpcm-lib.h">
       <Filter>Source Files\adpcm-xq</Filter>
     </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\vera_pcm.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\vera_psg.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFurnace.cpp">
@@ -1092,12 +1092,6 @@
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c">
       <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_pcm.c">
-      <Filter>Source Files\furnace\engine\platform\sound</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_psg.c">
-      <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp">
       <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
@@ -1716,6 +1710,12 @@
     </ClCompile>
     <ClCompile Include="furnace\extern\adpcm-xq\adpcm-lib.c">
       <Filter>Source Files\adpcm-xq</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\vera_pcm.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\vera_psg.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

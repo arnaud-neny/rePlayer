@@ -280,8 +280,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\nes\cpu_inline.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\fds.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes\mmc5.h" />
-    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_pcm.h" />
-    <ClInclude Include="furnace\src\engine\platform\sound\nes\vera_psg.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\nes_nsfplay\common.h" />
@@ -315,6 +313,8 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\ted-sound.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\tia\Audio.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\tia\AudioChannel.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\vera_pcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\vera_psg.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vic20sound.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vsu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm.h" />
@@ -542,8 +542,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c" />
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_pcm.c" />
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\vera_psg.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp" />
@@ -570,6 +568,8 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\sound\ted-sound.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\tia\Audio.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\tia\AudioChannel.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\vera_pcm.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\vera_psg.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\vic20sound.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\vsu.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.cpp" />
