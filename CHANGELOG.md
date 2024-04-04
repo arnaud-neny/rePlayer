@@ -1,4 +1,4 @@
-v0.15.3:
+v0.15.4:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -8,6 +8,7 @@ v0.15.3:
 - Updated libcurl to 8.7.0
 - Playlist sort from current playing position while pressing Ctrl
 - Resizable UI
+- Bug fixes
 
 v0.14.0:
 - Added vgmstream
