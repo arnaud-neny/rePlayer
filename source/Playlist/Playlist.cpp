@@ -1638,7 +1638,7 @@ namespace rePlayer
                             stream.Reset();
 
                             std::string artist;
-                            TagLib::FileStream fStream(entry.path.c_str(), true);
+                            TagLib::FileStream fStream(io::File::Convert(entry.path.c_str()).c_str(), true);
                             TagLib::FileRef f(&fStream);
                             if (auto* tag = f.tag())
                             {
