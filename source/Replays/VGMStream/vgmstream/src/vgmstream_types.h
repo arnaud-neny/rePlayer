@@ -131,6 +131,7 @@ typedef enum {
     coding_SASSC,           /* Activision EXAKT SASSC 8-bit DPCM */
     coding_DERF,            /* DERF 8-bit DPCM */
     coding_WADY,            /* WADY 8-bit DPCM */
+    coding_DPCM_KCEJ,       /* Konami Computer Entertainment Japan 8-bit DPCM */
     coding_NWA,             /* VisualArt's NWA DPCM */
     coding_ACM,             /* InterPlay ACM */
     coding_CIRCUS_ADPCM,    /* Circus 8-bit ADPCM */
@@ -233,6 +234,7 @@ typedef enum {
     layout_blocked_vid1,
     layout_blocked_ubi_sce,
     layout_blocked_tt_ad,
+    layout_blocked_vas,
 
     /* otherwise odd */
     layout_segmented,       /* song divided in segments (song sections) */
@@ -337,13 +339,13 @@ typedef enum {
     meta_STER,
     meta_BG00,              /* Ibara, Mushihimesama */
     meta_RSTM_ROCKSTAR,
-    meta_PS2_KCES,          /* Dance Dance Revolution */
+    meta_VIG_KCES,
     meta_HXD,
     meta_VSV,
     meta_SCD_PCM,           /* Lunar - Eternal Blue */
     meta_PS2_PCM,           /* Konami KCEJ East: Ephemeral Fantasia, Yu-Gi-Oh! The Duelists of the Roses, 7 Blades */
     meta_PS2_RKV,           /* Legacy of Kain - Blood Omen 2 (PS2) */
-    meta_PS2_VAS,           /* Pro Baseball Spirits 5 */
+    meta_VAS_KCEO,
     meta_LP_AP_LEP,
     meta_SDT,               /* Baldur's Gate - Dark Alliance */
     meta_STR_SEGA,
@@ -363,18 +365,18 @@ typedef enum {
     meta_FFCC_STR,          /* Final Fantasy: Crystal Chronicles */
     meta_UBI_JADE,          /* Beyond Good & Evil, Rayman Raving Rabbids */
     meta_GCA,               /* Metal Slug Anthology */
-    meta_NGC_SSM,           /* Golden Gashbell Full Power */
+    meta_SSM,
     meta_PS2_JOE,           /* Wall-E / Pixar games */
     meta_YMF,
     meta_SADL,
     meta_FAG,               /* Jackie Chan - Stuntmaster */
     meta_PS2_MIHB,          /* Merged MIH+MIB */
     meta_NGC_PDT,           /* Mario Party 6 */
-    meta_DC_ASD,            /* Miss Moonligh */
+    meta_ASD_NAXAT,
     meta_SPSD,
     meta_RSD,
-    meta_PS2_ASS,           /* ASS */
-    meta_SEG,               /* Eragon */
+    meta_PS2_ASS,
+    meta_SEG,
     meta_NDS_STRM_FFTA2,    /* Final Fantasy Tactics A2 */
     meta_KNON,
     meta_ZWDSP,             /* Zack and Wiki */
@@ -428,8 +430,8 @@ typedef enum {
     meta_FFXI_BGW,          /* FFXI (PC) BGW */
     meta_FFXI_SPW,          /* FFXI (PC) SPW */
     meta_STS,
-    meta_PS2_P2BT,          /* Pop'n'Music 7 Audio File */
-    meta_PS2_GBTS,          /* Pop'n'Music 9 Audio File */
+    meta_P2BT_MOVE_VISA,
+    meta_GBTS,
     meta_NGC_DSP_IADP,      /* Gamecube Interleave DSP */
     meta_PS2_MCG,           /* Gunvari MCG Files (was name .GCM on disk) */
     meta_ZSD,               /* Dragon Booster ZSD */
@@ -496,7 +498,7 @@ typedef enum {
     meta_RAW_SNDS,
     meta_PS2_WMUS,          /* The Warriors (PS2) */
     meta_HYPERSCAN_KVAG,    /* Hyperscan KVAG/BVG */
-    meta_IOS_PSND,          /* Crash Bandicoot Nitro Kart 2 (iOS) */
+    meta_PSND,
     meta_ADP_WILDFIRE,
     meta_QD_ADP,
     meta_EB_SFX,            /* Excitebots .sfx */
@@ -508,7 +510,7 @@ typedef enum {
     meta_MSS,               /* Guerilla: ShellShock Nam '67 (PS2/Xbox), Killzone (PS2) */
     meta_PS2_HSF,           /* Lowrider (PS2) */
     meta_IVAG,
-    meta_PS2_2PFS,          /* Konami: Mahoromatic: Moetto - KiraKira Maid-San, GANTZ (PS2) */
+    meta_2PFS,
     meta_PS2_VBK,           /* Disney's Stitch - Experiment 626 */
     meta_OTM,               /* Otomedius (Arcade) */
     meta_CSTM,              /* Nintendo 3DS CSTM (Century Stream) */
@@ -602,7 +604,6 @@ typedef enum {
     meta_MSV,
     meta_SDF,
     meta_SVG,               /* Hunter - The Reckoning - Wayward (PS2) */
-    meta_VIS,               /* AirForce Delta Strike (PS2) */
     meta_VAI,               /* Ratatouille (GC) */
     meta_AIF_ASOBO,         /* Ratatouille (PC) */
     meta_AO,                /* Cloudphobia (PC) */
@@ -703,6 +704,9 @@ typedef enum {
     meta_SQUEAKSAMPLE,
     meta_SNDS,
     meta_NXOF,
+    meta_GWB_GWD,
+    meta_CBX,
+    meta_VAS_ROCKSTAR,
 
 } meta_t;
 

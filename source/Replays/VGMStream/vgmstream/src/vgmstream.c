@@ -39,7 +39,7 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_cstr,
     init_vgmstream_gcsw,
     init_vgmstream_ads,
-    init_vgmstream_nps,
+    init_vgmstream_npsf,
     init_vgmstream_xa,
     init_vgmstream_rxws,
     init_vgmstream_ngc_dsp_stm,
@@ -93,13 +93,11 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_rstm_rockstar,
     init_vgmstream_acm,
     init_vgmstream_mus_acm,
-    init_vgmstream_ps2_kces,
+    init_vgmstream_vig_kces,
     init_vgmstream_hxd,
     init_vgmstream_vsv,
     init_vgmstream_ps2_pcm,
     init_vgmstream_ps2_rkv,
-    init_vgmstream_ps2_vas,
-    init_vgmstream_ps2_vas_container,
     init_vgmstream_lp_ap_lep,
     init_vgmstream_sdt,
     init_vgmstream_aix,
@@ -127,7 +125,6 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_ngc_pdt_split,
     init_vgmstream_ngc_pdt,
     init_vgmstream_mus_krome,
-    init_vgmstream_dc_asd,
     init_vgmstream_spsd,
     init_vgmstream_rsd,
     init_vgmstream_bgw,
@@ -143,15 +140,15 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_ish_isd,
     init_vgmstream_gsnd,
     init_vgmstream_ydsp,
-    init_vgmstream_ngc_ssm,
+    init_vgmstream_ssm,
     init_vgmstream_ps2_joe,
     init_vgmstream_vgs,
     init_vgmstream_dcs_wav,
     init_vgmstream_mul,
     init_vgmstream_thp,
     init_vgmstream_sts,
-    init_vgmstream_ps2_p2bt,
-    init_vgmstream_ps2_gbts,
+    init_vgmstream_p2bt_move_visa,
+    init_vgmstream_gbts,
     init_vgmstream_wii_sng,
     init_vgmstream_ngc_dsp_iadp,
     init_vgmstream_aax,
@@ -234,7 +231,7 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_xwav_new,
     init_vgmstream_xwav_old,
     init_vgmstream_hyperscan_kvag,
-    init_vgmstream_ios_psnd,
+    init_vgmstream_psnd,
     init_vgmstream_adp_wildfire,
     init_vgmstream_adp_qd,
     init_vgmstream_eb_sfx,
@@ -246,7 +243,7 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_mss,
     init_vgmstream_ps2_hsf,
     init_vgmstream_ivag,
-    init_vgmstream_ps2_2pfs,
+    init_vgmstream_2pfs,
     init_vgmstream_xnb,
     init_vgmstream_ubi_ckd,
     init_vgmstream_ps2_vbk,
@@ -376,7 +373,6 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_msv,
     init_vgmstream_sdf,
     init_vgmstream_svg,
-    init_vgmstream_vis,
     init_vgmstream_vai,
     init_vgmstream_aif_asobo,
     init_vgmstream_ao,
@@ -523,10 +519,16 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_snds,
     init_vgmstream_adm2,
     init_vgmstream_nxof,
+    init_vgmstream_gwb_gwd,
+    init_vgmstream_s_pack,
+    init_vgmstream_cbx,
+    init_vgmstream_vas_rockstar,
 
     /* lower priority metas (no clean header identity, somewhat ambiguous, or need extension/companion file to identify) */
-    init_vgmstream_scd_pcm,
     init_vgmstream_agsc,
+    init_vgmstream_scd_pcm,
+    init_vgmstream_vas_kceo,
+    init_vgmstream_vas_kceo_container,
     init_vgmstream_ps2_wmus,
     init_vgmstream_mib_mih,
     init_vgmstream_mjb_mjh,
@@ -534,6 +536,7 @@ init_vgmstream_t init_vgmstream_functions[] = {
     init_vgmstream_seb,
     init_vgmstream_tgc,
     init_vgmstream_ivaud,
+    init_vgmstream_asd_naxat,
     /* need companion files */
     init_vgmstream_pos,
     init_vgmstream_sli_loops,
@@ -949,6 +952,7 @@ static void try_dual_file_stereo(VGMSTREAM* opened_vgmstream, STREAMFILE* sf, in
     VGMSTREAM* new_vgmstream = NULL;
     STREAMFILE* dual_sf = NULL;
     int i,j, dfs_pair_count, extension_len, filename_len;
+    int sample_variance, loop_variance;
 
     if (opened_vgmstream->channels != 1)
         return;
@@ -1019,14 +1023,11 @@ static void try_dual_file_stereo(VGMSTREAM* opened_vgmstream, STREAMFILE* sf, in
 
     new_vgmstream = init_vgmstream_function(dual_sf); /* use the init function that just worked */
     close_streamfile(dual_sf);
+    if (!new_vgmstream)
+        goto fail;
 
     /* see if we were able to open the file, and if everything matched nicely */
-    if (!(new_vgmstream &&
-            new_vgmstream->channels == 1 &&
-            /* we have seen legitimate pairs where these are off by one...
-             * but leaving it commented out until I can find those and recheck */
-            /* abs(new_vgmstream->num_samples-opened_vgmstream->num_samples <= 1) && */
-            new_vgmstream->num_samples == opened_vgmstream->num_samples &&
+    if (!(new_vgmstream->channels == 1 &&
             new_vgmstream->sample_rate == opened_vgmstream->sample_rate &&
             new_vgmstream->meta_type   == opened_vgmstream->meta_type &&
             new_vgmstream->coding_type == opened_vgmstream->coding_type &&
@@ -1038,13 +1039,39 @@ static void try_dual_file_stereo(VGMSTREAM* opened_vgmstream, STREAMFILE* sf, in
         goto fail;
     }
 
-    /* check these even if there is no loop, because they should then be zero in both
-     * (Homura PS2 right channel doesn't have loop points so this check is ignored) */
-    if (new_vgmstream->meta_type != meta_SMPL &&
-            !(new_vgmstream->loop_flag      == opened_vgmstream->loop_flag &&
-            new_vgmstream->loop_start_sample== opened_vgmstream->loop_start_sample &&
-            new_vgmstream->loop_end_sample  == opened_vgmstream->loop_end_sample)) {
-        goto fail;
+    /* samples/loops should match even when there is no loop, except in special cases
+     * in the odd cases where values diverge, will use either L's loops or R's loops depending on which file is opened */
+    if (new_vgmstream->meta_type == meta_SMPL) {
+        loop_variance = -1; /* right channel doesn't have loop points so this check is ignored [Homura (PS2)] */
+        sample_variance = 0;
+    }
+    else if (new_vgmstream->meta_type == meta_DSP_STD && new_vgmstream->sample_rate <= 24000) {
+        loop_variance = 170000; /* rarely loop points are a bit apart, though usually only a few samples [Harvest Moon: Tree of Tranquility (Wii)] */
+        sample_variance = opened_vgmstream->loop_flag ? 1600 : 700; /* less common but loops don't reach end */
+    }
+    else {
+        loop_variance = 0;  /* otherwise should match exactly */
+        sample_variance = 0;
+    }
+
+    {
+        int ns_variance = new_vgmstream->num_samples - opened_vgmstream->num_samples;
+
+        /* either channel may be bigger */
+        if (abs(ns_variance) > sample_variance)
+            goto fail;
+    }
+
+    if (loop_variance >= 0) {
+        int ls_variance = new_vgmstream->loop_start_sample - opened_vgmstream->loop_start_sample;
+        int le_variance = new_vgmstream->loop_end_sample - opened_vgmstream->loop_end_sample;
+
+        if (new_vgmstream->loop_flag != opened_vgmstream->loop_flag)
+            goto fail;
+
+        /* either channel may be bigger */
+        if (abs(ls_variance) > loop_variance || abs(le_variance) > loop_variance)
+            goto fail;
     }
 
     /* We seem to have a usable, matching file. Merge in the second channel. */

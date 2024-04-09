@@ -13,7 +13,7 @@ typedef struct {
 
 
 /**
- * List of known keys, extracted from the game files (most from data analisys, some from 2ch.net/forums).
+ * List of known keys, extracted from the game files (most from data analysis, some from 2ch.net/forums).
  * CRI's tools expect an unsigned 64 bit numberic string, but keys are commonly found online in hex form.
  * Keys only use 56 bits though, so the upper 8 bits can be ignored.
  *
@@ -1271,6 +1271,42 @@ static const hcakey_info hcakey_list[] = {
 
         // Dokapon Kingdom Connect (PC, Switch)
         {104863924750642073},   // 01748d2f1883eb99
+
+        // Girls' Frontline 2: Exilium (PC)
+        {7152097263845921},     // 001968CB68CF8221
+
+        // Girls' Frontline 2: Exilium (PC)
+        {4079616028775461768},  // 389DB529D726B388
+
+        // Persona 3 Reload (PC)
+        {11918920},             // 0000000000B5DE48
+
+        // IDOL FANTASY (Android)
+        {4308390175392019587},  // 3BCA7A09A6063483
+
+        // re:colloquial (Android)
+        {9863154698521},        // 000008F871D50919
+
+        // Ojisama to Nego Super Miracle Puzzle (Android)
+        {5783843453453438113},  // 504456FA0F8F8CA1
+
+        // ARGONAVIS from BanG Dream! AAside (Android)
+        {1403972877097251940},  // 137BE9E4A5AA3464
+
+        // ARGONAVIS -Kimi ga Mita Stage e- (Android)
+        {301179795002661},      // 000111EBE2B1D525
+
+        // YuYuYui (Switch)
+        {3733383634313939},     // 000D437E1D5562D3
+
+        // Pachislot Valvrave (iOS)
+        {2753732797542815},      // 009C8816134319F
+
+        // Jujutsu Kaisen: Cursed Clash (multi)
+        {984703514306706654},    // DAA5EA10B547CDE
+
+        // Puyo Puyo Puzzle Pop (iOS)
+        {9999},                  // 000000000000270F
 
 };
 

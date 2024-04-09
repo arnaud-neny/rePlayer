@@ -19,7 +19,7 @@
 
 
 /* reasonable limits */
-enum { 
+enum {
     /* Windows generally only allows 260 chars in path, but other OSs have higher limits, and we handle
      * UTF-8 (that typically uses 2-bytes for common non-latin codepages) plus player may append protocols
      * to paths, so it should be a bit higher. Most people wouldn't use huge paths though. */

@@ -620,7 +620,7 @@ EXTENSION(lasf)         // VGMStream: Electronic Arts SCHl
 EXTENSION(lbin)         // VGMStream: Konami LP/AP/LEP
 EXTENSION(ldat)         // VGMStream: RIFF WAVE
 EXTENSION(ldt)          // VGMStream
-EXTENSION(leg)          // VGMStream
+EXTENSION(cat)          // VGMStream
 EXTENSION(lep)          // VGMStream
 EXTENSION(lflac)        // VGMStream: raw FLAC
 EXTENSION(lin)          // VGMStream: Electronic Arts SCHl
@@ -727,7 +727,7 @@ EXTENSION(ps3)          // VGMStream
 EXTENSION(ps3audio)     // VGMStream: FFmpeg
 EXTENSION(psb)          // VGMStream: M2 PSB
 EXTENSION(psh)          // VGMStream
-EXTENSION(psnd)         // VGMStream
+EXTENSION(psn)          // VGMStream
 EXTENSION(pwb)          // VGMStream
 EXTENSION(r)            // VGMStream: Sony VAG
 EXTENSION(rak)          // VGMStream
@@ -947,3 +947,9 @@ EXTENSION(fxm)          // Ayumi
 EXTENSION(dnm)          // Furnace: Dn-FamiTracker
 EXTENSION(0cc)          // Furnace: 0CC-FamiTracker
 EXTENSION(eft)          // Furnace: E-FamiTracker
+EXTENSION(cbx)          // VGMStream
+EXTENSION(ged)          // VGMStream
+EXTENSION(gwb)          // VGMStream
+EXTENSION(move)         // VGMStream
+EXTENSION(no)           // VGMStream
+EXTENSION(wax)          // VGMStream

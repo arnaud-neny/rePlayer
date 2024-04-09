@@ -1055,8 +1055,11 @@ static int preload_acb_cuename(acb_header* acb) {
 
     if (*p_rows) 
         return 1;
+
     if (!open_utf_subtable(acb, &acb->CueNameSf, &Table, "CueNameTable", p_rows, ACB_TABLE_BUFFER_CUENAME))
         goto fail;
+    acb->CueNames = Table; /* keep this table around since we need CueName pointers */
+
     if (!*p_rows)
         return 1;
     //;VGM_LOG("acb: preload CueName=%i\n", *p_rows);
@@ -1074,7 +1077,7 @@ static int preload_acb_cuename(acb_header* acb) {
         utf_query_col_string(Table, i, c_CueName, &r->CueName);
     }
 
-    //utf_close(Table); /* keep this table around since we need CueName pointers */
+    //utf_close(Table); /* released at the end */
     return 1;
 fail:
     VGM_LOG("acb: failed CueName preload\n");

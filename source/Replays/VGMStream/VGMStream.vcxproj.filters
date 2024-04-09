@@ -90,6 +90,9 @@
     <Filter Include="Source Files\ffmpeg\compat\atomics\win32">
       <UniqueIdentifier>{a6cf019e-0c79-4834-9e52-768b940f10e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\vgmstream\src\coding\libs">
+      <UniqueIdentifier>{7d099c5b-7784-4d4b-84f9-11fd05ce05cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayVGMStream.h">
@@ -153,9 +156,6 @@
       <Filter>Source Files\vgmstream\src\coding</Filter>
     </ClInclude>
     <ClInclude Include="vgmstream\src\coding\compresswave_decoder_lib.h">
-      <Filter>Source Files\vgmstream\src\coding</Filter>
-    </ClInclude>
-    <ClInclude Include="vgmstream\src\coding\ea_mt_decoder_utk.h">
       <Filter>Source Files\vgmstream\src\coding</Filter>
     </ClInclude>
     <ClInclude Include="vgmstream\src\coding\g72x_state.h">
@@ -1643,6 +1643,18 @@
     <ClInclude Include="ffmpeg\libavformat\w64.h">
       <Filter>Source Files\ffmpeg\libavformat</Filter>
     </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\utkdec.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\awc_decryption_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\cipher_xxtea.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\meta_utils.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGMStream.cpp">
@@ -2266,9 +2278,6 @@
     <ClCompile Include="vgmstream\src\meta\cxs.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\dc_asd.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\dc_idvi.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2444,9 +2453,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\imuse.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ios_psnd.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\isb.c">
@@ -2653,9 +2659,6 @@
     <ClCompile Include="vgmstream\src\meta\ngc_str_cauldron.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\nps.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\nub.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2734,9 +2737,6 @@
     <ClCompile Include="vgmstream\src\meta\ps_headerless.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_2pfs.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_adm.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2747,9 +2747,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_bmdx.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_gbts.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_gcm.c">
@@ -2764,9 +2761,6 @@
     <ClCompile Include="vgmstream\src\meta\ps2_joe.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_kces.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_mcg.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2774,9 +2768,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_mihb.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_p2bt.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_pcm.c">
@@ -2792,9 +2783,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_va3.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_vas.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_vbk.c">
@@ -3110,9 +3098,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\vid1.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\vis.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\voi.c">
@@ -4458,6 +4443,78 @@
     </ClCompile>
     <ClCompile Include="ffmpeg\libavformat\xwma.c">
       <Filter>Source Files\ffmpeg\libavformat</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\utkdec.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\dpcm_kcej_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\vorbis_custom_utils.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_vas.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\2pfs.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\asd_naxat.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cbx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_abk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_hdr_sth_dat.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_mpf_mus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_sbr.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_sbr_harmony.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_standard.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ea_eaac_tmx.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gbts.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gwb_gwd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\npsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\p2bt_move_visa.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\psnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vas_kceo.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vas_rockstar.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vig_kces.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\cipher_xxtea.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\meta_utils.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

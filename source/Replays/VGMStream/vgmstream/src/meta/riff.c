@@ -324,7 +324,7 @@ fail:
     return 0;
 }
 
-static int is_ue4_msadpcm(STREAMFILE* sf, riff_fmt_chunk* fmt, int fact_sample_count, off_t start_offset);
+static bool is_ue4_msadpcm(STREAMFILE* sf, riff_fmt_chunk* fmt, int fact_sample_count, off_t start_offset, uint32_t data_size);
 static size_t get_ue4_msadpcm_interleave(STREAMFILE* sf, riff_fmt_chunk* fmt, off_t start, size_t size);
 
 
@@ -354,12 +354,12 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
 
     /* checks*/
     if (!is_id32be(0x00,sf,"RIFF"))
-        goto fail;
+        return NULL;
 
     riff_size = read_u32le(0x04,sf);
 
     if (!is_id32be(0x08,sf, "WAVE"))
-        goto fail;
+        return NULL;
 
     file_size = get_streamfile_size(sf);
 
@@ -398,9 +398,11 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
      * .mus: Burnout Legends/Dominator (PSP)
      * .dat/ldat: RollerCoaster Tycoon 1/2 (PC)
      * .wma/lwma: SRS: Street Racing Syndicate (Xbox), Fast and the Furious (Xbox)
+     * .caf: Topple (iOS)
+     * .wax: Lamborghini (Xbox)
      */
-    if (!check_extensions(sf, "wav,lwav,xwav,mwv,da,dax,cd,med,snd,adx,adp,xss,xsew,adpcm,adw,wd,,sbv,wvx,str,at3,rws,aud,at9,ckd,saf,ima,nsa,pcm,xvag,ogg,logg,p1d,xms,mus,dat,ldat,wma,lwma")) {
-        goto fail;
+    if (!check_extensions(sf, "wav,lwav,xwav,mwv,da,dax,cd,med,snd,adx,adp,xss,xsew,adpcm,adw,wd,,sbv,wvx,str,at3,rws,aud,at9,ckd,saf,ima,nsa,pcm,xvag,ogg,logg,p1d,xms,mus,dat,ldat,wma,lwma,caf,wax")) {
+        return NULL;
     }
 
     /* some games have wonky sizes, selectively fix to catch bad rips and new mutations */
@@ -467,6 +469,9 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
 
         else if (codec == 0xFFFE && riff_size + 0x08 + 0x40 == file_size)
             file_size -= 0x40; /* [Megami no Etsubo (PSP)] (has extra padding in all files) */
+
+        else if (codec == 0x0011 && file_size - riff_size - 0x08 <= 0x900 && is_id32be(riff_size + 0x08, sf, "cont"))
+            riff_size = file_size - 0x08; /* [Shin Megami Tensei: Imagine (PC)] (extra "cont" info 0x800/0x900 chunk) */
     }
 
     /* check for truncated RIFF */
@@ -861,7 +866,7 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
     }
 
     /* UE4 uses interleaved mono MSADPCM, try to autodetect without breaking normal MSADPCM */
-    if (fmt.coding_type == coding_MSADPCM && is_ue4_msadpcm(sf, &fmt, fact_sample_count, start_offset)) {
+    if (fmt.coding_type == coding_MSADPCM && is_ue4_msadpcm(sf, &fmt, fact_sample_count, start_offset, data_size)) {
         vgmstream->coding_type = coding_MSADPCM_int;
         vgmstream->codec_config = 1; /* mark as UE4 MSADPCM */
         vgmstream->frame_size = fmt.block_size;
@@ -869,6 +874,8 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
         vgmstream->interleave_block_size = get_ue4_msadpcm_interleave(sf, &fmt, start_offset, data_size);
         if (fmt.size == 0x36)
             vgmstream->num_samples = read_s32le(fmt.offset+0x08+0x32, sf);
+        else if (fmt.size == 0x32)
+            vgmstream->num_samples = msadpcm_bytes_to_samples(data_size / fmt.channels, fmt.block_size, 1);
     }
 
     /* Dynasty Warriors 5 (Xbox) 6ch interleaves stereo frames, probably not official */
@@ -933,53 +940,79 @@ fail:
     return NULL;
 }
 
-/* UE4 MSADPCM is quite normal but has a few minor quirks we can use to detect it */
-static int is_ue4_msadpcm(STREAMFILE* sf, riff_fmt_chunk* fmt, int fact_sample_count, off_t start) {
+static bool is_ue4_msadpcm_blocks(STREAMFILE* sf, riff_fmt_chunk* fmt, uint32_t offset, uint32_t data_size) {
+    uint32_t max_offset = 10 * fmt->block_size; /* try N blocks */
+    if (max_offset > offset + data_size)
+        max_offset = offset + data_size;
 
-    /* multichannel ok */
-    if (fmt->channels < 2)
-        goto fail;
+    /* UE4 encoder doesn't calculate optimal coefs and uses certain values every frame.
+     * Implicitly this should reject stereo frames (not used in UE4), that have scale/coefs in different positions. */
+    while (offset < max_offset) {
+        uint8_t coefs = read_u8(offset+0x00, sf);
+        uint16_t scale = read_u16le(offset+0x01, sf);
 
-    /* UE4 class is "ADPCM", assume it's the extension too */
-    if (!check_extensions(sf, "adpcm"))
-        goto fail;
+        /* mono frames should only fill the lower bits (4b index) */
+        if (coefs > 0x07)
+            return false;
 
-    /* UE4 encoder doesn't add "fact" */
-    if (fact_sample_count != 0)
-        goto fail;
-
-    /* fixed block size */
-    if (fmt->block_size != 0x200)
-        goto fail;
-
-    /* later UE4 versions use 0x36 */
-    if (fmt->size != 0x32 && fmt->size != 0x36)
-        goto fail;
-
-    /* size 0x32 in older UE4 matches standard MSADPCM, so add extra detection */
-    if (fmt->size == 0x32) {
-        off_t offset = start;
-        off_t max_offset = 5 * fmt->block_size; /* try N blocks */
-        if (max_offset > get_streamfile_size(sf))
-            max_offset = get_streamfile_size(sf);
-
-        /* their encoder doesn't calculate optimal coefs and uses fixed values every frame
-         * (could do it for fmt size 0x36 too but maybe they'll fix it in the future) */
-        while (offset <= max_offset) {
-            if (read_u8(offset+0x00, sf) != 0 || read_u16le(offset+0x01, sf) != 0x00E6)
-                goto fail;
-            offset += fmt->block_size;
+        /* size 0x36 always uses scale 0x00E6 and coefs 0x00 while size 0x32 usually does, except for early
+         * games where it may use more standard values [2013: Infected Wars (iPhone)] */
+        if (fmt->block_size == 0x200) {
+            if (scale == 0x00E6 && coefs != 0x00)
+                return false;
         }
+        else {
+            if (scale > 0x4000) { /* observed max (high scales exists) */
+                VGM_LOG("RIFF: unexpected UE4 MSADPCM scale=%x\n", scale);
+                return false;
+            }
+        }
+
+        offset += fmt->block_size;
     }
 
-    return 1;
-fail:
-    return 0;
+    return true;
+}
+
+/* UE4 MSADPCM has a few minor quirks we can use to detect it */
+static bool is_ue4_msadpcm(STREAMFILE* sf, riff_fmt_chunk* fmt, int fact_sample_count, off_t start, uint32_t data_size) {
+
+    /* UE4 allows >=2ch (sample rate may be anything), while mono files are just regular MSADPCM */
+    if (fmt->channels < 2)
+        return false;
+
+    /* UE4 encoder doesn't add "fact" while regular encoders usually do (but not always) */
+    if (fact_sample_count != 0)
+        return false;
+
+    /* later UE4 versions use fmt size 0x36 (unlike standard MSADPCM's 0x32), and only certain block sizes */
+    if (fmt->size == 0x36) {
+        if (!(fmt->block_size == 0x200))
+            return false;
+    }
+    else if (fmt->size == 0x32) {
+        /* other than 0x200 is rarely used [2013: Infected Wars (iPhone)] */
+        if (!(fmt->block_size == 0x200 || fmt->block_size == 0x9b || fmt->block_size == 0x69))
+            return false;
+
+        /* could do it for fmt size 0x36 too but not important */
+        if (!is_ue4_msadpcm_blocks(sf, fmt, start, data_size))
+            return false;
+    }
+    else {
+        return false;
+    }
+
+    /* UE4's class is "ADPCM", assume it's the extension too (also safer since can't tell UE4 MSADPCM from .wav ADPCM in some cases) */
+    if (!check_extensions(sf, "adpcm"))
+        return false;
+
+    return true;
 }
 
 /* for maximum annoyance later UE4 versions (~v4.2x?) interleave single frames instead of
  * half interleave, but don't have flags to detect so we need some heuristics. Most later
- * games with 0x36 chunk size use v2_interleave but notably Travis Strikes Again doesn't  */
+ * games with 0x36 chunk size use v2_interleave but notably Travis Strikes Again doesn't */
 static size_t get_ue4_msadpcm_interleave(STREAMFILE* sf, riff_fmt_chunk* fmt, off_t start, size_t size) {
     size_t v1_interleave = size / fmt->channels;
     size_t v2_interleave = fmt->block_size;
@@ -1005,23 +1038,19 @@ static size_t get_ue4_msadpcm_interleave(STREAMFILE* sf, riff_fmt_chunk* fmt, of
     is_blank_full = memcmp(nibbles_full, empty, nibbles_size) == 0;
 
     /* last frame is almost always padded, so should at half interleave */
-    if (!is_blank_half && !is_blank_full) {
+    if (!is_blank_half && !is_blank_full)
         return v1_interleave;
-    }
 
-    /* last frame is padded, and half interleave is not: should be regular interleave*/
-    if (!is_blank_half && is_blank_full) {
+    /* last frame is padded, and half interleave is not: should be regular interleave */
+    if (!is_blank_half && is_blank_full)
         return v2_interleave;
-    }
 
     /* last frame is silent-ish, so should at half interleave (TSA's SML_DarknessLoop_01, TSA_CAD_YAKATA)
      * this doesn't work too well b/c num_samples at 0x36 uses all data, may need adjustment */
     {
-
-        int i;
         int empty_nibbles_full = 1, empty_nibbles_half = 1;
 
-        for (i = 0; i < sizeof(nibbles_full); i++) {
+        for (int i = 0; i < sizeof(nibbles_full); i++) {
             uint8_t n1 = ((nibbles_full[i] >> 0) & 0x0f);
             uint8_t n2 = ((nibbles_full[i] >> 4) & 0x0f);
             if ((n1 != 0x0 && n1 != 0xf && n1 != 0x1) || (n2 != 0x0 && n2 != 0xf && n2 != 0x1)) {
@@ -1030,7 +1059,7 @@ static size_t get_ue4_msadpcm_interleave(STREAMFILE* sf, riff_fmt_chunk* fmt, of
             }
         }
 
-        for (i = 0; i < sizeof(nibbles_half); i++) {
+        for (int i = 0; i < sizeof(nibbles_half); i++) {
             uint8_t n1 = ((nibbles_half[i] >> 0) & 0x0f);
             uint8_t n2 = ((nibbles_half[i] >> 4) & 0x0f);
             if ((n1 != 0x0 && n1 != 0xf && n1 != 0x1) || (n2 != 0x0 && n2 != 0xf && n2 != 0x1)) {
@@ -1039,10 +1068,8 @@ static size_t get_ue4_msadpcm_interleave(STREAMFILE* sf, riff_fmt_chunk* fmt, of
             }
         }
 
-        if (empty_nibbles_full && empty_nibbles_half){
-            VGM_LOG("v1 b\n");
+        if (empty_nibbles_full && empty_nibbles_half)
             return v1_interleave;
-        }
     }
 
     /* other tests? */
