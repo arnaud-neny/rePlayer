@@ -992,7 +992,7 @@ namespace rePlayer
                 ImGui::EndDragDropTarget();
             }
 
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Delete)))
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && ImGui::IsKeyDown(ImGuiKey_Delete))
             {
                 MusicID musicId;
                 auto currentEntryIndex = m_currentEntryIndex;
