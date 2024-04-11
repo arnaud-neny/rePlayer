@@ -5,7 +5,10 @@ v0.15.4:
 - Updated Furnace to 0.6.2
 - Updated libsidplay to 2.7.0
 - Updated OpenMPT to 0.7.6
+- Updated vgmstream to r1917
 - Updated libcurl to 8.7.0
+- Updated TagLib to 2.0.1
+- Patterns display
 - Playlist sort from current playing position while pressing Ctrl
 - Resizable UI
 - Bug fixes

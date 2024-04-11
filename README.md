@@ -136,6 +136,11 @@ There is a context menu (right click), to edit the windows states:
 Left click will turn on/off the Visible flag.  
 Middle click will turn on/off the invert States flag.
 
+## The patterns
+
+Realtime display of the current played pattern.
+Options are available to show or hide some parts of the patterns. (Usefull if you want to watch the [Wrecklamation](https://modland.com/pub/modules/Fasttracker%202/Hoffman/wrecklamation.xm) from Hoffman with only the colors enabled).
+
 ## Web Sites
 
 Here are the actual web sites you can import from (and thank you for all these repositories):
