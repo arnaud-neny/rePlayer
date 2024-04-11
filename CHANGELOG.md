@@ -1,4 +1,4 @@
-v0.15.4:
+v0.15.6:
 - Added Ayumi
 - Added Ken
 - Added Organya
