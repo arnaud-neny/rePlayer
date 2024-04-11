@@ -3,7 +3,7 @@
 #include <Replay.inl.h>
 #include <Audio/Surround.h>
 
-struct openmpt_module;
+#include "libopenmpt/libopenmpt_ext.h"
 
 namespace rePlayer
 {
@@ -59,6 +59,8 @@ namespace rePlayer
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
+        Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags) override;
+
     private:
         static constexpr uint32_t kSampleRate = 48000;
 
@@ -72,14 +74,15 @@ namespace rePlayer
             int32_t stereoSeparation = 100;
             int32_t surround = 0;
             int32_t vblank = -1;
+            int32_t patterns = 1;
 
-            std::string labels[6];
+            std::string labels[7];
 
             GlobalSettings(const char* name, const char* fmt, bool isSurroundEnabled = false, bool isEnbl = false) : serializedName(name), format(fmt), surround(isSurroundEnabled), isEnabled(isEnbl) {}
      };
 
     private:
-        ReplayOpenMPT(openmpt_module* module);
+        ReplayOpenMPT(openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals);
 
         static size_t OnRead(void* stream, void* dst, size_t bytes);
         static int32_t OnSeek(void* stream, int64_t offset, int32_t whence);
@@ -88,12 +91,17 @@ namespace rePlayer
         static MediaType BuildMediaType(openmpt_module* module);
 
     private:
-        openmpt_module* m_module = nullptr;
+        openmpt_module* m_modulePlayback = nullptr;
+        openmpt_module* m_moduleVisuals = nullptr;
+        openmpt_module_ext* m_moduleExtVisuals = nullptr;
+        openmpt_module_ext_interface_pattern_vis m_modulePatternVis;
         uint64_t m_silenceStart : 63 = 0;
         uint64_t m_isSilenceTriggered : 1 = 0;
         uint64_t m_currentPosition = 0;
         uint32_t m_previousSubsongIndex = 0xffFFffFF;
+        uint32_t m_visualsSamples = 0;
         Surround m_surround;
+        bool m_arePatternsDisplayed = true;
 
         static GlobalSettings ms_settings[];
     };

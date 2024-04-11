@@ -383,7 +383,7 @@ int openmpt_error_is_transient( int error ) {
 const char * openmpt_error_string( int error ) {
 	const char * text = "unknown error";
 	switch ( error ) {
-		case OPENMPT_ERROR_OK:                
+		case OPENMPT_ERROR_OK:
 			text = "";
 			break;
 		case OPENMPT_ERROR_UNKNOWN:
@@ -1890,5 +1890,11 @@ int openmpt_module_ext_get_interface( openmpt_module_ext * mod_ext, const char *
 	}
 	return 0;
 }
+
+// rePlayer begin
+size_t openmpt_module_read_one_tick(openmpt_module* module, int32_t samplerate) {
+	return module->impl->read_one_tick(samplerate);
+}
+// rePlayer end
 
 } // extern "C"

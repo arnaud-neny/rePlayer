@@ -71,7 +71,7 @@
  *
  * | create function                                 | speed  | memory consumption |
  * | ----------------------------------------------: | :----: | :----------------: |
- * | openmpt_module_create_from_memory2()            | <p style="background-color:green" >fast  </p> | <p style="background-color:yellow">medium</p> | 
+ * | openmpt_module_create_from_memory2()            | <p style="background-color:green" >fast  </p> | <p style="background-color:yellow">medium</p> |
  * | openmpt_module_create2() with seekable stream   | <p style="background-color:red"   >slow  </p> | <p style="background-color:green" >low   </p> |
  * | openmpt_module_create2() with unseekable stream | <p style="background-color:yellow">medium</p> | <p style="background-color:red"   >high  </p> |
  *
@@ -93,8 +93,8 @@
  * - Practically all module formats are made for stereo output. Mono will not
  * give you any measurable speed improvements and can trivially be obtained from
  * the stereo output anyway. Quad is not expected by almost all modules and even
- * if they do use surround effects, they expect the effects to be mixed to 
- * stereo. 
+ * if they do use surround effects, they expect the effects to be mixed to
+ * stereo.
  * - Floating point output provides headroom instead of hard clipping if the
  * module is louder than 0dBFs, will give you a better signal-to-noise ratio
  * than int16 output, and avoid the need to apply an additional dithering to the
@@ -146,7 +146,7 @@
  * \section libopenmpt_c_detailed Detailed documentation
  *
  * \ref libopenmpt_c
- * 
+ *
  * In case a function is not documented here, you might want to look at the
  * \ref libopenmpt_cpp documentation. The C and C++ APIs are kept semantically
  * as close as possible.
@@ -589,7 +589,7 @@ LIBOPENMPT_API size_t openmpt_probe_file_header_get_recommended_size(void);
  * \param erruser Error function user context. Used to pass any user-defined data associated with this module to the logging function.
  * \param error Pointer to an integer where an error may get stored. May be NULL.
  * \param error_message Pointer to a string pointer where an error message may get stored. May be NULL.
- * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size and filesize to the file's size. 
+ * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size and filesize to the file's size.
  * \remarks openmpt_could_open_probability2() provides a more elaborate interface that might be required for special use cases. It is recommended to use openmpt_probe_file_header() though, if possible.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_SUCCESS The file will most likely be supported by libopenmpt.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_FAILURE The file is not supported by libopenmpt.
@@ -614,7 +614,7 @@ LIBOPENMPT_API int openmpt_probe_file_header( uint64_t flags, const void * data,
  * \param error Pointer to an integer where an error may get stored. May be NULL.
  * \param error_message Pointer to a string pointer where an error message may get stored. May be NULL.
  * \remarks It is recommended to use openmpt_probe_file_header() and provide the acutal file's size as a parameter if at all possible. libopenmpt can provide more accurate answers if the filesize is known.
- * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size to the file's size. 
+ * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size to the file's size.
  * \remarks openmpt_could_open_probability2() provides a more elaborate interface that might be required for special use cases. It is recommended to use openmpt_probe_file_header() though, if possible.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_SUCCESS The file will most likely be supported by libopenmpt.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_FAILURE The file is not supported by libopenmpt.
@@ -640,7 +640,7 @@ LIBOPENMPT_API int openmpt_probe_file_header_without_filesize( uint64_t flags, c
  * \param error Pointer to an integer where an error may get stored. May be NULL.
  * \param error_message Pointer to a string pointer where an error message may get stored. May be NULL.
  * \remarks The stream is left in an unspecified state when this function returns.
- * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size and filesize to the file's size. 
+ * \remarks It is recommended to provide openmpt_probe_file_header_get_recommended_size() bytes of data for data and size. If the file is smaller, only provide the filesize amount and set size and filesize to the file's size.
  * \remarks openmpt_could_open_probability2() provides a more elaborate interface that might be required for special use cases. It is recommended to use openmpt_probe_file_header() though, if possible.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_SUCCESS The file will most likely be supported by libopenmpt.
  * \retval OPENMPT_PROBE_FILE_HEADER_RESULT_FAILURE The file is not supported by libopenmpt.
@@ -1538,6 +1538,8 @@ LIBOPENMPT_API int openmpt_module_ctl_set_floatingpoint( openmpt_module * mod, c
 LIBOPENMPT_API int openmpt_module_ctl_set_text( openmpt_module * mod, const char * ctl, const char * value );
 
 /* remember to add new functions to both C and C++ interfaces and to increase OPENMPT_API_VERSION_MINOR */
+
+LIBOPENMPT_API size_t openmpt_module_read_one_tick(openmpt_module* module, int32_t samplerate); // rePlayer
 
 #ifdef __cplusplus
 }

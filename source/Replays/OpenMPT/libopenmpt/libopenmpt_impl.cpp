@@ -2174,4 +2174,13 @@ void module_impl::ctl_set_text( std::string_view ctl, std::string_view value, bo
 	}
 }
 
+// rePlayer begin
+std::size_t module_impl::read_one_tick(std::int32_t samplerate) {
+	apply_mixer_settings(samplerate, 2);
+	auto count = m_sndFile->ReadOneTick();
+	m_currentPositionSeconds += static_cast<double>(count) / static_cast<double>(samplerate);
+	return count;
+}
+// rePlayer end
+
 } // namespace openmpt

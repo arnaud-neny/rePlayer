@@ -266,6 +266,7 @@ public:
 	void ctl_set_integer( std::string_view ctl, std::int64_t value, bool throw_if_unknown = true );
 	void ctl_set_floatingpoint( std::string_view ctl, double value, bool throw_if_unknown = true );
 	void ctl_set_text( std::string_view ctl, std::string_view value, bool throw_if_unknown = true );
+	std::size_t read_one_tick(std::int32_t samplerate); // rePlayer
 }; // class module_impl
 
 namespace helper {

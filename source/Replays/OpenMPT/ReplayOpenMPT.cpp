@@ -1,3 +1,8 @@
+// Some minor changes are done in OpenMPT:
+// - libopenmpt/libopenmpt.h
+// - libopenmpt/libopenmpt_c.cpp
+// - libopenmpt/libopenmpt_impl.cpp
+// - libopenmpt/libopenmpt_impl.hpp
 #include "ReplayOpenMPT.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -7,7 +12,6 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
-#include "libopenmpt/libopenmpt.h"
 #include "libopenmpt/libopenmpt_version.h"
 
 namespace rePlayer
@@ -52,6 +56,8 @@ namespace rePlayer
             window.RegisterSerializedData(settings.surround, settings.labels[4].c_str());
             settings.labels[5] = std::string("ReplayOpenMPTTiming_") + std::string(settings.serializedName);
             window.RegisterSerializedData(settings.vblank, settings.labels[5].c_str());
+            settings.labels[6] = std::string("ReplayOpenMPTPatterns_") + std::string(settings.serializedName);
+            window.RegisterSerializedData(settings.patterns, settings.labels[6].c_str());
         }
 
         g_replayPlugin.extensions = openmpt_get_supported_extensions();
@@ -78,7 +84,7 @@ namespace rePlayer
 
             bool isSynthMed = false;
         } cb;
-        auto module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, stream, cb.log, &cb, nullptr, nullptr, nullptr, nullptr, ctrls);
+        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, stream, cb.log, &cb, nullptr, nullptr, nullptr, nullptr, ctrls);
         if (!module)
             return nullptr;
         if (cb.isSynthMed) // not supported, so let another replay (uade) handle it
@@ -89,7 +95,9 @@ namespace rePlayer
         }
         openmpt_module_set_log_func(module, openmpt_log_func_silent, nullptr);
 
-        return new ReplayOpenMPT(module);
+        openmpt_module_initial_ctl emptyCtrls[] = { { "play.at_end", "continue" }, { "load.skip_samples", "1" }, { nullptr, nullptr } };
+        auto data = stream->Read();
+        return new ReplayOpenMPT(module, openmpt_module_ext_create_from_memory(data.Items(), data.Size(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, emptyCtrls));
     }
 
     bool ReplayOpenMPT::DisplaySettings()
@@ -111,6 +119,7 @@ namespace rePlayer
                 ms_settings[cb.index].stereoSeparation = ms_settings[0].stereoSeparation;
                 ms_settings[cb.index].surround = ms_settings[0].surround;
                 ms_settings[cb.index].vblank = ms_settings[0].vblank;
+                ms_settings[cb.index].patterns = ms_settings[0].patterns;
                 changed = true;
             }
         }
@@ -126,6 +135,8 @@ namespace rePlayer
         int32_t vblankValue = ms_settings[settingsIndex].vblank + 1;
         changed |= ImGui::Combo("Timing", &vblankValue, vblank, _countof(vblank));
         ms_settings[settingsIndex].vblank = vblankValue - 1;
+        const char* const patterns[] = { "Disable", "Enable" };
+        changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, _countof(patterns));
         ImGui::EndDisabled();
         return changed;
     }
@@ -151,14 +162,19 @@ namespace rePlayer
 
     ReplayOpenMPT::~ReplayOpenMPT()
     {
-        openmpt_module_destroy(m_module);
+        openmpt_module_ext_destroy(m_moduleExtVisuals);
+        openmpt_module_destroy(m_modulePlayback);
     }
 
-    ReplayOpenMPT::ReplayOpenMPT(openmpt_module* module)
-        : Replay(BuildMediaType(module))
-        , m_module(module)
+    ReplayOpenMPT::ReplayOpenMPT(openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals)
+        : Replay(BuildMediaType(modulePlayback))
+        , m_modulePlayback(modulePlayback)
+        , m_moduleVisuals(openmpt_module_ext_get_module(moduleVisuals))
+        , m_moduleExtVisuals(moduleVisuals)
         , m_surround(kSampleRate)
-    {}
+    {
+        openmpt_module_ext_get_interface(moduleVisuals, LIBOPENMPT_EXT_C_INTERFACE_PATTERN_VIS, &m_modulePatternVis, sizeof(m_modulePatternVis));
+    }
 
     size_t ReplayOpenMPT::OnRead(void* stream, void* dst, size_t bytes)
     {
@@ -196,7 +212,7 @@ namespace rePlayer
                 numSamples = uint32_t(currentDuration - currentPosition);
             }
         }
-        numSamples = uint32_t(openmpt_module_read_interleaved_float_stereo(m_module, kSampleRate, numSamples, reinterpret_cast<float*>(output)));
+        numSamples = uint32_t(openmpt_module_read_interleaved_float_stereo(m_modulePlayback, kSampleRate, numSamples, reinterpret_cast<float*>(output)));
         output->Convert(m_surround, numSamples);
         if (m_silenceStart)
         {
@@ -215,7 +231,7 @@ namespace rePlayer
 
     uint32_t ReplayOpenMPT::Seek(uint32_t timeInMs)
     {
-        auto newTime = openmpt_module_set_position_seconds(m_module, timeInMs / 1000.0);
+        auto newTime = openmpt_module_set_position_seconds(m_modulePlayback, timeInMs / 1000.0);
         m_surround.Reset();
         if (m_silenceStart)
         {
@@ -224,26 +240,49 @@ namespace rePlayer
                 m_currentPosition = m_silenceStart;
             m_isSilenceTriggered = false;
         }
+
+        auto posInSec = openmpt_module_get_position_seconds(m_moduleVisuals) * 1000.0;
+        if (posInSec > timeInMs)
+        {
+            posInSec = 0.0;
+            m_visualsSamples = 0;
+            openmpt_module_set_position_seconds(m_moduleVisuals, 0.0);
+        }
+        if (auto numSamples = uint32_t((timeInMs - posInSec) * kSampleRate / 1000.0))
+        {
+            auto availableSamples = Min(numSamples, m_visualsSamples);
+            m_visualsSamples -= availableSamples;
+            numSamples -= availableSamples;
+            while (numSamples)
+            {
+                m_visualsSamples = uint32_t(openmpt_module_read_one_tick(m_moduleVisuals, kSampleRate));
+                availableSamples = Min(numSamples, m_visualsSamples);
+                m_visualsSamples -= availableSamples;
+                numSamples -= availableSamples;
+            }
+        }
+
         return uint32_t(newTime * 1000);
     }
 
     void ReplayOpenMPT::ResetPlayback()
     {
         auto numSubsongs = GetNumSubsongs();
-        auto setSubsong = [&]()
+        auto setSubsong = [&](auto* module)
         {
             if (numSubsongs > 1)
             {
                 auto subsongIndex = m_subsongIndex;
                 //libopenmpt bug: if the current subsong index > 0 and we restart it after a loop, then the first end song is not triggered
                 //so this hack seems to reset the proper internal states
-                openmpt_module_select_subsong(m_module, (subsongIndex + 1) % numSubsongs);
-                openmpt_module_select_subsong(m_module, subsongIndex);
+                openmpt_module_select_subsong(module, (subsongIndex + 1) % numSubsongs);
+                openmpt_module_select_subsong(module, subsongIndex);
             }
             else
-                openmpt_module_set_position_seconds(m_module, 0.0);
+                openmpt_module_set_position_seconds(module, 0.0);
         };
-        setSubsong();
+        setSubsong(m_modulePlayback);
+        setSubsong(m_moduleVisuals);
         m_surround.Reset();
 
         // Silence trimmer
@@ -252,7 +291,7 @@ namespace rePlayer
             StereoSample samples[1024];
             uint64_t silenceStart = 0;
             uint64_t totalSamples = 0;
-            while (auto numSamples = int32_t(openmpt_module_read_interleaved_float_stereo(m_module, kSampleRate, 1024, reinterpret_cast<float*>(samples))))
+            while (auto numSamples = int32_t(openmpt_module_read_interleaved_float_stereo(m_modulePlayback, kSampleRate, 1024, reinterpret_cast<float*>(samples))))
             {
                 auto currentSample = totalSamples;
                 totalSamples += numSamples;
@@ -270,20 +309,22 @@ namespace rePlayer
             m_silenceStart = silenceStart < totalSamples ? silenceStart : 0;
             m_isSilenceTriggered = false;
             m_currentPosition = 0;
-            setSubsong();
+            setSubsong(m_modulePlayback);
             m_previousSubsongIndex = m_subsongIndex;
         }
+
+        m_visualsSamples = 0;
     }
 
     void ReplayOpenMPT::ApplySettings(const CommandBuffer metadata)
     {
         auto settings = metadata.Find<Settings>();
 
-        auto type = openmpt_module_get_metadata(m_module, "originaltype_long");
+        auto type = openmpt_module_get_metadata(m_modulePlayback, "originaltype_long");
         if (*type == 0)
         {
             openmpt_free_string(type);
-            type = openmpt_module_get_metadata(m_module, "type_long");
+            type = openmpt_module_get_metadata(m_modulePlayback, "type_long");
         }
         auto globalSettings = ms_settings;
         for (uint32_t i = 0; i < _countof(ms_settings); i++)
@@ -298,13 +339,16 @@ namespace rePlayer
         if (!globalSettings->isEnabled)
             globalSettings = ms_settings;
 
-        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_STEREOSEPARATION_PERCENT, (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globalSettings->stereoSeparation);
-        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && settings->overrideInterpolation) ? settings->interpolation : globalSettings->interpolation)) >> 1);
-        openmpt_module_set_render_param(m_module, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && settings->overrideRamping) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
+        openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_STEREOSEPARATION_PERCENT, (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globalSettings->stereoSeparation);
+        openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && settings->overrideInterpolation) ? settings->interpolation : globalSettings->interpolation)) >> 1);
+        openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && settings->overrideRamping) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
 
-        openmpt_module_ctl_set_integer(m_module, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
+        openmpt_module_ctl_set_integer(m_modulePlayback, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
+        openmpt_module_ctl_set_integer(m_moduleVisuals, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
 
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globalSettings->surround);
+
+        m_arePatternsDisplayed = globalSettings->patterns;
     }
 
     void ReplayOpenMPT::SetSubsong(uint32_t subsongIndex)
@@ -330,12 +374,12 @@ namespace rePlayer
     {
         if (m_silenceStart)
             return uint32_t((m_silenceStart * 1000ull) / kSampleRate);
-        return uint32_t(openmpt_module_get_duration_seconds(m_module) * 1000ull);
+        return uint32_t(openmpt_module_get_duration_seconds(m_modulePlayback) * 1000ull);
     }
 
     uint32_t ReplayOpenMPT::GetNumSubsongs() const
     {
-        uint32_t numSubsongs = openmpt_module_get_num_subsongs(m_module);
+        uint32_t numSubsongs = openmpt_module_get_num_subsongs(m_modulePlayback);
         assert(numSubsongs <= 65536);
         return numSubsongs;
     }
@@ -343,13 +387,13 @@ namespace rePlayer
     std::string ReplayOpenMPT::GetExtraInfo() const
     {
         std::string metadata;
-        if (auto str = openmpt_module_get_metadata(m_module, "title"))
+        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "title"))
         {
             if (str[0])
                 metadata = str;
             openmpt_free_string(str);
         }
-        if (auto str = openmpt_module_get_subsong_name(m_module, m_subsongIndex))
+        if (auto str = openmpt_module_get_subsong_name(m_modulePlayback, m_subsongIndex))
         {
             if (str[0])
             {
@@ -359,7 +403,7 @@ namespace rePlayer
             }
             openmpt_free_string(str);
         }
-        if (auto str = openmpt_module_get_metadata(m_module, "message"))
+        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message"))
         {
             if (str[0])
             {
@@ -376,10 +420,10 @@ namespace rePlayer
     {
         std::string info;
         char buf[128];
-        sprintf(buf, "%d", openmpt_module_get_num_channels(m_module));
+        sprintf(buf, "%d", openmpt_module_get_num_channels(m_modulePlayback));
         info += buf;
         info += " channels";
-        auto type = openmpt_module_get_metadata(m_module, "type_long");
+        auto type = openmpt_module_get_metadata(m_modulePlayback, "type_long");
         if (type)
         {
             if (type[0] != 0)
@@ -391,6 +435,162 @@ namespace rePlayer
         }
         info += "\nOpenMPT " OPENMPT_API_VERSION_STRING;
         return info;
+    }
+
+    Replay::Patterns ReplayOpenMPT::UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags)
+    {
+        if (numSamples > 0)
+        {
+            auto availableSamples = Min(numSamples, m_visualsSamples);
+            m_visualsSamples -= availableSamples;
+            numSamples -= availableSamples;
+            while (numSamples)
+            {
+                m_visualsSamples = uint32_t(openmpt_module_read_one_tick(m_moduleVisuals, kSampleRate));
+                availableSamples = Min(numSamples, m_visualsSamples);
+                m_visualsSamples -= availableSamples;
+                numSamples -= availableSamples;
+            }
+        }
+
+        if (!m_arePatternsDisplayed && !(flags & Patterns::kEnablePatterns)) // kEnablePatterns has priority over internal flag
+            return {};
+
+        auto numChannels = openmpt_module_get_num_channels(m_moduleVisuals);
+
+        Patterns patterns;
+        patterns.lines.Reserve(65536);
+        patterns.sizes.Resize(numLines);
+        patterns.currentLine = openmpt_module_get_current_row(m_moduleVisuals);
+        if (flags & (Patterns::kEnableInstruments | Patterns::kEnableVolume | Patterns::kEnableEffects))
+            patterns.width = (numChannels * 4 - 1) * charWidth;
+        else
+            patterns.width = (numChannels * 3) * charWidth + (numChannels - 1) * spaceWidth;
+        uint16_t size = uint16_t(numChannels * 4 - 1);
+        if (flags & Patterns::kEnableRowNumbers)
+        {
+            patterns.width += 4 * charWidth;
+            size += uint16_t(4);
+        }
+        if (flags & Patterns::kEnableInstruments)
+        {
+            patterns.width += numChannels * 2 * charWidth + spaceWidth * numChannels;
+            size += uint16_t(numChannels * 3);
+        }
+        if (flags & Patterns::kEnableVolume)
+        {
+            patterns.width += numChannels * 3 * charWidth + spaceWidth * numChannels;
+            size += uint16_t(numChannels * 4);
+        }
+        if (flags & Patterns::kEnableEffects)
+        {
+            patterns.width += numChannels * 3 * charWidth + spaceWidth * numChannels;
+            size += uint16_t(numChannels * 4);
+        }
+
+        auto currentPattern = openmpt_module_get_current_pattern(m_moduleVisuals);
+        auto numRows = openmpt_module_get_pattern_num_rows(m_moduleVisuals, currentPattern);
+        auto currentRow = patterns.currentLine - int32_t(numLines) / 2;
+
+        for (uint32_t line = 0; line < numLines; currentRow++, line++)
+        {
+            if (currentRow >= 0 && currentRow < numRows)
+            {
+                char color = Patterns::kColorDefault;
+                if (flags & Patterns::kEnableRowNumbers)
+                {
+                    if (flags & Patterns::kEnableColors)
+                        patterns.lines.Add(0x80 | color);
+                    patterns.lines.Add('0' + ((currentRow / 100) % 10));
+                    patterns.lines.Add('0' + ((currentRow / 10) % 10));
+                    patterns.lines.Add('0' + (currentRow % 10));
+                    patterns.lines.Add('\x7f');
+                }
+
+                for (int32_t channel = 0;;)
+                {
+                    auto read = [&](int command, int numChars, bool doColor = false, Patterns::ColorIndex otherColor = Patterns::kColorDefault)
+                    {
+                        auto* in = openmpt_module_format_pattern_row_channel_command(m_moduleVisuals, currentPattern, currentRow, channel, command);
+                        if (doColor) switch (*in)
+                        {
+                        case ' ':
+                        case '.':
+                        case '^':
+                        case '=':
+                        case '~':
+                            otherColor = Patterns::kColorEmpty;
+                        default:
+                            if (color != otherColor)
+                            {
+                                color = otherColor;
+                                patterns.lines.Add(0x80 | color);
+                            }
+                        }
+
+                        for (auto* c = in; *c && numChars--; c++)
+                        {
+                            if (*c <= ' ')
+                                patterns.lines.Add('\x7f'); // invisible character
+                            else
+                                patterns.lines.Add(*c);
+                        }
+                        openmpt_free_string(in);
+                        while (numChars-- > 0)
+                            patterns.lines.Add('\x7f'); // invisible character
+                    };
+                    auto getColor = [](int effectType) {
+                        switch (effectType)
+                        {
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_UNKNOWN:
+                            return Patterns::kColorDefault;
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_GENERAL:
+                            return Patterns::kColorText;
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_GLOBAL:
+                            return Patterns::kColorGlobal;
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_VOLUME:
+                            return Patterns::kColorVolume;
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_PANNING:
+                            return Patterns::kColorInstrument;
+                        case OPENMPT_MODULE_EXT_INTERFACE_PATTERN_VIS_EFFECT_TYPE_PITCH:
+                            return Patterns::kColorPitch;
+                        }
+                        return Patterns::kColorDefault;
+                    };
+
+                    read(OPENMPT_MODULE_COMMAND_NOTE, 3, flags & Patterns::kEnableColors, Patterns::kColorText);
+                    if (flags & Patterns::kEnableInstruments)
+                    {
+                        patterns.lines.Add(' ');
+                        read(OPENMPT_MODULE_COMMAND_INSTRUMENT, 2, flags & Patterns::kEnableColors, Patterns::kColorInstrument);
+                    }
+                    if (flags & Patterns::kEnableVolume)
+                    {
+                        patterns.lines.Add(' ');
+                        read(OPENMPT_MODULE_COMMAND_VOLUMEEFFECT, 1, flags & Patterns::kEnableColors, getColor(m_modulePatternVis.get_pattern_row_channel_volume_effect_type(m_moduleExtVisuals, currentPattern, currentRow, channel)));
+                        read(OPENMPT_MODULE_COMMAND_VOLUME, 2);
+                    }
+                    if (flags & Patterns::kEnableEffects)
+                    {
+                        patterns.lines.Add(' ');
+                        read(OPENMPT_MODULE_COMMAND_EFFECT, 1, flags & Patterns::kEnableColors, getColor(m_modulePatternVis.get_pattern_row_channel_effect_type(m_moduleExtVisuals, currentPattern, currentRow, channel)));
+                        read(OPENMPT_MODULE_COMMAND_PARAMETER, 2);
+                    }
+                    if (++channel == numChannels)
+                        break;
+                    if (flags & (Patterns::kEnableInstruments | Patterns::kEnableVolume | Patterns::kEnableEffects))
+                        patterns.lines.Add('\x7f');
+                    else
+                        patterns.lines.Add(' ');
+                }
+
+                patterns.sizes[line] = size;
+            }
+            else
+                patterns.sizes[line] = 0;
+            patterns.lines.Add('\0');
+        }
+        return patterns;
     }
 }
 // namespace rePlayer
