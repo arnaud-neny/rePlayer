@@ -307,12 +307,12 @@ namespace rePlayer
             }
             silenceStart += kSampleRate / 4; // keep 0.25 second of silence
             m_silenceStart = silenceStart < totalSamples ? silenceStart : 0;
-            m_isSilenceTriggered = false;
-            m_currentPosition = 0;
             setSubsong(m_modulePlayback);
             m_previousSubsongIndex = m_subsongIndex;
         }
 
+        m_isSilenceTriggered = false;
+        m_currentPosition = 0;
         m_visualsSamples = 0;
     }
 
