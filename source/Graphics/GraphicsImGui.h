@@ -18,6 +18,8 @@ namespace rePlayer
 
         void OnCreateWindow(GraphicsWindow* window);
 
+        int32_t Get3x5BaseRect() const { return m_3x5BaseRect; }
+
     protected:
         GraphicsImGui();
         ~GraphicsImGui() override;
@@ -28,9 +30,9 @@ namespace rePlayer
         {
             SmartPtr<ID3D12Resource> indexBuffer;
             SmartPtr<ID3D12Resource> vertexBuffer;
-            uint32_t indexBufferSize{ 0 };
-            uint32_t vertexBufferSize{ 0 };
-            uint64_t frameIndex{ 0 };
+            uint32_t indexBufferSize = 0;
+            uint32_t vertexBufferSize = 0;
+            uint64_t frameIndex = 0;
         };
 
     private:
@@ -42,12 +44,13 @@ namespace rePlayer
         void SetupRenderStates(GraphicsWindow* window, const ImDrawData& drawData, FrameResources* frameResources);
 
     private:
-        SmartPtr<ID3D12RootSignature> mRootSignature;
-        SmartPtr<ID3D12PipelineState> mPipelineState;
-        SmartPtr<ID3D12Resource> mFontTextureResource;
-        SmartPtr<ID3D12DescriptorHeap> mSrvDescHeap; //temporary until the descriptor manager is available
-        D3D12_CPU_DESCRIPTOR_HANDLE  mFontSrvCpuDescHandle = {};
-        D3D12_GPU_DESCRIPTOR_HANDLE  mFontSrvGpuDescHandle = {};
+        SmartPtr<ID3D12RootSignature> m_rootSignature;
+        SmartPtr<ID3D12PipelineState> m_pipelineState;
+        SmartPtr<ID3D12Resource> m_fontTextureResource;
+        SmartPtr<ID3D12DescriptorHeap> m_srvDescHeap; //temporary until the descriptor manager is available
+        D3D12_CPU_DESCRIPTOR_HANDLE  m_fontSrvCpuDescHandle = {};
+        D3D12_GPU_DESCRIPTOR_HANDLE  m_fontSrvGpuDescHandle = {};
+        int32_t m_3x5BaseRect = 0;
     };
 }
 // namespace rePlayer

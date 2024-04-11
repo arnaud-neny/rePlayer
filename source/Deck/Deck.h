@@ -10,6 +10,7 @@ namespace rePlayer
 {
     using namespace core;
 
+    class Patterns;
     class Player;
 
     class Deck : public Window
@@ -149,6 +150,8 @@ namespace rePlayer
 
         Serialized<bool> m_arePlaybackMediaHotKeysEnabled = { "PlaybackMediaHotKeys", true };
         Serialized<bool> m_areVolumeMediaHotKeysEnabled = { "VolumeMediaHotKeys", true };
+
+        Patterns* m_patterns;
     };
 }
 // namespace rePlayer

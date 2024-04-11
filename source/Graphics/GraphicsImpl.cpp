@@ -528,5 +528,10 @@ namespace rePlayer
 
         return window;
     }
+
+    int32_t GraphicsImpl::Get3x5BaseRect() const
+    {
+        return m_imGui->Get3x5BaseRect();
+    }
 }
 // namespace rePlayer

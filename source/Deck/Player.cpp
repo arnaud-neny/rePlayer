@@ -5,8 +5,9 @@
 #include <Thread/Thread.h>
 
 // rePlayer
-#include <RePlayer/Core.h>
 #include <Deck/Deck.h>
+#include <Graphics/Graphics.h>
+#include <RePlayer/Core.h>
 
 #include "Player.h"
 
@@ -67,6 +68,7 @@ namespace rePlayer
             m_songEnd = ~0ull;
             m_wavePlayPos = 0;
             m_waveFillPos = m_numCachedSamples;
+            m_patternsPos = 0;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
             m_hasSeeked = m_replay->CanLoop() && Core::GetDeck().IsEndless();
@@ -122,6 +124,7 @@ namespace rePlayer
             m_songEnd = ~0ull;
             m_wavePlayPos = 0;
             m_waveFillPos = m_numCachedSamples;
+            m_patternsPos = 0;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
             m_remainingFadeOut = m_replay->GetSampleRate() * 4;
@@ -213,6 +216,22 @@ namespace rePlayer
         return m_replay->GetInfo();
     }
 
+    Replay::Patterns Player::GetPatterns(uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Replay::Patterns::Flags flags) const
+    {
+        Replay::Patterns patterns;
+        if (m_status != Status::Stopped)
+        {
+            MMTIME mmt{};
+            mmt.wType = TIME_BYTES;
+            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
+
+            mmt.u.cb /= sizeof(StereoSample);
+            patterns = m_replay->UpdatePatterns(mmt.u.cb - m_patternsPos, numLines, charWidth, spaceWidth, flags);
+            m_patternsPos = mmt.u.cb;
+        }
+        return patterns;
+    }
+
     StereoSample Player::GetVuMeter() const
     {
         if (m_status == Status::Stopped)
@@ -244,11 +263,16 @@ namespace rePlayer
         return { sqrtf(sum.left / numVuMeterSamples), sqrtf(sum.right / numVuMeterSamples) };
     }
 
+    void Player::DrawVisuals(float xMin, float yMin, float xMax, float yMax) const
+    {
+        DrawOscilloscope(xMin, yMin, xMax, yMax);
+        DrawPatterns(xMin, yMin, xMax, yMax);
+    }
+
     void Player::DrawOscilloscope(float xMin, float yMin, float xMax, float yMax) const
     {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
-        auto color = ImGui::GetColorU32(ImGuiCol_FrameBgActive);
-
+        auto color = 0x98D9B27A; // ImGui::GetColorU32(ImGuiCol_FrameBgActive);
         if (m_status == Status::Stopped)
         {
             drawList->PrimReserve(6, 4);
@@ -262,13 +286,13 @@ namespace rePlayer
             drawList->PrimWriteVtx(ImVec2(xMax, y0), drawList->_Data->TexUvWhitePixel, color);
             drawList->PrimWriteVtx(ImVec2(xMax, y1), drawList->_Data->TexUvWhitePixel, color);
 
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 0));
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 1));
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 2));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 0));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
 
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 2));
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 1));
-            drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + 3));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
+            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 3));
         }
         else
         {
@@ -310,15 +334,99 @@ namespace rePlayer
 
                 if (i != 0)
                 {
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + (i - 1) * 2));
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + (i - 1) * 2 + 1));
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + i * 2));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2 + 1));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2));
 
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + i * 2));
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + (i - 1) * 2 + 1));
-                    drawList->PrimWriteIdx(static_cast<ImDrawIdx>(idxBase + i * 2 + 1));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2 + 1));
+                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2 + 1));
                 }
             }
+        }
+    }
+
+    void Player::DrawPatterns(float xMin, float yMin, float xMax, float yMax) const
+    {
+        auto height = int32_t(yMax) - int32_t(yMin);
+        auto numHalfLines = (((height - kCharHeight) / 2) + kCharHeight - 1) / kCharHeight;
+        auto numLines = 1 + 2 * numHalfLines;
+
+        Replay::Patterns patterns = GetPatterns(numLines, kCharWidth, kCharWidth / 2, Replay::Patterns::kDisableAll);
+
+        if (patterns.lines.IsNotEmpty())
+        {
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            drawList->PushClipRect({ xMin, yMin }, { xMax, yMax });
+            ImGuiIO& io = ImGui::GetIO();
+            float y = yMin + (height / 2) - (kCharHeight / 2 - 1) - numHalfLines * kCharHeight;
+            uint32_t colors[] = { 0xCCC5685B, 0xCCC77B3A }; // { ImGui::GetColorU32(ImGuiCol_Tab), ImGui::GetColorU32(ImGuiCol_TabHovered) };
+            if (patterns.currentLine & 1)
+                std::swap(colors[0], colors[1]);
+            auto baseRect = Graphics::Get3x5BaseRect();
+            auto* c = patterns.lines.Items();
+            for (auto& size : patterns.sizes)
+            {
+                if (size > 0)
+                {
+                    auto color = (&size - patterns.sizes) == numHalfLines ? 0xffff8080 : colors[0];
+
+                    drawList->PrimReserve(int32_t(6 * size), int32_t(4 * size));
+                    auto idxBase = drawList->_VtxCurrentIdx;
+                    float x;
+                    if (int32_t(xMax) - int32_t(xMin) >= patterns.width)
+                        x = xMax - patterns.width;
+                    else
+                        x = xMin +(int32_t(xMax) - int32_t(xMin) - patterns.width) / 2;
+                    for (; *c; ++c)
+                    {
+                        auto cc = *c;
+                        if (cc < 0) // ignore the colors
+                            continue;
+                        if (cc >= 33 && cc <= 126)
+                        {
+                            const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(baseRect + cc - 33);
+                            ImVec2 uv0, uv1;
+                            io.Fonts->CalcCustomRectUV(rect, &uv0, &uv1);
+
+                            drawList->PrimWriteVtx({ x, y }, uv0, color);
+                            drawList->PrimWriteVtx({ x, y + 5.0f }, { uv0.x, uv1.y }, color);
+                            drawList->PrimWriteVtx({ x + 3.0f, y }, { uv1.x, uv0.y }, color);
+                            drawList->PrimWriteVtx({ x + 3.0f, y + 5.0f }, uv1, color);
+
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 0));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
+
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 3));
+                        }
+                        else
+                        {
+                            drawList->PrimWriteVtx({ 0.0f, 0.0f }, { 0.0f, 0.0f }, 0);
+                            drawList->PrimWriteVtx({ 0.0f, 0.0f }, { 0.0f, 0.0f }, 0);
+                            drawList->PrimWriteVtx({ 0.0f, 0.0f }, { 0.0f, 0.0f }, 0);
+                            drawList->PrimWriteVtx({ 0.0f, 0.0f }, { 0.0f, 0.0f }, 0);
+
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+                            drawList->PrimWriteIdx(ImDrawIdx(idxBase));
+                        }
+
+                        idxBase += 4;
+                        x += cc == ' ' ? kCharWidth / 2 : kCharWidth;
+                    }
+                }
+                std::swap(colors[0], colors[1]);
+                y += kCharHeight;
+                c++;
+            }
+            drawList->PopClipRect();
         }
     }
 

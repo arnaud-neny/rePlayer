@@ -49,8 +49,10 @@ namespace rePlayer
         std::string GetInfo() const;
         MediaType GetMediaType() const;
 
+        Replay::Patterns GetPatterns(uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Replay::Patterns::Flags flags) const;
+
         StereoSample GetVuMeter() const;
-        void DrawOscilloscope(float xMin, float yMin, float xMax, float yMax) const;
+        void DrawVisuals(float xMin, float yMin, float xMax, float yMax) const;
 
         static uint32_t GetVolume();
         static void SetVolume(uint32_t volume);
@@ -69,8 +71,14 @@ namespace rePlayer
         void ResumeThread();
         void SuspendThread();
 
+        void DrawOscilloscope(float xMin, float yMin, float xMax, float yMax) const;
+        void DrawPatterns(float xMin, float yMin, float xMax, float yMax) const;
+
     private:
         struct Wave;
+
+        static constexpr uint32_t kCharWidth = 3;
+        static constexpr uint32_t kCharHeight = 5;
 
     private:
         MusicID m_id;
@@ -87,6 +95,7 @@ namespace rePlayer
         uint64_t m_songPos = 0;
         uint32_t m_wavePlayPos = 0;
         uint32_t m_waveFillPos = 0;
+        mutable uint32_t m_patternsPos = 0;
         const uint32_t m_numSamples;
         const uint32_t m_numCachedSamples;
 

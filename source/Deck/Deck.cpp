@@ -7,6 +7,7 @@
 #include <ImGui/imgui_internal.h>
 
 #include <Database/SongEditor.h>
+#include <Deck/Patterns.h>
 #include <Deck/Player.h>
 #include <Library/Library.h>
 #include <Playlist/Playlist.h>
@@ -24,6 +25,7 @@ namespace rePlayer
 {
     Deck::Deck()
         : Window("System", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking, true)
+        , m_patterns(new Patterns)
     {
         Enable(true);
         m_volume = Player::GetVolume();
@@ -39,7 +41,9 @@ namespace rePlayer
     }
 
     Deck::~Deck()
-    {}
+    {
+        delete m_patterns;
+    }
 
     void Deck::PlaySolo(MusicID musicId)
     {
@@ -389,6 +393,8 @@ namespace rePlayer
                 }
             }
         }
+
+        m_patterns->Update(m_currentPlayer);
     }
 
     std::string Deck::OnGetWindowTitle()
@@ -611,6 +617,9 @@ namespace rePlayer
             isEnabled = Core::GetSongEditor().IsEnabled();
             if (ImGui::MenuItem("Song Editor", "", &isEnabled))
                 Core::GetSongEditor().Enable(isEnabled);
+            isEnabled = m_patterns->IsEnabled();
+            if (ImGui::MenuItem("Patterns Display", "", &isEnabled))
+                m_patterns->Enable(isEnabled);
             isEnabled = Log::Get().IsEnabled();
             if (ImGui::MenuItem("Log", "", &isEnabled))
                 Log::Get().Enable(isEnabled);
@@ -920,7 +929,7 @@ namespace rePlayer
             info = "            /\\\n     <-  rePlayer  ->\n            \\/";
         auto flags = DrawClippedText(info, false, [player](const ImVec2& min, const ImVec2& max)
         {
-            player->DrawOscilloscope(min.x, min.y, max.x, max.y);
+            player->DrawVisuals(min.x, min.y, max.x, max.y);
         });
         if (flags == (ClippedTextFlags::kIsClipped | ClippedTextFlags::kIsHoovered))
         {

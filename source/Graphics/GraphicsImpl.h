@@ -30,7 +30,7 @@ namespace rePlayer
 
         operator HANDLE() const { return handle; }
 
-        HANDLE handle{ NULL };
+        HANDLE handle = NULL;
     };
 
     struct GraphicsWindow
@@ -44,7 +44,7 @@ namespace rePlayer
         {
         };
 
-        static constexpr uint32_t kNumBackBuffers{ 3 };
+        static constexpr uint32_t kNumBackBuffers = 3;
 
         SmartPtr<ID3D12CommandQueue> m_commandQueue;
         SmartPtr<ID3D12GraphicsCommandList> m_commandList;
@@ -56,7 +56,7 @@ namespace rePlayer
 
         SmartPtr<ID3D12Fence> m_fence;
         ScopedHandle m_fenceEvent;
-        uint64_t m_fenceLastSignaledValue{ 0 };
+        uint64_t m_fenceLastSignaledValue = 0;
 
         struct RenderTarget
         {
@@ -64,16 +64,16 @@ namespace rePlayer
             D3D12_CPU_DESCRIPTOR_HANDLE descriptor;
         } m_backBuffers[kNumBackBuffers];
 
-        uint32_t m_width{ 0 };
-        uint32_t m_height{ 0 };
+        uint32_t m_width = 0;
+        uint32_t m_height = 0;
 
         struct FrameContext
         {
             SmartPtr<ID3D12CommandAllocator> commandAllocator;
-            uint64_t fenceValue{ 0 };
+            uint64_t fenceValue = 0;
         } m_frameContexts[kNumBackBuffers];
-        FrameContext* m_currentFrameContext{ m_frameContexts };
-        uint64_t m_frameIndex{ 0 };
+        FrameContext* m_currentFrameContext = m_frameContexts;
+        uint64_t m_frameIndex = 0;
 
         class GraphicsImpl* m_graphics;
         SmartPtr<Item> m_items[kItemIdCount];//replace with render graph
@@ -81,8 +81,8 @@ namespace rePlayer
         bool m_isMainWindow;
 
         GraphicsWindow(GraphicsImpl* graphics, bool isMainWindow)
-            : m_graphics{ graphics }
-            , m_isMainWindow{ isMainWindow }
+            : m_graphics(graphics)
+            , m_isMainWindow(isMainWindow)
         {}
         ~GraphicsWindow();
         bool Resize(uint32_t width, uint32_t height);
@@ -106,9 +106,11 @@ namespace rePlayer
 
         auto GetDevice() const;
 
+        int32_t Get3x5BaseRect() const;
+
     public:
-        static constexpr uint32_t kNumFrames{ 3 };
-        static constexpr uint32_t kNumBackBuffers{ 3 };
+        static constexpr uint32_t kNumFrames = 3;
+        static constexpr uint32_t kNumBackBuffers = GraphicsWindow::kNumBackBuffers;
 
     private:
         SmartPtr<ID3D12CommandQueue> CreateCommandQueue();
@@ -122,11 +124,11 @@ namespace rePlayer
         SmartPtr<IDCompositionDevice> m_dcompDevice;
 
         SmartPtr<ID3D12DescriptorHeap> m_rtvDescriptorHeap;
-        uint64_t m_rtvDescritorUsage{ 0 };
+        uint64_t m_rtvDescritorUsage = 0;
 
-        GraphicsWindow* m_mainWindow{ nullptr };
+        GraphicsWindow* m_mainWindow = nullptr;
 
-        uint32_t m_dxgiFactoryFlags{ 0 };
+        uint32_t m_dxgiFactoryFlags = 0;
 
         SmartPtr<GraphicsImGui> m_imGui;
         SmartPtr<GraphicsPremul> m_premul;

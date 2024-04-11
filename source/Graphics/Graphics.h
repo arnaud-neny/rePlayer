@@ -19,6 +19,8 @@ namespace rePlayer
 
         static auto GetDevice() { return ms_instance.GetDevice(); }
 
+        static int32_t Get3x5BaseRect() { return ms_instance.Get3x5BaseRect(); }
+
     private:
         static GraphicsImpl ms_instance;
     };

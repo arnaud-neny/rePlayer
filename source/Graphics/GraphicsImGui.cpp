@@ -1,7 +1,7 @@
 #include <Imgui.h>
 
-//#include "font.h"
 #include "Graphics.h"
+#include "GraphicsFont3x5.h"
 #include "GraphicsFontLog.h"
 #include "GraphicsImGui.h"
 #include "MediaIcons.h"
@@ -93,7 +93,7 @@ namespace rePlayer
             return false;
         }
 
-        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature)) < S_OK)
+        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)) < S_OK)
         {
             MessageBox(nullptr, "ImGui: root signature", "rePlayer", MB_ICONERROR);
             return false;
@@ -106,7 +106,7 @@ namespace rePlayer
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
         psoDesc.NodeMask = 1;
         psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-        psoDesc.pRootSignature = mRootSignature;
+        psoDesc.pRootSignature = m_rootSignature;
         psoDesc.SampleMask = UINT_MAX;
         psoDesc.NumRenderTargets = 1;
         psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -174,7 +174,7 @@ namespace rePlayer
 */
         }
 
-        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) < S_OK)
+        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)) < S_OK)
         {
             MessageBox(nullptr, "ImGui: pipeline state", "rePlayer", MB_ICONERROR);
             return false;
@@ -211,8 +211,19 @@ namespace rePlayer
             fontConfig.OversampleH = fontConfig.OversampleV = 1;
             fontConfig.PixelSnapH = true;
             fontConfig.GlyphOffset.y = 0.0f;
-            strcpy_s(fontConfig.Name, "Pxl Regular");
+#ifdef _DEBUG
+            strcpy_s(fontConfig.Name, "Log");
+#endif
             io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_fontLog_compressed_data_base85, 0, &fontConfig);
+        }
+        {
+            m_3x5BaseRect = io.Fonts->AddCustomRectRegular(3, 5); // first character is '!' (we don't need the ' ')
+            for (int32_t i = 2; i < 16 * 6 - 1; ++i)
+            {
+                auto b = io.Fonts->AddCustomRectRegular(3, 5);
+                assert(b == (m_3x5BaseRect + i - 1));
+                (void)b;
+            }
         }
 
         uint8_t* pixels;
@@ -233,20 +244,36 @@ namespace rePlayer
             }
             mediaIconsOffset += widths[i];
         }
+        for (int32_t i = 1; i < 16 * 6 - 1; i++)
+        {
+            auto x = i % 16;
+            auto y = i / 16;
+            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(m_3x5BaseRect + i - 1))
+            {
+                for (int32_t p = 0; p < 5; p++)
+                {
+                    auto* src = ((const uint8_t*)s_font3x5_data) + x * 3 + (y * 5 + p) * 48;
+                    auto* dst = pixels + (rect->Y + p) * width + rect->X;
+                    dst[0] = src[0] * 0xff;
+                    dst[1] = src[1] * 0xff;
+                    dst[2] = src[2] * 0xff;
+                }
+            }
+        }
 
         //temporary: create the heap
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
         heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
         heapDesc.NumDescriptors = 1;
         heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        if (Graphics::GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mSrvDescHeap)) < S_OK)
+        if (Graphics::GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_srvDescHeap)) < S_OK)
         {
             MessageBox(nullptr, "ImGui: descriptor heap", "rePlayer", MB_ICONERROR);
             return false;
         }
 
-        mFontSrvCpuDescHandle = mSrvDescHeap->GetCPUDescriptorHandleForHeapStart();
-        mFontSrvGpuDescHandle = mSrvDescHeap->GetGPUDescriptorHandleForHeapStart();
+        m_fontSrvCpuDescHandle = m_srvDescHeap->GetCPUDescriptorHandleForHeapStart();
+        m_fontSrvGpuDescHandle = m_srvDescHeap->GetGPUDescriptorHandleForHeapStart();
 
         // Upload texture to graphics system
         {
@@ -378,13 +405,13 @@ namespace rePlayer
                 D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
                 D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
                 D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_3);
-            Graphics::GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, mFontSrvCpuDescHandle);
-            mFontTextureResource = pTexture;
+            Graphics::GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, m_fontSrvCpuDescHandle);
+            m_fontTextureResource = pTexture;
         }
 
         // Store our identifier
-        static_assert(sizeof(ImTextureID) >= sizeof(mFontSrvGpuDescHandle.ptr), "Can't pack descriptor handle into TexID, 32-bit not supported yet.");
-        io.Fonts->SetTexID((ImTextureID)mFontSrvGpuDescHandle.ptr);
+        static_assert(sizeof(ImTextureID) >= sizeof(m_fontSrvGpuDescHandle.ptr), "Can't pack descriptor handle into TexID, 32-bit not supported yet.");
+        io.Fonts->SetTexID((ImTextureID)m_fontSrvGpuDescHandle.ptr);
 
         return true;
     }
@@ -434,8 +461,8 @@ namespace rePlayer
         ibv.Format = sizeof(ImDrawIdx) == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
         window->m_commandList->IASetIndexBuffer(&ibv);
         window->m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        window->m_commandList->SetPipelineState(mPipelineState);
-        window->m_commandList->SetGraphicsRootSignature(mRootSignature);
+        window->m_commandList->SetPipelineState(m_pipelineState);
+        window->m_commandList->SetGraphicsRootSignature(m_rootSignature);
         window->m_commandList->SetGraphicsRoot32BitConstants(0, 16, &vertex_constant_buffer, 0);
 /*
         window->m_commandList->OMSetStencilRef(1);
@@ -454,7 +481,7 @@ namespace rePlayer
         if (drawData.DisplaySize.x <= 0.0f || drawData.DisplaySize.y <= 0.0f)
             return;
 
-        window->m_commandList->SetDescriptorHeaps(1, &mSrvDescHeap);
+        window->m_commandList->SetDescriptorHeaps(1, &m_srvDescHeap);
 
         auto frameIndex = window->m_frameIndex;
         auto frameResources = window->m_items[GraphicsWindow::kImGuiItemId].As<Item>()->m_frameResources + (frameIndex % Graphics::kNumFrames);

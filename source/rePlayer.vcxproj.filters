@@ -179,6 +179,9 @@
     <ClCompile Include="Library\Sources\VGMRips.cpp">
       <Filter>Source Files\Library\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Deck\Patterns.cpp">
+      <Filter>Source Files\Deck</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -372,6 +375,12 @@
     </ClInclude>
     <ClInclude Include="Library\Sources\VGMRips.h">
       <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsFont3x5.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck\Patterns.h">
+      <Filter>Source Files\Deck</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
