@@ -46,6 +46,43 @@ namespace rePlayer
             static void Durations(ReplayMetadataContext& context, uint32_t* durations, uint32_t numDurations, const char* format);
         };
 
+        struct Patterns
+        {
+            enum Flags : uint32_t
+            {
+                kDisableAll = 0,
+                kEnableRowNumbers = 1 << 0,
+                kEnableInstruments = 1 << 1,
+                kEnableVolume = 1 << 2,
+                kEnableEffects = 1 << 3,
+                kEnableColors = 1 << 4,
+                kEnableHighlight = 1 << 5,
+                kEnablePatterns = 1 << 6
+            };
+            static constexpr Flags kDisplayAll = Flags(kEnableRowNumbers | kEnableInstruments | kEnableVolume | kEnableEffects | kEnableColors | kEnableHighlight);
+
+            enum ColorIndex : char
+            {
+                kColorDefault = 0,
+                kColorText,
+                kColorEmpty,
+                kColorInstrument,
+                kColorVolume,
+                kColorPitch,
+                kColorGlobal,
+                kNumColors
+            };
+
+            // only characters in the range of [32;127] are allowed
+            // if < 0, then it's an index in the colors
+            Array<char> lines; // 0 terminated lines
+            Array<uint16_t> sizes; // number of chars on a line
+            int32_t currentLine = 0;
+            int32_t width = 0;
+
+            static const uint32_t colors[kNumColors];
+        };
+
     public:
         virtual ~Replay();
 
@@ -71,6 +108,8 @@ namespace rePlayer
         virtual std::string GetInfo() const = 0;
 
         virtual bool CanLoop() const { return true; }
+
+        virtual Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags = Patterns::kDisplayAll) { (void)numSamples; (void)numLines; (void)charWidth; (void)spaceWidth; (void)flags; return {}; }
 
     protected:
         Replay(MediaType mediaType) : m_mediaType(mediaType) {}

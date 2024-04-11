@@ -45,6 +45,16 @@ namespace rePlayer
 
     extern ReplayPlugin g_replayPlugin;
 
+    const uint32_t Replay::Patterns::colors[Patterns::kNumColors] = {
+        0xffa0a0a0, // Default
+        0xffFFffFF, // Text
+        0xff808080, // Empty
+        0xff80FF80, // Instrument
+        0xffFF8080, // Volume
+        0xff40a0a0, // Pitch
+        0xff8080FF  // Global
+    };
+
     Replay::~Replay()
     {
         g_replayPlugin.onDelete(this);
