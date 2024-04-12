@@ -601,6 +601,7 @@ int pl_sample[MAX_POLYPHONY];
 int pl_vol_row;
 int pl_pan_row;
 unsigned char *RawPatterns;
+
 int pl_eff_row[MAX_FX];
 int pl_dat_row[MAX_FX];
 int glide;
@@ -928,7 +929,7 @@ float filterhp2(int stereo, int ch, float input, float f, float q);
     void Go303(void);
 #endif
 
-float Kutoff(int v);
+float Cutoff(int v);
 float Resonance(float v);
 float Bandwidth(int v);
 void Reverb_work(void);
@@ -1184,7 +1185,7 @@ int STDCALL Ptk_InitDriver(void)
     }
 #endif // PTK_SYNTH
 
-    // Initializing working SINETABLE
+    // Initializing work SINETABLE
     for(i = 0; i < 360; i++)
     {
         SIN[i] = (float) sinf(i * 0.0174532f);
@@ -1248,18 +1249,35 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
     if(Packed_Length == -1)
     {
         // Sample wasn't packed
+
+#if defined(__PSVITA__)
+        Packed_Read_Buffer = (Uint8 *) PSVITA_malloc(Dest_Length * 2 + 8);
+#else
         Packed_Read_Buffer = (Uint8 *) malloc(Dest_Length * 2 + 8);
         memset(Packed_Read_Buffer, 0, Dest_Length * 2 + 8);
+#endif
+
         Mod_Dat_Read(Packed_Read_Buffer, sizeof(char) * (Dest_Length * 2));
         return((short *) Packed_Read_Buffer);
     }
     else
     {
+
+#if defined(__PSVITA__)
+        Packed_Read_Buffer = (Uint8 *) PSVITA_malloc(Packed_Length);
+#else
         Packed_Read_Buffer = (Uint8 *) malloc(Packed_Length);
+#endif
+
         // Read the packer buffer
         Mod_Dat_Read(Packed_Read_Buffer, sizeof(char) * Packed_Length);
+
+#if defined(__PSVITA__)
+        Dest_Buffer = (short *) PSVITA_malloc(Dest_Length * 2 + 8);
+#else
         Dest_Buffer = (short *) malloc(Dest_Length * 2 + 8);
         memset(Dest_Buffer, 0, Dest_Length * 2 + 8);
+#endif
 
 #if defined(PTK_AT3) || defined(PTK_GSM) || defined(PTK_MP3) || \
     defined(PTK_ADPCM) || defined(PTK_8BIT) || \
@@ -1309,7 +1327,12 @@ short *Unpack_Sample(int Dest_Length, char Pack_Type, int BitRate)
         }
 #endif
 
+#if defined(__PSVITA__)
+        PSVITA_free(Packed_Read_Buffer);
+#else
         free(Packed_Read_Buffer);
+#endif
+
         return(Dest_Buffer);
     }
 }
@@ -1358,16 +1381,25 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Allocated the necessary room for the patterns
         int max_lines = (PATTERN_LEN * nPatterns);
 
+#if defined(__PSVITA__)
+        // Free the patterns block
+        if(RawPatterns) PSVITA_free(RawPatterns);
+#else
         // Free the patterns block
         if(RawPatterns) free(RawPatterns);
+#endif
 
 #if defined(__PSP__)
         RawPatterns = (unsigned char *) AUDIO_malloc_64(&max_lines);
-        if(!RawPatterns) return(FALSE);
+#else
+#if defined(__PSVITA__)
+        RawPatterns = (unsigned char *) PSVITA_malloc(max_lines);
 #else
         RawPatterns = (unsigned char *) malloc(max_lines);
-        if(!RawPatterns) return(FALSE);
 #endif
+#endif
+
+        if(!RawPatterns) return(FALSE);
 
         // Multi notes
         Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
@@ -1445,7 +1477,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
             }
 #endif
-
             for(int slwrite = 0; slwrite < MAX_INSTRS_SPLITS; slwrite++)
             {
                 Mod_Dat_Read(&SampleType[swrite][slwrite], sizeof(char));
@@ -1494,8 +1525,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                      );
 
+#if defined(__PSVITA__)
+                        Sample_Dest_Buffer = (short *) PSVITA_malloc((Save_Len * 2 * sizeof(short)) + 8);
+#else
                         Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 8);
                         memset(Sample_Dest_Buffer, 0, (Save_Len * 2 * sizeof(short)) + 8);
+#endif
+
                         // Interpolate samples
                         for(iSmp = 0; iSmp < Save_Len; iSmp++)
                         {
@@ -1535,7 +1571,6 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                                       );
                     }
-                    //*(RawSamples[swrite][0][slwrite]) = 0;
 
                     // Stereo flag
                     Mod_Dat_Read(&Sample_Channels[swrite][slwrite], sizeof(char));
@@ -1559,8 +1594,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                          );
 
+#if defined(__PSVITA__)
+                            Sample_Dest_Buffer = (short *) PSVITA_malloc((Save_Len * 2 * sizeof(short)) + 8);
+#else
                             Sample_Dest_Buffer = (short *) malloc((Save_Len * 2 * sizeof(short)) + 8);
                             memset(Sample_Dest_Buffer, 0, (Save_Len * 2 * sizeof(short)) + 8);
+#endif
+
                             for(iSmp = 0; iSmp < Save_Len; iSmp++)
                             {
                                 Sample1 = Sample_Buffer[iSmp];
@@ -1596,9 +1636,13 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
                                                                           );
                         }
-                        //*RawSamples[swrite][1][slwrite] = 0;
                     }
+
+#if defined(__PSVITA__)
+                    if(Sample_Buffer) PSVITA_free(Sample_Buffer);
+#else
                     if(Sample_Buffer) free(Sample_Buffer);
+#endif
 
                 }// Exist Sample
 #endif // PTK_INSTRUMENTS
@@ -1622,6 +1666,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             Mod_Dat_Read(&FRez[twrite], sizeof(int));
             Mod_Dat_Read(&DThreshold[twrite], sizeof(float));
             Mod_Dat_Read(&DClamp[twrite], sizeof(float));
+
 #if defined(PTK_COMPRESSOR)
             if(compressor)
             {
@@ -1650,7 +1695,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 #endif
 
-        // Tracks compressors
+        // Tracks compressors.
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 #if defined(PTK_LIMITER_TRACKS)
         if(Comp_Flag)
@@ -2048,7 +2093,11 @@ void PTKEXPORT Ptk_Stop(void)
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
     // Free the patterns block
+#if defined(__PSVITA__)
+    if(RawPatterns) PSVITA_free(RawPatterns);
+#else
     if(RawPatterns) free(RawPatterns);
+#endif
     RawPatterns = NULL;
 #endif
 
@@ -2474,16 +2523,16 @@ void Sp_Player(void)
 
 #if defined(PTK_303)
     float Signal_303 = 0.0f;
+    int fired_303_1;
+    int fired_303_2;
+    int trigger_note_off;
 #endif
 
     char gotsome;
     int c;
     int i;
     int j;
-    int trigger_note_off;
     int ct;
-    int fired_303_1;
-    int fired_303_2;
 
 #if defined(PTK_SYNTH) || defined(PTK_INSTRUMENTS)
     float dest_volume;
@@ -2649,7 +2698,7 @@ void Sp_Player(void)
                     ComputeStereo(ct);
 
 #if !defined(__STAND_ALONE__)
-                    if(userscreen == USER_SCREEN_TRACK_FX_EDIT)
+                    if(userscreen == USER_SCREEN_TRACK_EDIT)
                     {
                         gui_action_external |= GUI_UPDATE_EXTERNAL_SET_PANNING;
                     }
@@ -3707,9 +3756,6 @@ ByPass_Wav:
             fstep1 = POWF2(SIN[(int) (gr_value * 359.0f)] * FLANGER_AMPL[c]);
             fstep2 = POWF2(SIN[(int) (de_value * 359.0f)] * FLANGER_AMPL[c]);
 
-            //fstep1 = POWF2(sinf(FLANGER_GR[c]) * FLANGER_AMPL[c]);
-            //fstep2 = POWF2(sinf(FLANGER_GR[c] + FLANGER_DEPHASE[c]) * FLANGER_AMPL[c]);
-
             FLANGER_OFFSET2[c] += fstep1;
             FLANGER_OFFSET1[c] += fstep2;
 
@@ -4565,7 +4611,6 @@ void Do_Effects_Tick_0(void)
 
 #if defined(PTK_LIMITER_TRACKS)
                 case 0x29:
-
                     Compress_Track[trackef] = pltr_dat_row[j] & TRUE;
 
 #if !defined(__STAND_ALONE__)
@@ -4738,7 +4783,9 @@ void Do_Effects_Ticks_X(void)
     int64 pltr_eff_row[MAX_FX];
 #endif
 
+#if defined(PTK_FX_0) || defined(PTK_FX_X)
     int64 pltr_dat_row[MAX_FX];
+#endif
 
     for(int trackef = 0; trackef < Songtracks; trackef++)
     {
@@ -5572,7 +5619,7 @@ void Get_Player_Values(void)
 #if defined(PTK_FILTER_LOHIBAND)
 void ComputeCoefs(int freq, int r, int t)
 {
-    float omega = float(2 * PI * Kutoff(freq) / fMIX_RATE);
+    float omega = float(2 * PI * Cutoff(freq) / fMIX_RATE);
     float sn = (float) sinf(omega);
     float cs = (float) cosf(omega);
     float alpha;
@@ -5654,7 +5701,7 @@ float Filter(int stereo, float x, char i)
 }
 #endif
 
-float Kutoff(int v)
+float Cutoff(int v)
 {
     return POWF((v + 5.0f) / (127.0f + 5.0f), 1.7f) * 13000.0f + 30.0f;
 }
@@ -6431,12 +6478,24 @@ void Free_Samples(void)
         {
             if(SampleType[freer][pedsplit] != 0)
             {
+
+#if defined(__PSVITA__)
+                if(RawSamples[freer][0][pedsplit]) PSVITA_free(RawSamples[freer][0][pedsplit]);
+#else
                 if(RawSamples[freer][0][pedsplit]) free(RawSamples[freer][0][pedsplit]);
+#endif
                 RawSamples[freer][0][pedsplit] = NULL;
+
                 if(Sample_Channels[freer][pedsplit] == 2)
                 {
+
+#if defined(__PSVITA__)
+                    if(RawSamples[freer][1][pedsplit]) PSVITA_free(RawSamples[freer][1][pedsplit]);
+#else
                     if(RawSamples[freer][1][pedsplit]) free(RawSamples[freer][1][pedsplit]);
+#endif                    
                     RawSamples[freer][1][pedsplit] = NULL;
+                    
                 }
             }
 
@@ -6642,7 +6701,6 @@ float Do_RMS(float input, float *rms_sum, float *buffer)
 #endif
 
 #if defined(PTK_LIMITER_TRACKS)
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 void Mas_Compressor_Set_Variables_Track(int Track, float threshold, float ratio)
 {
     if(threshold < 0.01f) threshold = 0.01f;
@@ -6654,7 +6712,6 @@ void Mas_Compressor_Set_Variables_Track(int Track, float threshold, float ratio)
     mas_threshold_Track[Track] = threshold * 0.001f;
     mas_ratio_Track[Track] = ratio * 0.01f;
 }
-#endif
 
 float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *buffer, float *env)
 {
@@ -6842,6 +6899,18 @@ float Process_Sample(short *Data, int c, int i, unsigned int res_dec)
 }
 
 #if defined(USE_FASTPOW)
+#if defined(__PSP__)
+float FastPow2(float x)
+{
+	float result;
+
+	__asm__ volatile(
+		"mtv      %1, S000\n"
+		"vexp2.s  S000, S000\n"
+		"mfv      %0, S000\n"
+	: "=r"(result) : "r"(x));
+	return result;
+}
 void ToFloat(int *dest, int val)
 {
     *dest = val;
@@ -6850,6 +6919,28 @@ float FastLog(float i)
 {
 	float x;
 	float y;
+    return i;
+	x = (float) (*(int *) &i);
+	x *= 1.0f / (1 << 23);
+	x = x - 127;
+	y = x - floorf(x);
+	y = (y - y * y) * 0.346607f;
+	return x + y;
+}
+float FastPow(float a, float b)
+{
+    return FastPow2(b * FastLog(a));
+}
+#else
+void ToFloat(int *dest, int val)
+{
+    *dest = val;
+}
+float FastLog(float i)
+{
+	float x;
+	float y;
+    return i;
 	x = (float) (*(int *) &i);
 	x *= 1.0f / (1 << 23);
 	x = x - 127;
@@ -6871,6 +6962,7 @@ float FastPow(float a, float b)
 {
     return FastPow2(b * FastLog(a));
 }
+#endif
 #endif
 
 #if defined(PTK_TRACK_EQ)

@@ -6,7 +6,8 @@ targeting small sized intros, demos or games.
 It’s a heavily modified version of the old NoiseTrekker 2 which was made by
 Juan Antonio Arguelles Rius aka Arguru.
 
-Currently the tracker is available on Windows, Linux, FreeBSD, NetBSD, Amiga OS4, AROS, MorphOS, Mac OS (ppc, x86, ia64 & arm64) and Haiku OS.
+Currently the tracker is available on Windows, Linux, FreeBSD, NetBSD, Amiga OS4, AROS, MorphOS, Mac OS (ppc, x86, ia64 & arm64) and Haiku OS.<br><br>
+Standalone replay routines are available for most of these Operating Systems and also for the PlayStation Portable & PlayStation Vita.<br><br>
 
 ![alt text](ptk.png)
 
@@ -19,7 +20,7 @@ make -f makefile.linux
 
 The executable will be created in the release/distrib directory.
 
-Notice that you'll need SDL 1.<br>
+Notice that you'll need SDL 1 (only to compile the tracker, the replay routines themselves have no dependencies).<br>
 > [!CAUTION]
 > **When compiling for Linux or Mac OS: Use libSDL12 and NOT libSDL12-compat.**<br><br>
 > **On Linux use libsdl12-dev and on Mac OS use libsdl from Mac Ports.**<br><br>
@@ -52,4 +53,3 @@ So far, ProTrekkr was used in these intros or demos (the ones i'm aware of, at l
 <a href="https://soundcloud.com/defraq79/starburst" target=_parent>starburst</a><br>
 <br>A video recording of another module done with the tracker: <a href="https://www.youtube.com/watch?v=N5Hr4uiPAZk" target=_parent>Crutokk by Vojta Nedved</a>
 <br>Another video recording of yet another module done with the tracker: <a href="https://www.youtube.com/watch?v=XMvkCSP4eEs" target=_parent>Horse Heads and Gray Biscuits by Man With No Alias</a>
-
