@@ -189,8 +189,8 @@ namespace rePlayer
                                         break;
                                     if (*e == ';')
                                     {
-                                        *((char*)e) = '0';
-                                        if (auto* desc = htmlEntityLookup(BAD_CAST c))
+                                        *((char*)e) = '\0';
+                                        if (auto* desc = htmlEntityLookup(BAD_CAST c + 1))
                                             code = desc->value;
                                         *((char*)e) = ';';
                                         break;
