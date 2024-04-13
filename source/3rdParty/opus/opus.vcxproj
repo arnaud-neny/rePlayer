@@ -253,7 +253,6 @@
     <ClInclude Include="src\mapping_matrix.h" />
     <ClInclude Include="src\mlp.h" />
     <ClInclude Include="src\opus_private.h" />
-    <ClInclude Include="src\tansig_table.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -531,9 +531,6 @@
     <ClInclude Include="src\opus_private.h">
       <Filter>Source Files\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\tansig_table.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
     <ClInclude Include="celt\_kiss_fft_guts.h">
       <Filter>Source Files\celt</Filter>
     </ClInclude>
