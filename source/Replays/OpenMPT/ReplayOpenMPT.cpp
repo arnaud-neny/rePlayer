@@ -288,25 +288,37 @@ namespace rePlayer
         // Silence trimmer
         if (m_previousSubsongIndex != m_subsongIndex)
         {
-            StereoSample samples[1024];
-            uint64_t silenceStart = 0;
+            static constexpr uint32_t kSilenceSampleRate = 8000;
+            Array<float> samples(kSilenceSampleRate);
             uint64_t totalSamples = 0;
-            while (auto numSamples = int32_t(openmpt_module_read_interleaved_float_stereo(m_modulePlayback, kSampleRate, 1024, reinterpret_cast<float*>(samples))))
+            while (auto numSamples = int32_t(openmpt_module_read_float_mono(m_modulePlayback, kSilenceSampleRate, kSilenceSampleRate, samples.Items(totalSamples))))
             {
-                auto currentSample = totalSamples;
                 totalSamples += numSamples;
-                do
-                {
-                    static constexpr float kEpsilon = 1.0f / 32767.0f;
-                    if (fabsf(samples[numSamples - 1].left) > kEpsilon || fabsf(samples[numSamples - 1].right) > kEpsilon)
-                    {
-                        silenceStart = currentSample + numSamples;
-                        break;
-                    }
-                } while (--numSamples);
+                samples.Resize(totalSamples + kSilenceSampleRate);
             }
-            silenceStart += kSampleRate / 4; // keep 0.25 second of silence
-            m_silenceStart = silenceStart < totalSamples ? silenceStart : 0;
+            auto min = samples[totalSamples - 1];
+            auto max = min;
+            auto silenceStart = totalSamples - 2;
+            while (silenceStart > 0)
+            {
+                static constexpr float kEpsilon = 1.5f / 32767.0f;
+
+                auto sample = samples[silenceStart--];
+                if (sample < min)
+                {
+                    if (max - sample > kEpsilon)
+                        break;
+                    min = sample;
+                }
+                else if (sample > max)
+                {
+                    if (sample - min > kEpsilon)
+                        break;
+                    max = sample;
+                }
+            }
+            silenceStart += kSilenceSampleRate / 4; // keep 0.25 second of silence
+            m_silenceStart = silenceStart < totalSamples ? silenceStart * kSampleRate / kSilenceSampleRate : 0;
             setSubsong(m_modulePlayback);
             m_previousSubsongIndex = m_subsongIndex;
         }
