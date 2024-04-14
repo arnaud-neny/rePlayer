@@ -579,6 +579,8 @@ namespace rePlayer
                 }
             }
         }
+        else
+            m_isJobDone = true;
         return false;
     }
 
