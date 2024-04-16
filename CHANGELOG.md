@@ -1,4 +1,4 @@
-v0.15.7:
+v0.15.8:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -9,7 +9,7 @@ v0.15.7:
 - Updated ProTrekkr to 2.6.7
 - Updated vgmstream to r1917
 - Updated ImGui to 1.90.5
-- Updated libcurl to 8.7.0
+- Updated libcurl to 8.7.1 as static librray with minimal content instead of full dynamic library
 - Updated TagLib to 2.0.1
 - Patterns display
 - Playlist sort from current playing position while pressing Ctrl
