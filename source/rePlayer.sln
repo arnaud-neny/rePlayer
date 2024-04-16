@@ -49,6 +49,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rePlayer", "rePlayer.vcxpro
 		{CB2BCD62-79B7-4FE3-9E73-6E0CE897E49F} = {CB2BCD62-79B7-4FE3-9E73-6E0CE897E49F}
 		{CC06F84E-2084-412F-AD96-072E817AC5F1} = {CC06F84E-2084-412F-AD96-072E817AC5F1}
 		{D014771C-7F55-4370-A260-AFD76D9AC519} = {D014771C-7F55-4370-A260-AFD76D9AC519}
+		{D685A078-6C3B-40C9-8E18-E579DB032349} = {D685A078-6C3B-40C9-8E18-E579DB032349}
 		{D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A} = {D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A}
 		{DA587978-5CF8-4A18-AC8C-AAE280CE1811} = {DA587978-5CF8-4A18-AC8C-AAE280CE1811}
 		{E602781A-5C85-477D-891E-775A56ACAAD2} = {E602781A-5C85-477D-891E-775A56ACAAD2}
@@ -106,22 +107,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SidPlay", "Replays\SidPlay\
 	ProjectSection(ProjectDependencies) = postProject
 		{0CEABF47-2736-4562-A739-1C0C141FE547} = {0CEABF47-2736-4562-A739-1C0C141FE547}
 		{D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A} = {D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A}
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "curl", "curl", "{1FD156FC-24D8-477A-B472-AF278D96A748}"
-	ProjectSection(SolutionItems) = preProject
-		3rdParty\curl\curl\curl.h = 3rdParty\curl\curl\curl.h
-		3rdParty\curl\curl\curlver.h = 3rdParty\curl\curl\curlver.h
-		3rdParty\curl\curl\easy.h = 3rdParty\curl\curl\easy.h
-		3rdParty\curl\curl\header.h = 3rdParty\curl\curl\header.h
-		3rdParty\curl\curl\mprintf.h = 3rdParty\curl\curl\mprintf.h
-		3rdParty\curl\curl\multi.h = 3rdParty\curl\curl\multi.h
-		3rdParty\curl\curl\options.h = 3rdParty\curl\curl\options.h
-		3rdParty\curl\curl\stdcheaders.h = 3rdParty\curl\curl\stdcheaders.h
-		3rdParty\curl\curl\system.h = 3rdParty\curl\curl\system.h
-		3rdParty\curl\curl\typecheck-gcc.h = 3rdParty\curl\curl\typecheck-gcc.h
-		3rdParty\curl\curl\urlapi.h = 3rdParty\curl\curl\urlapi.h
-		3rdParty\curl\curl\websockets.h = 3rdParty\curl\curl\websockets.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundMon", "Replays\SoundMon\SoundMon.vcxproj", "{4DFE1552-48BC-4E6B-B538-654CF45D3477}"
@@ -424,6 +409,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ayumi", "Replays\Ayumi\Ayum
 		{D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A} = {D6B917E3-ABA1-48AF-A50C-31B2C76A5D0A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcurl", "3rdParty\libcurl\libcurl.vcxproj", "{D685A078-6C3B-40C9-8E18-E579DB032349}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -666,6 +653,10 @@ Global
 		{9B6BFBF8-A02B-45AB-B8DE-C69B0F8CA550}.Debug|x64.Build.0 = Debug|x64
 		{9B6BFBF8-A02B-45AB-B8DE-C69B0F8CA550}.Release|x64.ActiveCfg = Release|x64
 		{9B6BFBF8-A02B-45AB-B8DE-C69B0F8CA550}.Release|x64.Build.0 = Release|x64
+		{D685A078-6C3B-40C9-8E18-E579DB032349}.Debug|x64.ActiveCfg = Debug|x64
+		{D685A078-6C3B-40C9-8E18-E579DB032349}.Debug|x64.Build.0 = Debug|x64
+		{D685A078-6C3B-40C9-8E18-E579DB032349}.Release|x64.ActiveCfg = Release|x64
+		{D685A078-6C3B-40C9-8E18-E579DB032349}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -682,7 +673,6 @@ Global
 		{19C50841-5792-4702-8E06-DEB6E2ACE9E1} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
 		{7DA0C3AC-F37D-4734-A7E1-DE58A277FFE4} = {91F5AAAF-16C2-4D03-BFC5-84E8FBF8074F}
 		{F7F29CDE-4B4E-4502-82BB-8633D5459DEC} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
-		{1FD156FC-24D8-477A-B472-AF278D96A748} = {91F5AAAF-16C2-4D03-BFC5-84E8FBF8074F}
 		{4DFE1552-48BC-4E6B-B538-654CF45D3477} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
 		{16FA5AF3-DCE9-44EB-9395-83A8A4166E51} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
 		{AE37098E-32F6-4972-B0D7-1FB27FC15F6F} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
@@ -734,6 +724,7 @@ Global
 		{6B7D823B-93B3-4DF9-950E-E0E65C2C33FE} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
 		{5C87566C-554D-4E4B-A15F-FD7A204BCB8E} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
 		{9B6BFBF8-A02B-45AB-B8DE-C69B0F8CA550} = {5C723288-C5B9-4538-9D4F-70E9BA779077}
+		{D685A078-6C3B-40C9-8E18-E579DB032349} = {91F5AAAF-16C2-4D03-BFC5-84E8FBF8074F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68293275-090D-428A-8C14-F035E554155D}
