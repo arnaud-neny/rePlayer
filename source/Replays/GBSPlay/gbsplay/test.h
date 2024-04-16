@@ -10,6 +10,7 @@
 #define _TEST_H_
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define ASSERT_EQUAL(fmt, a, b) do { \
 	if ((a) != (b)) { \
@@ -101,15 +102,17 @@ int main(int argc, char** argv)
 
 #ifndef TEST_EOF
 
+// rePlayer begin
 #ifndef _MSVC
 #define test
 #define TEST(func) static int test_ ## func
 #define TEST_EOF static int test_eof
 #else
+// rePlayer end
 #define test static __attribute__((unused))
 #define TEST(func) static __attribute__((unused)) int test_ ## func
 #define TEST_EOF static __attribute__((unused)) int test_eof
-#endif
+#endif // rePlayer
 
 #endif
 

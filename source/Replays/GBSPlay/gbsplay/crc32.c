@@ -6,9 +6,9 @@
  * @brief implementation of CRC32
  **/
 
-#ifndef _MSC_VER
+#ifndef _MSC_VER // rePlayer
 #include <unistd.h>
-#endif
+#endif // rePlayer
 #include "common.h"
 
 #define POLYNOMIAL (unsigned long)0xedb88320

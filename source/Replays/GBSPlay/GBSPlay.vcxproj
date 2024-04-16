@@ -108,6 +108,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="gbsplay\crc32.h" />
     <ClInclude Include="gbsplay\gbcpu.h" />
     <ClInclude Include="gbsplay\gbhw.h" />
+    <ClInclude Include="gbsplay\gblfsr.h" />
     <ClInclude Include="gbsplay\gbs_internal.h" />
     <ClInclude Include="gbsplay\impulse.h" />
     <ClInclude Include="gbsplay\impulsegen.h" />
@@ -120,6 +121,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="gbsplay\crc32.c" />
     <ClCompile Include="gbsplay\gbcpu.c" />
     <ClCompile Include="gbsplay\gbhw.c" />
+    <ClCompile Include="gbsplay\gblfsr.c" />
     <ClCompile Include="gbsplay\gbs.c" />
     <ClCompile Include="gbsplay\impulsegen.c" />
     <ClCompile Include="gbsplay\mapper.c" />

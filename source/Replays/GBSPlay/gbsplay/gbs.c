@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef _MSC_VER
+#ifndef _MSC_VER // rePlayer
 #include <unistd.h>
-#endif
+#endif // rePlayer
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -47,6 +47,15 @@
 #define GZIP_MAGIC		"\037\213\010"
 
 const char *boot_rom_file = ".dmg_rom.bin";
+
+/* // rePlayer begin
+enum filetype {
+	FILETYPE_GBS = 0,
+	FILETYPE_GBR = 1,
+	FILETYPE_GB  = 2,
+	FILETYPE_VGM = 3,
+};
+// rePlayer end */
 
 struct gbs_subsong_info {
 	uint32_t len;  /* GBS_LEN_DIV (1024) == 1 second */
@@ -237,6 +246,8 @@ long gbs_init(struct gbs* const gbs, long subsong)
 	struct gbcpu *gbcpu = &gbhw->gbcpu;
 
 	gbhw_init(gbhw);
+	if (gbs->mapper)
+		mapper_init(gbs->mapper);
 
 	if (subsong == -1) subsong = gbs->defaultsong - 1;
 	if (subsong >= gbs->songs) {
@@ -284,9 +295,9 @@ static long chvol(const struct gbhw_channel channels[], long ch)
 	long v;
 
 	if (channels[ch].mute ||
-		channels[ch].master == 0 ||
-		(channels[ch].leftgate == 0 &&
-		 channels[ch].rightgate == 0)) return 0;
+	    channels[ch].master == 0 ||
+	    (channels[ch].leftgate == 0 &&
+	     channels[ch].rightgate == 0)) return 0;
 
 	if (ch == 2)
 		v = (3-((channels[2].env_volume+3)&3)) << 2;
@@ -395,7 +406,7 @@ long gbs_step(struct gbs* const gbs, long time_to_work)
 	}
 
 	if (gbs->silence_start &&
-		(gbs->ticks - gbs->silence_start) / GBHW_CLOCK >= gbs->silence_timeout) {
+	    (gbs->ticks - gbs->silence_start) / GBHW_CLOCK >= gbs->silence_timeout) {
 		if (gbs->subsong_info[gbs->subsong].len == 0) {
 			gbs->subsong_info[gbs->subsong].len = gbs->ticks * GBS_LEN_DIV / GBHW_CLOCK;
 		}
@@ -404,7 +415,7 @@ long gbs_step(struct gbs* const gbs, long time_to_work)
 
 	if (gbs->subsong_timeout && gbs->status.loop_mode != LOOP_SINGLE) {
 		if (gbs->fadeout &&
-			time >= gbs->subsong_timeout - gbs->fadeout - gbs->gap)
+		    time >= gbs->subsong_timeout - gbs->fadeout - gbs->gap)
 			gbhw_master_fade(gbhw, 128/gbs->fadeout, 0);
 		if (time >= gbs->subsong_timeout - gbs->gap)
 			gbhw_master_fade(gbhw, 128*16, 0);
@@ -418,37 +429,37 @@ long gbs_step(struct gbs* const gbs, long time_to_work)
 void gbs_print_info(const struct gbs* const gbs, long verbose)
 {
 	printf(_("GBSVersion:       %u\n"
-			 "Title:            \"%s\"\n"
-			 "Author:           \"%s\"\n"
-			 "Copyright:        \"%s\"\n"
-			 "Load address:     0x%04x\n"
-			 "Init address:     0x%04x\n"
-			 "Play address:     0x%04x\n"
-			 "Stack pointer:    0x%04x\n"
-			 "File size:        0x%08x\n"
-			 "ROM size:         0x%08lx (%ld banks)\n"
-			 "Subsongs:         %u\n"
-			 "Default subsong:  %u\n"),
-		   gbs->version,
-		   gbs->title,
-		   gbs->author,
-		   gbs->copyright,
-		   gbs->load,
-		   gbs->init,
-		   gbs->play,
-		   gbs->stack,
-		   (unsigned int)gbs->filesize,
-		   gbs->romsize,
-		   gbs->romsize/0x4000,
-		   gbs->songs,
-		   gbs->defaultsong);
+	         "Title:            \"%s\"\n"
+	         "Author:           \"%s\"\n"
+	         "Copyright:        \"%s\"\n"
+	         "Load address:     0x%04x\n"
+	         "Init address:     0x%04x\n"
+	         "Play address:     0x%04x\n"
+	         "Stack pointer:    0x%04x\n"
+	         "File size:        0x%08x\n"
+	         "ROM size:         0x%08lx (%ld banks)\n"
+	         "Subsongs:         %u\n"
+	         "Default subsong:  %u\n"),
+	       gbs->version,
+	       gbs->title,
+	       gbs->author,
+	       gbs->copyright,
+	       gbs->load,
+	       gbs->init,
+	       gbs->play,
+	       gbs->stack,
+	       (unsigned int)gbs->filesize,
+	       gbs->romsize,
+	       gbs->romsize/0x4000,
+	       gbs->songs,
+	       gbs->defaultsong);
 	if (gbs->tac & 0x04) {
 		printf(_("Timing:           %2.2fHz timer%s\n"),
-			   gbhw_calc_timer_hz(gbs->tac, gbs->tma),
-			   (gbs->tac & 0x78) == 0x40 ? _(" + VBlank (ugetab)") : "");
+		       gbhw_calc_timer_hz(gbs->tac, gbs->tma),
+		       (gbs->tac & 0x78) == 0x40 ? _(" + VBlank (ugetab)") : "");
 	} else {
 		printf(_("Timing:           %s\n"),
-			   _("59.7Hz VBlank\n"));
+		       _("59.7Hz VBlank\n"));
 	}
 	if (gbs->defaultbank != 1) {
 		printf(_("Bank @0x4000:     %d\n"), gbs->defaultbank);
@@ -1244,8 +1255,6 @@ static struct gbs *gzip_open(const char* const name, char* const buf, size_t siz
 exit_free:
 	if (gbs == NULL || gbs->buf != out) {
 		free(out);
-	} else {
-		gbs->filetype += 4;
 	}
 	return gbs;
 }
@@ -1318,6 +1327,7 @@ exit_close:
 	return gbs;
 }
 
+// rePlayer begin
 struct gbs* gbs_open_memory(const char* const name, char* const buf, size_t size)
 {
 	struct gbs* gbs = NULL;
@@ -1341,6 +1351,7 @@ enum filetype gbs_get_filetype(const struct gbs* const gbs)
 {
 	return gbs->filetype;
 }
+// rePlayer end
 
 struct gbs_internal_api gbs_internal_api = {
 	.version = GBS_VERSION,

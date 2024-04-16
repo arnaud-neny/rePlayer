@@ -10,10 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifndef _MSC_VER
+#ifndef _MSC_VER // rePlayer
 #include <sys/param.h>
 #include <unistd.h>
-#endif
+#endif // rePlayer
 #include <string.h>
 #include <assert.h>
 

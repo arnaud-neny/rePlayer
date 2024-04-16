@@ -118,6 +118,7 @@ enum gbs_filter_type {
 	FILTER_CGB, /**< Gameboy Color high-pass filter */
 };
 
+// rePlayer begin
 /**
  * File type.  Enumerates the available gb file formats.
  */
@@ -131,6 +132,7 @@ enum filetype {
 	FILETYPE_GB_Z = 6,
 	FILETYPE_VGZ = 7
 };
+// rePlayer end
 
 //
 //////  typedefs
@@ -202,7 +204,7 @@ typedef long (*gbs_nextsubsong_cb)(struct gbs* const gbs, void *priv);
  * @return an opaque @link struct gbs @endlink to be passed to other functions or NULL on error
  */
 struct gbs *gbs_open(const char* const name);
-struct gbs* gbs_open_memory(const char* const name, char* const buf, size_t size);
+struct gbs* gbs_open_memory(const char* const name, char* const buf, size_t size); // rePlayer
 
 void gbs_configure(struct gbs* const gbs, long subsong, long subsong_timeout, long silence_timeout, long subsong_gap, long fadeout);
 void gbs_configure_channels(struct gbs* const gbs, long mute_0, long mute_1, long mute_2, long mute_3);
@@ -222,6 +224,6 @@ void gbs_cycle_loop_mode(struct gbs* const gbs);
 long gbs_toggle_mute(struct gbs* const gbs, long channel);
 void gbs_close(struct gbs* const gbs);
 long gbs_write(const struct gbs* const gbs, const char* const name);
-enum filetype gbs_get_filetype(const struct gbs* const gbs);
+enum filetype gbs_get_filetype(const struct gbs* const gbs); // rePlayer
 
 #endif

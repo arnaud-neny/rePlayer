@@ -50,6 +50,9 @@
     <ClInclude Include="gbsplay\test.h">
       <Filter>Source Files\gbsplay</Filter>
     </ClInclude>
+    <ClInclude Include="gbsplay\gblfsr.h">
+      <Filter>Source Files\gbsplay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayGBSPlay.cpp">
@@ -71,6 +74,9 @@
       <Filter>Source Files\gbsplay</Filter>
     </ClCompile>
     <ClCompile Include="gbsplay\impulsegen.c">
+      <Filter>Source Files\gbsplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gbsplay\gblfsr.c">
       <Filter>Source Files\gbsplay</Filter>
     </ClCompile>
   </ItemGroup>

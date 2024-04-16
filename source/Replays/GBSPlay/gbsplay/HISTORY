@@ -2,8 +2,51 @@
 gbsplay HISTORY
 
 
+2024/xx/xx  -  unreleased
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bugfixes:
+
+- gbs core:
+  - fix noise channel LSFR for more faithful drumtracks in most ROMs
+  - fix generated MIDI files being ~1.5% too slow
+  - reset cartridge RAM on subsong change to prevent the state of a
+    subsong from influencing later subsongs
+
+- gbsplay
+  - fix display of unknown version number (gbsplay -V)
+
+Enhancements:
+
+- build process
+  - display version number during configure
+
+
+2024/02/04  -  0.0.96
+~~~~~~~~~~~~~~~~~~~~~
+
+Bugfixes:
+
+- build process:
+  - fix build errors of devdsp plugout on FreeBSD
+
+Enhancements:
+
+- gbsplay:
+  - add PipeWire plugout
+  - add application and filename to audio stream metadata
+    (currently works with PipeWire, PulseAudio and with SDL2 depending
+     on the configured audio backend)
+
+- build process:
+  - add automated build pipeline for FreeBSD (arm64)
+
+
 2024/01/25  -  0.0.95
 ~~~~~~~~~~~~~~~~~~~~~
+
+(entries marked with (*) are present in version 0.0.95 but were
+ missing in the HISTORY file released with version 0.0.95)
 
 Bugfixes:
 
@@ -43,6 +86,7 @@ Bugfixes:
   - fix Windows builds on MSYS2, MINGW32 and MINGW64
   - fix library path detection on macOS
   - fix SDL2 detection
+  - (*) fix dist target in Makefile
 
 - documentation:
   - fix typos in manpage
@@ -72,6 +116,7 @@ Enhancements:
   - display '99:99' as remaining time when no subsong timeout is set
   - enforce minimum subsong timeout when playing actual ROMS
     (otherwise gbsplay might quit before the bootrom beep is played)
+  - (*) implement our own rand() function to keep shuffle tests stable on MSYS
 
 - gbs core:
   - transparent decompression of gzip-compressed files

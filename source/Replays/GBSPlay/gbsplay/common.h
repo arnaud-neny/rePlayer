@@ -25,10 +25,10 @@ typedef uint64_t cycles_t;
 #define HAVE_MINGW 1
 #endif
 
-#ifndef true
+#if !defined(_MSC_VER) && !defined(true) // rePlayer
 #define true (0==0)
 #define false (!true)
-#endif
+#endif // rePlayer
 
 #define UNUSED(x) (void)(x)
 
@@ -108,6 +108,7 @@ static inline void i18n_init(void) {}
 
 #endif
 
+// rePlayer begin
 #ifdef _MSC_VER
 #  define __ORDER_BIG_ENDIAN__ 1
 #  define __ORDER_LITTLE_ENDIAN__ 2
@@ -119,6 +120,7 @@ static inline void i18n_init(void) {}
 #    define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #  endif
 #else
+// rePlayer end
 
 #if !defined(__BYTE_ORDER__) || !defined(__ORDER_LITTLE_ENDIAN__) || !defined(__ORDER_BIG_ENDIAN__)
 #error Unsupported compiler
@@ -132,7 +134,7 @@ static inline void i18n_init(void) {}
 #if __ORDER_BIG_ENDIAN__ != 4321
 #error Unexpected endian value
 #endif
-#endif
+#endif // rePlayer
 
 #define GBS_BYTE_ORDER __BYTE_ORDER__
 #define GBS_ORDER_LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
