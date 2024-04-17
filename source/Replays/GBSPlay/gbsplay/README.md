@@ -1,10 +1,11 @@
 # gbsplay - A Gameboy sound player
 
-[![Code coverage status](https://codecov.io/github/mmitch/gbsplay/coverage.svg?branch=master)](https://codecov.io/github/mmitch/gbsplay?branch=master)
-[![Linux Build status](https://github.com/mmitch/gbsplay/workflows/Linux%20Build/badge.svg?branch=master)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22Linux+Build%22)
-[![macOS Build status](https://github.com/mmitch/gbsplay/workflows/macOS%20Build/badge.svg?branch=master)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22macOS+Build%22)
-[![Windows Build status](https://github.com/mmitch/gbsplay/workflows/Windows%20Build/badge.svg?branch=master)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22Windows+Build%22)
-[![CodeQL status](https://github.com/mmitch/gbsplay/workflows/CodeQL/badge.svg?branch=master)](https://github.com/mmitch/gbsplay/actions?query=workflow%3ACodeQL)
+[![Code coverage status](https://codecov.io/github/mmitch/gbsplay/coverage.svg)](https://codecov.io/github/mmitch/gbsplay?branch=master)
+[![Linux Build status](https://github.com/mmitch/gbsplay/workflows/Linux%20Build/badge.svg)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22Linux+Build%22)
+[![FreeBSD Build status](https://github.com/mmitch/gbsplay/workflows/FreeBSD%20Build/badge.svg)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22FreeBSD+Build%22)
+[![macOS Build status](https://github.com/mmitch/gbsplay/workflows/macOS%20Build/badge.svg)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22macOS+Build%22)
+[![Windows Build status](https://github.com/mmitch/gbsplay/workflows/Windows%20Build/badge.svg)](https://github.com/mmitch/gbsplay/actions?query=workflow%3A%22Windows+Build%22)
+[![CodeQL status](https://github.com/mmitch/gbsplay/workflows/CodeQL/badge.svg)](https://github.com/mmitch/gbsplay/actions?query=workflow%3ACodeQL)
 
 This program emulates the sound hardware of the Nintendo Gameboy.  It
 is able to play the sounds from a Gameboy module dump (.GBS format, as
@@ -13,8 +14,7 @@ format; button input and graphics are not supported) and Gameboy Video
 Game Music dumps (.VGM/.VGZ format).
 
 Homepage/Repo:   https://github.com/mmitch/gbsplay/
-Bug reports:     please send new bugs to the mailing list
-                 or use the issue tracker at
+Bug reports:     please use the issue tracker at
                  https://github.com/mmitch/gbsplay/issues
 
 gbsplay is compatible to GBSv1.  It uses a backwards compatible extension
@@ -31,7 +31,7 @@ the following parts:
 ## License
 
 ```
-(C) 2003-2022 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
+(C) 2003-2024 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
                  Christian Garbs <mitch@cgarbs.de>
                  Maximilian Rehkopf <otakon@gmx.net>
                  Vegard Nossum <vegardno@ifi.uio.no>
