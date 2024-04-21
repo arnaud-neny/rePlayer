@@ -542,7 +542,7 @@ static void player_DoAllMacros(TfmxState* state) {
 static void player_ChannelOff(TfmxState* state, int i) {
     struct Cdb* c;
 
-    if (i & 0xF < 8)
+    if ((i & 0xF) < 8)
     {
         c = &state->cdb[i & 0xF];
         if (!c->SfxFlag) {
