@@ -114,8 +114,7 @@ namespace core::io
         ::CloseHandle(m_handle);
         m_handle = INVALID_HANDLE_VALUE;
 
-        m_stream = StreamMemory::Create(m_name, data.Items(), data.Size(), true);
-        m_stream->m_mem = m_cachedData;
+        m_stream = StreamMemory::Create(m_name, m_cachedData, data.Size());
         return data;
     }
 

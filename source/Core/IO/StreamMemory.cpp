@@ -19,6 +19,17 @@ namespace core::io
         return stream;
     }
 
+    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, SharedMemory* sharedMemory, size_t size)
+    {
+        SmartPtr<StreamMemory> stream;
+        stream.New();
+        stream->m_buffer = reinterpret_cast<const uint8_t*>(sharedMemory->m_ptr);
+        stream->m_size = size;
+        stream->m_name = filename;
+        stream->m_mem = sharedMemory;
+        return stream;
+    }
+
     size_t StreamMemory::Read(void* buffer, size_t size)
     {
         auto remainingSize = m_size - m_position;
@@ -62,8 +73,7 @@ namespace core::io
 
     SmartPtr<Stream> StreamMemory::OnClone()
     {
-        auto stream = Create(m_name, m_buffer, m_size, true);
-        stream->m_mem = m_mem;
+        auto stream = Create(m_name, m_mem, m_size);
         return static_cast<SmartPtr<Stream>>(stream);
     }
 

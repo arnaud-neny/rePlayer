@@ -22,26 +22,30 @@ namespace core::io
         virtual size_t Read(void* buffer, size_t size) = 0;
         virtual Status Seek(int64_t offset, SeekWhence whence) = 0;
 
-        virtual size_t GetSize() const = 0;
-        virtual size_t GetPosition() const = 0;
+        virtual [[nodiscard]] size_t GetSize() const = 0;
+        virtual [[nodiscard]] size_t GetPosition() const = 0;
 
-        virtual const std::string& GetName() const = 0;
+        virtual void SetName(const std::string& name) { (void)name; }
+        virtual [[nodiscard]] const std::string& GetName() const = 0;
 
-        virtual std::string GetInfo() const { return {}; }
-        virtual std::string GetTitle() const { return {}; }
+        virtual [[nodiscard]] std::string GetComments() const { return {}; }
+        virtual [[nodiscard]] std::string GetInfo() const { return {}; }
+        virtual [[nodiscard]] std::string GetTitle() const { return {}; }
 
-        SmartPtr<Stream> Clone();
+        [[nodiscard]] SmartPtr<Stream> Clone();
 
         // open another stream in the same context as the current one
-        virtual SmartPtr<Stream> Open(const std::string& filename) = 0;
+        virtual [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) = 0;
+        // open the next entry in the stream (eg: archive)
+        virtual [[nodiscard]] SmartPtr<Stream> Next();
 
         // read all the stream
-        virtual const Span<const uint8_t> Read();
+        virtual [[nodiscard]] const Span<const uint8_t> Read();
 
     protected:
         Stream() = default;
 
-        virtual SmartPtr<Stream> OnClone() = 0;
+        virtual [[nodiscard]] SmartPtr<Stream> OnClone() = 0;
 
     private:
         Stream(const Stream&) = delete;

@@ -7,26 +7,26 @@ namespace core::io
     class StreamMemory : public Stream
     {
         friend class SmartPtr<StreamMemory>;
-        friend class StreamFile;
     public:
-        static SmartPtr<StreamMemory> Create(const std::string& filename, const uint8_t* buffer, size_t size, bool isStatic);
+        static [[nodiscard]] SmartPtr<StreamMemory> Create(const std::string& filename, const uint8_t* buffer, size_t size, bool isStatic);
+        static [[nodiscard]] SmartPtr<StreamMemory> Create(const std::string& filename, SharedMemory* sharedMemory, size_t size);
 
         size_t Read(void* buffer, size_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
 
-        size_t GetSize() const final;
-        size_t GetPosition() const final;
+        [[nodiscard]] size_t GetSize() const final;
+        [[nodiscard]] size_t GetPosition() const final;
 
-        void SetName(const std::string& filename) { m_name = filename; }
-        const std::string& GetName() const final { return m_name; }
+        void SetName(const std::string& filename) final { m_name = filename; }
+        [[nodiscard]] const std::string& GetName() const final { return m_name; }
 
-        SmartPtr<Stream> Open(const std::string& filename) override;
+        [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) override;
 
-        const Span<const uint8_t> Read() final;
+        [[nodiscard]] const Span<const uint8_t> Read() final;
 
     private:
         StreamMemory() = default;
-        SmartPtr<Stream> OnClone() final;
+        [[nodiscard]] SmartPtr<Stream> OnClone() final;
 
     private:
         SmartPtr<SharedMemory> m_mem;
