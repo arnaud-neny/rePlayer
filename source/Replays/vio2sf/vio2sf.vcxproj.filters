@@ -15,9 +15,6 @@
     <Filter Include="Source Files\psflib">
       <UniqueIdentifier>{0b64f16f-a9c1-4261-b5ac-b2a2555123d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayVio2sf.h">
@@ -171,10 +168,5 @@
     <None Include="desmume\thumb_tabdef.inc">
       <Filter>Source Files\desmume</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
 </Project>

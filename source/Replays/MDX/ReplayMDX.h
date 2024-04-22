@@ -8,8 +8,6 @@ extern "C"
 #include "mdxmini/src/mdxmini.h"
 }
 
-struct archive;
-
 namespace rePlayer
 {
     class ReplayMDX : public Replay
@@ -62,8 +60,9 @@ namespace rePlayer
         static constexpr uint32_t kSampleRate = 48000;
 
     private:
-        ReplayMDX(t_mdxmini&& mdx, archive* mdxArchive, uint32_t fileIndex, std::string&& filename, io::Stream* stream);
-        ReplayMDX(t_mdxmini&& mdx, io::Stream* stream);
+        ReplayMDX(t_mdxmini&& mdx, uint32_t fileIndex, io::Stream* stream, SmartPtr<io::Stream> mdxStream);
+
+        static size_t LoadCB(const char* filename, void** buf, void* user_data);
 
     private:
         SmartPtr<io::Stream> m_stream;

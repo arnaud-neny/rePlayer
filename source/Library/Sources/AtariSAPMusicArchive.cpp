@@ -266,7 +266,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceAtariSAPMusicArchive::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceAtariSAPMusicArchive::ImportSong(SourceID sourceId, const std::string& path)
     {
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);

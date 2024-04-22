@@ -351,7 +351,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceSNDH::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceSNDH::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;

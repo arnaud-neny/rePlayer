@@ -544,10 +544,12 @@ namespace rePlayer
             }
 
             ImGui::TableNextColumn();
+            ImGui::BeginDisabled(m_song.edited.subsongs[0].isArchive);
             auto extIndex = int32_t(m_mappedExtensions[int32_t(m_song.edited.type.ext)]);
             ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
             ImGui::Combo("##Extension", &extIndex, m_sortedExtensionNames, int32_t(eExtension::Count));
             m_song.edited.type.ext = m_sortedExtensions[extIndex];
+            ImGui::EndDisabled();
 
             ImGui::EndTable();
         }

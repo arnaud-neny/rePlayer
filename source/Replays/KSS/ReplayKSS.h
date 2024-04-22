@@ -58,8 +58,7 @@ namespace rePlayer
         static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
     private:
-        ReplayKSS(KSS* kss, CommandBuffer metadata);
-        ReplayKSS(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata);
+        ReplayKSS(io::Stream* stream, Array<uint32_t>&& subsongs, KSS* kss, std::string&& title, CommandBuffer metadata);
 
         void SetupMetadata(CommandBuffer metadata);
 
@@ -77,7 +76,7 @@ namespace rePlayer
         Array<uint32_t> m_subsongs;
 
         std::string m_title;
-        uint32_t m_currentSubsongIndex = 0xffFFffFF;
+        uint32_t m_currentSubsongIndex = 0;
 
         static int32_t ms_masterVolume;
         static int32_t ms_devicePan;

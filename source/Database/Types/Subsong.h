@@ -33,8 +33,9 @@ namespace rePlayer
                 uint8_t isPlayed : 1;       // subsong has been fully played (no seek) at least once
                 uint8_t isDirty : 1;        // force rebuild of subsongs
                 uint8_t isInvalid : 1;      // can't play (no known replay has been found)
-                uint8_t deprecated : 1;     //
+                uint8_t isPackage : 1;      // the file is an archive and only the first entry is playable (extension .7pk, only for library)
                 uint8_t isUnavailable : 1;  // can't load (download failed)
+                uint8_t isArchive : 1;      // the file is an archive (extension .7pk, only for library)
             };
         };
         BlobString<storage> name;
@@ -88,7 +89,11 @@ namespace rePlayer
     template <Blob::Storage storage>
     inline void SubsongData<storage>::Clear()
     {
+        auto oldIsPackage = isPackage;
+        auto oldIsArchive = isArchive;
         *this = SubsongData();
+        isPackage = oldIsPackage;
+        isArchive = oldIsArchive;
     }
 
     template <Blob::Storage storage>

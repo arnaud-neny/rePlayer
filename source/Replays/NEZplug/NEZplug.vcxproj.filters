@@ -51,9 +51,6 @@
     <Filter Include="Source Files\libnezplug\opltable">
       <UniqueIdentifier>{46296e9c-bffa-4b48-85db-823e25c8d3b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{6cb9665f-40c5-4c9d-8654-b7a0573cf003}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayNEZplug.h">
@@ -379,10 +376,5 @@
     <ClCompile Include="ReplayNEZplugMUS2KSS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
 </Project>

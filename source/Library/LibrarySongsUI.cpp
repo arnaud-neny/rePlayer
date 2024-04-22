@@ -108,7 +108,7 @@ namespace rePlayer
             filename += str;
         }
         filename += ".";
-        filename += song->GetType().GetExtension();
+        filename += song->IsArchive() ? "7z" : song->GetType().GetExtension();
         return filename;
     }
 
@@ -164,10 +164,14 @@ namespace rePlayer
                         uint32_t id;
                         if (sscanf_s(filename.c_str() + filename.size() - sizeof("][00000000]") + 1, "][%08X]", &id))
                         {
-                            auto f = GetFullpath(m_db[SongID(id)]);
-                            std::filesystem::path songPath = io::File::Convert(f.c_str());
-                            if (!std::filesystem::exists(songPath) || !std::filesystem::equivalent(filePath, songPath))
-                                isLostFile = true;
+                            isLostFile = !m_db.IsValid(SongID(id));
+                            if (!isLostFile)
+                            {
+                                auto f = GetFullpath(m_db[SongID(id)]);
+                                std::filesystem::path songPath = io::File::Convert(f.c_str());
+                                if (!std::filesystem::exists(songPath) || !std::filesystem::equivalent(filePath, songPath))
+                                    isLostFile = true;
+                            }
                         }
                         else
                             isLostFile = true;

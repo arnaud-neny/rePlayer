@@ -84,7 +84,6 @@ namespace rePlayer
         void SetupMetadata(CommandBuffer metadata);
 
     private:
-        SmartPtr<io::Stream> m_streamArchive;
         SmartPtr<io::Stream> m_stream;
         const psf_file_callbacks m_psfFileSystem = {
             "\\/|:",

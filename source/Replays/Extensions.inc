@@ -145,8 +145,8 @@ EXTENSION(nsf)          // GME & NEZplug
 EXTENSION(nsfe)         // GME & NEZplug
 EXTENSION(spc)
 EXTENSION(rsn)
-EXTENSION(mdx)
-EXTENSION(mdxPk)
+EXTENSION(mdx)          // MDX
+EXTENSION(mdxPk)        // deprecated (turned into 7z)
 EXTENSION(s98)
 EXTENSION(aps)          // UADE: AProSys
 EXTENSION(ast)          // UADE: ActionAmics & VGMStream: Nintendo AST
@@ -290,9 +290,9 @@ EXTENSION(tpu)          // UADE: DirkBialluch
 EXTENSION(qpa)          // UADE: Quartet
 EXTENSION(qts)          // UADE: Quartet_ST & Quartet
 EXTENSION(miniqsf)      // Highly Quixotic
-EXTENSION(qsfPk)        // Highly Quixotic
+EXTENSION(qsfPk)        // deprecated (turned into 7z)
 EXTENSION(minigsf)      // Highly Advanced
-EXTENSION(gsfPk)        // Highly Advanced
+EXTENSION(gsfPk)        // deprecated (turned into 7z)
 EXTENSION(ymst)         // UADE: YMST
 EXTENSION(wav)          // WAV
 EXTENSION(sid)          // SidPlay & UADE: SidMon1
@@ -318,28 +318,28 @@ EXTENSION(xmf)          // OpenMPT
 EXTENSION(mdat)         // TFMX & UADE: TFMX
 EXTENSION(ttt)          // TIATracker
 EXTENSION(mini2sf)      // vio2sf
-EXTENSION(2sfPk)        // vio2sf
+EXTENSION(2sfPk)        // deprecated (turned into 7z)
 EXTENSION(minissf)      // Highly Theoretical
-EXTENSION(ssfPk)        // Highly Theoretical
+EXTENSION(ssfPk)        // deprecated (turned into 7z)
 EXTENSION(minidsf)      // Highly Theoretical
-EXTENSION(dsfPk)        // Highly Theoretical
+EXTENSION(dsfPk)        // deprecated (turned into 7z)
 EXTENSION(ssf)          // Highly Theoretical
 EXTENSION(dsf)          // Highly Theoretical & DSD & VGMStream: Ocean DSF
 EXTENSION(gsf)          // Highly Advanced & VGMStream: Electronic Arts SCHl
 EXTENSION(2sf)          // vio2sf
 EXTENSION(minipsf)      // Highly Experimental
-EXTENSION(psfPk)        // Highly Experimental
+EXTENSION(psfPk)        // deprecated (turned into 7z)
 EXTENSION(psf2)         // Highly Experimental
 EXTENSION(minipsf2)     // Highly Experimental
-EXTENSION(psf2Pk)       // Highly Experimental
+EXTENSION(psf2Pk)       // deprecated (turned into 7z)
 EXTENSION(usf)          // LazyUSF
 EXTENSION(miniusf)      // LazyUSF
-EXTENSION(usfPk)        // LazyUSF
+EXTENSION(usfPk)        // deprecated (turned into 7z)
 EXTENSION(tf)           // UADE: TimFollin
 EXTENSION(cust)         // UADE: custom
 EXTENSION(snsf)         // Highly Competitive
 EXTENSION(minisnsf)     // Highly Competitive
-EXTENSION(snsfPk)       // Highly Competitive
+EXTENSION(snsfPk)       // deprecated (turned into 7z)
 EXTENSION(prt)          // UADE: PreTracker
 EXTENSION(mtr)          // Adlib: Master Tracker
 EXTENSION(buz2)         // Buzzic 2
@@ -389,10 +389,10 @@ EXTENSION(pcd)          // ZXTune: Powerfull Code Decreaser
 EXTENSION(soc)          // UADE: Jochen_Hippel_ST
 EXTENSION(sog)          // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)         // UADE: JochenHippel
-EXTENSION(mbmPk)        // KSS
-EXTENSION(musPk)        // NEZplug: FAC SoundTracker
+EXTENSION(mbmPk)        // deprecated (turned into 7z)
+EXTENSION(musPk)        // deprecated (turned into 7z)
 EXTENSION(eup)          // Euphony
-EXTENSION(eupPk)        // Euphony
+EXTENSION(eupPk)        // deprecated (turned into 7z)
 EXTENSION(4v)           // Quartet
 EXTENSION(fur)          // Furnace
 EXTENSION(aac)          // AAC

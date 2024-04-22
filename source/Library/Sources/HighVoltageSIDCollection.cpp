@@ -249,7 +249,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceHighVoltageSIDCollection::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceHighVoltageSIDCollection::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);

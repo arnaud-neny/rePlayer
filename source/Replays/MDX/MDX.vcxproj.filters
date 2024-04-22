@@ -12,9 +12,6 @@
     <Filter Include="Source Files\mdxmini">
       <UniqueIdentifier>{fced46cc-5d95-4ac2-894e-32c1b4a358ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{4b8242b0-d43f-48f3-994e-2cddd98bc77c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayMDX.h">
@@ -81,10 +78,5 @@
     <None Include="mdxmini\src\tl_tab.dat">
       <Filter>Source Files\mdxmini</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
 </Project>

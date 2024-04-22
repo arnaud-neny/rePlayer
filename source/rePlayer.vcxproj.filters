@@ -182,6 +182,12 @@
     <ClCompile Include="Deck\Patterns.cpp">
       <Filter>Source Files\Deck</Filter>
     </ClCompile>
+    <ClCompile Include="IO\StreamArchive.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\LibraryPatch.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGui.h">
@@ -381,6 +387,9 @@
     </ClInclude>
     <ClInclude Include="Deck\Patterns.h">
       <Filter>Source Files\Deck</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\StreamArchive.h">
+      <Filter>Source Files\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

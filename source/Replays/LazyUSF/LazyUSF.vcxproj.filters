@@ -12,9 +12,6 @@
     <Filter Include="Source Files\psflib">
       <UniqueIdentifier>{0b64f16f-a9c1-4261-b5ac-b2a2555123d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\lazyusf2">
       <UniqueIdentifier>{3846730c-c24b-4131-8877-8cd9abf77776}</UniqueIdentifier>
     </Filter>
@@ -595,11 +592,6 @@
     <ClCompile Include="lazyusf2\vi\vi_controller.c">
       <Filter>Source Files\lazyusf2\vi</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <None Include="lazyusf2\r4300\interpreter.def">

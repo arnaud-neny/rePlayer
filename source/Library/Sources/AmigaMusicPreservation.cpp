@@ -623,7 +623,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceAmigaMusicPreservation::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceAmigaMusicPreservation::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;

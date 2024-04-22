@@ -9,9 +9,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\snes9x">
       <UniqueIdentifier>{ce60cc9b-9595-40f7-9e85-d685e8513457}</UniqueIdentifier>
     </Filter>
@@ -229,10 +226,5 @@
     <ClCompile Include="ReplayHighlyCompetitiveWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
 </Project>

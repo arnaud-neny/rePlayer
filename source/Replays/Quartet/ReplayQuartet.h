@@ -68,7 +68,6 @@ namespace rePlayer
         struct Driver : public zz_vfs_dri_s
         {
             SmartPtr<io::Stream> stream;
-            bool isInternalQts;
         };
 
     private:

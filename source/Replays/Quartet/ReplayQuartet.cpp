@@ -45,9 +45,6 @@ namespace rePlayer
     {
         if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 128)
             return nullptr;
-        auto data = stream->Read();
-        stream->Seek(0, io::Stream::kSeekBegin);
-        ms_driver.isInternalQts = memcmp(data.Items(), "QTST-MOD", 8) == 0;
         ms_driver.stream = stream;
 
         zz_vfs_add(&ms_driver);
@@ -161,7 +158,7 @@ namespace rePlayer
     }
 
     ReplayQuartet::ReplayQuartet(zz_play_t player, zz_u8_t format, CommandBuffer metadata)
-        : Replay(ms_driver.isInternalQts ? eExtension::_qts : format == ZZ_FORMAT_4V ? eExtension::_4v : eExtension::Unknown, eReplay::Quartet)
+        : Replay(format == ZZ_FORMAT_4V ? eExtension::_4v : eExtension::Unknown, eReplay::Quartet)
         , m_player(player)
         , m_surround(kSampleRate)
     {
@@ -206,7 +203,8 @@ namespace rePlayer
     void ReplayQuartet::ResetPlayback()
     {
         m_surround.Reset();
-        zz_close(m_player);
+        zz_del(&m_player);
+        zz_new(&m_player);
         zz_u8_t format;
         ms_driver.stream->Seek(0, io::Stream::kSeekBegin);
         zz_load(m_player, ms_driver.stream->GetName().c_str(), nullptr, &format);
@@ -308,22 +306,7 @@ namespace rePlayer
         fileHandle->dri = &ms_driver;
         fileHandle->uri = uri;
         if (ms_driver.stream->GetName() == uri)
-        {
-            if (ms_driver.isInternalQts)
-            {
-                auto data = ms_driver.stream->Read();
-                auto offset = *data.Items<const uint32_t>(8);
-                fileHandle->stream = io::StreamMemory::Create(uri, data.Items(12), offset - 12, true);
-            }
-            else
-                fileHandle->stream = ms_driver.stream;
-        }
-        else if (ms_driver.isInternalQts)
-        {
-            auto data = ms_driver.stream->Read();
-            auto offset = *data.Items<const uint32_t>(8);
-            fileHandle->stream = io::StreamMemory::Create(uri, data.Items(offset), data.NumItems() - offset, true);
-        }
+            fileHandle->stream = ms_driver.stream;
         else
             fileHandle->stream = ms_driver.stream->Open(uri);
         return fileHandle;

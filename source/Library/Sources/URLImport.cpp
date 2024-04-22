@@ -34,7 +34,7 @@ namespace rePlayer
         (void)name; (void)collectedSongs;
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceURLImport::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceURLImport::ImportSong(SourceID sourceId, const std::string& path)
     {
         (void)path;
         return { StreamUrl::Create(m_strings.Items(m_songs[sourceId.internalId].url)), false };

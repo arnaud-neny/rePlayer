@@ -12,9 +12,6 @@
     <Filter Include="Source Files\psflib">
       <UniqueIdentifier>{aa84cb30-6abb-46c9-aff9-489bbd846f5c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{d8e5a52b-e1dc-481a-8d8e-9c70fde30428}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\mGBA">
       <UniqueIdentifier>{12873674-cd73-4003-8e9e-2c6a05d7f013}</UniqueIdentifier>
     </Filter>
@@ -634,10 +631,5 @@
     <ClCompile Include="mGBA\src\core\version.c">
       <Filter>Source Files\mGBA\src\core</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
 </Project>

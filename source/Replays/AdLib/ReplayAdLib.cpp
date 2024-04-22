@@ -59,44 +59,8 @@ namespace rePlayer
     {
     public:
         RawFileProvider(io::Stream* stream)
-        {
-            // check for internal packaged formats
-            auto data = stream->Read();
-            if (memcmp(data.Items(), "KENS-ADB", 8) == 0)
-            {
-                auto offset = *data.Items<const uint32_t>(8);
-                m_stream = io::StreamMemory::Create(stream->GetName(), data.Items(12), offset - 12, true);
-                m_otherProvider = new RawFileProvider(io::StreamMemory::Create("insts.dat", data.Items(offset), data.NumItems() - offset, true));
-            }
-            else if (memcmp(data.Items(), "ABTR-ADB", 8) == 0)
-            {
-                auto offset = *data.Items<const uint32_t>(8);
-                auto name = stream->GetName();
-                m_stream = io::StreamMemory::Create(name, data.Items(12), offset - 12, true);
-                auto pos = name.find_last_of('.');
-                name[pos + 1] = 'i';
-                name[pos + 2] = 'n';
-                name[pos + 3] = 's';
-                m_otherProvider = new RawFileProvider(io::StreamMemory::Create(name, data.Items(offset), data.NumItems() - offset, true));
-            }
-            else if (memcmp(data.Items(), "SIRA-ADB", 8) == 0)
-            {
-                auto offset = *data.Items<const uint32_t>(8);
-                m_stream = io::StreamMemory::Create(stream->GetName(), data.Items(12), offset - 12, true);
-                m_otherProvider = new RawFileProvider(io::StreamMemory::Create("patch.003", data.Items(offset), data.NumItems() - offset, true));
-            }
-            else if (memcmp(data.Items(), "VICO-ADB", 8) == 0)
-            {
-                auto offset = *data.Items<const uint32_t>(8);
-                m_stream = io::StreamMemory::Create(stream->GetName(), data.Items(12), offset - 12, true);
-                m_otherProvider = new RawFileProvider(io::StreamMemory::Create("standard.bnk", data.Items(offset), data.NumItems() - offset, true));
-            }
-            else
-            {
-                stream->Seek(0, io::Stream::kSeekBegin);
-                m_stream = stream;
-            }
-        }
+            : m_stream(stream)
+        {}
 
         ~RawFileProvider()
         {
@@ -106,7 +70,7 @@ namespace rePlayer
 
         binistream* open(std::string filename) const override
         {
-            if (filename != m_stream->GetName())
+            if (_stricmp(filename.c_str(), m_stream->GetName().c_str()))
             {
                 if (!m_otherProvider)
                 {

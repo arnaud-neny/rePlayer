@@ -134,11 +134,25 @@ namespace rePlayer
         return Dynamic()->subsongs[0].isInvalid;
     }
 
+    const bool Song::IsPackage() const
+    {
+        if (dataSize != 0)
+            return subsongs[0].isPackage;
+        return Dynamic()->subsongs[0].isPackage;
+    }
+
     const bool Song::IsUnavailable() const
     {
         if (dataSize != 0)
             return subsongs[0].isUnavailable;
         return Dynamic()->subsongs[0].isUnavailable;
+    }
+
+    const bool Song::IsArchive() const
+    {
+        if (dataSize != 0)
+            return subsongs[0].isArchive;
+        return Dynamic()->subsongs[0].isArchive;
     }
 
     const char* Song::GetName() const

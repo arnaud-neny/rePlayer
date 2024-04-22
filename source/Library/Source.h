@@ -82,12 +82,21 @@ namespace rePlayer
             Array<Artist> alternatives;
         };
 
+        struct Import
+        {
+            SmartPtr<io::Stream> stream;
+            bool isMissing = false;
+            bool isArchive = false;
+            bool isPackage = false;
+            eExtension extension = eExtension::Unknown;
+        };
+
     public:
         virtual ~Source() {}
         virtual void FindArtists(ArtistsCollection& artists, const char* name) = 0;
         virtual void ImportArtist(SourceID importedArtistID, SourceResults& results) = 0;
         virtual void FindSongs(const char* name, SourceResults& collectedSongs) = 0;
-        virtual std::pair<SmartPtr<io::Stream>, bool> ImportSong(SourceID sourceId, const std::string& path) = 0;
+        virtual Import ImportSong(SourceID sourceId, const std::string& path) = 0;
         virtual void OnArtistUpdate(ArtistSheet* artist) = 0;
         virtual void OnSongUpdate(const Song* const song) = 0;
         virtual void DiscardSong(SourceID sourceId, SongID newSongId) = 0;

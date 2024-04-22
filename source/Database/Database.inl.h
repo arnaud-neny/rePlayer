@@ -126,6 +126,16 @@ namespace rePlayer
         return m_artists.m_revision;
     }
 
+    inline uint32_t Database::SongsVersion() const
+    {
+        return m_songs.m_version;
+    }
+
+    inline uint32_t Database::ArtistsVersion() const
+    {
+        return m_artists.m_version;
+    }
+
     inline std::string Database::GetTitle(SubsongID subsongId) const
     {
         return GetTitle(subsongId.songId, subsongId.index);

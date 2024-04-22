@@ -1,11 +1,6 @@
 #include "ReplayNEZplug.h"
 
-#include <Core/Log.h>
 #include <Core/String.h>
-#include <IO/StreamMemory.h>
-
-#include <libarchive/archive.h>
-#include <libarchive/archive_entry.h>
 
 namespace rePlayer
 {
@@ -50,12 +45,12 @@ namespace rePlayer
         return data + size;
     }
 
-    NEZ_PLAY* ReplayNEZplug::LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamDefault, io::Stream* streamArchive)
+    NEZ_PLAY* ReplayNEZplug::LoadMUS(const uint8_t* data, uint32_t size, io::Stream* stream)
     {
         if (size < 0x4007)
             return nullptr;
 
-        auto ext = strrchr(filename.c_str(), '.');
+        auto ext = strrchr(stream->GetName().c_str(), '.');
         if (!ext || _stricmp(ext, ".mus"))
             return nullptr;
 
@@ -256,49 +251,13 @@ namespace rePlayer
             }
 
             SmartPtr<io::Stream> drumStreams[2];
-            if (streamArchive)
+            drumStreams[0] = stream->Open(drumKitName);
+            if (drumStreams[0] && drumStreams[0]->Read().NumItems() >= 0x4007)
             {
-                auto* musPk = archive_read_new();
-                archive_read_support_format_all(musPk);
-                archive_read_open_memory(musPk, streamArchive->Read().Items(8), streamArchive->Read().Size() - 8);
-
-                archive_entry* entry;
-                while (!(drumStreams[0] && drumStreams[1]) && archive_read_next_header(musPk, &entry) == ARCHIVE_OK)
-                {
-                    int32_t target = -1;
-                    if (_stricmp(archive_entry_pathname(entry), drumKitName) == 0)
-                        target = 0;
-                    else
-                    {
-                        drumKitExt[4] = '2';
-                        if (_stricmp(archive_entry_pathname(entry), drumKitName) == 0)
-                            target = 1;
-                        drumKitExt[4] = '1';
-                    }
-                    if (target >= 0)
-                    {
-                        auto fileSize = archive_entry_size(entry);
-                        Array<uint8_t> unpackedData;
-                        unpackedData.Resize(fileSize);
-                        auto readSize = archive_read_data(musPk, unpackedData.Items(), fileSize);
-                        if (readSize >= 0x4007)
-                            drumStreams[target] = io::StreamMemory::Create(archive_entry_pathname(entry), unpackedData.Detach(), readSize, false);
-                        else
-                            Log::Error("NEZplug: can't find drum kit \"%s\"\n", archive_entry_pathname(entry));
-                    }
-                }
-                archive_read_free(musPk);
-            }
-            else
-            {
-                drumStreams[0] = streamDefault->Open(drumKitName);
-                if (drumStreams[0] && drumStreams[0]->Read().NumItems() >= 0x4007)
-                {
-                    drumKitExt[4] = '2';
-                    drumStreams[1] = streamDefault->Open(drumKitName);
-                    if (drumStreams[1] && drumStreams[1]->Read().NumItems() < 0x4007)
-                        drumStreams[1].Reset();
-                }
+                drumKitExt[4] = '2';
+                drumStreams[1] = stream->Open(drumKitName);
+                if (drumStreams[1] && drumStreams[1]->Read().NumItems() < 0x4007)
+                    drumStreams[1].Reset();
             }
             if (drumStreams[0] && drumStreams[1])
             {

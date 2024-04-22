@@ -51,6 +51,7 @@ namespace rePlayer
         void ProcessImports();
 
         void Load();
+        void Patch();
 
         void ProcessFailedDeletes();
 

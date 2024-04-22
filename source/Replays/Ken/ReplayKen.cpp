@@ -123,34 +123,6 @@ namespace rePlayer
         loader.stream = stream;
         smsndsamplerate = ksmsamplerate = kdmsamplerate = kSampleRate;
 
-        uint64_t header = 0;
-        stream->Read(&header, sizeof(header));
-        if (memcmp(&header, "KENS-ADB", 8) == 0)
-        {
-            auto data = stream->Read();
-            auto offset = *data.Items<const uint32_t>(8);
-            loader.stream = io::StreamMemory::Create(stream->GetName(), data.Items(12), offset - 12, true);
-            auto duration = ksmload(&loader);
-            if (duration > 0)
-            {
-                speed = 240;
-                return new ReplayKen(eExtension::_ksm, uint32_t(duration));
-            }
-            return nullptr;
-        }
-        else if (memcmp(&header, "KENS-KDM", 8) == 0)
-        {
-            auto data = stream->Read();
-            auto offset = *data.Items<const uint32_t>(8);
-            loader.stream = io::StreamMemory::Create(stream->GetName(), data.Items(12), offset - 12, true);
-            loader.stream2 = io::StreamMemory::Create("waves.kwv", data.Items(offset), data.NumItems() - offset, true);
-            auto duration = kdmload(&loader);
-            if (duration > 0)
-                return new ReplayKen(eExtension::_kdm, uint32_t(duration));
-            freekdmeng();
-            return nullptr;
-        }
-        stream->Seek(0, io::Stream::kSeekBegin);
         auto duration = kdmload(&loader);
         if (duration > 0)
             return new ReplayKen(eExtension::_kdm, uint32_t(duration));

@@ -209,7 +209,7 @@ namespace rePlayer
         curl_easy_cleanup(curl);
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceZXArt::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceZXArt::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;

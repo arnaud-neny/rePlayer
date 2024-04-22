@@ -479,7 +479,7 @@ namespace rePlayer
 #endif
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceTheModArchive::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceTheModArchive::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;

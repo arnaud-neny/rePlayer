@@ -59,12 +59,11 @@ namespace rePlayer
         static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
     private:
-        ReplayNEZplug(NEZ_PLAY* nezPlay, eExtension extension, CommandBuffer metadata);
-        ReplayNEZplug(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata);
+        ReplayNEZplug(io::Stream* stream, Array<uint32_t>&& subsongs, NEZ_PLAY* nezPlay, eExtension extension, std::string&& title, CommandBuffer metadata);
 
         void SetupMetadata(CommandBuffer metadata);
 
-        static NEZ_PLAY* LoadMUS(const uint8_t* data, uint32_t size, const std::string& filename, io::Stream* streamDefault, io::Stream* streamArchive);
+        static NEZ_PLAY* LoadMUS(const uint8_t* data, uint32_t size, io::Stream* stream);
 
     private:
         NEZ_PLAY* m_nezPlay;
@@ -77,7 +76,7 @@ namespace rePlayer
         Array<uint32_t> m_subsongs;
 
         std::string m_title;
-        uint32_t m_currentSubsongIndex = 0xffFFffFF;
+        uint32_t m_currentSubsongIndex = 0;
 
         static int32_t ms_gain;
         static int32_t ms_filter;

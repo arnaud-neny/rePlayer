@@ -47,6 +47,9 @@ namespace rePlayer
         uint32_t SongsRevision() const;
         uint32_t ArtistsRevision() const;
 
+        uint32_t SongsVersion() const;
+        uint32_t ArtistsVersion() const;
+
         std::string GetTitle(SongID songId, int32_t subsongIndex = -1) const;
         std::string GetTitle(SubsongID subsongId) const;
         std::string GetArtists(SongID songId) const;
@@ -130,6 +133,7 @@ namespace rePlayer
             uint32_t m_numItems = 0;
             uint32_t m_revision = 0;
             uint32_t m_frozenIndex = 0;
+            uint32_t m_version = 0;
             thread::SpinLock m_spinLock;
         };
 

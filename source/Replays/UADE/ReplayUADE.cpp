@@ -114,7 +114,7 @@ namespace rePlayer
         auto data = buffer.Items();
         for (auto& entry : ms_replayOverrides)
         {
-            if (memcmp(data, entry.header, 8) == 0)
+            if (memcmp(data, entry.header, 8) == 0 || stream->GetComments() == entry.header)
             {
                 replayOverride = &entry;
                 break;
@@ -148,15 +148,15 @@ namespace rePlayer
                 }
             }
         }
-        if (!isPlayerSet && replayOverride && replayOverride->player)
-            uade_config_set_option(config, UC_PLAYER_FILE, replayOverride->player);
+        if (!isPlayerSet && stream->GetComments() == "MDST-MOD")
+            uade_config_set_option(config, UC_PLAYER_FILE, "/players/TFMX_ST");
 
         uade_state* state = uade_new_state(config);
         free(config);
         if (state == nullptr)
             return nullptr;
 
-        auto replay = new ReplayUADE(stream, state);
+        auto replay = new ReplayUADE(stream, state, replayOverride);
         uade_set_amiga_loader(ReplayUADE::AmigaLoader, replay, state);
 
         auto filepath = std::filesystem::path(stream->GetName());
@@ -221,14 +221,8 @@ namespace rePlayer
         auto dataSize = buffer.Size();
         if (This->m_stream->GetName().ends_with(name))
         {
-            for (auto& replayOverride : ms_replayOverrides)
-            {
-                if (memcmp(data, replayOverride.header, 8) == 0)
-                {
-                    replayOverride.main(This, data, dataSize);
-                    break;
-                }
-            }
+            if (This->m_replayOverride)
+                This->m_replayOverride->main(This, data, dataSize);
 
             struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
             f->name = strdup(name);
@@ -255,17 +249,14 @@ namespace rePlayer
         }
 
         // rePlayer extra formats
-        for (auto& replayOverride : ms_replayOverrides)
+        if (This->m_replayOverride && This->m_replayOverride->load(This, data, name, dataSize))
         {
-            if (memcmp(data, replayOverride.header, 8) == 0 && replayOverride.load(This, data, name, dataSize))
-            {
-                struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
-                f->name = strdup(name);
-                f->size = dataSize;
-                f->data = (char*)malloc(dataSize);
-                memcpy(f->data, data, dataSize);
-                return f;
-            }
+            struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
+            f->name = strdup(name);
+            f->size = dataSize;
+            f->data = (char*)malloc(dataSize);
+            memcpy(f->data, data, dataSize);
+            return f;
         }
 
         // load from the current stream
@@ -562,11 +553,12 @@ namespace rePlayer
         delete[] m_durations;
     }
 
-    ReplayUADE::ReplayUADE(io::Stream* stream, uade_state* uadeState)
+    ReplayUADE::ReplayUADE(io::Stream* stream, uade_state* uadeState, ReplayOverride* replayOverride)
         : Replay(eExtension::Unknown, eReplay::UADE)
         , m_stream(stream)
         , m_uadeState(uadeState)
         , m_surround(kSampleRate)
+        , m_replayOverride(replayOverride)
     {}
 
     uint32_t ReplayUADE::Render(StereoSample* output, uint32_t numSamples)
@@ -620,14 +612,10 @@ namespace rePlayer
             // rePlayer extra formats
             auto data = buffer.Items();
             auto dataSize = buffer.Size();
-            for (auto& replayOverride : ms_replayOverrides)
+            if (m_replayOverride)
             {
-                if (memcmp(data, replayOverride.header, 8) == 0)
-                {
-                    replayOverride.build(this, data, filepath, dataSize);
-                    filename = filepath.filename().string();
-                    break;
-                }
+                m_replayOverride->build(this, data, filepath, dataSize);
+                filename = filepath.filename().string();
             }
 
             uade_play_from_buffer(filename.c_str(), data, dataSize, subsongIndex, m_uadeState);

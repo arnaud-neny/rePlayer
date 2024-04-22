@@ -144,7 +144,7 @@ namespace rePlayer
         if (file.IsValid())
         {
             auto version = file.Read<uint64_t>();
-            if (version <= kVersion)
+            if ((version & 0xffFFffFF) == kMusicFileStamp && (version >> 32) <= (kVersion >> 32))
             {
                 m_cue.entries.Resize(file.Read<uint32_t>());
                 m_oldCurrentEntryIndex = m_currentEntryIndex = file.Read<int32_t>();
@@ -227,7 +227,9 @@ namespace rePlayer
 
                     cue.entries.Resize(summary.numSubsongs);
                     auto version = file.Read<uint64_t>();
-                    if (version <= kVersion || LoadPlaylist(file, cue, version) != Status::kOk)
+                    if ((version & 0xffFFffFF) != kMusicFileStamp
+                        || (version >> 32) > (kVersion >> 32)
+                        || LoadPlaylist(file, cue, version) != Status::kOk)
                         continue;
                     file = io::File(); // close file
 
@@ -1326,7 +1328,7 @@ namespace rePlayer
                             m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
 
                             auto version = file.Read<uint64_t>();
-                            if (version <= kVersion)
+                            if ((version & 0xffFFffFF) == kMusicFileStamp && (version >> 32) <= (kVersion >> 32))
                                 LoadPlaylist(file, m_cue, version);
                             else
                                 assert(0 && "file read error");
@@ -1513,7 +1515,7 @@ namespace rePlayer
                             if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
                             {
                                 if (MediaType::extensionLengths[i] == pathStem.size() || pathStem[MediaType::extensionLengths[i]] == '.')
-                                    prefix = MediaType::GetExtension<char8_t>(i);
+                                    prefix = reinterpret_cast<const char8_t*>(MediaType::extensionNames[i]);
                             }
                         }
                     }

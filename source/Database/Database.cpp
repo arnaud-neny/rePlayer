@@ -64,7 +64,7 @@ namespace rePlayer
         m_items.Clear();
         m_availableIds.Clear();
 
-        auto version = file.Read<uint32_t>();
+        auto version = m_version = file.Read<uint32_t>();
         if (version > ItemType::kVersion)
         {
             assert(0 && "file read error");

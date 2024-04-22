@@ -3,11 +3,8 @@
 #include <Audio/Audiotypes.inl.h>
 #include <Core/String.h>
 #include <Imgui.h>
-#include <IO/StreamMemory.h>
 #include <ReplayDll.h>
 
-#include <libarchive/archive.h>
-#include <libarchive/archive_entry.h>
 #include <filesystem>
 
 namespace rePlayer
@@ -17,84 +14,57 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Euphony,
         .name = "eupmini",
-        .extensions = "eup;eupPk",
+        .extensions = "eup",
         .about = "eupmini\nCopyright (c) 1995-1997, 2000 Tomoaki Hayasaka\nWin32 porting 2002, 2003 IIJIMA Hiromitsu aka Delmonta, and anonymous K\n2023 Giangiacomo Zaffini",
         .load = ReplayEuphony::Load
     };
 
     Replay* ReplayEuphony::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 64)
-            return nullptr;
-        auto eupbuf = stream->Read();
-        if (memcmp(eupbuf.Items(), "EUPH-PKG", 8) == 0)
+        Array<uint32_t> subsongs;
+        uint32_t fileIndex = 0;
+        for (SmartPtr<io::Stream> eupStream = stream; eupStream; eupStream = eupStream->Next())
         {
-            auto* archive = archive_read_new();
-            archive_read_support_format_all(archive);
-            uint32_t fileIndex = 0;
-            Array<uint32_t> subsongs;
-            if (archive_read_open_memory(archive, eupbuf.Items(8), eupbuf.Size() - 8) == ARCHIVE_OK)
+            if (stream->GetSize() > sizeof(EUPHEAD))
             {
-                archive_entry* entry;
-                while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-                {
-                    std::filesystem::path entryPath(archive_entry_pathname(entry));
-                    if (_stricmp(entryPath.extension().string().c_str(), ".eup") == 0)
-                        subsongs.Add(fileIndex);
-                    fileIndex++;
-                }
+                auto eupbuf = stream->Read();
+                auto* eupHeader = eupbuf.Items<const EUPHEAD>();
+                if (eupHeader->size >= 0 && (eupbuf.Size() - eupHeader->size) == 3598)
+                    subsongs.Add(fileIndex);
             }
-            archive_read_free(archive);
-
-            if (subsongs.IsNotEmpty())
-                return new ReplayEuphony(stream, std::move(subsongs));
-            return nullptr;
+            fileIndex++;
         }
-        else if (eupbuf.Size() < 2048 + 6 + 6)
-            return nullptr;
-
-        auto* eupHeader = eupbuf.Items<const EUPHEAD>();
-        if (eupHeader->size < 0 || (eupbuf.Size() - eupHeader->size) != 3598)
-            return nullptr;
-
-        return new ReplayEuphony(stream, {});
+        if (subsongs.IsNotEmpty())
+            return new ReplayEuphony(stream, std::move(subsongs));
+        return nullptr;
     }
 
-    EUPPlayer* ReplayEuphony::Load(int32_t subsongIndex)
+    EUPPlayer* ReplayEuphony::Load()
     {
-        auto eupbuf = m_stream->Read();
-        if (subsongIndex >= 0)
+        auto stream = m_stream;
+        stream->Seek(0, io::Stream::kSeekBegin);
+        for (uint32_t fileIndex = 0; stream; fileIndex++)
         {
-            auto data = m_stream->Read();
-            auto* archive = archive_read_new();
-            archive_read_support_format_all(archive);
-            archive_read_open_memory(archive, data.Items(8), data.Size() - 8);
-            archive_entry* entry;
-            for (int32_t fileIndex = 0; fileIndex < subsongIndex; ++fileIndex)
+            if (fileIndex == m_subsongs[m_subsongIndex])
             {
-                archive_read_next_header(archive, &entry);
-                archive_read_data_skip(archive);
-            }
-            archive_read_next_header(archive, &entry);
-            std::filesystem::path entryPath(archive_entry_pathname(entry));
-            m_title = reinterpret_cast<const char*>(entryPath.stem().u8string().c_str());
+                std::filesystem::path entryPath(stream->GetName());
+                m_title = reinterpret_cast<const char*>(entryPath.stem().u8string().c_str());
 
-            auto fileSize = archive_entry_size(entry);
-            m_data.Resize(fileSize);
-            auto readSize = archive_read_data(archive, m_data.Items(), fileSize);
-            assert(readSize == fileSize);
-            eupbuf = { m_data.Items(), m_data.NumItems() };
+                m_data.Resize(stream->GetSize());
+                stream->Read(m_data.Items(), m_data.NumItems());
+                break;
+            }
         }
 
         // とりあえず, TOWNS emu のみに対応.
 
-        if (eupbuf.Size() < 2048 + 6 + 6)
+        if (m_data.Size() < 2048 + 6 + 6)
             return nullptr;
 
         // ヘッダ読み込み用バッファ
-        auto* eupHeader = eupbuf.Items<const EUPHEAD>();
+        auto* eupHeader = m_data.Items<const EUPHEAD>();
 
-        if (eupHeader->size < 0 || (eupbuf.Size() - eupHeader->size) != 3598)
+        if (eupHeader->size < 0 || (m_data.Size() - eupHeader->size) != 3598)
             return nullptr;
 
         EUP_TownsEmulator* device = new EUP_TownsEmulator;
@@ -150,40 +120,13 @@ namespace rePlayer
             }
             if (fn0[0])
             {
-                if (subsongIndex < 0)
+                std::filesystem::path fn1(fn0);
+                fn1.replace_extension("fmb");
+                if (auto fmbStream = m_stream->Open(fn1.string()))
                 {
-                    std::filesystem::path fn1(fn0);
-                    fn1.replace_extension(".fmb");
-                    if (auto fmbStream = m_stream->Open(fn1.string()))
-                    {
-                        auto fmbData = fmbStream->Read();
-                        for (size_t n = 0; n < (fmbData.Size() - 8) / 48; n++)
-                            device->setFmInstrumentParameter(int(n), fmbData.Items(8 + 48 * n));
-                    }
-                }
-                else
-                {
-                    strcat_s(fn0, ".fmb");
-                    auto data = m_stream->Read();
-                    auto* archive = archive_read_new();
-                    archive_read_support_format_all(archive);
-                    archive_read_open_memory(archive, data.Items(8), data.Size() - 8);
-                    archive_entry* entry;
-                    while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-                    {
-                        auto entryName = archive_entry_pathname(entry);
-                        if (_stricmp(entryName, fn0) == 0)
-                        {
-                            auto fileSize = archive_entry_size(entry);
-                            Array<uint8_t> fmbData(fileSize);
-                            auto readSize = archive_read_data(archive, fmbData.Items(), fileSize);
-                            assert(readSize == fileSize);
-
-                            for (la_ssize_t n = 0; n < (readSize - 8) / 48; n++)
-                                device->setFmInstrumentParameter(int(n), fmbData.Items(8 + 48 * n));
-                            break;
-                        }
-                    }
+                    auto fmbData = fmbStream->Read();
+                    for (size_t n = 0; n < (fmbData.Size() - 8) / 48; n++)
+                        device->setFmInstrumentParameter(int(n), fmbData.Items(8 + 48 * n));
                 }
             }
         }
@@ -201,43 +144,17 @@ namespace rePlayer
             }
             if (fn0[0])
             {
-                if (subsongIndex < 0)
+                std::filesystem::path fn1(fn0);
+                fn1.replace_extension("pmb");
+                if (auto pmbStream = m_stream->Open(fn1.string()))
                 {
-                    std::filesystem::path fn1(fn0);
-                    fn1.replace_extension(".pmb");
-                    if (auto pmbStream = m_stream->Open(fn1.string()))
-                    {
-                        auto pmbData = pmbStream->Read();
-                        device->setPcmInstrumentParameters(pmbData.Items(), pmbData.Size());
-                    }
-                }
-                else
-                {
-                    strcat_s(fn0, ".pmb");
-                    auto data = m_stream->Read();
-                    auto* archive = archive_read_new();
-                    archive_read_support_format_all(archive);
-                    archive_read_open_memory(archive, data.Items(8), data.Size() - 8);
-                    archive_entry* entry;
-                    while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-                    {
-                        auto entryName = archive_entry_pathname(entry);
-                        if (_stricmp(entryName, fn0) == 0)
-                        {
-                            auto fileSize = archive_entry_size(entry);
-                            Array<uint8_t> pmbData(fileSize);
-                            auto readSize = archive_read_data(archive, pmbData.Items(), fileSize);
-                            assert(readSize == fileSize);
-
-                            device->setPcmInstrumentParameters(pmbData.Items(), readSize);
-                            break;
-                        }
-                    }
+                    auto pmbData = pmbStream->Read();
+                    device->setPcmInstrumentParameters(pmbData.Items(), pmbData.Size());
                 }
             }
         }
 
-        player->startPlaying(eupbuf.Items(2048 + 6));
+        player->startPlaying(m_data.Items(2048 + 6));
         memset(&device->pcm, 0, sizeof(device->pcm));
 
         return player;
@@ -254,11 +171,11 @@ namespace rePlayer
     }
 
     ReplayEuphony::ReplayEuphony(io::Stream* stream, Array<uint32_t>&& subsongs)
-        : Replay(subsongs.IsEmpty() ? eExtension::_eup : eExtension::_eupPk, eReplay::Euphony)
+        : Replay(eExtension::_eup, eReplay::Euphony)
         , m_stream(stream)
         , m_subsongs(std::move(subsongs))
     {
-        m_player = Load(m_subsongs.IsEmpty() ? -1 : m_subsongs[0]);
+        m_player = Load();
     }
 
     uint32_t ReplayEuphony::GetSampleRate() const
@@ -338,7 +255,7 @@ namespace rePlayer
 
     void ReplayEuphony::ResetPlayback()
     {
-        if (auto* player = Load(m_subsongs.IsNotEmpty() ? m_subsongs[m_subsongIndex] : -1))
+        if (auto* player = Load())
         {
             if (m_player)
             {
@@ -376,7 +293,7 @@ namespace rePlayer
 
     uint32_t ReplayEuphony::GetNumSubsongs() const
     {
-        return m_subsongs.IsEmpty() ? 1 : m_subsongs.NumItems();
+        return m_subsongs.NumItems();
     }
 
     std::string ReplayEuphony::GetSubsongTitle() const
@@ -387,9 +304,7 @@ namespace rePlayer
     std::string ReplayEuphony::GetExtraInfo() const
     {
         std::string metadata;
-        auto* eupHeader = m_subsongs.IsEmpty() ? m_stream->Read().Items<const EUPHEAD>() : m_data.Items<const EUPHEAD>();
-        if (!eupHeader)
-            return metadata;
+        auto* eupHeader = m_data.Items<const EUPHEAD>();
         if (eupHeader->title[0])
         {
             metadata = "Title  : ";

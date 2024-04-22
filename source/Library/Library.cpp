@@ -13,6 +13,7 @@
 #include <Database/Types/Countries.h>
 #include <Deck/Deck.h>
 #include <Deck/Player.h>
+#include <IO/StreamArchive.h>
 #include <Library/LibraryArtistsUI.h>
 #include <Library/LibrarySongsUI.h>
 #include <Library/Sources/AmigaMusicPreservation.h>
@@ -83,7 +84,14 @@ namespace rePlayer
     {
         auto filename = m_songs->GetFullpath(song);
 
-        SmartPtr<io::Stream> stream = song->GetFileSize() > 0 ? io::StreamFile::Create(filename) : nullptr;
+        SmartPtr<io::Stream> stream;
+        if (song->GetFileSize() > 0)
+        {
+            if (song->IsArchive())
+                stream = StreamArchive::Create(filename, song->IsPackage());
+            else
+                stream = io::StreamFile::Create(filename);
+        }
         if (stream.IsInvalid())
         {
             auto songSheet = song->Edit();
@@ -112,9 +120,12 @@ namespace rePlayer
             {
                 auto sourceId = songSheet->sourceIds[i];
                 auto importedSong = m_sources[sourceId.sourceId]->ImportSong(sourceId, filename);
-                stream = importedSong.first;
+                stream = importedSong.stream;
                 if (stream.IsValid())
                 {
+                    songSheet->subsongs[0].isPackage = importedSong.isPackage;
+                    songSheet->subsongs[0].isArchive = importedSong.isArchive;
+
                     // if the first source wasn't available, the next available becomes the default
                     if (i != 0)
                     {
@@ -139,13 +150,31 @@ namespace rePlayer
                     // save the downloaded song
                     if (moduleData.IsNotEmpty())
                     {
+                        if (importedSong.isArchive)
+                        {
+                            // archives are 7zip
+                            std::filesystem::path path(filename);
+                            path.replace_extension("7z");
+                            filename = path.string();
+                            stream = StreamArchive::Create(stream, song->IsPackage());
+                        }
+                        else if (importedSong.extension != eExtension::Unknown && songSheet->type.ext != importedSong.extension)
+                        {
+                            // corrective in case it has been edited
+                            std::filesystem::path path(filename);
+                            path.replace_extension(MediaType::extensionNames[int(importedSong.extension)]);
+                            filename = path.string();
+                            songSheet->type.ext = importedSong.extension;
+                            stream->SetName(filename);
+                        }
+
                         auto file = io::File::OpenForWrite(filename.c_str());
                         file.Write(moduleData.Items(), moduleData.Size());
                     }
 
                     break;
                 }
-                else if (importedSong.second)
+                else if (importedSong.isMissing)
                 {
                     --i;
                     songSheet->sourceIds.RemoveAt(0);
@@ -1225,6 +1254,8 @@ namespace rePlayer
 
         for (auto* source : m_sources)
             source->Load();
+
+        Patch();
     }
 
     void Library::Save()

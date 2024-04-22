@@ -7,8 +7,6 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
-#include <libarchive/archive.h>
-#include <libarchive/archive_entry.h>
 #include <filesystem>
 
 namespace rePlayer
@@ -43,49 +41,44 @@ namespace rePlayer
         if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024 * 128)
             return nullptr;
 
-        auto data = stream->Read();
-        if (memcmp(data.Items(), "MBMK-PKG", 8) == 0)
+        Array<uint32_t> subsongs;
+        uint32_t fileIndex = 0;
+        KSS* kss0 = nullptr;
+        std::string title;
+        for (SmartPtr<io::Stream> kssStream = stream; kssStream; kssStream = kssStream->Next())
         {
-            auto* archive = archive_read_new();
-            archive_read_support_format_all(archive);
-            uint32_t fileIndex = 0;
-            Array<uint32_t> subsongs;
-            if (archive_read_open_memory(archive, data.Items(8), data.Size() - 8) == ARCHIVE_OK)
+            auto data = kssStream->Read();
+            struct Loader
             {
-                archive_entry* entry;
-                while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
+                static void load(void* userData, const char* name, const uint8_t** buffer, size_t* size)
                 {
-                    std::filesystem::path entryPath(archive_entry_pathname(entry));
-                    if (_stricmp(entryPath.extension().string().c_str(), ".mbm") == 0)
-                        subsongs.Add(fileIndex);
-                    fileIndex++;
+                    auto* This = reinterpret_cast<Loader*>(userData);
+                    This->newStream = This->stream->Open(name);
+                    if (This->newStream)
+                    {
+                        auto data = This->newStream->Read();
+                        *buffer = data.Items();
+                        *size = data.NumItems();
+                    }
                 }
+                io::Stream* stream;
+                SmartPtr<io::Stream> newStream;
+            } cb{ kssStream };
+            if (auto kss = KSS_bin2kss((uint8_t*)data.Items(), uint32_t(data.Size()), kssStream->GetName().c_str(), cb.load, &cb))
+            {
+                subsongs.Add(fileIndex);
+                if (kss0 == nullptr)
+                {
+                    title = std::filesystem::path(kssStream->GetName()).stem().string();
+                    kss0 = kss;
+                }
+                else
+                    KSS_delete(kss);
             }
-            archive_read_free(archive);
-
-            if (subsongs.IsNotEmpty())
-                return new ReplayKSS(stream, std::move(subsongs), metadata);
+            fileIndex++;
         }
-
-        struct Loader
-        {
-            static void load(void* userData, const char* name, const uint8_t** buffer, size_t* size)
-            {
-                auto* This = reinterpret_cast<Loader*>(userData);
-                This->newStream = This->stream->Open(name);
-                if (This->newStream)
-                {
-                    auto data = This->newStream->Read();
-                    *buffer = data.Items();
-                    *size = data.NumItems();
-                }
-            }
-            io::Stream* stream;
-            SmartPtr<io::Stream> newStream;
-        } cb{ stream };
-        if (auto kss = KSS_bin2kss((uint8_t*)data.Items(), uint32_t(data.Size()), stream->GetName().c_str(), cb.load, &cb))
-            return new ReplayKSS(kss, metadata);
-
+        if (subsongs.IsNotEmpty())
+            return new ReplayKSS(stream, std::move(subsongs), kss0, std::move(title), metadata);
         return nullptr;
     }
 
@@ -204,21 +197,16 @@ namespace rePlayer
         return eExtension::_kss;
     }
 
-    ReplayKSS::ReplayKSS(KSS* kss, CommandBuffer metadata)
+    ReplayKSS::ReplayKSS(io::Stream* stream, Array<uint32_t>&& subsongs, KSS* kss, std::string&& title, CommandBuffer metadata)
         : Replay(GetExt(kss), eReplay::KSS)
         , m_kss(kss)
         , m_kssplay(KSSPLAY_new(kSampleRate, 2, 16))
+        , m_stream(stream)
+        , m_subsongs(std::move(subsongs))
+        , m_title(std::move(title))
     {
         KSSPLAY_set_data(m_kssplay, kss);
         m_kssplay->opll_stereo = 1;
-        SetupMetadata(metadata);
-    }
-
-    ReplayKSS::ReplayKSS(io::Stream* stream, Array<uint32_t>&& subsongs, CommandBuffer metadata)
-        : Replay(eExtension::_mbmPk, eReplay::KSS)
-        , m_stream(stream)
-        , m_subsongs(std::move(subsongs))
-    {
         SetupMetadata(metadata);
     }
 
@@ -253,73 +241,49 @@ namespace rePlayer
 
     void ReplayKSS::ResetPlayback()
     {
-        if (m_subsongs.IsEmpty())
+        if (m_subsongs.NumItems() == 1)
             KSSPLAY_reset(m_kssplay, m_subsongIndex, 0);
         else
         {
             if (m_subsongIndex != m_currentSubsongIndex)
             {
-                auto data = m_stream->Read();
-
-                auto* mbmPk = archive_read_new();
-                archive_read_support_format_all(mbmPk);
-                archive_read_open_memory(mbmPk, data.Items(8), data.Size() - 8);
-
-                uint32_t fileIndex = 0;
-                archive_entry* entry;
-                while (archive_read_next_header(mbmPk, &entry) == ARCHIVE_OK)
+                auto stream = m_stream;
+                for (uint32_t fileIndex = 0; stream; fileIndex++)
                 {
                     if (fileIndex == m_subsongs[m_subsongIndex])
                     {
-                        m_title = std::filesystem::path(archive_entry_pathname(entry)).stem().string().c_str();
-                        auto fileSize = archive_entry_size(entry);
-                        Array<uint8_t> unpackedData;
-                        unpackedData.Resize(fileSize);
-                        auto readSize = archive_read_data(mbmPk, unpackedData.Items(), fileSize);
-                        if (readSize > 0)
+                        auto data = stream->Read();
+                        KSSPLAY_delete(m_kssplay);
+                        KSS_delete(m_kss);
+
+                        struct Loader
                         {
-                            KSSPLAY_delete(m_kssplay);
-                            KSS_delete(m_kss);
-
-                            struct Loader
+                            static void load(void* userData, const char* name, const uint8_t** buffer, size_t* size)
                             {
-                                static void load(void* userData, const char* name, const uint8_t** buffer, size_t* size)
+                                auto* This = reinterpret_cast<Loader*>(userData);
+                                This->newStream = This->stream->Open(name);
+                                if (This->newStream)
                                 {
-                                    auto* This = reinterpret_cast<Loader*>(userData);
-                                    archive_entry* entry;
-                                    while (archive_read_next_header(This->mbmPk, &entry) == ARCHIVE_OK)
-                                    {
-                                        std::filesystem::path streamName(archive_entry_pathname(entry));
-                                        if (_stricmp(streamName.filename().string().c_str(), name) == 0)
-                                        {
-                                            auto fileSize = archive_entry_size(entry);
-                                            This->mbkData.Resize(fileSize);
-                                            archive_read_data(This->mbmPk, This->mbkData.Items(), fileSize);
-                                            *buffer = This->mbkData.Items();
-                                            *size = This->mbkData.NumItems();
-                                            break;
-                                        }
-                                    }
-                                    archive_read_free(This->mbmPk);
+                                    auto data = This->newStream->Read();
+                                    *buffer = data.Items();
+                                    *size = data.NumItems();
                                 }
-                                archive* mbmPk = archive_read_new();
-                                Array<uint8_t> mbkData;
-                            } cb;
-                            archive_read_support_format_all(cb.mbmPk);
-                            archive_read_open_memory(cb.mbmPk, data.Items(8), data.Size() - 8);
-                            m_kss = KSS_bin2kss((uint8_t*)unpackedData.Items(), uint32_t(unpackedData.Size()), archive_entry_pathname(entry), cb.load, &cb);
-                            m_kssplay = KSSPLAY_new(kSampleRate, 2, 16);
+                            }
+                            io::Stream* stream;
+                            SmartPtr<io::Stream> newStream;
+                        } cb{ stream };
 
-                            KSSPLAY_set_data(m_kssplay, m_kss);
-                            m_kssplay->opll_stereo = 1;
-                        }
-                        else
-                            Log::Error("KSS: can't find subsong %d\n", m_subsongIndex);
+                        m_kss = KSS_bin2kss((uint8_t*)data.Items(), uint32_t(data.Size()), stream->GetName().c_str(), cb.load, &cb);
+                        m_kssplay = KSSPLAY_new(kSampleRate, 2, 16);
+
+                        KSSPLAY_set_data(m_kssplay, m_kss);
+                        m_kssplay->opll_stereo = 1;
+
+                        m_title = std::filesystem::path(stream->GetName()).stem().string();
                         break;
                     }
-                    fileIndex++;
+                    stream = stream->Next();
                 }
-                archive_read_free(mbmPk);
 
                 m_currentSubsongIndex = m_subsongIndex;
             }
@@ -373,14 +337,16 @@ namespace rePlayer
 
     uint32_t ReplayKSS::GetNumSubsongs() const
     {
-        if (m_subsongs.IsNotEmpty())
+        if (m_subsongs.NumItems() > 1)
             return m_subsongs.NumItems();
         return m_kss->trk_max - m_kss->trk_min + 1;
     }
 
     std::string ReplayKSS::GetSubsongTitle() const
     {
-        return m_title;
+        if (m_mediaType.ext == eExtension::_mbm)
+            return m_title;
+        return Replay::GetSubsongTitle();
     }
 
     std::string ReplayKSS::GetExtraInfo() const

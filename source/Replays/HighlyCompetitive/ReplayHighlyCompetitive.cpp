@@ -5,11 +5,7 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
-#include <IO/StreamMemory.h>
 #include <ReplayDll.h>
-
-#include <libarchive/archive.h>
-#include <libarchive/archive_entry.h>
 
 #include <zlib.h>
 
@@ -20,7 +16,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::HighlyCompetitive, .isThreadSafe = false,
         .name = "Highly Competitive/snsf9x",
-        .extensions = "snsf;minisnsf;snsfPk",
+        .extensions = "snsf;minisnsf",
         .about = "Highly Competitive/snsf9x 0.05\nChristopher Snowhill & loveemu",
         .settings = "Highly Competitive/snsf9x 0.05",
         .init = ReplayHighlyCompetitive::Init,
@@ -126,34 +122,6 @@ namespace rePlayer
         auto This = reinterpret_cast<ReplayHighlyCompetitive*>(context);
         if (This->m_stream->GetName() == uri)
             return This->m_stream->Clone().Detach();
-        if (This->m_streamArchive.IsValid())
-        {
-            auto data = This->m_streamArchive->Read();
-
-            auto* archive = archive_read_new();
-            archive_read_support_format_all(archive);
-            archive_read_open_memory(archive, data.Items(), data.Size());
-            archive_entry* entry;
-            io::StreamMemory* stream = nullptr;
-            while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-            {
-                auto entryName = archive_entry_pathname(entry);
-                if (_stricmp(entryName, uri) == 0)
-                {
-                    auto fileSize = archive_entry_size(entry);
-                    Array<uint8_t> unpackedData;
-                    unpackedData.Resize(fileSize);
-                    auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-                    assert(readSize == fileSize);
-
-                    stream = io::StreamMemory::Create(entryName, unpackedData.Items(), fileSize, false).Detach();
-                    unpackedData.Detach();
-                    break;
-                }
-            }
-            archive_read_free(archive);
-            return stream;
-        }
         return This->m_stream->Open(uri).Detach();
     }
 
@@ -451,60 +419,29 @@ namespace rePlayer
 
     ReplayHighlyCompetitive* ReplayHighlyCompetitive::Load(CommandBuffer metadata)
     {
-        auto data = m_stream->Read();
-
-        auto* archive = archive_read_new();
-        archive_read_support_format_all(archive);
-        if (archive_read_open_memory(archive, data.Items(), data.Size()) != ARCHIVE_OK)
+        auto stream = m_stream;
+        uint32_t fileIndex = 0;
+        do
         {
             m_length = kDefaultSongDuration;
-            if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x23, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
+            if (psf_load(stream->GetName().c_str(), &m_psfFileSystem, 0x23, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
             {
-                auto extPos = m_stream->GetName().find_last_of('.');
-                if (extPos == std::string::npos || _stricmp(m_stream->GetName().c_str() + extPos + 1, "snsflib") != 0)
+                auto extPos = stream->GetName().find_last_of('.');
+                if (extPos == std::string::npos || _stricmp(stream->GetName().c_str() + extPos + 1, "snsflib") != 0)
                 {
-                    if (psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x23, SnsfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
+                    if (psf_load(stream->GetName().c_str(), &m_psfFileSystem, 0x23, SnsfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
                     {
                         m_mediaType.ext = m_hasLib ? eExtension::_minisnsf : eExtension::_snsf;
-                        m_subsongs.Add({ 0, uint32_t(m_length) });
-                    }
-                }
-            }
-        }
-        else
-        {
-            std::swap(m_stream, m_streamArchive);
-            uint32_t fileIndex = 0;
-            Array<uint8_t> unpackedData;
-            archive_entry* entry;
-            while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
-            {
-                std::string entryName = archive_entry_pathname(entry);
-                auto fileSize = archive_entry_size(entry);
-                unpackedData.Resize(fileSize);
-                auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-                assert(readSize == fileSize);
-
-                m_stream = io::StreamMemory::Create(entryName.c_str(), unpackedData.Items(), fileSize, true);
-
-                m_length = kDefaultSongDuration;
-                if (psf_load(entryName.c_str(), &m_psfFileSystem, 0x23, nullptr, nullptr, InfoMetaPSF, this, 0, nullptr, nullptr) >= 0)
-                {
-                    auto extPos = entryName.find_last_of('.');
-                    if (extPos == std::string::npos || _stricmp(entryName.c_str() + extPos + 1, "snsflib") != 0)
-                    {
-                        m_mediaType.ext = eExtension::_snsfPk;
                         m_subsongs.Add({ fileIndex, uint32_t(m_length) });
                     }
                 }
-                m_tags.Clear();
-
-                fileIndex++;
             }
-        }
-        archive_read_free(archive);
+            m_tags.Clear();
 
-        if (m_mediaType.ext == eExtension::Unknown)
+            fileIndex++;
+        } while (stream = stream->Next());
+
+        if (m_subsongs.IsEmpty())
         {
             delete this;
             return nullptr;
@@ -542,37 +479,23 @@ namespace rePlayer
     void ReplayHighlyCompetitive::ResetPlayback()
     {
         auto subsongIndex = m_subsongIndex;
-        if (m_streamArchive.IsValid() && m_currentSubsongIndex != subsongIndex)
+        if (m_currentSubsongIndex != subsongIndex)
         {
             m_loaderState.Clear();
             m_tags.Clear();
             m_title.clear();
 
-            auto data = m_streamArchive->Read();
-
-            auto* archive = archive_read_new();
-            archive_read_support_format_all(archive);
-            archive_read_open_memory(archive, data.Items(), data.Size());
-            archive_entry* entry;
-            for (uint32_t fileIndex = 0; fileIndex < m_subsongs[subsongIndex].index; ++fileIndex)
+            auto stream = m_stream;
+            for (uint32_t fileIndex = 0; stream; fileIndex++)
             {
-                archive_read_next_header(archive, &entry);
-                archive_read_data_skip(archive);
+                if (fileIndex == m_subsongs[m_subsongIndex].index)
+                {
+                    m_title = stream->GetName();
+                    psf_load(stream->GetName().c_str(), &m_psfFileSystem, 0x23, SnsfLoad, this, InfoMetaPSF, this, 0, nullptr, nullptr);
+                    break;
+                }
+                stream = stream->Next();
             }
-            archive_read_next_header(archive, &entry);
-            m_title = archive_entry_pathname(entry);
-
-            auto fileSize = archive_entry_size(entry);
-            Array<uint8_t> unpackedData;
-            unpackedData.Resize(fileSize);
-            auto readSize = archive_read_data(archive, unpackedData.Items(), fileSize);
-            assert(readSize == fileSize);
-
-            m_stream = io::StreamMemory::Create(m_title.c_str(), unpackedData.Items(), fileSize, true);
-
-            psf_load(m_stream->GetName().c_str(), &m_psfFileSystem, 0x23, SnsfLoad, this, InfoMetaPSF, this, 0, nullptr, nullptr);
-
-            archive_read_free(archive);
         }
 
         m_currentPosition = 0;

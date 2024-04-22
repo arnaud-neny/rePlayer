@@ -68,41 +68,33 @@ namespace rePlayer
             return nullptr;
         auto data = stream->Read();
 
-        struct
+        struct Loader
         {
             static void cb(const char* fileName, std::vector<uint8_t>& bufferRef, void* loaderData)
             {
-                auto stream = reinterpret_cast<io::Stream*>(loaderData);
-                auto data = stream->Read();
-                if (data.Size() > 12)
+                auto loader = reinterpret_cast<Loader*>(loaderData);
+                for (auto& stream : loader->streams)
                 {
-                    auto isInternal = memcmp(data.Items(), "STER-SID", 8) == 0;
-                    if (stream->GetName() == fileName)
+                    if (_stricmp(stream->GetName().c_str(), fileName) == 0)
                     {
-                        if (isInternal)
-                            bufferRef.assign(data.Items(12), data.Items(*data.Items<const uint32_t>(8)));
-                        else
-                            bufferRef.assign(data.Items(), data.Items(data.NumItems()));
-                    }
-                    else if (isInternal)
-                        bufferRef.assign(data.Items(*data.Items<const uint32_t>(8)), data.Items(data.NumItems()));
-                    else
-                    {
-                        auto file = io::File::OpenForRead(fileName);
-                        if (file.IsValid())
-                        {
-                            auto fileSize = file.GetSize();
-                            auto oldSize = bufferRef.size();
-                            bufferRef.resize(oldSize + fileSize);
-                            file.Read(bufferRef.data() + oldSize, fileSize);
-                        }
+                        auto data = stream->Read();
+                        bufferRef.assign(data.Items(), data.Items(data.NumItems()));
+                        return;
                     }
                 }
-                if (bufferRef.empty())
-                    throw libsidplayfp::loadError("Can't open file");
+                if (auto strStream = loader->streams[0]->Open(fileName))
+                {
+                    auto data = strStream->Read();
+                    bufferRef.assign(data.Items(), data.Items(data.NumItems()));
+                    loader->streams.Add(strStream);
+                    return;
+                }
+                throw libsidplayfp::loadError("Can't open file");
             }
+            Array<SmartPtr<io::Stream>> streams;
         } loader;
-        SidTune* sidTune = new SidTune(loader.cb, stream, stream->GetName().c_str());
+        loader.streams.Add(stream);
+        SidTune* sidTune = new SidTune(loader.cb, &loader, stream->GetName().c_str());
         if (!sidTune->getStatus())
         {
             //printf("%s", sidTune->statusString());

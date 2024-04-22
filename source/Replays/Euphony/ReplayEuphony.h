@@ -65,7 +65,7 @@ namespace rePlayer
     private:
         ReplayEuphony(io::Stream* stream, Array<uint32_t>&& subsongs);
 
-        EUPPlayer* Load(int32_t subsongIndex);
+        EUPPlayer* Load();
 
     private:
         SmartPtr<io::Stream> m_stream;

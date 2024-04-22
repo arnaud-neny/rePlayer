@@ -72,7 +72,9 @@ namespace rePlayer
         const uint16_t GetDatabaseDay() const;
         const MediaType GetType() const;
         const bool IsInvalid() const;
+        const bool IsPackage() const;
         const bool IsUnavailable() const;
+        const bool IsArchive() const;
 
         const char* GetName() const;
 
@@ -101,7 +103,8 @@ namespace rePlayer
 
         void Patch(uint32_t version);
 
-        static constexpr uint32_t kVersion = 1;
+        //static constexpr uint32_t kVersion = 1;   // updated type storage
+        static constexpr uint32_t kVersion = 2;     // converted internal packages to archive
 
     private:
         Song(Song&&) = delete;

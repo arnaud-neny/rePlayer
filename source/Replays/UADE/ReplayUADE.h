@@ -90,11 +90,10 @@ namespace rePlayer
                 dataSize = *reinterpret_cast<const uint32_t*>(data + 8) - 12;
                 data += 12;
             };
-            const char* player = nullptr;
         };
 
     private:
-        ReplayUADE(io::Stream* stream, uade_state* uadeState);
+        ReplayUADE(io::Stream* stream, uade_state* uadeState, ReplayOverride* replayOverride);
 
         static struct uade_file* AmigaLoader(const char* name, const char* playerdir, void* context, struct uade_state* state);
         static void LoadPlayerNames();
@@ -112,6 +111,7 @@ namespace rePlayer
         uint64_t m_currentDuration = 0;
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
+        ReplayOverride* m_replayOverride = nullptr;
         Array<std::string> m_packagedSubsongNames;
         static ReplayOverride ms_replayOverrides[];
 

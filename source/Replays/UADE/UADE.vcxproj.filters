@@ -42,9 +42,6 @@
     <Filter Include="Source Files\compat">
       <UniqueIdentifier>{e9dce91e-8e03-426f-b5f8-f09db952269e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{965cd881-a7b7-4e59-9913-bc40a62a4dcd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\data">
       <UniqueIdentifier>{4b2063d9-4e34-489b-bab1-a4b08a893bca}</UniqueIdentifier>
     </Filter>
@@ -1287,11 +1284,6 @@
     <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg.txt">
       <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="data\score">

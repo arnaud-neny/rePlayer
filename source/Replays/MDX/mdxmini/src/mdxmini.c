@@ -87,7 +87,7 @@ extern void ym2151_set_logging( int flag, songdata * );
 
 /* ------------------------------------------------------------------ */
 
-int mdx_open(t_mdxmini* data, void* buf, size_t bufsize, int freq, pdx_load load_callback, void* user_data)
+int mdx_open(t_mdxmini* data, const void* buf, size_t bufsize, int freq, pdx_load load_callback, void* user_data)
 {
   data->nlg_tempo = -1;
 

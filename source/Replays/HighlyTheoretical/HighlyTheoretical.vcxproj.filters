@@ -12,9 +12,6 @@
     <Filter Include="Source Files\psflib">
       <UniqueIdentifier>{0b64f16f-a9c1-4261-b5ac-b2a2555123d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3rdParty">
-      <UniqueIdentifier>{c5e402c4-bca1-4076-883d-7fe2204db695}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\core">
       <UniqueIdentifier>{93ce3595-d4cb-4b78-858e-974372860cc7}</UniqueIdentifier>
     </Filter>
@@ -94,11 +91,6 @@
     <ClCompile Include="core\c68k\gen68k.c">
       <Filter>Source Files\core\c68k</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\3rdParty\libarchive\archive.lib">
-      <Filter>3rdParty</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <None Include="core\c68k\c68k_ini.inc">

@@ -29,38 +29,45 @@ namespace rePlayer
 
     // rePlayer blobbed format for multi-files modules
     SourceModland::ModlandReplayOverride SourceModland::ms_replayOverrides[] = {
+        { // tfmx
+            "TFMX",
+            ModlandReplay::kTFMX,
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/mdat."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; ext[4] = 'l'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; name[3] = 'l'; },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdat, eReplay::TFMX); },
+            [](const char* name) { return strstr(name, "smpl.") != nullptr; }
+        },
         { // uade
             "Richard Joseph",
             ModlandReplay::kRichardJoseph,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = url.data() + url.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; return "RiJo-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = url.data() + url.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; ext = name.data() + name.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_rjp, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".ins") == (name + strlen(name) - 4); }
         },
         { // uade
             "Audio Sculpture",
             ModlandReplay::kAudioSculpture,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { url += ".as"; return "ADSC-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { url += ".as"; name += ".as"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_adsc, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".adsc.as") == (name + strlen(name) - 8); }
         },
         { // uade
             "Dirk Bialluch",
             ModlandReplay::kDirkBialluch,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/tpu."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "DIRK-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/tpu."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_tpu, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Dynamic Synthesizer",
             ModlandReplay::kDynamicSynthesizer,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/dns."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "DNSY-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/dns."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_dns, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Infogrames",
             ModlandReplay::kInfogrames,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url)
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name)
             {
                 const char* const names[] = {"gobliiins", "mus2b", "mus2c", "bob4a", "bob4b", "bob4c", "bob4e"};
                 for (auto* n : names)
@@ -68,7 +75,8 @@ namespace rePlayer
                     if (url.rfind(n) != url.npos)
                     {
                         auto ext = url.data() + url.size() - 5; ext[0] = '.';  ext[1] = 'i'; ext[2] = 'n'; ext[3] = 's'; ext[4] = 0;
-                        return "IFGM-MOD";
+                        ext = name.data() + name.size() - 5; ext[0] = '.';  ext[1] = 'i'; ext[2] = 'n'; ext[3] = 's'; ext[4] = 0;
+                        return;
                     }
                 }
                 const char* const namesWithDots[] = { "north%20%26%20south.", "rh-bobo." };
@@ -78,11 +86,12 @@ namespace rePlayer
                     if (offset != url.npos)
                     {
                         auto ext = url.data() + offset + strlen(n); ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; ext[3] = 0;
-                        return "IFGM-MOD";
+                        ext = name.data() + offset + strlen(n); ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; ext[3] = 0;
+                        return;
                     }
                 }
                 auto ext = url.data() + url.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's';
-                return "IFGM-MOD";
+                ext = name.data() + name.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's';
             },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_dum, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".ins") == (name + strlen(name) - 4); }
@@ -90,28 +99,28 @@ namespace rePlayer
         { // uade
             "Jason Page",
             ModlandReplay::kJasonPage,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/jpn."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "JSPG-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/jpn."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_jpn, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Kris Hatlelid",
             ModlandReplay::kKrisHatlelid,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "songplay"; return "KSHD-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "songplay"; name = "songplay"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_kh, eReplay::UADE); },
             [](const char* name) { auto len = strlen(name); return len >= 8 && _stricmp(name + len - 8, "songplay") == 0; }
         },
         { // uade
             "Magnetic Fields Packer",
             ModlandReplay::kMagneticFieldsPacker,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/mfp."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "MFPK-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/mfp."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_mfp, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Mark Cooksey Old",
             ModlandReplay::kMarkCookseyOld,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/mcr."); ext[3] = 's'; return "MCOD-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/mcr."); ext[3] = 's'; name[2] = 's'; },
             [](std::string& name) { auto ext = name[2] == 'o' ? eExtension::_mco : eExtension::_mcr; name.erase(name.begin(), name.begin() + 4); return MediaType(ext, eReplay::UADE); },
             [](const char* name) { return strstr(name, "mcs.") != nullptr; },
             [](const char* name) { return strstr(name, "mco.") == nullptr; }
@@ -119,21 +128,21 @@ namespace rePlayer
         { // uade
             "Pierre Adane Packer",
             ModlandReplay::kPierreAdanePacker,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "smp.set"; return "PAPK-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "smp.set"; name = "smp.set"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_pap, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.set") != nullptr; }
         },
         { // uade
             "PokeyNoise",
             ModlandReplay::kPokeyNoise,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { url += ".info"; return "PKNS-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { url += ".info"; name += ".info"; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 3); return MediaType(eExtension::_pn, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".info") == (name + strlen(name) - 5); }
         },
         { // uade
             "Quartet ST",
             ModlandReplay::kQuartetST,
-            [](CURL* curl, const ModlandReplayOverride* const replay, const SourceModland& modland, std::string& url)
+            [](CURL* curl, const ModlandReplayOverride* const replay, const SourceModland& modland, std::string& url, std::string& name)
             {
                 std::string lowerUrl = ToLower(url);
                 auto replayPos = url.find("Quartet%20ST") + sizeof("Quartet%20ST");
@@ -141,6 +150,7 @@ namespace rePlayer
                 if (pos != url.npos)
                 {
                     url[pos + 1] = 's'; url[pos + 2] = 'm'; url[pos + 3] = 'p';
+                    name[0] = 's'; name[1] = 'm'; name[2] = 'p';
                 }
                 else
                 {
@@ -150,6 +160,7 @@ namespace rePlayer
                         url[pos + 1] = 's'; url[pos + 2] = 'e'; url += 't';
                         pos = lowerUrl.rfind('/');
                     }
+                    name = "smp.set";
                 }
                 if (pos != url.npos)
                 {
@@ -165,7 +176,7 @@ namespace rePlayer
                             {
                                 url.resize(pos + 1);
                                 url += smpLink.c_str() + pos - replayPos + 1;
-                                return "QTST-MOD";
+                                return;
                             }
                             if (!smpSetItem && _stricmp(smpLink.c_str() + pos - replayPos + 1, "smp.set") == 0)
                                 smpSetItem = item;
@@ -177,11 +188,10 @@ namespace rePlayer
                         url.resize(pos + 1);
                         auto smpLink = CleanUrl(curl, modland.m_db.items[smpSetItem].name(modland.m_db.strings));
                         url += smpLink.c_str() + pos - replayPos + 1;
-                        return "QTST-MOD";
+                        return;
                     }
                 }
                 url.clear();
-                return "QTST-MOD";
             },
             [](std::string& name)
             {
@@ -202,25 +212,26 @@ namespace rePlayer
         { // uade
             "SoundPlayer",
             ModlandReplay::kSoundPlayer,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/sjs."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "SDPR-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/sjs."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_sjs, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Synth Dream",
             ModlandReplay::kSynthDream,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url)
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name)
             {
                 auto ext = strstr(url.data(), "/sdr.");
                 if (strstr(ext, "nobuddiesland%20") && ext[sizeof("/sdr.nobuddiesland%20")] >= '1' && ext[sizeof("/sdr.nobuddiesland%20")] <= '8')
                 {
                     ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p';
+                    name[0] = 's'; name[1] = 'm'; name[2] = 'p';
                 }
                 else
                 {
                     memcpy(ext + 1, "smp.set", sizeof("smp.set"));
+                    name = "smp.set";
                 }
-                return "SHDM-MOD";
             },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_sdr, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
@@ -228,21 +239,21 @@ namespace rePlayer
         { // uade
             "Synth Pack",
             ModlandReplay::kSynthPack,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "smp.set"; return "SHPK-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "smp.set"; name = "smp.set"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_osp, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.set") != nullptr; }
         },
         { // uade
             "Thomas Hermann",
             ModlandReplay::kThomasHermann,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/thm."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "TSHN-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/thm."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_thm, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // uade
             "Paul Robotham",
             ModlandReplay::kPaulRobotham,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url)
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name)
             {
                 const char* const names[] = { "ashes%20of%20empire-finale", "space%201889" };
                 for (auto* n : names)
@@ -250,11 +261,12 @@ namespace rePlayer
                     if (url.rfind(n) != url.npos)
                     {
                         auto ext = url.data() + url.size() - 3; ext[0] = 's'; ext[1] = 's'; ext[2] = 'd';
-                        return "PLRM-MOD";
+                        ext = name.data() + name.size() - 3; ext[0] = 's'; ext[1] = 's'; ext[2] = 'd';
+                        return;
                     }
                 }
                 auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "mdtest.ssd";
-                return "PLRM-MOD";
+                name = "mdtest.ssd";
             },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_dat, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".ssd") == (name + strlen(name) - 4); }
@@ -262,63 +274,63 @@ namespace rePlayer
         { // uade
             "TFMX ST",
             ModlandReplay::kTFMXST,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/mdat."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; ext[4] = 'l'; return "MDST-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/mdat."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; ext[4] = 'l'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; name[3] = 'l'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdst, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smpl.") != nullptr; }
         },
         { // uade
             "Startrekker AM",
             ModlandReplay::kStartrekkerAM,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { url += ".nt"; return "STAM-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { url += ".nt"; name += ".nt"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_mod, eReplay::UADE); },
             [](const char* name) { return strstr(name, ".mod.nt") == (name + strlen(name) - 7); }
         },
         { // uade
             "Unique Development",
             ModlandReplay::kUniqueDevelopment,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = strstr(url.data(), "/uds."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; return "UNDV-MOD"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/uds."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; },
             [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_uds, eReplay::UADE); },
             [](const char* name) { return strstr(name, "smp.") != nullptr; }
         },
         { // sidplay
             "Stereo Sidplayer",
             ModlandReplay::kStereoSidplayer,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = url.data() + url.size() - 3; ext[0] = 's'; ext[1] = 't'; ext[2] = 'r'; return "STER-SID"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = url.data() + url.size() - 3; ext[0] = 's'; ext[1] = 't'; ext[2] = 'r'; ext = name.data() + name.size() - 3; ext[0] = 's'; ext[1] = 't'; ext[2] = 'r';  },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_mus, eReplay::SidPlay); },
             [](const char* name) { return strstr(name, ".str") == (name + strlen(name) - 4); }
         },
         { // adlib
             "Ad Lib/Ken's AdLib Music",
             ModlandReplay::kKensAdLibMusic,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "insts.dat"; return "KENS-ADB"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "insts.dat"; name = "insts.dat"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_ksm, eReplay::AdLib); },
             [](const char* name) { return strstr(name, "insts.dat") != nullptr; }
         },
         { // adlib
             "Ad Lib/AdLib Tracker",
             ModlandReplay::kAdLibTracker,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto ext = url.data() + url.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; return "ABTR-ADB"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = url.data() + url.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; ext = name.data() + name.size() - 3; ext[0] = 'i'; ext[1] = 'n'; ext[2] = 's'; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_sng, eReplay::AdLib); },
             [](const char* name) { return strstr(name, ".ins") == (name + strlen(name) - 4); }
         },
         { // adlib
             "Ad Lib/Sierra",
             ModlandReplay::kAdLibSierra,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 4); url += "patch.003"; return "SIRA-ADB"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 4); url += "patch.003"; if (name.size() > 3) name.resize(3); name += "patch.003"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_sci, eReplay::AdLib); },
             [](const char* name) { return strstr(name, ".003") == (name + strlen(name) - 4); }
         },
         { // adlib
             "Ad Lib/Visual Composer",
             ModlandReplay::kAdLibVisualComposer,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "standard.bnk"; return "VICO-ADB"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "standard.bnk"; name = "standard.bnk"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_rol, eReplay::AdLib); },
             [](const char* name) { return strstr(name, "standard.bnk") != nullptr; }
         },
         { // ken
             "Ken's Digital Music",
             ModlandReplay::kKensDigitalMusic,
-            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "waves.kwv"; return "KENS-KDM"; },
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "waves.kwv"; name = "waves.kwv"; },
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_kdm, eReplay::Ken); },
             [](const char* name) { return strstr(name, "waves.kwv") != nullptr; }
         },
@@ -562,14 +574,12 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceModland::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
         auto* songSource = GetSongSource(sourceId.internalId);
 
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "TFMX") == 0)
-            return ImportTFMXSong(sourceId, path);
         if (auto* replay = GetReplayOverride(songSource))
             return ImportMultiSong(sourceId, replay, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "MDX") == 0)
@@ -1010,91 +1020,7 @@ namespace rePlayer
         return cleanedUrl;
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportTFMXSong(SourceID sourceId, const std::string& path)
-    {
-        auto* songSource = GetSongSource(sourceId.internalId);
-
-        CURL* curl = curl_easy_init();
-
-        char errorBuffer[CURL_ERROR_SIZE];
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-
-        auto url = SetupUrl(curl, songSource);
-
-        struct Buffer : public Array<uint8_t>
-        {
-            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
-            {
-                buffer->Add(data, size * nmemb);
-                return size * nmemb;
-            }
-        } buffer;
-
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        SmartPtr<io::Stream> stream;
-        bool isEntryMissing = false;
-        auto curlError = curl_easy_perform(curl);
-        if (curlError == CURLE_OK && buffer.IsNotEmpty())
-        {
-            if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
-            {
-                isEntryMissing = true;
-                if (songSource->artists[0])
-                    m_areStringsDirty |= --m_artists[songSource->artists[0]].refcount == 0;
-                if (songSource->artists[1])
-                    m_areStringsDirty |= --m_artists[songSource->artists[1]].refcount == 0;
-                new (songSource) SourceSong();
-                m_areDataDirty = true;
-                m_availableSongIds.Add(sourceId.internalId);
-                m_isDirty = true;
-
-                Log::Error("Modland: file \"%s\" not found\n", url.c_str());
-            }
-            else
-            {
-                auto mdatSize = static_cast<uint32_t>(buffer.Size());
-
-                auto ext = strstr(url.data(), "/mdat.");
-                ext[1] = 's';
-                ext[2] = 'm';
-                ext[3] = 'p';
-                ext[4] = 'l';
-                Log::Message("\"%s\"...", url.c_str());
-                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                curlError = curl_easy_perform(curl);
-                if (curlError == CURLE_OK)
-                {
-                    char hdr[20] = "TFMX-MOD";
-                    *reinterpret_cast<uint32_t*>(hdr + 8) = 20 + mdatSize;// smpl offset
-                    *reinterpret_cast<uint32_t*>(hdr + 12) = static_cast<uint32_t>(20 + buffer.Size());// tag offset ???
-                    *reinterpret_cast<uint32_t*>(hdr + 16) = 0;// 00000000 ???
-                    buffer.Insert(0, reinterpret_cast<uint8_t*>(hdr), 20);
-
-                    songSource->crc = crc32(0L, Z_NULL, 0);
-                    songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
-                    songSource->size = static_cast<uint32_t>(buffer.Size());
-                    m_isDirty = true;
-
-                    stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
-                    buffer.Detach();
-
-                    Log::Message("OK\n");
-                }
-                else
-                    Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-            }
-        }
-        else
-            Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-
-        curl_easy_cleanup(curl);
-
-        return { stream, isEntryMissing };
-    }
-
-    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path)
+    Source::Import SourceModland::ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path)
     {
         if (replay->isKeepingLink && DownloadDatabase())
             return {};
@@ -1106,6 +1032,7 @@ namespace rePlayer
         char errorBuffer[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
         auto url = SetupUrl(curl, songSource);
 
@@ -1116,18 +1043,103 @@ namespace rePlayer
                 buffer->Add(data, size * nmemb);
                 return size * nmemb;
             }
-        } buffer;
-        buffer.Copy(replay->getHeaderAndUrl(curl, replay, *this, url), 8);
-        buffer.Push(4); // reserve second file offset space
+        } curlBuffer;
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &curlBuffer);
         SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
         auto curlError = curl_easy_perform(curl);
-        if (curlError == CURLE_OK && buffer.IsNotEmpty())
+        if (curlError == CURLE_OK)
         {
-            if (buffer.Size() < 256 && strstr((const char*)buffer.begin(), "404 Not Found"))
+            struct ArchiveBuffer : public Array<uint8_t>
+            {
+                static int ArchiveOpen(struct archive*, void*)
+                {
+                    return ARCHIVE_OK;
+                }
+
+                static int ArchiveClose(struct archive*, void*)
+                {
+                    return ARCHIVE_OK;
+                }
+
+                static int ArchiveFree(struct archive*, void*)
+                {
+                    return ARCHIVE_OK;
+                }
+
+                static la_ssize_t ArchiveWrite(struct archive*, void* _client_data, const void* _buffer, size_t _length)
+                {
+                    reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), _length);
+                    return _length;
+                }
+            } archiveBuffer;
+
+            auto* archive = archive_write_new();
+            archive_write_set_format_7zip(archive);
+            auto r = archive_write_open2(archive, &archiveBuffer, archiveBuffer.ArchiveOpen, ArchiveBuffer::ArchiveWrite, archiveBuffer.ArchiveClose, archiveBuffer.ArchiveFree);
+            assert(r == ARCHIVE_OK);
+            auto entry = archive_entry_new();
+
+            std::string name = songSource->name;
+            auto npos = name.rfind('/');
+            if (npos != name.npos)
+                name.erase(0, npos + 1);
+            if (!songSource->isExtensionOverriden && m_replays[songSource->replay].ext.offset)
+            {
+                name += '.';
+                name += m_replays[songSource->replay].ext(m_strings);
+            }
+
+            archive_entry_set_pathname(entry, name.c_str());
+            archive_entry_set_size(entry, curlBuffer.Size());
+            archive_entry_set_filetype(entry, AE_IFREG);
+            archive_entry_set_perm(entry, 0644);
+            archive_write_header(archive, entry);
+            archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size());
+            archive_entry_clear(entry);
+            curlBuffer.Clear();
+
+            replay->nextUrlAndName(curl, replay, *this, url, name);
+            if (!url.empty())
+            {
+                Log::Message("\"%s\"...", url.c_str());
+                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+                curlError = curl_easy_perform(curl);
+                if (curlError == CURLE_OK)
+                {
+                    archive_entry_set_pathname(entry, name.c_str());
+                    archive_entry_set_size(entry, curlBuffer.Size());
+                    archive_entry_set_filetype(entry, AE_IFREG);
+                    archive_entry_set_perm(entry, 0644);
+                    archive_write_header(archive, entry);
+                    archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size());
+                    archive_entry_clear(entry);
+                }
+            }
+
+            r = archive_write_free(archive);
+            (void)r; assert(r == ARCHIVE_OK);
+            archive_entry_free(entry);
+
+            if (replay->type == ModlandReplay::kTFMXST)
+                archiveBuffer.Copy("MDST-MOD", sizeof("MDST-MOD") - 1);
+
+            songSource->crc = crc32(0L, Z_NULL, 0);
+            songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size());
+            songSource->size = static_cast<uint32_t>(archiveBuffer.Size());
+            m_isDirty = true;
+
+            stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
+            archiveBuffer.Detach();
+
+            Log::Message("OK\n");
+        }
+        else if (curlError == CURLE_HTTP_RETURNED_ERROR)
+        {
+            long responseCode = 0;
+            if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode == 404)
             {
                 isEntryMissing = true;
                 if (songSource->artists[0])
@@ -1142,40 +1154,17 @@ namespace rePlayer
                 Log::Error("Modland: file \"%s\" not found\n", url.c_str());
             }
             else
-            {
-                *buffer.Items<uint32_t>(8) = buffer.NumItems();
-
-                if (!url.empty())
-                {
-                    Log::Message("\"%s\"...", url.c_str());
-                    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                    curlError = curl_easy_perform(curl);
-                }
-                if (curlError == CURLE_OK) // don't check for 404 (or add special case for tfmx st which may have no samples)
-                {
-                    songSource->crc = crc32(0L, Z_NULL, 0);
-                    songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
-                    songSource->size = static_cast<uint32_t>(buffer.Size());
-                    m_isDirty = true;
-
-                    stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
-                    buffer.Detach();
-
-                    Log::Message("OK\n");
-                }
-                else
-                    Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
-            }
+                Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
         }
         else
             Log::Error("Modland: %s\n", curl_easy_strerror(curlError));
 
         curl_easy_cleanup(curl);
 
-        return { stream, isEntryMissing };
+        return { stream, isEntryMissing, true, true, replay->getTypeAndName(url).ext };
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType, const std::string& path)
+    Source::Import SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType, const std::string& path)
     {
         if (DownloadDatabase())
             return {};
@@ -1258,16 +1247,6 @@ namespace rePlayer
                     return _length;
                 }
             } archiveBuffer;
-            if (replayType == ModlandReplay::kDelitrackerCustom)
-                archiveBuffer.Copy("CUST-PKG", sizeof("CUST-PKG") - 1);
-            else if (replayType == ModlandReplay::kIFFSmus)
-                archiveBuffer.Copy("SMUS-PKG", sizeof("SMUS-PKG") - 1);
-            else if (replayType == ModlandReplay::kMBM || replayType == ModlandReplay::kMBMEdit)
-                archiveBuffer.Copy("MBMK-PKG", sizeof("MBMK-PKG") - 1);
-            else if (replayType == ModlandReplay::kFACSoundTracker)
-                archiveBuffer.Copy("FACS-PKG", sizeof("FACS-PKG") - 1);
-            else if (replayType == ModlandReplay::kEuphony)
-                archiveBuffer.Copy("EUPH-PKG", sizeof("EUPH-PKG") - 1);
 
             bool hasFailed = false;
             SmartPtr<io::Stream> stream;
@@ -1330,17 +1309,28 @@ namespace rePlayer
             curl_easy_cleanup(curl);
 
             r = archive_write_free(archive);
-            assert(r == ARCHIVE_OK);
+            (void)r; assert(r == ARCHIVE_OK);
             archive_entry_free(entry);
 
             if (!hasFailed)
             {
+                if (replayType == ModlandReplay::kDelitrackerCustom)
+                    archiveBuffer.Copy("CUST-PKG", sizeof("CUST-PKG") - 1);
+                else if (replayType == ModlandReplay::kIFFSmus)
+                    archiveBuffer.Copy("SMUS-PKG", sizeof("SMUS-PKG") - 1);
+
+                songSource->crc = crc32(0L, Z_NULL, 0);
+                songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size());
+                songSource->size = static_cast<uint32_t>(archiveBuffer.Size());
+                m_isDirty = true;
+
                 stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
                 archiveBuffer.Detach();
 
                 Log::Message("OK\n");
             }
-            return { stream, isEntryMissing };
+            std::string dbSongName(dbSong.name(m_db.strings));
+            return { stream, isEntryMissing, true, false, UpdateMediaType(dbSong, dbSongName).ext };
         }
 
         if (songSource->artists[0])
@@ -1393,35 +1383,30 @@ namespace rePlayer
         MediaType type;
         if (auto* replay = GetReplayOverride(m_db.replays[dbSong.replayId].type))
             type = replay->getTypeAndName(dbSongName);
-        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kTFMX)
-        {
-            dbSongName.erase(dbSongName.begin(), dbSongName.begin() + 5);// remove mdat.
-            type = { eExtension::_tfm, eReplay::TFMX };
-        }
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMDX)
-            type = { eExtension::_mdxPk, eReplay::MDX };
+            type = { eExtension::_mdx, eReplay::MDX };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kQSF)
-            type = { eExtension::_qsfPk, eReplay::HighlyQuixotic };
+            type = { eExtension::_miniqsf, eReplay::HighlyQuixotic };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kGSF)
-            type = { eExtension::_gsfPk, eReplay::HighlyAdvanced };
+            type = { eExtension::_minigsf, eReplay::HighlyAdvanced };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::k2SF)
-            type = { eExtension::_2sfPk, eReplay::vio2sf };
+            type = { eExtension::_mini2sf, eReplay::vio2sf };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSSF)
-            type = { eExtension::_ssfPk, eReplay::HighlyTheoretical };
+            type = { eExtension::_minissf, eReplay::HighlyTheoretical };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDSF)
-            type = { eExtension::_dsfPk, eReplay::HighlyTheoretical };
+            type = { eExtension::_minidsf, eReplay::HighlyTheoretical };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF)
-            type = { eExtension::_psfPk, eReplay::HighlyExperimental };
+            type = { eExtension::_minipsf, eReplay::HighlyExperimental };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kPSF2)
-            type = { eExtension::_psf2Pk, eReplay::HighlyExperimental };
+            type = { eExtension::_minipsf2, eReplay::HighlyExperimental };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kUSF)
-            type = { eExtension::_usfPk, eReplay::LazyUSF };
+            type = { eExtension::_miniusf, eReplay::LazyUSF };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSNSF)
-            type = { eExtension::_snsfPk, eReplay::HighlyCompetitive };
+            type = { eExtension::_minisnsf, eReplay::HighlyCompetitive };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMBM || m_db.replays[dbSong.replayId].type == ModlandReplay::kMBMEdit)
-            type = { eExtension::_mbmPk, eReplay::KSS };
+            type = { eExtension::_mbm, eReplay::KSS };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kFACSoundTracker)
-            type = { eExtension::_musPk, eReplay::NEZplug };
+            type = { eExtension::_mus, eReplay::NEZplug };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kDelitrackerCustom && dbSong.item)
             type = { eExtension::_cust, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kIFFSmus && dbSong.item)
@@ -1431,7 +1416,7 @@ namespace rePlayer
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
             type = { eExtension::_med, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
-            type = { eExtension::_eupPk, eReplay::Euphony };
+            type = { eExtension::_eup, eReplay::Euphony };
         else if (dbSong.isExtensionOverriden)
         {
             auto extOffset = dbSongName.find_last_of('.');
@@ -1594,9 +1579,6 @@ namespace rePlayer
                     auto newSong = line;
 
                     const auto currentReplayType = m_db.replays[replayIndex].type;
-                    // skip TFMX samples
-                    if (currentReplayType == ModlandReplay::kTFMX && strstr(newSong, "smpl.") == newSong)
-                        continue;
                     // skip multi files samples
                     if (auto* replay = GetReplayOverride(currentReplayType))
                     {
@@ -1740,8 +1722,6 @@ namespace rePlayer
         m_db.replays.Push();
         if (auto* replay = GetReplayOverride(theReplay.c_str()))
             m_db.replays.Last().type = replay->type;
-        else if (theReplay == "TFMX")
-            m_db.replays.Last().type = ModlandReplay::kTFMX;
         else if (theReplay == "MDX")
             m_db.replays.Last().type = ModlandReplay::kMDX;
         else if (theReplay == "Capcom Q-Sound Format")

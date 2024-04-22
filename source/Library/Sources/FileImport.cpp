@@ -14,7 +14,7 @@ namespace rePlayer
     void SourceFileImport::FindSongs(const char* /*name*/, SourceResults& /*collectedSongs*/)
     {}
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceFileImport::ImportSong(SourceID /*sourceId*/, const std::string& /*path*/)
+    Source::Import SourceFileImport::ImportSong(SourceID /*sourceId*/, const std::string& /*path*/)
     {
         return {};
     }

@@ -967,7 +967,7 @@ namespace rePlayer
         }
     }
 
-    std::pair<SmartPtr<io::Stream>, bool> SourceVGMRips::ImportSong(SourceID sourceId, const std::string& path)
+    Source::Import SourceVGMRips::ImportSong(SourceID sourceId, const std::string& path)
     {
         thread::ScopedSpinLock lock(m_mutex);
         SourceID sourceToDownload = sourceId;
@@ -985,10 +985,12 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-        char url[128];
-        sprintf(url, "https://vgmrips.net/packs/vgm/%s/%s", packSource->url(m_data), songSource->url(m_data));
-        Log::Message("VGMRips: downloading \"%s\"...", url);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
+        std::string url = "https://vgmrips.net/packs/vgm/";
+        url += packSource->url(m_data);
+        url += '/';
+        url += songSource->url(m_data);
+        Log::Message("VGMRips: downloading \"%s\"...", url.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_REFERER, "https://vgmrips.net/");
 
@@ -1023,7 +1025,7 @@ namespace rePlayer
             long responseCode = 0;
             if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode == 404)
             {
-                Log::Error("VGMRips: file \"%s\" not found\n", url);
+                Log::Error("VGMRips: file \"%s\" not found\n", url.c_str());
 
                 isEntryMissing = true;
                 songSource->crc = 0;

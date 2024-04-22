@@ -37,7 +37,7 @@ typedef struct
 
 // advanced loading
 typedef size_t (*pdx_load)(const char* filename, void** buf, void* user_data);
-int  mdx_open(t_mdxmini* data, void* buf, size_t bufsize, int freq, pdx_load load_callback, void* user_data);
+int  mdx_open(t_mdxmini* data, const void* buf, size_t bufsize, int freq, pdx_load load_callback, void* user_data);
 
 /**
  * \brief Changes the directory in which the provided t_mdxmini context should look for PDX samples.
