@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>CURL_STATICLIB;CURL_NO_OLDIES;LIBXML_STATIC;TAGLIB_STATIC;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;CURL_NO_OLDIES;LIBARCHIVE_STATIC;LIBXML_STATIC;TAGLIB_STATIC;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
@@ -69,7 +69,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>Core.lib;Replay.lib;libcurl.lib;libxml2.lib;taglib.lib;zlib.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;libarchive.lib;libcurl.lib;libxml2.lib;taglib.lib;zlib.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
@@ -82,7 +82,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CURL_STATICLIB;CURL_NO_OLDIES;LIBXML_STATIC;TAGLIB_STATIC;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;CURL_NO_OLDIES;LIBARCHIVE_STATIC;LIBXML_STATIC;TAGLIB_STATIC;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
@@ -96,7 +96,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Core.lib;Replay.lib;libcurl.lib;libxml2.lib;taglib.lib;zlib.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;Replay.lib;libarchive.lib;libcurl.lib;libxml2.lib;taglib.lib;zlib.lib;dllloader.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -245,9 +245,6 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
     <None Include="Deck\Player.inl" />
     <None Include="Graphics\GraphicsImpl.inl" />
     <None Include="Library\Library.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="3rdParty\libarchive\archive.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="replayer.ico" />
