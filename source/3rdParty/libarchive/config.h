@@ -1094,6 +1094,9 @@ typedef uint64_t uintmax_t;
 /* Define to 1 if you have the `symlink' function. */
 /* #undef HAVE_SYMLINK */
 
+/* Define to 1 if you have the `sysconf' function. */
+/* #undef HAVE_SYSCONF */
+
 /* Define to 1 if you have the <sys/acl.h> header file. */
 /* #undef HAVE_SYS_ACL_H */
 
