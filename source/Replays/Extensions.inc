@@ -146,7 +146,7 @@ EXTENSION(nsfe)         // GME & NEZplug
 EXTENSION(spc)
 EXTENSION(rsn)
 EXTENSION(mdx)          // MDX
-EXTENSION(mdxPk)        // deprecated (turned into 7z)
+EXTENSION(rk)           // UADE: CustomMade
 EXTENSION(s98)
 EXTENSION(aps)          // UADE: AProSys
 EXTENSION(ast)          // UADE: ActionAmics & VGMStream: Nintendo AST

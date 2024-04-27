@@ -19,6 +19,7 @@ namespace rePlayer
     void Library::Patch()
     {
         static constexpr uint32_t kSongsVersionWithArchive = 2;
+        static constexpr eExtension kExtension_mdxPk = eExtension::_rk;
         if (m_db.SongsVersion() < kSongsVersionWithArchive)
         {
             for (auto* song : m_db.Songs())
@@ -49,7 +50,7 @@ namespace rePlayer
 
                 switch (auto ext = song->GetType().ext)
                 {
-                case eExtension::_mdxPk:
+                case kExtension_mdxPk:
                 case eExtension::_qsfPk:
                 case eExtension::_gsfPk:
                 case eExtension::_2sfPk:
@@ -62,7 +63,7 @@ namespace rePlayer
                 {
                     auto oldFilename = m_songs->GetFullpath(song);
                     auto songSheet = song->Edit();
-                    songSheet->type.ext = ext == eExtension::_mdxPk ? eExtension::_mdx
+                    songSheet->type.ext = ext == kExtension_mdxPk ? eExtension::_mdx
                         : ext == eExtension::_qsfPk ? eExtension::_miniqsf
                         : ext == eExtension::_gsfPk ? eExtension::_minigsf
                         : ext == eExtension::_2sfPk ? eExtension::_mini2sf

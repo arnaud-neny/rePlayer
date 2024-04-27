@@ -690,6 +690,16 @@ namespace rePlayer
                 mediaType.ext = eExtension::_ymst;
             else if (mediaType.ext == eExtension::_mdat && _stricmp(uadeInfo->playername, "TFMX ST") == 0)
                 mediaType.ext = eExtension::_mdst;
+            else if (mediaType.ext == eExtension::_cm && _stricmp(uadeInfo->playername, "CustomMade") == 0)
+            {
+                m_stream->Seek(40, io::Stream::kSeekBegin);
+                static constexpr char rkHeader[] = "RON_KLAREN_SOUNDMODULE!";
+                char buf[sizeof(rkHeader)];
+                m_stream->Read(buf, sizeof(buf));
+                if (memcmp(buf, rkHeader, sizeof(rkHeader)) == 0)
+                    mediaType.ext = eExtension::_rk;
+            }
+
             m_mediaType = mediaType;
         }
     }
