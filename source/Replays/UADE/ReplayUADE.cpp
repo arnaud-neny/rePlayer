@@ -704,9 +704,11 @@ namespace rePlayer
         if (m_packagedSubsongNames.IsNotEmpty())
             return m_packagedSubsongNames.NumItems();
         auto uadeInfo = uade_get_song_info(m_uadeState);
-        auto songMin = Clamp(uadeInfo->subsongs.min, 0, 255);
-        auto songMax = Clamp(uadeInfo->subsongs.max, 0, 255);
-        return uint32_t(songMax >= songMin ? songMax - songMin + 1 : 1);
+        if (uadeInfo->subsongs.min < 0 || uadeInfo->subsongs.min > 255
+            || uadeInfo->subsongs.max < 0 || uadeInfo->subsongs.max > 255
+            || uadeInfo->subsongs.max < uadeInfo->subsongs.min)
+            return 1;
+        return uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1);
     }
 
     std::string ReplayUADE::GetSubsongTitle() const
