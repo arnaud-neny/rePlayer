@@ -128,7 +128,7 @@ namespace rePlayer
             return new ReplayKen(eExtension::_kdm, uint32_t(duration));
         stream->Seek(0, io::Stream::kSeekBegin);
         duration = ksmload(&loader);
-        if (duration > 0)
+        if (duration > 0 && stream->GetSize() == stream->GetPosition())
         {
             speed = 240;
             return new ReplayKen(eExtension::_ksm, uint32_t(duration));
