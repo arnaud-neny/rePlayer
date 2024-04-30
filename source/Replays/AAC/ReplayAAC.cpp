@@ -342,8 +342,9 @@ namespace rePlayer
 
         if (m_sampleBuffer == nullptr || frameInfo.error > 0)
             return Status::kFail;
+        if (m_sampleRate != frameInfo.samplerate || frameInfo.channels != 2)
+            return Status::kFail;
         m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
-        assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
 
         // compute the bitrate per second
         auto* bitRate = m_bitRate.free;
