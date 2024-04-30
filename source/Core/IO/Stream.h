@@ -37,7 +37,7 @@ namespace core::io
         // open another stream in the same context as the current one
         virtual [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) = 0;
         // open the next entry in the stream (eg: archive)
-        virtual [[nodiscard]] SmartPtr<Stream> Next();
+        virtual [[nodiscard]] SmartPtr<Stream> Next(bool isForced = false);
 
         // read all the stream
         virtual [[nodiscard]] const Span<const uint8_t> Read();

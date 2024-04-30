@@ -29,8 +29,9 @@ namespace core::io
         return { reinterpret_cast<const uint8_t*>(m_cachedData->m_ptr), size };
     }
 
-    SmartPtr<Stream> Stream::Next()
+    SmartPtr<Stream> Stream::Next(bool isForced)
     {
+        (void)isForced;
         return nullptr;
     }
 }

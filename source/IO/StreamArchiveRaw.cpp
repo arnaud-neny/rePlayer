@@ -5,8 +5,7 @@
 #include <IO/StreamMemory.h>
 
 // rePlayer
-// #include <Replayer/Core.h>
-#include "StreamArchive.h"
+#include "StreamArchiveRaw.h"
 
 // libarchive
 #include <libarchive/archive.h>
@@ -14,33 +13,31 @@
 
 namespace rePlayer
 {
-    SmartPtr<StreamArchive> StreamArchive::Create(const std::string& filename, bool isPackage)
-    {
-        auto stream = io::StreamFile::Create(filename);
-        if (stream.IsValid())
-            return Create(stream, isPackage);
-        return nullptr;
-    }
-
-    SmartPtr<StreamArchive> StreamArchive::Create(io::Stream* stream, bool isPackage)
+    SmartPtr<StreamArchiveRaw> StreamArchiveRaw::Create(io::Stream* stream)
     {
         if (stream)
         {
-            SmartPtr<StreamArchive> archiveStream(kAllocate, stream, isPackage);
+            SmartPtr<StreamArchiveRaw> archiveStream(kAllocate, stream);
             if (archiveStream->m_stream)
             {
-                if (archive_read_next_header(archiveStream->m_archive, &archiveStream->m_entry) == ARCHIVE_OK)
+                if (archive_entry_size_is_set(archiveStream->m_entry))
                 {
-                    archiveStream->m_entryFilename = archive_entry_pathname(archiveStream->m_entry);
                     archiveStream->m_entrySize = uint32_t(archive_entry_size(archiveStream->m_entry));
-                    return archiveStream;
                 }
+                else
+                {
+                    la_int64_t dataBlockOffset;
+                    while (archive_read_data_block(archiveStream->m_archive, (const void**)&archiveStream->m_entryDataBlock, &archiveStream->m_entryDataBlockSize, &dataBlockOffset) == ARCHIVE_OK)
+                        archiveStream->m_entrySize += archiveStream->m_entryDataBlockSize;
+                    archiveStream->ReOpen();
+                }
+                return archiveStream;
             }
         }
         return nullptr;
     }
 
-    size_t StreamArchive::Read(void* buffer, size_t size)
+    size_t StreamArchiveRaw::Read(void* buffer, size_t size)
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->Read(buffer, size);
@@ -73,7 +70,7 @@ namespace rePlayer
         return size - sizeLeft;
     }
 
-    Status StreamArchive::Seek(int64_t offset, SeekWhence whence)
+    Status StreamArchiveRaw::Seek(int64_t offset, SeekWhence whence)
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->Seek(offset, whence);
@@ -120,140 +117,94 @@ namespace rePlayer
         return Status::kOk;
     }
 
-    size_t StreamArchive::GetSize() const
+    size_t StreamArchiveRaw::GetSize() const
     {
         return m_entrySize;
     }
 
-    size_t StreamArchive::GetPosition() const
+    size_t StreamArchiveRaw::GetPosition() const
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->GetPosition();
         return m_entryPosition;
     }
 
-    SmartPtr<io::Stream> StreamArchive::Open(const std::string& filename)
+    const std::string& StreamArchiveRaw::GetName() const
     {
-        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
-        if (stream->m_stream.IsValid())
-        {
-            while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
-            {
-                auto* entryName = archive_entry_pathname(stream->m_entry);
-                if (_stricmp(entryName, filename.c_str()) == 0)
-                {
-                    stream->m_entryFilename = entryName;
-                    stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
-                    return stream;
-                }
-                stream->m_entryIndex++;
-            }
-        }
-        return nullptr;
+        return m_entryFilename;
     }
 
-    SmartPtr<io::Stream> StreamArchive::Next(bool isForced)
+    SmartPtr<io::Stream> StreamArchiveRaw::Open(const std::string& filename)
     {
-        if (isForced || !m_isPackage)
+        auto stream = m_stream->Open(filename);
+        if (stream.IsValid())
         {
-            SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
-            if (stream->m_stream.IsValid())
-            {
-                while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
-                {
-                    if (stream->m_entryIndex > m_entryIndex)
-                    {
-                        stream->m_entryFilename = archive_entry_pathname(stream->m_entry);
-                        stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
-                        return stream;
-                    }
-                    stream->m_entryIndex++;
-                }
-            }
+            if (auto archiveStream = StreamArchiveRaw::Create(stream))
+                stream = archiveStream;
         }
-        return nullptr;
+        return stream;
     }
 
-    const Span<const uint8_t> StreamArchive::Read()
+    const Span<const uint8_t> StreamArchiveRaw::Read()
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->Read();
 
         auto data = Stream::Read();
-        m_streamMemory = io::StreamMemory::Create(m_entryFilename, m_cachedData, data.Size());
+        m_streamMemory = io::StreamMemory::Create(m_stream->GetName(), m_cachedData, data.Size());
         return data;
     }
 
-    StreamArchive::StreamArchive(io::Stream* stream, bool isPackage)
+    StreamArchiveRaw::StreamArchiveRaw(io::Stream* stream)
         : m_stream(stream)
         , m_archive(archive_read_new())
-        , m_isPackage(isPackage)
     {
         stream->Seek(0, kSeekBegin);
 
         archive_read_support_filter_all(m_archive);
-        archive_read_support_format_all(m_archive);
+//         archive_read_support_format_empty(m_archive);
+        archive_read_support_format_raw(m_archive);
+
 
         archive_read_set_read_callback(m_archive, reinterpret_cast<archive_read_callback*>(ArchiveRead));
         archive_read_set_seek_callback(m_archive, reinterpret_cast<archive_seek_callback*>(ArchiveSeek));
         archive_read_set_skip_callback(m_archive, reinterpret_cast<archive_skip_callback*>(ArchiveSkip));
         archive_read_set_callback_data(m_archive, this);
-        if (archive_read_open1(m_archive) == ARCHIVE_OK)
-        {
-            // maybe we added a magic header at the end of the file
-            auto position = stream->GetPosition();
-            stream->Seek(-8, kSeekEnd);
-            char buf[8];
-            stream->Read(buf, 8);
-            stream->Seek(position, kSeekBegin);
-            for (uint32_t i = 0; i < 8; i++)
-            {
-                if (!((buf[i] >= 'A' && buf[i] <= 'Z')
-                    || buf[i] == '-'
-                    || (buf[i] >= '0' && buf[i] <= '9')))
-                    return;
-            }
-            m_comments.assign(buf, buf + 8);
-        }
-        else
+        // TBD: I suppose a raw has only one entry
+        if (archive_read_open1(m_archive) != ARCHIVE_OK || _stricmp(archive_filter_name(m_archive, 0), "none") == 0 || archive_read_next_header(m_archive, &m_entry) != ARCHIVE_OK)
             m_stream.Reset();
+        else
+            m_entryFilename = archive_entry_pathname(m_entry);
     }
 
-    StreamArchive::~StreamArchive()
+    StreamArchiveRaw::~StreamArchiveRaw()
     {
         archive_read_free(m_archive);
     }
 
-    SmartPtr<io::Stream> StreamArchive::OnClone()
+    SmartPtr<io::Stream> StreamArchiveRaw::OnClone()
     {
-        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
+        SmartPtr<StreamArchiveRaw> stream(kAllocate, m_stream->Clone());
         if (stream->m_stream.IsValid())
         {
             if (m_streamMemory.IsValid())
                 stream->m_streamMemory = m_streamMemory->Clone();
-            while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
-            {
-                if (stream->m_entryIndex == m_entryIndex)
-                {
-                    stream->m_entryFilename = m_entryFilename;
-                    stream->m_entrySize = m_entrySize;
-                    return stream;
-                }
-                stream->m_entryIndex++;
-            }
+            archive_read_next_header(stream->m_archive, &stream->m_entry);
+            stream->m_entrySize = m_entrySize;
             return stream;
         }
         return nullptr;
     }
 
-    void StreamArchive::ReOpen()
+    void StreamArchiveRaw::ReOpen()
     {
         archive_read_free(m_archive);
 
         m_archive = archive_read_new();
 
         archive_read_support_filter_all(m_archive);
-        archive_read_support_format_all(m_archive);
+//         archive_read_support_format_empty(m_archive);
+        archive_read_support_format_raw(m_archive);
 
         archive_read_set_read_callback(m_archive, reinterpret_cast<archive_read_callback*>(ArchiveRead));
         archive_read_set_seek_callback(m_archive, reinterpret_cast<archive_seek_callback*>(ArchiveSeek));
@@ -266,18 +217,17 @@ namespace rePlayer
 
         m_stream->Seek(0, kSeekBegin);
         archive_read_open1(m_archive);
-        for (uint32_t i = 0; i <= m_entryIndex; i++)
-            archive_read_next_header(m_archive, &m_entry);
+        archive_read_next_header(m_archive, &m_entry);
     }
 
-    int64_t StreamArchive::ArchiveRead(struct archive* a, StreamArchive* stream, const void** buf)
+    int64_t StreamArchiveRaw::ArchiveRead(struct archive* a, StreamArchiveRaw* stream, const void** buf)
     {
         (void)a;
         *buf = stream->m_cache;
         return int64_t(stream->m_stream->Read(stream->m_cache, kCacheSize));
     }
 
-    int64_t StreamArchive::ArchiveSeek(struct archive* a, StreamArchive* stream, int64_t request, int whence)
+    int64_t StreamArchiveRaw::ArchiveSeek(struct archive* a, StreamArchiveRaw* stream, int64_t request, int whence)
     {
         (void)a;
         if (stream->m_stream->Seek(request, io::Stream::SeekWhence(whence)) == Status::kOk)
@@ -285,7 +235,7 @@ namespace rePlayer
         return -1;
     }
 
-    int64_t StreamArchive::ArchiveSkip(struct archive* a, StreamArchive* stream, int64_t skip)
+    int64_t StreamArchiveRaw::ArchiveSkip(struct archive* a, StreamArchiveRaw* stream, int64_t skip)
     {
         (void)a;
         if (stream->m_stream->Seek(skip, kSeekCurrent) == Status::kFail)
