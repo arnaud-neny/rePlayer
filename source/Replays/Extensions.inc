@@ -290,9 +290,9 @@ EXTENSION(tpu)          // UADE: DirkBialluch
 EXTENSION(qpa)          // UADE: Quartet
 EXTENSION(qts)          // UADE: Quartet_ST & Quartet
 EXTENSION(miniqsf)      // Highly Quixotic
-EXTENSION(qsfPk)        // deprecated (turned into 7z)
+EXTENSION(rar)          // archive
 EXTENSION(minigsf)      // Highly Advanced
-EXTENSION(gsfPk)        // deprecated (turned into 7z)
+EXTENSION(7z)           // archive
 EXTENSION(ymst)         // UADE: YMST
 EXTENSION(wav)          // WAV
 EXTENSION(sid)          // SidPlay & UADE: SidMon1
@@ -318,7 +318,7 @@ EXTENSION(xmf)          // OpenMPT
 EXTENSION(mdat)         // TFMX & UADE: TFMX
 EXTENSION(ttt)          // TIATracker
 EXTENSION(mini2sf)      // vio2sf
-EXTENSION(2sfPk)        // deprecated (turned into 7z)
+EXTENSION(gz)           // archive
 EXTENSION(minissf)      // Highly Theoretical
 EXTENSION(ssfPk)        // deprecated (turned into 7z)
 EXTENSION(minidsf)      // Highly Theoretical

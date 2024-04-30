@@ -20,6 +20,9 @@ namespace rePlayer
     {
         static constexpr uint32_t kSongsVersionWithArchive = 2;
         static constexpr eExtension kExtension_mdxPk = eExtension::_rk;
+        static constexpr eExtension kExtension_qsfPk = eExtension::_rar;
+        static constexpr eExtension kExtension_gsfPk = eExtension::_7z;
+        static constexpr eExtension kExtension_2sfPk = eExtension::_gz;
         if (m_db.SongsVersion() < kSongsVersionWithArchive)
         {
             for (auto* song : m_db.Songs())
@@ -51,9 +54,9 @@ namespace rePlayer
                 switch (auto ext = song->GetType().ext)
                 {
                 case kExtension_mdxPk:
-                case eExtension::_qsfPk:
-                case eExtension::_gsfPk:
-                case eExtension::_2sfPk:
+                case kExtension_qsfPk:
+                case kExtension_gsfPk:
+                case kExtension_2sfPk:
                 case eExtension::_ssfPk:
                 case eExtension::_dsfPk:
                 case eExtension::_psfPk:
@@ -64,9 +67,9 @@ namespace rePlayer
                     auto oldFilename = m_songs->GetFullpath(song);
                     auto songSheet = song->Edit();
                     songSheet->type.ext = ext == kExtension_mdxPk ? eExtension::_mdx
-                        : ext == eExtension::_qsfPk ? eExtension::_miniqsf
-                        : ext == eExtension::_gsfPk ? eExtension::_minigsf
-                        : ext == eExtension::_2sfPk ? eExtension::_mini2sf
+                        : ext == kExtension_qsfPk ? eExtension::_miniqsf
+                        : ext == kExtension_gsfPk ? eExtension::_minigsf
+                        : ext == kExtension_2sfPk ? eExtension::_mini2sf
                         : ext == eExtension::_ssfPk ? eExtension::_minissf
                         : ext == eExtension::_dsfPk ? eExtension::_minidsf
                         : ext == eExtension::_psfPk ? eExtension::_minipsf

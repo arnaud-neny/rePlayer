@@ -71,13 +71,10 @@ namespace rePlayer
             Array<Entry> entries;
             bool arePathsDirty = false;
 
-            bool IsUrl(SourceID sourceId) const;
-            const char* GetPath(SourceID sourceId, bool isUrl) const;
             const char* GetPath(SourceID sourceId) const;
         };
 
-        static constexpr uint64_t kVersion0 = uint64_t(kMusicFileStamp) | (0ull << 32);
-        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (1ull << 32);
+        static constexpr uint32_t kVersion = 2;
         struct Summary
         {
             uint32_t numSubsongs = 0;
@@ -102,7 +99,7 @@ namespace rePlayer
 
         void ProcessExternalDragAndDrop(int32_t droppedEntryIndex);
 
-        Status LoadPlaylist(io::File& file, Cue& cue, uint64_t version);
+        Status LoadPlaylist(io::File& file, Cue& cue, uint32_t version);
         void SavePlaylist(io::File& file, const Cue& cue);
 
         void ButtonUrl();
@@ -111,9 +108,8 @@ namespace rePlayer
         void ButtonClear();
         void ButtonSort();
 
-        void AddFiles(int32_t droppedEntryIndex, bool isAcceptingAll);
+        void AddFiles(int32_t droppedEntryIndex, const Array<std::string>& files, bool isAcceptingAll, bool isUrl);
         void UpdateFiles();
-        void AddUrls(const Array<std::string>& urls, int32_t droppedEntryIndex);
 
         static std::string GetPlaylistFilename(const std::string& name);
         void SavePlaylistsToc();
