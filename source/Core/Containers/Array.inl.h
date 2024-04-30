@@ -197,21 +197,23 @@ namespace core
     template <typename ItemType>
     inline Array<ItemType>& Array<ItemType>::operator=(const Array& otherArray)
     {
-        assert(!m_items || m_items != otherArray.m_items);
+        auto* items = m_items;
+        auto* otherItems = otherArray.m_items;
+        if (items == otherItems)
+            return *this;
         auto otherNumItems = otherArray.m_numItems;
         if (otherNumItems > m_maxItems)
         {
             // allocate new items
-            auto otherItems = otherArray.m_items;
-            auto items = Alloc<ItemType>(otherNumItems * sizeof(ItemType));
+            auto newItems = Alloc<ItemType>(otherNumItems * sizeof(ItemType));
             // copy
             if constexpr (std::is_trivially_copyable<ItemType>::value)
             {
-                memcpy(items, otherItems, otherNumItems * sizeof(ItemType));
+                memcpy(newItems, otherItems, otherNumItems * sizeof(ItemType));
             }
             else
             {
-                auto itemsIt = items;
+                auto itemsIt = newItems;
                 for (auto num = otherNumItems; num--;)
                     new (itemsIt++) ItemType(*otherItems++);
             }
@@ -219,21 +221,19 @@ namespace core
             if constexpr (!std::is_trivially_destructible<ItemType>::value)
             {
                 auto numOldItems = m_numItems;
-                for (auto oldItems = m_items; numOldItems--; ++oldItems)
+                for (auto oldItems = items; numOldItems--; ++oldItems)
                     oldItems->~ItemType();
             }
-            Free(m_items);
-            m_items = items;
+            Free(items);
+            m_items = newItems;
             m_numItems = m_maxItems = otherNumItems;
         }
         else
         {
-            auto items = m_items;
             auto oldNumItems = m_numItems;
             if (otherNumItems > 0)
             {
                 // copy
-                auto otherItems = otherArray.m_items;
                 if constexpr (std::is_trivially_copyable<ItemType>::value)
                 {
                     memcpy(items, otherItems, otherNumItems * sizeof(ItemType));
@@ -263,9 +263,10 @@ namespace core
     template <typename ItemType>
     inline Array<ItemType>& Array<ItemType>::operator=(Array&& otherArray)
     {
-        auto items = m_items;
-        auto otherItems = otherArray.m_items;
-        assert(!items || items != otherItems);
+        auto* items = m_items;
+        auto* otherItems = otherArray.m_items;
+        if (items == otherItems)
+            return *this;
         // delete old items
         if constexpr (!std::is_trivially_destructible<ItemType>::value)
         {
