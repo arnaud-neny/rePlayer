@@ -1,8 +1,8 @@
-v0.15.10:
+v0.15.11:
 - Added Ayumi
 - Added Ken
 - Added Organya
-- Updated Furnace to 0.6.2
+- Updated Furnace to 0.6.3
 - Updated gbsplay to 0.0.97
 - Updated libsidplay to 2.7.0
 - Updated OpenMPT to 0.7.6
