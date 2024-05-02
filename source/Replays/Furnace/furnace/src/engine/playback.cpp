@@ -36,17 +36,6 @@ void DivEngine::nextOrder() {
     endOfSong=true;
     memset(walked,0,8192);
     curOrder=0;
-    if (numTimesPlayed>=0) {
-      numTimesPlayed++;
-      divider=curSubSong->hz*(1.0+(double)(MAX(numTimesPlayed-6,0))*0.04);
-    }
-  }
-  if (numTimesPlayed>2 && !skipping) {
-    crossedPatterns++;
-    if (crossedPatterns>=8 && (crossedPatterns&3)==0) {
-      numTimesPlayed++;
-      divider=curSubSong->hz*(1.0+(double)(MAX(numTimesPlayed-6,0))*0.04);
-    }
   }
 }
 
@@ -270,6 +259,9 @@ const char* cmdName[]={
   "DAVE_CLOCK_DIV",
 
   "MINMOD_ECHO",
+
+  "BIFURCATOR_STATE_LOAD",
+  "BIFURCATOR_PARAMETER"
 };
 
 static_assert((sizeof(cmdName)/sizeof(void*))==DIV_CMD_MAX,"update cmdName!");
@@ -632,14 +624,6 @@ void DivEngine::processRow(int i, bool afterDelay) {
   } else if (!(pat->data[whatRow][0]==0 && pat->data[whatRow][1]==0)) {
     chan[i].oldNote=chan[i].note;
     chan[i].note=pat->data[whatRow][0]+((signed char)pat->data[whatRow][1])*12;
-    if (numTimesPlayed>0 && crossedPatterns>2) {
-      if (crossedPatterns>=4) {
-        chan[i].note+=(int)(MAX(0,pow(MAX(0,crossedPatterns-4),1.2)))>>2;
-      }
-      if ((rand()%MAX(1,60-crossedPatterns))==0) {
-        chan[i].note=12+(rand()&63);
-      }
-    }
     if (!chan[i].keyOn) {
       if (disCont[dispatchOfChan[i]].dispatch->keyOffAffectsArp(dispatchChanOfChan[i])) {
         chan[i].arp=0;
@@ -670,6 +654,7 @@ void DivEngine::processRow(int i, bool afterDelay) {
   bool calledPorta=false;
   bool panChanged=false;
   bool surroundPanChanged=false;
+  bool sampleOffSet=false;
 
   // effects
   for (int j=0; j<curPat[i].effectCols; j++) {
@@ -905,13 +890,18 @@ void DivEngine::processRow(int i, bool afterDelay) {
       case 0x94: case 0x95: case 0x96: case 0x97: 
       case 0x98: case 0x99: case 0x9a: case 0x9b:
       case 0x9c: case 0x9d: case 0x9e: case 0x9f: // set samp. pos
-        dispatchCmd(DivCommand(DIV_CMD_SAMPLE_POS,i,(((effect&0x0f)<<8)|effectVal)*256));
+        if (song.oldSampleOffset) {
+          dispatchCmd(DivCommand(DIV_CMD_SAMPLE_POS,i,(((effect&0x0f)<<8)|effectVal)*256));
+        } else {
+          if (effect<0x93) {
+            chan[i].sampleOff&=~(0xff<<((effect-0x90)<<3));
+            chan[i].sampleOff|=effectVal<<((effect-0x90)<<3);
+            sampleOffSet=true;
+          }
+        }
         break;
       case 0xc0: case 0xc1: case 0xc2: case 0xc3: // set Hz
         divider=(double)(((effect&0x3)<<8)|effectVal);
-        if (numTimesPlayed>=0) {
-          divider*=1.0+(double)(MAX(numTimesPlayed-6,0))*0.04;
-        }
         if (divider<1) divider=1;
         cycles=got.rate*pow(2,MASTER_CLOCK_PREC)/divider;
         clockDrift=0;
@@ -1044,9 +1034,6 @@ void DivEngine::processRow(int i, bool afterDelay) {
         break;
       case 0xf0: // set Hz by tempo
         divider=(double)effectVal*2.0/5.0;
-        if (numTimesPlayed>=0) {
-          divider*=1.0+(double)(MAX(numTimesPlayed-6,0))*0.04;
-        }
         if (divider<1) divider=1;
         cycles=got.rate*pow(2,MASTER_CLOCK_PREC)/divider;
         clockDrift=0;
@@ -1133,6 +1120,10 @@ void DivEngine::processRow(int i, bool afterDelay) {
         logV("scheduling stop");
         break;
     }
+  }
+
+  if (sampleOffSet) {
+    dispatchCmd(DivCommand(DIV_CMD_SAMPLE_POS,i,chan[i].sampleOff));
   }
 
   if (panChanged) {
@@ -1744,7 +1735,7 @@ bool DivEngine::nextTick(bool noAccum, bool inhibitLowLat) {
       }
     }
 
-    if (consoleMode && subticks<=1 && !skipping) fprintf(stderr,"\x1b[2K> %d:%.2d:%.2d.%.2d  %.2x/%.2x:%.3d/%.3d  %4dcmd/s\x1b[G",totalSeconds/3600,(totalSeconds/60)%60,totalSeconds%60,totalTicks/10000,curOrder,curSubSong->ordersLen,curRow,curSubSong->patLen,cmdsPerSecond);
+    if (consoleMode && !disableStatusOut && subticks<=1 && !skipping) fprintf(stderr,"\x1b[2K> %d:%.2d:%.2d.%.2d  %.2x/%.2x:%.3d/%.3d  %4dcmd/s\x1b[G",totalSeconds/3600,(totalSeconds/60)%60,totalSeconds%60,totalTicks/10000,curOrder,curSubSong->ordersLen,curRow,curSubSong->patLen,cmdsPerSecond);
   }
 
   if (haltOn==DIV_HALT_TICK) halted=true;

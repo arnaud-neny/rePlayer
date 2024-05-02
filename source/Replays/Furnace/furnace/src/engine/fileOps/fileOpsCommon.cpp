@@ -150,16 +150,24 @@ bool DivEngine::load(unsigned char* f, size_t slen, const char* nameHint) {
     return loadFur(file,len);
   } else if (memcmp(file,DIV_FUR_MAGIC_DS0,16)==0) {
     return loadFur(file,len,DIV_FUR_VARIANT_B);
-    // rePlayer begin
-  }/* else if (memcmp(file, DIV_FC13_MAGIC, 4) == 0 || memcmp(file, DIV_FC14_MAGIC, 4) == 0) {
+  // rePlayer begin
+/*
+  } else if (memcmp(file, DIV_FC13_MAGIC, 4) == 0 || memcmp(file, DIV_FC14_MAGIC, 4) == 0) {
     return loadFC(file,len);
+*/
+  // rePlayer end
+  } else if (memcmp(file,DIV_TFM_MAGIC,8)==0) {
+    return loadTFMv2(file,len);
   }
 
+  // rePlayer begin
+/*
   // step 3: try loading as .mod
   if (loadMod(file,len)) {
     delete[] f;
     return true;
-  }*/
+  }
+*/
   // rePlayer end
 
   // step 4: not a valid file

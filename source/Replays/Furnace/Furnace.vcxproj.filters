@@ -162,8 +162,20 @@
     <Filter Include="Source Files\furnace\engine\platform\sound\dave">
       <UniqueIdentifier>{d5a06d2d-1220-4a08-bb11-c2df154321a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\adpcm-xq">
-      <UniqueIdentifier>{31285aa2-5ff5-4be7-936e-1897ec659238}</UniqueIdentifier>
+    <Filter Include="Source Files\furnace\engine\platform\sound\atomicssg">
+      <UniqueIdentifier>{78101b67-17da-44a9-83d8-26ca0bba2c22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\sid2">
+      <UniqueIdentifier>{8848b97b-8fe0-42c8-a23f-4b8dfce67ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\emu2413">
+      <UniqueIdentifier>{0a726af5-de4f-4b10-b198-aa655c49fa7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\YM2608-LLE">
+      <UniqueIdentifier>{adf7ee09-d187-4004-85f9-fdc576ccbd0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\adpcm-xq-s">
+      <UniqueIdentifier>{c478106e-7d02-437a-b8f5-15225bc17bed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -953,14 +965,65 @@
     <ClInclude Include="furnace\src\engine\platform\nds.h">
       <Filter>Source Files\furnace\engine\platform</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\adpcm-xq\adpcm-lib.h">
-      <Filter>Source Files\adpcm-xq</Filter>
-    </ClInclude>
     <ClInclude Include="furnace\src\engine\platform\sound\vera_pcm.h">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClInclude>
     <ClInclude Include="furnace\src\engine\platform\sound\vera_psg.h">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\atomicssg\ssg.h">
+      <Filter>Source Files\furnace\engine\platform\sound\atomicssg</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\envelope.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\filter.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\sid.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\siddefs.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\spline.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\voice.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\wave.h">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\bifurcator.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sid2.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\emu2413\emu2413.h">
+      <Filter>Source Files\emu2413</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2608.h">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2610.h">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2612.h">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_impl.h">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_rom.h">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\audio\pipe.h">
+      <Filter>Source Files\furnace\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\adpcm-xq-s\adpcm-lib.h">
+      <Filter>Source Files\adpcm-xq-s</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1708,14 +1771,74 @@
     <ClCompile Include="furnace\src\engine\platform\nds.cpp">
       <Filter>Source Files\furnace\engine\platform</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\adpcm-xq\adpcm-lib.c">
-      <Filter>Source Files\adpcm-xq</Filter>
-    </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\vera_pcm.c">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\vera_psg.c">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\tfm.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\atomicssg\ssg.c">
+      <Filter>Source Files\furnace\engine\platform\sound\atomicssg</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\envelope.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\filter.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\sid.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\version.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\voice.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580__ST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_P_T.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_PS_.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_PST.cc">
+      <Filter>Source Files\furnace\engine\platform\sound\sid2</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\bifurcator.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sid2.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\emu2413\emu2413.c">
+      <Filter>Source Files\emu2413</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2608.c">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2610.c">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2612.c">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_impl.c">
+      <Filter>Source Files\YM2608-LLE</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\audio\pipe.cpp">
+      <Filter>Source Files\furnace\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\adpcm-xq-s\adpcm-lib.c">
+      <Filter>Source Files\adpcm-xq-s</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

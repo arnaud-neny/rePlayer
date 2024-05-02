@@ -52,10 +52,10 @@ class DivWorkPool;
 #define EXTERN_BUSY_BEGIN_SOFT e->softLocked=true; e->isBusy.lock();
 #define EXTERN_BUSY_END e->isBusy.unlock(); e->softLocked=false;
 
-#define DIV_UNSTABLE
+//#define DIV_UNSTABLE
 
-#define DIV_VERSION "0.6.2"
-#define DIV_ENGINE_VERSION 197
+#define DIV_VERSION "0.6.3"
+#define DIV_ENGINE_VERSION 201
 // for imports
 #define DIV_VERSION_MOD 0xff01
 #define DIV_VERSION_FC 0xff02
@@ -72,6 +72,7 @@ enum DivAudioEngines {
   DIV_AUDIO_JACK=0,
   DIV_AUDIO_SDL=1,
   DIV_AUDIO_PORTAUDIO=2,
+  DIV_AUDIO_PIPE=3,
 
   DIV_AUDIO_NULL=126,
   DIV_AUDIO_DUMMY=127
@@ -104,9 +105,10 @@ struct DivChannelState {
   int delayOrder, delayRow, retrigSpeed, retrigTick;
   int vibratoDepth, vibratoRate, vibratoPos, vibratoPosGiant, vibratoDir, vibratoFine;
   int tremoloDepth, tremoloRate, tremoloPos;
+  int sampleOff;
   unsigned char arp, arpStage, arpTicks, panL, panR, panRL, panRR, lastVibrato, lastPorta, cutType;
   bool doNote, legato, portaStop, keyOn, keyOff, nowYouCanStop, stopOnOff, releasing;
-  bool arpYield, delayLocked, inPorta, scheduledSlideReset, shorthandPorta, wasShorthandPorta, noteOnInhibit, resetArp;
+  bool arpYield, delayLocked, inPorta, scheduledSlideReset, shorthandPorta, wasShorthandPorta, noteOnInhibit, resetArp, sampleOffSet;
   bool wentThroughNote, goneThroughNote;
 
   int midiNote, curMidiNote, midiPitch;
@@ -140,6 +142,7 @@ struct DivChannelState {
     tremoloDepth(0),
     tremoloRate(0),
     tremoloPos(0),
+    sampleOff(0),
     arp(0),
     arpStage(-1),
     arpTicks(1),
@@ -166,6 +169,7 @@ struct DivChannelState {
     wasShorthandPorta(false),
     noteOnInhibit(false),
     resetArp(false),
+    sampleOffSet(false),
     wentThroughNote(false),
     goneThroughNote(false),
     midiNote(-1),
@@ -405,6 +409,7 @@ class DivEngine {
   bool shallStop, shallStopSched;
   bool endOfSong;
   bool consoleMode;
+  bool disableStatusOut;
   bool extValuePresent;
   bool repeatPattern;
   bool metronome;
@@ -430,16 +435,14 @@ class DivEngine {
   float midiVolExp;
   int softLockCount;
 public: // rePlayer begin
-    int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, nextSpeed, elapsedBars, elapsedBeats, curSpeed;
+  int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, nextSpeed, elapsedBars, elapsedBeats, curSpeed;
 private: // rePlayer end
-    size_t curSubSongIndex;
+  size_t curSubSongIndex;
   size_t bufferPos;
   double divider;
   int cycles;
   double clockDrift;
   int midiClockCycles;
-  int numTimesPlayed;
-  int crossedPatterns;
   double midiClockDrift;
   int midiTimeCycles;
   double midiTimeDrift;
@@ -555,6 +558,8 @@ private: // rePlayer end
   bool loadS3M(unsigned char* file, size_t len);
   bool loadFTM(unsigned char* file, size_t len, bool dnft, bool dnftSig, bool eft);
   bool loadFC(unsigned char* file, size_t len);
+  bool loadTFMv1(unsigned char* file, size_t len);
+  bool loadTFMv2(unsigned char* file, size_t len);
 
   void loadDMP(SafeReader& reader, std::vector<DivInstrument*>& ret, String& stripPath);
   void loadTFI(SafeReader& reader, std::vector<DivInstrument*>& ret, String& stripPath);
@@ -750,9 +755,6 @@ private: // rePlayer end
 
     // find song loop position
     void walkSong(int& loopOrder, int& loopRow, int& loopEnd);
-
-    // set number of times the song has played
-    void setNumTimesPlayed(int count);
 
     // play (returns whether successful)
     bool play();
@@ -1106,7 +1108,7 @@ private: // rePlayer end
     void rescanMidiDevices();
 
     // set the console mode.
-    void setConsoleMode(bool enable);
+    void setConsoleMode(bool enable, bool statusOut=true);
 
     // get metronome
     bool getMetronome();
@@ -1289,6 +1291,7 @@ private: // rePlayer end
       shallStopSched(false),
       endOfSong(false),
       consoleMode(false),
+      disableStatusOut(false),
       extValuePresent(false),
       repeatPattern(false),
       metronome(false),
@@ -1332,8 +1335,6 @@ private: // rePlayer end
       cycles(0),
       clockDrift(0),
       midiClockCycles(0),
-      numTimesPlayed(0),
-      crossedPatterns(0),
       midiClockDrift(0),
       midiTimeCycles(0),
       midiTimeDrift(0),

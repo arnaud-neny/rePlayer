@@ -103,12 +103,13 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="furnace\extern\adpcm-xq\adpcm-lib.h" />
+    <ClInclude Include="furnace\extern\adpcm-xq-s\adpcm-lib.h" />
     <ClInclude Include="furnace\extern\adpcm\bs_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\oki_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\yma_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\ymb_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\ymz_codec.h" />
+    <ClInclude Include="furnace\extern\emu2413\emu2413.h" />
     <ClInclude Include="furnace\extern\ESFMu\esfm.h" />
     <ClInclude Include="furnace\extern\fmt\include\fmt\args.h" />
     <ClInclude Include="furnace\extern\fmt\include\fmt\chrono.h" />
@@ -154,9 +155,15 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\extern\vgsound_emu\src\scc\scc.hpp" />
     <ClInclude Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.hpp" />
     <ClInclude Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.hpp" />
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2608.h" />
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2610.h" />
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2612.h" />
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_impl.h" />
+    <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_rom.h" />
     <ClInclude Include="furnace\extern\YM3812-LLE\fmopl2.h" />
     <ClInclude Include="furnace\extern\YMF262-LLE\fmopl3.h" />
     <ClInclude Include="furnace\extern\YMF276-LLE\fmopn2.h" />
+    <ClInclude Include="furnace\src\audio\pipe.h" />
     <ClInclude Include="furnace\src\audio\taAudio.h" />
     <ClInclude Include="furnace\src\baseutils.h" />
     <ClInclude Include="furnace\src\engine\blip_buf.h" />
@@ -183,6 +190,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\arcade.h" />
     <ClInclude Include="furnace\src\engine\platform\ay.h" />
     <ClInclude Include="furnace\src\engine\platform\ay8930.h" />
+    <ClInclude Include="furnace\src\engine\platform\bifurcator.h" />
     <ClInclude Include="furnace\src\engine\platform\bubsyswsg.h" />
     <ClInclude Include="furnace\src\engine\platform\c140.h" />
     <ClInclude Include="furnace\src\engine\platform\c64.h" />
@@ -227,9 +235,11 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\saa.h" />
     <ClInclude Include="furnace\src\engine\platform\scc.h" />
     <ClInclude Include="furnace\src\engine\platform\segapcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sid2.h" />
     <ClInclude Include="furnace\src\engine\platform\sm8521.h" />
     <ClInclude Include="furnace\src\engine\platform\sms.h" />
     <ClInclude Include="furnace\src\engine\platform\snes.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\atomicssg\ssg.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ay8910.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\c140_c219.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\c64\envelope.h" />
@@ -299,6 +309,13 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="furnace\src\engine\platform\sound\rf5c68.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\saa1099.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\segapcm.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\envelope.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\filter.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\sid.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\siddefs.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\spline.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\voice.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid2\wave.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sm8521.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sn76496.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_common.h" />
@@ -370,12 +387,13 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClInclude Include="ReplayFurnace.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="furnace\extern\adpcm-xq\adpcm-lib.c" />
+    <ClCompile Include="furnace\extern\adpcm-xq-s\adpcm-lib.c" />
     <ClCompile Include="furnace\extern\adpcm\bs_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\oki_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\yma_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\ymb_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\ymz_codec.c" />
+    <ClCompile Include="furnace\extern\emu2413\emu2413.c" />
     <ClCompile Include="furnace\extern\ESFMu\esfm.c" />
     <ClCompile Include="furnace\extern\ESFMu\esfm_registers.c" />
     <ClCompile Include="furnace\extern\fmt\src\format.cc" />
@@ -410,11 +428,19 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\extern\vgsound_emu\src\scc\scc.cpp" />
     <ClCompile Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.cpp" />
     <ClCompile Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.cpp" />
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2608.c" />
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2610.c" />
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2612.c" />
+    <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_impl.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="furnace\extern\YM3812-LLE\fmopl2.c" />
     <ClCompile Include="furnace\extern\YMF262-LLE\fmopl3.c" />
     <ClCompile Include="furnace\extern\YMF276-LLE\fmopn2.c" />
     <ClCompile Include="furnace\src\audio\abstract.cpp" />
     <ClCompile Include="furnace\src\audio\midi.cpp" />
+    <ClCompile Include="furnace\src\audio\pipe.cpp" />
     <ClCompile Include="furnace\src\baseutils.cpp" />
     <ClCompile Include="furnace\src\engine\blip_buf.c" />
     <ClCompile Include="furnace\src\engine\brrUtils.c" />
@@ -439,6 +465,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\fileOps\mod.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\s3m.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\text.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\tfm.cpp" />
     <ClCompile Include="furnace\src\engine\filter.cpp" />
     <ClCompile Include="furnace\src\engine\instrument.cpp" />
     <ClCompile Include="furnace\src\engine\macroInt.cpp" />
@@ -449,6 +476,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\arcade.cpp" />
     <ClCompile Include="furnace\src\engine\platform\ay.cpp" />
     <ClCompile Include="furnace\src\engine\platform\ay8930.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\bifurcator.cpp" />
     <ClCompile Include="furnace\src\engine\platform\bubsyswsg.cpp" />
     <ClCompile Include="furnace\src\engine\platform\c140.cpp" />
     <ClCompile Include="furnace\src\engine\platform\c64.cpp" />
@@ -491,9 +519,11 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\saa.cpp" />
     <ClCompile Include="furnace\src\engine\platform\scc.cpp" />
     <ClCompile Include="furnace\src\engine\platform\segapcm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sid2.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sm8521.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sms.cpp" />
     <ClCompile Include="furnace\src\engine\platform\snes.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\atomicssg\ssg.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\ay8910.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\c140_c219.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\c64\envelope.cc" />
@@ -559,6 +589,16 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="furnace\src\engine\platform\sound\rf5c68.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\saa1099.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\segapcm.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\envelope.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\filter.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\sid.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\version.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\voice.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_PST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_PS_.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_P_T.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580__ST.cc" />
     <ClCompile Include="furnace\src\engine\platform\sound\sm8521.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\sn76496.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\snes\SPC_DSP.cpp" />

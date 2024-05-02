@@ -665,6 +665,20 @@ void DivEngine::registerSystems() {
     fmESFMPostEffectHandlerMap.emplace(0x30+i,fmESFMFixFreqFNumHandler[i/4]);
   }
 
+  EffectHandlerMap SID2PostEffectHandlerMap={
+    {0x10, {DIV_CMD_WAVE, "10xx: Set waveform (bit 0: triangle; bit 1: saw; bit 2: pulse; bit 3: noise)"}},
+    {0x11, {DIV_CMD_C64_RESONANCE, "11xx: Set resonance (0 to FF)"}},
+    {0x12, {DIV_CMD_C64_FILTER_MODE, "12xx: Set filter mode (bit 0: low pass; bit 1: band pass; bit 2: high pass)"}},
+    {0x13, {DIV_CMD_C64_RESET_MASK, "13xx: Disable envelope reset for this channel (1 disables; 0 enables)"}},
+    {0x14, {DIV_CMD_C64_FILTER_RESET, "14xy: Reset cutoff (x: on new note; y: now)"}},
+    {0x15, {DIV_CMD_C64_DUTY_RESET, "15xy: Reset pulse width (x: on new note; y: now)"}},
+    {0x16, {DIV_CMD_C64_EXTENDED, "16xy: Change other parameters"}},
+  };
+  const EffectHandler SID2FineDutyHandler(DIV_CMD_C64_FINE_DUTY, "3xxx: Set pulse width (0 to FFF)", effectValLong<12>);
+  const EffectHandler SID2FineCutoffHandler(DIV_CMD_C64_FINE_CUTOFF, "4xxx: Set cutoff (0 to FFF)", effectValLong<11>);
+  for (int i=0; i<16; i++) SID2PostEffectHandlerMap.emplace(0x30+i,SID2FineDutyHandler);
+  for (int i=0; i<16; i++) SID2PostEffectHandlerMap.emplace(0x40+i,SID2FineCutoffHandler);
+
   // SysDefs
 
   // this chip uses YMZ ADPCM, but the emulator uses ADPCM-B because I got it wrong back then.
@@ -777,7 +791,7 @@ void DivEngine::registerSystems() {
   );
 
   sysDefs[DIV_SYSTEM_C64_6581]=new DivSysDef(
-    "Commodore 64 (6581)", NULL, 0x47, 0x47, 3, false, true, 0, false, 0, 0, 0,
+    "Commodore 64 (SID 6581)", NULL, 0x47, 0x47, 3, false, true, 0, false, 0, 0, 0,
     "this computer is powered by the SID chip, which had synthesizer features like a filter and ADSR.",
     {"Channel 1", "Channel 2", "Channel 3"},
     {"CH1", "CH2", "CH3"},
@@ -789,7 +803,7 @@ void DivEngine::registerSystems() {
   );
 
   sysDefs[DIV_SYSTEM_C64_8580]=new DivSysDef(
-    "Commodore 64 (8580)", NULL, 0x07, 0x07, 3, false, true, 0, false, 0, 0, 0,
+    "Commodore 64 (SID 8580)", NULL, 0x07, 0x07, 3, false, true, 0, false, 0, 0, 0,
     "this computer is powered by the SID chip, which had synthesizer features like a filter and ADSR.\nthis is the newer revision of the chip.",
     {"Channel 1", "Channel 2", "Channel 3"},
     {"CH1", "CH2", "CH3"},
@@ -885,7 +899,7 @@ void DivEngine::registerSystems() {
   );
 
   sysDefs[DIV_SYSTEM_TIA]=new DivSysDef(
-    "Atari 2600", NULL, 0x84, 0, 2, false, true, 0, false, 0, 0, 0,
+    "Atari TIA", NULL, 0x84, 0, 2, false, true, 0, false, 0, 0, 0,
     "it's a challenge to make music on this chip which barely has musical capabilities...",
     {"Channel 1", "Channel 2"},
     {"CH1", "CH2"},
@@ -1303,7 +1317,7 @@ void DivEngine::registerSystems() {
 
   sysDefs[DIV_SYSTEM_VRC7]=new DivSysDef(
     "Konami VRC7", NULL, 0x9d, 0, 6, true, false, 0x151, false, 0, 0, 0,
-    "like OPLL, but even more cost reductions applied. three less FM channels, and no drums mode...",
+    "like OPLL, but even more cost reductions applied. three FM channels went missing, and drums mode did as well...",
     {"FM 1", "FM 2", "FM 3", "FM 4", "FM 5", "FM 6"},
     {"F1", "F2", "F3", "F4", "F5", "F6"},
     {DIV_CH_FM, DIV_CH_FM, DIV_CH_FM, DIV_CH_FM, DIV_CH_FM, DIV_CH_FM},
@@ -2089,6 +2103,34 @@ void DivEngine::registerSystems() {
       {0x19, {DIV_CMD_NES_LINEAR_LENGTH, "19xx: Set triangle linear counter (0 to 7F; 80 and higher halt)"}},
       {0x20, {DIV_CMD_SAMPLE_FREQ, "20xx: Set DPCM frequency (0 to F)"}}
     }
+  );
+
+  sysDefs[DIV_SYSTEM_BIFURCATOR]=new DivSysDef(
+    "Bifurcator", NULL, 0xd9, 0, 4, false, true, 0, false, 0, 0, 0,
+    "a fantasy sound chip using logistic map iterations to generate sound.",
+    {"Channel 1", "Channel 2", "Channel 3", "Channel 4"},
+    {"CH1", "CH2", "CH3", "CH4"},
+    {DIV_CH_NOISE, DIV_CH_NOISE, DIV_CH_NOISE, DIV_CH_NOISE},
+    {DIV_INS_BIFURCATOR, DIV_INS_BIFURCATOR, DIV_INS_BIFURCATOR, DIV_INS_BIFURCATOR},
+    {},
+    {
+      {0x10, {DIV_CMD_BIFURCATOR_STATE_LOAD, "10xx: Load low byte of channel sample state", constVal<0>, effectVal}},
+      {0x11, {DIV_CMD_BIFURCATOR_STATE_LOAD, "11xx: Load high byte of channel sample state", constVal<1>, effectVal}},
+      {0x12, {DIV_CMD_BIFURCATOR_PARAMETER, "12xx: Set low byte of channel parameter", constVal<0>, effectVal}},
+      {0x13, {DIV_CMD_BIFURCATOR_PARAMETER, "13xx: Set high byte of channel parameter", constVal<1>, effectVal}},
+    }
+  );
+
+  sysDefs[DIV_SYSTEM_SID2]=new DivSysDef(   
+    "SID2", NULL, 0xf0, 0, 3, false, true, 0, false, 0, 0, 0,
+    "a fantasy sound chip created by LTVA. it is similar to the SID chip, but with many of its problems fixed.",
+    {"Channel 1", "Channel 2", "Channel 3"},
+    {"CH1", "CH2", "CH3"},
+    {DIV_CH_NOISE, DIV_CH_NOISE, DIV_CH_NOISE},
+    {DIV_INS_SID2, DIV_INS_SID2, DIV_INS_SID2},
+    {},
+    {}, 
+    SID2PostEffectHandlerMap
   );
 
   sysDefs[DIV_SYSTEM_DUMMY]=new DivSysDef(

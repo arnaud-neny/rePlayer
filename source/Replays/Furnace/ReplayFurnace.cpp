@@ -24,7 +24,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
-        .extensions = "fur;dmf;ftm;dnm;0cc;eft",
+        .extensions = "fur;dmf;ftm;dnm;0cc;eft;tfm",
         .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2024 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
@@ -56,7 +56,7 @@ namespace rePlayer
     }
 
     ReplayFurnace::ReplayFurnace(DivEngine* engine, const char* name)
-        : Replay(engine->song.isDMF ? eExtension::_dmf : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur), eReplay::Furnace)
+        : Replay(engine->song.isDMF ? eExtension::_dmf : ((engine->song.systemName == "Sega Genesis/Mega Drive or TurboSound FM") ? eExtension::_tfm : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur)), eReplay::Furnace)
         , m_engine(engine)
     {}
 
