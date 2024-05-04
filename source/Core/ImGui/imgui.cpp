@@ -8612,6 +8612,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
     return id;
 }
 
+// rePlayer begin
+ImGuiID ImGuiWindow::GetID(const void* ptr, const void* ptr_end)
+{
+    ImGuiID seed = IDStack.back();
+    ImGuiID id = ImHashData(ptr, (uint8_t*)ptr_end - (uint8_t*)ptr, seed);
+#ifndef IMGUI_DISABLE_DEBUG_TOOLS
+    ImGuiContext& g = *Ctx;
+    if (g.DebugHookIdInfo == id)
+        ImGui::DebugHookIdInfo(id, ImGuiDataType_Pointer, ptr, NULL);
+#endif
+    return id;
+}
+// rePlayer end
+
 ImGuiID ImGuiWindow::GetID(int n)
 {
     ImGuiID seed = IDStack.back();
@@ -8656,6 +8670,16 @@ void ImGui::PushID(const void* ptr_id)
     ImGuiID id = window->GetID(ptr_id);
     window->IDStack.push_back(id);
 }
+
+// rePlayer begin
+void ImGui::PushID(const void* ptr_id_begin, const void* ptr_id_end)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
+    ImGuiID id = window->GetID(ptr_id_begin, ptr_id_end);
+    window->IDStack.push_back(id);
+}
+// rePlayer end
 
 void ImGui::PushID(int int_id)
 {

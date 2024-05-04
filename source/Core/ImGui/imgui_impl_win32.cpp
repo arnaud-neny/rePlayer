@@ -1007,12 +1007,18 @@ static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags fl
     else
         *out_style = WS_OVERLAPPEDWINDOW;
 
+#ifdef _WIN64
+    DWORD exStyle = WS_EX_NOREDIRECTIONBITMAP; // transparent window
+#else
+    DWORD exStyle = 0;
+#endif
+
     if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
-        *out_ex_style = WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP;
+        *out_ex_style = WS_EX_TOOLWINDOW | exStyle;
     else
     {
         *out_style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX; // min max to trigger wm_syscommand
-        *out_ex_style = WS_EX_APPWINDOW | WS_EX_NOREDIRECTIONBITMAP;
+        *out_ex_style = WS_EX_APPWINDOW | exStyle;
     }
 
     if (flags & ImGuiViewportFlags_TopMost)

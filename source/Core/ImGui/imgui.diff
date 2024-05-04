@@ -41,10 +41,18 @@ index d556cba..676f65f 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index 1476441..24dedae 100644
+index 1476441..79d4012 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
-@@ -586,7 +586,7 @@ namespace ImGui
+@@ -511,6 +511,7 @@ namespace ImGui
+     IMGUI_API void          PushID(const char* str_id);                                     // push string into the ID stack (will hash string).
+     IMGUI_API void          PushID(const char* str_id_begin, const char* str_id_end);       // push string into the ID stack (will hash string).
+     IMGUI_API void          PushID(const void* ptr_id);                                     // push pointer into the ID stack (will hash pointer).
++    IMGUI_API void          PushID(const void* ptr_id_begin, const void* ptr_id_end);       // push pointer into the ID stack (will hash pointer). // rePlayer
+     IMGUI_API void          PushID(int int_id);                                             // push integer into the ID stack (will hash integer).
+     IMGUI_API void          PopID();                                                        // pop from the ID stack.
+     IMGUI_API ImGuiID       GetID(const char* str_id);                                      // calculate unique ID (hash of whole ID stack + given parameter). e.g. if you want to query into ImGuiStorage yourself
+@@ -586,7 +587,7 @@ namespace ImGui
      IMGUI_API bool          DragInt3(const char* label, int v[3], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragInt4(const char* label, int v[4], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragIntRange2(const char* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
@@ -54,7 +62,7 @@ index 1476441..24dedae 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index d74843d..92b84fd 100644
+index d74843d..582d8a2 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
 @@ -2249,8 +2249,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
@@ -81,6 +89,56 @@ index d74843d..92b84fd 100644
          return false;
      if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
          return false;
+@@ -8608,6 +8612,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
+     return id;
+ }
+ 
++// rePlayer begin
++ImGuiID ImGuiWindow::GetID(const void* ptr, const void* ptr_end)
++{
++    ImGuiID seed = IDStack.back();
++    ImGuiID id = ImHashData(ptr, (uint8_t*)ptr_end - (uint8_t*)ptr, seed);
++#ifndef IMGUI_DISABLE_DEBUG_TOOLS
++    ImGuiContext& g = *Ctx;
++    if (g.DebugHookIdInfo == id)
++        ImGui::DebugHookIdInfo(id, ImGuiDataType_Pointer, ptr, NULL);
++#endif
++    return id;
++}
++// rePlayer end
++
+ ImGuiID ImGuiWindow::GetID(int n)
+ {
+     ImGuiID seed = IDStack.back();
+@@ -8653,6 +8671,16 @@ void ImGui::PushID(const void* ptr_id)
+     window->IDStack.push_back(id);
+ }
+ 
++// rePlayer begin
++void ImGui::PushID(const void* ptr_id_begin, const void* ptr_id_end)
++{
++    ImGuiContext& g = *GImGui;
++    ImGuiWindow* window = g.CurrentWindow;
++    ImGuiID id = window->GetID(ptr_id_begin, ptr_id_end);
++    window->IDStack.push_back(id);
++}
++// rePlayer end
++
+ void ImGui::PushID(int int_id)
+ {
+     ImGuiContext& g = *GImGui;
+diff --git "a/external\\imgui-docking\\imgui_internal.h" "b/source\\Core\\ImGui\\imgui_internal.h"
+index df086e5..b45d815 100644
+--- "a/external\\imgui-docking\\imgui_internal.h"
++++ "b/source\\Core\\ImGui\\imgui_internal.h"
+@@ -2850,6 +2850,7 @@ public:
+ 
+     ImGuiID     GetID(const char* str, const char* str_end = NULL);
+     ImGuiID     GetID(const void* ptr);
++    ImGuiID     GetID(const void* ptr, const void* ptr_end); // rePlayer
+     ImGuiID     GetID(int n);
+     ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
+ 
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 index 8361c5b..843db96 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
@@ -104,10 +162,10 @@ index 8361c5b..843db96 100644
      if (label_size.x > 0.0f)
          RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-index 8cc0d9a..59aa392 100644
+index 8cc0d9a..3f3bc20 100644
 --- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-@@ -999,21 +999,26 @@ struct ImGui_ImplWin32_ViewportData
+@@ -999,21 +999,32 @@ struct ImGui_ImplWin32_ViewportData
      ~ImGui_ImplWin32_ViewportData() { IM_ASSERT(Hwnd == nullptr); }
  };
  
@@ -122,13 +180,19 @@ index 8cc0d9a..59aa392 100644
  
 -    if (flags & ImGuiViewportFlags_NoTaskBarIcon)
 -        *out_ex_style = WS_EX_TOOLWINDOW;
++#ifdef _WIN64
++    DWORD exStyle = WS_EX_NOREDIRECTIONBITMAP; // transparent window
++#else
++    DWORD exStyle = 0;
++#endif
++
 +    if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
-+        *out_ex_style = WS_EX_TOOLWINDOW | WS_EX_NOREDIRECTIONBITMAP;
++        *out_ex_style = WS_EX_TOOLWINDOW | exStyle;
      else
 -        *out_ex_style = WS_EX_APPWINDOW;
 +    {
 +        *out_style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX; // min max to trigger wm_syscommand
-+        *out_ex_style = WS_EX_APPWINDOW | WS_EX_NOREDIRECTIONBITMAP;
++        *out_ex_style = WS_EX_APPWINDOW | exStyle;
 +    }
  
      if (flags & ImGuiViewportFlags_TopMost)
@@ -138,7 +202,7 @@ index 8cc0d9a..59aa392 100644
  
  static HWND ImGui_ImplWin32_GetHwndFromViewportID(ImGuiID viewport_id)
  {
-@@ -1029,7 +1034,9 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+@@ -1029,7 +1040,9 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
      viewport->PlatformUserData = vd;
  
      // Select style and parent window
@@ -149,7 +213,7 @@ index 8cc0d9a..59aa392 100644
      vd->HwndParent = ImGui_ImplWin32_GetHwndFromViewportID(viewport->ParentViewportId);
  
      // Create window
-@@ -1107,7 +1114,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
+@@ -1107,7 +1120,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
      // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
      DWORD new_style;
      DWORD new_ex_style;
@@ -160,7 +224,7 @@ index 8cc0d9a..59aa392 100644
  
      // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
      if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
-@@ -1242,6 +1251,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+@@ -1242,6 +1257,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
  #endif
  }
  
@@ -171,7 +235,7 @@ index 8cc0d9a..59aa392 100644
  static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
  {
      if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-@@ -1251,6 +1264,20 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1251,6 +1270,20 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
      {
          switch (msg)
          {
@@ -192,7 +256,7 @@ index 8cc0d9a..59aa392 100644
          case WM_CLOSE:
              viewport->PlatformRequestClose = true;
              return 0;
-@@ -1280,6 +1307,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1280,6 +1313,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
  
  static void ImGui_ImplWin32_InitPlatformInterface(bool platform_has_own_dc)
  {
@@ -200,7 +264,7 @@ index 8cc0d9a..59aa392 100644
      WNDCLASSEX wcex;
      wcex.cbSize = sizeof(WNDCLASSEX);
      wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0);
-@@ -1287,13 +1315,14 @@ static void ImGui_ImplWin32_InitPlatformInterface(bool platform_has_own_dc)
+@@ -1287,13 +1321,14 @@ static void ImGui_ImplWin32_InitPlatformInterface(bool platform_has_own_dc)
      wcex.cbClsExtra = 0;
      wcex.cbWndExtra = 0;
      wcex.hInstance = ::GetModuleHandle(nullptr);
