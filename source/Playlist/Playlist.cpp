@@ -714,11 +714,11 @@ namespace rePlayer
         if (m_addFilesContext)
         {
             const char wait[] = "|/-\\";
-            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d %c###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60, wait[m_addFilesContext->time >> 14]);
+            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u %c###Playlist", uint32_t(m_currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60), wait[m_addFilesContext->time >> 14]);
             m_addFilesContext->time += uint16_t(11 * ImGui::GetIO().DeltaTime * ((1 << 14) - 1));
         }
         else
-            sprintf(title, "Playlist: %d/%d %s - %d:%02d:%02d###Playlist", m_currentEntryIndex + 1, m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", duration / 3600, (duration % 3600) / 60, duration % 60);
+            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u###Playlist", uint32_t(m_currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60));
 
         ImGui::SetNextWindowPos(ImVec2(16.0f, 188.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(430.0f, 480.0f), ImGuiCond_FirstUseEver);
