@@ -1,4 +1,4 @@
-v0.15.11:
+v0.15.12:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -18,6 +18,7 @@ v0.15.11:
 - Playlist sort from current playing position while pressing Ctrl
 - Refactor song packages
 - Resizable UI
+- Win32 port
 - Bug fixes
 
 v0.14.0:

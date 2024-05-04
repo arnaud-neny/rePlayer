@@ -62,10 +62,10 @@
 - Vorbis: https://github.com/edubart/minivorbis  
   Some changes there to improved the loops (score) and some windows port.
 - WavPack: https://github.com/dbry/WavPack
+- WonderSwan: https://foobar2000.xrea.jp/?Input+64bit#f44897bc
 - zingzong: https://github.com/benjihan/zingzong
 - ZXTune: https://zxtune.bitbucket.io  
   Stripped to use only ZX stuff and "fixed" for MSVC.
-- WonderSwan: https://foobar2000.xrea.jp/?Input+64bit#f44897bc
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler
