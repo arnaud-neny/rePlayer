@@ -149,7 +149,7 @@ namespace rePlayer
 
     void Library::SongsUI::CleanupCache()
     {
-        if (m_hasFailedDeletes)
+        if (m_hasFailedDeletes && std::filesystem::exists(ms_path))
         {
             Array<std::filesystem::path> directories;
             for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(ms_path))
