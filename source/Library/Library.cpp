@@ -221,7 +221,7 @@ namespace rePlayer
             auto type = replay->GetMediaType();
             bool hasChanged = oldType != type || metadata != song->metadata;
             song->type = type;
-            if (oldType.ext != type.ext)
+            if (oldType.ext != type.ext && !song->subsongs[0].isArchive)
             {
                 auto newFilename = m_songs->GetFullpath(dbSong);
                 if (!io::File::Rename(stream->GetName().c_str(), newFilename.c_str()))
