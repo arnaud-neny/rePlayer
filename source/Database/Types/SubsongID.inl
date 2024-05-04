@@ -34,11 +34,6 @@ namespace rePlayer
         : songId(newSongId)
         , index(newIndex)
     {}
-
-    inline std::size_t SubsongID::operator()(SubsongID const& subsongId) const noexcept
-    {
-        return subsongId.Value();
-    }
 }
 // namespace rePlayer
 

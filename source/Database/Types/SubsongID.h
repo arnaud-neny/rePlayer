@@ -21,8 +21,6 @@ namespace rePlayer
 
         constexpr SubsongID() = default;
         constexpr SubsongID(SongID newSongId, uint32_t newIndex);
-
-        std::size_t operator()(SubsongID const& subsongId) const noexcept;
     };
 }
 // namespace rePlayer
