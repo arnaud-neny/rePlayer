@@ -198,17 +198,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\pack_x64.asm">
+    <MASM Include="src\pack_x86.asm">
       <Filter>Source Files\src</Filter>
-    </None>
-    <None Include="src\pack_x86.asm">
+    </MASM>
+    <MASM Include="src\unpack_x86.asm">
       <Filter>Source Files\src</Filter>
-    </None>
-    <None Include="src\unpack_x64.asm">
+    </MASM>
+    <MASM Include="src\pack_x64.asm">
       <Filter>Source Files\src</Filter>
-    </None>
-    <None Include="src\unpack_x86.asm">
+    </MASM>
+    <MASM Include="src\unpack_x64.asm">
       <Filter>Source Files\src</Filter>
-    </None>
+    </MASM>
   </ItemGroup>
 </Project>

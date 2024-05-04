@@ -344,7 +344,7 @@ namespace rePlayer
                     auto musicId = MusicID(m_entries[rowIdx].id, m_databaseId);
                     Song* song = m_db[musicId.subsongId];
 
-                    ImGui::PushID(reinterpret_cast<void*>(musicId.subsongId.Value()));
+                    ImGui::PushID(&musicId.subsongId, &musicId.subsongId + 1);
                     ImGui::TableNextColumn();
 
                     SetRowBackground(rowIdx, song, musicId.subsongId, currentPlayingSong);
@@ -489,13 +489,13 @@ namespace rePlayer
             {
                 auto numSongs = m_export->NumSongs();
                 char buf[32];
-                sprintf(buf, "Song %d/%d", songIndex + 1, numSongs);
+                sprintf(buf, "Song %u/%u", songIndex + 1, numSongs);
                 ImGui::ProgressBar((songIndex + 1.0f) / numSongs, ImVec2(-FLT_MIN, 0), buf);
             }
             if (duration != 0xffFFffFF)
             {
                 char buf[32];
-                sprintf(buf, "%d:%02d", duration / 60, duration % 60);
+                sprintf(buf, "%u:%02u", uint32_t(duration / 60), uint32_t(duration % 60));
                 ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), buf);
             }
             else
@@ -767,7 +767,7 @@ namespace rePlayer
     void DatabaseSongsUI::AddToArtist()
     {
         // Build and sort the artist list
-        Array<Artist*> artists(0ull, m_db.NumArtists());
+        Array<Artist*> artists(size_t(0), m_db.NumArtists());
         for (Artist* artist : m_db.Artists())
             artists.Add(artist);
         std::sort(artists.begin(), artists.end(), [this](auto l, auto r)

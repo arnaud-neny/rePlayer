@@ -429,7 +429,7 @@ namespace rePlayer
         const uint32_t numSamplesToAdd = m_replay->GetSampleRate() * 300;
         uint32_t numAllocatedSamples = m_samples.NumItems();
         uint32_t numSamples = m_numSamples;
-        ImGui::BeginDisabled((numSamples + numSamplesToAdd) * m_samples.ItemSize() > 0xffFFffFFull);
+        ImGui::BeginDisabled((numSamples + numSamplesToAdd) * m_samples.ItemSize<uint64_t>() > 0xffFFffFFull);
         if (ImGui::Button("+"))
         {
             numSamples += numSamplesToAdd;

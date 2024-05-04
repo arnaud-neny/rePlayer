@@ -1,5 +1,6 @@
+#ifdef _WIN64
 #include "Graphics.h"
-#include "GraphicsPremul.h"
+#include "GraphicsPremulDx12.h"
 
 namespace rePlayer
 {
@@ -152,3 +153,5 @@ namespace rePlayer
     }
 }
 // namespace rePlayer
+
+#endif // _WIN64

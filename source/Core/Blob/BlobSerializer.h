@@ -24,7 +24,7 @@ namespace core
 
         void Store(const uint8_t* items, size_t size, size_t alignment);
 
-        void Push(size_t patchOffset, size_t numItems = ~0ull);
+        void Push(size_t patchOffset, size_t numItems = ~size_t(0));
         void Pop();
 
         Status Save(io::File& file);

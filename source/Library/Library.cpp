@@ -1099,7 +1099,7 @@ namespace rePlayer
             ImGui::BeginDisabled(numChecked == 0);
             char txt[64] = "Nothing to import###Process";
             if (numChecked > 0)
-                sprintf(txt, "%d %s to import###Process", numChecked, numChecked == 1 ? "song" : "songs");
+                sprintf(txt, "%u %s to import###Process", numChecked, numChecked == 1 ? "song" : "songs");
             if (ImGui::Button(txt, ImVec2(-1.0f, 0.0f)))
             {
                 auto databaseDay = uint16_t((std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())) - std::chrono::sys_days(std::chrono::days(Core::kReferenceDate))).count());

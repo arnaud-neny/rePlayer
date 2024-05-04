@@ -244,7 +244,7 @@ namespace rePlayer
 
     void SongEditor::EditSubsongs()
     {
-        char indexFormat[] = "#%01d";
+        char indexFormat[] = "#%01u";
         for (auto count = m_song.edited.lastSubsongIndex + 1; count >= 10; count /= 10)
             indexFormat[3]++;
 

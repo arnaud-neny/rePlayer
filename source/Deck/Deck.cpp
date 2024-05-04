@@ -241,7 +241,9 @@ namespace rePlayer
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
                 }
             }
+#ifdef _WIN64
             ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
+#endif
             ImGui::SliderFloat("Scale", &m_scale, 1.0f, 4.0f, "%1.2f", ImGuiSliderFlags_AlwaysClamp);
             Log::DisplaySettings();
         }
@@ -484,21 +486,21 @@ namespace rePlayer
             if (m_mode == Mode::Solo)
             {
                 if (m_seekPos >= 0)
-                    sprintf(buf, "%d:%02d/%d:%02d", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60);
+                    sprintf(buf, "%u:%02u/%u:%02u", uint32_t(m_seekPos / 60000), uint32_t((m_seekPos / 1000) % 60), duration / 60000, (duration / 1000) % 60);
                 else if (durationCs > 0)
-                    sprintf(buf, "%d:%02d/%d:%02d", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60);
+                    sprintf(buf, "%u:%02u/%u:%02u", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60);
                 else
-                    sprintf(buf, "%d:%02d", playbackTime / 60000, (playbackTime / 1000) % 60);
+                    sprintf(buf, "%u:%02u", playbackTime / 60000, (playbackTime / 1000) % 60);
             }
             else
             {
                 auto& playlist = Core::GetPlaylist();
                 if (m_seekPos >= 0)
-                    sprintf(buf, "%d:%02d/%d:%02d [%d/%u]", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
+                    sprintf(buf, "%u:%02u/%u:%02u [%u/%u]", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
                 else if (durationCs > 0)
-                    sprintf(buf, "%d:%02d/%d:%02d [%d/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
+                    sprintf(buf, "%u:%02u/%u:%02u [%u/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
                 else
-                    sprintf(buf, "%d:%02d [%d/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
+                    sprintf(buf, "%u:%02u [%u/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
             }
             ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 4);
             ImGui::PushStyleVar(ImGuiStyleVar_DisabledAlpha, 1.0f);

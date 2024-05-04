@@ -644,7 +644,7 @@ namespace rePlayer
                         }
                     }
                     // re-pack artists
-                    Array<char> strings(0ull, m_strings.NumItems<size_t>());
+                    Array<char> strings(size_t(0), m_strings.NumItems<size_t>());
                     uint32_t lastArtist = 0xffFFffFF;
                     for (uint32_t i = 0, e = guessedArtists.NumItems(); i < e; i++)
                     {

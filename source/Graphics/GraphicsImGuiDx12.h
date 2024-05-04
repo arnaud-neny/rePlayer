@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef _WIN64
 #include <d3d12.h>
 #include <Containers/SmartPtr.h>
 #include <Core/RefCounted.h>
@@ -54,3 +55,5 @@ namespace rePlayer
     };
 }
 // namespace rePlayer
+
+#endif // _WIN64

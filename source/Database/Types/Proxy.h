@@ -35,7 +35,11 @@ namespace rePlayer
 
         struct Info : public Blob
         {
-            DynamicType* buffer;
+            union
+            {
+                DynamicType* buffer;
+                uint64_t dummy; // to keep the struct size between 32bit and 64bit architectures
+            };
             int16_t reconcileDelay;
         };
     };

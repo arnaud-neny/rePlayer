@@ -416,7 +416,7 @@ namespace rePlayer
                 newArtist.id = SourceID(kID, FindArtist(dbArtist.name(m_db.strings)));
                 newArtist.name = dbArtist.name(m_db.strings);
                 char buf[32];
-                sprintf(buf, "%d %s", dbArtist.numSongs, dbArtist.numSongs <= 1 ? "song" : "songs");
+                sprintf(buf, "%u %s", dbArtist.numSongs, dbArtist.numSongs <= 1 ? "song" : "songs");
                 newArtist.description = buf;
             }
         }
@@ -767,7 +767,7 @@ namespace rePlayer
                 file.Write(kVersion);
                 if (m_areStringsDirty)
                 {
-                    Array<char> strings(0ull, m_strings.NumItems());
+                    Array<char> strings(size_t(0), m_strings.NumItems());
                     strings.Add('\0');
                     // re-pack replays
                     Array<SourceReplay> replays(m_replays);
@@ -808,7 +808,7 @@ namespace rePlayer
                 }
                 if (m_areDataDirty)
                 {
-                    Array<uint8_t> data(0ull, m_data.NumItems<size_t>());
+                    Array<uint8_t> data(size_t(0), m_data.NumItems<size_t>());
                     data.Add(m_data.Items(), alignof(SourceSong));
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);

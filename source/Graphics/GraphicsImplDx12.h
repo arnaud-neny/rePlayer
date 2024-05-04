@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef _WIN64
 #include <d3d12.h>
 #include <dcomp.h>
 #include <Containers/SmartPtr.h>
@@ -138,4 +139,6 @@ namespace rePlayer
 }
 // namespace rePlayer
 
-#include "GraphicsImpl.inl"
+#include "GraphicsImplDx12.inl"
+
+#endif // _WIN64

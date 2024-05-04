@@ -91,7 +91,11 @@ namespace rePlayer
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &downloadBuffer);
                     char downloadUrl[256];
-                     sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer.zip", majorVersion, minorVersion, patchVersion);
+#ifdef _WIN64
+                    sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer.zip", majorVersion, minorVersion, patchVersion);
+#else
+                    sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer-win32.zip", majorVersion, minorVersion, patchVersion);
+#endif
                     curl_easy_setopt(curl, CURLOPT_URL, downloadUrl);
                     if (curl_easy_perform(curl) == CURLE_OK)
                     {

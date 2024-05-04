@@ -1,6 +1,10 @@
 #pragma once
 
-#include "GraphicsImpl.h"
+#ifdef _WIN64
+#include "GraphicsImplDx12.h"
+#else
+#include "GraphicsImplDx11.h"
+#endif
 
 namespace rePlayer
 {

@@ -372,7 +372,7 @@ namespace rePlayer
                 ImGui::BeginDisabled(m_numMergedEntries == 0);
                 char mergeLabel[64];
                 if (m_numMergedEntries > 0)
-                    sprintf(mergeLabel, "Merge %d song%s###Merge", m_numMergedEntries, m_numMergedEntries > 1 ? "s" : "");
+                    sprintf(mergeLabel, "Merge %u song%s###Merge", m_numMergedEntries, m_numMergedEntries > 1 ? "s" : "");
                 if (ImGui::Button(m_numMergedEntries > 0 ? mergeLabel : "Nothing to merge###Merge", ImVec2(-FLT_MIN, 0)))
                 {
                     Process(songs);

@@ -34,7 +34,7 @@
 typedef uint32_t Uword;				/* (0-0xFFFF) */
 typedef uint8_t Ubyte;			/* unsigned 8bit integer for table */
 #define CCall __cdecl
-#define FastCall __fastcall
+#define FastCall /*__fastcall*/
 #define RTO16(w) ((Uword)((w) & 0xFFFF))	/* Round to 16bit integer */
 #define RTO8(w) ((Uword)((w) & 0xFF))		/* Round to  8bit integer */
 #elif defined(__BORLANDC__)

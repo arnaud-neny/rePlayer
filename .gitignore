@@ -2,11 +2,7 @@
 /.output
 *.vcxproj.user
 *.aps
-/data/rePlayer.exe
-/data/settings.ini
-/data/db/
-/data/logs/
-/data/replays/
-/data/songs/
+/data/
+/data-win32/
 /external/
 /source/enc_temp_folder

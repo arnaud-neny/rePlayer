@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 extern void* myAlloc(size_t);
 extern void* myCalloc(size_t);
 extern void* myRealloc(void*, size_t);

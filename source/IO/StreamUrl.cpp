@@ -281,11 +281,11 @@ namespace rePlayer
     const Span<const uint8_t> StreamUrl::Read()
     {
         if (m_type == Type::kStreaming)
-            return { nullptr, 0ull };
+            return { nullptr, size_t(0) };
 
         while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
-        return { m_data.Items(), m_head };
+        return { m_data.Items(), size_t(m_head) };
     }
 
     StreamUrl::StreamUrl(const std::string& url, bool isClone)
@@ -315,7 +315,7 @@ namespace rePlayer
 
         curl_easy_setopt(m_curl, CURLOPT_REFERER, url.c_str());
         char buf[128];
-        sprintf(buf, "rePlayer %d.%d.%d", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
+        sprintf(buf, "rePlayer %u.%u.%u", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
         curl_easy_setopt(m_curl, CURLOPT_USERAGENT, buf);
 
         curl_easy_setopt(m_curl, CURLOPT_HEADERFUNCTION, OnCurlHeader);

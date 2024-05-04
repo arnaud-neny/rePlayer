@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GraphicsImpl.h"
+#ifdef _WIN64
+#include "GraphicsImplDx12.h"
 
 namespace rePlayer
 {
@@ -10,3 +11,5 @@ namespace rePlayer
     }
 }
 // namespace rePlayer
+
+#endif // _WIN64

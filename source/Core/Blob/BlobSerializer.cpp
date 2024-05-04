@@ -34,7 +34,7 @@ namespace core
         patch->previousPatch = m_currentPatch;
         m_currentPatch = m_patches.NumItems<uint16_t>() - 1;
         patch->numItems = uint16_t(numItems);
-        patch->hasNumItems = numItems != ~0ull;
+        patch->hasNumItems = numItems != ~size_t(0);
     }
 
     void BlobSerializer::Pop()

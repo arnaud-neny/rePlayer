@@ -23,17 +23,17 @@ namespace rePlayer
         bool IsUrl() const { return m_isUrl; }
         Array<std::string> AcquireFiles();
 
-        ULONG AddRef() override;
-        ULONG Release() override;
+        ULONG STDMETHODCALLTYPE AddRef() override;
+        ULONG STDMETHODCALLTYPE Release() override;
 
     private:
-        HRESULT QueryInterface(REFIID riid, void** ppvObject) override;
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 
-        HRESULT DragEnter(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
-        HRESULT DragLeave() override;
-        HRESULT DragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
+        HRESULT STDMETHODCALLTYPE DragEnter(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
+        HRESULT STDMETHODCALLTYPE DragLeave() override;
+        HRESULT STDMETHODCALLTYPE DragOver(DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
 
-        HRESULT Drop(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
+        HRESULT STDMETHODCALLTYPE Drop(IDataObject* pDataObj, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect) override;
 
         void OnCreateWindow(ImGuiViewport* vp) override;
         void OnDestroyWindow(ImGuiViewport* vp) override;

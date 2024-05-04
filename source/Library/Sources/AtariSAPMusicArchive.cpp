@@ -96,7 +96,7 @@ namespace rePlayer
                 newArtist.id = SourceID(kID, FindArtist(dbArtist));
                 newArtist.name = m_db.handles[dbArtist.handleIndex](m_db.strings);
                 char buf[32];
-                sprintf(buf, "%d %s", dbArtist.numSongs, dbArtist.numSongs <= 1 ? "song" : "songs");
+                sprintf(buf, "%u %s", dbArtist.numSongs, dbArtist.numSongs <= 1 ? "song" : "songs");
                 newArtist.description = buf;
                 if (dbArtist.name.offset && dbArtist.name.offset != m_db.handles[dbArtist.handleIndex].offset)
                 {
@@ -422,7 +422,7 @@ namespace rePlayer
                 file.Write(kVersion);
                 if (m_areStringsDirty)
                 {
-                    Array<char> strings(0ull, m_strings.NumItems());
+                    Array<char> strings(size_t(0), m_strings.NumItems());
                     strings.Add('\0');
                     // remove discarded roots at the end of the array
                     Array<SourceRoot> roots(m_roots);
@@ -474,7 +474,7 @@ namespace rePlayer
                 }
                 if (m_areDataDirty)
                 {
-                    Array<uint8_t> data(0ull, m_data.NumItems<size_t>());
+                    Array<uint8_t> data(size_t(0), m_data.NumItems<size_t>());
                     data.Add(m_data.Items(), alignof(SourceSong));
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);

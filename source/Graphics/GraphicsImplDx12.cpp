@@ -1,6 +1,7 @@
-#include "GraphicsImpl.h"
-#include "GraphicsImGui.h"
-#include "GraphicsPremul.h"
+#ifdef _WIN64
+#include "GraphicsImplDx12.h"
+#include "GraphicsImGuiDx12.h"
+#include "GraphicsPremulDx12.h"
 
 #include <Core/Log.h>
 #include <Imgui.h>
@@ -535,3 +536,5 @@ namespace rePlayer
     }
 }
 // namespace rePlayer
+
+#endif // _WIN64

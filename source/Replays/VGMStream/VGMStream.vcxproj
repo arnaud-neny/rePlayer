@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -24,7 +32,20 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -37,7 +58,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -45,11 +72,40 @@
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_FFMPEG;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;HAVE_AV_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\opus\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)ffmpeg;$(ProjectDir)ffmpeg\compat\atomics\win32;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;opus.lib;vorbis.lib;mpg123.lib;Bcrypt.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_FFMPEG;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;HAVE_AV_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -98,6 +154,36 @@
       <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
 del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
 $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_FFMPEG;VGM_USE_ATRAC9;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;HAVE_AV_CONFIG_H;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\opus\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\mpg123\src\include;$(ProjectDir)libg719_decode\reference_code\include;$(ProjectDir)libg719_decode;$(ProjectDir)ffmpeg;$(ProjectDir)ffmpeg\compat\atomics\win32;$(ProjectDir)LibAtrac9\src;$(ProjectDir)speex\include;$(ProjectDir)vgmstream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;ogg.lib;opus.lib;vorbis.lib;mpg123.lib;Bcrypt.lib;shlwapi.lib;$(CoreLibraryDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data-win32\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data-win32\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data-win32\replays\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -625,79 +711,117 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
   <ItemGroup>
     <ClCompile Include="celt-0.11.0\libcelt\bands.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\celt.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\cwrs.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\entcode.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\entdec.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\entenc.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\header.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\kiss_fft.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\laplace.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\mathops.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\mdct.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\modes.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\pitch.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\plc.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\quant_bands.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\rate.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\static_modes_fixed.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\static_modes_float.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="celt-0.11.0\libcelt\vq.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CUSTOM_MODES;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="celt-0.6.1\libcelt\bands.c" />
     <ClCompile Include="celt-0.6.1\libcelt\celt.c" />
@@ -722,26 +846,34 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\aacdec.c" />
     <ClCompile Include="ffmpeg\libavcodec\aacdec_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\aacps.c" />
     <ClCompile Include="ffmpeg\libavcodec\aacpsdata.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\aacpsdsp_template.c" />
     <ClCompile Include="ffmpeg\libavcodec\aacps_common.c" />
     <ClCompile Include="ffmpeg\libavcodec\aacsbr.c" />
     <ClCompile Include="ffmpeg\libavcodec\aacsbr_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\aactab.c" />
     <ClCompile Include="ffmpeg\libavcodec\aac_ac3_parser.c" />
     <ClCompile Include="ffmpeg\libavcodec\ac3.c" />
     <ClCompile Include="ffmpeg\libavcodec\ac3dec.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\ac3dec_data.c" />
     <ClCompile Include="ffmpeg\libavcodec\ac3dec_float.c" />
@@ -772,14 +904,18 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\bsf.c" />
     <ClCompile Include="ffmpeg\libavcodec\bsf_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\bswapdsp.c" />
     <ClCompile Include="ffmpeg\libavcodec\cbrt_data.c" />
     <ClCompile Include="ffmpeg\libavcodec\codec_desc.c" />
     <ClCompile Include="ffmpeg\libavcodec\codec_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\codec_par.c" />
     <ClCompile Include="ffmpeg\libavcodec\dct.c" />
@@ -787,13 +923,17 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\dct32_float.c" />
     <ClCompile Include="ffmpeg\libavcodec\dct32_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\decode.c" />
     <ClCompile Include="ffmpeg\libavcodec\dirac.c" />
     <ClCompile Include="ffmpeg\libavcodec\eac3dec.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\eac3_data.c" />
     <ClCompile Include="ffmpeg\libavcodec\encode.c" />
@@ -804,11 +944,15 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\flacdsp.c" />
     <ClCompile Include="ffmpeg\libavcodec\flacdsp_lpc_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\flacdsp_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\flac_parser.c" />
     <ClCompile Include="ffmpeg\libavcodec\fmtconvert.c" />
@@ -835,7 +979,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_float.c" />
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodec_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp.c" />
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_data.c" />
@@ -843,7 +989,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_float.c" />
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiodsp_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\mpegaudiotabs.c" />
     <ClCompile Include="ffmpeg\libavcodec\mpegaudio_parser.c" />
@@ -856,7 +1004,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\parsers.c" />
     <ClCompile Include="ffmpeg\libavcodec\parser_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\pcm.c" />
     <ClCompile Include="ffmpeg\libavcodec\profiles.c" />
@@ -865,7 +1015,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavcodec\sbrdsp.c" />
     <ClCompile Include="ffmpeg\libavcodec\sbrdsp_template.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavcodec\sinewin_tablegen.c" />
     <ClCompile Include="ffmpeg\libavcodec\smacker.c" />
@@ -923,7 +1075,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavformat\demux.c" />
     <ClCompile Include="ffmpeg\libavformat\demuxer_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavformat\demux_utils.c" />
     <ClCompile Include="ffmpeg\libavformat\dovi_isom.c" />
@@ -945,7 +1099,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavformat\mpc8.c" />
     <ClCompile Include="ffmpeg\libavformat\muxer_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavformat\mux_utils.c" />
     <ClCompile Include="ffmpeg\libavformat\oggdec.c" />
@@ -966,7 +1122,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ffmpeg\libavformat\protocols.c" />
     <ClCompile Include="ffmpeg\libavformat\protocol_list.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ffmpeg\libavformat\qtpalette.c" />
     <ClCompile Include="ffmpeg\libavformat\rawdec.c" />
@@ -1076,139 +1234,207 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     <ClCompile Include="ReplayVGMStream.cpp" />
     <ClCompile Include="speex\libspeex\bits.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\cb_search.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_10_16_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_10_32_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_20_32_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_5_256_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_5_64_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\exc_8_128_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\filters.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\gain_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\gain_table_lbr.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\hexc_10_32_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\hexc_table.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\high_lsp_tables.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\kiss_fft.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\kiss_fftr.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\lpc.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\lsp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\lsp_tables_nb.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\ltp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\modes.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\modes_wb.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\nb_celp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\quant_lsp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\sb_celp.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\smallft.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\speex.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\speex_callbacks.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\speex_header.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\stereo.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\vbr.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\vorbis_psy.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\vq.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="speex\libspeex\window.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;VGM_USE_VORBIS;VGM_USE_MPEG;VGM_USE_G7221;VGM_USE_G719;VGM_USE_CELT;VGM_USE_SPEEX;WIN32;USE_ALLOCA;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="vgmstream\src\base\decode.c" />
     <ClCompile Include="vgmstream\src\base\info.c" />

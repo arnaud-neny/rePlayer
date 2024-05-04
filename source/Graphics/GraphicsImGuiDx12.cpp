@@ -1,9 +1,10 @@
+#ifdef _WIN64
 #include <Imgui.h>
 
 #include "Graphics.h"
 #include "GraphicsFont3x5.h"
 #include "GraphicsFontLog.h"
-#include "GraphicsImGui.h"
+#include "GraphicsImGuiDx12.h"
 #include "MediaIcons.h"
 
 namespace rePlayer
@@ -598,3 +599,5 @@ namespace rePlayer
     }
 }
 // namespace rePlayer
+
+#endif // _WIN64

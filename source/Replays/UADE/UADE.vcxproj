@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -24,7 +32,20 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -39,7 +60,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -47,11 +74,40 @@
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -102,18 +158,80 @@ del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
 $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_WINDOWS;_USRDLL;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_DECLARE_NONSTDC_NAMES;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)uade\src;$(ProjectDir)uade\src\include;$(ProjectDir)uade\src\frontends\common;$(ProjectDir)uade\src\frontends\include;$(ProjectDir)bencode\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data-win32\replays &gt; nul 2&gt;&amp;1
+del $(SolutionDir)..\data-win32\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data-win32\replays\$(TargetFileName) $(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bencode\include\bencodetools\bencode.h" />
     <ClInclude Include="compat\memmemrep.h" />
     <ClInclude Include="compat\strlrep.h" />
     <ClInclude Include="data.h">
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(FullPath)</Outputs>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BuildInParallel>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</BuildInParallel>
       <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClInclude</OutputItemType>
+      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ClInclude</OutputItemType>
       <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClInclude</OutputItemType>
+      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ClInclude</OutputItemType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
+echo Path=%TARGET_PATH_FOR_SOURCE%
+type nul &gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;%(FullPath)
+echo { &gt;&gt;%(FullPath)
+echo     size_t size;&gt;&gt; %(FullPath)
+echo     const unsigned int* data;&gt;&gt; %(FullPath)
+echo     const char* path;&gt;&gt; %(FullPath)
+echo } static s_files[] = {&gt;&gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=\\!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo };&gt;&gt; %(FullPath)
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal EnableDelayedExpansion
 set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
 echo Path=%TARGET_PATH_FOR_SOURCE%
 type nul &gt; %(FullPath)
@@ -165,8 +283,36 @@ for /R data %%f in (*.*) do (
 )
 echo };&gt;&gt; %(FullPath)
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
+echo Path=%TARGET_PATH_FOR_SOURCE%
+type nul &gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;%(FullPath)
+echo { &gt;&gt;%(FullPath)
+echo     size_t size;&gt;&gt; %(FullPath)
+echo     const unsigned int* data;&gt;&gt; %(FullPath)
+echo     const char* path;&gt;&gt; %(FullPath)
+echo } static s_files[] = {&gt;&gt; %(FullPath)
+set /A filenumber=0
+for /R data %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=\\!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
+  set /A filenumber+=1
+)
+echo };&gt;&gt; %(FullPath)
+</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
     </ClInclude>
     <ClInclude Include="ReplayUADE.h" />
     <ClInclude Include="ReplayUADE.inl.h" />
@@ -224,7 +370,9 @@ echo };&gt;&gt; %(FullPath)
     <ClInclude Include="uade\src\machdep\maccess.h" />
     <ClInclude Include="uade\src\sd-sound-generic.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="uade\src\sd-sound.h" />
     <ClInclude Include="uade\src\sysconfig.h" />
@@ -235,19 +383,25 @@ echo };&gt;&gt; %(FullPath)
     <ClCompile Include="compat\memmemrep.c" />
     <ClCompile Include="compat\memmemtest.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="compat\strlrep.c" />
     <ClCompile Include="compat\unlikelytest.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ReplayUADE.cpp" />
     <ClCompile Include="ReplayUADEWrapper.cpp" />
     <ClCompile Include="uade\src\audio.c" />
     <ClCompile Include="uade\src\build68k.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\cfgfile.c" />
     <ClCompile Include="uade\src\cia.c" />
@@ -266,7 +420,9 @@ echo };&gt;&gt; %(FullPath)
     <ClCompile Include="uade\src\frontends\common\rmc.c" />
     <ClCompile Include="uade\src\frontends\common\songdb.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\frontends\common\songinfo.c" />
     <ClCompile Include="uade\src\frontends\common\support.c" />
@@ -277,53 +433,73 @@ echo };&gt;&gt; %(FullPath)
     <ClCompile Include="uade\src\frontends\common\uadeutils.c" />
     <ClCompile Include="uade\src\frontends\common\unixatomic.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\frontends\common\unixsupport.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\frontends\common\unixwalkdir.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\frontends\common\vparray.c" />
     <ClCompile Include="uade\src\gencpu.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\machdep\support.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\main.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\md-support.c" />
     <ClCompile Include="uade\src\memory.c" />
     <ClCompile Include="uade\src\missing.c" />
     <ClCompile Include="uade\src\newcpu.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\readcpu.c" />
     <ClCompile Include="uade\src\sd-sound-generic.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\sd-sound.c" />
     <ClCompile Include="uade\src\sinctable.c" />
     <ClCompile Include="uade\src\state_detection.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\text_scope.c" />
     <ClCompile Include="uade\src\uade.c" />
     <ClCompile Include="uade\src\uademain.c" />
     <ClCompile Include="uade\src\uade_logging.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="uade\src\write_audio.c" />
   </ItemGroup>
@@ -332,6 +508,31 @@ echo };&gt;&gt; %(FullPath)
     <CustomBuild Include="data\score">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
+type nul &gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;$(ProjectDir)data.h
+echo { &gt;&gt;$(ProjectDir)data.h
+echo     size_t size;&gt;&gt; $(ProjectDir)data.h
+echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
+echo     const char* path;&gt;&gt; $(ProjectDir)data.h
+echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=/!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo };&gt;&gt; $(ProjectDir)data.h
+</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal EnableDelayedExpansion
 set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
 type nul &gt; $(ProjectDir)data.h
 set /A filenumber=0
@@ -381,12 +582,43 @@ for /R "$(ProjectDir)data" %%f in (*.*) do (
 )
 echo };&gt;&gt; $(ProjectDir)data.h
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal EnableDelayedExpansion
+set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
+type nul &gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  echo %%f
+  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo struct &gt;&gt;$(ProjectDir)data.h
+echo { &gt;&gt;$(ProjectDir)data.h
+echo     size_t size;&gt;&gt; $(ProjectDir)data.h
+echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
+echo     const char* path;&gt;&gt; $(ProjectDir)data.h
+echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
+set /A filenumber=0
+for /R "$(ProjectDir)data" %%f in (*.*) do (
+  set "file=%%f"
+  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
+  set result=!result:\=/!
+  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
+  set /A filenumber+=1
+)
+echo };&gt;&gt; $(ProjectDir)data.h
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)data.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)data.h</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BuildInParallel>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</BuildInParallel>
     </CustomBuild>
     <None Include="data\extras\hippel_st.smp.set" />
     <None Include="data\extras\Samples\ackerbell" />
