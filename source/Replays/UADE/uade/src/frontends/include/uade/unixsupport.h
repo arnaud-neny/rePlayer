@@ -8,6 +8,7 @@
 
 #include <uade/uadeipc.h>
 
+#if 0
 #define DebugPrint(fmt, ...) { char txt[256]; sprintf(txt, fmt, ## __VA_ARGS__); OutputDebugStringA(txt); }
 
 #define uade_debug(state, fmt, ...) do { if ((state) == NULL || uade_is_verbose(state)) { DebugPrint(fmt, ## __VA_ARGS__); } } while (0)
@@ -19,6 +20,16 @@
   } while (0)
 #define uade_info(fmt, ...) do { DebugPrint("uade info: " fmt, ## __VA_ARGS__); } while(0)
 #define uade_warning(fmt, ...) do { DebugPrint("uade warning: " fmt, ## __VA_ARGS__); } while(0)
+#else
+#define DebugPrint(fmt, ...)
+
+#define uade_debug(state, fmt, ...)
+#define uade_die(fmt, ...)
+#define uade_die_error(fmt, ...)
+#define uade_error(fmt, ...)
+#define uade_info(fmt, ...)
+#define uade_warning(fmt, ...)
+#endif
 
 
 char* uade_dirname(char* dst, char* src, size_t maxlen);
