@@ -45,24 +45,27 @@ namespace rePlayer
         auto& patterns = m_patterns;
         if (patterns.lines.IsNotEmpty())
         {
+            float scale = m_scale == Scale::kFit ? (xMax - xMin) / patterns.width : (m_scale.As<float>() + 1.0f);
+
             ImDrawList* drawList = ImGui::GetWindowDrawList();
             drawList->PushClipRect({ xMin, yMin }, { xMax, yMax });
             ImGuiIO& io = ImGui::GetIO();
-            float y = yMin + (height / 2) - (kCharHeight / 2 - 1) - numHalfLines * kCharHeight;
+            float y = yMin + (height / 2) - (kCharHeight * scale / 2 - 1) - numHalfLines * kCharHeight * scale;
             uint32_t colors[] = { 0xffFFffFF, 0xffa0a0a0 };
             if (patterns.currentLine & 1)
                 std::swap(colors[0], colors[1]);
             auto baseRect = Graphics::Get3x5BaseRect();
             auto* c = patterns.lines.Items();
+
             for (auto& size : patterns.sizes)
             {
                 if (size > 0)
                 {
-                    float x = xMin + (int32_t(xMax) - int32_t(xMin) - patterns.width) / 2;
+                    float x = xMin + (int32_t(xMax) - int32_t(xMin) - patterns.width * scale) / 2;
 
                     auto color = colors[0];
                     if (m_flags & Replay::Patterns::kEnableHighlight && (&size - patterns.sizes) == numHalfLines)
-                        drawList->AddRect({ x - 1.0f, y - 1.0f }, { x + patterns.width, y + kCharHeight }, 0x8fFFffFF);
+                        drawList->AddRect({ x - 1.0f, y - 1.0f }, { x + patterns.width * scale, y + kCharHeight * scale }, 0x8fFFffFF);
                     drawList->PrimReserve(int32_t(6 * size), int32_t(4 * size));
                     auto idxBase = drawList->_VtxCurrentIdx;
                     for (; *c; ++c)
@@ -80,9 +83,9 @@ namespace rePlayer
                             io.Fonts->CalcCustomRectUV(rect, &uv0, &uv1);
 
                             drawList->PrimWriteVtx({ x, y }, uv0, color);
-                            drawList->PrimWriteVtx({ x, y + 5.0f }, { uv0.x, uv1.y }, color);
-                            drawList->PrimWriteVtx({ x + 3.0f, y }, { uv1.x, uv0.y }, color);
-                            drawList->PrimWriteVtx({ x + 3.0f, y + 5.0f }, uv1, color);
+                            drawList->PrimWriteVtx({ x, y + 5.0f * scale }, { uv0.x, uv1.y }, color);
+                            drawList->PrimWriteVtx({ x + 3.0f * scale, y }, { uv1.x, uv0.y }, color);
+                            drawList->PrimWriteVtx({ x + 3.0f * scale, y + 5.0f * scale }, uv1, color);
 
                             drawList->PrimWriteIdx(ImDrawIdx(idxBase + 0));
                             drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
@@ -109,11 +112,11 @@ namespace rePlayer
                         }
 
                         idxBase += 4;
-                        x += cc == ' ' ? 2 : kCharWidth;
+                        x += scale * (cc == ' ' ? 2 : kCharWidth);
                     }
                 }
                 std::swap(colors[0], colors[1]);
-                y += kCharHeight;
+                y += kCharHeight * scale;
                 c++;
             }
             drawList->PopClipRect();
@@ -142,7 +145,27 @@ namespace rePlayer
             isSelected = m_flags & Replay::Patterns::kEnableHighlight;
             if (ImGui::Checkbox("Display Highlight", &isSelected))
                 m_flags = Replay::Patterns::Flags(isSelected ? m_flags | Replay::Patterns::kEnableHighlight : (m_flags & ~Replay::Patterns::kEnableHighlight));
+            ImGui::Separator();
+            if (ImGui::BeginMenu("Scale"))
+            {
+                isSelected = m_scale == Scale::k1;
+                if (ImGui::MenuItem("x1", nullptr, &isSelected))
+                    m_scale = Scale::k1;
+                isSelected = m_scale == Scale::k2;
+                if (ImGui::MenuItem("x2", nullptr, &isSelected))
+                    m_scale = Scale::k2;
+                isSelected = m_scale == Scale::k3;
+                if (ImGui::MenuItem("x3", nullptr, &isSelected))
+                    m_scale = Scale::k3;
+                isSelected = m_scale == Scale::k4;
+                if (ImGui::MenuItem("x4", nullptr, &isSelected))
+                    m_scale = Scale::k4;
+                isSelected = m_scale == Scale::kFit;
+                if (ImGui::MenuItem("Fit to window", nullptr, &isSelected))
+                    m_scale = Scale::kFit;
 
+                ImGui::EndMenu();
+            }
             ImGui::EndPopup();
         }
     }
