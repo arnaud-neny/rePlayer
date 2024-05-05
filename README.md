@@ -18,7 +18,7 @@ Oh, and occasionally, you can use it as a normal player as it can also play mowa
 The first time, download the [lastest release](https://github.com/arnaud-neny/rePlayer/releases/latest/download/rePlayer.zip), unzip it and start rePlayer.exe  
 The software will try to auto-update itself each time you start it, so you won't have to download it again.  
 If you want to play your own files, just drag and drop them into the playlist. Or if you want to download new ones in the library, just click on import and select what you want it from (songs, artist or files), then search and pick your songs, you can later drag and drop from the library to the playlist.
-The player works only on PC with Windows 10 (x64) and later versions, and Windows 7 and 8 (x32) available [here](https://github.com/arnaud-neny/rePlayer/releases/latest/download/rePlayer-win32.zip) (but doesn't support tranparency).
+The player works only on PC with Windows 10 (x64) and later versions, and Windows 7 and 8 (x86) available [here](https://github.com/arnaud-neny/rePlayer/releases/latest/download/rePlayer-win32.zip) (but doesn't support transparency).
 
 ## The deck
 
