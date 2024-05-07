@@ -242,3 +242,4 @@ struct hvl_tune *hvl_LoadTune( const TEXT *name, uint32 freq, uint32 defstereo, 
 struct hvl_tune *hvl_ParseTune(const uint8 *buf, uint32 buflen, uint32 freq, uint32 defstereo, hvl_malloc_callback mallocCb, hvl_free_callback freeCb);
 void hvl_FreeTune( struct hvl_tune *ht );
 void hvl_UpdateStereo(struct hvl_tune* ht, uint32 stereoAsPercentage );
+void hvl_play_irq(struct hvl_tune* ht);
