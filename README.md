@@ -223,4 +223,4 @@ Or add some comments (and likes) there:
 - [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
 
 ## Known issues
-- Doesn't work on Intel® HD Graphics 4600 (fails in root signature or pipeline state creation, but without the hardware, I can't pinpoint the cause)
+- x64 version doesn't work on Intel® HD Graphics 4600 (fails in root signature or pipeline state creation, but without the hardware, I can't pinpoint the cause)

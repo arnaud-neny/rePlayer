@@ -1,4 +1,4 @@
-v0.15.12:
+v0.15.13:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -14,7 +14,7 @@ v0.15.12:
 - Updated libcurl to 8.7.1 as static library with minimal content instead of full dynamic library
 - Updated TagLib to 2.0.1
 - Archive loader
-- Patterns display
+- Patterns display (OpenMPT, Hively)
 - Playlist sort from current playing position while pressing Ctrl
 - Refactor song packages
 - Resizable UI
