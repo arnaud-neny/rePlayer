@@ -1309,6 +1309,8 @@ void m68k_go (void)
   reset_frame_rate_hack ();
   update_68k_cycles ();
 
+  in_m68k_go = 1;
+
   while (quit_program == 0) {
     uadecore_reset ();
     if (quit_program != 0)

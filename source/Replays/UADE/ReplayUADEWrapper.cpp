@@ -119,9 +119,13 @@ extern "C" ssize_t uade_atomic_write(int fd, const void* buf, size_t count)
     return count;
 }
 
+extern "C" int in_m68k_go;
 
 extern "C" void uade_arch_kill_and_wait_uadecore(struct uade_ipc* /*ipc*/, void** userdata)
 {
+    while (in_m68k_go == 0)
+        ::Sleep(1);
+
     s_isClosed = true;
     ::ReleaseSemaphore(s_sockets[0].m_semaphore, 1, nullptr);
     ::ReleaseSemaphore(s_sockets[1].m_semaphore, 1, nullptr);
