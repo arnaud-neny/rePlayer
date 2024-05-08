@@ -33,9 +33,11 @@ namespace core::thread
         for (uint32_t i = 0; i < numThreads; i++)
         {
             m_threads[i] = std::thread([this]() { Run(); });
+#ifdef _WIN64
             wchar_t desc[128];
             swprintf(desc, 128, format, name, i);
             ::SetThreadDescription(m_threads[i].native_handle(), desc);
+#endif
         }
     }
 

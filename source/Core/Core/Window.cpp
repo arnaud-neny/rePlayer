@@ -42,9 +42,11 @@ namespace core
     void Window::Handle::ApplyPassthrough() const
     {
         auto hWndStyle = ::GetWindowLong(HWND(hWnd), GWL_EXSTYLE);
+#ifdef _WIN64
         if (states.isPassthrough)
             hWndStyle |= WS_EX_TRANSPARENT | WS_EX_LAYERED;
         else
+#endif
             hWndStyle &= ~(WS_EX_TRANSPARENT | WS_EX_LAYERED);
         ::SetWindowLong(HWND(hWnd), GWL_EXSTYLE, hWndStyle);
     }

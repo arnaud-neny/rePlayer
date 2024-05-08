@@ -1028,7 +1028,9 @@ namespace rePlayer
                 m_hSystrayWnd = nullptr;
             }
             ImGui::MenuItem("Always On Top", nullptr, &m_windowStates.isAlwaysOnTop);
+#ifdef _WIN64
             ImGui::MenuItem("Passthrough", nullptr, &m_windowStates.isPassthrough);
+#endif
             ImGui::MenuItem("Minimal", nullptr, &m_windowStates.isMinimal);
             ImGui::Separator();
             if (ImGui::MenuItem("Invert states"))

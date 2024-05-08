@@ -244,7 +244,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         // Create application window
         WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, hInstance, s_hIcon = LoadIcon(hInstance, MAKEINTRESOURCEA(IDI_MAINICON)), nullptr, nullptr, nullptr, "rePlayer", nullptr };
         ::RegisterClassEx(&wc);
+#ifdef _WIN64
         s_hWnd = ::CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
+#else
+        s_hWnd = ::CreateWindowEx(WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
+#endif
 
         ImGuiInit();
 
