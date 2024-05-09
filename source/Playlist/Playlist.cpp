@@ -325,7 +325,7 @@ namespace rePlayer
                     for (uint64_t s = 0; s < streamSize; s += 65536)
                     {
                         auto readSize = stream->Read(moduleData, 65536);
-                        fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                        fileCrc = crc32_z(fileCrc, moduleData, size_t(readSize));
                     }
                     core::Free(moduleData);
                     song->fileCrc = fileCrc;
@@ -1669,7 +1669,7 @@ namespace rePlayer
                                     for (uint64_t s = 0; s < streamSize; s += 65536)
                                     {
                                         auto readSize = stream->Read(moduleData, 65536);
-                                        fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                                        fileCrc = crc32_z(fileCrc, moduleData, size_t(readSize));
                                     }
                                     core::Free(moduleData);
                                     songSheet->fileCrc = fileCrc;
@@ -1786,7 +1786,7 @@ namespace rePlayer
                                     for (uint64_t s = 0; s < streamSize; s += 65536)
                                     {
                                         auto readSize = stream->Read(moduleData, 65536);
-                                        fileCrc = crc32_z(fileCrc, moduleData, readSize);
+                                        fileCrc = crc32_z(fileCrc, moduleData, size_t(readSize));
                                     }
                                     core::Free(moduleData);
                                     songSheet->fileCrc = fileCrc;
@@ -1880,7 +1880,7 @@ namespace rePlayer
                 {
                     auto* songSheet = entries[entryIndex].song;
                     songSheet->sourceIds.Add(SourceID(addFilesContext->isUrl ? SourceID::URLImportID : SourceID::FileImportID, m_cue.paths.NumItems()));
-                    m_cue.paths.Add(filename.c_str(), filename.size() + 1);
+                    m_cue.paths.Add(filename.c_str(), uint32_t(filename.size() + 1));
                     m_cue.arePathsDirty = true;
 
                     m_cue.db.AddSong(songSheet);

@@ -165,7 +165,7 @@ namespace rePlayer
         static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
 
     private:
-        SourceSong* GetSongSource(size_t index) const;
+        SourceSong* GetSongSource(uint32_t index) const;
 
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const ModlandSong& dbSong);

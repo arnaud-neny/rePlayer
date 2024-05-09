@@ -41,7 +41,7 @@ namespace rePlayer
     size_t ReplayFLAC::OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead)
     {
         auto stream = reinterpret_cast<ReplayFLAC*>(pUserData)->m_stream;
-        return stream->Read(pBufferOut, bytesToRead);
+        return size_t(stream->Read(pBufferOut, bytesToRead));
     }
 
     drflac_bool32 ReplayFLAC::OnSeek(void* pUserData, int offset, drflac_seek_origin origin)

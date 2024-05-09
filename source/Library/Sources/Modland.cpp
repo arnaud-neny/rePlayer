@@ -347,7 +347,7 @@ namespace rePlayer
         if (len)
         {
             offset = blob.NumItems();
-            blob.Add(otherString, len + 1);
+            blob.Add(otherString, uint32_t(len + 1));
         }
     }
 
@@ -356,7 +356,7 @@ namespace rePlayer
         if (otherString.size())
         {
             offset = blob.NumItems();
-            blob.Add(otherString.c_str(), otherString.size() + 1);
+            blob.Add(otherString.c_str(), uint32_t(otherString.size() + 1));
         }
     }
 
@@ -623,7 +623,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -659,7 +659,7 @@ namespace rePlayer
             else
             {
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
+                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
                 songSource->size = buffer.NumItems();
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
@@ -808,13 +808,13 @@ namespace rePlayer
                 }
                 if (m_areDataDirty)
                 {
-                    Array<uint8_t> data(size_t(0), m_data.NumItems<size_t>());
+                    Array<uint8_t> data(0u, m_data.NumItems());
                     data.Add(m_data.Items(), alignof(SourceSong));
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);
                     for (auto i = m_songs.NumItems<int64_t>() - 1; i > 0; i--)
                     {
-                        auto* song = GetSongSource(i);
+                        auto* song = GetSongSource(uint32_t(i));
                         if (song->songId != SongID::Invalid || song->isDiscarded)
                             break;
                         songs.Pop();
@@ -850,7 +850,7 @@ namespace rePlayer
         }
     }
 
-    SourceModland::SourceSong* SourceModland::GetSongSource(size_t index) const
+    SourceModland::SourceSong* SourceModland::GetSongSource(uint32_t index) const
     {
         return m_data.Items<SourceSong>(m_songs[index]);
     }
@@ -1040,7 +1040,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } curlBuffer;
@@ -1071,7 +1071,7 @@ namespace rePlayer
 
                 static la_ssize_t ArchiveWrite(struct archive*, void* _client_data, const void* _buffer, size_t _length)
                 {
-                    reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), _length);
+                    reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), uint32_t(_length));
                     return _length;
                 }
             } archiveBuffer;
@@ -1097,7 +1097,7 @@ namespace rePlayer
             archive_entry_set_filetype(entry, AE_IFREG);
             archive_entry_set_perm(entry, 0644);
             archive_write_header(archive, entry);
-            archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size());
+            archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size<size_t>());
             archive_entry_clear(entry);
             curlBuffer.Clear();
 
@@ -1114,7 +1114,7 @@ namespace rePlayer
                     archive_entry_set_filetype(entry, AE_IFREG);
                     archive_entry_set_perm(entry, 0644);
                     archive_write_header(archive, entry);
-                    archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size());
+                    archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size<size_t>());
                     archive_entry_clear(entry);
                 }
             }
@@ -1127,8 +1127,8 @@ namespace rePlayer
                 archiveBuffer.Copy("MDST-MOD", sizeof("MDST-MOD") - 1);
 
             songSource->crc = crc32(0L, Z_NULL, 0);
-            songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size());
-            songSource->size = static_cast<uint32_t>(archiveBuffer.Size());
+            songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size<size_t>());
+            songSource->size = archiveBuffer.Size<uint32_t>();
             m_isDirty = true;
 
             stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
@@ -1213,7 +1213,7 @@ namespace rePlayer
             {
                 static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, CurlBuffer* buffer)
                 {
-                    buffer->Add(data, size * nmemb);
+                    buffer->Add(data, uint32_t(size * nmemb));
                     return size * nmemb;
                 }
             } curlBuffer;
@@ -1243,7 +1243,7 @@ namespace rePlayer
 
                 static la_ssize_t ArchiveWrite(struct archive*, void* _client_data, const void* _buffer, size_t _length)
                 {
-                    reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), _length);
+                    reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), uint32_t(_length));
                     return _length;
                 }
             } archiveBuffer;
@@ -1293,7 +1293,7 @@ namespace rePlayer
                         archive_entry_set_filetype(entry, AE_IFREG);
                         archive_entry_set_perm(entry, 0644);
                         archive_write_header(archive, entry);
-                        archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size());
+                        archive_write_data(archive, curlBuffer.Items(), curlBuffer.Size<size_t>());
                         archive_entry_clear(entry);
                         curlBuffer.Clear();
                     }
@@ -1320,8 +1320,8 @@ namespace rePlayer
                     archiveBuffer.Copy("SMUS-PKG", sizeof("SMUS-PKG") - 1);
 
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size());
-                songSource->size = static_cast<uint32_t>(archiveBuffer.Size());
+                songSource->crc = crc32_z(songSource->crc, archiveBuffer.Items(), archiveBuffer.Size<size_t>());
+                songSource->size = archiveBuffer.Size<uint32_t>();
                 m_isDirty = true;
 
                 stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
@@ -1457,7 +1457,7 @@ namespace rePlayer
             {
                 static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                 {
-                    buffer->Add(data, size * nmemb);
+                    buffer->Add(data, uint32_t(size * nmemb));
                     return size * nmemb;
                 }
             } buffer;
@@ -1469,7 +1469,7 @@ namespace rePlayer
                 auto* zipArchive = archive_read_new();
                 archive_read_support_compression_all(zipArchive);
                 archive_read_support_format_zip(zipArchive);
-                auto r = archive_read_open_memory(zipArchive, buffer.Items(), buffer.Size());
+                auto r = archive_read_open_memory(zipArchive, buffer.Items(), buffer.Size<size_t>());
                 assert(r == ARCHIVE_OK);
 
                 archive_entry* entry;
@@ -1477,8 +1477,8 @@ namespace rePlayer
                 if (archive_read_next_header(zipArchive, &entry) == ARCHIVE_OK)
                 {
                     auto fileSize = archive_entry_size(entry);
-                    unpackedData.Resize(fileSize);
-                    auto readSize = archive_read_data(zipArchive, unpackedData.Items(), fileSize);
+                    unpackedData.Resize(uint32_t(fileSize));
+                    auto readSize = archive_read_data(zipArchive, unpackedData.Items(), size_t(fileSize));
                     assert(readSize == fileSize); (void)readSize;
                 }
 

@@ -116,7 +116,7 @@ namespace rePlayer
         static size_t WriteCallback(char* in, size_t size, size_t nmemb, Array<char>* out)
         {
             size *= nmemb;
-            out->Add(in, size);
+            out->Add(in, uint32_t(size));
             return size;
         }
 

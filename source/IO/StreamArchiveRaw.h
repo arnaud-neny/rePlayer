@@ -15,11 +15,11 @@ namespace rePlayer
     public:
         static [[nodiscard]] SmartPtr<StreamArchiveRaw> Create(io::Stream* stream);
 
-        size_t Read(void* buffer, size_t size) final;
+        uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
 
-        [[nodiscard]] size_t GetSize() const final;
-        [[nodiscard]] size_t GetPosition() const final;
+        [[nodiscard]] uint64_t GetSize() const final;
+        [[nodiscard]] uint64_t GetPosition() const final;
 
         [[nodiscard]] const std::string& GetName() const final;
 
@@ -50,7 +50,7 @@ namespace rePlayer
         archive_entry* m_entry;
 
         std::string m_entryFilename;
-        size_t m_entrySize = 0;
+        uint64_t m_entrySize = 0;
         int64_t m_entryPosition = 0;
         uint8_t* m_entryDataBlock;
         size_t m_entryDataBlockSize = 0;

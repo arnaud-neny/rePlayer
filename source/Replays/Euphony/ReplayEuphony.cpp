@@ -50,7 +50,7 @@ namespace rePlayer
                 std::filesystem::path entryPath(stream->GetName());
                 m_title = reinterpret_cast<const char*>(entryPath.stem().u8string().c_str());
 
-                m_data.Resize(stream->GetSize());
+                m_data.Resize(uint32_t(stream->GetSize()));
                 stream->Read(m_data.Items(), m_data.NumItems());
                 break;
             }

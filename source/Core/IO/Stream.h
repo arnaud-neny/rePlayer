@@ -19,11 +19,11 @@ namespace core::io
         };
 
     public:
-        virtual size_t Read(void* buffer, size_t size) = 0;
+        virtual uint64_t Read(void* buffer, uint64_t size) = 0;
         virtual Status Seek(int64_t offset, SeekWhence whence) = 0;
 
-        virtual [[nodiscard]] size_t GetSize() const = 0;
-        virtual [[nodiscard]] size_t GetPosition() const = 0;
+        virtual [[nodiscard]] uint64_t GetSize() const = 0;
+        virtual [[nodiscard]] uint64_t GetPosition() const = 0;
 
         virtual void SetName(const std::string& name) { (void)name; }
         virtual [[nodiscard]] const std::string& GetName() const = 0;

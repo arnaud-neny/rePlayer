@@ -45,13 +45,13 @@ namespace rePlayer
     inline void SourceHighVoltageSIDCollection::Chars::Set(Array<char>& blob, const char* otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString, strlen(otherString) + 1);
+        blob.Add(otherString, uint32_t(strlen(otherString) + 1));
     }
 
     inline void SourceHighVoltageSIDCollection::Chars::Set(Array<char>& blob, const std::string& otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString.c_str(), otherString.size() + 1);
+        blob.Add(otherString.c_str(), uint32_t(otherString.size() + 1));
     }
 
     template <typename T>
@@ -264,7 +264,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -302,7 +302,7 @@ namespace rePlayer
             else
             {
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
+                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
                 songSource->size = buffer.NumItems();
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
@@ -444,13 +444,13 @@ namespace rePlayer
                 }
                 if (m_areDataDirty)
                 {
-                    Array<uint8_t> data(size_t(0), m_data.NumItems<size_t>());
+                    Array<uint8_t> data(0u, m_data.NumItems());
                     data.Add(m_data.Items(), 4);
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);
                     for (auto i = m_songs.NumItems<int64_t>() - 1; i > 0; i--)
                     {
-                        auto* song = GetSongSource(i);
+                        auto* song = GetSongSource(uint32_t(i));
                         if (song->songId != SongID::Invalid || song->isDiscarded)
                             break;
                         songs.Pop();
@@ -486,7 +486,7 @@ namespace rePlayer
         }
     }
 
-    SourceHighVoltageSIDCollection::SourceSong* SourceHighVoltageSIDCollection::GetSongSource(size_t index) const
+    SourceHighVoltageSIDCollection::SourceSong* SourceHighVoltageSIDCollection::GetSongSource(uint32_t index) const
     {
         return m_data.Items<SourceSong>(m_songs[index]);
     }
@@ -621,7 +621,7 @@ namespace rePlayer
             {
                 static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                 {
-                    buffer->Add(data, size * nmemb);
+                    buffer->Add(data, uint32_t(size * nmemb));
                     return size * nmemb;
                 }
             } buffer;

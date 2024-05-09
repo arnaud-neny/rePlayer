@@ -5,14 +5,14 @@
 namespace core
 {
     template <typename ItemType>
-    inline Span<ItemType>::Span(ItemType* items, size_t numItems)
+    inline Span<ItemType>::Span(ItemType* items, uint32_t numItems)
         : m_items(items)
-        , m_numItems(uint32_t(numItems))
+        , m_numItems(numItems)
     {}
 
     template <typename ItemType>
     inline Span<ItemType>::Span(ItemType* beginItems, ItemType* endItems)
-        : Span(beginItems, endItems - beginItems)
+        : Span(beginItems, uint32_t(endItems - beginItems))
     {}
 
     template <typename ItemType>
@@ -107,16 +107,18 @@ namespace core
     }
 
     template <typename ItemType>
-    inline ItemType& Span<ItemType>::operator[](size_t index)
+    template <typename T>
+    inline ItemType& Span<ItemType>::operator[](T index)
     {
-        assert(index < size_t(m_numItems));
+        assert(uint64_t(index) < m_numItems);
         return m_items[index];
     }
 
     template <typename ItemType>
-    inline const ItemType& Span<ItemType>::operator[](size_t index) const
+    template <typename T>
+    inline const ItemType& Span<ItemType>::operator[](T index) const
     {
-        assert(index < size_t(m_numItems));
+        assert(uint64_t(index) < m_numItems);
         return m_items[index];
     }
 
@@ -128,9 +130,10 @@ namespace core
     }
 
     template <typename ItemType>
-    template <typename OtherItemType>
-    inline OtherItemType* Span<ItemType>::Items(size_t index) const
+    template <typename OtherItemType, typename T>
+    inline OtherItemType* Span<ItemType>::Items(T index) const
     {
+        assert(uint64_t(index) < m_numItems);
         return reinterpret_cast<OtherItemType*>(m_items + index);
     }
 

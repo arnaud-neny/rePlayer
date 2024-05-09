@@ -80,20 +80,20 @@ namespace rePlayer
 
         const Span<ArtistID> ArtistIds() const;
         const uint16_t NumArtistIds() const;
-        const ArtistID GetArtistId(size_t index) const;
+        const ArtistID GetArtistId(uint32_t index) const;
 
         const Span<SourceID> SourceIds() const;
         const uint16_t NumSourceIds() const;
-        const SourceID GetSourceId(size_t index) const;
-        const char* const GetSourceName(size_t index = 0) const;
+        const SourceID GetSourceId(uint32_t index) const;
+        const char* const GetSourceName(uint32_t index = 0) const;
 
         const uint16_t GetLastSubsongIndex() const;
-        const uint32_t GetSubsongDurationCs(size_t index) const;
-        const uint8_t GetSubsongRating(size_t index) const;
-        const SubsongState GetSubsongState(size_t index) const;
-        const bool IsSubsongDiscarded(size_t index) const;
-        const bool IsSubsongPlayed(size_t index) const;
-        const char* GetSubsongName(size_t index) const;
+        const uint32_t GetSubsongDurationCs(uint32_t index) const;
+        const uint8_t GetSubsongRating(uint32_t index) const;
+        const SubsongState GetSubsongState(uint32_t index) const;
+        const bool IsSubsongDiscarded(uint32_t index) const;
+        const bool IsSubsongPlayed(uint32_t index) const;
+        const char* GetSubsongName(uint32_t index) const;
 
         const Span<CommandBuffer::Command> Metadatas() const;
 

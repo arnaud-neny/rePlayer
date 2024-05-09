@@ -32,11 +32,11 @@ namespace rePlayer
     Replay* ReplayFurnace::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
         auto size = stream->GetSize();
-        auto data = new uint8_t[size];
+        auto data = new uint8_t[size_t(size)];
         stream->Read(data, size);
         auto* engine = new DivEngine;
         engine->preInit();
-        if (engine->load(data, size, stream->GetName().c_str()) && engine->init())
+        if (engine->load(data, size_t(size), stream->GetName().c_str()) && engine->init())
         {
             engine->initDispatch(true);
             engine->renderSamplesP();

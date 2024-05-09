@@ -115,7 +115,8 @@ namespace rePlayer
         static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
 
     private:
-        SourceSong* GetSongSource(size_t index) const { return m_data.Items<SourceSong>(m_songs[index]); }
+        template <typename T = uint32_t>
+        SourceSong* GetSongSource(T index) const { return m_data.Items<SourceSong>(m_songs[index]); }
 
         std::string GetArtistName(const ASMAArtist& dbArtist) const;
 

@@ -109,7 +109,7 @@ namespace rePlayer
         if (*subsongName)
             ImGui::Text("         %s", subsongName);
         std::string txt = "Artist : ";
-        for (int64_t i = 0, e = song->NumArtistIds(); i < e; i++)
+        for (uint32_t i = 0, e = song->NumArtistIds(); i < e; i++)
         {
             if (i != 0)
                 txt += " & ";

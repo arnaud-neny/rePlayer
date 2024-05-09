@@ -518,7 +518,7 @@ namespace rePlayer
                             {
                                 auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
                                 Array<uint8_t> otherData;
-                                otherData.Resize(file.GetSize());
+                                otherData.Resize(uint32_t(file.GetSize()));
                                 file.Read(otherData.Items(), otherData.Size());
                                 if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
                                 {

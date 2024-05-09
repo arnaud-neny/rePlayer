@@ -29,7 +29,7 @@ namespace rePlayer
         if (len)
         {
             offset = blob.NumItems();
-            blob.Add(otherString, len + 1);
+            blob.Add(otherString, uint32_t(len + 1));
         }
     }
 
@@ -38,7 +38,7 @@ namespace rePlayer
         if (otherString.size())
         {
             offset = blob.NumItems();
-            blob.Add(otherString.c_str(), otherString.size() + 1);
+            blob.Add(otherString.c_str(), uint32_t(otherString.size() + 1));
         }
     }
 
@@ -132,7 +132,7 @@ namespace rePlayer
                                     if (name != nameEnd)
                                     {
                                         artist->second.offset = db.data.NumItems();
-                                        db.data.Add(name, (nameEnd - name));
+                                        db.data.Add(name, uint32_t(nameEnd - name));
                                         db.data.Add(0);
                                     }
                                     break;
@@ -227,9 +227,9 @@ namespace rePlayer
                         ReadSystems(node->children);
 
                         auto urlOffset = data.NumItems();
-                        data.Add(url.c_str(), url.size() + 1);
+                        data.Add(url.c_str(), uint32_t(url.size() + 1));
                         auto nameOffset = data.NumItems();
-                        data.Add(name.c_str(), name.size() + 1);
+                        data.Add(name.c_str(), uint32_t(name.size() + 1));
                         data.Resize(AlignUp(data.NumItems(), sizeof(uint32_t)));
                         packs.Add(data.NumItems());
                         auto* pack = data.Push<Pack*>(sizeof(Pack));
@@ -465,9 +465,9 @@ namespace rePlayer
                         ReadSystems(node->children);
 
                         auto urlOffset = db.data.NumItems();
-                        db.data.Add(url.c_str(), url.size() + 1);
+                        db.data.Add(url.c_str(), uint32_t(url.size() + 1));
                         auto nameOffset = db.data.NumItems();
-                        db.data.Add(name.c_str(), name.size() + 1);
+                        db.data.Add(name.c_str(), uint32_t(name.size() + 1));
                         db.data.Resize(AlignUp(db.data.NumItems(), alignof(Pack)));
                         db.packs.Add(db.data.NumItems());
                         auto* pack = db.data.Push<Pack*>(sizeof(Pack));
@@ -678,7 +678,7 @@ namespace rePlayer
                             }
                             if (data.IsEmpty())
                             {
-                                data.Add(reinterpret_cast<const char*>(packUrl), songUrl - packUrl);
+                                data.Add(reinterpret_cast<const char*>(packUrl), uint32_t(songUrl - packUrl));
                                 data.Last() = 0;
                             }
                             songs.Push()->first.Set(data, reinterpret_cast<const char*>(songUrl));
@@ -805,8 +805,8 @@ namespace rePlayer
                 m_data.Resize(AlignUp(m_data.NumItems(), alignof(PackSource)));
                 sourcePackOffset = m_data.NumItems();
                 m_data.Push(sizeof(PackSource) + pack->numArtists * sizeof(uint32_t));
-                m_data.Items<PackSource>(sourcePackOffset)->url.Set(m_data, packCollector.data.Items());
-                m_data.Items<PackSource>(sourcePackOffset)->numArtists = pack->numArtists;
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, packCollector.data.Items());
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = pack->numArtists;
             }
             else
                 sourcePackOffset = m_songs[sourcePackOffset].pack;
@@ -815,7 +815,7 @@ namespace rePlayer
             for (uint32_t i = 0; i < pack->numArtists; i++)
             {
                 auto* newArtistSource = FindArtist(m_db.artists[pack->artists[i]].first(m_db.data));
-                m_data.Items<PackSource>(sourcePackOffset)->artists[i] = newArtistSource->id;
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->artists[i] = newArtistSource->id;
                 SourceID artistId(kID, newArtistSource->id);
                 auto* artistIt = results.artists.FindIf([&](auto& entry)
                 {
@@ -906,8 +906,8 @@ namespace rePlayer
                     m_data.Resize(AlignUp(m_data.NumItems(), alignof(PackSource)));
                     sourcePackOffset = m_data.NumItems();
                     m_data.Push(sizeof(PackSource) + pack->numArtists * sizeof(uint32_t));
-                    m_data.Items<PackSource>(sourcePackOffset)->url.Set(m_data, packCollector.data.Items());
-                    m_data.Items<PackSource>(sourcePackOffset)->numArtists = pack->numArtists;
+                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, packCollector.data.Items());
+                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = pack->numArtists;
                 }
                 else
                     sourcePackOffset = m_songs[sourcePackOffset].pack;
@@ -916,7 +916,7 @@ namespace rePlayer
                 for (uint32_t i = 0; i < pack->numArtists; i++)
                 {
                     auto* newArtistSource = FindArtist(m_db.artists[pack->artists[i]].first(m_db.data));
-                    m_data.Items<PackSource>(sourcePackOffset)->artists[i] = newArtistSource->id;
+                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->artists[i] = newArtistSource->id;
                     SourceID artistId(kID, newArtistSource->id);
                     auto* artistIt = collectedSongs.artists.FindIf([&](auto& entry)
                     {
@@ -998,7 +998,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -1011,8 +1011,8 @@ namespace rePlayer
         if (curlError == CURLE_OK)
         {
             songSource->crc = crc32(0L, Z_NULL, 0);
-            songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
-            songSource->size = static_cast<uint32_t>(buffer.Size());
+            songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
+            songSource->size = buffer.Size<uint32_t>();
 
             stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
             buffer.Detach();
@@ -1170,7 +1170,7 @@ namespace rePlayer
                             if (packUsage == 0)
                             {
                                 packUsage = data.NumItems();
-                                data.Add(m_data.Items(pack->url.offset), strlen(pack->url(m_data)) + 1);
+                                data.Add(m_data.Items(pack->url.offset), uint32_t(strlen(pack->url(m_data)) + 1));
                             }
 
                             for (uint32_t i = 0; i < pack->numArtists; i++)

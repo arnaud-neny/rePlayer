@@ -108,7 +108,7 @@ namespace core
         if (!m_handle.empty() && *m_handle.c_str() != 0)
         {
             s.Push(sizeof(StaticInfo));
-            s.Store(m_handle.c_str(), m_handle.size() + 1);
+            s.Store(m_handle.c_str(), uint32_t(m_handle.size() + 1));
             s.Pop();
         }
     }

@@ -258,7 +258,7 @@ namespace rePlayer
                             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                             {
                                 auto oldSize = buffer->storage.NumItems();
-                                buffer->storage.Resize(oldSize + size * nmemb);
+                                buffer->storage.Resize(uint32_t(oldSize + size * nmemb));
 
                                 memcpy(&buffer->storage[oldSize], data, size * nmemb);
 
@@ -395,7 +395,7 @@ namespace rePlayer
                 auto* filter = data.Items<FileFilters::Filter>(filterOffset);
                 filter->nameOffset = nameOffset;
                 filter->numExtensions = extensions.NumItems();
-                data.Add(extensions.Items<char>(), extensions.Size());
+                data.Add(extensions.Items<char>(), uint32_t(extensions.Size()));
             };
 
             if (auto plugin = m_sortedPlugins[i])
@@ -429,7 +429,7 @@ namespace rePlayer
         }
         data.Resize((data.NumItems() + alignof(FileFilters) - 1) & ~(alignof(FileFilters) - 1));
         auto fileFiltersOffset = data.Push<uint32_t>(sizeof(FileFilters) - sizeof(uint32_t));
-        data.Add(filters.Items<char>(), filters.Size());
+        data.Add(filters.Items<char>(), uint32_t(filters.Size()));
         auto* fileFilters = data.Items<FileFilters>(fileFiltersOffset);
         fileFilters->data = data.Detach();
         fileFilters->numFilters = filters.NumItems();

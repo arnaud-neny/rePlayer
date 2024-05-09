@@ -6,9 +6,9 @@
 namespace core
 {
     template <typename ItemType>
-    inline Array<ItemType>::Array(size_t numItems, size_t numReservedItems)
-        : m_numItems(uint32_t(numItems))
-        , m_maxItems(uint32_t(numItems + numReservedItems))
+    inline Array<ItemType>::Array(uint32_t numItems, uint32_t numReservedItems)
+        : m_numItems(numItems)
+        , m_maxItems(numItems + numReservedItems)
         , m_items(Alloc<ItemType>((numItems + numReservedItems) * sizeof(ItemType)))
     {
         if constexpr (!std::is_trivially_constructible<ItemType>::value)
@@ -20,9 +20,9 @@ namespace core
     }
 
     template <typename ItemType>
-    inline Array<ItemType>::Array(const ItemType* otherItems, size_t numOtherItems)
-        : m_numItems(uint32_t(numOtherItems))
-        , m_maxItems(uint32_t(numOtherItems))
+    inline Array<ItemType>::Array(const ItemType* otherItems, uint32_t numOtherItems)
+        : m_numItems(numOtherItems)
+        , m_maxItems(numOtherItems)
         , m_items(Alloc<ItemType>(numOtherItems * sizeof(ItemType)))
     {
         // copy
@@ -167,16 +167,18 @@ namespace core
     }
 
     template <typename ItemType>
-    inline ItemType& Array<ItemType>::operator[](size_t index)
+    template <typename T>
+    inline ItemType& Array<ItemType>::operator[](T index)
     {
-        assert(index < size_t(m_numItems));
+        assert(uint64_t(index) < m_numItems);
         return m_items[index];
     }
 
     template <typename ItemType>
-    inline const ItemType& Array<ItemType>::operator[](size_t index) const
+    template <typename T>
+    inline const ItemType& Array<ItemType>::operator[](T index) const
     {
-        assert(index < size_t(m_numItems));
+        assert(uint64_t(index) < m_numItems);
         return m_items[index];
     }
 
@@ -188,9 +190,10 @@ namespace core
     }
 
     template <typename ItemType>
-    template <typename OtherItemType>
-    inline OtherItemType* Array<ItemType>::Items(size_t index) const
+    template <typename OtherItemType, typename T>
+    inline OtherItemType* Array<ItemType>::Items(T index) const
     {
+        assert(index == 0 || uint64_t(index) < m_numItems);
         return reinterpret_cast<OtherItemType*>(m_items + index);
     }
 
@@ -298,7 +301,7 @@ namespace core
             auto newItems = Grow(oldNumItems, newNumItems);
             if constexpr (std::is_trivially_copyable<ItemType>::value)
                 memcpy(newItems, items, oldNumItems * sizeof(ItemType));
-            else for (size_t i = 0; i < oldNumItems; ++i)
+            else for (uint32_t i = 0; i < oldNumItems; ++i)
             {
                 new (newItems + i) ItemType(std::move(items[i]));
                 items[i].~ItemType();
@@ -322,7 +325,7 @@ namespace core
     }
 
     template <typename ItemType>
-    ItemType Array<ItemType>::Pop(size_t numItems)
+    ItemType Array<ItemType>::Pop(uint32_t numItems)
     {
         auto oldNumItems = m_numItems;
         assert(numItems > 0 && numItems <= oldNumItems);
@@ -337,7 +340,7 @@ namespace core
                 ++items;
             }
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         return item;
     }
 
@@ -353,7 +356,7 @@ namespace core
             auto newItems = Grow(numItems, newNumItems);
             if constexpr (std::is_trivially_copyable<ItemType>::value)
                 memcpy(newItems, items, numItems * sizeof(ItemType));
-            else for (size_t i = 0; i < numItems; ++i)
+            else for (uint32_t i = 0; i < numItems; ++i)
             {
                 new (newItems + i) ItemType(std::move(items[i]));
                 items[i].~ItemType();
@@ -383,7 +386,7 @@ namespace core
             auto newItems = Grow(numItems, newNumItems);
             if constexpr (std::is_trivially_copyable<ItemType>::value)
                 memcpy(newItems, items, numItems * sizeof(ItemType));
-            else for (size_t i = 0; i < numItems; ++i)
+            else for (uint32_t i = 0; i < numItems; ++i)
             {
                 new (newItems + i) ItemType(std::move(items[i]));
                 items[i].~ItemType();
@@ -403,7 +406,7 @@ namespace core
 
     template <typename ItemType>
     template <typename ReturnType>
-    inline ReturnType Array<ItemType>::Add(const ItemType* otherItems, size_t numOtherItems)
+    inline ReturnType Array<ItemType>::Add(const ItemType* otherItems, uint32_t numOtherItems)
     {
         auto items = m_items;
         auto numItems = m_numItems;
@@ -418,12 +421,12 @@ namespace core
             }
             else
             {
-                for (size_t i = 0; i < numItems; ++i)
+                for (uint32_t i = 0; i < numItems; ++i)
                 {
                     new (newItems + i) ItemType(std::move(items[i]));
                     items[i].~ItemType();
                 }
-                for (size_t i = 0; i < numOtherItems; ++i)
+                for (uint32_t i = 0; i < numOtherItems; ++i)
                     new (newItems + i + numItems) ItemType(otherItems[i]);
             }
             Free(items);
@@ -437,11 +440,11 @@ namespace core
             }
             else
             {
-                for (size_t i = 0; i < numOtherItems; ++i)
+                for (uint32_t i = 0; i < numOtherItems; ++i)
                     new (items + i + numItems) ItemType(otherItems[i]);
             }
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         if constexpr (std::is_pointer<ReturnType>::value)
             return reinterpret_cast<ReturnType>(items + numItems);
         else if constexpr (std::is_reference<ReturnType>::value)
@@ -452,17 +455,17 @@ namespace core
 
     template <typename ItemType>
     template <typename ReturnType>
-    inline ReturnType Array<ItemType>::Add(const ItemType& otherItem, size_t numOtherItems)
+    inline ReturnType Array<ItemType>::Add(const ItemType& otherItem, uint32_t numOtherItems)
     {
         auto items = m_items;
         auto numItems = m_numItems;
-        auto newNumItems = numItems + uint32_t(numOtherItems);
+        auto newNumItems = numItems + numOtherItems;
         if (newNumItems > m_maxItems)
         {
             auto newItems = Grow(numItems, newNumItems);
             if constexpr (std::is_trivially_copyable<ItemType>::value)
                 memcpy(newItems, items, numItems * sizeof(ItemType));
-            else for (size_t i = 0; i < numItems; ++i)
+            else for (uint32_t i = 0; i < numItems; ++i)
             {
                 new (newItems + i) ItemType(std::move(items[i]));
                 items[i].~ItemType();
@@ -495,10 +498,13 @@ namespace core
     }
 
     template <typename ItemType>
-    inline ItemType* Array<ItemType>::Insert(size_t index, const ItemType& otherItem)
+    template <typename T>
+    inline ItemType* Array<ItemType>::Insert(T atIndex, const ItemType& otherItem)
     {
+        auto index = uint32_t(atIndex);
         auto items = m_items;
         auto numItems = m_numItems;
+        assert(uint64_t(atIndex) <= numItems);
         auto newNumItems = numItems + 1;
         if (newNumItems > m_maxItems)
         {
@@ -513,13 +519,13 @@ namespace core
             }
             else
             {
-                for (size_t i = 0; i < index; ++i)
+                for (uint32_t i = 0; i < index; ++i)
                 {
                     new (newItems + i) ItemType(std::move(items[i]));
                     items[i].~ItemType();
                 }
                 new (newItems + index) ItemType(otherItem);
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                 {
                     new (newItems + i + 1) ItemType(std::move(items[i]));
                     items[i].~ItemType();
@@ -538,20 +544,23 @@ namespace core
             }
             else
             {
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                     new (items + numItems - i) ItemType(std::move(items[numItems - i - 1]));
                 new (items + index) ItemType(otherItem);
             }
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         return items + index;
     }
 
     template <typename ItemType>
-    inline ItemType* Array<ItemType>::Insert(size_t index, ItemType&& otherItem)
+    template <typename T>
+    inline ItemType* Array<ItemType>::Insert(T atIndex, ItemType&& otherItem)
     {
+        auto index = uint32_t(atIndex);
         auto items = m_items;
         auto numItems = m_numItems;
+        assert(uint64_t(atIndex) <= numItems);
         auto newNumItems = numItems + 1;
         if (newNumItems > m_maxItems)
         {
@@ -566,13 +575,13 @@ namespace core
             }
             else
             {
-                for (size_t i = 0; i < index; ++i)
+                for (uint32_t i = 0; i < index; ++i)
                 {
                     new (newItems + i) ItemType(std::move(items[i]));
                     items[i].~ItemType();
                 }
                 new (newItems + index) ItemType(std::move(otherItem));
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                 {
                     new (newItems + i + 1) ItemType(std::move(items[i]));
                     items[i].~ItemType();
@@ -591,20 +600,23 @@ namespace core
             }
             else
             {
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                     new (items + numItems - i) ItemType(std::move(items[numItems - i - 1]));
                 new (items + index) ItemType(std::move(otherItem));
             }
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         return items + index;
     }
 
     template <typename ItemType>
-    inline ItemType* Array<ItemType>::Insert(size_t index, const ItemType* otherItems, size_t numOtherItems)
+    template <typename T>
+    inline ItemType* Array<ItemType>::Insert(T atIndex, const ItemType* otherItems, uint32_t numOtherItems)
     {
+        auto index = uint32_t(atIndex);
         auto items = m_items;
         auto numItems = m_numItems;
+        assert(uint64_t(atIndex) <= numItems);
         auto newNumItems = numItems + numOtherItems;
         if (newNumItems > m_maxItems)
         {
@@ -619,14 +631,14 @@ namespace core
             }
             else
             {
-                for (size_t i = 0; i < index; ++i)
+                for (uint32_t i = 0; i < index; ++i)
                 {
                     new (newItems + i) ItemType(std::move(items[i]));
                     items[i].~ItemType();
                 }
-                for (size_t i = 0; i < numOtherItems; ++i)
+                for (uint32_t i = 0; i < numOtherItems; ++i)
                     new (newItems + i + index) ItemType(otherItems[i]);
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                 {
                     new (newItems + i + numOtherItems) ItemType(std::move(items[i]));
                     items[i].~ItemType();
@@ -645,37 +657,37 @@ namespace core
             }
             else
             {
-                for (size_t i = index; i < numItems; ++i)
+                for (uint32_t i = index; i < numItems; ++i)
                     new (items + numItems - i - 1 + numOtherItems) ItemType(std::move(items[numItems - i - 1]));
-                for (size_t i = 0; i < numOtherItems; ++i)
+                for (uint32_t i = 0; i < numOtherItems; ++i)
                     new (items + i + index) ItemType(otherItems[i]);
             }
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         return items + index;
     }
 
     template <typename ItemType>
     template <typename OtherItemType, typename ReturnType>
-    inline ReturnType Array<ItemType>::Copy(const OtherItemType* otherItems, size_t size)
+    inline ReturnType Array<ItemType>::Copy(const OtherItemType* otherItems, uint64_t size)
     {
         static_assert(std::is_trivially_copyable<ItemType>::value && std::is_trivially_copyable<OtherItemType>::value);
         auto items = m_items;
         auto numItems = m_numItems;
-        auto newNumItems = numItems + size / sizeof(ItemType);
+        auto newNumItems = numItems + uint32_t(size / sizeof(ItemType));
         if (newNumItems > m_maxItems)
         {
             auto newItems = Grow(numItems, newNumItems);
             memcpy(newItems, items, numItems * sizeof(ItemType));
-            memcpy(newItems + numItems, otherItems, size);
+            memcpy(newItems + numItems, otherItems, size_t(size));
             Free(items);
             items = newItems;
         }
         else
         {
-            memcpy(items + numItems, otherItems, size);
+            memcpy(items + numItems, otherItems, size_t(size));
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
         if constexpr (std::is_pointer<ReturnType>::value)
             return reinterpret_cast<ReturnType>(items + numItems);
         else if constexpr (std::is_reference<ReturnType>::value)
@@ -685,8 +697,10 @@ namespace core
     }
 
     template <typename ItemType>
-    void Array<ItemType>::RemoveAtFast(size_t index, size_t numItemsToRemove)
+    template <typename T>
+    void Array<ItemType>::RemoveAtFast(T atIndex, uint32_t numItemsToRemove)
     {
+        auto index = uint32_t(atIndex);
         auto numItems = m_numItems;
         auto newNumItems = numItems - numItemsToRemove;
         assert(newNumItems <= numItems && (index + numItemsToRemove <= numItems));
@@ -708,12 +722,14 @@ namespace core
             while (numItemsToRemove--)
                 (--movedItems)->~ItemType();
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
     }
 
     template <typename ItemType>
-    void Array<ItemType>::RemoveAt(size_t index, size_t numItemsToRemove)
+    template <typename T>
+    void Array<ItemType>::RemoveAt(T atindex, uint32_t numItemsToRemove)
     {
+        auto index = uint32_t(atindex);
         auto numItems = m_numItems;
         auto newNumItems = numItems - numItemsToRemove;
         assert(newNumItems <= numItems && (index + numItemsToRemove <= numItems));
@@ -735,13 +751,14 @@ namespace core
             while (numItemsToRemove--)
                 (items++)->~ItemType();
         }
-        m_numItems = uint32_t(newNumItems);
+        m_numItems = newNumItems;
     }
 
     template <typename ItemType>
-    template <typename SearchType, typename OnFound>
-    const int64_t Array<ItemType>::Remove(const SearchType& searchItem, size_t index, OnFound&& onFound)
+    template <typename SearchType, typename OnFound, typename T>
+    const int64_t Array<ItemType>::Remove(const SearchType& searchItem, T atIndex, OnFound&& onFound)
     {
+        auto index = uint32_t(atIndex);
         auto numItems = m_numItems;
         auto items = m_items + index;
         for (; index < numItems; index++, items++)
@@ -757,8 +774,8 @@ namespace core
     }
 
     template <typename ItemType>
-    template <typename SearchType>
-    const int64_t Array<ItemType>::Remove(const SearchType& searchItem, size_t index)
+    template <typename SearchType, typename T>
+    const int64_t Array<ItemType>::Remove(const SearchType& searchItem, T index)
     {
         return Remove(searchItem, index, [](const ItemType&) {});
     }
@@ -835,12 +852,12 @@ namespace core
     }
 
     template <typename ItemType>
-    inline Array<ItemType>& Array<ItemType>::Resize(size_t numItems)
+    inline Array<ItemType>& Array<ItemType>::Resize(uint32_t numItems)
     {
         auto oldItems = m_items;
-        auto oldNumItems = size_t(m_numItems);
-        auto oldMaxItems = size_t(m_maxItems);
-        m_numItems = uint32_t(numItems);
+        auto oldNumItems = m_numItems;
+        auto oldMaxItems = m_maxItems;
+        m_numItems = numItems;
         if (numItems > oldMaxItems)
         {
             auto newItems = Alloc<ItemType>(numItems * sizeof(ItemType));
@@ -867,7 +884,7 @@ namespace core
             }
             Free(oldItems);
             m_items = newItems;
-            m_maxItems = uint32_t(numItems);
+            m_maxItems = numItems;
         }
         else if (numItems > oldNumItems)
         {
@@ -891,7 +908,7 @@ namespace core
     }
 
     template <typename ItemType>
-    inline Array<ItemType>& Array<ItemType>::Reserve(size_t numOtherItems)
+    inline Array<ItemType>& Array<ItemType>::Reserve(uint32_t numOtherItems)
     {
         auto items = m_items;
         auto numItems = m_numItems;
@@ -943,7 +960,7 @@ namespace core
     }
 
     template <typename ItemType>
-    inline ItemType* Array<ItemType>::Grow(size_t oldNumItems, size_t newNumItems)
+    inline ItemType* Array<ItemType>::Grow(uint32_t oldNumItems, uint32_t newNumItems)
     {
         // 50% grow from the current number of items
         auto growSize = (oldNumItems * 3 + 1) / 2;
@@ -954,7 +971,7 @@ namespace core
 
         auto* items = Alloc<ItemType>(maxItems * sizeof(ItemType));
         m_items = items;
-        m_maxItems = uint32_t(maxItems);
+        m_maxItems = maxItems;
         return items;
     }
 

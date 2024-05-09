@@ -46,7 +46,7 @@ namespace rePlayer
 
                     static la_ssize_t ArchiveWrite(struct archive*, void* _client_data, const void* _buffer, size_t _length)
                     {
-                        reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), _length);
+                        reinterpret_cast<ArchiveBuffer*>(_client_data)->Add(reinterpret_cast<const uint8_t*>(_buffer), uint32_t(_length));
                         return _length;
                     }
                 } archiveBuffer;
@@ -105,7 +105,7 @@ namespace rePlayer
                         if (newFile.IsValid())
                         {
                             oldFile.Seek(8);
-                            Array<uint8_t> data(oldFile.GetSize() - 8);
+                            Array<uint8_t> data(uint32_t(oldFile.GetSize() - 8));
                             oldFile.Read(data.Items(), data.Size());
                             newFile.Write(data.Items(), data.Size());
                         }
@@ -126,7 +126,7 @@ namespace rePlayer
                         file.Read(buf, 8);
                         if (memcmp(buf, ext == eExtension::_cust ? "CUST-PKG" : "SMUS-PKG", 8) == 0)
                         {
-                            Array<uint8_t> data(file.GetSize() - 8);
+                            Array<uint8_t> data(uint32_t(file.GetSize() - 8));
                             file.Read(data.Items(), data.NumItems());
                             file = {};
                             if (!io::File::Delete(oldFilename.c_str()))
@@ -144,7 +144,7 @@ namespace rePlayer
 
                                 songSheet->fileSize = data.Size<uint32_t>();
                                 songSheet->fileCrc = crc32(0L, Z_NULL, 0);
-                                songSheet->fileCrc = crc32_z(songSheet->fileCrc, data.Items(), data.Size());
+                                songSheet->fileCrc = crc32_z(songSheet->fileCrc, data.Items(), data.Size<size_t>());
                             }
                         }
                     }
@@ -197,7 +197,7 @@ namespace rePlayer
                         {
                             auto smplOffset = file.Read<uint32_t>();
                             auto mdatSize = smplOffset - (ext == eExtension::_tfm ? 20 : 12);
-                            auto smplSize = file.GetSize() - smplOffset;
+                            auto smplSize = uint32_t(file.GetSize() - smplOffset);
                             file.Seek(ext == eExtension::_tfm ? 20 : 12);
 
                             auto songSheet = song->Edit();
@@ -345,7 +345,7 @@ namespace rePlayer
 
                                 songSheet->fileSize = archiveBuffer.Size<uint32_t>();
                                 songSheet->fileCrc = crc32(0L, Z_NULL, 0);
-                                songSheet->fileCrc = crc32_z(songSheet->fileCrc, archiveBuffer.Items(), archiveBuffer.Size());
+                                songSheet->fileCrc = crc32_z(songSheet->fileCrc, archiveBuffer.Items(), archiveBuffer.Size<size_t>());
                             }
                         }
                     }

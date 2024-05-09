@@ -181,7 +181,7 @@ namespace rePlayer
                                 if (!pfc::is_valid_utf8((const char*)p_exm3u_buf, m3uData.Size()))
                                 {
                                     auto conv = pfc::string_ansi_to_utf8((const char*)p_exm3u_buf, m3uData.Size());
-                                    if (exm3u.load(conv.Items(), conv.Size()) != extended_m3u_playlist::exm3u_success)
+                                    if (exm3u.load(conv.Items(), conv.Size<size_t>()) != extended_m3u_playlist::exm3u_success)
                                         exm3u = {};
                                     else
                                         m3uStream.Reset();

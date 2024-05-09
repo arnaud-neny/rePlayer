@@ -10,8 +10,8 @@ namespace core
     public:
         // Setup
         Array() = default;
-        Array(size_t numItems, size_t numReservedItems = 0);
-        Array(const ItemType* otherItems, size_t numOtherItems);
+        Array(uint32_t numItems, uint32_t numReservedItems = 0);
+        Array(const ItemType* otherItems, uint32_t numOtherItems);
         Array(const Array& otherArray);
         Array(Array&& otherArray);
 
@@ -20,7 +20,7 @@ namespace core
         // States
         template <typename T = uint32_t>
         T NumItems() const;
-        template <typename T = size_t>
+        template <typename T = uint64_t>
         T Size() const;
         template <typename T = size_t>
         static T ItemSize();
@@ -36,13 +36,15 @@ namespace core
         ReturnType FindIf(Predicate&& predicate) const;
 
         // Accessors
-        ItemType& operator[](size_t index);
-        const ItemType& operator[](size_t index) const;
+        template <typename T = uint32_t>
+        ItemType& operator[](T index);
+        template <typename T = uint32_t>
+        const ItemType& operator[](T index) const;
 
         ItemType& Last() const;
 
-        template <typename OtherItemType = ItemType>
-        OtherItemType* Items(size_t index = 0) const;
+        template <typename OtherItemType = ItemType, typename T = uint32_t>
+        OtherItemType* Items(T index = 0) const;
 
         // Modifiers
         Array& operator=(const Array& otherArray);
@@ -50,32 +52,37 @@ namespace core
 
         template <typename ReturnType = ItemType*>
         ReturnType Push(uint32_t numItems = 1);
-        ItemType Pop(size_t numItems = 1);
+        ItemType Pop(uint32_t numItems = 1);
 
         template <typename ReturnType = ItemType*>
         ReturnType Add(const ItemType& otherItem);
         template <typename ReturnType = ItemType*>
         ReturnType Add(ItemType&& otherItem);
         template <typename ReturnType = ItemType*>
-        ReturnType Add(const ItemType* otherItems, size_t numOtherItems);
+        ReturnType Add(const ItemType* otherItems, uint32_t numOtherItems);
         template <typename ReturnType = ItemType*>
-        ReturnType Add(const ItemType& otherItem, size_t numOtherItems);
+        ReturnType Add(const ItemType& otherItem, uint32_t numOtherItems);
 
         std::pair<ItemType*, bool> AddOnce(const ItemType& otherItem);
 
-        ItemType* Insert(size_t index, const ItemType& otherItem);
-        ItemType* Insert(size_t index, ItemType&& otherItem);
-        ItemType* Insert(size_t index, const ItemType* otherItems, size_t numOtherItems);
+        template <typename T = uint32_t>
+        ItemType* Insert(T index, const ItemType& otherItem);
+        template <typename T = uint32_t>
+        ItemType* Insert(T index, ItemType&& otherItem);
+        template <typename T = uint32_t>
+        ItemType* Insert(T index, const ItemType* otherItems, uint32_t numOtherItems);
 
         template <typename OtherItemType, typename ReturnType = ItemType*>
-        ReturnType Copy(const OtherItemType* otherItems, size_t size);
+        ReturnType Copy(const OtherItemType* otherItems, uint64_t size);
 
-        void RemoveAtFast(size_t index, size_t numItemsToRemove = 1);
-        void RemoveAt(size_t index, size_t numItemsToRemove = 1);
-        template <typename SearchType, typename OnFound>
-        const int64_t Remove(const SearchType& searchItem, size_t index = 0, OnFound&& onFound = [](const ItemType&) {});
-        template <typename SearchType>
-        const int64_t Remove(const SearchType& searchItem, size_t index = 0);
+        template <typename T = uint32_t>
+        void RemoveAtFast(T index, uint32_t numItemsToRemove = 1);
+        template <typename T = uint32_t>
+        void RemoveAt(T index, uint32_t numItemsToRemove = 1);
+        template <typename SearchType, typename OnFound, typename T = uint32_t>
+        const int64_t Remove(const SearchType& searchItem, T index = 0u, OnFound&& onFound = [](const ItemType&) {});
+        template <typename SearchType, typename T = uint32_t>
+        const int64_t Remove(const SearchType& searchItem, T index = 0u);
         template <typename Predicate>
         uint32_t RemoveIf(Predicate&& predicate); // return the number of items removed
 
@@ -86,8 +93,8 @@ namespace core
         ItemType* Detach();
 
         Array& Clear();
-        Array& Resize(size_t numItems);
-        Array& Reserve(size_t numOtherItems);
+        Array& Resize(uint32_t numItems);
+        Array& Reserve(uint32_t numOtherItems);
 
         // Stl
         ItemType* begin();
@@ -96,7 +103,7 @@ namespace core
         const ItemType* end() const;
 
     private:
-        ItemType* Grow(size_t oldNumItems, size_t newNumItems);
+        ItemType* Grow(uint32_t oldNumItems, uint32_t newNumItems);
 
     private:
         ItemType* m_items = nullptr;

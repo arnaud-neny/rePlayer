@@ -235,9 +235,9 @@ namespace rePlayer
 
                     if (masterArtistSheet->realName.IsEmpty())
                         masterArtistSheet->realName = mergedArtist->GetRealName();
-                    for (size_t j = 0, mergedSize = mergedArtist->NumHandles(), masterSize = masterArtistSheet->handles.NumItems(); j < mergedSize; j++)
+                    for (uint32_t j = 0, mergedSize = mergedArtist->NumHandles(), masterSize = masterArtistSheet->handles.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;; ++i)
+                        for (uint32_t i = 0;; ++i)
                         {
                             if (i == masterSize)
                             {
@@ -248,9 +248,9 @@ namespace rePlayer
                                 break;
                         }
                     }
-                    for (size_t j = 0, mergedSize = mergedArtist->NumCountries(), masterSize = masterArtistSheet->countries.NumItems(); j < mergedSize; j++)
+                    for (uint32_t j = 0, mergedSize = mergedArtist->NumCountries(), masterSize = masterArtistSheet->countries.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;; ++i)
+                        for (uint32_t i = 0;; ++i)
                         {
                             if (i == masterSize)
                             {
@@ -261,9 +261,9 @@ namespace rePlayer
                                 break;
                         }
                     }
-                    for (size_t j = 0, mergedSize = mergedArtist->NumGroups(), masterSize = masterArtistSheet->groups.NumItems(); j < mergedSize; j++)
+                    for (uint32_t j = 0, mergedSize = mergedArtist->NumGroups(), masterSize = masterArtistSheet->groups.NumItems(); j < mergedSize; j++)
                     {
-                        for (size_t i = 0;; ++i)
+                        for (uint32_t i = 0;; ++i)
                         {
                             if (i == masterSize)
                             {
@@ -863,7 +863,7 @@ namespace rePlayer
                 }
             }
         }
-        ImGui::SetDragDropPayload("DATABASE", subsongsList.begin(), subsongsList.Size());
+        ImGui::SetDragDropPayload("DATABASE", subsongsList.begin(), subsongsList.Size<size_t>());
 
         if (subsongsList.NumItems() <= 7)
         {

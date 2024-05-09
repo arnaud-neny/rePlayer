@@ -73,20 +73,20 @@ namespace rePlayer
         const char* GetRealName() const;
 
         const uint16_t NumHandles() const;
-        const char* GetHandle(size_t index = 0) const;
+        const char* GetHandle(uint32_t index = 0) const;
         bool AreSameHandles(ArtistSheet* artistSheet) const;
 
         const Span<uint16_t> Countries() const;
         const uint16_t NumCountries() const;
-        const uint16_t GetCountry(size_t index) const;
+        const uint16_t GetCountry(uint32_t index) const;
 
         const uint16_t NumGroups() const;
-        const char* GetGroup(size_t index) const;
+        const char* GetGroup(uint32_t index) const;
         bool AreSameGroups(ArtistSheet* artistSheet) const;
 
         const Span<ArtistSource> Sources() const;
         const uint16_t NumSources() const;
-        const ArtistSource& GetSource(size_t index = 0) const;
+        const ArtistSource& GetSource(uint32_t index = 0) const;
 
         // helpers
         void Tooltip() const;

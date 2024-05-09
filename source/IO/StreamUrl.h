@@ -19,11 +19,11 @@ namespace rePlayer
     public:
         static SmartPtr<StreamUrl> Create(const std::string& url);
 
-        size_t Read(void* buffer, size_t size) final;
+        uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
 
-        size_t GetSize() const final;
-        size_t GetPosition() const final;
+        uint64_t GetSize() const final;
+        uint64_t GetPosition() const final;
 
         const std::string& GetName() const final { return m_url; }
 
@@ -35,8 +35,8 @@ namespace rePlayer
         const Span<const uint8_t> Read() final;
 
     private:
-        static constexpr uint64_t kCacheSize = 512 * 1024;
-        static constexpr uint64_t kCacheMask = kCacheSize - 1;
+        static constexpr uint32_t kCacheSize = 512 * 1024;
+        static constexpr uint32_t kCacheMask = kCacheSize - 1;
 
     private:
         StreamUrl(const std::string& filename, bool isClone = false);
@@ -68,8 +68,8 @@ namespace rePlayer
 
         std::string m_title;
 
-        uint64_t m_tail = 0;
-        uint64_t m_head = 0;
+        uint32_t m_tail = 0;
+        uint32_t m_head = 0;
         uint32_t m_icySize = 0;
         uint32_t m_metadataSize = 0;
         uint32_t m_chunkSize = 0;

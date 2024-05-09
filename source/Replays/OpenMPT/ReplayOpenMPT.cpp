@@ -178,7 +178,7 @@ namespace rePlayer
 
     size_t ReplayOpenMPT::OnRead(void* stream, void* dst, size_t bytes)
     {
-        return reinterpret_cast<io::Stream*>(stream)->Read(dst, bytes);
+        return size_t(reinterpret_cast<io::Stream*>(stream)->Read(dst, bytes));
     }
 
     int32_t ReplayOpenMPT::OnSeek(void* stream, int64_t offset, int32_t whence)
@@ -290,7 +290,7 @@ namespace rePlayer
         {
             static constexpr uint32_t kSilenceSampleRate = 8000;
             Array<float> samples(kSilenceSampleRate);
-            uint64_t totalSamples = 0;
+            uint32_t totalSamples = 0;
             while (auto numSamples = int32_t(openmpt_module_read_float_mono(m_modulePlayback, kSilenceSampleRate, kSilenceSampleRate, samples.Items(totalSamples))))
             {
                 totalSamples += numSamples;

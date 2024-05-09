@@ -106,7 +106,7 @@ namespace core::io
         return *this;
     }
 
-    size_t File::GetSize() const
+    uint64_t File::GetSize() const
     {
         LARGE_INTEGER llFileSize = { 0, 0 };
 
@@ -119,21 +119,21 @@ namespace core::io
         return llFileSize.QuadPart;
     }
 
-    size_t File::Read(void* buffer, size_t size) const
+    uint64_t File::Read(void* buffer, uint64_t size) const
     {
         DWORD dwBytesRead = 0;
-        ::ReadFile(mHandle, buffer, static_cast<uint32_t>(size), &dwBytesRead, nullptr);
+        ::ReadFile(mHandle, buffer, uint32_t(size), &dwBytesRead, nullptr);
 
         return dwBytesRead;
     }
 
-    void File::Write(const void* buffer, size_t size) const
+    void File::Write(const void* buffer, uint64_t size) const
     {
         DWORD dwBytesWritten = 0;
-        ::WriteFile(mHandle, buffer, static_cast<uint32_t>(size), &dwBytesWritten, nullptr);
+        ::WriteFile(mHandle, buffer, uint32_t(size), &dwBytesWritten, nullptr);
     }
 
-    void File::Seek(size_t offset)
+    void File::Seek(uint64_t offset)
     {
         LARGE_INTEGER largeOffset;
         largeOffset.QuadPart = offset;

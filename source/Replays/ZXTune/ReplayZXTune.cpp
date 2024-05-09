@@ -84,7 +84,7 @@ namespace rePlayer
             }
             std::size_t Size() const override
             {
-                return m_stream->GetSize();
+                return std::size_t(m_stream->GetSize());
             }
             SmartPtr<io::Stream> m_stream;
         };

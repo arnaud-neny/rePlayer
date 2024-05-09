@@ -29,11 +29,11 @@ namespace core::io
         File& operator=(File&& other);
 
         bool IsValid() const { return mHandle != (void*)-1ll; }
-        size_t GetSize() const;
+        uint64_t GetSize() const;
 
-        size_t Read(void* buffer, size_t size) const;
+        uint64_t Read(void* buffer, uint64_t size) const;
         template <typename Type>
-        size_t Read(Type& data) const { return Read(&data, sizeof(data)); }
+        uint64_t Read(Type& data) const { return Read(&data, sizeof(data)); }
         template <typename Type>
         Type Read() const { Type data = {}; Read(&data, sizeof(data)); return data; }
         template <typename SizeType, typename Type>
@@ -42,7 +42,7 @@ namespace core::io
         template <typename SizeType>
         void Read(Array<std::string>& data) const { auto numItems = Read<SizeType>(); data.Resize(numItems); for (auto& element : data) Read(element); }
 
-        void Write(const void* buffer, size_t size) const;
+        void Write(const void* buffer, uint64_t size) const;
         template <typename Type>
         void Write(const Type& data) const { Write(&data, sizeof(data)); }
         template <typename DataType, typename ValueType>
@@ -53,7 +53,7 @@ namespace core::io
         template <typename SizeType>
         void Write(const Array<std::string>& data) const { WriteAs<SizeType>(data.NumItems()); for (auto& element : data) Write(element); }
 
-        void Seek(size_t offset);
+        void Seek(uint64_t offset);
 
         static bool Delete(const char* name);
         static bool Copy(const char* srcName, const char* dstName);

@@ -48,7 +48,7 @@ namespace rePlayer
         static constexpr uint64_t kDefaultSongLength = 60 * 15; // in seconds
         m_numSamples = kDefaultSongLength * replay->GetSampleRate();
         m_samples.Resize(m_numSamples);
-        memset(m_samples.Items(), 0, m_samples.Size());
+        memset(m_samples.Items(), 0, m_samples.Size<size_t>());
 
         Core::AddJob([this]()
         {
@@ -95,7 +95,7 @@ namespace rePlayer
             auto numMillisecondsPerPixel = m_numMillisecondsPerPixel;
             auto sampleRate = m_replay->GetSampleRate();
             uint32_t numSamples = m_numSamples;
-            uint64_t numFrames = (1000ull * numSamples) / (sampleRate * numMillisecondsPerPixel);
+            uint32_t numFrames = uint32_t((1000ull * numSamples) / (sampleRate * numMillisecondsPerPixel));
             if (m_frames.NumItems() != numFrames)
             {
                 m_frames.Resize(numFrames);

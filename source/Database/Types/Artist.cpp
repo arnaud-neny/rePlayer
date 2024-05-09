@@ -147,7 +147,7 @@ namespace rePlayer
         return Dynamic()->handles.NumItems<uint16_t>();
     }
 
-    const char* Artist::GetHandle(size_t index) const
+    const char* Artist::GetHandle(uint32_t index) const
     {
         if (dataSize != 0)
             return handles[index].Items();
@@ -175,7 +175,7 @@ namespace rePlayer
         return Dynamic()->countries.NumItems<uint16_t>();
     }
 
-    const uint16_t Artist::GetCountry(size_t index) const
+    const uint16_t Artist::GetCountry(uint32_t index) const
     {
         if (dataSize != 0)
             return countries[index];
@@ -189,7 +189,7 @@ namespace rePlayer
         return Dynamic()->groups.NumItems<uint16_t>();
     }
 
-    const char* Artist::GetGroup(size_t index) const
+    const char* Artist::GetGroup(uint32_t index) const
     {
         if (dataSize != 0)
             return groups[index].Items();
@@ -217,7 +217,7 @@ namespace rePlayer
         return Dynamic()->sources.NumItems<uint16_t>();
     }
 
-    const ArtistSource& Artist::GetSource(size_t index) const
+    const ArtistSource& Artist::GetSource(uint32_t index) const
     {
         if (dataSize != 0)
             return sources[index];

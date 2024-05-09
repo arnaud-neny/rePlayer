@@ -32,13 +32,13 @@ namespace rePlayer
     inline void SourceZXArt::Chars::Set(Array<char>& blob, const char* otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString, strlen(otherString) + 1);
+        blob.Add(otherString, uint32_t(strlen(otherString) + 1));
     }
 
     inline void SourceZXArt::Chars::Set(Array<char>& blob, const std::string& otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString.c_str(), otherString.size() + 1);
+        blob.Add(otherString.c_str(), uint32_t(otherString.size() + 1));
     }
 
     template <typename T>
@@ -162,7 +162,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -195,7 +195,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -231,7 +231,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -255,8 +255,8 @@ namespace rePlayer
             {
                 auto* songSource = FindSong(sourceToDownload.internalId);
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
-                songSource->size = static_cast<uint32_t>(buffer.Size());
+                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
+                songSource->size = buffer.Size<uint32_t>();
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
@@ -458,7 +458,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -534,7 +534,7 @@ namespace rePlayer
             {
                 static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                 {
-                    buffer->Add(data, size * nmemb);
+                    buffer->Add(data, uint32_t(size * nmemb));
                     return size * nmemb;
                 }
             } buffer;
@@ -547,7 +547,7 @@ namespace rePlayer
                 Array<std::pair<uint32_t, std::string>> aliases;
                 {
                     auto jsonAllAliases = nlohmann::json::parse(buffer.begin(), buffer.end());
-                    aliases.Reserve(jsonAllAliases["responseData"]["authorAlias"].size());
+                    aliases.Reserve(uint32_t(jsonAllAliases["responseData"]["authorAlias"].size()));
                     for (auto& jsonAlias : jsonAllAliases["responseData"]["authorAlias"])
                     {
                         if (jsonAlias.contains("title"))

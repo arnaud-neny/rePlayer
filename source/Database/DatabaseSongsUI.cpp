@@ -694,7 +694,7 @@ namespace rePlayer
             if (entry.isSelected)
                 subsongsList.Add(MusicID(entry.id, m_databaseId));
         }
-        ImGui::SetDragDropPayload("DATABASE", subsongsList.begin(), subsongsList.Size());
+        ImGui::SetDragDropPayload("DATABASE", subsongsList.begin(), subsongsList.Size<size_t>());
 
         if (subsongsList.NumItems() <= 7)
         {

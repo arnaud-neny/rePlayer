@@ -12,11 +12,11 @@ namespace core::io
         static [[nodiscard]] SmartPtr<StreamFile> Create(const std::string& filename);
         static [[nodiscard]] SmartPtr<StreamFile> Create(const std::wstring& filename);
 
-        size_t Read(void* buffer, size_t size) final;
+        uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
 
-        [[nodiscard]] size_t GetSize() const final;
-        [[nodiscard]] size_t GetPosition() const final;
+        [[nodiscard]] uint64_t GetSize() const final;
+        [[nodiscard]] uint64_t GetPosition() const final;
 
         [[nodiscard]] const std::string& GetName() const final { return m_name; }
 

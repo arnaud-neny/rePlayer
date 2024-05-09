@@ -439,7 +439,7 @@ namespace rePlayer
             auto rootSong = m_entries[rootEntryIndex].song;
             for (int64_t i = m_entries.NumItems() - 1; i >= 0; i--)
             {
-                if (m_entries[i].isSelected)
+                if (m_entries[uint32_t(i)].isSelected)
                     Unmerge(int32_t(i));
             }
 

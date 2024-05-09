@@ -57,7 +57,7 @@ namespace rePlayer
 
         auto currentLength = pos < size ? size - pos : 0;
         if (currentLength < length)
-            length = currentLength;
+            length = size_t(currentLength);
         if (length == 0)
             return TagLib::ByteVector();
 

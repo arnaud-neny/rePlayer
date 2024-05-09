@@ -19,7 +19,7 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline const ItemType& BlobArray<ItemType, storage>::StaticInfo::operator[](size_t index) const
+    inline const ItemType& BlobArray<ItemType, storage>::StaticInfo::operator[](uint32_t index) const
     {
         return Items()[index];
     }
@@ -41,7 +41,7 @@ namespace core
         if constexpr (storage == Blob::kIsStatic)
         {
             auto items = Items();
-            for (size_t i = 0, e = NumItems(); i < e; i++)
+            for (uint32_t i = 0, e = NumItems(); i < e; i++)
                 items[i].~ItemType();
         }
     }
@@ -91,13 +91,13 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline ItemType& BlobArray<ItemType, storage>::operator[](size_t index) requires (storage == Blob::kIsDynamic)
+    inline ItemType& BlobArray<ItemType, storage>::operator[](uint32_t index) requires (storage == Blob::kIsDynamic)
     {
         return m_handle[index];
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline const ItemType& BlobArray<ItemType, storage>::operator[](size_t index) const
+    inline const ItemType& BlobArray<ItemType, storage>::operator[](uint32_t index) const
     {
         return m_handle[index];
     }
@@ -105,7 +105,7 @@ namespace core
     template <typename ItemType, Blob::Storage storage>
     inline BlobArray<ItemType, storage>::operator const Span<ItemType>() const
     {
-        return { m_handle.Items(), size_t(m_handle.NumItems()) };
+        return { m_handle.Items(), m_handle.NumItems() };
     }
 
     template <typename ItemType, Blob::Storage storage>
@@ -156,32 +156,32 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline ItemType* BlobArray<ItemType, storage>::Add(const ItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Add(const ItemType* otherItems, uint32_t numOtherItems) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Add(otherItems, numOtherItems);
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline void BlobArray<ItemType, storage>::RemoveAt(size_t index, size_t numItemsToRemove) requires (storage == Blob::kIsDynamic)
+    inline void BlobArray<ItemType, storage>::RemoveAt(uint32_t index, uint32_t numItemsToRemove) requires (storage == Blob::kIsDynamic)
     {
         m_handle.RemoveAt(index, numItemsToRemove);
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Insert(uint32_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Insert(index, otherItem);
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline ItemType* BlobArray<ItemType, storage>::Insert(size_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic)
+    inline ItemType* BlobArray<ItemType, storage>::Insert(uint32_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Insert(index, std::forward<ItemType>(otherItem));
     }
 
     template <typename ItemType, Blob::Storage storage>
     template <typename SearchType>
-    inline int64_t BlobArray<ItemType, storage>::Remove(const SearchType& searchItem, size_t index) requires (storage == Blob::kIsDynamic)
+    inline int64_t BlobArray<ItemType, storage>::Remove(const SearchType& searchItem, uint32_t index) requires (storage == Blob::kIsDynamic)
     {
         return m_handle.Remove(searchItem, index);
     }
@@ -200,7 +200,7 @@ namespace core
     }
 
     template <typename ItemType, Blob::Storage storage>
-    inline BlobArray<ItemType, storage>& BlobArray<ItemType, storage>::Resize(size_t numItems) requires (storage == Blob::kIsDynamic)
+    inline BlobArray<ItemType, storage>& BlobArray<ItemType, storage>::Resize(uint32_t numItems) requires (storage == Blob::kIsDynamic)
     {
         m_handle.Resize(numItems);
         return *this;
@@ -242,7 +242,7 @@ namespace core
             }
             else
             {
-                s.Store(m_handle.Items(), m_handle.Size());
+                s.Store(m_handle.Items(), m_handle.Size<uint32_t>());
             }
             s.Pop();
         }

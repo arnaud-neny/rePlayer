@@ -37,7 +37,7 @@ namespace rePlayer
         return nullptr;
     }
 
-    size_t StreamArchiveRaw::Read(void* buffer, size_t size)
+    uint64_t StreamArchiveRaw::Read(void* buffer, uint64_t size)
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->Read(buffer, size);
@@ -60,7 +60,7 @@ namespace rePlayer
                 m_entryDataBlockPosition = 0;
             }
             auto sizeToCopy = Min(sizeLeft, remainingSize);
-            memcpy(dest, m_entryDataBlock + m_entryDataBlockPosition, sizeToCopy);
+            memcpy(dest, m_entryDataBlock + m_entryDataBlockPosition, size_t(sizeToCopy));
             dest += sizeToCopy;
             m_entryPosition += sizeToCopy;
             m_entryDataBlockPosition += sizeToCopy;
@@ -117,12 +117,12 @@ namespace rePlayer
         return Status::kOk;
     }
 
-    size_t StreamArchiveRaw::GetSize() const
+    uint64_t StreamArchiveRaw::GetSize() const
     {
         return m_entrySize;
     }
 
-    size_t StreamArchiveRaw::GetPosition() const
+    uint64_t StreamArchiveRaw::GetPosition() const
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->GetPosition();

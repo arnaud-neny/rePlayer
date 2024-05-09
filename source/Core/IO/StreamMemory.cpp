@@ -7,7 +7,7 @@
 
 namespace core::io
 {
-    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, const uint8_t* buffer, size_t size, bool isStatic)
+    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, const uint8_t* buffer, uint64_t size, bool isStatic)
     {
         SmartPtr<StreamMemory> stream;
         stream.New();
@@ -19,7 +19,7 @@ namespace core::io
         return stream;
     }
 
-    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, SharedMemory* sharedMemory, size_t size)
+    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, SharedMemory* sharedMemory, uint64_t size)
     {
         SmartPtr<StreamMemory> stream;
         stream.New();
@@ -30,13 +30,13 @@ namespace core::io
         return stream;
     }
 
-    size_t StreamMemory::Read(void* buffer, size_t size)
+    uint64_t StreamMemory::Read(void* buffer, uint64_t size)
     {
         auto remainingSize = m_size - m_position;
         size = Min(remainingSize, size);
         if (size > 0)
         {
-            memcpy(buffer, m_buffer + m_position, size);
+            memcpy(buffer, m_buffer + m_position, size_t(size));
             m_position += size;
         }
         return size;
@@ -54,14 +54,14 @@ namespace core::io
         return Status::kOk;
     }
 
-    size_t StreamMemory::GetSize() const
+    uint64_t StreamMemory::GetSize() const
     {
         return m_size;
     }
 
-    size_t StreamMemory::GetPosition() const
+    uint64_t StreamMemory::GetPosition() const
     {
-        return size_t(m_position);
+        return uint64_t(m_position);
     }
 
     SmartPtr<Stream> StreamMemory::Open(const std::string& filename)
@@ -80,7 +80,7 @@ namespace core::io
     const Span<const uint8_t> StreamMemory::Read()
     {
         m_position = int64_t(m_size);
-        return { m_buffer, m_size };
+        return { m_buffer, uint32_t(m_size) };
     }
 }
 // namespace core::io

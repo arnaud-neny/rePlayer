@@ -177,7 +177,7 @@ namespace rePlayer
         return Dynamic()->artistIds.NumItems<uint16_t>();
     }
 
-    const ArtistID Song::GetArtistId(size_t index) const
+    const ArtistID Song::GetArtistId(uint32_t index) const
     {
         if (dataSize != 0)
             return artistIds[index];
@@ -199,14 +199,14 @@ namespace rePlayer
         return Dynamic()->sourceIds.NumItems<uint16_t>();
     }
 
-    const SourceID Song::GetSourceId(size_t index) const
+    const SourceID Song::GetSourceId(uint32_t index) const
     {
         if (dataSize != 0)
             return sourceIds[index];
         return Dynamic()->sourceIds[index];
     }
 
-    const char* const Song::GetSourceName(size_t index) const
+    const char* const Song::GetSourceName(uint32_t index) const
     {
         SourceID sourceId;
         if (dataSize != 0)
@@ -232,42 +232,42 @@ namespace rePlayer
         return Dynamic()->lastSubsongIndex;
     }
 
-    const uint32_t Song::GetSubsongDurationCs(size_t index) const
+    const uint32_t Song::GetSubsongDurationCs(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].durationCs;
         return Dynamic()->subsongs[index].durationCs;
     }
 
-    const uint8_t Song::GetSubsongRating(size_t index) const
+    const uint8_t Song::GetSubsongRating(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].rating;
         return Dynamic()->subsongs[index].rating;
     }
 
-    const SubsongState Song::GetSubsongState(size_t index) const
+    const SubsongState Song::GetSubsongState(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].state;
         return Dynamic()->subsongs[index].state;
     }
 
-    const bool Song::IsSubsongDiscarded(size_t index) const
+    const bool Song::IsSubsongDiscarded(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].isDiscarded;
         return Dynamic()->subsongs[index].isDiscarded;
     }
 
-    const bool Song::IsSubsongPlayed(size_t index) const
+    const bool Song::IsSubsongPlayed(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].isPlayed;
         return Dynamic()->subsongs[index].isPlayed;
     }
 
-    const char* Song::GetSubsongName(size_t index) const
+    const char* Song::GetSubsongName(uint32_t index) const
     {
         if (dataSize != 0)
             return subsongs[index].name.Items();

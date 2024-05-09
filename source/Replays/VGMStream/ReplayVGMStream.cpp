@@ -213,17 +213,17 @@ namespace rePlayer
     size_t ReplayVGMStream::StreamFileRead(StreamFile* sf, uint8_t* dst, offv_t offset, size_t length)
     {
         sf->stream->Seek(offset, io::Stream::kSeekBegin);
-        return sf->stream->Read(dst, length);
+        return size_t(sf->stream->Read(dst, length));
     }
 
     size_t ReplayVGMStream::StreamFileGetSize(StreamFile* sf)
     {
-        return sf->stream->GetSize();
+        return size_t(sf->stream->GetSize());
     }
 
     offv_t ReplayVGMStream::StreamFileGetOffset(StreamFile* sf)
     {
-        return sf->stream->GetPosition();
+        return offv_t(sf->stream->GetPosition());
     }
 
     void ReplayVGMStream::StreamFileGetName(StreamFile* sf, char* name, size_t name_size)

@@ -66,7 +66,7 @@ namespace core
         if (command >= m_commands.begin() && command < m_commands.end())
         {
             if (isRemoved)
-                m_commands.RemoveAt(reinterpret_cast<const Command*>(command) - m_commands.Items(), command->numEntries + 1);
+                m_commands.RemoveAt(uint32_t(reinterpret_cast<const Command*>(command) - m_commands.Items()), command->numEntries + 1);
         }
         else if (!isRemoved)
             Add(command);

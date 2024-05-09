@@ -264,7 +264,7 @@ namespace rePlayer
         {
             struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
             f->name = strdup(name);
-            f->size = newStream->GetSize();
+            f->size = size_t(newStream->GetSize());
             f->data = (char*)malloc(f->size);
             newStream->Read(f->data, f->size);
             return f;
@@ -309,7 +309,7 @@ namespace rePlayer
         uade_detection_info detectionInfo = {};
         uade_analyze_eagleplayer(&detectionInfo, state, sizeof(uade_state), nullptr, 0, state);
 
-        ms_globals.players.Reserve(state->playerstore->nplayers);
+        ms_globals.players.Reserve(uint32_t(state->playerstore->nplayers));
         ms_globals.players.Add({ 0, 0 });
         ms_globals.strings.Add("Default", sizeof("Default"));
         for (size_t i = 0; i < state->playerstore->nplayers; i++)
@@ -331,7 +331,7 @@ namespace rePlayer
                 hash = static_cast<uint32_t>(static_cast<uint64_t>(hash ^ *str) * fnvPrime);
 
             ms_globals.players.Add({ ms_globals.strings.NumItems(), hash });
-            ms_globals.strings.Add(state->playerstore->players[i].playername, strlen(state->playerstore->players[i].playername) + 1);
+            ms_globals.strings.Add(state->playerstore->players[i].playername, uint32_t(strlen(state->playerstore->players[i].playername) + 1));
         }
         std::sort(ms_globals.players.begin() + 1, ms_globals.players.end(), [](auto& l, auto& r)
         {

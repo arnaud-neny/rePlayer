@@ -44,7 +44,7 @@ namespace rePlayer
     size_t ReplayHighlyQuixotic::ReadPSF(void* buffer, size_t size, size_t count, void* handle)
     {
         auto stream = reinterpret_cast<io::Stream*>(handle);
-        return stream->Read(buffer, size * count) / size;
+        return size_t(stream->Read(buffer, size * count) / size);
     }
 
     int ReplayHighlyQuixotic::SeekPSF(void* handle, int64_t offset, int whence)

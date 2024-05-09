@@ -12,21 +12,21 @@ namespace core
         m_patches.Push()->buffer.Resize(sizeof(Blob));
     }
 
-    void BlobSerializer::Store(const uint8_t* items, size_t size, size_t alignment)
+    void BlobSerializer::Store(const uint8_t* items, uint32_t size, size_t alignment)
     {
         auto& patch = m_patches[m_currentPatch];
         patch.alignment = Max(patch.alignment, uint16_t(alignment));
 
         auto dataOffset = patch.buffer.NumItems();
         auto newDataOffset = (dataOffset + alignment - 1) & ~(alignment - 1);
-        patch.buffer.Add(zero, newDataOffset - dataOffset);
-        patch.buffer.Add(reinterpret_cast<const uint8_t*>(items), size);
+        patch.buffer.Add(zero, uint32_t(newDataOffset - dataOffset));
+        patch.buffer.Add(reinterpret_cast<const uint8_t*>(items), uint32_t(size));
     }
 
-    void BlobSerializer::Push(size_t patchOffset, size_t numItems)
+    void BlobSerializer::Push(uint32_t patchOffset, uint32_t numItems)
     {
         // prepare the offset
-        auto currentOffset = m_patches[m_currentPatch].buffer.Size() - patchOffset;
+        auto currentOffset = m_patches[m_currentPatch].buffer.NumItems() - patchOffset;
 
         // next memory chunk
         auto patch = m_patches.Push();
@@ -34,7 +34,7 @@ namespace core
         patch->previousPatch = m_currentPatch;
         m_currentPatch = m_patches.NumItems<uint16_t>() - 1;
         patch->numItems = uint16_t(numItems);
-        patch->hasNumItems = numItems != ~size_t(0);
+        patch->hasNumItems = numItems != ~0u;
     }
 
     void BlobSerializer::Pop()
@@ -47,7 +47,7 @@ namespace core
         Commit();
         if (m_isValid)
         {
-            auto size = m_patches[0].buffer.Size() - sizeof(Blob);
+            auto size = m_patches[0].buffer.NumItems() - sizeof(Blob);
             file.WriteAs<uint16_t>(size);
             file.Write(m_patches[0].buffer.Items() + sizeof(Blob), size);
             return Status::kOk;
@@ -59,7 +59,7 @@ namespace core
     {
         Commit();
         if (m_isValid)
-            return { m_patches[0].buffer.Items() + sizeof(Blob), m_patches[0].buffer.Size() - sizeof(Blob) };
+            return { m_patches[0].buffer.Items() + sizeof(Blob), uint32_t(m_patches[0].buffer.NumItems() - sizeof(Blob)) };
         return { nullptr, nullptr };
     }
 
@@ -99,7 +99,7 @@ namespace core
                 patch[0] |= offset;
                 dataOffset += currentPatch.buffer.NumItems<uint16_t>();
 
-                mainPatch.buffer.Add(currentPatch.buffer.Items(), currentPatch.buffer.Size());
+                mainPatch.buffer.Add(currentPatch.buffer.Items(), currentPatch.buffer.NumItems());
             }
             if (m_patches.Size() >= 65536)
                 m_isValid = false;

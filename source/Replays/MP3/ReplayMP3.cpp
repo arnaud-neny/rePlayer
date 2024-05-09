@@ -60,7 +60,7 @@ namespace rePlayer
         auto* streamData = reinterpret_cast<StreamData*>(pUserData);
         if (streamData->isInit && streamData->stream->GetPosition() > 65536)
             return 0;
-        return streamData->stream->Read(pBufferOut, bytesToRead);
+        return size_t(streamData->stream->Read(pBufferOut, bytesToRead));
     }
 
     drmp3_bool32 ReplayMP3::OnSeek(void* pUserData, int offset, drmp3_seek_origin origin)

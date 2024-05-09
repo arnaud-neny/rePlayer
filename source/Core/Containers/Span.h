@@ -11,7 +11,7 @@ namespace core
         friend class Span;
     public:
         // Setup
-        Span(ItemType* items, size_t numItems);
+        Span(ItemType* items, uint32_t numItems);
         Span(ItemType* beginItems, ItemType* endItems);
         Span(const Span& otherSpan);
         Span(Span&& otherSpan);
@@ -36,13 +36,15 @@ namespace core
         bool operator!=(const Span& otherSpan) const;
 
         // Accessors
-        ItemType& operator[](size_t index);
-        const ItemType& operator[](size_t index) const;
+        template <typename T = uint32_t>
+        ItemType& operator[](T index);
+        template <typename T = uint32_t>
+        const ItemType& operator[](T index) const;
 
         ItemType& Last() const;
 
-        template <typename OtherItemType = ItemType>
-        OtherItemType* Items(size_t index = 0) const;
+        template <typename OtherItemType = ItemType, typename T = uint32_t>
+        OtherItemType* Items(T index = 0) const;
 
         // Modifiers
         Span& operator=(const Span& otherSpan);

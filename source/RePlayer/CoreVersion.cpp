@@ -79,7 +79,7 @@ namespace rePlayer
                         static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                         {
                             auto oldSize = buffer->NumItems();
-                            buffer->Resize(oldSize + size * nmemb);
+                            buffer->Resize(uint32_t(oldSize + size * nmemb));
 
                             memcpy(&(*buffer)[oldSize], data, size * nmemb);
 
@@ -115,7 +115,7 @@ namespace rePlayer
                         // unzip
                         auto archive = archive_read_new();
                         archive_read_support_format_all(archive);
-                        archive_read_open_memory(archive, downloadBuffer.Items(), downloadBuffer.Size());
+                        archive_read_open_memory(archive, downloadBuffer.Items(), downloadBuffer.Size<size_t>());
                         archive_entry* entry;
                         while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
                         {
@@ -123,8 +123,8 @@ namespace rePlayer
                             if (fileSize > 0)
                             {
                                 Array<uint8_t> unpackedData;
-                                unpackedData.Resize(fileSize);
-                                archive_read_data(archive, unpackedData.Items(), fileSize);
+                                unpackedData.Resize(uint32_t(fileSize));
+                                archive_read_data(archive, unpackedData.Items(), size_t(fileSize));
 
                                 // rebuild the path (remove the root path from the archive files)
                                 auto entryPath = std::filesystem::path(archive_entry_pathname(entry));

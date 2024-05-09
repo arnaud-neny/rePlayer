@@ -39,9 +39,10 @@ namespace rePlayer
         auto stream = reinterpret_cast<io::Stream*>(user_data)->Open(filename);
         if (stream.IsValid())
         {
-            *buf = malloc(stream->GetSize());
-            stream->Read(*buf, stream->GetSize());
-            return stream->GetSize();
+            auto size = size_t(stream->GetSize());
+            *buf = malloc(size);
+            stream->Read(*buf, size);
+            return size_t(size);
         }
         Log::Error("[MDX] can't open %s\n", filename);
         return 0;

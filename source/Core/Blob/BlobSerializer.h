@@ -20,11 +20,11 @@ namespace core
         template <typename T>
         void Store(const T& item);
         template <typename T>
-        void Store(const T* items, size_t size);
+        void Store(const T* items, uint32_t size);
 
-        void Store(const uint8_t* items, size_t size, size_t alignment);
+        void Store(const uint8_t* items, uint32_t size, size_t alignment);
 
-        void Push(size_t patchOffset, size_t numItems = ~size_t(0));
+        void Push(uint32_t patchOffset, uint32_t numItems = ~0u);
         void Pop();
 
         Status Save(io::File& file);
@@ -57,11 +57,11 @@ namespace core
         if constexpr (requires { &item.Store; })
             return item.Store(*this);
         else
-            Store(reinterpret_cast<const uint8_t*>(&item), sizeof(T), alignof(T));
+            Store(reinterpret_cast<const uint8_t*>(&item), uint32_t(sizeof(T)), alignof(T));
     }
 
     template <typename T>
-    inline void BlobSerializer::Store(const T* items, size_t size)
+    inline void BlobSerializer::Store(const T* items, uint32_t size)
     {
         Store(reinterpret_cast<const uint8_t*>(items), size, alignof(T));
     }

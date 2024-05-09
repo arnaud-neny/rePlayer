@@ -52,7 +52,7 @@ namespace rePlayer
     size_t ReplayWAV::OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead)
     {
         auto stream = reinterpret_cast<io::Stream*>(pUserData);
-        return stream->Read(pBufferOut, bytesToRead);
+        return size_t(stream->Read(pBufferOut, bytesToRead));
     }
 
     drwav_bool32 ReplayWAV::OnSeek(void* pUserData, int offset, drwav_seek_origin origin)

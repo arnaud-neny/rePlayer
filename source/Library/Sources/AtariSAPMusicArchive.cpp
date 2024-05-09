@@ -33,13 +33,13 @@ namespace rePlayer
     inline void SourceAtariSAPMusicArchive::Chars::Set(Array<char>& blob, const char* otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString, strlen(otherString) + 1);
+        blob.Add(otherString, uint32_t(strlen(otherString) + 1));
     }
 
     inline void SourceAtariSAPMusicArchive::Chars::Set(Array<char>& blob, const std::string& otherString)
     {
         offset = blob.NumItems();
-        blob.Add(otherString.c_str(), otherString.size() + 1);
+        blob.Add(otherString.c_str(), uint32_t(otherString.size() + 1));
     }
 
     template <typename T>
@@ -283,7 +283,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -310,7 +310,7 @@ namespace rePlayer
             else
             {
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
+                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
                 songSource->size = buffer.NumItems();
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
@@ -474,7 +474,7 @@ namespace rePlayer
                 }
                 if (m_areDataDirty)
                 {
-                    Array<uint8_t> data(size_t(0), m_data.NumItems<size_t>());
+                    Array<uint8_t> data(0u, m_data.NumItems());
                     data.Add(m_data.Items(), alignof(SourceSong));
                     // remove discarded songs at the end of the array
                     Array<uint32_t> songs(m_songs);
@@ -667,7 +667,7 @@ namespace rePlayer
             {
                 static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
                 {
-                    buffer->Add(data, size * nmemb);
+                    buffer->Add(data, uint32_t(size * nmemb));
                     return size * nmemb;
                 }
             } buffer;
@@ -693,7 +693,7 @@ namespace rePlayer
 
                 // parse db composers
                 auto& composerInfos = json["composerInfos"];
-                m_db.artists.Reserve(composerInfos.size());
+                m_db.artists.Reserve(uint32_t(composerInfos.size()));
                 for (auto& composerInfo : composerInfos)
                 {
                     auto* artist = m_db.artists.Push();
@@ -742,7 +742,7 @@ namespace rePlayer
 
                 // parse db songs
                 auto& fileInfos = json["fileInfos"];
-                m_db.songs.Reserve(fileInfos.size());
+                m_db.songs.Reserve(uint32_t(fileInfos.size()));
                 for (auto& fileInfo : fileInfos)
                 {
                     auto songOffset = m_db.data.Push<uint32_t>(sizeof(ASMASong));

@@ -257,7 +257,7 @@ namespace rePlayer
         {
             size_t r;
             r = size * nmemb;
-            out->Add(in, r);
+            out->Add(in, uint32_t(r));
             return r;
         }
 

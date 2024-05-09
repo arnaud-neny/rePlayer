@@ -48,7 +48,7 @@ namespace rePlayer
     size_t ReplayVorbis::OnRead(void* ptr, size_t size, size_t nmemb, void* datasource)
     {
         auto stream = reinterpret_cast<io::Stream*>(datasource);
-        return stream->Read(ptr, size * nmemb);
+        return size_t(stream->Read(ptr, size * nmemb));
     }
 
     int32_t ReplayVorbis::OnSeek(void* datasource, ogg_int64_t offset, int whence)

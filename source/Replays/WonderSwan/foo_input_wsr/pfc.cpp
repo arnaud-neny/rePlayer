@@ -10,6 +10,6 @@ namespace pfc
     {
         pfc::stringcvt::string_utf8_from_ansi converter;
         converter.convert(buf, size);
-        return { converter.get_ptr(), converter.length() };
+        return { converter.get_ptr(), uint32_t(converter.length()) };
     }
 }

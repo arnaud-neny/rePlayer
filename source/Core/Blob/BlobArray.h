@@ -30,7 +30,7 @@ namespace core
             uint16_t NumItems() const;
             ItemType* Items() const;
 
-            const ItemType& operator[](size_t index) const;
+            const ItemType& operator[](uint32_t index) const;
         };
         typedef std::conditional<storage == Blob::kIsStatic, StaticInfo, Array<ItemType>>::type Type;
         template <typename ItemType, Blob::Storage otherStorage>
@@ -59,8 +59,8 @@ namespace core
         const ItemType* Find(const SearchType& searchItem) const;
 
         // Accessors
-        ItemType& operator[](size_t index) requires (storage == Blob::kIsDynamic);
-        const ItemType& operator[](size_t index) const;
+        ItemType& operator[](uint32_t index) requires (storage == Blob::kIsDynamic);
+        const ItemType& operator[](uint32_t index) const;
 
         operator const Span<ItemType>() const;
 
@@ -76,20 +76,20 @@ namespace core
         ItemType* Push() requires (storage == Blob::kIsDynamic);
         ItemType* Add(const ItemType& otherItem) requires (storage == Blob::kIsDynamic);
         ItemType* Add(ItemType&& otherItem) requires (storage == Blob::kIsDynamic);
-        ItemType* Add(const ItemType* otherItems, size_t numOtherItems) requires (storage == Blob::kIsDynamic);
+        ItemType* Add(const ItemType* otherItems, uint32_t numOtherItems) requires (storage == Blob::kIsDynamic);
 
-        ItemType* Insert(size_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic);
-        ItemType* Insert(size_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Insert(uint32_t index, const ItemType& otherItem) requires (storage == Blob::kIsDynamic);
+        ItemType* Insert(uint32_t index, ItemType&& otherItem) requires (storage == Blob::kIsDynamic);
 
-        void RemoveAt(size_t index, size_t numItemsToRemove = 1) requires (storage == Blob::kIsDynamic);
+        void RemoveAt(uint32_t index, uint32_t numItemsToRemove = 1) requires (storage == Blob::kIsDynamic);
         template <typename SearchType>
-        int64_t Remove(const SearchType& item, size_t index = 0) requires (storage == Blob::kIsDynamic);
+        int64_t Remove(const SearchType& item, uint32_t index = 0) requires (storage == Blob::kIsDynamic);
 
         Type& Container() requires (storage == Blob::kIsDynamic);
 
         // Storage
         BlobArray& Clear() requires (storage == Blob::kIsDynamic);
-        BlobArray& Resize(size_t numItems) requires (storage == Blob::kIsDynamic);
+        BlobArray& Resize(uint32_t numItems) requires (storage == Blob::kIsDynamic);
 
         // Stl
         const ItemType* begin() const;

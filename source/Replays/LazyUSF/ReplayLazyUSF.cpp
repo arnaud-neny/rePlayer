@@ -100,7 +100,7 @@ namespace rePlayer
     size_t ReplayLazyUSF::ReadPSF(void* buffer, size_t size, size_t count, void* handle)
     {
         auto stream = reinterpret_cast<io::Stream*>(handle);
-        return stream->Read(buffer, size * count) / size;
+        return size_t(stream->Read(buffer, size * count) / size);
     }
 
     int ReplayLazyUSF::SeekPSF(void* handle, int64_t offset, int whence)
@@ -381,7 +381,7 @@ namespace rePlayer
 
     std::string ReplayLazyUSF::GetSubsongTitle() const
     {
-        for (size_t i = 0, e = m_tags.NumItems(); i < e; i += 2)
+        for (uint32_t i = 0, e = m_tags.NumItems(); i < e; i += 2)
         {
             if (_stricmp(m_tags[i].c_str(), "title") == 0)
                 return m_tags[i + 1];
@@ -395,7 +395,7 @@ namespace rePlayer
     std::string ReplayLazyUSF::GetExtraInfo() const
     {
         std::string metadata;
-        for (size_t i = 0, e = m_tags.NumItems(); i < e; i += 2)
+        for (uint32_t i = 0, e = m_tags.NumItems(); i < e; i += 2)
         {
             if (i != 0)
                 metadata += "\n";

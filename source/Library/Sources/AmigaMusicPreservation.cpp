@@ -645,7 +645,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -686,12 +686,12 @@ namespace rePlayer
                     inflateGetHeader(&strm, &gzhdr);
 
                     Array<uint8_t> unpackedData;
-                    unpackedData.Resize(buffer[buffer.Size() - 4] | (buffer[buffer.Size() - 3] << 8) | (buffer[buffer.Size() - 2] << 16) | (buffer[buffer.Size() - 1] << 24));//gzip file last 2 dwords are crc & decompressed size
+                    unpackedData.Resize(buffer[buffer.NumItems() - 4] | (buffer[buffer.NumItems() - 3] << 8) | (buffer[buffer.NumItems() - 2] << 16) | (buffer[buffer.NumItems() - 1] << 24));//gzip file last 2 dwords are crc & decompressed size
 
                     for (;;)
                     {
-                        if (strm.total_out >= unpackedData.Size())//just in case something is wrong with the gzip file
-                            unpackedData.Resize(unpackedData.Size() + 65536);
+                        if (strm.total_out >= unpackedData.NumItems())//just in case something is wrong with the gzip file
+                            unpackedData.Resize(unpackedData.NumItems() + 65536);
 
                         strm.next_out = reinterpret_cast<Bytef*>(unpackedData.Items() + strm.total_out);
                         strm.avail_out = static_cast<uint32_t>(unpackedData.Size()) - strm.total_out;
@@ -712,8 +712,8 @@ namespace rePlayer
                     if (unpackedData.IsNotEmpty())
                     {
                         SongSource* songAMP = FindSong(sourceToDownload.internalId);
-                        songAMP->crc = buffer[buffer.Size() - 8] | (buffer[buffer.Size() - 7] << 8) | (buffer[buffer.Size() - 6] << 16) | (buffer[buffer.Size() - 5] << 24);
-                        songAMP->size = static_cast<uint32_t>(buffer.Size());
+                        songAMP->crc = buffer[buffer.NumItems() - 8] | (buffer[buffer.NumItems() - 7] << 8) | (buffer[buffer.NumItems() - 6] << 16) | (buffer[buffer.NumItems() - 5] << 24);
+                        songAMP->size = buffer.NumItems();
                         m_isDirty = true;
 
                         stream = io::StreamMemory::Create(path, unpackedData.Items(), unpackedData.Size(), false);

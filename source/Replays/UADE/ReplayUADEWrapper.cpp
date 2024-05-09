@@ -80,7 +80,7 @@ extern "C" ssize_t uade_atomic_read(int fd, const void* buf, size_t count)
 
         auto src = socket.m_message.Items() + socket.m_messageOffset;
         auto messageSize = socket.m_message.NumItems() - socket.m_messageOffset;
-        auto toRead = core::Min(count - bytes_read, messageSize);
+        auto toRead = size_t(core::Min(count - bytes_read, messageSize));
         memcpy(dst + bytes_read, src, toRead);
 
         bytes_read += toRead;
@@ -110,7 +110,7 @@ extern "C" ssize_t uade_atomic_write(int fd, const void* buf, size_t count)
     socket.Lock();
 
     auto offset = socket.m_message.NumItems();
-    socket.m_message.Resize(offset + count);
+    socket.m_message.Resize(uint32_t(offset + count));
     memcpy(socket.m_message.Items(offset), buf, count);
 
     socket.Unlock();

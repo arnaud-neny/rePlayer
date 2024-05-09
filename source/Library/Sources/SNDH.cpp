@@ -373,7 +373,7 @@ namespace rePlayer
         {
             static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
             {
-                buffer->Add(data, size * nmemb);
+                buffer->Add(data, uint32_t(size * nmemb));
                 return size * nmemb;
             }
         } buffer;
@@ -397,8 +397,8 @@ namespace rePlayer
             {
                 auto* songSource = FindSong(sourceToDownload.internalId);
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size());
-                songSource->size = static_cast<uint32_t>(buffer.Size());
+                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
+                songSource->size = buffer.Size<uint32_t>();
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
@@ -509,12 +509,12 @@ namespace rePlayer
                     {
                         if (!artists[i].isNotRegistered)
                         {
-                            artists.Resize(i + 1);
+                            artists.Resize(uint32_t(i + 1));
                             break;
                         }
                     }
                     // re-pack artists
-                    Array<char> strings(size_t(0), m_strings.NumItems<size_t>());
+                    Array<char> strings(0u, m_strings.NumItems());
                     uint32_t lastArtist = 0xffFFffFF;
                     for (uint32_t i = 0, e = artists.NumItems(); i < e; i++)
                     {
@@ -524,11 +524,11 @@ namespace rePlayer
                             auto* name = m_strings.Items(artist.nameOffset);
                             auto* url = m_strings.Items(artist.urlOffset);
                             artist.nameOffset = strings.NumItems();
-                            strings.Add(name, strlen(name) + 1);
+                            strings.Add(name, uint32_t(strlen(name) + 1));
                             if (name != url)
                             {
                                 artist.urlOffset = strings.NumItems();
-                                strings.Add(url, strlen(url) + 1);
+                                strings.Add(url, uint32_t(strlen(url) + 1));
                             }
                             else
                                 artist.urlOffset = artist.nameOffset;
@@ -593,11 +593,11 @@ namespace rePlayer
             else
                 artist = m_artists.Push();
             artist->nameOffset = m_strings.NumItems();
-            m_strings.Add(name.c_str(), name.size() + 1);
+            m_strings.Add(name.c_str(), uint32_t(name.size() + 1));
             if (url != name)
             {
                 artist->urlOffset = m_strings.NumItems();
-                m_strings.Add(url.c_str(), url.size() + 1);
+                m_strings.Add(url.c_str(), uint32_t(url.size() + 1));
             }
             else
                 artist->urlOffset = artist->nameOffset;

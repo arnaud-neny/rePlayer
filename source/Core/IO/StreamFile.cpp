@@ -33,16 +33,16 @@ namespace core::io
         return stream;
     }
 
-    size_t StreamFile::Read(void* buffer, size_t size)
+    uint64_t StreamFile::Read(void* buffer, uint64_t size)
     {
         if (m_stream.IsValid())
             return m_stream->Read(buffer, size);
-        size_t totalRead{ 0 };
+        uint64_t totalRead = 0;
         while (totalRead < size)
         {
             uint32_t toRead = size > 0xffFFffFF ? 0xffFFffFF : uint32_t(size);
-            DWORD readSize{ 0 };
-            ::ReadFile(m_handle, buffer, static_cast<uint32_t>(size), &readSize, nullptr);
+            DWORD readSize = 0;
+            ::ReadFile(m_handle, buffer, uint32_t(size), &readSize, nullptr);
             totalRead += readSize;
             if (toRead != readSize)
                 break;
@@ -56,13 +56,13 @@ namespace core::io
             return m_stream->Seek(offset, whence);
         LARGE_INTEGER seekPos;
         seekPos.QuadPart = offset;
-        LARGE_INTEGER newPos{ 0 };
+        LARGE_INTEGER newPos = { 0 };
         if (::SetFilePointerEx(m_handle, seekPos, &newPos, whence == SeekWhence::kSeekCurrent ? FILE_CURRENT : whence == SeekWhence::kSeekBegin ? FILE_BEGIN : FILE_END))
             return Status::kOk;
         return Status::kFail;
     }
 
-    size_t StreamFile::GetSize() const
+    uint64_t StreamFile::GetSize() const
     {
         if (m_stream.IsValid())
             return m_stream->GetSize();
@@ -75,10 +75,10 @@ namespace core::io
             llFileSize = fileStandardInfo.EndOfFile;
         }
 
-        return size_t(llFileSize.QuadPart);
+        return llFileSize.QuadPart;
     }
 
-    size_t StreamFile::GetPosition() const
+    uint64_t StreamFile::GetPosition() const
     {
         if (m_stream.IsValid())
             return m_stream->GetPosition();
@@ -86,7 +86,7 @@ namespace core::io
         LARGE_INTEGER seekPos{ 0 };
         LARGE_INTEGER newPos{ 0 };
         ::SetFilePointerEx(m_handle, seekPos, &newPos, FILE_CURRENT);
-        return size_t(newPos.QuadPart);
+        return newPos.QuadPart;
     }
 
     StreamFile::~StreamFile()

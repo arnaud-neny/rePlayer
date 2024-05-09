@@ -24,7 +24,7 @@ namespace rePlayer
         return stream;
     }
 
-    size_t StreamUrl::Read(void* buffer, size_t size)
+    uint64_t StreamUrl::Read(void* buffer, uint64_t size)
     {
         std::atomic_ref atomicHead(m_head);
 
@@ -52,7 +52,7 @@ namespace rePlayer
                         return size - remainingSize;
                     }
                 }
-                chunkSize = Min(remainingSize, chunkSize);
+                chunkSize = uint32_t(Min(remainingSize, chunkSize));
 
                 auto dataPos = tail & kCacheMask;
                 if (dataPos + chunkSize > kCacheSize)
@@ -91,7 +91,7 @@ namespace rePlayer
                     availableSize = atomicHead - tail;
                 }
 
-                availableSize = Min(remainingSize, availableSize);
+                availableSize = uint32_t(Min(remainingSize, availableSize));
                 m_mutex.lock();
                 memcpy(output, m_data.Items(tail), availableSize);
                 m_mutex.unlock();
@@ -153,14 +153,14 @@ namespace rePlayer
                 ::Sleep(1);
             if (offset >= 0 && offset <= int64_t(std::atomic_ref(m_head)))
             {
-                m_tail = offset;
+                m_tail = uint32_t(offset);
                 return Status::kOk;
             }
         }
         return Status::kFail;
     }
 
-    size_t StreamUrl::GetSize() const
+    uint64_t StreamUrl::GetSize() const
     {
         if (m_type == Type::kStreaming)
             return 0;
@@ -169,7 +169,7 @@ namespace rePlayer
         return m_head;
     }
 
-    size_t StreamUrl::GetPosition() const
+    uint64_t StreamUrl::GetPosition() const
     {
         return m_tail;
     }
@@ -285,7 +285,7 @@ namespace rePlayer
 
         while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
-        return { m_data.Items(), size_t(m_head) };
+        return { m_data.Items(), m_head };
     }
 
     StreamUrl::StreamUrl(const std::string& url, bool isClone)
@@ -485,7 +485,7 @@ namespace rePlayer
             std::atomic_ref atomicHead(stream->m_head);
             if (stream->m_type == Type::kStreaming)
             {
-                auto remainingSize = size;
+                auto remainingSize = uint32_t(size);
                 if (stream->m_icySize > 0)
                 {
                     while (remainingSize > 0)
@@ -581,9 +581,9 @@ namespace rePlayer
             else // basic download
             {
                 stream->m_mutex.lock();
-                stream->m_data.Add(data, size);
+                stream->m_data.Add(data, uint32_t(size));
                 stream->m_mutex.unlock();
-                atomicHead += size;
+                atomicHead += uint32_t(size);
             }
         }
         return size;
