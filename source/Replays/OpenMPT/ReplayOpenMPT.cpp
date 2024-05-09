@@ -318,7 +318,7 @@ namespace rePlayer
                 }
             }
             silenceStart += kSilenceSampleRate / 4; // keep 0.25 second of silence
-            m_silenceStart = silenceStart < totalSamples ? silenceStart * kSampleRate / kSilenceSampleRate : 0;
+            m_silenceStart = silenceStart < totalSamples ? MulDiv(silenceStart, kSampleRate, kSilenceSampleRate) : 0;
             setSubsong(m_modulePlayback);
             m_previousSubsongIndex = m_subsongIndex;
         }
