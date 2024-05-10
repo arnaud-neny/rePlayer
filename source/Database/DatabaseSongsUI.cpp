@@ -325,6 +325,7 @@ namespace rePlayer
             ImGui::TableSetupColumn(">|", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, 0.0f, kState);
             ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
             ImGui::TableSetupColumn("Added", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide, 0.0f, kDatabaseDate);
+            ImGui::TableSetupColumn("Source", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultHide, 0.0f, kSource);
             ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
             ImGui::TableHeadersRow();
 
@@ -419,6 +420,8 @@ namespace rePlayer
                     ImGui::TableNextColumn();
                     auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(song->GetDatabaseDay() + Core::kReferenceDate)));
                     ImGui::Text("%04d/%02u/%02u", int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", SourceID::sourceNames[song->GetSourceId(0).sourceId]);
                     ImGui::PopID();
                 }
             }
@@ -554,6 +557,9 @@ namespace rePlayer
                         break;
                     case kDatabaseDate:
                         delta = int64_t(lSong->GetDatabaseDay()) - int64_t(rSong->GetDatabaseDay());
+                        break;
+                    case kSource:
+                        delta = strcmp(SourceID::sourceNames[lSong->GetSourceId(0).sourceId], SourceID::sourceNames[rSong->GetSourceId(0).sourceId]);
                         break;
                     }
 

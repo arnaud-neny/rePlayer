@@ -82,6 +82,7 @@ namespace rePlayer
             kState,
             kRating,
             kDatabaseDate,
+            kSource,
             kNumIDs
         };
 

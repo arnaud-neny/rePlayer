@@ -8,12 +8,12 @@ namespace rePlayer
         "Amiga Music Preservation",
         "The Mod Archive",
         "Modland",
-        "File Import",
+        "File",
         "High Voltage SID Collection",
         "SNDH - Atari ST YM2149 Archive",
         "Atari SAP Music Archive",
         "ZX-Art",
-        "URL Import",
+        "URL",
         "VGMRips"
     };
 
