@@ -1,6 +1,5 @@
 # rePlayer (another multi-formats music player)
 
-- update 'size_t' in core to not be used for counters (container with num items..., stream...)
 - add the replay selection for each extension in the global settings
 - add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
@@ -23,7 +22,7 @@
 - remove allocated vb & ib and replace it by a scratch buffer
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
-- multi-threaded load/import (with main screens lock)
+- multi-threaded load (with main screens lock)
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://www.exotica.org.uk/ importer?
