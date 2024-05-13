@@ -193,7 +193,6 @@ namespace core
     template <typename OtherItemType, typename T>
     inline OtherItemType* Array<ItemType>::Items(T index) const
     {
-        assert(index == 0 || uint64_t(index) < m_numItems);
         return reinterpret_cast<OtherItemType*>(m_items + index);
     }
 

@@ -133,7 +133,6 @@ namespace core
     template <typename OtherItemType, typename T>
     inline OtherItemType* Span<ItemType>::Items(T index) const
     {
-        assert(uint64_t(index) < m_numItems);
         return reinterpret_cast<OtherItemType*>(m_items + index);
     }
 
