@@ -58,7 +58,7 @@ namespace rePlayer
     size_t ReplayMP3::OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead)
     {
         auto* streamData = reinterpret_cast<StreamData*>(pUserData);
-        if (streamData->isInit && streamData->stream->GetPosition() > 65536)
+        if (streamData->isInit && !streamData->isSeekable && streamData->stream->GetPosition() > 65536)
             return 0;
         return size_t(streamData->stream->Read(pBufferOut, bytesToRead));
     }
