@@ -248,7 +248,7 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 			madeWithTracker = U_("Akord");
 		break;
 	case S3MFileHeader::trkScreamTracker:
-		if(fileHeader.cwtv == S3MFileHeader::trkST3_20 && fileHeader.special == 0 && (fileHeader.ordNum & 0x0F) == 0 && fileHeader.ultraClicks == 0 && (fileHeader.flags & ~0x50) == 0)
+		if(fileHeader.cwtv == S3MFileHeader::trkST3_20 && fileHeader.special == 0 && (fileHeader.ordNum & 0x0F) == 0 && fileHeader.ultraClicks == 0 && (fileHeader.flags & ~0x50) == 0 && fileHeader.usePanningTable == S3MFileHeader::idPanning)
 		{
 			// MPT and OpenMPT before 1.17.03.02 - Simply keep default (filter) MIDI macros
 			if((fileHeader.masterVolume & 0x80) != 0)
@@ -266,7 +266,10 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 			m_playBehaviour.set(kST3LimitPeriod);
 		} else if(fileHeader.cwtv == S3MFileHeader::trkST3_20 && fileHeader.special == 0 && fileHeader.ultraClicks == 0 && fileHeader.flags == 0 && fileHeader.usePanningTable == 0)
 		{
-			madeWithTracker = U_("Velvet Studio");
+			if(fileHeader.globalVol == 64 && fileHeader.masterVolume == 48)
+				madeWithTracker = U_("PlayerPRO");
+			else  // Always stereo
+				madeWithTracker = U_("Velvet Studio");
 		} else
 		{
 			// ST3.20 should only ever write ultra-click values 16, 24 and 32 (corresponding to 8, 12 and 16 in the GUI), ST3.01/3.03 should only write 0,
@@ -279,8 +282,11 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 		}
 		break;
 	case S3MFileHeader::trkImagoOrpheus:
-		madeWithTracker = U_("Imago Orpheus");
-		formatTrackerStr = true;
+		formatTrackerStr = (fileHeader.cwtv != S3MFileHeader::trkPlayerPRO);
+		if(formatTrackerStr)
+			madeWithTracker = U_("Imago Orpheus");
+		else
+			madeWithTracker = U_("PlayerPRO");
 		nonCompatTracker = true;
 		break;
 	case S3MFileHeader::trkImpulseTracker:
@@ -439,14 +445,17 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 	else
 		m_nSamplePreAmp = std::max(fileHeader.masterVolume & 0x7F, 0x10);  // Bit 7 = Stereo (we always use stereo)
 
-	const bool isStereo = (fileHeader.masterVolume & 0x80) != 0 || m_dwLastSavedWithVersion;
-	if(!isStereo)
-		m_nSamplePreAmp = Util::muldivr_unsigned(m_nSamplePreAmp, 8, 11);
-
 	// Approximately as loud as in DOSBox and a real SoundBlaster 16
 	m_nVSTiVolume = 36;
 	if(isSchism && schismDateVersion < SchismVersionFromDate<2018, 11, 12>::date)
 		m_nVSTiVolume = 64;
+
+	const bool isStereo = (fileHeader.masterVolume & 0x80) != 0 || m_dwLastSavedWithVersion;
+	if(!isStereo)
+	{
+		m_nSamplePreAmp = Util::muldivr_unsigned(m_nSamplePreAmp, 8, 11);
+		m_nVSTiVolume = Util::muldivr_unsigned(m_nVSTiVolume, 8, 11);
+	}
 
 	// Channel setup
 	m_nChannels = 4;
@@ -491,8 +500,7 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 	// Read extended channel panning
 	if(fileHeader.usePanningTable == S3MFileHeader::idPanning)
 	{
-		uint8 pan[32];
-		file.ReadArray(pan);
+		const auto pan = file.ReadArray<uint8, 32>();
 		for(CHANNELINDEX i = 0; i < 32; i++)
 		{
 			if((pan[i] & 0x20) != 0 && (!isST3 || !isAdlibChannel[i]))
@@ -839,7 +847,8 @@ bool CSoundFile::SaveS3M(std::ostream &f) const
 
 	// Write patterns
 	enum class S3MChannelType : uint8 { kUnused = 0, kPCM = 1, kAdlib = 2 };
-	FlagSet<S3MChannelType> channelType[32] = { S3MChannelType::kUnused };
+	std::array<FlagSet<S3MChannelType>, 32> channelType;
+	channelType.fill(S3MChannelType::kUnused);
 	bool globalCmdOnMutedChn = false;
 	for(PATTERNINDEX pat = 0; pat < writePatterns; pat++)
 	{

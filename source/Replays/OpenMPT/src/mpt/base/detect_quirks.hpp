@@ -19,6 +19,16 @@
 
 
 
+#if MPT_GCC_AT_LEAST(14, 0, 0) && MPT_GCC_BEFORE(15, 0, 0)
+// GCC 14 causes severe miscompilation of inline functions.
+// See <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=115049>.
+#if defined(__OPTIMIZE__)
+#define MPT_COMPILER_QUIRK_GCC_NO_O2
+#endif
+#endif
+
+
+
 #if MPT_COMPILER_MSVC
 #if !defined(_MSVC_TRADITIONAL)
 #define MPT_COMPILER_QUIRK_MSVC_OLD_PREPROCESSOR
