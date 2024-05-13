@@ -560,7 +560,7 @@ xmlHTMLPrintFileContext(xmlParserInputPtr input) {
     len = strlen(buffer);
     snprintf(&buffer[len], sizeof(buffer) - len, "\n");
     cur = input->cur;
-    while ((*cur == '\n') || (*cur == '\r'))
+    while ((cur > base) && ((*cur == '\n') || (*cur == '\r')))
 	cur--;
     n = 0;
     while ((cur != base) && (n++ < 80)) {
@@ -3350,7 +3350,7 @@ main(int argc, char **argv) {
 	else if ((!strcmp(argv[i], "-pedantic")) ||
 	         (!strcmp(argv[i], "--pedantic"))) {
 	    options |= XML_PARSE_PEDANTIC;
-            options &= XML_PARSE_NOWARNING;
+            options &= ~XML_PARSE_NOWARNING;
         }
 #ifdef LIBXML_DEBUG_ENABLED
 	else if ((!strcmp(argv[i], "-debugent")) ||
