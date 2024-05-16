@@ -307,7 +307,7 @@ namespace rePlayer
                 m_songs.m_items.Resize(m_songs.m_frozenIndex);
                 std::atomic_ref(m_songs.m_revision)++;
             }
-            if (m_artists.m_frozenIndex != m_artists.m_frozenIndex)
+            if (m_artists.m_frozenIndex != m_artists.m_items.NumItems())
             {
                 m_artists.m_items.Resize(m_artists.m_frozenIndex);
                 std::atomic_ref(m_artists.m_revision)++;
