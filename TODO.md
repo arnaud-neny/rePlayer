@@ -1,5 +1,7 @@
 # rePlayer (another multi-formats music player)
 
+- auto merge
+- array: change ReturnType (is_pointer, is_reference,...) with a trait enuym type (enum return type value, index, pointer, ref)
 - add the replay selection for each extension in the global settings
 - add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui

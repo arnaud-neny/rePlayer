@@ -1,4 +1,4 @@
-v0.15.14:
+v0.15.15:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -16,6 +16,7 @@ v0.15.14:
 - Archive loader
 - Patterns display (OpenMPT, Hively)
 - Playlist sort from current playing position while pressing Ctrl
+- Refactor file importer
 - Refactor song packages
 - Resizable UI
 - Win32 port
