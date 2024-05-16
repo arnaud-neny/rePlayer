@@ -68,7 +68,7 @@ namespace core
 
         ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
 
-        ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None);
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
