@@ -269,6 +269,8 @@ static void Terminate(NEZ_PLAY *pNezPlay)
 	NSFNSF *nsf = (NSFNSF*)((NEZ_PLAY*)pNezPlay)->nsf;
 	if (nsf)
 	{
+        NESMemoryHandlerInitialize(pNezPlay); // rePlayer (memory leak)
+
 		if (nsf->bankbase)
 		{
 			XFREE(nsf->bankbase);
@@ -527,7 +529,7 @@ PROTECTED uint32_t NSFELoad(NEZ_PLAY *pNezPlay, const uint8_t *pData, uint32_t u
     fadeSize = 0;
     tlblSize = 0;
     authSize = 0;
-    
+
     trackInfo = NULL;
 
     ((NSFNSF*)pNezPlay->nsf)->head[0x00] = 'N';
