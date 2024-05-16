@@ -60,6 +60,7 @@ namespace rePlayer
 
         Replay* Load(io::Stream* stream, CommandBuffer metadata, MediaType type);
         Replayables Enumerate(io::Stream* stream);
+        Replayables Enumerate(io::Stream* stream, MediaType type);
         MediaType Find(const char* extension) const;
 
         bool DisplaySettings() const;

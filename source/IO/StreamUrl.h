@@ -13,11 +13,11 @@ namespace rePlayer
 {
     using namespace core;
 
-    class StreamUrl : public core::io::Stream
+    class StreamUrl : public io::Stream
     {
         friend class SmartPtr<StreamUrl>;
     public:
-        static SmartPtr<StreamUrl> Create(const std::string& url);
+        static SmartPtr<StreamUrl> Create(const std::string& url, io::Stream* root = nullptr);
 
         uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
@@ -30,8 +30,6 @@ namespace rePlayer
         std::string GetInfo() const final;
         std::string GetTitle() const final;
 
-        SmartPtr<Stream> Open(const std::string& filename) override;
-
         const Span<const uint8_t> Read() final;
 
     private:
@@ -39,9 +37,10 @@ namespace rePlayer
         static constexpr uint32_t kCacheMask = kCacheSize - 1;
 
     private:
-        StreamUrl(const std::string& filename, bool isClone = false);
+        StreamUrl(const std::string& filename, bool isClone, io::Stream* root);
         ~StreamUrl() override;
 
+        SmartPtr<Stream> OnOpen(const std::string& filename) final;
         SmartPtr<Stream> OnClone() final;
 
         std::string Escape(const std::string& url, size_t startPos);

@@ -19,9 +19,10 @@ namespace rePlayer
         return m_numSelectedEntries;
     }
 
-    inline std::string DatabaseSongsUI::GetFullpath(Song* song) const
+    inline std::string DatabaseSongsUI::GetFullpath(Song* song, Array<Artist*>* artists) const
     {
         (void)song;
+        (void)artists;
         return {};
     }
 

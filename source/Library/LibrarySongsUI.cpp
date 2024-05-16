@@ -83,9 +83,9 @@ namespace rePlayer
         }
     }
 
-    std::string Library::SongsUI::GetFullpath(Song* song) const
+    std::string Library::SongsUI::GetFullpath(Song* song, Array<Artist*>* artists) const
     {
-        std::string filename = GetDirectory(song);
+        std::string filename = GetDirectory(song, artists);
         //build song filename
         {
             auto name = std::string(song->GetName());
@@ -95,7 +95,23 @@ namespace rePlayer
         filename += " [";
         for (uint16_t i = 0; i < song->NumArtistIds(); i++)
         {
-            auto* artist = m_db[song->GetArtistId(i)];
+            Artist* artist;
+            if (artists)
+            {
+                artist = nullptr;
+                for (auto* a : *artists)
+                {
+                    if (a->id == song->GetArtistId(i))
+                    {
+                        artist = a;
+                        break;
+                    }
+                }
+                if (artist == nullptr)
+                    artist = m_db[song->GetArtistId(i)];
+            }
+            else
+                artist = m_db[song->GetArtistId(i)];
             if (i != 0)
                 filename += ",";
             std::string artistName = artist->GetHandle();
@@ -210,12 +226,20 @@ namespace rePlayer
         m_songMerger->MenuItem(*this);
     }
 
-    std::string Library::SongsUI::GetDirectory(Song* song) const
+    std::string Library::SongsUI::GetDirectory(Song* song, Array<Artist*>* artists) const
     {
         if (song->NumArtistIds() == 0)
         {
             std::string directory = ms_path;
             return directory + "!/";
+        }
+        if (artists)
+        {
+            for (auto* artist : *artists)
+            {
+                if (song->GetArtistId(0) == artist->id)
+                    return GetDirectory(artist);
+            }
         }
         return GetDirectory(m_db[song->GetArtistId(0)]);
     }

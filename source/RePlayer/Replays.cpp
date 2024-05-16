@@ -67,7 +67,7 @@ namespace rePlayer
         // default load
         if (auto plugin = m_plugins[int32_t(type.replay)])
         {
-            stream->Seek(0, io::Stream::kSeekBegin);
+            stream->Rewind();
             if (auto replay = Load(plugin, stream, metadata))
                 return replay;
         }
@@ -93,7 +93,7 @@ namespace rePlayer
                             ++nextExt;
                         if (_strnicmp(extensions, currentExt, nextExt - extensions) == 0)
                         {
-                            stream->Seek(0, io::Stream::kSeekBegin);
+                            stream->Rewind();
                             if (auto replay = Load(plugin, stream, metadata))
                                 return replay;
                             plugins[replayIndex] = nullptr;
@@ -114,7 +114,7 @@ namespace rePlayer
             auto replayIndex = (i + baseReplayIndex) % uint16_t(eReplay::Count);
             if (auto plugin = plugins[replayIndex])
             {
-                stream->Seek(0, io::Stream::kSeekBegin);
+                stream->Rewind();
                 if (auto replay = Load(plugin, stream, metadata))
                     return replay;
             }
@@ -131,7 +131,7 @@ namespace rePlayer
         {
             if (auto plugin = m_plugins[i])
             {
-                stream->Seek(0, io::Stream::kSeekBegin);
+                stream->Rewind();
                 if (auto replay = Load(plugin, stream, commands))
                 {
                     replays[numReplays++] = plugin->replayId;
@@ -139,6 +139,68 @@ namespace rePlayer
                 }
             }
         }
+        replays[numReplays++] = eReplay::Unknown;
+        return replays;
+    }
+
+    Replayables Replays::Enumerate(io::Stream* stream, MediaType type)
+    {
+        if (type.ext == eExtension::Unknown)
+            return Enumerate(stream);
+
+        ReplayPlugin* plugins[uint16_t(eReplay::Count)];
+        memcpy(plugins, m_sortedPlugins, sizeof(m_sortedPlugins));
+        auto baseReplayIndex = m_replayToIndex[int32_t(type.replay)];
+
+        Replayables replays;
+        uint32_t numReplays = 0;
+        Array<CommandBuffer::Command> commands;
+
+        // load by extension
+        auto currentExt = MediaType::extensionNames[int32_t(type.ext)];
+        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        {
+            auto replayIndex = (i + baseReplayIndex) % uint16_t(eReplay::Count);
+            if (auto plugin = plugins[replayIndex])
+            {
+                for (auto extensions = plugin->extensions;;)
+                {
+                    auto nextExt = extensions + 1;
+                    while (*nextExt != 0 && *nextExt != ';')
+                        ++nextExt;
+                    if (_strnicmp(extensions, currentExt, nextExt - extensions) == 0)
+                    {
+                        stream->Rewind();
+                        if (auto replay = Load(plugin, stream, commands))
+                        {
+                            replays[numReplays++] = plugin->replayId;
+                            delete replay;
+                        }
+                        plugins[replayIndex] = nullptr;
+                        break;
+                    }
+                    if (*nextExt)
+                        extensions = nextExt + 1;
+                    else
+                        break;
+                }
+            }
+        }
+
+        // try to load with the remaining plugins
+        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        {
+            if (auto plugin = plugins[i])
+            {
+                stream->Rewind();
+                if (auto replay = Load(plugin, stream, commands))
+                {
+                    replays[numReplays++] = plugin->replayId;
+                    delete replay;
+                }
+            }
+        }
+
         replays[numReplays++] = eReplay::Unknown;
         return replays;
     }

@@ -13,7 +13,7 @@ namespace rePlayer
 
         void OnEndUpdate() override;
 
-        std::string GetFullpath(Song* song) const override;
+        std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const override;
 
         Playlist& GetPlaylist();
 

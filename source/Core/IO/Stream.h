@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Containers/Array.h>
 #include <Containers/SmartPtr.h>
 #include <Containers/Span.h>
 #include <Core/RefCounted.h>
@@ -35,19 +36,30 @@ namespace core::io
         [[nodiscard]] SmartPtr<Stream> Clone();
 
         // open another stream in the same context as the current one
-        virtual [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) = 0;
+        [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename);
         // open the next entry in the stream (eg: archive)
-        virtual [[nodiscard]] SmartPtr<Stream> Next(bool isForced = false);
+        [[nodiscard]] SmartPtr<Stream> Next(bool isForced = false);
+        // reset all states of the stream
+        void Rewind();
 
         // read all the stream
         virtual [[nodiscard]] const Span<const uint8_t> Read();
 
-    protected:
-        Stream() = default;
+        [[nodiscard]] Array<std::string> GetFilenames() const;
 
+    protected:
+        Stream(Stream* root);
+        virtual ~Stream();
+
+        virtual [[nodiscard]] SmartPtr<Stream> OnOpen(const std::string& filename) = 0;
         virtual [[nodiscard]] SmartPtr<Stream> OnClone() = 0;
+        virtual [[nodiscard]] SmartPtr<Stream> OnNext(bool isForced);
+
+        void AddFilename(const std::string& filename);
+        Stream* GetRoot() const { return m_root ? m_root.Get() : const_cast<Stream*>(this); }
 
     private:
+        Stream() = delete;
         Stream(const Stream&) = delete;
         Stream& operator=(const Stream&) = delete;
 
@@ -59,6 +71,17 @@ namespace core::io
             void* m_ptr;
         };
         SmartPtr<SharedMemory> m_cachedData;
+
+    private:
+        SmartPtr<Stream> m_root;
+
+        // list of files opened in the context of a stream (root), not including the first opened file
+        struct FS
+        {
+            static FS* Create(const std::string& filename, FS* nextFS);
+            FS* next;
+            char name[0];
+        }* m_files = nullptr;
     };
 }
 // namespace core::io

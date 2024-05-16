@@ -9,7 +9,7 @@ namespace rePlayer
 {
     using namespace core;
 
-    class StreamArchive : public core::io::Stream
+    class StreamArchive : public io::Stream
     {
         friend class SmartPtr<StreamArchive>;
     public:
@@ -26,19 +26,18 @@ namespace rePlayer
 
         [[nodiscard]] std::string GetComments() const final { return m_comments; }
 
-        [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) final;
-        [[nodiscard]] SmartPtr<Stream> Next(bool isForced) final;
-
         const Span<const uint8_t> Read() final;
 
     private:
         static constexpr uint32_t kCacheSize = 4096;
 
     private:
-        StreamArchive(io::Stream* stream, bool isPackage);
+        StreamArchive(io::Stream* stream, bool isPackage, io::Stream* root);
         ~StreamArchive() final;
 
+        [[nodiscard]] SmartPtr<Stream> OnOpen(const std::string& filename) final;
         [[nodiscard]] SmartPtr<Stream> OnClone() final;
+        [[nodiscard]] SmartPtr<Stream> OnNext(bool isForced) final;
 
         void ReOpen();
 

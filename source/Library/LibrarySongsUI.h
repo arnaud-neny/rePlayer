@@ -14,7 +14,7 @@ namespace rePlayer
         void OnDisplay() override;
         void OnEndUpdate() override;
 
-        std::string GetFullpath(Song* song) const override;
+        std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const override;
         std::string GetDirectory(Artist* artist) const;
 
         Library& GetLibrary();
@@ -30,7 +30,7 @@ namespace rePlayer
         class SongMerger;
 
     private:
-        std::string GetDirectory(Song* song) const;
+        std::string GetDirectory(Song* song, Array<Artist*>* artists = nullptr) const;
 
     private:
         SongMerger* m_songMerger = nullptr;

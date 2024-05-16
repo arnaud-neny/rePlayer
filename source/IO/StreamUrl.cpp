@@ -16,11 +16,13 @@
 
 namespace rePlayer
 {
-    SmartPtr<StreamUrl> StreamUrl::Create(const std::string& filename)
+    SmartPtr<StreamUrl> StreamUrl::Create(const std::string& filename, io::Stream* root)
     {
-        auto stream = SmartPtr<StreamUrl>(kAllocate, filename);
+        auto stream = SmartPtr<StreamUrl>(kAllocate, filename, false, root);
         if (std::atomic_ref(stream->m_state) == State::kFailed)
             stream.Reset();
+        else
+            stream->AddFilename(filename);
         return stream;
     }
 
@@ -220,64 +222,6 @@ namespace rePlayer
         return title;
     }
 
-    SmartPtr<io::Stream> StreamUrl::Open(const std::string& filename)
-    {
-        if (filename == m_url)
-            return Clone();
-
-        SmartPtr<StreamUrl> stream;
-        std::string url;
-        if (filename.find("://") != std::string::npos)
-        {
-            // go to the uncommon part
-            size_t startPos = 0;
-            while (startPos < filename.size() && startPos < m_url.size() && filename[startPos] == m_url[startPos])
-                startPos++;
-            // make it curl friendly
-            url = Escape(filename, startPos);
-            // already fetch?
-            for (auto& link : m_links)
-            {
-                if (link->m_url == filename || link->m_url == url)
-                    return link->Clone();
-            }
-            // download the default, and if it fails, then do the escaped
-            stream = StreamUrl::Create(filename);
-            if (stream.IsInvalid())
-                stream = StreamUrl::Create(url);
-            else
-                url = filename;
-        }
-        else
-        {
-            // behave like a path, so try to remove the original filename
-            url = m_url;
-            auto pos = url.rfind('/');
-            url.resize(pos + 1);
-            auto urlEscaped = url;
-            // append the filename
-            url += filename;
-            // append the curl friendly filename
-            urlEscaped += Escape(filename, 0);
-            // already fetch?
-            for (auto& link : m_links)
-            {
-                if (link->m_url == url || link->m_url == urlEscaped)
-                    return link->Clone();
-            }
-            // download the default, and if it fails, then do the escaped
-            stream = StreamUrl::Create(url);
-            if (stream.IsInvalid())
-            {
-                stream = StreamUrl::Create(urlEscaped);
-                url = std::move(urlEscaped);
-            }
-        }
-        if (stream.IsValid())
-            m_links.Add(stream);
-        return stream;
-    }
-
     const Span<const uint8_t> StreamUrl::Read()
     {
         if (m_type == Type::kStreaming)
@@ -288,8 +232,9 @@ namespace rePlayer
         return { m_data.Items(), m_head };
     }
 
-    StreamUrl::StreamUrl(const std::string& url, bool isClone)
-        : m_url(url)
+    StreamUrl::StreamUrl(const std::string& url, bool isClone, io::Stream* root)
+        : io::Stream(root)
+        , m_url(url)
         , m_isJobDone(isClone)
     {
         if (isClone)
@@ -345,6 +290,64 @@ namespace rePlayer
         }
     }
 
+    SmartPtr<io::Stream> StreamUrl::OnOpen(const std::string& filename)
+    {
+        if (filename == m_url)
+            return Clone();
+
+        SmartPtr<StreamUrl> stream;
+        std::string url;
+        if (filename.find("://") != std::string::npos)
+        {
+            // go to the uncommon part
+            size_t startPos = 0;
+            while (startPos < filename.size() && startPos < m_url.size() && filename[startPos] == m_url[startPos])
+                startPos++;
+            // make it curl friendly
+            url = Escape(filename, startPos);
+            // already fetch?
+            for (auto& link : m_links)
+            {
+                if (link->m_url == filename || link->m_url == url)
+                    return link->Clone();
+            }
+            // download the default, and if it fails, then do the escaped
+            stream = StreamUrl::Create(filename, GetRoot());
+            if (stream.IsInvalid())
+                stream = StreamUrl::Create(url, GetRoot());
+            else
+                url = filename;
+        }
+        else
+        {
+            // behave like a path, so try to remove the original filename
+            url = m_url;
+            auto pos = url.rfind('/');
+            url.resize(pos + 1);
+            auto urlEscaped = url;
+            // append the filename
+            url += filename;
+            // append the curl friendly filename
+            urlEscaped += Escape(filename, 0);
+            // already fetch?
+            for (auto& link : m_links)
+            {
+                if (link->m_url == url || link->m_url == urlEscaped)
+                    return link->Clone();
+            }
+            // download the default, and if it fails, then do the escaped
+            stream = StreamUrl::Create(url, GetRoot());
+            if (stream.IsInvalid())
+            {
+                stream = StreamUrl::Create(urlEscaped, GetRoot());
+                url = std::move(urlEscaped);
+            }
+        }
+        if (stream.IsValid())
+            m_links.Add(stream);
+        return stream;
+    }
+
     SmartPtr<io::Stream> StreamUrl::OnClone()
     {
         if (m_type == Type::kStreaming)
@@ -353,7 +356,7 @@ namespace rePlayer
         while (std::atomic_ref(m_state) < State::kEnd)
             ::Sleep(1);
 
-        SmartPtr<StreamUrl> stream(kAllocate, m_url, true);
+        SmartPtr<StreamUrl> stream(kAllocate, m_url, true, GetRoot());
         stream->m_url = m_url;
         stream->m_icyName = m_icyName;
         stream->m_icyDescription = m_icyDescription;

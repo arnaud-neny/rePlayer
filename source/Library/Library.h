@@ -35,6 +35,8 @@ namespace rePlayer
         class ArtistsUI;
         class SongsUI;
 
+        class FileImport;
+
     private:
         std::string OnGetWindowTitle() override;
         void OnDisplay() override;
@@ -105,6 +107,7 @@ namespace rePlayer
             bool* isOpened = nullptr;
         } m_imports;
 
+        FileImport* m_fileImport = nullptr;
         Serialized<std::string> m_lastFileDialogPath = "LastFileDialogPath";
 
         static const char* const ms_songsFilename;

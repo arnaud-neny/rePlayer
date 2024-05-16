@@ -194,6 +194,9 @@
     <ClCompile Include="Graphics\GraphicsImGuiDx11.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Library\LibraryFileImport.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -405,6 +408,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\GraphicsImGuiDx11.h">
       <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibraryFileImport.h">
+      <Filter>Source Files\Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,11 +9,11 @@ namespace rePlayer
 {
     using namespace core;
 
-    class StreamArchiveRaw : public core::io::Stream
+    class StreamArchiveRaw : public io::Stream
     {
         friend class SmartPtr<StreamArchiveRaw>;
     public:
-        static [[nodiscard]] SmartPtr<StreamArchiveRaw> Create(io::Stream* stream);
+        static [[nodiscard]] SmartPtr<StreamArchiveRaw> Create(io::Stream* stream, io::Stream* root = nullptr);
 
         uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
@@ -23,17 +23,16 @@ namespace rePlayer
 
         [[nodiscard]] const std::string& GetName() const final;
 
-        [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) final;
-
         const Span<const uint8_t> Read() final;
 
     private:
         static constexpr uint32_t kCacheSize = 4096;
 
     private:
-        StreamArchiveRaw(io::Stream* stream);
+        StreamArchiveRaw(io::Stream* stream, io::Stream* root);
         ~StreamArchiveRaw() final;
 
+        [[nodiscard]] SmartPtr<Stream> OnOpen(const std::string& filename) final;
         [[nodiscard]] SmartPtr<Stream> OnClone() final;
 
         void ReOpen();

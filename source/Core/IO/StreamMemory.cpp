@@ -7,10 +7,10 @@
 
 namespace core::io
 {
-    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, const uint8_t* buffer, uint64_t size, bool isStatic)
+    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, const uint8_t* buffer, uint64_t size, bool isStatic, Stream* root)
     {
         SmartPtr<StreamMemory> stream;
-        stream.New();
+        stream.New(root);
         stream->m_buffer = buffer;
         stream->m_size = size;
         stream->m_name = filename;
@@ -19,10 +19,10 @@ namespace core::io
         return stream;
     }
 
-    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, SharedMemory* sharedMemory, uint64_t size)
+    SmartPtr<StreamMemory> StreamMemory::Create(const std::string& filename, SharedMemory* sharedMemory, uint64_t size, Stream* root)
     {
         SmartPtr<StreamMemory> stream;
-        stream.New();
+        stream.New(root);
         stream->m_buffer = reinterpret_cast<const uint8_t*>(sharedMemory->m_ptr);
         stream->m_size = size;
         stream->m_name = filename;
@@ -64,16 +64,20 @@ namespace core::io
         return uint64_t(m_position);
     }
 
-    SmartPtr<Stream> StreamMemory::Open(const std::string& filename)
+    StreamMemory::StreamMemory(Stream* root)
+        : Stream(root)
+    {}
+
+    SmartPtr<Stream> StreamMemory::OnOpen(const std::string& filename)
     {
         std::filesystem::path path(m_name);
         path.replace_filename(filename);
-        return StreamFile::Create(path.string());
+        return StreamFile::Create(path.string(), GetRoot());
     }
 
     SmartPtr<Stream> StreamMemory::OnClone()
     {
-        auto stream = Create(m_name, m_mem, m_size);
+        auto stream = Create(m_name, m_mem, m_size, GetRoot());
         return static_cast<SmartPtr<Stream>>(stream);
     }
 

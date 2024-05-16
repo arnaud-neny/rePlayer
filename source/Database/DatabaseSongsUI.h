@@ -37,7 +37,7 @@ namespace rePlayer
         virtual void OnDisplay();
         virtual void OnEndUpdate();
 
-        virtual std::string GetFullpath(Song* song) const;
+        virtual std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const;
 
         virtual void InvalidateCache();
 

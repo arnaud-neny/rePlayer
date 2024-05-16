@@ -15,6 +15,7 @@
 #include <Deck/Player.h>
 #include <IO/StreamArchive.h>
 #include <Library/LibraryArtistsUI.h>
+#include <Library/LibraryFileImport.h>
 #include <Library/LibrarySongsUI.h>
 #include <Library/Sources/AmigaMusicPreservation.h>
 #include <Library/Sources/AtariSAPMusicArchive.h>
@@ -485,104 +486,31 @@ namespace rePlayer
 
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(480.f, 240.f), ImGuiCond_FirstUseEver);
-        isImportFilesOpened = FileSelector::IsOpened();
+        isImportFilesOpened = FileSelector::IsOpened() || m_fileImport != nullptr;
         if (ImGui::BeginPopupModal("Import Files", &isImportFilesOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
             ImGui::BeginBusy(m_isBusy);
-            if (auto files = FileSelector::Display())
+            if (m_fileImport)
+                m_fileImport = m_fileImport->Display();
+            else if (auto files = FileSelector::Display())
             {
-                // database will be updated in the worker, so freeze it to avoid concurrency
-                m_db.Freeze();
-                m_isBusy = true;
-                Core::AddJob([this, files = std::move(files.value())]()
-                {
-                    for (auto& path : files)
-                    {
-                        auto filename = path.u8string();
-                        auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(filename.c_str()));
-                        if (stream.IsInvalid())
-                            continue;
-
-                        auto fileSize = static_cast<uint32_t>(stream->GetSize());
-                        if (fileSize == 0)
-                            continue;
-
-                        auto moduleData = stream->Read();
-
-                        // search if it has already been added
-                        auto fileCrc = crc32(0L, Z_NULL, 0);
-                        fileCrc = crc32_z(fileCrc, moduleData.Items(), moduleData.Size());
-                        for (auto* song : m_db.Songs())
-                        {
-                            if (song->GetFileSize() == fileSize && song->GetFileCrc() == fileCrc)
-                            {
-                                auto file = io::File::OpenForRead(m_songs->GetFullpath(song).c_str());
-                                Array<uint8_t> otherData;
-                                otherData.Resize(uint32_t(file.GetSize()));
-                                file.Read(otherData.Items(), otherData.Size());
-                                if (memcmp(moduleData.Items(), otherData.Items(), fileSize) == 0)
-                                {
-                                    Core::FromJob([this, filename, song = SmartPtr<Song>(song)]()
-                                    {
-                                        Log::Warning("File \"%s\" already imported as \"[%s]%s\"\n", reinterpret_cast<const char*>(filename.c_str()), song->GetType().GetExtension(), m_db.GetTitleAndArtists(song->GetId()).c_str());
-                                    });
-
-                                    stream.Reset();
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (stream.IsInvalid())
-                            continue;
-
-                        Core::FromJob([filename]()
-                        {
-                            Log::Message("Import: \"%s\"\n", reinterpret_cast<const char*>(filename.c_str()));
-                        });
-
-                        auto* song = new SongSheet;
-                        auto* dbSong = m_db.AddSong(song);
-
-                        // guess the song type
-                        std::string songName = reinterpret_cast<const char*>(path.filename().u8string().c_str());
-                        auto extOffset = songName.find_last_of('.');
-                        if (extOffset != songName.npos)
-                        {
-                            song->type = { songName.c_str() + extOffset + 1, eReplay::Unknown };
-                            if (song->type.ext != eExtension::Unknown)
-                                songName.resize(extOffset);
-                        }
-                        song->name = songName;
-
-                        // build the crc of the file
-                        song->fileSize = fileSize;
-                        song->fileCrc = fileCrc;
-
-                        // null source
-                        song->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
-
-                        // save file
-                        auto file = io::File::OpenForWrite(m_songs->GetFullpath(dbSong).c_str());
-                        file.Write(moduleData.Items(), moduleData.Size());
-
-                        m_db.Raise(Database::Flag::kSaveSongs);
-                    }
-                    Core::FromJob([this]()
-                    {
-                        m_db.UnFreeze();
-                        m_lastFileDialogPath = FileSelector::Close();
-                        Core::Unlock();
-                        m_isBusy = false;
-                    });
-                });
+                m_fileImport = new FileImport;
+                m_fileImport->Scan(std::move(files.value()));
+                m_lastFileDialogPath = FileSelector::Close();
             }
+
             ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
             ImGui::EndPopup();
         }
-        if (!isImportFilesOpened && FileSelector::IsOpened())
+        if (!isImportFilesOpened && (FileSelector::IsOpened() || m_fileImport != nullptr))
         {
-            m_lastFileDialogPath = FileSelector::Close();
+            if (FileSelector::IsOpened())
+                m_lastFileDialogPath = FileSelector::Close();
+            if (m_fileImport)
+            {
+                delete m_fileImport;
+                m_fileImport = nullptr;
+            }
             Core::Unlock();
         }
         ImGui::EndDisabled();
@@ -793,7 +721,7 @@ namespace rePlayer
                         ImGui::EndPopup();
                     }
                     ImGui::SameLine(0.0f, 0.0f);//no spacing
-                    ImGui::Checkbox("###CheckedArtist", &state.isImported);
+                    ImGui::Checkbox("##CheckedArtist", &state.isImported);
                     ImGui::TableNextColumn();
                     if (state.id != ArtistID::Invalid)
                     {
@@ -1045,7 +973,7 @@ namespace rePlayer
                     ImGui::SameLine(0.0f, 0.0f);//no spacing
                     ImGui::BeginDisabled(songState.IsOwned());
                     bool isChecked = songState.IsChecked();
-                    if (ImGui::Checkbox("###CheckedSong", &isChecked))
+                    if (ImGui::Checkbox("##Checked", &isChecked))
                         songState.SetChecked(isChecked);
                     ImGui::TableNextColumn();
                     static const char* const statusNames[] = { "New", "Merged", "Discarded", "Owned" };

@@ -53,8 +53,9 @@ namespace rePlayer
         }
     }
 
-    std::string Playlist::SongsUI::GetFullpath(Song* song) const
+    std::string Playlist::SongsUI::GetFullpath(Song* song, Array<Artist*>* artists) const
     {
+        (void)artists;
         return m_paths.Items(song->GetSourceId(0).internalId);
     }
 

@@ -7,28 +7,30 @@
 
 namespace core::io
 {
-    SmartPtr<StreamFile> StreamFile::Create(const std::string& filename)
+    SmartPtr<StreamFile> StreamFile::Create(const std::string& filename, Stream* root)
     {
         SmartPtr<StreamFile> stream;
         auto handle = ::CreateFileW(Convert(filename).c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
         if (handle != INVALID_HANDLE_VALUE)
         {
-            stream.New();
+            stream.New(root);
             stream->m_handle = handle;
             stream->m_name = filename;
+            stream->AddFilename(filename);
         }
         return stream;
     }
 
-    SmartPtr<StreamFile> StreamFile::Create(const std::wstring& filename)
+    SmartPtr<StreamFile> StreamFile::Create(const std::wstring& filename, Stream* root)
     {
         SmartPtr<StreamFile> stream;
         auto handle = ::CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
         if (handle != INVALID_HANDLE_VALUE)
         {
-            stream.New();
+            stream.New(root);
             stream->m_handle = handle;
             stream->m_name = Convert(filename);
+            stream->AddFilename(stream->m_name);
         }
         return stream;
     }
@@ -89,20 +91,14 @@ namespace core::io
         return newPos.QuadPart;
     }
 
+    StreamFile::StreamFile(Stream* root)
+        : Stream(root)
+    {}
+
     StreamFile::~StreamFile()
     {
         if (m_handle != INVALID_HANDLE_VALUE)
             ::CloseHandle(m_handle);
-    }
-
-    SmartPtr<Stream> StreamFile::Open(const std::string& filename)
-    {
-        std::filesystem::path path(m_name);
-        path.replace_filename(filename);
-        auto stream = Create(path.string());
-        if (stream.IsInvalid())
-            stream = Create(filename);
-        return stream;
     }
 
     const Span<const uint8_t> StreamFile::Read()
@@ -114,15 +110,25 @@ namespace core::io
         ::CloseHandle(m_handle);
         m_handle = INVALID_HANDLE_VALUE;
 
-        m_stream = StreamMemory::Create(m_name, m_cachedData, data.Size());
+        m_stream = StreamMemory::Create(m_name, m_cachedData, data.Size(), nullptr);
         return data;
+    }
+
+    SmartPtr<Stream> StreamFile::OnOpen(const std::string& filename)
+    {
+        std::filesystem::path path(m_name);
+        path.replace_filename(filename);
+        auto stream = Create(path.string(), GetRoot());
+        if (stream.IsInvalid())
+            stream = Create(filename, GetRoot());
+        return stream;
     }
 
     SmartPtr<Stream> StreamFile::OnClone()
     {
         if (m_stream.IsValid())
             return m_stream->Clone();
-        return Create(m_name);
+        return Create(m_name, GetRoot());
     }
 
     std::wstring StreamFile::Convert(const std::string& name)

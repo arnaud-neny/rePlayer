@@ -9,8 +9,8 @@ namespace core::io
     {
         friend class SmartPtr<StreamFile>;
     public:
-        static [[nodiscard]] SmartPtr<StreamFile> Create(const std::string& filename);
-        static [[nodiscard]] SmartPtr<StreamFile> Create(const std::wstring& filename);
+        static [[nodiscard]] SmartPtr<StreamFile> Create(const std::string& filename, Stream* root = nullptr);
+        static [[nodiscard]] SmartPtr<StreamFile> Create(const std::wstring& filename, Stream* root = nullptr);
 
         uint64_t Read(void* buffer, uint64_t size) final;
         Status Seek(int64_t offset, SeekWhence whence) final;
@@ -20,14 +20,13 @@ namespace core::io
 
         [[nodiscard]] const std::string& GetName() const final { return m_name; }
 
-        [[nodiscard]] SmartPtr<Stream> Open(const std::string& filename) override;
-
         [[nodiscard]] const Span<const uint8_t> Read() final;
 
     private:
-        StreamFile() = default;
+        StreamFile(Stream* root);
         ~StreamFile() final;
 
+        [[nodiscard]] SmartPtr<Stream> OnOpen(const std::string& filename) final;
         [[nodiscard]] SmartPtr<Stream> OnClone() final;
 
         static [[nodiscard]] std::wstring Convert(const std::string& name);

@@ -26,13 +26,14 @@ namespace rePlayer
     {
         if (stream)
         {
-            SmartPtr<StreamArchive> archiveStream(kAllocate, stream, isPackage);
+            SmartPtr<StreamArchive> archiveStream(kAllocate, stream, isPackage, nullptr);
             if (archiveStream->m_stream)
             {
                 if (archive_read_next_header(archiveStream->m_archive, &archiveStream->m_entry) == ARCHIVE_OK)
                 {
                     archiveStream->m_entryFilename = archive_entry_pathname(archiveStream->m_entry);
                     archiveStream->m_entrySize = uint32_t(archive_entry_size(archiveStream->m_entry));
+                    archiveStream->AddFilename(archiveStream->m_entryFilename);
                     return archiveStream;
                 }
             }
@@ -132,60 +133,19 @@ namespace rePlayer
         return m_entryPosition;
     }
 
-    SmartPtr<io::Stream> StreamArchive::Open(const std::string& filename)
-    {
-        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
-        if (stream->m_stream.IsValid())
-        {
-            while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
-            {
-                auto* entryName = archive_entry_pathname(stream->m_entry);
-                if (_stricmp(entryName, filename.c_str()) == 0)
-                {
-                    stream->m_entryFilename = entryName;
-                    stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
-                    return stream;
-                }
-                stream->m_entryIndex++;
-            }
-        }
-        return nullptr;
-    }
-
-    SmartPtr<io::Stream> StreamArchive::Next(bool isForced)
-    {
-        if (isForced || !m_isPackage)
-        {
-            SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
-            if (stream->m_stream.IsValid())
-            {
-                while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
-                {
-                    if (stream->m_entryIndex > m_entryIndex)
-                    {
-                        stream->m_entryFilename = archive_entry_pathname(stream->m_entry);
-                        stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
-                        return stream;
-                    }
-                    stream->m_entryIndex++;
-                }
-            }
-        }
-        return nullptr;
-    }
-
     const Span<const uint8_t> StreamArchive::Read()
     {
         if (m_streamMemory.IsValid())
             return m_streamMemory->Read();
 
         auto data = Stream::Read();
-        m_streamMemory = io::StreamMemory::Create(m_entryFilename, m_cachedData, data.Size());
+        m_streamMemory = io::StreamMemory::Create(m_entryFilename, m_cachedData, data.Size(), nullptr);
         return data;
     }
 
-    StreamArchive::StreamArchive(io::Stream* stream, bool isPackage)
-        : m_stream(stream)
+    StreamArchive::StreamArchive(io::Stream* stream, bool isPackage, io::Stream* root)
+        : io::Stream(root)
+        , m_stream(stream)
         , m_archive(archive_read_new())
         , m_isPackage(isPackage)
     {
@@ -224,9 +184,29 @@ namespace rePlayer
         archive_read_free(m_archive);
     }
 
+    SmartPtr<io::Stream> StreamArchive::OnOpen(const std::string& filename)
+    {
+        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage, GetRoot());
+        if (stream->m_stream.IsValid())
+        {
+            while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
+            {
+                auto* entryName = archive_entry_pathname(stream->m_entry);
+                if (_stricmp(entryName, filename.c_str()) == 0)
+                {
+                    stream->m_entryFilename = entryName;
+                    stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
+                    return stream;
+                }
+                stream->m_entryIndex++;
+            }
+        }
+        return nullptr;
+    }
+
     SmartPtr<io::Stream> StreamArchive::OnClone()
     {
-        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage);
+        SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage, GetRoot());
         if (stream->m_stream.IsValid())
         {
             if (m_streamMemory.IsValid())
@@ -242,6 +222,28 @@ namespace rePlayer
                 stream->m_entryIndex++;
             }
             return stream;
+        }
+        return nullptr;
+    }
+
+    SmartPtr<io::Stream> StreamArchive::OnNext(bool isForced)
+    {
+        if (isForced || !m_isPackage)
+        {
+            SmartPtr<StreamArchive> stream(kAllocate, m_stream->Clone(), m_isPackage, GetRoot());
+            if (stream->m_stream.IsValid())
+            {
+                while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
+                {
+                    if (stream->m_entryIndex > m_entryIndex)
+                    {
+                        stream->m_entryFilename = archive_entry_pathname(stream->m_entry);
+                        stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
+                        return stream;
+                    }
+                    stream->m_entryIndex++;
+                }
+            }
         }
         return nullptr;
     }
