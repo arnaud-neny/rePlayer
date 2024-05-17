@@ -10,9 +10,13 @@
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
+#include <Thread/Thread.h>
+
 #include <ReplayDll.h>
 
 #include "libopenmpt/libopenmpt_version.h"
+
+#include <atomic>
 
 namespace rePlayer
 {
@@ -97,7 +101,7 @@ namespace rePlayer
 
         openmpt_module_initial_ctl emptyCtrls[] = { { "play.at_end", "continue" }, { "load.skip_samples", "1" }, { nullptr, nullptr } };
         auto data = stream->Read();
-        return new ReplayOpenMPT(module, openmpt_module_ext_create_from_memory(data.Items(), data.Size(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, emptyCtrls));
+        return new ReplayOpenMPT(stream, module, openmpt_module_ext_create_from_memory(data.Items(), data.Size(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, emptyCtrls));
     }
 
     bool ReplayOpenMPT::DisplaySettings()
@@ -164,10 +168,15 @@ namespace rePlayer
     {
         openmpt_module_ext_destroy(m_moduleExtVisuals);
         openmpt_module_destroy(m_modulePlayback);
+
+        std::atomic_ref(m_isSilenceDetectionCancelled).store(true);
+        while (std::atomic_ref(m_isSilenceDetectionRunning).load())
+            thread::Sleep(0);
     }
 
-    ReplayOpenMPT::ReplayOpenMPT(openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals)
+    ReplayOpenMPT::ReplayOpenMPT(io::Stream* stream, openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals)
         : Replay(BuildMediaType(modulePlayback))
+        , m_stream(stream->Clone())
         , m_modulePlayback(modulePlayback)
         , m_moduleVisuals(openmpt_module_ext_get_module(moduleVisuals))
         , m_moduleExtVisuals(moduleVisuals)
@@ -195,10 +204,10 @@ namespace rePlayer
 
     uint32_t ReplayOpenMPT::Render(StereoSample* output, uint32_t numSamples)
     {
-        if (m_silenceStart)
+        auto currentPosition = m_currentPosition;
+        auto currentDuration = std::atomic_ref(m_silenceStart).load();
+        if (currentDuration > 0)
         {
-            auto currentPosition = m_currentPosition;
-            auto currentDuration = m_silenceStart;
             if (currentPosition == currentDuration)
             {
                 if (!m_isSilenceTriggered)
@@ -214,17 +223,14 @@ namespace rePlayer
         }
         numSamples = uint32_t(openmpt_module_read_interleaved_float_stereo(m_modulePlayback, kSampleRate, numSamples, reinterpret_cast<float*>(output)));
         output->Convert(m_surround, numSamples);
-        if (m_silenceStart)
+        if (numSamples)
         {
-            if (numSamples)
-            {
-                m_currentPosition += numSamples;
-            }
-            else
-            {
-                m_currentPosition = 0;
-                m_isSilenceTriggered = false;
-            }
+            m_currentPosition += numSamples;
+        }
+        else if (currentDuration > 0)
+        {
+            m_currentPosition = 0;
+            m_isSilenceTriggered = false;
         }
         return numSamples;
     }
@@ -233,13 +239,11 @@ namespace rePlayer
     {
         auto newTime = openmpt_module_set_position_seconds(m_modulePlayback, timeInMs / 1000.0);
         m_surround.Reset();
-        if (m_silenceStart)
-        {
-            m_currentPosition = uint64_t(newTime * kSampleRate);
-            if (m_currentPosition > m_silenceStart)
-                m_currentPosition = m_silenceStart;
-            m_isSilenceTriggered = false;
-        }
+        auto currentDuration = std::atomic_ref(m_silenceStart).load();
+        m_currentPosition = uint64_t(newTime * kSampleRate);
+        if (currentDuration > 0 && m_currentPosition > currentDuration)
+            m_currentPosition = currentDuration;
+        m_isSilenceTriggered = false;
 
         auto posInSec = openmpt_module_get_position_seconds(m_moduleVisuals) * 1000.0;
         if (posInSec > timeInMs)
@@ -288,38 +292,12 @@ namespace rePlayer
         // Silence trimmer
         if (m_previousSubsongIndex != m_subsongIndex)
         {
-            static constexpr uint32_t kSilenceSampleRate = 8000;
-            Array<float> samples(kSilenceSampleRate);
-            uint32_t totalSamples = 0;
-            while (auto numSamples = int32_t(openmpt_module_read_float_mono(m_modulePlayback, kSilenceSampleRate, kSilenceSampleRate, samples.Items(totalSamples))))
-            {
-                totalSamples += numSamples;
-                samples.Resize(totalSamples + kSilenceSampleRate);
-            }
-            auto min = samples[totalSamples - 1];
-            auto max = min;
-            auto silenceStart = totalSamples - 2;
-            while (silenceStart > 0)
-            {
-                static constexpr float kEpsilon = 1.5f / 32767.0f;
-
-                auto sample = samples[silenceStart--];
-                if (sample < min)
-                {
-                    if (max - sample > kEpsilon)
-                        break;
-                    min = sample;
-                }
-                else if (sample > max)
-                {
-                    if (sample - min > kEpsilon)
-                        break;
-                    max = sample;
-                }
-            }
-            silenceStart += kSilenceSampleRate / 4; // keep 0.25 second of silence
-            m_silenceStart = silenceStart < totalSamples ? MulDiv(silenceStart, kSampleRate, kSilenceSampleRate) : 0;
-            setSubsong(m_modulePlayback);
+            std::atomic_ref(m_isSilenceDetectionCancelled).store(true);
+            while (std::atomic_ref(m_isSilenceDetectionRunning).load())
+                thread::Sleep(0);
+            m_isSilenceDetectionCancelled = false;
+            m_isSilenceDetectionRunning = true;
+            g_replayPlugin.addJob(this, ReplayPlugin::JobCallback(SilenceDetection));
             m_previousSubsongIndex = m_subsongIndex;
         }
 
@@ -384,8 +362,6 @@ namespace rePlayer
 
     uint32_t ReplayOpenMPT::GetDurationMs() const
     {
-        if (m_silenceStart)
-            return uint32_t((m_silenceStart * 1000ull) / kSampleRate);
         return uint32_t(openmpt_module_get_duration_seconds(m_modulePlayback) * 1000ull);
     }
 
@@ -603,6 +579,53 @@ namespace rePlayer
             patterns.lines.Add('\0');
         }
         return patterns;
+    }
+
+    void ReplayOpenMPT::SilenceDetection(ReplayOpenMPT* replay)
+    {
+        replay->m_stream->Rewind();
+        openmpt_module_initial_ctl ctrls[] = { { "play.at_end", "continue" }, { nullptr, nullptr } };
+        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, replay->m_stream, openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, ctrls);
+        openmpt_module_select_subsong(module, replay->m_subsongIndex);
+
+        static constexpr uint32_t kSilenceSampleRate = 8000;
+        Array<float> samples(kSilenceSampleRate);
+        uint32_t totalSamples = 0;
+        while (auto numSamples = int32_t(openmpt_module_read_float_mono(module, kSilenceSampleRate, kSilenceSampleRate, samples.Items(totalSamples))))
+        {
+            totalSamples += numSamples;
+
+            if (std::atomic_ref(replay->m_isSilenceDetectionCancelled).load())
+                break;
+
+            samples.Resize(totalSamples + kSilenceSampleRate);
+        }
+        openmpt_module_destroy(module);
+
+        auto min = samples[totalSamples - 1];
+        auto max = min;
+        auto silenceStart = totalSamples - 2;
+        while (silenceStart > 0)
+        {
+            static constexpr float kEpsilon = 1.5f / 32767.0f;
+
+            auto sample = samples[silenceStart--];
+            if (sample < min)
+            {
+                if (max - sample > kEpsilon)
+                    break;
+                min = sample;
+            }
+            else if (sample > max)
+            {
+                if (sample - min > kEpsilon)
+                    break;
+                max = sample;
+            }
+        }
+        silenceStart += kSilenceSampleRate / 4; // keep 0.25 second of silence
+        std::atomic_ref(replay->m_silenceStart).store(silenceStart < totalSamples ? MulDiv(silenceStart, kSampleRate, kSilenceSampleRate) : 0);
+        std::atomic_ref(replay->m_isSilenceDetectionRunning).store(false);
     }
 }
 // namespace rePlayer

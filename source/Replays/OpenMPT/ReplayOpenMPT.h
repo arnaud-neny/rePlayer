@@ -82,7 +82,7 @@ namespace rePlayer
      };
 
     private:
-        ReplayOpenMPT(openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals);
+        ReplayOpenMPT(io::Stream* stream, openmpt_module* modulePlayback, openmpt_module_ext* moduleVisuals);
 
         static size_t OnRead(void* stream, void* dst, size_t bytes);
         static int32_t OnSeek(void* stream, int64_t offset, int32_t whence);
@@ -90,18 +90,23 @@ namespace rePlayer
 
         static MediaType BuildMediaType(openmpt_module* module);
 
+        static void SilenceDetection(ReplayOpenMPT* replay);
+
     private:
+        SmartPtr<io::Stream> m_stream;
         openmpt_module* m_modulePlayback = nullptr;
         openmpt_module* m_moduleVisuals = nullptr;
         openmpt_module_ext* m_moduleExtVisuals = nullptr;
         openmpt_module_ext_interface_pattern_vis m_modulePatternVis;
-        uint64_t m_silenceStart : 63 = 0;
-        uint64_t m_isSilenceTriggered : 1 = 0;
+        uint64_t m_silenceStart = 0;
         uint64_t m_currentPosition = 0;
         uint32_t m_previousSubsongIndex = 0xffFFffFF;
         uint32_t m_visualsSamples = 0;
         Surround m_surround;
         bool m_arePatternsDisplayed = true;
+        bool m_isSilenceTriggered = false;
+        bool m_isSilenceDetectionRunning = false;
+        bool m_isSilenceDetectionCancelled = false;
 
         static GlobalSettings ms_settings[];
     };
