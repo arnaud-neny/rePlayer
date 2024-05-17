@@ -589,7 +589,7 @@ namespace rePlayer
         openmpt_module_select_subsong(module, replay->m_subsongIndex);
 
         static constexpr uint32_t kSilenceSampleRate = 8000;
-        Array<float> samples(kSilenceSampleRate);
+        Array<float> samples(kSilenceSampleRate, uint32_t((openmpt_module_get_duration_seconds(module) + 7) * kSilenceSampleRate));
         uint32_t totalSamples = 0;
         while (auto numSamples = int32_t(openmpt_module_read_float_mono(module, kSilenceSampleRate, kSilenceSampleRate, samples.Items(totalSamples))))
         {
@@ -598,7 +598,7 @@ namespace rePlayer
             if (std::atomic_ref(replay->m_isSilenceDetectionCancelled).load())
                 break;
 
-            samples.Resize(totalSamples + kSilenceSampleRate);
+            samples.Push(kSilenceSampleRate);
         }
         openmpt_module_destroy(module);
 
