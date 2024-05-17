@@ -55,6 +55,9 @@ namespace rePlayer
         Array<uint8_t> (*download)(const char*) = nullptr;
         void (*onDelete)(Replay*) = [](Replay*) {};
 
+        using JobCallback = void (*)(Replay*);
+        void (*addJob)(Replay*, JobCallback) = [](Replay* replay, JobCallback cb) { cb(replay); };
+
         // shared data from one dll to another dll
 
         void* globals = nullptr;

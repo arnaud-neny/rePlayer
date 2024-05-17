@@ -337,6 +337,13 @@ namespace rePlayer
 
                         return std::move(buffer.storage);
                     };
+                    replayPlugin->addJob = [](Replay* replay, void (*cb)(Replay*))
+                    {
+                        Core::AddJob([replay, cb]()
+                        {
+                            cb(replay);
+                        });
+                    };
 
                     if (m_plugins[int32_t(replayPlugin->replayId)] == nullptr)
                     {
