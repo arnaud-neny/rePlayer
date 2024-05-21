@@ -141,7 +141,7 @@ SID::SID() :
     resampler(nullptr),
     potX(new Potentiometer()),
     potY(new Potentiometer()),
-    cws(AVERAGE)
+    cws(STRONG)
 {
     voice[0].reset(new Voice());
     voice[1].reset(new Voice());
@@ -149,8 +149,8 @@ SID::SID() :
 
     muted[0] = muted[1] = muted[2] = false;
 
-    reset();
     setChipModel(MOS8580);
+    reset();
 }
 
 SID::~SID()
