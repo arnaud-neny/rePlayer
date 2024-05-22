@@ -75,7 +75,6 @@
     <ClInclude Include="lib\curl_memrchr.h" />
     <ClInclude Include="lib\curl_multibyte.h" />
     <ClInclude Include="lib\curl_ntlm_core.h" />
-    <ClInclude Include="lib\curl_ntlm_wb.h" />
     <ClInclude Include="lib\curl_path.h" />
     <ClInclude Include="lib\curl_printf.h" />
     <ClInclude Include="lib\curl_range.h" />
@@ -186,6 +185,7 @@
     <ClInclude Include="lib\vquic\vquic_int.h" />
     <ClInclude Include="lib\vssh\ssh.h" />
     <ClInclude Include="lib\vtls\bearssl.h" />
+    <ClInclude Include="lib\vtls\cipher_suite.h" />
     <ClInclude Include="lib\vtls\gtls.h" />
     <ClInclude Include="lib\vtls\hostcheck.h" />
     <ClInclude Include="lib\vtls\keylog.h" />
@@ -232,7 +232,6 @@
     <ClCompile Include="lib\curl_memrchr.c" />
     <ClCompile Include="lib\curl_multibyte.c" />
     <ClCompile Include="lib\curl_ntlm_core.c" />
-    <ClCompile Include="lib\curl_ntlm_wb.c" />
     <ClCompile Include="lib\curl_path.c" />
     <ClCompile Include="lib\curl_range.c" />
     <ClCompile Include="lib\curl_rtmp.c" />
@@ -358,6 +357,7 @@
     <ClCompile Include="lib\vssh\libssh2.c" />
     <ClCompile Include="lib\vssh\wolfssh.c" />
     <ClCompile Include="lib\vtls\bearssl.c" />
+    <ClCompile Include="lib\vtls\cipher_suite.c" />
     <ClCompile Include="lib\vtls\gtls.c" />
     <ClCompile Include="lib\vtls\hostcheck.c" />
     <ClCompile Include="lib\vtls\keylog.c" />
