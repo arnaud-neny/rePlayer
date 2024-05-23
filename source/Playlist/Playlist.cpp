@@ -609,7 +609,7 @@ namespace rePlayer
                 else
                 {
                     if (numEntries != m_cue.entries.NumItems<int32_t>())
-                        return LoadNextSong(isAdvancing);
+                        return LoadNextSong(false);
                 }
             }
 
