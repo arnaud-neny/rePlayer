@@ -81,6 +81,11 @@ namespace rePlayer
         delete m_songs;
     }
 
+    void Library::DisplaySettings()
+    {
+        ImGui::Checkbox("Auto merge on download in Library", &m_isMergingOnDownload);
+    }
+
     SmartPtr<core::io::Stream> Library::GetStream(Song* song)
     {
         auto filename = m_songs->GetFullpath(song);
@@ -148,6 +153,68 @@ namespace rePlayer
                         songSheet->fileCrc = fileCrc;
                     }
 
+                    // Already in the database?
+                    if (m_isMergingOnDownload)
+                    {
+                        for (auto* otherSong : m_db.Songs())
+                        {
+                            if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc)
+                            {
+                                otherSong->AddRef();
+
+                                auto* primarySong = songSheet;
+                                auto* otherSongSheet = otherSong->Edit();
+                                if (songSheet->sourceIds[0].Priority() < otherSongSheet->sourceIds[0].Priority())
+                                {
+                                    auto oldFilename = m_songs->GetFullpath(otherSong);
+                                    if (!io::File::Delete(oldFilename.c_str()))
+                                    {
+                                        Log::Warning("Can't delete file \"%s\"\n", oldFilename.c_str());
+                                        m_songs->InvalidateCache();
+                                    }
+                                }
+                                else
+                                {
+                                    std::swap(primarySong, otherSongSheet);
+                                    moduleData = { nullptr, 0u };
+                                    stream.Reset();
+                                }
+
+                                Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(otherSongSheet->id), otherSongSheet->type.GetExtension(), m_db.GetTitleAndArtists(otherSongSheet->id).c_str()
+                                    , uint32_t(primarySong->id), primarySong->type.GetExtension(), m_db.GetTitleAndArtists(primarySong->id).c_str());
+
+                                for (auto oldSourceId : otherSongSheet->sourceIds)
+                                {
+                                    primarySong->sourceIds.Add(oldSourceId);
+                                    m_sources[oldSourceId.sourceId]->DiscardSong(oldSourceId, primarySong->id);
+                                }
+                                primarySong->sourceIds.Container().RemoveIf([](auto& entry)
+                                {
+                                    return entry.sourceId == SourceID::FileImportID;
+                                });
+
+                                m_db.RemoveSong(otherSongSheet->id);
+                                for (uint16_t j = 0; j <= otherSongSheet->lastSubsongIndex; j++)
+                                {
+                                    otherSongSheet->subsongs[j].isDiscarded = true;
+                                    SubsongID subsongId(otherSongSheet->id, j);
+                                    Core::Discard(MusicID(subsongId, DatabaseID::kLibrary));
+                                }
+
+                                for (auto artistId : otherSongSheet->artistIds)
+                                {
+                                    auto* artist = m_db[artistId]->Edit();
+                                    if (--artist->numSongs == 0)
+                                        m_db.RemoveArtist(artistId);
+                                }
+
+                                otherSong->Release();
+
+                                break;
+                            }
+                        }
+                    }
+
                     // save the downloaded song
                     if (moduleData.IsNotEmpty())
                     {
@@ -197,7 +264,7 @@ namespace rePlayer
     {
         assert(musicId.databaseId == DatabaseID::kLibrary);
         SmartPtr<Player> player;
-        auto dbSong = m_db[musicId.subsongId];
+        SmartPtr<Song> dbSong = m_db[musicId.subsongId];
         if (dbSong == nullptr)
             return player;
 

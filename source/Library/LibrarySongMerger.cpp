@@ -51,22 +51,8 @@ namespace rePlayer
                 if (lFileCrc != rFileCrc)
                     return lFileCrc < rFileCrc;
 
-                static int32_t sourceOrder[] = {
-                    65536,  // AmigaMusicPreservationSourceID
-                    65537,  // TheModArchiveSourceID
-                    65538,  // ModlandSourceID
-                    -2, // FileImportID
-                    0,  // HighVoltageSIDCollectionID
-                    1,  // SNDHID
-                    2,  // AtariSAPMusicArchiveID
-                    3,  // ZXArtID
-                    4,  // VGMRips
-                    -1  // UrlImportID
-                };
-                static_assert(_countof(sourceOrder) == SourceID::NumSourceIDs);
-
-                auto lSourceId = sourceOrder[l.song->GetSourceId(0).sourceId];
-                auto rSourceId = sourceOrder[r.song->GetSourceId(0).sourceId];
+                auto lSourceId = l.song->GetSourceId(0).Priority();
+                auto rSourceId = r.song->GetSourceId(0).Priority();
                 return lSourceId < rSourceId;
             });
 
@@ -524,8 +510,7 @@ namespace rePlayer
 
                     for (auto sourceId : song->sourceIds)
                     {
-                        if (sourceId.sourceId != SourceID::FileImportID)
-                            primarySong->sourceIds.Add(sourceId);
+                        primarySong->sourceIds.Add(sourceId);
                         library.m_sources[sourceId.sourceId]->DiscardSong(sourceId, primarySong->id);
                     }
 
@@ -546,6 +531,12 @@ namespace rePlayer
 
                     library.m_db.Raise(Database::Flag::kSaveArtists | Database::Flag::kSaveSongs);
                 }
+                primarySong->sourceIds.Container().RemoveIf([](auto& entry)
+                {
+                    return entry.sourceId == SourceID::FileImportID;
+                });
+                if (primarySong->sourceIds.IsEmpty())
+                    primarySong->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
             }
             else
                 i++;

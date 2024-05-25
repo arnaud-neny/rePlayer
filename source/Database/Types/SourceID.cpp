@@ -16,7 +16,20 @@ namespace rePlayer
         "URL",
         "VGMRips"
     };
-
     static_assert(_countof(SourceID::sourceNames) == SourceID::NumSourceIDs);
+
+    const int32_t SourceID::sourceProrities[] = {
+        65536,      // AmigaMusicPreservationSourceID
+        65537,      // TheModArchiveSourceID
+        65538,      // ModlandSourceID
+        0x7fFFffFF, // FileImportID
+        0,          // HighVoltageSIDCollectionID
+        1,          // SNDHID
+        2,          // AtariSAPMusicArchiveID
+        3,          // ZXArtID
+        4,          // VGMRips
+        -1          // UrlImportID
+    };
+    static_assert(_countof(SourceID::sourceProrities) == SourceID::NumSourceIDs);
 }
 // namespace rePlayer

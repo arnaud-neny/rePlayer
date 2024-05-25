@@ -204,6 +204,7 @@ namespace rePlayer
         {
             ImGui::Checkbox("Focus current playing song in Playlist", &m_isTrackingSongInPlaylist);
             ImGui::Checkbox("Focus current playing song in Database", &m_isTrackingSongInDatabase);
+            Core::GetLibrary().DisplaySettings();
             uint32_t saveFrequency = (m_saveFrequency + 59) / 60;
             uint32_t saveMin = 0;
             uint32_t saveMax = 24 * 60;

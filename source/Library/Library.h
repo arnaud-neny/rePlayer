@@ -26,6 +26,8 @@ namespace rePlayer
         Library();
         ~Library();
 
+        void DisplaySettings();
+
         void Save();
 
         SmartPtr<core::io::Stream> GetStream(Song* song);
@@ -71,6 +73,8 @@ namespace rePlayer
 
         bool m_hasSongsBackup = false;
         bool m_hasArtistsBackup = false;
+
+        Serialized<bool> m_isMergingOnDownload = { "AutoMerge", false };
 
         bool m_isBusy = false;
         float m_busyTime = 0.0f;

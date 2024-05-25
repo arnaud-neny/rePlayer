@@ -27,6 +27,8 @@ namespace rePlayer
 
         constexpr bool operator==(SourceID other) const { return sourceId == other.sourceId && internalId == other.internalId; }
 
+        int32_t Priority() const { return sourceProrities[int(sourceId)]; }
+
         union
         {
             uint32_t value = 0;
@@ -38,6 +40,7 @@ namespace rePlayer
         };
 
         static const char* const sourceNames[];
+        static const int32_t sourceProrities[];
     };
 
     static constexpr SourceID kInvalidSourceID = { SourceID::AmigaMusicPreservationSourceID, 0 };
