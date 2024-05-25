@@ -207,7 +207,15 @@ namespace rePlayer
     {
         auto info = m_replay->GetExtraInfo();
         if (info.empty())
-            return m_extraInfo;
+            info = m_extraInfo;
+        auto streamingTitle = m_replay->GetStreamingTitle();
+        if (!streamingTitle.empty())
+        {
+            if (!info.empty())
+                info += "\n";
+            info += "Streaming Title: ";
+            info += streamingTitle;
+        }
         return info;
     }
 
