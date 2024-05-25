@@ -1,19 +1,20 @@
-v0.15.15:
+v0.15.16:
 - Added Ayumi
 - Added Ken
 - Added Organya
 - Updated Furnace to 0.6.3
 - Updated gbsplay to 0.0.97
-- Updated libsidplay to 2.7.0
+- Updated libsidplay to 2.7.1
 - Updated OpenMPT to 0.7.7
 - Updated Opus to 1.5.2
 - Updated ProTrekkr to 2.6.7
 - Updated vgmstream to r1917
 - Updated ImGui to 1.90.6
 - Updated libarchive to 3.7.4 as static library
-- Updated libcurl to 8.7.1 as static library with minimal content instead of full dynamic library
+- Updated libcurl to 8.8.0 as static library with minimal content instead of full dynamic library
 - Updated TagLib to 2.0.1
 - Archive loader
+- Library auto merge option on download
 - Patterns display (OpenMPT, Hively)
 - Playlist sort from current playing position while pressing Ctrl
 - Refactor file importer

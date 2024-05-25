@@ -1,12 +1,10 @@
 # rePlayer (another multi-formats music player)
 
-- auto merge
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enuym type (enum return type value, index, pointer, ref)
 - add the replay selection for each extension in the global settings
 - add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
 - add a project to make rePlayer as a lib/dll (so people can use the replays too): rePlayback (stripped from database and ui)
-- import from files: support for songs with multiple files (perfect import?)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
 - database: add album database
@@ -24,7 +22,7 @@
 - remove allocated vb & ib and replace it by a scratch buffer
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
-- multi-threaded load (with main screens lock)
+- async song load?
 - https://www.amigaremix.com/ importer
 - https://remix.kwed.org/ importer
 - https://www.exotica.org.uk/ importer?

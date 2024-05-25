@@ -116,10 +116,11 @@ Note 3: you can drag and drop url. On load, it will download the song or stream 
 ![rePlayer's Settings](/doc/settings.png)
 
 Enable/disable the songs focus there (when a song start to play, it is focused in the playlist and/or database).  
+Enable/disable the auto merge when a song is download from the library.  
 AutoSave frequency of the rePlayer. (it will save on quit anyway).  
 Enable/disable the media hot keys (for playback and volume).  
-Transparency of the windows.  
-Live loggin can be enabled/disabled as well as its save on the disk. The log retention can be changed too (older log files than the retention days limit are deleted).  
+Transparency of the windows (not available on the win32 release).  
+Live log can be enabled/disabled as well as its save on the disk. The logs retention can be changed too (older log files than the retention days limit are deleted).  
 You can change the global settings of each players. I will not enter into the details here, I'm too lazy (I've just enabled by default my simple surround filter because I like it).
 
 ## The tray icon
