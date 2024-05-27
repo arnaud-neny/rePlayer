@@ -100,7 +100,7 @@ namespace rePlayer
         }
         if (stream.IsInvalid())
         {
-            auto songSheet = song->Edit();
+            auto* songSheet = song->Edit();
 
             // we need to import because the file is not in the cache
             if (songSheet->sourceIds[0].sourceId == SourceID::FileImportID)
@@ -160,8 +160,6 @@ namespace rePlayer
                         {
                             if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc)
                             {
-                                otherSong->AddRef();
-
                                 auto* primarySong = songSheet;
                                 auto* otherSongSheet = otherSong->Edit();
                                 if (songSheet->sourceIds[0].Priority() < otherSongSheet->sourceIds[0].Priority())
@@ -193,22 +191,14 @@ namespace rePlayer
                                     return entry.sourceId == SourceID::FileImportID;
                                 });
 
-                                m_db.RemoveSong(otherSongSheet->id);
+                                // reset the source of the discarded song to avoid messing up with the original source when discarding
+                                otherSongSheet->sourceIds.Clear();
+                                otherSongSheet->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
                                 for (uint16_t j = 0; j <= otherSongSheet->lastSubsongIndex; j++)
                                 {
-                                    otherSongSheet->subsongs[j].isDiscarded = true;
-                                    SubsongID subsongId(otherSongSheet->id, j);
-                                    Core::Discard(MusicID(subsongId, DatabaseID::kLibrary));
+                                    if (!otherSongSheet->subsongs[j].isDiscarded)
+                                        m_songs->DeleteSubsong(SubsongID(otherSongSheet->id, j));
                                 }
-
-                                for (auto artistId : otherSongSheet->artistIds)
-                                {
-                                    auto* artist = m_db[artistId]->Edit();
-                                    if (--artist->numSongs == 0)
-                                        m_db.RemoveArtist(artistId);
-                                }
-
-                                otherSong->Release();
 
                                 break;
                             }
@@ -1324,6 +1314,7 @@ namespace rePlayer
         if (numSongs != artist->NumSongs())
         {
             Log::Error("Artist %d (%s) validation failed!", uint32_t(artist->GetId()), artist->GetHandle(0));
+            ((Artist*)artist)->Edit()->numSongs = uint16_t(numSongs);
             assert(0);
         }
     }
