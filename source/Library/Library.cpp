@@ -158,20 +158,11 @@ namespace rePlayer
                     {
                         for (auto* otherSong : m_db.Songs())
                         {
-                            if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc)
+                            if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc && !m_songs->HasDeletedSubsongs(otherSong->GetId()))
                             {
                                 auto* primarySong = songSheet;
                                 auto* otherSongSheet = otherSong->Edit();
-                                if (songSheet->sourceIds[0].Priority() < otherSongSheet->sourceIds[0].Priority())
-                                {
-                                    auto oldFilename = m_songs->GetFullpath(otherSong);
-                                    if (!io::File::Delete(oldFilename.c_str()))
-                                    {
-                                        Log::Warning("Can't delete file \"%s\"\n", oldFilename.c_str());
-                                        m_songs->InvalidateCache();
-                                    }
-                                }
-                                else
+                                if (primarySong->sourceIds[0].Priority() >= otherSongSheet->sourceIds[0].Priority())
                                 {
                                     std::swap(primarySong, otherSongSheet);
                                     moduleData = { nullptr, 0u };

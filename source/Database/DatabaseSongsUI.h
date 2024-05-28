@@ -30,6 +30,7 @@ namespace rePlayer
 
         void TrackSubsong(SubsongID subsongId);
         void DeleteSubsong(SubsongID subsongId);
+        bool HasDeletedSubsongs(SongID songId) const;
 
         uint32_t NumSubsongs() const;
         uint32_t NumSelectedSubsongs() const;
