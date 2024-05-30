@@ -158,22 +158,22 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - micro part.
  */
-#define ASAPInfo_VERSION_MICRO 1
+#define ASAPInfo_VERSION_MICRO 3
 
 /**
  * ASAP version as a string.
  */
-#define ASAPInfo_VERSION "6.0.1"
+#define ASAPInfo_VERSION "6.0.3"
 
 /**
  * Years ASAP was created in.
  */
-#define ASAPInfo_YEARS "2005-2023"
+#define ASAPInfo_YEARS "2005-2024"
 
 /**
  * Short credits for ASAP.
  */
-#define ASAPInfo_CREDITS "Another Slight Atari Player (C) 2005-2023 Piotr Fusik\nCMC, MPT, TMC, TM2 players (C) 1994-2005 Marcin Lewandowski\nRMT player (C) 2002-2005 Radek Sterba\nDLT player (C) 2009 Marek Konopka\nCMS player (C) 1999 David Spilka\nFC player (C) 2011 Jerzy Kut\n"
+#define ASAPInfo_CREDITS "Another Slight Atari Player (C) 2005-2024 Piotr Fusik\nCMC, MPT, TMC, TM2 players (C) 1994-2005 Marcin Lewandowski\nRMT player (C) 2002-2005 Radek Sterba\nDLT player (C) 2009 Marek Konopka\nCMS player (C) 1999 David Spilka\nFC player (C) 2011 Jerzy Kut\n"
 
 /**
  * Short license notice.
@@ -273,7 +273,7 @@ const char *ASAPInfo_GetTitleOrFilename(const ASAPInfo *self);
 
 /**
  * Returns music creation date.
- *
+ * 
  * <p>Some of the possible formats are:
  * <ul>
  * <li>YYYY</li>
@@ -288,7 +288,7 @@ const char *ASAPInfo_GetDate(const ASAPInfo *self);
 
 /**
  * Sets music creation date.
- *
+ * 
  * <p>Some of the possible formats are:
  * <ul>
  * <li>YYYY</li>
@@ -371,7 +371,7 @@ bool ASAPInfo_SetDuration(ASAPInfo *self, int song, int duration);
 
 /**
  * Returns information whether the specified song loops.
- *
+ * 
  * <p>Returns:
  * <ul>
  * <li><code>true</code> if the song loops</li>
@@ -384,7 +384,7 @@ bool ASAPInfo_GetLoop(const ASAPInfo *self, int song);
 
 /**
  * Sets information whether the specified song loops.
- *
+ * 
  * <p>Use:
  * <ul>
  * <li><code>true</code> if the song loops</li>
