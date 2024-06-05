@@ -30,7 +30,10 @@ namespace rePlayer
             delete streamData;
             return nullptr;
         }
-        if (mp3->channels > 2)
+        bool isValid = mp3->channels <= 2;
+        if (isValid && streamData->isSeekable)
+            isValid = drmp3_get_pcm_frame_count(mp3) > (mp3->sampleRate / 8);
+        if (!isValid)
         {
             drmp3_uninit(mp3);
             delete mp3;
@@ -126,7 +129,7 @@ namespace rePlayer
 
     uint32_t ReplayMP3::GetDurationMs() const
     {
-        if (m_streamData->stream->GetSize() > 0)
+        if (m_streamData->isSeekable)
             return static_cast<uint32_t>((1000ull * drmp3_get_pcm_frame_count(m_mp3)) / m_mp3->sampleRate);
         return 0;
     }
