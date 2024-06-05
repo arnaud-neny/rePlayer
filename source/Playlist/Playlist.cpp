@@ -179,6 +179,8 @@ namespace rePlayer
         m_uniqueIdGenerator = PlaylistID::kInvalid;
         m_lastSelectedEntry = PlaylistID::kInvalid;
 
+        Flush();
+
         Core::GetDeck().OnNewPlaylist();
     }
 
@@ -1356,6 +1358,8 @@ namespace rePlayer
                                 LoadPlaylist(file, m_cue, version);
                             else
                                 assert(0 && "file read error");
+
+                            Flush();
 
                             Core::GetDeck().OnNewPlaylist();
                         }
