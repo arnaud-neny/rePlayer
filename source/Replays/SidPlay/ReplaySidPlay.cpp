@@ -443,9 +443,9 @@ namespace rePlayer
     {
         auto format = sidTune->getInfo()->formatString();
         if (strstr(format, "PSID"))
-            return eExtension::_psid;
+            return eExtension::_sid;
         if (strstr(format, "RSID"))
-            return eExtension::_rsid;
+            return eExtension::_sid;
         if (strstr(format, "MUS"))
             return eExtension::_mus;
         assert(0);
