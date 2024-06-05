@@ -359,6 +359,49 @@ namespace rePlayer
         m_isDirty = true;
     }
 
+    bool SourceHighVoltageSIDCollection::IsValidationEnabled() const
+    {
+        // validation is only possible when the database has been downloaded
+        return m_db.songs.IsNotEmpty();
+    }
+
+    Status SourceHighVoltageSIDCollection::Validate(SourceID sourceId, SongID songId)
+    {
+        thread::ScopedSpinLock lock(m_mutex);
+        auto* songSource = GetSongSource(sourceId.internalId);
+        if (songSource->songId == songId) // some bugs where introduced from time to time in this db, so we can have a mismatch
+        {
+            // now check if this song still exists in the remote database
+            for (uint32_t i = 0, e = m_db.songs.NumItems(); i < e; i++)
+            {
+                const auto& dbSong = m_db.songs[i];
+                if (!dbSong.name.IsSame(m_db.strings, songSource->name))
+                    continue;
+                if (!m_db.roots[dbSong.root].name.IsSame(m_db.strings, m_roots[songSource->root].name(m_strings)))
+                    continue;
+                if (songSource->artist)
+                {
+                    if (!dbSong.artist)
+                        continue;
+                    if (!m_db.artists[dbSong.artist].name.IsSame(m_db.strings, m_artists[songSource->artist].name(m_strings)))
+                        continue;
+                }
+                else if (dbSong.artist)
+                    continue;
+                return Status::kOk;
+            }
+        }
+
+        if (songSource->artist)
+            m_artists[songSource->artist].refcount--;
+        new (songSource) SourceSong();
+        m_isDirty = true;
+        m_areStringsDirty = true;
+        m_areDataDirty = true;
+
+        return Status::kFail;
+    }
+
     void SourceHighVoltageSIDCollection::Load()
     {
         auto file = io::File::OpenForRead(ms_filename);

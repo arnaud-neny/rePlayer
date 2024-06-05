@@ -22,6 +22,9 @@ namespace rePlayer
         void DiscardSong(SourceID sourceId, SongID newSongId) final;
         void InvalidateSong(SourceID sourceId, SongID newSongId) final;
 
+        bool IsValidationEnabled() const final;
+        Status Validate(SourceID sourceId, SongID songId) final;
+
         void Load() final;
         void Save() const final;
 

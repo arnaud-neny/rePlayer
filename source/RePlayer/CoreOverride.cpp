@@ -67,6 +67,7 @@ namespace rePlayer
     {
         m_playlist->Flush();
         m_workers->Flush();
+        m_library->Validate();
         m_library->Save();
         m_playlist->Save();
 

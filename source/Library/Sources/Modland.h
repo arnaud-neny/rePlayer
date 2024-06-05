@@ -23,6 +23,9 @@ namespace rePlayer
         void DiscardSong(SourceID sourceId, SongID newSongId) final;
         void InvalidateSong(SourceID sourceId, SongID newSongId) final;
 
+        bool IsValidationEnabled() const final;
+        Status Validate(SourceID sourceId, SongID songId) final;
+
         void Load() final;
         void Save() const final;
 
@@ -153,7 +156,7 @@ namespace rePlayer
             uint32_t crc = 0;
             uint32_t size : 30 = 0;
             uint32_t isDiscarded : 1 = 0; // deleted or merged
-            uint32_t isExtensionOverriden : 1 = 0; // defaut replay extension doesn't match
+            uint32_t isExtensionOverriden : 1 = 0; // default replay extension doesn't match
 
             uint16_t replay = 0;
             uint16_t artists[2] = { 0, 0 };
@@ -198,6 +201,7 @@ namespace rePlayer
 
         Array<uint32_t> m_availableSongIds;
         Array<uint16_t> m_availableArtistIds;
+        Array<uint16_t> m_availableReplayIds;
 
         Array<char> m_strings;
         Array<SourceReplay> m_replays;

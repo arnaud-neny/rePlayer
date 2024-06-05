@@ -102,6 +102,9 @@ namespace rePlayer
         virtual void DiscardSong(SourceID sourceId, SongID newSongId) = 0;
         virtual void InvalidateSong(SourceID sourceId, SongID newSongId) = 0;
 
+        virtual bool IsValidationEnabled() const { return false; }
+        virtual Status Validate(SourceID sourceId, SongID songId) { (void)sourceId; (void)songId; return Status::kOk; }
+
         virtual void Load() = 0;
         virtual void Save() const = 0;
     };

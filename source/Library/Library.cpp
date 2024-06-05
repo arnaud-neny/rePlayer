@@ -1196,6 +1196,53 @@ namespace rePlayer
         }
     }
 
+    void Library::Validate()
+    {
+        bool isValidationEnabled = false;
+        for (auto* source : m_sources)
+            isValidationEnabled |= source->IsValidationEnabled();
+        if (isValidationEnabled) for (auto* song : m_db.Songs())
+        {
+            auto songId = song->GetId();
+            for (uint32_t i = 0; i < song->NumSourceIds(); i++)
+            {
+                auto sourceId = song->GetSourceId(i);
+                if (m_sources[sourceId.sourceId]->IsValidationEnabled())
+                {
+                    auto status = m_sources[sourceId.sourceId]->Validate(sourceId, songId);
+                    if (status == Status::kFail)
+                    {
+                        auto* songSheet = song->Edit();
+                        songSheet->sourceIds.RemoveAt(i);
+                        if (songSheet->sourceIds.IsEmpty())
+                        {
+                            if (songSheet->fileSize == 0)
+                            {
+                                for (uint16_t subsongIndex = 0, lastSubsongIndex = songSheet->lastSubsongIndex; subsongIndex <= lastSubsongIndex; subsongIndex++)
+                                {
+                                    if (!songSheet->subsongs[subsongIndex].isDiscarded)
+                                        Core::Discard(MusicID(SubsongID(songSheet->id, subsongIndex), DatabaseID::kLibrary));
+                                }
+                                for (auto artistId : songSheet->artistIds)
+                                {
+                                    auto* artist = m_db[artistId]->Edit();
+                                    if (--artist->numSongs == 0)
+                                        m_db.RemoveArtist(artistId);
+                                    m_db.Raise(Database::Flag::kSaveArtists);
+                                }
+                                m_db.RemoveSong(songId);
+                            }
+                            else
+                                songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
+                        }
+                        i--;
+                        m_db.Raise(Database::Flag::kSaveSongs);
+                    }
+                }
+            }
+        }
+    }
+
     void Library::Load()
     {
         auto file = io::File::OpenForRead(ms_songsFilename);

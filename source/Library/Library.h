@@ -28,6 +28,7 @@ namespace rePlayer
 
         void DisplaySettings();
 
+        void Validate();
         void Save();
 
         SmartPtr<core::io::Stream> GetStream(Song* song);

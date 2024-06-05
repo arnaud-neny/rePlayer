@@ -368,6 +368,51 @@ namespace rePlayer
         m_isDirty = true;
     }
 
+    bool SourceAtariSAPMusicArchive::IsValidationEnabled() const
+    {
+        // validation is only possible when the database has been downloaded
+        return m_db.songs.IsNotEmpty();
+    }
+
+    Status SourceAtariSAPMusicArchive::Validate(SourceID sourceId, SongID songId)
+    {
+        thread::ScopedSpinLock lock(m_mutex);
+        auto* songSource = GetSongSource(sourceId.internalId);
+        if (songSource->songId == songId) // some bugs where introduced from time to time in this db, so we can have a mismatch
+        {
+            // now check if this song still exists in the remote database
+            for (auto songOffset : m_db.songs)
+            {
+                const auto& dbSong = DbSong(songOffset);
+                if (!dbSong.path.IsSame(m_db.strings, songSource->name()))
+                    continue;
+                if (!m_db.roots[dbSong.root].IsSame(m_db.strings, m_roots[songSource->root].id, m_roots[songSource->root].label(m_strings)))
+                    continue;
+                if (dbSong.numArtists != songSource->numArtists)
+                    continue;
+                uint16_t artistIndex = 0;
+                for (; artistIndex < dbSong.numArtists; artistIndex++)
+                {
+                    if (!m_artists[songSource->artists[artistIndex]].name.IsSame(m_strings, GetArtistName(m_db.artists[dbSong.artists[artistIndex].id])))
+                        break;
+                }
+                if (artistIndex != dbSong.numArtists)
+                    continue;
+
+                return Status::kOk;
+            }
+        }
+
+        for (uint32_t i = 0; i < songSource->numArtists; i++)
+            m_artists[songSource->artists[i]].refcount--;
+        new (songSource) SourceSong();
+        m_isDirty = true;
+        m_areStringsDirty = true;
+        m_areDataDirty = true;
+
+        return Status::kFail;
+    }
+
     void SourceAtariSAPMusicArchive::Load()
     {
         auto file = io::File::OpenForRead(ms_filename);

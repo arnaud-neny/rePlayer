@@ -458,8 +458,8 @@ namespace rePlayer
             if (results.IsSongAvailable(SourceID(kID, songSourceId)))
                 continue;
 
-            auto song = new SongSheet();
-            auto songSource = GetSongSource(songSourceId);
+            auto* song = new SongSheet();
+            auto* songSource = GetSongSource(songSourceId);
 
             SourceResults::State state;
             song->id = songSource->songId;
@@ -527,8 +527,8 @@ namespace rePlayer
                 continue;
 
             auto songSourceId = FindSong(dbSong);
-            auto song = new SongSheet();
-            auto songSource = GetSongSource(songSourceId);
+            auto* song = new SongSheet();
+            auto* songSource = GetSongSource(songSourceId);
 
             SourceResults::State state;
             song->id = songSource->songId;
@@ -685,7 +685,7 @@ namespace rePlayer
     void SourceModland::OnSongUpdate(const Song* const song)
     {
         assert(song->GetSourceId(0).sourceId == kID);
-        auto songSource = GetSongSource(song->GetSourceId(0).internalId);
+        auto* songSource = GetSongSource(song->GetSourceId(0).internalId);
         if (!songSource->IsValid())
         {
             for (auto artistId : songSource->artists)
@@ -703,7 +703,7 @@ namespace rePlayer
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
-        auto songSource = GetSongSource(sourceId.internalId);
+        auto* songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
         songSource->isDiscarded = true;
         m_isDirty = true;
@@ -713,10 +713,56 @@ namespace rePlayer
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID && newSongId != SongID::Invalid);
-        auto songSource = GetSongSource(sourceId.internalId);
+        auto* songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
         songSource->isDiscarded = false;
         m_isDirty = true;
+    }
+
+    bool SourceModland::IsValidationEnabled() const
+    {
+        // validation is only possible when the database has been downloaded
+        return m_db.songs.IsNotEmpty();
+    }
+
+    Status SourceModland::Validate(SourceID sourceId, SongID songId)
+    {
+        thread::ScopedSpinLock lock(m_mutex);
+        auto* songSource = GetSongSource(sourceId.internalId);
+        if (songSource->songId == songId) // some bugs where introduced from time to time in this db, so we can have a mismatch
+        {
+            // now check if this song still exists in the remote database
+            for (uint32_t i = 0, e = m_db.songs.NumItems(); i < e; i++)
+            {
+                const auto& dbSong = m_db.songs[i];
+                if (dbSong.isExtensionOverriden != songSource->isExtensionOverriden)
+                    continue;
+                if (!dbSong.name.IsSame(m_db.strings, songSource->name))
+                    continue;
+                if (!m_db.replays[dbSong.replayId].name.IsSame(m_db.strings, m_replays[songSource->replay].name(m_strings)))
+                    continue;
+                if (!m_db.artists[dbSong.artists[0]].name.IsSame(m_db.strings, m_artists[songSource->artists[0]].name(m_strings)))
+                    continue;
+                if (!m_db.artists[dbSong.artists[1]].name.IsSame(m_db.strings, m_artists[songSource->artists[1]].name(m_strings)))
+                    continue;
+                return Status::kOk;
+            }
+        }
+
+        if (songSource->artists[0])
+        {
+            m_artists[songSource->artists[0]].refcount--;
+            if (songSource->artists[1])
+            {
+                m_artists[songSource->artists[1]].refcount--;
+            }
+        }
+        new (songSource) SourceSong();
+        m_isDirty = true;
+        m_areStringsDirty = true;
+        m_areDataDirty = true;
+
+        return Status::kFail;
     }
 
     void SourceModland::Load()
@@ -747,6 +793,12 @@ namespace rePlayer
                 if (!song->IsValid())
                     m_availableSongIds.Add(i);
             }
+            m_availableReplayIds.Clear();
+            for (uint32_t i = 1, e = m_replays.NumItems(); i < e; i++)
+            {
+                if (m_replays[i].name.offset == 0)
+                    m_availableReplayIds.Add(uint16_t(i));
+            }
         }
     }
 
@@ -769,13 +821,39 @@ namespace rePlayer
                 {
                     Array<char> strings(size_t(0), m_strings.NumItems());
                     strings.Add('\0');
-                    // re-pack replays
+                    // scan for unused replays
                     Array<SourceReplay> replays(m_replays);
+                    Array<bool> isReplayAvailable(m_replays.NumItems());
+                    memset(isReplayAvailable.Items(), 0, isReplayAvailable.Size());
+                    for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                    {
+                        auto* song = GetSongSource(uint32_t(i));
+                        if (song->songId == SongID::Invalid && !song->isDiscarded)
+                            continue;
+                        isReplayAvailable[song->replay] = true;
+                    }
+                    // clear unused replays
                     for (uint32_t i = 1, e = replays.NumItems(); i < e; i++)
                     {
-                        replays[i].name.Set(strings, replays[i].name(m_strings));
-                        if (replays[i].ext.offset)
-                            replays[i].ext.Set(strings, replays[i].ext(m_strings));
+                        if (!isReplayAvailable[i])
+                            replays[i] = {};
+                    }
+                    // remove discarded replays at the end of the array
+                    for (auto i = isReplayAvailable.NumItems<int64_t>() - 1; i > 0; i--)
+                    {
+                        if (isReplayAvailable[i])
+                            break;
+                        replays.Pop();
+                    }
+                    // re-pack replays
+                    for (uint32_t i = 1, e = replays.NumItems(); i < e; i++)
+                    {
+                        if (replays[i].name.offset)
+                        {
+                            replays[i].name.Set(strings, replays[i].name(m_strings));
+                            if (replays[i].ext.offset)
+                                replays[i].ext.Set(strings, replays[i].ext(m_strings));
+                        }
                     }
                     // remove discarded artists at the end of the array
                     Array<SourceArtist> artists(m_artists);
@@ -883,7 +961,7 @@ namespace rePlayer
         {
             if (m_songs[i] == 0)
                 continue;
-            auto song = GetSongSource(i);
+            auto* song = GetSongSource(i);
             if (dbSong.name.IsSame(m_db.strings, song->name))
             {
                 if (!m_db.replays[dbSong.replayId].name.IsSame(m_db.strings, m_replays[song->replay].name(m_strings)))
@@ -927,8 +1005,14 @@ namespace rePlayer
         if (songSource->replay == 0)
         {
             // add a new replay
-            songSource->replay = m_replays.NumItems<uint16_t>();
-            auto replay = m_replays.Push();
+            if (m_availableReplayIds.IsEmpty())
+            {
+                songSource->replay = m_replays.NumItems<uint16_t>();
+                m_replays.Push();
+            }
+            else
+                songSource->replay = m_availableReplayIds.Pop();
+            auto replay = m_replays.Items(songSource->replay);
             replay->name.Set(m_strings, m_db.replays[dbSong.replayId].name(m_db.strings));
             if (m_db.replays[dbSong.replayId].type <= ModlandReplay::kDefault && m_db.replays[dbSong.replayId].ext.offset)
                 replay->ext.Set(m_strings, m_db.replays[dbSong.replayId].ext(m_db.strings));
@@ -1513,7 +1597,9 @@ namespace rePlayer
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
             BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
+            BuildPathList("PlaySID/"),                              // deprecated, everything is in the HVSC folder
             BuildPathList("Pollytracker/"),                         // c64 player, available as sid
+            BuildPathList("RealSID/"),                              // deprecated, everything is in the HVSC folder
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
             BuildPathList("Stonetracker/"),                         // need to add to uade (multi-files & missing library support in uade)
