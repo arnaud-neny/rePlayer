@@ -1,7 +1,9 @@
-v0.15.17:
+v0.15.18:
 - Added Ayumi
 - Added Ken
 - Added Organya
+- Updated adplug to 2.3.3.826
+- Updated ASAP to 6.0.3
 - Updated Furnace to 0.6.3
 - Updated gbsplay to 0.0.97
 - Updated libsidplay to 2.7.1
@@ -19,6 +21,7 @@ v0.15.17:
 - Playlist sort from current playing position while pressing Ctrl
 - Refactor file importer
 - Refactor song packages
+- Remote database validation (Modland, High Voltage SID Collection, Atari SAP Music Archive)
 - Resizable UI
 - Win32 port
 - Bug fixes

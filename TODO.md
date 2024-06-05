@@ -8,7 +8,6 @@
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
 - database: add album database
-- modland: source validation (check for removed files)
 - mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)
 - source: don't load on start, just at access (to save memory)
 - support for .cue, .m3u, .pls
