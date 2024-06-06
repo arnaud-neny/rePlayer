@@ -542,7 +542,7 @@ namespace rePlayer
                             song->fileSize = uint32_t(archiveBuffer.Size());
 
                             auto fileCrc = crc32(0L, Z_NULL, 0);
-                            song->fileCrc = crc32_z(fileCrc, archiveBuffer.Items(), archiveBuffer.Size());
+                            song->fileCrc = crc32_z(fileCrc, archiveBuffer.Items(), archiveBuffer.Size<size_t>());
 
                             auto file = io::File::OpenForWrite(library.m_songs->GetFullpath(dbSong, &artists).c_str());
                             file.Write(archiveBuffer.Items(), archiveBuffer.Size());

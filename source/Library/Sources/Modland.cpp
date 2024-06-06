@@ -824,7 +824,7 @@ namespace rePlayer
                     // scan for unused replays
                     Array<SourceReplay> replays(m_replays);
                     Array<bool> isReplayAvailable(m_replays.NumItems());
-                    memset(isReplayAvailable.Items(), 0, isReplayAvailable.Size());
+                    memset(isReplayAvailable.Items(), 0, isReplayAvailable.Size<size_t>());
                     for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
                     {
                         auto* song = GetSongSource(uint32_t(i));
