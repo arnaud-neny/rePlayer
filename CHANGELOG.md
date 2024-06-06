@@ -1,4 +1,4 @@
-v0.15.18:
+v0.15.19:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -11,7 +11,7 @@ v0.15.18:
 - Updated Opus to 1.5.2
 - Updated ProTrekkr to 2.6.7
 - Updated vgmstream to r1917
-- Updated ImGui to 1.90.7
+- Updated ImGui to 1.90.8
 - Updated libarchive to 3.7.4 as static library
 - Updated libcurl to 8.8.0 as static library with minimal content instead of full dynamic library
 - Updated TagLib to 2.0.1
