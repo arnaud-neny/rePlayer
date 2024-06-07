@@ -450,6 +450,7 @@
     <None Include="Graphics\GraphicsImplDx11.inl">
       <Filter>Source Files\Graphics</Filter>
     </None>
+    <None Include="..\BUILD.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="replayer.ico">

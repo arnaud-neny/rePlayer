@@ -8,6 +8,7 @@
 #include <IO/Stream.h>
 #include <IO/StreamFile.h>
 #include <RePlayer/Core.h>
+#include <Replayer/Version.h>
 #include <Replays/Replay.h>
 #include <Replays/ReplayPlugin.h>
 
@@ -293,7 +294,7 @@ namespace rePlayer
     {
         char* pgrPath;
         _get_pgmptr(&pgrPath);
-        auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays/";
+        auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays" REPLAYER_OS_STUB "/";
 
         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
         {
@@ -514,7 +515,7 @@ namespace rePlayer
 
         char* pgrPath;
         _get_pgmptr(&pgrPath);
-        auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays" / plugin->dllName;
+        auto mainPath = std::filesystem::path(pgrPath).remove_filename() / "replays" REPLAYER_OS_STUB / plugin->dllName;
         mainPath += ".dll";
         mainPath = mainPath.lexically_normal(); // important for the dll loader
 

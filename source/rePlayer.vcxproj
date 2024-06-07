@@ -78,6 +78,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-win32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -88,6 +89,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-win32</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -201,8 +203,8 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <PostBuildEvent>
-      <Command>del $(SolutionDir)..\data-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir)..\data-win32\$(TargetFileName) $(TargetPath)</Command>
+      <Command>del $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1
+$(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -335,6 +337,7 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include="..\3rdParties.md" />
+    <None Include="..\BUILD.md" />
     <None Include="..\CHANGELOG.md" />
     <None Include="..\LICENSE" />
     <None Include="..\README.md" />

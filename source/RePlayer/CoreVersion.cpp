@@ -44,7 +44,7 @@ namespace rePlayer
         auto mainPath = std::filesystem::current_path();
 
         // clean old files
-        std::filesystem::remove_all(mainPath / "replays.old/");
+        std::filesystem::remove_all(mainPath / "replays" REPLAYER_OS_STUB ".old/");
         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
         {
             if (dirEntry.is_regular_file() && _stricmp(dirEntry.path().extension().generic_string().c_str(), ".old") == 0)
@@ -91,17 +91,13 @@ namespace rePlayer
                     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
                     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &downloadBuffer);
                     char downloadUrl[256];
-#ifdef _WIN64
-                    sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer.zip", majorVersion, minorVersion, patchVersion);
-#else
-                    sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer-win32.zip", majorVersion, minorVersion, patchVersion);
-#endif
+                    sprintf(downloadUrl, "https://github.com/arnaud-neny/rePlayer/releases/download/v%u.%u.%u/rePlayer" REPLAYER_OS_STUB ".zip", majorVersion, minorVersion, patchVersion);
                     curl_easy_setopt(curl, CURLOPT_URL, downloadUrl);
                     if (curl_easy_perform(curl) == CURLE_OK)
                     {
                         // rename
-                        std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer.exe", std::filesystem::path(mainPath) / "rePlayer.old");
-                        std::filesystem::rename(std::filesystem::path(mainPath) / "replays/", std::filesystem::path(mainPath) / "replays.old/");
+                        std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".exe", std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".old");
+                        std::filesystem::rename(std::filesystem::path(mainPath) / "replays" REPLAYER_OS_STUB "/", std::filesystem::path(mainPath) / "replays" REPLAYER_OS_STUB ".old/");
                         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
                         {
                             if (dirEntry.is_regular_file() && _stricmp(dirEntry.path().extension().generic_string().c_str(), ".dll") == 0)
@@ -151,7 +147,7 @@ namespace rePlayer
             STARTUPINFO startupInfo = {};
             startupInfo.cb = sizeof(startupInfo);
 
-            if (CreateProcess((mainPath / "rePlayer.exe").generic_string().c_str(), nullptr,
+            if (CreateProcess((mainPath / "rePlayer" REPLAYER_OS_STUB ".exe").generic_string().c_str(), nullptr,
                 nullptr, nullptr, FALSE, 0, nullptr,
                 mainPath.generic_string().c_str(), &startupInfo, &processInfo))
             {
