@@ -40,9 +40,7 @@
 #  include "config.h"
 #endif
 
-#ifdef HAVE_CXX11
-#  include <atomic>
-#endif
+#include <atomic>
 #include <vector>
 
 class SidTune;
@@ -56,12 +54,12 @@ namespace libsidplayfp
 class Player
 {
 private:
-    typedef enum
+    enum class state_t
     {
         STOPPED,
         PLAYING,
         STOPPING
-    } state_t;
+    };
 
 private:
     /// Commodore 64 emulator
@@ -82,11 +80,7 @@ private:
     /// Error message
     const char *m_errorString;
 
-#ifndef HAVE_CXX11
-    volatile state_t m_isPlaying;
-#else
     std::atomic<state_t> m_isPlaying;
-#endif
 
     sidrandom m_rand;
 
@@ -137,7 +131,7 @@ private:
 
 public:
     Player();
-    ~Player() {}
+    ~Player() = default;
 
     const SidConfig &config() const { return m_cfg; }
 
@@ -151,7 +145,7 @@ public:
 
     uint_least32_t play(short *buffer, uint_least32_t samples);
 
-    bool isPlaying() const { return m_isPlaying != STOPPED; }
+    bool isPlaying() const { return m_isPlaying != state_t::STOPPED; }
 
     void stop();
 

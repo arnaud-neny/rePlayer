@@ -46,13 +46,8 @@ namespace libsidplayfp
 class sidemu : public c64sid
 {
 public:
-    /**
-     * Buffer size. 5000 is roughly 5 ms at 96 kHz
-     */
-    enum
-    {
-        OUTPUTBUFFERSIZE = 5000
-    };
+    /// Buffer size. 5000 is roughly 5 ms at 96 kHz
+    static constexpr unsigned int OUTPUTBUFFERSIZE = 5000;
 
 private:
     sidbuilder* const m_builder;
@@ -87,7 +82,7 @@ public:
         m_status(true),
         isLocked(false),
         m_error("N/A") {}
-    virtual ~sidemu() {}
+    ~sidemu() override = default;
 
     /**
      * Clock the SID chip.
@@ -105,7 +100,7 @@ public:
     virtual void unlock();
 
     // Standard SID functions
-    
+
     /**
      * Mute/unmute voice.
      */

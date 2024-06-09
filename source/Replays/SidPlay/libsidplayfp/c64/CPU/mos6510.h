@@ -85,10 +85,10 @@ public:
 private:
     struct ProcessorCycle
     {
-        void (MOS6510::*func)();
+        void (*func)(MOS6510&);
         bool nosteal;
         ProcessorCycle() :
-            func(0),
+            func(nullptr),
             nosteal(false) {}
     };
 
@@ -150,17 +150,17 @@ private:
     struct ProcessorCycle instrTable[0x101 << 3];
 
 private:
-    /// Represents an instruction subcycle that writes
-    EventCallback<MOS6510> m_nosteal;
-
-    /// Represents an instruction subcycle that reads
-    EventCallback<MOS6510> m_steal;
-
-    EventCallback<MOS6510> clearInt;
-
     void eventWithoutSteals();
     void eventWithSteals();
     void removeIRQ();
+
+    /// Represents an instruction subcycle that writes
+    FastEventCallback<MOS6510, &MOS6510::eventWithoutSteals> m_nosteal;
+
+    /// Represents an instruction subcycle that reads
+    FastEventCallback<MOS6510, &MOS6510::eventWithSteals> m_steal;
+
+    FastEventCallback<MOS6510, &MOS6510::removeIRQ> clearInt;
 
     inline void Initialise();
 
@@ -299,7 +299,7 @@ private:
 
 protected:
     MOS6510(EventScheduler &scheduler);
-    ~MOS6510() {}
+    ~MOS6510() = default;
 
     /**
      * Get data from system environment.

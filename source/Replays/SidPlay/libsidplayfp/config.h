@@ -21,9 +21,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define to 1 if you have the <emmintrin.h> header file. */
-#define HAVE_EMMINTRIN_H 1
-
 /* Define to 1 if you have libexsid (-lexsid). */
 #undef HAVE_EXSID
 
@@ -42,14 +39,14 @@
 /* Define to 1 if you have libgcrypt (-lgcrypt). */
 #undef HAVE_LIBGCRYPT
 
-/* Define to 1 if you have the <mmintrin.h> header file. */
-#undef HAVE_MMINTRIN_H
-
 /* Define to 1 if you have pthread.h */
 #undef HAVE_PTHREAD_H
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if you have the <smmintrin.h> header file. */
+#define HAVE_SMMINTRIN_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H
@@ -94,7 +91,7 @@
 #define PACKAGE_NAME "libsidplayfp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsidplayfp 2.7.1"
+#define PACKAGE_STRING "libsidplayfp 2.8.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsidplayfp"
@@ -103,7 +100,7 @@
 #define PACKAGE_URL "https://github.com/libsidplayfp/libsidplayfp/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.7.1"
+#define PACKAGE_VERSION "2.8.0"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -124,7 +121,7 @@
 #undef STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "2.7.1"
+#define VERSION "2.8.0"
 
 /* Path to VICE testsuite. */
 #undef VICE_TESTSUITE

@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2013 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004 Dag Lem <resid@nimrod.no>
  *
@@ -25,12 +25,7 @@
 
 #include "Resampler.h"
 
-#include <string>
-#include <map>
-
 #include "../array.h"
-
-#include "sidcxx11.h"
 
 namespace reSIDfp
 {
@@ -74,7 +69,7 @@ private:
 
     int outputValue;
 
-    short sample[RINGSIZE * 2];
+    int sample[RINGSIZE * 2];
 
 private:
     int fir(int subcycle);
@@ -101,6 +96,7 @@ public:
      * @param highestAccurateFrequency
      */
     SincResampler(double clockFrequency, double samplingFrequency, double highestAccurateFrequency);
+    ~SincResampler() override;
 
     bool input(int input) override;
 
