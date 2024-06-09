@@ -36,7 +36,7 @@ namespace rePlayer
         .replayId = eReplay::SidPlay,
         .name = "SidPlay",
         .extensions = "psid;rsid;sid;mus",
-        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2023 Leandro Nini",
+        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2024 Leandro Nini",
         .settings = "SidPlay " PACKAGE_VERSION,
         .init = ReplaySidPlay::Init,
         .release = ReplaySidPlay::Release,
