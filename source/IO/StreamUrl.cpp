@@ -108,8 +108,6 @@ namespace rePlayer
 
     Status StreamUrl::Seek(int64_t offset, SeekWhence whence)
     {
-        if (std::atomic_ref(m_state) == State::kFailed)
-            return Status::kFail;
         if (m_type != Type::kDownload)
         {
             if (whence == SeekWhence::kSeekBegin && offset == 0)
@@ -408,8 +406,16 @@ namespace rePlayer
     void StreamUrl::Update()
     {
         CURLcode curlCode;
-        curlCode = curl_easy_perform(m_curl);
-        assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST || curlCode == CURLE_URL_MALFORMAT);
+        for (;;)
+        {
+            curlCode = curl_easy_perform(m_curl);
+            assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST || curlCode == CURLE_URL_MALFORMAT || curlCode == CURLE_RECV_ERROR);
+            if (curlCode != CURLE_RECV_ERROR || m_type != Type::kStreaming)
+                break;
+            m_metadataSize = 0;
+            m_chunkSize = 0;
+            m_isReadingChunk = true;
+        }
 
         if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
             std::atomic_ref(m_state).store(State::kEnd);
