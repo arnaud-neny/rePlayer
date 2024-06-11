@@ -1,4 +1,4 @@
-v0.15.19:
+v0.15.20:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -6,8 +6,8 @@ v0.15.19:
 - Updated ASAP to 6.0.3
 - Updated Furnace to 0.6.3
 - Updated gbsplay to 0.0.97
-- Updated libsidplay to 2.7.1
-- Updated OpenMPT to 0.7.7
+- Updated libsidplay to 2.8.0
+- Updated OpenMPT to 0.7.8
 - Updated Opus to 1.5.2
 - Updated ProTrekkr to 2.6.7
 - Updated vgmstream to r1917
