@@ -186,7 +186,8 @@ namespace rePlayer
                 if (stack == 0)
                 {
                     int32_t modSize;
-                    if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
+                    char kb[3];
+                    if (sscanf_s((const char*)node->content, "%d%s", &modSize, kb, uint32_t(sizeof(kb))) != 2 || kb[0] != 'K' || kb[1] != 'b' || kb[2] != 0)
                         ConvertString(node->content, ext);
                     else
                         state = kStateSongArtistsEnd;
@@ -416,7 +417,8 @@ namespace rePlayer
             case kStateArtistBegin:
                 {
                     int32_t modSize;
-                    if (sscanf_s((const char*)node->content, "%dKb", &modSize) != 1)
+                    char kb[3];
+                    if (sscanf_s((const char*)node->content, "%d%s", &modSize, kb, uint32_t(sizeof(kb))) != 2 || kb[0] != 'K' || kb[1] != 'b' || kb[2] != 0)
                         ConvertString(node->content, ext);
                     else
                         state = kStateArtistContinue;
