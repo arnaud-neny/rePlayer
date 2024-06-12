@@ -132,14 +132,6 @@
     </ClCompile>
     <ClCompile Include="threads.c" />
     <ClCompile Include="tree.c" />
-    <ClCompile Include="trio.c" />
-    <ClCompile Include="trionan.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="triostr.c" />
     <ClCompile Include="uri.c" />
     <ClCompile Include="valid.c" />
     <ClCompile Include="xinclude.c" />
@@ -246,11 +238,6 @@
     <ClInclude Include="include\wsockcompat.h" />
     <ClInclude Include="libxml.h" />
     <ClInclude Include="timsort.h" />
-    <ClInclude Include="trio.h" />
-    <ClInclude Include="triodef.h" />
-    <ClInclude Include="trionan.h" />
-    <ClInclude Include="triop.h" />
-    <ClInclude Include="triostr.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

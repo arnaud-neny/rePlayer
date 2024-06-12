@@ -130,15 +130,6 @@
     <ClCompile Include="tree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="trio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="trionan.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="triostr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="uri.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -208,21 +199,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="timsort.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="trio.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="triodef.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="trionan.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="triop.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="triostr.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\win32config.h">

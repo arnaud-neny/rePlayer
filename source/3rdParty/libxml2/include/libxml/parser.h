@@ -11,9 +11,7 @@
 #define __XML_PARSER_H__
 
 #include <libxml/xmlversion.h>
-#define XML_TREE_INTERNALS
 #include <libxml/tree.h>
-#undef XML_TREE_INTERNALS
 #include <libxml/dict.h>
 #include <libxml/hash.h>
 #include <libxml/valid.h>
@@ -62,11 +60,11 @@ struct _xmlParserInput {
     xmlParserInputBufferPtr buf;      /* UTF-8 encoded buffer */
 
     const char *filename;             /* The file analyzed, if any */
-    const char *directory;            /* the directory/base of the file */
+    const char *directory;            /* unused */
     const xmlChar *base;              /* Base of the array to parse */
     const xmlChar *cur;               /* Current char being parsed */
     const xmlChar *end;               /* end of the array to parse */
-    int length;                       /* length if known */
+    int length;                       /* unused */
     int line;                         /* Current line */
     int col;                          /* Current column */
     unsigned long consumed;           /* How many xmlChars already consumed */
@@ -75,7 +73,7 @@ struct _xmlParserInput {
     const xmlChar *version;           /* the version string for entity */
     int flags;                        /* Flags */
     int id;                           /* an unique identifier for the entity */
-    unsigned long parentConsumed;     /* consumed bytes from parents */
+    unsigned long parentConsumed;     /* unused */
     xmlEntityPtr entity;              /* entity, if any */
 };
 
@@ -134,30 +132,14 @@ typedef enum {
     XML_PARSER_XML_DECL         /* before XML decl (but after BOM) */
 } xmlParserInputState;
 
-/**
- * XML_DETECT_IDS:
- *
- * Bit in the loadsubset context field to tell to do ID/REFs lookups.
- * Use it to initialize xmlLoadExtDtdDefaultValue.
+/** DOC_DISABLE */
+/*
+ * Internal bits in the 'loadsubset' context member
  */
 #define XML_DETECT_IDS		2
-
-/**
- * XML_COMPLETE_ATTRS:
- *
- * Bit in the loadsubset context field to tell to do complete the
- * elements attributes lists with the ones defaulted from the DTDs.
- * Use it to initialize xmlLoadExtDtdDefaultValue.
- */
 #define XML_COMPLETE_ATTRS	4
-
-/**
- * XML_SKIP_IDS:
- *
- * Bit in the loadsubset context field to tell to not do ID/REFs registration.
- * Used to initialize xmlLoadExtDtdDefaultValue in some special cases.
- */
 #define XML_SKIP_IDS		8
+/** DOC_ENABLE */
 
 /**
  * xmlParserMode:
@@ -222,16 +204,16 @@ struct _xmlParserCtxt {
 
     int     hasExternalSubset;        /* reference and external subset */
     int             hasPErefs;        /* the internal subset has PE refs */
-    int              external;        /* are we parsing an external entity */
+    int              external;        /* unused */
 
     int                 valid;        /* is the document valid */
     int              validate;        /* shall we try to validate ? */
     xmlValidCtxt        vctxt;        /* The validity context */
 
-    xmlParserInputState instate;      /* current type of input */
-    int                 token;        /* next char look-ahead */
+    xmlParserInputState instate;      /* push parser state */
+    int                 token;        /* unused */
 
-    char           *directory;        /* the data directory */
+    char           *directory;        /* unused */
 
     /* Node name stack */
     const xmlChar     *name;          /* Current parsed Node */
@@ -255,7 +237,7 @@ struct _xmlParserCtxt {
     int *              spaceTab;      /* array of space infos */
 
     int                depth;         /* to prevent entity substitution loops */
-    xmlParserInputPtr  entity;        /* used to check entities boundaries */
+    xmlParserInputPtr  entity;        /* unused */
     int                charset;       /* unused */
     int                nodelen;       /* Those two fields are there to */
     int                nodemem;       /* Speed up large node parsing */
@@ -266,11 +248,11 @@ struct _xmlParserCtxt {
     int                linenumbers;   /* set line number in element content */
     void              *catalogs;      /* document's own catalog */
     int                recovery;      /* run in recovery mode */
-    int                progressive;   /* is this a progressive parsing */
+    int                progressive;   /* unused */
     xmlDictPtr         dict;          /* dictionary for the parser */
     const xmlChar *   *atts;          /* array for the attributes callbacks */
     int                maxatts;       /* the size of the array */
-    int                docdict;       /* use strings from dict to build tree */
+    int                docdict;       /* unused */
 
     /*
      * pre-interned strings
@@ -308,7 +290,7 @@ struct _xmlParserCtxt {
     xmlError          lastError;
     xmlParserMode     parseMode;    /* the parser mode */
     unsigned long    nbentities;    /* unused */
-    unsigned long  sizeentities;    /* size of parsed entities */
+    unsigned long  sizeentities;    /* size of external entities */
 
     /* for use by HTML non-recursive parser */
     xmlParserNodeInfo *nodeInfo;      /* Current NodeInfo */
@@ -327,6 +309,9 @@ struct _xmlParserCtxt {
     xmlParserNsData       *nsdb;    /* namespace database */
     unsigned        attrHashMax;    /* allocated size */
     xmlAttrHashBucket *attrHash;    /* atttribute hash table */
+
+    xmlStructuredErrorFunc errorHandler;
+    void *errorCtxt;
 };
 
 /**
@@ -843,21 +828,39 @@ typedef xmlParserInputPtr (*xmlExternalEntityLoader) (const char *URL,
  */
 
 XMLPUBVAR const char *const xmlParserVersion;
+XML_DEPRECATED
+XMLPUBVAR const int oldXMLWDcompatibility;
+XML_DEPRECATED
+XMLPUBVAR const int xmlParserDebugEntities;
+XML_DEPRECATED
+XMLPUBVAR const xmlSAXLocator xmlDefaultSAXLocator;
+#ifdef LIBXML_SAX1_ENABLED
+XML_DEPRECATED
+XMLPUBVAR const xmlSAXHandlerV1 xmlDefaultSAXHandler;
+#endif
+
 #ifdef LIBXML_THREAD_ENABLED
 /* backward compatibility */
 XMLPUBFUN const char *const *__xmlParserVersion(void);
+XML_DEPRECATED
+XMLPUBFUN const int *__oldXMLWDcompatibility(void);
+XML_DEPRECATED
+XMLPUBFUN const int *__xmlParserDebugEntities(void);
+XML_DEPRECATED
+XMLPUBFUN const xmlSAXLocator *__xmlDefaultSAXLocator(void);
+#ifdef LIBXML_SAX1_ENABLED
+XML_DEPRECATED
+XMLPUBFUN const xmlSAXHandlerV1 *__xmlDefaultSAXHandler(void);
+#endif
 #endif
 
 /** DOC_DISABLE */
 #define XML_GLOBALS_PARSER_CORE \
-  XML_OP(oldXMLWDcompatibility, int, XML_DEPRECATED) \
-  XML_OP(xmlDefaultSAXLocator, xmlSAXLocator, XML_DEPRECATED) \
   XML_OP(xmlDoValidityCheckingDefaultValue, int, XML_DEPRECATED) \
   XML_OP(xmlGetWarningsDefaultValue, int, XML_DEPRECATED) \
   XML_OP(xmlKeepBlanksDefaultValue, int, XML_DEPRECATED) \
   XML_OP(xmlLineNumbersDefaultValue, int, XML_DEPRECATED) \
   XML_OP(xmlLoadExtDtdDefaultValue, int, XML_DEPRECATED) \
-  XML_OP(xmlParserDebugEntities, int, XML_DEPRECATED) \
   XML_OP(xmlPedanticParserDefaultValue, int, XML_DEPRECATED) \
   XML_OP(xmlSubstituteEntitiesDefaultValue, int, XML_DEPRECATED)
 
@@ -870,26 +873,15 @@ XMLPUBFUN const char *const *__xmlParserVersion(void);
   #define XML_GLOBALS_PARSER_OUTPUT
 #endif
 
-#ifdef LIBXML_SAX1_ENABLED
-  #define XML_GLOBALS_PARSER_SAX1 \
-    XML_OP(xmlDefaultSAXHandler, xmlSAXHandlerV1, XML_DEPRECATED)
-#else
-  #define XML_GLOBALS_PARSER_SAX1
-#endif
-
 #define XML_GLOBALS_PARSER \
   XML_GLOBALS_PARSER_CORE \
-  XML_GLOBALS_PARSER_OUTPUT \
-  XML_GLOBALS_PARSER_SAX1
+  XML_GLOBALS_PARSER_OUTPUT
 
 #define XML_OP XML_DECLARE_GLOBAL
 XML_GLOBALS_PARSER
 #undef XML_OP
 
 #if defined(LIBXML_THREAD_ENABLED) && !defined(XML_GLOBALS_NO_REDEFINITION)
-  #define oldXMLWDcompatibility XML_GLOBAL_MACRO(oldXMLWDcompatibility)
-  #define xmlDefaultSAXHandler XML_GLOBAL_MACRO(xmlDefaultSAXHandler)
-  #define xmlDefaultSAXLocator XML_GLOBAL_MACRO(xmlDefaultSAXLocator)
   #define xmlDoValidityCheckingDefaultValue \
     XML_GLOBAL_MACRO(xmlDoValidityCheckingDefaultValue)
   #define xmlGetWarningsDefaultValue \
@@ -898,7 +890,6 @@ XML_GLOBALS_PARSER
   #define xmlLineNumbersDefaultValue \
     XML_GLOBAL_MACRO(xmlLineNumbersDefaultValue)
   #define xmlLoadExtDtdDefaultValue XML_GLOBAL_MACRO(xmlLoadExtDtdDefaultValue)
-  #define xmlParserDebugEntities XML_GLOBAL_MACRO(xmlParserDebugEntities)
   #define xmlPedanticParserDefaultValue \
     XML_GLOBAL_MACRO(xmlPedanticParserDefaultValue)
   #define xmlSubstituteEntitiesDefaultValue \
@@ -1185,18 +1176,18 @@ XMLPUBFUN xmlParserInputPtr
  * Node infos.
  */
 XMLPUBFUN const xmlParserNodeInfo*
-		xmlParserFindNodeInfo	(const xmlParserCtxtPtr ctxt,
-				         const xmlNodePtr node);
+		xmlParserFindNodeInfo	(xmlParserCtxtPtr ctxt,
+				         xmlNodePtr node);
 XMLPUBFUN void
 		xmlInitNodeInfoSeq	(xmlParserNodeInfoSeqPtr seq);
 XMLPUBFUN void
 		xmlClearNodeInfoSeq	(xmlParserNodeInfoSeqPtr seq);
 XMLPUBFUN unsigned long
-		xmlParserFindNodeInfoIndex(const xmlParserNodeInfoSeqPtr seq,
-                                         const xmlNodePtr node);
+		xmlParserFindNodeInfoIndex(xmlParserNodeInfoSeqPtr seq,
+                                         xmlNodePtr node);
 XMLPUBFUN void
 		xmlParserAddNodeInfo	(xmlParserCtxtPtr ctxt,
-					 const xmlParserNodeInfoPtr info);
+					 xmlParserNodeInfoPtr info);
 
 /*
  * External entities handling actually implemented in xmlIO.
@@ -1251,7 +1242,8 @@ typedef enum {
     XML_PARSE_HUGE      = 1<<19,/* relax any hardcoded limit from the parser */
     XML_PARSE_OLDSAX    = 1<<20,/* parse using SAX2 interface before 2.7.0 */
     XML_PARSE_IGNORE_ENC= 1<<21,/* ignore internal document encoding hint */
-    XML_PARSE_BIG_LINES = 1<<22 /* Store big lines numbers in text PSVI field */
+    XML_PARSE_BIG_LINES = 1<<22,/* Store big lines numbers in text PSVI field */
+    XML_PARSE_NO_XXE    = 1<<23 /* disable loading of external content */
 } xmlParserOption;
 
 XMLPUBFUN void
@@ -1263,8 +1255,15 @@ XMLPUBFUN int
 					 const char *filename,
 					 const char *encoding);
 XMLPUBFUN int
+		xmlCtxtSetOptions	(xmlParserCtxtPtr ctxt,
+					 int options);
+XMLPUBFUN int
 		xmlCtxtUseOptions	(xmlParserCtxtPtr ctxt,
 					 int options);
+XMLPUBFUN void
+		xmlCtxtSetErrorHandler	(xmlParserCtxtPtr ctxt,
+					 xmlStructuredErrorFunc handler,
+					 void *data);
 XMLPUBFUN void
 		xmlCtxtSetMaxAmplification(xmlParserCtxtPtr ctxt,
 					 unsigned maxAmpl);
@@ -1295,6 +1294,9 @@ XMLPUBFUN xmlDocPtr
 					 const char *URL,
 					 const char *encoding,
 					 int options);
+XMLPUBFUN xmlDocPtr
+		xmlCtxtParseDocument	(xmlParserCtxtPtr ctxt,
+					 xmlParserInputPtr input);
 XMLPUBFUN xmlDocPtr
 		xmlCtxtReadDoc		(xmlParserCtxtPtr ctxt,
 					 const xmlChar *cur,
@@ -1368,7 +1370,7 @@ typedef enum {
     XML_WITH_MODULES = 27,
     XML_WITH_DEBUG = 28,
     XML_WITH_DEBUG_MEM = 29,
-    XML_WITH_DEBUG_RUN = 30,
+    XML_WITH_DEBUG_RUN = 30, /* unused */
     XML_WITH_ZLIB = 31,
     XML_WITH_ICU = 32,
     XML_WITH_LZMA = 33,

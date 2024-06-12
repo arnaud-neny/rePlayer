@@ -19,10 +19,13 @@
 #undef HAVE_DL_H
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-#undef HAVE_FCNTL_H
+#define HAVE_FCNTL_H 1
 
 /* Define to 1 if you have the `ftime' function. */
 #undef HAVE_FTIME
+
+/* Define to 1 if you have the `getentropy' function. */
+#undef HAVE_GETENTROPY
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
@@ -32,9 +35,6 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `isascii' function. */
-#undef HAVE_ISASCII
 
 /* Define if history library is there (-lhistory) */
 #undef HAVE_LIBHISTORY
@@ -92,6 +92,9 @@
 /* Define to 1 if you have the <sys/mman.h> header file. */
 #undef HAVE_SYS_MMAN_H
 
+/* Define to 1 if you have the <sys/random.h> header file. */
+#undef HAVE_SYS_RANDOM_H
+
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
 
@@ -113,14 +116,8 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Whether va_copy() is available */
-#undef HAVE_VA_COPY
-
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
-
-/* Whether __va_copy() is available */
-#undef HAVE___VA_COPY
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
@@ -135,7 +132,7 @@
 #define PACKAGE_NAME "libxml2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libxml2 2.12.7"
+#define PACKAGE_STRING "libxml2 2.13.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libxml2"
@@ -144,7 +141,7 @@
 #define PACKAGE_URL "https://gitlab.gnome.org/GNOME/libxml2"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.12.7"
+#define PACKAGE_VERSION "2.13.0"
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -154,9 +151,6 @@
 /* Support for IPv6 */
 #undef SUPPORT_IP6
 
-/* Define if va_list is an array type */
-#undef VA_LIST_IS_ARRAY
-
 /* Version number of package */
 #undef VERSION
 
@@ -165,12 +159,3 @@
 
 /* TLS specifier */
 #undef XML_THREAD_LOCAL
-
-/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
-#undef _UINT32_T
-
-/* Define to the type of an unsigned integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
-//#undef uint32_t
