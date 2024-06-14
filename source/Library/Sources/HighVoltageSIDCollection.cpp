@@ -392,6 +392,17 @@ namespace rePlayer
             }
         }
 
+        std::string url = m_roots[songSource->root].name(m_strings);
+        url += '/';
+        if (songSource->artist != 0)
+        {
+            url += m_artists[songSource->artist].name(m_strings);
+            url += '/';
+        }
+        url += songSource->name;
+        url += ".sid";
+        Log::Message("High Voltage SID Collection: lost \"%s\"\n", url.c_str());
+
         if (songSource->artist)
             m_artists[songSource->artist].refcount--;
         new (songSource) SourceSong();
@@ -400,6 +411,15 @@ namespace rePlayer
         m_areDataDirty = true;
 
         return Status::kFail;
+    }
+
+    Status SourceHighVoltageSIDCollection::Validate(SourceID sourceId, ArtistID artistId)
+    {
+        (void)artistId;
+        thread::ScopedSpinLock lock(m_mutex);
+        if (sourceId.internalId >= m_artists.NumItems())
+            return Status::kFail;
+        return m_artists[sourceId.internalId].refcount > 0 ? Status::kOk : Status::kFail;
     }
 
     void SourceHighVoltageSIDCollection::Load()
@@ -689,6 +709,23 @@ namespace rePlayer
 
             if (downloadStatus == 0)
                 DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems());
+
+            // Check if discarded songs are still in the remote database
+            if (m_db.songs.IsNotEmpty())
+            {
+                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                {
+                    auto songOffset = m_songs[i];
+                    if (songOffset == 0)
+                        continue;
+                    auto* songSource = m_data.Items<SourceSong>(songOffset);
+                    if (songSource->isDiscarded && songSource->songId == SongID::Invalid)
+                    {
+                        if (Validate(SourceID(kID, i), SongID::Invalid) == Status::kFail)
+                            m_songs[i] = 0;
+                    }
+                }
+            }
         }
         return m_db.songs.IsEmpty();
     }

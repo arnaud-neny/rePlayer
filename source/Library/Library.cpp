@@ -1201,42 +1201,63 @@ namespace rePlayer
         bool isValidationEnabled = false;
         for (auto* source : m_sources)
             isValidationEnabled |= source->IsValidationEnabled();
-        if (isValidationEnabled) for (auto* song : m_db.Songs())
+        if (isValidationEnabled)
         {
-            auto songId = song->GetId();
-            for (uint32_t i = 0; i < song->NumSourceIds(); i++)
+            for (auto* song : m_db.Songs())
             {
-                auto sourceId = song->GetSourceId(i);
-                if (m_sources[sourceId.sourceId]->IsValidationEnabled())
+                auto songId = song->GetId();
+                for (uint32_t i = 0; i < song->NumSourceIds(); i++)
                 {
-                    auto status = m_sources[sourceId.sourceId]->Validate(sourceId, songId);
-                    if (status == Status::kFail)
+                    auto sourceId = song->GetSourceId(i);
+                    if (m_sources[sourceId.sourceId]->IsValidationEnabled())
                     {
-                        auto* songSheet = song->Edit();
-                        songSheet->sourceIds.RemoveAt(i);
-                        if (songSheet->sourceIds.IsEmpty())
+                        auto status = m_sources[sourceId.sourceId]->Validate(sourceId, songId);
+                        if (status == Status::kFail)
                         {
-                            if (songSheet->fileSize == 0)
+                            auto* songSheet = song->Edit();
+                            songSheet->sourceIds.RemoveAt(i);
+                            if (songSheet->sourceIds.IsEmpty())
                             {
-                                for (uint16_t subsongIndex = 0, lastSubsongIndex = songSheet->lastSubsongIndex; subsongIndex <= lastSubsongIndex; subsongIndex++)
+                                if (songSheet->fileSize == 0)
                                 {
-                                    if (!songSheet->subsongs[subsongIndex].isDiscarded)
-                                        Core::Discard(MusicID(SubsongID(songSheet->id, subsongIndex), DatabaseID::kLibrary));
+                                    for (uint16_t subsongIndex = 0, lastSubsongIndex = songSheet->lastSubsongIndex; subsongIndex <= lastSubsongIndex; subsongIndex++)
+                                    {
+                                        if (!songSheet->subsongs[subsongIndex].isDiscarded)
+                                            Core::Discard(MusicID(SubsongID(songSheet->id, subsongIndex), DatabaseID::kLibrary));
+                                    }
+                                    for (auto artistId : songSheet->artistIds)
+                                    {
+                                        auto* artist = m_db[artistId]->Edit();
+                                        if (--artist->numSongs == 0)
+                                            m_db.RemoveArtist(artistId);
+                                        m_db.Raise(Database::Flag::kSaveArtists);
+                                    }
+                                    m_db.RemoveSong(songId);
                                 }
-                                for (auto artistId : songSheet->artistIds)
-                                {
-                                    auto* artist = m_db[artistId]->Edit();
-                                    if (--artist->numSongs == 0)
-                                        m_db.RemoveArtist(artistId);
-                                    m_db.Raise(Database::Flag::kSaveArtists);
-                                }
-                                m_db.RemoveSong(songId);
+                                else
+                                    songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
                             }
-                            else
-                                songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, 0));
+                            i--;
+                            m_db.Raise(Database::Flag::kSaveSongs);
                         }
-                        i--;
-                        m_db.Raise(Database::Flag::kSaveSongs);
+                    }
+                }
+            }
+            for (auto* artist : m_db.Artists())
+            {
+                auto artistId = artist->GetId();
+                for (uint16_t i = 0; i < artist->NumSources(); i++)
+                {
+                    auto& source = artist->GetSource(i);
+                    if (m_sources[source.id.sourceId]->IsValidationEnabled())
+                    {
+                        auto status = m_sources[source.id.sourceId]->Validate(source.id, artistId);
+                        if (status == Status::kFail)
+                        {
+                            artist->Edit()->sources.RemoveAt(i);
+                            m_db.Raise(Database::Flag::kSaveArtists);
+                            i--;
+                        }
                     }
                 }
             }

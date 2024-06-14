@@ -749,11 +749,35 @@ namespace rePlayer
             }
         }
 
+        std::string url = m_replays[songSource->replay].name(m_strings);
+        if (songSource->artists[0] == 0)
+            url += "/- unknown/";
+        else
+        {
+            url += "/";
+            url += m_artists[songSource->artists[0]].name(m_strings);
+            if (songSource->artists[1] != 0)
+            {
+                url += "/coop-";
+                url += m_artists[songSource->artists[1]].name(m_strings);
+            }
+            url += "/";
+        }
+        url += songSource->name;
+        if (!songSource->isExtensionOverriden && m_replays[songSource->replay].ext.offset)
+        {
+            url += '.';
+            url += m_replays[songSource->replay].ext(m_strings);
+        }
+        Log::Message("Modland: lost \"%s\"\n", url.c_str());
+
         if (songSource->artists[0])
         {
+            assert(m_artists[songSource->artists[0]].refcount >= 0);
             m_artists[songSource->artists[0]].refcount--;
             if (songSource->artists[1])
             {
+                assert(m_artists[songSource->artists[1]].refcount >= 0);
                 m_artists[songSource->artists[1]].refcount--;
             }
         }
@@ -763,6 +787,15 @@ namespace rePlayer
         m_areDataDirty = true;
 
         return Status::kFail;
+    }
+
+    Status SourceModland::Validate(SourceID sourceId, ArtistID artistId)
+    {
+        (void)artistId;
+        thread::ScopedSpinLock lock(m_mutex);
+        if (sourceId.internalId >= m_artists.NumItems())
+            return Status::kFail;
+        return m_artists[sourceId.internalId].refcount > 0 ? Status::kOk : Status::kFail;
     }
 
     void SourceModland::Load()
@@ -1574,6 +1607,23 @@ namespace rePlayer
 
             if (unpackedData.IsNotEmpty())
                 DecodeDatabase(unpackedData.Items(), unpackedData.Items() + unpackedData.NumItems());
+
+            // Check if discarded songs are still in the remote database
+            if (m_db.songs.IsNotEmpty())
+            {
+                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                {
+                    auto songOffset = m_songs[i];
+                    if (songOffset == 0)
+                        continue;
+                    auto* songSource = m_data.Items<SourceSong>(songOffset);
+                    if (songSource->isDiscarded && songSource->songId == SongID::Invalid)
+                    {
+                        if (Validate(SourceID(kID, i), SongID::Invalid) == Status::kFail)
+                            m_songs[i] = 0;
+                    }
+                }
+            }
         }
         return m_db.songs.IsEmpty();
     }

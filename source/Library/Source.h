@@ -104,6 +104,7 @@ namespace rePlayer
 
         virtual bool IsValidationEnabled() const { return false; }
         virtual Status Validate(SourceID sourceId, SongID songId) { (void)sourceId; (void)songId; return Status::kOk; }
+        virtual Status Validate(SourceID sourceId, ArtistID artistId) { (void)sourceId; (void)artistId; return Status::kOk; }
 
         virtual void Load() = 0;
         virtual void Save() const = 0;

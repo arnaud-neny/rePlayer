@@ -67,6 +67,10 @@ namespace rePlayer
         return IsSame(blob, otherString.c_str());
     }
 
+    static const char* const s_roots[] = {
+        "", "", "Composers/", "Games/", "Groups/", "Misc/", "Unknown/"
+    };
+
     SourceAtariSAPMusicArchive::SourceAtariSAPMusicArchive()
     {
         m_strings.Add('\0'); // 0 == empty string == invalid offset
@@ -403,6 +407,18 @@ namespace rePlayer
             }
         }
 
+        std::string url;
+        auto& root = m_roots[songSource->root];
+        if (root.id > RootID::kNone)
+            url = s_roots[size_t(root.id)];
+        if (root.label.offset)
+        {
+            url += root.label(m_strings);
+            url += "/";
+        }
+        url += songSource->name();
+        Log::Message("Atari SAP Music Archive: lost \"%s\"\n", url.c_str());
+
         for (uint32_t i = 0; i < songSource->numArtists; i++)
             m_artists[songSource->artists[i]].refcount--;
         new (songSource) SourceSong();
@@ -411,6 +427,15 @@ namespace rePlayer
         m_areDataDirty = true;
 
         return Status::kFail;
+    }
+
+    Status SourceAtariSAPMusicArchive::Validate(SourceID sourceId, ArtistID artistId)
+    {
+        (void)artistId;
+        thread::ScopedSpinLock lock(m_mutex);
+        if (sourceId.internalId >= m_artists.NumItems())
+            return Status::kFail;
+        return m_artists[sourceId.internalId].refcount > 0 ? Status::kOk : Status::kFail;
     }
 
     void SourceAtariSAPMusicArchive::Load()
@@ -674,13 +699,9 @@ namespace rePlayer
             }
         };
 
-        static const char* const roots[] = {
-            "", "", "Composers/", "Games/", "Groups/", "Misc/", "Unknown/"
-        };
-
         auto& root = m_roots[songSource->root];
         if (root.id > RootID::kNone)
-            url += roots[size_t(root.id)];
+            url += s_roots[size_t(root.id)];
         if (root.label.offset)
         {
             unescape(root.label(m_strings));
@@ -807,6 +828,23 @@ namespace rePlayer
                             sscanf_s(date.c_str() + date.size() - 4, "%hu", &DbSong(songOffset).date);
                         else
                             sscanf_s(date.c_str() + date.size() - 8, "%hu <?>", &DbSong(songOffset).date);
+                    }
+                }
+
+                // Check if discarded songs are still in the remote database
+                if (m_db.songs.IsNotEmpty())
+                {
+                    for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                    {
+                        auto songOffset = m_songs[i];
+                        if (songOffset == 0)
+                            continue;
+                        auto* songSource = m_data.Items<SourceSong>(songOffset);
+                        if (songSource->isDiscarded && songSource->songId == SongID::Invalid)
+                        {
+                            if (Validate(SourceID(kID, i), SongID::Invalid) == Status::kFail)
+                                m_songs[i] = 0;
+                        }
                     }
                 }
             }

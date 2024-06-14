@@ -25,6 +25,7 @@ namespace rePlayer
 
         bool IsValidationEnabled() const final;
         Status Validate(SourceID sourceId, SongID songId) final;
+        Status Validate(SourceID sourceId, ArtistID artistId) final;
 
         void Load() final;
         void Save() const final;
