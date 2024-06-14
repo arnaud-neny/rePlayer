@@ -10,6 +10,7 @@
 #include "LibraryArtistsUI.h"
 
 // stl
+#include <algorithm>
 #include <ctime>
 
 namespace rePlayer
@@ -35,6 +36,9 @@ namespace rePlayer
         ImGui::TableNextColumn();
         if (selectedArtist)
         {
+            Artist* moveToArtist = nullptr;
+            uint32_t moveToArtistSourceIndex = 0;
+
             char txt[256];
             for (auto& source : selectedArtist->Sources())
             {
@@ -49,7 +53,48 @@ namespace rePlayer
                     sprintf_s(txt, "----/--/-- --:-- %06X %s", source.id.internalId, source.GetName());
                 ImGui::SetNextItemWidth(-FLT_MIN);
                 ImGui::InputText("##source", txt, sizeof(txt), ImGuiInputTextFlags_ReadOnly);
+                if (ImGui::BeginPopupContextItem("Source popup"))
+                {
+                    if (ImGui::BeginMenu("Move to artist"))
+                    {
+                        // Build and sort the artist list
+                        Array<Artist*> artists(size_t(0), m_db.NumArtists() - 1);
+                        for (Artist* artist : m_db.Artists())
+                        {
+                            if (artist != selectedArtist)
+                                artists.Add(artist);
+                        }
+                        std::sort(artists.begin(), artists.end(), [this](auto l, auto r)
+                        {
+                            return _stricmp(l->GetHandle(), r->GetHandle()) < 0;
+                        });
+
+                        // Select
+                        ImGuiListClipper clipper;
+                        clipper.Begin(artists.NumItems<int32_t>());
+                        while (clipper.Step())
+                        {
+                            for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
+                            {
+                                ImGui::PushID(static_cast<int>(artists[rowIdx]->GetId()));
+                                if (ImGui::Selectable(artists[rowIdx]->GetHandle(), false))
+                                {
+                                    moveToArtist = artists[rowIdx];
+                                    moveToArtistSourceIndex = uint32_t(&source - selectedArtist->Sources().begin());
+                                }
+                                ImGui::PopID();
+                            }
+                        }
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndPopup();
+                }
                 ImGui::PopID();
+            }
+            if (moveToArtist != nullptr)
+            {
+                moveToArtist->Edit()->sources.Add(selectedArtist->GetSource(moveToArtistSourceIndex));
+                selectedArtist->Edit()->sources.RemoveAt(moveToArtistSourceIndex);
             }
             ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.7f, 0.8f));
