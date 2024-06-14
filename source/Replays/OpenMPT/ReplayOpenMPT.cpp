@@ -299,6 +299,7 @@ namespace rePlayer
                 thread::Sleep(0);
             m_isSilenceDetectionCancelled = false;
             m_isSilenceDetectionRunning = true;
+            m_silenceStart = 0;
             g_replayPlugin.addJob(this, ReplayPlugin::JobCallback(SilenceDetection));
             m_previousSubsongIndex = m_subsongIndex;
         }
