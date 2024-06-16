@@ -1,4 +1,4 @@
-v0.15.20:
+v0.15.21:
 - Added Ayumi
 - Added Ken
 - Added Organya
@@ -14,6 +14,7 @@ v0.15.20:
 - Updated ImGui to 1.90.8
 - Updated libarchive to 3.7.4 as static library
 - Updated libcurl to 8.8.0 as static library with minimal content instead of full dynamic library
+- Updated libxml2 to 2.13.0
 - Updated TagLib to 2.0.1
 - Archive loader
 - Library auto merge option on download
