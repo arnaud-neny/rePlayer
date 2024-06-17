@@ -405,6 +405,8 @@ namespace rePlayer
 
     bool FileSelector::ScanDirectory(const fsPath& directory)
     {
+        if (!std::filesystem::exists(directory))
+            return false;
         auto path = std::filesystem::canonical(directory);
         if (m_directory.native().size() == path.native().size() && _wcsicmp(m_directory.native().c_str(), path.native().c_str()) == 0)
             return false;
