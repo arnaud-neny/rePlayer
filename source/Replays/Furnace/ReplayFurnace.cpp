@@ -17,6 +17,8 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+#include "furnace/src/engine/fileOps/fileOpsCommon.h"
+
 void reportError(String) {}
 
 namespace rePlayer
@@ -24,7 +26,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
-        .extensions = "fur;dmf;ftm;dnm;0cc;eft;tfm",
+        .extensions = "fur;dmf;ftm;dnm;0cc;eft;tfm;tfe",
         .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2024 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
@@ -34,14 +36,17 @@ namespace rePlayer
         auto size = stream->GetSize();
         auto data = new uint8_t[size_t(size)];
         stream->Read(data, size);
+        uint64_t magic;
+        memcpy(&magic, data, sizeof(magic));
         auto* engine = new DivEngine;
+        initLog(stdout); // could be nice to have an option to not link with logs...
         engine->preInit();
         if (engine->load(data, size_t(size), stream->GetName().c_str()) && engine->init())
         {
             engine->initDispatch(true);
             engine->renderSamplesP();
             engine->play();
-            return new ReplayFurnace(engine, stream->GetName().c_str());
+            return new ReplayFurnace(engine, stream->GetName().c_str(), magic);
         }
         engine->quit(false);
         delete engine;
@@ -55,8 +60,8 @@ namespace rePlayer
         delete m_engine;
     }
 
-    ReplayFurnace::ReplayFurnace(DivEngine* engine, const char* name)
-        : Replay(engine->song.isDMF ? eExtension::_dmf : ((engine->song.systemName == "Sega Genesis/Mega Drive or TurboSound FM") ? eExtension::_tfm : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur)), eReplay::Furnace)
+    ReplayFurnace::ReplayFurnace(DivEngine* engine, const char* name, uint64_t magic)
+        : Replay(engine->song.isDMF ? eExtension::_dmf : ((engine->song.systemName == "Sega Genesis/Mega Drive or TurboSound FM") ? (memcmp(&magic, DIV_TFM_MAGIC, sizeof(magic)) == 0) ? eExtension::_tfm : eExtension::_tfe : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur)), eReplay::Furnace)
         , m_engine(engine)
     {}
 

@@ -33,7 +33,7 @@ namespace rePlayer
         static constexpr uint32_t kMaxSamples = 2048;
 
     private:
-        ReplayFurnace(DivEngine* engine, const char* name);
+        ReplayFurnace(DivEngine* engine, const char* name, uint64_t magic);
         static eExtension GetFamitrackerExtension(const char* name);
 
     private:

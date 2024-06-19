@@ -160,10 +160,13 @@ bool DivEngine::load(unsigned char* f, size_t slen, const char* nameHint) {
     return loadTFMv2(file,len);
   }
 
+  // step 3: try loading as .mod or TFEv1 (if the file extension matches)
+  if (extS==".tfe") {
+    return loadTFMv1(file,len);
+  }
   // rePlayer begin
 /*
-  // step 3: try loading as .mod
-  if (loadMod(file,len)) {
+  else if (loadMod(file,len)) {
     delete[] f;
     return true;
   }
