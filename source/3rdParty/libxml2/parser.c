@@ -79,6 +79,10 @@
 #define URI_HASH_EMPTY  0xD943A04E
 #define URI_HASH_XML    0xF0451F02
 
+#ifndef STDIN_FILENO
+  #define STDIN_FILENO 0
+#endif
+
 struct _xmlStartTag {
     const xmlChar *prefix;
     const xmlChar *URI;
@@ -2529,9 +2533,6 @@ xmlPopInput(xmlParserCtxtPtr ctxt) {
  * @input:  an XML parser input fragment (entity, XML fragment ...).
  *
  * Push an input stream onto the stack.
- *
- * This makes the parser use an input returned from advanced functions
- * like xmlNewInputURL or xmlNewInputMemory.
  *
  * Returns -1 in case of error or the index in the input stack
  */
@@ -10493,12 +10494,9 @@ xmlParseDocument(xmlParserCtxtPtr ctxt) {
      */
     xmlCtxtInitializeLate(ctxt);
 
-    /*
-     * Document locator is unused. Only for backward compatibility.
-     */
     if ((ctxt->sax) && (ctxt->sax->setDocumentLocator)) {
-        xmlSAXLocator copy = xmlDefaultSAXLocator;
-        ctxt->sax->setDocumentLocator(ctxt->userData, &copy);
+        ctxt->sax->setDocumentLocator(ctxt->userData,
+                (xmlSAXLocator *) &xmlDefaultSAXLocator);
     }
 
     xmlDetectEncoding(ctxt);
@@ -10623,12 +10621,9 @@ xmlParseExtParsedEnt(xmlParserCtxtPtr ctxt) {
 
     xmlCtxtInitializeLate(ctxt);
 
-    /*
-     * Document locator is unused. Only for backward compatibility.
-     */
     if ((ctxt->sax) && (ctxt->sax->setDocumentLocator)) {
-        xmlSAXLocator copy = xmlDefaultSAXLocator;
-        ctxt->sax->setDocumentLocator(ctxt->userData, &copy);
+        ctxt->sax->setDocumentLocator(ctxt->userData,
+                (xmlSAXLocator *) &xmlDefaultSAXLocator);
     }
 
     xmlDetectEncoding(ctxt);
@@ -11092,8 +11087,8 @@ xmlParseTryOrFinish(xmlParserCtxtPtr ctxt, int terminate) {
 		    }
 		}
                 if ((ctxt->sax) && (ctxt->sax->setDocumentLocator)) {
-                    xmlSAXLocator copy = xmlDefaultSAXLocator;
-                    ctxt->sax->setDocumentLocator(ctxt->userData, &copy);
+                    ctxt->sax->setDocumentLocator(ctxt->userData,
+                            (xmlSAXLocator *) &xmlDefaultSAXLocator);
                 }
                 if ((ctxt->sax) && (ctxt->sax->startDocument) &&
                     (!ctxt->disableSAX))
@@ -12605,7 +12600,7 @@ xmlParseEntity(const char *filename) {
  * @ID:  the entity PUBLIC ID
  * @base:  a possible base for the target URI
  *
- * DEPRECATED: Use xmlNewInputURL.
+ * DEPRECATED: Don't use.
  *
  * Create a parser context for an external entity
  * Automatic support for ZLIB/Compress compressed document is provided
@@ -12748,7 +12743,10 @@ xmlSAXParseFileWithData(xmlSAXHandlerPtr sax, const char *filename,
         ctxt->recovery = 1;
     }
 
-    input = xmlNewInputURL(ctxt, filename, NULL, NULL, 0);
+    if ((filename != NULL) && (filename[0] == '-') && (filename[1] == 0))
+        input = xmlNewInputFd(ctxt, filename, STDIN_FILENO, NULL, 0);
+    else
+        input = xmlNewInputURL(ctxt, filename, NULL, NULL, 0);
 
     ret = xmlCtxtParseDocument(ctxt, input);
 
@@ -13770,7 +13768,15 @@ xmlReadFile(const char *filename, const char *encoding, int options)
 
     xmlCtxtUseOptions(ctxt, options);
 
-    input = xmlNewInputURL(ctxt, filename, NULL, encoding, 0);
+    /*
+     * Backward compatibility for users of command line utilities like
+     * xmlstarlet expecting "-" to mean stdin. This is dangerous and
+     * should be removed at some point.
+     */
+    if ((filename != NULL) && (filename[0] == '-') && (filename[1] == 0))
+        input = xmlNewInputFd(ctxt, filename, STDIN_FILENO, encoding, 0);
+    else
+        input = xmlNewInputURL(ctxt, filename, NULL, encoding, 0);
 
     doc = xmlCtxtParseDocument(ctxt, input);
 
@@ -13937,8 +13943,6 @@ xmlCtxtReadDoc(xmlParserCtxtPtr ctxt, const xmlChar *str,
  *
  * Parse an XML file from the filesystem, the network or a user-defined
  * resource loader.
- *
- * See xmlNewInputURL and xmlCtxtUseOptions for details.
  *
  * Returns the resulting document tree
  */

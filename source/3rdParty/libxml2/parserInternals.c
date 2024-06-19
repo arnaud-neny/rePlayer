@@ -180,12 +180,12 @@ xmlCtxtErrIO(xmlParserCtxtPtr ctxt, int code, const char *uri)
         return;
 
     /*
-     * Don't report a well-formedness error if an external entity could
-     * not be found. We assume that inputNr is zero for the document
-     * entity which is somewhat fragile.
+     * Only report a warning if a file could not be found. This should
+     * only be done for external entities, but the external entity loader
+     * of xsltproc can try multiple paths and assumes that ENOENT doesn't
+     * raise an error and aborts parsing.
      */
-    if ((ctxt->inputNr > 0) &&
-        ((code == XML_IO_ENOENT) ||
+    if (((code == XML_IO_ENOENT) ||
          (code == XML_IO_NETWORK_ATTEMPT) ||
          (code == XML_IO_UNKNOWN))) {
         if (ctxt->validate == 0)
@@ -1536,37 +1536,6 @@ xmlNewInputStream(xmlParserCtxtPtr ctxt) {
  * Creates a new parser input from the filesystem, the network or
  * a user-defined resource loader.
  *
- * @url is a filename or URL. If if contains the substring "://",
- * it is assumed to be a Legacy Extended IRI. Otherwise, it is
- * treated as a filesystem path.
- *
- * @publicId is an optional XML public ID, typically from a doctype
- * declaration. It is used for catalog lookups.
- *
- * If @encoding is specified, it will override any encodings found
- * in XML declarations, text declarations, BOMs, etc. Pass NULL
- * for auto-detection.
- *
- * The following resource loaders will be called if they were
- * registered (in order of precedence):
- *
- * - the global external entity loader set with
- *   xmlSetExternalEntityLoader
- * - the per-thread xmlParserInputBufferCreateFilenameFunc set with
- *   xmlParserInputBufferCreateFilenameDefault
- * - the default loader which will return
- *   - the result from a matching global input callback set with
- *     xmlRegisterInputCallbacks
- *   - a HTTP resource if support is compiled in.
- *   - a file opened from the filesystem, with automatic detection
- *     of compressed files if support is compiled in.
- *
- * The returned input can be passed to xmlCtxtParseDocument or
- * htmlCtxtParseDocument.
- *
- * This function should not be invoked from user-defined resource
- * loaders to avoid infinite loops.
- *
  * Returns a new parser input.
  */
 xmlParserInputPtr
@@ -2233,6 +2202,27 @@ xmlGetExternalEntityLoader(void) {
  * @URL:  the URL for the entity to load
  * @ID:  the Public ID for the entity to load
  * @ctxt:  the context in which the entity is called or NULL
+ *
+ * @URL is a filename or URL. If if contains the substring "://",
+ * it is assumed to be a Legacy Extended IRI. Otherwise, it is
+ * treated as a filesystem path.
+ *
+ * @ID is an optional XML public ID, typically from a doctype
+ * declaration. It is used for catalog lookups.
+ *
+ * The following resource loaders will be called if they were
+ * registered (in order of precedence):
+ *
+ * - the global external entity loader set with
+ *   xmlSetExternalEntityLoader
+ * - the per-thread xmlParserInputBufferCreateFilenameFunc set with
+ *   xmlParserInputBufferCreateFilenameDefault
+ * - the default loader which will return
+ *   - the result from a matching global input callback set with
+ *     xmlRegisterInputCallbacks
+ *   - a HTTP resource if support is compiled in.
+ *   - a file opened from the filesystem, with automatic detection
+ *     of compressed files if support is compiled in.
  *
  * Returns the xmlParserInputPtr or NULL
  */

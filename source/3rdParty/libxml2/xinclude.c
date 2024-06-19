@@ -334,7 +334,11 @@ xmlXIncludeParseFile(xmlXIncludeCtxtPtr ctxt, const char *URL) {
 	xmlDictReference(pctxt->dict);
     }
 
-    xmlCtxtUseOptions(pctxt, ctxt->parseFlags);
+    /*
+     * We set DTDLOAD to make sure that ID attributes declared in
+     * external DTDs are detected.
+     */
+    xmlCtxtUseOptions(pctxt, ctxt->parseFlags | XML_PARSE_DTDLOAD);
 
     inputStream = xmlLoadExternalEntity(URL, NULL, pctxt);
     if (inputStream == NULL)
@@ -1469,9 +1473,11 @@ loaded:
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
             ctxt->xpctxt->opLimit = 100000;
 #endif
+        } else {
+            ctxt->xpctxt->doc = doc;
         }
 	xptr = xmlXPtrEval(fragment, ctxt->xpctxt);
-	if (xptr == NULL) {
+	if (ctxt->xpctxt->lastError.code != XML_ERR_OK) {
             if (ctxt->xpctxt->lastError.code == XML_ERR_NO_MEMORY)
                 xmlXIncludeErrMemory(ctxt);
             else
@@ -1480,6 +1486,8 @@ loaded:
                                fragment);
             goto error;
 	}
+        if (xptr == NULL)
+            goto done;
 	switch (xptr->type) {
 	    case XPATH_UNDEFINED:
 	    case XPATH_BOOLEAN:
@@ -1559,6 +1567,7 @@ loaded:
     }
 #endif
 
+done:
     ret = 0;
 
 error:
