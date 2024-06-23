@@ -412,16 +412,12 @@ namespace rePlayer
         std::string info;
         char buf[128];
         sprintf(buf, "%d", openmpt_module_get_num_channels(m_modulePlayback));
-        info += buf;
-        info += " channels";
+        info = buf;
+        info += " channels\n";
         auto type = openmpt_module_get_metadata(m_modulePlayback, "type_long");
         if (type)
         {
-            if (type[0] != 0)
-            {
-                sprintf(buf, "\n%s", type);
-                info += buf;
-            }
+            info += type;
             openmpt_free_string(type);
         }
         info += "\nOpenMPT " OPENMPT_API_VERSION_STRING;
