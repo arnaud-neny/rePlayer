@@ -23,7 +23,13 @@ namespace rePlayer
         static constexpr eExtension kExtension_qsfPk = eExtension::_rar;
         static constexpr eExtension kExtension_gsfPk = eExtension::_7z;
         static constexpr eExtension kExtension_2sfPk = eExtension::_gz;
-        if (m_db.SongsVersion() < kSongsVersionWithArchive)
+        static constexpr eExtension kExtension_ssfPk = eExtension::_liq;
+        static constexpr eExtension kExtension_dsfPk = eExtension::_rtm;
+        static constexpr eExtension kExtension_psfPk = eExtension::_mgt;
+        static constexpr eExtension kExtension_psf2Pk = eExtension::_fnk;
+        static constexpr eExtension kExtension_usfPk = eExtension::_arch;
+        static constexpr eExtension kExtension_snsfPk = eExtension::_coco;
+                    if (m_db.SongsVersion() < kSongsVersionWithArchive)
         {
             for (auto* song : m_db.Songs())
             {
@@ -57,12 +63,12 @@ namespace rePlayer
                 case kExtension_qsfPk:
                 case kExtension_gsfPk:
                 case kExtension_2sfPk:
-                case eExtension::_ssfPk:
-                case eExtension::_dsfPk:
-                case eExtension::_psfPk:
-                case eExtension::_psf2Pk:
-                case eExtension::_usfPk:
-                case eExtension::_snsfPk:
+                case kExtension_ssfPk:
+                case kExtension_dsfPk:
+                case kExtension_psfPk:
+                case kExtension_psf2Pk:
+                case kExtension_usfPk:
+                case kExtension_snsfPk:
                 {
                     auto oldFilename = m_songs->GetFullpath(song);
                     auto songSheet = song->Edit();
@@ -70,11 +76,11 @@ namespace rePlayer
                         : ext == kExtension_qsfPk ? eExtension::_miniqsf
                         : ext == kExtension_gsfPk ? eExtension::_minigsf
                         : ext == kExtension_2sfPk ? eExtension::_mini2sf
-                        : ext == eExtension::_ssfPk ? eExtension::_minissf
-                        : ext == eExtension::_dsfPk ? eExtension::_minidsf
-                        : ext == eExtension::_psfPk ? eExtension::_minipsf
-                        : ext == eExtension::_psf2Pk ? eExtension::_minipsf2
-                        : ext == eExtension::_usfPk ? eExtension::_miniusf
+                        : ext == kExtension_ssfPk ? eExtension::_minissf
+                        : ext == kExtension_dsfPk ? eExtension::_minidsf
+                        : ext == kExtension_psfPk ? eExtension::_minipsf
+                        : ext == kExtension_psf2Pk ? eExtension::_minipsf2
+                        : ext == kExtension_usfPk ? eExtension::_miniusf
                         : eExtension::_minisnsf;
                     songSheet->subsongs[0].isPackage = false;
                     songSheet->subsongs[0].isArchive = true;

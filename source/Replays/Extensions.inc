@@ -1,46 +1,46 @@
 //just add at the end of the list new extensions
 EXTENSION(mptm)
-EXTENSION(mod)
-EXTENSION(s3m)
-EXTENSION(xm)
-EXTENSION(it)
-EXTENSION(669)
-EXTENSION(amf)
+EXTENSION(mod)          // OpenMPT & XMP
+EXTENSION(s3m)          // OpenMPT & XMP
+EXTENSION(xm)           // OpenMPT & XMP
+EXTENSION(it)           // OpenMPT & XMP
+EXTENSION(669)          // OpenMPT & XMP
+EXTENSION(amf)          // OpenMPT & XMP
 EXTENSION(ams)
 EXTENSION(c67)
-EXTENSION(dbm)          // OpenMPT & VGMStream: Konami MTA2
+EXTENSION(dbm)          // OpenMPT & XMP & VGMStream: Konami MTA2
 EXTENSION(digi)
 EXTENSION(dmf)
 EXTENSION(dsm)
 EXTENSION(dtm)
-EXTENSION(far)
-EXTENSION(imf)          // OpenMPT & VGMStream: MPEG
+EXTENSION(far)          // OpenMPT & XMP
+EXTENSION(imf)          // OpenMPT & XMP & VGMStream: MPEG
 EXTENSION(ice)
 EXTENSION(j2b)
 EXTENSION(m15)
-EXTENSION(mdl)
-EXTENSION(med)          // OpenMPT & UADE: Octa-MED & VGMStream
+EXTENSION(mdl)          // OpenMPT & XMP
+EXTENSION(med)          // OpenMPT & XMP & UADE: Octa-MED & VGMStream
 EXTENSION(mms)          // OpenMPT & UADE: MultiMedia_Sound
 EXTENSION(mt2)
-EXTENSION(mtm)
+EXTENSION(mtm)          // OpenMPT & XMP
 EXTENSION(nst)
-EXTENSION(okt)          // OpenMPT & UADE: Oktalyzer
+EXTENSION(okt)          // OpenMPT & XMP & UADE: Oktalyzer
 EXTENSION(plm)
-EXTENSION(psm)          // ZXTune: Pro Sound Maker
+EXTENSION(psm)          // OpenMPT & XMP & ZXTune: Pro Sound Maker
 EXTENSION(pt36)
-EXTENSION(ptm)
-EXTENSION(sfx)          // OpenMPT & UADE: Sound-FX & VGMStream: FMOD FSB
+EXTENSION(ptm)          // OpenMPT & XMP
+EXTENSION(sfx)          // OpenMPT & XMP & UADE: Sound-FX & VGMStream: FMOD FSB
 EXTENSION(sfx2)
 EXTENSION(st26)
-EXTENSION(stk)
-EXTENSION(stm)          // OpenMPT & VGMStream
+EXTENSION(stk)          // OpenMPT & XMP
+EXTENSION(stm)          // OpenMPT & XMP & VGMStream
 EXTENSION(stp)          // ZXTune: Sound Tracker Pro
-EXTENSION(ult)
+EXTENSION(ult)          // OpenMPT & XMP
 EXTENSION(wow)
-EXTENSION(gdm)
+EXTENSION(gdm)          // OpenMPT & XMP
 EXTENSION(mo3)
 EXTENSION(oxm)
-EXTENSION(umx)
+EXTENSION(umx)          // OpenMPT & XMP
 EXTENSION(xpk)
 EXTENSION(ppm)
 EXTENSION(mmcmp)
@@ -48,10 +48,10 @@ EXTENSION(hvl)
 EXTENSION(ahx)          // Hively & VGMStream: CRI AHX
 EXTENSION(bp)           // SoundMon & UAE: SoundMon2.0
 EXTENSION(ym)           // ZXTune: ST-Sound
-EXTENSION(dsym)
+EXTENSION(dsym)         // OpenMPT & XMP
 EXTENSION(fmt)
 EXTENSION(mus)          // OpenMPT: ? & Sidplay: ? & UADE: UFO & NEZplug: FAC SoundTracker & VGMStream: Krome MUSC
-EXTENSION(stx)          // OpenMPT & VGMStream
+EXTENSION(stx)          // OpenMPT & XMP & VGMStream
 EXTENSION(symmod)
 EXTENSION(smod)
 EXTENSION(fc)
@@ -71,9 +71,9 @@ EXTENSION(cmf)
 EXTENSION(d00)
 EXTENSION(dfm)
 EXTENSION(hsp)
-EXTENSION(ksm)          // Adlib: Ken's Silverman & Ken
+EXTENSION(ksm)          // Adlib: Ken's Silverman & Ken & XMP
 EXTENSION(mad)          // Adlib & VGMStream: Electronic Arts SCHl
-EXTENSION(ims)          // Adlib: Midi/IMS & UADE: ImagesMusicSystem
+EXTENSION(ims)          // Adlib: Midi/IMS & XMP & UADE: ImagesMusicSystem
 EXTENSION(mdi)
 EXTENSION(mid)
 EXTENSION(sci)
@@ -152,7 +152,7 @@ EXTENSION(aps)          // UADE: AProSys
 EXTENSION(ast)          // UADE: ActionAmics & VGMStream: Nintendo AST
 EXTENSION(adpcm)        // UADE: ADPCM_mono & VGMStream: RIFF WAVE
 EXTENSION(amc)          // UADE: AM-Composer
-EXTENSION(abk)          // UADE: AMOS & VGMStream: Electronic Arts BNK
+EXTENSION(abk)          // UADE & XMP: AMOS & VGMStream: Electronic Arts BNK
 EXTENSION(hot)          // UADE: Anders_0land
 EXTENSION(aam)          // UADE: ArtAndMagic
 EXTENSION(alp)          // UADE: Alcatraz_Packer
@@ -193,7 +193,7 @@ EXTENSION(gmc)          // UADE: GMC
 EXTENSION(ea)           // UADE: EarAche
 EXTENSION(hd)           // UADE: HowieDavies
 EXTENSION(hipc)         // UADE: JochenHippel-CoSo
-EXTENSION(emod)         // UADE: QuadraComposer
+EXTENSION(emod)         // UADE & XMP: QuadraComposer
 EXTENSION(dum)          // UADE: Infogrames
 EXTENSION(is)           // UADE: InStereo
 EXTENSION(is20)         // UADE: InStereo2.0
@@ -213,7 +213,7 @@ EXTENSION(kh)           // UADE: KrisHatlelid
 EXTENSION(pt)           // UADE: Laxity
 EXTENSION(lme)          // UADE: LegglessMusicEditor
 EXTENSION(mon)          // UADE: ManiacsOfNoise
-EXTENSION(mfp)          // UADE: MagneticFieldsPacker
+EXTENSION(mfp)          // UADE & XMP: MagneticFieldsPacker
 EXTENSION(hn)           // UADE: MajorTom
 EXTENSION(mc)           // UADE: Mark_Cooksey
 EXTENSION(mco)          // UADE: Mark_Cooksey_Old
@@ -230,7 +230,7 @@ EXTENSION(ma)           // UADE: MusicAssembler
 EXTENSION(mm4)          // UADE: MusicMaker-4V
 EXTENSION(mm8)          // UADE: MusicMaker-8V
 EXTENSION(npp)          // UADE: Nick_Pelling_Packer
-EXTENSION(ntp)          // UADE: NovoTradePacker
+EXTENSION(ntp)          // UADE & XMP: NovoTradePacker
 EXTENSION(two)          // UADE: NTSP-system
 EXTENSION(one)          // UADE: onEscapee
 EXTENSION(dat)          // UADE: PaulRobotham
@@ -244,7 +244,7 @@ EXTENSION(psa)          // UADE: ProfessionalSoundArtists
 EXTENSION(puma)         // UADE: PumaTracker
 EXTENSION(rj)           // UADE: RichardJoseph
 EXTENSION(rjp)          // UADE: RichardJoseph_Player
-EXTENSION(riff)         // UADE: RiffRaff
+EXTENSION(riff)         // UADE: RiffRaff & XMP: Galaxy Music System 4.0
 EXTENSION(rh)           // UADE: RobHubbard
 EXTENSION(rho)          // UADE: RobHubbard_ST
 EXTENSION(scumm)        // UADE: SCUMM
@@ -314,32 +314,32 @@ EXTENSION(pis)          // AdLib: Beni Tracker
 EXTENSION(667)          // OpenMPT: Composer 667
 EXTENSION(gtk)          // OpenMPT: Gramouf Tracker
 EXTENSION(gt2)          // OpenMPT: Gramouf Tracker
-EXTENSION(xmf)          // OpenMPT
+EXTENSION(xmf)          // OpenMPT & XMP
 EXTENSION(mdat)         // TFMX & UADE: TFMX
 EXTENSION(ttt)          // TIATracker
 EXTENSION(mini2sf)      // vio2sf
 EXTENSION(gz)           // archive
 EXTENSION(minissf)      // Highly Theoretical
-EXTENSION(ssfPk)        // deprecated (turned into 7z)
+EXTENSION(liq)          // XMP: Liquid Tracker
 EXTENSION(minidsf)      // Highly Theoretical
-EXTENSION(dsfPk)        // deprecated (turned into 7z)
+EXTENSION(rtm)          // XMP: Real Tracker
 EXTENSION(ssf)          // Highly Theoretical
 EXTENSION(dsf)          // Highly Theoretical & DSD & VGMStream: Ocean DSF
 EXTENSION(gsf)          // Highly Advanced & VGMStream: Electronic Arts SCHl
 EXTENSION(2sf)          // vio2sf
 EXTENSION(minipsf)      // Highly Experimental
-EXTENSION(psfPk)        // deprecated (turned into 7z)
+EXTENSION(mgt)          // XMP: Megatracker
 EXTENSION(psf2)         // Highly Experimental
 EXTENSION(minipsf2)     // Highly Experimental
-EXTENSION(psf2Pk)       // deprecated (turned into 7z)
+EXTENSION(fnk)          // XMP: Funktracker
 EXTENSION(usf)          // LazyUSF
 EXTENSION(miniusf)      // LazyUSF
-EXTENSION(usfPk)        // deprecated (turned into 7z)
+EXTENSION(arch)         // XMP: Archimedes Tracker
 EXTENSION(tf)           // UADE: TimFollin
 EXTENSION(cust)         // UADE: custom
 EXTENSION(snsf)         // Highly Competitive
 EXTENSION(minisnsf)     // Highly Competitive
-EXTENSION(snsfPk)       // deprecated (turned into 7z)
+EXTENSION(coco)         // XMP: Coconizer
 EXTENSION(prt)          // UADE: PreTracker
 EXTENSION(mtr)          // Adlib: Master Tracker
 EXTENSION(buz2)         // Buzzic 2

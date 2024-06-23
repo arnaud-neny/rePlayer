@@ -1,0 +1,649 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libxmp">
+      <UniqueIdentifier>{6b7dacd5-4f8a-4709-b163-bb5a2edb2ead}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libxmp\include">
+      <UniqueIdentifier>{1ad9b21c-711e-41af-b710-b1f55832677f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libxmp\src">
+      <UniqueIdentifier>{7557b7b5-6991-41fa-9be1-64c505a80781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libxmp\src\depackers">
+      <UniqueIdentifier>{9c293383-5c7e-4184-8458-fdeb6797623b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libxmp\src\loaders">
+      <UniqueIdentifier>{678a8c9e-1474-47de-be2a-3bd2b80201fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libxmp\src\loaders\prowizard">
+      <UniqueIdentifier>{2d262cd2-259c-43a8-bb79-ef4fe566c230}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayXMP.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\include\xmp.h">
+      <Filter>Source Files\libxmp\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\callbackio.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\common.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\effects.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\extras.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\far_extras.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\format.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\hio.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\hmn_extras.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\lfo.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\list.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\md5.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\mdataio.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\med_extras.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\memio.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\miniz.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\mixer.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\paula.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\period.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\player.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\precomp_blep.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\precomp_lut.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\tempfile.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\virtual.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\arc_unpack.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\crc32.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\depacker.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lzx_unpack.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\miniz_zip.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\ptpopen.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xfnmatch.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xz.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xz_config.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xz_lzma2.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xz_private.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\xz_stream.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\iff.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\it.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\loader.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\lzw.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\med.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\mod.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\s3m.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\vorbis.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\xm.h">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\loaders\prowizard\prowiz.h">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayXMP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\control.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\dataio.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\effects.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\extras.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\far_extras.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\filetype.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\filter.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\format.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\hio.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\hmn_extras.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\lfo.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\load.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\load_helpers.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\md5.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\med_extras.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\memio.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\miniz_tinfl.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\misc.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\mix_all.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\mix_paula.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\mixer.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\mkstemp.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\period.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\player.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\read_event.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\scan.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\smix.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\tempfile.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\virtual.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\win32.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\arc.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\arc_unpack.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\arcfs.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\bunzip2.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\crc32.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\depacker.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\gunzip.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lzx.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lzx_unpack.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\miniz_zip.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\mmcmp.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\ppdepack.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\ptpopen.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\s404_dec.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\uncompress.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\unlha.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\unsqsh.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\unxz.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\unzip.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\xfd.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\xfd_link.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\xfnmatch.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\xz_dec_lzma2.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\xz_dec_stream.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\669_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\abk_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\amf_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\arch_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\asylum_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\chip_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\coco_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\common.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\dbm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\digi_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\dt_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\emod_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\far_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\flt_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\fnk_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\gal4_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\gal5_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\gdm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\hmn_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\ice_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\iff.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\imf_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\ims_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\it_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\itsex.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\liq_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\lzw.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\masi_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\masi16_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mdl_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\med2_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\med3_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\med4_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mfp_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mgt_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mmd_common.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mmd1_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mmd3_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mod_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\mtm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\muse_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\no_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\okt_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\pt3_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\ptm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\pw_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\rtm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\s3m_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\sample.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\sfx_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\st_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\stim_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\stm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\stx_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\sym_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\ult_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\umx_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\voltable.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\vorbis.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\xm_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\xmf_load.c">
+      <Filter>Source Files\libxmp\src\loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\ac1d.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\di.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\eureka.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\fc-m.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\fuchs.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\fuzzac.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\gmc.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\heatseek.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\hrt.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\ksm.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\mp.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\noiserun.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\novotrade.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\np1.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\np2.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\np3.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\p40.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\p61a.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\pha.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\pm10c.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\pm18a.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\pp10.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\pp21.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\prowiz.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\prun1.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\prun2.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\ptktable.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\skyt.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\starpack.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\tdd.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\theplayer.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\titanics.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\tp1.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\tp3.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\tuning.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\unic.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\unic2.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\wn.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\xann.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\loaders\prowizard\zen.c">
+      <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libxmp\README">
+      <Filter>Source Files\libxmp</Filter>
+    </None>
+  </ItemGroup>
+</Project>
