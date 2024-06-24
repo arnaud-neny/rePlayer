@@ -69,6 +69,7 @@ namespace rePlayer
         void EditTags();
         bool Discard();
         void ResetReplay();
+        void ResetSubsongState();
 
     private:
         enum TabIDs

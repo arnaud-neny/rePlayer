@@ -767,6 +767,11 @@ namespace rePlayer
                 ResetReplay();
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Reset state"))
+            {
+                ResetSubsongState();
+                ImGui::EndMenu();
+            }
         }
     }
 
@@ -916,38 +921,92 @@ namespace rePlayer
 
     void DatabaseSongsUI::ResetReplay()
     {
-        std::string resetLabel;
-        for (auto& entry : m_entries)
+        for (uint32_t i = 0; i < uint32_t(eReplay::Count); i++)
         {
-            if (entry.isSelected)
+            if (ImGui::BeginMenu(MediaType::replayNames[i]))
             {
-                auto discardSong = m_db[entry.id];
-                resetLabel += "[";
-                resetLabel += discardSong->GetType().GetExtension();
-                resetLabel += "] ";
-                resetLabel += m_db.GetArtists(entry.id.songId);
-                resetLabel += " - ";
-                resetLabel += m_db.GetTitle(entry.id);
-                resetLabel += "\n";
-            }
-        }
-        auto pos = ImGui::GetCursorPos();
-        if (ImGui::Selectable("##ResetList", false, 0, ImGui::CalcTextSize(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size())))
-        {
-            for (auto& entry : m_entries)
-            {
-                if (entry.isSelected)
+                std::string resetLabel;
+                for (auto& entry : m_entries)
                 {
-                    auto* song = m_db[entry.id]->Edit();
-                    song->type.replay = eReplay::Unknown;
-                    for (auto& subsong : song->subsongs)
-                        subsong.isPlayed = false;
+                    if (entry.isSelected)
+                    {
+                        auto discardSong = m_db[entry.id];
+                        resetLabel += "[";
+                        resetLabel += discardSong->GetType().GetExtension();
+                        resetLabel += "] ";
+                        resetLabel += m_db.GetArtists(entry.id.songId);
+                        resetLabel += " - ";
+                        resetLabel += m_db.GetTitle(entry.id);
+                        resetLabel += "\n";
+                    }
                 }
+                auto pos = ImGui::GetCursorPos();
+                if (ImGui::Selectable("##ResetList", false, 0, ImGui::CalcTextSize(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size())))
+                {
+                    for (auto& entry : m_entries)
+                    {
+                        if (entry.isSelected)
+                        {
+                            auto* song = m_db[entry.id]->Edit();
+                            if (song->type.replay != eReplay(i))
+                            {
+                                song->type.replay = eReplay(i);
+                                for (auto& subsong : song->subsongs)
+                                    subsong.isPlayed = false;
+                            }
+                        }
+                    }
+                    m_db.Raise(Database::Flag::kSaveSongs);
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SetCursorPos(pos);
+                ImGui::TextUnformatted(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size());
+                ImGui::EndMenu();
             }
-            ImGui::CloseCurrentPopup();
         }
-        ImGui::SetCursorPos(pos);
-        ImGui::TextUnformatted(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size());
+    }
+
+    void DatabaseSongsUI::ResetSubsongState()
+    {
+        for (uint32_t i = 0; i < kNumSubsongStates; i++)
+        {
+            static const char* const subsongStates[] = { "Undefined", "Stop", "Fade Out", "Loop Once" };
+            if (ImGui::BeginMenu(subsongStates[i]))
+            {
+                std::string resetLabel;
+                for (auto& entry : m_entries)
+                {
+                    if (entry.isSelected)
+                    {
+                        auto discardSong = m_db[entry.id];
+                        resetLabel += "[";
+                        resetLabel += discardSong->GetType().GetExtension();
+                        resetLabel += "] ";
+                        resetLabel += m_db.GetArtists(entry.id.songId);
+                        resetLabel += " - ";
+                        resetLabel += m_db.GetTitle(entry.id);
+                        resetLabel += "\n";
+                    }
+                }
+                auto pos = ImGui::GetCursorPos();
+                if (ImGui::Selectable("##ResetList", false, 0, ImGui::CalcTextSize(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size())))
+                {
+                    for (auto& entry : m_entries)
+                    {
+                        if (entry.isSelected)
+                        {
+                            auto* song = m_db[entry.id]->Edit();
+                            song->subsongs[entry.id.index].state = SubsongState(i);
+                        }
+                    }
+                    m_db.Raise(Database::Flag::kSaveSongs);
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SetCursorPos(pos);
+                ImGui::TextUnformatted(resetLabel.c_str(), resetLabel.c_str() + resetLabel.size());
+                ImGui::EndMenu();
+            }
+        }
     }
 }
 // namespace rePlayer
