@@ -19,7 +19,7 @@ namespace rePlayer
 
     #define REPLAY(a, b) #a,
     const char* const MediaType::replayNames[] = {
-        "Dummy",
+        "Unknown",
         #include "Replays.inc"
     };
     #undef REPLAY

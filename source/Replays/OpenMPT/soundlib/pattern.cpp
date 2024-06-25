@@ -135,6 +135,7 @@ void CPattern::Deallocate()
 {
 	m_Rows = m_RowsPerBeat = m_RowsPerMeasure = 0;
 	m_ModCommands.clear();
+	m_tempoSwing.clear();
 	m_PatternName.clear();
 }
 
@@ -368,9 +369,9 @@ bool CPattern::WriteEffect(EffectWriter &settings)
 					m->command = settings.m_command;
 
 					if(isS3M)
-						m->vol = static_cast<uint8>((m->param + 1u) / 2u);
+						m->vol = static_cast<ModCommand::VOL>((m->param + 1u) / 2u);
 					else
-						m->vol = static_cast<uint8>((m->param + 2u) / 4u);
+						m->vol = static_cast<ModCommand::VOL>((m->param + 2u) / 4u);
 
 					m->param = settings.m_param;
 					return true;

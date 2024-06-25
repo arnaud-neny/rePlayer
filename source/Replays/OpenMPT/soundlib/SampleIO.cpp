@@ -11,13 +11,13 @@
 
 
 #include "stdafx.h"
-#include "Loaders.h"
 #include "SampleIO.h"
-#include "openmpt/soundbase/SampleDecode.hpp"
+#include "BitReader.h"
+#include "ITCompression.h"
+#include "Loaders.h"
+#include "ModSampleCopy.h"
 #include "SampleCopy.h"
 #include "SampleNormalize.h"
-#include "ModSampleCopy.h"
-#include "ITCompression.h"
 #ifndef MODPLUG_NO_FILESAVE
 #include "../common/mptFileIO.h"
 #include "mpt/io/base.hpp"
@@ -25,7 +25,7 @@
 #include "mpt/io/io_stdstream.hpp"
 #include "mpt/io_write/buffer.hpp"
 #endif
-#include "BitReader.h"
+#include "openmpt/soundbase/SampleDecode.hpp"
 
 
 OPENMPT_NAMESPACE_BEGIN
@@ -41,12 +41,12 @@ size_t SampleIO::ReadSample(ModSample &sample, FileReader &file) const
 
 	LimitMax(sample.nLength, MAX_SAMPLE_LENGTH);
 
-	FileReader::off_t bytesRead = 0;	// Amount of memory that has been read from file
+	FileReader::pos_type bytesRead = 0;	// Amount of memory that has been read from file
 
-	FileReader::off_t filePosition = file.GetPosition();
+	FileReader::pos_type filePosition = file.GetPosition();
 	const std::byte * sourceBuf = nullptr;
 	FileReader::PinnedView restrictedSampleDataView;
-	FileReader::off_t fileSize = 0;
+	FileReader::pos_type fileSize = 0;
 	if(UsesFileReaderForDecoding())
 	{
 		sourceBuf = nullptr;
@@ -69,7 +69,7 @@ size_t SampleIO::ReadSample(ModSample &sample, FileReader &file) const
 		// However, for ProTracker MODs we need to support samples exceeding the end of file
 		// (see the comment about MOD.shorttune2 in Load_mod.cpp), so as a semi-arbitrary threshold,
 		// we do not apply this limit to samples shorter than 256K.
-		size_t maxLength = fileSize - std::min(GetEncodedHeaderSize(), fileSize);
+		std::size_t maxLength = static_cast<std::size_t>(fileSize) - std::min(GetEncodedHeaderSize(), static_cast<std::size_t>(fileSize));
 		uint8 bps = GetEncodedBitsPerSample();
 		if(bps % 8u != 0)
 		{
@@ -146,7 +146,7 @@ size_t SampleIO::ReadSample(ModSample &sample, FileReader &file) const
 		if(file.ReadArray(compressionTable))
 		{
 			size_t readLength = (sample.nLength + 1) / 2;
-			LimitMax(readLength, file.BytesLeft());
+			LimitMax(readLength, mpt::saturate_cast<std::size_t>(file.BytesLeft()));
 
 			const uint8 *inBuf = mpt::byte_cast<const uint8*>(sourceBuf) + sizeof(compressionTable);
 			int8 *outBuf = sample.sample8();

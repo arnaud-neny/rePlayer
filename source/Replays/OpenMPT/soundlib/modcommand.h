@@ -108,6 +108,15 @@ enum EffectCommand : uint8
 	CMD_OFFSETPERCENTAGE    = 44, // PLM Percentage Offset
 	CMD_DIGIREVERSESAMPLE   = 45, // DIGI reverse sample
 	CMD_VOLUME8             = 46, // 8-bit volume
+	CMD_HMN_MEGA_ARP        = 47, // His Master's Noise "mega-arp"
+	CMD_MED_SYNTH_JUMP      = 48, // MED synth jump / MIDI panning
+	CMD_AUTO_VOLUMESLIDE    = 49,
+	CMD_AUTO_PORTAUP        = 50,
+	CMD_AUTO_PORTADOWN      = 51,
+	CMD_AUTO_PORTAUP_FINE   = 52,
+	CMD_AUTO_PORTADOWN_FINE = 53,
+	CMD_TONEPORTA_DURATION  = 54, // Parameter = how many rows the slide should last
+	CMD_VOLUMEDOWN_DURATION = 55, // Parameter = how many rows the slide should last
 	MAX_EFFECTS
 };
 
@@ -191,7 +200,7 @@ public:
 	bool IsNoteOrEmpty() const { return note == NOTE_NONE || IsNote(); }
 	static bool IsNoteOrEmpty(NOTE note) { return note == NOTE_NONE || IsNote(note); }
 	// Returns true if any of the commands in this cell trigger a tone portamento.
-	bool IsPortamento() const { return command == CMD_TONEPORTAMENTO || command == CMD_TONEPORTAVOL || volcmd == VOLCMD_TONEPORTAMENTO; }
+	bool IsTonePortamento() const { return command == CMD_TONEPORTAMENTO || command == CMD_TONEPORTAVOL || command == CMD_TONEPORTA_DURATION || volcmd == VOLCMD_TONEPORTAMENTO; }
 	// Returns true if any commands in this cell trigger any sort of pitch slide / portamento.
 	bool IsAnyPitchSlide() const;
 	// Returns true if the cell contains a sliding or otherwise continuous effect command.
@@ -205,7 +214,7 @@ public:
 	// Returns true if the cell contains an effect command whose parameter is divided into two nibbles
 	bool CommandHasTwoNibbles() const { return CommandHasTwoNibbles(command); }
 	static bool CommandHasTwoNibbles(COMMAND command);
-	// Returns true if the two commands' parameters have the same 
+	// Returns true if the command is a regular volume slide
 	bool IsNormalVolumeSlide() const { return command == CMD_VOLUMESLIDE || command == CMD_VIBRATOVOL || command == CMD_TONEPORTAVOL; }
 
 	// Returns true if the note is inside the Amiga frequency range

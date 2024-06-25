@@ -79,9 +79,8 @@ bool CSoundFile::ReadWAV(FileReader &file, ModLoadingFlags loadFlags)
 		return true;
 	}
 
-	InitializeGlobals(MOD_TYPE_MPT);
+	InitializeGlobals(MOD_TYPE_MPT, std::max(wavFile.GetNumChannels(), uint16(2)));
 	m_ContainerType = ModContainerType::WAV;
-	m_nChannels = std::max(wavFile.GetNumChannels(), uint16(2));
 	Patterns.ResizeArray(2);
 	if(!Patterns.Insert(0, 64) || !Patterns.Insert(1, 64))
 	{
@@ -111,13 +110,12 @@ bool CSoundFile::ReadWAV(FileReader &file, ModLoadingFlags loadFlags)
 
 	m_nSamples = wavFile.GetNumChannels();
 	m_nInstruments = 0;
-	m_nDefaultSpeed = ticksPerRow;
-	m_nDefaultTempo.Set(125);
+	Order().SetDefaultSpeed(ticksPerRow);
+	Order().SetDefaultTempoInt(125);
 	m_SongFlags = SONG_LINEARSLIDES;
 
-	for(CHANNELINDEX channel = 0; channel < m_nChannels; channel++)
+	for(CHANNELINDEX channel = 0; channel < GetNumChannels(); channel++)
 	{
-		ChnSettings[channel].Reset();
 		ChnSettings[channel].nPan = (channel % 2u) ? 256 : 0;
 	}
 

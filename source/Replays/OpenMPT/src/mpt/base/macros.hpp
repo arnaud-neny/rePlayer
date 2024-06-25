@@ -51,6 +51,14 @@
 
 
 #if MPT_CXX_AT_LEAST(20)
+#define MPT_CONSTEVAL_NOEXCEPT noexcept
+#else // !C++20
+#define MPT_CONSTEVAL_NOEXCEPT
+#endif // C++20
+
+
+
+#if MPT_CXX_AT_LEAST(20)
 // this assumes that for C++20, a consteval function will be used
 #define MPT_FORCE_CONSTEVAL_EXPRESSION(expr) (expr)
 #define MPT_FORCE_CONSTEVAL_VALUE(val)       (val)
@@ -141,6 +149,30 @@
 #else
 #define MPT_RESTRICT
 #endif
+
+
+
+#if MPT_CXX_AT_LEAST(23)
+#define MPT_ASSUME(expr) [[assume(expr)]]
+#else // !C++23
+#if MPT_COMPILER_CLANG
+#define MPT_ASSUME(expr) __builtin_assume(expr)
+#endif
+#if MPT_COMPILER_MSVC
+#define MPT_ASSUME(expr) __assume(expr)
+#endif
+#if MPT_COMPILER_GCC
+#define MPT_ASSUME(expr) \
+	do { \
+		if (!expr) { \
+			__builtin_unreachable(); \
+		} \
+	} while (0)
+#endif
+#if !defined(MPT_ASSUME)
+#define MPT_ASSUME(expr) MPT_DISCARD(expr)
+#endif
+#endif // C++23
 
 
 

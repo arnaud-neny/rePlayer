@@ -211,7 +211,7 @@ struct AMFFInstrumentHeader
 		static_assert(mpt::array_size<decltype(sampleMap)>::size <= mpt::array_size<decltype(mptIns.Keyboard)>::size);
 		for(size_t i = 0; i < std::size(sampleMap); i++)
 		{
-			mptIns.Keyboard[i] = sampleMap[i] + baseSample + 1;
+			mptIns.Keyboard[i] = static_cast<SAMPLEINDEX>(sampleMap[i] + baseSample + 1);
 		}
 
 		mptIns.nFadeOut = fadeout << 5;
@@ -393,7 +393,7 @@ struct AMInstrumentHeader
 		static_assert(mpt::array_size<decltype(sampleMap)>::size <= mpt::array_size<decltype(mptIns.Keyboard)>::size);
 		for(uint8 i = 0; i < std::size(sampleMap); i++)
 		{
-			mptIns.Keyboard[i] = sampleMap[i] + baseSample + 1;
+			mptIns.Keyboard[i] = static_cast<SAMPLEINDEX>(sampleMap[i] + baseSample + 1);
 		}
 
 		mptIns.nFadeOut = volEnv.fadeout << 5;
@@ -430,8 +430,8 @@ struct AMSampleHeader
 	void ConvertToMPT(AMInstrumentHeader &instrHeader, ModSample &mptSmp) const
 	{
 		mptSmp.Initialize();
-		mptSmp.nPan = std::min(pan.get(), uint16(32767)) * 256 / 32767;
-		mptSmp.nVolume = std::min(volume.get(), uint16(32767)) * 256 / 32767;
+		mptSmp.nPan = static_cast<uint16>(std::min(pan.get(), uint16(32767)) * 256 / 32767);
+		mptSmp.nVolume = static_cast<uint16>(std::min(volume.get(), uint16(32767)) * 256 / 32767);
 		mptSmp.nGlobalVol = 64;
 		mptSmp.nLength = length;
 		mptSmp.nLoopStart = loopStart;
@@ -568,11 +568,11 @@ static bool ConvertAMPattern(FileReader chunk, PATTERNINDEX pat, bool isAM, CSou
 					if (m.param & 0xF0) m.param &= 0xF0;
 					break;
 				case CMD_PANNING8:
-					if(m.param <= 0x80) m.param = mpt::saturate_cast<uint8>(m.param * 2);
-					else if(m.param == 0xA4) {m.command = CMD_S3MCMDEX; m.param = 0x91;}
+					if(m.param <= 0x80) m.param = mpt::saturate_cast<ModCommand::PARAM>(m.param * 2);
+					else if(m.param == 0xA4) m.SetEffectCommand(CMD_S3MCMDEX, 0x91u);
 					break;
 				case CMD_PATTERNBREAK:
-					m.param = ((m.param >> 4) * 10) + (m.param & 0x0F);
+					m.param = static_cast<ModCommand::PARAM>(((m.param >> 4) * 10u) + (m.param & 0x0Fu));
 					break;
 				case CMD_MODCMDEX:
 					m.ExtendedMODtoS3MEffect();
@@ -612,7 +612,7 @@ static bool ConvertAMPattern(FileReader chunk, PATTERNINDEX pat, bool isAM, CSou
 				m.vol = chunk.ReadUint8();
 				if(isAM)
 				{
-					m.vol = m.vol * 64 / 127;
+					m.vol = static_cast<ModCommand::VOL>(m.vol * 64u / 127u);
 				}
 			}
 		}
@@ -738,13 +738,12 @@ bool CSoundFile::ReadAM(FileReader &file, ModLoadingFlags loadFlags)
 		return true;
 	}
 
-	InitializeGlobals(MOD_TYPE_J2B);
+	InitializeGlobals(MOD_TYPE_J2B, std::min(static_cast<CHANNELINDEX>(mainChunk.channels), static_cast<CHANNELINDEX>(MAX_BASECHANNELS)));
 	m_SongFlags = SONG_ITOLDEFFECTS | SONG_ITCOMPATGXX;
 	m_SongFlags.set(SONG_LINEARSLIDES, !(mainChunk.flags & AMFFMainChunk::amigaSlides));
 
-	m_nChannels = std::min(static_cast<CHANNELINDEX>(mainChunk.channels), static_cast<CHANNELINDEX>(MAX_BASECHANNELS));
-	m_nDefaultSpeed = mainChunk.speed;
-	m_nDefaultTempo.Set(mainChunk.tempo);
+	Order().SetDefaultSpeed(mainChunk.speed);
+	Order().SetDefaultTempoInt(mainChunk.tempo);
 	m_nDefaultGlobalVolume = mainChunk.globalvolume * 2;
 
 	m_modFormat.formatName = isAM ? UL_("Galaxy Sound System (new version)") : UL_("Galaxy Sound System (old version)");
@@ -756,23 +755,21 @@ bool CSoundFile::ReadAM(FileReader &file, ModLoadingFlags loadFlags)
 	// It seems like there's no way to differentiate between
 	// Muted and Surround channels (they're all 0xA0) - might
 	// be a limitation in mod2j2b.
-	for(CHANNELINDEX nChn = 0; nChn < m_nChannels; nChn++)
+	for(auto &chn : ChnSettings)
 	{
-		ChnSettings[nChn].Reset();
-
 		uint8 pan = chunkMain.ReadUint8();
 		if(isAM)
 		{
 			if(pan > 128)
-				ChnSettings[nChn].dwFlags = CHN_MUTE;
+				chn.dwFlags = CHN_MUTE;
 			else
-				ChnSettings[nChn].nPan = pan * 2;
+				chn.nPan = pan * 2;
 		} else
 		{
 			if(pan >= 128)
-				ChnSettings[nChn].dwFlags = CHN_MUTE;
+				chn.dwFlags = CHN_MUTE;
 			else
-				ChnSettings[nChn].nPan = static_cast<uint16>(std::min(pan * 4, 256));
+				chn.nPan = static_cast<uint16>(std::min(pan * 4, 256));
 		}
 	}
 
@@ -1041,7 +1038,7 @@ bool CSoundFile::ReadJ2B(FileReader &file, ModLoadingFlags loadFlags)
 		Bytef buffer[mpt::IO::BUFFERSIZE_TINY];
 		uint32 readSize = std::min(static_cast<uint32>(sizeof(buffer)), remainRead);
 		file.ReadRaw(mpt::span(buffer, readSize));
-		crc = crc32(crc, buffer, readSize);
+		crc = static_cast<uint32>(crc32(crc, buffer, readSize));
 
 		strm.avail_in = readSize;
 		strm.next_in = buffer;

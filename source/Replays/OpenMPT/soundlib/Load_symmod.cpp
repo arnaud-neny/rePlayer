@@ -35,14 +35,20 @@ struct SymFileHeader
 {
 	char     magic[4];  // "SymM"
 	uint32be version;
+	// Technically this is already the first chunk; for simplicity we always assume that the channel count comes first (which in practice it does)
+	int32be  firstChunkID;
+	uint32be numChannels;
 
 	bool Validate() const
 	{
-		return !std::memcmp(magic, "SymM", 4) && version == 1;
+		return !std::memcmp(magic, "SymM", 4)
+			&& version == 1
+			&& firstChunkID == -1
+			&& numChannels > 0 && numChannels <= MAX_BASECHANNELS;
 	}
 };
 
-MPT_BINARY_STRUCT(SymFileHeader, 8)
+MPT_BINARY_STRUCT(SymFileHeader, 16)
 
 
 struct SymEvent
@@ -503,7 +509,7 @@ struct SymInstrument
 				return;
 			CopySample<SC::ConversionChain<SC::Convert<int16, int8>, SC::DecodeIdentity<int8>>>(newSample, mptSmp.nLength * mptSmp.GetNumChannels(), 1, mptSmp.sample8(), mptSmp.GetSampleSizeInBytes(), 1);
 			mptSmp.uFlags.set(CHN_16BIT);
-			ctrlSmp::ReplaceSample(mptSmp, newSample, mptSmp.nLength, sndFile);
+			mptSmp.ReplaceWaveform(newSample, mptSmp.nLength, sndFile);
 		}
 
 		// Highpass
@@ -640,7 +646,6 @@ struct SymInstrument
 			if(!newSample)
 				return;
 
-			mptSmp.nLength = newLength;
 			std::memcpy(newSample, mptSmp.sampleb(), (loopStart + loopLen) * bps);
 			for(uint8 i = 0; i < numRepetitions; i++)
 			{
@@ -648,7 +653,7 @@ struct SymInstrument
 			}
 			std::memcpy(newSample + loopEnd * bps, mptSmp.sampleb() + (loopStart + loopLen) * bps, (newLength - loopEnd) * bps);
 			
-			ctrlSmp::ReplaceSample(mptSmp, newSample, mptSmp.nLength, sndFile);
+			mptSmp.ReplaceWaveform(newSample, newLength, sndFile);
 		}
 	}
 
@@ -657,8 +662,8 @@ struct SymInstrument
 		if(type != Loop && type != Sustain)
 			return {0, 0};
 
-		SmpLength loopStart = static_cast<SmpLength>(std::min(loopStartHigh.get(), uint8(100)));
-		SmpLength loopLen = static_cast<SmpLength>(std::min(loopLenHigh.get(), uint8(100)));
+		SmpLength loopStart = std::min(loopStartHigh.get(), uint8(100));
+		SmpLength loopLen = std::min(loopLenHigh.get(), uint8(100));
 		if(sampleFlags & NewLoopSystem)
 		{
 			loopStart = (loopStart << 16) + loopStartFine;
@@ -952,7 +957,7 @@ static bool ConvertDSP(const SymEvent event, MIDIMacroConfigData::Macro &macro, 
 	{
 		// Symphonie practically uses the same filter for this as for the sample processing.
 		// The cutoff and resonance are an approximation.
-		const uint8 type = event.note % 5u;
+		const uint8 type = static_cast<uint8>(event.note % 5u);
 		const uint8 cutoff = sndFile.FrequencyToCutOff(event.param * 10000.0 / 240.0);
 		const uint8 reso = static_cast<uint8>(std::min(127, event.inst * 127 / 185));
 
@@ -988,10 +993,6 @@ CSoundFile::ProbeResult CSoundFile::ProbeFileHeaderSymMOD(MemoryFileReader file,
 		return ProbeWantMoreData;
 	if(!fileHeader.Validate())
 		return ProbeFailure;
-	if(!file.CanRead(sizeof(uint32be)))
-		return ProbeWantMoreData;
-	if(file.ReadInt32BE() >= 0)
-		return ProbeFailure;
 	return ProbeSuccess;
 }
 
@@ -1002,16 +1003,15 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 	SymFileHeader fileHeader;
 	if(!file.ReadStruct(fileHeader) || !fileHeader.Validate())
 		return false;
-	if(file.ReadInt32BE() >= 0)
-		return false;
 	else if(loadFlags == onlyVerifyHeader)
 		return true;
 
-	InitializeGlobals(MOD_TYPE_MPT);
+	InitializeGlobals(MOD_TYPE_MPT, static_cast<CHANNELINDEX>(fileHeader.numChannels));
 
 	m_SongFlags.set(SONG_LINEARSLIDES | SONG_EXFILTERRANGE | SONG_IMPORTED);
 	m_playBehaviour = GetDefaultPlaybackBehaviour(MOD_TYPE_IT);
 	m_playBehaviour.reset(kITShortSampleRetrig);
+	m_nSamplePreAmp = Clamp(512 / GetNumChannels(), 16, 128);
 
 	enum class ChunkType : int32
 	{
@@ -1049,7 +1049,6 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 	std::vector<SymEvent> patternData;
 	std::vector<SymInstrument> instruments;
 
-	file.SkipBack(sizeof(int32));
 	while(file.CanRead(sizeof(int32)))
 	{
 		const ChunkType chunkType = static_cast<ChunkType>(file.ReadInt32BE());
@@ -1057,11 +1056,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 		{
 		// Simple values
 		case ChunkType::NumChannels:
-			if(auto numChannels = static_cast<CHANNELINDEX>(file.ReadUint32BE()); !m_nChannels && numChannels > 0 && numChannels <= MAX_BASECHANNELS)
-			{
-				m_nChannels = numChannels;
-				m_nSamplePreAmp = Clamp(512 / m_nChannels, 16, 128);
-			}
+			file.Skip(sizeof(uint32be));  // Already handled
 			break;
 
 		case ChunkType::TrackLength:
@@ -1076,7 +1071,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 			break;
 
 		case ChunkType::Tempo:
-			m_nDefaultTempo = TEMPO(1.24 * std::min(file.ReadUint32BE(), uint32(800)));
+			Order().SetDefaultTempo(TEMPO(1.24 * std::min(file.ReadUint32BE(), uint32(800))));
 			break;
 
 		// Unused values
@@ -1208,7 +1203,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 		}
 	}
 
-	if(!m_nChannels || !trackLen || instruments.empty())
+	if(!trackLen || instruments.empty())
 		return false;
 	if((loadFlags & loadPatternData) && (positions.empty() || patternData.empty() || sequences.empty()))
 		return false;
@@ -1312,7 +1307,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 	std::map<SymEvent, uint8> macroMap;
 
 	bool useDSP = false;
-	const uint32 patternSize = m_nChannels * trackLen;
+	const uint32 patternSize = GetNumChannels() * trackLen;
 	const PATTERNINDEX numPatterns = mpt::saturate_cast<PATTERNINDEX>(patternData.size() / patternSize);
 
 	Patterns.ResizeArray(numPatterns);
@@ -1340,7 +1335,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 		uint16 retriggerRemain = 0;
 		uint16 tonePortaRemain = 0;
 	};
-	std::vector<ChnState> chnStates(m_nChannels);
+	std::vector<ChnState> chnStates(GetNumChannels());
 
 	// In Symphonie, sequences represent the structure of a song, and not separate songs like in OpenMPT. Hence they will all be loaded into the same ModSequence.
 	for(SymSequence &seq : sequences)
@@ -1387,14 +1382,14 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 				uint8 patternSpeed = static_cast<uint8>(pos.speed);
 
 				// This may intentionally read into the next pattern
-				auto srcEvent = patternData.cbegin() + (pos.pattern * patternSize) + (pos.start * m_nChannels);
+				auto srcEvent = patternData.cbegin() + (pos.pattern * patternSize) + (pos.start * GetNumChannels());
 				const SymEvent emptyEvent{};
 				ModCommand syncPlayCommand;
 				for(ROWINDEX row = 0; row < pos.length; row++)
 				{
 					ModCommand *rowBase = Patterns[patternIndex].GetpModCommand(row, 0);
 					bool applySyncPlay = false;
-					for(CHANNELINDEX chn = 0; chn < m_nChannels; chn++)
+					for(CHANNELINDEX chn = 0; chn < GetNumChannels(); chn++)
 					{
 						ModCommand &m = rowBase[chn];
 						const SymEvent &event = (srcEvent != patternData.cend()) ? *srcEvent : emptyEvent;
@@ -1544,7 +1539,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 							}
 
 							// Key-On commands with stereo instruments are played on both channels - unless there's already some sort of event
-							if(event.note > 0 && (chn < m_nChannels - 1) && !(chn % 2u)
+							if(event.note > 0 && (chn < GetNumChannels() - 1) && !(chn % 2u)
 							   && origInst < instruments.size() && instruments[origInst].channel == SymInstrument::StereoL)
 							{
 								ModCommand &next = rowBase[chn + 1];
@@ -1666,8 +1661,8 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 							if(event.param < 1)
 								break;
 							m.command = CMD_RETRIG;
-							m.param = static_cast<uint8>(std::min(15, event.inst + 1));
-							chnState.retriggerRemain = event.param * (event.inst + 1u);
+							m.param = static_cast<ModCommand::PARAM>(std::min(15, event.inst + 1));
+							chnState.retriggerRemain = static_cast<uint16>(event.param * (event.inst + 1u));
 							break;
 
 						case SymEvent::SetSpeed:
@@ -1694,7 +1689,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 									m.command = CMD_CHANNELVOLUME;
 									m.param   = chnState.calculatedVol = static_cast<uint8>(Util::muldivr_unsigned(chnState.lastVol, chnState.channelVol, 100));
 								}
-								if(event.note == 4 && chn < (m_nChannels - 1) && chnStates[chn + 1].channelVol != volR)
+								if(event.note == 4 && chn < (GetNumChannels() - 1) && chnStates[chn + 1].channelVol != volR)
 								{
 									chnStates[chn + 1].channelVol = volR;
 
@@ -1779,28 +1774,28 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 								if(patternSpeed > 1 && chnState.curVolSlideAmt >= (patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(15, mpt::saturate_round<uint8>(chnState.curVolSlideAmt / (patternSpeed - 1)));
-									chnState.curVolSlideAmt -= slideAmt * (patternSpeed - 1);
+									chnState.curVolSlideAmt -= static_cast<float>(slideAmt * (patternSpeed - 1));
 									// normal slide up
 									m.command = CMD_CHANNELVOLSLIDE;
 									m.param = slideAmt << 4;
 								} else if(chnState.curVolSlideAmt >= 1.0f)
 								{
 									uint8 slideAmt = std::min<uint8>(15, mpt::saturate_round<uint8>(chnState.curVolSlideAmt));
-									chnState.curVolSlideAmt -= slideAmt;
+									chnState.curVolSlideAmt -= static_cast<float>(slideAmt);
 									// fine slide up
 									m.command = CMD_CHANNELVOLSLIDE;
 									m.param = (slideAmt << 4) | 0x0F;
 								} else if(patternSpeed > 1 && chnState.curVolSlideAmt <= -(patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(15, mpt::saturate_round<uint8>(-chnState.curVolSlideAmt / (patternSpeed - 1)));
-									chnState.curVolSlideAmt += slideAmt * (patternSpeed - 1);
+									chnState.curVolSlideAmt += static_cast<float>(slideAmt * (patternSpeed - 1));
 									// normal slide down
 									m.command = CMD_CHANNELVOLSLIDE;
 									m.param = slideAmt;
 								} else if(chnState.curVolSlideAmt <= -1.0f)
 								{
 									uint8 slideAmt = std::min<uint8>(14, mpt::saturate_round<uint8>(-chnState.curVolSlideAmt));
-									chnState.curVolSlideAmt += slideAmt;
+									chnState.curVolSlideAmt += static_cast<float>(slideAmt);
 									// fine slide down
 									m.command = CMD_CHANNELVOLSLIDE;
 									m.param = slideAmt | 0xF0;
@@ -1816,28 +1811,28 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 								if(patternSpeed > 1 && chnState.curPitchSlideAmt >= (patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(0xDF, mpt::saturate_round<uint8>(chnState.curPitchSlideAmt / (patternSpeed - 1)));
-									chnState.curPitchSlideAmt -= slideAmt * (patternSpeed - 1);
+									chnState.curPitchSlideAmt -= static_cast<float>(slideAmt * (patternSpeed - 1));
 									// normal slide up
 									m.command = CMD_PORTAMENTOUP;
 									m.param = slideAmt;
 								} else if(chnState.curPitchSlideAmt >= 1.0f)
 								{
 									uint8 slideAmt = std::min<uint8>(15, mpt::saturate_round<uint8>(chnState.curPitchSlideAmt));
-									chnState.curPitchSlideAmt -= slideAmt;
+									chnState.curPitchSlideAmt -= static_cast<float>(slideAmt);
 									// fine slide up
 									m.command = CMD_PORTAMENTOUP;
 									m.param = slideAmt | 0xF0;
 								} else if(patternSpeed > 1 && chnState.curPitchSlideAmt <= -(patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(0xDF, mpt::saturate_round<uint8>(-chnState.curPitchSlideAmt / (patternSpeed - 1)));
-									chnState.curPitchSlideAmt += slideAmt * (patternSpeed - 1);
+									chnState.curPitchSlideAmt += static_cast<float>(slideAmt * (patternSpeed - 1));
 									// normal slide down
 									m.command = CMD_PORTAMENTODOWN;
 									m.param = slideAmt;
 								} else if(chnState.curPitchSlideAmt <= -1.0f)
 								{
 									uint8 slideAmt = std::min<uint8>(14, mpt::saturate_round<uint8>(-chnState.curPitchSlideAmt));
-									chnState.curPitchSlideAmt += slideAmt;
+									chnState.curPitchSlideAmt += static_cast<float>(slideAmt);
 									// fine slide down
 									m.command = CMD_PORTAMENTODOWN;
 									m.param = slideAmt | 0xF0;
@@ -1849,13 +1844,13 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 								if(patternSpeed > 1 && chnState.curPitchSlideAmt / 4 >= (patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(9, mpt::saturate_round<uint8>(chnState.curPitchSlideAmt / (patternSpeed - 1)) / 4);
-									chnState.curPitchSlideAmt -= slideAmt * (patternSpeed - 1) * 4;
+									chnState.curPitchSlideAmt -= static_cast<float>(slideAmt * (patternSpeed - 1) * 4);
 									m.volcmd = VOLCMD_PORTAUP;
 									m.vol = slideAmt;
 								} else if(patternSpeed > 1 && chnState.curPitchSlideAmt / 4 <= -(patternSpeed - 1))
 								{
 									uint8 slideAmt = std::min<uint8>(9, mpt::saturate_round<uint8>(-chnState.curPitchSlideAmt / (patternSpeed - 1)) / 4);
-									chnState.curPitchSlideAmt += slideAmt * (patternSpeed - 1) * 4;
+									chnState.curPitchSlideAmt += static_cast<float>(slideAmt * (patternSpeed - 1) * 4);
 									m.volcmd = VOLCMD_PORTADOWN;
 									m.vol = slideAmt;
 								}
@@ -1907,7 +1902,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 	if(useDSP)
 	{
 		SNDMIXPLUGIN &plugin = m_MixPlugins[0];
-		plugin.Destroy();
+		mpt::reconstruct(plugin);
 		memcpy(&plugin.Info.dwPluginId1, "SymM", 4);
 		memcpy(&plugin.Info.dwPluginId2, "Echo", 4);
 		plugin.Info.routingFlags    = SNDMIXPLUGININFO::irAutoSuspend;
@@ -1924,9 +1919,8 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 #endif // NO_PLUGINS
 
 	// Channel panning
-	for(CHANNELINDEX chn = 0; chn < m_nChannels; chn++)
+	for(CHANNELINDEX chn = 0; chn < GetNumChannels(); chn++)
 	{
-		InitChannel(chn);
 		ChnSettings[chn].nPan = (chn & 1) ? 256 : 0;
 		ChnSettings[chn].nMixPlugin = useDSP ? 1 : 0;  // For MIDI macros controlling the echo DSP
 	}

@@ -18,13 +18,15 @@
 
 #include <atomic>
 
+#define OPENMPT_REVISION "r21056"
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::OpenMPT,
         .name = "OpenMPT",
-        .about = "OpenMPT " OPENMPT_API_VERSION_STRING "\nCopyright (c) 2004-2024 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
-        .settings = "OpenMPT " OPENMPT_API_VERSION_STRING,
+        .about = "OpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION "\nCopyright (c) 2004-2024 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
+        .settings = "OpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION,
         .init = ReplayOpenMPT::Init,
         .release = ReplayOpenMPT::Release,
         .load = ReplayOpenMPT::Load,
@@ -78,30 +80,13 @@ namespace rePlayer
     {
         openmpt_module_initial_ctl ctrls[] = { { "play.at_end", "continue" }, { nullptr, nullptr } };
 
-        struct CB
-        {
-            static void log(const char* message, void* user)
-            {
-                if (strstr(message, "Synthesized MED instruments are not supported."))
-                    reinterpret_cast<CB*>(user)->isSynthMed = true;
-            }
-
-            bool isSynthMed = false;
-        } cb;
-        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, stream, cb.log, &cb, nullptr, nullptr, nullptr, nullptr, ctrls);
+        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, stream, openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, ctrls);
         if (!module)
             return nullptr;
-        if (cb.isSynthMed) // not supported, so let another replay (uade) handle it
-        {
-            Log::Warning("OpenMPT: Synthesized MED instruments detected, skipping \"%s\"\n", stream->GetName().c_str());
-            openmpt_module_destroy(module);
-            return nullptr;
-        }
-        openmpt_module_set_log_func(module, openmpt_log_func_silent, nullptr);
 
         openmpt_module_initial_ctl emptyCtrls[] = { { "play.at_end", "continue" }, { "load.skip_samples", "1" }, { nullptr, nullptr } };
         auto data = stream->Read();
-        return new ReplayOpenMPT(stream, module, openmpt_module_ext_create_from_memory(data.Items(), data.Size(), nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, emptyCtrls));
+        return new ReplayOpenMPT(stream, module, openmpt_module_ext_create_from_memory(data.Items(), data.Size(), openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, emptyCtrls));
     }
 
     bool ReplayOpenMPT::DisplaySettings()
@@ -420,7 +405,7 @@ namespace rePlayer
             info += type;
             openmpt_free_string(type);
         }
-        info += "\nOpenMPT " OPENMPT_API_VERSION_STRING;
+        info += "\nOpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION;
         return info;
     }
 

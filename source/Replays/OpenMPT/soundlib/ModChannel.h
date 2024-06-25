@@ -1,7 +1,8 @@
 /*
  * ModChannel.h
  * ------------
- * Purpose: Module Channel header class and helpers
+ * Purpose: The ModChannel struct represents the state of one mixer channel.
+ *          ModChannelSettings represents the default settings of one pattern channel.
  * Notes  : (currently none)
  * Authors: OpenMPT Devs
  * The OpenMPT source code is released under the BSD license. Read LICENSE for more details.
@@ -12,15 +13,18 @@
 
 #include "openmpt/all/BuildSettings.hpp"
 
-#include "ModSample.h"
-#include "ModInstrument.h"
+#include "InstrumentSynth.h"
 #include "modcommand.h"
 #include "Paula.h"
 #include "tuningbase.h"
 
+#include <bitset>
+
 OPENMPT_NAMESPACE_BEGIN
 
 class CSoundFile;
+struct ModSample;
+struct ModInstrument;
 
 // Mix Channel Struct
 struct ModChannel
@@ -37,6 +41,23 @@ struct ModChannel
 			nEnvPosition = 0;
 			nEnvValueAtReleaseJump = NOT_YET_RELEASED;
 		}
+	};
+
+	struct AutoSlideStatus
+	{
+		bool AnyActive() const noexcept { return m_set.any(); }
+		bool IsActive(AutoSlideCommand cmd) const noexcept { return m_set[static_cast<size_t>(cmd)]; }
+		void SetActive(AutoSlideCommand cmd, bool active = true) noexcept { m_set[static_cast<size_t>(cmd)] = active; }
+		void Reset() noexcept { m_set.reset(); }
+
+		bool AnyPitchSlideActive() const noexcept
+		{
+			return IsActive(AutoSlideCommand::TonePortamento)
+				|| IsActive(AutoSlideCommand::PortamentoUp) || IsActive(AutoSlideCommand::PortamentoDown)
+				|| IsActive(AutoSlideCommand::FinePortamentoUp) || IsActive(AutoSlideCommand::FinePortamentoDown);
+		}
+	private:
+		std::bitset<static_cast<size_t>(AutoSlideCommand::NumCommands)> m_set;
 	};
 
 	// Information used in the mixer (should be kept tight for better caching)
@@ -62,6 +83,7 @@ struct ModChannel
 
 	const ModSample *pModSample;  // Currently assigned sample slot (may already be stopped)
 	Paula::State paulaState;
+	InstrumentSynth::States synthState;
 
 	// Information not used in the mixer
 	const ModInstrument *pModInstrument;  // Currently assigned instrument slot
@@ -76,21 +98,24 @@ struct ModChannel
 	int32 cachedPeriod, glissandoPeriod;
 	int32 nCalcVolume;                 // Calculated channel volume, 14-Bit (without global volume, pre-amp etc applied) - for MIDI macros
 	EnvInfo VolEnv, PanEnv, PitchEnv;  // Envelope playback info
-	int32 nGlobalVol;                  // Channel volume (CV in ITTECH.TXT) 0...64
-	int32 nInsVol;                     // Sample / Instrument volume (SV * IV in ITTECH.TXT) 0...64
 	int32 nAutoVibDepth;
 	uint32 nEFxOffset;  // Offset memory for Invert Loop (EFx, .MOD only)
 	ROWINDEX nPatternLoop;
+	AutoSlideStatus autoSlide;
 	uint16 portamentoSlide;
-	int16 nTranspose;
 	int16 nFineTune;
 	int16 microTuning;  // Micro-tuning / MIDI pitch wheel command
 	int16 nVolSwing, nPanSwing;
 	int16 nCutSwing, nResSwing;
+	uint16 volSlideDownRemain, volSlideDownTotal;
 	uint16 nRestorePanOnNewNote;  // If > 0, nPan should be set to nRestorePanOnNewNote - 1 on new note. Used to recover from pan swing and IT sample / instrument panning. High bit set = surround
+	uint16 nnaGeneration;         // For PlaybackTest implementation
 	CHANNELINDEX nMasterChn;
 	ModCommand rowCommand;
 	// 8-bit members
+	uint8 nGlobalVol;  // Channel volume (CV in ITTECH.TXT) 0...64
+	uint8 nInsVol;     // Sample / Instrument volume (SV * IV in ITTECH.TXT) 0...64
+	int8 nTranspose;
 	ResamplingMode resamplingMode;
 	uint8 nRestoreResonanceOnNewNote;  // See nRestorePanOnNewNote
 	uint8 nRestoreCutoffOnNewNote;     // ditto
@@ -116,6 +141,7 @@ struct ModChannel
 	uint8 nPatternLoopCount;
 	uint8 nLeftVU, nRightVU;
 	uint8 nActiveMacro;
+	uint8 volSlideDownStart;
 	FilterMode nFilterMode;
 	uint8 nEFxSpeed, nEFxDelay;              // memory for Invert Loop (EFx, .MOD only)
 	uint8 noteSlideParam, noteSlideCounter;  // IMF / PTM Note Slide
@@ -141,8 +167,6 @@ struct ModChannel
 	float m_plugParamValueStep, m_plugParamTargetValue;
 	uint16 m_RowPlugParam;
 	PLUGINDEX m_RowPlug;
-
-	void ClearRowCmd() { rowCommand = ModCommand(); }
 
 	// Get a reference to a specific envelope of this channel
 	const EnvInfo &GetEnvelope(EnvelopeType envType) const
@@ -185,17 +209,17 @@ struct ModChannel
 
 	bool IsSamplePlaying() const noexcept { return !increment.IsZero(); }
 
-	uint32 GetVSTVolume() const noexcept { return (pModInstrument) ? pModInstrument->nGlobalVol * 4 : nVolume; }
+	uint32 GetVSTVolume() const noexcept;
 
-	ModCommand::NOTE GetPluginNote(bool ignoreArpeggio = false) const;
+	ModCommand::NOTE GetPluginNote(bool ignoreArpeggio = false) const noexcept;
 
 	// Check if the channel has a valid MIDI output. A return value of true implies that pModInstrument != nullptr.
-	bool HasMIDIOutput() const noexcept { return pModInstrument != nullptr && pModInstrument->HasValidMIDIChannel(); }
+	bool HasMIDIOutput() const noexcept;
 	// Check if the channel uses custom tuning. A return value of true implies that pModInstrument != nullptr.
-	bool HasCustomTuning() const noexcept { return pModInstrument != nullptr && pModInstrument->pTuning != nullptr; }
+	bool HasCustomTuning() const noexcept;
 
 	// Check if currently processed loop is a sustain loop. pModSample is not checked for validity!
-	bool InSustainLoop() const noexcept { return (dwFlags & (CHN_LOOP | CHN_KEYOFF)) == CHN_LOOP && pModSample->uFlags[CHN_SUSTAINLOOP]; }
+	bool InSustainLoop() const noexcept;
 
 	void UpdateInstrumentVolume(const ModSample *smp, const ModInstrument *ins);
 
@@ -224,15 +248,10 @@ struct ModChannelSettings
 #endif                              // MODPLUG_TRACKER
 	FlagSet<ChannelFlags> dwFlags;  // Channel flags
 	uint16 nPan = 128;              // Initial pan (0...256)
-	uint16 nVolume = 64;            // Initial channel volume (0...64)
+	uint8 nVolume = 64;             // Initial channel volume (0...64)
 	PLUGINDEX nMixPlugin = 0;       // Assigned plugin
 
 	mpt::charbuf<MAX_CHANNELNAME> szName;  // Channel name
-
-	void Reset()
-	{
-		*this = {};
-	}
 };
 
 OPENMPT_NAMESPACE_END

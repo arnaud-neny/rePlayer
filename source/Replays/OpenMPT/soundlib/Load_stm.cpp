@@ -145,7 +145,7 @@ static void ConvertSTMCommand(ModCommand &m, const uint8 command, const ROWINDEX
 		break;
 
 	case CMD_PATTERNBREAK:
-		m.param = (m.param & 0xF0) * 10 + (m.param & 0x0F);
+		m.param = static_cast<ModCommand::PARAM>((m.param & 0xF0) * 10 + (m.param & 0x0F));
 		if(breakPos != ORDERINDEX_INVALID && m.param == 0)
 		{
 			// Merge Bxx + C00 into just Bxx
@@ -177,7 +177,7 @@ static void ConvertSTMCommand(ModCommand &m, const uint8 command, const ROWINDEX
 
 	case CMD_SPEED:
 		if(fileVerMinor < 21)
-			m.param = ((m.param / 10u) << 4u) + m.param % 10u;
+			m.param = static_cast<ModCommand::PARAM>(((m.param / 10u) << 4u) + m.param % 10u);
 
 		if(!m.param)
 		{
@@ -224,13 +224,12 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 		return false;
 	if(!fileHeader.Validate())
 		return false;
-	if(!file.CanRead(mpt::saturate_cast<FileReader::off_t>(fileHeader.GetHeaderMinimumAdditionalSize())))
+	if(!file.CanRead(mpt::saturate_cast<FileReader::pos_type>(fileHeader.GetHeaderMinimumAdditionalSize())))
 		return false;
 	if(loadFlags == onlyVerifyHeader)
 		return true;
 
-	InitializeGlobals(MOD_TYPE_STM);
-	InitializeChannels();
+	InitializeGlobals(MOD_TYPE_STM, 4);
 
 	m_songName = mpt::String::ReadBuf(mpt::String::maybeNullTerminated, fileHeader.songname);
 
@@ -242,7 +241,6 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 	m_playBehaviour.set(kST3SampleSwap);
 
 	m_nSamples = 31;
-	m_nChannels = 4;
 	m_nMinPeriod = 64;
 	m_nMaxPeriod = 0x7FFF;
 	
@@ -250,12 +248,12 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 	
 	uint8 initTempo = fileHeader.initTempo;
 	if(fileHeader.verMinor < 21)
-		initTempo = ((initTempo / 10u) << 4u) + initTempo % 10u;
+		initTempo = static_cast<uint8>(((initTempo / 10u) << 4u) + initTempo % 10u);
 	if(initTempo == 0)
 		initTempo = 0x60;
 
-	m_nDefaultTempo = ConvertST2Tempo(initTempo);
-	m_nDefaultSpeed = initTempo >> 4;
+	Order().SetDefaultTempo(ConvertST2Tempo(initTempo));
+	Order().SetDefaultSpeed(initTempo >> 4);
 	if(fileHeader.verMinor > 10)
 		m_nDefaultGlobalVolume = std::min(fileHeader.globalVolume, uint8(64)) * 4u;
 
@@ -325,7 +323,7 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 				if(note == 0xFE)
 					m->note = NOTE_NOTECUT;
 				else if(note < 0x60)
-					m->note = (note >> 4) * 12 + (note & 0x0F) + 36 + NOTE_MIN;
+					m->note = static_cast<ModCommand::NOTE>((note >> 4) * 12 + (note & 0x0F) + 36 + NOTE_MIN);
 
 				m->instr = insVol >> 3;
 				if(m->instr > 31)
@@ -370,7 +368,7 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 			// ST2 just plays random noise for samples with a default volume of 0
 			if(sample.nLength && sample.nVolume > 0)
 			{
-				FileReader::off_t sampleOffset = sampleOffsets[smp - 1] << 4;
+				FileReader::pos_type sampleOffset = sampleOffsets[smp - 1] << 4;
 				// acidlamb.stm has some bogus samples with sample offsets past EOF
 				if(sampleOffset > sizeof(STMFileHeader) && file.Seek(sampleOffset))
 				{
@@ -449,18 +447,16 @@ bool CSoundFile::ReadSTX(FileReader &file, ModLoadingFlags loadFlags)
 		return false;
 	if(!fileHeader.Validate())
 		return false;
-	if (!file.CanRead(mpt::saturate_cast<FileReader::off_t>(fileHeader.GetHeaderMinimumAdditionalSize())))
+	if (!file.CanRead(mpt::saturate_cast<FileReader::pos_type>(fileHeader.GetHeaderMinimumAdditionalSize())))
 		return false;
 	if(loadFlags == onlyVerifyHeader)
 		return true;
 
-	InitializeGlobals(MOD_TYPE_STM);
-	InitializeChannels();
+	InitializeGlobals(MOD_TYPE_STM, 4);
 
 	m_songName = mpt::String::ReadBuf(mpt::String::maybeNullTerminated, fileHeader.songName);
 
 	m_nSamples = fileHeader.numSamples;
-	m_nChannels = 4;
 	m_nMinPeriod = 64;
 	m_nMaxPeriod = 0x7FFF;
 
@@ -470,8 +466,8 @@ bool CSoundFile::ReadSTX(FileReader &file, ModLoadingFlags loadFlags)
 	if(initTempo == 0)
 		initTempo = 0x60;
 
-	m_nDefaultTempo = ConvertST2Tempo(initTempo);
-	m_nDefaultSpeed = initTempo >> 4;
+	Order().SetDefaultTempo(ConvertST2Tempo(initTempo));
+	Order().SetDefaultSpeed(initTempo >> 4);
 	m_nDefaultGlobalVolume = std::min(fileHeader.globalVolume, uint8(64)) * 4u;
 
 	std::vector<uint16le> patternOffsets, sampleOffsets;

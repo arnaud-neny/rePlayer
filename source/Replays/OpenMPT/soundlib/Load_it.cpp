@@ -302,7 +302,7 @@ size_t CSoundFile::ITInstrToMPT(FileReader &file, ModInstrument &ins, uint16 trk
 		}
 	} else
 	{
-		const FileReader::off_t offset = file.GetPosition();
+		const FileReader::pos_type offset = file.GetPosition();
 
 		// Try loading extended instrument... instSize will differ between normal and extended instruments.
 		ITInstrumentEx instrumentHeader;
@@ -421,7 +421,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 	{
 		return false;
 	}
-	if(!file.CanRead(mpt::saturate_cast<FileReader::off_t>(GetHeaderMinimumAdditionalSize(fileHeader))))
+	if(!file.CanRead(mpt::saturate_cast<FileReader::pos_type>(GetHeaderMinimumAdditionalSize(fileHeader))))
 	{
 		return false;
 	}
@@ -430,7 +430,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 		return true;
 	}
 
-	InitializeGlobals(MOD_TYPE_IT);
+	InitializeGlobals(MOD_TYPE_IT, 0);
 
 	bool interpretModPlugMade = false;
 	mpt::ustring madeWithTracker;
@@ -533,20 +533,9 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 	if(m_nDefaultGlobalVolume > MAX_GLOBAL_VOLUME)
 		m_nDefaultGlobalVolume = MAX_GLOBAL_VOLUME;
 	if(fileHeader.speed)
-		m_nDefaultSpeed = fileHeader.speed;
-	m_nDefaultTempo.Set(std::max(uint8(31), static_cast<uint8>(fileHeader.tempo)));
+		Order().SetDefaultSpeed(fileHeader.speed);
+	Order().SetDefaultTempoInt(std::max(uint8(31), static_cast<uint8>(fileHeader.tempo)));
 	m_nSamplePreAmp = std::min(static_cast<uint8>(fileHeader.mv), uint8(128));
-
-	// Reading Channels Pan Positions
-	for(CHANNELINDEX i = 0; i < 64; i++) if(fileHeader.chnpan[i] != 0xFF)
-	{
-		ChnSettings[i].Reset();
-		ChnSettings[i].nVolume = Clamp<uint8, uint8>(fileHeader.chnvol[i], 0, 64);
-		if(fileHeader.chnpan[i] & 0x80) ChnSettings[i].dwFlags.set(CHN_MUTE);
-		uint8 n = fileHeader.chnpan[i] & 0x7F;
-		if(n <= 64) ChnSettings[i].nPan = n * 4;
-		if(n == 100) ChnSettings[i].dwFlags.set(CHN_SURROUND);
-	}
 
 	// Reading orders
 	file.Seek(sizeof(ITFileHeader));
@@ -665,7 +654,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 	} else if(possiblyUNMO3 && fileHeader.special <= 1)
 	{
 		// UNMO3 < v2.4.0.1 will set the edit history special bit iff the MIDI macro embed bit is also set,
-		// but it always writes the two extra bytes for the edit history length (zeroes).
+		// but it always writes the two extra bytes for the edit history length (zeros).
 		// If MIDI macros are embedded, we are fine and end up in the first case of the if statement (read edit history).
 		// Otherwise we end up here and might have to read the edit history length.
 		if(file.ReadUint16LE() == 0)
@@ -697,24 +686,21 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 		hasModPlugExtensions = true;
 	}
 
-	m_nChannels = 1;
 	// Read channel names: "CNAM"
 	if(file.ReadMagic("CNAM"))
 	{
 		FileReader chnNames = file.ReadChunk(file.ReadUint32LE());
-		const CHANNELINDEX readChns = std::min(MAX_BASECHANNELS, static_cast<CHANNELINDEX>(chnNames.GetLength() / MAX_CHANNELNAME));
-		m_nChannels = readChns;
+		ChnSettings.resize(std::min(MAX_BASECHANNELS, static_cast<CHANNELINDEX>(chnNames.GetLength() / MAX_CHANNELNAME)));
 		hasModPlugExtensions = true;
-
-		for(CHANNELINDEX i = 0; i < readChns; i++)
+		for(auto &chn : ChnSettings)
 		{
-			chnNames.ReadString<mpt::String::maybeNullTerminated>(ChnSettings[i].szName, MAX_CHANNELNAME);
+			chnNames.ReadString<mpt::String::maybeNullTerminated>(chn.szName, MAX_CHANNELNAME);
 		}
 	}
 
 	// Read mix plugins information
 	FileReader pluginChunk = file.ReadChunk((minPtr >= file.GetPosition()) ? minPtr - file.GetPosition() : file.BytesLeft());
-	const auto [hasPluginChunks, isBeRoTracker] = LoadMixPlugins(pluginChunk);
+	const auto [hasPluginChunks, isBeRoTracker] = LoadMixPlugins(pluginChunk, false);
 	if(hasPluginChunks)
 		hasModPlugExtensions = true;
 
@@ -770,7 +756,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 	// In order to properly compute the position, in file, of eventual extended settings
 	// such as "attack" we need to keep the "real" size of the last sample as those extra
 	// setting will follow this sample in the file
-	FileReader::off_t lastSampleOffset = 0;
+	FileReader::pos_type lastSampleOffset = 0;
 	if(fileHeader.smpnum > 0)
 	{
 		lastSampleOffset = smpPos[fileHeader.smpnum - 1] + sizeof(ITSample);
@@ -889,7 +875,8 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 		numPats = 0;
 	}
 
-	// Checking for number of used channels, which is not explicitely specified in the file.
+	// Checking for number of used channels, which is not explicitly specified in the file.
+	CHANNELINDEX numChannels = std::max(GetNumChannels(), CHANNELINDEX(1));
 	for(PATTERNINDEX pat = 0; pat < numPats; pat++)
 	{
 		if(patPos[pat] == 0 || !file.Seek(patPos[pat]))
@@ -905,7 +892,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 
 		FileReader patternData = file.ReadChunk(len);
 		ROWINDEX row = 0;
-		std::vector<uint8> chnMask(GetNumChannels());
+		std::vector<uint8> chnMask(numChannels);
 
 		while(row < numRows && patternData.CanRead(1))
 		{
@@ -927,34 +914,26 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 				chnMask.resize(ch + 1, 0);
 			}
 
-			if(b & IT_bitmask_patternChanEnabled_c)            // 0x80 check if the upper bit is enabled.
+			if(b & IT_bitmask_patternChanEnabled_c)  // 0x80 check if the upper bit is enabled.
 			{
-				chnMask[ch] = patternData.ReadUint8();       // set the channel mask for this channel.
+				chnMask[ch] = patternData.ReadUint8();  // set the channel mask for this channel.
 			}
 			// Channel used
-			if(chnMask[ch] & 0x0F)         // if this channel is used set m_nChannels
+			if(chnMask[ch] & 0x0F)  // if this channel is used set m_nChannels
 			{
-				if(ch >= GetNumChannels() && ch < MAX_BASECHANNELS)
+				if(ch >= numChannels && ch < MAX_BASECHANNELS)
 				{
-					m_nChannels = ch + 1;
+					numChannels = ch + 1;
 				}
+
+				// Skip a number of bytes depending on note, instrument, volume, effect being present.
+				static constexpr uint8 maskToSkips[] = {0, 1, 1, 2, 1, 2, 2, 3, 2, 3, 3, 4, 3, 4, 4, 5};
+				patternData.Skip(maskToSkips[chnMask[ch] & 0x0F]);
 			}
-			// Now we actually update the pattern-row entry the note,instrument etc.
-			// Note
-			if(chnMask[ch] & 1)
-				patternData.Skip(1);
-			// Instrument
-			if(chnMask[ch] & 2)
-				patternData.Skip(1);
-			// Volume
-			if(chnMask[ch] & 4)
-				patternData.Skip(1);
-			// Effect
-			if(chnMask[ch] & 8)
-				patternData.Skip(2);
 		}
 		lastSampleOffset = std::max(lastSampleOffset, file.GetPosition());
 	}
+	ChnSettings.resize(numChannels);
 
 	// Compute extra instruments settings position
 	if(lastSampleOffset > 0)
@@ -992,6 +971,22 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 	}
 	// Need to do this before reading the patterns because m_nChannels might be modified by LoadExtendedSongProperties. *sigh*
 	const bool hasExtendedSongProperties = LoadExtendedSongProperties(file, false, &interpretModPlugMade);
+
+	// Reading Channels Pan Positions
+	const CHANNELINDEX headerChannels = std::min(GetNumChannels(), CHANNELINDEX(64));
+	for(CHANNELINDEX i = 0; i < headerChannels; i++)
+	{
+		if(fileHeader.chnpan[i] == 0xFF)
+			continue;
+		ChnSettings[i].nVolume = Clamp<uint8, uint8>(fileHeader.chnvol[i], 0, 64);
+		if(fileHeader.chnpan[i] & 0x80)
+			ChnSettings[i].dwFlags.set(CHN_MUTE);
+		uint8 n = fileHeader.chnpan[i] & 0x7F;
+		if(n <= 64)
+			ChnSettings[i].nPan = n * 4;
+		if(n == 100)
+			ChnSettings[i].dwFlags.set(CHN_SURROUND);
+	}
 
 	// Reading Patterns
 	Patterns.ResizeArray(numPats);
@@ -1058,7 +1053,7 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 
 			// Now we grab the data for this particular row/channel.
 			ModCommand dummy{};
-			ModCommand &m = ch < m_nChannels ? patData[ch] : dummy;
+			ModCommand &m = ch < GetNumChannels() ? patData[ch] : dummy;
 
 			if(chnMask[ch] & 0x10)
 			{
@@ -1088,14 +1083,11 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 					if(note > NOTE_MAX && note < 0xFD) note = NOTE_FADE;
 					else if(note == 0xFD) note = NOTE_NONE;
 				}
-				m.note = note;
-				lastValue[ch].note = note;
+				m.note = lastValue[ch].note = note;
 			}
 			if(chnMask[ch] & 2)
 			{
-				uint8 instr = patternData.ReadUint8();
-				m.instr = instr;
-				lastValue[ch].instr = instr;
+				m.instr = lastValue[ch].instr = patternData.ReadUint8();
 			}
 			if(chnMask[ch] & 4)
 			{
@@ -1255,57 +1247,40 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 			break;
 		case 1:
 			madeWithTracker = GetSchismTrackerVersion(fileHeader.cwtv, fileHeader.reserved);
-			// Hertz in linear mode: Added 2015-01-29, https://github.com/schismtracker/schismtracker/commit/671b30311082a0e7df041fca25f989b5d2478f69
-			if(schismDateVersion < SchismVersionFromDate<2015, 01, 29>::date && m_SongFlags[SONG_LINEARSLIDES])
-				m_playBehaviour.reset(kPeriodsAreHertz);
+			{
+				static constexpr std::pair<int32, PlayBehaviour> SchismQuirks[] =
+				{
+					{SchismVersionFromDate<2015,  1, 29>::date, kPeriodsAreHertz              },  // https://github.com/schismtracker/schismtracker/commit/671b30311082a0e7df041fca25f989b5d2478f69
+					{SchismVersionFromDate<2016,  5, 13>::date, kITShortSampleRetrig          },  // https://github.com/schismtracker/schismtracker/commit/e7b1461fe751554309fd403713c2a1ef322105ca
+					{SchismVersionFromDate<2021,  5,  2>::date, kITDoNotOverrideChannelPan    },  // https://github.com/schismtracker/schismtracker/commit/a34ec86dc819915debc9e06f4727b77bf2dd29ee
+					{SchismVersionFromDate<2021,  5,  2>::date, kITPanningReset               },  // https://github.com/schismtracker/schismtracker/commit/648f5116f984815c69e11d018b32dfec53c6b97a
+					{SchismVersionFromDate<2021, 11,  1>::date, kITPitchPanSeparation         },  // https://github.com/schismtracker/schismtracker/commit/6e9f1207015cae0fe1b829fff7bb867e02ec6dea
+					{SchismVersionFromDate<2022,  4, 30>::date, kITEmptyNoteMapSlot           },  // https://github.com/schismtracker/schismtracker/commit/1b2f7d5522fcb971f134a6664182ca569f7c8008
+					{SchismVersionFromDate<2022,  4, 30>::date, kITPortamentoSwapResetsPos    },  // https://github.com/schismtracker/schismtracker/commit/1b2f7d5522fcb971f134a6664182ca569f7c8008
+					{SchismVersionFromDate<2022,  4, 30>::date, kITMultiSampleInstrumentNumber},  // https://github.com/schismtracker/schismtracker/commit/1b2f7d5522fcb971f134a6664182ca569f7c8008
+					{SchismVersionFromDate<2023,  3,  9>::date, kITInitialNoteMemory          },  // https://github.com/schismtracker/schismtracker/commit/73e9d60676c2b48c8e94e582373e29517105b2b1
+					{SchismVersionFromDate<2023, 10, 17>::date, kITDCTBehaviour               },  // https://github.com/schismtracker/schismtracker/commit/31d36dc00013fc5ab0efa20c782af18e8b006e07
+					{SchismVersionFromDate<2023, 10, 19>::date, kITSampleAndHoldPanbrello     },  // https://github.com/schismtracker/schismtracker/commit/411ec16b190ba1a486d8b0907ad8d74f8fdc2840
+					{SchismVersionFromDate<2023, 10, 19>::date, kITPortaNoNote                },  // https://github.com/schismtracker/schismtracker/commit/8ff0a86a715efb50c89770fb9095d4c4089ff187
+					{SchismVersionFromDate<2023, 10, 22>::date, kITFirstTickHandling          },  // https://github.com/schismtracker/schismtracker/commit/b9609e4f827e1b6ce9ebe6573b85e69388ca0ea0
+					{SchismVersionFromDate<2023, 10, 22>::date, kITMultiSampleInstrumentNumber},  // https://github.com/schismtracker/schismtracker/commit/a9e5df533ab52c35190fcc1cbfed4f0347b660bb
+					{SchismVersionFromDate<2024,  3,  9>::date, kITPanbrelloHold              },  // https://github.com/schismtracker/schismtracker/commit/ebdebaa8c8a735a7bf49df55debded1b7aac3605
+					{SchismVersionFromDate<2024,  5, 12>::date, kITNoSustainOnPortamento      },  // https://github.com/schismtracker/schismtracker/commit/6f68f2855a7e5e4ffe825869244e631e15741037
+					{SchismVersionFromDate<2024,  5, 12>::date, kITEmptyNoteMapSlotIgnoreCell },  // https://github.com/schismtracker/schismtracker/commit/aa84148e019a65f3d52ecd33fd84bfecfdb87bf4
+					{SchismVersionFromDate<2024,  5, 27>::date, kITOffsetWithInstrNumber      },  // https://github.com/schismtracker/schismtracker/commit/9237960d45079a54ad73f87bacfe5dd8ae82e273
+				};
+				for(const auto &quirk : SchismQuirks)
+				{
+					if(schismDateVersion < quirk.first)
+						m_playBehaviour.reset(quirk.second);
+				}
+			}
 			// Hertz in Amiga mode: Added 2021-05-02, https://github.com/schismtracker/schismtracker/commit/c656a6cbd5aaf81198a7580faf81cb7960cb6afa
-			else if(schismDateVersion < SchismVersionFromDate<2021, 05, 02>::date && !m_SongFlags[SONG_LINEARSLIDES])
+			if(schismDateVersion < SchismVersionFromDate<2021, 05, 02>::date && !m_SongFlags[SONG_LINEARSLIDES])
 				m_playBehaviour.reset(kPeriodsAreHertz);
-			// Qxx with short samples: Added 2016-05-13, https://github.com/schismtracker/schismtracker/commit/e7b1461fe751554309fd403713c2a1ef322105ca
-			if(schismDateVersion < SchismVersionFromDate<2016, 05, 13>::date)
-				m_playBehaviour.reset(kITShortSampleRetrig);
-			// Instrument pan doesn't override channel pan: Added 2021-05-02, https://github.com/schismtracker/schismtracker/commit/a34ec86dc819915debc9e06f4727b77bf2dd29ee
-			if(schismDateVersion < SchismVersionFromDate<2021, 05, 02>::date)
-				m_playBehaviour.reset(kITDoNotOverrideChannelPan);
-			// Notes set instrument panning, not instrument numbers: Added 2021-05-02, https://github.com/schismtracker/schismtracker/commit/648f5116f984815c69e11d018b32dfec53c6b97a
-			if(schismDateVersion < SchismVersionFromDate<2021, 05, 02>::date)
-				m_playBehaviour.reset(kITPanningReset);
 			// Imprecise calculation of ping-pong loop wraparound: Added 2021-11-01, https://github.com/schismtracker/schismtracker/commit/22cbb9b676e9c2c9feb7a6a17deca7a17ac138cc
 			if(schismDateVersion < SchismVersionFromDate<2021, 11, 01>::date)
 				m_playBehaviour.set(kImprecisePingPongLoops);
-			// Pitch/Pan Separation can be overridden by panning commands: Added 2021-11-01, https://github.com/schismtracker/schismtracker/commit/6e9f1207015cae0fe1b829fff7bb867e02ec6dea
-			if(schismDateVersion < SchismVersionFromDate<2021, 11, 01>::date)
-				m_playBehaviour.reset(kITPitchPanSeparation);
-			// Various fixes to multisampled instruments: Added 2022-04-30, https://github.com/schismtracker/schismtracker/commit/1b2f7d5522fcb971f134a6664182ca569f7c8008
-			if(schismDateVersion < SchismVersionFromDate<2022, 04, 30>::date)
-			{
-				m_playBehaviour.reset(kITEmptyNoteMapSlot);
-				m_playBehaviour.reset(kITPortamentoSwapResetsPos);
-				m_playBehaviour.reset(kITMultiSampleInstrumentNumber);
-			}
-			// Initial note memory for channel is C-0: Added 2023-03-09, https://github.com/schismtracker/schismtracker/commit/73e9d60676c2b48c8e94e582373e29517105b2b1
-			if(schismDateVersion < SchismVersionFromDate<2023, 03, 9>::date)
-				m_playBehaviour.reset(kITInitialNoteMemory);
-			// DCT note comparison: Added 2023-10-17, https://github.com/schismtracker/schismtracker/commit/31d36dc00013fc5ab0efa20c782af18e8b006e07
-			if(schismDateVersion < SchismVersionFromDate<2023, 10, 17>::date)
-				m_playBehaviour.reset(kITDCTBehaviour);
-			if(schismDateVersion < SchismVersionFromDate<2023, 10, 19>::date)
-			{
-				// Panbrello sample & hold random waveform: Added 2023-10-19, https://github.com/schismtracker/schismtracker/commit/411ec16b190ba1a486d8b0907ad8d74f8fdc2840
-				m_playBehaviour.reset(kITSampleAndHoldPanbrello);
-				// Don't apply any portamento if no previous note is playing: Added 2023-10-19, https://github.com/schismtracker/schismtracker/commit/8ff0a86a715efb50c89770fb9095d4c4089ff187
-				m_playBehaviour.reset(kITPortaNoNote);
-			}
-			if(schismDateVersion < SchismVersionFromDate<2023, 10, 22>::date)
-			{
-				// Note delay delays first-tick behaviour for slides: Added 2023-10-22, https://github.com/schismtracker/schismtracker/commit/b9609e4f827e1b6ce9ebe6573b85e69388ca0ea0
-				m_playBehaviour.reset(kITFirstTickHandling);
-				// https://github.com/schismtracker/schismtracker/commit/a9e5df533ab52c35190fcc1cbfed4f0347b660bb
-				m_playBehaviour.reset(kITMultiSampleInstrumentNumber);
-			}
-			// Panbrello hold: Added 2024-03-09, https://github.com/schismtracker/schismtracker/commit/ebdebaa8c8a735a7bf49df55debded1b7aac3605
-			if(schismDateVersion < SchismVersionFromDate<2024, 03, 9>::date)
-				m_playBehaviour.reset(kITPanbrelloHold);
 			break;
 		case 4:
 			madeWithTracker = MPT_UFORMAT("pyIT {}.{}")((fileHeader.cwtv & 0x0F00) >> 8, mpt::ufmt::hex0<2>(fileHeader.cwtv & 0xFF));
@@ -1320,7 +1295,12 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 				madeWithTracker = MPT_UFORMAT("ITMCK {}.{}.{}")((fileHeader.cwtv >> 8) & 0x0F, (fileHeader.cwtv >> 4) & 0x0F, fileHeader.cwtv & 0x0F);
 			break;
 		case 0xD:
-			madeWithTracker = U_("spc2it");
+			if(fileHeader.cwtv == 0xDAEB)
+				madeWithTracker = U_("spc2it");
+			else if(fileHeader.cwtv == 0xD1CE)
+				madeWithTracker = U_("itwriter");
+			else
+				madeWithTracker = U_("Unknown");
 			break;
 		}
 	}
@@ -1554,8 +1534,8 @@ bool CSoundFile::SaveIT(std::ostream &f, const mpt::PathString &filename, bool c
 
 	itHeader.globalvol = static_cast<uint8>(m_nDefaultGlobalVolume / 2u);
 	itHeader.mv = static_cast<uint8>(std::min(m_nSamplePreAmp, uint32(128)));
-	itHeader.speed = mpt::saturate_cast<uint8>(m_nDefaultSpeed);
- 	itHeader.tempo = mpt::saturate_cast<uint8>(m_nDefaultTempo.GetInt()); // We save the real tempo in an extension below if it exceeds 255.
+	itHeader.speed = mpt::saturate_cast<uint8>(Order().GetDefaultSpeed());
+ 	itHeader.tempo = mpt::saturate_cast<uint8>(Order().GetDefaultTempo().GetInt()); // We save the real tempo in an extension below if it exceeds 255.
 	itHeader.sep = 128; // pan separation
 	// IT doesn't have a per-instrument Pitch Wheel Depth setting, so we just store the first non-zero PWD setting in the header.
 	for(INSTRUMENTINDEX ins = 1; ins <= GetNumInstruments(); ins++)
@@ -1572,7 +1552,7 @@ bool CSoundFile::SaveIT(std::ostream &f, const mpt::PathString &filename, bool c
 	memset(itHeader.chnpan, 0xA0, 64);
 	memset(itHeader.chnvol, 64, 64);
 
-	for(CHANNELINDEX ich = 0; ich < std::min(m_nChannels, CHANNELINDEX(64)); ich++) // Header only has room for settings for 64 chans...
+	for(CHANNELINDEX ich = 0; ich < std::min(GetNumChannels(), CHANNELINDEX(64)); ich++) // Header only has room for settings for 64 chans...
 	{
 		itHeader.chnpan[ich] = (uint8)(ChnSettings[ich].nPan >> 2);
 		if (ChnSettings[ich].dwFlags[CHN_SURROUND]) itHeader.chnpan[ich] = 100;
@@ -1586,7 +1566,7 @@ bool CSoundFile::SaveIT(std::ostream &f, const mpt::PathString &filename, bool c
 	// Channel names
 	if(!compatibilityExport)
 	{
-		for(CHANNELINDEX i = 0; i < m_nChannels; i++)
+		for(CHANNELINDEX i = 0; i < GetNumChannels(); i++)
 		{
 			if(ChnSettings[i].szName[0])
 			{
@@ -2067,9 +2047,9 @@ uint32 CSoundFile::SaveMixPlugins(std::ostream *file, bool updatePlugData)
 				std::ostream &f = *file;
 				// Chunk ID (= plugin ID)
 				char id[4] = { 'F', 'X', '0', '0' };
-				if(i >= 100) id[1] = '0' + (i / 100u);
-				id[2] += (i / 10u) % 10u;
-				id[3] += (i % 10u);
+				if(i >= 100) id[1] = static_cast<unsigned char>(static_cast<unsigned char>('0') + (i / 100u));
+				id[2] = static_cast<unsigned char>(static_cast<unsigned char>('0') + ((i / 10u) % 10u));
+				id[3] = static_cast<unsigned char>(static_cast<unsigned char>('0') + (i % 10u));
 				mpt::IO::WriteRaw(f, id, 4);
 
 				// Write chunk size, plugin info and plugin data chunk
@@ -2132,7 +2112,7 @@ uint32 CSoundFile::SaveMixPlugins(std::ostream *file, bool updatePlugData)
 #endif // MODPLUG_NO_FILESAVE
 
 
-std::pair<bool, bool> CSoundFile::LoadMixPlugins(FileReader &file)
+std::pair<bool, bool> CSoundFile::LoadMixPlugins(FileReader &file, bool ignoreChannelCount)
 {
 	bool hasPluginChunks = false, isBeRoTracker = false;
 	while(file.CanRead(9))
@@ -2154,6 +2134,10 @@ std::pair<bool, bool> CSoundFile::LoadMixPlugins(FileReader &file)
 		// Channel FX
 		if(!memcmp(code, "CHFX", 4))
 		{
+			if(!ignoreChannelCount)
+			{
+				ChnSettings.resize(std::clamp(static_cast<CHANNELINDEX>(chunkSize / 4), GetNumChannels(), MAX_BASECHANNELS));
+			}
 			for(auto &chn : ChnSettings)
 			{
 				chn.nMixPlugin = static_cast<PLUGINDEX>(chunk.ReadUint32LE());
@@ -2166,8 +2150,8 @@ std::pair<bool, bool> CSoundFile::LoadMixPlugins(FileReader &file)
 		else if(code[0] == 'F' && (code[1] == 'X' || MPT_ISDIGIT(1)) && MPT_ISDIGIT(2) && MPT_ISDIGIT(3))
 #undef MPT_ISDIGIT
 		{
-			uint16 fxplug = (code[2] - '0') * 10 + (code[3] - '0');  //calculate plug-in number.
-			if(code[1] != 'X') fxplug += (code[1] - '0') * 100;
+			uint16 fxplug = static_cast<uint16>((code[2] - '0') * 10 + (code[3] - '0'));  //calculate plug-in number.
+			if(code[1] != 'X') fxplug += static_cast<uint16>((code[1] - '0') * 100);
 			if(fxplug < MAX_MIXPLUGINS)
 			{
 				PLUGINDEX plug = static_cast<PLUGINDEX>(fxplug);
@@ -2255,14 +2239,14 @@ void CSoundFile::SaveExtendedSongProperties(std::ostream &f) const
 		mpt::IO::WriteIntLE(f, field); \
 	}
 
-	if(m_nDefaultTempo.GetInt() > 255)
+	if(Order().GetDefaultTempo().GetInt() > 255)
 	{
-		uint32 tempo = m_nDefaultTempo.GetInt();
+		uint32 tempo = Order().GetDefaultTempo().GetInt();
 		WRITEMODULAR(MagicBE("DT.."), tempo);
 	}
-	if(m_nDefaultTempo.GetFract() != 0 && specs.hasFractionalTempo)
+	if(Order().GetDefaultTempo().GetFract() != 0 && specs.hasFractionalTempo)
 	{
-		uint32 tempo = m_nDefaultTempo.GetFract();
+		uint32 tempo = Order().GetDefaultTempo().GetFract();
 		WRITEMODULAR(MagicLE("DTFR"), tempo);
 	}
 
@@ -2274,13 +2258,13 @@ void CSoundFile::SaveExtendedSongProperties(std::ostream &f) const
 
 	if(GetType() != MOD_TYPE_XM)
 	{
-		WRITEMODULAR(MagicBE("C..."), m_nChannels);
+		WRITEMODULAR(MagicBE("C..."), GetNumChannels());
 	}
 
 	if((GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT)) && GetNumChannels() > 64)
 	{
 		// IT header has only room for 64 channels. Save the settings that do not fit to the header here as an extension.
-		WRITEMODULARHEADER(MagicBE("ChnS"), (GetNumChannels() - 64) * 2);
+		WRITEMODULARHEADER(MagicBE("ChnS"), static_cast<uint16>((GetNumChannels() - 64) * 2));
 		for(CHANNELINDEX chn = 64; chn < GetNumChannels(); chn++)
 		{
 			uint8 panvol[2];
@@ -2359,12 +2343,13 @@ void CSoundFile::SaveExtendedSongProperties(std::ostream &f) const
 
 	// Playback compatibility flags
 	{
-		uint8 bits[(kMaxPlayBehaviours + 7) / 8u];
-		MemsetZero(bits);
+		const auto supportedBehaviours = GetSupportedPlaybackBehaviour(GetBestSaveFormat());
+		std::array<uint8, (kMaxPlayBehaviours + 7) / 8u> bits;
+		bits.fill(0);
 		size_t maxBit = 0;
 		for(size_t i = 0; i < kMaxPlayBehaviours; i++)
 		{
-			if(m_playBehaviour[i])
+			if(m_playBehaviour[i] && supportedBehaviours[i])
 			{
 				bits[i >> 3] |= 1 << (i & 0x07);
 				maxBit = i + 8;
@@ -2372,7 +2357,7 @@ void CSoundFile::SaveExtendedSongProperties(std::ostream &f) const
 		}
 		uint16 numBytes = static_cast<uint16>(maxBit / 8u);
 		WRITEMODULARHEADER(MagicBE("MSF."), numBytes);
-		mpt::IO::WriteRaw(f, bits, numBytes);
+		mpt::IO::WriteRaw(f, bits.data(), numBytes);
 	}
 
 	if(!m_songArtist.empty() && specs.hasArtistName)
@@ -2401,7 +2386,7 @@ void CSoundFile::SaveExtendedSongProperties(std::ostream &f) const
 	// Channel colors
 	{
 		CHANNELINDEX numChannels = 0;
-		for(CHANNELINDEX i = 0; i < m_nChannels; i++)
+		for(CHANNELINDEX i = 0; i < GetNumChannels(); i++)
 		{
 			if(ChnSettings[i].color != ModChannelSettings::INVALID_COLOR)
 			{
@@ -2478,12 +2463,12 @@ bool CSoundFile::LoadExtendedSongProperties(FileReader &file, bool ignoreChannel
 
 		switch (code)					// interpret field code
 		{
-			case MagicBE("DT.."): { uint32 tempo; ReadField(chunk, size, tempo); m_nDefaultTempo.Set(tempo, m_nDefaultTempo.GetFract()); break; }
-			case MagicLE("DTFR"): { uint32 tempoFract; ReadField(chunk, size, tempoFract); m_nDefaultTempo.Set(m_nDefaultTempo.GetInt(), tempoFract); break; }
+			case MagicBE("DT.."): { uint32 tempo; ReadField(chunk, size, tempo); Order().SetDefaultTempo(TEMPO(tempo, Order().GetDefaultTempo().GetFract())); break; }
+			case MagicLE("DTFR"): { uint32 tempoFract; ReadField(chunk, size, tempoFract); Order().SetDefaultTempo(TEMPO(Order().GetDefaultTempo().GetInt(), tempoFract)); break; }
 			case MagicBE("RPB."): ReadField(chunk, size, m_nDefaultRowsPerBeat); break;
 			case MagicBE("RPM."): ReadField(chunk, size, m_nDefaultRowsPerMeasure); break;
 				// FIXME: If there are only PC events on the last few channels in an MPTM MO3, they won't be imported!
-			case MagicBE("C..."): if(!ignoreChannelCount) { CHANNELINDEX chn = 0; ReadField(chunk, size, chn); m_nChannels = Clamp(chn, m_nChannels, MAX_BASECHANNELS); } break;
+			case MagicBE("C..."): if(!ignoreChannelCount) { CHANNELINDEX chn = 0; ReadField(chunk, size, chn); ChnSettings.resize(Clamp(chn, GetNumChannels(), MAX_BASECHANNELS)); } break;
 			case MagicBE("TM.."): ReadFieldCast(chunk, size, m_nTempoMode); break;
 			case MagicBE("PMM."): ReadFieldCast(chunk, size, m_nMixLevels); break;
 			case MagicBE("CWV."): { uint32 ver = 0; ReadField(chunk, size, ver); m_dwCreatedWithVersion = Version(ver); break; }
@@ -2523,11 +2508,13 @@ bool CSoundFile::LoadExtendedSongProperties(FileReader &file, bool ignoreChannel
 				break;
 			case MagicBE("ChnS"):
 				// Channel settings for channels 65+
-				if(size <= (MAX_BASECHANNELS - 64) * 2 && (size % 2u) == 0)
+				static_assert(MAX_BASECHANNELS >= 64);
+				if(size <= (MAX_BASECHANNELS - 64) * 2 && (size % 2u) == 0 && (GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT)))
 				{
-					static_assert(mpt::array_size<decltype(ChnSettings)>::size >= 64);
-					const CHANNELINDEX loopLimit = std::min(uint16(64 + size / 2), uint16(std::size(ChnSettings)));
-
+					const CHANNELINDEX channelsInFile = mpt::saturate_cast<CHANNELINDEX>(64 + size / 2);
+					if(!ignoreChannelCount)
+						ChnSettings.resize(std::clamp(GetNumChannels(), channelsInFile, MAX_BASECHANNELS));
+					const CHANNELINDEX loopLimit = std::min(channelsInFile, GetNumChannels());
 					for(CHANNELINDEX chn = 64; chn < loopLimit; chn++)
 					{
 						auto [pan, vol] = chunk.ReadArray<uint8, 2>();
@@ -2595,7 +2582,7 @@ bool CSoundFile::LoadExtendedSongProperties(FileReader &file, bool ignoreChannel
 	}
 
 	// Validate read values.
-	Limit(m_nDefaultTempo, GetModSpecifications().GetTempoMin(), GetModSpecifications().GetTempoMax());
+	Order().SetDefaultTempo(Clamp(Order().GetDefaultTempo(), GetModSpecifications().GetTempoMin(), GetModSpecifications().GetTempoMax()));
 	if(m_nTempoMode >= TempoMode::NumModes)
 		m_nTempoMode = TempoMode::Classic;
 	if(m_nMixLevels >= MixLevels::NumMixLevels)

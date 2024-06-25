@@ -28,9 +28,11 @@ class ModSequence: public std::vector<PATTERNINDEX>
 	friend class ModSequenceSet;
 
 protected:
-	mpt::ustring m_name;          // Sequence name
-	CSoundFile &m_sndFile;        // Associated CSoundFile
-	ORDERINDEX m_restartPos = 0;  // Restart position when playback of this order ended
+	mpt::ustring m_name;           // Sequence name
+	CSoundFile &m_sndFile;         // Associated CSoundFile
+	ORDERINDEX m_restartPos = 0;   // Restart position when playback of this order ended
+	TEMPO m_defaultTempo{125, 0};  // Default tempo at start of sequence
+	uint32 m_defaultSpeed = 6;     // Default ticks per row at start of sequence
 
 public:
 	ModSequence(CSoundFile &sndFile);
@@ -48,6 +50,8 @@ public:
 	ORDERINDEX GetLengthTailTrimmed() const noexcept;
 	// Returns length of sequence stopping counting on first '---' (or at the end of sequence).
 	ORDERINDEX GetLengthFirstEmpty() const noexcept;
+	// Returns amount of patterns that can be added at the end of the order list before reaching the current format's limits.
+	ORDERINDEX GetRemainingCapacity(ORDERINDEX startingFrom = ORDERINDEX_INVALID, bool enforceFormatLimits = true) const noexcept;
 
 	// Replaces order list with 'newSize' copies of 'pat'.
 	void assign(ORDERINDEX newSize, PATTERNINDEX pat);
@@ -55,8 +59,9 @@ public:
 	// Inserts 'count' orders starting from 'pos' using 'fill' as the pattern index for all inserted orders.
 	// Sequence will automatically grow if needed and if it can't grow enough, some tail orders will be discarded.
 	// Return: Number of orders inserted (up to 'count' many).
-	ORDERINDEX insert(ORDERINDEX pos, ORDERINDEX count) { return insert(pos, count, GetInvalidPatIndex()); }
-	ORDERINDEX insert(ORDERINDEX pos, ORDERINDEX count, PATTERNINDEX fill);
+	ORDERINDEX insert(ORDERINDEX pos, ORDERINDEX count) { return insert(pos, count, GetInvalidPatIndex(), true); }
+	ORDERINDEX insert(ORDERINDEX pos, ORDERINDEX count, PATTERNINDEX fill, bool enforceFormatLimits = true);
+	ORDERINDEX insert(ORDERINDEX pos, const mpt::span<const PATTERNINDEX> orders, bool enforceFormatLimits = true);
 
 	void push_back() { push_back(GetInvalidPatIndex()); }
 	void push_back(PATTERNINDEX pat) { if(GetLength() < MAX_ORDERS) std::vector<PATTERNINDEX>::push_back(pat); }
@@ -119,13 +124,18 @@ public:
 	bool HasSubsongs() const noexcept;
 #endif // MODPLUG_TRACKER
 
-	// Sequence name setter / getter
 	inline void SetName(mpt::ustring newName) noexcept { m_name = std::move(newName); }
 	inline mpt::ustring GetName() const { return m_name; }
 
-	// Restart position setter / getter
 	inline void SetRestartPos(ORDERINDEX restartPos) noexcept { m_restartPos = restartPos; }
 	inline ORDERINDEX GetRestartPos() const noexcept { return m_restartPos; }
+
+	void SetDefaultTempo(TEMPO tempo) noexcept;
+	inline void SetDefaultTempoInt(uint32 tempo) noexcept { SetDefaultTempo(TEMPO{mpt::saturate_cast<uint16>(tempo), 0}); }
+	inline TEMPO GetDefaultTempo() const noexcept { return m_defaultTempo; }
+
+	inline void SetDefaultSpeed(uint32 speed) noexcept { m_defaultSpeed = speed ? speed : 6; }
+	inline uint32 GetDefaultSpeed() const noexcept { return m_defaultSpeed; }
 };
 
 
@@ -185,8 +195,8 @@ public:
 	// Returns true if sequences were modified, false otherwise.
 	bool SplitSubsongsToMultipleSequences();
 
-	// Convert the sequence's restart position information to a pattern command.
-	bool RestartPosToPattern(SEQUENCEINDEX seq);
+	// Convert the sequence's restart position and tempo information to a pattern command.
+	bool WriteGlobalsToPattern(SEQUENCEINDEX seq, bool writeRestartPos, bool writeTempo);
 	// Merges multiple sequences into one and destroys all other sequences.
 	// Returns false if there were no sequences to merge, true otherwise.
 	bool MergeSequences();

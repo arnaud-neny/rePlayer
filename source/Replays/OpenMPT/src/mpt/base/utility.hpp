@@ -13,6 +13,9 @@
 #include "mpt/base/saturate_cast.hpp"
 #endif
 
+#if MPT_CXX_BEFORE(23) && !MPT_COMPILER_MSVC && !MPT_COMPILER_GCC && !MPT_COMPILER_CLANG
+#include <exception>
+#endif
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -53,14 +56,14 @@ constexpr bool in_range(Tsrc val) {
 
 using std::to_underlying;
 
-#else
+#else // !C++23
 
 template <typename T>
 constexpr std::underlying_type_t<T> to_underlying(T value) noexcept {
 	return static_cast<typename std::underlying_type<T>::type>(value);
 }
 
-#endif
+#endif // C++23
 
 
 
@@ -190,6 +193,26 @@ constexpr bool cmp_greater_equal(Ta a, Tb b) noexcept {
 }
 
 #endif
+
+
+
+#if MPT_CXX_AT_LEAST(23)
+
+using std::unreachable;
+
+#else // !C++23
+
+[[noreturn]] inline void unreachable() {
+#if MPT_COMPILER_MSVC
+	__assume(false);
+#elif MPT_COMPILER_GCC || MPT_COMPILER_CLANG
+	__builtin_unreachable();
+#else
+	std::terminate();
+#endif
+}
+
+#endif // C++23
 
 
 

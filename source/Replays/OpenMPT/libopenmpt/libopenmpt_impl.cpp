@@ -512,7 +512,7 @@ std::size_t module_impl::read_wrapper( std::size_t count, std::int16_t * left, s
 	OpenMPT::AudioTargetBufferWithGain<mpt::audio_span_planar<std::int16_t>> target( mpt::audio_span_planar<std::int16_t>( buffers, valid_channels( buffers, std::size( buffers ) ), count ), *m_Dithers, m_Gain );
 	while ( count > 0 ) {
 		std::size_t count_chunk = m_sndFile->Read(
-			static_cast<OpenMPT::CSoundFile::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::CSoundFile::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
+			static_cast<OpenMPT::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
 			target
 			);
 		if ( count_chunk == 0 ) {
@@ -523,7 +523,7 @@ std::size_t module_impl::read_wrapper( std::size_t count, std::int16_t * left, s
 	}
 	if ( count_read == 0 && m_ctl_play_at_end == song_end_action::continue_song ) {
 		// This is the song end, but allow the song or loop to restart on the next call
-		m_sndFile->m_SongFlags.reset(OpenMPT::SONG_ENDREACHED);
+		m_sndFile->m_PlayState.m_flags.reset(OpenMPT::SONG_ENDREACHED);
 	}
 	return count_read;
 }
@@ -535,7 +535,7 @@ std::size_t module_impl::read_wrapper( std::size_t count, float * left, float * 
 	OpenMPT::AudioTargetBufferWithGain<mpt::audio_span_planar<float>> target( mpt::audio_span_planar<float>( buffers, valid_channels( buffers, std::size( buffers ) ), count ), *m_Dithers, m_Gain );
 	while ( count > 0 ) {
 		std::size_t count_chunk = m_sndFile->Read(
-			static_cast<OpenMPT::CSoundFile::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::CSoundFile::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
+			static_cast<OpenMPT::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
 			target
 			);
 		if ( count_chunk == 0 ) {
@@ -546,7 +546,7 @@ std::size_t module_impl::read_wrapper( std::size_t count, float * left, float * 
 	}
 	if ( count_read == 0 && m_ctl_play_at_end == song_end_action::continue_song ) {
 		// This is the song end, but allow the song or loop to restart on the next call
-		m_sndFile->m_SongFlags.reset(OpenMPT::SONG_ENDREACHED);
+		m_sndFile->m_PlayState.m_flags.reset(OpenMPT::SONG_ENDREACHED);
 	}
 	return count_read;
 }
@@ -557,7 +557,7 @@ std::size_t module_impl::read_interleaved_wrapper( std::size_t count, std::size_
 	OpenMPT::AudioTargetBufferWithGain<mpt::audio_span_interleaved<std::int16_t>> target( mpt::audio_span_interleaved<std::int16_t>( interleaved, channels, count ), *m_Dithers, m_Gain );
 	while ( count > 0 ) {
 		std::size_t count_chunk = m_sndFile->Read(
-			static_cast<OpenMPT::CSoundFile::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::CSoundFile::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
+			static_cast<OpenMPT::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
 			target
 			);
 		if ( count_chunk == 0 ) {
@@ -568,7 +568,7 @@ std::size_t module_impl::read_interleaved_wrapper( std::size_t count, std::size_
 	}
 	if ( count_read == 0 && m_ctl_play_at_end == song_end_action::continue_song ) {
 		// This is the song end, but allow the song or loop to restart on the next call
-		m_sndFile->m_SongFlags.reset(OpenMPT::SONG_ENDREACHED);
+		m_sndFile->m_PlayState.m_flags.reset(OpenMPT::SONG_ENDREACHED);
 	}
 	return count_read;
 }
@@ -579,7 +579,7 @@ std::size_t module_impl::read_interleaved_wrapper( std::size_t count, std::size_
 	OpenMPT::AudioTargetBufferWithGain<mpt::audio_span_interleaved<float>> target( mpt::audio_span_interleaved<float>( interleaved, channels, count ), *m_Dithers, m_Gain );
 	while ( count > 0 ) {
 		std::size_t count_chunk = m_sndFile->Read(
-			static_cast<OpenMPT::CSoundFile::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::CSoundFile::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
+			static_cast<OpenMPT::samplecount_t>( std::min( static_cast<std::uint64_t>( count ), static_cast<std::uint64_t>( std::numeric_limits<OpenMPT::samplecount_t>::max() / 2 / 4 / 4 ) ) ), // safety margin / samplesize / channels
 			target
 			);
 		if ( count_chunk == 0 ) {
@@ -590,7 +590,7 @@ std::size_t module_impl::read_interleaved_wrapper( std::size_t count, std::size_
 	}
 	if ( count_read == 0 && m_ctl_play_at_end == song_end_action::continue_song ) {
 		// This is the song end, but allow the song or loop to restart on the next call
-		m_sndFile->m_SongFlags.reset(OpenMPT::SONG_ENDREACHED);
+		m_sndFile->m_PlayState.m_flags.reset(OpenMPT::SONG_ENDREACHED);
 	}
 	return count_read;
 }
@@ -1898,7 +1898,7 @@ std::string module_impl::ctl_get_text( std::string_view ctl, bool throw_if_unkno
 		default:
 			return std::string();
 		}
-		// rePlayer end
+	// rePlayer end
 	} else {
 		MPT_ASSERT_NOTREACHED();
 		return std::string();

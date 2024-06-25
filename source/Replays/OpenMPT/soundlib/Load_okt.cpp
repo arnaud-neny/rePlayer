@@ -346,7 +346,7 @@ bool CSoundFile::ReadOKT(FileReader &file, ModLoadingFlags loadFlags)
 	std::array<int8, 8> pairedChn{{}};
 	ORDERINDEX numOrders = 0;
 
-	InitializeGlobals(MOD_TYPE_OKT);
+	InitializeGlobals(MOD_TYPE_OKT, 0);
 
 	m_modFormat.formatName = U_("Oktalyzer");
 	m_modFormat.type = U_("okt");
@@ -367,20 +367,21 @@ bool CSoundFile::ReadOKT(FileReader &file, ModLoadingFlags loadFlags)
 		{
 		case OktIffChunk::idCMOD:
 			// Channel setup table
-			if(m_nChannels == 0 && chunk.GetLength() >= 8)
+			if(GetNumChannels() == 0 && chunk.CanRead(8))
 			{
 				const auto chnTable = chunk.ReadArray<uint16be, 4>();
+				ChnSettings.reserve(8);
+				CHANNELINDEX realChn = 0;
 				for(CHANNELINDEX chn = 0; chn < 4; chn++)
 				{
 					if(chnTable[chn])
 					{
-						pairedChn[m_nChannels] = 1;
-						pairedChn[m_nChannels + 1] = -1;
-						ChnSettings[m_nChannels].Reset();
-						ChnSettings[m_nChannels++].nPan = (((chn & 3) == 1) || ((chn & 3) == 2)) ? 0xC0 : 0x40;
+						pairedChn[realChn++] = 1;
+						pairedChn[realChn] = -1;
+						ChnSettings.emplace_back().nPan = (((chn & 3) == 1) || ((chn & 3) == 2)) ? 0xC0 : 0x40;
 					}
-					ChnSettings[m_nChannels].Reset();
-					ChnSettings[m_nChannels++].nPan = (((chn & 3) == 1) || ((chn & 3) == 2)) ? 0xC0 : 0x40;
+					realChn++;
+					ChnSettings.emplace_back().nPan = (((chn & 3) == 1) || ((chn & 3) == 2)) ? 0xC0 : 0x40;
 				}
 
 				if(loadFlags == onlyVerifyHeader)
@@ -403,7 +404,7 @@ bool CSoundFile::ReadOKT(FileReader &file, ModLoadingFlags loadFlags)
 			// Read default speed
 			if(chunk.GetLength() >= 2)
 			{
-				m_nDefaultSpeed = Clamp(chunk.ReadUint16BE(), uint16(1), uint16(255));
+				Order().SetDefaultSpeed(Clamp(chunk.ReadUint16BE(), uint16(1), uint16(255)));
 			}
 			break;
 
@@ -443,14 +444,15 @@ bool CSoundFile::ReadOKT(FileReader &file, ModLoadingFlags loadFlags)
 	}
 
 	// If there wasn't even a CMOD chunk, we can't really load this.
-	if(m_nChannels == 0)
+	if(GetNumChannels() == 0)
 		return false;
 
-	m_nDefaultTempo.Set(125);
+	Order().SetDefaultTempoInt(125);
 	m_nDefaultGlobalVolume = MAX_GLOBAL_VOLUME;
 	m_nSamplePreAmp = m_nVSTiVolume = 48;
 	m_nMinPeriod = 113 * 4;
 	m_nMaxPeriod = 856 * 4;
+	m_SongFlags.set(SONG_FASTPORTAS);
 
 	// Fix orderlist
 	Order().resize(numOrders);

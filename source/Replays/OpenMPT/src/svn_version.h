@@ -1,10 +1,21 @@
 
 #pragma once
-#define OPENMPT_VERSION_SVNVERSION "20990"
-#define OPENMPT_VERSION_REVISION 20990
-#define OPENMPT_VERSION_DIRTY 0
-#define OPENMPT_VERSION_MIXEDREVISIONS 0
-#define OPENMPT_VERSION_URL "https://source.openmpt.org/svn/openmpt/tags/libopenmpt-0.7.8"
-#define OPENMPT_VERSION_DATE "2024-06-09T10:46:26.177639Z"
+
+#if defined(MPT_PACKAGE)
 #define OPENMPT_VERSION_IS_PACKAGE 1
+#else
+#define OPENMPT_VERSION_IS_PACKAGE 0
+#endif
+
+#if defined(MPT_SVNURL)
+#define OPENMPT_VERSION_URL MPT_SVNURL
+#endif
+
+#if defined(MPT_SVNVERSION)
+#define OPENMPT_VERSION_SVNVERSION MPT_SVNVERSION
+#endif
+
+#if defined(MPT_SVNDATE)
+#define OPENMPT_VERSION_DATE MPT_SVNDATE
+#endif
 

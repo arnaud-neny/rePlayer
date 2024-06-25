@@ -130,18 +130,18 @@ bool CSoundFile::Read669(FileReader &file, ModLoadingFlags loadFlags)
 		return true;
 	}
 	
-	if(!file.CanRead(mpt::saturate_cast<FileReader::off_t>(GetHeaderMinimumAdditionalSize(fileHeader))))
+	if(!file.CanRead(mpt::saturate_cast<FileReader::pos_type>(GetHeaderMinimumAdditionalSize(fileHeader))))
 	{
 		return false;
 	}
 
-	InitializeGlobals(MOD_TYPE_669);
+	InitializeGlobals(MOD_TYPE_669, 8);
 	m_nMinPeriod = 28 << 2;
 	m_nMaxPeriod = 1712 << 3;
-	m_nDefaultTempo.Set(78);
-	m_nDefaultSpeed = 4;
-	m_nChannels = 8;
+	Order().SetDefaultTempoInt(78);
+	Order().SetDefaultSpeed(4);
 	m_playBehaviour.set(kPeriodsAreHertz);
+	m_SongFlags.set(SONG_FASTPORTAS | SONG_AUTO_TONEPORTA);
 #ifdef MODPLUG_TRACKER
 	// 669 uses frequencies rather than periods, so linear slides mode will sound better in the higher octaves.
 	//m_SongFlags.set(SONG_LINEARSLIDES);
@@ -178,7 +178,6 @@ bool CSoundFile::Read669(FileReader &file, ModLoadingFlags loadFlags)
 	// Set up panning
 	for(CHANNELINDEX chn = 0; chn < 8; chn++)
 	{
-		ChnSettings[chn].Reset();
 		ChnSettings[chn].nPan = (chn & 1) ? 0xD0 : 0x30;
 	}
 
@@ -194,8 +193,8 @@ bool CSoundFile::Read669(FileReader &file, ModLoadingFlags loadFlags)
 
 		static constexpr ModCommand::COMMAND effTrans[] =
 		{
-			CMD_PORTAMENTOUP,    // Slide up (param * 80) Hz on every tick
-			CMD_PORTAMENTODOWN,  // Slide down (param * 80) Hz on every tick
+			CMD_AUTO_PORTAUP,    // Slide up (param * 80) Hz on every tick
+			CMD_AUTO_PORTADOWN,  // Slide down (param * 80) Hz on every tick
 			CMD_TONEPORTAMENTO,  // Slide to note by (param * 40) Hz on every tick
 			CMD_S3MCMDEX,        // Add (param * 80) Hz to sample frequency
 			CMD_VIBRATO,         // Add (param * 669) Hz on every other tick
@@ -225,7 +224,7 @@ bool CSoundFile::Read669(FileReader &file, ModLoadingFlags loadFlags)
 				if(noteInstr <= 0xFE)
 				{
 					m->volcmd = VOLCMD_VOLUME;
-					m->vol = ((vol * 64 + 8) / 15);
+					m->vol = static_cast<ModCommand::VOL>((vol * 64 + 8) / 15);
 				}
 
 				if(effParam != 0xFF)
