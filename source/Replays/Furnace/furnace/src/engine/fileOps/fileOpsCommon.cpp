@@ -139,7 +139,7 @@ bool DivEngine::load(unsigned char* f, size_t slen, const char* nameHint) {
     len=slen;
   }
 
-  // step 2: try loading as .fur or .dmf
+  // step 2: try loading as .fur, .dmf, or another magic-ful format
   if (memcmp(file,DIV_DMF_MAGIC,16)==0) {
     return loadDMF(file,len);
   } else if (memcmp(file,DIV_FTM_MAGIC,18)==0) {
@@ -158,20 +158,31 @@ bool DivEngine::load(unsigned char* f, size_t slen, const char* nameHint) {
   // rePlayer end
   } else if (memcmp(file,DIV_TFM_MAGIC,8)==0) {
     return loadTFMv2(file,len);
+  // rePlayer begin
+/*
+  } else if (memcmp(file,DIV_IT_MAGIC,4)==0) {
+    return loadIT(file,len);
+  } else if (len>=48) {
+    if (memcmp(&file[0x2c],DIV_S3M_MAGIC,4)==0) {
+      return loadS3M(file,len);
+    } else if (memcmp(file,DIV_XM_MAGIC,17)==0) {
+      return loadXM(file,len);
+    }
+*/
+  // rePlayer end
   }
 
   // step 3: try loading as .mod or TFEv1 (if the file extension matches)
   if (extS==".tfe") {
     return loadTFMv1(file,len);
-  }
   // rePlayer begin
 /*
-  else if (loadMod(file,len)) {
+  } else if (loadMod(file,len)) {
     delete[] f;
     return true;
-  }
 */
   // rePlayer end
+  }
 
   // step 4: not a valid file
   logE("not a valid module!");

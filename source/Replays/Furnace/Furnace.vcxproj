@@ -550,10 +550,12 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\fileOps\fileOpsCommon.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\ftm.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\fur.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\it.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\mod.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\s3m.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\text.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\tfm.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\xm.cpp" />
     <ClCompile Include="furnace\src\engine\filter.cpp" />
     <ClCompile Include="furnace\src\engine\instrument.cpp" />
     <ClCompile Include="furnace\src\engine\macroInt.cpp" />
@@ -738,6 +740,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\sample.cpp" />
     <ClCompile Include="furnace\src\engine\song.cpp" />
     <ClCompile Include="furnace\src\engine\sysDef.cpp" />
+    <ClCompile Include="furnace\src\engine\tiunaOps.cpp" />
     <ClCompile Include="furnace\src\engine\vgmOps.cpp" />
     <ClCompile Include="furnace\src\engine\waveSynth.cpp" />
     <ClCompile Include="furnace\src\engine\wavetable.cpp" />

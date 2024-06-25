@@ -23,7 +23,7 @@
 #include <math.h>
 
 #define PITCH_OFFSET ((double)(16*2048*(chanMax+1)))
-#define NOTE_ES5506(c,note) (parent->calcBaseFreq(chipClock,chan[c].pcm.freqOffs,note,false))
+#define NOTE_ES5506(c,note) ((amigaPitch && parent->song.linearPitch!=2)?parent->calcBaseFreq(COLOR_NTSC,chan[c].pcm.freqOffs,note,true):parent->calcBaseFreq(chipClock,chan[c].pcm.freqOffs,note,false))
 
 #define rWrite(a,...) {if(!skipRegisterWrites) {hostIntf32.push_back(QueuedHostIntf(4,(a),__VA_ARGS__)); }}
 #define immWrite(a,...) {hostIntf32.push_back(QueuedHostIntf(4,(a),__VA_ARGS__));}
@@ -181,6 +181,47 @@ void DivPlatformES5506::irqb(bool state) {
   */
 }
 
+// modified GUSVolumeTable from Impulse Tracker (SoundDrivers/GUS.INC)
+static const short amigaVolTable[65]={
+  0x000, 0x8FF, 0x9FF, 0xA80,
+  0xAFF, 0xB40, 0xB80, 0xBC0,
+  0xBFF, 0xC20, 0xC40, 0xC60,
+  0xC80, 0xCA0, 0xCC0, 0xCE0,
+  0xCFF, 0xD10, 0xD20, 0xD30,
+  0xD40, 0xD50, 0xD60, 0xD70,
+  0xD80, 0xD90, 0xDA0, 0xDB0,
+  0xDC0, 0xDD0, 0xDE0, 0xDF0,
+  0xDFF, 0xE08, 0xE10, 0xE18,
+  0xE20, 0xE28, 0xE30, 0xE38,
+  0xE40, 0xE48, 0xE50, 0xE58,
+  0xE60, 0xE68, 0xE70, 0xE78,
+  0xE80, 0xE88, 0xE90, 0xE98,
+  0xEA0, 0xEA8, 0xEB0, 0xEB8,
+  0xEC0, 0xEC8, 0xED0, 0xED8,
+  0xEE0, 0xEE8, 0xEF0, 0xEF8,
+  0xEFF
+};
+
+// same thing
+static const short amigaPanTable[128]={
+  0x000, 0x8FF, 0x9FF, 0xA80, 0xAFF, 0xB40, 0xB80, 0xBC0,
+  0xBFF, 0xC20, 0xC40, 0xC60, 0xC80, 0xCA0, 0xCC0, 0xCE0,
+  0xCFF, 0xD10, 0xD20, 0xD30, 0xD40, 0xD50, 0xD60, 0xD70,
+  0xD80, 0xD90, 0xDA0, 0xDB0, 0xDC0, 0xDD0, 0xDE0, 0xDF0,
+  0xDFF, 0xE08, 0xE10, 0xE18, 0xE20, 0xE28, 0xE30, 0xE38,
+  0xE40, 0xE48, 0xE50, 0xE58, 0xE60, 0xE68, 0xE70, 0xE78,
+  0xE80, 0xE88, 0xE90, 0xE98, 0xEA0, 0xEA8, 0xEB0, 0xEB8,
+  0xEC0, 0xEC8, 0xED0, 0xED8, 0xEE0, 0xEE8, 0xEF0, 0xEF8,
+  0xEFF, 0xF04, 0xF08, 0xF0C, 0xF10, 0xF14, 0xF18, 0xF1C,
+  0xF20, 0xF24, 0xF28, 0xF2C, 0xF30, 0xF34, 0xF38, 0xF3C,
+  0xF40, 0xF44, 0xF48, 0xF4C, 0xF50, 0xF54, 0xF58, 0xF5C,
+  0xF60, 0xF64, 0xF68, 0xF6C, 0xF70, 0xF74, 0xF78, 0xF7C,
+  0xF80, 0xF84, 0xF88, 0xF8C, 0xF90, 0xF94, 0xF98, 0xF9C,
+  0xFA0, 0xFA4, 0xFA8, 0xFAC, 0xFB0, 0xFB4, 0xFB8, 0xFBC,
+  0xFC0, 0xFC4, 0xFC8, 0xFCC, 0xFD0, 0xFD4, 0xFD8, 0xFDC,
+  0xFE0, 0xFE4, 0xFE8, 0xFEC, 0xFF0, 0xFF4, 0xFF8, 0xFFF
+};
+
 void DivPlatformES5506::tick(bool sysTick) {
   for (int i=0; i<=chanMax; i++) {
     chan[i].std.next();
@@ -188,7 +229,12 @@ void DivPlatformES5506::tick(bool sysTick) {
     signed int k1=chan[i].k1Prev,k2=chan[i].k2Prev;
     // volume/panning macros
     if (chan[i].std.vol.had) {
-      const int nextVol=VOL_SCALE_LOG((0xfff*chan[i].vol)/0xff,(0xfff*chan[i].std.vol.val)/chan[i].volMacroMax,0xfff);
+      int nextVol;
+      if (amigaVol) {
+        nextVol=VOL_SCALE_LINEAR(MIN(64,chan[i].vol),MIN(64,chan[i].std.vol.val),64);
+      } else {
+        nextVol=VOL_SCALE_LOG((0xfff*chan[i].vol)/0xff,(0xfff*chan[i].std.vol.val)/chan[i].volMacroMax,0xfff);
+      }
       if (chan[i].outVol!=nextVol) {
         chan[i].outVol=nextVol;
         chan[i].volChanged.lVol=1;
@@ -363,7 +409,11 @@ void DivPlatformES5506::tick(bool sysTick) {
     if (chan[i].volChanged.changed) {
       // calculate volume (16 bit)
       if (chan[i].volChanged.lVol) {
-        chan[i].resLVol=VOL_SCALE_LOG(chan[i].outVol,chan[i].outLVol,0xfff);
+        if (amigaVol) {
+          chan[i].resLVol=VOL_SCALE_LOG(amigaVolTable[CLAMP(chan[i].outVol,0,64)],chan[i].outLVol,0xfff);
+        } else {
+          chan[i].resLVol=VOL_SCALE_LOG(chan[i].outVol,chan[i].outLVol,0xfff);
+        }
         chan[i].resLVol-=volScale;
         if (chan[i].resLVol<0) chan[i].resLVol=0;
         chan[i].resLVol<<=4;
@@ -372,7 +422,11 @@ void DivPlatformES5506::tick(bool sysTick) {
         }
       }
       if (chan[i].volChanged.rVol) {
-        chan[i].resRVol=VOL_SCALE_LOG(chan[i].outVol,chan[i].outRVol,0xfff);
+        if (amigaVol) {
+          chan[i].resRVol=VOL_SCALE_LOG(amigaVolTable[CLAMP(chan[i].outVol,0,64)],chan[i].outRVol,0xfff);
+        } else {
+          chan[i].resRVol=VOL_SCALE_LOG(chan[i].outVol,chan[i].outRVol,0xfff);
+        }
         chan[i].resRVol-=volScale;
         if (chan[i].resRVol<0) chan[i].resRVol=0;
         chan[i].resRVol<<=4;
@@ -419,7 +473,7 @@ void DivPlatformES5506::tick(bool sysTick) {
             const unsigned int length=s->samples-1;
             const unsigned int end=start+(length<<11);
             const unsigned int nextBank=(offES5506>>22)&3;
-            const double nextFreqOffs=PITCH_OFFSET*off;
+            const double nextFreqOffs=((amigaPitch && parent->song.linearPitch!=2)?16:PITCH_OFFSET)*off;
             chan[i].pcm.loopMode=loopMode;
             chan[i].pcm.bank=nextBank;
             chan[i].pcm.start=start;
@@ -582,7 +636,12 @@ void DivPlatformES5506::tick(bool sysTick) {
       chan[i].pcm.nextPos=0;
     }
     if (chan[i].freqChanged || chan[i].keyOn || chan[i].keyOff) {
-      chan[i].freq=CLAMP(parent->calcFreq(chan[i].baseFreq,chan[i].pitch,chan[i].fixedArp?chan[i].baseNoteOverride:chan[i].arpOff,chan[i].fixedArp,false,2,chan[i].pitch2,chipClock,chan[i].pcm.freqOffs),0,0x1ffff);
+      if (amigaPitch && parent->song.linearPitch!=2) {
+        chan[i].freq=CLAMP(parent->calcFreq(chan[i].baseFreq,chan[i].pitch,chan[i].fixedArp?chan[i].baseNoteOverride:chan[i].arpOff,chan[i].fixedArp,true,2,chan[i].pitch2,COLOR_NTSC,chan[i].pcm.freqOffs),1,0xffff);
+        chan[i].freq=32768*(COLOR_NTSC/chan[i].freq)/(chipClock/32.0);
+      } else {
+        chan[i].freq=CLAMP(parent->calcFreq(chan[i].baseFreq,chan[i].pitch,chan[i].fixedArp?chan[i].baseNoteOverride:chan[i].arpOff,chan[i].fixedArp,false,2,chan[i].pitch2,chipClock,chan[i].pcm.freqOffs),0,0x1ffff);
+      }
       if (chan[i].keyOn) {
         if (chan[i].pcm.index>=0 && chan[i].pcm.index<parent->song.sampleLen) {
           const int ind=chan[i].pcm.index;
@@ -597,7 +656,7 @@ void DivPlatformES5506::tick(bool sysTick) {
           }
           chan[i].pcm.loopStart=(chan[i].pcm.start+(s->loopStart<<11))&0xfffff800;
           chan[i].pcm.loopEnd=(chan[i].pcm.start+((s->loopEnd)<<11))&0xffffff80;
-          chan[i].pcm.freqOffs=PITCH_OFFSET*off;
+          chan[i].pcm.freqOffs=((amigaPitch && parent->song.linearPitch!=2)?16:PITCH_OFFSET)*off;
           unsigned int startPos=chan[i].pcm.direction?chan[i].pcm.end:chan[i].pcm.start;
           if (chan[i].pcm.nextPos) {
             const unsigned int start=chan[i].pcm.start;
@@ -735,7 +794,7 @@ int DivPlatformES5506::dispatch(DivCommand c) {
         chan[c.chan].sampleNote=c.value;
         if (sample>=0 && sample<parent->song.sampleLen) {
           sampleValid=true;
-          chan[c.chan].volMacroMax=ins->type==DIV_INS_AMIGA?64:0xfff;
+          chan[c.chan].volMacroMax=(ins->type==DIV_INS_AMIGA || amigaVol)?64:0xfff;
           chan[c.chan].panMacroMax=ins->type==DIV_INS_AMIGA?127:0xfff;
           chan[c.chan].pcm.next=ins->amiga.useNoteMap?c.value:sample;
           c.value=ins->amiga.getFreq(c.value);
@@ -750,7 +809,7 @@ int DivPlatformES5506::dispatch(DivCommand c) {
         int sample=ins->amiga.getSample(chan[c.chan].sampleNote);
         if (sample>=0 && sample<parent->song.sampleLen) {
           sampleValid=true;
-          chan[c.chan].volMacroMax=ins->type==DIV_INS_AMIGA?64:0xfff;
+          chan[c.chan].volMacroMax=(ins->type==DIV_INS_AMIGA || amigaVol)?64:0xfff;
           chan[c.chan].panMacroMax=ins->type==DIV_INS_AMIGA?127:0xfff;
           chan[c.chan].pcm.next=ins->amiga.useNoteMap?chan[c.chan].sampleNote:sample;
           c.value=ins->amiga.getFreq(chan[c.chan].sampleNote);
@@ -777,13 +836,26 @@ int DivPlatformES5506::dispatch(DivCommand c) {
         chan[c.chan].volChanged.changed=0xff;
       }
       if (!chan[c.chan].std.vol.will) {
-        chan[c.chan].outVol=(0xfff*chan[c.chan].vol)/0xff;
+        if (amigaVol) {
+          chan[c.chan].outVol=chan[c.chan].vol;
+        } else {
+          chan[c.chan].outVol=(0xfff*chan[c.chan].vol)/0xff;
+        }
       }
-      if (!chan[c.chan].std.panL.will) {
-        chan[c.chan].outLVol=(0xfff*chan[c.chan].lVol)/0xff;
-      }
-      if (!chan[c.chan].std.panR.will) {
-        chan[c.chan].outRVol=(0xfff*chan[c.chan].rVol)/0xff;
+      if (amigaVol) {
+        if (!chan[c.chan].std.panL.will) {
+          chan[c.chan].outLVol=amigaPanTable[(chan[c.chan].lVol>>1)&127];
+        }
+        if (!chan[c.chan].std.panR.will) {
+          chan[c.chan].outRVol=amigaPanTable[(chan[c.chan].rVol>>1)&127];
+        }
+      } else {
+        if (!chan[c.chan].std.panL.will) {
+          chan[c.chan].outLVol=(0xfff*chan[c.chan].lVol)/0xff;
+        }
+        if (!chan[c.chan].std.panR.will) {
+          chan[c.chan].outRVol=(0xfff*chan[c.chan].rVol)/0xff;
+        }
       }
       chan[c.chan].active=true;
       chan[c.chan].keyOn=true;
@@ -810,7 +882,11 @@ int DivPlatformES5506::dispatch(DivCommand c) {
       if (chan[c.chan].vol!=c.value) {
         chan[c.chan].vol=c.value;
         if (!chan[c.chan].std.vol.has) {
-          chan[c.chan].outVol=(0xfff*c.value)/0xff;
+          if (amigaVol) {
+            chan[c.chan].outVol=c.value;
+          } else {
+            chan[c.chan].outVol=(0xfff*c.value)/0xff;
+          }
           chan[c.chan].volChanged.changed=0xff;
         }
       }
@@ -823,20 +899,39 @@ int DivPlatformES5506::dispatch(DivCommand c) {
         chan[c.chan].ca=0;
         chan[c.chan].volChanged.ca=1;
       }
-      // Left volume
-      if (chan[c.chan].lVol!=c.value) {
-        chan[c.chan].lVol=c.value;
-        if (!chan[c.chan].std.panL.has) {
-          chan[c.chan].outLVol=(0xfff*c.value)/0xff;
-          chan[c.chan].volChanged.lVol=1;
+      if (amigaVol) {
+        // Left volume
+        if (chan[c.chan].lVol!=c.value) {
+          chan[c.chan].lVol=c.value;
+          if (!chan[c.chan].std.panL.has) {
+            chan[c.chan].outLVol=amigaPanTable[(c.value>>1)&127];
+            chan[c.chan].volChanged.lVol=1;
+          }
         }
-      }
-      // Right volume
-      if (chan[c.chan].rVol!=c.value2) {
-        chan[c.chan].rVol=c.value2;
-        if (!chan[c.chan].std.panR.has) {
-          chan[c.chan].outRVol=(0xfff*c.value2)/0xff;
-          chan[c.chan].volChanged.rVol=1;
+        // Right volume
+        if (chan[c.chan].rVol!=c.value2) {
+          chan[c.chan].rVol=c.value2;
+          if (!chan[c.chan].std.panR.has) {
+            chan[c.chan].outRVol=amigaPanTable[(c.value2>>1)&127];
+            chan[c.chan].volChanged.rVol=1;
+          }
+        }
+      } else {
+        // Left volume
+        if (chan[c.chan].lVol!=c.value) {
+          chan[c.chan].lVol=c.value;
+          if (!chan[c.chan].std.panL.has) {
+            chan[c.chan].outLVol=(0xfff*c.value)/0xff;
+            chan[c.chan].volChanged.lVol=1;
+          }
+        }
+        // Right volume
+        if (chan[c.chan].rVol!=c.value2) {
+          chan[c.chan].rVol=c.value2;
+          if (!chan[c.chan].std.panR.has) {
+            chan[c.chan].outRVol=(0xfff*c.value2)/0xff;
+            chan[c.chan].volChanged.rVol=1;
+          }
         }
       }
       break;
@@ -986,7 +1081,7 @@ int DivPlatformES5506::dispatch(DivCommand c) {
       break;
     case DIV_CMD_NOTE_PORTA: {
       int nextFreq=chan[c.chan].baseFreq;
-      const int destFreq=NOTE_ES5506(c.chan,c.value2+chan[c.chan].sampleNoteDelta);
+      int destFreq=NOTE_ES5506(c.chan,c.value2+chan[c.chan].sampleNoteDelta);
       bool return2=false;
       if (destFreq>nextFreq) {
         nextFreq+=c.value;
@@ -1038,7 +1133,7 @@ int DivPlatformES5506::dispatch(DivCommand c) {
       break;
     }
     case DIV_CMD_GET_VOLMAX:
-      return 255;
+      return amigaVol?64:255;
       break;
     case DIV_CMD_MACRO_OFF:
       chan[c.chan].std.mask(c.value,true);
@@ -1093,6 +1188,8 @@ void DivPlatformES5506::reset() {
   while (!hostIntf8.empty()) hostIntf8.pop();
   for (int i=0; i<32; i++) {
     chan[i]=DivPlatformES5506::Channel();
+    chan[i].vol=amigaVol?64:255;
+    chan[i].outVol=amigaVol?64:255;
     chan[i].std.setEngine(parent);
   }
   es5506.reset();
@@ -1148,6 +1245,8 @@ void DivPlatformES5506::setFlags(const DivConfig& flags) {
 
   initChanMax=MAX(4,flags.getInt("channels",0x1f)&0x1f);
   volScale=4095-flags.getInt("volScale",4095);
+  amigaVol=flags.getBool("amigaVol",false);
+  amigaPitch=flags.getBool("amigaPitch",false);
   chanMax=initChanMax;
   pageWriteMask(0x00,0x60,0x0b,chanMax);
 

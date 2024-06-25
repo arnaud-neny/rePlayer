@@ -80,6 +80,7 @@ for other operating systems, you may [build the source](#developer-info).
   - TED used in Commodore Plus/4
   - Casio PV-1000
   - TIA used in Atari 2600
+    - including software tuning engine (TIunA)
   - POKEY used in Atari 8-bit computers
   - **Game Boy**
     - including SOFTWARE ENVELOPES (zombie mode)
@@ -92,6 +93,8 @@ for other operating systems, you may [build the source](#developer-info).
     - Commander X16 VERA
     - tildearrow Sound Unit
     - PowerNoise
+    - Bifurcator
+    - SID2
     - Generic PCM DAC
 - mix and match sound chips!
   - over 200 ready to use presets from computers, game consoles and arcade boards...
@@ -179,6 +182,8 @@ otherwise, you may also need the following:
 
 some Linux distributions (e.g. Ubuntu or openSUSE) will require you to install the `-dev` versions of these.
 
+having libintl is recommended for locale support, but if it isn't present, Furnace will use its own implementation.
+
 ## getting the source
 
 type the following on a terminal/console: (make sure Git is installed)
@@ -258,11 +263,13 @@ Available options:
 | Name | Default | Description |
 | :--: | :-----: | ----------- |
 | `BUILD_GUI` | `ON` | Build the tracker (disable to build only a headless player) |
+| `WITH_LOCALE` | `ON` | Enable language support |
 | `USE_RTMIDI` | `ON` | Build with MIDI support using RtMidi |
 | `USE_SDL2` | `ON` | Build with SDL2 (required to build with GUI) |
 | `USE_SNDFILE` | `ON` | Build with libsndfile (required in order to work with audio files) |
 | `USE_BACKWARD` | `ON` | Use backward-cpp to print a backtrace on crash/abort |
 | `USE_FREETYPE` | `OFF` | Build with FreeType support |
+| `USE_MOMO` | auto\*\*\* | Build a libintl implementation instead of using the system one |
 | `WITH_JACK` | auto\* | Whether to build with JACK support. Auto-detects if JACK is available |
 | `WITH_PORTAUDIO` | `ON` | Whether to build with PortAudio. |
 | `SYSTEM_FFTW` | `OFF` | Use a system-installed version of FFTW instead of the vendored one |
@@ -278,11 +285,14 @@ Available options:
 | `WITH_INSTRUMENTS` | `ON` | Install demo instruments on `make install` |
 | `WITH_WAVETABLES` | `ON` | Install wavetables on `make install` |
 | `SHOW_OPEN_ASSETS_MENU_ENTRY` | `OFF` | Show option to open built-in assets directory (on supported platforms) |
+| `CONSOLE_SUBSYSTEM` | `OFF` | Build with subsystem set to Console on Windows |
 | `FORCE_APPLE_BIN` | `OFF` | Enable installation of binaries (when doing `make install`) to PREFIX/bin on Apple platforms |
 
 (\*) `ON` if system-installed JACK detected, otherwise `OFF`
 
 (\*\*) but consider enabling this & reporting any errors that arise from it!
+
+(\*\*\*) enabled by default if both libintl and setlocale aren't present (MSVC and Android), or on macOS
 
 ## CMake Error
 

@@ -1840,6 +1840,15 @@
     <ClCompile Include="furnace\extern\adpcm-xq-s\adpcm-lib.c">
       <Filter>Source Files\adpcm-xq-s</Filter>
     </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\it.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\xm.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\tiunaOps.cpp">
+      <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="furnace\extern\SAASound\src\SAAFreq.dat">
