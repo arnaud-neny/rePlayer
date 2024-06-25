@@ -6146,10 +6146,11 @@ static ImVec2 CalcWindowAutoFitSize(ImGuiWindow* window, const ImVec2& size_cont
     else
     {
         // Maximum window size is determined by the viewport size or monitor size
+        const bool is_child_not_popup = (window->Flags & ImGuiWindowFlags_ChildWindow) && !(window->Flags & ImGuiWindowFlags_Popup);
         ImVec2 size_min = CalcWindowMinSize(window);
-        ImVec2 size_max = (window->ViewportOwned || ((window->Flags & ImGuiWindowFlags_ChildWindow) && !(window->Flags & ImGuiWindowFlags_Popup))) ? ImVec2(FLT_MAX, FLT_MAX) : ImGui::GetMainViewport()->WorkSize - style.DisplaySafeAreaPadding * 2.0f;
+        ImVec2 size_max = (window->ViewportOwned || is_child_not_popup) ? ImVec2(FLT_MAX, FLT_MAX) : ImGui::GetMainViewport()->WorkSize - style.DisplaySafeAreaPadding * 2.0f;
         const int monitor_idx = window->ViewportAllowPlatformMonitorExtend;
-        if (monitor_idx >= 0 && monitor_idx < g.PlatformIO.Monitors.Size && (window->Flags & ImGuiWindowFlags_ChildWindow) == 0)
+        if (monitor_idx >= 0 && monitor_idx < g.PlatformIO.Monitors.Size && !is_child_not_popup)
             size_max = g.PlatformIO.Monitors[monitor_idx].WorkSize - style.DisplaySafeAreaPadding * 2.0f;
         ImVec2 size_auto_fit = ImClamp(size_desired, size_min, ImMax(size_min, size_max));
 
