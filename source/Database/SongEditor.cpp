@@ -749,18 +749,22 @@ namespace rePlayer
 
             if (areSubsongsUpdated)
             {
-                if (m_song.edited.subsongs[0].isInvalid && !m_song.original.subsongs[0].isInvalid)
+                if (m_song.edited.subsongs[0].isInvalid != m_song.original.subsongs[0].isInvalid)
                 {
-                    m_song.edited.subsongs.Resize(1);
-                    m_song.edited.subsongs[0].name = {};
-                    m_song.edited.subsongs[0].isDiscarded = false;
-                    m_song.edited.subsongs[0].rating = 0;
-                    m_song.edited.subsongs[0].state = SubsongState::Undefined;
-                    m_song.edited.subsongs[0].isInvalid = true;
-                    m_song.edited.lastSubsongIndex = 0;
+                    if (m_song.edited.subsongs[0].isInvalid)
+                    {
+                        m_song.edited.subsongs.Resize(1);
+                        m_song.edited.subsongs[0].name = {};
+                        m_song.edited.subsongs[0].isDiscarded = false;
+                        m_song.edited.subsongs[0].rating = 0;
+                        m_song.edited.subsongs[0].state = SubsongState::Undefined;
+                        m_song.edited.subsongs[0].isInvalid = true;
+                        m_song.edited.lastSubsongIndex = 0;
 
-                    currentSongEdit->subsongs[0].durationCs = 0;
-                    currentSongEdit->subsongs[0].isInvalid = true;
+                        currentSongEdit->subsongs[0].durationCs = 0;
+                    }
+
+                    currentSongEdit->subsongs[0].isInvalid = m_song.edited.subsongs[0].isInvalid;
                 }
                 for (uint16_t i = 0; i <= m_song.edited.lastSubsongIndex; i++)
                 {
