@@ -89,12 +89,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;MPT_BUILD_DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;MPT_WITH_MPG123;MPT_WITH_OGG;MPT_WITH_VORBIS;MPT_WITH_VORBISFILE;MPT_WITH_ZLIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;MPT_BUILD_DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\libmpg123;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\include;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -110,12 +110,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;MPT_BUILD_DEBUG;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;MPT_WITH_MPG123;MPT_WITH_OGG;MPT_WITH_VORBIS;MPT_WITH_VORBISFILE;MPT_WITH_ZLIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;MPT_BUILD_DEBUG;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\libmpg123;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\include;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -133,12 +133,12 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;MPT_WITH_MPG123;MPT_WITH_OGG;MPT_WITH_VORBIS;MPT_WITH_VORBISFILE;MPT_WITH_ZLIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\libmpg123;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\include;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -163,12 +163,12 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MPT_BUILD_MSVC_STATIC;MPT_BUILD_MSVC;MPT_WITH_MPG123;MPT_WITH_OGG;MPT_WITH_VORBIS;MPT_WITH_VORBISFILE;MPT_WITH_ZLIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1;_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1;LIBOPENMPT_BUILD;MPT_CHECK_CXX_IGNORE_PREPROCESSOR;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\libmpg123;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)src;$(ProjectDir)common;$(ProjectDir);$(SolutionDir)3rdParty\ogg\include;$(SolutionDir)3rdParty\vorbis\include;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\mpg123\src\include;$(SolutionDir)3rdParty\mpg123\\ports\MSVC++;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>

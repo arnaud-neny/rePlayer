@@ -18,15 +18,13 @@
 
 #include <atomic>
 
-#define OPENMPT_REVISION "r21056"
-
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::OpenMPT,
         .name = "OpenMPT",
-        .about = "OpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION "\nCopyright (c) 2004-2024 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
-        .settings = "OpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION,
+        .about = "OpenMPT " OPENMPT_API_VERSION_STRING "\nCopyright (c) 2004-2024 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
+        .settings = "OpenMPT " OPENMPT_API_VERSION_STRING,
         .init = ReplayOpenMPT::Init,
         .release = ReplayOpenMPT::Release,
         .load = ReplayOpenMPT::Load,
@@ -405,7 +403,7 @@ namespace rePlayer
             info += type;
             openmpt_free_string(type);
         }
-        info += "\nOpenMPT " OPENMPT_API_VERSION_STRING OPENMPT_REVISION;
+        info += "\nOpenMPT " OPENMPT_API_VERSION_STRING;
         return info;
     }
 
