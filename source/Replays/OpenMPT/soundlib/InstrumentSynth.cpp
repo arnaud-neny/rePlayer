@@ -569,12 +569,12 @@ bool InstrumentSynth::States::State::EvaluateEvent(const Event &event, PlayState
 	case Event::Type::Puma_SetPitch:
 		m_linearPitchFactor = event.i8 * 8;
 		m_periodAdd = 0;
-		m_ticksRemain = event.Byte2();
+		m_ticksRemain = std::max(event.Byte2(), uint8(1)) - 1;
 		return true;
 	case Event::Type::Puma_PitchRamp:
 		m_linearPitchFactor = 0;
 		m_periodAdd = event.i8 * 4;
-		m_ticksRemain = event.Byte2();
+		m_ticksRemain = std::max(event.Byte2(), uint8(1)) - 1;
 		return true;
 
 	case Event::Type::Mupp_SetWaveform:
@@ -808,10 +808,13 @@ bool InstrumentSynth::States::State::EvaluateEvent(const Event &event, PlayState
 		playState.m_nGlobalVolume = event.u16;
 		return false;
 	case Event::Type::FTM_SetTempo:
-		playState.m_nMusicTempo = TEMPO(1777517.482 / event.u16);
+		playState.m_nMusicTempo = TEMPO(1777517.482 / std::clamp(event.u16, uint16(0x1000), uint16(0x4FFF)));
 		return false;
 	case Event::Type::FTM_SetSpeed:
-		playState.m_nMusicSpeed = event.u16;
+		if(event.u16)
+			playState.m_nMusicSpeed = event.u16;
+		else
+			playState.m_nMusicSpeed = uint16_max;
 		return false;
 	case Event::Type::FTM_SetPlayPosition:
 		if(ORDERINDEX playPos = sndFile.Order().FindOrder(event.u16, event.u16); playPos != ORDERINDEX_INVALID)
@@ -872,7 +875,7 @@ void GlobalScriptState::NextTick(PlayState &playState, const CSoundFile &sndFile
 	{
 		auto &state = states[chn];
 		auto &modChn = playState.Chn[chn];
-		if(modChn.rowCommand.command == CMD_MED_SYNTH_JUMP && modChn.isFirstTick)
+		if(modChn.rowCommand.command == CMD_MED_SYNTH_JUMP && !playState.m_nTickCount)
 			states[chn].JumpToPosition(sndFile.m_globalScript, modChn.rowCommand.param);
 		int32 period = 0;
 		state.NextTick(sndFile.m_globalScript, playState, chn, period, sndFile, *this);

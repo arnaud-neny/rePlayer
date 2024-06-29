@@ -406,6 +406,7 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 
 		// Check if pattern is valid
 		playState.m_nPattern = playState.m_nCurrentOrder < orderList.size() ? orderList[playState.m_nCurrentOrder] : orderList.GetInvalidPatIndex();
+		playState.m_nTickCount = 0;
 
 		if(!Patterns.IsValidPat(playState.m_nPattern) && playState.m_nPattern != orderList.GetInvalidPatIndex() && target.mode == GetLengthTarget::SeekPosition && playState.m_nCurrentOrder == target.pos.order)
 		{
@@ -809,8 +810,9 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 				break;
 			}
 
-			// The following calculations are not interesting if we just want to get the song length.
-			if(!(adjustMode & eAdjust))
+			// The following calculations are not interesting if we just want to get the song length...
+			// ...unless we're playing a Face The Music module with scripts that may modify the speed or tempo based on some volume or pitch variable (see schlendering.ftm)
+			if(!(adjustMode & eAdjust) && m_globalScript.empty())
 				continue;
 
 			ResetAutoSlides(chn);
@@ -1049,6 +1051,14 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 			}
 		}
 
+		if(!m_globalScript.empty())
+		{
+			for(playState.m_nTickCount = 1; playState.m_nTickCount < numTicks; playState.m_nTickCount++)
+			{
+				playState.m_globalScriptState.NextTick(playState, *this);
+			}
+		}
+
 		// Interpret F00 effect in XM files as "stop song"
 		if(GetType() == MOD_TYPE_XM && playState.m_nMusicSpeed == uint16_max)
 		{
@@ -1127,7 +1137,8 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 				{
 					if(m.command == CMD_OFFSET)
 					{
-						ProcessSampleOffset(chn, nChn, playState);
+						if(!porta || !(GetType() & (MOD_TYPE_XM | MOD_TYPE_DBM)))
+							ProcessSampleOffset(chn, nChn, playState);
 					} else if(m.command == CMD_OFFSETPERCENTAGE)
 					{
 						SampleOffset(chn, Util::muldiv_unsigned(chn.nLength, m.param, 256));
@@ -1303,8 +1314,9 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 						}
 						break;
 					case VOLCMD_PLAYCONTROL:
-						if(m.vol <= 1)
-							chn.isPaused = (m.vol == 0);
+						if(m.vol >= 2 && m.vol <= 4)
+							memory.RenderChannel(nChn, oldTickDuration);  // Re-sync what we've got so far
+						chn.PlayControl(m.vol);
 						break;
 					default:
 						break;
@@ -2176,8 +2188,10 @@ void CSoundFile::NoteChange(ModChannel &chn, int note, bool bPorta, bool bResetE
 		chn.paulaState.Reset();
 	}
 	const bool wasGlobalSlideRunning = chn.autoSlide.IsActive(AutoSlideCommand::GlobalVolumeSlide);
+	const bool wasChannelVolSlideRunning = chn.autoSlide.IsActive(AutoSlideCommand::VolumeDownWithDuration);
 	chn.autoSlide.Reset();
 	chn.autoSlide.SetActive(AutoSlideCommand::GlobalVolumeSlide, wasGlobalSlideRunning);
+	chn.autoSlide.SetActive(AutoSlideCommand::VolumeDownWithDuration, wasChannelVolSlideRunning);
 }
 
 
@@ -2550,7 +2564,7 @@ bool CSoundFile::ProcessEffects()
 		const uint32 tickCount = m_PlayState.m_nTickCount % (m_PlayState.m_nMusicSpeed + m_PlayState.m_nFrameDelay);
 		uint32 instr = chn.rowCommand.instr;
 		ModCommand::VOLCMD volcmd = chn.rowCommand.volcmd;
-		uint32 vol = chn.rowCommand.vol;
+		ModCommand::VOL vol = chn.rowCommand.vol;
 		ModCommand::COMMAND cmd = chn.rowCommand.command;
 		uint32 param = chn.rowCommand.param;
 		bool bPorta = chn.rowCommand.IsTonePortamento();
@@ -3174,7 +3188,7 @@ bool CSoundFile::ProcessEffects()
 				{
 					// IT Compatibility: Effects in the volume column don't have an unified memory.
 					// Test case: VolColMemory.it
-					if(vol) chn.nOldVolParam = static_cast<ModCommand::PARAM>(vol); else vol = chn.nOldVolParam;
+					if(vol) chn.nOldVolParam = vol; else vol = chn.nOldVolParam;
 				}
 
 				switch(volcmd)
@@ -3190,7 +3204,7 @@ bool CSoundFile::ProcessEffects()
 							break;
 					} else
 					{
-						chn.nOldVolParam = static_cast<ModCommand::PARAM>(vol);
+						chn.nOldVolParam = vol;
 					}
 					VolumeSlide(chn, static_cast<ModCommand::PARAM>(volcmd == VOLCMD_VOLSLIDEUP ? (vol << 4) : vol));
 					break;
@@ -3202,7 +3216,7 @@ bool CSoundFile::ProcessEffects()
 					{
 						// IT Compatibility: Volume column volume slides have their own memory
 						// Test case: VolColMemory.it
-						FineVolumeUp(chn, static_cast<ModCommand::PARAM>(vol), m_playBehaviour[kITVolColMemory]);
+						FineVolumeUp(chn, vol, m_playBehaviour[kITVolColMemory]);
 					}
 					break;
 
@@ -3213,7 +3227,7 @@ bool CSoundFile::ProcessEffects()
 					{
 						// IT Compatibility: Volume column volume slides have their own memory
 						// Test case: VolColMemory.it
-						FineVolumeDown(chn, static_cast<ModCommand::PARAM>(vol), m_playBehaviour[kITVolColMemory]);
+						FineVolumeDown(chn, vol, m_playBehaviour[kITVolColMemory]);
 					}
 					break;
 
@@ -3230,7 +3244,7 @@ bool CSoundFile::ProcessEffects()
 					break;
 
 				case VOLCMD_PANSLIDELEFT:
-					PanningSlide(chn, static_cast<ModCommand::PARAM>(vol), !m_playBehaviour[kFT2VolColMemory]);
+					PanningSlide(chn, vol, !m_playBehaviour[kFT2VolColMemory]);
 					break;
 
 				case VOLCMD_PANSLIDERIGHT:
@@ -3260,8 +3274,7 @@ bool CSoundFile::ProcessEffects()
 					break;
 
 				case VOLCMD_PLAYCONTROL:
-					if(vol <= 1)
-						chn.isPaused = (vol == 0);
+					chn.PlayControl(vol);
 					break;
 
 				default:
@@ -3378,7 +3391,7 @@ bool CSoundFile::ProcessEffects()
 			{
 				// FT2 compatibility: Portamento + Offset = Ignore offset
 				// Test case: porta-offset.xm
-				if(bPorta && GetType() == MOD_TYPE_XM)
+				if(bPorta && (GetType() & (MOD_TYPE_XM | MOD_TYPE_DBM)))
 					break;
 
 				ProcessSampleOffset(chn, nChn, m_PlayState);
