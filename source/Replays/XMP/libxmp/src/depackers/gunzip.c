@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2021 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -82,7 +82,7 @@ static int decrunch_gzip(HIO_HANDLE *in, void **out, long *outlen)
 	member.os  = hio_read8(in);
 
 	if (member.cm != 0x08) {
-		D_(D_CRIT "Unsuported compression method: %x", member.cm);
+		D_(D_CRIT "Unsupported compression method: %x", member.cm);
 		return -1;
 	}
 
@@ -152,8 +152,8 @@ static int decrunch_gzip(HIO_HANDLE *in, void **out, long *outlen)
 	crc_in = hio_read32l(in);
 	crc = libxmp_crc32_A((uint8 *)pOut_buf, pOut_len, 0UL);
 	if (crc_in != crc) {
-		D_(D_CRIT "CRC-32 mismatch: expected %08zx, got %08zx",
-		   (size_t)crc_in, (size_t)crc);
+		D_(D_CRIT "CRC-32 mismatch: expected %08lx, got %08lx",
+		   (unsigned long)crc_in, (unsigned long)crc);
 		free(pOut_buf);
 		return -1;
 	}
@@ -174,5 +174,6 @@ static int decrunch_gzip(HIO_HANDLE *in, void **out, long *outlen)
 
 const struct depacker libxmp_depacker_gzip = {
 	test_gzip,
+	NULL,
 	decrunch_gzip
 };

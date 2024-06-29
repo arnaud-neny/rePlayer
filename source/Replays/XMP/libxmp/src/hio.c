@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2022 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -541,4 +541,20 @@ int hio_close(HIO_HANDLE *h)
 long hio_size(HIO_HANDLE *h)
 {
 	return h->size;
+}
+
+/* Returns a pointer to the underlying continuous memory buffer the entire
+ * contents of HIO_HANDLE `h` are stored at if applicable, otherwise NULL.
+ * Do not reallocate this pointer or modify its underlying data!
+ */
+const unsigned char *hio_get_underlying_memory(HIO_HANDLE *h)
+{
+	switch (HIO_HANDLE_TYPE(h)) {
+	case HIO_HANDLE_TYPE_FILE:
+	case HIO_HANDLE_TYPE_CBFILE:
+		return NULL;
+	case HIO_HANDLE_TYPE_MEMORY:
+		return h->handle.mem->start;
+	}
+	return NULL;
 }

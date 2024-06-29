@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 2023 Alice Rowan <petrifiedrowan@gmail.com>
+ * Copyright (C) 2023-2024 Alice Rowan <petrifiedrowan@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -136,8 +136,8 @@ static int xmf_test(HIO_HANDLE *f, char *t, const int start)
 	samples_start = 0x1103 + num_channels + num_patterns * num_channels * 64 * 6;
 	length = hio_size(f);
 	if (length < samples_start || (size_t)length - samples_start < samples_length) {
-		D_(D_WARN "not XMF: file length %ld is shorter than required %zu",
-		 length, (size_t)samples_start + samples_length);
+		D_(D_WARN "not XMF: file length %ld is shorter than required %lu",
+		 length, (unsigned long)samples_start + samples_length);
 		return -1;
 	}
 

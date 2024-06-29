@@ -2,7 +2,7 @@
  * Copyright (C) 1998 Sylvain "Asle" Chipaux
  * Copyright (C) 2006-2013 Sylvain "Asle" Chipaux
  * Modified by Claudio Matsuoka
- * Modified in 2021 by Alice Rowan
+ * Modified in 2021-2024 by Alice Rowan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -457,10 +457,10 @@ static int theplayer_test(const uint8 *data, char *t, int s, int version)
 
 	/* test pattern table */
 	len = 0;
-	while (1) {
+	while (len < 128) {
 		int pat = data[num_ins * 6 + 4 + num_pat * 8 + len];
 
-		if (pat == 0xff || len >= 128)
+		if (pat == 0xff)
 			break;
 
 		if (version >= 0x60) {
@@ -511,7 +511,7 @@ static int theplayer_test(const uint8 *data, char *t, int s, int version)
 }
 
 
-static int depack_p50a(HIO_HANDLE *in, mem_out *out)
+static int depack_p50a(HIO_HANDLE *in, mem_out *out) // rePlayer
 {
 	return theplayer_depack(in, out, 0x50);
 }

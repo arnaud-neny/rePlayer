@@ -27,6 +27,9 @@
     <Filter Include="Source Files\libxmp\src\loaders\prowizard">
       <UniqueIdentifier>{2d262cd2-259c-43a8-bb79-ef4fe566c230}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\libxmp\src\depackers\lhasa">
+      <UniqueIdentifier>{86d00a33-a3cd-4cc1-b0d1-cb93b6c0fc0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayXMP.h">
@@ -169,6 +172,30 @@
     </ClInclude>
     <ClInclude Include="libxmp\src\loaders\prowizard\prowiz.h">
       <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\rng.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\ext_header.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\lha_basic_reader.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\lha_decoder.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\lha_file_header.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\lha_input_stream.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\lhasa.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\lhasa\macbinary.h">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -639,6 +666,63 @@
     </ClCompile>
     <ClCompile Include="libxmp\src\loaders\prowizard\zen.c">
       <Filter>Source Files\libxmp\src\loaders\prowizard</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\rng.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\ext_header.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lh1_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lh5_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lh6_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lh7_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lha_basic_reader.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lha_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lha_file_header.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lha_input_stream.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lha_reader.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lhx_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lk7_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lz5_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\lzs_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\macbinary.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\null_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\pm1_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\lhasa\pm2_decoder.c">
+      <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

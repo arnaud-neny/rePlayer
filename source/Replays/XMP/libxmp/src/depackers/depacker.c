@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2023 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -280,8 +280,9 @@ int libxmp_decrunch(HIO_HANDLE *h, const char *filename, char **temp)
 
 	/* Check built-in depackers */
 	for (i = 0; depacker_list[i] != NULL; i++) {
-		if (depacker_list[i]->test(b)) {
-			depacker = depacker_list[i];
+		const struct depacker *d = depacker_list[i];
+		if ((d->test && d->test(b)) || (d->test_hio && d->test_hio(h))) {
+			depacker = d;
 			D_(D_INFO "Use depacker %d", i);
 			break;
 		}
@@ -357,6 +358,8 @@ int libxmp_exclude_match(const char *name)
 		"*.EXE", "*.exe",
 		"*.COM", "*.com",
 		"*.README", "*.readme", "*.Readme", "*.ReadMe",
+		"*.HTM", "*.htm",
+		"*.HTML", "*.html",
 		/* Found in Spark archives. */
 		"\\?From", "From\\?", "InfoText",
 		NULL

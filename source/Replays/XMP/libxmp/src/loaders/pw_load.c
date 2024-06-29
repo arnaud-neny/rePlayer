@@ -86,7 +86,7 @@ static int pw_load(struct module_data *m, HIO_HANDLE *h, const int start)
 	/* Module loading */
 
 	D_(D_INFO "loading generated module");
-	if ((f = hio_open_mem(temp.buf, temp.pos, 0)) == NULL) {
+	if ((f = hio_open_mem(temp.buf, temp.pos, 0)) == NULL) { // rePlayer
 		goto err2;
 	}
 

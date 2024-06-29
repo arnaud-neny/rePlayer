@@ -1,7 +1,7 @@
 /* ProWizard
  * Copyright (C) 1997-1999 Sylvain "Asle" Chipaux
  * Copyright (C) 2006-2007 Claudio Matsuoka
- * Copyright (C) 2021 Alice Rowan
+ * Copyright (C) 2021-2024 Alice Rowan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,9 +27,7 @@
  */
 
 #include "xmp.h"
-
 #include "prowiz.h"
-
 
 const struct pw_format *const pw_formats[NUM_PW_FORMATS + 1] = {
 	/* With signature */
@@ -147,33 +145,48 @@ const struct pw_format *pw_check(HIO_HANDLE *f, struct xmp_test_info *info)
 	int i, res;
 	char title[21];
 	unsigned char *b;
+	const unsigned char *internal;
+	const unsigned char *src;
 	int s = BUF_SIZE;
 
+	if ((internal = hio_get_underlying_memory(f)) != NULL) {
+		/* File is in memory, so reading chunks isn't necessary. */
+		src = internal;
+		s = hio_size(f);
+		b = NULL;
+
+	} else {
 	b = (unsigned char *) calloc(1, BUF_SIZE);
 	if (b == NULL)
 		return NULL;
 
 	s = hio_read(b, 1, s, f);
+		src = b;
+	}
 
 	for (i = 0; pw_formats[i] != NULL; i++) {
 		D_("checking format [%d]: %s", s, pw_formats[i]->name);
-		res = pw_formats[i]->test(b, title, s);
-		if (res > 0) {
+		res = pw_formats[i]->test(src, title, s);
+		if (res > 0 && !internal) {
 			/* Extra data was requested. */
-			unsigned char *buf = (unsigned char *) realloc(b, s + res);
+			/* Round requests up to 4k to reduce slow checks. */
+			int fetch = (res + 0xfff) & ~0xfff;
+			unsigned char *buf = (unsigned char *) realloc(b, s + fetch);
 			if (buf == NULL) {
 				free(b);
 				return NULL;
 			}
 			b = buf;
+			src = b;
 
 			/* If the requested data can't be read, try the next format. */
-			if (!hio_read(b + s, res, 1, f)) {
+			fetch = hio_read(b + s, 1, fetch, f);
+			if (fetch < res) {
 				continue;
 			}
 
 			/* Try this format again... */
-			s += res;
+			s += fetch;
 			i--;
 		} else if (res == 0) {
 			D_("format ok: %s\n", pw_formats[i]->name);

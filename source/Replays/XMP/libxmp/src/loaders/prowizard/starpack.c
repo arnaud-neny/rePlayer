@@ -1,7 +1,7 @@
 /* ProWizard
  * Copyright (C) 1997 Sylvain "Asle" Chipaux
  * Modified in 2006,2009,2014 by Claudio Matsuoka
- * Modified in 2021 by Alice Rowan
+ * Modified in 2021-2024 by Alice Rowan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -277,7 +277,7 @@ static int test_starpack(const uint8 *data, char *t, int s)
 			return -1;
 	}
 
-	PW_REQUEST_DATA(s, sdata_ofs + 4);
+	PW_REQUEST_DATA(s, sdata_ofs + 8);
 
 	/* test pattern data */
 	pdata_ofs = 788;

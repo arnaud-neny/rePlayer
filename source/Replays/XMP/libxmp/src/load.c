@@ -495,7 +495,7 @@ int xmp_load_module_from_callbacks(xmp_context opaque, void *priv,
 	if (ctx->state > XMP_STATE_UNLOADED)
 		xmp_release_module(opaque);
 
-	m->filename = callbacks.get_name(priv);
+	m->filename = callbacks.get_name(priv); // rePlayer
 	m->basename = get_basename(m->filename); // rePlayer
 	m->dirname = get_dirname(m->filename); // rePlayer
 	m->size = hio_size(h);
