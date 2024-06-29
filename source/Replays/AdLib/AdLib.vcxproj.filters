@@ -269,6 +269,24 @@
     <ClInclude Include="adplug\mtr.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
+    <ClInclude Include="adplug\a2m-v2.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\depack.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\sixpack.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\unlzh.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\unlzss.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\unlzw.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayAdLib.cpp">
@@ -497,6 +515,24 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\mtr.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\a2m-v2.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\depack.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\sixpack.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\unlzh.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\unlzss.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\unlzw.c">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
   </ItemGroup>

@@ -190,6 +190,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="adplugdb.h" />
+    <ClInclude Include="adplug\a2m-v2.h" />
     <ClInclude Include="adplug\a2m.h" />
     <ClInclude Include="adplug\adl.h" />
     <ClInclude Include="adplug\adlibemu.h" />
@@ -207,6 +208,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="adplug\d00.h" />
     <ClInclude Include="adplug\database.h" />
     <ClInclude Include="adplug\debug.h" />
+    <ClInclude Include="adplug\depack.h" />
     <ClInclude Include="adplug\dfm.h" />
     <ClInclude Include="adplug\diskopl.h" />
     <ClInclude Include="adplug\dmo.h" />
@@ -260,12 +262,16 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="adplug\s3m.h" />
     <ClInclude Include="adplug\sa2.h" />
     <ClInclude Include="adplug\silentopl.h" />
+    <ClInclude Include="adplug\sixpack.h" />
     <ClInclude Include="adplug\sng.h" />
     <ClInclude Include="adplug\sop.h" />
     <ClInclude Include="adplug\strnlen.h" />
     <ClInclude Include="adplug\surroundopl.h" />
     <ClInclude Include="adplug\temuopl.h" />
     <ClInclude Include="adplug\u6m.h" />
+    <ClInclude Include="adplug\unlzh.h" />
+    <ClInclude Include="adplug\unlzss.h" />
+    <ClInclude Include="adplug\unlzw.h" />
     <ClInclude Include="adplug\version.h" />
     <ClInclude Include="adplug\vgm.h" />
     <ClInclude Include="adplug\wemuopl.h" />
@@ -275,6 +281,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="ReplayAdLib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="adplug\a2m-v2.cpp" />
     <ClCompile Include="adplug\a2m.cpp" />
     <ClCompile Include="adplug\adl.cpp" />
     <ClCompile Include="adplug\adlibemu.c" />
@@ -292,6 +299,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="adplug\d00.cpp" />
     <ClCompile Include="adplug\database.cpp" />
     <ClCompile Include="adplug\debug.c" />
+    <ClCompile Include="adplug\depack.c" />
     <ClCompile Include="adplug\dfm.cpp" />
     <ClCompile Include="adplug\diskopl.cpp" />
     <ClCompile Include="adplug\dmo.cpp" />
@@ -341,11 +349,15 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="adplug\rol.cpp" />
     <ClCompile Include="adplug\s3m.cpp" />
     <ClCompile Include="adplug\sa2.cpp" />
+    <ClCompile Include="adplug\sixpack.c" />
     <ClCompile Include="adplug\sng.cpp" />
     <ClCompile Include="adplug\sop.cpp" />
     <ClCompile Include="adplug\surroundopl.cpp" />
     <ClCompile Include="adplug\temuopl.cpp" />
     <ClCompile Include="adplug\u6m.cpp" />
+    <ClCompile Include="adplug\unlzh.c" />
+    <ClCompile Include="adplug\unlzss.c" />
+    <ClCompile Include="adplug\unlzw.c" />
     <ClCompile Include="adplug\vgm.cpp" />
     <ClCompile Include="adplug\woodyopl.cpp" />
     <ClCompile Include="adplug\xad.cpp" />

@@ -30,6 +30,7 @@ namespace rePlayer
         static constexpr eExtension kExtension_usfPk = eExtension::_arch;
         static constexpr eExtension kExtension_snsfPk = eExtension::_coco;
         static constexpr eExtension kExtension_mbmPk = eExtension::_cba;
+        static constexpr eExtension kExtension_musPk = eExtension::_a2t;
         if (m_db.SongsVersion() < kSongsVersionWithArchive)
         {
             for (auto* song : m_db.Songs())
@@ -94,13 +95,13 @@ namespace rePlayer
                 }
                 break;
                 case kExtension_mbmPk:
-                case eExtension::_musPk:
+                case kExtension_musPk:
                 case eExtension::_eupPk:
                 {
                     auto oldFilename = m_songs->GetFullpath(song);
                     auto songSheet = song->Edit();
                     songSheet->type.ext = ext == kExtension_mbmPk ? eExtension::_mbm
-                        : ext == eExtension::_musPk ? eExtension::_mus
+                        : ext == kExtension_musPk ? eExtension::_mus
                         : eExtension::_eup;
                     songSheet->subsongs[0].isPackage = false;
                     songSheet->subsongs[0].isArchive = true;

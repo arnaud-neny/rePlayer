@@ -390,7 +390,7 @@ EXTENSION(soc)          // UADE: Jochen_Hippel_ST
 EXTENSION(sog)          // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)         // UADE: JochenHippel
 EXTENSION(cba)          // OpenMPT
-EXTENSION(musPk)        // deprecated (turned into 7z)
+EXTENSION(a2t)			// Adlib: Adlib Tracker 2
 EXTENSION(eup)          // Euphony
 EXTENSION(eupPk)        // deprecated (turned into 7z)
 EXTENSION(4v)           // Quartet

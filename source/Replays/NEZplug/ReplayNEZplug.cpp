@@ -310,7 +310,7 @@ namespace rePlayer
             info += "NEZplug sound format";
         else if (m_mediaType.ext == eExtension::_ay)
             info += "ZXAYEMUL";
-        else if (m_mediaType.ext == eExtension::_mus || m_mediaType.ext == eExtension::_musPk)
+        else if (m_mediaType.ext == eExtension::_mus)
             info += "FAC SoundTracker";
         info += "\n";
         info += "NEZplug++";
