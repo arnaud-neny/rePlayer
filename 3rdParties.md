@@ -43,7 +43,7 @@
 - libnezplug: https://github.com/jprjr/libnezplug
 - libvgm: https://github.com/ValleyBell/libvgm
 - mdxmini: https://github.com/mistydemeo/mdxmini
-- OpenMPT: https://lib.openmpt.org/libopenmpt  
+- OpenMPT: https://source.openmpt.org
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org
 - Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
@@ -63,6 +63,7 @@
   Some changes there to improved the loops (score) and some windows port.
 - WavPack: https://github.com/dbry/WavPack
 - WonderSwan: https://foobar2000.xrea.jp/?Input+64bit#f44897bc
+- XMP: https://github.com/libxmp/libxmp
 - zingzong: https://github.com/benjihan/zingzong
 - ZXTune: https://zxtune.bitbucket.io  
   Stripped to use only ZX stuff and "fixed" for MSVC.

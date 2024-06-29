@@ -1,3 +1,12 @@
+v0.16.0
+- Added XMP
+- Updated adplug to 2.3.3.834
+- Updated Furnace to 0.6.5
+- Updated OpenMPT to 0.8.0-pre.5 r21107
+- Updated libsc68 to 3.0.0a r706
+- Updated libxml2 to 2.13.1
+- Bug fixes
+
 v0.15.21:
 - Added Ayumi
 - Added Ken

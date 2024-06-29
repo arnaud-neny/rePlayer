@@ -220,6 +220,7 @@ Or add some comments (and likes) there:
 - [Vorbis](https://github.com/edubart/minivorbis): to decode OGG sound files.
 - [WavPack](https://github.com/dbry/WavPack): Hybrid Lossless Wavefile Compressor.
 - [WonderSwan](https://foobar2000.xrea.jp/?Input+64bit#f44897bc): aka foo_input_wsr. You can play the song data of BANDAI's Wonder Swan.
+- [XMP](https://xmp.sourceforge.net): Libxmp is a library that renders module files to PCM data.
 - [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
 - [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
 
