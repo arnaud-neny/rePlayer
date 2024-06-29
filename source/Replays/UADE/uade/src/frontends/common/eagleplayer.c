@@ -239,6 +239,13 @@ int uade_analyze_eagleplayer(struct uade_detection_info *detectioninfo,
 
 	custom_check(detectioninfo);
 
+	// rePlayer begin
+	// ignore MED by extension, it sux
+	if (detectioninfo->ep && strcmp(detectioninfo->ep->playername,
+		"MED") == 0)
+		return -1;
+	// rePlayer end
+
 	return detectioninfo->ep != NULL ? 0 : -1;
 }
 
