@@ -39,7 +39,8 @@ namespace rePlayer
         GlobalSettings("ScreamTracker3", "Scream Tracker 3", false, true),
         GlobalSettings("ScreamTracker2", "Scream Tracker 2"),
         GlobalSettings("MultiTracker", "MultiTracker"),
-        GlobalSettings("DigitalTracker", "Digital Tracker", false, true)
+        GlobalSettings("DigitalTracker", "Digital Tracker", false, true),
+        GlobalSettings("DelusionDigital", "Delusion Digital Music", false, true)
     };
 
     bool ReplayOpenMPT::Init(SharedContexts* ctx, Window& window)
