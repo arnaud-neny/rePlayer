@@ -364,7 +364,7 @@ namespace rePlayer
         {
             ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_TabHovered, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.7f, 0.8f));
-            ImGui::PushStyleColor(ImGuiCol_TabActive, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.8f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_TabSelected, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.8f, 1.0f));
             if (ImGui::TabItemButton("Import", ImGuiTabItemFlags_Leading | ImGuiTabItemFlags_NoTooltip))
                 ImGui::OpenPopup("Import");
             ImGui::PopStyleColor(3);
