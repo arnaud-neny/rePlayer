@@ -532,6 +532,13 @@ namespace rePlayer
                         if (collector.artist.name != "n/a" && collector.artist.name != "currently not public")
                             rplArtist->realName = collector.artist.name;
                         rplArtist->handles = collector.artist.handles;
+                        if (collector.artist.handles.IsEmpty())
+                        {
+                            // Shit happens (server failure?)
+                            char buf[32];
+                            sprintf(buf, "#Error:ID%u", artistSourceId.value);
+                            rplArtist->handles.Add(buf);
+                        }
                         rplArtist->groups = collector.artist.groups;
                         rplArtist->sources.Add(artistSourceId);
                         for (auto& country : collector.artist.countries)
