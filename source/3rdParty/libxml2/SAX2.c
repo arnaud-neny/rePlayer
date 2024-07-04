@@ -412,6 +412,13 @@ xmlSAX2ResolveEntity(void *ctx, const xmlChar *publicId, const xmlChar *systemId
     if (ctxt->input != NULL)
 	base = BAD_CAST ctxt->input->filename;
 
+    /*
+     * We don't really need the 'directory' struct member, but some
+     * users set it manually to a base URI for memory streams.
+     */
+    if (base == NULL)
+        base = BAD_CAST ctxt->directory;
+
     if ((xmlStrlen(systemId) > XML_MAX_URI_LENGTH) ||
         (xmlStrlen(base) > XML_MAX_URI_LENGTH)) {
         xmlFatalErr(ctxt, XML_ERR_RESOURCE_LIMIT, "URI too long");
@@ -573,6 +580,13 @@ xmlSAX2EntityDecl(void *ctx, const xmlChar *name, int type,
                 break;
             }
         }
+
+        /*
+         * We don't really need the 'directory' struct member, but some
+         * users set it manually to a base URI for memory streams.
+         */
+        if (base == NULL)
+            base = ctxt->directory;
 
         res = xmlBuildURISafe(systemId, (const xmlChar *) base, &URI);
 
@@ -1255,6 +1269,7 @@ xmlSAX2AttributeInternal(void *ctx, const xmlChar *fullname,
     } else
 #endif /* LIBXML_VALID_ENABLED */
            if (((ctxt->loadsubset & XML_SKIP_IDS) == 0) &&
+               (ctxt->input->entity == NULL) &&
                /* Don't create IDs containing entity references */
                (ret->children != NULL) &&
                (ret->children->type == XML_TEXT_NODE) &&
@@ -1987,6 +2002,7 @@ xmlSAX2AttributeNs(xmlParserCtxtPtr ctxt,
     } else
 #endif /* LIBXML_VALID_ENABLED */
            if (((ctxt->loadsubset & XML_SKIP_IDS) == 0) &&
+               (ctxt->input->entity == NULL) &&
                /* Don't create IDs containing entity references */
                (ret->children != NULL) &&
                (ret->children->type == XML_TEXT_NODE) &&

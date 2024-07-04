@@ -1213,7 +1213,7 @@ xmlNodeParseContentInternal(const xmlDoc *doc, xmlNodePtr parent,
     else
         remaining = len;
 
-    if (value == NULL)
+    if ((value == NULL) || (value[0] == 0))
         goto done;
 
     cur = value;
@@ -4059,7 +4059,6 @@ xmlCopyPropInternal(xmlDocPtr doc, xmlNodePtr target, xmlAttrPtr cur) {
      */
     if ((target != NULL) && (cur != NULL) &&
 	(target->doc != NULL) && (cur->doc != NULL) &&
-	(cur->doc->ids != NULL) &&
         (cur->parent != NULL) &&
         (cur->children != NULL)) {
         int res = xmlIsID(cur->doc, cur->parent, cur);
