@@ -912,7 +912,7 @@ EXTENSION(xen)          // VGMStream
 EXTENSION(xma)          // VGMStream: Microsoft XMA RIFF
 EXTENSION(xma2)         // VGMStream
 EXTENSION(xmd)          // VGMStream
-EXTENSION(xms)          // VGMStream
+EXTENSION(xms)          // Adlib: XMS-Tracker & VGMStream
 EXTENSION(xmu)          // VGMStream
 EXTENSION(xmv)          // VGMStream
 EXTENSION(xnb)          // VGMStream: Microsoft XNA Game Studio
