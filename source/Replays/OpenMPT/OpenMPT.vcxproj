@@ -190,6 +190,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="common\BuildSettings.h" />
+    <ClInclude Include="common\BuildSettingsCompiler.h" />
     <ClInclude Include="common\ComponentManager.h" />
     <ClInclude Include="common\Dither.h" />
     <ClInclude Include="common\FileReader.h" />
@@ -357,6 +358,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="soundlib\Load_dsm.cpp" />
     <ClCompile Include="soundlib\Load_dsym.cpp" />
     <ClCompile Include="soundlib\Load_dtm.cpp" />
+    <ClCompile Include="soundlib\Load_etx.cpp" />
     <ClCompile Include="soundlib\Load_far.cpp" />
     <ClCompile Include="soundlib\Load_fmt.cpp" />
     <ClCompile Include="soundlib\Load_ftm.cpp" />

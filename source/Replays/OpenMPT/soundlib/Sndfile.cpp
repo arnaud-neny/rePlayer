@@ -306,6 +306,7 @@ static constexpr FileFormatLoader ModuleFormatLoaders[] =
 	MPT_DECLARE_FORMAT(FTM),
 	MPT_DECLARE_FORMAT(RTM),
 	MPT_DECLARE_FORMAT(CBA),
+	MPT_DECLARE_FORMAT(ETX),
 	MPT_DECLARE_FORMAT(DSm),
 	MPT_DECLARE_FORMAT(STK),
 	MPT_DECLARE_FORMAT(XMF),
@@ -406,6 +407,14 @@ CSoundFile::ProbeResult CSoundFile::Probe(ProbeFlags flags, mpt::span<const std:
 		}
 	}
 	return result;
+}
+
+
+void CSoundFile::Create(MODTYPE type, CHANNELINDEX numChannels, CModDoc *modDoc)
+{
+	Create(FileReader{}, CSoundFile::loadCompleteModule, modDoc);
+	SetType(type);
+	ChnSettings.resize(numChannels);
 }
 
 

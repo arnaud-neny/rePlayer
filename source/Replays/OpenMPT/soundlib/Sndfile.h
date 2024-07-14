@@ -461,12 +461,11 @@ public:
 
 	static constexpr uint32 TICKS_ROW_FINISHED = uint32_max - 1u;
 
-public:	// for Editing
+private:
 #ifdef MODPLUG_TRACKER
 	CModDoc *m_pModDoc = nullptr;  // Can be a null pointer for example when previewing samples from the treeview.
 #endif // MODPLUG_TRACKER
 	Enum<MODTYPE> m_nType;
-private:
 	ModContainerType m_ContainerType = ModContainerType::None;
 public:
 	SAMPLEINDEX m_nSamples = 0;
@@ -664,6 +663,7 @@ public:
 	CModDoc *GetpModDoc() const noexcept { return m_pModDoc; }
 #endif  // MODPLUG_TRACKER
 
+	void Create(MODTYPE type, CHANNELINDEX numChannels, CModDoc *pModDoc = nullptr);
 	bool Create(FileReader file, ModLoadingFlags loadFlags = loadCompleteModule, CModDoc *pModDoc = nullptr);
 private:
 	bool CreateInternal(FileReader file, ModLoadingFlags loadFlags);
@@ -784,6 +784,7 @@ public:
 	static ProbeResult ProbeFileHeaderDSM(MemoryFileReader file, const uint64 *pfilesize);
 	static ProbeResult ProbeFileHeaderDSm(MemoryFileReader file, const uint64 *pfilesize);
 	static ProbeResult ProbeFileHeaderDSym(MemoryFileReader file, const uint64 *pfilesize);
+	static ProbeResult ProbeFileHeaderETX(MemoryFileReader file, const uint64 *pfilesize);
 	static ProbeResult ProbeFileHeaderFAR(MemoryFileReader file, const uint64 *pfilesize);
 	static ProbeResult ProbeFileHeaderFMT(MemoryFileReader file, const uint64 *pfilesize);
 	static ProbeResult ProbeFileHeaderFTM(MemoryFileReader file, const uint64 *pfilesize);
@@ -845,6 +846,7 @@ public:
 	bool ReadDSM(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
 	bool ReadDSm(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
 	bool ReadDSym(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
+	bool ReadETX(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
 	bool ReadFAR(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
 	bool ReadFMT(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
 	bool ReadFTM(FileReader &file, ModLoadingFlags loadFlags = loadCompleteModule);
@@ -1065,7 +1067,8 @@ protected:
 	void TonePortamentoWithDuration(ModChannel &chn, uint16 param = uint16_max) const;
 	void Vibrato(ModChannel &chn, uint32 param) const;
 	void FineVibrato(ModChannel &chn, uint32 param) const;
-	void AutoVolumeSlide(ModChannel& chn, ModCommand::PARAM param) const;
+	void AutoVolumeSlide(ModChannel &chn, ModCommand::PARAM param) const;
+	void VolumeDownETX(const PlayState &playState, ModChannel &chn, ModCommand::PARAM param) const;
 	void VolumeSlide(ModChannel &chn, ModCommand::PARAM param) const;
 	void PanningSlide(ModChannel &chn, ModCommand::PARAM param, bool memory = true) const;
 	void ChannelVolSlide(ModChannel &chn, ModCommand::PARAM param) const;

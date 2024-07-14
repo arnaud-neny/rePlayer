@@ -450,7 +450,7 @@ bool CSoundFile::ReadMT2(FileReader &file, ModLoadingFlags loadFlags)
 	InitializeGlobals(MOD_TYPE_MT2, fileHeader.numChannels);
 
 	m_modFormat.formatName = MPT_UFORMAT("MadTracker {}.{}")(fileHeader.version >> 8, mpt::ufmt::hex0<2>(fileHeader.version & 0xFF));
-	m_modFormat.type = U_("mt2");
+	m_modFormat.type = UL_("mt2");
 	m_modFormat.madeWithTracker = mpt::ToUnicode(mpt::Charset::Windows1252, mpt::String::ReadBuf(mpt::String::maybeNullTerminated, fileHeader.trackerName));
 	m_modFormat.charset = mpt::Charset::Windows1252;
 
@@ -683,7 +683,7 @@ bool CSoundFile::ReadMT2(FileReader &file, ModLoadingFlags loadFlags)
 					if(libraryName.length() > 4 && libraryName[libraryName.length() - 4] == '.')
 					{
 						// Remove ".dll" from library name
-						libraryName.resize(libraryName.length() - 4 );
+						libraryName.resize(libraryName.length() - 4);
 					}
 					mixPlug.Info.szLibraryName = libraryName;
 					mixPlug.Info.dwPluginId1 = Vst::kEffectMagic;

@@ -395,6 +395,9 @@
     <ClInclude Include="soundlib\PlayState.h">
       <Filter>Source Files\soundlib</Filter>
     </ClInclude>
+    <ClInclude Include="common\BuildSettingsCompiler.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayOpenMPT.cpp">
@@ -833,6 +836,9 @@
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
     <ClCompile Include="soundlib\PlayState.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
+    <ClCompile Include="soundlib\Load_etx.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
   </ItemGroup>

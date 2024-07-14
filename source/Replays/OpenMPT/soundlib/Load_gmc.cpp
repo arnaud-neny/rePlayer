@@ -32,7 +32,7 @@ struct GMCSampleHeader
 
 		if(loopLength > 2)
 		{
-			mptSmp.nLoopStart = mptSmp.nLength - loopLength;
+			mptSmp.nLoopStart = mptSmp.nLength - loopLength * 2u;
 			mptSmp.nLoopEnd = mptSmp.nLength;
 			mptSmp.uFlags.set(CHN_LOOP);
 		}
@@ -44,7 +44,7 @@ struct GMCSampleHeader
 			return false;
 		if(length > 0x7FFF || dataStart > 0x7FFF || (dataStart & 1))
 			return false;
-		if(loopLength > 2 && loopLength > (length * 2u))
+		if(loopLength > 2 && loopLength > length)
 			return false;
 		if(volume > 64)
 			return false;
@@ -229,8 +229,8 @@ bool CSoundFile::ReadGMC(FileReader &file, ModLoadingFlags loadFlags)
 		}
 	}
 
-	m_modFormat.madeWithTracker = U_("Game Music Creator");
-	m_modFormat.formatName = U_("Game Music Creator");
+	m_modFormat.madeWithTracker = UL_("Game Music Creator");
+	m_modFormat.formatName = UL_("Game Music Creator");
 	m_modFormat.type = UL_("GMC");
 	m_modFormat.charset = mpt::Charset::Amiga_no_C1;  // No strings in this format...
 

@@ -34,6 +34,7 @@ static constexpr EffectType effectTypes[] =
 	EffectType::Normal, EffectType::Normal,  EffectType::Volume, EffectType::Normal,
 	EffectType::Normal, EffectType::Volume,  EffectType::Pitch,  EffectType::Pitch,
 	EffectType::Pitch,  EffectType::Pitch,   EffectType::Pitch,  EffectType::Volume,
+	EffectType::Volume,
 };
 
 static_assert(std::size(effectTypes) == MAX_EFFECTS);
@@ -250,7 +251,7 @@ void ModCommand::Convert(MODTYPE fromType, MODTYPE toType, const CSoundFile &snd
 
 	/////////////////////////////////////////
 	// Convert MOD / XM to S3M / IT / MPTM
-	if(oldTypeIsMOD_XM && newTypeIsS3M_IT_MPT)
+	if(!oldTypeIsS3M_IT_MPT && newTypeIsS3M_IT_MPT)
 	{
 		switch(command)
 		{
@@ -317,7 +318,7 @@ void ModCommand::Convert(MODTYPE fromType, MODTYPE toType, const CSoundFile &snd
 				command = CMD_S3MCMDEX;
 				if(param == 0)
 					instr = 0;
-				param = 0xD0 | (param & 0x0F);
+				param = 0xD0 | std::min(param, PARAM(0x0F));
 			}
 			break;
 
@@ -341,12 +342,12 @@ void ModCommand::Convert(MODTYPE fromType, MODTYPE toType, const CSoundFile &snd
 		default:
 			break;
 		}
-	} // End if(oldTypeIsMOD_XM && newTypeIsS3M_IT_MPT)
+	} // End if(!oldTypeIsS3M_IT_MPT && newTypeIsS3M_IT_MPT)
 
 
 	/////////////////////////////////////////
 	// Convert S3M / IT / MPTM to MOD / XM
-	else if(oldTypeIsS3M_IT_MPT && newTypeIsMOD_XM)
+	else if(!oldTypeIsMOD_XM && newTypeIsMOD_XM)
 	{
 		if(note == NOTE_NOTECUT)
 		{
@@ -477,7 +478,7 @@ void ModCommand::Convert(MODTYPE fromType, MODTYPE toType, const CSoundFile &snd
 		default:
 			break;
 		}
-	} // End if(oldTypeIsS3M_IT_MPT && newTypeIsMOD_XM)
+	} // End if(!oldTypeIsMOD_XM && newTypeIsMOD_XM)
 
 
 	///////////////////////
@@ -1212,6 +1213,7 @@ size_t ModCommand::GetEffectWeight(COMMAND cmd)
 		CMD_TONEPORTAVOL,
 		CMD_DBMECHO,
 		CMD_VOLUMEDOWN_DURATION,
+		CMD_VOLUMEDOWN_ETX,
 		CMD_CHANNELVOLSLIDE,
 		CMD_CHANNELVOLUME,
 		CMD_GLOBALVOLSLIDE,

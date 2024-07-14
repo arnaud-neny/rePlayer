@@ -392,7 +392,7 @@ EXTENSION(mcmd)         // UADE: JochenHippel
 EXTENSION(cba)          // OpenMPT
 EXTENSION(a2t)			// Adlib: Adlib Tracker 2
 EXTENSION(eup)          // Euphony
-EXTENSION(eupPk)        // deprecated (turned into 7z)
+EXTENSION(etx)			// OpenMPT
 EXTENSION(4v)           // Quartet
 EXTENSION(fur)          // Furnace
 EXTENSION(aac)          // AAC
