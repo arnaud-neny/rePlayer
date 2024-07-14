@@ -1,10 +1,12 @@
-v0.16.0
+v0.16.1
 - Added XMP
-- Updated adplug to 2.3.3.834
+- Updated adplug to 2.3.3.838
 - Updated Furnace to 0.6.5
-- Updated OpenMPT to 0.8.0-pre.5 r21107
+- Updated libvgm to 34c368c
+- Updated OpenMPT to 0.8.0-pre.6 r21179
 - Updated libsc68 to 3.0.0a r706
-- Updated libxml2 to 2.13.1
+- Updated libxml2 to 2.13.2
+- Updated ImGui to 1.90.9
 - Bug fixes
 
 v0.15.21:
