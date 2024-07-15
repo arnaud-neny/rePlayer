@@ -105,10 +105,10 @@ namespace rePlayer
                 library.m_imports = {};
                 library.m_isBusy = true;
                 library.m_importArtists.isOpened = library.m_importArtists.isExternal = true;
-                Core::AddJob([&library, selectedArtist]()
+                Core::AddJob([&library, artist = SmartPtr<ArtistSheet>(selectedArtist->Edit())]()
                 {
                     SourceResults sourceResults;
-                    for (auto& source : selectedArtist->Sources())
+                    for (auto& source : artist->sources)
                         library.ImportArtist(source.id, sourceResults);
                     Core::FromJob([&library, sourceResults = std::move(sourceResults)]()
                     {
