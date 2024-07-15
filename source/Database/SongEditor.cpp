@@ -302,7 +302,8 @@ namespace rePlayer
         ImGui::SameLine();
         bool isSubsongValid = !subsong.isDiscarded;
         ImGui::BeginDisabled(isSubsongValid && numValidSubsongs == 1);
-        ImGui::Checkbox("##Valid", &isSubsongValid);
+        if (ImGui::Checkbox("##Valid", &isSubsongValid) && !isSubsongValid)
+            subsong.name.String().clear();
         ImGui::EndDisabled();
         subsong.isDiscarded = !isSubsongValid;
         ImGui::SameLine();
