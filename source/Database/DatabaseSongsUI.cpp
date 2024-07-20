@@ -326,6 +326,7 @@ namespace rePlayer
             ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
             ImGui::TableSetupColumn("Added", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide, 0.0f, kDatabaseDate);
             ImGui::TableSetupColumn("Source", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultHide, 0.0f, kSource);
+            ImGui::TableSetupColumn("Replay", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultHide, 0.0f, kReplay);
             ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
             ImGui::TableHeadersRow();
 
@@ -422,6 +423,8 @@ namespace rePlayer
                     ImGui::Text("%04d/%02u/%02u", int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", SourceID::sourceNames[song->GetSourceId(0).sourceId]);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", song->GetType().GetReplay());
                     ImGui::PopID();
                 }
             }
@@ -560,6 +563,9 @@ namespace rePlayer
                         break;
                     case kSource:
                         delta = strcmp(SourceID::sourceNames[lSong->GetSourceId(0).sourceId], SourceID::sourceNames[rSong->GetSourceId(0).sourceId]);
+                        break;
+                    case kReplay:
+                        delta = strcmp(lSong->GetType().GetReplay(), rSong->GetType().GetReplay());
                         break;
                     }
 
