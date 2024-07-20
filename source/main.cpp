@@ -295,7 +295,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         // Show the window
         auto mainWindowExStyle = ::GetWindowLong(s_hWnd, GWL_EXSTYLE);
         ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
-        ::ShowWindow(s_hWnd, SW_SHOWDEFAULT);
+        ::ShowWindow(s_hWnd, SW_SHOW);
         ::UpdateWindow(s_hWnd);
 
 /*
