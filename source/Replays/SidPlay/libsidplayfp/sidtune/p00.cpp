@@ -35,8 +35,8 @@
 namespace libsidplayfp
 {
 
-#define X00_ID_LEN   8
-#define X00_NAME_LEN 17
+constexpr int X00_ID_LEN = 8;
+constexpr int X00_NAME_LEN = 17;
 
 // File format from PC64. PC64 automatically generates
 // the filename from the cbm name (16 to 8 conversion)
@@ -126,8 +126,8 @@ SidTuneBase* p00::load(const char *fileName, buffer_t& dataBuf)
         return nullptr;
 
     X00Header pHeader;
-    memcpy(pHeader.id, &dataBuf[0], X00_ID_LEN);
-    memcpy(pHeader.name, &dataBuf[X00_ID_LEN], X00_NAME_LEN);
+    std::memcpy(pHeader.id, &dataBuf[0], X00_ID_LEN);
+    std::memcpy(pHeader.name, &dataBuf[X00_ID_LEN], X00_NAME_LEN);
     pHeader.length = dataBuf[X00_ID_LEN + X00_NAME_LEN];
 
     if (strcmp(pHeader.id, P00_ID))

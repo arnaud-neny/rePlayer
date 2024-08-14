@@ -44,11 +44,13 @@ protected:
 
     /// Transistor parameters.
     //@{
-    const double Vdd;
+    /// Thermal voltage: Ut = kT/q = 8.61734315e-5*T ~ 26mV
+    static constexpr double Ut = 26.0e-3;
+
+    const double Vdd;           ///< Positive supply voltage
     const double Vth;           ///< Threshold voltage
-    const double Ut;            ///< Thermal voltage: Ut = kT/q = 8.61734315e-5*T ~ 26mV
-    double uCox;                ///< Transconductance coefficient: u*Cox
     const double Vddt;          ///< Vdd - Vth
+    double uCox;                ///< Transconductance coefficient: u*Cox
     //@}
 
     // Derived stuff
@@ -58,18 +60,18 @@ protected:
     /// Fixed point scaling for 16 bit op-amp output.
     const double N16;
 
-    /// Current factor coefficient for op-amp integrators.
-    double currFactorCoeff;
-
     const double voice_voltage_range;
     const double voice_DC_voltage;
+
+    /// Current factor coefficient for op-amp integrators.
+    double currFactorCoeff;
 
     /// Lookup tables for gain and summer op-amps in output stage / filter.
     //@{
     unsigned short* mixer[8];       //-V730_NOINIT this is initialized in the derived class constructor
     unsigned short* summer[5];      //-V730_NOINIT this is initialized in the derived class constructor
-    unsigned short* volume[16];   //-V730_NOINIT this is initialized in the derived class constructor
-    unsigned short* resonance[16];   //-V730_NOINIT this is initialized in the derived class constructor
+    unsigned short* volume[16];     //-V730_NOINIT this is initialized in the derived class constructor
+    unsigned short* resonance[16];  //-V730_NOINIT this is initialized in the derived class constructor
     //@}
 
     /// Reverse op-amp transfer function.
@@ -89,11 +91,11 @@ protected:
      * @param vvr voice voltage range
      * @param vdv voice DC voltage
      * @param c   capacitor value
-     * @param vdd Vdd
+     * @param vdd Vdd supply voltage
      * @param vth threshold voltage
      * @param ucox u*Cox
-     * @param ominv opamp min voltage
-     * @param omaxv opamp max voltage
+     * @param opamp_voltage opamp voltage array
+     * @param opamp_size opamp voltage array size
      */
     FilterModelConfig(
         double vvr,
@@ -121,17 +123,20 @@ protected:
      */
     inline void buildSummerTable(const OpAmp& opampModel)
     {
+        const double r_N16 = 1. / N16;
+
         for (int i = 0; i < 5; i++)
         {
             const int idiv = 2 + i;        // 2 - 6 input "resistors".
             const int size = idiv << 16;
             const double n = idiv;
+            const double r_idiv = 1. / idiv;
             opampModel.reset();
             summer[i] = new unsigned short[size];
 
             for (int vi = 0; vi < size; vi++)
             {
-                const double vin = vmin + vi / N16 / idiv; /* vmin .. vmax */
+                const double vin = vmin + vi * r_N16 * r_idiv; /* vmin .. vmax */
                 summer[i][vi] = getNormalizedValue(opampModel.solve(n, vin));
             }
         }
@@ -147,17 +152,20 @@ protected:
      */
     inline void buildMixerTable(const OpAmp& opampModel, double nRatio)
     {
+        const double r_N16 = 1. / N16;
+
         for (int i = 0; i < 8; i++)
         {
             const int idiv = (i == 0) ? 1 : i;
             const int size = (i == 0) ? 1 : i << 16;
             const double n = i * nRatio;
+            const double r_idiv = 1. / idiv;
             opampModel.reset();
             mixer[i] = new unsigned short[size];
 
             for (int vi = 0; vi < size; vi++)
             {
-                const double vin = vmin + vi / N16 / idiv; /* vmin .. vmax */
+                const double vin = vmin + vi * r_N16 * r_idiv; /* vmin .. vmax */
                 mixer[i][vi] = getNormalizedValue(opampModel.solve(n, vin));
             }
         }
@@ -172,6 +180,8 @@ protected:
      */
     inline void buildVolumeTable(const OpAmp& opampModel, double nDivisor)
     {
+        const double r_N16 = 1. / N16;
+
         for (int n8 = 0; n8 < 16; n8++)
         {
             const int size = 1 << 16;
@@ -181,7 +191,7 @@ protected:
 
             for (int vi = 0; vi < size; vi++)
             {
-                const double vin = vmin + vi / N16; /* vmin .. vmax */
+                const double vin = vmin + vi * r_N16; /* vmin .. vmax */
                 volume[n8][vi] = getNormalizedValue(opampModel.solve(n, vin));
             }
         }
@@ -196,6 +206,8 @@ protected:
      */
     inline void buildResonanceTable(const OpAmp& opampModel, const double resonance_n[16])
     {
+        const double r_N16 = 1. / N16;
+
         for (int n8 = 0; n8 < 16; n8++)
         {
             const int size = 1 << 16;
@@ -204,7 +216,7 @@ protected:
 
             for (int vi = 0; vi < size; vi++)
             {
-                const double vin = vmin + vi / N16; /* vmin .. vmax */
+                const double vin = vmin + vi * r_N16; /* vmin .. vmax */
                 resonance[n8][vi] = getNormalizedValue(opampModel.solve(resonance_n[n8], vin));
             }
         }

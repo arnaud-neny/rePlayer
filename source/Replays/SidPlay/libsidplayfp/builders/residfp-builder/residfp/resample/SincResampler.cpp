@@ -25,6 +25,7 @@
 #include <cassert>
 #include <cstring>
 #include <cmath>
+#include <cstdint>
 
 #include "siddefs-fp.h"
 
@@ -95,9 +96,11 @@ int convolve(const int* a, const short* b, int bLength)
 
         for (int i = 0; i < l; i++)
         {
-            out += *a++ * static_cast<int>(*b++);
+            out += a[i] * static_cast<int>(b[i]);
         }
 
+        a += l;
+        b += l;
         bLength -= l;
     }
 
@@ -214,7 +217,7 @@ int convolve(const int* a, const short* b, int bLength)
 
     for (int i = 0; i < bLength; i++)
     {
-        out += *a++ * static_cast<int>(*b++);
+        out += a[i] * static_cast<int>(b[i]);
     }
 
     return (out + (1 << 14)) >> 15;
@@ -247,13 +250,10 @@ int SincResampler::fir(int subcycle)
 }
 
 SincResampler::SincResampler(double clockFrequency, double samplingFrequency, double highestAccurateFrequency) :
-    sampleIndex(0),
-    cyclesPerSample(static_cast<int>(clockFrequency / samplingFrequency * 1024.)),
-    sampleOffset(0),
-    outputValue(0)
+    cyclesPerSample(static_cast<int>(clockFrequency / samplingFrequency * 1024.))
 {
     // 16 bits -> -96dB stopband attenuation.
-    const double A = -20. * log10(1.0 / (1 << BITS));
+    const double A = -20. * std::log10(1.0 / (1 << BITS));
     // A fraction of the bandwidth is allocated to the transition band, which we double
     // because we design the filter to transition halfway at nyquist.
     const double dw = (1. - 2.*highestAccurateFrequency / samplingFrequency) * M_PI * 2.;
@@ -264,6 +264,7 @@ SincResampler::SincResampler(double clockFrequency, double samplingFrequency, do
     const double beta = 0.1102 * (A - 8.7);
     const double I0beta = I0(beta);
     const double cyclesPerSampleD = clockFrequency / samplingFrequency;
+    const double inv_cyclesPerSampleD = samplingFrequency / clockFrequency;
 
     {
         // The filter order will maximally be 124 with the current constraints.
@@ -283,7 +284,7 @@ SincResampler::SincResampler(double clockFrequency, double samplingFrequency, do
         assert(firN < RINGSIZE);
 
         // Error is bounded by err < 1.234 / L^2, so L = sqrt(1.234 / (2^-16)) = sqrt(1.234 * 2^16).
-        firRES = static_cast<int>(ceil(sqrt(1.234 * (1 << BITS)) / cyclesPerSampleD));
+        firRES = static_cast<int>(std::ceil(std::sqrt(1.234 * (1 << BITS)) * inv_cyclesPerSampleD));
 
         // firN*firRES represent the total resolution of the sinc sampling. JOS
         // recommends a length of 2^BITS, but we don't quite use that good a filter.
@@ -298,7 +299,7 @@ SincResampler::SincResampler(double clockFrequency, double samplingFrequency, do
         const double wc = M_PI;
 
         // Calculate the sinc tables.
-        const double scale = 32768.0 * wc / cyclesPerSampleD / M_PI;
+        const double scale = 32768.0 * wc * inv_cyclesPerSampleD / M_PI;
 
         // we're not interested in the fractional part
         // so use int division before converting to double
@@ -314,10 +315,10 @@ SincResampler::SincResampler(double clockFrequency, double samplingFrequency, do
                 const double x = j - jPhase;
 
                 const double xt = x / firN_2;
-                const double kaiserXt = fabs(xt) < 1. ? I0(beta * sqrt(1. - xt * xt)) / I0beta : 0.;
+                const double kaiserXt = std::fabs(xt) < 1. ? I0(beta * std::sqrt(1. - xt * xt)) / I0beta : 0.;
 
-                const double wt = wc * x / cyclesPerSampleD;
-                const double sincWt = fabs(wt) >= 1e-8 ? sin(wt) / wt : 1.;
+                const double wt = wc * x * inv_cyclesPerSampleD;
+                const double sincWt = std::fabs(wt) >= 1e-8 ? std::sin(wt) / wt : 1.;
 
                 (*firTable)[i][j] = static_cast<short>(scale * sincWt * kaiserXt);
             }

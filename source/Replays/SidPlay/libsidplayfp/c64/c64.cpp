@@ -54,18 +54,18 @@ typedef struct
 
 const model_data_t modelData[] =
 {
-    {4433618.75,  18., 50., MOS656X::MOS6569},      // PAL-B
-    {3579545.455, 14., 60., MOS656X::MOS6567R8},    // NTSC-M
-    {3579545.455, 14., 60., MOS656X::MOS6567R56A},  // Old NTSC-M
-    {3582056.25,  14., 50., MOS656X::MOS6572},      // PAL-N
-    {3575611.49,  14., 50., MOS656X::MOS6573},      // PAL-M
+    {4433618.75,  18., 50., MOS656X::model_t::MOS6569},      // PAL-B
+    {3579545.455, 14., 60., MOS656X::model_t::MOS6567R8},    // NTSC-M
+    {3579545.455, 14., 60., MOS656X::model_t::MOS6567R56A},  // Old NTSC-M
+    {3582056.25,  14., 50., MOS656X::model_t::MOS6572},      // PAL-N
+    {3575611.49,  14., 50., MOS656X::model_t::MOS6573},      // PAL-M
 };
 
 const cia_model_data_t ciaModelData[] =
 {
-    {MOS652X::MOS6526},      // Old
-    {MOS652X::MOS8521},      // New
-    {MOS652X::MOS6526W4485}, // Old week 4485
+    {MOS652X::model_t::MOS6526},      // Old
+    {MOS652X::model_t::MOS8521},      // New
+    {MOS652X::model_t::MOS6526W4485}, // Old week 4485
 };
 
 double c64::getCpuFreq(model_t model)
@@ -82,12 +82,13 @@ double c64::getCpuFreq(model_t model)
 c64::c64() :
     c64env(eventScheduler),
     cpuFrequency(getCpuFreq(PAL_B)),
-    cpu(*this),
     cia1(*this),
     cia2(*this),
     vic(*this),
     disconnectedBusBank(mmu),
-    mmu(eventScheduler, &ioBank)
+    mmu(eventScheduler, &ioBank),
+    cpubus(mmu),
+    cpu(eventScheduler, cpubus)
 {
     resetIoBank();
 }
@@ -112,9 +113,6 @@ void c64::resetIoBank()
     ioBank.setBank(0xf, &disconnectedBusBank);
 }
 
-template<typename T>
-void resetSID(T &e) { e.second->reset(); }
-
 void c64::reset()
 {
     eventScheduler.reset();
@@ -127,7 +125,7 @@ void c64::reset()
     colorRAMBank.reset();
     mmu.reset();
 
-    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), resetSID<sidBankMap_t::value_type>);
+    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), [](sidBankMap_t::value_type &e) { e.second->reset(); });
 
     irqCount = 0;
     oldBAState = true;
@@ -185,12 +183,9 @@ bool c64::addExtraSid(c64sid *s, int address)
     return true;
 }
 
-template<class T>
-void Delete(T &s) { delete s.second; }
-
 c64::~c64()
 {
-    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), Delete<sidBankMap_t::value_type>);
+    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), [](sidBankMap_t::value_type &s) { delete s.second; });
     extraSidBanks.clear();
 }
 
@@ -200,7 +195,7 @@ void c64::clearSids()
 
     resetIoBank();
 
-    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), Delete<sidBankMap_t::value_type>);
+    std::for_each(extraSidBanks.begin(), extraSidBanks.end(), [](sidBankMap_t::value_type &s) { delete s.second; });
 
     extraSidBanks.clear();
 }
