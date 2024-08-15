@@ -289,8 +289,24 @@ namespace rePlayer
 
         // special cases
         if (strstr(name, "smp.set") && strstr(state->song.info.playername, "(soc)"))
+        {
             if (auto f = loadFile("extra/hippel_st.smp.set", name))
                 return f;
+        }
+        else if (strstr(name, "smpl.mdst.") == name)
+        {
+            filename = "smpl";
+            filename += name + 9;
+            if (auto newStream = This->m_stream->Open(filename))
+            {
+                struct uade_file* f = (struct uade_file*)calloc(1, sizeof(struct uade_file));
+                f->name = strdup(name);
+                f->size = size_t(newStream->GetSize());
+                f->data = (char*)malloc(f->size);
+                newStream->Read(f->data, f->size);
+                return f;
+            }
+        }
 
         Log::Warning("UADE: can't load \"%s\"\n", name);
 
