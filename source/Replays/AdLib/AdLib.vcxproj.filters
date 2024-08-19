@@ -275,9 +275,6 @@
     <ClInclude Include="adplug\depack.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
-    <ClInclude Include="adplug\sixpack.h">
-      <Filter>Source Files\adplug</Filter>
-    </ClInclude>
     <ClInclude Include="adplug\unlzh.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
@@ -521,9 +518,6 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\depack.c">
-      <Filter>Source Files\adplug</Filter>
-    </ClCompile>
-    <ClCompile Include="adplug\sixpack.c">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\unlzh.c">
