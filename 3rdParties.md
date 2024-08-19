@@ -38,7 +38,7 @@
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.
 - Ken: http://advsys.net/ken/ & https://bitbucket.org/wothke/webken
-- LazyUSF: https://bitbucket.org/losnoco/lazyusf2 and https://bitbucket.org/losnoco/psflib
+- LazyUSF: https://bitbucket.org/losnoco/lazyusf2, https://gitlab.com/kode54/lazyusf2 and https://bitbucket.org/losnoco/psflib
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
 - libvgm: https://github.com/ValleyBell/libvgm
