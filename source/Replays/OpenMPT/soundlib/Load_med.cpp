@@ -434,12 +434,12 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 	switch(command)
 	{
 	case 0x04:  // Vibrato (twice as deep as in ProTracker)
-		m.SetEffectCommand(CMD_VIBRATO, (std::min<uint8>(param >> 3, 0x0F) << 4) | std::min<uint8>((param & 0x0F) * 2, 0x0F));
+		m.SetEffectCommand(CMD_VIBRATO, (param & 0xF0) | std::min<uint8>((param & 0x0F) * 2, 0x0F));
 		break;
 	case 0x08:  // Hold and decay
 		break;
 	case 0x09:  // Set secondary speed
-		if(param > 0 && param <= 20)
+		if(param > 0 && param <= 0x20)
 			m.SetEffectCommand(CMD_SPEED, param);
 		break;
 	case 0x0C:  // Set Volume (note: parameters >= 0x80 (only in hex mode?) should set the default instrument volume, which we don't support)
@@ -479,10 +479,6 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 					return {CMD_XPARAM, static_cast<ModCommand::PARAM>(tempo & 0xFF)};
 				}
 			}
-#ifdef MODPLUG_TRACKER
-			if(m.param < 0x20)
-				m.param = 0x20;
-#endif  // MODPLUG_TRACKER
 		} else switch(param)
 		{
 			case 0xF1:  // Play note twice
@@ -518,7 +514,7 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 		m.SetEffectCommand(CMD_MODCMDEX, 0x20 | nibbleLo);
 		break;
 	case 0x14:  // Vibrato (ProTracker compatible depth, but faster)
-		m.SetEffectCommand(CMD_VIBRATO, (std::min<uint8>((param >> 4) + 1, 0x0F) << 4) | (param & 0x0F));
+		m.SetEffectCommand(CMD_VIBRATO, param);
 		break;
 	case 0x15:  // Set finetune
 		m.SetEffectCommand(CMD_MODCMDEX, 0x50 | (param & 0x0F));
@@ -1111,6 +1107,9 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			SampleIO::bigEndian,
 			SampleIO::signedPCM);
 
+		const bool hasLoop = sampleHeader.loopLength > 1;
+		SmpLength loopStart = sampleHeader.loopStart * 2;
+		SmpLength loopEnd = loopStart + sampleHeader.loopLength * 2;
 		if(isSynth)
 		{
 			for(size_t i = 0; i < waveformOffsets.size(); i++)
@@ -1132,7 +1131,15 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 					MMDInstrHeader hybridHeader;
 					file.ReadStruct(hybridHeader);
 					if(hybridHeader.type == MMDInstrHeader::SAMPLE)
+					{
 						mptSmp.nLength = hybridHeader.length;
+						if(hasLoop)
+						{
+							mptSmp.nLoopStart = loopStart;
+							mptSmp.nLoopEnd = loopEnd;
+							mptSmp.uFlags.set(CHN_LOOP);
+						}
+					}
 					m_szNames[smp + i] = "Hybrid";
 				}
 				if(loadFlags & loadSampleData)
@@ -1140,9 +1147,6 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			}
 		} else
 		{
-			const bool hasLoop = sampleHeader.loopLength > 1;
-			SmpLength loopStart = sampleHeader.loopStart * 2;
-			SmpLength loopEnd = loopStart + sampleHeader.loopLength * 2;
 
 			SmpLength length = mpt::saturate_cast<SmpLength>(sampleChunk.GetLength());
 			if(instrHeader.type & MMDInstrHeader::S_16)
@@ -1647,8 +1651,8 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 				order[from] = pat;
 			}
 			Patterns[pat].WriteEffect(EffectWriter(CMD_POSITIONJUMP, mpt::saturate_cast<ModCommand::PARAM>(to)).Row(Patterns[pat].GetNumRows() - 1).RetryPreviousRow());
-			if(pat >= numPatterns)
-				numPatterns = pat + 1;
+			if(pat >= basePattern && (pat - basePattern) >= numPatterns)
+				numPatterns = static_cast<PATTERNINDEX>(pat - basePattern + 1);
 		}
 
 		if(numSongs > 1)
@@ -1661,8 +1665,8 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 					Patterns[firstPat].WriteEffect(EffectWriter(CMD_CHANNELVOLUME, static_cast<ModCommand::PARAM>(ChnSettings[chn].nVolume)).Channel(chn).RetryNextRow());
 					Patterns[firstPat].WriteEffect(EffectWriter(CMD_PANNING8, mpt::saturate_cast<ModCommand::PARAM>(ChnSettings[chn].nPan)).Channel(chn).RetryNextRow());
 				}
-				if(firstPat >= numPatterns)
-					numPatterns = firstPat + 1;
+				if(firstPat >= basePattern && (firstPat - basePattern) >= numPatterns)
+					numPatterns = static_cast<PATTERNINDEX>(firstPat - basePattern + 1);
 			}
 		}
 

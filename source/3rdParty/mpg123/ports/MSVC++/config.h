@@ -46,6 +46,9 @@
 /* also gapless playback! */
 #define GAPLESS 1
 
+/* new huffman decoding */
+#define USE_NEW_HUFFTABLE 1
+
 /* Debugging */
 
 /* #define DEBUG */

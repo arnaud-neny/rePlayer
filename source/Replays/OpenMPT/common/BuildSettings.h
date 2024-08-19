@@ -114,6 +114,10 @@
 
 #define MPT_ENABLE_UPDATE
 
+#if defined(MPT_BUILD_DEBUG)
+#define MPT_ENABLE_PLAYBACK_TEST_MENU
+#endif
+
 // Disable unarchiving support
 //#define NO_ARCHIVE_SUPPORT
 
@@ -321,6 +325,8 @@
 #endif
 
 #endif
+
+#define MPT_CONFIGURATION_IO_READ_FILEDATA_NO_64BIT
 
 
 
