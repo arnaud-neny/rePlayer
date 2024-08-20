@@ -461,16 +461,26 @@ VGMSTREAM* init_vgmstream_txth(STREAMFILE* sf) {
             break;
 
         case coding_MS_IMA:
-            vgmstream->interleave_block_size = txth.frame_size ? txth.frame_size : txth.interleave;
-            vgmstream->layout_type = layout_none;
+            if (txth.interleave && txth.frame_size) {
+                coding = coding_MS_IMA_mono;
+                vgmstream->frame_size = txth.frame_size;
+                vgmstream->interleave_block_size = txth.interleave;
+                vgmstream->layout_type = layout_interleave;
+            }
+            else {
+                vgmstream->frame_size = txth.frame_size ? txth.frame_size : txth.interleave;
+                vgmstream->layout_type = layout_none;
+            }
 
-            vgmstream->allow_dual_stereo = 1; //???
+            //TO-DO: needs to force MS_IMA_mono first if ch = 1, since dual_stereo + MS_IMA = assumes MS_IMA_stereo
+            // (or better do it after init / during setup stream)
+            //vgmstream->allow_dual_stereo = 1;
             break;
 
         case coding_MSADPCM:
-            if (vgmstream->channels > 2) goto fail; //can't handle
+            if (vgmstream->channels > 2) goto fail; //can't handle (to-do: only non-mono?)
             if (txth.interleave && txth.frame_size) {
-                coding = coding_MSADPCM_int;
+                coding = coding_MSADPCM_mono;
                 vgmstream->frame_size = txth.frame_size;
                 vgmstream->interleave_block_size = txth.interleave;
                 vgmstream->layout_type = layout_interleave;
@@ -483,7 +493,7 @@ VGMSTREAM* init_vgmstream_txth(STREAMFILE* sf) {
 
         case coding_XBOX_IMA:
             if (txth.codec_mode == 1) { /* mono interleave */
-                coding = coding_XBOX_IMA_int;
+                coding = coding_XBOX_IMA_mono;
                 vgmstream->layout_type = layout_interleave;
                 vgmstream->interleave_block_size = txth.interleave;
                 vgmstream->interleave_last_block_size = txth.interleave_last;
@@ -1056,6 +1066,21 @@ fail:
     return 0;
 }
 
+static int is_absolute(const char* fn) {
+    return fn[0] == '/' || fn[0] == '\\'  || fn[1] == ':';
+}
+
+static STREAMFILE* open_path_streamfile(STREAMFILE* sf, char* path) {
+    fix_dir_separators(path); /* clean paths */
+
+    /* absolute paths are detected for convenience, but since it's hard to unify all OSs
+    * and plugins, they aren't "officially" supported nor documented, thus may or may not work */
+    if (is_absolute(path))
+        return open_streamfile(sf, path); /* from path as is */
+    else
+        return open_streamfile_by_filename(sf, path); /* from current path */
+}
+
 static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, char* val) {
 
     if (txth->debug)
@@ -1405,9 +1430,7 @@ static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, cha
             txth->sf_head_opened = 1;
         }
         else { /* open file */
-            fix_dir_separators(val); /* clean paths */
-
-            txth->sf_head = open_streamfile_by_filename(txth->sf, val);
+            txth->sf_head = open_path_streamfile(txth->sf, val);
             if (!txth->sf_head) goto fail;
             txth->sf_head_opened = 1;
         }
@@ -1435,9 +1458,7 @@ static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, cha
             txth->sf_body_opened = 1;
         }
         else { /* open file */
-            fix_dir_separators(val); /* clean paths */
-
-            txth->sf_body = open_streamfile_by_filename(txth->sf, val);
+            txth->sf_body = open_path_streamfile(txth->sf, val);
             if (!txth->sf_body) goto fail;
             txth->sf_body_opened = 1;
         }
@@ -2145,6 +2166,8 @@ fail:
 static int get_bytes_to_samples(txth_header* txth, uint32_t bytes) {
     switch(txth->codec) {
         case MS_IMA:
+            if (txth->interleave && txth->frame_size) /* mono mode */ //TODO maybe some helper instead
+                return ms_ima_bytes_to_samples(bytes / txth->channels, txth->frame_size, 1);
             return ms_ima_bytes_to_samples(bytes, txth->frame_size ? txth->frame_size : txth->interleave, txth->channels);
         case XBOX:
             return xbox_ima_bytes_to_samples(bytes, txth->channels);
@@ -2175,6 +2198,8 @@ static int get_bytes_to_samples(txth_header* txth, uint32_t bytes) {
         case TGC:
             return pcm_bytes_to_samples(bytes, txth->channels, 4);
         case MSADPCM:
+            if (txth->interleave && txth->frame_size) /* mono mode */ //TODO some helper instead
+                return msadpcm_bytes_to_samples(bytes / txth->channels, txth->frame_size, 1);
             return msadpcm_bytes_to_samples(bytes, txth->frame_size ? txth->frame_size : txth->interleave, txth->channels);
         case ATRAC3:
             return atrac3_bytes_to_samples(bytes, txth->frame_size ? txth->frame_size : txth->interleave);

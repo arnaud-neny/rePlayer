@@ -454,7 +454,7 @@ EXTENSION(aus)          // VGMStream: Capcom AUS
 EXTENSION(awb)          // VGMStream: CRI HCA
 EXTENSION(awc)          // VGMStream: Rockstar AWC
 EXTENSION(awd)          // VGMStream
-EXTENSION(b1s)          // VGMStream
+EXTENSION(amb)          // VGMStream
 EXTENSION(baf)          // VGMStream: Bizarre Creations .baf
 EXTENSION(baka)         // VGMStream: Konami BAKA
 EXTENSION(bank)         // VGMStream: FMOD FSB
@@ -532,7 +532,7 @@ EXTENSION(ezw)          // VGMStream
 EXTENSION(fag)          // VGMStream: Radical .FAG
 EXTENSION(fcb)          // VGMStream: Bink Audio
 EXTENSION(fda)          // VGMStream: Apple AIFF-C
-EXTENSION(ffw)          // VGMStream
+EXTENSION(amx)          // VGMStream
 EXTENSION(filp)         // VGMStream
 EXTENSION(fish)         // VGMStream: Ogg Vorbis Encrypted
 EXTENSION(flx)          // VGMStream: Ultima IX .FLX
@@ -662,7 +662,7 @@ EXTENSION(mdsp)         // VGMStream
 EXTENSION(mi4)          // VGMStream
 EXTENSION(mib)          // VGMStream: Headerless PS-ADPCM raw
 EXTENSION(mic)          // VGMStream: KOEI .MIC
-EXTENSION(mihb)         // VGMStream
+EXTENSION(msx)          // VGMStream
 EXTENSION(mjb)          // VGMStream
 EXTENSION(mnstr)        // VGMStream
 EXTENSION(mogg)         // VGMStream
@@ -886,7 +886,7 @@ EXTENSION(wbd)          // VGMStream
 EXTENSION(wbk)          // VGMStream
 EXTENSION(wd)           // VGMStream
 EXTENSION(wem)          // VGMStream: Audiokinetic Wwise RIFF
-EXTENSION(wii)          // VGMStream
+EXTENSION(ntx)          // VGMStream
 EXTENSION(wma)          // VGMStream: FFmpeg
 EXTENSION(wmus)         // VGMStream
 EXTENSION(wp2)          // VGMStream
@@ -953,3 +953,4 @@ EXTENSION(gwb)          // VGMStream
 EXTENSION(move)         // VGMStream
 EXTENSION(no)           // VGMStream
 EXTENSION(wax)          // VGMStream
+EXTENSION(se)           // VGMStream

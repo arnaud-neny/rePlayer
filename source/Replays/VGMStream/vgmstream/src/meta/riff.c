@@ -244,8 +244,8 @@ static int read_fmt(int big_endian, STREAMFILE* sf, off_t offset, riff_fmt_chunk
             /* real 0x300 is "Fujitsu FM Towns SND" with block align 0x01 */
             break;
 
-        case 0x0555: /* Level-5 0x555 ADPCM (unofficial) */
-            fmt->coding_type = coding_L5_555;
+        case 0x0555: /* Level-5 ADPCM (unofficial) */
+            fmt->coding_type = coding_LEVEL5;
             fmt->interleave = 0x12;
             break;
 
@@ -400,8 +400,10 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
      * .wma/lwma: SRS: Street Racing Syndicate (Xbox), Fast and the Furious (Xbox)
      * .caf: Topple (iOS)
      * .wax: Lamborghini (Xbox)
+     * .voi: Sol Trigger (PSP)[ATRAC3]
+     * .se: Rockman X4 (PC)
      */
-    if (!check_extensions(sf, "wav,lwav,xwav,mwv,da,dax,cd,med,snd,adx,adp,xss,xsew,adpcm,adw,wd,,sbv,wvx,str,at3,rws,aud,at9,ckd,saf,ima,nsa,pcm,xvag,ogg,logg,p1d,xms,mus,dat,ldat,wma,lwma,caf,wax")) {
+    if (!check_extensions(sf, "wav,lwav,xwav,mwv,da,dax,cd,med,snd,adx,adp,xss,xsew,adpcm,adw,wd,,sbv,wvx,str,at3,rws,aud,at9,ckd,saf,ima,nsa,pcm,xvag,ogg,logg,p1d,xms,mus,dat,ldat,wma,lwma,caf,wax,voi,se")) {
         return NULL;
     }
 
@@ -472,6 +474,7 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
 
         else if (codec == 0x0011 && file_size - riff_size - 0x08 <= 0x900 && is_id32be(riff_size + 0x08, sf, "cont"))
             riff_size = file_size - 0x08; /* [Shin Megami Tensei: Imagine (PC)] (extra "cont" info 0x800/0x900 chunk) */
+
     }
 
     /* check for truncated RIFF */
@@ -735,7 +738,7 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
             vgmstream->num_samples = pcm_bytes_to_samples(data_size, fmt.channels, fmt.bps);
             break;
 
-        case coding_L5_555:
+        case coding_LEVEL5:
             vgmstream->num_samples = data_size / 0x12 / fmt.channels * 32;
 
             /* coefs */
@@ -867,7 +870,7 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
 
     /* UE4 uses interleaved mono MSADPCM, try to autodetect without breaking normal MSADPCM */
     if (fmt.coding_type == coding_MSADPCM && is_ue4_msadpcm(sf, &fmt, fact_sample_count, start_offset, data_size)) {
-        vgmstream->coding_type = coding_MSADPCM_int;
+        vgmstream->coding_type = coding_MSADPCM_mono;
         vgmstream->codec_config = 1; /* mark as UE4 MSADPCM */
         vgmstream->frame_size = fmt.block_size;
         vgmstream->layout_type = layout_interleave;
@@ -909,7 +912,7 @@ VGMSTREAM* init_vgmstream_riff(STREAMFILE* sf) {
             vgmstream->loop_end_sample = loop_end_wsmp;
             vgmstream->meta_type = meta_RIFF_WAVE_wsmp;
         }
-        else if (fmt.coding_type == coding_L5_555 && mwv_ctrl_offset) {
+        else if (fmt.coding_type == coding_LEVEL5 && mwv_ctrl_offset) {
             vgmstream->loop_start_sample = read_s32le(mwv_ctrl_offset + 0x0c, sf);
             vgmstream->loop_end_sample = vgmstream->num_samples;
             vgmstream->meta_type = meta_RIFF_WAVE_MWV;
@@ -1192,7 +1195,7 @@ VGMSTREAM* init_vgmstream_rifx(STREAMFILE* sf) {
             /* end must add +1, but check in case of faulty tools */
             if (vgmstream->loop_end_sample - 1 == vgmstream->num_samples)
                 vgmstream->loop_end_sample--;
-            
+
             vgmstream->meta_type = meta_RIFX_WAVE_smpl;
         }
     }

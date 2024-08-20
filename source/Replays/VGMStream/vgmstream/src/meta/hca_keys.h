@@ -1300,13 +1300,31 @@ static const hcakey_info hcakey_list[] = {
         {3733383634313939},     // 000D437E1D5562D3
 
         // Pachislot Valvrave (iOS)
-        {2753732797542815},      // 009C8816134319F
+        {2753732797542815},     // 0009C8816134319F
 
         // Jujutsu Kaisen: Cursed Clash (multi)
-        {984703514306706654},    // DAA5EA10B547CDE
+        {984703514306706654},   // 0DAA5EA10B547CDE
 
         // Puyo Puyo Puzzle Pop (iOS)
-        {9999},                  // 000000000000270F
+        {9999},                 // 000000000000270F
+
+        // Penny Blood: Hellbound (PC)
+        {845873498572},         // 000000C4F1FD49CC
+
+        // Sonic Rumble (Android)
+        {6834182874188563},     // 001847A7328BCB13
+
+        // P A Certain Magical Index 1/2 (Android)
+        {5963},                 // 000000000000174B
+
+        // Reynatis (Switch)
+        {5963496778882477625},  // 52C298B97479EE39
+
+        // Buddysma!! ~Smartphone Start! Buddyfight (Android)
+        {8132462270},           // 00000001E4BB86BE
+
+        // Code Geass: Lost Stories (Android)
+        {9182735170},           // 0000000223556B42
 
 };
 
