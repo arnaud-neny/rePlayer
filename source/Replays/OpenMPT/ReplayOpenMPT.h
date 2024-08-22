@@ -73,10 +73,9 @@ namespace rePlayer
             int32_t ramping = -1;
             int32_t stereoSeparation = 100;
             int32_t surround = 0;
-            int32_t vblank = -1;
             int32_t patterns = 1;
 
-            std::string labels[7];
+            std::string labels[6];
 
             GlobalSettings(const char* name, const char* fmt, bool isSurroundEnabled = false, bool isEnbl = false) : serializedName(name), format(fmt), surround(isSurroundEnabled), isEnabled(isEnbl) {}
      };
@@ -107,6 +106,7 @@ namespace rePlayer
         bool m_isSilenceTriggered = false;
         bool m_isSilenceDetectionRunning = false;
         bool m_isSilenceDetectionCancelled = false;
+        int32_t m_vblank = -1;
 
         static GlobalSettings ms_settings[];
     };

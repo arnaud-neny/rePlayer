@@ -59,10 +59,8 @@ namespace rePlayer
             window.RegisterSerializedData(settings.stereoSeparation, settings.labels[3].c_str());
             settings.labels[4] = std::string("ReplayOpenMPTSurround_") + std::string(settings.serializedName);
             window.RegisterSerializedData(settings.surround, settings.labels[4].c_str());
-            settings.labels[5] = std::string("ReplayOpenMPTTiming_") + std::string(settings.serializedName);
-            window.RegisterSerializedData(settings.vblank, settings.labels[5].c_str());
-            settings.labels[6] = std::string("ReplayOpenMPTPatterns_") + std::string(settings.serializedName);
-            window.RegisterSerializedData(settings.patterns, settings.labels[6].c_str());
+            settings.labels[5] = std::string("ReplayOpenMPTPatterns_") + std::string(settings.serializedName);
+            window.RegisterSerializedData(settings.patterns, settings.labels[5].c_str());
         }
 
         g_replayPlugin.extensions = openmpt_get_supported_extensions();
@@ -106,7 +104,6 @@ namespace rePlayer
                 ms_settings[cb.index].ramping = ms_settings[0].ramping;
                 ms_settings[cb.index].stereoSeparation = ms_settings[0].stereoSeparation;
                 ms_settings[cb.index].surround = ms_settings[0].surround;
-                ms_settings[cb.index].vblank = ms_settings[0].vblank;
                 ms_settings[cb.index].patterns = ms_settings[0].patterns;
                 changed = true;
             }
@@ -119,10 +116,6 @@ namespace rePlayer
         changed |= ImGui::SliderInt("Stereo", &ms_settings[settingsIndex].stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
         changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, _countof(surround));
-        const char* const vblank[] = { "Auto", "CIA", "VBlank" };
-        int32_t vblankValue = ms_settings[settingsIndex].vblank + 1;
-        changed |= ImGui::Combo("Timing", &vblankValue, vblank, _countof(vblank));
-        ms_settings[settingsIndex].vblank = vblankValue - 1;
         const char* const patterns[] = { "Disable", "Enable" };
         changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, _countof(patterns));
         ImGui::EndDisabled();
@@ -143,7 +136,7 @@ namespace rePlayer
         SliderOverride("Ramping", GETSET(entry, overrideRamping), GETSET(entry, ramping),
             ms_settings[0].ramping, -1, 10, "Ramping %d", -1);
         ComboOverride("VBlank", GETSET(entry, overrideVblank), GETSET(entry, vblank),
-            ms_settings[0].vblank == 1, "CIA Timing", "VBlank Timing");
+            false, "CIA Timing", "VBlank Timing");
 
         context.metadata.Update(entry, entry->value == 0);
     }
@@ -320,8 +313,20 @@ namespace rePlayer
         openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && settings->overrideInterpolation) ? settings->interpolation : globalSettings->interpolation)) >> 1);
         openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && settings->overrideRamping) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
 
-        openmpt_module_ctl_set_integer(m_modulePlayback, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
-        openmpt_module_ctl_set_integer(m_moduleVisuals, "vblank", (settings && (settings->overrideVblank)) ? int64_t(settings->vblank) : int64_t(globalSettings->vblank));
+        int32_t vblank = (settings && (settings->overrideVblank)) ? settings->vblank : -1;
+        openmpt_module_ctl_set_integer(m_modulePlayback, "vblank", vblank);
+        openmpt_module_ctl_set_integer(m_moduleVisuals, "vblank", vblank);
+        if (m_vblank != vblank)
+        {
+            std::atomic_ref(m_isSilenceDetectionCancelled).store(true);
+            while (std::atomic_ref(m_isSilenceDetectionRunning).load())
+                thread::Sleep(0);
+            m_vblank = vblank;
+            m_isSilenceDetectionCancelled = false;
+            m_isSilenceDetectionRunning = true;
+            std::atomic_ref(m_silenceStart).exchange(0);
+            g_replayPlugin.addJob(this, ReplayPlugin::JobCallback(SilenceDetection));
+        }
 
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globalSettings->surround);
 
@@ -570,6 +575,7 @@ namespace rePlayer
         openmpt_module_initial_ctl ctrls[] = { { "play.at_end", "continue" }, { nullptr, nullptr } };
         auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, replay->m_stream, openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, ctrls);
         openmpt_module_select_subsong(module, replay->m_subsongIndex);
+        openmpt_module_ctl_set_integer(module, "vblank", replay->m_vblank);
 
         static constexpr uint32_t kSilenceSampleRate = 8000;
         Array<float> samples(kSilenceSampleRate, uint32_t((openmpt_module_get_duration_seconds(module) + 7) * kSilenceSampleRate));
