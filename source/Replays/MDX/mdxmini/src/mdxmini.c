@@ -41,7 +41,7 @@ NLGCTX *nlgctx;
 /* ------------------------------------------------------------------ */
 #define PATH_BUF_SIZE 1024
 
-static PDX_DATA* _get_pdx(MDX_DATA* mdx, char* mdxpath);
+static PDX_DATA* _get_pdx(MDX_DATA* mdx, char* mdxpath, void* user_data);
 static int self_construct(songdata* songdata);
 static void self_destroy(songdata* songdata);
 
