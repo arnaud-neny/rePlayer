@@ -538,54 +538,62 @@ namespace rePlayer
                 ::SetThreadPriority(threadHandle, threadPriority);
             });
 
-            // read stream tags if there is any
-            TagLibStream tagLibStream(stream->Clone());
-            TagLib::FileRef f(&tagLibStream);
-            if (auto tag = f.tag())
+            Core::AddJob([This = SmartPtr<Player>(this), clonedStream = stream->Clone()]()
             {
-                if (!tag->artist().isEmpty())
+                // read stream tags if there is any
+                TagLibStream tagLibStream(clonedStream);
+                TagLib::FileRef f(&tagLibStream);
+                if (auto tag = f.tag())
                 {
-                    m_extraInfo = "Artist: ";
-                    m_extraInfo += tag->artist().to8Bit();
-                }
-                if (!tag->title().isEmpty())
-                {
-                    if (!m_extraInfo.empty())
-                        m_extraInfo += "\n";
-                    m_extraInfo += "Title : ";
-                    m_extraInfo += tag->title().to8Bit();
-                }
-                if (!tag->album().isEmpty())
-                {
-                    if (!m_extraInfo.empty())
-                        m_extraInfo += "\n";
-                    m_extraInfo += "Album : ";
-                    m_extraInfo += tag->album().to8Bit();
-                }
-                if (!tag->genre().isEmpty())
-                {
-                    if (!m_extraInfo.empty())
-                        m_extraInfo += "\n";
-                    m_extraInfo += "Genre : ";
-                    m_extraInfo += tag->genre().to8Bit();
-                }
-                if (tag->year())
-                {
-                    if (!m_extraInfo.empty())
-                        m_extraInfo += "\n";
-                    m_extraInfo += "Year  : ";
-                    char buf[64];
-                    core::sprintf(buf, "%d", tag->year());
-                    m_extraInfo += buf;
-                }
+                    std::string extraInfo;
+                    if (!tag->artist().isEmpty())
+                    {
+                        extraInfo = "Artist: ";
+                        extraInfo += tag->artist().to8Bit();
+                    }
+                    if (!tag->title().isEmpty())
+                    {
+                        if (!extraInfo.empty())
+                            extraInfo += "\n";
+                        extraInfo += "Title : ";
+                        extraInfo += tag->title().to8Bit();
+                    }
+                    if (!tag->album().isEmpty())
+                    {
+                        if (!extraInfo.empty())
+                            extraInfo += "\n";
+                        extraInfo += "Album : ";
+                        extraInfo += tag->album().to8Bit();
+                    }
+                    if (!tag->genre().isEmpty())
+                    {
+                        if (!extraInfo.empty())
+                            extraInfo += "\n";
+                        extraInfo += "Genre : ";
+                        extraInfo += tag->genre().to8Bit();
+                    }
+                    if (tag->year())
+                    {
+                        if (!extraInfo.empty())
+                            extraInfo += "\n";
+                        extraInfo += "Year  : ";
+                        char buf[64];
+                        core::sprintf(buf, "%d", tag->year());
+                        extraInfo += buf;
+                    }
 
-                if (!tag->comment().isEmpty())
-                {
-                    if (!m_extraInfo.empty())
-                        m_extraInfo += "\n\n";
-                    m_extraInfo += tag->comment().to8Bit();
+                    if (!tag->comment().isEmpty())
+                    {
+                        if (!extraInfo.empty())
+                            extraInfo += "\n\n";
+                        extraInfo += tag->comment().to8Bit();
+                    }
+                    Core::FromJob([This, extraInfo = std::move(extraInfo)]
+                    {
+                        This->m_extraInfo = extraInfo;
+                    });
                 }
-            }
+            });
         }
         else
             m_isJobDone = true;
