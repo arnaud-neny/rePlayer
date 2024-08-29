@@ -1,7 +1,7 @@
-v0.16.3
+v0.16.4
 - Added XMP
 - Updated adplug to 2.3.3.858
-- Updated Furnace to 0.6.5
+- Updated Furnace to 0.6.7
 - Updated libsc68 to 3.0.0a r706
 - Updated libsidplay to 2.9.0
 - Updated libvgm to 34c368c
