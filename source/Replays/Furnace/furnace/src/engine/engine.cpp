@@ -83,6 +83,10 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
       return _("81xx: Set panning (left channel)");
     case 0x82:
       return _("82xx: Set panning (right channel)");
+    case 0x83:
+      return _("83xy: Panning slide (x0: left; 0y: right)");
+    case 0x84:
+      return _("84xy: Panbrello (x: speed; y: depth)");
     case 0x88:
       return _("88xy: Set panning (rear channels; x: left; y: right)");
       break;
@@ -94,6 +98,12 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
       break;
     case 0xc0: case 0xc1: case 0xc2: case 0xc3:
       return _("Cxxx: Set tick rate (hz)");
+    case 0xd3:
+      return _("D3xx: Volume portamento");
+    case 0xd4:
+      return _("D4xx: Volume portamento (fast)");
+    case 0xdc:
+      return _("DCxx: Delayed mute");
     case 0xe0:
       return _("E0xx: Set arp speed");
     case 0xe1:
@@ -127,9 +137,9 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
     case 0xf0:
       return _("F0xx: Set tick rate (bpm)");
     case 0xf1:
-      return _("F1xx: Single tick note slide up");
+      return _("F1xx: Single tick pitch up");
     case 0xf2:
-      return _("F2xx: Single tick note slide down");
+      return _("F2xx: Single tick pitch down");
     case 0xf3:
       return _("F3xx: Fine volume slide up");
     case 0xf4:
@@ -141,9 +151,9 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
     case 0xf7:
       return _("F7xx: Restart macro (see manual)");
     case 0xf8:
-      return _("F8xx: Single tick volume slide up");
+      return _("F8xx: Single tick volume up");
     case 0xf9:
-      return _("F9xx: Single tick volume slide down");
+      return _("F9xx: Single tick volume down");
     case 0xfa:
       return _("FAxx: Fast volume slide (0y: down; x0: up)");
     case 0xfc:
@@ -188,79 +198,14 @@ const char* DivEngine::getEffectDesc(unsigned char effect, int chan, bool notNul
 }
 
 void DivEngine::walkSong(int& loopOrder, int& loopRow, int& loopEnd) {
-  loopOrder=0;
-  loopRow=0;
-  loopEnd=-1;
-  int nextOrder=-1;
-  int nextRow=0;
-  int effectVal=0;
-  int lastSuspectedLoopEnd=-1;
-  DivPattern* pat[DIV_MAX_CHANS];
-  unsigned char wsWalked[8192];
-  memset(wsWalked,0,8192);
-  for (int i=0; i<curSubSong->ordersLen; i++) {
-    for (int j=0; j<chans; j++) {
-      pat[j]=curPat[j].getPattern(curOrders->ord[j][i],false);
-    }
-    if (i>lastSuspectedLoopEnd) {
-      lastSuspectedLoopEnd=i;
-    }
-    for (int j=nextRow; j<curSubSong->patLen; j++) {
-      nextRow=0;
-      bool changingOrder=false;
-      bool jumpingOrder=false;
-      if (wsWalked[((i<<5)+(j>>3))&8191]&(1<<(j&7))) {
-        loopOrder=i;
-        loopRow=j;
-        loopEnd=lastSuspectedLoopEnd;
-        return;
-      }
-      for (int k=0; k<chans; k++) {
-        for (int l=0; l<curPat[k].effectCols; l++) {
-          effectVal=pat[k]->data[j][5+(l<<1)];
-          if (effectVal<0) effectVal=0;
-          if (pat[k]->data[j][4+(l<<1)]==0x0d) {
-            if (song.jumpTreatment==2) {
-              if ((i<curSubSong->ordersLen-1 || !song.ignoreJumpAtEnd)) {
-                nextOrder=i+1;
-                nextRow=effectVal;
-                jumpingOrder=true;
-              }
-            } else if (song.jumpTreatment==1) {
-              if (nextOrder==-1 && (i<curSubSong->ordersLen-1 || !song.ignoreJumpAtEnd)) {
-                nextOrder=i+1;
-                nextRow=effectVal;
-                jumpingOrder=true;
-              }
-            } else {
-              if ((i<curSubSong->ordersLen-1 || !song.ignoreJumpAtEnd)) {
-                if (!changingOrder) {
-                  nextOrder=i+1;
-                }
-                jumpingOrder=true;
-                nextRow=effectVal;
-              }
-            }
-          } else if (pat[k]->data[j][4+(l<<1)]==0x0b) {
-            if (nextOrder==-1 || song.jumpTreatment==0) {
-              nextOrder=effectVal;
-              if (song.jumpTreatment==1 || song.jumpTreatment==2 || !jumpingOrder) {
-                nextRow=0;
-              }
-              changingOrder=true;
-            }
-          }
-        }
-      }
+  if (curSubSong!=NULL) {
+    curSubSong->walk(loopOrder,loopRow,loopEnd,chans,song.jumpTreatment,song.ignoreJumpAtEnd);
+  }
+}
 
-      wsWalked[((i<<5)+(j>>3))&8191]|=1<<(j&7);
-
-      if (nextOrder!=-1) {
-        i=nextOrder-1;
-        nextOrder=-1;
-        break;
-      }
-    }
+void DivEngine::findSongLength(int loopOrder, int loopRow, double fadeoutLen, int& rowsForFadeout, bool& hasFFxx, std::vector<int>& orders, int& length) {
+  if (curSubSong!=NULL) {
+    curSubSong->findLength(loopOrder,loopRow,fadeoutLen,rowsForFadeout,hasFFxx,orders,song.grooves,length,chans,song.jumpTreatment,song.ignoreJumpAtEnd);
   }
 }
 
@@ -301,7 +246,7 @@ double DivEngine::benchmarkSeek() {
   // benchmark
   for (int i=0; i<20; i++) {
     std::chrono::high_resolution_clock::time_point timeStart=std::chrono::high_resolution_clock::now();
-    playSub(false);
+    playSub(false);     
     std::chrono::high_resolution_clock::time_point timeEnd=std::chrono::high_resolution_clock::now();
     t[i]=(double)(std::chrono::duration_cast<std::chrono::microseconds>(timeEnd-timeStart).count())/1000000.0;
     printf("[#%d] %fs\n",i+1,t[i]);
@@ -569,7 +514,7 @@ void DivEngine::initSongWithDesc(const char* description, bool inBase64, bool ol
     song.systemFlags[index].loadFromBase64(flags.c_str());
   }
   song.systemLen=index;
-
+  
   // extra attributes
   song.subsong[0]->hz=c.getDouble("tickRate",60.0);
   if (song.subsong[0]->hz<1.0) song.subsong[0]->hz=1.0;
@@ -753,7 +698,7 @@ void DivEngine::checkAssetDir(std::vector<DivAssetDir>& dir, size_t entries) {
         j--;
         continue;
       }
-
+      
       // mark entry as present
       inAssetDir[i.entries[j]]=true;
     }
@@ -795,7 +740,9 @@ void DivEngine::swapChannelsP(int src, int dest) {
 
 void DivEngine::changeSongP(size_t index) {
   if (index>=song.subsong.size()) return;
-  if (index==curSubSongIndex) return;
+  // rePlayer begin
+  //if (index==curSubSongIndex) return;
+  // rePlayer end
   stop();
   BUSY_BEGIN;
   saveLock.lock();
@@ -834,7 +781,7 @@ int DivEngine::duplicateSubSong(int index) {
   theCopy->patLen=theOrig->patLen;
   theCopy->ordersLen=theOrig->ordersLen;
   theCopy->orders=theOrig->orders;
-
+  
   memcpy(theCopy->chanShow,theOrig->chanShow,DIV_MAX_CHANS*sizeof(bool));
   memcpy(theCopy->chanShowChanOsc,theOrig->chanShowChanOsc,DIV_MAX_CHANS*sizeof(bool));
   memcpy(theCopy->chanCollapse,theOrig->chanCollapse,DIV_MAX_CHANS);
@@ -854,7 +801,7 @@ int DivEngine::duplicateSubSong(int index) {
   }
 
   song.subsong.push_back(theCopy);
-
+  
   saveLock.unlock();
   BUSY_END;
   return song.subsong.size()-1;
@@ -943,7 +890,7 @@ void DivEngine::delUnusedIns() {
       }
     }
   }
-
+  
   // delete
   for (int i=0; i<song.insLen; i++) {
     if (!isUsed[i]) {
@@ -1350,7 +1297,7 @@ void DivEngine::swapSystemUnsafe(int src, int dest, bool preserveOrder) {
 
     memset(unswappedChannels,0,DIV_MAX_CHANS);
     memset(swappedChannels,0,DIV_MAX_CHANS);
-
+    
     for (int i=0; i<tchans; i++) {
       unswappedChannels[i]=i;
     }
@@ -2390,6 +2337,13 @@ int DivEngine::mapVelocity(int ch, float vel) {
   return disCont[dispatchOfChan[ch]].dispatch->mapVelocity(dispatchChanOfChan[ch],vel);
 }
 
+float DivEngine::getGain(int ch, int vol) {
+  if (ch<0) return 0;
+  if (ch>=chans) return 0;
+  if (disCont[dispatchOfChan[ch]].dispatch==NULL) return 0;
+  return disCont[dispatchOfChan[ch]].dispatch->getGain(dispatchChanOfChan[ch],vol);
+}
+
 unsigned char DivEngine::getOrder() {
   return prevOrder;
 }
@@ -2877,7 +2831,7 @@ DivWavetable* DivEngine::waveFromFile(const char* path, bool addRaw) {
     lastError=_("premature end of file");
     return NULL;
   }
-
+  
   return wave;
 }
 
@@ -3647,6 +3601,12 @@ void DivEngine::synchronized(const std::function<void()>& what) {
   BUSY_END;
 }
 
+void DivEngine::synchronizedSoft(const std::function<void()>& what) {
+  BUSY_BEGIN_SOFT;
+  what();
+  BUSY_END;
+}
+
 void DivEngine::lockSave(const std::function<void()>& what) {
   saveLock.lock();
   what();
@@ -3975,6 +3935,9 @@ bool DivEngine::preInit(bool noSafeMode) {
   // register systems
   if (!systemsRegistered) registerSystems();
 
+  // register ROM exports
+  if (!romExportsRegistered) registerROMExports();
+
   // TODO: re-enable with a better approach
   // see issue #1581
   /*
@@ -4085,7 +4048,7 @@ bool DivEngine::init() {
   metroBufLen=8192;
 
   logV("setting blip rate of samp_bb (%f)",got.rate);
-
+  
   blip_set_rates(samp_bb,44100,got.rate);
 
   for (int i=0; i<64; i++) {

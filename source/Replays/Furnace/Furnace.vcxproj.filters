@@ -177,6 +177,9 @@
     <Filter Include="Source Files\adpcm-xq-s">
       <UniqueIdentifier>{c478106e-7d02-437a-b8f5-15225bc17bed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\itcompress">
+      <UniqueIdentifier>{018db14b-abcf-4e26-b377-b23355c378e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayFurnace.h">
@@ -264,9 +267,6 @@
       <Filter>Source Files\furnace\engine</Filter>
     </ClInclude>
     <ClInclude Include="furnace\src\engine\workPool.h">
-      <Filter>Source Files\furnace\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="furnace\src\engine\zsm.h">
       <Filter>Source Files\furnace\engine</Filter>
     </ClInclude>
     <ClInclude Include="furnace\src\baseutils.h">
@@ -1025,6 +1025,15 @@
     <ClInclude Include="furnace\extern\adpcm-xq-s\adpcm-lib.h">
       <Filter>Source Files\adpcm-xq-s</Filter>
     </ClInclude>
+    <ClInclude Include="furnace\src\engine\export\tiuna.h">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\export\zsm.h">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\itcompress\compression.h">
+      <Filter>Source Files\itcompress</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFurnace.cpp">
@@ -1444,12 +1453,6 @@
     <ClCompile Include="furnace\src\engine\workPool.cpp">
       <Filter>Source Files\furnace\engine</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\src\engine\zsm.cpp">
-      <Filter>Source Files\furnace\engine</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\zsmOps.cpp">
-      <Filter>Source Files\furnace\engine</Filter>
-    </ClCompile>
     <ClCompile Include="furnace\extern\SAASound\src\SAAAmp.cpp">
       <Filter>Source Files\SAASound</Filter>
     </ClCompile>
@@ -1846,8 +1849,38 @@
     <ClCompile Include="furnace\src\engine\fileOps\xm.cpp">
       <Filter>Source Files\furnace\engine\fileOps</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\src\engine\tiunaOps.cpp">
+    <ClCompile Include="furnace\src\engine\export\tiuna.cpp">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\export\zsm.cpp">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\p.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\p86.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\pdx.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\ppc.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\pps.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\pvi.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\fileOps\pzi.cpp">
+      <Filter>Source Files\furnace\engine\fileOps</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\exportDef.cpp">
       <Filter>Source Files\furnace\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\itcompress\compression.c">
+      <Filter>Source Files\itcompress</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

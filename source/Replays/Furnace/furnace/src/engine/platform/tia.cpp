@@ -189,10 +189,10 @@ void DivPlatformTIA::tick(bool sysTick) {
           addWrite(0xfffe0000+i,chan[i].freq*256);
         }
       } else if (oldPitch) {
-      int bf=chan[i].baseFreq;
-      if (!chan[i].fixedArp) {
-        bf+=chan[i].arpOff<<8;
-      }
+        int bf=chan[i].baseFreq;
+        if (!chan[i].fixedArp) {
+          bf+=chan[i].arpOff<<8;
+        }
         chan[i].freq=dealWithFreq(chan[i].shape,bf,chan[i].pitch+chan[i].pitch2);
         if (chan[i].shape==4 || chan[i].shape==5) {
           if (bf<39*256) {
@@ -236,7 +236,7 @@ void DivPlatformTIA::tick(bool sysTick) {
       }
       if (!softwarePitch) {
         if (chan[i].tuneFreq>=128) chan[i].freq++;
-      rWrite(0x17+i,chan[i].freq);
+        rWrite(0x17+i,chan[i].freq);
         if (!skipRegisterWrites && dumpWrites) {
           addWrite(0xfffe0000+i,chan[i].freq<<8);
         }

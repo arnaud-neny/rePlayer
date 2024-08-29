@@ -211,6 +211,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\extern\fmt\include\fmt\std.h" />
     <ClInclude Include="furnace\extern\fmt\include\fmt\xchar.h" />
     <ClInclude Include="furnace\extern\IconFontCppHeaders\IconsFontAwesome4.h" />
+    <ClInclude Include="furnace\extern\itcompress\compression.h" />
     <ClInclude Include="furnace\extern\Nuked-OPLL\opll.h" />
     <ClInclude Include="furnace\extern\Nuked-PSG\ympsg.h" />
     <ClInclude Include="furnace\extern\opl\opl3.h" />
@@ -266,6 +267,8 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\engine.h" />
     <ClInclude Include="furnace\src\engine\export.h" />
     <ClInclude Include="furnace\src\engine\export\amigaValidation.h" />
+    <ClInclude Include="furnace\src\engine\export\tiuna.h" />
+    <ClInclude Include="furnace\src\engine\export\zsm.h" />
     <ClInclude Include="furnace\src\engine\fileOps\fileOpsCommon.h" />
     <ClInclude Include="furnace\src\engine\filter.h" />
     <ClInclude Include="furnace\src\engine\instrument.h" />
@@ -462,7 +465,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\wavetable.h" />
     <ClInclude Include="furnace\src\engine\winStuff.h" />
     <ClInclude Include="furnace\src\engine\workPool.h" />
-    <ClInclude Include="furnace\src\engine\zsm.h" />
     <ClInclude Include="furnace\src\fileutils.h" />
     <ClInclude Include="furnace\src\fixedQueue.h" />
     <ClInclude Include="furnace\src\icon\furIcons.h" />
@@ -484,6 +486,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\extern\ESFMu\esfm_registers.c" />
     <ClCompile Include="furnace\extern\fmt\src\format.cc" />
     <ClCompile Include="furnace\extern\fmt\src\os.cc" />
+    <ClCompile Include="furnace\extern\itcompress\compression.c" />
     <ClCompile Include="furnace\extern\Nuked-OPLL\opll.c" />
     <ClCompile Include="furnace\extern\Nuked-PSG\ympsg.c" />
     <ClCompile Include="furnace\extern\opl\opl3.c" />
@@ -541,8 +544,11 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\effect\dummy.cpp" />
     <ClCompile Include="furnace\src\engine\engine.cpp" />
     <ClCompile Include="furnace\src\engine\export.cpp" />
+    <ClCompile Include="furnace\src\engine\exportDef.cpp" />
     <ClCompile Include="furnace\src\engine\export\abstract.cpp" />
     <ClCompile Include="furnace\src\engine\export\amigaValidation.cpp" />
+    <ClCompile Include="furnace\src\engine\export\tiuna.cpp" />
+    <ClCompile Include="furnace\src\engine\export\zsm.cpp" />
     <ClCompile Include="furnace\src\engine\fileOpsIns.cpp" />
     <ClCompile Include="furnace\src\engine\fileOpsSample.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\dmf.cpp" />
@@ -552,6 +558,13 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\fileOps\fur.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\it.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\mod.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\p.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\p86.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\pdx.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\ppc.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\pps.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\pvi.cpp" />
+    <ClCompile Include="furnace\src\engine\fileOps\pzi.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\s3m.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\text.cpp" />
     <ClCompile Include="furnace\src\engine\fileOps\tfm.cpp" />
@@ -740,14 +753,11 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\sample.cpp" />
     <ClCompile Include="furnace\src\engine\song.cpp" />
     <ClCompile Include="furnace\src\engine\sysDef.cpp" />
-    <ClCompile Include="furnace\src\engine\tiunaOps.cpp" />
     <ClCompile Include="furnace\src\engine\vgmOps.cpp" />
     <ClCompile Include="furnace\src\engine\waveSynth.cpp" />
     <ClCompile Include="furnace\src\engine\wavetable.cpp" />
     <ClCompile Include="furnace\src\engine\wavOps.cpp" />
     <ClCompile Include="furnace\src\engine\workPool.cpp" />
-    <ClCompile Include="furnace\src\engine\zsm.cpp" />
-    <ClCompile Include="furnace\src\engine\zsmOps.cpp" />
     <ClCompile Include="furnace\src\fileutils.cpp" />
     <ClCompile Include="furnace\src\log.cpp" />
     <ClCompile Include="furnace\src\utfutils.cpp" />

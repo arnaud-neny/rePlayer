@@ -108,6 +108,7 @@ for other operating systems, you may [build the source](#developer-info).
   - some bug/quirk implementation for increased playback accuracy through compatibility flags
 - VGM export
 - ZSM export for Commander X16
+- TIunA export for Atari 2600
 - modular layout that you may adapt to your needs
 - audio file export - entire song, per chip or per channel
 - quality emulation cores (Nuked, MAME, SameBoy, Mednafen PCE, NSFplay, puNES, reSID, Stella, SAASound, vgsound_emu and ymfm)
@@ -137,7 +138,7 @@ for other operating systems, you may [build the source](#developer-info).
 ---
 # quick references
 
-- **discussion**: see the [Discussions](https://github.com/tildearrow/furnace/discussions) section, the [official Revolt](https://rvlt.gg/GRPS6tmc) or the [official Discord server](https://discord.gg/EfrwT2wq7z).
+- **discussion**: see the [Discussions](https://github.com/tildearrow/furnace/discussions) section.
 - **help**: check out the [documentation](doc/README.md).
 
 ## packages
@@ -332,6 +333,27 @@ this will play a compatible file and enable the commands view.
 ---
 # frequently asked questions
 
+> where's the manual?
+
+it is in [doc/](doc/README.md).
+
+> is there a tutorial?
+
+[a video tutorial of tracker concepts is available on YouTube](https://www.youtube.com/watch?v=Q37XuOLz0jw). thanks Button Masher!
+
+> can I import VGM or NSF?
+
+nope. it's a feature that's been requested many times, but I don't have plans to implement that yet.
+
+for NSF import, you can use [a modified version of FamiTracker called NSFImport](http://rainwarrior.ca/projects/nes/nsfimport.html), and then import the resulting .ftm into Furnace.
+it's all speed 1 though, so don't expect any songs to be nicely laid out with instruments and all.
+
+> how about MIDI? can I import these?
+
+nope. it's not implemented.
+
+also, Furnace isn't a MIDI tracker.
+
 > it doesn't open under macOS!
 
 this is due to Apple's application signing policy. a workaround is to right click on the Furnace app icon and select Open.
@@ -349,14 +371,6 @@ xattr -d com.apple.quarantine /path/to/Furnace.app
 
 you may need to log out and/or reboot after doing this.
 
-> where's the manual?
-
-it is in [doc/](doc/README.md).
-
-> is there a tutorial?
-
-[a video tutorial (of a previous version) is available on YouTube](https://youtube.com/playlist?list=PLCELB6AsTZUnwv0PC5AAGHjvg47F44YQ1), made by Spinning Square Waves.
-
 > I've lost my song!
 
 Furnace keeps backups of the songs you've worked on before. go to **file > restore backup**.
@@ -368,6 +382,12 @@ Furnace keeps backups of the songs you've worked on before. go to **file > resto
 > ROM export?
 
 **not yet!** coming in 0.7 though, eventually...
+
+> Roland MT-32 support?
+
+MT-32 is used with MIDI in 99.999% of situations. it lacks a direct register interface.
+
+also, Furnace is not a MIDI tracker....
 
 > my .dmf song sounds odd at a certain point
 
