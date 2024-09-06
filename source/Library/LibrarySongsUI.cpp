@@ -173,12 +173,12 @@ namespace rePlayer
                 auto& filePath = dir_entry.path();
                 if (!dir_entry.is_directory())
                 {
-                    auto filename = filePath.stem().string();
+                    auto filename = filePath.stem().u8string();
                     bool isLostFile = filename.size() < sizeof("][00000000]");
                     if (!isLostFile)
                     {
                         uint32_t id;
-                        if (sscanf_s(filename.c_str() + filename.size() - sizeof("][00000000]") + 1, "][%08X]", &id))
+                        if (sscanf_s(reinterpret_cast<const char*>(filename.c_str()) + filename.size() - sizeof("][00000000]") + 1, "][%08X]", &id))
                         {
                             isLostFile = !m_db.IsValid(SongID(id));
                             if (!isLostFile)
