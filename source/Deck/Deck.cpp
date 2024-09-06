@@ -648,7 +648,7 @@ namespace rePlayer
             auto window = ImGui::GetCurrentWindow();
             window->AutoFitFramesX = 2;
 
-            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Border, 0))
+            if (ImGui::BeginChild("Metadata", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Borders, 0))
             {
                 auto metadata = isPlayerValid ? player->GetMetadata() : "";
                 // input text so we can select and copy text
