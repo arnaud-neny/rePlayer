@@ -13,6 +13,7 @@
 #include "mpt/random/default_engines.hpp"
 #include "mpt/random/device.hpp"
 #include "mpt/random/random.hpp"
+#include "mpt/random/seed.hpp"
 #include "mpt/test/test.hpp"
 #include "mpt/test/test_macros.hpp"
 
@@ -64,6 +65,11 @@ MPT_TEST_GROUP_INLINE("mpt/random")
 		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng, 9), 0, 511);
 		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng, 1), 0, 1);
 
+		failed = failed || !mpt::is_in_range(mpt::random<int8>(prng, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int32>(prng, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng, -42, 69), -42, 69);
+
 		failed = failed || !mpt::is_in_range(mpt::random<float>(prng, 0.0f, 1.0f), 0.0f, 1.0f);
 		failed = failed || !mpt::is_in_range(mpt::random<double>(prng, 0.0, 1.0), 0.0, 1.0);
 		failed = failed || !mpt::is_in_range(mpt::random<double>(prng, -1.0, 1.0), -1.0, 1.0);
@@ -92,6 +98,11 @@ MPT_TEST_GROUP_INLINE("mpt/random")
 		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng64, 9), 0, 511);
 		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng64, 1), 0, 1);
 
+		failed = failed || !mpt::is_in_range(mpt::random<int8>(prng64, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng64, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int32>(prng64, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng64, -42, 69), -42, 69);
+
 		failed = failed || !mpt::is_in_range(mpt::random<float>(prng64, 0.0f, 1.0f), 0.0f, 1.0f);
 		failed = failed || !mpt::is_in_range(mpt::random<double>(prng64, 0.0, 1.0), 0.0, 1.0);
 		failed = failed || !mpt::is_in_range(mpt::random<double>(prng64, -1.0, 1.0), -1.0, 1.0);
@@ -119,6 +130,11 @@ MPT_TEST_GROUP_INLINE("mpt/random")
 		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng8, 8), 0, 255);
 		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng8, 9), 0, 511);
 		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng8, 1), 0, 1);
+
+		failed = failed || !mpt::is_in_range(mpt::random<int8>(prng8, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int16>(prng8, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int32>(prng8, -42, 69), -42, 69);
+		failed = failed || !mpt::is_in_range(mpt::random<int64>(prng8, -42, 69), -42, 69);
 
 		failed = failed || !mpt::is_in_range(mpt::random<float>(prng8, 0.0f, 1.0f), 0.0f, 1.0f);
 		failed = failed || !mpt::is_in_range(mpt::random<double>(prng8, 0.0, 1.0), 0.0, 1.0);

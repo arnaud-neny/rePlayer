@@ -613,6 +613,7 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 					// ProTracker MODs with VBlank timing: All Fxx parameters set the tick count.
 					if(p->param != 0) SetSpeed(playState, p->param);
 				}
+				// Regular tempo handled below
 				break;
 
 			case CMD_S3MCMDEX:
@@ -756,42 +757,23 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 				if(!m_playBehaviour[kMODVBlankTiming])
 				{
 					TEMPO tempo(CalculateXParam(playState.m_nPattern, playState.m_nRow, nChn), 0);
-					if ((adjustMode & eAdjust) && (GetType() & (MOD_TYPE_S3M | MOD_TYPE_IT | MOD_TYPE_MPT)))
+					if(GetType() & (MOD_TYPE_S3M | MOD_TYPE_IT | MOD_TYPE_MPT))
 					{
 						if (tempo.GetInt()) chn.nOldTempo = static_cast<uint8>(tempo.GetInt()); else tempo.Set(chn.nOldTempo);
 					}
 
-					const auto &specs = GetModSpecifications();
 					if(tempo >= GetMinimumTempoParam(GetType()))
 					{
-#if MPT_MSVC_BEFORE(2019, 0)
-						// Work-around for VS2017 /std:c++17 /permissive-
-						// which fails to find operator < for templated user types inside std::min.
-						playState.m_nMusicTempo.SetRaw(std::min(tempo.GetRaw(), specs.GetTempoMax().GetRaw()));
-#else
-						playState.m_nMusicTempo = std::min(tempo, specs.GetTempoMax());
-#endif
+						playState.m_flags.set(SONG_FIRSTTICK, !m_playBehaviour[kMODTempoOnSecondTick]);
+						SetTempo(playState, tempo, false);
 					} else
 					{
 						// Tempo Slide
-						TEMPO tempoDiff((tempo.GetInt() & 0x0F) * nonRowTicks, 0);
-						if ((tempo.GetInt() & 0xF0) == 0x10)
+						playState.m_flags.reset(SONG_FIRSTTICK);
+						for(uint32 i = 0; i < nonRowTicks; i++)
 						{
-							playState.m_nMusicTempo += tempoDiff;
-						} else
-						{
-							if(tempoDiff < playState.m_nMusicTempo)
-								playState.m_nMusicTempo -= tempoDiff;
-							else
-								playState.m_nMusicTempo.Set(0);
+							SetTempo(playState, tempo, false);
 						}
-
-						TEMPO tempoMin = specs.GetTempoMin(), tempoMax = specs.GetTempoMax();
-						if(m_playBehaviour[kTempoClamp])  // clamp tempo correctly in compatible mode
-						{
-							tempoMax.Set(255);
-						}
-						Limit(playState.m_nMusicTempo, tempoMin, tempoMax);
 					}
 				}
 				break;
@@ -3382,18 +3364,16 @@ bool CSoundFile::ProcessEffects()
 			if(m_playBehaviour[kMODVBlankTiming])
 			{
 				// ProTracker MODs with VBlank timing: All Fxx parameters set the tick count.
-				if(m_PlayState.m_flags[SONG_FIRSTTICK] && param != 0) SetSpeed(m_PlayState, param);
-				break;
-			}
+				if(m_PlayState.m_flags[SONG_FIRSTTICK] && param != 0)
+					SetSpeed(m_PlayState, param);
+			} else
 			{
 				param = CalculateXParam(m_PlayState.m_nPattern, m_PlayState.m_nRow, nChn);
-				if (GetType() & (MOD_TYPE_S3M|MOD_TYPE_IT|MOD_TYPE_MPT))
+				if (GetType() & (MOD_TYPE_S3M | MOD_TYPE_IT | MOD_TYPE_MPT))
 				{
 					if (param) chn.nOldTempo = static_cast<ModCommand::PARAM>(param); else param = chn.nOldTempo;
 				}
-				TEMPO t(param, 0);
-				LimitMax(t, GetModSpecifications().GetTempoMax());
-				SetTempo(t);
+				SetTempo(m_PlayState, TEMPO(param, 0));
 			}
 			break;
 
@@ -6354,38 +6334,41 @@ TEMPO CSoundFile::ConvertST2Tempo(uint8 tempo)
 }
 
 
-void CSoundFile::SetTempo(TEMPO param, bool setFromUI)
+void CSoundFile::SetTempo(PlayState &playState, TEMPO param, bool setFromUI) const
 {
 	const CModSpecifications &specs = GetModSpecifications();
 
 	// Anything lower than the minimum tempo is considered to be a tempo slide
 	const TEMPO minTempo = GetMinimumTempoParam(GetType());
+	TEMPO maxTempo = specs.GetTempoMax();
+	// MED files may be imported with #xx parameter extension for tempos above 255, but they may be imported as either MOD or XM.
+	// As regular MOD files cannot contain effect #xx, the tempo parameter cannot exceed 255 anyway, so we simply ignore their max tempo in CModSpecifications here.
+	if(!(GetType() & (MOD_TYPE_XM | MOD_TYPE_IT | MOD_TYPE_MPT)))
+		maxTempo = GetModSpecifications(MOD_TYPE_MPT).GetTempoMax();
+	if(m_playBehaviour[kTempoClamp])
+		maxTempo.Set(255);
 
 	if(setFromUI)
 	{
 		// Set tempo from UI - ignore slide commands and such.
-		m_PlayState.m_nMusicTempo = Clamp(param, specs.GetTempoMin(), specs.GetTempoMax());
-	} else if(param >= minTempo && m_PlayState.m_flags[SONG_FIRSTTICK] == !m_playBehaviour[kMODTempoOnSecondTick])
+		playState.m_nMusicTempo = Clamp(param, specs.GetTempoMin(), maxTempo);
+	} else if(param >= minTempo && playState.m_flags[SONG_FIRSTTICK] == !m_playBehaviour[kMODTempoOnSecondTick])
 	{
 		// ProTracker sets the tempo after the first tick.
 		// Note: The case of one tick per row is handled in ProcessRow() instead.
 		// Test case: TempoChange.mod
-		m_PlayState.m_nMusicTempo = std::min(param, specs.GetTempoMax());
-	} else if(param < minTempo && !m_PlayState.m_flags[SONG_FIRSTTICK])
+		playState.m_nMusicTempo = std::min(param, maxTempo);
+	} else if(param < minTempo && !playState.m_flags[SONG_FIRSTTICK])
 	{
 		// Tempo Slide
 		TEMPO tempDiff(param.GetInt() & 0x0F, 0);
 		if((param.GetInt() & 0xF0) == 0x10)
-			m_PlayState.m_nMusicTempo += tempDiff;
+			playState.m_nMusicTempo += tempDiff;
 		else
-			m_PlayState.m_nMusicTempo -= tempDiff;
+			playState.m_nMusicTempo -= tempDiff;
 
-		TEMPO tempoMin = specs.GetTempoMin(), tempoMax = specs.GetTempoMax();
-		if(m_playBehaviour[kTempoClamp])	// clamp tempo correctly in compatible mode
-		{
-			tempoMax.Set(255);
-		}
-		Limit(m_PlayState.m_nMusicTempo, tempoMin, tempoMax);
+		TEMPO tempoMin = specs.GetTempoMin();
+		Limit(playState.m_nMusicTempo, tempoMin, maxTempo);
 	}
 }
 
