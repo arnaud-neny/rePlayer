@@ -954,3 +954,4 @@ EXTENSION(move)         // VGMStream
 EXTENSION(no)           // VGMStream
 EXTENSION(wax)          // VGMStream
 EXTENSION(se)           // VGMStream
+EXTENSION(unic)         // OpenMPT: UNIC Tracker

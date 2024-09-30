@@ -841,5 +841,8 @@
     <ClCompile Include="soundlib\Load_etx.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
+    <ClCompile Include="soundlib\Load_unic.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
