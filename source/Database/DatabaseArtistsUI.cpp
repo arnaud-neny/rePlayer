@@ -516,6 +516,7 @@ namespace rePlayer
             if (ImGui::Button("Merge With Another Artist", ImVec2(-FLT_MIN, 0)))
                 ImGui::OpenPopup("MergeArtist");
             ImGui::PopStyleColor(3);
+            ImGui::SetNextWindowSizeConstraints(ImVec2(128.0f, ImGui::GetTextLineHeightWithSpacing()), ImVec2(FLT_MAX, FLT_MAX));
             if (ImGui::BeginPopupContextItem("MergeArtist"))
             {
                 m_artistMerger.mergedArtistId = selectedArtist->GetId();
