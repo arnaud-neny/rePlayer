@@ -197,20 +197,23 @@ FilterModelConfig8580::FilterModelConfig8580() :
         buildResonanceTable(opampModel, resGain);
     };
 
-    auto thdSummer = std::thread(filterSummer);
-    auto thdMixer = std::thread(filterMixer);
-    auto thdGain = std::thread(filterGain);
-    auto thdResonance = std::thread(filterResonance);
+#if defined(HAVE_CXX20) && defined(__cpp_lib_jthread)
+    using sidThread = std::jthread;
+#else
+    using sidThread = std::thread;
+#endif
 
+    sidThread thdSummer(filterSummer);
+    sidThread thdMixer(filterMixer);
+    sidThread thdGain(filterGain);
+    sidThread thdResonance(filterResonance);
+
+#if !defined(HAVE_CXX20) || !defined(__cpp_lib_jthread)
     thdSummer.join();
     thdMixer.join();
     thdGain.join();
     thdResonance.join();
-}
-
-Integrator* FilterModelConfig8580::buildIntegrator()
-{
-    return new Integrator8580(this);
+#endif
 }
 
 } // namespace reSIDfp

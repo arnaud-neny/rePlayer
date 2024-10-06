@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2023 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2000 Simon White
  *
@@ -135,11 +135,21 @@ public:
     /**
      * Mute/unmute a SID channel.
      *
-     * @param sidNum the SID chip, 0 for the first one, 1 for the second.
-     * @param voice the channel to mute/unmute.
+     * @param sidNum the SID chip, 0 for the first one, 1 for the second or 2 for the third.
+     * @param voice the channel to mute/unmute, 0 to 2 for the voices or 3 for samples.
      * @param enable true unmutes the channel, false mutes it.
      */
     void mute(unsigned int sidNum, unsigned int voice, bool enable);
+
+    /**
+     * Enable/disable SID filter.
+     * Must be called after #config or it has no effect.
+     *
+     * @param sidNum the SID chip, 0 for the first one, 1 for the second or 2 for the third.
+     * @param enable true enable the filter, false disable it.
+     * @since 2.10
+     */
+    void filter(unsigned int sidNum, bool enable);
 
     /**
      * Get the current playing time.

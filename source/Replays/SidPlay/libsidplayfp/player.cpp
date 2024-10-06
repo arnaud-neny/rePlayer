@@ -192,6 +192,13 @@ void Player::mute(unsigned int sidNum, unsigned int voice, bool enable)
         s->voice(voice, enable);
 }
 
+void Player::filter(unsigned int sidNum, bool enable)
+{
+    sidemu *s = m_mixer.getSid(sidNum);
+    if (s != nullptr)
+        s->filter(enable);
+}
+
 /**
  * @throws MOS6510::haltInstruction
  */
@@ -356,6 +363,7 @@ bool Player::config(const SidConfig &cfg, bool force)
         }
         catch (configError const &e)
         {
+            sidRelease();
             m_errorString = e.message();
             m_cfg.sidEmulation = nullptr;
             if (&m_cfg != &cfg)

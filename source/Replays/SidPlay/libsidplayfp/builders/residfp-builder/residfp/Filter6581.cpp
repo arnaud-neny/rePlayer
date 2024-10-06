@@ -27,6 +27,38 @@
 namespace reSIDfp
 {
 
+unsigned short Filter6581::clock(float voice1, float voice2, float voice3)
+{
+    const int V1 = fmc.getNormalizedVoice(voice1);
+    const int V2 = fmc.getNormalizedVoice(voice2);
+    // Voice 3 is silenced by voice3off if it is not routed through the filter.
+    const int V3 = (filt3 || !voice3off) ? fmc.getNormalizedVoice(voice3) : 0;
+
+    int Vsum = 0;
+    int Vmix = 0;
+
+    (filt1 ? Vsum : Vmix) += V1;
+    (filt2 ? Vsum : Vmix) += V2;
+    (filt3 ? Vsum : Vmix) += V3;
+    (filtE ? Vsum : Vmix) += Ve;
+
+    Vhp = currentSummer[currentResonance[Vbp] + Vlp + Vsum];
+    Vbp = hpIntegrator.solve(Vhp);
+    Vlp = bpIntegrator.solve(Vbp);
+
+    int Vfilt = 0;
+    if (lp) Vfilt += Vlp;
+    if (bp) Vfilt += Vbp;
+    if (hp) Vfilt += Vhp;
+
+    // The filter input resistors are slightly bigger than the voice ones
+    // Scale the values accordingly
+    constexpr int filterGain = static_cast<int>(0.93 * (1 << 12));
+    Vfilt = (Vfilt * filterGain) >> 12;
+
+    return currentVolume[currentMixer[Vmix + Vfilt]];
+}
+
 Filter6581::~Filter6581()
 {
     delete [] f0_dac;
@@ -35,8 +67,8 @@ Filter6581::~Filter6581()
 void Filter6581::updateCenterFrequency()
 {
     const unsigned short Vw = f0_dac[getFC()];
-    static_cast<Integrator6581*>(hpIntegrator)->setVw(Vw);
-    static_cast<Integrator6581*>(bpIntegrator)->setVw(Vw);
+    hpIntegrator.setVw(Vw);
+    bpIntegrator.setVw(Vw);
 }
 
 void Filter6581::setFilterCurve(double curvePosition)

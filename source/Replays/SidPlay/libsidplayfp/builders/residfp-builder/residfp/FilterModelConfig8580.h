@@ -50,13 +50,6 @@ private:
 
 public:
     static FilterModelConfig8580* getInstance();
-
-    /**
-     * Construct an integrator solver.
-     *
-     * @return the integrator
-     */
-    Integrator* buildIntegrator() override;
 };
 
 } // namespace reSIDfp

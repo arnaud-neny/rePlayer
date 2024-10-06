@@ -241,19 +241,27 @@ FilterModelConfig6581::FilterModelConfig6581() :
         }
     };
 
-    auto thdSummer = std::thread(filterSummer);
-    auto thdMixer = std::thread(filterMixer);
-    auto thdGain = std::thread(filterGain);
-    auto thdResonance = std::thread(filterResonance);
-    auto thdVcrVg = std::thread(filterVcrVg);
-    auto thdVcrIds = std::thread(filterVcrIds);
+#if defined(HAVE_CXX20) && defined(__cpp_lib_jthread)
+    using sidThread = std::jthread;
+#else
+    using sidThread = std::thread;
+#endif
 
+    sidThread thdSummer(filterSummer);
+    sidThread thdMixer(filterMixer);
+    sidThread thdGain(filterGain);
+    sidThread thdResonance(filterResonance);
+    sidThread thdVcrVg(filterVcrVg);
+    sidThread thdVcrIds(filterVcrIds);
+
+#if !defined(HAVE_CXX20) || !defined(__cpp_lib_jthread)
     thdSummer.join();
     thdMixer.join();
     thdGain.join();
     thdResonance.join();
     thdVcrVg.join();
     thdVcrIds.join();
+#endif
 }
 
 unsigned short* FilterModelConfig6581::getDAC(double adjustment) const
@@ -269,11 +277,6 @@ unsigned short* FilterModelConfig6581::getDAC(double adjustment) const
     }
 
     return f0_dac;
-}
-
-Integrator* FilterModelConfig6581::buildIntegrator()
-{
-    return new Integrator6581(this, WL_snake);
 }
 
 } // namespace reSIDfp
