@@ -41,6 +41,7 @@
 
 #include "player.h"
 #include "depack.h"
+#include "sixdepack.h"
 #include "unlzh.h"
 #include "unlzss.h"
 #include "unlzw.h"
@@ -701,33 +702,32 @@ private:
     const uint8_t def_vibtrem_speed_factor = 1;
     const uint8_t def_vibtrem_table_size = 32;
 
-    uint8_t vibtrem_speed_factor;
-    uint8_t vibtrem_table_size;
+    uint8_t vibtrem_speed_factor = def_vibtrem_speed_factor;
+    uint8_t vibtrem_table_size = def_vibtrem_table_size;
     uint8_t vibtrem_table[256];
 
-    uint8_t misc_register;
+    uint8_t misc_register = 0;
 
     uint8_t current_tremolo_depth = 0;
     uint8_t current_vibrato_depth = 0;
 
-    bool speed_update, lockvol, panlock, lockVP;
-    uint8_t tremolo_depth, vibrato_depth;
-    bool volume_scaling, percussion_mode;
-    uint8_t last_order;
+    bool speed_update = false, lockvol = false, panlock = false, lockVP = false;
+    uint8_t tremolo_depth = 0, vibrato_depth = 0;
+    bool volume_scaling = false, percussion_mode = false;
 
     bool editor_mode = false; // true to allocate max resources
 
     tSONGINFO *songinfo;
     tINSTR_INFO *instrinfo;
-    unsigned int arpvib_count;
+    unsigned int arpvib_count = 0;
     tVIBRATO_TABLE **vibrato_table = 0;
     tARPEGGIO_TABLE **arpeggio_table = 0;
     tEVENTS_INFO *eventsinfo;
     tCHDATA *ch;
 
     // Timer
-    int ticks, tickD, tickXF;
-    int ticklooper, macro_ticklooper;
+    int ticks = 0, tickD = 0, tickXF = 0;
+    int ticklooper = 0, macro_ticklooper = 0;
 
     // Loader
     int type = 0; // 0 - a2m, 1 - a2t
@@ -748,7 +748,7 @@ private:
 
     // Helpers for macro tables
     void fmreg_table_allocate(size_t n, tFMREG_TABLE rt[]);
-    void disabled_fmregs_import(size_t n, bool dis_fmregs[][28]);
+    void disabled_fmregs_import(size_t n, bool dis_fmregs[255][28]);
     void arpvib_tables_free();
     void arpvib_tables_allocate(size_t n, tARPVIB_TABLE mt[]);
     tARPEGGIO_TABLE *get_arpeggio_table(uint8_t arp_table);
@@ -782,7 +782,7 @@ private:
 
     t4OP_DATA get_4op_data(uint8_t chan);
     bool _4op_vol_valid_chan(int chan);
-    void set_ins_volume(uint8_t modulator, uint8_t carrier, int chan);
+    void set_ins_volume(uint8_t modulator, uint8_t carrier, uint8_t chan);
     void set_volume(uint8_t modulator, uint8_t carrier, uint8_t chan);
     void set_ins_volume_4op(uint8_t volume, uint8_t chan);
     void reset_ins_volume(int chan);
@@ -826,8 +826,8 @@ private:
     void update_extra_fine_effects_slot(int slot, int chan);
     void update_extra_fine_effects();
 
+    void set_current_order(uint8_t new_order);
     int calc_following_order(uint8_t order);
-    int calc_order_jump();
     void update_song_position();
     void poll_proc();
     void macro_poll_proc();

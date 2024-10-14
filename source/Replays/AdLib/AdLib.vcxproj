@@ -262,6 +262,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="adplug\s3m.h" />
     <ClInclude Include="adplug\sa2.h" />
     <ClInclude Include="adplug\silentopl.h" />
+    <ClInclude Include="adplug\sixdepack.h" />
     <ClInclude Include="adplug\sng.h" />
     <ClInclude Include="adplug\sop.h" />
     <ClInclude Include="adplug\strnlen.h" />
@@ -348,6 +349,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="adplug\rol.cpp" />
     <ClCompile Include="adplug\s3m.cpp" />
     <ClCompile Include="adplug\sa2.cpp" />
+    <ClCompile Include="adplug\sixdepack.cpp" />
     <ClCompile Include="adplug\sng.cpp" />
     <ClCompile Include="adplug\sop.cpp" />
     <ClCompile Include="adplug\surroundopl.cpp" />

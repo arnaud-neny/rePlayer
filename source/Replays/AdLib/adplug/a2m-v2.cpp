@@ -30,7 +30,6 @@
  */
 
 #include "a2m-v2.h"
-#include "a2m.h" // Ca2mLoader::sixdepak
 #include "debug.h"
 #include <climits>
 #include <math.h>
@@ -102,8 +101,11 @@ void Ca2mv2Player::rewind(int subsong)
     init_player();
 
     songend = false;
-    current_order = 0;
-    last_order = 0xff;
+    set_current_order(0);
+
+    if ((songinfo->pattern_order[current_order] > 0x7f))
+        return;
+
     current_pattern = songinfo->pattern_order[current_order];
     current_line = 0;
     pattern_break = false;
@@ -729,8 +731,13 @@ bool Ca2mv2Player::_4op_vol_valid_chan(int chan)
 
 // TODO here: fade_out_volume
 // inverted volume here
-void Ca2mv2Player::set_ins_volume(uint8_t modulator, uint8_t carrier, int chan)
+void Ca2mv2Player::set_ins_volume(uint8_t modulator, uint8_t carrier, uint8_t chan)
 {
+    if (chan >= 20) {
+        AdPlug_LogWrite("set_ins_volume: channel out of bounds\n");
+        return;
+    }
+
     tINSTR_DATA *instr = get_instr_data_by_ch(chan);
 
     // ** OPL3 emulation workaround **
@@ -752,7 +759,7 @@ void Ca2mv2Player::set_ins_volume(uint8_t modulator, uint8_t carrier, int chan)
     if (modulator != BYTE_NULL) {
         uint8_t regm;
         bool is_perc_chan = instr->fm.connect ||
-                            (percussion_mode && (chan >= 16 && chan <= 19)); // in [17..20]
+                            (percussion_mode && chan >= 16); // in [17..20]
 
         ch->fmpar_table[chan].volM = modulator;
 
@@ -1520,6 +1527,7 @@ void Ca2mv2Player::process_effects(tADTRACK2_EVENT *event, int slot, int chan)
                 current_tremolo_depth = 1;
                 break;
             }
+            break;
 
         case ef_ex_SetVibDepth:
             switch (val % 16) {
@@ -1533,6 +1541,7 @@ void Ca2mv2Player::process_effects(tADTRACK2_EVENT *event, int slot, int chan)
                 current_vibrato_depth = 1;
                 break;
             }
+            break;
 
         case ef_ex_SetAttckRateM:
             ch->fmpar_table[chan].attckM = val % 16;
@@ -1865,12 +1874,6 @@ void Ca2mv2Player::new_process_note(tADTRACK2_EVENT *event, int chan)
 void Ca2mv2Player::play_line()
 {
     tADTRACK2_EVENT _event, *event = &_event;
-
-    if (!(pattern_break && ((next_line & 0xf0) == pattern_loop_flag)) && current_order != last_order) {
-        memset(ch->loopbck_table, BYTE_NULL, sizeof(ch->loopbck_table));
-        memset(ch->loop_table, BYTE_NULL, sizeof(ch->loop_table));
-        last_order = current_order;
-    }
 
     for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
         // save effect_table into last_effect
@@ -2601,6 +2604,37 @@ void Ca2mv2Player::update_extra_fine_effects()
     }
 }
 
+void Ca2mv2Player::set_current_order(uint8_t new_order)
+{
+    if (new_order >= 0x80) {
+        AdPlug_LogWrite("set_current_order parameter 0x%x is out of bounds, possibly corrupt file\n", new_order);
+    }
+    current_order = new_order < 0x80 ? new_order : 0;
+
+    if (songinfo->pattern_order[current_order] < 0x80)
+        return;
+
+    // protect from circular jump to jump order command
+    // if after 128 attempts of order jump we still land on jump command
+    // then quit
+    int i = 0;
+    do {
+        if (songinfo->pattern_order[current_order] > 0x7f) {
+            uint8_t old_order = current_order;
+            current_order = songinfo->pattern_order[current_order] - 0x80;
+            if (current_order <= old_order)
+                songend = true;
+        }
+        i++;
+    } while (i < 128 && songinfo->pattern_order[current_order] > 0x7f);
+
+    if (i >= 128) {
+        AdPlug_LogWrite("set_current_order: Circular order jump detected, stopping playback\n");
+        songend = true;
+        a2t_stop();
+    }
+}
+
 int Ca2mv2Player::calc_following_order(uint8_t order)
 {
     int result;
@@ -2622,66 +2656,47 @@ int Ca2mv2Player::calc_following_order(uint8_t order)
     return result;
 }
 
-int Ca2mv2Player::calc_order_jump()
-{
-    uint8_t temp = 0;
-    int result = 0;
-
-    do {
-        if (songinfo->pattern_order[current_order] > 0x7f) {
-            current_order = songinfo->pattern_order[current_order] - 0x80;
-            songend = true;
-        }
-        temp++;
-    } while (!((temp > 0x7f) || (songinfo->pattern_order[current_order] < 0x80)));
-
-    if (temp > 0x7f) {
-        a2t_stop();
-        result = -1;
-    }
-
-    return result;
-}
-
 void Ca2mv2Player::update_song_position()
 {
     if ((current_line < songinfo->patt_len - 1) && !pattern_break) {
         current_line++;
     } else {
-        if (!(pattern_break && ((next_line & 0xf0) == pattern_loop_flag)) && (current_order < 0x7f)) {
+        bool do_pattern_loop =  pattern_break && ((next_line & 0xf0) == pattern_loop_flag);
+        bool do_position_jump = pattern_break && ((next_line & 0xf0) == pattern_break_flag);
+
+        if (do_pattern_loop) {
+            // ZCx, ZDx - loop back
+            uint8_t chan = next_line - pattern_loop_flag;
+            next_line = ch->loopbck_table[chan];
+
+            if (ch->loop_table[chan][current_line] != 0)
+                ch->loop_table[chan][current_line]--;
+        } else {
+            // A bit overkill to clean arrays here, better do it in the end of pattern loop
             memset(ch->loopbck_table, BYTE_NULL, sizeof(ch->loopbck_table));
             memset(ch->loop_table, BYTE_NULL, sizeof(ch->loop_table));
-            current_order++;
-        }
 
-        if (pattern_break && ((next_line & 0xf0) == pattern_loop_flag)) {
-            uint8_t temp;
-
-            temp = next_line - pattern_loop_flag;
-            next_line = ch->loopbck_table[temp];
-
-            if (ch->loop_table[temp][current_line] != 0)
-                ch->loop_table[temp][current_line]--;
-        } else {
-            if (pattern_break && ((next_line & 0xf0) == pattern_break_flag)) {
+            if (do_position_jump) {
+                // Bxx - order position jump
                 uint8_t old_order = current_order;
-                if (ch->event_table[next_line - pattern_break_flag].eff[1].def == ef_PositionJump) {
-                    current_order = ch->event_table[next_line - pattern_break_flag].eff[1].val;
-                } else {
-                    current_order = ch->event_table[next_line - pattern_break_flag].eff[0].val;
-                }
+
+                uint8_t chan = next_line - pattern_break_flag;
+                int slot = ch->event_table[chan].eff[0].def == ef_PositionJump ? 0 : 1;
+                uint8_t val = ch->event_table[chan].eff[slot].val;
+
+                set_current_order(val);
+
                 if (current_order <= old_order)
                     songend = true;
                 pattern_break = false;
             } else {
-                if (current_order >= 0x7f)
-                    current_order = 0;
+                int new_order = current_order < 0x7f ? current_order + 1 : 0;
+                set_current_order(new_order);
             }
         }
 
-        if ((songinfo->pattern_order[current_order] > 0x7f) && (calc_order_jump() == -1)) {
+        if ((songinfo->pattern_order[current_order] > 0x7f))
             return;
-        }
 
         current_pattern = songinfo->pattern_order[current_order];
         if (!pattern_break) {
@@ -2699,8 +2714,7 @@ void Ca2mv2Player::update_song_position()
         ch->glfsld_table[1][chan].val = 0;
     }
 
-    if ((current_line == 0) &&
-        (current_order == calc_following_order(0)) && speed_update) {
+    if (speed_update && current_line == 0 && current_order == calc_following_order(0)) {
         tempo = songinfo->tempo;
         speed = songinfo->speed;
         update_timer(tempo);
@@ -2984,8 +2998,7 @@ void Ca2mv2Player::macro_poll_proc()
                         (mt->vib_pos != IDLE) && (mt->vib_pos != finished_flag)) {
                         if (vt->data[mt->vib_pos - 1] > 0)
                             macro_vibrato__porta_up(chan, vt->data[mt->vib_pos]);
-                    } else {
-                        if (vt->data[mt->vib_pos - 1] < 0)
+                        else if (vt->data[mt->vib_pos - 1] < 0)
                             macro_vibrato__porta_down(chan, abs(vt->data[mt->vib_pos]));
                         else
                             change_freq(chan, mt->vib_freq);
@@ -3076,6 +3089,11 @@ void Ca2mv2Player::init_buffers()
 
     for (int i = 0; i < 20; i++)
         ch->volslide_type[i] = (songinfo->lock_flags[i] >> 2) & 3;
+
+    memset(ch->notedel_table, BYTE_NULL, sizeof(ch->notedel_table));
+    memset(ch->notecut_table, BYTE_NULL, sizeof(ch->notecut_table));
+    memset(ch->loopbck_table, BYTE_NULL, sizeof(ch->loopbck_table));
+    memset(ch->loop_table, BYTE_NULL, sizeof(ch->loop_table));
 }
 
 void Ca2mv2Player::init_player()
@@ -3191,7 +3209,7 @@ void Ca2mv2Player::a2t_depack(char *src, int srcsize, char *dst, int dstsize)
     switch (ffver) {
     case 1:
     case 5: // sixpack
-        Ca2mLoader::sixdepak::decode((unsigned short *)src, srcsize, (unsigned char *)dst, dstsize);
+        Sixdepak::decode((unsigned short *)src, srcsize, (unsigned char *)dst, dstsize);
         break;
     case 2:
     case 6: // lzw
@@ -3318,13 +3336,13 @@ void Ca2mv2Player::instrument_import(int ins, tINSTR_DATA *instr_s)
 
 int Ca2mv2Player::a2t_read_instruments(char *src, unsigned long size)
 {
+    if (len[0] > size) return INT_MAX;
+
     int instnum = (ffver < 9 ? 250 : 255);
     int instsize = (ffver < 9 ? sizeof(tINSTR_DATA_V1_8) : sizeof(tINSTR_DATA));
     int dstsize = (instnum * instsize) +
                   (ffver > 11 ?  sizeof(tBPM_DATA) + sizeof(tINS_4OP_FLAGS) + sizeof(tRESERVED) : 0);
     char *dst = (char *)calloc(1, dstsize);
-
-    if (len[0] > size) return INT_MAX;
 
     a2t_depack(src, len[0], dst, dstsize);
 
@@ -3413,9 +3431,9 @@ int Ca2mv2Player::a2t_read_disabled_fmregs(char *src, unsigned long size)
 {
     if (ffver < 11) return 0;
 
-    bool (*dis_fmregs)[255][28] = (bool (*)[255][28])calloc(255, 28);
-
     if (len[3] > size) return INT_MAX;
+
+    bool (*dis_fmregs)[255][28] = (bool (*)[255][28])calloc(255, 28);
 
     a2t_depack(src, len[3], (char *)*dis_fmregs, 255 * 28);
 
@@ -3556,7 +3574,7 @@ void Ca2mv2Player::convert_v1234_event(tADTRACK2_EVENT_V1234 *ev, int chan)
             ev->effect = ef_ex_ExtendedCmd2 << 4;
             if ((ev->effect & 0x0f) < 10) {
                 // FIXME: Should be a parameter
-                bool whole_song = false;
+                const bool whole_song = false;
 
                 switch (ev->effect & 0x0f) {
                 case 0: ev->effect |= ef_ex_cmd2_RSS;       break;
