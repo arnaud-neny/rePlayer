@@ -283,9 +283,16 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 			// though several ST3.01/3.03 files with ultra-click values of 16 have been found as well.
 			// However, we won't fingerprint these values here as it's unlikely that there is any other tracker out there disguising as ST3 and using a strange ultra-click value.
 			// Also, re-saving a file with a strange ultra-click value in ST3 doesn't fix this value unless the user manually changes it, or if it's below 16.
-			madeWithTracker = UL_("Scream Tracker");
-			formatTrackerStr = true;
 			isST3 = true;
+			if(fileHeader.cwtv == S3MFileHeader::trkST3_20)
+			{
+				// 3.21 writes the version number as 3.20. There is no known way to differentiate between the two.
+				madeWithTracker = UL_("Scream Tracker 3.20 - 3.21");
+			} else
+			{
+				madeWithTracker = UL_("Scream Tracker");
+				formatTrackerStr = true;
+			}
 		}
 		break;
 	case S3MFileHeader::trkImagoOrpheus:
@@ -708,7 +715,7 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 						else if(m.param > 0x08)
 							zxxCountRight++;
 					}
-				} else if(m.command == CMD_OFFSET && m.param == 0 && fileHeader.cwtv <= S3MFileHeader::trkST3_01)
+				} else if(m.command == CMD_OFFSET && m.param == 0 && isST3 && fileHeader.cwtv <= S3MFileHeader::trkST3_01)
 				{
 					// Offset command didn't have effect memory in ST3.01; fixed in ST3.03
 					m.command = CMD_DUMMY;
@@ -914,6 +921,7 @@ bool CSoundFile::SaveS3M(std::ostream &f) const
 				const auto rowBase = Patterns[pat].GetRow(row);
 
 				CHANNELINDEX writeChannels = std::min(CHANNELINDEX(32), GetNumChannels());
+				bool writePatternBreak = (Patterns[pat].GetNumRows() < 64 && row + 1 == Patterns[pat].GetNumRows() && !Patterns[pat].RowHasJump(row));
 				for(CHANNELINDEX chn = 0; chn < writeChannels; chn++)
 				{
 					const ModCommand &m = rowBase[chn];
@@ -978,6 +986,12 @@ bool CSoundFile::SaveS3M(std::ostream &f) const
 								globalCmdOnMutedChn = true;
 							}
 						}
+					}
+					if(writePatternBreak && !(info & s3mEffectPresent))
+					{
+						info |= s3mEffectPresent;
+						command = 'C' ^ 0x40;
+						writePatternBreak = false;
 					}
 
 					if(info & s3mAnyPresent)

@@ -3145,6 +3145,32 @@ bool CSoundFile::ProcessEffects()
 		{
 			doVolumeColumn = m_PlayState.m_nTickCount != 0 && (m_PlayState.m_nTickCount != nStartTick || (chn.rowCommand.instr == 0 && volcmd != VOLCMD_TONEPORTAMENTO));
 		}
+
+		// IT compatibility: Various mind-boggling behaviours when combining volume colum and effect column portamentos
+		// The most crucial thing here is to initialize effect memory in the exact right order.
+		// Test cases: DoubleSlide.it, DoubleSlideCompatGxx.it
+		if(m_playBehaviour[kITDoublePortamentoSlides] && chn.isFirstTick)
+		{
+			const bool effectColumnTonePorta = (cmd == CMD_TONEPORTAMENTO || cmd == CMD_TONEPORTAVOL);
+			if(effectColumnTonePorta)
+				InitTonePortamento(chn, static_cast<uint16>(param));
+			if(volcmd == VOLCMD_TONEPORTAMENTO)
+				InitTonePortamento(chn, GetVolCmdTonePorta(chn.rowCommand, nStartTick).first);
+
+			if(vol && (volcmd == VOLCMD_PORTAUP || volcmd == VOLCMD_PORTADOWN))
+			{
+				chn.nOldPortaUp = chn.nOldPortaDown = vol << 2;
+				if(!effectColumnTonePorta && TonePortamentoSharesEffectMemory())
+					chn.portamentoSlide = vol << 2;
+			}
+			if(param && (cmd == CMD_PORTAMENTOUP || cmd == CMD_PORTAMENTODOWN))
+			{
+				chn.nOldPortaUp = chn.nOldPortaDown = static_cast<uint8>(param);
+				if(TonePortamentoSharesEffectMemory())
+					chn.portamentoSlide = static_cast<uint16>(param);
+			}
+		}
+
 		if(volcmd > VOLCMD_PANNING && doVolumeColumn)
 		{
 			if(volcmd == VOLCMD_TONEPORTAMENTO)
@@ -4027,7 +4053,9 @@ void CSoundFile::PortamentoUp(PlayState &playState, CHANNELINDEX nChn, ModComman
 {
 	ModChannel &chn = playState.Chn[nChn];
 
-	if(param)
+	// IT compatibility: Initialize effect memory in the right order in case there are portamentos in both effect columns.
+	// Test cases: DoubleSlide.it, DoubleSlideCompatGxx.it
+	if(param && !m_playBehaviour[kITDoublePortamentoSlides])
 	{
 		// FT2 compatibility: Separate effect memory for all portamento commands
 		// Test case: Porta-LinkMem.xm
@@ -4098,7 +4126,9 @@ void CSoundFile::PortamentoDown(PlayState &playState, CHANNELINDEX nChn, ModComm
 {
 	ModChannel &chn = playState.Chn[nChn];
 
-	if(param)
+	// IT compatibility: Initialize effect memory in the right order in case there are portamentos in both effect columns.
+	// Test cases: DoubleSlide.it, DoubleSlideCompatGxx.it
+	if(param && !m_playBehaviour[kITDoublePortamentoSlides])
 	{
 		// FT2 compatibility: Separate effect memory for all portamento commands
 		// Test case: Porta-LinkMem.xm
@@ -4394,6 +4424,27 @@ std::pair<uint16, bool> CSoundFile::GetVolCmdTonePorta(const ModCommand &m, uint
 }
 
 
+bool CSoundFile::TonePortamentoSharesEffectMemory() const
+{
+	return (!m_SongFlags[SONG_ITCOMPATGXX] && m_playBehaviour[kITPortaMemoryShare]) || GetType() == MOD_TYPE_PLM;
+}
+
+
+void CSoundFile::InitTonePortamento(ModChannel &chn, uint16 param) const
+{
+	// IT compatibility 03: Share effect memory with portamento up/down
+	if(TonePortamentoSharesEffectMemory())
+	{
+		if(param == 0)
+			param = chn.nOldPortaUp;
+		chn.nOldPortaUp = chn.nOldPortaDown = static_cast<uint8>(param);
+	}
+
+	if(param)
+		chn.portamentoSlide = param;
+}
+
+
 void CSoundFile::TonePortamento(CHANNELINDEX nChn, uint16 param)
 {
 	auto delta = TonePortamento(m_PlayState, nChn, param);
@@ -4422,26 +4473,21 @@ int32 CSoundFile::TonePortamento(PlayState &playState, CHANNELINDEX nChn, uint16
 	if(m_SongFlags[SONG_AUTO_TONEPORTA])
 		chn.autoSlide.SetActive(AutoSlideCommand::TonePortamento, param != 0 || m_SongFlags[SONG_AUTO_TONEPORTA_CONT]);
 
-	//IT compatibility 03: Share effect memory with portamento up/down
-	if((!m_SongFlags[SONG_ITCOMPATGXX] && m_playBehaviour[kITPortaMemoryShare]) || GetType() == MOD_TYPE_PLM)
-	{
-		if(param == 0) param = chn.nOldPortaUp;
-		chn.nOldPortaUp = chn.nOldPortaDown = static_cast<uint8>(param);
-	}
-
-	if(param)
-		chn.portamentoSlide = param;
+	// IT compatibility: Initialize effect memory in the right order in case there are portamentos in both effect columns.
+	// Test cases: DoubleSlide.it, DoubleSlideCompatGxx.it
+	if(!m_playBehaviour[kITDoublePortamentoSlides])
+		InitTonePortamento(chn, param);
+	int32 delta = chn.portamentoSlide;
 
 	if(chn.HasCustomTuning())
 	{
 		//Behavior: Param tells number of finesteps(or 'fullsteps'(notes) with glissando)
 		//to slide per row(not per tick).
-		if(chn.portamentoSlide == 0)
+		if(delta == 0)
 			return 0;
 
 		const int32 oldPortamentoTickSlide = (playState.m_nTickCount != 0) ? chn.m_PortamentoTickSlide : 0;
 
-		int32 delta = chn.portamentoSlide;
 		if(chn.nPortamentoDest < 0)
 			delta = -delta;
 
@@ -4483,7 +4529,6 @@ int32 CSoundFile::TonePortamento(PlayState &playState, CHANNELINDEX nChn, uint16
 	               || (playState.m_nMusicSpeed == 1 && m_playBehaviour[kSlidesAtSpeed1])
 	               || m_SongFlags[SONG_FASTPORTAS];
 
-	int32 delta = chn.portamentoSlide;
 	if(GetType() == MOD_TYPE_PLM && delta >= 0xF0)
 	{
 		delta -= 0xF0;
