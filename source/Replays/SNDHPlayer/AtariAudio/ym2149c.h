@@ -71,7 +71,7 @@ private:
 	uint8_t		m_regs[14];
 	uint32_t	m_currentLevel;
 	uint32_t	m_innerCycle;
-	uint32_t 	m_noiseEnvHalf;
+	uint32_t 	m_noiseHalf;
 	uint32_t	m_currentDebugThreeVoices;
 	bool		m_insideTimerIrq;
 	bool		m_edgeNeedReset[3];
