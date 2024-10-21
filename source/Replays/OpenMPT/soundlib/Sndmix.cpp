@@ -225,7 +225,6 @@ samplecount_t CSoundFile::Read(samplecount_t count, IAudioTarget &target, IAudio
 
 	while(!m_PlayState.m_flags[SONG_ENDREACHED] && countToRender > 0)
 	{
-
 		// Update Channel Data
 		if(!m_PlayState.m_nBufferCount)
 		{
@@ -363,6 +362,8 @@ samplecount_t CSoundFile::Read(samplecount_t count, IAudioTarget &target, IAudio
 		countToRender -= countChunk;
 		m_PlayState.m_nBufferCount -= countChunk;
 		m_PlayState.m_lTotalSampleCount += countChunk;
+		if(!m_PlayState.m_nBufferCount && !m_PlayState.m_flags[SONG_PAUSED])
+			m_PlayState.m_ppqPosFract += 1.0 / (m_PlayState.m_nCurrentRowsPerBeat * m_PlayState.TicksOnRow());
 
 #ifdef MODPLUG_TRACKER
 		if(IsRenderingToDisc())
@@ -456,15 +457,17 @@ bool CSoundFile::ProcessRow()
 		MPT_UNUSED_VARIABLE(patternTransition);
 #endif // MODPLUG_TRACKER
 
+		m_PlayState.UpdatePPQ(patternTransition);
+
 		// Check if pattern is valid
 		if(!m_PlayState.m_flags[SONG_PATTERNLOOP])
 		{
-			m_PlayState.m_nPattern = (m_PlayState.m_nCurrentOrder < Order().size()) ? Order()[m_PlayState.m_nCurrentOrder] : Order.GetInvalidPatIndex();
-			if (m_PlayState.m_nPattern < Patterns.Size() && !Patterns[m_PlayState.m_nPattern].IsValid()) m_PlayState.m_nPattern = Order.GetIgnoreIndex();
+			m_PlayState.m_nPattern = (m_PlayState.m_nCurrentOrder < Order().size()) ? Order()[m_PlayState.m_nCurrentOrder] : PATTERNINDEX_INVALID;
+			if (m_PlayState.m_nPattern < Patterns.Size() && !Patterns[m_PlayState.m_nPattern].IsValid()) m_PlayState.m_nPattern = PATTERNINDEX_SKIP;
 			while (m_PlayState.m_nPattern >= Patterns.Size())
 			{
 				// End of song?
-				if ((m_PlayState.m_nPattern == Order.GetInvalidPatIndex()) || (m_PlayState.m_nCurrentOrder >= Order().size()))
+				if ((m_PlayState.m_nPattern == PATTERNINDEX_INVALID) || (m_PlayState.m_nCurrentOrder >= Order().size()))
 				{
 					ORDERINDEX restartPosOverride = Order().GetRestartPos();
 					if(restartPosOverride == 0 && m_PlayState.m_nCurrentOrder <= Order().size() && m_PlayState.m_nCurrentOrder > 0)
@@ -474,7 +477,7 @@ bool CSoundFile::ProcessRow()
 						// (i.e. the first order after the previous "---" item)
 						for(ORDERINDEX ord = m_PlayState.m_nCurrentOrder - 1; ord > 0; ord--)
 						{
-							if(Order()[ord] == Order.GetInvalidPatIndex())
+							if(Order()[ord] == PATTERNINDEX_INVALID)
 							{
 								// Jump back to first order of this subtune
 								restartPosOverride = ord + 1;
@@ -536,7 +539,7 @@ bool CSoundFile::ProcessRow()
 					m_PlayState.m_nCurrentOrder = restartPosOverride;
 					m_PlayState.m_flags.reset(SONG_BREAKTOROW);
 					//If restart pos points to +++, move along
-					while(m_PlayState.m_nCurrentOrder < Order().size() && Order()[m_PlayState.m_nCurrentOrder] == Order.GetIgnoreIndex())
+					while(m_PlayState.m_nCurrentOrder < Order().size() && Order()[m_PlayState.m_nCurrentOrder] == PATTERNINDEX_SKIP)
 					{
 						m_PlayState.m_nCurrentOrder++;
 					}
@@ -555,10 +558,10 @@ bool CSoundFile::ProcessRow()
 				if (m_PlayState.m_nCurrentOrder < Order().size())
 					m_PlayState.m_nPattern = Order()[m_PlayState.m_nCurrentOrder];
 				else
-					m_PlayState.m_nPattern = Order.GetInvalidPatIndex();
+					m_PlayState.m_nPattern = PATTERNINDEX_INVALID;
 
 				if (m_PlayState.m_nPattern < Patterns.Size() && !Patterns[m_PlayState.m_nPattern].IsValid())
-					m_PlayState.m_nPattern = Order.GetIgnoreIndex();
+					m_PlayState.m_nPattern = PATTERNINDEX_SKIP;
 			}
 			m_PlayState.m_nNextOrder = m_PlayState.m_nCurrentOrder;
 
@@ -601,7 +604,7 @@ bool CSoundFile::ProcessRow()
 				{
 					for(const auto &t : GetLength(eNoAdjust, GetLengthTarget(true)))
 					{
-						if(t.lastOrder == m_PlayState.m_nCurrentOrder && t.lastRow == m_PlayState.m_nRow)
+						if(t.restartOrder == m_PlayState.m_nCurrentOrder && t.restartRow == m_PlayState.m_nRow)
 						{
 							isReallyAtEnd = true;
 							break;
@@ -719,7 +722,7 @@ bool CSoundFile::ProcessRow()
 		}
 
 		// Now that we know which pattern we're on, we can update time signatures (global or pattern-specific)
-		UpdateTimeSignature();
+		m_PlayState.UpdateTimeSignature(*this);
 
 		if(ignoreRow)
 		{
@@ -1848,23 +1851,33 @@ void CSoundFile::ProcessSampleAutoVibrato(ModChannel &chn, int32 &period, Tuning
 		} else
 		{
 			// MPT's autovibrato code
+			int32 autoVibDepth = chn.nAutoVibDepth;
+			const int32 fullDepth = pSmp->nVibDepth * 256u;
 			if (pSmp->nVibSweep == 0 && !(GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT)))
 			{
-				chn.nAutoVibDepth = pSmp->nVibDepth * 256;
+				autoVibDepth = fullDepth;
 			} else
 			{
 				// Calculate current autovibrato depth using vibsweep
-				if (GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT))
+				if(GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT))
 				{
-					chn.nAutoVibDepth += pSmp->nVibSweep * 2u;
+					autoVibDepth += pSmp->nVibSweep * 2u;
+					LimitMax(autoVibDepth, fullDepth);
+					chn.nAutoVibDepth = autoVibDepth;
 				} else
 				{
-					if(!chn.dwFlags[CHN_KEYOFF])
+					if(!chn.dwFlags[CHN_KEYOFF] && autoVibDepth <= fullDepth)
 					{
-						chn.nAutoVibDepth += (pSmp->nVibDepth * 256u) / pSmp->nVibSweep;
+						autoVibDepth += fullDepth / pSmp->nVibSweep;
+						chn.nAutoVibDepth = autoVibDepth;
 					}
+					// FT2 compatibility: Key-off before auto-vibrato sweep-in is complete resets auto-vibrato depth
+					// Test case: AutoVibratoSweepKeyOff.xm
+					if(autoVibDepth > fullDepth)
+						autoVibDepth = fullDepth;
+					else if(chn.dwFlags[CHN_KEYOFF] && m_playBehaviour[kFT2AutoVibratoAbortSweep])
+						autoVibDepth = fullDepth / pSmp->nVibSweep;
 				}
-				LimitMax(chn.nAutoVibDepth, static_cast<int>(pSmp->nVibDepth * 256u));
 			}
 			chn.nAutoVibPos += pSmp->nVibRate;
 			int vdelta;
@@ -1896,7 +1909,7 @@ void CSoundFile::ProcessSampleAutoVibrato(ModChannel &chn, int32 &period, Tuning
 					vdelta = (-ITSinusTable[(chn.nAutoVibPos + 192) & 0xFF] + 64) / 2;
 				}
 			}
-			int n = (vdelta * chn.nAutoVibDepth) / 256;
+			int n = (vdelta * autoVibDepth) / 256;
 
 			if(hasTuning)
 			{

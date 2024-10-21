@@ -926,6 +926,8 @@ void CSoundFile::ResetPlayPos()
 	m_PlayState.m_nFrameDelay = 0;
 	m_PlayState.m_nextPatStartRow = 0;
 	m_PlayState.m_lTotalSampleCount = 0;
+	m_PlayState.m_ppqPosFract = 0.0;
+	m_PlayState.m_ppqPosBeat = 0;
 	m_PlayState.m_globalScriptState.Initialize(*this);
 }
 
@@ -1242,6 +1244,7 @@ PlayBehaviourSet CSoundFile::GetSupportedPlaybackBehaviour(MODTYPE type)
 		playBehaviour.set(kFT2PanSustainRelease);
 		playBehaviour.set(kFT2NoteDelayWithoutInstr);
 		playBehaviour.set(kFT2PortaResetDirection);
+		playBehaviour.set(kFT2AutoVibratoAbortSweep);
 		break;
 
 	case MOD_TYPE_S3M:
@@ -1262,6 +1265,7 @@ PlayBehaviourSet CSoundFile::GetSupportedPlaybackBehaviour(MODTYPE type)
 		playBehaviour.set(kOPLNoteOffOnNoteChange);
 		playBehaviour.set(kApplyUpperPeriodLimit);
 		playBehaviour.set(kST3TonePortaWithAdlibNote);
+		playBehaviour.set(kS3MIgnoreCombinedFineSlides);
 		break;
 
 	case MOD_TYPE_MOD:
@@ -1330,6 +1334,8 @@ PlayBehaviourSet CSoundFile::GetDefaultPlaybackBehaviour(MODTYPE type)
 		// Default behaviour was chosen to follow GUS, so kST3PortaSampleChange is enabled and kST3SampleSwap is disabled.
 		// For SoundBlaster behaviour, those two flags would need to be swapped.
 		playBehaviour.reset(kST3SampleSwap);
+		// Most trackers supporting the S3M format, including all OpenMPT versions up to now, support fine slides with Kxy / Lxy, so only enable this quirk for files made with ST3.
+		playBehaviour.reset(kS3MIgnoreCombinedFineSlides);
 		break;
 
 	case MOD_TYPE_XM:
@@ -1792,7 +1798,7 @@ std::vector<SubSong> CSoundFile::GetAllSubSongs()
 		subSongs.reserve(subSongs.size() + subSongsSeq.size());
 		for(const auto &song : subSongsSeq)
 		{
-			subSongs.push_back({song.duration, song.startRow, song.endRow, song.lastRow, song.startOrder, song.endOrder, song.lastOrder, seq});
+			subSongs.push_back({song.duration, song.startRow, song.endRow, song.restartRow, song.startOrder, song.endOrder, song.restartOrder, seq});
 		}
 	}
 	return subSongs;

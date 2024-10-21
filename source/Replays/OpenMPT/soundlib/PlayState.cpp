@@ -34,6 +34,31 @@ void PlayState::ResetGlobalVolumeRamping() noexcept
 }
 
 
+void PlayState::UpdateTimeSignature(const CSoundFile &sndFile) noexcept
+{
+	if(!sndFile.Patterns.IsValidIndex(m_nPattern) || !sndFile.Patterns[m_nPattern].GetOverrideSignature())
+	{
+		m_nCurrentRowsPerBeat = sndFile.m_nDefaultRowsPerBeat;
+		m_nCurrentRowsPerMeasure = sndFile.m_nDefaultRowsPerMeasure;
+	} else
+	{
+		m_nCurrentRowsPerBeat = sndFile.Patterns[m_nPattern].GetRowsPerBeat();
+		m_nCurrentRowsPerMeasure = sndFile.Patterns[m_nPattern].GetRowsPerMeasure();
+	}
+}
+
+
+void PlayState::UpdatePPQ(bool patternTransition) noexcept
+{
+	if(m_lTotalSampleCount > 0 && (patternTransition || !(m_nRow % m_nCurrentRowsPerMeasure)))
+	{
+		// Pattern end = end of measure, so round up PPQ to the next full measure
+		m_ppqPosBeat += (m_nCurrentRowsPerMeasure + (m_nCurrentRowsPerBeat - 1)) / m_nCurrentRowsPerBeat;
+		m_ppqPosFract = 0;
+	}
+}
+
+
 mpt::span<ModChannel> PlayState::PatternChannels(const CSoundFile &sndFile) noexcept
 {
 	return mpt::as_span(Chn).subspan(0, std::min(Chn.size(), static_cast<size_t>(sndFile.GetNumChannels())));

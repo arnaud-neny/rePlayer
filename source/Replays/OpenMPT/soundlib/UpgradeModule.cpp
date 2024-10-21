@@ -625,6 +625,7 @@ void CSoundFile::UpgradeModule()
 			{ kFT2NoteDelayWithoutInstr,     MPT_V("1.28.00.44") },
 			{ kITFT2DontResetNoteOffOnPorta, MPT_V("1.29.00.34") },
 			{ kFT2PortaResetDirection,       MPT_V("1.30.00.40") },
+			{ kFT2AutoVibratoAbortSweep,     MPT_V("1.32.00.29") },
 		};
 
 		for(const auto &b : behaviours)
@@ -743,6 +744,7 @@ void CSoundFile::UpgradeModule()
 		}
 	}
 
+#ifndef NO_PLUGINS
 	if(m_dwLastSavedWithVersion >= MPT_V("1.27.00.42") && m_dwLastSavedWithVersion < MPT_V("1.30.00.46") && hasAnyPlugins)
 	{
 		// The Flanger DMO plugin is almost identical to the Chorus... but only almost.
@@ -791,6 +793,19 @@ void CSoundFile::UpgradeModule()
 			}
 		}
 	}
+
+	if(m_dwLastSavedWithVersion >= MPT_V("1.17") && m_dwLastSavedWithVersion < MPT_V("1.32.00.30") && hasAnyPlugins)
+	{
+		for(const auto &plugin : m_MixPlugins)
+		{
+			if(plugin.Info.dwPluginId1 == PLUGMAGIC('V', 's', 't', 'P'))
+			{
+				m_playBehaviour.set(kLegacyPPQpos);
+				break;
+			}
+		}
+	}
+#endif
 }
 
 OPENMPT_NAMESPACE_END

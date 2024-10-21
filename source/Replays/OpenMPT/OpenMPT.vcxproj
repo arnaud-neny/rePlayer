@@ -287,7 +287,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="soundlib\plugins\dmo\ParamEq.h" />
     <ClInclude Include="soundlib\plugins\dmo\WavesReverb.h" />
     <ClInclude Include="soundlib\plugins\LFOPlugin.h" />
-    <ClInclude Include="soundlib\plugins\OpCodes.h" />
     <ClInclude Include="soundlib\plugins\PluginManager.h" />
     <ClInclude Include="soundlib\plugins\PluginMixBuffer.h" />
     <ClInclude Include="soundlib\plugins\PluginStructs.h" />

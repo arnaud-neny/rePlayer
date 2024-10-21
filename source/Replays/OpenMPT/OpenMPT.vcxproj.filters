@@ -242,9 +242,6 @@
     <ClInclude Include="soundlib\plugins\LFOPlugin.h">
       <Filter>Source Files\soundlib\plugins</Filter>
     </ClInclude>
-    <ClInclude Include="soundlib\plugins\OpCodes.h">
-      <Filter>Source Files\soundlib\plugins</Filter>
-    </ClInclude>
     <ClInclude Include="soundlib\plugins\PluginManager.h">
       <Filter>Source Files\soundlib\plugins</Filter>
     </ClInclude>

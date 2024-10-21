@@ -304,17 +304,11 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 		nonCompatTracker = true;
 		break;
 	case S3MFileHeader::trkImpulseTracker:
-		if(fileHeader.cwtv <= S3MFileHeader::trkIT2_14)
-		{
-			madeWithTracker = UL_("Impulse Tracker");
-			formatTrackerStr = true;
-		} else if(fileHeader.cwtv == S3MFileHeader::trkIT1_old)
-		{
+		if(fileHeader.cwtv == S3MFileHeader::trkIT1_old)
 			madeWithTracker = UL_("Impulse Tracker 1.03");  // Could also be 1.02, maybe? I don't have that one
-		} else
-		{
-			madeWithTracker = MPT_UFORMAT("Impulse Tracker 2.14p{}")(fileHeader.cwtv - S3MFileHeader::trkIT2_14);
-		}
+		else
+			madeWithTracker = GetImpulseTrackerVersion(fileHeader.cwtv, 0);
+		
 		if(fileHeader.cwtv >= S3MFileHeader::trkIT2_07 && fileHeader.reserved3 != 0)
 		{
 			// Starting from version 2.07, IT stores the total edit time of a module in the "reserved" field
@@ -572,7 +566,6 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 		// All Scream Tracker versions except for some probably early revisions of Scream Tracker 3.00 write GUS addresses. GUS support might not have existed at that point (1992).
 		// Hence if a file claims to be written with ST3 (but not ST3.00), but has no GUS addresses, we deduce that it must be written by some other software (e.g. some PSM -> S3M conversions)
 		isST3 = false;
-		MPT_UNUSED(isST3);
 		m_modFormat.madeWithTracker = UL_("Unknown");
 		// Check these only after we are certain that it can't be ST3.01 because that version doesn't sanitize the ultraClicks value yet
 		if(fileHeader.cwtv == S3MFileHeader::trkST3_01 && fileHeader.ultraClicks == 0)
@@ -598,6 +591,8 @@ bool CSoundFile::ReadS3M(FileReader &file, ModLoadingFlags loadFlags)
 		if(useGUS)
 			m_nSamplePreAmp = 48;
 	}
+	if(isST3)
+		m_playBehaviour.set(kS3MIgnoreCombinedFineSlides);
 
 	if(anyADPCM)
 		m_modFormat.madeWithTracker += UL_(" (ADPCM packed)");

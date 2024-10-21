@@ -164,10 +164,10 @@ struct PSMSubSong // For internal use (pattern conversion)
 	std::vector<bool> channelSurround;
 	char songName[10] = {};
 
-	PSMSubSong()
-	    : channelPanning(MAX_BASECHANNELS, 128)
-	    , channelVolume(MAX_BASECHANNELS, 64)
-	    , channelSurround(MAX_BASECHANNELS, false)
+	PSMSubSong(CHANNELINDEX numChannels)
+	    : channelPanning(numChannels, 128)
+	    , channelVolume(numChannels, 64)
+	    , channelSurround(numChannels, false)
 	{ }
 
 	void SetPanning(CHANNELINDEX chn, uint8 type, int16 pan, bool &subsongPanningDiffers, std::vector<PSMSubSong> &subsongs)
@@ -344,7 +344,7 @@ bool CSoundFile::ReadPSM(FileReader &file, ModLoadingFlags loadFlags)
 		PSMSongHeader songHeader;
 		chunk.ReadStruct(songHeader);
 
-		PSMSubSong subsong;
+		PSMSubSong subsong{GetNumChannels()};
 		mpt::String::WriteAutoBuf(subsong.songName) = mpt::String::ReadBuf(mpt::String::nullTerminated, songHeader.songType);
 
 		if(!Order().empty())
@@ -409,9 +409,9 @@ bool CSoundFile::ReadPSM(FileReader &file, ModLoadingFlags loadFlags)
 							{
 								PATTERNINDEX pat = ReadPSMPatternIndex(subChunk, sinariaFormat);
 								if(pat == 0xFF)
-									pat = Order.GetInvalidPatIndex();
+									pat = PATTERNINDEX_INVALID;
 								else if(pat == 0xFE)
-									pat = Order.GetIgnoreIndex();
+									pat = PATTERNINDEX_SKIP;
 								Order().push_back(pat);
 								// Decide whether this is the first order chunk or not (for finding out the correct restart position)
 								if(firstOrderChunk == uint16_max)

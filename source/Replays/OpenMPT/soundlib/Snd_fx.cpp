@@ -91,6 +91,8 @@ public:
 		state->m_lTotalSampleCount = 0;
 		state->m_nMusicSpeed = sndFile.Order(m_sequence).GetDefaultSpeed();
 		state->m_nMusicTempo = sndFile.Order(m_sequence).GetDefaultTempo();
+		state->m_ppqPosFract = 0.0;
+		state->m_ppqPosBeat = 0;
 		state->m_nGlobalVolume = sndFile.m_nDefaultGlobalVolume;
 		state->m_globalScriptState.Initialize(sndFile);
 		chnSettings.assign(sndFile.GetNumChannels(), {});
@@ -413,10 +415,10 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 		}
 
 		// Check if pattern is valid
-		playState.m_nPattern = playState.m_nCurrentOrder < orderList.size() ? orderList[playState.m_nCurrentOrder] : orderList.GetInvalidPatIndex();
+		playState.m_nPattern = playState.m_nCurrentOrder < orderList.size() ? orderList[playState.m_nCurrentOrder] : PATTERNINDEX_INVALID;
 		playState.m_nTickCount = 0;
 
-		if(!Patterns.IsValidPat(playState.m_nPattern) && playState.m_nPattern != orderList.GetInvalidPatIndex() && target.mode == GetLengthTarget::SeekPosition && playState.m_nCurrentOrder == target.pos.order)
+		if(!Patterns.IsValidPat(playState.m_nPattern) && playState.m_nPattern != PATTERNINDEX_INVALID && target.mode == GetLengthTarget::SeekPosition && playState.m_nCurrentOrder == target.pos.order)
 		{
 			// Early test: Target is inside +++ or non-existing pattern
 			retval.targetReached = true;
@@ -426,7 +428,7 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 		while(playState.m_nPattern >= Patterns.Size())
 		{
 			// End of song?
-			if((playState.m_nPattern == orderList.GetInvalidPatIndex()) || (playState.m_nCurrentOrder >= orderList.size()))
+			if((playState.m_nPattern == PATTERNINDEX_INVALID) || (playState.m_nCurrentOrder >= orderList.size()))
 			{
 				if(playState.m_nCurrentOrder == orderList.GetRestartPos())
 					break;
@@ -436,14 +438,14 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 			{
 				playState.m_nCurrentOrder++;
 			}
-			playState.m_nPattern = (playState.m_nCurrentOrder < orderList.size()) ? orderList[playState.m_nCurrentOrder] : orderList.GetInvalidPatIndex();
+			playState.m_nPattern = (playState.m_nCurrentOrder < orderList.size()) ? orderList[playState.m_nCurrentOrder] : PATTERNINDEX_INVALID;
 			playState.m_nNextOrder = playState.m_nCurrentOrder;
 			if((!Patterns.IsValidPat(playState.m_nPattern)) && visitedRows.Visit(playState.m_nCurrentOrder, 0, playState.Chn, ignoreRow))
 			{
 				if(!hasSearchTarget)
 				{
-					retval.lastOrder = playState.m_nCurrentOrder;
-					retval.lastRow = 0;
+					retval.restartOrder = playState.m_nCurrentOrder;
+					retval.restartRow = 0;
 				}
 				if(target.mode == GetLengthTarget::NoTarget || !visitedRows.GetFirstUnvisitedRow(playState.m_nNextOrder, playState.m_nRow, true))
 				{
@@ -523,8 +525,8 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 		{
 			if(!hasSearchTarget)
 			{
-				retval.lastOrder = playState.m_nCurrentOrder;
-				retval.lastRow = playState.m_nRow;
+				retval.restartOrder = playState.m_nCurrentOrder;
+				retval.restartRow = playState.m_nRow;
 			}
 			if(target.mode == GetLengthTarget::NoTarget || !visitedRows.GetFirstUnvisitedRow(playState.m_nNextOrder, playState.m_nRow, true))
 			{
@@ -554,6 +556,9 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 		{
 			playState.m_nRow = 0;
 		}
+
+		playState.UpdatePPQ(breakToRow);
+		playState.UpdateTimeSignature(*this);
 
 		if(ignoreRow)
 			continue;
@@ -1060,16 +1065,11 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 			continue;
 		}
 
-		playState.m_nCurrentRowsPerBeat = m_nDefaultRowsPerBeat;
-		if(Patterns[playState.m_nPattern].GetOverrideSignature())
-		{
-			playState.m_nCurrentRowsPerBeat = Patterns[playState.m_nPattern].GetRowsPerBeat();
-		}
-
 		const uint32 tickDuration = GetTickDuration(playState);
 		const uint32 rowDuration = tickDuration * numTicks;
 		memory.elapsedTime += static_cast<double>(rowDuration) / static_cast<double>(m_MixerSettings.gdwMixingFreq);
 		playState.m_lTotalSampleCount += rowDuration;
+		playState.m_ppqPosFract += 1.0 / playState.m_nCurrentRowsPerBeat;
 
 		if(adjustSamplePos)
 		{
@@ -1208,7 +1208,9 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 					case CMD_VIBRATOVOL:
 						if(m.param || (GetType() != MOD_TYPE_MOD))
 						{
-							for(uint32 i = 0; i < numTicks; i++)
+							// ST3 compatibility: Do not run combined slides (Kxy / Lxy) on first tick
+							// Test cases: NoCombinedSlidesOnFirstTick-Normal.s3m, NoCombinedSlidesOnFirstTick-Fast.s3m
+							for(uint32 i = (m_playBehaviour[kS3MIgnoreCombinedFineSlides] ? 1 : 0); i < numTicks; i++)
 							{
 								chn.isFirstTick = (i == 0);
 								VolumeSlide(chn, m.param);
@@ -1350,8 +1352,8 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 
 	if(retval.targetReached)
 	{
-		retval.lastOrder = playState.m_nCurrentOrder;
-		retval.lastRow = playState.m_nRow;
+		retval.restartOrder = playState.m_nCurrentOrder;
+		retval.restartRow = playState.m_nRow;
 	}
 	retval.duration = memory.elapsedTime;
 	results.push_back(retval);
@@ -3364,7 +3366,14 @@ bool CSoundFile::ProcessEffects()
 
 		// Tone-Portamento + Volume Slide
 		case CMD_TONEPORTAVOL:
-			if ((param) || (GetType() != MOD_TYPE_MOD)) VolumeSlide(chn, static_cast<ModCommand::PARAM>(param));
+			if(param || GetType() != MOD_TYPE_MOD)
+			{
+				// ST3 compatibility: Do not run combined slides (Kxy / Lxy) on first tick
+				// Test cases: NoCombinedSlidesOnFirstTick-Normal.s3m, NoCombinedSlidesOnFirstTick-Fast.s3m
+
+				if(!chn.isFirstTick || !m_playBehaviour[kS3MIgnoreCombinedFineSlides])
+					VolumeSlide(chn, static_cast<ModCommand::PARAM>(param));
+			}
 			TonePortamento(nChn, 0);
 			break;
 
@@ -3375,7 +3384,13 @@ bool CSoundFile::ProcessEffects()
 
 		// Vibrato + Volume Slide
 		case CMD_VIBRATOVOL:
-			if ((param) || (GetType() != MOD_TYPE_MOD)) VolumeSlide(chn, static_cast<ModCommand::PARAM>(param));
+			if(param || GetType() != MOD_TYPE_MOD)
+			{
+				// ST3 compatibility: Do not run combined slides (Kxy / Lxy) on first tick
+				// Test cases: NoCombinedSlidesOnFirstTick-Normal.s3m, NoCombinedSlidesOnFirstTick-Fast.s3m
+				if(!chn.isFirstTick || !m_playBehaviour[kS3MIgnoreCombinedFineSlides])
+					VolumeSlide(chn, static_cast<ModCommand::PARAM>(param));
+			}
 			Vibrato(chn, 0);
 			break;
 
@@ -6886,21 +6901,6 @@ void CSoundFile::HandleRowTransitionEvents(bool nextPattern)
 	}
 }
 #endif // MODPLUG_TRACKER
-
-
-// Update time signatures (global or pattern-specific). Don't forget to call this when changing the RPB/RPM settings anywhere!
-void CSoundFile::UpdateTimeSignature()
-{
-	if(!Patterns.IsValidIndex(m_PlayState.m_nPattern) || !Patterns[m_PlayState.m_nPattern].GetOverrideSignature())
-	{
-		m_PlayState.m_nCurrentRowsPerBeat = m_nDefaultRowsPerBeat;
-		m_PlayState.m_nCurrentRowsPerMeasure = m_nDefaultRowsPerMeasure;
-	} else
-	{
-		m_PlayState.m_nCurrentRowsPerBeat = Patterns[m_PlayState.m_nPattern].GetRowsPerBeat();
-		m_PlayState.m_nCurrentRowsPerMeasure = Patterns[m_PlayState.m_nPattern].GetRowsPerMeasure();
-	}
-}
 
 
 void CSoundFile::PortamentoMPT(ModChannel &chn, int param) const

@@ -27,7 +27,8 @@ using ORDERINDEX = uint16;
 inline constexpr ORDERINDEX ORDERINDEX_INVALID = uint16_max;
 inline constexpr ORDERINDEX ORDERINDEX_MAX = uint16_max - 1;
 using PATTERNINDEX = uint16;
-inline constexpr PATTERNINDEX PATTERNINDEX_INVALID = uint16_max;
+inline constexpr PATTERNINDEX PATTERNINDEX_INVALID = uint16_max;   // "---" in order list
+inline constexpr PATTERNINDEX PATTERNINDEX_SKIP = uint16_max - 1;  // "+++" in order list
 using PLUGINDEX = uint8;
 inline constexpr PLUGINDEX PLUGINDEX_INVALID = uint8_max;
 using SAMPLEINDEX = uint16;
@@ -52,7 +53,7 @@ inline constexpr PLUGINDEX MAX_MIXPLUGINS        = 250;
 
 inline constexpr SEQUENCEINDEX MAX_SEQUENCES     = 50;
 
-inline constexpr CHANNELINDEX MAX_BASECHANNELS   = 127; // Maximum pattern channels.
+inline constexpr CHANNELINDEX MAX_BASECHANNELS   = 192; // Maximum pattern channels.
 inline constexpr CHANNELINDEX MAX_CHANNELS       = 256; // Maximum number of mixing channels.
 
 enum { FREQ_FRACBITS = 4 }; // Number of fractional bits in return value of CSoundFile::GetFreqFromPeriod()
@@ -599,6 +600,9 @@ enum PlayBehaviour
 	kContinueSampleWithoutInstr,    // FTM: A note without instrument number continues looped samples with the new pitch instead of retriggering them
 	kMIDINotesFromChannelPlugin,    // Behaviour before OpenMPT 1.26: Channel plugin can be used to send MIDI notes
 	kITDoublePortamentoSlides,      // IT only reads parameters once per row, so if two commands sharing effect parameters are found in the two effect columns, they influence each other
+	kS3MIgnoreCombinedFineSlides,   // S3M commands Kxy and Lxy ignore fine slides
+	kFT2AutoVibratoAbortSweep,      // Key-off before auto-vibrato sweep-in is complete resets auto-vibrato depth
+	kLegacyPPQpos,                  // Report fake PPQ position to VST plugins
 
 	// Add new play behaviours here.
 

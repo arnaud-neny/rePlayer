@@ -113,7 +113,7 @@ static bool ValidateSTMOrderList(ModSequence &order)
 	for(auto &pat : order)
 	{
 		if(pat == 99 || pat == 255)  // 99 is regular, sometimes a single 255 entry can be found too
-			pat = order.GetInvalidPatIndex();
+			pat = PATTERNINDEX_INVALID;
 		else if(pat > 63)
 			return false;
 	}
@@ -240,7 +240,7 @@ bool CSoundFile::ReadSTM(FileReader &file, ModLoadingFlags loadFlags)
 	if(!std::memcmp(fileHeader.trackerName, "!Scream!", 8))
 	{
 		if(fileHeader.verMinor >= 21)
-			m_modFormat.madeWithTracker = UL_("Scream Tracker 2.2 - 2.4 or compatible");
+			m_modFormat.madeWithTracker = UL_("Scream Tracker 2.2 - 2.3 or compatible");
 		else
 			m_modFormat.madeWithTracker = MPT_UFORMAT("Scream Tracker {}.{} or compatible")(fileHeader.verMajor, mpt::ufmt::dec0<2>(fileHeader.verMinor));
 	}

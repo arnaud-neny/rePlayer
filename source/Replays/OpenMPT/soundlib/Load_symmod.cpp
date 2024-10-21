@@ -985,6 +985,30 @@ static bool ConvertDSP(const SymEvent event, MIDIMacroConfigData::Macro &macro, 
 }
 
 
+static uint8 MapToClosestMidiMacro(const SymEvent event, std::map<SymEvent, uint8> &macroMap)
+{
+	if(event.command == SymEvent::DSPDelay)
+		return 0;
+	uint8 bestMatch = 0;
+	uint32 bestDistance = uint32_max;
+	for(const auto &m : macroMap)
+	{
+		const auto &mapEvent = m.first;
+		if(event.command != mapEvent.command || event.note != mapEvent.note)
+			continue;
+		const uint32 diff1 = static_cast<uint32>(event.param) - mapEvent.param, diff2 = static_cast<uint32>(event.inst) - mapEvent.inst;
+		const uint32 distance = diff1 * diff1 + diff2 * diff2;
+		if(distance >= bestDistance)
+			continue;
+
+		bestMatch = m.second;
+		bestDistance = distance;
+	}
+	macroMap[event] = bestMatch;
+	return bestMatch;
+}
+
+
 CSoundFile::ProbeResult CSoundFile::ProbeFileHeaderSymMOD(MemoryFileReader file, const uint64 *pfilesize)
 {
 	MPT_UNREFERENCED_PARAMETER(pfilesize);
@@ -1044,6 +1068,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 	uint16 sampleBoost   = 2500;
 	bool isSymphoniePro  = false;
 	bool externalSamples = false;
+	bool unknownHunks    = false;
 	std::vector<SymPosition> positions;
 	std::vector<SymSequence> sequences;
 	std::vector<SymEvent> patternData;
@@ -1197,9 +1222,10 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 			file.Skip(file.ReadUint32BE());
 			break;
 
-		// Unrecognized chunk/value type
+		// Unrecognized chunk/value type (e.g. garbage at the end of Natsh1.SymMOD)
 		default:
-			return false;
+			unknownHunks = true;
+			break;
 		}
 	}
 
@@ -1207,6 +1233,8 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 		return false;
 	if((loadFlags & loadPatternData) && (positions.empty() || patternData.empty() || sequences.empty()))
 		return false;
+	if(unknownHunks)
+		AddToLog(LogWarning, U_("Unknown hunks were found and ignored."));
 
 	// Let's hope noone is going to use the 256th instrument ;)
 	if(instruments.size() >= MAX_INSTRUMENTS)
@@ -1357,7 +1385,7 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 		// Sequences are all part of the same song, just add a skip index as a divider
 		ModSequence &order = Order();
 		if(!order.empty())
-			order.push_back(ModSequence::GetIgnoreIndex());
+			order.push_back(PATTERNINDEX_SKIP);
 
 		for(auto &pos : seqPositions)
 		{
@@ -1391,12 +1419,14 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 				{
 					ModCommand *rowBase = Patterns[patternIndex].GetpModCommand(row, 0);
 					bool applySyncPlay = false;
-					for(CHANNELINDEX chn = 0; chn < GetNumChannels(); chn++)
+					for(CHANNELINDEX chn = 0; chn < fileHeader.numChannels; chn++)
 					{
-						ModCommand &m = rowBase[chn];
 						const SymEvent &event = (srcEvent != patternData.cend()) ? *srcEvent : emptyEvent;
 						if(srcEvent != patternData.cend())
 							srcEvent++;
+						if(chn >= GetNumChannels())
+							continue;
+						ModCommand &m = rowBase[chn];
 
 						int8 note = (event.note >= 0 && event.note <= 84) ? event.note + 25 : -1;
 						uint8 origInst = event.inst;
@@ -1634,9 +1664,9 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 						case SymEvent::DSPEcho:
 						case SymEvent::DSPDelay:
 #endif
-							if(macroMap.count(event))
+							if(auto it = macroMap.find(event); it != macroMap.end() && it->second != 0)
 							{
-								m.SetEffectCommand(CMD_MIDI, macroMap[event]);
+								m.SetEffectCommand(CMD_MIDI, it->second);
 							} else if(macroMap.size() < m_MidiCfg.Zxx.size())
 							{
 								uint8 param = static_cast<uint8>(macroMap.size());
@@ -1647,6 +1677,9 @@ bool CSoundFile::ReadSymMOD(FileReader &file, ModLoadingFlags loadFlags)
 									if(event.command == SymEvent::DSPEcho || event.command == SymEvent::DSPDelay)
 										useDSP = true;
 								}
+							} else if(uint8 param = MapToClosestMidiMacro(event, macroMap))
+							{
+								m.SetEffectCommand(CMD_MIDI, param);
 							}
 							break;
 
