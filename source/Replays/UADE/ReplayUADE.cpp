@@ -579,14 +579,15 @@ namespace rePlayer
 
     uint32_t ReplayUADE::Render(StereoSample* output, uint32_t numSamples)
     {
+        auto currentDuration = m_currentDuration;
         if (m_uadeState->hasended)
         {
             m_uadeState->hasended = 0;
-            return 0;
+            if (currentDuration == 0)
+                return 0;
         }
         auto currentPosition = m_currentPosition;
-        auto currentDuration = m_currentDuration;
-        if (m_currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
+        if (currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
         {
             numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
             if (numSamples == 0)
