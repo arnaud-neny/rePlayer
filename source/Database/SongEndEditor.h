@@ -48,6 +48,7 @@ namespace rePlayer
 
         Array<StereoSample> m_samples;
         Array<Frame> m_frames;
+        Array<uint32_t> m_loops;
         uint64_t m_numMillisecondsPerPixel = 250;
         uint32_t m_duration;
         uint32_t m_currentSample = 0;

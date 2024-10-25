@@ -186,6 +186,13 @@ namespace rePlayer
         while (remainingSamples && std::atomic_ref(m_isRunning).load())
         {
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
+            if (numSamples == 0)
+            {
+                Core::FromJob([this, current_duration = uint32_t((m_currentSample * 1000ull) / replay->GetSampleRate())]()
+                {
+                    m_loops.Add(current_duration);
+                });
+            }
             if ((numSamples | preNumSamples) == 0)
             {
                 m_duration = uint32_t((m_currentSample * 1000ull) / replay->GetSampleRate());
@@ -323,6 +330,8 @@ namespace rePlayer
             pos.x -= maxFrames;
             auto drawListFlags = drawList->Flags;
             drawList->Flags &= ~(ImDrawListFlags_AntiAliasedLines | ImDrawListFlags_AntiAliasedLinesUseTex | ImDrawListFlags_AntiAliasedFill);
+            for (auto loopPos : m_loops)
+                drawList->AddLine(ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y + size.y), 0x8000ffff);
             drawList->AddTriangleFilled(ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel + 0.5f, pos.y + 6.5f)
                 , ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel - 4.0f, pos.y)
                 , ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel + 5.0f, pos.y)
