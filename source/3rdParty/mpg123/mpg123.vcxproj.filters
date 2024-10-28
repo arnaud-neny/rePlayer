@@ -131,5 +131,92 @@
     <ClInclude Include="src\libmpg123\lfs_wrap.h">
       <Filter>libmpg123</Filter>
     </ClInclude>
+    <ClInclude Include="src\libmpg123\aarch64_defs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\costabs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\mpg123lib_intern.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\getcpuflags.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\icy.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\id3.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\frame.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\index.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\getbits.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\l2tables.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\l12tabs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\init_layer12.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\newhuffman.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\huffman.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\l3bandgain.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\l3tabs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\init_layer3.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\icy2utf8.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\parse.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\mpeghead.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\synth.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\synth_mono.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\synth_ntom.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\synth_8bit.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\init_costabs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\optimize.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\reader.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\synths.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\decode.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

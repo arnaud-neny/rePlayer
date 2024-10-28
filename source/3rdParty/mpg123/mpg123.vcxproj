@@ -58,7 +58,36 @@
     <ClInclude Include="src\include\mpg123.h" />
     <ClInclude Include="src\include\out123.h" />
     <ClInclude Include="src\include\syn123.h" />
+    <ClInclude Include="src\libmpg123\aarch64_defs.h" />
+    <ClInclude Include="src\libmpg123\costabs.h" />
+    <ClInclude Include="src\libmpg123\decode.h" />
+    <ClInclude Include="src\libmpg123\frame.h" />
+    <ClInclude Include="src\libmpg123\getbits.h" />
+    <ClInclude Include="src\libmpg123\getcpuflags.h" />
+    <ClInclude Include="src\libmpg123\huffman.h" />
+    <ClInclude Include="src\libmpg123\icy.h" />
+    <ClInclude Include="src\libmpg123\icy2utf8.h" />
+    <ClInclude Include="src\libmpg123\id3.h" />
+    <ClInclude Include="src\libmpg123\index.h" />
+    <ClInclude Include="src\libmpg123\init_costabs.h" />
+    <ClInclude Include="src\libmpg123\init_layer12.h" />
+    <ClInclude Include="src\libmpg123\init_layer3.h" />
+    <ClInclude Include="src\libmpg123\l12tabs.h" />
+    <ClInclude Include="src\libmpg123\l2tables.h" />
+    <ClInclude Include="src\libmpg123\l3bandgain.h" />
+    <ClInclude Include="src\libmpg123\l3tabs.h" />
     <ClInclude Include="src\libmpg123\lfs_wrap.h" />
+    <ClInclude Include="src\libmpg123\mpeghead.h" />
+    <ClInclude Include="src\libmpg123\mpg123lib_intern.h" />
+    <ClInclude Include="src\libmpg123\newhuffman.h" />
+    <ClInclude Include="src\libmpg123\optimize.h" />
+    <ClInclude Include="src\libmpg123\parse.h" />
+    <ClInclude Include="src\libmpg123\reader.h" />
+    <ClInclude Include="src\libmpg123\synth.h" />
+    <ClInclude Include="src\libmpg123\synths.h" />
+    <ClInclude Include="src\libmpg123\synth_8bit.h" />
+    <ClInclude Include="src\libmpg123\synth_mono.h" />
+    <ClInclude Include="src\libmpg123\synth_ntom.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
