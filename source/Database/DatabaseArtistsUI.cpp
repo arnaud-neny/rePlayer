@@ -668,6 +668,7 @@ namespace rePlayer
             for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
             {
                 auto* artist = m_db[m_artistMerger.artists[rowIdx]];
+                ImGui::PushID(static_cast<int>(artist->GetId()));
                 std::string label = artist->GetHandle();
                 if (artist->NumSources() != 0)
                 {
@@ -676,6 +677,7 @@ namespace rePlayer
                 }
                 if (ImGui::MenuItem(label.c_str()))
                     m_artistMerger.masterArtistId = artist->GetId();
+                ImGui::PopID();
             }
         }
 
