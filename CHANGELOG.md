@@ -1,17 +1,19 @@
-v0.16.5
+v0.16.6
 - Added XMP
-- Updated adplug to 2.3.3.858
+- Updated adplug to 2.3.3.870
 - Updated Furnace to 0.6.7
 - Updated libsc68 to 3.0.0a r706
-- Updated libsidplay to 2.10.0
+- Updated libsidplay to 2.11.0
 - Updated libvgm to 34c368c
-- Updated OpenMPT to 0.8.0-pre.7 r21782
+- Updated OpenMPT to 0.8.0-pre.12 r22092
+- Updated SNDH-Player to 0.78
 - Updated vgmstream to r1951
-- Updated ImGui to 1.91.3
-- Updated libarchive to 3.7.6
+- Updated ImGui to 1.91.4
+- Updated libarchive to 3.7.7
 - Updated libcurl to 8.10.1
 - Updated libxml2 to 2.13.4
 - Updated TagLib to 2.0.2
+- Display loop points in song end editor
 - Bug fixes
 
 v0.15.21:
