@@ -234,7 +234,7 @@ namespace rePlayer
         }
 
         // Store our identifier
-        io.Fonts->SetTexID((ImTextureID)m_fontTextureView);
+        io.Fonts->SetTexID((ImTextureID)m_fontTextureView.Get());
 
         // Create texture sampler
         // (Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling)
