@@ -77,13 +77,13 @@ public:
     static constexpr int_least32_t C2 = static_cast<int_least32_t>(SQRT_0_5 / (1.0 + SQRT_0_5) * SCALE_FACTOR);
 
 private:
-    typedef int_least32_t (Mixer::*mixer_func_t)() const;
+    using mixer_func_t = int_least32_t (Mixer::*)() const;
 
-    typedef int (Mixer::*scale_func_t)(unsigned int);
+    using scale_func_t = int (Mixer::*)(unsigned int);
 
 public:
     /// Maximum allowed volume, must be a power of 2.
-    static const int_least32_t VOLUME_MAX = 1024;
+    static constexpr int_least32_t VOLUME_MAX = 1024;
 
 private:
     std::vector<sidemu*> m_chips;
@@ -106,6 +106,8 @@ private:
     uint_least32_t m_sampleRate = 0;
 
     bool m_stereo = false;
+
+    bool m_wait = false;
 
     randomLCG<VOLUME_MAX> m_rand;
 
@@ -258,12 +260,17 @@ public:
     /**
      * Check if the buffer have been filled.
      */
-    bool notFinished() const { return m_sampleIndex != m_sampleCount; }
+    bool notFinished() const { return m_sampleIndex < m_sampleCount; }
 
     /**
      * Get the number of samples generated up to now.
      */
     uint_least32_t samplesGenerated() const { return m_sampleIndex; }
+
+    /*
+     * Wait till we consume the buffer.
+     */
+    bool wait() const { return m_wait; }
 };
 
 }

@@ -45,11 +45,27 @@ private:
     friend std::unique_ptr<FilterModelConfig8580>::deleter_type;
 
 private:
+    /**
+     * Reference voltage generated from Vcc by a voltage divider
+     */
+    static constexpr double Vref = 4.75;
+
+    /**
+     * Power bricks generate voltages slightly out of spec
+     */
+    static constexpr double VOLTAGE_SKEW = 1.01;
+
+private:
     FilterModelConfig8580();
     ~FilterModelConfig8580() = default;
 
+protected:
+    double getVoiceDC(unsigned int) const override { return getVref(); }
+
 public:
     static FilterModelConfig8580* getInstance();
+
+    inline double getVref() const { return Vref * VOLTAGE_SKEW; }
 };
 
 } // namespace reSIDfp
