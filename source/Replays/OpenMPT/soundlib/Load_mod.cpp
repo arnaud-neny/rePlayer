@@ -498,6 +498,7 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 
 	// Reading patterns
 	Patterns.ResizeArray(numPatterns);
+	std::bitset<32> referencedSamples;
 	for(PATTERNINDEX pat = 0; pat < numPatterns; pat++)
 	{
 		ModCommand *rowBase = nullptr;
@@ -608,6 +609,8 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 				if(m.instr != 0)
 				{
 					lastInstrument[chn] = m.instr;
+					if(isStartrekker)
+						referencedSamples.set(m.instr & 0x1F);
 				}
 			}
 			if(hasSpeedOnRow && hasTempoOnRow)
@@ -644,7 +647,7 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 	{
 		m_SongFlags.set(SONG_ISAMIGA);
 	}
-	if(isGenericMultiChannel || isMdKd)
+	if(isGenericMultiChannel || isMdKd || IsMagic(magic, "M!K!"))
 	{
 		m_playBehaviour.set(kFT2MODTremoloRampWaveform);
 	}
@@ -745,7 +748,9 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 		m_nInstruments = 31;
 #endif
 
-		for(SAMPLEINDEX smp = 1; smp <= m_nInstruments; smp++)
+		mpt::deterministic_random_device rd;
+		auto prng = mpt::make_prng<mpt::deterministic_fast_engine>(rd);
+		for(SAMPLEINDEX smp = 1; smp <= GetNumInstruments(); smp++)
 		{
 			// For Startrekker AM synthesis, we need instrument envelopes.
 			ModInstrument *ins = AllocateInstrument(smp, smp);
@@ -759,11 +764,33 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 			// Allow partial reads for fa.worse face.mod
 			if(amData.ReadStructPartial(am) && !memcmp(am.am, "AM", 2) && am.waveform < 4)
 			{
-				am.ConvertToMPT(Samples[smp], *ins, AccessPRNG());
+				am.ConvertToMPT(Samples[smp], *ins, prng);
 			}
 
 			// This extra padding is probably present to have identical block sizes for AM and FM instruments.
 			amData.Skip(120 - sizeof(AMInstrument));
+		}
+
+		if(!m_nInstruments)
+		{
+			uint8 emptySampleReferences = 0;
+			for(SAMPLEINDEX smp = 1; smp <= 31; smp++)
+			{
+				if(referencedSamples[smp] && !Samples[smp].nLength)
+				{
+					if(++emptySampleReferences > 1)
+					{
+						mpt::ustring filenameHint;
+						if(file.GetOptionalFileName())
+						{
+							const auto filename = file.GetOptionalFileName()->GetFilename().ToUnicode();
+							filenameHint = MPT_UFORMAT(" ({}.nt or {}.as)")(filename, filename);
+						}
+						AddToLog(LogWarning, MPT_UFORMAT("This Startrekker AM file is most likely missing its companion file{}. Synthesized instruments will not play.")(filenameHint));
+						break;
+					}
+				}
+			}
 		}
 	}
 #endif  // MPT_EXTERNAL_SAMPLES || MPT_BUILD_FUZZER
@@ -849,7 +876,7 @@ bool CSoundFile::ReadMOD(FileReader &file, ModLoadingFlags loadFlags)
 	// (as this would indicate that e.g. a F30 command was really meant to set
 	// the ticks per row to 48, and not the tempo to 48 BPM).
 	// In the pattern loader above, a second condition is used: Only tempo commands
-	// below 100 BPM are taken into account. Furthermore, only M.K. (ProTracker)
+	// below 100 BPM are taken into account. Furthermore, only ProTracker (M.K. / M!K!)
 	// modules are checked.
 	if((isMdKd || IsMagic(magic, "M!K!")) && hasTempoCommands && !definitelyCIA)
 	{

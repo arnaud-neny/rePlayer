@@ -10,8 +10,10 @@
 */
 
 #include "config.h"
+#if !defined(__DJGPP__)  /* OpenMPT */
 /* This source file does need _POSIX_SOURCE to get some sigaction. */
 #define _POSIX_SOURCE
+#endif  /* OpenMPT */
 #include "compat.h"
 
 #ifdef _MSC_VER
@@ -88,7 +90,7 @@ int INT123_compat_open(const char *filename, int flags)
 open_fallback:
 #endif
 
-#if (defined(WIN32) && !defined (__CYGWIN__))
+#if defined(MPG123_COMPAT_MSVCRT_IO)
 	/* MSDN says POSIX function is deprecated beginning in Visual C++ 2005 */
 	/* Try plain old _open(), if it fails, do nothing */
 	ret = _open(filename, flags|_O_BINARY, _S_IREAD | _S_IWRITE);
@@ -138,12 +140,16 @@ fopen_ok:
 
 FILE* INT123_compat_fdopen(int fd, const char *mode)
 {
+#if defined(MPG123_COMPAT_MSVCRT_IO)
+	return _fdopen(fd, mode);
+#else
 	return fdopen(fd, mode);
+#endif
 }
 
 int INT123_compat_close(int infd)
 {
-#if (defined(WIN32) && !defined (__CYGWIN__)) /* MSDN says POSIX function is deprecated beginning in Visual C++ 2005 */
+#if defined(MPG123_COMPAT_MSVCRT_IO)
 	return _close(infd);
 #else
 	return close(infd);
@@ -158,8 +164,10 @@ int INT123_compat_fclose(FILE *stream)
 void INT123_compat_binmode(int fd, int enable)
 {
 #if   defined(HAVE__SETMODE)
+	(void)  /* OpenMPT */
 	_setmode(fd, enable ? _O_BINARY : _O_TEXT);
 #elif defined(HAVE_SETMODE)
+	(void)  /* OpenMPT */
 	setmode(fd, enable ? O_BINARY : O_TEXT);
 #endif
 }

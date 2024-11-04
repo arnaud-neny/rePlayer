@@ -54,7 +54,8 @@ struct ModChannel
 		{
 			return IsActive(AutoSlideCommand::TonePortamento)
 				|| IsActive(AutoSlideCommand::PortamentoUp) || IsActive(AutoSlideCommand::PortamentoDown)
-				|| IsActive(AutoSlideCommand::FinePortamentoUp) || IsActive(AutoSlideCommand::FinePortamentoDown);
+				|| IsActive(AutoSlideCommand::FinePortamentoUp) || IsActive(AutoSlideCommand::FinePortamentoDown)
+				|| IsActive(AutoSlideCommand::PortamentoFC);
 		}
 	private:
 		std::bitset<static_cast<size_t>(AutoSlideCommand::NumCommands)> m_set;
@@ -111,6 +112,7 @@ struct ModChannel
 	uint16 nRestorePanOnNewNote;  // If > 0, nPan should be set to nRestorePanOnNewNote - 1 on new note. Used to recover from pan swing and IT sample / instrument panning. High bit set = surround
 	uint16 nnaGeneration;         // For PlaybackTest implementation
 	CHANNELINDEX nMasterChn;
+	SAMPLEINDEX swapSampleIndex;  // Sample to swap to when current sample (loop) has finished playing
 	ModCommand rowCommand;
 	// 8-bit members
 	uint8 nGlobalVol;  // Channel volume (CV in ITTECH.TXT) 0...64
@@ -151,6 +153,7 @@ struct ModChannel
 	bool isPreviewNote : 1;                  // Notes preview in editor
 	bool isPaused : 1;                       // Don't mix or increment channel position, but keep the note alive
 	bool portaTargetReached : 1;             // Tone portamento is finished
+	bool fcPortaTick : 1;                    // Future Composer portamento state
 
 	//-->Variables used to make user-definable tuning modes work with pattern effects.
 	//If true, freq should be recalculated in ReadNote() on first tick.
