@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-typedef struct Curl_easy CURL;
+typedef void CURL;
 struct curl_slist;
 
 namespace rePlayer

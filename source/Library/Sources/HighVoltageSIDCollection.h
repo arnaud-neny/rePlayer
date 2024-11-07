@@ -4,7 +4,7 @@
 
 #include <Thread/SpinLock.h>
 
-typedef struct Curl_easy CURL;
+typedef void CURL;
 
 namespace rePlayer
 {

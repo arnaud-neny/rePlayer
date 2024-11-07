@@ -193,9 +193,6 @@
     <ClInclude Include="lib\curl_ntlm_core.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_path.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_printf.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -577,6 +574,9 @@
     <ClInclude Include="lib\vtls\cipher_suite.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
+    <ClInclude Include="lib\vssh\curl_path.h">
+      <Filter>Source Files\lib\vssh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\altsvc.c">
@@ -661,9 +661,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_ntlm_core.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\curl_path.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_range.c">
@@ -1085,6 +1082,9 @@
     </ClCompile>
     <ClCompile Include="lib\vtls\cipher_suite.c">
       <Filter>Source Files\lib\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vssh\curl_path.c">
+      <Filter>Source Files\lib\vssh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
