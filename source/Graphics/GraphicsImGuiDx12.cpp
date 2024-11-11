@@ -537,7 +537,7 @@ namespace rePlayer
 
             // Upload vertex/index data into a single contiguous GPU buffer
             void* vtxResource, *idxResource;
-            D3D12_RANGE range{};
+            D3D12_RANGE range = {};
             if (frameResources->vertexBuffer->Map(0, &range, &vtxResource) < S_OK)
                 return;
             if (frameResources->indexBuffer->Map(0, &range, &idxResource) < S_OK)
@@ -552,7 +552,9 @@ namespace rePlayer
                 vtxDst += cmdList->VtxBuffer.Size;
                 idxDst += cmdList->IdxBuffer.Size;
             }
+            range.End = uintptr_t(vtxDst) - uintptr_t(vtxResource);
             frameResources->vertexBuffer->Unmap(0, &range);
+            range.End = uintptr_t(idxDst) - uintptr_t(idxResource);
             frameResources->indexBuffer->Unmap(0, &range);
 
             frameResources->frameIndex = frameIndex;
