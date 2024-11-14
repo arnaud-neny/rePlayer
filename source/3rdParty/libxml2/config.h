@@ -132,7 +132,7 @@
 #define PACKAGE_NAME "libxml2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libxml2 2.13.4"
+#define PACKAGE_STRING "libxml2 2.13.5"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libxml2"
@@ -141,7 +141,7 @@
 #define PACKAGE_URL "https://gitlab.gnome.org/GNOME/libxml2"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.13.4"
+#define PACKAGE_VERSION "2.13.5"
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
