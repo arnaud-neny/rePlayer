@@ -168,17 +168,15 @@ namespace rePlayer
         }
 
         auto buf = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
+        if (m_sc68Instances[1])
         {
-            if (m_sc68Instances[1])
-            {
-                auto bufRight = reinterpret_cast<int16_t*>(output);
-                auto n = numSamples;
-                sc68_process(m_sc68Instances[1], bufRight, reinterpret_cast<int32_t*>(&n));
-            }
-            auto status = sc68_process(m_sc68Instances[0], buf, reinterpret_cast<int32_t*>(&numSamples));
-            if (status & (SC68_LOOP | SC68_END) && numSamples > 0)
-                m_hasLooped = true;
+            auto bufRight = reinterpret_cast<int16_t*>(output);
+            auto n = numSamples;
+            sc68_process(m_sc68Instances[1], bufRight, reinterpret_cast<int32_t*>(&n));
         }
+        auto status = sc68_process(m_sc68Instances[0], buf, reinterpret_cast<int32_t*>(&numSamples));
+        if (status & (SC68_LOOP | SC68_END) && numSamples > 0)
+            m_hasLooped = true;
 
         if (m_sc68Instances[1] && m_surround.IsEnabled())
         {
@@ -194,6 +192,8 @@ namespace rePlayer
         }
         else
             output->Convert(m_surround, buf, numSamples, 100);
+
+        m_currentPosition += numSamples;
 
         return numSamples;
     }
@@ -211,6 +211,49 @@ namespace rePlayer
             }
         }
         m_surround.Reset();
+        m_currentPosition = 0;
+    }
+
+    uint32_t ReplaySC68::Seek(uint32_t timeInMs)
+    {
+        auto currentPosition = m_currentPosition;
+        auto seekPosition = (uint64_t(timeInMs) * kSampleRate) / 1000;
+        if (seekPosition != currentPosition)
+        {
+            if (seekPosition < currentPosition)
+            {
+                ResetPlayback();
+                currentPosition = 0;
+            }
+            else
+                m_surround.Reset();
+
+            sc68_t* sc68Instances[2] = { m_sc68Instances[0], m_sc68Instances[1] };
+            int16_t buf[1024 * 2];
+            if (sc68Instances[1])
+            {
+                while (currentPosition < seekPosition)
+                {
+                    int32_t numSamples = int32_t(Min(seekPosition - currentPosition, 1024ull));
+                    int32_t n = numSamples;
+                    sc68_process(sc68Instances[0], buf, &n);
+                    sc68_process(sc68Instances[1], buf, &numSamples);
+                    currentPosition += numSamples;
+                }
+            }
+            else
+            {
+                while (currentPosition < seekPosition)
+                {
+                    int32_t numSamples = int32_t(Min(seekPosition - currentPosition, 1024ull));
+                    sc68_process(sc68Instances[0], buf, &numSamples);
+                    currentPosition += numSamples;
+                }
+            }
+
+            m_currentPosition = currentPosition;
+        }
+        return uint32_t((currentPosition * 1000) / kSampleRate);
     }
 
     void ReplaySC68::ApplySettings()

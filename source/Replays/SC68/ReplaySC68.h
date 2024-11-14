@@ -36,8 +36,10 @@ namespace rePlayer
         ~ReplaySC68() override;
 
         uint32_t GetSampleRate() const override { return kSampleRate; }
+        bool IsSeekable() const override { return true; }
 
         uint32_t Render(StereoSample* output, uint32_t numSamples) override;
+        uint32_t Seek(uint32_t timeInMs) override;
 
         void ResetPlayback() override;
 
@@ -62,6 +64,8 @@ namespace rePlayer
         sc68_t* m_sc68Instances[2];
         Surround m_surround;
         bool m_hasLooped = false;
+
+        uint64_t m_currentPosition = 0;
 
         static int32_t ms_aSIDfier;
         //static int32_t ms_defaultTime;
