@@ -1532,6 +1532,8 @@ namespace rePlayer
             type = { eExtension::_sid1, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kMusicEditor)
             type = { eExtension::_med, eReplay::XMP };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOktalyzer)
+            type = { eExtension::_okt, eReplay::OpenMPT };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
             type = { eExtension::_med, eReplay::UADE };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
@@ -1890,6 +1892,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         else if (theReplay == "Music Editor")
             m_db.replays.Last().type = ModlandReplay::kMusicEditor;
+        else if (theReplay == "Oktalyzer")
+            m_db.replays.Last().type = ModlandReplay::kOktalyzer;
         else if (theReplay.starts_with("OctaMED"))
             m_db.replays.Last().type = ModlandReplay::kOctaMED;
         else if (theReplay == "Delitracker Custom")
