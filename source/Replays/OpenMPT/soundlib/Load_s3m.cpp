@@ -969,21 +969,17 @@ bool CSoundFile::SaveS3M(std::ostream &f) const
 					{
 						info |= s3mNotePresent;
 
-						if(note == NOTE_NONE)
-						{
-							note = s3mNoteNone;
-						} else if(ModCommand::IsSpecialNote(note))
+						if(ModCommand::IsSpecialNote(note))
 						{
 							// Note Cut
 							note = s3mNoteOff;
-						} else if(note < 12 + NOTE_MIN)
+						} else if(note >= NOTE_MIN + 12 && note <= NOTE_MIN + 107)
 						{
-							// Too low
-							note = 0;
-						} else if(note <= NOTE_MAX)
-						{
-							note -= (12 + NOTE_MIN);
+							note -= NOTE_MIN + 12;
 							note = static_cast<uint8>((note % 12) + ((note / 12) << 4));
+						} else
+						{
+							note = s3mNoteNone;
 						}
 
 						if(m.instr > 0 && m.instr <= GetNumSamples())

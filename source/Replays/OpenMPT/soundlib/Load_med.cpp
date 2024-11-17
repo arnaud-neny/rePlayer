@@ -391,7 +391,7 @@ struct MMDDump
 MPT_BINARY_STRUCT(MMDDump, 10)
 
 
-static TEMPO MMDTempoToBPM(uint32 tempo, bool is8Ch, bool bpmMode, uint8 rowsPerBeat)
+static TEMPO MMDTempoToBPM(uint32 tempo, bool is8Ch, bool softwareMixing, bool bpmMode, uint8 rowsPerBeat)
 {
 	if(bpmMode && !is8Ch)
 	{
@@ -405,10 +405,14 @@ static TEMPO MMDTempoToBPM(uint32 tempo, bool is8Ch, bool bpmMode, uint8 rowsPer
 		// MED Soundstudio uses these tempos when importing old files
 		static constexpr uint8 tempos[10] = {179, 164, 152, 141, 131, 123, 116, 110, 104, 99};
 		return TEMPO(tempos[tempo - 1], 0);
-	} else if(tempo > 0 && tempo <= 10)
+	} else if(!softwareMixing &&  tempo > 0 && tempo <= 10)
 	{
 		// SoundTracker compatible tempo
 		return TEMPO((6.0 * 1773447.0 / 14500.0) / tempo);
+	} else if(softwareMixing && tempo < 8)
+	{
+		// Observed in MED SoundStudio 1.03 with 1-64ch mixing mode and SPD tempo mode (bug?)
+		return TEMPO(157.86);
 	}
 
 	return TEMPO(tempo / 0.264);
@@ -421,10 +425,11 @@ struct TranslateMEDPatternContext
 	const CHANNELINDEX numTracks;
 	const uint8 version;
 	const uint8 rowsPerBeat;
-	const bool hardwareMixSamples : 1;
 	const bool is8Ch : 1;
+	const bool softwareMixing : 1;
 	const bool bpmMode : 1;
 	const bool volHex : 1;
+	const bool vol7bit : 1;
 };
 
 
@@ -445,7 +450,7 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 	case 0x0C:  // Set Volume (note: parameters >= 0x80 (only in hex mode?) should set the default instrument volume, which we don't support)
 		if(!ctx.volHex && param < 0x99)
 			m.SetEffectCommand(CMD_VOLUME, static_cast<ModCommand::PARAM>((param >> 4) * 10 + (param & 0x0F)));
-		else if(ctx.volHex && ctx.version < 3)
+		else if(ctx.volHex && !ctx.vol7bit)
 			m.SetEffectCommand(CMD_VOLUME, static_cast<ModCommand::PARAM>(std::min(param & 0x7F, 64)));
 		else if(ctx.volHex)
 			m.SetEffectCommand(CMD_VOLUME, static_cast<ModCommand::PARAM>(((param & 0x7F) + 1) / 2));
@@ -469,7 +474,7 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 				m.param = 0x70;
 			} else
 			{
-				uint16 tempo = mpt::saturate_round<uint16>(MMDTempoToBPM(param, ctx.is8Ch, ctx.bpmMode, ctx.rowsPerBeat).ToDouble());
+				uint16 tempo = mpt::saturate_round<uint16>(MMDTempoToBPM(param, ctx.is8Ch, ctx.softwareMixing, ctx.bpmMode, ctx.rowsPerBeat).ToDouble());
 				if(tempo <= Util::MaxValueOfType(m.param))
 				{
 					m.param = static_cast<ModCommand::PARAM>(tempo);
@@ -628,7 +633,11 @@ static bool TranslateMEDPattern(FileReader &file, FileReader &cmdExt, CPattern &
 			if(note >= NOTE_MIDDLEC + 2 * 12)
 				needInstruments = true;
 
-			if(note >= NOTE_MIN && note <= NOTE_MAX)
+			if(note > NOTE_MIN + 131)
+				note -= 108;
+			else if(note > NOTE_MAX)
+				note -= mpt::align_down(note - (NOTE_MAX - 11), 12);
+			if(note >= NOTE_MIN)
 				m->note = static_cast<ModCommand::NOTE>(note);
 
 			if(!cmd && !param1)
@@ -1160,6 +1169,7 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			{
 				sampleIO |= SampleIO::stereoSplit;
 				length /= 2;
+				m_SongFlags.reset(SONG_ISAMIGA);  // Amiga resampler does not handle stereo samples
 			}
 			if(instrHeader.type & MMDInstrHeader::DELTA)
 			{
@@ -1447,8 +1457,9 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 		const bool volHex = (songHeader.flags & MMDSong::FLAG_VOLHEX) != 0;
 		const bool is8Ch = (songHeader.flags & MMDSong::FLAG_8CHANNEL) != 0;
 		const bool bpmMode = (songHeader.flags2 & MMDSong::FLAG2_BPM) != 0;
+		const bool softwareMixing = (songHeader.flags2 & MMDSong::FLAG2_MIX) != 0;
 		const uint8 rowsPerBeat = 1 + (songHeader.flags2 & MMDSong::FLAG2_BMASK);
-		order.SetDefaultTempo(MMDTempoToBPM(songHeader.defaultTempo, is8Ch, bpmMode, rowsPerBeat));
+		order.SetDefaultTempo(MMDTempoToBPM(songHeader.defaultTempo, is8Ch, softwareMixing, bpmMode, rowsPerBeat));
 		order.SetDefaultSpeed(Clamp<uint8, uint8>(songHeader.tempo2, 1, 32));
 		if(bpmMode)
 		{
@@ -1569,6 +1580,7 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			int16 transpose = NOTE_MIN + 47 + songHeader.playTranspose;
 			uint16 numPages = 0;
 			FileReader cmdExt, commandPages;
+			bool vol7bit = false;
 
 			if(version < 1)
 			{
@@ -1586,6 +1598,7 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 				numRows = patHeader.numRows + 1;
 				if(patHeader.blockInfoOffset)
 				{
+					vol7bit = true;
 					auto offset = file.GetPosition();
 					file.Seek(patHeader.blockInfoOffset);
 					MMDBlockInfo blockInfo;
@@ -1624,7 +1637,7 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			pattern.SetName(patName);
 			LimitMax(numTracks, GetNumChannels());
 
-			TranslateMEDPatternContext context{transpose, numTracks, version, rowsPerBeat, hardwareMixSamples, is8Ch, bpmMode, volHex};
+			TranslateMEDPatternContext context{transpose, numTracks, version, rowsPerBeat, is8Ch, softwareMixing, bpmMode, volHex, vol7bit};
 			needInstruments |= TranslateMEDPattern(file, cmdExt, pattern, context, false);
 
 			for(uint16 page = 0; page < numPages; page++)

@@ -784,6 +784,19 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 
 	bool possibleXMconversion = false;
 
+	// There's a bug in IT somewhere that resets the "sample data present" flag in sample headers, but keeps the sample length
+	// of a previously deleted sample (presumably).
+	// As old ModPlug versions didn't set this flag under some circumstances (if a sample wasn't referenced by any instruments in instrument mode),
+	// and because there appear to be some external tools that forget to set this flag at all, we only respect the flag if the file
+	// vaguely looks like it was saved with IT. Some files that play garbage data if we don't do this:
+	// astral projection.it by Lord Jon Ray
+	// classic illusions.it by Blackstar
+	// deep in dance.it by Simply DJ
+	// There are many more such files but they don't reference the broken samples in their pattern data, or the sample data pointer
+	// points right to the end of the file, so in both cases no audible problem can be observed.
+	const bool muteBuggySamples = !interpretModPlugMade && fileHeader.cwtv >= 0x0100 && fileHeader.cwtv <= 0x0217
+		&& (fileHeader.cwtv < 0x0207 || fileHeader.reserved != 0);
+
 	// Reading Samples
 	m_nSamples = std::min(static_cast<SAMPLEINDEX>(fileHeader.smpnum), static_cast<SAMPLEINDEX>(MAX_SAMPLES - 1));
 	bool lastSampleCompressed = false, anyADPCM = false;
@@ -792,9 +805,10 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 		ITSample sampleHeader;
 		if(smpPos[i] > 0 && file.Seek(smpPos[i]) && file.ReadStruct(sampleHeader))
 		{
-			// IT does not check for the IMPS magic, and some bad XM->IT converter out there doesn't write the magic bytes for empty sample slots.
 			ModSample &sample = Samples[i + 1];
 			size_t sampleOffset = sampleHeader.ConvertToMPT(sample);
+			if(muteBuggySamples && !(sampleHeader.flags & ITSample::sampleDataPresent))
+				sample.nLength = 0;
 
 			m_szNames[i + 1] = mpt::String::ReadBuf(mpt::String::spacePadded, sampleHeader.name);
 
@@ -1098,11 +1112,14 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 				uint8 note = patternData.ReadUint8();
 				if(note < 0x80)
 					note += NOTE_MIN;
-				if(!(GetType() & MOD_TYPE_MPT))
-				{
-					if(note > NOTE_MAX && note < 0xFD) note = NOTE_FADE;
-					else if(note == 0xFD) note = NOTE_NONE;
-				}
+				else if(note == 0xFF)
+					note = NOTE_KEYOFF;
+				else if(note == 0xFE)
+					note = NOTE_NOTECUT;
+				else if(note == 0xFD && GetType() != MOD_TYPE_MPT)
+					note = NOTE_NONE;  // Note: in MPTM format, NOTE_FADE is written as 0xFD to preserve compatibility with older OpenMPT versions.
+				else
+					note = NOTE_FADE;
 				m.note = lastValue[ch].note = note;
 			}
 			if(chnMask[ch] & 2)
@@ -1248,6 +1265,10 @@ bool CSoundFile::ReadIT(FileReader &file, ModLoadingFlags loadFlags)
 				madeWithTracker = UL_("CheeseTracker");
 			} else if(fileHeader.cwtv == 0 && madeWithTracker.empty())
 			{
+				madeWithTracker = UL_("Unknown");
+			} else if(fileHeader.cwtv >= 0x0208 && fileHeader.cwtv <= 0x0214 && !fileHeader.reserved && m_FileHistory.empty() && madeWithTracker.empty())
+			{
+				// Any file made with IT starting from v2.07 onwards should have an edit history
 				madeWithTracker = UL_("Unknown");
 			} else if(fileHeader.cmwt < 0x0300 && madeWithTracker.empty())
 			{
@@ -1769,14 +1790,23 @@ bool CSoundFile::SaveIT(std::ostream &f, const mpt::PathString &filename, bool c
 				}
 
 				auto &chnState = chnStates[ch];
-				uint8 b = 0;
+				uint8 b = 1;
 				uint8 vol = 0xFF;
 				uint8 note = m->note;
-				if (note != NOTE_NONE) b |= 1;
-				if (m->IsNote()) note -= NOTE_MIN;
-				if (note == NOTE_FADE && GetType() != MOD_TYPE_MPT) note = 0xF6;
-				if (m->instr) b |= 2;
-				if (m->volcmd != VOLCMD_NONE)
+				if(note >= NOTE_MIN && note <= NOTE_MIN + 119)
+					note = m->note - NOTE_MIN;
+				else if(note == NOTE_FADE)
+					note = (GetType() == MOD_TYPE_MPT) ? 0xFD : 0xF6;
+				else if(note == NOTE_NOTECUT)
+					note = 0xFE;
+				else if(note == NOTE_KEYOFF)
+					note = 0xFF;
+				else
+					b = 0;
+				
+				if(m->instr)
+					b |= 2;
+				if(m->volcmd != VOLCMD_NONE)
 				{
 					vol = std::min(m->vol, uint8(9));
 					switch(m->volcmd)
@@ -1801,7 +1831,8 @@ bool CSoundFile::SaveIT(std::ostream &f, const mpt::PathString &filename, bool c
 					default: vol = 0xFF;
 					}
 				}
-				if (vol != 0xFF) b |= 4;
+				if(vol != 0xFF)
+					b |= 4;
 				uint8 command = 0, param = 0;
 				if(m->command == CMD_VOLUME && vol == 0xFF)
 				{

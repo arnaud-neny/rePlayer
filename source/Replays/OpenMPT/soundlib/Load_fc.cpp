@@ -118,8 +118,9 @@ static void TranslateFCScript(InstrumentSynth::Events &events, const mpt::span<c
 {
 	FileReader file{script};
 	const bool isVolume = startSequence > 255;
+	const uint8 volScriptSpeed = (script[0] > 0) ? script[0] : uint8_max;
 	if(isVolume)
-		events.push_back(InstrumentSynth::Event::SetStepSpeed(script[0], true));
+		events.push_back(InstrumentSynth::Event::SetStepSpeed(volScriptSpeed, true));
 
 	std::vector<uint8> sequencesToParse(1, static_cast<uint8>(isVolume ? 0 : startSequence));
 	std::bitset<256> parsedSequences;
@@ -221,11 +222,11 @@ static void TranslateFCScript(InstrumentSynth::Events &events, const mpt::span<c
 			case 0xE8:  // Sustain (time)
 				{
 					const uint8 delay = file.ReadUint8();
-					if(isVolume && script[0] > 1)
+					if(isVolume && volScriptSpeed > 1)
 					{
 						events.push_back(InstrumentSynth::Event::SetStepSpeed(1, true));
-						events.push_back(InstrumentSynth::Event::Delay(static_cast<uint16>(delay + script[0] - 2)));
-						events.push_back(InstrumentSynth::Event::SetStepSpeed(script[0], true));
+						events.push_back(InstrumentSynth::Event::Delay(static_cast<uint16>(delay + volScriptSpeed - 2)));
+						events.push_back(InstrumentSynth::Event::SetStepSpeed(volScriptSpeed, true));
 					} else if(delay)
 					{
 						events.push_back(InstrumentSynth::Event::Delay(delay - 1));
@@ -423,6 +424,7 @@ bool CSoundFile::ReadFC(FileReader &file, ModLoadingFlags loadFlags)
 		if(!instr)
 			return false;
 
+		static_assert(NOTE_MAX - NOTE_MIN + 1 >= 128, "Need at least a note range of 128 for correct emulation of note wrap-around logic in Future Composer");
 		for(uint8 note = 0; note < static_cast<uint8>(instr->NoteMap.size()); note++)
 		{
 			if(note < 48)
@@ -470,9 +472,9 @@ bool CSoundFile::ReadFC(FileReader &file, ModLoadingFlags loadFlags)
 
 	static constexpr uint8 SampleLengths[] =
 	{
-		32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
-		32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
-		16, 16, 16, 16, 16, 16, 16, 16, 32, 16, 32, 32, 16, 16, 48,
+		16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+		16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+		8, 8, 8, 8, 8, 8, 8, 8, 16, 8, 16, 16, 8, 8, 24,  // Future Composer 1.4 imports the last sample with a length of 32 instead of 48, causing some older FC files to be detuned.
 	};
 
 	static constexpr uint8 SampleData[] =
@@ -525,35 +527,22 @@ bool CSoundFile::ReadFC(FileReader &file, ModLoadingFlags loadFlags)
 		0x00, 0x00, 0x40, 0x60, 0x7F, 0x60, 0x40, 0x20, 0x00, 0xE0, 0xC0, 0xA0, 0x80, 0xA0, 0xC0, 0xE0,
 		0x80, 0x80, 0x90, 0x98, 0xA0, 0xA8, 0xB0, 0xB8, 0xC0, 0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8, 0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x40, 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x7F, 0x80, 0x80, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
 	};
-	
+
+	if(isFC14 && !file.Seek(fileHeader.waveTableOffset))
+		return false;
+
+	FileReader smpFile{mpt::as_span(SampleData)};
+	const auto sampleLengths = isFC14 ? mpt::span<const uint8>(waveTableLengths) : mpt::as_span(SampleLengths);
 	SampleIO sampleIO{SampleIO::_8bit, SampleIO::mono, SampleIO::bigEndian, SampleIO::signedPCM};
-	if(isFC14)
+	for(SAMPLEINDEX smp = 0; smp < sampleLengths.size(); smp++)
 	{
-		if(!file.Seek(fileHeader.waveTableOffset))
-			return false;
-		for(SAMPLEINDEX smp = 0; smp < waveTableLengths.size(); smp++)
-		{
-			ModSample &mptSmp = Samples[smp + 11];
-			mptSmp.Initialize(MOD_TYPE_MOD);
-			mptSmp.nLength = waveTableLengths[smp] * 2u;
-			mptSmp.nLoopStart = 0;
-			mptSmp.nLoopEnd = mptSmp.nLength;
-			mptSmp.uFlags.set(CHN_LOOP);
-			sampleIO.ReadSample(mptSmp, file);
-		}
-	} else
-	{
-		FileReader smpFile{mpt::as_span(SampleData)};
-		for(SAMPLEINDEX smp = 0; smp < std::size(SampleLengths); smp++)
-		{
-			ModSample &mptSmp = Samples[smp + 11];
-			mptSmp.Initialize(MOD_TYPE_MOD);
-			mptSmp.nLength = SampleLengths[smp];
-			mptSmp.nLoopStart = 0;
-			mptSmp.nLoopEnd = mptSmp.nLength;
-			mptSmp.uFlags.set(CHN_LOOP);
-			sampleIO.ReadSample(mptSmp, smpFile);
-		}
+		ModSample &mptSmp = Samples[smp + 11];
+		mptSmp.Initialize(MOD_TYPE_MOD);
+		mptSmp.nLength = sampleLengths[smp] * 2u;
+		mptSmp.nLoopStart = 0;
+		mptSmp.nLoopEnd = mptSmp.nLength;
+		mptSmp.uFlags.set(CHN_LOOP);
+		sampleIO.ReadSample(mptSmp, isFC14 ? file : smpFile);
 	}
 
 	return true;
