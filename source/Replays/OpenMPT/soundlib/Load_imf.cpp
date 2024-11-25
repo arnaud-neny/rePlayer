@@ -190,7 +190,7 @@ struct IMFSample
 	// Convert an IMFSample to OpenMPT's internal sample representation.
 	void ConvertToMPT(ModSample &mptSmp) const
 	{
-		mptSmp.Initialize();
+		mptSmp.Initialize(MOD_TYPE_IMF);
 		mptSmp.filename = mpt::String::ReadBuf(mpt::String::nullTerminated, filename);
 
 		mptSmp.nLength = length;
@@ -437,12 +437,12 @@ bool CSoundFile::ReadIMF(FileReader &file, ModLoadingFlags loadFlags)
 
 	// Read channel configuration
 	std::bitset<32> ignoreChannels;  // bit set for each channel that's completely disabled
-	uint64 channelMuteStatus = 0xAAAA'AAAA << (GetNumChannels() * 2);
+	uint64 channelMuteStatus = 0;
 	for(CHANNELINDEX chn = 0; chn < GetNumChannels(); chn++)
 	{
 		ChnSettings[chn].nPan = static_cast<uint16>(fileHeader.channels[chn].panning * 256 / 255);
 		ChnSettings[chn].szName = mpt::String::ReadBuf(mpt::String::nullTerminated, fileHeader.channels[chn].name);
-		channelMuteStatus |= fileHeader.channels[chn].status << (chn * 2);
+		channelMuteStatus |= static_cast<uint64>(fileHeader.channels[chn].status) << (chn * 2);
 		// TODO: reverb/chorus?
 		switch(fileHeader.channels[chn].status)
 		{
@@ -459,7 +459,7 @@ bool CSoundFile::ReadIMF(FileReader &file, ModLoadingFlags loadFlags)
 	}
 	// BEHIND.IMF: All channels but the first are muted
 	// mikmod refers to this as an Orpheus bug, but I haven't seen any other files like this, so maybe it's just an incorrectly saved file?
-	if(channelMuteStatus == 0xAAAA'AAAA'5555'5554)
+	if(GetNumChannels() == 16 && channelMuteStatus == 0x5555'5554)
 	{
 		for(CHANNELINDEX chn = 1; chn < GetNumChannels(); chn++)
 			ChnSettings[chn].dwFlags.reset(CHN_MUTE);
@@ -536,7 +536,7 @@ bool CSoundFile::ReadIMF(FileReader &file, ModLoadingFlags loadFlags)
 				const auto [e1c, e1d, e2c, e2d] = patternChunk.ReadArray<uint8, 4>();  // Command 1, Data 1, Command 2, Data 2
 				const auto [command1, param1] = TranslateIMFEffect(e1c, e1d);
 				const auto [command2, param2] = TranslateIMFEffect(e2c, e2d);
-				m.FillInTwoCommands(command1, param1, command2, param2);
+				m.FillInTwoCommands(command1, param1, command2, param2, true);
 			} else if(mask & 0xC0)
 			{
 				// There's one effect, just stick it in the effect column (unless it's a volume command)

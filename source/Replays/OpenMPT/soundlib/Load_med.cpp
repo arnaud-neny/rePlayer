@@ -438,8 +438,28 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 	const uint8 nibbleLo = std::min(param, uint8(0x0F));
 	switch(command)
 	{
+	case 0x01:  // Portamento Up (avoid effect memory when importing as XM)
+		if(param)
+			m.SetEffectCommand(CMD_PORTAMENTOUP, param);
+		break;
+	case 0x02:  // Portamento Down (avoid effect memory when importing as XM)
+		if(param)
+			m.SetEffectCommand(CMD_PORTAMENTODOWN, param);
+		break;
 	case 0x04:  // Vibrato (twice as deep as in ProTracker)
 		m.SetEffectCommand(CMD_VIBRATO, (param & 0xF0) | std::min<uint8>((param & 0x0F) * 2, 0x0F));
+		break;
+	case 0x05:  // Tone Porta + Volume Slide (avoid effect memory when importing as XM)
+		if(param)
+			m.SetEffectCommand(CMD_TONEPORTAVOL, param);
+		else
+			m.SetEffectCommand(CMD_TONEPORTAMENTO, 0);
+		break;
+	case 0x06:  // Vibrato + Volume Slide (avoid effect memory when importing as XM)
+		if(param)
+			m.SetEffectCommand(CMD_VIBRATOVOL, param);
+		else
+			m.SetEffectCommand(CMD_VIBRATO, 0);
 		break;
 	case 0x08:  // Hold and decay
 		break;
@@ -456,7 +476,8 @@ static std::pair<EffectCommand, ModCommand::PARAM> ConvertMEDEffect(ModCommand &
 			m.SetEffectCommand(CMD_VOLUME, static_cast<ModCommand::PARAM>(((param & 0x7F) + 1) / 2));
 		break;
 	case 0x0D:
-		m.SetEffectCommand(CMD_VOLUMESLIDE, param);
+		if(param)
+			m.SetEffectCommand(CMD_VOLUMESLIDE, param);
 		break;
 	case 0x0E:  // Synth jump / MIDI panning
 		m.SetEffectCommand(CMD_MED_SYNTH_JUMP, param);
@@ -647,7 +668,7 @@ static bool TranslateMEDPattern(FileReader &file, FileReader &cmdExt, CPattern &
 			if(oldCmd.first != CMD_NONE && m->command != oldCmd.first)
 			{
 				if(!ModCommand::CombineEffects(m->command, m->param, oldCmd.first, oldCmd.second) && m->volcmd == VOLCMD_NONE)
-					m->FillInTwoCommands(m->command, m->param, oldCmd.first, oldCmd.second);
+					m->FillInTwoCommands(m->command, m->param, oldCmd.first, oldCmd.second, true);
 				// Reset X-Param to 8-bit value if this cell was overwritten with a "useful" effect
 				if(row > 0 && oldCmd.first == CMD_XPARAM && m->command != CMD_XPARAM)
 					pattern.GetpModCommand(row - 1, chn)->param = Util::MaxValueOfType(m->param);
@@ -667,7 +688,7 @@ static bool TranslateMEDPattern(FileReader &file, FileReader &cmdExt, CPattern &
 
 static void TranslateMEDSynthScript(std::array<uint8, 128> &arr, size_t numEntries, uint8 speed, uint8 hold, uint8 decay, InstrumentSynth::Events &events, bool isVolume)
 {
-	events.push_back(InstrumentSynth::Event::SetStepSpeed(speed, false));
+	events.push_back(InstrumentSynth::Event::SetStepSpeed(speed, true));
 	if(hold && isVolume)
 		events.push_back(InstrumentSynth::Event::MED_HoldDecay(hold, decay));
 
@@ -1367,9 +1388,9 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 			if((header.mixEchoType == 1 || header.mixEchoType == 2) && numPlugins < MAX_MIXPLUGINS)
 			{
 				// Emulating MED echo using the DMO echo requires to compensate for the differences in initial feedback in the latter.
-				const float feedback = 1.0f / (1 << std::max(header.mixEchoDepth, uint8(1)));  // The feedback we want
-				const float initialFeedback = std::sqrt(1.0f - (feedback * feedback));         // Actual strength of first delay's feedback
-				const float wetFactor = feedback / initialFeedback;                            // Factor to compensate for this
+				const float feedback = 1.0f / (1 << std::clamp(header.mixEchoDepth, uint8(1), uint8(9)));  // The feedback we want
+				const float initialFeedback = std::sqrt(1.0f - (feedback * feedback));                     // Actual strength of first delay's feedback
+				const float wetFactor = feedback / initialFeedback;                                        // Factor to compensate for this
 				const float delay = (std::max(header.mixEchoLength.get(), uint16(1)) - 1) / 1999.0f;
 				SNDMIXPLUGIN &mixPlug = m_MixPlugins[numPlugins];
 				mpt::reconstruct(mixPlug);
@@ -1473,6 +1494,9 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 
 		m_SongFlags.set(SONG_FASTVOLSLIDES, !(songHeader.flags & MMDSong::FLAG_STSLIDE));
 		m_SongFlags.set(SONG_FASTPORTAS, !(songHeader.flags& MMDSong::FLAG_STSLIDE));
+		m_playBehaviour.set(kST3OffsetWithoutInstrument);
+		m_playBehaviour.set(kST3PortaSampleChange);
+		m_playBehaviour.set(kFT2PortaNoNote);
 
 		if(expData.songNameOffset && file.Seek(expData.songNameOffset))
 		{
@@ -1598,7 +1622,6 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 				numRows = patHeader.numRows + 1;
 				if(patHeader.blockInfoOffset)
 				{
-					vol7bit = true;
 					auto offset = file.GetPosition();
 					file.Seek(patHeader.blockInfoOffset);
 					MMDBlockInfo blockInfo;
@@ -1623,6 +1646,7 @@ bool CSoundFile::ReadMED(FileReader &file, ModLoadingFlags loadFlags)
 					   && file.Seek(blockInfo.cmdExtTableOffset)
 					   && file.Seek(file.ReadUint32BE()))
 					{
+						vol7bit = true;
 						cmdExt = file.ReadChunk(numTracks * numRows * (1 + numPages));
 					}
 

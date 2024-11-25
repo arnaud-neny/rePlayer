@@ -1475,7 +1475,7 @@ void CSoundFile::InstrumentChange(ModChannel &chn, uint32 instr, bool bPorta, bo
 
 		if(pIns->NoteMap[note - NOTE_MIN] > NOTE_MAX) return;
 		uint32 n = pIns->Keyboard[note - NOTE_MIN];
-		pSmp = ((n) && (n < MAX_SAMPLES)) ? &Samples[n] : nullptr;
+		pSmp = (n <= GetNumSamples()) ? &Samples[n] : &Samples[0];
 	} else if(GetNumInstruments())
 	{
 		// No valid instrument, or not a valid note.
@@ -1843,9 +1843,9 @@ void CSoundFile::NoteChange(ModChannel &chn, int note, bool bPorta, bool bResetE
 	if((pIns) && (note - NOTE_MIN < (int)std::size(pIns->Keyboard)))
 	{
 		uint32 n = pIns->Keyboard[note - NOTE_MIN];
-		if((n) && (n < MAX_SAMPLES))
+		if(n > 0)
 		{
-			pSmp = &Samples[n];
+			pSmp = &Samples[(n <= GetNumSamples()) ? n : 0];
 		} else if(m_playBehaviour[kITEmptyNoteMapSlot] && !chn.HasMIDIOutput())
 		{
 			// Impulse Tracker ignores empty slots.
@@ -2050,7 +2050,7 @@ void CSoundFile::NoteChange(ModChannel &chn, int note, bool bPorta, bool bResetE
 			chn.nLoopEnd = pSmp->nLength;
 			chn.nLoopStart = 0;
 			chn.position.Set(0);
-			if((m_SongFlags[SONG_PT_MODE] || m_playBehaviour[kST3OffsetWithoutInstrument]) && !chn.rowCommand.instr)
+			if((m_SongFlags[SONG_PT_MODE] || m_playBehaviour[kST3OffsetWithoutInstrument] || GetType() == MOD_TYPE_MED) && !chn.rowCommand.instr)
 			{
 				chn.position.SetInt(std::min(chn.prevNoteOffset, chn.nLength - SmpLength(1)));
 			} else
@@ -2327,9 +2327,9 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 		// Test case: dct_smp_note_test.it
 		if(!m_playBehaviour[kITDCTBehaviour] || !m_playBehaviour[kITRealNoteMapping])
 			dnaNote = pIns->NoteMap[note - NOTE_MIN];
-		if(smp > 0 && smp < MAX_SAMPLES)
+		if(smp > 0)
 		{
-			pSample = &Samples[smp];
+			pSample = &Samples[(smp <= GetNumSamples()) ? smp : 0];
 		} else if(m_playBehaviour[kITEmptyNoteMapSlot] && !pIns->HasValidMIDIChannel())
 		{
 			// Impulse Tracker ignores empty slots.
@@ -5878,7 +5878,7 @@ void CSoundFile::SampleOffset(ModChannel &chn, SmpLength param) const
 {
 	// ST3 compatibility: Instrument-less note recalls previous note's offset
 	// Test case: OxxMemory.s3m
-	if(m_playBehaviour[kST3OffsetWithoutInstrument])
+	if(m_playBehaviour[kST3OffsetWithoutInstrument] || GetType() == MOD_TYPE_MED)
 		chn.prevNoteOffset = 0;
 	
 	chn.prevNoteOffset += param;
@@ -6160,7 +6160,10 @@ void CSoundFile::RetrigNote(CHANNELINDEX nChn, int param, int offset)
 
 		const bool fading = chn.dwFlags[CHN_NOTEFADE];
 		const auto oldPrevNoteOffset = chn.prevNoteOffset;
-		chn.prevNoteOffset = 0;  // Retriggered notes should not use previous offset (test case: OxxMemoryWithRetrig.s3m)
+		// Retriggered notes should not use previous offset in S3M
+		// Test cases: OxxMemoryWithRetrig.s3m, PTOffsetRetrigger.mod
+		if(GetType() == MOD_TYPE_S3M)
+			chn.prevNoteOffset = 0;
 		// IT compatibility: Really weird combination of envelopes and retrigger (see Storlek's q.it testcase)
 		// Test cases: retrig.it, RetrigSlide.s3m
 		const bool itS3Mstyle = m_playBehaviour[kITRetrigger] || (GetType() == MOD_TYPE_S3M && chn.nLength && !oplRealRetrig);
