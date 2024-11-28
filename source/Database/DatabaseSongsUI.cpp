@@ -30,11 +30,12 @@ namespace rePlayer
         : m_db(Core::GetDatabase(databaseId))
         , m_owner(owner)
         , m_databaseId(databaseId)
-        , m_songFilter(new ImGuiTextFilter())
+        , m_songFilters{ new ImGuiTextFilter(), new ImGuiTextFilter() }
     {
         m_db.Register(this);
         owner.RegisterSerializedData(m_filterMode, "SongsFilterMode");
-        owner.RegisterSerializedData(m_songFilter->InputBuf, "SongsFilter", &OnSongFilterLoaded, uintptr_t(m_songFilter));
+        owner.RegisterSerializedData(m_songFilters[0]->InputBuf, "SongsFilter", &OnSongFilterLoaded, uintptr_t(m_songFilters[0]));
+        owner.RegisterSerializedData(m_songFilters[1]->InputBuf, "SongsFilter2", &OnSongFilterLoaded, uintptr_t(m_songFilters[1]));
     }
 
     DatabaseSongsUI::~DatabaseSongsUI()
@@ -46,7 +47,8 @@ namespace rePlayer
                 thread::Sleep(1);
             delete m_export;
         }
-        delete m_songFilter;
+        delete m_songFilters[0];
+        delete m_songFilters[1];
     }
 
     void DatabaseSongsUI::TrackSubsong(SubsongID subsongId)
@@ -140,147 +142,26 @@ namespace rePlayer
             }
             ImGui::SameLine();
             auto oldFilterMode = m_filterMode;
-            ImGui::Combo("##Filter", reinterpret_cast<int*>(&m_filterMode), "All\0Songs\0Artists\0");
+            ImGui::Combo("##Filter", reinterpret_cast<int*>(&m_filterMode), "Any\0Songs\0Artists\0Both\0");
             isDirty |= oldFilterMode != m_filterMode;
             ImGui::TableNextColumn();
 
             auto tagMode = m_tagMode;
             bool isFilteringTags = tagMode != TagMode::Disable;
-            bool isFiltering = isDirty && (m_songFilter->IsActive() || isFilteringTags);
-            if (m_songFilter->Draw("##filter", -1) || isFiltering)
+            bool isDualFiltering = m_filterMode == FilterMode::Both;
+            bool isFiltering = isDirty && (m_songFilters[0]->IsActive() || isFilteringTags || (isDualFiltering && m_songFilters[1]->IsActive()));
+            isFiltering |= m_songFilters[0]->Draw("##filter", isDualFiltering ? ImGui::GetContentRegionAvail().x / 2.0f : -FLT_MIN);
+            if (isDualFiltering)
             {
-                m_numSelectedEntries = 0;
-                auto oldEntries = std::move(m_entries);
-                bool isFilteringSong = m_filterMode != FilterMode::Artists;
-                auto filterTags = m_filterTags;
-                if (m_filterMode != FilterMode::Songs)
-                {
-                    Array<ArtistID> artists;
-                    for (Artist* artist : m_db.Artists())
-                    {
-                        if (m_songFilter->PassFilter(artist->GetHandle()))
-                            artists.Add(artist->GetId());
-                    }
-                    for (auto* song : m_db.Songs())
-                    {
-                        if (isFilteringTags)
-                        {
-                            auto songTags = song->GetTags();
-                            if (tagMode == TagMode::Match && songTags != filterTags)
-                                continue;
-                            else if (tagMode == TagMode::Exclusive && !songTags.IsEnabled(filterTags))
-                                continue;
-                            else if (tagMode == TagMode::Inclusive && !songTags.IsAnyEnabled(filterTags))
-                                continue;
-                        }
-                        bool checkForSong = isFilteringSong;
-                        if (song->NumArtistIds() == 0 && m_songFilter->PassFilter(nullptr, nullptr))
-                        {
-                            auto songId = song->GetId();
-                            for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                            {
-                                if (!song->IsSubsongDiscarded(i))
-                                {
-                                    m_entries.Add({ SubsongID(songId, i) });
-                                    oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
-                                    {
-                                        if (oldEntry.isSelected)
-                                        {
-                                            m_entries.Last().isSelected = true;
-                                            m_numSelectedEntries++;
-                                        }
-                                    });
-                                }
-                            }
-                            checkForSong = false;
-                        }
-                        else for (auto artistId : song->ArtistIds())
-                        {
-                            if (artists.Find(artistId))
-                            {
-                                auto songId = song->GetId();
-                                for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                                {
-                                    if (!song->IsSubsongDiscarded(i))
-                                    {
-                                        m_entries.Add({ SubsongID(songId, i) });
-                                        oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
-                                        {
-                                            if (oldEntry.isSelected)
-                                            {
-                                                m_entries.Last().isSelected = true;
-                                                m_numSelectedEntries++;
-                                            }
-                                        });
-                                    }
-                                }
-                                checkForSong = false;
-                                break;
-                            }
-                        }
-                        if (checkForSong && m_songFilter->PassFilter(song->GetName()))
-                        {
-                            auto songId = song->GetId();
-                            for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                            {
-                                if (!song->IsSubsongDiscarded(i))
-                                {
-                                    m_entries.Add({ SubsongID(songId, i) });
-                                    oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
-                                    {
-                                        if (oldEntry.isSelected)
-                                        {
-                                            m_entries.Last().isSelected = true;
-                                            m_numSelectedEntries++;
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for (auto* song : m_db.Songs())
-                    {
-                        if (isFilteringTags)
-                        {
-                            auto songTags = song->GetTags();
-                            if (tagMode == TagMode::Match && songTags != filterTags)
-                                continue;
-                            else if (tagMode == TagMode::Exclusive && !songTags.IsEnabled(filterTags))
-                                continue;
-                            else if (tagMode == TagMode::Inclusive && !songTags.IsAnyEnabled(filterTags))
-                                continue;
-                        }
-                        if (m_songFilter->PassFilter(song->GetName()))
-                        {
-                            auto songId = song->GetId();
-                            for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                            {
-                                if (!song->IsSubsongDiscarded(i))
-                                {
-                                    m_entries.Add({ SubsongID(songId, i) });
-                                    oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
-                                    {
-                                        if (oldEntry.isSelected)
-                                        {
-                                            m_entries.Last().isSelected = true;
-                                            m_numSelectedEntries++;
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
-                isDirty = true;
+                ImGui::SameLine();
+                isFiltering |= m_songFilters[1]->Draw("##filter2", -FLT_MIN);
             }
-            else if (isDirty)
+            if (isFiltering || isDirty)
             {
                 m_numSelectedEntries = 0;
                 auto oldEntries = std::move(m_entries);
-                for (auto* song : m_db.Songs())
+
+                auto addSong = [&](Song* song)
                 {
                     auto songId = song->GetId();
                     for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
@@ -298,6 +179,98 @@ namespace rePlayer
                             });
                         }
                     }
+                };
+
+                if (isFiltering)
+                {
+                    auto areTagsValid = [&, filterTags = m_filterTags](Song* song)
+                    {
+                        if (isFilteringTags)
+                        {
+                            auto songTags = song->GetTags();
+                            if (tagMode == TagMode::Match && songTags != filterTags)
+                                return false;
+                            if (tagMode == TagMode::Exclusive && !songTags.IsEnabled(filterTags))
+                                return false;
+                            if (tagMode == TagMode::Inclusive && !songTags.IsAnyEnabled(filterTags))
+                                return false;
+                        }
+                        return true;
+                    };
+
+                    if (isDualFiltering)
+                    {
+                        bool isArtistFilterActive = m_songFilters[0]->IsActive();
+                        bool isSongFilterActive = m_songFilters[1]->IsActive();
+                        for (auto* song : m_db.Songs())
+                        {
+                            if (areTagsValid(song))
+                            {
+                                auto isSongValid = [&]()
+                                {
+                                    if (isArtistFilterActive)
+                                    {
+                                        if (song->NumArtistIds() == 0)
+                                            return false;
+                                        std::string artists;
+                                        for (auto artistId : song->ArtistIds())
+                                        {
+                                            if (m_songFilters[0]->PassFilter(m_db[artistId]->GetHandle()))
+                                                return true;
+                                        }
+                                        return false;
+                                    }
+                                    return true;
+                                };
+                                if (isSongValid() && (!isSongFilterActive || m_songFilters[1]->PassFilter(song->GetName())))
+                                    addSong(song);
+                            }
+                        }
+                    }
+                    else if (m_filterMode != FilterMode::Songs)
+                    {
+                        bool isFilteringSong = m_filterMode != FilterMode::Artists;
+                        Array<ArtistID> artists;
+                        for (Artist* artist : m_db.Artists())
+                        {
+                            if (m_songFilters[0]->PassFilter(artist->GetHandle()))
+                                artists.Add(artist->GetId());
+                        }
+                        for (auto* song : m_db.Songs())
+                        {
+                            if (areTagsValid(song))
+                            {
+                                bool checkForSong = isFilteringSong;
+                                if (song->NumArtistIds() == 0 && m_songFilters[0]->PassFilter(nullptr, nullptr))
+                                    addSong(song);
+                                else for (auto artistId : song->ArtistIds())
+                                {
+                                    if (artists.Find(artistId))
+                                    {
+                                        addSong(song);
+                                        checkForSong = false;
+                                        break;
+                                    }
+                                }
+                                if (checkForSong && m_songFilters[0]->PassFilter(song->GetName()))
+                                    addSong(song);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (auto* song : m_db.Songs())
+                        {
+                            if (areTagsValid(song) && m_songFilters[0]->PassFilter(song->GetName()))
+                                addSong(song);
+                        }
+                    }
+                    isDirty = true;
+                }
+                else
+                {
+                    for (auto* song : m_db.Songs())
+                        addSong(song);
                 }
             }
             ImGui::EndTable();

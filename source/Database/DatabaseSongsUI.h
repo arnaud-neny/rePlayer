@@ -104,12 +104,13 @@ namespace rePlayer
         } m_tagMode = TagMode::Disable;
         enum class FilterMode : uint32_t
         {
-            All,
+            Any,
             Songs,
-            Artists
+            Artists,
+            Both
         };
-        FilterMode m_filterMode = FilterMode::All;
-        ImGuiTextFilter* m_songFilter;
+        FilterMode m_filterMode = FilterMode::Any;
+        ImGuiTextFilter* m_songFilters[2];
 
         struct SubsongEntry
         {
