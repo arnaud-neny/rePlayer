@@ -1,5 +1,5 @@
 /**
- * emu2149 v1.41
+ * emu2149 v1.42
  * https://github.com/digital-sound-antiques/emu2149
  * Copyright (C) 2001-2022 Mitsutaka Okazaki
  *
@@ -296,7 +296,7 @@ update_output (PSG * psg)
         psg->count[i] = 0;
     }
 
-    if (0 < psg->freq_limit && psg->freq[i] <= psg->freq_limit) 
+    if (0 < psg->freq_limit && psg->freq[i] <= psg->freq_limit && psg->nmask[i]) 
     {
       /* Mute the channel if the pitch is higher than the Nyquist frequency at the current sample rate, 
        * to prevent aliased or broken tones from being generated. Of course, this logic doesn't exist 

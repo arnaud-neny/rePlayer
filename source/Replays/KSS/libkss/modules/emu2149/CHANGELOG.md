@@ -1,3 +1,6 @@
+## 2024-08-28 : v1.42
+- Fix the problem where white noise is not generated if tone frequency is set higher than internal limit (issue #5). Thanks to Norix-san.
+
 ## 2022-11-26 : v1.41
 - Fix a problem with DC offset when muting a channel (issue #4).
 - Disable frequency limiter if the internal rate converter is not active (i.e. quality == 0).
