@@ -47,6 +47,9 @@ static void load_content_db(struct uade_state *state)
 	struct stat st;
 	char name[PATH_MAX];
 
+	if (state->config.no_content_db)
+		return;
+
 	/* Try to read global database, this does not override any data
 	   from user database */
 	snprintf(name, sizeof name, "%s/contentdb", state->config.basedir.name);
@@ -79,7 +82,7 @@ static void save_content_db(struct uade_state *state)
 	struct stat st;
 	const char *fname = state->songdb.ccfilename;
 
-	if (!fname[0] || stat(fname, &st))
+	if (!fname[0] || state->config.no_content_db || stat(fname, &st))
 		return;
 
 	if (state->songdb.ccloadtime < st.st_mtime)

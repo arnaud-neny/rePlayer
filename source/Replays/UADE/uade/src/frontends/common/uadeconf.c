@@ -60,6 +60,7 @@ static const struct uade_conf_opts uadeconfopts[] = {
 	{.str = "ignore_player_check",   .l = 2,  .e = UC_IGNORE_PLAYER_CHECK},
 	{.str = "interpolator",          .l = 2,  .e = UC_RESAMPLER},
 	{.str = "magic_detection",       .l = 1,  .e = UC_CONTENT_DETECTION},
+	{.str = "no_content_db",         .l = 4,  .e = UC_NO_CONTENT_DB},
 	{.str = "no_ep_end_detect",      .l = 4,  .e = UC_NO_EP_END},
 	{.str = "no_filter",             .l = 4,  .e = UC_NO_FILTER},
 	{.str = "no_song_end",           .l = 4,  .e = UC_NO_EP_END},
@@ -409,6 +410,7 @@ void uade_merge_configs(struct uade_config *ucd, const struct uade_config *ucs)
 	MERGE_OPTION(ignore_player_check);
 	MERGE_OPTION(led_forced);
 	MERGE_OPTION(led_state);
+	MERGE_OPTION(no_content_db);
 	MERGE_OPTION(no_ep_end);
 	MERGE_OPTION(no_filter);
 	MERGE_OPTION(no_postprocessing);
@@ -674,6 +676,10 @@ void uade_config_set_option(struct uade_config *uc, enum uade_option opt,
 		} else {
 			fprintf(stderr,	"uade.conf: no memory for resampler.\n");
 		}
+		break;
+
+	case UC_NO_CONTENT_DB:
+		SET_OPTION(no_content_db, 1);
 		break;
 
 	case UC_NO_EP_END:

@@ -4,8 +4,8 @@ UADE - Unix Amiga Delitracker Emulator
 UADE is a music player for UNIX platforms that plays music formats used on
 the Amiga computer.
 
-Very short instructions for installing UADE
-===========================================
+Instructions for installing UADE
+================================
 
 1. Read INSTALL.readme
 2. Install the program globally or directly to your home directory. Do either

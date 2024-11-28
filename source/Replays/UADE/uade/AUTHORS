@@ -6,10 +6,6 @@ Main authors
 
  - Heikki Orsila <heikki.orsila@iki.fi>
  - Michael Doering <mldoering@gmx.net>
-
-Subsystems
-----------
-
  - Antti S. Lankila <alankila@bel.fi> for filter emulation and sound effects
  - Claudio Matsuoka and Hipolito Carraro Jr for module decruncing code in
    uade 1.xy.
@@ -23,6 +19,7 @@ Subsystems
  - Nicolas A. Mendoza (part of the AmigaOS port)
  - Stuart 'kyzer' Caie for Mac OS X port and powerpacker decruncher
    http://www.kyz.uklinux.net
+ - Matti Tiainen <mvtiaine@cc.hut.fi>
 
 Everyone from UAE project. See doc/UAE-CREDITS.
 

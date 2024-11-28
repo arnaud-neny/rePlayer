@@ -335,7 +335,7 @@ static int tfmxtest(unsigned char *buf, size_t bufsize, char *pre)
 	  strncmp((char *) &buf[16], "(Empty)", 7) == 0 ||
 	  /* Lethal Zone */
 	  (buf[16] == 0x30 && buf[17] == 0x3d) ||
-	  (buf[4] == 0x20)){
+	  (buf[4] == 0x20)){ 
 
 	if (read_be_u32(&buf[464]) == 0x00000000) {
 	  uint16_t x = read_be_u16(&buf[14]);
@@ -347,7 +347,7 @@ static int tfmxtest(unsigned char *buf, size_t bufsize, char *pre)
 	  }
 	}
 	return 1;
-
+	
       } else if (((buf[0x0e] == 0x08 && buf[0x0f] == 0xb0) &&	/* BMWi */
 		  (buf[0x140] == 0x00 && buf[0x141] == 0x0b) &&	/*End tackstep 1st subsong */
 		  (buf[0x1d2] == 0x02 && buf[0x1d3] == 0x00) &&	/*Trackstep datas */
@@ -448,7 +448,7 @@ static void modparsing(unsigned char *buf, size_t bufsize, size_t header,
   int offset;
   int i, j, fx;
   unsigned char fxarg;
-
+  
   for (i = 0; i < max_pattern; i++) {
     for (j = 0; j < 256; j++) {
       offset = header + i * 1024 + j * 4;
@@ -458,7 +458,7 @@ static void modparsing(unsigned char *buf, size_t bufsize, size_t header,
 
       fx = buf[offset + 2] & 0x0f;
       fxarg = buf[offset + 3];
-
+      
       if (fx == 0) {
 	if (fxarg != 0 )
 	  pfx[fx] += 1;
@@ -527,7 +527,7 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
   /* Special cases first */
   if (patterntest(buf, "M&K!", (S31_HEADER_LENGTH - 4), 4, bufsize))
     return MOD_NOISETRACKER;	/* Noisetracker (M&K!) */
-
+  
   if (patterntest(buf, "M!K!", (S31_HEADER_LENGTH - 4), 4, bufsize))
     return MOD_PROTRACKER;		/* Protracker (100 patterns) */
 
@@ -546,14 +546,14 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
       if (t > 0) {
 	if (buf[0x43b] == '4'){
 	  ret = MOD_AUDIOSCULPTURE4;	/* Startrekker 4 AM / ADSC */
-	} else {
-	  ret = MOD_AUDIOSCULPTURE8;	/* Startrekker 8 AM / ADSC */
+	} else { 		
+	  ret = MOD_AUDIOSCULPTURE8;	/* Startrekker 8 AM / ADSC */	
 	}
       } else {
 	if (buf[0x43b] == '4'){
 	  ret = MOD_STARTREKKER4;	/* Startrekker 4ch */
-	} else {
-	  ret = MOD_STARTREKKER8;	/* Startrekker 8ch */
+	} else { 		
+	  ret = MOD_STARTREKKER8;	/* Startrekker 8ch */	
 	}
       }
       return ret;
@@ -629,7 +629,7 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
 	if (buf[1080 - 130 + 2 + i] > max_pattern)
 	  max_pattern = buf[1080 - 130 + 2 + i];
       }
-
+      
       if (max_pattern > 100) {
 	/* pattern number can only be  0 <-> 100 for mod*/
 	return MOD_UNDEFINED;
@@ -658,7 +658,7 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
 	}
       }
 
-      if ((buf[0x3b7] == 0x7f) &&
+      if ((buf[0x3b7] == 0x7f) && 
 	  (has_slen_sreplen_zero <= has_slen_sreplen_one) &&
 	  (no_slen_sreplen_zero <=no_slen_sreplen_one))
 	return MOD_PROTRACKER; /* Protracker */
@@ -666,7 +666,7 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
       if (buf[0x3b7] >0x7f)
 	return MOD_PTK_COMPATIBLE; /* Protracker compatible */
 
-      if ((buf[0x3b7] == 0) &&
+      if ((buf[0x3b7] == 0) && 
 	  (has_slen_sreplen_zero >  has_slen_sreplen_one) &&
 	  (no_slen_sreplen_zero > no_slen_sreplen_one)){
 	if (pfx[0x10] == 0) {
@@ -678,28 +678,28 @@ static int mod32check(unsigned char *buf, size_t bufsize, size_t realfilesize,
 	  return MOD_PROTRACKER; // probl. Protracker
 	  } */
       }
-
+	    
       if (pfx[0x05] != 0 || pfx[0x06] != 0 || pfx[0x07] != 0 ||
 	  pfx[0x09] != 0) {
 	/* Protracker compatible */
 	return MOD_PTK_COMPATIBLE;
       }
 
-      if ((buf[0x3b7] >0 && buf[0x3b7] <= buf[0x3b6]) &&
+      if ((buf[0x3b7] >0 && buf[0x3b7] <= buf[0x3b6]) && 
 	  (has_slen_sreplen_zero <= has_slen_sreplen_one) &&
 	  (no_slen_sreplen_zero == 1) &&
-	  (no_slen_sreplen_zero <= no_slen_sreplen_one))
+	  (no_slen_sreplen_zero <= no_slen_sreplen_one))    
 	return MOD_NOISETRACKER12; // Noisetracker 1.2
 
-      if ((buf[0x3b7] <0x80) &&
+      if ((buf[0x3b7] <0x80) && 
 	  (has_slen_sreplen_zero <= has_slen_sreplen_one) &&
-	  (no_slen_sreplen_zero <=no_slen_sreplen_one))
+	  (no_slen_sreplen_zero <=no_slen_sreplen_one))    
 	return MOD_NOISETRACKER20; // Noisetracker 2.x
 
-      if ((buf[0x3b7] <0x80) &&
+      if ((buf[0x3b7] <0x80) && 
 	  (pfx[0x0e] ==0) &&
 	  (has_slen_sreplen_zero <= has_slen_sreplen_one) &&
-	  (no_slen_sreplen_zero >=no_slen_sreplen_one))
+	  (no_slen_sreplen_zero >=no_slen_sreplen_one))    
 	return MOD_SOUNDTRACKER25_NOISETRACKER10; // Noisetracker 1.x
 
       return MOD_PTK_COMPATIBLE; // Protracker compatible
@@ -732,7 +732,7 @@ static int mod15check(unsigned char *buf, size_t bufsize, size_t realfilesize,
   int srep_bigger_slen = 0;
   int srep_bigger_ffff = 0;
   int st_xy = 0;
-
+  
   int max_pattern = 1;
   int pfx[32];
   int pfxarg[32];
@@ -794,7 +794,7 @@ static int mod15check(unsigned char *buf, size_t bufsize, size_t realfilesize,
       if ((srep+sreplen) > slen)
 	srep_bigger_slen++;
     }
-
+       	
     /* slen < 9999 */
     slen = (buf[42 + i * 30] << 8) + buf[43 + i * 30];
     if (slen <= 9999) {
@@ -824,7 +824,7 @@ static int mod15check(unsigned char *buf, size_t bufsize, size_t realfilesize,
 /* Soundtracker I-VI		0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f*/
 
 
-  /* Check for fx used between 0x3 <-> 0xb for some weird ST II-IV mods */
+  /* Check for fx used between 0x3 <-> 0xb for some weird ST II-IV mods */ 
   for (j = 0x5; j < 0xa; j++) {
     if (pfx[j] != 0)
       return 4; /* ST II-IV */
@@ -851,7 +851,7 @@ static int mod15check(unsigned char *buf, size_t bufsize, size_t realfilesize,
   if ((pfxarg[1] > 0 && pfxarg[1] <0x1f) ||
       (pfxarg[2] > 0 && pfxarg [2] <0x1f) ||
       pfx [0] >2) return 1; // ST style Arpeggio, Pitchbends ???
-
+  
   if (pfx[1] > 0 || pfx[2] > 0)
     return 2; /* nope UST like fx */
 
@@ -891,12 +891,12 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 		    size_t realfilesize, const char *path, int verbose)
 {
   /* char filemagic():
-     detects formats like e.g.: tfmx1.5, hip, hipc, fc13, fc1.4
-     - tfmx 1.5 checking based on both tfmx DT and tfmxplay by jhp,
+     detects formats like e.g.: tfmx1.5, hip, hipc, fc13, fc1.4      
+     - tfmx 1.5 checking based on both tfmx DT and tfmxplay by jhp, 
      and the EP by Don Adan/WT.
      - tfmx 7v checking based on info by don adan, the amore file
      ripping description and jhp's desc of the tfmx format.
-     - other checks based on e.g. various player sources from Exotica
+     - other checks based on e.g. various player sources from Exotica 
      or by checking bytes with a hexeditor
      by far not complete...
 
@@ -970,7 +970,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
   } else if (buf[0x2c] == 'S' && buf[0x2d] == 'C' && buf[0x2e] == 'R'
 	     && buf[0x2f] == 'M') {
     strcpy(pre, "S3M");		/*Scream Tracker */
-
+    
   } else if ((buf[0] == 0x60 && buf[2] == 0x60 && buf[4] == 0x48
 	      && buf[5] == 0xe7) || (buf[0] == 0x60 && buf[2] == 0x60
 				     && buf[4] == 0x41 && buf[5] == 0xfa)
@@ -980,8 +980,8 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 		 && buf[5] == 0x00 && buf[8] == 0x60 && buf[9] == 0x00
 		 && buf[12] == 0x60 && buf[13] == 0x00 && buf[16] == 0x48
 		 && buf[17] == 0xe7)) {
-    strcpy(pre, "HIP");		/* Hippel */
-
+    strcpy(pre, "HIP");		/* Hippel */ // rePlayer fix
+    
   } else if (bufsize > 0x34f && buf[0x348] == '.' && buf[0x349] == 'Z' && buf[0x34A] == 'A'
 	     && buf[0x34B] == 'D' && buf[0x34c] == 'S' && buf[0x34d] == '8'
 	     && buf[0x34e] == '9' && buf[0x34f] == '.') {
@@ -995,7 +995,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 	     read_be_u32(&buf[0x24]) == 0x32004eb9 &&
 	     read_be_u16(&buf[0x2c])  == 0x4e75)	{
     strcpy(pre, "JPO");	/* Steve Turner*/
-
+        
   } else if (((buf[0] == 0x08 && buf[1] == 0xf9 && buf[2] == 0x00
 	       && buf[3] == 0x01) && (buf[4] == 0x00 && buf[5] == 0xbb
 				      && buf[6] == 0x41 && buf[7] == 0xfa)
@@ -1212,7 +1212,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 	  strcpy(pre, "APS");  /* AProSys */
 
     /* magic ids of some modpackers */
-  } else if (buf[0x438] == 'P' && buf[0x439] == 'W' && buf[0x43a] == 'R'
+  } else if (bufsize > 0x43b && buf[0x438] == 'P' && buf[0x439] == 'W' && buf[0x43a] == 'R'
 	     && buf[0x43b] == 0x2e) {
     strcpy(pre, "PPK");		/*Polkapacker */
 
@@ -1220,10 +1220,10 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
 	     && buf[0x103] == 'T') {
     strcpy(pre, "SKT");		/*Skytpacker */
 
-  } else if ((bufsize > 0x43b && buf[0x5b8] == 'I' && buf[0x5b9] == 'T' && buf[0x5ba] == '1'
+  } else if (bufsize > 0x5bb && ((buf[0x5b8] == 'I' && buf[0x5b9] == 'T' && buf[0x5ba] == '1'
 	      && buf[0x5bb] == '0') || (buf[0x5b8] == 'M' && buf[0x5b9] == 'T'
 					&& buf[0x5ba] == 'N'
-					&& buf[0x5bb] == 0x00)) {
+					&& buf[0x5bb] == 0x00))) {
     strcpy(pre, "ICE");		/*Ice/Soundtracker 2.6 */
 
   } else if (bufsize > 0x3bb && buf[0x3b8] == 'K' && buf[0x3b9] == 'R' && buf[0x3ba] == 'I'
@@ -1265,7 +1265,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
       }
 
       if (t < 0x40) {
-	/* longword after Delirium is rel. offset from first chunk
+	/* longword after Delirium is rel. offset from first chunk 
 	   where "hopefully" the delitags are */
 	int s = (buf[i + t + 10] * 256) + buf[i + t + 11] + i;	/* 64K */
 	if (s < bufsize - 0x33) {
@@ -1281,7 +1281,7 @@ void uade_filemagic(unsigned char *buf, size_t bufsize, char *pre,
     }
 
   } else if (buf[0] == 'P' && buf[1] == 'R' && buf[2] == 'T') {
-      strcpy(pre, "PRT");	/* PreTracker */
+      strcpy(pre, "PRT");	/* PreTracker */ // rePlayer
   } else if (buf[12] == 0x00) {
     int s = (buf[12] * 256 + buf[13] + 1) * 14;
     if (s < (bufsize - 91)) {

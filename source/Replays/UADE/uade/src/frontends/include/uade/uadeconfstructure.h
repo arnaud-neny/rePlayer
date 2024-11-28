@@ -67,6 +67,7 @@ struct uade_config {
 	char *resampler;
 	char resampler_set;
 
+	UADE_CHAR_CONFIG(no_content_db);
 	UADE_CHAR_CONFIG(no_ep_end);
 	UADE_CHAR_CONFIG(no_filter);
 	UADE_CHAR_CONFIG(no_postprocessing);
