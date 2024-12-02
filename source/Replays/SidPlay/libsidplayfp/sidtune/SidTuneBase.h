@@ -60,7 +60,7 @@ public:
 class SidTuneBase
 {
 protected:
-    typedef std::vector<uint8_t> buffer_t;
+    using buffer_t = std::vector<uint8_t>;
 
 protected:
     /// Also PSID file format limit.
