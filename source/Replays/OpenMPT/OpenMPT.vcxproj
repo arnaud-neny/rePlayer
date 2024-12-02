@@ -251,6 +251,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="soundlib\Loaders.h" />
     <ClInclude Include="soundlib\Message.h" />
     <ClInclude Include="soundlib\MIDIEvents.h" />
+    <ClInclude Include="soundlib\MIDIMacroParser.h" />
     <ClInclude Include="soundlib\MIDIMacros.h" />
     <ClInclude Include="soundlib\Mixer.h" />
     <ClInclude Include="soundlib\MixerInterface.h" />
@@ -401,6 +402,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="soundlib\Load_xmf.cpp" />
     <ClCompile Include="soundlib\Message.cpp" />
     <ClCompile Include="soundlib\MIDIEvents.cpp" />
+    <ClCompile Include="soundlib\MIDIMacroParser.cpp" />
     <ClCompile Include="soundlib\MIDIMacros.cpp" />
     <ClCompile Include="soundlib\MixerLoops.cpp" />
     <ClCompile Include="soundlib\MixerSettings.cpp" />

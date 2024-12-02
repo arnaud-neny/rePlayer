@@ -60,6 +60,9 @@ enum { FREQ_FRACBITS = 4 }; // Number of fractional bits in return value of CSou
 
 using samplecount_t = uint32;  // Number of rendered samples
 
+using PlugParamIndex = uint32;
+using PlugParamValue = float;
+
 // String lengths (including trailing null char)
 enum
 {
@@ -278,14 +281,13 @@ enum PlayFlags : uint16
 	SONG_FIRSTTICK       =  0x20,  // Is set when the current tick is the first tick of the row
 	SONG_MPTFILTERMODE   =  0x40,  // Local filter mode (reset filter on each note)
 	SONG_SURROUNDPAN     =  0x80,  // Pan in the rear channels
-	SONG_POSJUMP         = 0x100,  // Position jump encountered (internal flag, do not touch)
-	SONG_BREAKTOROW      = 0x200,  // Break to row command encountered (internal flag, do not touch)
+	SONG_POSJUMP         = 0x100,  // Position jump encountered
+	SONG_BREAKTOROW      = 0x200,  // Break to row command encountered
 	SONG_POSITIONCHANGED = 0x400,  // Report to plugins that we jumped around in the module
 };
 DECLARE_FLAGSET(PlayFlags)
 
 
-// Module flags - contains both song configuration and playback state... Use SONG_FILE_FLAGS and SONG_PLAY_FLAGS distinguish between the two.
 enum SongFlags
 {
 	SONG_FASTPORTAS          =     0x01,  // Portamentos are executed on every tick
@@ -306,6 +308,7 @@ enum SongFlags
 	SONG_AUTO_VIBRATO        =   0x8000,  // Vibrato command is continued automatically
 	SONG_AUTO_TREMOLO        = 0x1'8000,  // Tremolo command is continued automatically
 	SONG_AUTO_VOLSLIDE_STK   = 0x2'0000,  // Automatic volume slide command is interpreted like in STK files (rather than like in STP files)
+	SONG_FORMAT_NO_VOLCOL    = 0x4'0000,  // The original (imported) format has no volume column, so it can be hidden in the pattern editor.
 };
 DECLARE_FLAGSET(SongFlags)
 

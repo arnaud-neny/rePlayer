@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "Sndfile.h"
+#include "MIDIMacroParser.h"
 #include "mod_specifications.h"
 #ifdef MODPLUG_TRACKER
 #include "../mptrack/Moddoc.h"
@@ -1428,6 +1429,8 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 			{
 				m_MixPlugins[plug].fDryRatio = dryWetRatio;
 			}
+
+			UpdatePluginPositions();
 #endif // NO_PLUGINS
 		} else if(adjustMode != eAdjustOnSuccess)
 		{
@@ -2447,7 +2450,7 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 	IMixPlugin *pPlugin = nullptr;
 	if(srcChn.HasMIDIOutput() && ModCommand::IsNote(srcChn.nNote)) // instro sends to a midi chan
 	{
-		PLUGINDEX plugin = GetBestPlugin(m_PlayState, nChn, PrioritiseInstrument, RespectMutes);
+		PLUGINDEX plugin = GetBestPlugin(m_PlayState.Chn[nChn], nChn, PrioritiseInstrument, RespectMutes);
 
 		if(plugin > 0 && plugin <= MAX_MIXPLUGINS)
 		{
@@ -2582,7 +2585,7 @@ bool CSoundFile::ProcessEffects()
 			const PlugParamValue value = chn.rowCommand.GetValueEffectCol() / PlugParamValue(ModCommand::maxColumnValue);
 
 			if(plug > 0 && plug <= MAX_MIXPLUGINS && m_MixPlugins[plug - 1].pMixPlugin)
-				m_MixPlugins[plug-1].pMixPlugin->SetParameter(plugparam, value);
+				m_MixPlugins[plug-1].pMixPlugin->SetParameter(plugparam, value, &m_PlayState, nChn);
 #endif // NO_PLUGINS
 		}
 
@@ -2613,10 +2616,10 @@ bool CSoundFile::ProcessEffects()
 				}
 				if(m_PlayState.m_nTickCount + 1 == m_PlayState.TicksOnRow())
 				{	// On last tick, set parameter exactly to target value.
-					m_MixPlugins[plugin - 1].pMixPlugin->SetParameter(plugparam, chn.m_plugParamTargetValue);
+					m_MixPlugins[plugin - 1].pMixPlugin->SetParameter(plugparam, chn.m_plugParamTargetValue, &m_PlayState, nChn);
 				}
 				else
-					m_MixPlugins[plugin - 1].pMixPlugin->ModifyParameter(plugparam, chn.m_plugParamValueStep);
+					m_MixPlugins[plugin - 1].pMixPlugin->ModifyParameter(plugparam, chn.m_plugParamValueStep, m_PlayState, nChn);
 			}
 #endif // NO_PLUGINS
 		}
@@ -5413,258 +5416,12 @@ void CSoundFile::InvertLoop(ModChannel &chn)
 void CSoundFile::ProcessMIDIMacro(PlayState &playState, CHANNELINDEX nChn, bool isSmooth, const MIDIMacroConfigData::Macro &macro, uint8 param, PLUGINDEX plugin)
 {
 	playState.m_midiMacroScratchSpace.resize(macro.Length() + 1);
-	auto out = mpt::as_span(playState.m_midiMacroScratchSpace);
-
-	ParseMIDIMacro(playState, nChn, isSmooth, macro, out, param, plugin);
-
-	// Macro string has been parsed and translated, now send the message(s)...
-	uint32 outSize = static_cast<uint32>(out.size());
-	uint32 sendPos = 0;
-	uint8 runningStatus = 0;
-	while(sendPos < out.size())
+	MIDIMacroParser parser{*this, &playState, nChn, isSmooth, macro, mpt::as_span(playState.m_midiMacroScratchSpace), param, plugin};
+	mpt::span<uint8> midiMsg;
+	while(parser.NextMessage(midiMsg))
 	{
-		uint32 sendLen = 0;
-		if(out[sendPos] == 0xF0)
-		{
-			// SysEx start
-			if((outSize - sendPos >= 4) && (out[sendPos + 1] == 0xF0 || out[sendPos + 1] == 0xF1))
-			{
-				// Internal macro (normal (F0F0) or extended (F0F1)), 4 bytes long
-				sendLen = 4;
-			} else
-			{
-				// SysEx message, find end of message
-				for(uint32 i = sendPos + 1; i < outSize; i++)
-				{
-					if(out[i] == 0xF7)
-					{
-						// Found end of SysEx message
-						sendLen = i - sendPos + 1;
-						break;
-					}
-				}
-				if(sendLen == 0)
-				{
-					// Didn't find end, so "invent" end of SysEx message
-					out[outSize++] = 0xF7;
-					sendLen = outSize - sendPos;
-				}
-			}
-		} else if(!(out[sendPos] & 0x80))
-		{
-			// Missing status byte? Try inserting running status
-			if(runningStatus != 0)
-			{
-				sendPos--;
-				out[sendPos] = runningStatus;
-			} else
-			{
-				// No running status to re-use; skip this byte
-				sendPos++;
-			}
-			continue;
-		} else
-		{
-			// Other MIDI messages
-			sendLen = std::min(static_cast<uint32>(MIDIEvents::GetEventLength(out[sendPos])), outSize - sendPos);
-		}
-
-		if(sendLen == 0)
-			break;
-
-		if(out[sendPos] < 0xF0)
-		{
-			runningStatus = out[sendPos];
-		}
-		const auto midiMsg = out.subspan(sendPos, sendLen);
 		SendMIDIData(playState, nChn, isSmooth, midiMsg, plugin);
-		sendPos += sendLen;
 	}
-}
-
-
-void CSoundFile::ParseMIDIMacro(PlayState &playState, CHANNELINDEX nChn, bool isSmooth, const mpt::span<const char> macro, mpt::span<uint8> &out, uint8 param, PLUGINDEX plugin) const
-{
-	ModChannel &chn = playState.Chn[nChn];
-	const ModInstrument *pIns = chn.pModInstrument;
-
-	const uint8 lastZxxParam = chn.lastZxxParam;  // always interpolate based on original value in case z appears multiple times in macro string
-	uint8 updateZxxParam = 0xFF;                  // avoid updating lastZxxParam immediately if macro contains both internal and external MIDI message
-
-	bool firstNibble = true;
-	size_t outPos = 0;  // output buffer position, which also equals the number of complete bytes
-	for(size_t pos = 0; pos < macro.size() && outPos < out.size(); pos++)
-	{
-		bool isNibble = false;  // did we parse a nibble or a byte value?
-		uint8 data = 0;         // data that has just been parsed
-
-		// Parse next macro byte... See Impulse Tracker's MIDI.TXT for detailed information on each possible character.
-		if(macro[pos] >= '0' && macro[pos] <= '9')
-		{
-			isNibble = true;
-			data = static_cast<uint8>(macro[pos] - '0');
-		} else if(macro[pos] >= 'A' && macro[pos] <= 'F')
-		{
-			isNibble = true;
-			data = static_cast<uint8>(macro[pos] - 'A' + 0x0A);
-		} else if(macro[pos] == 'c')
-		{
-			// MIDI channel
-			isNibble = true;
-			data = 0xFF;
-#ifndef NO_PLUGINS
-			const PLUGINDEX plug = (plugin != 0) ? plugin : GetBestPlugin(playState, nChn, PrioritiseChannel, EvenIfMuted);
-			if(plug > 0 && plug <= MAX_MIXPLUGINS)
-			{
-				auto midiPlug = dynamic_cast<const IMidiPlugin *>(m_MixPlugins[plug - 1u].pMixPlugin);
-				if(midiPlug)
-					data = midiPlug->GetMidiChannel(playState.Chn[nChn], nChn);
-			}
-#endif // NO_PLUGINS
-			if(data == 0xFF)
-			{
-				// Fallback if no plugin was found
-				if(pIns)
-					data = pIns->GetMIDIChannel(playState.Chn[nChn], nChn);
-				else
-					data = 0;
-			}
-		} else if(macro[pos] == 'n')
-		{
-			// Last triggered note
-			if(ModCommand::IsNote(chn.nLastNote))
-			{
-				data = chn.nLastNote - NOTE_MIN;
-			}
-		} else if(macro[pos] == 'v')
-		{
-			// Velocity
-			// This is "almost" how IT does it - apparently, IT seems to lag one row behind on global volume or channel volume changes.
-			const int swing = (m_playBehaviour[kITSwingBehaviour] || m_playBehaviour[kMPTOldSwingBehaviour]) ? chn.nVolSwing : 0;
-			const int vol = Util::muldiv((chn.nVolume + swing) * m_PlayState.m_nGlobalVolume, chn.nGlobalVol * chn.nInsVol, 1 << 20);
-			data = static_cast<uint8>(Clamp(vol / 2, 1, 127));
-			//data = (unsigned char)std::min((chn.nVolume * chn.nGlobalVol * m_nGlobalVolume) >> (1 + 6 + 8), 127);
-		} else if(macro[pos] == 'u')
-		{
-			// Calculated volume
-			// Same note as with velocity applies here, but apparently also for instrument / sample volumes?
-			const int vol = Util::muldiv(chn.nCalcVolume * m_PlayState.m_nGlobalVolume, chn.nGlobalVol * chn.nInsVol, 1 << 26);
-			data = static_cast<uint8>(Clamp(vol / 2, 1, 127));
-			//data = (unsigned char)std::min((chn.nCalcVolume * chn.nGlobalVol * m_nGlobalVolume) >> (7 + 6 + 8), 127);
-		} else if(macro[pos] == 'x')
-		{
-			// Pan set
-			data = static_cast<uint8>(std::min(static_cast<int>(chn.nPan / 2), 127));
-		} else if(macro[pos] == 'y')
-		{
-			// Calculated pan
-			data = static_cast<uint8>(std::min(static_cast<int>(chn.nRealPan / 2), 127));
-		} else if(macro[pos] == 'a')
-		{
-			// High byte of bank select
-			if(pIns && pIns->wMidiBank)
-			{
-				data = static_cast<uint8>(((pIns->wMidiBank - 1) >> 7) & 0x7F);
-			}
-		} else if(macro[pos] == 'b')
-		{
-			// Low byte of bank select
-			if(pIns && pIns->wMidiBank)
-			{
-				data = static_cast<uint8>((pIns->wMidiBank - 1) & 0x7F);
-			}
-		} else if(macro[pos] == 'o')
-		{
-			// Offset (ignoring high offset)
-			data = static_cast<uint8>((chn.oldOffset >> 8) & 0xFF);
-		} else if(macro[pos] == 'h')
-		{
-			// Host channel number
-			data = static_cast<uint8>((nChn >= GetNumChannels() ? (chn.nMasterChn - 1) : nChn) & 0x7F);
-		} else if(macro[pos] == 'm')
-		{
-			// Loop direction (on sample channels - MIDI note on MIDI channels)
-			data = chn.dwFlags[CHN_PINGPONGFLAG] ? 1 : 0;
-		} else if(macro[pos] == 'p')
-		{
-			// Program select
-			if(pIns && pIns->nMidiProgram)
-			{
-				data = static_cast<uint8>((pIns->nMidiProgram - 1) & 0x7F);
-			}
-		} else if(macro[pos] == 'z')
-		{
-			// Zxx parameter
-			data = param;
-			if(isSmooth && chn.lastZxxParam < 0x80
-				&& (outPos < 3 || out[outPos - 3] != 0xF0 || out[outPos - 2] < 0xF0))
-			{
-				// Interpolation for external MIDI messages - interpolation for internal messages
-				// is handled separately to allow for more than 7-bit granularity where it's possible
-				data = static_cast<uint8>(CalculateSmoothParamChange(playState, lastZxxParam, data));
-				chn.lastZxxParam = data;
-				updateZxxParam = 0x80;
-			} else if(updateZxxParam == 0xFF)
-			{
-				updateZxxParam = data;
-			}
-		} else if(macro[pos] == 's')
-		{
-			// SysEx Checksum (not an original Impulse Tracker macro variable, but added for convenience)
-			auto startPos = outPos;
-			while(startPos > 0 && out[--startPos] != 0xF0)
-				;
-
-			if(outPos - startPos < 3 || out[startPos] != 0xF0)
-				continue;
-
-			// If first byte of model number is 0, read one more
-			uint8 checksumStart = out[startPos + 3] ? 5 : 6;
-			if(outPos - startPos < checksumStart)
-				continue;
-
-			for(auto p = startPos + checksumStart; p != outPos; p++)
-			{
-				data += out[p];
-			}
-			data = (~data + 1) & 0x7F;
-		} else
-		{
-			// Unrecognized byte (e.g. space char)
-			continue;
-		}
-
-		// Append parsed data
-		if(isNibble)  // parsed a nibble (constant or 'c' variable)
-		{
-			if(firstNibble)
-			{
-				out[outPos] = data;
-			} else
-			{
-				out[outPos] = (out[outPos] << 4) | data;
-				outPos++;
-			}
-			firstNibble = !firstNibble;
-		} else  // parsed a byte (variable)
-		{
-			if(!firstNibble)  // From MIDI.TXT: '9n' is exactly the same as '09 n' or '9 n' -- so finish current byte first
-			{
-				outPos++;
-			}
-			out[outPos++] = data;
-			firstNibble = true;
-		}
-	}
-	if(!firstNibble)
-	{
-		// Finish current byte
-		outPos++;
-	}
-	if(updateZxxParam < 0x80)
-		chn.lastZxxParam = updateZxxParam;
-
-	out = out.first(outPos);
 }
 
 
@@ -5749,7 +5506,7 @@ void CSoundFile::SendMIDIData(PlayState &playState, CHANNELINDEX nChn, bool isSm
 		} else if(macroCode == 0x03 && !isExtended)
 		{
 			// F0.F0.03.xx: Set plug dry/wet
-			PLUGINDEX plug = (plugin != 0) ? plugin : GetBestPlugin(playState, nChn, PrioritiseChannel, EvenIfMuted);
+			PLUGINDEX plug = (plugin != 0) ? plugin : GetBestPlugin(chn, nChn, PrioritiseChannel, EvenIfMuted);
 			if(plug > 0 && plug <= MAX_MIXPLUGINS && param < 0x80)
 			{
 				plug--;
@@ -5767,7 +5524,7 @@ void CSoundFile::SendMIDIData(PlayState &playState, CHANNELINDEX nChn, bool isSm
 		} else if((macroCode & 0x80) || isExtended)
 		{
 			// F0.F0.{80|n}.xx / F0.F1.n.xx: Set VST effect parameter n to xx
-			PLUGINDEX plug = (plugin != 0) ? plugin : GetBestPlugin(playState, nChn, PrioritiseChannel, EvenIfMuted);
+			PLUGINDEX plug = (plugin != 0) ? plugin : GetBestPlugin(chn, nChn, PrioritiseChannel, EvenIfMuted);
 			if(plug > 0 && plug <= MAX_MIXPLUGINS && param < 0x80)
 			{
 				plug--;
@@ -5778,9 +5535,9 @@ void CSoundFile::SendMIDIData(PlayState &playState, CHANNELINDEX nChn, bool isSm
 					if(localOnly)
 						playState.m_midiMacroEvaluationResults->pluginParameter[{plug, plugParam}] = value;
 					else if(!isSmooth)
-						pPlugin->SetParameter(plugParam, value);
+						pPlugin->SetParameter(plugParam, value, &playState, nChn);
 					else
-						pPlugin->SetParameter(plugParam, CalculateSmoothParamChange(playState, pPlugin->GetParameter(plugParam), value));
+						pPlugin->SetParameter(plugParam, CalculateSmoothParamChange(playState, pPlugin->GetParameter(plugParam), value), &playState, nChn);
 				}
 			}
 #endif // NO_PLUGINS
@@ -5795,23 +5552,14 @@ void CSoundFile::SendMIDIData(PlayState &playState, CHANNELINDEX nChn, bool isSm
 			PLUGINDEX plug = 0;
 			if(!chn.dwFlags[CHN_NOFX])
 			{
-				plug = (plugin != 0) ? plugin : GetBestPlugin(playState, nChn, PrioritiseChannel, EvenIfMuted);
+				plug = (plugin != 0) ? plugin : GetBestPlugin(chn, nChn, PrioritiseChannel, EvenIfMuted);
 			}
 
 			if(plug > 0 && plug <= MAX_MIXPLUGINS)
 			{
 				if(IMixPlugin *pPlugin = m_MixPlugins[plug - 1].pMixPlugin; pPlugin != nullptr)
 				{
-					if(macro[0] == 0xF0)
-					{
-						pPlugin->MidiSysexSend(mpt::byte_cast<mpt::const_byte_span>(macro));
-					} else
-					{
-						size_t len = std::min(static_cast<size_t>(MIDIEvents::GetEventLength(macro[0])), macro.size());
-						uint32 curData = 0;
-						memcpy(&curData, macro.data(), len);
-						pPlugin->MidiSend(curData);
-					}
+					pPlugin->MidiSend(mpt::byte_cast<mpt::const_byte_span>(macro));
 				}
 			}
 		}
@@ -6774,35 +6522,30 @@ uint32 CSoundFile::GetFreqFromPeriod(uint32 period, uint32 c5speed, int32 nPerio
 }
 
 
-PLUGINDEX CSoundFile::GetBestPlugin(const PlayState &playState, CHANNELINDEX nChn, PluginPriority priority, PluginMutePriority respectMutes) const
+PLUGINDEX CSoundFile::GetBestPlugin(const ModChannel &channel, CHANNELINDEX nChn, PluginPriority priority, PluginMutePriority respectMutes) const
 {
-	if (nChn >= playState.Chn.size())		//Check valid channel number
-	{
-		return 0;
-	}
-
 	//Define search source order
 	PLUGINDEX plugin = 0;
-	switch (priority)
+	switch(priority)
 	{
 		case ChannelOnly:
-			plugin = GetChannelPlugin(playState, nChn, respectMutes);
+			plugin = GetChannelPlugin(channel, nChn, respectMutes);
 			break;
 		case InstrumentOnly:
-			plugin  = GetActiveInstrumentPlugin(playState.Chn[nChn], respectMutes);
+			plugin  = GetActiveInstrumentPlugin(channel, respectMutes);
 			break;
 		case PrioritiseInstrument:
-			plugin  = GetActiveInstrumentPlugin(playState.Chn[nChn], respectMutes);
+			plugin  = GetActiveInstrumentPlugin(channel, respectMutes);
 			if(!plugin || plugin > MAX_MIXPLUGINS)
 			{
-				plugin = GetChannelPlugin(playState, nChn, respectMutes);
+				plugin = GetChannelPlugin(channel, nChn, respectMutes);
 			}
 			break;
 		case PrioritiseChannel:
-			plugin  = GetChannelPlugin(playState, nChn, respectMutes);
+			plugin  = GetChannelPlugin(channel, nChn, respectMutes);
 			if(!plugin || plugin > MAX_MIXPLUGINS)
 			{
-				plugin = GetActiveInstrumentPlugin(playState.Chn[nChn], respectMutes);
+				plugin = GetActiveInstrumentPlugin(channel, respectMutes);
 			}
 			break;
 	}
@@ -6811,10 +6554,8 @@ PLUGINDEX CSoundFile::GetBestPlugin(const PlayState &playState, CHANNELINDEX nCh
 }
 
 
-PLUGINDEX CSoundFile::GetChannelPlugin(const PlayState &playState, CHANNELINDEX nChn, PluginMutePriority respectMutes) const
+PLUGINDEX CSoundFile::GetChannelPlugin(const ModChannel &channel, CHANNELINDEX nChn, PluginMutePriority respectMutes) const
 {
-	const ModChannel &channel = playState.Chn[nChn];
-
 	PLUGINDEX plugin;
 	if((respectMutes == RespectMutes && channel.dwFlags[CHN_MUTE | CHN_SYNCMUTE]) || channel.dwFlags[CHN_NOFX])
 	{
