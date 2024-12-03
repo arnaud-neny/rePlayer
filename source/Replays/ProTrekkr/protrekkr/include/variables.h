@@ -116,7 +116,7 @@
 #define GUI_CMD_SWITCH_TRACK_LARGE_STATE 75
 #define GUI_CMD_SWITCH_TRACK_SMALL_STATE 76
 
-#define GUI_CMD_EXPORT_WAV 77
+#define GUI_CMD_EXPORT_WHOLE_WAV 77
 
 #define GUI_CMD_SET_FILES_LIST_PLAY_WAV 78
 
@@ -127,6 +127,9 @@
 
 #define GUI_CMD_REDUCE_TRACK_EFFECTS 82
 #define GUI_CMD_EXPAND_TRACK_EFFECTS 83
+
+#define GUI_CMD_EXPORT_SEL_WAV 84
+#define GUI_CMD_EXPORT_LOOP_WAV 85
 
 #define GUI_CMD_FILELIST_SCROLL 100
 #define GUI_CMD_UPDATE_LOOP_EDITOR_ED 101
@@ -352,6 +355,7 @@ typedef struct
 #if defined(__HAIKU__)
 #include <stdint.h>
 typedef int32_t int32;
+#define int64 int64_t
 #endif
 
 // ------------------------------------------------------
@@ -521,7 +525,7 @@ void Actualize_Track_Ed(char gode);
 void Actualize_Songname(int *newletter, char *nam);
 void Get_Player_Values(void);
 void Check_Loops(void);
-void Skincopy(int xd, int yd, int xs, int ys, int w, int h);
+void Skin_Copy(int xd, int yd, int xs, int ys, int w, int h);
 void Go303(void);
 void knob(int x, int y, unsigned char number);
 void ShowInfo(void);

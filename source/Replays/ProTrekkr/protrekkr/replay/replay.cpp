@@ -1842,9 +1842,12 @@ void PTKEXPORT Ptk_ReleaseDriver(void)
     for(i = 0; i < MAX_TRACKS; i++)
     {
         if(Scope_Dats[i]) free(Scope_Dats[i]);
+        Scope_Dats[i] = NULL;
     }
     if(Scope_Dats_LeftRight[0]) free(Scope_Dats_LeftRight[0]);
+    Scope_Dats_LeftRight[0] = NULL;
     if(Scope_Dats_LeftRight[1]) free(Scope_Dats_LeftRight[1]);
+    Scope_Dats_LeftRight[1] = NULL;
 #endif
 
 }
@@ -2333,6 +2336,41 @@ void Post_Song_Init(void)
 
         oldspawn[i] = 0;
         roldspawn[i] = 0;
+
+#if defined(PTK_TRACK_EQ)
+        EqDat[i].f1p0[0] = 0.0f;
+        EqDat[i].f1p0[1] = 0.0f;
+        
+        EqDat[i].f1p1[0] = 0.0f;
+        EqDat[i].f1p1[1] = 0.0f;
+        
+        EqDat[i].f1p2[0] = 0.0f;
+        EqDat[i].f1p2[1] = 0.0f;
+        
+        EqDat[i].f1p3[0] = 0.0f;
+        EqDat[i].f1p3[1] = 0.0f;
+        
+        EqDat[i].f2p0[0] = 0.0f;
+        EqDat[i].f2p0[1] = 0.0f;
+
+        EqDat[i].f2p1[0] = 0.0f;
+        EqDat[i].f2p1[1] = 0.0f;
+
+        EqDat[i].f2p2[0] = 0.0f;
+        EqDat[i].f2p2[1] = 0.0f;
+        
+        EqDat[i].f2p3[0] = 0.0f;
+        EqDat[i].f2p3[1] = 0.0f;
+
+        EqDat[i].sdm1[0] = 0.0f;
+        EqDat[i].sdm1[1] = 0.0f;
+
+        EqDat[i].sdm2[0] = 0.0f;
+        EqDat[i].sdm2[1] = 0.0f;
+
+        EqDat[i].sdm3[0] = 0.0f;
+        EqDat[i].sdm3[1] = 0.0f;
+#endif
 
 #if defined(PTK_FX_TRANCEGLIDER)
         glidestep[i] = 0;
@@ -6584,8 +6622,8 @@ void Reverb_work(void)
 
     if(compressor)
     {
-        float l_rout = 0;
-        float r_rout = 0;
+        float l_rout = 0.0f;
+        float r_rout = 0.0f;
 
         // Comb filter
         for(i = 0; i < num_echoes; i++)
@@ -6919,7 +6957,6 @@ float FastLog(float i)
 {
 	float x;
 	float y;
-    return i;
 	x = (float) (*(int *) &i);
 	x *= 1.0f / (1 << 23);
 	x = x - 127;
@@ -6940,7 +6977,6 @@ float FastLog(float i)
 {
 	float x;
 	float y;
-    return i;
 	x = (float) (*(int *) &i);
 	x *= 1.0f / (1 << 23);
 	x = x - 127;
