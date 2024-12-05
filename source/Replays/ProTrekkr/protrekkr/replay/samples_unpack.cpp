@@ -88,7 +88,7 @@ WAVEFORMATEX Wave_Format;
 // ------------------------------------------------------
 // Unpack a GSM sample
 #if defined(PTK_GSM)
-void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+void Unpack_GSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     int i;
     int Real_Size;
@@ -132,7 +132,7 @@ void UnpackGSM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 // ------------------------------------------------------
 // Unpack an AT3 sample
 #if defined(PTK_AT3)
-void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
+void Unpack_AT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
 {
     int i;
     int Real_Size;
@@ -194,7 +194,7 @@ void UnpackAT3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRa
 // ------------------------------------------------------
 // Unpack a MP3 sample
 #if defined(PTK_MP3)
-void UnpackMP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
+void Unpack_MP3(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size, int BitRate)
 {
     int i;
     int Real_Size;
@@ -257,7 +257,7 @@ static int stepsizeTable[89] =
 	5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
 	15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 };
-void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+void Unpack_ADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     signed char *inp;   /* Input buffer pointer */
     short *outp;        /* output buffer pointer */
@@ -332,7 +332,7 @@ void UnpackADPCM(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 // ------------------------------------------------------
 // Unpack a Bit 8 sample
 #if defined(PTK_8BIT)
-void Unpack8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
+void Unpack_8Bit(Uint8 *Source, short *Dest, int Src_Size, int Dst_Size)
 {
     int i;
 
