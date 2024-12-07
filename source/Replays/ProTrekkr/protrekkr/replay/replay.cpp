@@ -52,7 +52,7 @@
 // ------------------------------------------------------
 // Variables
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-    extern SDL_sem *thread_sem;
+    extern SDL_sem *thread_sema;
 #endif
 
 int SamplesPerTick;
@@ -954,12 +954,12 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 {
 #if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__) || defined(__REPLAYER__)
     float *pSamples_flt = (float *) Buffer;
-#else
-    short *pSamples = (short *) Buffer;
 #endif
+
+    short *pSamples = (short *) Buffer;
     int i;
 
-#if !defined(__STAND_ALONE__) || defined(__REPLAYER__)
+#if !defined(__STAND_ALONE__)
     float clamp_left_value;
     float clamp_right_value;
 #endif
@@ -1026,10 +1026,7 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #endif
 #endif
 
-#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__)
-            *pSamples_flt++ = left_float;
-            *pSamples_flt++ = right_float;
-#elif defined (__REPLAYER__)
+#if defined(__MACOSX_PPC__) || defined(__MACOSX_X86__) || defined (__REPLAYER__)
             *pSamples_flt++ = left_float;
             *pSamples_flt++ = right_float;
 #else
@@ -1699,7 +1696,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         }
 #endif
 
-        // Tracks compressors.
+        // Tracks compressors
         Mod_Dat_Read(&Comp_Flag, sizeof(char));
 #if defined(PTK_LIMITER_TRACKS)
         if(Comp_Flag)
@@ -3297,7 +3294,8 @@ ByPass_Wav:
                                           Player_LW[c][i],
                                           Player_NS[c][i],
                                           Player_LE[c][i],
-                                          Player_LS[c][i]);
+                                          Player_LS[c][i]
+                                         );
 
                     if(Player_WL[c][i])
                     {
@@ -4123,7 +4121,7 @@ void Play_Instrument(int channel, int sub_channel)
         if(associated_sample != 255)
         {
 #if defined(PTK_INSTRUMENTS)
-            for(int revo = 0; revo < 16; revo++)
+            for(int revo = 0; revo < MAX_INSTRS_SPLITS; revo++)
             {
                 if(inote >= Basenote[associated_sample][revo] &&
                    SampleType[associated_sample][revo] != 0)
@@ -4368,22 +4366,43 @@ void Play_Instrument(int channel, int sub_channel)
                     }
                     Player_LS[channel][sub_channel] = Sel_Start;
                     Player_LE[channel][sub_channel] = Sel_End;
-                    if(!no_retrig_note) sp_Position[channel][sub_channel].half.first = Sel_Start;
+                    if(!no_retrig_note)
+                    {
+                        sp_Position[channel][sub_channel].half.first = Sel_Start;
+                    }
                     Player_NS[channel][sub_channel] = Sel_End;
-                    if(!glide) if(!no_retrig_note) sp_Position[channel][sub_channel].half.first += offset << 8;
+                    if(!glide)
+                    {
+                        if(!no_retrig_note)
+                        {
+                            sp_Position[channel][sub_channel].half.first += offset << 8;
+                        }
+                    }
                 }
                 else
                 {
                     Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
                     Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
                     Player_NS[channel][sub_channel] = Sample_Length[associated_sample][split];
-                    if(!glide) if(!no_retrig_note) sp_Position[channel][sub_channel].half.first = offset << 8;
+                    if(!glide)
+                    {
+                        if(!no_retrig_note)
+                        {
+                            sp_Position[channel][sub_channel].half.first = offset << 8;
+                        }
+                    }
                 }
 #else
                 Player_LS[channel][sub_channel] = LoopStart[associated_sample][split];
                 Player_LE[channel][sub_channel] = LoopEnd[associated_sample][split];
                 Player_NS[channel][sub_channel] = Sample_Length[associated_sample][split];
-                if(!glide) if(!no_retrig_note) sp_Position[channel][sub_channel].half.first = offset << 8;
+                if(!glide)
+                {
+                    if(!no_retrig_note)
+                    {
+                        sp_Position[channel][sub_channel].half.first = offset << 8;
+                    }
+                }
 #endif
                 Player_LL[channel][sub_channel] = Player_LE[channel][sub_channel] - Player_LS[channel][sub_channel];
 
@@ -4404,7 +4423,7 @@ void Play_Instrument(int channel, int sub_channel)
                 Player_SC[channel][sub_channel] = Sample_Channels[associated_sample][split];
 
                 // I know this isn't exactly correct but using a sub channel for this
-                // would mean that we'd have to maintain 1 filters state / sub channel which would be insane.
+                // would mean that we'd have to maintain 1 filters state per sub channel which would be insane.
                 Player_FD[channel] = FDecay[associated_sample][split];
 
                 Player_WL[channel][sub_channel] = RawSamples[associated_sample][0][split];
@@ -4421,7 +4440,6 @@ void Play_Instrument(int channel, int sub_channel)
 #endif // PTK_INSTRUMENTS
 
             {
-
                 Player_WL[channel][sub_channel] = 0;
                 Player_WR[channel][sub_channel] = 0;
                 Player_Ampli[channel][sub_channel] = 1.0f;
@@ -4499,7 +4517,10 @@ void Play_Instrument(int channel, int sub_channel)
 
                 int Max_Loop = Player_NS[channel][sub_channel];
                 // No loop: go to the end of the sample
-                if((int) Player_LE[channel][sub_channel] < Max_Loop) Max_Loop = Player_LE[channel][sub_channel];
+                if((int) Player_LE[channel][sub_channel] < Max_Loop)
+                {
+                    Max_Loop = Player_LE[channel][sub_channel];
+                }
                 sp_Position[channel][sub_channel].half.first = Max_Loop;
 #if defined(PTK_SYNTH)
                 if(Synthesizer[channel][sub_channel].Data.OSC_1_WAVEFORM == WAVEFORM_WAV)
@@ -6398,20 +6419,32 @@ void Kill_Instrument(int inst_nbr, int all_splits)
 #endif
     for(int z = first_split; z < last_split; z++)
     {
-        if(RawSamples[inst_nbr][0][z]) free(RawSamples[inst_nbr][0][z]);
+        if(RawSamples[inst_nbr][0][z])
+        {
+            free(RawSamples[inst_nbr][0][z]);
+        }
         RawSamples[inst_nbr][0][z] = NULL;
         if(Sample_Channels[inst_nbr][z] == 2)
         {
-            if(RawSamples[inst_nbr][1][z]) free(RawSamples[inst_nbr][1][z]);
+            if(RawSamples[inst_nbr][1][z])
+            {
+                free(RawSamples[inst_nbr][1][z]);
+            }
             RawSamples[inst_nbr][1][z] = NULL;
         }
 
 #if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-        if(RawSamples_Swap[inst_nbr][0][z]) free(RawSamples_Swap[inst_nbr][0][z]);
+        if(RawSamples_Swap[inst_nbr][0][z])
+        {
+            free(RawSamples_Swap[inst_nbr][0][z]);
+        }
         RawSamples_Swap[inst_nbr][0][z] = NULL;
         if(Sample_Channels[inst_nbr][z] == 2)
         {
-            if(RawSamples_Swap[inst_nbr][1][z]) free(RawSamples_Swap[inst_nbr][1][z]);
+            if(RawSamples_Swap[inst_nbr][1][z])
+            {
+                free(RawSamples_Swap[inst_nbr][1][z]);
+            }
             RawSamples_Swap[inst_nbr][1][z] = NULL;
         }
 #endif
