@@ -584,9 +584,9 @@ int PosJump = -1;
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-    char Songtracks = 6;
+    char Song_Tracks = 6;
 #else
-    char Songtracks;
+    char Song_Tracks;
 #endif
 
 char Channels_Polyphony[MAX_TRACKS];
@@ -855,6 +855,8 @@ int delay_time;
     extern int Chan_Midi_Prg[MAX_TRACKS];
     float *Scope_Dats[MAX_TRACKS];
     float *Scope_Dats_LeftRight[2];
+    float *VuMeters_Dats_L[MAX_TRACKS];
+    float *VuMeters_Dats_R[MAX_TRACKS];
     int pos_scope;
     int pos_scope_latency;
     extern signed char c_midiin;
@@ -963,6 +965,13 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
     float clamp_left_value;
     float clamp_right_value;
 #endif
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    if(thread_sema)
+    {
+        SDL_SemWait(thread_sema);
+    }
+#endif
     Uint32 numSamples = Len;
 
 #if !defined(__STAND_ALONE__)
@@ -1069,7 +1078,15 @@ Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
 #if !defined(__STAND_ALONE__)
     } //RawRender
 #endif
+
+#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    if(thread_sema)
+    {
+        SDL_SemPost(thread_sema);
+    }
+#endif
     return Len - numSamples;
+
 }
 
 // ------------------------------------------------------
@@ -1212,7 +1229,7 @@ int STDCALL Ptk_InitDriver(void)
     }
 
 #if !defined(__STAND_ALONE__)
-    if(!Init_Scopes_Buffers()) return(FALSE);
+    if(!Init_Scopes_VuMeters_Buffers()) return(FALSE);
 #endif
 
     AUDIO_Play();
@@ -1364,7 +1381,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Pre_Song_Init();
 
         Mod_Dat_Read(&nPatterns, sizeof(char));
-        Mod_Dat_Read(&Songtracks, sizeof(char));
+        Mod_Dat_Read(&Song_Tracks, sizeof(char));
         Mod_Dat_Read(&Song_Length, sizeof(char));
 
         Mod_Dat_Read(&Use_Cubic, sizeof(char));
@@ -1403,19 +1420,19 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         if(!RawPatterns) return(FALSE);
 
         // Multi notes
-        Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Songtracks);
+        Mod_Dat_Read(Channels_MultiNotes, sizeof(char) * Song_Tracks);
 
         // Multi fx
-        Mod_Dat_Read(Channels_Effects, sizeof(char) * Songtracks);
+        Mod_Dat_Read(Channels_Effects, sizeof(char) * Song_Tracks);
 
         // Individual volumes
-        Mod_Dat_Read(Track_Volume, sizeof(float) * Songtracks);
+        Mod_Dat_Read(Track_Volume, sizeof(float) * Song_Tracks);
 
         // Surround effect
-        Mod_Dat_Read(Track_Surround, sizeof(char) * Songtracks);
+        Mod_Dat_Read(Track_Surround, sizeof(char) * Song_Tracks);
 
         // Eq parameters
-        for(i = 0; i < Songtracks; i++)
+        for(i = 0; i < Song_Tracks; i++)
         {
             Mod_Dat_Read(&EqDat[i].lg, sizeof(float));
             Mod_Dat_Read(&EqDat[i].mg, sizeof(float));
@@ -1428,7 +1445,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
             TmpPatterns_Rows = TmpPatterns + (pwrite * PATTERN_LEN);
             for(i = 0; i < PATTERN_BYTES; i++)
             {   // Bytes / track
-                for(k = 0; k < Songtracks; k++)
+                for(k = 0; k < Song_Tracks; k++)
                 {   // Tracks
                     TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
                     for(j = 0; j < patternLines[pwrite]; j++)
@@ -1655,7 +1672,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         Mod_Dat_Read(&compressor, sizeof(char));
 
         // Reading Track Properties
-        for(twrite = 0; twrite < Songtracks; twrite++)
+        for(twrite = 0; twrite < Song_Tracks; twrite++)
         {
             Mod_Dat_Read(&TCut[twrite], sizeof(float));
             Mod_Dat_Read(&ICut[twrite], sizeof(float));
@@ -1701,9 +1718,9 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #if defined(PTK_LIMITER_TRACKS)
         if(Comp_Flag)
         {
-            Mod_Dat_Read(&mas_threshold_Track, sizeof(float) * Songtracks);
-            Mod_Dat_Read(&mas_ratio_Track, sizeof(float) * Songtracks);
-            Mod_Dat_Read(&Compress_Track, sizeof(char) * Songtracks);
+            Mod_Dat_Read(&mas_threshold_Track, sizeof(float) * Song_Tracks);
+            Mod_Dat_Read(&mas_ratio_Track, sizeof(float) * Song_Tracks);
+            Mod_Dat_Read(&Compress_Track, sizeof(char) * Song_Tracks);
         }
 #endif
 
@@ -1735,18 +1752,18 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
         // Reading track part sequence
         for(int tps_pos = 0; tps_pos < Song_Length; tps_pos++)
         {
-            for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
+            for(tps_trk = 0; tps_trk < Song_Tracks; tps_trk++)
             {
                 Mod_Dat_Read(&Chan_Active_State[tps_pos][tps_trk], sizeof(char));
             }
         }
 
-        for(int spl = 0; spl < Songtracks; spl++)
+        for(int spl = 0; spl < Song_Tracks; spl++)
         {
             CCoef[spl] = float((float) CSend[spl] / 127.0f);
         }
 
-        for(twrite = 0; twrite < Songtracks; twrite++)
+        for(twrite = 0; twrite < Song_Tracks; twrite++)
         {
             Mod_Dat_Read(&LFO_ON[twrite], sizeof(char));
 
@@ -1760,7 +1777,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 #endif
         }
 
-        for(twrite = 0; twrite < Songtracks; twrite++)
+        for(twrite = 0; twrite < Song_Tracks; twrite++)
         {
             Mod_Dat_Read(&FLANGER_ON[twrite], sizeof(char));
 
@@ -1781,7 +1798,7 @@ int PTKEXPORT Ptk_InitModule(Uint8 *Module, int start_position)
 
         }
 
-        for(tps_trk = 0; tps_trk < Songtracks; tps_trk++)
+        for(tps_trk = 0; tps_trk < Song_Tracks; tps_trk++)
         {
             Mod_Dat_Read(&Disclap[tps_trk], sizeof(char));
         }
@@ -1842,12 +1859,31 @@ void PTKEXPORT Ptk_ReleaseDriver(void)
 #if !defined(__STAND_ALONE__)
     for(i = 0; i < MAX_TRACKS; i++)
     {
-        if(Scope_Dats[i]) free(Scope_Dats[i]);
+        if(Scope_Dats[i])
+        {
+            free(Scope_Dats[i]);
+        }
         Scope_Dats[i] = NULL;
+        if(VuMeters_Dats_L[i])
+        {
+            free(VuMeters_Dats_L[i]);
+        }
+        VuMeters_Dats_L[i] = NULL;
+        if(VuMeters_Dats_R[i])
+        {
+            free(VuMeters_Dats_R[i]);
+        }
+        VuMeters_Dats_R[i] = NULL;
     }
-    if(Scope_Dats_LeftRight[0]) free(Scope_Dats_LeftRight[0]);
+    if(Scope_Dats_LeftRight[0])
+    {
+        free(Scope_Dats_LeftRight[0]);
+    }
     Scope_Dats_LeftRight[0] = NULL;
-    if(Scope_Dats_LeftRight[1]) free(Scope_Dats_LeftRight[1]);
+    if(Scope_Dats_LeftRight[1])
+    {
+        free(Scope_Dats_LeftRight[1]);
+    }
     Scope_Dats_LeftRight[1] = NULL;
 #endif
 
@@ -2618,7 +2654,7 @@ void Sp_Player(void)
             fired_303_1 = FALSE;
             fired_303_2 = FALSE;
 
-            for(ct = 0; ct < Songtracks; ct++)
+            for(ct = 0; ct < Song_Tracks; ct++)
             {
                 int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
 
@@ -2679,7 +2715,7 @@ void Sp_Player(void)
 
 #endif
 
-            for(ct = 0; ct < Songtracks; ct++)
+            for(ct = 0; ct < Song_Tracks; ct++)
             {
                 int efactor = Get_Pattern_Offset(pSequence[Song_Position], ct, Pattern_Line);
                 
@@ -3189,7 +3225,7 @@ void Sp_Player(void)
     // -------------------------------------------
     // Process the data, this is the huge loop
     // -------------------------------------------
-    for(c = 0; c < Songtracks; c++)
+    for(c = 0; c < Song_Tracks; c++)
     {
 
 #if defined(PTK_FX_VIBRATO)
@@ -3929,14 +3965,18 @@ ByPass_Wav:
 #if !defined(__STAND_ALONE__)
         if(!Chan_Mute_State[c])
         {
-            Scope_Dats[c][pos_scope] = (All_Signal_L + All_Signal_R) * 0.15f;
+            Scope_Dats[c][pos_scope] = ((All_Signal_L + All_Signal_R) * 0.2f) * mas_vol;
+            VuMeters_Dats_L[c][pos_scope] = All_Signal_L * mas_vol;
+            VuMeters_Dats_R[c][pos_scope] = All_Signal_R * mas_vol;
         }
         else
         {
             Scope_Dats[c][pos_scope] = 0.0f;
+            VuMeters_Dats_L[c][pos_scope] = 0.0f;
+            VuMeters_Dats_R[c][pos_scope] = 0.0f;
         }
 #endif
-    } // Songtracks
+    } // Song_Tracks
 }
 
 // ------------------------------------------------------
@@ -4587,7 +4627,7 @@ void Do_Effects_Tick_0(void)
     int pltr_eff_row[MAX_FX];
     int pltr_dat_row[MAX_FX];
 
-    for(int trackef = 0; trackef < Songtracks; trackef++)
+    for(int trackef = 0; trackef < Song_Tracks; trackef++)
     {
         int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
 
@@ -4855,7 +4895,7 @@ void Do_Effects_Ticks_X(void)
     int64 pltr_dat_row[MAX_FX];
 #endif
 
-    for(int trackef = 0; trackef < Songtracks; trackef++)
+    for(int trackef = 0; trackef < Song_Tracks; trackef++)
     {
         int tefactor = Get_Pattern_Offset(pSequence[Song_Position], trackef, Pattern_Line);
 
@@ -6482,22 +6522,28 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->osc_2_waveform = WAVEFORM_PULSE;
     TSP->osc_combine = COMBINE_ADD;
     TSP->osc_1_pw = 256;
+
     TSP->osc_2_pw = 256;
     TSP->osc_2_detune = 65;
     TSP->osc_2_finetune = 0;
+    
     TSP->vcf_cutoff = 64;
     TSP->vcf_resonance = 64;
     TSP->vcf_type = 0;
+    
     TSP->env_1_attack = 0;
     TSP->env_1_decay = 2560;
     TSP->env_1_sustain = 20;
     TSP->env_1_release = 16384;
+    
     TSP->env_2_attack = 0;
     TSP->env_2_decay = 2560;
     TSP->env_2_sustain = 20;
     TSP->env_2_release = 16384;
+    
     TSP->lfo_1_period = 16;
     TSP->lfo_2_period = 16;
+    
     TSP->lfo_1_osc_1_pw = 64;
     TSP->lfo_1_osc_2_pw = 64;
     TSP->lfo_1_osc_1_pitch = 64;
@@ -6506,6 +6552,8 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->lfo_1_osc_2_volume = 64;   
     TSP->lfo_1_vcf_cutoff = 64;
     TSP->lfo_1_vcf_resonance = 64; 
+    TSP->lfo_1_disto = 64; 
+
     TSP->lfo_2_osc_1_pw = 64;
     TSP->lfo_2_osc_2_pw = 64;
     TSP->lfo_2_osc_1_pitch = 64;
@@ -6514,6 +6562,8 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->lfo_2_osc_2_volume = 64;   
     TSP->lfo_2_vcf_cutoff = 64;
     TSP->lfo_2_vcf_resonance = 64; 
+    TSP->lfo_2_disto = 64; 
+
     TSP->env_1_osc_1_pw = 64;
     TSP->env_1_osc_2_pw = 64;
     TSP->env_1_osc_1_pitch = 64;
@@ -6522,6 +6572,8 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->env_1_osc_2_volume = 127;   
     TSP->env_1_vcf_cutoff = 64;
     TSP->env_1_vcf_resonance = 64; 
+    TSP->env_1_disto = 64; 
+    
     TSP->env_2_osc_1_pw = 64;
     TSP->env_2_osc_2_pw = 64;
     TSP->env_2_osc_1_pitch = 64;
@@ -6530,11 +6582,13 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->env_2_osc_2_volume = 127;
     TSP->env_2_vcf_cutoff = 64;
     TSP->env_2_vcf_resonance = 64; 
+    TSP->env_2_disto = 64; 
+    
     TSP->osc_3_volume = 128;
     TSP->osc_3_switch = FALSE;
     TSP->ptc_glide = 0;
     TSP->glb_volume = 128;
-    TSP->disto = 0;
+    TSP->disto = 64;
     TSP->lfo_1_attack = 2560;
     TSP->lfo_1_decay = 2560;
     TSP->lfo_1_sustain = 16;

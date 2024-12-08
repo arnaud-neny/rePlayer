@@ -71,6 +71,7 @@ extern Synth_Parameters PARASynth[128];
 extern int Beveled;
 char AutoBackup;
 char AutoReload;
+char SplashScreen = TRUE;
 
 int Mod_Length;
 int Mod_Simulate;
@@ -171,6 +172,7 @@ int Load_Ptk(ReplayerFile replayerFile)
     int Tb303_Scaling = FALSE;
     int Track_Srnd = FALSE;
     int Long_Midi_Prg = FALSE;
+    int Var_Disto = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -218,6 +220,8 @@ int Load_Ptk(ReplayerFile replayerFile)
 
         switch(extension[7])
         {
+            case 'R':
+                Var_Disto = TRUE;
             case 'Q':
                 Long_Midi_Prg = TRUE;
             case 'P':
@@ -331,7 +335,7 @@ Read_Mod_File:
         Read_Mod_Data(replayerPtkName, sizeof(char), 20, in);
         Read_Mod_Data(&nPatterns, sizeof(char), 1, in);
 
-        Songtracks = MAX_TRACKS;
+        Song_Tracks = MAX_TRACKS;
         Read_Mod_Data(&Song_Length, sizeof(char), 1, in);
 
         Use_Cubic = CUBIC_INT;
@@ -401,7 +405,7 @@ Read_Mod_File:
             for(j = 0; j < Rows_To_Read; j++)
             {
                 // Bytes / track
-                for(k = 0; k < Songtracks; k++)
+                for(k = 0; k < Song_Tracks; k++)
                 {
                     // Tracks
                     TmpPatterns_Tracks = TmpPatterns_Rows + (k * PATTERN_BYTES);
@@ -473,7 +477,7 @@ Read_Mod_File:
 
             Read_Mod_Data(&Synthprg[swrite], sizeof(char), 1, in);
 
-            PARASynth[swrite].disto = 0;
+            PARASynth[swrite].disto = 64;
 
             PARASynth[swrite].lfo_1_attack = 0;
             PARASynth[swrite].lfo_1_decay = 0;
@@ -487,7 +491,7 @@ Read_Mod_File:
 
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
                               new_disto, New_adsr, Portable, Env_Modulation,
-                              New_Env, Ntk_Beta, Combine);
+                              New_Env, Ntk_Beta, Combine, Var_Disto);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo_1_period > 128) PARASynth[swrite].lfo_1_period = 128;
@@ -646,7 +650,7 @@ Read_Mod_File:
             }
         }
 
-        for(int spl = 0; spl < Songtracks; spl++)
+        for(int spl = 0; spl < Song_Tracks; spl++)
         {
             CCoef[spl] = float((float) CSend[spl] / 127.0f);
         }
@@ -685,7 +689,7 @@ Read_Mod_File:
             Read_Mod_Data_Swap(&Chan_Mute_State[tps_trk], sizeof(int), 1, in);
         }
 
-        Read_Mod_Data(&Songtracks, sizeof(char), 1, in);
+        Read_Mod_Data(&Song_Tracks, sizeof(char), 1, in);
 
         for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
         {
@@ -1203,7 +1207,7 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 cur_pattern_col = RawPatterns + (j * PATTERN_LEN);
                 found_dat_in_patt = FALSE;
                 // Next column
-                for(i = 0; i < Songtracks; i++)
+                for(i = 0; i < Song_Tracks; i++)
                 {
                     cur_pattern = cur_pattern_col + (i * PATTERN_BYTES);
                     // Next pattern
@@ -1279,7 +1283,7 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
                 Write_Mod_Data_Swap(&EqDat[i].hg, sizeof(float), 1, in);
             }
             // Clean the unused patterns garbage (doesn't seem to do much)
-            for(i = Songtracks; i < MAX_TRACKS; i++)
+            for(i = Song_Tracks; i < MAX_TRACKS; i++)
             {
                 // Next column
                 cur_pattern_col = RawPatterns + (i * PATTERN_BYTES);
@@ -1453,7 +1457,7 @@ int Save_Ptk(char *FileName, int NewFormat, int Simulate, Uint8 *Memory)
             {
                 Write_Mod_Data_Swap(&Chan_Mute_State[tps_trk], sizeof(int), 1, in);
             }
-            Write_Mod_Data(&Songtracks, sizeof(char), 1, in);
+            Write_Mod_Data(&Song_Tracks, sizeof(char), 1, in);
 
             for(tps_trk = 0; tps_trk < MAX_TRACKS; tps_trk++)
             {
@@ -1681,7 +1685,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKQ");
+        sprintf(extension, "PROTREKR");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
@@ -1914,7 +1918,7 @@ int Calc_Length(void)
             Cur_Patt = RawPatterns + (pSequence[i] * PATTERN_LEN) + (pos_patt * PATTERN_ROW_LEN);
             if(!PosTicks)
             {
-                for(k = 0; k < Songtracks; k++)
+                for(k = 0; k < Song_Tracks; k++)
                 {
                     // Check if there's a pattern loop command
                     // or a change in the tempo/ticks

@@ -131,7 +131,7 @@ namespace rePlayer
     {
         std::string info;
         char buf[32];
-        sprintf(buf, "%d channels\n", int(Songtracks));
+        sprintf(buf, "%d channels\n", int(Song_Tracks));
         info = buf;
         info += m_stream->Read().Items<const char>();
         info += "\n" TITLE " " VER_VER "." VER_REV "." VER_REVSMALL;
