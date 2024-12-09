@@ -1072,7 +1072,8 @@ std::vector<GetLengthType> CSoundFile::GetLength(enmGetLengthResetMode adjustMod
 		const uint32 rowDuration = tickDuration * numTicks;
 		memory.elapsedTime += static_cast<double>(rowDuration) / static_cast<double>(m_MixerSettings.gdwMixingFreq);
 		playState.m_lTotalSampleCount += rowDuration;
-		playState.m_ppqPosFract += 1.0 / playState.m_nCurrentRowsPerBeat;
+		const ROWINDEX rowsPerBeat = playState.m_nCurrentRowsPerBeat ? playState.m_nCurrentRowsPerBeat : DEFAULT_ROWS_PER_BEAT;
+		playState.m_ppqPosFract += 1.0 / rowsPerBeat;
 
 		if(adjustSamplePos)
 		{
@@ -3219,8 +3220,7 @@ bool CSoundFile::ProcessEffects()
 						// no memory here.
 						volcmd = VOLCMD_NONE;
 					}
-
-				} else if(!m_playBehaviour[kITVolColMemory])
+				} else if(!m_playBehaviour[kITVolColMemory] && volcmd != VOLCMD_PLAYCONTROL)
 				{
 					// IT Compatibility: Effects in the volume column don't have an unified memory.
 					// Test case: VolColMemory.it
@@ -6480,6 +6480,8 @@ uint32 CSoundFile::GetFreqFromPeriod(uint32 period, uint32 c5speed, int32 nPerio
 				octave = ((14 - div) & 0x1F);
 			} else
 			{
+				if(period > 29 * 768)
+					return 0;
 				octave = (period / 768) + 2;
 			}
 			return (XMLinearTable[period % 768] << (FREQ_FRACBITS + 2)) >> octave;

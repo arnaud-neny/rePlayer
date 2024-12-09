@@ -850,5 +850,8 @@
     <ClCompile Include="soundlib\MIDIMacroParser.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
+    <ClCompile Include="soundlib\Load_tcb.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
