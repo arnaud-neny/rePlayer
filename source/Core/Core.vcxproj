@@ -73,6 +73,7 @@
   <ItemGroup>
     <None Include="Blob\Blob.inl.h" />
     <None Include="Containers\SmartPtr.inl.h" />
+    <None Include="ImGui\imgui.diff" />
     <None Include="ImGui\imgui.natstepfilter" />
     <None Include="Thread\SpinLock.inl.h" />
   </ItemGroup>

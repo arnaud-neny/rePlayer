@@ -198,6 +198,9 @@
     <None Include="ImGui\imgui.natstepfilter">
       <Filter>Source Files\ImGui</Filter>
     </None>
+    <None Include="ImGui\imgui.diff">
+      <Filter>Source Files\ImGui</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Log.cpp">
