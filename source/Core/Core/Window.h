@@ -57,6 +57,9 @@ namespace core
         using OnLoadedCallback = void (T::*)(void* data, const char* name);
         using OnLoadedCallbackStatic = void (*)(uintptr_t userData, void* data, const char* name);
 
+        using OnLoadCallback = bool (*)(void* data, const char* line);
+        using OnSaveCallback = void (*)(void* data, ImGuiTextBuffer* buf);
+
     public:
         Window(std::string&& name, ImGuiWindowFlags flags = 0, bool isMaster = false);
         virtual ~Window() {}
@@ -81,6 +84,8 @@ namespace core
 
         template <typename T>
         void RegisterSerializedData(T& data, const char* name, OnLoadedCallbackStatic callback, uintptr_t userData);
+
+        void RegisterSerializedCustomData(void* data, OnLoadCallback onLoadCallback, OnSaveCallback onSaveCallback);
 
     protected:
         // always called at the beginning of the frame, before all windows updates and displays
@@ -118,7 +123,11 @@ namespace core
 
         struct SerializedData
         {
-            const char* name;
+            union
+            {
+                const char* name;
+                OnSaveCallback onSaveCallback;
+            };
             void* addr;
             uint32_t size;
             enum Type : uint16_t
@@ -132,7 +141,8 @@ namespace core
                 kUint32_t,
                 kBool,
                 kString,
-                kChars
+                kChars,
+                kCustom
             } type;
             uint16_t isStaticCallback : 1 = 0;
             uintptr_t userData = 0;
@@ -140,6 +150,7 @@ namespace core
             {
                 OnLoadedCallback<Window> onLoadedCallback = nullptr;
                 OnLoadedCallbackStatic onLoadedStaticCallback;
+                OnLoadCallback onLoadCallback;
             };
         };
         Array<SerializedData> m_serializedData;

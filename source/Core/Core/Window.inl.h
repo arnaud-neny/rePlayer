@@ -92,5 +92,15 @@ namespace core
         m_serializedData.Last().userData = userData;
         m_serializedData.Last().onLoadedStaticCallback = callback;
     }
+
+    inline void Window::RegisterSerializedCustomData(void* data, OnLoadCallback onLoadCallback, OnSaveCallback onSaveCallback)
+    {
+        m_serializedData.Add({
+            .onSaveCallback = onSaveCallback,
+            .addr = data,
+            .type = SerializedData::kCustom,
+            .onLoadCallback = onLoadCallback
+        });
+    }
 }
 //namespace core

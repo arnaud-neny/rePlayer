@@ -189,6 +189,9 @@ namespace core
                     isLoaded = true;
                 }
                 break;
+            case SerializedData::kCustom:
+                isLoaded = data.onLoadCallback(data.addr, line);
+                break;
             }
             if (isLoaded)
             {
@@ -241,6 +244,9 @@ namespace core
                 break;
             case SerializedData::kChars:
                 buf->appendf((name + "=%s\n").c_str(), reinterpret_cast<const char*>(data.addr));
+                break;
+            case SerializedData::kCustom:
+                data.onSaveCallback(data.addr, buf);
                 break;
             }
         }
