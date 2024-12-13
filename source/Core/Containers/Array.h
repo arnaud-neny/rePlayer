@@ -95,6 +95,7 @@ namespace core
         Array& Clear();
         Array& Resize(uint32_t numItems);
         Array& Reserve(uint32_t numOtherItems);
+        Array& Refit();
 
         // Stl
         ItemType* begin();

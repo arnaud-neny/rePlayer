@@ -935,6 +935,39 @@ namespace core
     }
 
     template <typename ItemType>
+    inline Array<ItemType>& Array<ItemType>::Refit()
+    {
+        auto numItems = m_numItems;
+        if (numItems < m_maxItems)
+        {
+            auto* items = m_items;
+            m_maxItems = numItems;
+            if (numItems > 0)
+            {
+                auto* newItems = m_items = Alloc<ItemType>(numItems * sizeof(ItemType));
+                if constexpr (std::is_trivially_copyable<ItemType>::value)
+                {
+                    memcpy(newItems, items, numItems * sizeof(ItemType));
+                }
+                else
+                {
+                    auto oldItems = items;
+                    while (numItems--)
+                    {
+                        new (newItems++) ItemType(std::move(*oldItems));
+                        oldItems->~ItemType();
+                        oldItems++;
+                    }
+                }
+            }
+            else
+                m_items = nullptr;
+            Free(items);
+        }
+        return *this;
+    }
+
+    template <typename ItemType>
     inline ItemType* Array<ItemType>::begin()
     {
         return m_items;
