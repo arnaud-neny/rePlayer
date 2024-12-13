@@ -1,13 +1,14 @@
 // Core
-#include <ImGui.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
+#include <ImGui.h>
 #include <ImGui/imgui_internal.h>
 #include <Thread/Thread.h>
 
 // rePlayer
 #include <Database/Database.h>
 #include <Database/SongEditor.h>
+#include <Database/Types/Countries.h>
 #include <Deck/Deck.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Export.h>
@@ -26,16 +27,66 @@ namespace rePlayer
         return id == otherId;
     }
 
+    inline constexpr DatabaseSongsUI::FilterFlag operator|(DatabaseSongsUI::FilterFlag a, DatabaseSongsUI::FilterFlag b)
+    {
+        a = DatabaseSongsUI::FilterFlag(DatabaseSongsUI::FilterFlagType(a) | DatabaseSongsUI::FilterFlagType(b));
+        return a;
+    }
+
+    inline constexpr DatabaseSongsUI::FilterFlag& operator^=(DatabaseSongsUI::FilterFlag& a, DatabaseSongsUI::FilterFlagType b)
+    {
+        a = DatabaseSongsUI::FilterFlag(DatabaseSongsUI::FilterFlagType(a) ^ b);
+        return a;
+    }
+
+    inline constexpr bool operator&&(DatabaseSongsUI::FilterFlag a, DatabaseSongsUI::FilterFlag b)
+    {
+        return DatabaseSongsUI::FilterFlagType(a) & DatabaseSongsUI::FilterFlagType(b);
+    }
+
     DatabaseSongsUI::DatabaseSongsUI(DatabaseID databaseId, Window& owner)
         : m_db(Core::GetDatabase(databaseId))
         , m_owner(owner)
         , m_databaseId(databaseId)
-        , m_songFilters{ new ImGuiTextFilter(), new ImGuiTextFilter() }
     {
         m_db.Register(this);
-        owner.RegisterSerializedData(m_filterMode, "SongsFilterMode");
-        owner.RegisterSerializedData(m_songFilters[0]->InputBuf, "SongsFilter", &OnSongFilterLoaded, uintptr_t(m_songFilters[0]));
-        owner.RegisterSerializedData(m_songFilters[1]->InputBuf, "SongsFilter2", &OnSongFilterLoaded, uintptr_t(m_songFilters[1]));
+        m_filters.Add({ .flags = FilterFlag::kSongTitle | FilterFlag::kArtistHandle, .id = 0, .ui = new ImGuiTextFilter() });
+        owner.RegisterSerializedCustomData(&m_filters, [](void* data, const char* line)
+        {
+            auto& filters = *reinterpret_cast<Array<Filter>*>(data);
+            uint32_t numFilters;
+            if (sscanf_s(line, "SongsFilterCount=%u", &numFilters) == 1)
+            {
+                filters.Resize(numFilters);
+                for (uint32_t i = 1; i < numFilters; i++)
+                    filters[i] = { .flags = FilterFlag::kSongTitle | FilterFlag::kArtistHandle, .id = i, .ui = new ImGuiTextFilter() };
+                return true;
+            }
+            else if (strstr(line, "SongsFilter") == line)
+            {
+                uint32_t filterIndex;
+                uint32_t flags;
+                if (sscanf_s(line, "SongsFilter%u=%u", &filterIndex, &flags) == 2)
+                {
+                    if (auto* c = strstr(line, "/"))
+                    {
+                        filters[filterIndex].flags = FilterFlag(flags);
+                        strcpy_s(filters[filterIndex].ui->InputBuf, c + 1);
+                        filters[filterIndex].ui->Build();
+                        return true;
+                    }
+                }
+            }
+            return false;
+
+        }, [](void* data, ImGuiTextBuffer* buf)
+        {
+            auto& filters = *reinterpret_cast<Array<Filter>*>(data);
+            auto numItems = filters.NumItems();
+            buf->appendf("SongsFilterCount=%u\n", numItems);
+            for (uint32_t i = 0; i < numItems; i++)
+                buf->appendf("SongsFilter%u=%u/%s\n", i, FilterFlagType(filters[i].flags), filters[i].ui->InputBuf);
+        });
     }
 
     DatabaseSongsUI::~DatabaseSongsUI()
@@ -47,8 +98,8 @@ namespace rePlayer
                 thread::Sleep(1);
             delete m_export;
         }
-        delete m_songFilters[0];
-        delete m_songFilters[1];
+        for (auto& filter : m_filters)
+            delete filter.ui;
     }
 
     void DatabaseSongsUI::TrackSubsong(SubsongID subsongId)
@@ -98,182 +149,106 @@ namespace rePlayer
 
     void DatabaseSongsUI::FilteringUI(bool& isDirty)
     {
-        if (ImGui::BeginTable("Menu", 2, ImGuiTableFlags_NoSavedSettings))
+        FilterBarsUI(isDirty);
+
+        if (isDirty)
         {
-            ImGui::TableSetupColumn("Mode", ImGuiTableColumnFlags_WidthFixed, 0.0f, 0);
-            ImGui::TableSetupColumn("Filter", ImGuiTableColumnFlags_WidthStretch, 0.0f, 1);
-            ImGui::TableNextColumn();
-
-            if (ImGui::Button("Tags"))
-                ImGui::OpenPopup("FilterTags");
-            if (ImGui::BeginPopup("FilterTags"))
+            // prepare selection
+            m_numSelectedEntries = 0;
+            auto oldEntries = std::move(m_entries);
+            for (int64_t oldEntryIndex = 0, numOldEntries = oldEntries.NumItems<int64_t>(); oldEntryIndex < numOldEntries;)
             {
-                static const char* const item[] = {
-                    "Disable###Mode",
-                    "Match###Mode",
-                    "Inclusive###Mode",
-                    "Exclusive###Mode"
-                };
-                if (ImGui::BeginMenu(item[static_cast<int>(m_tagMode)]))
+                if (!oldEntries[oldEntryIndex].isSelected)
                 {
-                    auto tagMode = m_tagMode;
-                    for (uint32_t i = 0; i < 4; i++)
-                    {
-                        if (tagMode != static_cast<TagMode>(i) && ImGui::MenuItem(item[i]))
-                        {
-                            isDirty = true;
-                            m_tagMode = static_cast<TagMode>(i);
-                        }
-                    }
-                    ImGui::EndMenu();
-                }
-                ImGui::Separator();
-                for (uint32_t i = 0; i < Tag::kNumTags; i++)
-                {
-                    bool isChecked = m_filterTags.IsEnabled(1ull << i);
-                    if (ImGui::Checkbox(Tag::Name(i), &isChecked))
-                    {
-                        m_filterTags.Enable(1ull << i, isChecked);
-                        isDirty |= m_tagMode != TagMode::Disable;
-                    }
-                }
-
-                ImGui::EndPopup();
-            }
-            ImGui::SameLine();
-            auto oldFilterMode = m_filterMode;
-            ImGui::Combo("##Filter", reinterpret_cast<int*>(&m_filterMode), "Any\0Songs\0Artists\0Both\0");
-            isDirty |= oldFilterMode != m_filterMode;
-            ImGui::TableNextColumn();
-
-            auto tagMode = m_tagMode;
-            bool isFilteringTags = tagMode != TagMode::Disable;
-            bool isDualFiltering = m_filterMode == FilterMode::Both;
-            bool isFiltering = isDirty && (m_songFilters[0]->IsActive() || isFilteringTags || (isDualFiltering && m_songFilters[1]->IsActive()));
-            isFiltering |= m_songFilters[0]->Draw("##filter", isDualFiltering ? ImGui::GetContentRegionAvail().x / 2.0f : -FLT_MIN);
-            if (isDualFiltering)
-            {
-                ImGui::SameLine();
-                isFiltering |= m_songFilters[1]->Draw("##filter2", -FLT_MIN);
-            }
-            if (isFiltering || isDirty)
-            {
-                m_numSelectedEntries = 0;
-                auto oldEntries = std::move(m_entries);
-
-                auto addSong = [&](Song* song)
-                {
-                    auto songId = song->GetId();
-                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                    {
-                        if (!song->IsSubsongDiscarded(i))
-                        {
-                            m_entries.Add({ SubsongID(songId, i) });
-                            oldEntries.Remove(SubsongID(songId, i), 0, [&](auto& oldEntry)
-                            {
-                                if (oldEntry.isSelected)
-                                {
-                                    m_entries.Last().isSelected = true;
-                                    m_numSelectedEntries++;
-                                }
-                            });
-                        }
-                    }
-                };
-
-                if (isFiltering)
-                {
-                    auto areTagsValid = [&, filterTags = m_filterTags](Song* song)
-                    {
-                        if (isFilteringTags)
-                        {
-                            auto songTags = song->GetTags();
-                            if (tagMode == TagMode::Match && songTags != filterTags)
-                                return false;
-                            if (tagMode == TagMode::Exclusive && !songTags.IsEnabled(filterTags))
-                                return false;
-                            if (tagMode == TagMode::Inclusive && !songTags.IsAnyEnabled(filterTags))
-                                return false;
-                        }
-                        return true;
-                    };
-
-                    if (isDualFiltering)
-                    {
-                        bool isArtistFilterActive = m_songFilters[0]->IsActive();
-                        bool isSongFilterActive = m_songFilters[1]->IsActive();
-                        for (auto* song : m_db.Songs())
-                        {
-                            if (areTagsValid(song))
-                            {
-                                auto isSongValid = [&]()
-                                {
-                                    if (isArtistFilterActive)
-                                    {
-                                        if (song->NumArtistIds() == 0)
-                                            return false;
-                                        std::string artists;
-                                        for (auto artistId : song->ArtistIds())
-                                        {
-                                            if (m_songFilters[0]->PassFilter(m_db[artistId]->GetHandle()))
-                                                return true;
-                                        }
-                                        return false;
-                                    }
-                                    return true;
-                                };
-                                if (isSongValid() && (!isSongFilterActive || m_songFilters[1]->PassFilter(song->GetName())))
-                                    addSong(song);
-                            }
-                        }
-                    }
-                    else if (m_filterMode != FilterMode::Songs)
-                    {
-                        bool isFilteringSong = m_filterMode != FilterMode::Artists;
-                        Array<ArtistID> artists;
-                        for (Artist* artist : m_db.Artists())
-                        {
-                            if (m_songFilters[0]->PassFilter(artist->GetHandle()))
-                                artists.Add(artist->GetId());
-                        }
-                        for (auto* song : m_db.Songs())
-                        {
-                            if (areTagsValid(song))
-                            {
-                                bool checkForSong = isFilteringSong;
-                                if (song->NumArtistIds() == 0 && m_songFilters[0]->PassFilter(nullptr, nullptr))
-                                    addSong(song);
-                                else for (auto artistId : song->ArtistIds())
-                                {
-                                    if (artists.Find(artistId))
-                                    {
-                                        addSong(song);
-                                        checkForSong = false;
-                                        break;
-                                    }
-                                }
-                                if (checkForSong && m_songFilters[0]->PassFilter(song->GetName()))
-                                    addSong(song);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (auto* song : m_db.Songs())
-                        {
-                            if (areTagsValid(song) && m_songFilters[0]->PassFilter(song->GetName()))
-                                addSong(song);
-                        }
-                    }
-                    isDirty = true;
+                    oldEntries.RemoveAtFast(oldEntryIndex);
+                    --numOldEntries;
                 }
                 else
+                    ++oldEntryIndex;
+            }
+            // gather all entries
+            Array<SubsongEntry> entries;
+            for (auto* song : m_db.Songs())
+            {
+                for (uint16_t i = 0, lastSubsongIndex = song->GetLastSubsongIndex(); i <= lastSubsongIndex; i++)
                 {
-                    for (auto* song : m_db.Songs())
-                        addSong(song);
+                    if (!song->IsSubsongDiscarded(i))
+                        entries.Add({ .id = { song->GetId(), i } });
                 }
             }
-            ImGui::EndTable();
+            // filter entries
+            std::string textToFilter;
+            for (auto& filter : m_filters)
+            {
+                if (!filter.ui->IsActive())
+                    continue;
+                auto flags = filter.flags;
+
+                auto updateTextToFilter = [&textToFilter](const char* text)
+                {
+                    if (!textToFilter.empty())
+                        textToFilter += '\n';
+                    textToFilter += text;
+                };
+
+                for (int64_t entryIndex = 0, numEntries = entries.NumItems<int64_t>(); entryIndex < numEntries; ++entryIndex)
+                {
+                    auto* song = m_db[entries[entryIndex].id];
+                    textToFilter.clear();
+                    if (flags && FilterFlag::kSongTitle)
+                        updateTextToFilter(song->GetName());
+                    if (flags && FilterFlag::kArtistHandle)
+                        for (auto artistId : song->ArtistIds())
+                            updateTextToFilter(m_db[artistId]->GetHandle());
+                    if (flags && FilterFlag::kSubongTitle)
+                        updateTextToFilter(song->GetSubsongName(entries[entryIndex].id.index));
+                    if (flags && FilterFlag::kArtistName)
+                        for (auto artistId : song->ArtistIds())
+                            updateTextToFilter(m_db[artistId]->GetRealName());
+                    if (flags && FilterFlag::kArtistAlias)
+                        for (auto artistId : song->ArtistIds())
+                            for (uint16_t i = 1, numHandles = m_db[artistId]->NumHandles(); i < numHandles; i++)
+                                updateTextToFilter(m_db[artistId]->GetHandle(i));
+                    if (flags && FilterFlag::kArtistCountry)
+                        for (auto artistId : song->ArtistIds())
+                            for (uint16_t i = 0, numCountries = m_db[artistId]->NumCountries(); i < numCountries; i++)
+                                updateTextToFilter(Countries::GetName(m_db[artistId]->GetCountry(i)));
+                    if (flags && FilterFlag::kArtistGroup)
+                        for (auto artistId : song->ArtistIds())
+                            for (uint16_t i = 0, numGroups = m_db[artistId]->NumGroups(); i < numGroups; i++)
+                                updateTextToFilter(m_db[artistId]->GetGroup(i));
+                    if (flags && FilterFlag::kSongTag)
+                        updateTextToFilter(song->GetTags().ToString().c_str());
+                    if (flags && FilterFlag::kSongType)
+                        updateTextToFilter(song->GetType().GetExtension());
+                    if (flags && FilterFlag::kReplay)
+                        updateTextToFilter(song->GetType().GetReplay());
+                    if (flags && FilterFlag::kSource)
+                        for (auto sourceId : song->SourceIds())
+                            updateTextToFilter(SourceID::sourceNames[sourceId.sourceId]);
+
+                    if (!filter.ui->PassFilter(textToFilter.c_str(), textToFilter.c_str() + textToFilter.size()))
+                    {
+                        entries.RemoveAtFast(entryIndex--);
+                        --numEntries;
+                    }
+                }
+            }
+            // assign the selection
+            for (int64_t entryIndex = 0, numEntries = entries.NumItems<int64_t>(); entryIndex < numEntries; ++entryIndex)
+            {
+                for (int64_t oldEntryIndex = 0, numOldEntries = oldEntries.NumItems<int64_t>(); oldEntryIndex < numOldEntries; ++oldEntryIndex)
+                {
+                    if (oldEntries[oldEntryIndex].id == entries[entryIndex].id)
+                    {
+                        entries[entryIndex].isSelected = true;
+                        oldEntries.RemoveAtFast(oldEntryIndex);
+                        m_numSelectedEntries++;
+                        break;
+                    }
+                }
+            }
+            m_entries = std::move(entries.Refit());
         }
     }
 
@@ -493,6 +468,128 @@ namespace rePlayer
 
             ImGui::EndPopup();
         }
+    }
+
+    void DatabaseSongsUI::FilterBarsUI(bool& isDirty)
+    {
+        ImGui::PushID("FilterBarsUI");
+
+        const float buttonSize = ImGui::GetFrameHeight();
+        auto& style = ImGui::GetStyle();
+
+        struct Op
+        {
+            bool isAdding = false;
+            bool isRemoving = false;
+            bool isSwappingUp = false;
+            bool isSwappingDown = false;
+            int index;
+        } op;
+        for (int filterIndex = 0, lastIndex = m_filters.NumItems<int>() - 1; filterIndex <= lastIndex; filterIndex++)
+        {
+            ImGui::PushID(m_filters[filterIndex].id);
+
+            auto filterFlags = m_filters[filterIndex].flags;
+
+            static const char* filterName[] = {
+                "Title",
+                "Artist",
+                "Subsong",
+                "Name",
+                "Alias",
+                "Country",
+                "Group",
+                "Tag",
+                "Type",
+                "Replay",
+                "Source"
+            };
+            static_assert(_countof(filterName) == kNumFilterFlags);
+
+            std::string filterIdPreview;
+            for (auto flags = FilterFlagType(filterFlags); flags;)
+            {
+                auto idx = std::countr_zero(flags);
+                if (!filterIdPreview.empty())
+                    filterIdPreview += '+';
+                filterIdPreview += filterName[idx];
+                flags &= ~(1 << idx);
+            }
+
+            ImGui::SetNextItemWidth(128.0f);
+            if (ImGui::BeginCombo("##FilterIDs", filterIdPreview.c_str()))
+            {
+                for (uint32_t i = 0; i < kNumFilterFlags; i++)
+                {
+                    bool isEnabled = FilterFlagType(filterFlags) & (FilterFlagType(1) << i);
+                    if (ImGui::Checkbox(filterName[i], &isEnabled))
+                        filterFlags ^= (FilterFlagType(1) << i);
+                }
+
+                ImGui::EndCombo();
+            }
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip(filterIdPreview.c_str());
+            if (filterFlags == FilterFlag::kNone)
+                filterFlags = FilterFlag::kSongTitle;
+            if (filterFlags != m_filters[filterIndex].flags)
+            {
+                isDirty = true;
+                m_filters[filterIndex].flags = filterFlags;
+            }
+
+            ImGui::SameLine();
+            static constexpr uint32_t kNumButtons = 3;
+            isDirty |= m_filters[filterIndex].ui->Draw("##filter", -(buttonSize + style.ItemInnerSpacing.x) * kNumButtons);
+
+            ImGui::SameLine(0, style.ItemInnerSpacing.x);
+            ImGui::BeginDisabled(filterIndex == 0);
+            if (ImGui::Button("^", ImVec2(buttonSize, 0.0f)))
+                op = { .isSwappingUp = true, .index = filterIndex };
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Move filter up");
+            ImGui::EndDisabled();
+
+            ImGui::SameLine(0, style.ItemInnerSpacing.x);
+            ImGui::BeginDisabled(lastIndex == (kMaxFilters - 1));
+            if (ImGui::Button(filterIndex == lastIndex ? "+" : "v", ImVec2(buttonSize, 0.0f)))
+                op = { .isAdding = filterIndex == lastIndex, .isSwappingDown = filterIndex != lastIndex, .index = filterIndex };
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip(filterIndex == lastIndex ? "Add filter" : "Move filter down");
+            ImGui::EndDisabled();
+
+            ImGui::SameLine(0, style.ItemInnerSpacing.x);
+            ImGui::BeginDisabled(lastIndex == 0);
+            if (ImGui::Button("X", ImVec2(buttonSize, 0.0f)))
+                op = { .isRemoving = true, .index = filterIndex };
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Remove filter");
+            ImGui::EndDisabled();
+
+            ImGui::PopID();
+        }
+        if (op.isAdding)
+        {
+            m_filters.Add({ .flags = FilterFlag::kSongTitle, .id = m_filterLostIds.IsEmpty() ? m_filters.NumItems() : m_filterLostIds.Pop(), .ui = new ImGuiTextFilter() });
+        }
+        else if (op.isRemoving)
+        {
+            delete m_filters[op.index].ui;
+            m_filters.RemoveAt(op.index);
+            isDirty = true;
+        }
+        else if (op.isSwappingDown)
+        {
+            std::swap(m_filters[op.index], m_filters[op.index + 1]);
+            isDirty = true;
+        }
+        else if (op.isSwappingUp)
+        {
+            std::swap(m_filters[op.index - 1], m_filters[op.index]);
+            isDirty = true;
+        }
+
+        ImGui::PopID();
     }
 
     void DatabaseSongsUI::SortSubsongs(bool isDirty)

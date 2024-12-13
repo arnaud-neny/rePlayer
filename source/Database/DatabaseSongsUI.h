@@ -55,6 +55,7 @@ namespace rePlayer
         void ExportAsWavUI();
 
         // SongUI
+        void FilterBarsUI(bool& isDirty);
         void SortSubsongs(bool isDirty);
         void SetRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId, MusicID currentPlayingSong);
         void Selection(int32_t rowIdx, MusicID musicId);
@@ -94,23 +95,36 @@ namespace rePlayer
         Window& m_owner;
         const DatabaseID m_databaseId;
 
-        Tag m_filterTags = Tag::kNone;
-        enum class TagMode : uint32_t
+        using FilterFlagType = uint32_t;
+        enum class FilterFlag : FilterFlagType
         {
-            Disable,
-            Match,
-            Inclusive,
-            Exclusive
-        } m_tagMode = TagMode::Disable;
-        enum class FilterMode : uint32_t
-        {
-            Any,
-            Songs,
-            Artists,
-            Both
+            kNone           = 0,
+            kSongTitle      = FilterFlagType(1) << 0,
+            kArtistHandle   = FilterFlagType(1) << 1,
+            kSubongTitle    = FilterFlagType(1) << 2,
+            kArtistName     = FilterFlagType(1) << 3,
+            kArtistAlias    = FilterFlagType(1) << 4,
+            kArtistCountry  = FilterFlagType(1) << 5,
+            kArtistGroup    = FilterFlagType(1) << 6,
+            kSongTag        = FilterFlagType(1) << 7,
+            kSongType       = FilterFlagType(1) << 8,
+            kReplay         = FilterFlagType(1) << 9,
+            kSource         = FilterFlagType(1) << 10
         };
-        FilterMode m_filterMode = FilterMode::Any;
-        ImGuiTextFilter* m_songFilters[2];
+        friend constexpr FilterFlag operator|(FilterFlag a, FilterFlag b);
+        friend constexpr FilterFlag& operator^=(FilterFlag& a, FilterFlagType b);
+        friend constexpr bool operator&&(FilterFlag a, FilterFlag b);
+
+        static constexpr uint32_t kNumFilterFlags = 11;
+        static constexpr uint32_t kMaxFilters = 8;
+        struct Filter
+        {
+            FilterFlag flags;
+            uint32_t id;
+            ImGuiTextFilter* ui;
+        };
+        Array<Filter> m_filters;
+        Array<uint32_t> m_filterLostIds;
 
         struct SubsongEntry
         {
