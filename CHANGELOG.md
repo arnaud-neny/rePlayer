@@ -1,18 +1,22 @@
-v0.16.7
+v0.16.8
 - Added XMP
 - Updated adplug to 2.3.3.870
 - Updated Furnace to 0.6.7
+- Updated libkss to 1.2.1
 - Updated libsc68 to 3.0.0a r706
-- Updated libsidplay to 2.11.0
+- Updated libsidplay to 2.12.0
 - Updated libvgm to 34c368c
-- Updated OpenMPT to 0.8.0-pre.12 r22209
+- Updated OpenMPT to 0.8.0-pre.12 r22552
+- Updated ProTrekkr to 2.7.6
 - Updated SNDH-Player to 0.78
+- Updated UADE to 3.0.5
 - Updated vgmstream to r1951
-- Updated ImGui to 1.91.5
+- Updated ImGui to 1.91.6
 - Updated libarchive to 3.7.7
-- Updated libcurl to 8.11.0
+- Updated libcurl to 8.11.1
 - Updated libxml2 to 2.13.5
 - Updated TagLib to 2.0.2
+- Rework song filtering with refined filters and more options
 - Display loop points in song end editor
 - Bug fixes
 

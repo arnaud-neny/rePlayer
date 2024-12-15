@@ -47,9 +47,9 @@ This where you manage all your songs and artists you've imported (or going to im
 2. Import button: click it to import files from you disk drives or artists or songs from online websites/databases.
 3. Song tab button: the current tab button for the songs
 4. Artists tab button (see next paragraph).
-5. Tags button: filter your database from the tags you've setin your songs.
-6. Combo to select the behavior of the search filter (7): all, songs or artists.
-7. Search filter: type text their and it will filter your songs list.
+5. Combo to select the behavior of the search filter (6).
+6. Search filter: type text their and it will filter your songs list.
+7. Filter buttons: you can add (remove or move) more filter bars to help you refine you research with different criteria.
 8. Song list.
 9. Rating button: the rating you set to your song, from N/A (not available aka not set) and 0 to 100%.
 10. End of playback button: to define the type end you want in your song. U means undefined (the player will detect it when it will reach the end of the song); F to fade out at the end, L to loop the song once.

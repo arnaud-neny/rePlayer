@@ -1,6 +1,7 @@
 # rePlayer (another multi-formats music player)
 
-- array: change ReturnType (is_pointer, is_reference,...) with a trait enuym type (enum return type value, index, pointer, ref)
+- array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
+- fallback to dx11 for unsupported gpus
 - seek: return the number of loops
 - add the replay selection for each extension in the global settings
 - add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
