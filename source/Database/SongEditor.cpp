@@ -40,7 +40,9 @@ namespace rePlayer
     }
 
     SongEditor::~SongEditor()
-    {}
+    {
+        delete m_artistFilter;
+    }
 
 
     void SongEditor::OnSongSelected(MusicID musicId)
@@ -351,11 +353,12 @@ namespace rePlayer
         const float buttonSize = ImGui::GetFrameHeight();
         auto& style = ImGui::GetStyle();
 
-        uint16_t artistToRemove = m_song.edited.artistIds.NumItems<uint16_t>();
-        for (uint16_t i = 0, e = m_song.edited.artistIds.NumItems<uint16_t>(); i < e; i++)
+        ImGuiID artistPopupId = ImGui::GetID("ArtistPopup");
+        int artistToRemove = -1;
+        for (int i = 0, lastIndex = m_song.edited.artistIds.NumItems<int>() - 1; i <= lastIndex; i++)
         {
             ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::PushID(static_cast<int>(i));
+            ImGui::PushID(i);
             ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x) * 3));
             auto artist = m_musicId.GetArtist(m_song.edited.artistIds[i]);
             ImGui::InputText("##artist", const_cast<char*>(artist->GetHandle()), strlen(artist->GetHandle()) + 1, ImGuiInputTextFlags_ReadOnly);
@@ -367,12 +370,21 @@ namespace rePlayer
                 ImGui::Tooltip("Move up");
             ImGui::EndDisabled();
             ImGui::SameLine(0, style.ItemInnerSpacing.x);
-            ImGui::BeginDisabled(i == (e - 1));
-            if (ImGui::Button("v", ImVec2(buttonSize, 0.0f)))
+            if (i == lastIndex)
+            {
+                ImGui::BeginDisabled(m_song.edited.artistIds.NumItems() == Core::GetDatabase(m_musicId.databaseId).NumArtists());
+                if (ImGui::Button("+", ImVec2(buttonSize, 0.0f)))
+                {
+                    ImGui::OpenPopup(artistPopupId);
+                    if (m_artistFilter == nullptr)
+                        m_artistFilter = new ImGuiTextFilter();
+                }
+                ImGui::EndDisabled();
+            }
+            else if (ImGui::Button("v", ImVec2(buttonSize, 0.0f)))
                 std::swap(m_song.edited.artistIds[i + 1], m_song.edited.artistIds[i]);
             if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Move down");
-            ImGui::EndDisabled();
+                ImGui::Tooltip(i == lastIndex ? "Add another artist" : "Move down");
             ImGui::SameLine(0, style.ItemInnerSpacing.x);
             if (ImGui::Button("X", ImVec2(buttonSize, 0.0f)))
                 artistToRemove = i;
@@ -380,79 +392,56 @@ namespace rePlayer
                 ImGui::Tooltip("Remove artist");
             ImGui::PopID();
         }
-        if (artistToRemove != m_song.edited.artistIds.NumItems())
+        if (artistToRemove >= 0)
             m_song.edited.artistIds.RemoveAt(artistToRemove);
-        ImGui::SetNextItemWidth(-FLT_MIN);
-        ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x)));
-        static ArtistID selectedNewArtistId;
-        for (auto artistId : m_song.edited.artistIds)
+        if (ImGui::BeginPopup("ArtistPopup"))
         {
-            if (selectedNewArtistId == artistId)
+            // Draw filter
+            m_artistFilter->Draw("##filter", m_artistMaxWidth);
+
+            // Build and sort the artist list
+            auto& db = Core::GetDatabase(m_musicId.databaseId);
+            Array<Artist*> artists(size_t(0), db.NumArtists());
+            float artistMaxWidth = 64.0f;
+            for (Artist* artist : db.Artists())
             {
-                selectedNewArtistId = {};
-                break;
-            }
-        }
-        auto selectedNewArtist = selectedNewArtistId != ArtistID::Invalid ? m_musicId.GetArtist(selectedNewArtistId) : nullptr;
-        if (selectedNewArtist == nullptr)
-            selectedNewArtistId = {};
-        if (ImGui::BeginCombo("##newartist", selectedNewArtistId == ArtistID::Invalid ? "" : selectedNewArtist->GetHandle()))
-        {
-            auto discardArtistIds(m_song.edited.artistIds);
-            Array<Artist*> artists;
-            for (Artist* artist : Core::GetDatabase(m_musicId.databaseId).Artists())
-            {
-                bool isRemoved = false;
-                for (uint16_t i = 0, e = discardArtistIds.NumItems<uint16_t>(); i < e; i++)
+                if (m_artistFilter->PassFilter(artist->GetHandle()) && !m_song.edited.artistIds.Find(artist->GetId()))
                 {
-                    if (discardArtistIds[i] == artist->GetId())
-                    {
-                        discardArtistIds.RemoveAt(i);
-                        isRemoved = true;
-                        break;
-                    }
-                }
-                if (!isRemoved)
+                    // sad but I have to build the with myself as imgui doesn't want to autfit properly in the child window...
+                    artistMaxWidth = Max(artistMaxWidth, ImGui::CalcTextSize(artist->GetHandle()).x);
                     artists.Add(artist);
+                }
             }
+            artistMaxWidth += ImGui::GetIO().FontGlobalScale * 16.0f;
+            m_artistMaxWidth = artistMaxWidth;
             std::sort(artists.begin(), artists.end(), [this](auto l, auto r)
             {
                 return _stricmp(l->GetHandle(), r->GetHandle()) < 0;
             });
 
+            // Select and add the artist
+            ImGui::BeginChild("ArtistList", ImVec2(artistMaxWidth, ImGui::GetTextLineHeightWithSpacing() * Min(32u, artists.NumItems())));
             ImGuiListClipper clipper;
             clipper.Begin(artists.NumItems<int32_t>());
-
             while (clipper.Step())
             {
                 for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
                 {
-                    auto isSelected = selectedNewArtistId == artists[rowIdx]->GetId();
-                    ImGui::PushID(static_cast<int>(artists[rowIdx]->GetId()));
-                    if (ImGui::Selectable(artists[rowIdx]->GetHandle(), isSelected))
+                    auto* artist = artists[rowIdx];
+                    ImGui::PushID(static_cast<int>(artist->GetId()));
+                    if (ImGui::Selectable(artist->GetHandle()))
                     {
-                        selectedNewArtistId = artists[rowIdx]->GetId();
+                        m_song.edited.artistIds.Add(artist->id);
+                        ImGui::CloseCurrentPopup();
                     }
-
-                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                    if (isSelected)
-                        ImGui::SetItemDefaultFocus();
                     ImGui::PopID();
                 }
             }
 
-            ImGui::EndCombo();
+            ImGui::EndChild();
+
+            ImGui::EndPopup();
         }
-        ImGui::SameLine(0, style.ItemInnerSpacing.x);
-        ImGui::BeginDisabled(selectedNewArtistId == ArtistID::Invalid);
-        if (ImGui::Button("+", ImVec2(buttonSize, 0.0f)))
-        {
-            m_song.edited.artistIds.Add(selectedNewArtistId);
-            selectedNewArtistId = {};
-        }
-        if (ImGui::IsItemHovered())
-            ImGui::Tooltip("Add another artist");
-        ImGui::EndDisabled();
         ImGui::PopID();
     }
 

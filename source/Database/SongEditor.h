@@ -4,6 +4,8 @@
 
 #include <Core/Window.h>
 
+struct ImGuiTextFilter;
+
 namespace rePlayer
 {
     class SongEndEditor;
@@ -46,6 +48,10 @@ namespace rePlayer
         eExtension m_mappedExtensions[int32_t(eExtension::Count)];
 
         SongEndEditor* m_songEndEditor = nullptr;
+
+        ArtistID m_selectedArtistID = ArtistID::Invalid;
+        ImGuiTextFilter* m_artistFilter = nullptr;
+        float m_artistMaxWidth = 0.0f;
 
         bool m_isBusy = false;
         float m_busyTime = 0.0f;
