@@ -1,7 +1,7 @@
 /*
  * Load_tcb.cpp
  * ------------
- * Purpose: TCB Tracker loader
+ * Purpose: TCB Tracker module loader
  * Notes  : Based on the manual scan available at https://files.scene.org/view/resources/gotpapers/manuals/tcb_tracker_1.0_manual_1990.pdf
  *          and a bit of messing about in TCB Tracker 1.0 and 1.1.
  * Authors: OpenMPT Devs
@@ -17,12 +17,12 @@ OPENMPT_NAMESPACE_BEGIN
 
 struct TCBFileHeader
 {
-	char     magic[8];     // "AN COOL." (new) or "AN COOL!" (old - even TCB Tracker 1.0 cannot load these files)
+	char     magic[8];     // "AN COOL." (new) or "AN COOL!" (early TCB Tracker beta versions; not even TCB Tracker 1.0 can read these files)
 	uint32be numPatterns;
 	uint8    tempo;
 	uint8    unused1;
 	uint8    order[128];
-	uint8    lastOrder;
+	uint8    numOrders;
 	uint8    unused2;  // Supposed to be part of lastOrder but then it would have to be a little-endian word
 
 	bool IsNewFormat() const
@@ -34,8 +34,13 @@ struct TCBFileHeader
 	{
 		if(memcmp(magic, "AN COOL.", 8) && memcmp(magic, "AN COOL!", 8))
 			return false;
-		if(tempo > 15 || unused1 || lastOrder > 127 || unused2 || numPatterns > 128)
+		if(tempo > 15 || unused1 || numOrders > 127 || unused2 || numPatterns > 128)
 			return false;
+		for(uint8 ord : order)
+		{
+			if(ord >= 128)
+				return false;
+		}
 		return true;
 	}
 
@@ -80,15 +85,13 @@ bool CSoundFile::ReadTCB(FileReader &file, ModLoadingFlags loadFlags)
 	SetupMODPanning(true);
 	Order().SetDefaultSpeed(16 - fileHeader.tempo);
 	Order().SetDefaultTempoInt(125);
-	ReadOrderFromArray(Order(), fileHeader.order, fileHeader.lastOrder + 1);
+	ReadOrderFromArray(Order(), fileHeader.order, std::max(uint8(1), fileHeader.numOrders));
 	m_nSamplePreAmp = 64;
 	m_SongFlags.set(SONG_IMPORTED);
 	m_playBehaviour.set(kApplyUpperPeriodLimit);
 
 	const bool newFormat = fileHeader.IsNewFormat();
 	bool useAmigaFreqs = false;
-	std::array<char[8], 16> instrNames{};
-	std::array<int16be, 16> specialValues{};
 	if(newFormat)
 	{
 		uint16 amigaFreqs = file.ReadUint16BE();
@@ -96,7 +99,8 @@ bool CSoundFile::ReadTCB(FileReader &file, ModLoadingFlags loadFlags)
 			return false;
 		useAmigaFreqs = amigaFreqs != 0;
 	}
-	file.ReadStruct(instrNames);
+	const auto instrNames = file.ReadArray<char[8], 16>();
+	std::array<int16be, 16> specialValues{};
 	if(newFormat)
 		file.ReadStruct(specialValues);
 
@@ -135,10 +139,10 @@ bool CSoundFile::ReadTCB(FileReader &file, ModLoadingFlags loadFlags)
 			case 0x0C:  // Continue sample after interrupt
 				m.SetVolumeCommand(VOLCMD_PLAYCONTROL, static_cast<ModCommand::VOL>(((specialValues[0x0B] == 2) ? 5 : 0) + ((instrEffect & 0x0F) - 0x0B)));
 				break;
-			case 0x0D:
+			case 0x0D:  // End Pattern
 				m.SetEffectCommand(CMD_PATTERNBREAK, 0);
 				break;
-			default:
+			default:  // Pitch Bend
 				if(int value = specialValues[(instrEffect & 0x0F)]; value > 0)
 					m.SetEffectCommand(CMD_PORTAMENTODOWN, mpt::saturate_cast<ModCommand::PARAM>((value + 16) / 32));
 				else if(value < 0)
@@ -156,31 +160,31 @@ bool CSoundFile::ReadTCB(FileReader &file, ModLoadingFlags loadFlags)
 	m_nSamples = 16;
 	for(SAMPLEINDEX smp = 1; smp <= 16; smp++)
 	{
-		ModSample &mptSample = Samples[smp];
-		mptSample.Initialize(MOD_TYPE_MOD);
-		mptSample.nVolume = std::min(sampleHeaders1.ReadUint8(), uint8(127)) * 2;
+		ModSample &mptSmp = Samples[smp];
+		mptSmp.Initialize(MOD_TYPE_MOD);
+		mptSmp.nVolume = std::min(sampleHeaders1.ReadUint8(), uint8(127)) * 2;
 		sampleHeaders1.Skip(1);  // Empty value according to docs
-		mptSample.nLoopStart = sampleHeaders1.ReadUint16BE();
+		mptSmp.nLoopStart = sampleHeaders1.ReadUint16BE();
 		uint32 offset = sampleHeaders2.ReadUint32BE();
-		mptSample.nLength = sampleHeaders2.ReadUint32BE();
-		if(mptSample.nLoopStart && mptSample.nLoopStart < mptSample.nLength)
+		mptSmp.nLength = sampleHeaders2.ReadUint32BE();
+		if(mptSmp.nLoopStart && mptSmp.nLoopStart < mptSmp.nLength)
 		{
-			mptSample.nLoopEnd = mptSample.nLength;
-			mptSample.nLoopStart = mptSample.nLength - mptSample.nLoopStart;
-			mptSample.uFlags.set(CHN_LOOP);
+			mptSmp.nLoopEnd = mptSmp.nLength;
+			mptSmp.nLoopStart = mptSmp.nLength - mptSmp.nLoopStart;
+			mptSmp.uFlags.set(CHN_LOOP);
 		}
 		if(!useAmigaFreqs)
-			mptSample.nFineTune = 5 * 16;
+			mptSmp.nFineTune = 5 * 16;
 
-		if((loadFlags & loadSampleData) && file.Seek(sampleStart + offset))
-			sampleIO.ReadSample(mptSample, file);
+		if((loadFlags & loadSampleData) && mptSmp.nLength > 1 && file.Seek(sampleStart + offset))
+			sampleIO.ReadSample(mptSmp, file);
 
 		m_szNames[smp] = mpt::String::ReadBuf(mpt::String::spacePadded, instrNames[smp - 1]);
 	}
 
-	m_modFormat.formatName = newFormat ? UL_("TCB Tracker (New Format)") : UL_("TCB Tracker (Old Format)");
+	m_modFormat.formatName = newFormat ? UL_("TCB Tracker") : UL_("TCB Tracker (Beta Format)");
 	m_modFormat.type = UL_("mod");
-	m_modFormat.madeWithTracker = UL_("TCB Tracker");
+	m_modFormat.madeWithTracker = newFormat ? UL_("TCB Tracker 1.0 - 2.0") : UL_("TCB Tracker Beta");
 	m_modFormat.charset = mpt::Charset::AtariST;
 
 	return true;

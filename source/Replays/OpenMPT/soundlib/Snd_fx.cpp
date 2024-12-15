@@ -1479,7 +1479,10 @@ void CSoundFile::InstrumentChange(ModChannel &chn, uint32 instr, bool bPorta, bo
 
 		if(pIns->NoteMap[note - NOTE_MIN] > NOTE_MAX) return;
 		uint32 n = pIns->Keyboard[note - NOTE_MIN];
-		pSmp = (n <= GetNumSamples()) ? &Samples[n] : &Samples[0];
+		if(n)
+			pSmp = (n <= GetNumSamples()) ? &Samples[n] : &Samples[0];
+		else
+			pSmp = nullptr;
 	} else if(GetNumInstruments())
 	{
 		// No valid instrument, or not a valid note.
@@ -3168,7 +3171,7 @@ bool CSoundFile::ProcessEffects()
 		// Test cases: DoubleSlide.it, DoubleSlideCompatGxx.it
 		if(m_playBehaviour[kITDoublePortamentoSlides] && chn.isFirstTick)
 		{
-			const bool effectColumnTonePorta = (cmd == CMD_TONEPORTAMENTO || cmd == CMD_TONEPORTAVOL);
+			const bool effectColumnTonePorta = (cmd == CMD_TONEPORTAMENTO);
 			if(effectColumnTonePorta)
 				InitTonePortamento(chn, static_cast<uint16>(param));
 			if(volcmd == VOLCMD_TONEPORTAMENTO)
@@ -3310,7 +3313,8 @@ bool CSoundFile::ProcessEffects()
 					break;
 
 				case VOLCMD_PLAYCONTROL:
-					chn.PlayControl(vol);
+					if(chn.isFirstTick)
+						chn.PlayControl(vol);
 					break;
 
 				default:
@@ -4583,7 +4587,15 @@ int32 CSoundFile::TonePortamento(PlayState &playState, CHANNELINDEX nChn, uint16
 	if(chn.nPeriod && chn.nPortamentoDest && doPorta)
 	{
 		const int32 actualDelta = PeriodsAreFrequencies() ? delta : -delta;
-		if(chn.nPeriod < chn.nPortamentoDest || chn.portaTargetReached)
+		// IT compatibility: Command Lxx, with no tone portamento set up before, will always execute the "portamento down" branch.
+		// Test cases: LxxWith0Portamento-Linear.it, LxxWith0Portamento-Amiga.it
+		if(m_playBehaviour[kITDoublePortamentoSlides] && !delta && chn.rowCommand.command == CMD_TONEPORTAVOL)
+		{
+			if(chn.nPeriod > 1 && m_SongFlags[SONG_LINEARSLIDES])
+				chn.nPeriod--;
+			if(chn.nPeriod < chn.nPortamentoDest)
+				chn.nPeriod = chn.nPortamentoDest;
+		} else if(chn.nPeriod < chn.nPortamentoDest || chn.portaTargetReached)
 		{
 			DoFreqSlide(chn, chn.nPeriod, actualDelta, true);
 			if(chn.nPeriod > chn.nPortamentoDest)

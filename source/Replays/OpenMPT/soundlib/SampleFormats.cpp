@@ -1341,7 +1341,7 @@ bool CSoundFile::ReadXIInstrument(INSTRUMENTINDEX nInstr, FileReader &file)
 	}
 
 	// Read MPT crap
-	ReadExtendedInstrumentProperties(pIns, file);
+	ReadExtendedInstrumentProperties(*pIns, file);
 	pIns->Convert(MOD_TYPE_XM, GetType());
 	pIns->Sanitize(GetType());
 	return true;
@@ -1360,9 +1360,11 @@ bool CSoundFile::SaveXIInstrument(INSTRUMENTINDEX nInstr, std::ostream &f) const
 
 	// Create file header
 	XIInstrumentHeader header;
-	header.ConvertToXM(*pIns, false);
+	const auto sampleList = header.ConvertToXM(*pIns, false);
+	const auto &samples = sampleList.samples;
+	if(sampleList.tooManySamples)
+		AddToLog(LogInformation, MPT_UFORMAT("This instrument references too many samples, only the first {} will be exported.")(samples.size()));
 
-	const std::vector<SAMPLEINDEX> samples = header.instrument.GetSampleList(*pIns, false);
 	if(samples.size() > 0 && samples[0] <= GetNumSamples())
 	{
 		// Copy over auto-vibrato settings of first sample
@@ -2403,7 +2405,7 @@ bool CSoundFile::ReadITIInstrument(INSTRUMENTINDEX nInstr, FileReader &file)
 	if(file.Seek(extraOffset))
 	{
 		// Read MPT crap
-		ReadExtendedInstrumentProperties(pIns, file);
+		ReadExtendedInstrumentProperties(*pIns, file);
 	}
 
 	pIns->Convert(MOD_TYPE_IT, GetType());

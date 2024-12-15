@@ -206,6 +206,7 @@ void CSoundFile::InitializeGlobals(MODTYPE type, CHANNELINDEX numChannels)
 	m_nResampling = SRCMODE_DEFAULT;
 	m_dwLastSavedWithVersion = Version(0);
 	m_dwCreatedWithVersion = Version(0);
+	m_nTempoMode = TempoMode::Classic;
 
 	SetMixLevels(MixLevels::Compatible);
 
@@ -1024,16 +1025,12 @@ void CSoundFile::ResumePlugins()
 void CSoundFile::UpdatePluginPositions()
 {
 #ifndef NO_PLUGINS
-	float out = 0.0f;
 	for(auto &plugin : m_MixPlugins)
 	{
 		IMixPlugin *pPlugin = plugin.pMixPlugin;
 		if(pPlugin != nullptr && !pPlugin->IsResumed())
 		{
 			pPlugin->PositionChanged();
-			pPlugin->Resume();
-			pPlugin->Process(&out, &out, 0);
-			pPlugin->Suspend();
 		}
 	}
 #endif  // NO_PLUGINS
