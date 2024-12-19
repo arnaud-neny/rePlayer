@@ -1341,7 +1341,7 @@ bool CSoundFile::ReadXIInstrument(INSTRUMENTINDEX nInstr, FileReader &file)
 	}
 
 	// Read MPT crap
-	ReadExtendedInstrumentProperties(*pIns, file);
+	LoadExtendedInstrumentProperties(mpt::as_span(&Instruments[nInstr], 1), file);
 	pIns->Convert(MOD_TYPE_XM, GetType());
 	pIns->Sanitize(GetType());
 	return true;
@@ -1402,9 +1402,7 @@ bool CSoundFile::SaveXIInstrument(INSTRUMENTINDEX nInstr, std::ostream &f) const
 		}
 	}
 
-	// Write 'MPTX' extension tag
-	mpt::IO::WriteText(f, "XTPM");
-	WriteInstrumentHeaderStructOrField(pIns, f);	// Write full extended header.
+	SaveExtendedInstrumentProperties(nInstr, MOD_TYPE_XM, f);
 
 	return true;
 }
@@ -1618,11 +1616,11 @@ bool CSoundFile::ReadCAFSample(SAMPLEINDEX nSample, FileReader &file, bool mayNo
 		return false;
 	}
 
-	if(!mpt::in_range<uint32>(mpt::saturate_round<int64>(audioFormat.mSampleRate)))
+	if(!mpt::in_range<uint32>(mpt::saturate_round<int64>(audioFormat.mSampleRate.get())))
 	{
 		return false;
 	}
-	uint32 sampleRate = static_cast<uint32>(mpt::saturate_round<int64>(audioFormat.mSampleRate));
+	uint32 sampleRate = static_cast<uint32>(mpt::saturate_round<int64>(audioFormat.mSampleRate.get()));
 	if(sampleRate <= 0)
 	{
 		return false;
@@ -2405,7 +2403,7 @@ bool CSoundFile::ReadITIInstrument(INSTRUMENTINDEX nInstr, FileReader &file)
 	if(file.Seek(extraOffset))
 	{
 		// Read MPT crap
-		ReadExtendedInstrumentProperties(*pIns, file);
+		LoadExtendedInstrumentProperties(mpt::as_span(&Instruments[nInstr], 1), file);
 	}
 
 	pIns->Convert(MOD_TYPE_IT, GetType());
@@ -2490,9 +2488,7 @@ bool CSoundFile::SaveITIInstrument(INSTRUMENTINDEX nInstr, std::ostream &f, cons
 	}
 
 	mpt::IO::SeekEnd(f);
-	// Write 'MPTX' extension tag
-	mpt::IO::WriteRaw(f, "XTPM", 4);
-	WriteInstrumentHeaderStructOrField(pIns, f);	// Write full extended header.
+	SaveExtendedInstrumentProperties(nInstr, MOD_TYPE_MPT, f);
 
 	return true;
 }

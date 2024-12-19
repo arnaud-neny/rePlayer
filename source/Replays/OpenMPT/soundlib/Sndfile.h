@@ -68,18 +68,6 @@ OPENMPT_NAMESPACE_BEGIN
 bool SettingCacheCompleteFileBeforeLoading();
 
 
-// -----------------------------------------------------------------------------
-// MODULAR ModInstrument FIELD ACCESS : body content in InstrumentExtensions.cpp
-// -----------------------------------------------------------------------------
-#ifndef MODPLUG_NO_FILESAVE
-void WriteInstrumentHeaderStructOrField(ModInstrument * input, std::ostream &file, uint32 only_this_code = -1 /* -1 for all */, uint16 fixedsize = 0);
-#endif // !MODPLUG_NO_FILESAVE
-// ITP: Read instrument property with 'code' from 'file' to instrument 'ins'.
-void ReadExtendedInstrumentProperty(ModInstrument *ins, const uint32 code, FileReader &file);
-// ITI / XI: Read extended instrument properties from 'file' to instrument 'ins'.
-void ReadExtendedInstrumentProperties(ModInstrument &ins, FileReader &file);
-
-
 // Sample decompression routines in format-specific source files
 void AMSUnpack(mpt::const_byte_span source, mpt::byte_span dest, int8 packCharacter);
 uintptr_t DMFUnpack(FileReader &file, uint8 *psample, uint32 maxlen);
@@ -935,19 +923,21 @@ public:
 	bool SaveMod(std::ostream &f) const;
 	bool SaveIT(std::ostream &f, const mpt::PathString &filename, bool compatibilityExport = false);
 	uint32 SaveMixPlugins(std::ostream *file=nullptr, bool bUpdate=true);
-	void WriteInstrumentPropertyForAllInstruments(uint32 code,  uint16 size, std::ostream &f, INSTRUMENTINDEX nInstruments) const;
-	void SaveExtendedInstrumentProperties(INSTRUMENTINDEX nInstruments, std::ostream &f) const;
+	void SaveExtendedInstrumentProperties(INSTRUMENTINDEX instr, MODTYPE forceType, std::ostream &f) const;
+	static void SaveExtendedInstrumentProperties(mpt::span<const ModInstrument * const> instruments, MODTYPE forceType, std::ostream &f, bool allInstruments);
 	void SaveExtendedSongProperties(std::ostream &f) const;
 #endif // MODPLUG_NO_FILESAVE
+	static void ReadExtendedInstrumentProperty(mpt::span<ModInstrument *> instruments, const uint32 code, FileReader &file);
 	bool LoadExtendedSongProperties(FileReader &file, bool ignoreChannelCount, bool* pInterpretMptMade = nullptr);
 	void LoadMPTMProperties(FileReader &file, uint16 cwtv);
 
 	static mpt::ustring GetImpulseTrackerVersion(uint16 cwtv, uint16 cmwt);
 	static mpt::ustring GetSchismTrackerVersion(uint16 cwtv, uint32 reserved);
 
-	// Reads extended instrument properties(XM/IT/MPTM).
+	// Reads extended instrument properties(XM/IT/MPTM/ITI/XI).
 	// Returns true if extended instrument properties were found.
-	bool LoadExtendedInstrumentProperties(FileReader &file);
+	bool LoadExtendedInstrumentProperties(FileReader &file) { return LoadExtendedInstrumentProperties(mpt::as_span(Instruments).subspan(1, GetNumInstruments()), file); }
+	static bool LoadExtendedInstrumentProperties(mpt::span<ModInstrument *> instruments, FileReader &file);
 
 	void SetDefaultPlaybackBehaviour(MODTYPE type);
 	static PlayBehaviourSet GetSupportedPlaybackBehaviour(MODTYPE type);
