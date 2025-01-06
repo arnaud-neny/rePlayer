@@ -160,7 +160,7 @@ uint16_t Ym2149c::Tick()
 		m_envCounter = 0;
 	}
 
-	// noise & env state machine is running half speed
+	// noise state machine is running half speed
 	m_noiseHalf ^= 1;
 	if (m_noiseHalf)
 	{
