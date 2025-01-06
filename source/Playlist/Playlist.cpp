@@ -1657,6 +1657,9 @@ namespace rePlayer
                         bool isArchiveRaw = false;
                         for (;;)
                         {
+                            if (addFilesContext->isCancel)
+                                break;
+
                             Array<CommandBuffer::Command> commands;
                             if (auto* replay = replays.Load(stream, commands, entry.type))
                             {
