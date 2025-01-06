@@ -29,12 +29,16 @@ namespace rePlayer
             SmartPtr<StreamArchive> archiveStream(kAllocate, stream, isPackage, nullptr);
             if (archiveStream->m_stream)
             {
-                if (archive_read_next_header(archiveStream->m_archive, &archiveStream->m_entry) == ARCHIVE_OK)
+                while (archive_read_next_header(archiveStream->m_archive, &archiveStream->m_entry) == ARCHIVE_OK)
                 {
-                    archiveStream->m_entryFilename = archive_entry_pathname(archiveStream->m_entry);
-                    archiveStream->m_entrySize = uint32_t(archive_entry_size(archiveStream->m_entry));
-                    archiveStream->AddFilename(archiveStream->m_entryFilename);
-                    return archiveStream;
+                    if (archive_entry_mode(archiveStream->m_entry) & _S_IFREG)
+                    {
+                        archiveStream->m_entryFilename = archive_entry_pathname(archiveStream->m_entry);
+                        archiveStream->m_entrySize = uint32_t(archive_entry_size(archiveStream->m_entry));
+                        archiveStream->AddFilename(archiveStream->m_entryFilename);
+                        return archiveStream;
+                    }
+                    archiveStream->m_entryIndex++;
                 }
             }
         }
@@ -235,7 +239,7 @@ namespace rePlayer
             {
                 while (archive_read_next_header(stream->m_archive, &stream->m_entry) == ARCHIVE_OK)
                 {
-                    if (stream->m_entryIndex > m_entryIndex)
+                    if (stream->m_entryIndex > m_entryIndex && archive_entry_mode(stream->m_entry) & _S_IFREG)
                     {
                         stream->m_entryFilename = archive_entry_pathname(stream->m_entry);
                         stream->m_entrySize = uint32_t(archive_entry_size(stream->m_entry));
