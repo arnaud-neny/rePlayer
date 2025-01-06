@@ -64,7 +64,8 @@ namespace rePlayer
 
     Replay* ReplaySidPlay::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        if (stream->GetSize() > 1024 * 1024 * 128)
+        auto streamSize = stream->GetSize();
+        if (streamSize > 1024 * 1024 * 128 || streamSize == 0)
             return nullptr;
         auto data = stream->Read();
 
