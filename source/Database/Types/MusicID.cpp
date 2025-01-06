@@ -100,8 +100,8 @@ namespace rePlayer
                 ImGui::SetNextWindowSize(textSize);
                 isTextWrapped = true;
             }
-            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(512.0f, 2048.0f));
         }
+        ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(1024.0f, 2048.0f));
 
         ImGui::BeginTooltip();
         ImGui::Text("Title  : %s", song->GetName());
