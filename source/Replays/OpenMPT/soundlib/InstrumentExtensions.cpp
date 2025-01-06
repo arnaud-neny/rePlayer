@@ -136,8 +136,21 @@ it was always ignored, because sample indices may change when loading external i
 
 #ifndef MODPLUG_NO_FILESAVE
 
+namespace
+{
+#if MPT_COMPILER_CLANG
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif  // MPT_COMPILER_CLANG
+	const ModInstrument DEFAULT_INSTRUMENT;
+#if MPT_COMPILER_CLANG
+#pragma clang diagnostic pop
+#endif  // MPT_COMPILER_CLANG
+}  // namespace
+
 template <auto Member>
-constexpr bool IsPropertyNonDefault(const ModInstrument &ins) { return ModInstrument{}.*Member != ins.*Member; }
+constexpr bool IsPropertyNonDefault(const ModInstrument &ins) { return DEFAULT_INSTRUMENT.*Member != ins.*Member; }
 
 template <auto Member>
 constexpr uint16 PropertySize() noexcept { return sizeof(ModInstrument{}.*Member); }
@@ -174,7 +187,7 @@ struct PropertyWriterEnum : PropertyWriterBase<Member, PropertyNeededFunc, Prope
 
 struct PropertyWriterReleaseNode
 {
-	bool IsPropertyNeeded(const ModInstrument &ins) const noexcept { return ModInstrument{}.GetEnvelope(type).nReleaseNode != ins.GetEnvelope(type).nReleaseNode; }
+	bool IsPropertyNeeded(const ModInstrument &ins) const noexcept { return DEFAULT_INSTRUMENT.GetEnvelope(type).nReleaseNode != ins.GetEnvelope(type).nReleaseNode; }
 	static constexpr uint16 Size() noexcept { return sizeof(InstrumentEnvelope{}.nReleaseNode); }
 	void Write(std::ostream &file, const ModInstrument &ins) const { mpt::IO::WriteIntLE(file, ins.GetEnvelope(type).nReleaseNode); }
 	const EnvelopeType type;
@@ -183,7 +196,7 @@ struct PropertyWriterReleaseNode
 struct PropertyWriterEnvelopeBase
 {
 	PropertyWriterEnvelopeBase(uint32 nodes, EnvelopeType type) : nodes{nodes}, type{type} {}
-	static bool IsPropertyNeeded(const ModInstrument&) noexcept
+	static bool IsPropertyNeeded(const ModInstrument &) noexcept
 	{
 		return true;
 	}
@@ -232,7 +245,7 @@ struct PropertyWriterEnvelopeValues : PropertyWriterEnvelopeBase
 			mpt::IO::WriteIntLE(file, static_cast<uint8>(env[i].value));
 		}
 		// Not every instrument's envelope will be the same length. fill up with zeros.
-		uint16le padding{};
+		uint8 padding{};
 		for(uint32 i = maxNodes; i < nodes; ++i)
 		{
 			mpt::IO::Write(file, padding);
@@ -242,7 +255,7 @@ struct PropertyWriterEnvelopeValues : PropertyWriterEnvelopeBase
 
 struct PropertyWriterPitchTempoLock
 {
-	static bool IsPropertyNeeded(const ModInstrument &ins) noexcept { return ModInstrument{}.pitchToTempoLock != ins.pitchToTempoLock; }
+	static constexpr auto IsPropertyNeeded = IsPropertyNonDefault<&ModInstrument::pitchToTempoLock>;
 	static constexpr uint16 Size() noexcept { return sizeof(uint16le); }
 	PropertyWriterPitchTempoLock(bool intPart) : m_intPart{intPart} {}
 	void Write(std::ostream &file, const ModInstrument &ins)
@@ -269,10 +282,9 @@ static void WriteProperty(std::ostream &f, uint32 code, mpt::span<const ModInstr
 		return;
 	mpt::IO::WriteIntLE<uint32>(f, code);
 	mpt::IO::WriteIntLE<uint16>(f, property.Size());
-	ModInstrument defaultInstr{};
 	for(const ModInstrument *ins : instruments)
 	{
-		property.Write(f, ins ? *ins : defaultInstr);
+		property.Write(f, ins ? *ins : DEFAULT_INSTRUMENT);
 	}
 }
 
@@ -301,7 +313,7 @@ void CSoundFile::SaveExtendedInstrumentProperties(mpt::span<const ModInstrument 
 		WriteProperty(f, MagicBE("FO.."), instruments, PropertyWriterInt<&ModInstrument::nFadeOut>{[](const ModInstrument &ins) { return (ins.nFadeOut % 32u) || ins.nFadeOut > 8192; }});
 		// XM instrument headers already have support for this
 		// Note: For ITI we always want to write this property, hence the allInstruments check
-		int32 prevPWD = allInstruments ? int32_max : int32_min;
+		int32 prevPWD = allInstruments ? int32_min : int32_max;
 		WriteProperty(f, MagicBE("MPWD"), instruments, PropertyWriterInt<&ModInstrument::midiPWD, std::function<bool(const ModInstrument &)>>{[&prevPWD](const ModInstrument& ins)
 		{
 			if((prevPWD != int32_min && ins.midiPWD != prevPWD) || (ins.midiPWD < 0))

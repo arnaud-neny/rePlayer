@@ -99,6 +99,9 @@ void CSoundFile::InitPlayer(bool bReset)
 #ifndef NO_DSP
 	m_BitCrush.Initialize(bReset, m_MixerSettings.gdwMixingFreq);
 #endif
+#ifdef MODPLUG_TRACKER
+	m_metronomeChn.pCurrentSample = nullptr;
+#endif
 	if(m_opl)
 	{
 		m_opl->Initialize(m_MixerSettings.gdwMixingFreq);
@@ -339,6 +342,15 @@ samplecount_t CSoundFile::Read(samplecount_t count, IAudioTarget &target, IAudio
 			ProcessDSP(countChunk);
 		}
 
+#ifdef MODPLUG_TRACKER
+		// Metronome needs to be mixed last, so that it is not affected by global volume, plugins, DSP effects, etc...
+		// It will still be visible on VU Meters though, which is not optimal.
+		if(IsMetronomeEnabled())
+		{
+			MixChannel(countChunk, m_metronomeChn, CHANNELINDEX_INVALID, true);
+		}
+#endif  // MODPLUG_TRACKER
+
 		if(m_MixerSettings.gnChannels == 4)
 		{
 			InterleaveFrontRear(MixSoundBuffer, MixRearBuffer, countChunk);
@@ -448,8 +460,6 @@ bool CSoundFile::ProcessRow()
 		{
 			m_PlayState.m_nCurrentOrder = m_lockOrderStart;
 		}
-#else
-		MPT_UNUSED_VARIABLE(patternTransition);
 #endif // MODPLUG_TRACKER
 
 		m_PlayState.UpdatePPQ(patternTransition);
@@ -486,7 +496,7 @@ bool CSoundFile::ProcessRow()
 
 					// If channel resetting is disabled in MPT, we will emulate a pattern break (and we always do it if we're not in MPT)
 #ifdef MODPLUG_TRACKER
-					if(!(TrackerSettings::Instance().m_dwPatternSetup & PATTERN_RESETCHANNELS))
+					if(!(TrackerSettings::Instance().patternSetup & PatternSetup::ResetChannelsOnLoop))
 #endif // MODPLUG_TRACKER
 					{
 						m_PlayState.m_flags.set(SONG_BREAKTOROW);
@@ -2169,6 +2179,9 @@ bool CSoundFile::ReadNote()
 			chn.nLength = 0;
 			chn.nROfs = chn.nLOfs = 0;
 		}
+		// Increment age of NNA channels
+		if(chn.nMasterChn && chn.nnaChannelAge < Util::MaxValueOfType(chn.nnaChannelAge))
+			chn.nnaChannelAge++;
 		// Check for unused channel
 		if(chn.dwFlags[CHN_MUTE] || (nChn >= GetNumChannels() && !chn.nLength))
 		{
@@ -2729,7 +2742,7 @@ void CSoundFile::ProcessMidiOut(CHANNELINDEX nChn)
 				break;
 			default:
 				break;
-		}
+		}		
 	}
 }
 
@@ -2747,14 +2760,14 @@ MPT_FORCEINLINE void ApplyGlobalVolumeWithRamping(int32 *SoundBuffer, int32 *Rea
 		{
 			// Ramping required
 			m_lHighResRampingGlobalVolume += step;
-			                          SoundBuffer[0] = Util::muldiv(SoundBuffer[0], m_lHighResRampingGlobalVolume, MAX_GLOBAL_VOLUME << VOLUMERAMPPRECISION);
+			                       SoundBuffer[0] = Util::muldiv(SoundBuffer[0], m_lHighResRampingGlobalVolume, MAX_GLOBAL_VOLUME << VOLUMERAMPPRECISION);
 			if constexpr(isStereo) SoundBuffer[1] = Util::muldiv(SoundBuffer[1], m_lHighResRampingGlobalVolume, MAX_GLOBAL_VOLUME << VOLUMERAMPPRECISION);
 			if constexpr(hasRear)  RearBuffer[0]  = Util::muldiv(RearBuffer[0] , m_lHighResRampingGlobalVolume, MAX_GLOBAL_VOLUME << VOLUMERAMPPRECISION); else MPT_UNUSED_VARIABLE(RearBuffer);
 			if constexpr(hasRear)  RearBuffer[1]  = Util::muldiv(RearBuffer[1] , m_lHighResRampingGlobalVolume, MAX_GLOBAL_VOLUME << VOLUMERAMPPRECISION); else MPT_UNUSED_VARIABLE(RearBuffer);
 			m_nSamplesToGlobalVolRampDest--;
 		} else
 		{
-			                          SoundBuffer[0] = Util::muldiv(SoundBuffer[0], m_nGlobalVolume, MAX_GLOBAL_VOLUME);
+			                       SoundBuffer[0] = Util::muldiv(SoundBuffer[0], m_nGlobalVolume, MAX_GLOBAL_VOLUME);
 			if constexpr(isStereo) SoundBuffer[1] = Util::muldiv(SoundBuffer[1], m_nGlobalVolume, MAX_GLOBAL_VOLUME);
 			if constexpr(hasRear)  RearBuffer[0]  = Util::muldiv(RearBuffer[0] , m_nGlobalVolume, MAX_GLOBAL_VOLUME); else MPT_UNUSED_VARIABLE(RearBuffer);
 			if constexpr(hasRear)  RearBuffer[1]  = Util::muldiv(RearBuffer[1] , m_nGlobalVolume, MAX_GLOBAL_VOLUME); else MPT_UNUSED_VARIABLE(RearBuffer);

@@ -2233,16 +2233,19 @@ CHANNELINDEX CSoundFile::GetNNAChannel(CHANNELINDEX nChn) const
 	for(CHANNELINDEX i = GetNumChannels(); i < m_PlayState.Chn.size(); i++)
 	{
 		const ModChannel &c = m_PlayState.Chn[i];
-		// No sample and no plugin playing
-		if(!c.nLength && !c.HasMIDIOutput())
+		// Sample playing?
+		if(c.nLength)
+			continue;
+		// Can a plugin potentially be playing?
+		if(!c.HasMIDIOutput())
 			return i;
-		// Plugin channel with already released note
-		if(!c.nLength && c.dwFlags[CHN_KEYOFF | CHN_NOTEFADE])
+		// Has the plugin note already been released? (note: lastMidiNoteWithoutArp is set from within IMixPlugin, so this implies that there is a valid plugin assignment)
+		if(c.dwFlags[CHN_KEYOFF | CHN_NOTEFADE] || c.lastMidiNoteWithoutArp == NOTE_NONE)
 			return i;
 	}
 
-	uint32 vol = 0x800000;
-	if(nChn < MAX_CHANNELS)
+	int32 vol = 0x800100;
+	if(nChn < m_PlayState.Chn.size())
 	{
 		const ModChannel &srcChn = m_PlayState.Chn[nChn];
 		if(!srcChn.nFadeOutVol && srcChn.nLength)
@@ -2264,10 +2267,14 @@ CHANNELINDEX CSoundFile::GetNNAChannel(CHANNELINDEX nChn) const
 		// Use a combination of real volume [14 bit] (which includes volume envelopes, but also potentially global volume) and note volume [9 bit].
 		// Rationale: We need volume envelopes in case e.g. all NNA channels are playing at full volume but are looping on a 0-volume envelope node.
 		// But if global volume is not applied to master and the global volume temporarily drops to 0, we would kill arbitrary channels. Hence, add the note volume as well.
-		uint32 v = (c.nRealVolume << 9) | c.nVolume;
+		int32 v = (c.nRealVolume << 9) | c.nVolume;
+		// Less priority to looped samples
 		if(c.dwFlags[CHN_LOOP])
 			v /= 2;
-		if((v < vol) || ((v == vol) && (c.VolEnv.nEnvPosition > envpos)))
+		// Less priority for channels potentially held for plugin notes with NNA=continue the older they get
+		if(!c.nLength && c.nMasterChn)
+			v -= std::min(static_cast<uint32>(c.nnaChannelAge) * c.nnaChannelAge, static_cast<uint32>(int32_max / 16)) * 16;
+		if((v < vol) || ((v == vol) && (c.VolEnv.nEnvPosition > envpos || !c.VolEnv.flags[ENV_ENABLED])))
 		{
 			envpos = c.VolEnv.nEnvPosition;
 			vol = v;
@@ -2285,11 +2292,32 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 	if(!ModCommand::IsNote(static_cast<ModCommand::NOTE>(note)))
 		return CHANNELINDEX_INVALID;
 
-	// Always NNA cut - using
-	if((!(GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT | MOD_TYPE_MT2)) || !m_nInstruments || forceCut) && !srcChn.HasMIDIOutput())
+	// Do we need to apply New/Duplicate Note Action to an instrument plugin?
+#ifndef NO_PLUGINS
+	IMixPlugin *pPlugin = nullptr;
+	if(srcChn.HasMIDIOutput() && ModCommand::IsNote(srcChn.nNote))  // Instrument has MIDI channel assigned (but not necessarily a plugin)
+	{
+		const PLUGINDEX plugin = GetBestPlugin(m_PlayState.Chn[nChn], nChn, PrioritiseInstrument, RespectMutes);
+		if(plugin > 0 && plugin <= MAX_MIXPLUGINS)
+			pPlugin = m_MixPlugins[plugin - 1].pMixPlugin;
+	}
+	// apply NNA to this plugin iff it is currently playing a note on this tracker channel
+	// (and if it is playing a note, we know that would be the last note played on this chan).
+	const bool applyNNAtoPlug = pPlugin && (srcChn.lastMidiNoteWithoutArp != NOTE_NONE) && pPlugin->IsNotePlaying(srcChn.lastMidiNoteWithoutArp, nChn);
+#else
+	const bool applyNNAtoPlug = false;
+#endif  // NO_PLUGINS
+
+	// Always NNA cut
+	if(!(GetType() & (MOD_TYPE_IT | MOD_TYPE_MPT | MOD_TYPE_MT2)) || !m_nInstruments || forceCut)
 	{
 		if(!srcChn.nLength || srcChn.dwFlags[CHN_MUTE] || !(srcChn.rightVol | srcChn.leftVol))
 			return CHANNELINDEX_INVALID;
+
+#ifndef NO_PLUGINS
+		if(applyNNAtoPlug)
+			SendMIDINote(nChn, NOTE_KEYOFF, 0, m_playBehaviour[kMIDINotesFromChannelPlugin] ? pPlugin : nullptr);
+#endif  // NO_PLUGINS
 
 		if(srcChn.dwFlags[CHN_ADLIB] && m_opl)
 		{
@@ -2301,6 +2329,7 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 		if(nnaChn == CHANNELINDEX_INVALID)
 			return CHANNELINDEX_INVALID;
 		ModChannel &chn = m_PlayState.Chn[nnaChn];
+		StopOldNNA(chn, nnaChn);
 		// Copy Channel
 		chn = srcChn;
 		chn.dwFlags.reset(CHN_VIBRATO | CHN_TREMOLO | CHN_MUTE | CHN_PORTAMENTO);
@@ -2311,6 +2340,7 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 		// Cut the note
 		chn.nFadeOutVol = 0;
 		chn.dwFlags.set(CHN_NOTEFADE | CHN_FASTVOLRAMP);
+		chn.nnaChannelAge = 0;
 		chn.nnaGeneration = ++srcChn.nnaGeneration;
 		// Stop this channel
 		srcChn.nLength = 0;
@@ -2448,33 +2478,14 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 		}
 	}
 
-	// Do we need to apply New/Duplicate Note Action to a VSTi?
-	bool applyNNAtoPlug = false;
-#ifndef NO_PLUGINS
-	IMixPlugin *pPlugin = nullptr;
-	if(srcChn.HasMIDIOutput() && ModCommand::IsNote(srcChn.nNote)) // instro sends to a midi chan
-	{
-		PLUGINDEX plugin = GetBestPlugin(m_PlayState.Chn[nChn], nChn, PrioritiseInstrument, RespectMutes);
-
-		if(plugin > 0 && plugin <= MAX_MIXPLUGINS)
-		{
-			pPlugin =  m_MixPlugins[plugin - 1].pMixPlugin;
-			if(pPlugin)
-			{
-				// apply NNA to this plugin iff it is currently playing a note on this tracker channel
-				// (and if it is playing a note, we know that would be the last note played on this chan).
-				applyNNAtoPlug = (srcChn.lastMidiNoteWithoutArp != NOTE_NONE) && pPlugin->IsNotePlaying(srcChn.lastMidiNoteWithoutArp, nChn);
-			}
-		}
-	}
-#endif // NO_PLUGINS
-
 	// New Note Action
 	if(!srcChn.IsSamplePlaying() && !applyNNAtoPlug)
 		return CHANNELINDEX_INVALID;
 
+	const CHANNELINDEX nnaChn = GetNNAChannel(nChn);
+
 #ifndef NO_PLUGINS
-	if(applyNNAtoPlug && pPlugin)
+	if(applyNNAtoPlug)
 	{
 		switch(srcChn.nNNA)
 		{
@@ -2487,18 +2498,21 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 				srcChn.lastMidiNoteWithoutArp = NOTE_NONE;
 				break;
 			case NewNoteAction::Continue:
+				// If there's no NNA channels available, avoid the note lingering on forever
+				if(nnaChn == CHANNELINDEX_INVALID)
+					SendMIDINote(nChn, NOTE_KEYOFF, 0, m_playBehaviour[kMIDINotesFromChannelPlugin] ? pPlugin : nullptr);
+				else if(!m_playBehaviour[kLegacyPluginNNABehaviour])
+					pPlugin->MoveChannel(nChn, nnaChn);
 				break;
 		}
 	}
 #endif  // NO_PLUGINS
 
-	CHANNELINDEX nnaChn = GetNNAChannel(nChn);
 	if(nnaChn == CHANNELINDEX_INVALID)
 		return CHANNELINDEX_INVALID;
 
 	ModChannel &chn = m_PlayState.Chn[nnaChn];
-	if(chn.dwFlags[CHN_ADLIB] && m_opl)
-		m_opl->NoteCut(nnaChn);
+	StopOldNNA(chn, nnaChn);
 	// Copy Channel
 	chn = srcChn;
 	chn.dwFlags.reset(CHN_VIBRATO | CHN_TREMOLO | CHN_PORTAMENTO);
@@ -2506,6 +2520,7 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 
 	chn.nMasterChn = nChn < GetNumChannels() ? nChn + 1 : 0;
 	chn.nCommand = CMD_NONE;
+	chn.nnaChannelAge = 0;
 	chn.nnaGeneration = ++srcChn.nnaGeneration;
 
 	// Key Off the note
@@ -2557,6 +2572,31 @@ CHANNELINDEX CSoundFile::CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, boo
 	srcChn.nROfs = srcChn.nLOfs = 0;
 	
 	return nnaChn;
+}
+
+
+void CSoundFile::StopOldNNA(ModChannel &chn, CHANNELINDEX channel)
+{
+	if(chn.dwFlags[CHN_ADLIB] && m_opl)
+		m_opl->NoteCut(channel);
+
+#ifndef NO_PLUGINS
+	// Is a plugin note still associated with this old NNA channel? Stop it first.
+	if(chn.HasMIDIOutput() && ModCommand::IsNote(chn.nNote) && !chn.dwFlags[CHN_KEYOFF] && chn.lastMidiNoteWithoutArp != NOTE_NONE)
+	{
+		const PLUGINDEX plugin = GetBestPlugin(m_PlayState.Chn[channel], channel, PrioritiseInstrument, RespectMutes);
+		if(plugin > 0 && plugin <= MAX_MIXPLUGINS)
+		{
+			IMixPlugin *nnaPlugin = m_MixPlugins[plugin - 1].pMixPlugin;
+			// apply NNA to this plugin iff it is currently playing a note on this tracker channel
+			// (and if it is playing a note, we know that would be the last note played on this chan).
+			if(nnaPlugin && (chn.lastMidiNoteWithoutArp != NOTE_NONE) && nnaPlugin->IsNotePlaying(chn.lastMidiNoteWithoutArp, channel))
+			{
+				SendMIDINote(channel, chn.lastMidiNoteWithoutArp | IMixPlugin::MIDI_NOTE_OFF, 0, m_playBehaviour[kMIDINotesFromChannelPlugin] ? nnaPlugin : nullptr);
+			}
+		}
+	}
+#endif  // NO_PLUGINS
 }
 
 
@@ -5260,7 +5300,7 @@ void CSoundFile::ExtendedS3MCommands(CHANNELINDEX nChn, ModCommand::PARAM param)
 								IMixPlugin *pPlugin;
 								if(pIns != nullptr && pIns->nMixPlug && (pPlugin = m_MixPlugins[pIns->nMixPlug - 1].pMixPlugin) != nullptr)
 								{
-									pPlugin->MidiCommand(*pIns, bkChn.nNote | IMixPlugin::MIDI_NOTE_OFF, 0, nChn);
+									pPlugin->MidiCommand(*pIns, bkChn.nNote | IMixPlugin::MIDI_NOTE_OFF, 0, m_playBehaviour[kLegacyPluginNNABehaviour] ? nChn : i);
 								}
 #endif // NO_PLUGINS
 							}
@@ -6682,6 +6722,33 @@ void CSoundFile::HandleRowTransitionEvents(bool nextPattern)
 				m_bChannelMuteTogglePending[chan] = false;
 			}
 		}
+	}
+
+	// Metronome
+	if(IsMetronomeEnabled() && !IsRenderingToDisc() && !m_PlayState.m_flags[SONG_PAUSED | SONG_STEP])
+	{
+		const ROWINDEX rpm = m_PlayState.m_nCurrentRowsPerMeasure ? m_PlayState.m_nCurrentRowsPerMeasure : DEFAULT_ROWS_PER_MEASURE;
+		const ROWINDEX rpb = m_PlayState.m_nCurrentRowsPerBeat ? m_PlayState.m_nCurrentRowsPerBeat : DEFAULT_ROWS_PER_BEAT;
+		const ModSample *sample = nullptr;
+		if(!m_PlayState.m_lTotalSampleCount || !(m_PlayState.m_nRow % rpm))
+			sample = m_metronomeMeasure;
+		else if(!(m_PlayState.m_nRow % rpm % rpb))
+			sample = m_metronomeBeat;
+		if(sample)
+		{
+			m_metronomeChn.pModSample = sample;
+			m_metronomeChn.pCurrentSample = sample->samplev();
+			m_metronomeChn.dwFlags = (sample->uFlags & CHN_SAMPLEFLAGS) | CHN_NOREVERB;
+			m_metronomeChn.position.Set(0);
+			m_metronomeChn.increment = SamplePosition::Ratio(sample->nC5Speed, m_MixerSettings.gdwMixingFreq);
+			m_metronomeChn.rampLeftVol = m_metronomeChn.rampRightVol = m_metronomeChn.leftVol = m_metronomeChn.rightVol = sample->nVolume * 16;
+			m_metronomeChn.leftRamp = m_metronomeChn.rightRamp = 0;
+			m_metronomeChn.nLength = m_metronomeChn.pModSample->nLength;
+			m_metronomeChn.resamplingMode = m_Resampler.m_Settings.SrcMode;
+		}
+	} else
+	{
+		m_metronomeChn.pCurrentSample = nullptr;
 	}
 }
 #endif // MODPLUG_TRACKER

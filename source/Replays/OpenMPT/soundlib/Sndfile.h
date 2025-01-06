@@ -409,7 +409,6 @@ public:
 	//Tuning-->
 public:
 	static std::unique_ptr<CTuning> CreateTuning12TET(const mpt::ustring &name);
-	static CTuning *GetDefaultTuning() {return nullptr;}
 	CTuningCollection& GetTuneSpecificTunings() {return *m_pTuningsTuneSpecific;}
 
 	mpt::ustring GetNoteName(const ModCommand::NOTE note, const INSTRUMENTINDEX inst, const NoteName *noteNames = nullptr) const;
@@ -735,6 +734,20 @@ public:
 
 protected:
 	void HandleRowTransitionEvents(bool nextPattern);
+
+	const ModSample *m_metronomeMeasure = nullptr;
+	const ModSample *m_metronomeBeat = nullptr;
+	ModChannel m_metronomeChn{};
+
+public:
+	void SetMetronomeSamples(const ModSample *measure, const ModSample *beat)
+	{
+		m_metronomeMeasure = measure;
+		m_metronomeBeat = beat;
+		m_metronomeChn.pModSample = nullptr;
+		m_metronomeChn.pCurrentSample = nullptr;
+	}
+	constexpr bool IsMetronomeEnabled() const noexcept { return m_metronomeMeasure || m_metronomeBeat; }
 #endif  // MODPLUG_TRACKER
 
 public:
@@ -975,6 +988,7 @@ public:
 	samplecount_t ReadOneTick();
 private:
 	void CreateStereoMix(int count);
+	bool MixChannel(int count, ModChannel &chn, CHANNELINDEX channel, bool doMix);
 public:
 	bool FadeSong(uint32 msec);
 private:
@@ -1007,6 +1021,7 @@ public:
 	void SetupNextRow(PlayState &playState, const bool patternLoop) const;
 	CHANNELINDEX GetNNAChannel(CHANNELINDEX nChn) const;
 	CHANNELINDEX CheckNNA(CHANNELINDEX nChn, uint32 instr, int note, bool forceCut);
+	void StopOldNNA(ModChannel &chn, CHANNELINDEX channel);
 	void NoteChange(ModChannel &chn, int note, bool bPorta = false, bool bResetEnv = true, bool bManual = false, CHANNELINDEX channelHint = CHANNELINDEX_INVALID) const;
 	void InstrumentChange(ModChannel &chn, uint32 instr, bool bPorta = false, bool bUpdVol = true, bool bResetEnv = true) const;
 	void ApplyInstrumentPanning(ModChannel &chn, const ModInstrument *instr, const ModSample *smp) const;
