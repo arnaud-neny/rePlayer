@@ -295,6 +295,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="libxmp\src\far_extras.c" />
     <ClCompile Include="libxmp\src\filetype.c" />
     <ClCompile Include="libxmp\src\filter.c" />
+    <ClCompile Include="libxmp\src\flow.c" />
     <ClCompile Include="libxmp\src\format.c" />
     <ClCompile Include="libxmp\src\hio.c" />
     <ClCompile Include="libxmp\src\hmn_extras.c" />

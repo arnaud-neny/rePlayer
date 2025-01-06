@@ -4,7 +4,7 @@
  * Checksum added by Sipos Attila <h430827@stud.u-szeged.hu>
  * Rewritten for libxmp by Claudio Matsuoka
  *
- * Copyright (C) 2013 Claudio Matsuoka
+ * Copyright (C) 2013-2024 Claudio Matsuoka
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -35,7 +35,7 @@ struct io {
 	int srclen;
 };
 
-static uint8 ctable[] = {
+static const uint8 ctable[] = {
 	2, 3, 4, 5, 6, 7, 8, 0,
 	3, 2, 4, 5, 6, 7, 8, 0,
 	4, 3, 5, 2, 6, 7, 8, 0,

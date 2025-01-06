@@ -814,10 +814,6 @@ static int xm_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		return -1;
 	}
 
-	if (xfh.restart > 255) {
-		D_(D_CRIT "bad restart position: %d", xfh.restart);
-		return -1;
-	}
 	if (xfh.channels > XMP_MAX_CHANNELS) {
 		D_(D_CRIT "bad channel count: %d", xfh.channels);
 		return -1;
@@ -850,7 +846,7 @@ static int xm_load(struct module_data *m, HIO_HANDLE * f, const int start)
 	mod->chn = xfh.channels;
 	mod->pat = xfh.patterns;
 	mod->ins = xfh.instruments;
-	mod->rst = xfh.restart;
+	mod->rst = xfh.restart >= xfh.songlen ? 0 : xfh.restart;
 	mod->spd = xfh.tempo;
 	mod->bpm = xfh.bpm;
 	mod->trk = mod->chn * mod->pat + 1;
@@ -1004,6 +1000,8 @@ static int xm_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		libxmp_set_type(m, "ModPlug Tracker 1.16 XM %d.%02d",
 				xfh.version >> 8, xfh.version & 0xff);
 
+		m->quirk &= ~QUIRK_FT2BUGS;
+		m->flow_mode = FLOW_MODE_MPT_116;
 		m->mvolbase = 48;
 		m->mvol = 48;
 		libxmp_apply_mpt_preamp(m);

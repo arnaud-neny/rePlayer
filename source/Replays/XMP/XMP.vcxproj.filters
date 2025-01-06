@@ -724,6 +724,9 @@
     <ClCompile Include="libxmp\src\depackers\lhasa\pm2_decoder.c">
       <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
     </ClCompile>
+    <ClCompile Include="libxmp\src\flow.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="libxmp\README">

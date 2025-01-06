@@ -25,6 +25,7 @@
 #include "mixer.h"
 #include "rng.h"
 
+/* TODO: Change this to const char *const in a future ABI change */
 const char *xmp_version LIBXMP_EXPORT_VAR = XMP_VERSION;
 const unsigned int xmp_vercode LIBXMP_EXPORT_VAR = XMP_VERCODE;
 
@@ -558,8 +559,13 @@ int xmp_set_instrument_path(xmp_context opaque, const char *path)
 	struct context_data *ctx = (struct context_data *)opaque;
 	struct module_data *m = &ctx->m;
 
-	if (m->instrument_path != NULL)
+	if (m->instrument_path != NULL) {
 		free(m->instrument_path);
+		m->instrument_path = NULL;
+	}
+	if (path == NULL) {
+		return 0;
+	}
 
 	m->instrument_path = libxmp_strdup(path);
 	if (m->instrument_path == NULL) {
