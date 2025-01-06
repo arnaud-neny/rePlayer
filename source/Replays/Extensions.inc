@@ -886,7 +886,7 @@ EXTENSION(wbd)          // VGMStream
 EXTENSION(wbk)          // VGMStream
 EXTENSION(wd)           // VGMStream
 EXTENSION(wem)          // VGMStream: Audiokinetic Wwise RIFF
-EXTENSION(ntx)          // VGMStream
+EXTENSION(nfx)          // VGMStream
 EXTENSION(wma)          // VGMStream: FFmpeg
 EXTENSION(wmus)         // VGMStream
 EXTENSION(wp2)          // VGMStream
@@ -924,7 +924,7 @@ EXTENSION(xsf)          // VGMStream
 EXTENSION(xsh)          // VGMStream
 EXTENSION(xss)          // VGMStream
 EXTENSION(xvag)         // VGMStream: Sony XVAG
-EXTENSION(xvas)         // VGMStream
+EXTENSION(v)			// VGMStream
 EXTENSION(xwav)         // VGMStream: RIFF Wave (XBOX)
 EXTENSION(xwb)          // VGMStream: Microsoft XWB
 EXTENSION(xwc)          // VGMStream
@@ -955,3 +955,6 @@ EXTENSION(no)           // VGMStream
 EXTENSION(wax)          // VGMStream
 EXTENSION(se)           // VGMStream
 EXTENSION(unic)         // OpenMPT: UNIC Tracker
+EXTENSION(apm)          // VGMStream
+EXTENSION(sdd)          // VGMStream
+EXTENSION(sd1)          // VGMStream

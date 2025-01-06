@@ -239,9 +239,12 @@ typedef struct {
     int loop_count;                 /* counter of complete loops (1=looped once) */
     int loop_target;                /* max loops before continuing with the stream end (loops forever if not set) */
 
-    sample_t* tmpbuf;               /* garbage buffer used for seeking/trimming */
-    size_t tmpbuf_size;             /* for all channels (samples = tmpbuf_size / channels) */
+    void* tmpbuf;                   /* garbage buffer used for seeking/trimming */
+    size_t tmpbuf_size;             /* for all channels (samples = tmpbuf_size / channels / sample_size) */
 
+#if VGM_TEST_DECODER
+    void* decode_state;             /* for some decoders (TO-DO: to be mover around) */
+#endif
 } VGMSTREAM;
 
 

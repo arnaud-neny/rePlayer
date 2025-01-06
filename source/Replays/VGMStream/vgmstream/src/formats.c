@@ -70,6 +70,7 @@ static const char* extension_list[] = {
     "ao",
     "ap",
     "apc",
+    "apm",
     "as4",
     "asbin",
     "asd",
@@ -392,7 +393,7 @@ static const char* extension_list[] = {
     "npsf", //fake extension/header id for .nps (in bigfiles)
     "nsa",
     "nsopus",
-    "ntx",
+    "nfx",
     "nub",
     "nub2",
     "nus3audio",
@@ -454,6 +455,7 @@ static const char* extension_list[] = {
     "rsnd", //txth/reserved [Birushana: Ichijuu no Kaze (Switch)]
     "rsp",
     "rstm", //fake extension/header id for .rstm (in bigfiles)
+    "rvw", //txth/reserved [Half-Minute Hero (PC)]
     "rvws",
     "rwar",
     "rwav",
@@ -497,6 +499,8 @@ static const char* extension_list[] = {
     "scd",
     "sch",
     "sd9",
+    "sdd",
+    "sdl",
     "sdp", //txth/reserved [Metal Gear Arcade (AC)]
     "sdf",
     "sdt",
@@ -586,6 +590,7 @@ static const char* extension_list[] = {
     "utk",
     "uv",
 
+    "v",
     "v0",
     //"v1", //dual channel with v0
     "va3",
@@ -684,7 +689,6 @@ static const char* extension_list[] = {
     "xsew",
     "xss",
     "xvag",
-    "xvas",
     "xwav", //fake extension for .wav (renamed, to be removed)
     "xwb",
     "xmd",
@@ -953,7 +957,7 @@ static const layout_info layout_info_list[] = {
         {layout_blocked_ea_1snh,        "blocked (EA 1SNh)"},
         {layout_blocked_caf,            "blocked (CAF)"},
         {layout_blocked_wsi,            "blocked (WSI)"},
-        {layout_blocked_xvas,           "blocked (.xvas)"},
+        {layout_blocked_xvas,           "blocked (.vas)"},
         {layout_blocked_str_snds,       "blocked (.str SNDS)"},
         {layout_blocked_ws_aud,         "blocked (Westwood Studios .aud)"},
         {layout_blocked_dec,            "blocked (DEC)"},
@@ -1089,9 +1093,10 @@ static const meta_info meta_info_list[] = {
         {meta_VIG_KCES,             "Konami .VIG header"},
         {meta_HXD,                  "Tecmo HXD header"},
         {meta_VSV,                  "Square Enix .vsv Header"},
-        {meta_RIFF_WAVE_labl,       "RIFF WAVE header (labl looping)"},
         {meta_RIFF_WAVE_smpl,       "RIFF WAVE header (smpl looping)"},
         {meta_RIFF_WAVE_wsmp,       "RIFF WAVE header (wsmp looping)"},
+        {meta_RIFF_WAVE_labl,       "RIFF WAVE header (labl looping)"},
+        {meta_RIFF_WAVE_cue,        "RIFF WAVE header (cue looping)"},
         {meta_RIFX_WAVE,            "RIFX WAVE header"},
         {meta_RIFX_WAVE_smpl,       "RIFX WAVE header (smpl looping)"},
         {meta_XNB,                  "Microsoft XNA Game Studio header"},
@@ -1107,7 +1112,6 @@ static const meta_info meta_info_list[] = {
         {meta_STR_SEGA,             "Sega Stream Asset Builder header"},
         {meta_STR_SEGA_custom,      "Sega Stream Asset Builder header (custom)"},
         {meta_XMU,                  "Outrage XMU header"},
-        {meta_XVAS,                 "Konami .XVAS header"},
         {meta_XA2_ACCLAIM,          "Acclaim .XA2 header"},
         {meta_SAP,                  "VING .SAP header"},
         {meta_DC_IDVI,              "Capcom IDVI header"},
@@ -1147,7 +1151,7 @@ static const meta_info meta_info_list[] = {
         {meta_P2BT_MOVE_VISA,       "Konami P2BT/MOVE/VISA header"},
         {meta_GBTS,                 "Konami GBTS header"},
         {meta_NGC_DSP_IADP,         "IADP Header"},
-        {meta_RIFF_WAVE_MWV,        "RIFF WAVE header (ctrl looping)"},
+        {meta_RIFF_WAVE_ctrl,       "RIFF WAVE header (ctrl looping)"},
         {meta_FFCC_STR,             "Final Fantasy: Crystal Chronicles STR header"},
         {meta_SAT_BAKA,             "Konami BAKA header"},
         {meta_SWAV,                 "Nintendo SWAV header"},
@@ -1188,7 +1192,6 @@ static const meta_info meta_info_list[] = {
         {meta_PONA_3DO,             "Policenauts BGM header"},
         {meta_PONA_PSX,             "Policenauts BGM header"},
         {meta_NGC_DSP_AAAP,         "Acclaim Austin AAAp DSP header"},
-        {meta_NGC_DSP_KONAMI,       "Konami DSP header"},
         {meta_BNSF,                 "Namco Bandai BNSF header"},
         {meta_WB,                   "Triangle Service .WB header"},
         {meta_S14,                  "Namco .S14 raw header"},
@@ -1286,6 +1289,7 @@ static const meta_info meta_info_list[] = {
         {meta_OPUS,                 "Nintendo Switch OPUS header"},
         {meta_PC_AST,               "Capcom AST (PC) header"},
         {meta_UBI_SB,               "Ubisoft SBx header"},
+        {meta_UBI_APM,              "Ubisoft APM header"},
         {meta_NAAC,                 "Namco NAAC header"},
         {meta_EZW,                  "EZ2DJ EZWAVE header"},
         {meta_VXN,                  "Gameloft VXN header"},
@@ -1444,6 +1448,7 @@ static const meta_info meta_info_list[] = {
         {meta_EA_SBK,               "Electronic Arts SBK header"},
         {meta_DSP_ASURA,            "Rebellion DSP header"},
         {meta_ONGAKUKAN_RIFF_ADP,   "Ongakukan RIFF WAVE header"},
+        {meta_SDD,                  "Doki Denki DSBH header"},
 };
 
 void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t out_size) {

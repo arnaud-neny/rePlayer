@@ -136,13 +136,16 @@ void setup_vgmstream(VGMSTREAM* vgmstream) {
             vgmstream->loop_end_sample = 0;
         }
     }
-    
+
+#if 0
+    //TODO: this removes loop info after disabling loops externally (this must be called), though this is not very useful
     /* clean as loops are readable metadata but loop fields may contain garbage
         * (done *after* dual stereo as it needs loop fields to match) */
     if (!vgmstream->loop_flag) {
         vgmstream->loop_start_sample = 0;
         vgmstream->loop_end_sample = 0;
     }
+#endif
 
     /* save start things so we can restart when seeking */
     memcpy(vgmstream->start_ch, vgmstream->ch, sizeof(VGMSTREAMCHANNEL)*vgmstream->channels);
@@ -216,17 +219,23 @@ VGMSTREAM* allocate_vgmstream(int channels, int loop_flag) {
         if (!vgmstream->loop_ch) goto fail;
     }
 
-    /* garbage buffer for decode discarding (local bufs may cause stack overflows with segments/layers)
-     * in theory the bigger the better but in practice there isn't much difference */
-    vgmstream->tmpbuf_size = 0x10000; /* for all channels */
-    vgmstream->tmpbuf = malloc(sizeof(sample_t) * vgmstream->tmpbuf_size);
-    if (!vgmstream->tmpbuf) goto fail;
-
     vgmstream->channels = channels;
     vgmstream->loop_flag = loop_flag;
 
     vgmstream->mixer = mixer_init(vgmstream->channels); /* pre-init */
-    //if (!vgmstream->mixer) goto fail;
+    if (!vgmstream->mixer) goto fail;
+
+#if VGM_TEST_DECODER
+    vgmstream->decode_state = decode_init();
+    if (!vgmstream->decode_state) goto fail;
+#endif
+
+    //TODO: improve/init later to minimize memory
+    /* garbage buffer for seeking/discarding (local bufs may cause stack overflows with segments/layers)
+     * in theory the bigger the better but in practice there isn't much difference. */
+    vgmstream->tmpbuf_size = 1024 * 2 * channels * sizeof(float);
+    vgmstream->tmpbuf = malloc(vgmstream->tmpbuf_size);
+    if (!vgmstream->tmpbuf) goto fail;
 
     /* BEWARE: merge_vgmstream does some free'ing too */ 
 
@@ -411,6 +420,9 @@ static bool merge_vgmstream(VGMSTREAM* opened_vgmstream, VGMSTREAM* new_vgmstrea
         opened_vgmstream->layout_type = layout_none; /* fixes some odd cases */
 
     /* discard the second VGMSTREAM */
+#if VGM_TEST_DECODER
+    decode_free(new_vgmstream);
+#endif
     mixer_free(new_vgmstream->mixer);
     free(new_vgmstream->tmpbuf);
     free(new_vgmstream->start_vgmstream);

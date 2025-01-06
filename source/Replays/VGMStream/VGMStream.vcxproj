@@ -593,6 +593,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="vgmstream\src\api.h" />
     <ClInclude Include="vgmstream\src\base\api_internal.h" />
     <ClInclude Include="vgmstream\src\base\decode.h" />
+    <ClInclude Include="vgmstream\src\base\decode_state.h" />
     <ClInclude Include="vgmstream\src\base\mixer.h" />
     <ClInclude Include="vgmstream\src\base\mixer_priv.h" />
     <ClInclude Include="vgmstream\src\base\mixing.h" />
@@ -1811,7 +1812,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="vgmstream\src\meta\nds_strm_ffta2.c" />
     <ClCompile Include="vgmstream\src\meta\ngc_adpdtk.c" />
     <ClCompile Include="vgmstream\src\meta\ngc_dsp_asura.c" />
-    <ClCompile Include="vgmstream\src\meta\ngc_dsp_konami.c" />
     <ClCompile Include="vgmstream\src\meta\ngc_dsp_mpds.c" />
     <ClCompile Include="vgmstream\src\meta\ngc_dsp_std.c" />
     <ClCompile Include="vgmstream\src\meta\ngc_ffcc_str.c" />
@@ -1901,6 +1901,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="vgmstream\src\meta\sbk.c" />
     <ClCompile Include="vgmstream\src\meta\scd_pcm.c" />
     <ClCompile Include="vgmstream\src\meta\sd9.c" />
+    <ClCompile Include="vgmstream\src\meta\sdd.c" />
     <ClCompile Include="vgmstream\src\meta\sdf.c" />
     <ClCompile Include="vgmstream\src\meta\sdrh.c" />
     <ClCompile Include="vgmstream\src\meta\sdt.c" />
@@ -1954,6 +1955,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="vgmstream\src\meta\txtp.c" />
     <ClCompile Include="vgmstream\src\meta\txtp_parser.c" />
     <ClCompile Include="vgmstream\src\meta\txtp_process.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_apm.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_bao.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_ckd.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_ckd_cwav.c" />
@@ -2018,7 +2020,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="vgmstream\src\meta\xss.c" />
     <ClCompile Include="vgmstream\src\meta\xssb.c" />
     <ClCompile Include="vgmstream\src\meta\xvag.c" />
-    <ClCompile Include="vgmstream\src\meta\xvas.c" />
     <ClCompile Include="vgmstream\src\meta\xwav.c" />
     <ClCompile Include="vgmstream\src\meta\xwb.c" />
     <ClCompile Include="vgmstream\src\meta\xwc.c" />

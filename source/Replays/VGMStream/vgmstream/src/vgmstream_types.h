@@ -391,12 +391,10 @@ typedef enum {
     meta_PS2_VSF_TTA,       /* Tiny Toon Adventures: Defenders of the Universe */
     meta_ADS_MIDWAY,
     meta_PS2_SPS,           /* Ape Escape 2 */
-    meta_NGC_DSP_KONAMI,    /* Konami DSP header, found in various games */
     meta_UBI_CKD,           /* Ubisoft CKD RIFF header (Rayman Origins Wii) */
     meta_RAW_WAVM,
     meta_WVS,
     meta_XMU,
-    meta_XVAS,
     meta_EA_SCHL,           /* Electronic Arts SCHl with variable header */
     meta_EA_SCHL_fixed,     /* Electronic Arts SCHl with fixed header */
     meta_EA_BNK,            /* Electronic Arts BNK */
@@ -410,10 +408,11 @@ typedef enum {
     meta_WS_AUD,
     meta_RIFF_WAVE,         /* RIFF, for WAVs */
     meta_RIFF_WAVE_POS,     /* .wav + .pos for looping (Ys Complete PC) */
-    meta_RIFF_WAVE_labl,    /* RIFF w/ loop Markers in LIST-adtl-labl */
-    meta_RIFF_WAVE_smpl,    /* RIFF w/ loop data in smpl chunk */
-    meta_RIFF_WAVE_wsmp,    /* RIFF w/ loop data in wsmp chunk */
-    meta_RIFF_WAVE_MWV,     /* .mwv RIFF w/ loop data in ctrl chunk pflt */
+    meta_RIFF_WAVE_labl,
+    meta_RIFF_WAVE_smpl,
+    meta_RIFF_WAVE_wsmp,
+    meta_RIFF_WAVE_ctrl,
+    meta_RIFF_WAVE_cue,
     meta_RIFX_WAVE,         /* RIFX, for big-endian WAVs */
     meta_RIFX_WAVE_smpl,    /* RIFX w/ loop data in smpl chunk */
     meta_XNB,               /* XNA Game Studio 4.0 */
@@ -550,6 +549,7 @@ typedef enum {
     meta_PC_AST,            /* Dead Rising (PC) */
     meta_NAAC,              /* Namco AAC (3DS) */
     meta_UBI_SB,            /* Ubisoft banks */
+    meta_UBI_APM,           /* Ubisoft APM */
     meta_EZW,               /* EZ2DJ (Arcade) EZWAV */
     meta_VXN,               /* Gameloft mobile games */
     meta_EA_SNR_SNS,        /* Electronic Arts SNR+SNS (Burnout Paradise) */
@@ -709,6 +709,7 @@ typedef enum {
     meta_EA_SBK,
     meta_DSP_ASURA,
     meta_ONGAKUKAN_RIFF_ADP,
+    meta_SDD,
 
 } meta_t;
 

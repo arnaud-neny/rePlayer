@@ -12,6 +12,7 @@
 extern "C" {
 #include "vgmstream/version.h"
 #include "vgmstream/src/api.h"
+#include "vgmstream/src/base/mixing.h"
 }
 
 namespace rePlayer
@@ -279,6 +280,7 @@ namespace rePlayer
 
         vgmstream_mixing_autodownmix(vgmstream, 2);
         vgmstream_mixing_enable(vgmstream, 32768, nullptr, nullptr);
+        mixing_macro_output_sample_format(vgmstream, SFMT_FLT);
     }
 
     uint32_t ReplayVGMStream::Render(StereoSample* output, uint32_t numSamples)
@@ -293,18 +295,15 @@ namespace rePlayer
             m_loopCount = m_vgmstream->loop_count;
             return 0;
         }
-        auto* buf = m_vgmstream->channels > 2 ? new int16_t[numSamples * m_vgmstream->channels] : (reinterpret_cast<int16_t*>(output + numSamples) - numSamples * m_vgmstream->channels);
+
+        bool isMono = m_vgmstream->channels == 1;
+        auto* buf = reinterpret_cast<sample_t*>(output);
+        if (isMono)
+            buf = reinterpret_cast<sample_t*>(reinterpret_cast<float*>(output + numSamples) - numSamples);
         auto numRendered = render_vgmstream(buf, int32_t(numSamples), m_vgmstream);
-        if (m_vgmstream->channels == 1)
-        {
-            output->ConvertMono(buf, numSamples);
-        }
-        else
-        {
-            output->Convert(buf, numRendered);
-            if (m_vgmstream->channels > 2)
-                delete[] buf;
-        }
+        if (isMono)
+            output->ConvertMono(reinterpret_cast<float*>(buf), numRendered);
+
         return numRendered;
     }
 
@@ -352,6 +351,7 @@ namespace rePlayer
 
                 vgmstream_mixing_autodownmix(m_vgmstream, 2);
                 vgmstream_mixing_enable(m_vgmstream, 32768, nullptr, nullptr);
+                mixing_macro_output_sample_format(m_vgmstream, SFMT_FLT);
 
                 m_loopCount = m_vgmstream->loop_count;
             }

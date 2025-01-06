@@ -1685,6 +1685,9 @@
     <ClInclude Include="vgmstream\src\vgmstream_init.h">
       <Filter>Source Files\vgmstream\src</Filter>
     </ClInclude>
+    <ClInclude Include="vgmstream\src\base\decode_state.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGMStream.cpp">
@@ -2605,9 +2608,6 @@
     <ClCompile Include="vgmstream\src\meta\ngc_adpdtk.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ngc_dsp_konami.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ngc_dsp_mpds.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -3191,9 +3191,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\xvag.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\xvas.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\xwav.c">
@@ -4629,6 +4626,12 @@
     </ClCompile>
     <ClCompile Include="vgmstream\src\vgmstream_init.c">
       <Filter>Source Files\vgmstream\src</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sdd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_apm.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
