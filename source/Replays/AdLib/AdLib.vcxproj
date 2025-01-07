@@ -251,6 +251,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="adplug\pis.h" />
     <ClInclude Include="adplug\player.h" />
     <ClInclude Include="adplug\players.h" />
+    <ClInclude Include="adplug\plx.h" />
     <ClInclude Include="adplug\protrack.h" />
     <ClInclude Include="adplug\psi.h" />
     <ClInclude Include="adplug\rad2.h" />
@@ -339,6 +340,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="adplug\pis.cpp" />
     <ClCompile Include="adplug\player.cpp" />
     <ClCompile Include="adplug\players.cpp" />
+    <ClCompile Include="adplug\plx.cpp" />
     <ClCompile Include="adplug\protrack.cpp" />
     <ClCompile Include="adplug\psi.cpp" />
     <ClCompile Include="adplug\rad2.cpp" />

@@ -958,3 +958,4 @@ EXTENSION(unic)         // OpenMPT: UNIC Tracker
 EXTENSION(apm)          // VGMStream
 EXTENSION(sdd)          // VGMStream
 EXTENSION(sd1)          // VGMStream
+EXTENSION(plx)          // Adlib: PALLADIX Sound System
