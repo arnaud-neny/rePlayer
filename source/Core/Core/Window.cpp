@@ -36,7 +36,7 @@ namespace core
 
     void Window::Handle::ApplyAlwaysOnTop() const
     {
-        ::SetWindowPos(HWND(hWnd), states.isAlwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        ::SetWindowPos(HWND(hWnd), states.isAlwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | (states.isAlwaysOnTop ? SWP_SHOWWINDOW : 0));
     }
 
     void Window::Handle::ApplyPassthrough() const
