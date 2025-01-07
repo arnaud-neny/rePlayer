@@ -1,16 +1,17 @@
-v0.16.9
+v0.16.10
 - Added XMP
-- Updated adplug to 2.3.3.870
+- Updated adplug to 2.3.3.890
 - Updated Furnace to 0.6.7
 - Updated libkss to 1.2.1
 - Updated libsc68 to 3.0.0a r706
 - Updated libsidplay to 2.12.0
 - Updated libvgm to 34c368c
-- Updated OpenMPT to 0.8.0-pre.12 r22575
+- Updated libxmp to 4.6.1
+- Updated OpenMPT to 0.8.0-pre.12 r22843
 - Updated ProTrekkr to 2.7.6
-- Updated SNDH-Player to 0.78
+- Updated SNDH-Player to 0.79
 - Updated UADE to 3.0.5
-- Updated vgmstream to r1951
+- Updated vgmstream to r1980
 - Updated dr_flac to 0.12.43
 - Updated dr_mp3 to 0.6.40
 - Updated dr_wav to 0.13.17

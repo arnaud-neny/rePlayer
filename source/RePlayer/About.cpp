@@ -3,6 +3,7 @@
 #include <Database/Types/SourceID.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <RePlayer/Version.h>
 
 #include <Core/String.h>
 #include <Imgui.h>
@@ -41,7 +42,7 @@ namespace rePlayer
         ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_None);
 
         ImGui::TextUnformatted(Core::GetLabel());
-        ImGui::TextUnformatted(reinterpret_cast<const char*>(u8"Copyright (c) 2021-2024 Arnaud Nény (aka replay/Razor1911)"));
+        ImGui::TextUnformatted(REPLAYER_COPYRIGHT " (aka replay/Razor1911)");
 
         ImGui::TextUnformatted("\nSupported databases:");
         for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
