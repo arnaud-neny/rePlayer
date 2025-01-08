@@ -195,7 +195,7 @@ namespace core
             }
             if (isLoaded)
             {
-                if (data.onLoadedCallback)
+                if (data.type != SerializedData::kCustom && data.onLoadedCallback)
                 {
                     if (data.isStaticCallback)
                         data.onLoadedStaticCallback(data.userData, data.addr, data.name);
