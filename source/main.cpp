@@ -25,8 +25,9 @@
 static HWND s_hWnd = nullptr;
 static HICON s_hIcon = nullptr;
 static bool s_isWindows11 = false;
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+static uint32_t s_windows11FixTrayMiddleButton = 4;
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //
 RePlayer* s_rePlayer = nullptr;
 
@@ -118,12 +119,15 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             switch (LOWORD(lParam))
             {
+            case WM_LBUTTONUP:
+                if (s_windows11FixTrayMiddleButton >= 4)
+                {
+                    s_rePlayer->SystrayMouseLeft(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
+                    break;
+                }
             case WM_MBUTTONUP:
                 // Windows 11 bug: the middle button is returned as left button
                 s_rePlayer->SystrayMouseMiddle(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
-                break;
-            case WM_LBUTTONUP:
-                s_rePlayer->SystrayMouseLeft(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                 break;
             case WM_RBUTTONUP:
             case WM_CONTEXTMENU:
@@ -313,6 +317,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             MSG msg = {};
             while (msg.message != WM_QUIT)
             {
+                if (s_isWindows11 && GetAsyncKeyState(VK_MBUTTON))
+                    s_windows11FixTrayMiddleButton = 0;
+
                 // Poll and handle messages (inputs, window resize, etc.)
                 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
                 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -356,6 +363,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 
                 if (rePlayer::Graphics::EndFrame(s_rePlayer->GetBlendingFactor()))
                     break;
+
+                if (s_windows11FixTrayMiddleButton < 4)
+                    s_windows11FixTrayMiddleButton++;
             }
 
             // Taskbar Icon end
