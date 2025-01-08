@@ -74,15 +74,16 @@ namespace rePlayer
         m_numItems = file.Read<uint32_t>();
 
         m_items.Add(nullptr);
-        uint32_t nextId = 1;
-        for (uint32_t i = 0, n = m_numItems; i < n; i++, nextId++)
+        for (uint32_t i = 0, n = m_numItems; i < n; i++)
         {
             auto item = ItemType::Load(file);
             auto id = static_cast<uint32_t>(item->GetId());
-            for (; nextId < id; nextId++)
+            if (id < m_items.NumItems())
+                return Status::kFail;
+            while (m_items.NumItems() < id)
             {
+                m_availableIds.Add(m_items.NumItems<ItemID>());
                 m_items.Add(nullptr);
-                m_availableIds.Add(static_cast<ItemID>(nextId));
             }
             m_items.Add(item);
         }
