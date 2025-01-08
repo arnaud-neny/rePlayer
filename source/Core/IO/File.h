@@ -53,6 +53,7 @@ namespace core::io
         template <typename SizeType>
         void Write(const Array<std::string>& data) const { WriteAs<SizeType>(data.NumItems()); for (auto& element : data) Write(element); }
 
+        uint64_t GetPosition() const;
         void Seek(uint64_t offset);
 
         static bool Delete(const char* name);

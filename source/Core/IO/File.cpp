@@ -133,6 +133,14 @@ namespace core::io
         ::WriteFile(mHandle, buffer, uint32_t(size), &dwBytesWritten, nullptr);
     }
 
+    uint64_t File::GetPosition() const
+    {
+        LARGE_INTEGER largeOffset{ 0 };
+        LARGE_INTEGER newPos{ 0 };
+        ::SetFilePointerEx(mHandle, largeOffset, &newPos, FILE_CURRENT);
+        return newPos.QuadPart;
+    }
+
     void File::Seek(uint64_t offset)
     {
         LARGE_INTEGER largeOffset;
