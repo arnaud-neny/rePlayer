@@ -1,4 +1,4 @@
-v0.16.11
+v0.16.12
 - Added XMP
 - Updated adplug to 2.3.3.890
 - Updated Furnace to 0.6.7
