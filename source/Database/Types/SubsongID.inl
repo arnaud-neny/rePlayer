@@ -30,7 +30,7 @@ namespace rePlayer
         return Value() < other.Value();
     }
 
-    inline constexpr SubsongID::SubsongID(SongID newSongId, uint32_t newIndex)
+    inline constexpr SubsongID::SubsongID(SongID newSongId, uint16_t newIndex)
         : songId(newSongId)
         , index(newIndex)
     {}

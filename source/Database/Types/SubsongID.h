@@ -9,7 +9,8 @@ namespace rePlayer
     struct SubsongID
     {
         SongID songId = SongID::Invalid;
-        uint32_t index = 0;
+        uint16_t index = 0;
+        uint16_t external = 0; // use this externally
 
         constexpr bool IsValid() const;
         constexpr bool IsInvalid() const;
@@ -20,7 +21,7 @@ namespace rePlayer
         constexpr bool operator<(SubsongID other) const;
 
         constexpr SubsongID() = default;
-        constexpr SubsongID(SongID newSongId, uint32_t newIndex);
+        constexpr SubsongID(SongID newSongId, uint16_t newIndex);
     };
 }
 // namespace rePlayer

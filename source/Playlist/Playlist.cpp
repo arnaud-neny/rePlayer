@@ -1204,6 +1204,7 @@ namespace rePlayer
 
     Status Playlist::LoadPlaylist(io::File& file, Cue& cue, uint32_t version)
     {
+        auto filePos = file.GetPosition();
         for (uint32_t i = 0, e = cue.entries.NumItems(); i < e; i++)
         {
             SubsongID subsongId;
@@ -1242,6 +1243,32 @@ namespace rePlayer
 
         auto status = Status::kOk;
         status = cue.db.LoadSongs(file);
+        if (status == Status::kFail && version > 0 && version < 3)
+        {
+            // try to fix a bug with wrong releases 0.16.9 to 0.16.11 (compiled with temporary code)
+            file.Seek(filePos);
+
+            for (uint32_t i = 0, e = cue.entries.NumItems(); i < e; i++)
+            {
+                SubsongID subsongId;
+                file.Read(subsongId.songId);
+                subsongId.index = uint16_t(file.Read<uint32_t>());
+
+                cue.entries[i] = {};
+                cue.entries[i].subsongId = subsongId;
+                cue.entries[i].playlistId = ++m_uniqueIdGenerator;
+            }
+
+            for (uint32_t i = 0, e = cue.entries.NumItems(); i < e;)
+            {
+                uint8_t isPlaylistDatabase = 0;
+                file.Read(isPlaylistDatabase);
+                for (uint32_t j = 0; j < 8 && i < e; j++, i++, isPlaylistDatabase >>= 1)
+                    cue.entries[i].databaseId = DatabaseID(isPlaylistDatabase & 1);
+            }
+
+            status = cue.db.LoadSongs(file);
+        }
         if (status == Status::kOk)
         {
             status = cue.db.LoadArtists(file);
@@ -1260,6 +1287,13 @@ namespace rePlayer
                     }
                 }
             }
+        }
+        if (status == Status::kFail)
+        {
+            cue.db.Reset();
+            cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+            cue.paths = {};
+            cue.entries.Clear();
         }
 
         return status;
