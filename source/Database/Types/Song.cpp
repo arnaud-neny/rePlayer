@@ -324,6 +324,8 @@ namespace rePlayer
 
     void Song::Patch(uint32_t version)
     {
+        // version 1: updated type storage
+        // version 2: converted internal packages to archive
         if (version == 0)
         {
             struct MediaType0

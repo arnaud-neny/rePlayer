@@ -334,7 +334,7 @@ namespace rePlayer
         auto file = io::File::OpenForRead(ms_filename);
         if (file.IsValid())
         {
-            if (file.Read<uint64_t>() != SongSource::kVersion)
+            if (file.Read<uint32_t>() != kMusicFileStamp || file.Read<uint32_t>() > Core::GetVersion())
             {
                 assert(0 && "file read error");
                 return;
@@ -357,7 +357,8 @@ namespace rePlayer
             auto file = io::File::OpenForWrite(ms_filename);
             if (file.IsValid())
             {
-                file.Write(SongSource::kVersion);
+                file.Write(kMusicFileStamp);
+                file.Write(Core::GetVersion());
                 file.Write<uint32_t>(m_songs);
                 m_isDirty = false;
             }

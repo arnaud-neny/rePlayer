@@ -116,8 +116,6 @@ namespace rePlayer
             bool IsValid() const { return songId != SongID::Invalid || isDiscarded == true; }
         };
 
-        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
-
     private:
         template <typename T = uint32_t>
         SourceSong* GetSongSource(T index) const { return m_data.Items<SourceSong>(m_songs[index]); }

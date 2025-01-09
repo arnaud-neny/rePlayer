@@ -67,8 +67,6 @@ namespace rePlayer
             };
         };
 
-        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
-
     private:
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;

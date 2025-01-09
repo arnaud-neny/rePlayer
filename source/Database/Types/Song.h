@@ -103,9 +103,6 @@ namespace rePlayer
 
         void Patch(uint32_t version);
 
-        //static constexpr uint32_t kVersion = 1;   // updated type storage
-        static constexpr uint32_t kVersion = 2;     // converted internal packages to archive
-
     private:
         Song(Song&&) = delete;
         Song(const Song&) = delete;

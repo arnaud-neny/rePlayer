@@ -1102,7 +1102,7 @@ namespace rePlayer
         auto file = io::File::OpenForRead(ms_filename);
         if (file.IsValid())
         {
-            if (file.Read<uint64_t>() != kVersion)
+            if (file.Read<uint32_t>() != kMusicFileStamp || file.Read<uint32_t>() > Core::GetVersion())
             {
                 assert(0 && "file read error");
                 return;
@@ -1147,7 +1147,8 @@ namespace rePlayer
             auto file = io::File::OpenForWrite(ms_filename);
             if (file.IsValid())
             {
-                file.Write(kVersion);
+                file.Write(kMusicFileStamp);
+                file.Write(Core::GetVersion());
                 if (m_areDataDirty)
                 {
                     HashMap<uint32_t, uint32_t> dataUsage;

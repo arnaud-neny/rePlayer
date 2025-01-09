@@ -5,6 +5,7 @@
 // rePlayer
 #include <Database/DatabaseSongsUI.h>
 #include <Database/Types/Proxy.inl.h>
+#include <Replayer/Core.h>
 
 #include "Database.h"
 
@@ -65,7 +66,7 @@ namespace rePlayer
         m_availableIds.Clear();
 
         auto version = m_version = file.Read<uint32_t>();
-        if (version > ItemType::kVersion)
+        if (version > Core::GetVersion())
         {
             assert(0 && "file read error");
             return Status::kFail;
@@ -87,7 +88,7 @@ namespace rePlayer
             }
             m_items.Add(item);
         }
-        if (version != ItemType::kVersion)
+        if (version != Core::GetVersion())
         {
             for (uint32_t i = 0, n = m_items.NumItems(); i < n; i++)
             {
@@ -102,7 +103,7 @@ namespace rePlayer
     template <typename ItemType, typename ItemID>
     void Database::Set<ItemType, ItemID>::Save(io::File& file)
     {
-        file.Write(ItemType::kVersion);
+        file.Write(Core::GetVersion());
         file.WriteAs<uint32_t>(m_numItems);
         for (auto& item : m_items)
         {

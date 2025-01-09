@@ -67,8 +67,6 @@ namespace rePlayer
                 };
             };
             SongID songId = SongID::Invalid;
-
-            static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
         };
 
     public:

@@ -96,8 +96,6 @@ namespace rePlayer
 
         void Patch(uint32_t version) { (void)version; }
 
-        static constexpr uint32_t kVersion = 0;
-
     private:
         Artist(Artist&&) = delete;
         Artist(const Artist&) = delete;

@@ -141,7 +141,7 @@ namespace rePlayer
         {
             auto stamp = file.Read<uint32_t>();
             auto version = file.Read<uint32_t>();
-            if (stamp == kMusicFileStamp && version <= kVersion)
+            if (stamp == kMusicFileStamp && version <= Core::GetVersion())
             {
                 m_cue.entries.Resize(file.Read<uint32_t>());
                 m_oldCurrentEntryIndex = m_currentEntryIndex = file.Read<int32_t>();
@@ -228,7 +228,7 @@ namespace rePlayer
                     auto stamp = file.Read<uint32_t>();
                     auto version = file.Read<uint32_t>();
                     if (stamp != kMusicFileStamp
-                        || version > kVersion
+                        || version > Core::GetVersion()
                         || LoadPlaylist(file, cue, version) != Status::kOk)
                         continue;
                     file = io::File(); // close file
@@ -257,7 +257,7 @@ namespace rePlayer
                             cue.entries.Resize(numEntries);
 
                             file.Write(kMusicFileStamp);
-                            file.Write(kVersion);
+                            file.Write(Core::GetVersion());
                             SavePlaylist(file, cue);
                         }
                         else
@@ -1366,7 +1366,7 @@ namespace rePlayer
 
                             auto stamp = file.Read<uint32_t>();
                             auto version = file.Read<uint32_t>();
-                            if (stamp == kMusicFileStamp && version <= kVersion)
+                            if (stamp == kMusicFileStamp && version <= Core::GetVersion())
                                 LoadPlaylist(file, m_cue, version);
                             else
                                 assert(0 && "file read error");
@@ -1422,7 +1422,7 @@ namespace rePlayer
                 if (file.IsValid())
                 {
                     file.Write(kMusicFileStamp);
-                    file.Write(kVersion);
+                    file.Write(Core::GetVersion());
                     SavePlaylist(file, m_cue);
                 }
 
@@ -2091,7 +2091,7 @@ namespace rePlayer
         if (file.IsValid())
         {
             file.Write(kMusicFileStamp);
-            file.Write(kVersion);
+            file.Write(Core::GetVersion());
 
             file.WriteAs<uint32_t>(m_cue.entries.NumItems());
             file.Write(m_currentEntryIndex);

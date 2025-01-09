@@ -80,8 +80,6 @@ namespace rePlayer
             Chars url;
         };
 
-        static constexpr uint64_t kVersion = uint64_t(kMusicFileStamp) | (0ull << 32);
-
     private:
         SongSource* FindSong(uint32_t pack, const std::string& titleUrl);
         ArtistSource* FindArtist(const std::string& url);

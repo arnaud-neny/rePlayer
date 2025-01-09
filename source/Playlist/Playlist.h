@@ -74,7 +74,6 @@ namespace rePlayer
             const char* GetPath(SourceID sourceId) const;
         };
 
-        static constexpr uint32_t kVersion = 3;
         struct Summary
         {
             uint32_t numSubsongs = 0;
