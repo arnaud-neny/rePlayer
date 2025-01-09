@@ -71,7 +71,7 @@ namespace rePlayer
         static eExtension GetExtension(io::Stream* stream, PlayerA* player, DATA_LOADER* loader);
 
     private:
-        SmartPtr<io::Stream> m_stream;
+        Array<SmartPtr<io::Stream>> m_streams;
         PlayerA* m_player;
         DATA_LOADER* m_loader;
         Surround m_surround;

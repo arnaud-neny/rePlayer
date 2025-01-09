@@ -14,6 +14,8 @@
 #include <player/gymplayer.hpp>
 #include <utils/MemoryLoader.h>
 
+#include "yrw801.h"
+
 #define LIBVGM_VERSION "@34c368c"
 
 namespace rePlayer
@@ -77,19 +79,45 @@ namespace rePlayer
         }
 
         auto data = stream->Read();
-        auto* loader = MemoryLoader_Init(data.Items(), uint32_t(data.Size()));
-        if (DataLoader_Load(loader) || player->LoadFile(loader))
+        auto* replay = new ReplayVGM(stream, player, MemoryLoader_Init(data.Items(), uint32_t(data.Size())));
+        player->SetFileReqCallback([](void* userParam, PlayerBase* /*player*/, const char* fileName)
         {
-            delete player;
-            DataLoader_Deinit(loader);
+            DATA_LOADER* loader = nullptr;
+            auto* replay = reinterpret_cast<ReplayVGM*>(userParam);
+            if (strcmp(fileName, "yrw801.rom") == 0)
+                loader = MemoryLoader_Init(s_yrw801_rom, uint32_t(sizeof(s_yrw801_rom)));
+            else
+            {
+                auto newStream = replay->m_streams[0]->Open(fileName);
+                if (newStream.IsValid())
+                {
+                    replay->m_streams.Add(newStream);
+                    auto data = newStream->Read();
+                    loader = MemoryLoader_Init(data.Items(), data.NumItems());
+                }
+            }
+            if (DataLoader_Load(loader))
+            {
+                DataLoader_Deinit(loader);
+                loader = nullptr;
+            }
+            return loader;
+        }, replay);
+
+        if (DataLoader_Load(replay->m_loader) || player->LoadFile(replay->m_loader))
+        {
+            delete replay;
             return nullptr;
         }
 
         player->SetLoopCount(0);
         player->SetEndSilenceSamples(kSampleRate / 4);
         player->Start();
+        player->SetEventCallback(OnEvent, replay);
 
-        return new ReplayVGM(stream, player, loader);
+        replay->m_mediaType.ext = GetExtension(stream, player, replay->m_loader);
+
+        return replay;
     }
 
     bool ReplayVGM::DisplaySettings()
@@ -202,13 +230,12 @@ namespace rePlayer
     }
 
     ReplayVGM::ReplayVGM(io::Stream* stream, PlayerA* player, DATA_LOADER* loader)
-        : Replay(GetExtension(stream, player, loader), eReplay::VGM)
-        , m_stream(stream)
+        : Replay(eExtension::Unknown, eReplay::VGM)
         , m_player(player)
         , m_loader(loader)
         , m_surround(kSampleRate)
     {
-        player->SetEventCallback(OnEvent, this);
+        m_streams.Add(stream);
     }
 
     UINT8 ReplayVGM::OnEvent(PlayerBase* /*player*/, void* userParam, UINT8 evtType, void* /*evtParam*/)
@@ -290,11 +317,8 @@ namespace rePlayer
             && settings->duration) ? (uint64_t(settings->duration) * kSampleRate) / 1000 : 0;
     }
 
-    void ReplayVGM::SetSubsong(uint32_t subsongIndex)
-    {
-        m_subsongIndex = subsongIndex;
-        ResetPlayback();
-    }
+    void ReplayVGM::SetSubsong(uint32_t /*subsongIndex*/)
+    {}
 
     eExtension ReplayVGM::GetExtension(io::Stream* stream, PlayerA* player, DATA_LOADER* loader)
     {

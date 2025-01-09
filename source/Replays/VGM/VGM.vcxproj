@@ -305,6 +305,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="libvgm\utils\OSThread.h" />
     <ClInclude Include="libvgm\utils\StrUtils.h" />
     <ClInclude Include="ReplayVGM.h" />
+    <ClInclude Include="yrw801.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libvgm\emu\cores\2151intf.c" />
