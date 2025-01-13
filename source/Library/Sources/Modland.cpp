@@ -1703,16 +1703,20 @@ namespace rePlayer
                     else
                     {
                         auto newArtist = line;
-                        while (*line != '/')
+                        while (*line != '/' && !(isLineSkipped = *line == 0))
                             line++;
+                        if (isLineSkipped)
+                            continue;
                         *line++ = 0;
                         artists[0] = FindDatabaseArtist(newArtist);
                         if (memcmp(line, "coop-", sizeof("coop-") - 1) == 0)
                         {
                             line += sizeof("coop-") - 1;
                             auto newArtist2 = line;
-                            while (*line != '/')
+                            while (*line != '/' && !(isLineSkipped = *line == 0))
                                 line++;
+                            if (isLineSkipped)
+                                continue;
                             *line++ = 0;
                             artists[1] = FindDatabaseArtist(newArtist2);
                         }
