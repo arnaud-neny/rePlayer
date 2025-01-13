@@ -4,18 +4,15 @@
 #include <Core/String.h>
 #include <IO/File.h>
 
-#include <Database/Database.h>
 #include <Library/Library.h>
+#include <Library/LibraryDatabase.h>
 #include <Library/LibrarySongMerger.h>
 #include <RePlayer/Core.h>
-#include <RePlayer/CoreHeader.h>
 
 #include <filesystem>
 
 namespace rePlayer
 {
-    const char* const Library::SongsUI::ms_path = SongsPath;
-
     Library::SongsUI::SongsUI(Window& owner)
         : DatabaseSongsUI(DatabaseID::kLibrary, owner)
         , m_songMerger(new SongMerger())
@@ -54,11 +51,11 @@ namespace rePlayer
                 if (numSubsongs == 0)
                 {
                     auto& library = GetLibrary();
-                    auto filename = GetFullpath(holdSong);
+                    auto filename = m_db.GetFullpath(holdSong);
                     if (!io::File::Delete(filename.c_str()))
                     {
                         Log::Warning("Can't delete file \"%s\"\n", filename.c_str());
-                        m_hasFailedDeletes = true;
+                        Core::GetLibraryDatabase().InvalidateCache();
                     }
 
                     for (auto sourceId : song->sourceIds)
@@ -66,9 +63,9 @@ namespace rePlayer
 
                     for (auto artistId : song->artistIds)
                     {
-                        auto* artist = library.m_db[artistId]->Edit();
+                        auto* artist = Core::GetLibraryDatabase()[artistId]->Edit();
                         if (--artist->numSongs == 0)
-                            library.m_db.RemoveArtist(artistId);
+                            Core::GetLibraryDatabase().RemoveArtist(artistId);
                     }
 
                     m_db.RemoveSong(song->id);
@@ -83,165 +80,22 @@ namespace rePlayer
         }
     }
 
-    std::string Library::SongsUI::GetFullpath(Song* song, Array<Artist*>* artists) const
-    {
-        std::string filename = GetDirectory(song, artists);
-        //build song filename
-        {
-            auto name = std::string(song->GetName());
-            io::File::CleanFilename(name.data());
-            filename += name;
-        }
-        filename += " [";
-        for (uint16_t i = 0; i < song->NumArtistIds(); i++)
-        {
-            Artist* artist;
-            if (artists)
-            {
-                artist = nullptr;
-                for (auto* a : *artists)
-                {
-                    if (a->id == song->GetArtistId(i))
-                    {
-                        artist = a;
-                        break;
-                    }
-                }
-                if (artist == nullptr)
-                    artist = m_db[song->GetArtistId(i)];
-            }
-            else
-                artist = m_db[song->GetArtistId(i)];
-            if (i != 0)
-                filename += ",";
-            std::string artistName = artist->GetHandle();
-            io::File::CleanFilename(artistName.data());
-            filename += artistName;
-        }
-        {
-            char str[16];
-            sprintf(str, "][%08X]", static_cast<uint32_t>(song->GetId()));//easy way to make the file unique
-            filename += str;
-        }
-        filename += ".";
-        filename += song->IsArchive() ? "7z" : song->GetType().GetExtension();
-        return filename;
-    }
-
-    std::string Library::SongsUI::GetDirectory(Artist* artist) const
-    {
-        std::string directory = ms_path;
-        //build artist directory
-        {
-            std::string artistName = artist->GetHandle();
-            io::File::CleanFilename(artistName.data());
-            auto c = ::tolower(artistName[0]);
-            if (c < 'a' || c > 'z')
-            {
-                directory += "#/";
-            }
-            else
-            {
-                directory += static_cast<char>(toupper(c));
-                directory += '/';
-            }
-            directory += artistName;
-            char str[16];
-            sprintf(str, " [%04X]/", static_cast<uint32_t>(artist->GetId()));//easy way to make the directory unique
-            directory += str;
-        }
-        return directory;
-    }
-
     Library& Library::SongsUI::GetLibrary()
     {
         return reinterpret_cast<Library&>(m_owner);
     }
 
-    void Library::SongsUI::InvalidateCache()
-    {
-        m_hasFailedDeletes = true;
-    }
-
-    void Library::SongsUI::CleanupCache()
-    {
-        if (m_hasFailedDeletes && std::filesystem::exists(ms_path))
-        {
-            Array<std::filesystem::path> directories;
-            for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(ms_path))
-            {
-                auto& filePath = dir_entry.path();
-                if (!dir_entry.is_directory())
-                {
-                    auto filename = filePath.stem().u8string();
-                    bool isLostFile = filename.size() < sizeof("][00000000]");
-                    if (!isLostFile)
-                    {
-                        uint32_t id;
-                        if (sscanf_s(reinterpret_cast<const char*>(filename.c_str()) + filename.size() - sizeof("][00000000]") + 1, "][%08X]", &id))
-                        {
-                            isLostFile = !m_db.IsValid(SongID(id));
-                            if (!isLostFile)
-                            {
-                                auto f = GetFullpath(m_db[SongID(id)]);
-                                std::filesystem::path songPath = io::File::Convert(f.c_str());
-                                if (!std::filesystem::exists(songPath) || !std::filesystem::equivalent(filePath, songPath))
-                                    isLostFile = true;
-                            }
-                        }
-                        else
-                            isLostFile = true;
-                    }
-                    if (isLostFile)
-                    {
-                        Log::Warning("Cache: deleting \"%s\"\n", filePath.c_str());
-                        std::filesystem::remove(filePath);
-                    }
-                }
-                else
-                    directories.Add(filePath);
-            }
-            for (int32_t i = directories.NumItems<int32_t>() - 1; i >= 0; i--)
-            {
-                auto& filePath = directories[i];
-                if (std::filesystem::is_empty(filePath))
-                {
-                    Log::Warning("Cache: deleting \"%s\"\n", filePath.c_str());
-                    std::filesystem::remove(filePath);
-                }
-            }
-        }
-    }
-
     void Library::SongsUI::OnAddingArtistToSong(Song* song, ArtistID artistId)
     {
-        auto oldFileName = GetFullpath(song);
+        auto oldFileName = m_db.GetFullpath(song);
         song->Edit()->artistIds.Add(artistId);
-        auto newFileName = GetFullpath(song);
+        auto newFileName = m_db.GetFullpath(song);
         io::File::Move(oldFileName.c_str(), newFileName.c_str());
     }
 
     void Library::SongsUI::OnSelectionContext()
     {
         m_songMerger->MenuItem(*this);
-    }
-
-    std::string Library::SongsUI::GetDirectory(Song* song, Array<Artist*>* artists) const
-    {
-        if (song->NumArtistIds() == 0)
-        {
-            std::string directory = ms_path;
-            return directory + "!/";
-        }
-        if (artists)
-        {
-            for (auto* artist : *artists)
-            {
-                if (song->GetArtistId(0) == artist->id)
-                    return GetDirectory(artist);
-            }
-        }
-        return GetDirectory(m_db[song->GetArtistId(0)]);
     }
 }
 // namespace rePlayer

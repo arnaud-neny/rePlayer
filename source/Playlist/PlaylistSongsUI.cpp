@@ -6,9 +6,8 @@
 
 namespace rePlayer
 {
-    Playlist::SongsUI::SongsUI(Array<char>& paths, Window& owner)
+    Playlist::SongsUI::SongsUI(Window& owner)
         : DatabaseSongsUI(DatabaseID::kPlaylist, owner)
-        , m_paths(paths)
     {}
 
     Playlist::SongsUI::~SongsUI()
@@ -51,12 +50,6 @@ namespace rePlayer
             m_db.Raise(Database::Flag::kSaveSongs);
             m_deletedSubsongs.Clear();
         }
-    }
-
-    std::string Playlist::SongsUI::GetFullpath(Song* song, Array<Artist*>* artists) const
-    {
-        (void)artists;
-        return m_paths.Items(song->GetSourceId(0).internalId);
     }
 
     Playlist& Playlist::SongsUI::GetPlaylist()

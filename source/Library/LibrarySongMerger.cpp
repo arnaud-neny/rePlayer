@@ -5,10 +5,10 @@
 #include <IO/File.h>
 #include <ImGui.h>
 
-#include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
 #include <Deck/Player.h>
+#include <Library/LibraryDatabase.h>
 #include <RePlayer/Core.h>
 
 #include <algorithm>
@@ -245,16 +245,16 @@ namespace rePlayer
                             {
                                 m_isRenaming = false;
 
-                                auto oldFileName = songs.GetFullpath(m_entries[rowIdx].song);
+                                auto oldFileName = songs.m_db.GetFullpath(m_entries[rowIdx].song);
                                 if (io::File::IsExisting(oldFileName.c_str()))
                                 {
                                     m_entries[rowIdx].song->Edit()->name = m_renamedString;
-                                    auto newFileName = songs.GetFullpath(song);
+                                    auto newFileName = songs.m_db.GetFullpath(song);
                                     if (!io::File::Move(oldFileName.c_str(), newFileName.c_str()))
                                     {
                                         io::File::Copy(oldFileName.c_str(), newFileName.c_str());
                                         Log::Warning("Merge: Can't rename file \"%s\"\n", oldFileName.c_str());
-                                        songs.m_hasFailedDeletes = true;
+                                        reinterpret_cast<LibraryDatabase&>(songs.m_db).InvalidateCache();
                                     }
                                     else
                                         Log::Message("Merge: \"%s\" renamed to \"%s\"\n", oldFileName.c_str(), newFileName.c_str());
@@ -498,11 +498,11 @@ namespace rePlayer
                 for (++i; i < numEntries && m_entries[i].parentId != SongID::Invalid; ++i)
                 {
                     auto* song = m_entries[i].song->Edit();
-                    auto filename = songs.GetFullpath(m_entries[i].song);
+                    auto filename = songs.m_db.GetFullpath(m_entries[i].song);
                     if (!io::File::Delete(filename.c_str()))
                     {
                         Log::Warning("Can't delete file \"%s\"\n", filename.c_str());
-                        songs.InvalidateCache();
+                        reinterpret_cast<LibraryDatabase&>(songs.m_db).InvalidateCache();
                     }
 
                     Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(song->id), song->type.GetExtension(), songs.m_db.GetTitleAndArtists(song->id).c_str()

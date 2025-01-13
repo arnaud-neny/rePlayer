@@ -8,11 +8,10 @@
 #include <IO/File.h>
 #include <IO/Stream.h>
 
-#include <Database/Database.h>
-#include <Database/DatabaseSongsUI.h>
 #include <Database/SongEndEditor.h>
 #include <Deck/Deck.h>
 #include <Library/Library.h>
+#include <Library/LibraryDatabase.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/ReplayContexts.h>
@@ -670,18 +669,18 @@ namespace rePlayer
             {
                 if (m_musicId.databaseId == DatabaseID::kLibrary)
                 {
-                    auto songsUI = Core::GetDatabase(DatabaseID::kLibrary).GetSongsUI();
-                    auto oldFileName = songsUI->GetFullpath(currentSong);
+                    auto& db = Core::GetLibraryDatabase();
+                    auto oldFileName = db.GetFullpath(currentSong);
                     if (io::File::IsExisting(oldFileName.c_str()))
                     {
                         m_song.edited.AddRef(); // keep ownership
                         SmartPtr<Song> song = Song::Create(&m_song.edited);
-                        auto newFileName = songsUI->GetFullpath(song);
+                        auto newFileName = db.GetFullpath(song);
                         if (!io::File::Move(oldFileName.c_str(), newFileName.c_str()))
                         {
                             io::File::Copy(oldFileName.c_str(), newFileName.c_str());
                             Log::Warning("SongEditor: Can't move file \"%s\"\n", oldFileName.c_str());
-                            songsUI->InvalidateCache();
+                            db.InvalidateCache();
                         }
                         else
                             Log::Message("SongEditor: \"%s\" moved to \"%s\"\n", oldFileName.c_str(), newFileName.c_str());
@@ -718,10 +717,10 @@ namespace rePlayer
                         newSong->artistIds = m_song.edited.artistIds;
                         newSong->sourceIds.Add(sourceId);
                         newSong->metadata = m_song.edited.metadata;
-                        Core::GetDatabase(DatabaseID::kLibrary).AddSong(newSong);
+                        Core::GetLibraryDatabase().AddSong(newSong);
                         for (auto artistId : newSong->artistIds)
                         {
-                            Core::GetDatabase(DatabaseID::kLibrary)[artistId]->Edit()->numSongs++;
+                            Core::GetLibraryDatabase()[artistId]->Edit()->numSongs++;
                         }
 
                         Core::GetLibrary().m_sources[sourceId.sourceId]->InvalidateSong(sourceId, newSong->id);

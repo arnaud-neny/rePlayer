@@ -3,8 +3,7 @@
 #include <IO/File.h>
 
 // rePlayer
-#include <Database/Database.h>
-#include <Library/LibrarySongsUI.h>
+#include <Library/LibraryDatabase.h>
 #include <RePlayer/Core.h>
 
 #include "LibraryArtistsUI.h"
@@ -126,9 +125,9 @@ namespace rePlayer
 
     void Library::ArtistsUI::OnSavedChanges(Artist* selectedArtist)
     {
-        auto* songs = GetLibrary().m_songs;
+        auto& db = reinterpret_cast<LibraryDatabase&>(m_db);
         Array<std::pair<Song*, std::string>> toRename;
-        std::string oldDirectory = songs->GetDirectory(selectedArtist);
+        std::string oldDirectory = db.GetDirectory(selectedArtist);
         if (strcmp(selectedArtist->GetHandle(), m_selectedArtistCopy.handles[0].Items()))
         {
             auto selectedArtistId = selectedArtist->GetId();
@@ -142,7 +141,7 @@ namespace rePlayer
                     {
                         toRename.Push();
                         toRename.Last().first = song;
-                        toRename.Last().second = songs->GetFullpath(song);
+                        toRename.Last().second = db.GetFullpath(song);
                         break;
                     }
                 }
@@ -159,11 +158,11 @@ namespace rePlayer
         {
             for (auto& entry : toRename)
             {
-                auto filename = songs->GetFullpath(entry.first);
+                auto filename = db.GetFullpath(entry.first);
                 io::File::Move(entry.second.c_str(), filename.c_str());
             }
             //call rename if it's only a case change
-            io::File::Rename(oldDirectory.c_str(), songs->GetDirectory(selectedArtist).c_str());
+            io::File::Rename(oldDirectory.c_str(), db.GetDirectory(selectedArtist).c_str());
         }
 
         m_db.Raise(Database::Flag::kSaveArtists);

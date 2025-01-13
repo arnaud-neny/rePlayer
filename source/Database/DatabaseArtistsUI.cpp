@@ -186,7 +186,6 @@ namespace rePlayer
                     , masterArtist->GetHandle(), static_cast<uint32_t>(masterArtistId));
                 if (ImGui::Button("Proceed", ImVec2(120, 0)))
                 {
-                    auto* songs = m_db.GetSongsUI();
                     auto* masterArtistSheet = masterArtist->Edit();
 
                     for (auto* song : m_db.Songs())
@@ -211,7 +210,7 @@ namespace rePlayer
                             else if (song->GetArtistId(i) == mergedArtistId)
                             {
                                 if (song->GetFileSize() != 0 && oldFilename.empty() && m_databaseId == DatabaseID::kLibrary)
-                                    oldFilename = songs->GetFullpath(song);
+                                    oldFilename = m_db.GetFullpath(song);
                                 if (dupArtistPos != song->NumArtistIds())
                                 {
                                     song->Edit()->artistIds.RemoveAt(i);
@@ -228,7 +227,7 @@ namespace rePlayer
                         }
                         if (!oldFilename.empty())
                         {
-                            auto newFilename = songs->GetFullpath(song);
+                            auto newFilename = m_db.GetFullpath(song);
                             io::File::Move(oldFilename.c_str(), newFilename.c_str());
                         }
                     }
@@ -762,7 +761,6 @@ namespace rePlayer
 
     void DatabaseArtistsUI::RemoveArtist(Artist* selectedArtist)
     {
-        auto* songs = m_db.GetSongsUI();
         for (auto& entry : m_songEntries)
         {
             if (entry.isSelected)
@@ -771,11 +769,11 @@ namespace rePlayer
 
                 auto* song = m_db[entry.id];
                 auto* songSheet = song->Edit();
-                auto oldFilename = songs->GetFullpath(song);
+                auto oldFilename = m_db.GetFullpath(song);
                 songSheet->artistIds.Remove(selectedArtist->id);
                 if (m_databaseId == DatabaseID::kLibrary && !oldFilename.empty())
                 {
-                    auto newFilename = songs->GetFullpath(song);
+                    auto newFilename = m_db.GetFullpath(song);
                     io::File::Move(oldFilename.c_str(), newFilename.c_str());
                 }
             }

@@ -18,10 +18,10 @@ namespace rePlayer
 {
     using namespace core;
 
-    class Database;
     class DatabaseArtistsUI;
     class DatabaseSongsUI;
     class Player;
+    class PlaylistDatabase;
 
     class Playlist : public Window
     {
@@ -66,12 +66,8 @@ namespace rePlayer
                 bool IsAvailable() const;
             };
 
-            Database& db;
-            Array<char> paths; // paths are indexed in the sourceID of the song
+            PlaylistDatabase& db;
             Array<Entry> entries;
-            bool arePathsDirty = false;
-
-            const char* GetPath(SourceID sourceId) const;
         };
 
         struct Summary

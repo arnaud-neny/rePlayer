@@ -19,7 +19,9 @@ namespace rePlayer
     class Database;
     class Deck;
     class Library;
+    class LibraryDatabase;
     class Playlist;
+    class PlaylistDatabase;
     class Replays;
     class Settings;
     class SongEditor;
@@ -47,6 +49,8 @@ namespace rePlayer
         // Jukebox
         static About& GetAbout();
         static Database& GetDatabase(DatabaseID databaseId);
+        static LibraryDatabase& GetLibraryDatabase();
+        static PlaylistDatabase& GetPlaylistDatabase();
         static Deck& GetDeck();
         static Library& GetLibrary();
         static Playlist& GetPlaylist();
@@ -120,7 +124,15 @@ namespace rePlayer
         Replays* m_replays = nullptr;
         Settings* m_settings = nullptr;
         SongEditor* m_songEditor = nullptr;
-        Database* m_db[int32_t(rePlayer::DatabaseID::kCount)];
+        union
+        {
+            Database* m_db[int32_t(rePlayer::DatabaseID::kCount)];
+            struct
+            {
+                LibraryDatabase* m_libraryDatabase;
+                PlaylistDatabase* m_playlistDatabase;
+            };
+        };
 
         thread::Workers* m_workers = nullptr;
 

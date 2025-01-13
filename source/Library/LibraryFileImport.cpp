@@ -5,7 +5,7 @@
 #include <IO/StreamFile.h>
 
 // rePlayer
-#include <Database/Database.h>
+#include <Library/LibraryDatabase.h>
 #include <Library/LibrarySongsUI.h>
 #include <IO/StreamArchive.h>
 #include <IO/StreamArchiveRaw.h>
@@ -13,6 +13,7 @@
 #include <RePlayer/Replays.h>
 #include <Replays/Replay.h>
 #include <UI/FileSelector.h>
+
 #include "LibraryFileImport.h"
 
 // libarchive
@@ -484,7 +485,7 @@ namespace rePlayer
                             auto fileCrc = crc32(0L, Z_NULL, 0);
                             song->fileCrc = crc32_z(fileCrc, fileData.Items(), fileData.Size());
 
-                            auto file = io::File::OpenForWrite(library.m_songs->GetFullpath(dbSong, &artists).c_str());
+                            auto file = io::File::OpenForWrite(library.m_db.GetFullpath(dbSong, &artists).c_str());
                             file.Write(fileData.Items(), fileData.Size());
                         }
                         else
@@ -544,7 +545,7 @@ namespace rePlayer
                             auto fileCrc = crc32(0L, Z_NULL, 0);
                             song->fileCrc = crc32_z(fileCrc, archiveBuffer.Items(), archiveBuffer.Size<size_t>());
 
-                            auto file = io::File::OpenForWrite(library.m_songs->GetFullpath(dbSong, &artists).c_str());
+                            auto file = io::File::OpenForWrite(library.m_db.GetFullpath(dbSong, &artists).c_str());
                             file.Write(archiveBuffer.Items(), archiveBuffer.Size());
                         }
                     }

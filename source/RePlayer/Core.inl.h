@@ -14,6 +14,16 @@ namespace rePlayer
         return *ms_instance->m_db[int32_t(databaseId)];
     }
 
+    inline LibraryDatabase& Core::GetLibraryDatabase()
+    {
+        return *ms_instance->m_libraryDatabase;
+    }
+
+    inline PlaylistDatabase& Core::GetPlaylistDatabase()
+    {
+        return *ms_instance->m_playlistDatabase;
+    }
+
     inline Deck& Core::GetDeck()
     {
         return *ms_instance->m_deck;

@@ -25,11 +25,11 @@ namespace rePlayer
         Database();
         Database(const Database&) = delete;
         Database(Database&&) = delete;
-        ~Database();
+        virtual ~Database();
 
         void Register(DatabaseSongsUI* ui);
         void Register(DatabaseArtistsUI* ui);
-        void Reset();
+        virtual void Reset();
 
         Song* operator[](SongID songId) const;
         Song* operator[](SubsongID subsongId) const;
@@ -56,6 +56,7 @@ namespace rePlayer
         std::string GetTitleAndArtists(SongID songId, int32_t subsongIndex = -1) const;
         std::string GetTitleAndArtists(SubsongID subsongId) const;
         std::string GetFullpath(SongID songId) const;
+        virtual std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const = 0;
 
         Song* AddSong(SongSheet* song);
         void RemoveSong(SongID songId);

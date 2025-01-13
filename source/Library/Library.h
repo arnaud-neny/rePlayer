@@ -14,7 +14,7 @@ namespace core::io
 
 namespace rePlayer
 {
-    class Database;
+    class LibraryDatabase;
     class Player;
     class SongEditor;
     struct MusicID;
@@ -64,7 +64,7 @@ namespace rePlayer
         void ValidateArtist(const Artist* const artist) const;
 
     private:
-        Database& m_db;
+        LibraryDatabase& m_db;
         ArtistsUI* m_artists = nullptr;
         SongsUI* m_songs = nullptr;
 

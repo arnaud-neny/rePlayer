@@ -12,7 +12,6 @@
 #include <Thread/Thread.h>
 
 // rePlayer
-#include <Database/Database.h>
 #include <Database/DatabaseArtistsUI.h>
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
@@ -21,6 +20,7 @@
 #include <IO/StreamArchiveRaw.h>
 #include <IO/StreamUrl.h>
 #include <Library/Library.h>
+#include <PlayList/PlaylistDatabase.h>
 #include <PlayList/PlaylistDropTarget.h>
 #include <PlayList/PlaylistSongsUI.h>
 #include <RePlayer/Core.h>
@@ -64,11 +64,6 @@ namespace rePlayer
     inline bool Playlist::Cue::Entry::IsAvailable() const
     {
         return !GetSong()->IsInvalid();
-    }
-
-    inline const char* Playlist::Cue::GetPath(SourceID sourceId) const
-    {
-        return paths.Items(sourceId.internalId);
     }
 
     void Playlist::Summary::Load(io::File& file)
@@ -131,10 +126,10 @@ namespace rePlayer
 
     Playlist::Playlist()
         : Window("Playlist", ImGuiWindowFlags_NoCollapse)
-        , m_cue{ Core::GetDatabase(DatabaseID::kPlaylist) }
+        , m_cue{ Core::GetPlaylistDatabase() }
         , m_dropTarget(new DropTarget(*this))
         , m_artists(new DatabaseArtistsUI(DatabaseID::kPlaylist, *this))
-        , m_songs(new SongsUI(m_cue.paths, *this))
+        , m_songs(new SongsUI(*this))
     {
         auto file = io::File::OpenForRead(ms_fileName);
         if (file.IsValid())
@@ -173,7 +168,6 @@ namespace rePlayer
     {
         m_cue.db.Reset();
         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-        m_cue.paths = {};
         m_cue.entries.Clear();
         m_oldCurrentEntryIndex = m_currentEntryIndex = -1;
         m_uniqueIdGenerator = PlaylistID::kInvalid;
@@ -221,7 +215,7 @@ namespace rePlayer
                 auto file = io::File::OpenForRead(filename.c_str());
                 if (file.IsValid())
                 {
-                    Database db;
+                    PlaylistDatabase db;
                     Cue cue(db);
 
                     cue.entries.Resize(summary.numSubsongs);
@@ -284,16 +278,16 @@ namespace rePlayer
         SmartPtr<io::Stream> stream;
         auto sourceId = song->GetSourceId(0);
         if (sourceId.sourceId == SourceID::URLImportID)
-            stream = StreamUrl::Create(m_cue.GetPath(sourceId));
+            stream = StreamUrl::Create(m_cue.db.GetPath(sourceId));
         else
-            stream = io::StreamFile::Create(m_cue.GetPath(sourceId));
+            stream = io::StreamFile::Create(m_cue.db.GetPath(sourceId));
         if (stream.IsValid() && song->IsArchive())
         {
             if (song->NumSourceIds() > 1)
             {
                 stream = StreamArchive::Create(stream, true);
                 if (stream.IsValid())
-                    stream = stream->Open(m_cue.GetPath(song->GetSourceId(1)));
+                    stream = stream->Open(m_cue.db.GetPath(song->GetSourceId(1)));
             }
             else
                 stream = StreamArchiveRaw::Create(stream);
@@ -399,12 +393,12 @@ namespace rePlayer
                     {
                         player = Player::Create(musicId, song, replay, stream);
                         player->MarkSongAsNew(hasChanged);
-                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.GetPath(sourceId));
+                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
                     }
                     else
                     {
                         delete replay;
-                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.GetPath(sourceId));
+                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
                     }
 
                     if (hasChanged)
@@ -417,7 +411,7 @@ namespace rePlayer
                         song->subsongs[0].isInvalid = true;
                         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                     }
-                    Log::Error("Can't find a replay for \"%s\"\n", m_cue.GetPath(sourceId));
+                    Log::Error("Can't find a replay for \"%s\"\n", m_cue.db.GetPath(sourceId));
                 }
             }
             else
@@ -427,7 +421,7 @@ namespace rePlayer
                     song->subsongs[0].isUnavailable = true;
                     m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                 }
-                Log::Error("Can't open file \"%s\"\n", m_cue.GetPath(sourceId));
+                Log::Error("Can't open file \"%s\"\n", m_cue.db.GetPath(sourceId));
             }
         }
         else
@@ -1245,34 +1239,9 @@ namespace rePlayer
                 cue.entries[i].databaseId = DatabaseID(isPlaylistDatabase & 1);
         }
 
-        auto status = Status::kOk;
-        status = cue.db.LoadSongs(file);
-        if (status == Status::kOk)
-        {
-            status = cue.db.LoadArtists(file);
-            if (status == Status::kOk)
-            {
-                file.Read<uint32_t>(cue.paths);
-                if (version < 2)
-                {
-                    for (auto* song : cue.db.Songs())
-                    {
-                        if (cue.paths[song->GetSourceId(0).internalId] == 0)
-                        {
-                            auto* songEdit = song->Edit();
-                            songEdit->sourceIds[0].internalId++;
-                        }
-                    }
-                }
-            }
-        }
+        auto status = cue.db.Load(file, version);
         if (status == Status::kFail)
-        {
-            cue.db.Reset();
-            cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-            cue.paths = {};
             cue.entries.Clear();
-        }
 
         return status;
     }
@@ -1297,9 +1266,7 @@ namespace rePlayer
             file.Write(isPlaylistDatabase);
         }
 
-        cue.db.SaveSongs(file);
-        cue.db.SaveArtists(file);
-        file.Write<uint32_t>(cue.paths);
+        cue.db.Save(file);
     }
 
     void Playlist::ButtonUrl()
@@ -1877,7 +1844,7 @@ namespace rePlayer
                 auto& filename = entries[entryIndex].path;
                 if (auto* song = m_cue.db.FindSong([&](auto* song)
                 {
-                    return _stricmp(m_cue.GetPath(song->GetSourceId(0)), filename.c_str()) == 0;
+                    return _stricmp(m_cue.db.GetPath(song->GetSourceId(0)), filename.c_str()) == 0;
                 }))
                 {
                     for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
@@ -1898,9 +1865,7 @@ namespace rePlayer
                 else
                 {
                     auto* songSheet = entries[entryIndex].song;
-                    songSheet->sourceIds.Add(SourceID(addFilesContext->isUrl ? SourceID::URLImportID : SourceID::FileImportID, m_cue.paths.NumItems()));
-                    m_cue.paths.Add(filename.c_str(), uint32_t(filename.size() + 1));
-                    m_cue.arePathsDirty = true;
+                    songSheet->sourceIds.Add(m_cue.db.AddPath(addFilesContext->isUrl ? SourceID::URLImportID : SourceID::FileImportID, filename));
 
                     m_cue.db.AddSong(songSheet);
 
@@ -1929,9 +1894,9 @@ namespace rePlayer
                     {
                         songSheet->subsongs[0].isInvalid = 1;
                         if (entryToUpdate.artist.empty())
-                            Log::Warning("Playlist: can't find replay for \"%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]));
+                            Log::Warning("Playlist: can't find replay for \"%s\"\n", m_cue.db.GetPath(songSheet->sourceIds[0]));
                         else
-                            Log::Warning("Playlist: can't opened \"%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]));
+                            Log::Warning("Playlist: can't opened \"%s\"\n", m_cue.db.GetPath(songSheet->sourceIds[0]));
                     }
                     else
                     {
@@ -1941,9 +1906,9 @@ namespace rePlayer
                             if (entryToUpdate.song->subsongs[0].isInvalid)
                             {
                                 if (entryToUpdate.song->name.IsEmpty())
-                                    Log::Warning("Playlist: can't find replay for \"%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]));
+                                    Log::Warning("Playlist: can't find replay for \"%s\"\n", m_cue.db.GetPath(songSheet->sourceIds[0]));
                                 else
-                                    Log::Warning("Playlist: can't find replay for \"%s:%s\"\n", m_cue.GetPath(songSheet->sourceIds[0]), entryToUpdate.song->name.String().c_str());
+                                    Log::Warning("Playlist: can't find replay for \"%s:%s\"\n", m_cue.db.GetPath(songSheet->sourceIds[0]), entryToUpdate.song->name.String().c_str());
                             }
                             if (addFilesContext->previousSongId == songSheet->id)
                             {
@@ -1972,10 +1937,10 @@ namespace rePlayer
                                 addFilesContext->previousSongId = songSheet->id;
 
                             if (!isArchiveRaw) // ArchiveRaw doesn't have extra file (for now)
-                                songSheet->sourceIds.Add(SourceID(SourceID::FileImportID, m_cue.paths.Add<uint32_t>(entryToUpdate.song->name.String().c_str(), uint32_t(entryToUpdate.song->name.String().size() + 1))));
+                                songSheet->sourceIds.Add(m_cue.db.AddPath(SourceID::FileImportID, entryToUpdate.song->name.String()));
 
                             songSheet->subsongs[0].isDirty = true;
-                            std::string name = reinterpret_cast<const char*>(std::filesystem::path(m_cue.paths.Items(songSheet->sourceIds[0].internalId)).filename().u8string().c_str());
+                            std::string name = reinterpret_cast<const char*>(std::filesystem::path(m_cue.db.GetPath(songSheet->sourceIds[0])).filename().u8string().c_str());
                             if (entryToUpdate.song->name.IsNotEmpty())
                             {
                                 name += ":";

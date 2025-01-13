@@ -8,13 +8,13 @@
 #include <IO/StreamFile.h>
 
 // rePlayer
-#include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Database/Types/Countries.h>
 #include <Deck/Deck.h>
 #include <Deck/Player.h>
 #include <IO/StreamArchive.h>
 #include <Library/LibraryArtistsUI.h>
+#include <Library/LibraryDatabase.h>
 #include <Library/LibraryFileImport.h>
 #include <Library/LibrarySongsUI.h>
 #include <Library/Sources/AmigaMusicPreservation.h>
@@ -50,7 +50,7 @@ namespace rePlayer
 
     Library::Library()
         : Window("Library", ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar)
-        , m_db(Core::GetDatabase(DatabaseID::kLibrary))
+        , m_db(Core::GetLibraryDatabase())
         , m_artists(new ArtistsUI(*this))
         , m_songs(new SongsUI(*this))
     {
@@ -72,8 +72,6 @@ namespace rePlayer
 
     Library::~Library()
     {
-        m_songs->CleanupCache();
-
         for (auto source : m_sources)
             delete source;
 
@@ -88,7 +86,7 @@ namespace rePlayer
 
     SmartPtr<core::io::Stream> Library::GetStream(Song* song)
     {
-        auto filename = m_songs->GetFullpath(song);
+        auto filename = m_db.GetFullpath(song);
 
         SmartPtr<io::Stream> stream;
         if (song->GetFileSize() > 0)
@@ -272,11 +270,11 @@ namespace rePlayer
             song->type = type;
             if (oldType.ext != type.ext && !song->subsongs[0].isArchive)
             {
-                auto newFilename = m_songs->GetFullpath(dbSong);
+                auto newFilename = m_db.GetFullpath(dbSong);
                 if (!io::File::Rename(stream->GetName().c_str(), newFilename.c_str()))
                 {
                     Log::Warning("Can't rename file \"%s\"\n", stream->GetName().c_str());
-                    m_songs->InvalidateCache();
+                    m_db.InvalidateCache();
                     io::File::Copy(stream->GetName().c_str(), newFilename.c_str());
                 }
             }

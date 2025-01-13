@@ -3,11 +3,12 @@
 #include <Core/Thread/Workers.h>
 
 // rePlayer
-#include <Database/Database.h>
 #include <Database/SongEditor.h>
 #include <Deck/Deck.h>
 #include <Library/Library.h>
+#include <Library/LibraryDatabase.h>
 #include <Playlist/Playlist.h>
+#include <Playlist/PlaylistDatabase.h>
 #include <RePlayer/About.h>
 #include <RePlayer/Replays.h>
 #include <RePlayer/Settings.h>
@@ -115,8 +116,10 @@ namespace rePlayer
         {
             m_workers = new thread::Workers(8, 16, L"rePlayer");
 
-            for (auto& db : m_db)
-                db = new Database();
+            m_libraryDatabase = new LibraryDatabase();
+            m_playlistDatabase = new PlaylistDatabase();
+            assert(m_db[int32_t(DatabaseID::kLibrary)] == m_libraryDatabase);
+            assert(m_db[int32_t(DatabaseID::kPlaylist)] == m_playlistDatabase);
             m_deck = new Deck();
             m_settings = new Settings();
             m_replays = new Replays();

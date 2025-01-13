@@ -197,6 +197,12 @@
     <ClCompile Include="Library\LibraryFileImport.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
+    <ClCompile Include="Library\LibraryDatabase.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Playlist\PlaylistDatabase.cpp">
+      <Filter>Source Files\Playlist</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -411,6 +417,12 @@
     </ClInclude>
     <ClInclude Include="Library\LibraryFileImport.h">
       <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibraryDatabase.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Playlist\PlaylistDatabase.h">
+      <Filter>Source Files\Playlist</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -188,8 +188,7 @@ namespace rePlayer
 
     std::string Database::GetFullpath(SongID songId) const
     {
-        auto& db = *this;
-        return m_songsUI->GetFullpath(db[songId]);
+        return GetFullpath((*this)[songId]);
     }
 
     Song* Database::AddSong(SongSheet* song)
