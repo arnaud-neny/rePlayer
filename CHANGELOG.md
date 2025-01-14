@@ -1,4 +1,4 @@
-v0.16.13:
+v0.16.14:
 - Added XMP
 - Updated adplug to 2.3.3.890
 - Updated Furnace to 0.6.7
@@ -7,7 +7,7 @@ v0.16.13:
 - Updated libsidplay to 2.12.0
 - Updated libvgm to 34c368c
 - Updated libxmp to 4.6.1
-- Updated OpenMPT to 0.8.0-pre.12 r22843
+- Updated OpenMPT to 0.8.0-pre.12 r22854
 - Updated ProTrekkr to 2.7.6
 - Updated SNDH-Player to 0.79
 - Updated UADE to 3.0.5
