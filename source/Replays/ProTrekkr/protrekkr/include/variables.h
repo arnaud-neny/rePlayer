@@ -204,6 +204,8 @@
 #define GUI_CMD_INSERT_TRACK 156
 #define GUI_CMD_DELETE_TRACK 157
 
+#define GUI_CMD_PLAY_STEP 158
+
 #define GUI_CMD_RENDER_WAV 169
 
 #define GUI_CMD_REDUCE_POSITIONS_10 170
@@ -246,6 +248,7 @@
 #define GUI_UPDATE_EXTERNAL_FLANGER (1 << 8)
 #define GUI_UPDATE_EXTERNAL_LFO (1 << 9)
 #define GUI_UPDATE_EXTERNAL_SET_PANNING (1 << 10)
+#define GUI_UPDATE_EXTERNAL_REVERB_DAMP (1 << 11)
 
 #define GUI_UPDATE_EXTERNAL_303_1_CUTOFF (1 << 0)
 #define GUI_UPDATE_EXTERNAL_303_2_CUTOFF (1 << 1)
@@ -410,6 +413,7 @@ extern int rs_coef;
 #if !defined(__REPLAYER__)
 extern SDL_Surface *Main_Screen;
 #endif
+
 extern int CONSOLE_HEIGHT2;
 
 extern float left_float_render;
@@ -477,9 +481,9 @@ extern unsigned int SamplesPerSub;
 extern char sas;
 
 extern float *Scope_Dats[MAX_TRACKS];
+extern float *Scope_Dats_L[MAX_TRACKS];
+extern float *Scope_Dats_R[MAX_TRACKS];
 extern float *Scope_Dats_LeftRight[2];
-extern float *VuMeters_Dats_L[MAX_TRACKS];
-extern float *VuMeters_Dats_R[MAX_TRACKS];
 
 #if !defined(__REPLAYER__)
 extern SDL_Surface *SKIN303;
@@ -536,7 +540,7 @@ void guiDial2(const char *str);
 void out_decchar(int x, int y, int number, char smith);
 
 void out_nibble(int x, int y, int color, int number);
-void Song_Play(void);
+void Song_Play(int play_step);
 void Song_Stop(void);
 void Free_Samples(void);
 void Draw_Pattern(int track, int line, int petrack, int row);
@@ -575,7 +579,9 @@ int Get_Line_Over_Mouse(int *Need_Scroll);
 int Get_Column_Over_Mouse(int *track, int *column,
                           int check_boundaries,
                           int *Was_Scrolling,
-                          int Left);
+                          int Left,
+                          int *Column_Pos,
+                          int *Line);
 void Set_Track_Slider(int pos);
 #define BLOCK_MARK_TRACKS 1
 #define BLOCK_MARK_ROWS 2
@@ -598,7 +604,7 @@ void Select_Block_Keyboard(int Type);
 void Calc_selection(void);
 int Next_Line_Pattern_Auto(int *position, int lines, int *line);
 int Get_Free_Midi_Sub_Channel(int track);
-int Search_Corresponding_Midi_Sub_Channel(int track, Uint32 Datas);
+int Search_Corresponding_Midi_Sub_Channel(int track, Uint32 Data);
 int Get_Midi_Channel(int midi_channel);
 void Draw_Scope_Files_Button(void);
 

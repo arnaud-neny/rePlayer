@@ -61,7 +61,7 @@ typedef __int64 int64;
 typedef unsigned __int64 Uint64;
 #else
 typedef long long int64;
-#if defined(__HAIKU__) || defined(__LINUX__)
+#if defined(__HAIKU__) || defined(__LINUX__) || defined(__AROS__)
 #include <stdint.h>
 typedef uint64_t Uint64;
 #else
@@ -123,7 +123,6 @@ struct Synth_Parameters
     unsigned char lfo_1_osc_2_volume;
     unsigned char lfo_1_vcf_cutoff;
     unsigned char lfo_1_vcf_resonance;
-    unsigned char lfo_1_disto;
 
     unsigned char lfo_2_osc_1_pw;
     unsigned char lfo_2_osc_2_pw;
@@ -133,7 +132,6 @@ struct Synth_Parameters
     unsigned char lfo_2_osc_2_volume;
     unsigned char lfo_2_vcf_cutoff;
     unsigned char lfo_2_vcf_resonance;
-    unsigned char lfo_2_disto;
 
     unsigned char env_1_osc_1_pw;
     unsigned char env_1_osc_2_pw;
@@ -143,7 +141,6 @@ struct Synth_Parameters
     unsigned char env_1_osc_2_volume;  
     unsigned char env_1_vcf_cutoff;
     unsigned char env_1_vcf_resonance;
-    unsigned char env_1_disto;
 
     unsigned char env_2_osc_1_pw;
     unsigned char env_2_osc_2_pw;
@@ -153,7 +150,6 @@ struct Synth_Parameters
     unsigned char env_2_osc_2_volume;  
     unsigned char env_2_vcf_cutoff;
     unsigned char env_2_vcf_resonance;
-    unsigned char env_2_disto;
 
     unsigned char osc_3_volume;
     unsigned char osc_3_switch;
@@ -172,6 +168,11 @@ struct Synth_Parameters
     int lfo_2_decay;
     unsigned char lfo_2_sustain;
     int lfo_2_release;
+
+    unsigned char lfo_1_disto;
+    unsigned char lfo_2_disto;
+    unsigned char env_1_disto;
+    unsigned char env_2_disto;
 };
 
 #endif      // !defined(__STAND_ALONE__) || defined(__WINAMP__)

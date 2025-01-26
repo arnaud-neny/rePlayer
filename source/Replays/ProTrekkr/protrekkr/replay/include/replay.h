@@ -412,6 +412,7 @@ extern short Beat_Lines[128];
 extern float Reverb_Filter_Cutoff;
 extern float Reverb_Filter_Resonance;
 extern unsigned char Reverb_Stereo_Amount;
+extern float Reverb_Damp;
 
 extern float Sample_Vol[MAX_INSTRS];
 
@@ -524,6 +525,8 @@ void Init_Equ(LPEQSTATE es);
 float Do_Equ(LPEQSTATE es, float sample, int Left);
 #if defined(PTK_SHUFFLE)
 void Update_Shuffle(void);
+float absf(float x);
+
 #endif
 
 #endif

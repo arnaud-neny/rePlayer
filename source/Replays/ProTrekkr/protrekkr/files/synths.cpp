@@ -155,7 +155,7 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, ReplayerFile&),
                 }
                 else
                 {
-                    Read_Function(&PARASynth[idx], sizeof(Synth_Parameters) - 4 - 32, 1, in);
+                    Read_Function(&PARASynth[idx], sizeof(Synth_Parameters) - 4 - 32 - 4, 1, in);
                 }
             }
         }

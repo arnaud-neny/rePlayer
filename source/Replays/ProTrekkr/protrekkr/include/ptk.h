@@ -153,5 +153,6 @@ int Read_Pattern_Note(int Position);
 void Set_Font_Normal(void);
 void Set_Font_Double(void);
 void Display_Patterns_Sizes_Status(void);
+void Display_Patterns_Sliders_Status(void);
 
 #endif
