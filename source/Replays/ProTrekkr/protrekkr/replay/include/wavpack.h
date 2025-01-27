@@ -5,7 +5,7 @@
 // Copyright (C) 2008-2024 Franck Charlet.
 // All rights reserved.
 //
-// This file is :
+// This file is:
 // Copyright (c) 1998-2007 Conifer Software.
 // All right reserved.
 //
@@ -38,7 +38,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#if !defined(__PSP__)
+#if !defined(__PSP__)  
 #if !defined(__AMIGAOS4__)
 #include <memory.h>
 #endif
@@ -74,8 +74,13 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 
+#if !defined(FALSE)
 #define FALSE 0
+#endif
+
+#if !defined(TRUE)
 #define TRUE 1
+#endif
 
 typedef struct
 {

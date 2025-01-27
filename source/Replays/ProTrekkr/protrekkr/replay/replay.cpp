@@ -231,7 +231,6 @@ int PosInTick;
     int rawrender_from;
     int rawrender_to;
     float mas_vol = 1.0f;
-    extern int play_one_step;
 #else
     float mas_vol;
 #endif
@@ -3097,15 +3096,6 @@ void Sp_Player(void)
             // ------------------------------
             // Pattern movements
 
-#if !defined(__WINAMP__)
-#if !defined(__STAND_ALONE__) 
-            if(play_one_step)
-            {
-                goto No_Check_Loop;
-            }
-#endif
-#endif
-
 #if defined(PTK_FX_PATTERNLOOP)
             // Check if we're in a loop
             if(repeat_loop_counter_in)
@@ -3117,12 +3107,6 @@ void Sp_Player(void)
             else
 #endif
             {
-
-#if !defined(__WINAMP__)
-#if !defined(__STAND_ALONE__) 
-No_Check_Loop:
-#endif
-#endif
 
 #if defined(PTK_FX_PATTERNBREAK)
                 if(Patbreak_Line > 127)
@@ -3272,20 +3256,6 @@ No_Check_Loop:
                     repeat_loop_counter_in = 0;
 #endif
                 }
-
-#if !defined(__WINAMP__)
-#if !defined(__STAND_ALONE__)
-                if(play_one_step)
-                {
-                    Song_Position_Visual = Song_Position;
-                    Pattern_Line_Visual = Pattern_Line;
-                    Song_Playing = FALSE;
-                    gui_action = GUI_CMD_STOP_SONG;
-                    done = TRUE;
-                }
-#endif
-#endif
-
             }
         }
 

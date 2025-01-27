@@ -204,7 +204,8 @@
 #define GUI_CMD_INSERT_TRACK 156
 #define GUI_CMD_DELETE_TRACK 157
 
-#define GUI_CMD_PLAY_STEP 158
+#define GUI_CMD_GOTO_START_POSITION 158
+#define GUI_CMD_GOTO_END_POSITION 159
 
 #define GUI_CMD_RENDER_WAV 169
 
@@ -508,6 +509,8 @@ extern char Channels_Polyphony[MAX_TRACKS];
 extern char Channels_MultiNotes[MAX_TRACKS];
 extern char Channels_Effects[MAX_TRACKS];
 
+extern int can_modify_song;
+
 // ------------------------------------------------------
 // Functions
 void Reset_Filters(int tr);
@@ -540,7 +543,7 @@ void guiDial2(const char *str);
 void out_decchar(int x, int y, int number, char smith);
 
 void out_nibble(int x, int y, int color, int number);
-void Song_Play(int play_step);
+void Song_Play();
 void Song_Stop(void);
 void Free_Samples(void);
 void Draw_Pattern(int track, int line, int petrack, int row);
@@ -618,7 +621,7 @@ void Draw_Scope(void);
 int Init_Scopes_VuMeters_Buffers(void);
 
 void Remove_Title(void);
-void Switch_Cmd_Playing(int Enable);
+void Switch_Cmd_Playing(void);
 
 void Lock_Audio_Thread(void);
 void Unlock_Audio_Thread(void);

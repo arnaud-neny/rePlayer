@@ -104,7 +104,9 @@ struct ReplayerFile
             newPos = maxSize;
         }
         else
+        {
             memcpy(dst, buf + pos, size * count);
+        }
         pos = newPos;
         return int(count);
     }
