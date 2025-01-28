@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2024 David Bryant.                 //
+//                Copyright (c) 1998 - 2025 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@
 
 static const char *sign_on = "\n"
 " WVUNPACK  Hybrid Lossless Audio Decompressor  %s Version %s\n"
-" Copyright (c) 1998 - 2024 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2025 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVUNPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -96,7 +96,7 @@ static const char *usage =
 "          -s  = display summary information only to stdout (no audio decode)\n"
 "          -ss = display super summary (including tags) to stdout (no decode)\n"
 #ifdef ENABLE_THREADS
-"          --threads = use multiple threads for faster operation\n"
+"          --no-threads = do not use multiple threads for faster operation\n"
 #endif
 "          -v  = verify source data only (no output file created)\n"
 "          -vv = quick verify (no output, version 5+ files only)\n"
@@ -164,6 +164,11 @@ static const char *help =
 #endif
 "    -m                    calculate and display MD5 signature; verify if lossless\n"
 "    -n                    no audio decoding (use with -xx to extract tags only)\n"
+"    --no-overwrite        never overwrite existing files (and don't ask)\n"
+#ifdef ENABLE_THREADS
+"    --no-threads          do not use multiple threads for faster operation\n"
+"                           (equivalent to --threads=1)\n"
+#endif
 "    --normalize-floats    normalize float audio to +/-1.0 if it isn't already\n"
 "                           (rarely the case, but alters audio and fails MD5)\n"
 #ifdef _WIN32
@@ -237,9 +242,9 @@ static struct {
 
 int debug_logging_mode;
 
-static int overwrite_all, delete_source, raw_decode, raw_pcm, normalize_floats, no_utf8_convert, no_audio_decode, file_info, summary,
-    ignore_wvc, quiet_mode, calc_md5, copy_time, blind_decode, decode_format, format_specified, caf_be, aif_le, set_console_title,
-    worker_threads;
+static int overwrite_all, no_overwrite, delete_source, raw_decode, raw_pcm, normalize_floats, no_utf8_convert,
+   no_audio_decode, file_info, summary, ignore_wvc, quiet_mode, calc_md5, copy_time, blind_decode,
+   decode_format, format_specified, caf_be, aif_le, set_console_title, worker_threads;
 
 static int num_files, file_index;
 
@@ -334,6 +339,10 @@ int main(int argc, char **argv)
     set_console_title = 1;      // on Windows, we default to messing with the console title
 #endif                          // on Linux, this is considered uncool to do by default
 
+#ifdef ENABLE_THREADS
+    worker_threads = get_default_worker_threads ();
+#endif
+
     // loop through command-line arguments
 
     for (argi = 0; argi < argc + argc_fn - 1; ++argi) {
@@ -370,6 +379,8 @@ int main(int argc, char **argv)
                 normalize_floats = 1;
             else if (!strcmp (long_option, "no-utf8-convert"))          // --no-utf8-convert
                 no_utf8_convert = 1;
+            else if (!strcmp (long_option, "no-overwrite"))             // --no-overwrite
+                no_overwrite = 1;
             else if (!strncmp (long_option, "skip", 4)) {               // --skip
                 parse_sample_time_index (&skip, long_param);
 
@@ -403,6 +414,8 @@ int main(int argc, char **argv)
                 error_line ("warning: --threads not enabled, ignoring option!");
 #endif
             }
+            else if (!strcmp (long_option, "no-threads"))               // --no-threads
+                worker_threads = 0;                                     // harmless if threads not enabled
             else if (!strcmp (long_option, "caf-be")) {                 // --caf-be
                 decode_format = WP_FORMAT_CAF;
                 caf_be = format_specified = 1;
@@ -648,6 +661,11 @@ int main(int argc, char **argv)
     if (delete_source && (verify_only || skip.value_is_valid || until.value_is_valid)) {
         error_line ("can't delete in verify mode or when --skip or --until are used!");
         delete_source = 0;
+    }
+
+    if (overwrite_all && no_overwrite) {
+        error_line ("overwrite all and no overwrite and mutually exclusive!");
+        ++error_count;
     }
 
     if (raw_decode && format_specified) {
@@ -1018,7 +1036,7 @@ static void parse_sample_time_index (struct sample_time_index *dst, char *src)
             continue;
         }
         else if (*src == '.' || isdigit (*src)) {
-            temp = strtod (src, &src);
+            temp = strtod_hexfree (src, &src);
 
             if (temp < 0.0 || (dst->value_is_time && temp >= 60.0) ||
                 (!dst->value_is_time && temp != floor (temp)))
@@ -1065,6 +1083,11 @@ static FILE *open_output_file (char *filename, char **tempfilename)
 
         if (res == 1) {
             int count = 0;
+
+            if (no_overwrite) {
+                error_line ("not overwriting %s", FN_FIT (filename));
+                return NULL;
+            }
 
             if (!overwrite_all) {
                 fprintf (stderr, "overwrite %s (yes/no/all)? ", FN_FIT (filename));
@@ -2478,20 +2501,27 @@ static int do_tag_extractions (WavpackContext *wpc, char *outfilename)
 
             if (!overwrite_all && (outfile = fopen (full_filename, "r")) != NULL) {
                 DoCloseHandle (outfile);
-                fprintf (stderr, "overwrite %s (yes/no/all)? ", FN_FIT (full_filename));
-                fflush (stderr);
 
-                if (set_console_title)
-                    DoSetConsoleTitle ("overwrite?");
+                if (no_overwrite) {
+                    error_line ("not overwriting %s", FN_FIT (full_filename));
+                    *full_filename = 0;
+                }
+                else {
+                    fprintf (stderr, "overwrite %s (yes/no/all)? ", FN_FIT (full_filename));
+                    fflush (stderr);
 
-                switch (yna ()) {
+                    if (set_console_title)
+                        DoSetConsoleTitle ("overwrite?");
 
-                    case 'n':
-                        *full_filename = 0;
-                        break;
+                    switch (yna ()) {
 
-                    case 'a':
-                        overwrite_all = 1;
+                        case 'n':
+                            *full_filename = 0;
+                            break;
+
+                        case 'a':
+                            overwrite_all = 1;
+                    }
                 }
             }
 
@@ -2768,9 +2798,13 @@ static void dump_summary (WavpackContext *wpc, char *name, FILE *dst)
 
     if ((WavpackGetQualifyMode (wpc) & QMODE_DSD_AUDIO) && !raw_pcm)
         fprintf (dst, "source:            1-bit DSD at %u Hz\n", WavpackGetNativeSampleRate (wpc));
-    else
+    else if ((WavpackGetBitsPerSample (wpc) + 7) / 8 == WavpackGetBytesPerSample (wpc))
         fprintf (dst, "source:            %d-bit %s at %u Hz\n", WavpackGetBitsPerSample (wpc),
             (WavpackGetMode (wpc) & MODE_FLOAT) ? "floats" : "ints",
+            WavpackGetSampleRate (wpc));
+    else
+        fprintf (dst, "source:            %d-bit %s (in %d bytes each) at %u Hz\n", WavpackGetBitsPerSample (wpc),
+            (WavpackGetMode (wpc) & MODE_FLOAT) ? "floats" : "ints", WavpackGetBytesPerSample (wpc),
             WavpackGetSampleRate (wpc));
 
     if (!channel_mask)
@@ -3378,7 +3412,7 @@ static void UTF8ToAnsi (char *string, int len)
     int max_chars = (int) strlen (string);
 #if defined (_WIN32)
     wchar_t *temp = malloc ((max_chars + 1) * 2);
-    int act_chars = UTF8ToWideChar ((unsigned char *) string, temp);
+    int act_chars = UTF8ToWideChar ((const unsigned char *) string, temp);
 
     while (act_chars) {
         memset (string, 0, len);

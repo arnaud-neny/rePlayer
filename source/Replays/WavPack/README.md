@@ -1,8 +1,8 @@
-<img src="http://www.rarewares.org/wavpack/logos/wavpacklogo.png" width="250"></img>
+<img src="https://www.wavpack.com/logos/wavpacklogo-with-theme.svg" width="250"></img>
 
 Hybrid Lossless Wavefile Compressor
 
-Copyright (c) 1998 - 2024 David Bryant.
+Copyright (c) 1998 - 2025 David Bryant.
 
 All Rights Reserved.
 

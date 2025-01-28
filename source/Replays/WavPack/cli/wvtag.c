@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2024 David Bryant.                 //
+//                Copyright (c) 1998 - 2025 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 static const char *sign_on = "\n"
 " WVTAG  WavPack Metadata Tagging Utility  %s Version %s\n"
-" Copyright (c) 2018 - 2024 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 2018 - 2025 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVTAG using libwavpack version %s, expected %s (see README)\n\n";
@@ -1344,7 +1344,7 @@ static void UTF8ToAnsi (char *string, int len)
     int max_chars = (int) strlen (string);
 #if defined (_WIN32)
     wchar_t *temp = malloc ((max_chars + 1) * 2);
-    int act_chars = UTF8ToWideChar ((unsigned char *) string, temp);
+    int act_chars = UTF8ToWideChar ((const unsigned char *) string, temp);
 
     while (act_chars) {
         memset (string, 0, len);

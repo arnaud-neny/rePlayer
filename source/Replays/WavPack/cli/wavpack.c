@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2024 David Bryant.                 //
+//                Copyright (c) 1998 - 2025 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 static const char *sign_on = "\n"
 " WAVPACK  Hybrid Lossless Audio Compressor  %s Version %s\n"
-" Copyright (c) 1998 - 2024 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2025 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WAVPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -106,7 +106,7 @@ static const char *usage =
 "          -o FILENAME | PATH = specify output filename or path\n"
 #endif
 #ifdef ENABLE_THREADS
-"          --threads = use multiple threads for faster operation\n"
+"          --no-threads = do not use multiple threads for faster operation\n"
 #endif
 "          -v  = verify output file integrity after write (no pipes)\n"
 "          -x  = extra encode processing (no decoding speed penalty)\n"
@@ -198,6 +198,10 @@ static const char *help =
 "    -n                      calculate average and peak quantization noise\n"
 "                             (for hybrid mode only, reference fullscale sine)\n"
 "    --no-overwrite          never overwrite existing files (and don't ask)\n"
+#ifdef ENABLE_THREADS
+"    --no-threads            do not use multiple threads for faster operation\n"
+"                             (equivalent to --threads=1)\n"
+#endif
 #ifdef _WIN32
 "    --no-utf8-convert       assume tag values read from files are already UTF-8,\n"
 "                             don't attempt to convert from local encoding\n"
@@ -413,6 +417,10 @@ int main (int argc, char **argv)
 #endif                          // on Linux, this is considered uncool to do by default
 
     CLEAR (config);
+
+#ifdef ENABLE_THREADS
+    config.worker_threads = worker_threads = get_default_worker_threads ();
+#endif
 
     // loop through command-line arguments
 
@@ -669,6 +677,8 @@ int main (int argc, char **argv)
                 error_line ("warning: --threads not enabled, ignoring option!");
 #endif
             }
+            else if (!strcmp (long_option, "no-threads"))               // --no-threads
+                config.worker_threads = worker_threads = 0;             // harmless if threads not enabled
             else {
                 error_line ("unknown option: %s !", long_option);
                 ++error_count;
@@ -791,7 +801,7 @@ int main (int argc, char **argv)
 
                     case 'B': case 'b':
                         config.flags |= CONFIG_HYBRID_FLAG;
-                        config.bitrate = (float) strtod (++argcp, &argcp);
+                        config.bitrate = (float) strtod_hexfree (++argcp, &argcp);
                         --argcp;
 
                         if (config.bitrate < 2.0 || config.bitrate > 9600.0) {
@@ -825,7 +835,7 @@ int main (int argc, char **argv)
                         break;
 
                     case 'S': case 's':
-                        config.shaping_weight = (float) strtod (++argcp, &argcp);
+                        config.shaping_weight = (float) strtod_hexfree (++argcp, &argcp);
 
                         if (!config.shaping_weight) {
                             config.flags |= CONFIG_SHAPE_OVERRIDE;
@@ -2556,8 +2566,13 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
         }
     }
 
-    if (WavpackGetBitsPerSample (wpc) % 8)
-        padding_error_bit_mask = (1 << (8 - (WavpackGetBitsPerSample (wpc) % 8))) - 1;
+    // The padding_error_bit_mask now handles both the case of sub-full-byte sample depths
+    // (e.g., 12-bit or 20-bit) and the case of unpacked containers (e.g., 24-bit in 4
+    // bytes). In the case of any non-zero padding bits/bytes, we will abort the operation
+    // and suggest possible fixes to the user depending on the particulars.
+
+    if (WavpackGetBytesPerSample (wpc) * 8 != WavpackGetBitsPerSample (wpc))
+        padding_error_bit_mask = (1 << (WavpackGetBytesPerSample (wpc) * 8 - WavpackGetBitsPerSample (wpc))) - 1;
 
     while (1) {
         uint32_t bytes_to_read, bytes_read = 0;
@@ -2633,10 +2648,26 @@ static int pack_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigned ch
                 for (x = 0; x < l; x ++)
                     if (sample_buffer[x] & padding_error_bit_mask) {
                         int bits = WavpackGetBitsPerSample (wpc);
-                        error_line ("\"%d-bit\" file has non-zero PCM padding bits!!", bits);
-                        error_line ("use --force-even-byte-depth to encode as %d-bit", (bits + 7) / 8 * 8);
-                        if (bits >= 4)
-                            error_line ("or --pre-quantize=%d to zero those bits before encoding", bits);
+
+                        if (padding_error_bit_mask >= 0xff) {
+                            if (bits % 8)
+                                error_line ("\"%d-bit\" file has non-zero PCM padding bits/bytes!!", bits);
+                            else
+                                error_line ("\"%d-bit\" file has non-zero PCM padding bytes!!", bits);
+
+                            if (bits >= 4) {
+                                error_line ("use --pre-quantize=%d to zero those bits before encoding", bits);
+
+                                if (bits == 24)
+                                    error_line ("or use -a for float files generated by CoolEdit or Audition");
+                            }
+                        }
+                        else {
+                            error_line ("\"%d-bit\" file has non-zero PCM padding bits!!", bits);
+                            error_line ("use --force-even-byte-depth to encode as %d-bit", (bits + 7) / 8 * 8);
+                            if (bits >= 4)
+                                error_line ("or --pre-quantize=%d to zero those bits before encoding", bits);
+                        }
                         free (sample_buffer);
                         free (input_buffer);
                         return WAVPACK_SOFT_ERROR;
