@@ -279,7 +279,7 @@ namespace rePlayer
     {
         if (replay != eReplay::Unknown)
         {
-            for (int32_t selectedSettings = 0; selectedSettings < int32_t(eReplay::Count); selectedSettings++)
+            for (int32_t selectedSettings = 0, e = m_numSettings; selectedSettings < e; selectedSettings++)
             {
                 if (m_settingsPlugins[selectedSettings]->replayId == replay)
                 {
@@ -373,11 +373,13 @@ namespace rePlayer
         {
             m_replayToIndex[indices[i]] = uint8_t(i);
             m_sortedPlugins[i] = m_plugins[indices[i]];
-            m_settingsPlugins[i] = m_plugins[i];
-            if (m_plugins[i]->settings)
+            if (m_plugins[i] && m_plugins[i]->settings)
+            {
+                m_settingsPlugins[m_numSettings] = m_plugins[i];
                 m_numSettings++;
+            }
         }
-        std::sort(m_settingsPlugins, m_settingsPlugins + uint16_t(eReplay::Count), [](auto l, auto r)
+        std::sort(m_settingsPlugins, m_settingsPlugins + m_numSettings, [](auto l, auto r)
         {
             if (l->settings == nullptr && r->settings == nullptr)
                 return r < l;
