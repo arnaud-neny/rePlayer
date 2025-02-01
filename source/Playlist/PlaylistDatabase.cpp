@@ -1,3 +1,10 @@
+// Core
+#include <Core/Log.h>
+
+// rePlayer
+#include <Playlist/Playlist.h>
+#include <RePlayer/Core.h>
+
 #include "PlaylistDatabase.h"
 
 namespace rePlayer
@@ -12,6 +19,43 @@ namespace rePlayer
     {
         (void)artists;
         return GetPath(song->GetSourceId(0));
+    }
+
+    void PlaylistDatabase::Update()
+    {
+        if (m_deletedSubsongs.IsNotEmpty())
+        {
+            for (auto subsongIdToRemove : m_deletedSubsongs)
+            {
+                SmartPtr<Song> holdSong = (*this)[subsongIdToRemove.songId];
+                auto song = holdSong->Edit();
+                Log::Message("Discard: ID_%06X_%02XP \"[%s]%s\"\n", uint32_t(subsongIdToRemove.songId), uint32_t(subsongIdToRemove.index), song->type.GetExtension(), GetTitleAndArtists(subsongIdToRemove).c_str());
+
+                uint32_t numSubsongs = song->lastSubsongIndex + 1ul;
+                song->subsongs[subsongIdToRemove.index].isDiscarded = true;
+                for (uint32_t i = 0, e = numSubsongs; i < e; i++)
+                {
+                    if (song->subsongs[i].isDiscarded)
+                        numSubsongs--;
+                }
+                if (numSubsongs == 0)
+                {
+                    for (auto artistId : song->artistIds)
+                    {
+                        auto* artist = (*this)[artistId]->Edit();
+                        if (--artist->numSongs == 0)
+                            RemoveArtist(artistId);
+                    }
+                    RemoveSong(song->id);
+
+                    Raise(Database::Flag::kSaveArtists);
+                }
+
+                Core::GetPlaylist().Discard(MusicID(subsongIdToRemove, DatabaseID::kPlaylist));
+            }
+            Raise(Database::Flag::kSaveSongs);
+            m_deletedSubsongs.Clear();
+        }
     }
 
     SourceID PlaylistDatabase::AddPath(SourceID::eSourceID id, const std::string& path)

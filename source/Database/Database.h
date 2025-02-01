@@ -16,7 +16,6 @@ namespace core::io
 
 namespace rePlayer
 {
-    class DatabaseArtistsUI;
     class DatabaseSongsUI;
 
     class Database
@@ -28,7 +27,6 @@ namespace rePlayer
         virtual ~Database();
 
         void Register(DatabaseSongsUI* ui);
-        void Register(DatabaseArtistsUI* ui);
         virtual void Reset();
 
         Song* operator[](SongID songId) const;
@@ -63,8 +61,13 @@ namespace rePlayer
         template <typename Predicate>
         Song* FindSong(Predicate&& predicate) const;
 
+        void DeleteSubsong(SubsongID subsongId);
+        bool HasDeletedSubsongs(SongID songId) const;
+
         Artist* AddArtist(ArtistSheet* artist);
         void RemoveArtist(ArtistID artistId);
+
+        virtual bool AddArtistToSong(Song* song, Artist* artist);
 
         Status LoadSongs(io::File& file);
         void SaveSongs(io::File& file);
@@ -100,14 +103,22 @@ namespace rePlayer
 
         void TrackSubsong(SubsongID subsongId);
 
-        DatabaseArtistsUI* GetArtistsUI() const;
-        DatabaseSongsUI* GetSongsUI() const;
-
         template <typename ItemID, typename ItemType>
-        void Update(ItemID id, ItemType* item);
+        void Reconcile(ItemID id, ItemType* item);
+
+        virtual void Update() = 0;
+
+        template <typename SongType>
+        void Delete(const SongType& song, const char* logId) const;
+        template <typename StringType, typename SongType>
+        void Move(const StringType& oldFilename, const SongType& song, const char* logId) const;
 
         void Freeze();
         void UnFreeze();
+
+    protected:
+        virtual void DeleteInternal(Song* song, const char* logId) const;
+        virtual void MoveInternal(const char* oldFilename, Song* song, const char* logId) const;
 
     private:
         template <typename ItemType, typename ItemID>
@@ -163,11 +174,13 @@ namespace rePlayer
         Flag m_flags = Flag::kNone;
         uint32_t m_numFreeze = 0;
 
-        DatabaseSongsUI* m_songsUI = nullptr;
-        DatabaseArtistsUI* m_artistsUI = nullptr;
+        DatabaseSongsUI* m_ui[int(DatabaseID::kCount)] = { nullptr };
 
         Command m_commandTail;
         Command* m_commandHead = &m_commandTail;
+
+    protected:
+        Array<SubsongID> m_deletedSubsongs;
     };
 }
 // namespace rePlayer

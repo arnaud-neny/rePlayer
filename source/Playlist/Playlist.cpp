@@ -1103,6 +1103,7 @@ namespace rePlayer
         UpdateFiles();
 
         m_songs->OnEndUpdate();
+        m_artists->OnEndUpdate();
     }
 
     void Playlist::MoveSelection(uint32_t draggedEntryIndex)

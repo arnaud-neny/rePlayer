@@ -57,12 +57,12 @@ namespace rePlayer
 
     inline void Database::Register(DatabaseSongsUI* ui)
     {
-        m_songsUI = ui;
-    }
-
-    inline void Database::Register(DatabaseArtistsUI* ui)
-    {
-        m_artistsUI = ui;
+        if (m_ui[0] == nullptr)
+            m_ui[0] = ui;
+        else if (m_ui[1] == nullptr)
+            m_ui[1] = ui;
+        else
+            assert(0);
     }
 
     inline Song* Database::operator[](SongID songId) const
@@ -160,23 +160,54 @@ namespace rePlayer
         return nullptr;
     }
 
-    inline DatabaseArtistsUI* Database::GetArtistsUI() const
+    inline void Database::DeleteSubsong(SubsongID subsongId)
     {
-        return m_artistsUI;
+        m_deletedSubsongs.AddOnce(subsongId);
     }
 
-    inline DatabaseSongsUI* Database::GetSongsUI() const
+    inline bool Database::HasDeletedSubsongs(SongID songId) const
     {
-        return m_songsUI;
+        return m_deletedSubsongs.FindIf([songId](auto subsongId)
+        {
+            return subsongId.songId == songId;
+        }) != nullptr;
     }
 
     template <typename ItemID, typename ItemType>
-    inline void Database::Update(ItemID id, ItemType* item)
+    inline void Database::Reconcile(ItemID id, ItemType* item)
     {
         if constexpr (std::is_same<ItemID, SongID>::value)
             m_songs.m_items[uint32_t(id)] = item;
         else
             m_artists.m_items[uint32_t(id)] = item;
+    }
+
+    template <typename SongType>
+    inline void Database::Delete(const SongType& song, const char* logId) const
+    {
+        Song* songPtr;
+        if constexpr (std::is_same<SongType, SongID>::value)
+            songPtr = (*this)[song];
+        else
+            songPtr = song;
+        DeleteInternal(songPtr, logId);
+    }
+
+    template <typename StringType, typename SongType>
+    inline void Database::Move(const StringType& oldFilename, const SongType& song, const char* logId) const
+    {
+        const char* oldFilenamePtr;
+        static_assert(std::is_same<StringType, std::string>::value || std::is_same<StringType, char*>::value);
+        if constexpr (std::is_same<StringType, std::string>::value)
+            oldFilenamePtr = oldFilename.c_str();
+        else
+            oldFilenamePtr = oldFilename;
+        Song* songPtr;
+        if constexpr (std::is_same<SongType, SongID>::value)
+            songPtr = (*this)[song];
+        else
+            songPtr = song;
+        MoveInternal(oldFilenamePtr, songPtr, logId);
     }
 }
 // namespace rePlayer

@@ -4,7 +4,6 @@
 #include <Containers/Array.h>
 #include <Containers/HashMap.h>
 #include <Database/Types/MusicID.h>
-#include <Database/Types/Tags.h>
 
 struct ImGuiTextFilter;
 
@@ -25,12 +24,10 @@ namespace rePlayer
     class DatabaseSongsUI
     {
     public:
-        DatabaseSongsUI(DatabaseID databaseId, Window& owner);
+        DatabaseSongsUI(DatabaseID databaseId, Window& owner, bool isScrollingEnabled = true, uint16_t defaultHiddenColumns = (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay), const char* header = "Songs");
         virtual ~DatabaseSongsUI();
 
         void TrackSubsong(SubsongID subsongId);
-        void DeleteSubsong(SubsongID subsongId);
-        bool HasDeletedSubsongs(SongID songId) const;
 
         uint32_t NumSubsongs() const;
         uint32_t NumSelectedSubsongs() const;
@@ -39,57 +36,54 @@ namespace rePlayer
         virtual void OnEndUpdate();
 
     protected:
-        virtual void OnAddingArtistToSong(Song* song, ArtistID artistId);
+        struct SubsongEntry : public SubsongID
+        {
+            bool IsSelected() const;
+            void Select(bool isEnabled);
+        };
+
+    protected:
+        virtual Array<SubsongEntry> GatherEntries() const;
         virtual void OnSelectionContext();
 
     private:
-        static void OnSongFilterLoaded(uintptr_t userData, void*, const char*);
+        void DisplaySongsFilter(bool& isDirty);
+        void DisplaySongsTable(bool& isDirty);
+        void DisplayExportAsWav();
 
-        void FilteringUI(bool& isDirty);
-        void SongsUI(bool isDirty);
+        // Used in DisplaySongsFilter
+        void DisplaySongsFilterUI(bool& isDirty);
+        void FilterSongs();
 
-        void ExportAsWavUI();
-
-        // SongUI
-        void FilterBarsUI(bool& isDirty);
+        // Used in DisplaySongsTable
         void SortSubsongs(bool isDirty);
-        void SetRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId, MusicID currentPlayingSong);
-        void Selection(int32_t rowIdx, MusicID musicId);
+        void UpdateRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId, MusicID currentPlayingSong);
+        void UpdateSelection(int32_t rowIdx, MusicID musicId);
 
-        // Selection
+        // Used in UpdateSelection
         bool Select(int32_t rowIdx, MusicID musicId, bool isSelected);
         void DragSelection();
-        void SelectionContext(bool isSelected);
+        void UpdateSelectionContext(bool isSelected);
 
-        // Selection Context
+        // Used in UpdateSelectionContext
         void AddToArtist();
+        void RemoveFromArtistUI();
         void EditTags();
         bool Discard();
         void ResetReplay();
         void ResetSubsongState();
 
-    private:
-        enum TabIDs
-        {
-            kTitle,
-            kArtists,
-            kType,
-            kSize,
-            kDuration,
-            kYear,
-            kCRC,
-            kState,
-            kRating,
-            kDatabaseDate,
-            kSource,
-            kReplay,
-            kNumIDs
-        };
+        void RemoveFromArtist();
 
     protected:
         Database& m_db;
         Window& m_owner;
+        const std::string m_header;
         const DatabaseID m_databaseId;
+
+        uint32_t m_dbSongsRevision = 0;
+
+        // filter
 
         using FilterFlagType = uint32_t;
         enum class FilterFlag : FilterFlagType
@@ -122,27 +116,33 @@ namespace rePlayer
         Array<Filter> m_filters;
         Array<uint32_t> m_filterLostIds;
 
-        struct SubsongEntry
-        {
-            SubsongID id;
-            bool isSelected = false;
+        // table
 
-            bool operator==(SubsongID otherId) const;
+        enum TabIDs
+        {
+            kTitle, kArtist, kType, kSize, kDuration, kYear, kCRC, kState, kRating, kDatabaseDate, kSource, kReplay,
+            kNumIDs
         };
+
+        HashMap<SubsongID, float> m_subsongHighlights;
+        const uint16_t m_defaultHiddenColumns;
+
+        // entries
+
         Array<SubsongEntry> m_entries;
         uint32_t m_numSelectedEntries = 0;
 
-        uint32_t m_dbRevision = 0;
+        const bool m_isScrollingEnabled = true;
 
-        SubsongID m_lastSelectedSubsong;
         SubsongID m_trackedSubsongId;
 
-        HashMap<SubsongID, float> m_subsongHighlights;
+        // selection
+        SubsongID m_lastSelectedSubsong;
+        ArtistID m_artistToRemove = ArtistID::Invalid;
 
+        // WAV export
         bool m_isExportAsWavTriggered = false;
         Export* m_export = nullptr;
-
-        Array<SubsongID> m_deletedSubsongs;
     };
 }
 // namespace rePlayer

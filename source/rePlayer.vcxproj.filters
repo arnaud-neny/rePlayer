@@ -77,9 +77,6 @@
     <ClCompile Include="Database\Database.cpp">
       <Filter>Source Files\Database</Filter>
     </ClCompile>
-    <ClCompile Include="Library\LibrarySongMerger.cpp">
-      <Filter>Source Files\Library</Filter>
-    </ClCompile>
     <ClCompile Include="Database\DatabaseSongsUI.cpp">
       <Filter>Source Files\Database</Filter>
     </ClCompile>
@@ -182,7 +179,7 @@
     <ClCompile Include="IO\StreamArchive.cpp">
       <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Library\LibraryPatch.cpp">
+    <ClCompile Include="Library\LibraryDatabasePatch.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
     <ClCompile Include="IO\StreamArchiveRaw.cpp">
@@ -423,6 +420,15 @@
     </ClInclude>
     <ClInclude Include="Playlist\PlaylistDatabase.h">
       <Filter>Source Files\Playlist</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibraryDatabaseUI.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibraryDatabaseUI.inl.h">
+      <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\LibrarySongMerger.inl.h">
+      <Filter>Source Files\Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -59,7 +59,6 @@ namespace core::io
         static bool Delete(const char* name);
         static bool Copy(const char* srcName, const char* dstName);
         static bool Move(const char* oldName, const char* newName);
-        static bool Rename(const char* oldName, const char* newName);
 
         //replace invalid characters with underscores
         static void CleanFilename(char* name);

@@ -4,19 +4,6 @@
 
 namespace rePlayer
 {
-    inline void DatabaseSongsUI::DeleteSubsong(SubsongID subsongId)
-    {
-        m_deletedSubsongs.AddOnce(subsongId);
-    }
-
-    inline bool DatabaseSongsUI::HasDeletedSubsongs(SongID songId) const
-    {
-        return m_deletedSubsongs.FindIf([songId](auto subsongId)
-        {
-            return subsongId.songId == songId;
-        }) != nullptr;
-    }
-
     inline uint32_t DatabaseSongsUI::NumSubsongs() const
     {
         return m_entries.NumItems();
@@ -25,6 +12,16 @@ namespace rePlayer
     inline uint32_t DatabaseSongsUI::NumSelectedSubsongs() const
     {
         return m_numSelectedEntries;
+    }
+
+    inline bool DatabaseSongsUI::SubsongEntry::IsSelected() const
+    {
+        return external;
+    }
+
+    inline void DatabaseSongsUI::SubsongEntry::Select(bool isEnabled)
+    {
+        external = isEnabled;
     }
 }
 // namespace rePlayer

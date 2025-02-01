@@ -245,6 +245,18 @@ namespace rePlayer
         std::atomic_ref(m_commandHead).exchange(command)->next = command;
     }
 
+    bool Database::AddArtistToSong(Song* song, Artist* artist)
+    {
+        bool isAdded = song->ArtistIds().Find(artist->GetId()) == nullptr;
+        if (isAdded)
+        {
+            artist->Edit()->numSongs++;
+            song->Edit()->artistIds.Add(artist->GetId());
+            Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+        }
+        return isAdded;
+    }
+
     Status Database::LoadSongs(io::File& file)
     {
         return m_songs.Load(file);
@@ -285,7 +297,8 @@ namespace rePlayer
 
     void Database::TrackSubsong(SubsongID subsongId)
     {
-        m_songsUI->TrackSubsong(subsongId);
+        for (auto* ui : m_ui)
+            ui->TrackSubsong(subsongId);
     }
 
     void Database::Freeze()
@@ -340,6 +353,16 @@ namespace rePlayer
             m_commandTail.next = nullptr;
             m_commandHead = &m_commandTail;
         }
+    }
+
+    void Database::DeleteInternal(Song* song, const char* logId) const
+    {
+        UnusedArg(song, logId);
+    }
+
+    void Database::MoveInternal(const char* oldFilename, Song* song, const char* logId) const
+    {
+        UnusedArg(oldFilename, song, logId);
     }
 }
 // namespace rePlayer

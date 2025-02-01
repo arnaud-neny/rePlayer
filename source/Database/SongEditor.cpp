@@ -675,15 +675,7 @@ namespace rePlayer
                     {
                         m_song.edited.AddRef(); // keep ownership
                         SmartPtr<Song> song = Song::Create(&m_song.edited);
-                        auto newFileName = db.GetFullpath(song);
-                        if (!io::File::Move(oldFileName.c_str(), newFileName.c_str()))
-                        {
-                            io::File::Copy(oldFileName.c_str(), newFileName.c_str());
-                            Log::Warning("SongEditor: Can't move file \"%s\"\n", oldFileName.c_str());
-                            db.InvalidateCache();
-                        }
-                        else
-                            Log::Message("SongEditor: \"%s\" moved to \"%s\"\n", oldFileName.c_str(), newFileName.c_str());
+                        db.Move(oldFileName, song, "SongEditor");
                     }
                 }
             }

@@ -1,49 +1,28 @@
-#include "DatabaseArtistsUI.h"
-
 // Core
+#include <Core/Log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <ImGui.h>
 #include <ImGui/imgui_internal.h>
-#include <IO/File.h>
 
 // rePlayer
 #include <Database/Types/Countries.h>
 #include <Database/Database.h>
-#include <Database/DatabaseSongsUI.h>
-#include <Database/SongEditor.h>
-#include <RePlayer/Core.h>
+
+#include "DatabaseArtistsUI.h"
 
 // stl
 #include <algorithm>
 
 namespace rePlayer
 {
-    inline constexpr DatabaseArtistsUI::States& operator|=(DatabaseArtistsUI::States& a, DatabaseArtistsUI::States b)
-    {
-        a = DatabaseArtistsUI::States(uint32_t(a) | uint32_t(b));
-        return a;
-    }
-
-    inline constexpr bool operator&&(DatabaseArtistsUI::States a, DatabaseArtistsUI::States b)
-    {
-        return uint32_t(a) & uint32_t(b);
-    }
-
-    inline bool DatabaseArtistsUI::SongEntry::operator==(SongID otherId) const
-    {
-        return id == otherId;
-    }
-
     DatabaseArtistsUI::DatabaseArtistsUI(DatabaseID databaseId, Window& owner)
-        : m_db(Core::GetDatabase(databaseId))
-        , m_owner(owner)
-        , m_databaseId(databaseId)
+        : DatabaseSongsUI(databaseId, owner, false, (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kState) + (1 << kRating) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay),"Artists")
         , m_artistFilter(new ImGuiTextFilter())
         , m_artistMerger{ new ImGuiTextFilter() }
     {
-        m_db.Register(this);
         owner.RegisterSerializedData(m_artistFilter->InputBuf, "ArtistsFilter", &OnArtistFilterLoaded, uintptr_t(m_artistFilter));
+        owner.RegisterSerializedData(m_selectedArtistCopy.id, "ArtistsSelection", &OnArtistSelectionLoaded, uintptr_t(this));
     }
 
     DatabaseArtistsUI::~DatabaseArtistsUI()
@@ -54,8 +33,8 @@ namespace rePlayer
 
     void DatabaseArtistsUI::OnDisplay()
     {
-        bool isDirty = m_dbRevision != m_db.ArtistsRevision();
-        m_dbRevision = m_db.ArtistsRevision();
+        bool isDirty = m_dbArtistsRevision != m_db.ArtistsRevision();
+        m_dbArtistsRevision = m_db.ArtistsRevision();
         Artist* selectedArtist = m_db.IsValid(m_selectedArtistCopy.id) ? m_db[m_selectedArtistCopy.id] : nullptr;
         if (selectedArtist != nullptr)
         {
@@ -67,38 +46,42 @@ namespace rePlayer
         if (m_selectedArtistCopy.handles.IsEmpty())
             m_selectedArtistCopy.handles.Push();
 
-        bool isFiltering = isDirty && m_artistFilter->IsActive();
-        if (m_artistFilter->Draw("##filter", -1) || isFiltering)
-        {
-            m_artists.Clear();
-            for (Artist* artist : m_db.Artists())
-            {
-                if (m_artistFilter->PassFilter(artist->GetHandle()))
-                    m_artists.Add(artist->GetId());
-            }
-            isDirty = true;
-        }
-        else if (isDirty)
-        {
-            m_artists.Clear();
-            for (Artist* artist : m_db.Artists())
-                m_artists.Add(artist->GetId());
-        }
-
-        if (ImGui::BeginTable("Artists", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit))
+        if (ImGui::BeginTable("Artists", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit, ImVec2(0.0f, -FLT_MIN)))
         {
             ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthFixed, 128.0f, 0);
             ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthStretch, 0.0f, 1);
 
             ImGui::TableNextColumn();
 
+            // display the artists
             if (ImGui::BeginTable("artists", 1, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Sortable | ImGuiTableFlags_RowBg
                 | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY))
             {
                 ImGui::TableSetupColumn("Artist", 0, 0.0f, 0);
-                ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
+                ImGui::TableSetupScrollFreeze(0, 2); // Make rows always visible
                 ImGui::TableHeadersRow();
 
+                // display and process the artist search bar
+                ImGui::TableNextColumn();
+                bool isFiltering = isDirty && m_artistFilter->IsActive();
+                if (m_artistFilter->Draw("##filter", -1) || isFiltering)
+                {
+                    m_artists.Clear();
+                    for (Artist* artist : m_db.Artists())
+                    {
+                        if (m_artistFilter->PassFilter(artist->GetHandle()))
+                            m_artists.Add(artist->GetId());
+                    }
+                    isDirty = true;
+                }
+                else if (isDirty)
+                {
+                    m_artists.Clear();
+                    for (Artist* artist : m_db.Artists())
+                        m_artists.Add(artist->GetId());
+                }
+
+                // sort everything
                 auto* sortsSpecs = ImGui::TableGetSortSpecs();
                 if (sortsSpecs && (sortsSpecs->SpecsDirty || isDirty))
                 {
@@ -121,6 +104,7 @@ namespace rePlayer
                     sortsSpecs->SpecsDirty = false;
                 }
 
+                // display the artists list
                 ImGuiListClipper clipper;
                 clipper.Begin(m_artists.NumItems<int32_t>());
                 while (clipper.Step())
@@ -138,8 +122,8 @@ namespace rePlayer
                             selectedArtist = artist;
                             if (m_selectedArtistCopy.id != artistId)
                             {
+                                m_dbSongsRevision = m_db.SongsRevision() + 1;
                                 artist->CopyTo(&m_selectedArtistCopy);
-                                m_selectedCountry = -1;
                             }
                         }
                         ImGui::SameLine(0.0f, 0.0f);//no spacing
@@ -153,26 +137,24 @@ namespace rePlayer
 
             ImGui::TableNextColumn();
 
-            if (ImGui::BeginTable("artist", 2, ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings))
+            // display the artist properties and songs
+            if (ImGui::BeginChild("artist", ImVec2(0.0f, 0.0f)) && selectedArtist)
             {
-                ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthFixed, 0.0f, 0);
-                ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthStretch, 0.0f, 1);
-
-                IdUI(selectedArtist);
-                HandleUI(selectedArtist);
-                AliasUI(selectedArtist);
-                NameUI(selectedArtist);
-                GroupUI(selectedArtist);
-                CountryUI(selectedArtist);
+                HandleUI();
+                AliasUI();
+                NameUI();
+                GroupUI();
+                CountryUI();
                 SaveChangesUI(selectedArtist);
                 SourcesUI(selectedArtist);
-                MergeUI(selectedArtist);
-                SongUI(selectedArtist);
-
-                ImGui::EndTable();
+                MergeUI();
+                SongUI();
             }
+            ImGui::EndChild();
+
             ImGui::EndTable();
 
+            // process the merge if any
             if (m_artistMerger.isActive && m_artistMerger.masterArtistId != ArtistID::Invalid)
                 ImGui::OpenPopup("Merge Artist");
             ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
@@ -226,10 +208,7 @@ namespace rePlayer
                             }
                         }
                         if (!oldFilename.empty())
-                        {
-                            auto newFilename = m_db.GetFullpath(song);
-                            io::File::Move(oldFilename.c_str(), newFilename.c_str());
-                        }
+                            m_db.Move(oldFilename, song, "MergeArtist");
                     }
 
                     if (masterArtistSheet->realName.IsEmpty())
@@ -284,7 +263,6 @@ namespace rePlayer
                     m_db.Raise(Database::Flag::kSaveArtists | Database::Flag::kSaveSongs);
 
                     m_selectedArtistCopy = {};
-                    m_selectedCountry = -1;
                     m_artistMerger.masterArtistId = ArtistID::Invalid;
                     ImGui::CloseCurrentPopup();
                 }
@@ -300,9 +278,40 @@ namespace rePlayer
         }
     }
 
+    Array<DatabaseSongsUI::SubsongEntry> DatabaseArtistsUI::GatherEntries() const
+    {
+        Array<DatabaseSongsUI::SubsongEntry> entries;
+        auto selectedArtistId = m_selectedArtistCopy.id;
+        Artist* selectedArtist = m_db.IsValid(selectedArtistId) ? m_db[selectedArtistId] : nullptr;
+        if (selectedArtist)
+        {
+            for (auto* song : m_db.Songs())
+            {
+                for (auto artistId : song->ArtistIds())
+                {
+                    if (artistId == selectedArtistId)
+                    {
+                        for (uint16_t i = 0, lastSubsongIndex = song->GetLastSubsongIndex(); i <= lastSubsongIndex; i++)
+                        {
+                            if (!song->IsSubsongDiscarded(i))
+                            {
+                                SubsongEntry subsongEntry;
+                                subsongEntry.songId = song->GetId();
+                                subsongEntry.index = i;
+                                entries.Add(subsongEntry);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return entries;
+    }
+
     void DatabaseArtistsUI::SourcesUI(Artist* selectedArtist)
     {
-        (void)selectedArtist;
+        UnusedArg(selectedArtist);
     }
 
     void DatabaseArtistsUI::OnSavedChanges(Artist* selectedArtist)
@@ -321,44 +330,69 @@ namespace rePlayer
         artistFilter->Build();
     }
 
-    void DatabaseArtistsUI::IdUI(Artist* selectedArtist)
+    void DatabaseArtistsUI::OnArtistSelectionLoaded(uintptr_t userData, void*, const char*)
     {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("ID:");
-        ImGui::TableNextColumn();
-        if (selectedArtist)
-            ImGui::Text("%04X", static_cast<uint32_t>(selectedArtist->GetId()));
-        ImGui::Spacing();
-    }
-
-    void DatabaseArtistsUI::HandleUI(Artist* selectedArtist)
-    {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("Handle:");
-        ImGui::TableNextColumn();
-        ImGui::SetNextItemWidth(-FLT_MIN);
-        ImGui::InputText("##Handle", &m_selectedArtistCopy.handles[0].String(), selectedArtist ? 0 : ImGuiInputTextFlags_ReadOnly);
-        ImGui::Spacing();
-    }
-
-    void DatabaseArtistsUI::AliasUI(Artist* selectedArtist)
-    {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("Alias:");
-        ImGui::TableNextColumn();
+        auto* ui = reinterpret_cast<DatabaseArtistsUI*>(userData);
+        Artist* selectedArtist = ui->m_db.IsValid(ui->m_selectedArtistCopy.id) ? ui->m_db[ui->m_selectedArtistCopy.id] : nullptr;
         if (selectedArtist)
         {
-            const float button_size = ImGui::GetFrameHeight();
-            auto& style = ImGui::GetStyle();
+            selectedArtist->CopyTo(&ui->m_selectedArtistCopy);
+        }
+        else
+            ui->m_selectedArtistCopy = {};
+    }
 
-            uint16_t handleToSwap = 0;
-            uint16_t handleToRemove = 0;
-            for (uint16_t i = 1; i < m_selectedArtistCopy.handles.NumItems(); i++)
+    void DatabaseArtistsUI::HandleUI()
+    {
+        char label[sizeof("Handle for ID:0000")];
+        sprintf(label, "Handle for ID:%04X", static_cast<uint32_t>(m_selectedArtistCopy.id));
+
+        ImGui::SeparatorText(label);
+
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##Handle", &m_selectedArtistCopy.handles[0].String(), 0);
+    }
+
+    void DatabaseArtistsUI::AliasUI()
+    {
+        ImGui::SeparatorText("Alias");
+
+        const float button_size = ImGui::GetFrameHeight();
+        auto& style = ImGui::GetStyle();
+
+        auto aliasButton = [&]()
+        {
+            if (ImGui::Button("+", ImVec2(button_size, button_size)))
+                m_selectedArtistCopy.handles.Add("");
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Add another alias");
+        };
+
+        if (m_selectedArtistCopy.handles.NumItems() == 1)
+        {
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            ImGui::PushID(-1);
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + Max(1.0f, ImGui::CalcItemWidth() - button_size));
+            aliasButton();
+            ImGui::PopID();
+        }
+        else
+        {
+            int32_t handleToSwap = 0;
+            int32_t handleToRemove = 0;
+            for (int32_t i = 1, last = m_selectedArtistCopy.handles.NumItems() - 1; i <= last; i++)
             {
+                bool isLast = i == last;
+
                 ImGui::SetNextItemWidth(-FLT_MIN);
                 ImGui::PushID(i);
-                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x) * 2));
+                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x) * (isLast ? 3 : 2)));
                 ImGui::InputText("##Handle", &m_selectedArtistCopy.handles[i].String());
+                if (isLast)
+                {
+                    ImGui::SameLine(0, style.ItemInnerSpacing.x);
+                    aliasButton();
+                }
                 ImGui::SameLine(0, style.ItemInnerSpacing.x);
                 if (ImGui::Button("M", ImVec2(button_size, button_size)))
                     handleToSwap = i;
@@ -375,47 +409,56 @@ namespace rePlayer
                 std::swap(m_selectedArtistCopy.handles[0], m_selectedArtistCopy.handles[handleToSwap]);
             if (handleToRemove)
                 m_selectedArtistCopy.handles.RemoveAt(handleToRemove);
-            ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + Max(1.0f, ImGui::CalcItemWidth() - button_size));
+        }
+    }
+
+    void DatabaseArtistsUI::NameUI()
+    {
+        ImGui::SeparatorText("Name");
+
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##Name", &m_selectedArtistCopy.realName.String());
+    }
+
+    void DatabaseArtistsUI::GroupUI()
+    {
+        ImGui::SeparatorText("Group");
+
+        ImGui::PushID("EditGroups");
+        const float button_size = ImGui::GetFrameHeight();
+        auto& style = ImGui::GetStyle();
+
+        auto groupButton = [&]()
+        {
             if (ImGui::Button("+", ImVec2(button_size, button_size)))
-                m_selectedArtistCopy.handles.Add("");
+                m_selectedArtistCopy.groups.Add("");
             if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Add another alias");
-        }
-        ImGui::Spacing();
-    }
+                ImGui::Tooltip("Add another group");
+        };
 
-    void DatabaseArtistsUI::NameUI(Artist* selectedArtist)
-    {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("Name:");
-        ImGui::TableNextColumn();
-        if (selectedArtist)
+        if (m_selectedArtistCopy.groups.IsEmpty())
         {
             ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::InputText("##Name", &m_selectedArtistCopy.realName.String());
+            ImGui::PushID(-1);
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + Max(1.0f, ImGui::CalcItemWidth() - button_size));
+            groupButton();
+            ImGui::PopID();
         }
-        ImGui::Spacing();
-    }
-
-    void DatabaseArtistsUI::GroupUI(Artist* selectedArtist)
-    {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("Group:");
-        ImGui::TableNextColumn();
-        if (selectedArtist)
+        else
         {
-            ImGui::PushID("EditGroups");
-            const float button_size = ImGui::GetFrameHeight();
-            auto& style = ImGui::GetStyle();
-
-            uint16_t groupToRemove = m_selectedArtistCopy.groups.NumItems<uint16_t>();
-            for (uint16_t i = 0, e = groupToRemove; i < e; i++)
+            int32_t groupToRemove = -1;
+            for (int32_t i = 0, last = m_selectedArtistCopy.groups.NumItems() - 1; i <= last; i++)
             {
+                bool isLast = i == last;
                 ImGui::SetNextItemWidth(-FLT_MIN);
                 ImGui::PushID(i);
-                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x)));
+                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x) * (isLast ? 2 : 1)));
                 ImGui::InputText("##Group", &m_selectedArtistCopy.groups[i].String());
+                if (isLast)
+                {
+                    ImGui::SameLine(0, style.ItemInnerSpacing.x);
+                    groupButton();
+                }
                 ImGui::SameLine(0, style.ItemInnerSpacing.x);
                 if (ImGui::Button("X", ImVec2(button_size, button_size)))
                     groupToRemove = i;
@@ -423,37 +466,68 @@ namespace rePlayer
                     ImGui::Tooltip("Remove group");
                 ImGui::PopID();
             }
-            if (groupToRemove != m_selectedArtistCopy.groups.NumItems())
+            if (groupToRemove >= 0)
                 m_selectedArtistCopy.groups.RemoveAt(groupToRemove);
-            ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + Max(1.0f, ImGui::CalcItemWidth() - button_size));
-            if (ImGui::Button("+", ImVec2(button_size, button_size)))
-                m_selectedArtistCopy.groups.Add("");
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Add another group");
-            ImGui::PopID();
         }
-        ImGui::Spacing();
+        ImGui::PopID();
     }
 
-    void DatabaseArtistsUI::CountryUI(Artist* selectedArtist)
+    void DatabaseArtistsUI::CountryUI()
     {
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted("Country:");
-        ImGui::TableNextColumn();
-        if (selectedArtist)
-        {
-            ImGui::PushID("EditCountries");
-            const float button_size = ImGui::GetFrameHeight();
-            auto& style = ImGui::GetStyle();
+        ImGui::SeparatorText("Country");
 
-            uint16_t countryToRemove = m_selectedArtistCopy.countries.NumItems<uint16_t>();
-            for (uint16_t i = 0, e = countryToRemove; i < e; i++)
+        ImGui::PushID("EditCountries");
+        const float button_size = ImGui::GetFrameHeight();
+        auto& style = ImGui::GetStyle();
+
+        auto countriyButton = [&]()
+        {
+            if (ImGui::Button("+", ImVec2(button_size, button_size)))
+                ImGui::OpenPopup("StatePopup");
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
+            if (ImGui::BeginPopup("StatePopup"))
             {
+                auto countries = Countries::GetComboList(m_selectedArtistCopy.countries.Container());
+                ImGuiListClipper clipper;
+                clipper.Begin(countries.NumItems<int32_t>());
+                while (clipper.Step())
+                {
+                    for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
+                    {
+                        if (ImGui::Selectable(countries[rowIdx]))
+                            m_selectedArtistCopy.countries.Add(Countries::GetCode(countries[rowIdx]));
+                    }
+                }
+
+                ImGui::EndPopup();
+            }
+            else if (ImGui::IsItemHovered())
+                ImGui::Tooltip("Add another country");
+        };
+
+        if (m_selectedArtistCopy.countries.IsEmpty())
+        {
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            ImGui::PushID(-1);
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + Max(1.0f, ImGui::CalcItemWidth() - button_size));
+            countriyButton();
+            ImGui::PopID();
+        }
+        else
+        {
+            int32_t countryToRemove = -1;
+            for (int32_t i = 0, last = m_selectedArtistCopy.countries.NumItems() - 1; i <= last; i++)
+            {
+                bool isLast = i == last;
                 ImGui::SetNextItemWidth(-FLT_MIN);
                 ImGui::PushID(m_selectedArtistCopy.countries[i]);
-                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x)));
+                ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x) * (isLast ? 2 : 1)));
                 ImGui::InputText("##country", const_cast<char*>(Countries::GetName(m_selectedArtistCopy.countries[i])), strlen(Countries::GetName(m_selectedArtistCopy.countries[i])) + 1, ImGuiInputTextFlags_ReadOnly);
+                if (isLast)
+                {
+                    ImGui::SameLine(0, style.ItemInnerSpacing.x);
+                    countriyButton();
+                }
                 ImGui::SameLine(0, style.ItemInnerSpacing.x);
                 if (ImGui::Button("X", ImVec2(button_size, button_size)))
                     countryToRemove = i;
@@ -461,189 +535,51 @@ namespace rePlayer
                     ImGui::Tooltip("Remove country");
                 ImGui::PopID();
             }
-            if (countryToRemove != m_selectedArtistCopy.countries.NumItems())
+            if (countryToRemove >= 0)
                 m_selectedArtistCopy.countries.RemoveAt(countryToRemove);
-            ImGui::SetNextItemWidth(-FLT_MIN);
-            ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (button_size + style.ItemInnerSpacing.x)));
-            auto countries = Countries::GetComboList(m_selectedArtistCopy.countries.Container());
-            ImGui::Combo("##NewCountry", &m_selectedCountry, countries.Items(), countries.NumItems<int32_t>());
-            ImGui::SameLine(0, style.ItemInnerSpacing.x);
-            ImGui::BeginDisabled(m_selectedCountry == -1);
-            if (ImGui::Button("+", ImVec2(button_size, button_size)))
-            {
-                m_selectedArtistCopy.countries.Add(Countries::GetCode(countries[m_selectedCountry]));
-                m_selectedCountry = -1;
-            }
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Add another country");
-            ImGui::EndDisabled();
-            ImGui::PopID();
         }
-        ImGui::Spacing();
+        ImGui::PopID();
     }
 
     void DatabaseArtistsUI::SaveChangesUI(Artist* selectedArtist)
     {
-        if (selectedArtist)
-        {
-            auto isUpdated = !selectedArtist->AreSameHandles(&m_selectedArtistCopy);
-            isUpdated |= selectedArtist->Countries() != m_selectedArtistCopy.countries;
-            isUpdated |= !selectedArtist->AreSameGroups(&m_selectedArtistCopy);
-            isUpdated |= selectedArtist->GetRealName() != m_selectedArtistCopy.realName;
+        ImGui::SeparatorText("");
+        auto isUpdated = !selectedArtist->AreSameHandles(&m_selectedArtistCopy);
+        isUpdated |= selectedArtist->Countries() != m_selectedArtistCopy.countries;
+        isUpdated |= !selectedArtist->AreSameGroups(&m_selectedArtistCopy);
+        isUpdated |= selectedArtist->GetRealName() != m_selectedArtistCopy.realName;
 
-            ImGui::BeginDisabled(!isUpdated);
-            if (ImGui::Button("Save Changes", ImVec2(-FLT_MIN, 0)))
-                OnSavedChanges(selectedArtist);
-            ImGui::EndDisabled();
-        }
-        ImGui::Spacing();
+        ImGui::BeginDisabled(!isUpdated);
+        if (ImGui::Button("Save Changes", ImVec2(-FLT_MIN, 0)))
+            OnSavedChanges(selectedArtist);
+        ImGui::EndDisabled();
     }
 
-    void DatabaseArtistsUI::MergeUI(Artist* selectedArtist)
+    void DatabaseArtistsUI::MergeUI()
     {
-        ImGui::TableNextColumn();
-        ImGui::Separator();
-        ImGui::TableNextColumn();
-        ImGui::Separator();
-        ImGui::Spacing();
-        if (selectedArtist)
+        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.5f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 1.0f));
+        ImGui::BeginDisabled(m_db.NumArtists() <= 1);
+        if (ImGui::Button("Merge With Another Artist", ImVec2(-FLT_MIN, 0)))
+            ImGui::OpenPopup("MergeArtist");
+        ImGui::PopStyleColor(3);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(128.0f, ImGui::GetTextLineHeightWithSpacing()), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
+        if (ImGui::BeginPopupContextItem("MergeArtist"))
         {
-            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.5f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.8f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 1.0f));
-            ImGui::BeginDisabled(m_db.NumArtists() <= 1);
-            if (ImGui::Button("Merge With Another Artist", ImVec2(-FLT_MIN, 0)))
-                ImGui::OpenPopup("MergeArtist");
-            ImGui::PopStyleColor(3);
-            ImGui::SetNextWindowSizeConstraints(ImVec2(128.0f, ImGui::GetTextLineHeightWithSpacing()), ImVec2(FLT_MAX, FLT_MAX));
-            if (ImGui::BeginPopupContextItem("MergeArtist"))
-            {
-                m_artistMerger.mergedArtistId = selectedArtist->GetId();
-                if (SelectMasterArtist(m_artistMerger.mergedArtistId))
-                    ImGui::CloseCurrentPopup();
-                ImGui::EndPopup();
-            }
-            ImGui::EndDisabled();
+            m_artistMerger.mergedArtistId = m_selectedArtistCopy.id;
+            if (SelectMasterArtist(m_artistMerger.mergedArtistId))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
         }
-        ImGui::Spacing();
+        ImGui::EndDisabled();
     }
 
-    void DatabaseArtistsUI::SongUI(Artist* selectedArtist)
+    void DatabaseArtistsUI::SongUI()
     {
-        ImGui::TableNextColumn();
-        ImGui::Separator();
-        ImGui::Spacing();
-        ImGui::TextUnformatted("Songs:");
-        ImGui::Spacing();
-        ImGui::TableNextColumn();
-        ImGui::Separator();
-        ImGui::Spacing();
-        auto dbSongsRevision = m_db.SongsRevision();
-        if (selectedArtist)
-        {
-            bool isDirty = false;
-            auto selectedArtistId = selectedArtist->GetId();
-            ImGui::Text("%u", selectedArtist->NumSongs());
-            if (m_selectedArtist != selectedArtistId)
-            {
-                m_songEntries.Clear();
-                m_songEntries.Reserve(selectedArtist->NumSongs());
-                for (auto* song : m_db.Songs())
-                {
-                    for (auto artistId : song->ArtistIds())
-                    {
-                        if (artistId == selectedArtistId)
-                        {
-                            m_songEntries.Add({ song->GetId() });
-                            break;
-                        }
-                    }
-                }
-                m_selectedArtist = selectedArtistId;
-                isDirty = true;
-                m_numSelectedSongEntries = 0;
-            }
-            else if (dbSongsRevision != m_dbSongsRevision)
-            {
-                m_numSelectedSongEntries = 0;
-                auto oldEntries = std::move(m_songEntries);
-                m_songEntries.Reserve(selectedArtist->NumSongs());
-                for (auto* song : m_db.Songs())
-                {
-                    for (auto artistId : song->ArtistIds())
-                    {
-                        if (artistId == selectedArtistId)
-                        {
-                            m_songEntries.Add({ song->GetId() });
-                            oldEntries.Remove(song->GetId(), 0, [&](auto& oldEntry)
-                            {
-                                if (oldEntry.isSelected)
-                                {
-                                    m_songEntries.Last().isSelected = true;
-                                    m_numSelectedSongEntries++;
-                                }
-                            });
-                            break;
-                        }
-                    }
-                }
-                isDirty = true;
-            }
+        ImGui::SeparatorText("Songs");
 
-            auto states = States::kNone;
-
-            constexpr ImGuiTableFlags flags =
-                ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
-                | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoSavedSettings; // todo remove nosave
-
-            if (ImGui::BeginTable("artistSongs", kNumIDs, flags))
-            {
-                ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthStretch, 0.0f, kTitle);
-                ImGui::TableSetupColumn("Artist", ImGuiTableColumnFlags_WidthStretch, 0.0f, kArtists);
-                ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 0.0f, kType);
-                ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
-                ImGui::TableHeadersRow();
-
-                SortSongs(isDirty);
-
-                ImGuiListClipper clipper;
-                clipper.Begin(m_songEntries.NumItems<int>());
-
-                auto musicId = MusicID({}, m_databaseId);
-                for (uint32_t i = 0, e = m_songEntries.NumItems(); i < e; i++)
-                {
-                    musicId.subsongId.songId = m_songEntries[i].id;
-                    Song* song = m_db[musicId.subsongId];
-
-                    ImGui::PushID(&musicId.subsongId, &musicId.subsongId + 1);
-                    ImGui::TableNextColumn();
-                    states |= Selection(i, musicId, selectedArtist);
-                    ImGui::SameLine(0.0f, 0.0f);//no spacing
-                    ImGui::TextUnformatted(song->GetName());
-
-                    ImGui::TableNextColumn();
-                    musicId.DisplayArtists();
-
-                    ImGui::TableNextColumn();
-                    ImGui::TextUnformatted(song->GetType().GetExtension());
-
-                    ImGui::PopID();
-                }
-
-                ImGui::EndTable();
-            }
-
-            if (states && States::kRemoveArtist)
-                RemoveArtist(selectedArtist);
-        }
-        else
-        {
-            m_selectedArtist = {};
-            m_songEntries.Clear();
-            m_numSelectedSongEntries = 0;
-        }
-        m_dbSongsRevision = dbSongsRevision;
-        ImGui::Spacing();
+        DatabaseSongsUI::OnDisplay();
     }
 
     bool DatabaseArtistsUI::SelectMasterArtist(ArtistID artistId)
@@ -681,245 +617,6 @@ namespace rePlayer
         }
 
         return m_artistMerger.masterArtistId != ArtistID::Invalid;
-    }
-
-    void DatabaseArtistsUI::SortSongs(bool isDirty)
-    {
-        auto* sortsSpecs = ImGui::TableGetSortSpecs();
-        if (sortsSpecs && (sortsSpecs->SpecsDirty || isDirty) && m_songEntries.NumItems() > 1)
-        {
-            std::sort(m_songEntries.begin(), m_songEntries.end(), [this, sortsSpecs](auto& l, auto& r)
-            {
-                Song* lSong = m_db[l.id];
-                Song* rSong = m_db[r.id];
-                for (int i = 0; i < sortsSpecs->SpecsCount; i++)
-                {
-                    auto& sortSpec = sortsSpecs->Specs[i];
-                    int64_t delta = 0;
-                    switch (sortSpec.ColumnUserID)
-                    {
-                    case kTitle:
-                        delta = CompareStringMixed(lSong->GetName(), rSong->GetName());
-                        break;
-                    case kArtists:
-                        delta = CompareStringMixed(m_db.GetArtists(l.id).c_str(), m_db.GetArtists(r.id).c_str());
-                        break;
-                    case kType:
-                        delta = strcmp(lSong->GetType().GetExtension(), rSong->GetType().GetExtension());
-                        break;
-                    }
-
-                    if (delta)
-                        return (sortSpec.SortDirection == ImGuiSortDirection_Ascending) ? delta < 0 : delta > 0;
-                }
-                return l.id < r.id;
-            });
-
-            sortsSpecs->SpecsDirty = false;
-        }
-    }
-
-    DatabaseArtistsUI::States DatabaseArtistsUI::Selection(int32_t entryIdx, MusicID musicId, Artist* selectedArtist)
-    {
-        auto states = States::kNone;
-
-        // Update the selection
-        bool isSelected = m_songEntries[entryIdx].isSelected;
-        if (ImGui::Selectable("##select", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//tbd: using imgui_internal for row height
-            isSelected = Select(entryIdx, musicId, isSelected);
-        // Open song editor with middle button
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Middle))
-        {
-            Core::GetSongEditor().OnSongSelected(musicId);
-            Core::GetSongEditor().Enable(true);
-        }
-        // Drag selected files
-        if (ImGui::BeginDragDropSource())
-        {
-            if (!isSelected)
-            {
-                m_songEntries[entryIdx].isSelected = isSelected = true;
-                m_numSelectedSongEntries++;
-            }
-            DragSelection();
-            ImGui::EndDragDropSource();
-        }
-        // Context menu
-        if (ImGui::BeginPopupContextItem("Song Popup"))
-        {
-            if (!isSelected)
-            {
-                m_songEntries[entryIdx].isSelected = isSelected = true;
-                m_numSelectedSongEntries++;
-            }
-            states |= SelectionContext(isSelected, selectedArtist);
-            ImGui::EndPopup();
-        }
-
-        return states;
-    }
-
-    void DatabaseArtistsUI::RemoveArtist(Artist* selectedArtist)
-    {
-        for (auto& entry : m_songEntries)
-        {
-            if (entry.isSelected)
-            {
-                selectedArtist->numSongs--;
-
-                auto* song = m_db[entry.id];
-                auto* songSheet = song->Edit();
-                auto oldFilename = m_db.GetFullpath(song);
-                songSheet->artistIds.Remove(selectedArtist->id);
-                if (m_databaseId == DatabaseID::kLibrary && !oldFilename.empty())
-                {
-                    auto newFilename = m_db.GetFullpath(song);
-                    io::File::Move(oldFilename.c_str(), newFilename.c_str());
-                }
-            }
-        }
-
-        if (selectedArtist->numSongs == 0)
-        {
-            m_db.RemoveArtist(selectedArtist->id);
-            m_selectedArtistCopy = {};
-            m_selectedArtistCopy.handles.Push();
-            m_selectedArtist = ArtistID::Invalid;
-        }
-        m_lastSelectedSong = SongID::Invalid;
-        m_songEntries.Clear();
-        m_numSelectedSongEntries = 0;
-        m_db.Raise(Database::Flag::kSaveArtists | Database::Flag::kSaveSongs);
-    }
-
-    bool DatabaseArtistsUI::Select(int32_t entryIdx, MusicID musicId, bool isSelected)
-    {
-        Core::GetSongEditor().OnSongSelected(musicId);
-
-        if (ImGui::GetIO().KeyShift)
-        {
-            if (!ImGui::GetIO().KeyCtrl)
-            {
-                for (auto& entry : m_songEntries)
-                    entry.isSelected = false;
-            }
-            auto lastSelectedIndex = m_songEntries.FindIf<int32_t>([this](auto& entry)
-            {
-                return entry.id == m_lastSelectedSong;
-            });
-            if (lastSelectedIndex < 0)
-            {
-                lastSelectedIndex = entryIdx;
-                m_lastSelectedSong = musicId.subsongId.songId;
-            }
-            if (lastSelectedIndex <= entryIdx) for (; lastSelectedIndex <= entryIdx; lastSelectedIndex++)
-                m_songEntries[lastSelectedIndex].isSelected = true;
-            else for (int32_t i = entryIdx; i <= lastSelectedIndex; i++)
-                m_songEntries[i].isSelected = true;
-            isSelected = true;
-            m_numSelectedSongEntries = 0;
-            for (auto& entry : m_songEntries)
-            {
-                if (entry.isSelected)
-                    m_numSelectedSongEntries++;
-            }
-        }
-        else
-        {
-            m_lastSelectedSong = musicId.subsongId.songId;
-            if (ImGui::GetIO().KeyCtrl)
-            {
-                m_songEntries[entryIdx].isSelected = !m_songEntries[entryIdx].isSelected;
-                isSelected ? m_numSelectedSongEntries-- : m_numSelectedSongEntries++;
-            }
-            else
-            {
-                for (auto& entry : m_songEntries)
-                    entry.isSelected = false;
-                m_songEntries[entryIdx].isSelected = !isSelected;
-                m_numSelectedSongEntries = isSelected ? 1 : 0;
-            }
-            isSelected = !isSelected;
-        }
-        return isSelected;
-    }
-
-    void DatabaseArtistsUI::DragSelection()
-    {
-        MusicID musicId({}, m_databaseId);
-        Array<MusicID> subsongsList;
-        for (auto& entry : m_songEntries)
-        {
-            if (entry.isSelected)
-            {
-                musicId.subsongId.songId = entry.id;
-                auto* song = m_db[entry.id];
-                for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                {
-                    if (!song->IsSubsongDiscarded(i))
-                    {
-                        musicId.subsongId.index = i;
-                        subsongsList.Add(musicId);
-                    }
-                }
-            }
-        }
-        ImGui::SetDragDropPayload("DATABASE", subsongsList.begin(), subsongsList.Size<size_t>());
-
-        if (subsongsList.NumItems() <= 7)
-        {
-            for (uint32_t i = 0; i < 7 && i < subsongsList.NumItems(); i++)
-                ImGui::TextUnformatted(m_db[subsongsList[i].subsongId]->GetName());
-        }
-        else
-        {
-            ImGui::TextUnformatted(m_db[subsongsList[0].subsongId]->GetName());
-            ImGui::TextUnformatted(m_db[subsongsList[1].subsongId]->GetName());
-            ImGui::Text("\n... %d songs ...\n ", subsongsList.NumItems() - 4);
-            ImGui::TextUnformatted(m_db[subsongsList[subsongsList.NumItems() - 2].subsongId]->GetName());
-            ImGui::TextUnformatted(m_db[subsongsList[subsongsList.NumItems() - 1].subsongId]->GetName());
-        }
-    }
-
-    DatabaseArtistsUI::States DatabaseArtistsUI::SelectionContext(bool isSelected, Artist* selectedArtist)
-    {
-        auto states = States::kNone;
-        if (ImGui::Selectable("Invert selection"))
-        {
-            for (auto& entry : m_songEntries)
-                entry.isSelected = !entry.isSelected;
-            isSelected = !isSelected;
-            m_numSelectedSongEntries = m_songEntries.NumItems() - m_numSelectedSongEntries;
-            ImGui::CloseCurrentPopup();
-        }
-        if (ImGui::Selectable("Add to playlist"))
-        {
-            MusicID musicId({}, m_databaseId);
-            for (auto& entry : m_songEntries)
-            {
-                if (entry.isSelected)
-                {
-                    musicId.subsongId.songId = entry.id;
-                    auto* song = m_db[entry.id];
-                    for (uint16_t i = 0, e = song->GetLastSubsongIndex(); i <= e; i++)
-                    {
-                        if (!song->IsSubsongDiscarded(i))
-                        {
-                            musicId.subsongId.index = i;
-                            Core::Enqueue(musicId);
-                        }
-                    }
-                }
-            }
-            ImGui::CloseCurrentPopup();
-        }
-        if (ImGui::BeginMenu("Remove from artist"))
-        {
-            if (ImGui::Selectable(selectedArtist->GetHandle(), false))
-                states |= States::kRemoveArtist;
-            ImGui::EndMenu();
-        }
-        return states;
     }
 }
 // namespace rePlayer

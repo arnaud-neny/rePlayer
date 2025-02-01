@@ -80,7 +80,7 @@ namespace rePlayer
                     {
                         if (auto newItem = oldItem->Reconcile())
                         {
-                            db.Update(id, newItem);
+                            db.Reconcile(id, newItem);
                             numReconciled++;
                         }
                     }

@@ -3,6 +3,8 @@
 #include <Core/String.h>
 
 // rePlayer
+#include <Library/Library.h>
+#include <RePlayer/Core.h>
 #include <RePlayer/CoreHeader.h>
 
 #include "LibraryDatabase.h"
@@ -79,34 +81,57 @@ namespace rePlayer
         return GetDirectory((*this)[song->GetArtistId(0)]);
     }
 
-    std::string LibraryDatabase::GetDirectory(Artist* artist) const
+    bool LibraryDatabase::AddArtistToSong(Song* song, Artist* artist)
     {
-        std::string directory = SongsPath;
-        //build artist directory
-        {
-            std::string artistName = artist->GetHandle();
-            io::File::CleanFilename(artistName.data());
-            auto c = ::tolower(artistName[0]);
-            if (c < 'a' || c > 'z')
-            {
-                directory += "#/";
-            }
-            else
-            {
-                directory += static_cast<char>(toupper(c));
-                directory += '/';
-            }
-            directory += artistName;
-            char str[16];
-            sprintf(str, " [%04X]/", static_cast<uint32_t>(artist->GetId()));//easy way to make the directory unique
-            directory += str;
-        }
-        return directory;
+        auto oldFileName = GetFullpath(song);
+        bool isAdded = Database::AddArtistToSong(song, artist);
+        if (isAdded)
+            Move(oldFileName, song, "AddArtistToSong");
+        return isAdded;
     }
 
-    void LibraryDatabase::InvalidateCache()
+    void LibraryDatabase::Update()
     {
-        m_hasFailedDeletes = true;
+        if (m_deletedSubsongs.IsNotEmpty())
+        {
+            for (auto subsongIdToRemove : m_deletedSubsongs)
+            {
+                SmartPtr<Song> holdSong = (*this)[subsongIdToRemove.songId];
+                auto song = holdSong->Edit();
+                Log::Message("Discard: ID_%06X_%02XL \"[%s]%s\"\n", uint32_t(subsongIdToRemove.songId), uint32_t(subsongIdToRemove.index), song->type.GetExtension(), GetTitleAndArtists(subsongIdToRemove).c_str());
+
+                uint32_t numSubsongs = song->lastSubsongIndex + 1ul;
+                song->subsongs[subsongIdToRemove.index].isDiscarded = true;
+                for (uint32_t i = 0, e = numSubsongs; i < e; i++)
+                {
+                    if (song->subsongs[i].isDiscarded)
+                        numSubsongs--;
+                }
+                if (numSubsongs == 0)
+                {
+                    Delete(holdSong, "Discard");
+
+                    auto& library = Core::GetLibrary();
+                    for (auto sourceId : song->sourceIds)
+                        library.m_sources[sourceId.sourceId]->DiscardSong(sourceId, SongID::Invalid);
+
+                    for (auto artistId : song->artistIds)
+                    {
+                        auto* artist = Core::GetLibraryDatabase()[artistId]->Edit();
+                        if (--artist->numSongs == 0)
+                            Core::GetLibraryDatabase().RemoveArtist(artistId);
+                    }
+
+                    RemoveSong(song->id);
+
+                    Raise(Database::Flag::kSaveArtists);
+                }
+
+                Core::Discard(MusicID(subsongIdToRemove, DatabaseID::kLibrary));
+            }
+            Raise(Database::Flag::kSaveSongs);
+            m_deletedSubsongs.Clear();
+        }
     }
 
     void LibraryDatabase::CleanupCache()
@@ -157,6 +182,56 @@ namespace rePlayer
                 }
             }
         }
+    }
+
+    void LibraryDatabase::DeleteInternal(Song* song, const char* logId) const
+    {
+        auto filename = GetFullpath(song);
+        if (!io::File::Delete(filename.c_str()))
+        {
+            Log::Warning("%s: Can't delete file \"%s\" to \"%s\"\n", logId, filename.c_str());
+            m_hasFailedDeletes = true;
+        }
+        else
+            Log::Message("%s: \"%s\" deleted\n", logId, filename.c_str());
+    }
+
+    void LibraryDatabase::MoveInternal(const char* oldFilename, Song* song, const char* logId) const
+    {
+        auto newFilename = GetFullpath(song);
+        if (!io::File::Move(oldFilename, newFilename.c_str()))
+        {
+            io::File::Copy(oldFilename, newFilename.c_str());
+            Log::Warning("%s: Can't move file \"%s\" to \"%s\"\n", logId, oldFilename, newFilename.c_str());
+            m_hasFailedDeletes = true;
+        }
+        else
+            Log::Message("%s: \"%s\" moved to \"%s\"\n", logId, oldFilename, newFilename.c_str());
+    }
+
+    std::string LibraryDatabase::GetDirectory(Artist* artist) const
+    {
+        std::string directory = SongsPath;
+        //build artist directory
+        {
+            std::string artistName = artist->GetHandle();
+            io::File::CleanFilename(artistName.data());
+            auto c = ::tolower(artistName[0]);
+            if (c < 'a' || c > 'z')
+            {
+                directory += "#/";
+            }
+            else
+            {
+                directory += static_cast<char>(toupper(c));
+                directory += '/';
+            }
+            directory += artistName;
+            char str[16];
+            sprintf(str, " [%04X]/", static_cast<uint32_t>(artist->GetId()));//easy way to make the directory unique
+            directory += str;
+        }
+        return directory;
     }
 }
 // namespace rePlayer

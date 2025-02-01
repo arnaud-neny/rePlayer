@@ -93,5 +93,20 @@ namespace core
     {
         return Max(static_cast<std::remove_reference<T1>::type>(0), Min(static_cast<std::remove_reference<T1>::type>(1), std::forward<T1>(a)));
     }
+
+    /**
+    * Compiler
+    */
+
+    template <typename T>
+    inline constexpr void UnusedArg(T&&)
+    {}
+
+    template<typename T, typename... Ts>
+    inline constexpr void UnusedArg(T&& a, Ts&&... others)
+    {
+        UnusedArg(std::forward<T>(a));
+        UnusedArg(std::forward<Ts>(others)...);
+    }
 }
 // namespace core

@@ -11,6 +11,8 @@ namespace rePlayer
 
         std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const override;
 
+        void Update() override;
+
         SourceID AddPath(SourceID::eSourceID id, const std::string& path);
         const char* GetPath(SourceID sourceId) const;
 

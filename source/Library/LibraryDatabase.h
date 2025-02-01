@@ -12,14 +12,22 @@ namespace rePlayer
         std::string GetFullpath(Song* song, Array<Artist*>* artists = nullptr) const override;
         std::string GetDirectory(Artist* artist) const;
 
-        void InvalidateCache();
-        void CleanupCache();
+        bool AddArtistToSong(Song* song, Artist* artist) override;
+
+        void Update() override;
+
+        void Patch();
 
     private:
+        void CleanupCache();
+
+        void DeleteInternal(Song* song, const char* logId) const override;
+        void MoveInternal(const char* oldFilename, Song* song, const char* logId) const override;
+
         std::string GetDirectory(Song* song, Array<Artist*>* artists = nullptr) const;
 
     private:
-        bool m_hasFailedDeletes = false;
+        mutable bool m_hasFailedDeletes = false;
     };
 }
 // namespace rePlayer

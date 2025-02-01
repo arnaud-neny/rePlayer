@@ -138,7 +138,12 @@ namespace rePlayer
 
         Reconcile();
 
-        return m_deck->UpdateFrame();
+        auto status =  m_deck->UpdateFrame();
+
+        for (auto* db : m_db)
+            db->Update();
+
+        return status;
     }
 
     void Core::Enable(bool isEnabled)

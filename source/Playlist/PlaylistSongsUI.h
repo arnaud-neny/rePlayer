@@ -10,10 +10,6 @@ namespace rePlayer
     public:
         SongsUI(Window& owner);
         ~SongsUI() override;
-
-        void OnEndUpdate() override;
-
-        Playlist& GetPlaylist();
     };
 }
 // namespace rePlayer

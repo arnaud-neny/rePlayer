@@ -21,6 +21,7 @@ namespace rePlayer
 
     class Library : public Window
     {
+        friend class LibraryDatabase;
         friend class SongEditor;
     public:
         Library();
@@ -35,6 +36,8 @@ namespace rePlayer
         SmartPtr<Player> LoadSong(const MusicID musicId);
 
     private:
+        template <typename ParentDatabaseUI>
+        class DatabaseUI;
         class ArtistsUI;
         class SongsUI;
 
@@ -56,9 +59,6 @@ namespace rePlayer
         void ProcessImports();
 
         void Load();
-        void Patch();
-
-        void ProcessFailedDeletes();
 
         //DEBUG
         void ValidateArtist(const Artist* const artist) const;
@@ -75,6 +75,8 @@ namespace rePlayer
         bool m_hasSongsBackup = false;
         bool m_hasArtistsBackup = false;
 
+        bool m_isSongTabFirstCall = true; // Too many bugs with ImGuiTabItemFlags_SetSelected...
+        Serialized<bool> m_isSongTabEnabled = { "SongTab", true };
         Serialized<bool> m_isMergingOnDownload = { "AutoMerge", false };
 
         bool m_isBusy = false;

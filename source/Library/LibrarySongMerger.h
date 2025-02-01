@@ -9,11 +9,12 @@ namespace rePlayer
 {
     class Database;
 
-    class Library::SongsUI::SongMerger
+    template <typename ParentDatabaseUI>
+    class Library::DatabaseUI<ParentDatabaseUI>::SongMerger
     {
     public:
-        void MenuItem(SongsUI& songs);
-        void Update(SongsUI& songs);
+        void MenuItem(DatabaseUI<ParentDatabaseUI>& songs);
+        void Update(DatabaseUI<ParentDatabaseUI>& songs);
 
     private:
         struct Entry
@@ -30,7 +31,7 @@ namespace rePlayer
     private:
         void Unmerge(int32_t unmergedEntryIndex);
         void Remerge(int32_t rootEntryIndex);
-        void Process(SongsUI& songs);
+        void Process(DatabaseUI<ParentDatabaseUI>& songs);
 
     public:
         Array<Entry> m_entries;

@@ -3,9 +3,6 @@
 
 // rePlayer
 #include <Library/LibraryDatabase.h>
-#include <Library/LibrarySongsUI.h>
-
-#include "Library.h"
 
 // libarchive
 #include <libarchive/archive.h>
@@ -16,7 +13,7 @@
 
 namespace rePlayer
 {
-    void Library::Patch()
+    void LibraryDatabase::Patch()
     {
         static constexpr uint32_t kSongsVersionWithArchive = 2;
         static constexpr eExtension kExtension_mdxPk = eExtension::_rk;
@@ -32,9 +29,9 @@ namespace rePlayer
         static constexpr eExtension kExtension_mbmPk = eExtension::_cba;
         static constexpr eExtension kExtension_musPk = eExtension::_a2t;
         static constexpr eExtension kExtension_eupPk = eExtension::_etx;
-        if (m_db.SongsVersion() < kSongsVersionWithArchive)
+        if (SongsVersion() < kSongsVersionWithArchive)
         {
-            for (auto* song : m_db.Songs())
+            for (auto* song : Songs())
             {
                 struct ArchiveBuffer : public Array<uint8_t>
                 {
@@ -73,7 +70,7 @@ namespace rePlayer
                 case kExtension_usfPk:
                 case kExtension_snsfPk:
                 {
-                    auto oldFilename = m_db.GetFullpath(song);
+                    auto oldFilename = GetFullpath(song);
                     auto songSheet = song->Edit();
                     songSheet->type.ext = ext == kExtension_mdxPk ? eExtension::_mdx
                         : ext == kExtension_qsfPk ? eExtension::_miniqsf
@@ -87,26 +84,21 @@ namespace rePlayer
                         : eExtension::_minisnsf;
                     songSheet->subsongs[0].isPackage = false;
                     songSheet->subsongs[0].isArchive = true;
-                    auto newFilename = m_db.GetFullpath(song);
-                    if (!io::File::Rename(oldFilename.c_str(), newFilename.c_str()))
-                    {
-                        Log::Warning("Can't rename file \"%s\"\n", oldFilename.c_str());
-                        io::File::Copy(oldFilename.c_str(), newFilename.c_str());
-                    }
+                    Move(oldFilename, song, "Patch");
                 }
                 break;
                 case kExtension_mbmPk:
                 case kExtension_musPk:
                 case kExtension_eupPk:
                 {
-                    auto oldFilename = m_db.GetFullpath(song);
+                    auto oldFilename = GetFullpath(song);
                     auto songSheet = song->Edit();
                     songSheet->type.ext = ext == kExtension_mbmPk ? eExtension::_mbm
                         : ext == kExtension_musPk ? eExtension::_mus
                         : eExtension::_eup;
                     songSheet->subsongs[0].isPackage = false;
                     songSheet->subsongs[0].isArchive = true;
-                    auto newFilename = m_db.GetFullpath(song);
+                    auto newFilename = GetFullpath(song);
                     auto oldFile = io::File::OpenForRead(oldFilename.c_str());
                     if (oldFile.IsValid())
                     {
@@ -127,7 +119,7 @@ namespace rePlayer
                 case eExtension::_cust:
                 case eExtension::_smus:
                 {
-                    auto oldFilename = m_db.GetFullpath(song);
+                    auto oldFilename = GetFullpath(song);
                     auto file = io::File::OpenForRead(oldFilename.c_str());
                     if (file.IsValid())
                     {
@@ -145,7 +137,7 @@ namespace rePlayer
                             songSheet->subsongs[0].isPackage = false;
                             songSheet->subsongs[0].isArchive = true;
 
-                            file = io::File::OpenForWrite(m_db.GetFullpath(song).c_str());
+                            file = io::File::OpenForWrite(GetFullpath(song).c_str());
                             if (file.IsValid())
                             {
                                 data.Copy(buf, 8);
@@ -188,7 +180,7 @@ namespace rePlayer
                 case eExtension::_rol:
                 case eExtension::_kdm:
                 {
-                    auto oldFilename = m_db.GetFullpath(song);
+                    auto oldFilename = GetFullpath(song);
                     auto file = io::File::OpenForRead(oldFilename.c_str());
                     if (file.IsValid())
                     {
@@ -347,7 +339,7 @@ namespace rePlayer
                             if (!io::File::Delete(oldFilename.c_str()))
                                 Log::Warning("Can't delete file \"%s\"\n", oldFilename.c_str());
 
-                            file = io::File::OpenForWrite(m_db.GetFullpath(song).c_str());
+                            file = io::File::OpenForWrite(GetFullpath(song).c_str());
                             if (file.IsValid())
                             {
                                 file.Write(archiveBuffer.Items(), archiveBuffer.NumItems());
@@ -364,8 +356,8 @@ namespace rePlayer
                     break;
                 }
             }
-            m_db.Raise(Database::Flag::kSaveSongs);
-            m_db.InvalidateCache();
+            Raise(Database::Flag::kSaveSongs);
+            m_hasFailedDeletes = true;
         }
     }
 }

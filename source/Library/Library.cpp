@@ -156,7 +156,7 @@ namespace rePlayer
                     {
                         for (auto* otherSong : m_db.Songs())
                         {
-                            if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc && !m_songs->HasDeletedSubsongs(otherSong->GetId()))
+                            if (song != otherSong && otherSong->GetFileSize() == fileSize && otherSong->GetFileCrc() == fileCrc && !m_db.HasDeletedSubsongs(otherSong->GetId()))
                             {
                                 auto* primarySong = songSheet;
                                 auto* otherSongSheet = otherSong->Edit();
@@ -186,7 +186,7 @@ namespace rePlayer
                                 for (uint16_t j = 0; j <= otherSongSheet->lastSubsongIndex; j++)
                                 {
                                     if (!otherSongSheet->subsongs[j].isDiscarded)
-                                        m_songs->DeleteSubsong(SubsongID(otherSongSheet->id, j));
+                                        m_db.DeleteSubsong(SubsongID(otherSongSheet->id, j));
                                 }
 
                                 break;
@@ -230,7 +230,7 @@ namespace rePlayer
                         for (uint16_t subsongIdx = 0; subsongIdx <= songSheet->lastSubsongIndex; subsongIdx++)
                         {
                             if (!songSheet->subsongs[subsongIdx].isDiscarded)
-                                m_songs->DeleteSubsong(SubsongID(songSheet->id, subsongIdx));
+                                m_db.DeleteSubsong(SubsongID(songSheet->id, subsongIdx));
                         }
                     }
                 }
@@ -269,15 +269,7 @@ namespace rePlayer
             bool hasChanged = oldType != type || metadata != song->metadata;
             song->type = type;
             if (oldType.ext != type.ext && !song->subsongs[0].isArchive)
-            {
-                auto newFilename = m_db.GetFullpath(dbSong);
-                if (!io::File::Rename(stream->GetName().c_str(), newFilename.c_str()))
-                {
-                    Log::Warning("Can't rename file \"%s\"\n", stream->GetName().c_str());
-                    m_db.InvalidateCache();
-                    io::File::Copy(stream->GetName().c_str(), newFilename.c_str());
-                }
-            }
+                m_db.Move(stream->GetName(), dbSong, "LoadSong");
             uint32_t oldNumSubsongs = song->lastSubsongIndex + 1ul;
             auto numSubsongs = replay->GetNumSubsongs();
             if (numSubsongs != oldNumSubsongs || song->subsongs[0].isDirty || song->subsongs[0].isInvalid || oldType.replay != type.replay)
@@ -346,7 +338,8 @@ namespace rePlayer
     std::string Library::OnGetWindowTitle()
     {
         char title[128];
-        sprintf(title, "Library: %u/%u songs (%u packages) - %u artists###Library", m_songs->NumSelectedSubsongs(), m_songs->NumSubsongs(), m_db.NumSongs(), m_db.NumArtists());
+        DatabaseSongsUI* ui = m_isSongTabEnabled ? static_cast<DatabaseSongsUI*>(m_songs) : static_cast<DatabaseSongsUI*>(m_artists);
+        sprintf(title, "Library: %u/%u subsongs (%u songs & %u artists)###Library", ui->NumSelectedSubsongs(), ui->NumSubsongs(), m_db.NumSongs(), m_db.NumArtists());
 
         ImGui::SetNextWindowPos(ImVec2(480.0f, 16.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(624.0f, 660.0f), ImGuiCond_FirstUseEver);
@@ -368,16 +361,20 @@ namespace rePlayer
             ImGui::PopStyleColor(3);
             UpdateImports();
 
-            if (ImGui::BeginTabItem("Songs"))
+            auto isSongTabEnabled = m_isSongTabEnabled;
+            if (ImGui::BeginTabItem("Songs", nullptr, (m_isSongTabFirstCall && isSongTabEnabled) ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
             {
+                m_isSongTabEnabled = true;
                 m_songs->OnDisplay();
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Artists"))
+            if (ImGui::BeginTabItem("Artists", nullptr, (m_isSongTabFirstCall && !isSongTabEnabled) ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
             {
+                m_isSongTabEnabled = false;
                 m_artists->OnDisplay();
                 ImGui::EndTabItem();
             }
+            m_isSongTabFirstCall = false;
             ImGui::EndTabBar();
         }
     }
@@ -385,6 +382,7 @@ namespace rePlayer
     void Library::OnEndUpdate()
     {
         m_songs->OnEndUpdate();
+        m_artists->OnEndUpdate();
         if (m_isBusy)
             m_busyTime += ImGui::GetIO().DeltaTime;
         else
@@ -1297,7 +1295,7 @@ namespace rePlayer
         for (auto* source : m_sources)
             source->Load();
 
-        Patch();
+        Core::GetLibraryDatabase().Patch();
     }
 
     void Library::Save()

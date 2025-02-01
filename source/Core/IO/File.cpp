@@ -205,19 +205,6 @@ namespace core::io
         return e != 0;
     }
 
-    bool File::Rename(const char* oldName, const char* newName)
-    {
-        auto numChars = ::MultiByteToWideChar(CP_UTF8, 0, oldName, -1, NULL, 0);
-        auto wOldName = reinterpret_cast<wchar_t*>(_alloca(numChars * sizeof(wchar_t)));
-        ::MultiByteToWideChar(CP_UTF8, 0, oldName, -1, wOldName, numChars);
-
-        numChars = ::MultiByteToWideChar(CP_UTF8, 0, newName, -1, NULL, 0);
-        auto wNewName = reinterpret_cast<wchar_t*>(_alloca(numChars * sizeof(wchar_t)));
-        ::MultiByteToWideChar(CP_UTF8, 0, newName, -1, wNewName, numChars);
-
-        return ::MoveFileW(wOldName, wNewName);
-    }
-
     void File::CleanFilename(char* name)
     {
         while (auto c = *name)
