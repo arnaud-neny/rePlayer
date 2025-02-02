@@ -1,4 +1,4 @@
-v0.16.14:
+v0.16.15:
 - Added XMP
 - Updated adplug to 2.3.3.890
 - Updated Furnace to 0.6.7
@@ -7,21 +7,23 @@ v0.16.14:
 - Updated libsidplay to 2.12.0
 - Updated libvgm to 34c368c
 - Updated libxmp to 4.6.1
-- Updated OpenMPT to 0.8.0-pre.12 r22854
-- Updated ProTrekkr to 2.7.6
+- Updated OpenMPT to 0.8.0-pre.12 r22862
+- Updated ProTrekkr to 2.8.1
 - Updated SNDH-Player to 0.79
 - Updated UADE to 3.0.5
 - Updated vgmstream to r1980
+- Updated WavPack to 5.8.0
 - Updated dr_flac to 0.12.43
 - Updated dr_mp3 to 0.6.40
 - Updated dr_wav to 0.13.17
-- Updated ImGui to 1.91.6
+- Updated ImGui to 1.91.8
 - Updated libarchive to 3.7.7
 - Updated libcurl to 8.11.1
 - Updated libxml2 to 2.13.5
 - Updated TagLib to 2.0.2
-- Rework song filtering with refined filters and more options
 - Display loop points in song end editor
+- Rework artist ui
+- Rework song filtering with refined filters and more options
 - Bug fixes
 
 v0.15.21:
@@ -70,6 +72,7 @@ v0.13.5 (Khatchadour's Release):
 - Updated Opus to 1.5.1
 - Updated ProTrekkr to 2.6.6
 - Updated StSound with surround
+- Updated WavPack to 5.7.0
 - Updated ImGui to 1.90.4
 - Removed ImGuiFileDialog
 - Removed Tidy Html
