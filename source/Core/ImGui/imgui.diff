@@ -170,7 +170,7 @@ index 8f3f53b..489c803 100644
      if (label_size.x > 0.0f)
          RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-index 3c7f7b3..15f4682 100644
+index 3c7f7b3..8a34d72 100644
 --- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
 @@ -1051,21 +1051,32 @@ struct ImGui_ImplWin32_ViewportData
@@ -232,7 +232,7 @@ index 3c7f7b3..15f4682 100644
  
      // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
      if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
-@@ -1310,6 +1325,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+@@ -1310,12 +1325,16 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
  
  namespace ImGui { extern ImGuiIO& GetIOEx(ImGuiContext*); extern ImGuiPlatformIO& GetPlatformIOEx(ImGuiContext*); }
  
@@ -243,6 +243,13 @@ index 3c7f7b3..15f4682 100644
  static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
  {
      // Allow secondary viewport WndProc to be called regardless of current context
+     ImGuiContext* ctx = (ImGuiContext*)::GetPropA(hWnd, "IMGUI_CONTEXT");
+     if (ctx == NULL)
+-        return DefWindowProc(hWnd, msg, wParam, lParam); // unlike ImGui_ImplWin32_WndProcHandler() we are called directly by Windows, we can't just return 0.
++        return DefWindowProcW(hWnd, msg, wParam, lParam); // unlike ImGui_ImplWin32_WndProcHandler() we are called directly by Windows, we can't just return 0. // rePlayer
+ 
+     ImGuiIO& io = ImGui::GetIOEx(ctx);
+     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(ctx);
 @@ -1326,6 +1345,14 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
      {
          switch (msg)
@@ -258,7 +265,14 @@ index 3c7f7b3..15f4682 100644
          case WM_CLOSE:
              viewport->PlatformRequestClose = true;
              break;
-@@ -1356,6 +1383,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1350,12 +1377,13 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+         }
+     }
+     if (result == 0)
+-        result = DefWindowProc(hWnd, msg, wParam, lParam);
++        result = DefWindowProcW(hWnd, msg, wParam, lParam); // rePlayer
+     return result;
+ }
  
  static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
  {
