@@ -1536,7 +1536,7 @@ namespace rePlayer
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOktalyzer)
             type = { eExtension::_okt, eReplay::OpenMPT };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kOctaMED)
-            type = { eExtension::_med, eReplay::UADE };
+            type = { eExtension::_med, eReplay::OpenMPT };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
             type = { eExtension::_eup, eReplay::Euphony };
         else if (dbSong.isExtensionOverriden)
