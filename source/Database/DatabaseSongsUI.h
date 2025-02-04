@@ -45,6 +45,7 @@ namespace rePlayer
     protected:
         virtual Array<SubsongEntry> GatherEntries() const;
         virtual void OnSelectionContext();
+        virtual bool AddToPlaylistUI();
 
     private:
         void DisplaySongsFilter(bool& isDirty);

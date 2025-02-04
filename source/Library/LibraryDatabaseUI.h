@@ -15,6 +15,7 @@ namespace rePlayer
 
     protected:
         void OnSelectionContext() override;
+        bool AddToPlaylistUI() override;
 
     protected:
         class SongMerger;

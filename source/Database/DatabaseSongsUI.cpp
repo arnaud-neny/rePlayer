@@ -160,6 +160,20 @@ namespace rePlayer
     void DatabaseSongsUI::OnSelectionContext()
     {}
 
+    bool DatabaseSongsUI::AddToPlaylistUI()
+    {
+        bool isSelected = ImGui::Selectable("Add to playlist");
+        if (isSelected)
+        {
+            for (auto& entry : m_entries)
+            {
+                if (entry.IsSelected())
+                    Core::Enqueue(MusicID(entry, m_databaseId));
+            }
+        }
+        return isSelected;
+    }
+
     void DatabaseSongsUI::DisplaySongsFilter(bool& isDirty)
     {
         DisplaySongsFilterUI(isDirty);
@@ -831,15 +845,8 @@ namespace rePlayer
             m_numSelectedEntries = m_entries.NumItems() - m_numSelectedEntries;
             ImGui::CloseCurrentPopup();
         }
-        if (ImGui::Selectable("Add to playlist"))
-        {
-            for (auto& entry : m_entries)
-            {
-                if (entry.IsSelected())
-                    Core::Enqueue(MusicID(entry, m_databaseId));
-            }
+        if (AddToPlaylistUI())
             ImGui::CloseCurrentPopup();
-        }
         ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
         if (ImGui::BeginMenu("Add to artist"))
         {
@@ -1064,6 +1071,7 @@ namespace rePlayer
     {
         for (uint32_t i = 0; i < uint32_t(eReplay::Count); i++)
         {
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
             if (ImGui::BeginMenu(MediaType::replayNames[i]))
             {
                 std::string resetLabel;
@@ -1111,6 +1119,7 @@ namespace rePlayer
     {
         for (uint32_t i = 0; i < kNumSubsongStates; i++)
         {
+            ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
             static const char* const subsongStates[] = { "Undefined", "Stop", "Fade Out", "Loop Once" };
             if (ImGui::BeginMenu(subsongStates[i]))
             {
