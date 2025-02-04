@@ -27,8 +27,8 @@ namespace rePlayer
         1,          // SNDHID
         2,          // AtariSAPMusicArchiveID
         3,          // ZXArtID
-        4,          // VGMRips
-        -1          // UrlImportID
+        -1,         // UrlImportID
+        4           // VGMRips
     };
     static_assert(_countof(SourceID::sourceProrities) == SourceID::NumSourceIDs);
 }
