@@ -47,10 +47,10 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const oversamples[] = { "x1", "x2", "x3", "x4" };
-        changed |= ImGui::Combo("Oversample", &ms_oversample, oversamples, _countof(oversamples));
+        changed |= ImGui::Combo("Oversample", &ms_oversample, oversamples, NumItemsOf(oversamples));
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         return changed;
     }
 

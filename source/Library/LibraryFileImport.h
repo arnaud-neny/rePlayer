@@ -19,13 +19,14 @@ namespace rePlayer
     private:
         struct Entry
         {
+            static constexpr uint32_t kMaxReplays = 6;
             std::filesystem::path path;
             std::string name;
             uint8_t currentReplay;
             uint8_t isSelected : 1 = false;
             uint8_t isChecked : 1 = false;
             uint8_t isArchive : 1 = false;
-            uint8_t replays[6] = { 0 };
+            uint8_t replays[kMaxReplays] = { 0 };
         };
 
     private:

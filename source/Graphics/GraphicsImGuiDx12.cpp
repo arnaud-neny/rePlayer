@@ -77,7 +77,7 @@ namespace rePlayer
         staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
         D3D12_ROOT_SIGNATURE_DESC desc = {};
-        desc.NumParameters = _countof(param);
+        desc.NumParameters = NumItemsOf(param);
         desc.pParameters = param;
         desc.NumStaticSamplers = 1;
         desc.pStaticSamplers = &staticSampler;
@@ -192,8 +192,8 @@ namespace rePlayer
 
         // add media icons
         int32_t widths[] = { 19, 19, 15, 14, 14, 25, 25, 25, 21, 25, 25, 15, 15, 15 };
-        int32_t rectIds[_countof(widths)];
-        for (uint32_t i = 0; i < _countof(widths); i++)
+        int32_t rectIds[NumItemsOf(widths)];
+        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
             rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xE000 + i), widths[i], 15, float(widths[i]), ImVec2(0, -1));
 /*
         {
@@ -232,7 +232,7 @@ namespace rePlayer
         io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
 
         uint32_t mediaIconsOffset = 0;
-        for (uint32_t i = 0; i < _countof(widths); i++)
+        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
         {
             if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(rectIds[i]))
             {

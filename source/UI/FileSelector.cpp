@@ -474,9 +474,9 @@ namespace rePlayer
             "Music",
             "Videos"
         };
-        static_assert(_countof(folderIds) == _countof(folderNames));
+        static_assert(NumItemsOf(folderIds) == NumItemsOf(folderNames));
 
-        for (size_t i = 0; i < _countof(folderIds); i++)
+        for (size_t i = 0; i < NumItemsOf(folderIds); i++)
         {
             PWSTR path = nullptr;
             HRESULT hr = SHGetKnownFolderPath(folderIds[i], 0, nullptr, &path);

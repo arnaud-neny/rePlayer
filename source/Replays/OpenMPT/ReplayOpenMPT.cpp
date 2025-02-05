@@ -94,11 +94,11 @@ namespace rePlayer
             int32_t index = 0;
             static const char* getter(void*, int32_t index) { return ms_settings[index].format; }
         } static cb;
-        ImGui::Combo("Format", &cb.index, cb.getter, nullptr, _countof(ms_settings));
+        ImGui::Combo("Format", &cb.index, cb.getter, nullptr, NumItemsOf(ms_settings));
         if (cb.index != 0)
         {
             const char* const overridden[] = { "Disable", "Enable" };
-            if (ImGui::Combo("Override", &ms_settings[cb.index].isEnabled, overridden, _countof(overridden)))
+            if (ImGui::Combo("Override", &ms_settings[cb.index].isEnabled, overridden, NumItemsOf(overridden)))
             {
                 ms_settings[cb.index].interpolation = ms_settings[0].interpolation;
                 ms_settings[cb.index].ramping = ms_settings[0].ramping;
@@ -111,13 +111,13 @@ namespace rePlayer
         auto settingsIndex = ms_settings[cb.index].isEnabled ? cb.index : 0;
         ImGui::BeginDisabled(!ms_settings[cb.index].isEnabled);
         const char* const interpolation[] = { "default", "off", "linear", "cubic", "sinc" };
-        changed |= ImGui::Combo("Interpolation", &ms_settings[settingsIndex].interpolation, interpolation, _countof(interpolation));
+        changed |= ImGui::Combo("Interpolation", &ms_settings[settingsIndex].interpolation, interpolation, NumItemsOf(interpolation));
         changed |= ImGui::SliderInt("Ramping", &ms_settings[settingsIndex].ramping, -1, 10, "%d", ImGuiSliderFlags_NoInput);
         changed |= ImGui::SliderInt("Stereo", &ms_settings[settingsIndex].stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, NumItemsOf(surround));
         const char* const patterns[] = { "Disable", "Enable" };
-        changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, _countof(patterns));
+        changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, NumItemsOf(patterns));
         ImGui::EndDisabled();
         return changed;
     }
@@ -297,7 +297,7 @@ namespace rePlayer
             type = openmpt_module_get_metadata(m_modulePlayback, "type_long");
         }
         auto globalSettings = ms_settings;
-        for (uint32_t i = 0; i < _countof(ms_settings); i++)
+        for (uint32_t i = 0; i < NumItemsOf(ms_settings); i++)
         {
             if (strstr(type, ms_settings[i].format))
             {

@@ -215,10 +215,10 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, NumItemsOf(surround));
 
         const char* const coreSwan[] = { "mednafen", "Oswan", "in_wsr" };
-        changed |= ImGui::Combo("Core", reinterpret_cast<int*>(&ms_globals.core), coreSwan, _countof(coreSwan));
+        changed |= ImGui::Combo("Core", reinterpret_cast<int*>(&ms_globals.core), coreSwan, NumItemsOf(coreSwan));
 
         return changed;
     }

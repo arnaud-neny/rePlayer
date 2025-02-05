@@ -51,7 +51,7 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const surround[] = { "Default", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         return changed;
     }
 

@@ -51,10 +51,10 @@ namespace rePlayer
         bool changed = false;
         const char* const filter[] = { "Off", "On" };
         int32_t index = ms_isLowpassFilterEnabled ? 1 : 0;
-        changed |= ImGui::Combo("Lowpass filter", &index, filter, _countof(filter));
+        changed |= ImGui::Combo("Lowpass filter", &index, filter, NumItemsOf(filter));
         ms_isLowpassFilterEnabled = index != 0;
         const char* const surround[] = { "Default", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         return changed;
     }
 

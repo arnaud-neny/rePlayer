@@ -46,7 +46,7 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const interpolation[] = { "none", "linear", "gaussian", "cubic", "sinc" };
-        changed |= ImGui::Combo("Interpolation", &ms_interpolation, interpolation, _countof(interpolation));
+        changed |= ImGui::Combo("Interpolation", &ms_interpolation, interpolation, NumItemsOf(interpolation));
         return changed;
     }
 

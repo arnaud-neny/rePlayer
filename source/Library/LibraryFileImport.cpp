@@ -88,7 +88,7 @@ namespace rePlayer
                         newEntry->name += stream->GetName();
                     }
 
-                    for (uint32_t i = 0; i < _countof(Entry::replays); i++)
+                    for (uint32_t i = 0; i < Entry::kMaxReplays; i++)
                     {
                         if (playables[i] != eReplay::Unknown)
                             newEntry->replays[i] = uint8_t(playables[i]);
@@ -320,7 +320,7 @@ namespace rePlayer
                 "Parent Path"
             };
             ImGui::SetNextItemWidth(ImGui::CalcTextSize(artistModes[3]).x + 32.0f * ImGui::GetIO().FontGlobalScale);
-            ImGui::Combo("##ArtistCB", reinterpret_cast<int*>(&m_artistMode), artistModes, _countof(artistModes));
+            ImGui::Combo("##ArtistCB", reinterpret_cast<int*>(&m_artistMode), artistModes, NumItemsOf(artistModes));
             ImGui::SameLine();
 
             uint32_t numChecked = 0;

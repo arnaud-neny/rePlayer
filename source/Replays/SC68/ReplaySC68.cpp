@@ -96,23 +96,23 @@ namespace rePlayer
         bool changed = false;
         {
             const char* const aSIDfier[] = { "off", "on", "force"};
-            changed |= ImGui::Combo("aSIDfier", &ms_aSIDfier, aSIDfier, _countof(aSIDfier));
+            changed |= ImGui::Combo("aSIDfier", &ms_aSIDfier, aSIDfier, NumItemsOf(aSIDfier));
         }
         {
             const char* const engines[] = { "blep", "pulse/2-poles", "pulse/mixed", "pulse/1-pole", "pulse/boxcar", "pulse/none"};
-            changed |= ImGui::Combo("YM Engine & Filter", &ms_ymEngineAndFilter, engines, _countof(engines));
+            changed |= ImGui::Combo("YM Engine & Filter", &ms_ymEngineAndFilter, engines, NumItemsOf(engines));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
         }
         {
             const char* const volumeModels[] = { "atari", "linear" };
-            changed |= ImGui::Combo("YM Volume Model", &ms_ymVolumeModel, volumeModels, _countof(volumeModels));
+            changed |= ImGui::Combo("YM Volume Model", &ms_ymVolumeModel, volumeModels, NumItemsOf(volumeModels));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
         }
         {
             const char* const paulaFilters[] = { "off", "on" };
-            changed |= ImGui::Combo("Paula Filter", &ms_paulaFilter, paulaFilters, _countof(paulaFilters));
+            changed |= ImGui::Combo("Paula Filter", &ms_paulaFilter, paulaFilters, NumItemsOf(paulaFilters));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
         }
@@ -120,7 +120,7 @@ namespace rePlayer
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
         const char* const surround[] = { "Default", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         return changed;
     }
 

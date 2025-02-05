@@ -74,9 +74,9 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         const char* const patterns[] = { "Disable", "Enable" };
-        changed |= ImGui::Combo("Show Patterns", &ms_patterns, patterns, _countof(patterns));
+        changed |= ImGui::Combo("Show Patterns", &ms_patterns, patterns, NumItemsOf(patterns));
         return changed;
     }
 

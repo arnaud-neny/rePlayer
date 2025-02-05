@@ -53,7 +53,7 @@ namespace rePlayer
                 65537, // UrlImportID
                 0      // VGMRips
             };
-            static_assert(_countof(groups) == SourceID::NumSourceIDs);
+            static_assert(NumItemsOf(groups) == SourceID::NumSourceIDs);
 
             // gather selected entries
             Array<SubsongID> entries(0u, ParentDatabaseUI::m_numSelectedEntries);

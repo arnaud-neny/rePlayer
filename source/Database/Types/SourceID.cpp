@@ -1,9 +1,12 @@
+#include <Core.h>
 #include "SourceID.h"
 
 #include <stdlib.h>
 
 namespace rePlayer
 {
+    using namespace core;
+
     const char* const SourceID::sourceNames[] = {
         "Amiga Music Preservation",
         "The Mod Archive",
@@ -16,7 +19,7 @@ namespace rePlayer
         "URL",
         "VGMRips"
     };
-    static_assert(_countof(SourceID::sourceNames) == SourceID::NumSourceIDs);
+    static_assert(NumItemsOf(SourceID::sourceNames) == SourceID::NumSourceIDs);
 
     const int32_t SourceID::sourceProrities[] = {
         65536,      // AmigaMusicPreservationSourceID
@@ -30,6 +33,6 @@ namespace rePlayer
         -1,         // UrlImportID
         4           // VGMRips
     };
-    static_assert(_countof(SourceID::sourceProrities) == SourceID::NumSourceIDs);
+    static_assert(NumItemsOf(SourceID::sourceProrities) == SourceID::NumSourceIDs);
 }
 // namespace rePlayer

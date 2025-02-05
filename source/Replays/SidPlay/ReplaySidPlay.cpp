@@ -114,36 +114,36 @@ namespace rePlayer
         {
             const char* const sidModels[] = { "6581", "8580" };
             int index = ms_isSidModel8580 ? 1 : 0;
-            changed |= ImGui::Combo("SID Default Model", &index, sidModels, _countof(sidModels));
+            changed |= ImGui::Combo("SID Default Model", &index, sidModels, NumItemsOf(sidModels));
             ms_isSidModel8580 = index == 1;
         }
         {
             const char* const clocks[] = { "PAL", "NTSC" };
             auto index = ms_isNtsc ? 1 : 0;
-            changed |= ImGui::Combo("Default Clock###SidClock", &index, clocks, _countof(clocks));
+            changed |= ImGui::Combo("Default Clock###SidClock", &index, clocks, NumItemsOf(clocks));
             ms_isNtsc = index == 1;
         }
         {
             const char* const samplings[] = { "Interpolate", "Resample" };
             auto index = ms_isResampling ? 1 : 0;
-            changed |= ImGui::Combo("Sampling###SidSampling", &index, samplings, _countof(samplings));
+            changed |= ImGui::Combo("Sampling###SidSampling", &index, samplings, NumItemsOf(samplings));
             ms_isResampling = index == 1;
         }
         {
             const char* const samplings[] = { "Off", "On" };
             auto index = ms_isFilterEnabled ? 1 : 0;
-            changed |= ImGui::Combo("Filter###SidFilter", &index, samplings, _countof(samplings));
+            changed |= ImGui::Combo("Filter###SidFilter", &index, samplings, NumItemsOf(samplings));
             ms_isFilterEnabled = index != 0;
         }
         changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         {
             const char* const combinedWaveforms[] = { "Average", "Weak", "Strong" };
-            changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, _countof(combinedWaveforms));
+            changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, NumItemsOf(combinedWaveforms));
         }
         {
             const char* const surround[] = { "Default", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+            changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         }
         return changed;
     }

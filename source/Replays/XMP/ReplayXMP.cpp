@@ -117,20 +117,20 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         const char* const interp[] = { "None", "Linear", "Cubic" };
-        changed |= ImGui::Combo("Interpolation", &ms_interpolation, interp, _countof(interp));
+        changed |= ImGui::Combo("Interpolation", &ms_interpolation, interp, NumItemsOf(interp));
         const char* const filter[] = { "None", "Low Pass" };
-        changed |= ImGui::Combo("Filter", &ms_filter, filter, _countof(filter));
+        changed |= ImGui::Combo("Filter", &ms_filter, filter, NumItemsOf(filter));
         const char* const timing[] = { "Auto/CIA", "VBlank" };
-        changed |= ImGui::Combo("Timing", &ms_vblank, timing, _countof(timing));
+        changed |= ImGui::Combo("Timing", &ms_vblank, timing, NumItemsOf(timing));
         const char* const modes[] = { "Autodetect", "Generic MOD", "Noisetracker", "Protracker", "Generic S3M", "ST3 bug emulation", "ST3+GUS", "generic XM", "FT2", "IT", "IT sample mode" };
-        changed |= ImGui::Combo("Mode", &ms_mode, modes, _countof(modes));
+        changed |= ImGui::Combo("Mode", &ms_mode, modes, NumItemsOf(modes));
         const char* const onOff[] = { "Off", "On" };
-        changed |= ImGui::Combo("A500 Mixer", &ms_a500, onOff, _countof(onOff));
-        changed |= ImGui::Combo("Emulate FX9 Bug", &ms_fx9bug, onOff, _countof(onOff));
-        changed |= ImGui::Combo("Emulate Sample Loop Bug", &ms_fixLoop, onOff, _countof(onOff));
-        changed |= ImGui::Combo("Show Patterns", &ms_patterns, onOff, _countof(onOff));
+        changed |= ImGui::Combo("A500 Mixer", &ms_a500, onOff, NumItemsOf(onOff));
+        changed |= ImGui::Combo("Emulate FX9 Bug", &ms_fx9bug, onOff, NumItemsOf(onOff));
+        changed |= ImGui::Combo("Emulate Sample Loop Bug", &ms_fixLoop, onOff, NumItemsOf(onOff));
+        changed |= ImGui::Combo("Show Patterns", &ms_patterns, onOff, NumItemsOf(onOff));
         return changed;
     }
 

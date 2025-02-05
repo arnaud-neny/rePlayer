@@ -45,26 +45,26 @@ static RECT GetTrayRect()
     id.guidItem = GUID_NULL;
 
     RECT rect = {};
-    Shell_NotifyIconGetRect(&id, &rect);
+    ::Shell_NotifyIconGetRect(&id, &rect);
     return rect;
 }
 
 static void CreateSystrayIcon()
 {
-    NOTIFYICONDATA tnid = {};
+    NOTIFYICONDATAW tnid = {};
 
-    tnid.cbSize = sizeof(NOTIFYICONDATA);
+    tnid.cbSize = sizeof(NOTIFYICONDATAW);
     tnid.hWnd = s_hWnd;
     tnid.uID = 0x777;
     tnid.uFlags = NIF_MESSAGE | NIF_ICON | (s_isWindows11 ? 0 : NIF_TIP);
     tnid.uCallbackMessage = WM_USER;
     tnid.hIcon = s_hIcon;
     if (!s_isWindows11)
-        strcpy_s(tnid.szTip, rePlayer::Core::GetLabel());
+        ::MultiByteToWideChar(CP_UTF8, 0, rePlayer::Core::GetLabel(), -1, tnid.szTip, core::NumItemsOf(tnid.szTip));
 
-    Shell_NotifyIcon(NIM_ADD, &tnid);
+    ::Shell_NotifyIconW(NIM_ADD, &tnid);
     tnid.uVersion = NOTIFYICON_VERSION_4;
-    Shell_NotifyIcon(NIM_SETVERSION, &tnid);
+    ::Shell_NotifyIconW(NIM_SETVERSION, &tnid);
 }
 
 // Win32 message handler
@@ -82,7 +82,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_CREATE:
-        s_taskbarRestart = RegisterWindowMessage(TEXT("TaskbarCreated"));
+        s_taskbarRestart = ::RegisterWindowMessageW(L"TaskbarCreated");
         break;
     case WM_SYSCOMMAND:
         if (wParam == SC_KEYMENU) // Disable ALT application menu
@@ -139,7 +139,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     auto rc = GetTrayRect();
                     POINT pt = { rc.left, rc.top };
                     SIZE sz = { 96, 32 };
-                    CalculatePopupWindowPosition(&pt, &sz, TPM_CENTERALIGN | TPM_BOTTOMALIGN, nullptr, &rc);
+                    ::CalculatePopupWindowPosition(&pt, &sz, TPM_CENTERALIGN | TPM_BOTTOMALIGN, nullptr, &rc);
                     s_rePlayer->SystrayTooltipOpen(rc.right, rc.bottom);
                 }
                 else
@@ -157,7 +157,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (msg == s_taskbarRestart)
             CreateSystrayIcon();
     }
-    return ::DefWindowProc(hWnd, msg, wParam, lParam);
+    return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
 void ImGuiInit()
@@ -234,7 +234,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
     {
         NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
         OSVERSIONINFOEXW osInfo;
-        *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+        *(FARPROC*)&RtlGetVersion = ::GetProcAddress(::GetModuleHandleA("ntdll"), "RtlGetVersion");
         if (NULL != RtlGetVersion) {
             osInfo.dwOSVersionInfoSize = sizeof(osInfo);
             RtlGetVersion(&osInfo);
@@ -247,12 +247,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
     if (s_rePlayer = RePlayer::Create())
     {
         // Create application window
-        WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, hInstance, s_hIcon = LoadIcon(hInstance, MAKEINTRESOURCEA(IDI_MAINICON)), nullptr, nullptr, nullptr, "rePlayer", nullptr };
-        ::RegisterClassEx(&wc);
+        WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, hInstance, s_hIcon = ::LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_MAINICON)), nullptr, nullptr, nullptr, L"rePlayer", nullptr };
+        ::RegisterClassExW(&wc);
 #ifdef _WIN64
-        s_hWnd = ::CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
+        s_hWnd = ::CreateWindowExW(WS_EX_NOREDIRECTIONBITMAP | WS_EX_TOOLWINDOW, wc.lpszClassName, nullptr, WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
 #else
-        s_hWnd = ::CreateWindowEx(WS_EX_TOOLWINDOW, wc.lpszClassName, "rePlayer", WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
+        s_hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, nullptr, WS_OVERLAPPED, 0, 0, 1, 1, nullptr, nullptr, wc.hInstance, nullptr);
 #endif
 
         ImGuiInit();
@@ -272,7 +272,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 if (rect && rect->left > 0)
                 {
                     MONITORINFO info = { sizeof(MONITORINFO) };
-                    GetMonitorInfo(hMonitor, &info);
+                    ::GetMonitorInfoW(hMonitor, &info);
                     *reinterpret_cast<LPRECT>(lParam) = info.rcWork;
                 }
                 return TRUE;
@@ -284,7 +284,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         RECT rc;
         if (::EnumDisplayMonitors(NULL, nullptr, Test::proc, reinterpret_cast<LPARAM>(&rc)))
         {
-            ::SetWindowLong(s_hWnd, GWL_STYLE, WS_OVERLAPPED);
+            ::SetWindowLongW(s_hWnd, GWL_STYLE, WS_OVERLAPPED);
             ::SetWindowPos(s_hWnd, HWND_TOP,//HWND_TOPMOST,
                 rc.left,
                 rc.top,
@@ -298,15 +298,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
         CreateSystrayIcon();
 
         // Show the window
-        auto mainWindowExStyle = ::GetWindowLong(s_hWnd, GWL_EXSTYLE);
-        ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+        auto mainWindowExStyle = ::GetWindowLongW(s_hWnd, GWL_EXSTYLE);
+        ::SetWindowLongW(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
         ::ShowWindow(s_hWnd, SW_SHOW);
         ::UpdateWindow(s_hWnd);
 
 /*
-        LONG cur_style = GetWindowLong(s_hWnd, GWL_EXSTYLE);
-        SetWindowLong(s_hWnd, GWL_EXSTYLE, cur_style | WS_EX_TRANSPARENT | WS_EX_LAYERED);//let the hwnd messaged passthrough our app as POC
-        SetWindowPos(s_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);//and let the hwnd always on top to be displayed :)
+        LONG cur_style = ::GetWindowLongW(s_hWnd, GWL_EXSTYLE);
+        ::SetWindowLongW(s_hWnd, GWL_EXSTYLE, cur_style | WS_EX_TRANSPARENT | WS_EX_LAYERED);//let the hwnd messaged passthrough our app as POC
+        ::SetWindowPos(s_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);//and let the hwnd always on top to be displayed :)
 */
 
         std::srand(static_cast<uint32_t>(std::time(0) & 0xffFFffFF));
@@ -317,7 +317,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             MSG msg = {};
             while (msg.message != WM_QUIT)
             {
-                if (s_isWindows11 && GetAsyncKeyState(VK_MBUTTON))
+                if (s_isWindows11 && ::GetAsyncKeyState(VK_MBUTTON))
                     s_windows11FixTrayMiddleButton = 0;
 
                 // Poll and handle messages (inputs, window resize, etc.)
@@ -325,10 +325,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
                 // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
                 // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-                if (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+                if (::PeekMessageW(&msg, NULL, 0U, 0U, PM_REMOVE))
                 {
                     ::TranslateMessage(&msg);
-                    ::DispatchMessage(&msg);
+                    ::DispatchMessageW(&msg);
                     continue;
                 }
 
@@ -349,11 +349,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 /*
                 if (!ImGui::GetCurrentContext()->HoveredWindow)
                 {
-                    ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+                    ::SetWindowLongW(s_hWnd, GWL_EXSTYLE, mainWindowExStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
                 }
                 else
                 {
-                    ::SetWindowLong(s_hWnd, GWL_EXSTYLE, mainWindowExStyle);
+                    ::SetWindowLongW(s_hWnd, GWL_EXSTYLE, mainWindowExStyle);
                 }
 */
 
@@ -366,17 +366,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 
                 if (s_windows11FixTrayMiddleButton < 4)
                     s_windows11FixTrayMiddleButton++;
+
+                static bool isFirstLaunch = true;
+                if (isFirstLaunch)
+                {
+                    ::SetForegroundWindow(s_hWnd);
+                    isFirstLaunch = false;
+                }
             }
 
             // Taskbar Icon end
             {
-                NOTIFYICONDATA tnid = {};
+                NOTIFYICONDATAW tnid = {};
 
-                tnid.cbSize = sizeof(NOTIFYICONDATA);
+                tnid.cbSize = sizeof(NOTIFYICONDATAW);
                 tnid.hWnd = s_hWnd;
                 tnid.uID = 0x777;
 
-                Shell_NotifyIcon(NIM_DELETE, &tnid);
+                ::Shell_NotifyIconW(NIM_DELETE, &tnid);
             }
         }
 

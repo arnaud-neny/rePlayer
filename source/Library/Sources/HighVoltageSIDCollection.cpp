@@ -279,14 +279,14 @@ namespace rePlayer
 
         std::string url;
         int32_t downloadStatus = -1;
-        for (uint32_t i = 0; i < _countof(ms_urls) && downloadStatus != 0; i++)
+        for (uint32_t i = 0; i < NumItemsOf(ms_urls) && downloadStatus != 0; i++)
         {
             url = SetupUrl(curl, songSource, ms_urls[m_currentUrl]);
             downloadStatus = Download(curl);
             if (downloadStatus != 0)
             {
                 buffer.Clear();
-                m_currentUrl = (m_currentUrl + 1) % _countof(ms_urls);
+                m_currentUrl = (m_currentUrl + 1) % NumItemsOf(ms_urls);
             }
         }
         if (downloadStatus >= 0)
@@ -697,7 +697,7 @@ namespace rePlayer
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
             int32_t downloadStatus = -1;
-            for (uint32_t i = 0; i < _countof(ms_urls) && downloadStatus != 0; i++)
+            for (uint32_t i = 0; i < NumItemsOf(ms_urls) && downloadStatus != 0; i++)
             {
                 auto url = std::string(ms_urls[m_currentUrl]) + "DOCUMENTS/Songlengths.md5";
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -705,7 +705,7 @@ namespace rePlayer
                 if (downloadStatus != 0)
                 {
                     buffer.Clear();
-                    m_currentUrl = (m_currentUrl + 1) % _countof(ms_urls);
+                    m_currentUrl = (m_currentUrl + 1) % NumItemsOf(ms_urls);
                 }
             }
 

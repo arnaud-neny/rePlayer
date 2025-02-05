@@ -59,10 +59,10 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const clocks[] = { "PAL", "NTSC" };
-        changed |= ImGui::Combo("Amiga Clock###FCAmigaClock", &ms_isNtsc, clocks, _countof(clocks));
+        changed |= ImGui::Combo("Amiga Clock###FCAmigaClock", &ms_isNtsc, clocks, NumItemsOf(clocks));
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         return changed;
     }
 

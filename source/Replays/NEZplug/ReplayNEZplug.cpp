@@ -95,7 +95,7 @@ namespace rePlayer
     {
         bool changed = false;
         const char* const filter[] = { "None", "LowPass", "Weighted", "LowPass Weighted" };
-        changed |= ImGui::Combo("Filter", &ms_filter, filter, _countof(filter));
+        changed |= ImGui::Combo("Filter", &ms_filter, filter, NumItemsOf(filter));
         float gain = 1.0f + 7.0f * ms_gain / 255.0f;
         changed |= ImGui::SliderFloat("Gain", &gain, 1.0f, 8.0f, "x%1.3f", ImGuiSliderFlags_NoInput);
         ms_gain = int32_t(255.0f * (gain - 1.0f) / 7.0f);

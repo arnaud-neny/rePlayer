@@ -68,7 +68,7 @@ namespace rePlayer
         bool changed = false;
         const char* const synths[] = { "x86", "Core" };
         int index = ms_isCoreSynth ? 1 : 0;
-        changed |= ImGui::Combo("Synth engine", &index, synths, _countof(synths));
+        changed |= ImGui::Combo("Synth engine", &index, synths, NumItemsOf(synths));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("V2 Synth x86 is \"emulating\" original assembler code.\nV2 Synth Core is a lot fast but it isn't playing properly some tunes.");
         ms_isCoreSynth = index == 1;

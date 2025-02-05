@@ -71,7 +71,7 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_globals.stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, NumItemsOf(surround));
         return changed;
     }
 

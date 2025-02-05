@@ -388,7 +388,7 @@ namespace rePlayer
                 "Replay",
                 "Source"
             };
-            static_assert(_countof(filterName) == kNumFilterFlags);
+            static_assert(NumItemsOf(filterName) == kNumFilterFlags);
 
             std::string filterIdPreview;
             for (auto flags = FilterFlagType(filterFlags); flags;)

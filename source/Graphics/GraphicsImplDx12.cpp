@@ -158,11 +158,11 @@ namespace rePlayer
                 };
 
                 D3D12_INFO_QUEUE_FILTER filter = {};
-                //filter.DenyList.NumCategories = _countof(categories);
+                //filter.DenyList.NumCategories = NumItemsOf(categories);
                 //filter.DenyList.pCategoryList = categories;
-                filter.DenyList.NumSeverities = _countof(severities);
+                filter.DenyList.NumSeverities = NumItemsOf(severities);
                 filter.DenyList.pSeverityList = severities;
-                filter.DenyList.NumIDs = _countof(denyIds);
+                filter.DenyList.NumIDs = NumItemsOf(denyIds);
                 filter.DenyList.pIDList = denyIds;
 
                 infoQueue->PushStorageFilter(&filter);

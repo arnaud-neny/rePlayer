@@ -362,11 +362,11 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_globals.stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_globals.surround, surround, NumItemsOf(surround));
         const char* const filters[] = { "None", "A500", "A1200"};
-        changed |= ImGui::Combo("Filter", &ms_globals.filter, filters, _countof(filters));
+        changed |= ImGui::Combo("Filter", &ms_globals.filter, filters, NumItemsOf(filters));
         const char* const region[] = { "PAL", "NTSC" };
-        changed |= ImGui::Combo("Region", &ms_globals.isNtsc, region, _countof(region));
+        changed |= ImGui::Combo("Region", &ms_globals.isNtsc, region, NumItemsOf(region));
         return changed;
     }
 

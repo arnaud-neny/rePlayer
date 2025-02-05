@@ -125,17 +125,17 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         const char* const dro[] = { "Detect", "Header", "Forced"};
-        changed |= ImGui::Combo("DRO v2 with Opl3", &ms_droV2Opl3, dro, _countof(dro));
+        changed |= ImGui::Combo("DRO v2 with Opl3", &ms_droV2Opl3, dro, NumItemsOf(dro));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
         const char* const hz[] = { "Default", "PAL", "NTSC" };
-        changed |= ImGui::Combo("VGM playback", &ms_vgmPlaybackHz, hz, _countof(hz));
+        changed |= ImGui::Combo("VGM playback", &ms_vgmPlaybackHz, hz, NumItemsOf(hz));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
         const char* const stop[] = { "Off", "On" };
-        changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, _countof(stop));
+        changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, NumItemsOf(stop));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
         return changed;

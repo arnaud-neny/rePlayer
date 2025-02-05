@@ -131,11 +131,11 @@ namespace rePlayer
         bool changed = false;
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
-        changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+        changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
         const char* const filters[] = { "Off", "Low", "Medium", "High" };
-        changed |= ImGui::Combo("Filter", &ms_filter, filters, _countof(filters));
+        changed |= ImGui::Combo("Filter", &ms_filter, filters, NumItemsOf(filters));
         const char* const resampling[] = { "Disable", "Enable" };
-        changed |= ImGui::Combo("Resampling", &ms_resampling, resampling, _countof(resampling));
+        changed |= ImGui::Combo("Resampling", &ms_resampling, resampling, NumItemsOf(resampling));
         return changed;
     }
 

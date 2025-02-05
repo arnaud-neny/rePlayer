@@ -144,13 +144,13 @@ namespace rePlayer
         bool changed = false;
         {
             const char* const opls[] = { "DOSBox OPL3", "Nuked OPL3", "Ken Silverman", "Tatsuyuki Satoh MAME OPL2"};
-            changed |= ImGui::Combo("OPL Emulator", reinterpret_cast<int32_t*>(&ms_opl), opls, _countof(opls));
+            changed |= ImGui::Combo("OPL Emulator", reinterpret_cast<int32_t*>(&ms_opl), opls, NumItemsOf(opls));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
         }
         {
             const char* const surround[] = { "Stereo", "Surround" };
-            changed |= ImGui::Combo("Output", &ms_surround, surround, _countof(surround));
+            changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
         }

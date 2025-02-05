@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "String.h"
 
 namespace core
@@ -28,7 +29,7 @@ namespace core
         static const char* entities[] = { "nbsp", "quot", "amp", "apos", "lt", "gt" };
         static const char ascii[] = { ' ', '"', '&', '\'', '<', '>' };
 
-        for (size_t i = 0; i < _countof(entities); i++)
+        for (size_t i = 0; i < NumItemsOf(entities); i++)
         {
             auto s = src + 1;
             for (auto c = entities[i];;)
@@ -98,7 +99,7 @@ namespace core
                         while (*++src != ';');
                     }
                 }
-                else for (size_t i = 0; i < _countof(entities); i++)
+                else for (size_t i = 0; i < NumItemsOf(entities); i++)
                 {
                     auto s = src + 1;
                     for (auto c = entities[i];;)
@@ -109,7 +110,7 @@ namespace core
                             {
                                 *dst = ascii[i];
                                 src += c - entities[i] + 1;
-                                i = _countof(entities);
+                                i = NumItemsOf(entities);
                             }
                             break;
                         }
