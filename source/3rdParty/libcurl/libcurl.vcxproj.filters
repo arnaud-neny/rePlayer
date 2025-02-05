@@ -82,9 +82,6 @@
     <ClInclude Include="lib\bufref.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\c-hyper.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\cf-h1-proxy.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -103,12 +100,6 @@
     <ClInclude Include="lib\cfilters.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\config-amigaos.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\config-dos.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\config-mac.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -122,9 +113,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\config-win32.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\config-win32ce.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\conncache.h">
@@ -577,6 +565,18 @@
     <ClInclude Include="lib\vssh\curl_path.h">
       <Filter>Source Files\lib\vssh</Filter>
     </ClInclude>
+    <ClInclude Include="lib\vtls\vtls_scache.h">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vtls\vtls_spack.h">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\httpsrr.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\strparse.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\altsvc.c">
@@ -598,9 +598,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\bufref.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\c-hyper.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\cf-h1-proxy.c">
@@ -1085,6 +1082,18 @@
     </ClCompile>
     <ClCompile Include="lib\vssh\curl_path.c">
       <Filter>Source Files\lib\vssh</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vtls\vtls_scache.c">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vtls\vtls_spack.c">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\httpsrr.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\strparse.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
