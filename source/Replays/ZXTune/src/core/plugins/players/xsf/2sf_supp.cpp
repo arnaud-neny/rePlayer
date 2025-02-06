@@ -7,13 +7,12 @@
  * @author vitamin.caig@gmail.com
  *
  **/
-// local includes
 #include "core/plugins/player_plugins_registrator.h"
 #include "core/plugins/players/plugin.h"
-// library includes
-#include <core/plugin_attrs.h>
-#include <formats/chiptune/decoders.h>
-#include <module/players/xsf/2sf.h>
+#include "formats/chiptune/decoders.h"
+#include "module/players/xsf/2sf.h"
+
+#include "core/plugin_attrs.h"
 
 namespace ZXTune
 {
@@ -26,7 +25,8 @@ namespace ZXTune
 
     auto factory = Module::TwoSF::CreateFactory();
     auto decoder = Formats::Chiptune::Create2SFDecoder();
-    auto plugin = CreatePlayerPlugin(ID, CAPS, std::move(decoder), std::move(factory));
+    auto plugin =
+        CreatePlayerPlugin(ID, CAPS, std::move(decoder), Module::XSF::CreateModuleFactory(std::move(factory)));
     registrator.RegisterPlugin(std::move(plugin));
   }
 }  // namespace ZXTune

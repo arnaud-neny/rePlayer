@@ -12254,16 +12254,7 @@
     <ClInclude Include="include\byteorder.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\char_type.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="include\contract.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\cycle_buffer.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\data_streaming.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\error.h">
@@ -12272,28 +12263,13 @@
     <ClInclude Include="include\error_tools.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\indices.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\iterator.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="include\lazy.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\locale_helpers.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\make_ptr.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\pointers.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\progress_callback.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\range_checker.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\source_location.h">
@@ -12306,9 +12282,6 @@
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\types.h">
-      <Filter>Source Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\xrange.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="src\strings\array.h">
@@ -12633,9 +12606,6 @@
       <Filter>Source Files\src\module\conversion</Filter>
     </ClInclude>
     <ClInclude Include="src\module\conversion\parameters.h">
-      <Filter>Source Files\src\module\conversion</Filter>
-    </ClInclude>
-    <ClInclude Include="src\module\conversion\types.h">
       <Filter>Source Files\src\module\conversion</Filter>
     </ClInclude>
     <ClInclude Include="src\module\players\duration.h">
@@ -13423,6 +13393,39 @@
     </ClInclude>
     <ClInclude Include="src\strings\split.h">
       <Filter>Source Files\src\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parameters\delegated.h">
+      <Filter>Source Files\src\parameters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\strings\src\find.h">
+      <Filter>Source Files\src\strings\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\strings\sanitize.h">
+      <Filter>Source Files\src\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\cycle_buffer.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\data_streaming.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\indices.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\iterators.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\locale_helpers.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\progress_callback.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\range_checker.h">
+      <Filter>Source Files\src\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tools\xrange.h">
+      <Filter>Source Files\src\tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -14515,6 +14518,9 @@
     <ClCompile Include="src\strings\src\casing.cpp">
       <Filter>Source Files\src\strings\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\strings\src\sanitize.cpp">
+      <Filter>Source Files\src\strings\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\strings\src\sjis2unicode.inc">
@@ -14545,10 +14551,8 @@
     <None Include="src\module\players\xsf\scph10000_he.inc">
       <Filter>Source Files\src\module\players\xsf</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\core\plugins\players\sid\Songlengths.txt">
-      <Filter>Source Files\src\core\plugins\players\sid</Filter>
-    </Text>
+    <None Include="ZXTune.diff">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

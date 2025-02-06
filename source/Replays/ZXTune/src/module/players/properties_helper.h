@@ -10,11 +10,12 @@
 
 #pragma once
 
-// library includes
-#include <formats/chiptune.h>
-#include <parameters/modifier.h>
-#include <strings/array.h>
-#include <time/duration.h>
+#include "formats/chiptune.h"
+#include "parameters/modifier.h"
+#include "strings/array.h"
+#include "time/duration.h"
+
+#include "string_view.h"
 
 namespace Module
 {
@@ -27,6 +28,7 @@ namespace Module
 
     // Generic
     void SetNonEmptyProperty(StringView name, StringView value);
+    void SetBinaryProperty(StringView name, Binary::View value);
 
     // Common
     void SetType(StringView type);
@@ -44,6 +46,7 @@ namespace Module
     void SetVersion(StringView version);
     void SetDate(StringView date);
     void SetPlatform(StringView platform);
+    void SetChannels(const Strings::Array& names);
 
     // Sound
     void SetFadein(Time::Milliseconds fadein);

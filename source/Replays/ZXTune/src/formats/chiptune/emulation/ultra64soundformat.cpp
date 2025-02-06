@@ -8,20 +8,21 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/emulation/ultra64soundformat.h"
-// common includes
-#include <byteorder.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+
+#include "byteorder.h"
+#include "make_ptr.h"
+
+#include <array>
 
 namespace Formats::Chiptune
 {
   namespace Ultra64SoundFormat
   {
-    const Char DESCRIPTION[] = "Ultra64 Sound Format";
+    const auto DESCRIPTION = "Ultra64 Sound Format"sv;
 
     using SignatureType = std::array<uint8_t, 4>;
     const SignatureType EMPTY_SIGNATURE = {{0, 0, 0, 0}};
@@ -99,7 +100,7 @@ namespace Formats::Chiptune
     const auto FORMAT =
         "'P'S'F"
         "21"
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -108,7 +109,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateMatchOnlyFormat(FORMAT))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }

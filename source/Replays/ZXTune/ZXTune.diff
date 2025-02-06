@@ -1,12 +1,68 @@
+diff --git "a/external\\zxtune\\3rdparty\\z80ex\\typedefs.h" "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\typedefs.h"
+index 4d88742..e0034f1 100644
+--- "a/external\\zxtune\\3rdparty\\z80ex\\typedefs.h"
++++ "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\typedefs.h"
+@@ -14,7 +14,7 @@ struct _z80_cpu_context;
+ typedef struct _z80_cpu_context Z80EX_CONTEXT;
+ 
+ #define __Z80EX_SELF_INCLUDE
+-#include "z80ex.h"
++#include "include/z80ex.h" // rePlayer
+ 
+ #define LITTLE_ENDIAN_VAL 0x41424344UL
+ #define BIG_ENDIAN_VAL 0x44434241UL
+diff --git "a/external\\zxtune\\3rdparty\\z80ex\\z80ex.c" "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\z80ex.c"
+index 08b1900..9f5c373 100644
+--- "a/external\\zxtune\\3rdparty\\z80ex\\z80ex.c"
++++ "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\z80ex.c"
+@@ -13,7 +13,7 @@
+ #define __Z80EX_SELF_INCLUDE
+ 
+ #include "typedefs.h"
+-#include "z80ex.h"
++#include "include/z80ex.h" // rePlayer
+ #include "macros.h"
+ 
+ #define temp_byte cpu->tmpbyte
+@@ -33,6 +33,7 @@
+ /*#define _DOQUOTE(x) #x
+ #define DOQUOTE(x) _DOQUOTE(x)*/
+ 
++/* rePlayer
+ #define DOQUOTE(x) #x
+ 
+ static char revision_type[]=DOQUOTE(Z80EX_RELEASE_TYPE);
+@@ -43,6 +44,7 @@ LIB_EXPORT Z80EX_VERSION *z80ex_get_version()
+ {
+ 	return(&version);
+ }
++*/
+ 
+ /* do one opcode (instruction or prefix) */
+ LIB_EXPORT int z80ex_step(Z80EX_CONTEXT *cpu)
+diff --git "a/external\\zxtune\\3rdparty\\z80ex\\z80ex_dasm.c" "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\z80ex_dasm.c"
+index 07aee73..e7db0b0 100644
+--- "a/external\\zxtune\\3rdparty\\z80ex\\z80ex_dasm.c"
++++ "b/source\\Replays\\ZXTune\\3rdparty\\z80ex\\z80ex_dasm.c"
+@@ -14,7 +14,7 @@
+ #include <stdarg.h>
+  
+ #define __Z80EX_SELF_INCLUDE
+-#include "z80ex_dasm.h"
++#include "include/z80ex_dasm.h" // rePlayer
+ 
+ #ifdef _MSC_VER
+ #define snprintf _snprintf
 diff --git "a/external\\zxtune\\include\\source_location.h" "b/source\\Replays\\ZXTune\\include\\source_location.h"
-index d030c26..d38a6d7 100644
+index 6817391..710295f 100644
 --- "a/external\\zxtune\\include\\source_location.h"
 +++ "b/source\\Replays\\ZXTune\\include\\source_location.h"
-@@ -64,17 +64,13 @@ namespace Debug
+@@ -66,26 +66,20 @@ namespace Debug
    }
  }  // namespace Debug
  
 -template<class C, C... Chars>
++// rePlayer begin
  class SourceFile
  {
 -  static_assert(sizeof...(Chars) != 0, "Empty SourceFile");
@@ -15,19 +71,28 @@ index d030c26..d38a6d7 100644
  public:
    using TagType = uint32_t;
  
--  constexpr static const auto StaticLocation = basic_string_view<C>{Path};
+-  constexpr static const auto StaticLocation = std::basic_string_view<C>{Path.data(), Path.size()};
 -  constexpr static const auto StaticTag = Debug::Hash<TagType>(StaticLocation);
-+  const basic_string_view<Char> StaticLocation;
-+  const TagType StaticTag = 0;
- 
+-
    constexpr auto Location() const
    {
-@@ -95,12 +91,12 @@ public:
+-    return StaticLocation;
++    return "";
+   }
+ 
+   constexpr auto Tag() const
+   {
+-    return StaticTag;
++    return 0;
+   }
+ 
+   class SourceLine
+@@ -97,12 +91,12 @@ public:
  
      constexpr auto Location() const
      {
 -      return StaticLocation;
-+      return basic_string_view<Char>();
++        return "";
      }
  
      constexpr TagType Tag() const
@@ -37,9 +102,9 @@ index d030c26..d38a6d7 100644
      }
  
      constexpr auto Line() const
-@@ -127,26 +123,31 @@ namespace Debug
+@@ -129,27 +123,33 @@ namespace Debug
  #else
-   constexpr auto ROOT = ""_sv;
+   constexpr auto ROOT = ""sv;
  #endif
 -  template<std::size_t Offset, typename C, C Head, C... Tail>
 -  constexpr auto MakeSourceFile()
@@ -84,25 +149,35 @@ index d030c26..d38a6d7 100644
 -  return Debug::MakeSourceFile<0, C, Chars...>();
 +  return SourceFile();
  }
++// rePlayer end
  
  #define ThisFile() DO_LITERAL(__FILE__, _source)
-diff --git "a/external\\zxtune\\include\\string_view.h" "b/source\\Replays\\ZXTune\\include\\string_view.h"
-index 4db1b12..5d3a691 100644
---- "a/external\\zxtune\\include\\string_view.h"
-+++ "b/source\\Replays\\ZXTune\\include\\string_view.h"
-@@ -49,6 +49,10 @@ public:
-     : parent(str.data(), str.size())
-   {}
+ #define ThisLine() ThisFile().Line(__LINE__)
+diff --git "a/external\\zxtune\\src\\binary\\format\\expression.cpp" "b/source\\Replays\\ZXTune\\src\\binary\\format\\expression.cpp"
+index bd64591..af8184c 100644
+--- "a/external\\zxtune\\src\\binary\\format\\expression.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\binary\\format\\expression.cpp"
+@@ -106,12 +106,15 @@ namespace Binary::FormatDSL
  
-+  constexpr basic_string_view(parent::const_iterator begin, parent::const_iterator end) // rePlayer
-+    : parent(begin, end)
-+  {}
-+
-   constexpr basic_string_view<C> substr(std::size_t pos = 0, std::size_t count = parent::npos) const
-   {
-     return basic_string_view<C>(parent::substr(pos, count));
+     std::size_t Cleanup()
+     {
+-      const auto first = Predicates.begin();
+-      const auto last = Predicates.end();
++      // rePlayer begin
++      const auto first = Predicates.data();
++      const auto last = Predicates.data() + Predicates.size();
+       const auto isAny = [](const Predicate* p) { return p == AnyValuePredicate::Instance(); };
+       const auto firstNotAny = std::find_if_not(first, last, isAny);
+       Require(firstNotAny != last);
+-      const auto lastNotAny = std::find_if_not(Predicates.rbegin(), Predicates.rend(), isAny).base();
++      const auto lastNotAnyIt = std::find_if_not(Predicates.rbegin(), Predicates.rend(), isAny).base();
++      const auto lastNotAny = lastNotAnyIt != Predicates.end() ? &lastNotAnyIt[0] : last;
++      // rePlayer end
+       if (first != firstNotAny)
+       {
+         std::copy(firstNotAny, lastNotAny, first);
 diff --git "a/external\\zxtune\\src\\binary\\format\\lexic_analysis.cpp" "b/source\\Replays\\ZXTune\\src\\binary\\format\\lexic_analysis.cpp"
-index 6fdea94..bcbafdf 100644
+index e907afa..51c8198 100644
 --- "a/external\\zxtune\\src\\binary\\format\\lexic_analysis.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\binary\\format\\lexic_analysis.cpp"
 @@ -95,13 +95,13 @@ namespace LexicalAnalysis
@@ -112,7 +187,7 @@ index 6fdea94..bcbafdf 100644
 -      for (const auto* lexemeEnd = lexemeStart + 1; !candidates.empty(); ++lexemeEnd)
 +      for (auto lexemeEnd = lexemeStart + 1; !candidates.empty(); ++lexemeEnd) // rePlayer
        {
-         const StringView lexeme(lexemeStart, lexemeEnd);
+         const auto lexeme = MakeStringView(lexemeStart, lexemeEnd);
          auto tokens = MakeRWPtr<TokensSet>(lexeme);
          std::vector<const Tokenizer*> passedCandidates;
          passedCandidates.reserve(candidates.size());
@@ -122,12 +197,12 @@ index 6fdea94..bcbafdf 100644
            switch (const TokenType result = tokenizer->Parse(lexeme))
            {
 diff --git "a/external\\zxtune\\src\\core\\plugin_attrs.h" "b/source\\Replays\\ZXTune\\src\\core\\plugin_attrs.h"
-index 6a44efb..fc68954 100644
+index 6ceae6a..6ab2b0a 100644
 --- "a/external\\zxtune\\src\\core\\plugin_attrs.h"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugin_attrs.h"
 @@ -13,6 +13,12 @@
- // common includes
- #include <types.h>
+ #include "string_view.h"
+ #include "types.h"
  
 +// rePlayer beging
 +#ifdef OUT
@@ -138,42 +213,28 @@ index 6a44efb..fc68954 100644
  namespace ZXTune
  {
    class PluginId : public StringView
-diff --git "a/external\\zxtune\\src\\core\\plugins\\enumerator.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\enumerator.cpp"
-index 657fc8f..998dc63 100644
---- "a/external\\zxtune\\src\\core\\plugins\\enumerator.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\enumerator.cpp"
-@@ -59,8 +59,7 @@ namespace ZXTune
-       Players.reserve(256);
-       const Time::Timer timer;
-       ZXTune::RegisterArchivePlugins(*this);
--      ZXTune::RegisterMultitrackPlayerPlugins(*this, *this);
--      ZXTune::RegisterPlayerPlugins(*this);
-+      ZXTune::RegisterPlayerPlugins(*this, *this);
-       EnumeratorDbg("Registered {} archives and {} players for {}ms", Archives.size(), Players.size(),
-                     timer.Elapsed<Time::Millisecond>().Get());
-     }
 diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
-index 7292590..9075df8 100644
+index e3aa50a..6c61531 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\plugins_archived.cpp"
-@@ -34,10 +34,10 @@ namespace ZXTune
+@@ -33,10 +33,10 @@ namespace ZXTune
    const ContainerPluginDescription UNARCHIVES[] =
    {
      {"ZIP"_id,     &CreateZipDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
 -    {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
-+//     {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
++//    {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
      {"LHA"_id,     &CreateLhaDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
      {"UMX"_id,     &CreateUMXDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::PLAIN},
 -    {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
-+//     {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
++//    {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
    };
  
    const ContainerPluginDescription ZXUNARCHIVES[] =
 diff --git "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
-index e8e6ce9..78a00ab 100644
+index ac0d6a5..02e7918 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\archives\\raw_supp.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\archives\\raw_supp.cpp"
-@@ -428,7 +428,7 @@ namespace ZXTune::Raw
+@@ -427,7 +427,7 @@ namespace ZXTune::Raw
  
      void Move(std::size_t step)
      {
@@ -182,7 +243,7 @@ index e8e6ce9..78a00ab 100644
        {
          Dbg("Subdata is captured. Duplicate.");
          Subdata = MakePtr<ScanDataContainer>(Parent->GetData(), Subdata->GetOffset() + step);
-@@ -796,7 +796,7 @@ namespace ZXTune::Raw
+@@ -806,7 +806,7 @@ namespace ZXTune::Raw
          progress.Report(offset);
          usedPlugins.SetOffset(offset);
          const auto detectResult = usedPlugins.Detect(subLocation, callback);
@@ -192,160 +253,38 @@ index e8e6ce9..78a00ab 100644
            Dbg("Sublocation is captured. Duplicate.");
            subLocation = MakePtr<ScanDataLocation>(input, offset);
 diff --git "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
-index 64f7fee..8fcfa65 100644
+index 4492567..b69af70 100644
 --- "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.cpp"
-@@ -13,64 +13,113 @@
- 
- namespace ZXTune
- {
--  void RegisterPlayerPlugins(PlayerPluginsRegistrator& registrator)
--  {
--    // try TS & AY first
--    RegisterTSSupport(registrator);
--    RegisterAYSupport(registrator);
--    RegisterPT3Support(registrator);
--    RegisterPT2Support(registrator);
--    RegisterSTCSupport(registrator);
--    RegisterST1Support(registrator);
--    RegisterST3Support(registrator);
--    RegisterASCSupport(registrator);
--    RegisterSTPSupport(registrator);
--    RegisterTXTSupport(registrator);
--    RegisterPSGSupport(registrator);
--    RegisterPDTSupport(registrator);
--    RegisterCHISupport(registrator);
--    RegisterSTRSupport(registrator);
--    RegisterDSTSupport(registrator);
--    RegisterSQDSupport(registrator);
--    RegisterDMMSupport(registrator);
--    RegisterPSMSupport(registrator);
--    RegisterGTRSupport(registrator);
--    RegisterPT1Support(registrator);
--    RegisterVTXSupport(registrator);
--    RegisterYMSupport(registrator);
--    RegisterTFDSupport(registrator);
--    RegisterTFCSupport(registrator);
--    RegisterSQTSupport(registrator);
--    RegisterPSCSupport(registrator);
--    RegisterFTCSupport(registrator);
--    RegisterCOPSupport(registrator);
--    RegisterTFESupport(registrator);
--    RegisterXMPPlugins(registrator);
--    RegisterET1Support(registrator);
--    RegisterAYCSupport(registrator);
--    RegisterSPCSupport(registrator);
--    RegisterMTCSupport(registrator);
--    RegisterAHXSupport(registrator);
--    RegisterPSFSupport(registrator);
--    RegisterUSFSupport(registrator);
--    RegisterGSFSupport(registrator);
--    Register2SFSupport(registrator);
--    RegisterNCSFSupport(registrator);
--    RegisterSDSFSupport(registrator);
--    RegisterMP3Plugin(registrator);
--    RegisterOGGPlugin(registrator);
--    RegisterWAVPlugin(registrator);
--    RegisterFLACPlugin(registrator);
--    RegisterV2MSupport(registrator);
--    RegisterVGMPlugins(registrator);
--    RegisterMPTPlugins(registrator);
--  }
-+  void RegisterTSSupport(PlayerPluginsRegistrator& players);
-+  void RegisterAYSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPSGSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSTCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterST1Support(PlayerPluginsRegistrator& players);
-+  void RegisterST3Support(PlayerPluginsRegistrator& players);
-+  void RegisterPT2Support(PlayerPluginsRegistrator& players);
-+  void RegisterPT3Support(PlayerPluginsRegistrator& players);
-+  void RegisterASCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSTPSupport(PlayerPluginsRegistrator& players);
-+  void RegisterTXTSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPDTSupport(PlayerPluginsRegistrator& players);
-+  void RegisterCHISupport(PlayerPluginsRegistrator& players);
-+  void RegisterSTRSupport(PlayerPluginsRegistrator& players);
-+  void RegisterDSTSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSQDSupport(PlayerPluginsRegistrator& players);
-+  void RegisterDMMSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPSMSupport(PlayerPluginsRegistrator& players);
-+  void RegisterGTRSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPT1Support(PlayerPluginsRegistrator& players);
-+  void RegisterVTXSupport(PlayerPluginsRegistrator& players);
-+  void RegisterYMSupport(PlayerPluginsRegistrator& players);
-+  void RegisterTFDSupport(PlayerPluginsRegistrator& players);
-+  void RegisterTFCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSQTSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPSCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterFTCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterCOPSupport(PlayerPluginsRegistrator& players);
-+  void RegisterTFESupport(PlayerPluginsRegistrator& players);
-+  void RegisterXMPPlugins(PlayerPluginsRegistrator& players);
-+  void RegisterSIDPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
-+  void RegisterET1Support(PlayerPluginsRegistrator& players);
-+  void RegisterAYCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSPCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterMTCSupport(PlayerPluginsRegistrator& players);
-+  void RegisterGMEPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
-+  void RegisterAHXSupport(PlayerPluginsRegistrator& players);
-+  void RegisterPSFSupport(PlayerPluginsRegistrator& players);
-+  void RegisterUSFSupport(PlayerPluginsRegistrator& players);
-+  void RegisterGSFSupport(PlayerPluginsRegistrator& players);
-+  void Register2SFSupport(PlayerPluginsRegistrator& players);
-+  void RegisterNCSFSupport(PlayerPluginsRegistrator& players);
-+  void RegisterSDSFSupport(PlayerPluginsRegistrator& players);
-+  void RegisterASAPPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
-+  void RegisterMP3Plugin(PlayerPluginsRegistrator& players);
-+  void RegisterOGGPlugin(PlayerPluginsRegistrator& players);
-+  void RegisterWAVPlugin(PlayerPluginsRegistrator& players);
-+  void RegisterFLACPlugin(PlayerPluginsRegistrator& players);
-+  void RegisterV2MSupport(PlayerPluginsRegistrator& players);
-+  void RegisterVGMPlugins(PlayerPluginsRegistrator& players);
-+  void RegisterMPTPlugins(PlayerPluginsRegistrator& players);
-+  void RegisterVGMStreamPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
- 
--  void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
-+  void RegisterPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives)
-   {
+@@ -97,28 +97,28 @@ namespace ZXTune
+     RegisterFTCSupport(players);
+     RegisterCOPSupport(players);
+     RegisterTFESupport(players);
+-    RegisterXMPPlugins(players);
++//    RegisterXMPPlugins(players);
+     RegisterET1Support(players);
+     RegisterAYCSupport(players);
+-    RegisterSPCSupport(players);
++//    RegisterSPCSupport(players);
+     RegisterMTCSupport(players);
+-    RegisterAHXSupport(players);
+-    RegisterPSFSupport(players);
+-    RegisterUSFSupport(players);
+-    RegisterGSFSupport(players);
+-    Register2SFSupport(players);
+-    RegisterNCSFSupport(players);
+-    RegisterSDSFSupport(players);
+-    RegisterMP3Plugin(players);
+-    RegisterOGGPlugin(players);
+-    RegisterFLACPlugin(players);
+-    RegisterVGMPlugins(players);
+-    RegisterMPTPlugins(players);
 -    RegisterSIDPlugins(players, archives);
 -    RegisterGMEPlugins(players, archives);
 -    RegisterASAPPlugins(players, archives);
 -    RegisterVGMStreamPlugins(players, archives);
-+    // try TS & AY first
-+    RegisterTSSupport(players);
-+    RegisterAYSupport(players);
-+    RegisterPT3Support(players);
-+    RegisterPT2Support(players);
-+    RegisterSTCSupport(players);
-+    RegisterST1Support(players);
-+    RegisterST3Support(players);
-+    RegisterASCSupport(players);
-+    RegisterSTPSupport(players);
-+    RegisterTXTSupport(players);
-+    RegisterPSGSupport(players);
-+    RegisterPDTSupport(players);
-+    RegisterCHISupport(players);
-+    RegisterSTRSupport(players);
-+    RegisterDSTSupport(players);
-+    RegisterSQDSupport(players);
-+    RegisterDMMSupport(players);
-+    RegisterPSMSupport(players);
-+    RegisterGTRSupport(players);
-+    RegisterPT1Support(players);
-+    RegisterVTXSupport(players);
-+    RegisterYMSupport(players);
-+    RegisterTFDSupport(players);
-+    RegisterTFCSupport(players);
-+    RegisterSQTSupport(players);
-+    RegisterPSCSupport(players);
-+    RegisterFTCSupport(players);
-+    RegisterCOPSupport(players);
-+    RegisterTFESupport(players);
-+//    RegisterXMPPlugins(players);
-+    RegisterET1Support(players);
-+    RegisterAYCSupport(players);
-+//    RegisterSPCSupport(players);
-+    RegisterMTCSupport(players);
+-    RegisterV2MSupport(players);
+-    RegisterWAVPlugin(players);  // wav after VGMStream
 +//    RegisterAHXSupport(players);
 +//    RegisterPSFSupport(players);
 +//    RegisterUSFSupport(players);
@@ -366,73 +305,20 @@ index 64f7fee..8fcfa65 100644
 +//    RegisterWAVPlugin(players);  // wav after VGMStream
    }
  }  // namespace ZXTune
-diff --git "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.h" "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.h"
-index 5a416f3..93e3281 100644
---- "a/external\\zxtune\\src\\core\\plugins\\players\\plugins_list.h"
-+++ "b/source\\Replays\\ZXTune\\src\\core\\plugins\\players\\plugins_list.h"
-@@ -15,59 +15,5 @@ namespace ZXTune
-   class PlayerPluginsRegistrator;
-   class ArchivePluginsRegistrator;
+diff --git "a/external\\zxtune\\src\\formats\\archived\\zip.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\archived\\zip.cpp"
+index 37b1b30..54ad595 100644
+--- "a/external\\zxtune\\src\\formats\\archived\\zip.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\archived\\zip.cpp"
+@@ -21,6 +21,7 @@
+ #include "make_ptr.h"
+ #include "string_view.h"
  
--  void RegisterTSSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterAYSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPSGSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSTCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterST1Support(PlayerPluginsRegistrator& registrator);
--  void RegisterST3Support(PlayerPluginsRegistrator& registrator);
--  void RegisterPT2Support(PlayerPluginsRegistrator& registrator);
--  void RegisterPT3Support(PlayerPluginsRegistrator& registrator);
--  void RegisterASCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSTPSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterTXTSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPDTSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterCHISupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSTRSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterDSTSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSQDSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterDMMSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPSMSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterGTRSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPT1Support(PlayerPluginsRegistrator& registrator);
--  void RegisterVTXSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterYMSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterTFDSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterTFCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSQTSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPSCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterFTCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterCOPSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterTFESupport(PlayerPluginsRegistrator& registrator);
--  void RegisterXMPPlugins(PlayerPluginsRegistrator& registrator);
--  void RegisterSIDPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
--  void RegisterET1Support(PlayerPluginsRegistrator& registrator);
--  void RegisterAYCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSPCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterMTCSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterGMEPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
--  void RegisterAHXSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterPSFSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterUSFSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterGSFSupport(PlayerPluginsRegistrator& registrator);
--  void Register2SFSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterNCSFSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterSDSFSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterASAPPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
--  void RegisterMP3Plugin(PlayerPluginsRegistrator& registrator);
--  void RegisterOGGPlugin(PlayerPluginsRegistrator& registrator);
--  void RegisterWAVPlugin(PlayerPluginsRegistrator& registrator);
--  void RegisterFLACPlugin(PlayerPluginsRegistrator& registrator);
--  void RegisterV2MSupport(PlayerPluginsRegistrator& registrator);
--  void RegisterVGMPlugins(PlayerPluginsRegistrator& registrator);
--  void RegisterMPTPlugins(PlayerPluginsRegistrator& registrator);
--  void RegisterVGMStreamPlugins(PlayerPluginsRegistrator& registrator, ArchivePluginsRegistrator& archives);
--
--  void RegisterPlayerPlugins(PlayerPluginsRegistrator& registrator);
--  void RegisterMultitrackPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
-+  void RegisterPlayerPlugins(PlayerPluginsRegistrator& players, ArchivePluginsRegistrator& archives);
- }  // namespace ZXTune
++#define assert(...) // rePlayer
+ #include <memory>
+ #include <numeric>
+ 
 diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\globaltracker.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
-index 844d70c..4d1ce52 100644
+index 6538875..bd9be60 100644
 --- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\globaltracker.cpp"
 @@ -867,7 +867,7 @@ namespace Formats::Chiptune
@@ -440,12 +326,12 @@ index 844d70c..4d1ce52 100644
        {
          AddArea(HEADER, 0);
 -        AddArea(PATTERNS, GetStart(hdr.Patterns.front().Offsets.begin(), hdr.Patterns.back().Offsets.end(), StartAddr));
-+        AddArea(PATTERNS, GetStart(&hdr.Patterns.front().Offsets[0], &hdr.Patterns.back().Offsets.back() + 1, StartAddr)); // rePlayer
++        AddArea(PATTERNS, GetStart(hdr.Patterns.front().Offsets.data(), hdr.Patterns.back().Offsets.data() + hdr.Patterns.back().Offsets.size(), StartAddr)); // rePlayer
          AddArea(SAMPLES, GetStart(hdr.SamplesOffsets.begin(), hdr.SamplesOffsets.end(), StartAddr));
          AddArea(ORNAMENTS, GetStart(hdr.OrnamentsOffsets.begin(), hdr.OrnamentsOffsets.end(), StartAddr));
          AddArea(END, size);
 diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
-index 3026667..3e554fe 100644
+index 31a1c40..a657952 100644
 --- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\protracker3_vortex.cpp"
 @@ -255,7 +255,7 @@ namespace Formats::Chiptune
@@ -457,7 +343,7 @@ index 3026667..3e554fe 100644
          const SignFlag sign(*it);
          for (++it; it != val.end(); ++it)
          {
-@@ -835,7 +835,7 @@ namespace Formats::Chiptune
+@@ -833,7 +833,7 @@ namespace Formats::Chiptune
      private:
        uint_t AsInt() const
        {
@@ -467,94 +353,45 @@ index 3026667..3e554fe 100644
          const uint_t halftone = notePos - NOTES.begin();
          const char octave = Val[2];
 diff --git "a/external\\zxtune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
-index 2fbb53e..fb3fb57 100644
+index 1a05358..393a218 100644
 --- "a/external\\zxtune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\aym\\ym_vtx.cpp"
-@@ -313,7 +313,7 @@ namespace Formats::Chiptune
+@@ -313,8 +313,8 @@ namespace Formats::Chiptune
            ParseTransponedMatrix(src, lines, columns, target);
            if (Ver3b::FastCheck(data, size))
            {
--            const uint_t loop = stream.Read<be_uint32_t>();
-+            const uint_t loop = stream.Read<le_uint32_t>(); // rePlayer
-             target.SetLoop(loop);
+-            const uint32_t loop = stream.Read<be_uint32_t>();
+-            target.SetLoop(std::min(loop, swapBytes(loop)));
++              const uint_t loop = stream.Read<le_uint32_t>(); // rePlayer
++              target.SetLoop(loop);
            }
            return CreateCalculatingCrcContainer(stream.GetReadContainer(), dumpOffset, matrixSize);
-diff --git "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
-index cbd42d9..fcc61b5 100644
---- "a/external\\zxtune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\digital\\digitalstudio.cpp"
-@@ -240,8 +240,8 @@ namespace Formats::Chiptune
-         {
-           const uint_t samIdx = *it;
-           const SampleInfo& info = Source.Samples[samIdx];
--          Dbg("Sample {}: start=#{:04x} loop=#{:04x} page=#{:02x} size=#{:04x}", samIdx, info.Start, info.Loop,
--              unsigned(info.Page), info.Size);
-+          Dbg("Sample {}: start=#{:04x} loop=#{:04x} page=#{:02x} size=#{:04x}", samIdx, uint_t(info.Start), uint_t(info.Loop), // rePlayer
-+              unsigned(info.Page), uint_t(info.Size));
-           if (!ParseSample(samIdx, info, samples))
-           {
-             Dbg(" Stub sample");
-diff --git "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\ay.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\ay.cpp"
-index 69df402..d8698cb 100644
---- "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\ay.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\ay.cpp"
-@@ -462,7 +462,7 @@ namespace Formats::Chiptune
-           dst->Address = it->first;
-           dst->Size = static_cast<uint16_t>(it->second->Size());
-           SetPointer(&dst->Offset, result.Add(*it->second));
--          Dbg("Stored block {} bytes at {} stored at {}", dst->Size, dst->Address, dst->Offset);
-+          Dbg("Stored block {} bytes at {} stored at {}", uint_t(dst->Size), uint_t(dst->Address), uint_t(dst->Offset));
          }
-         return result.CaptureResult();
-       }
-@@ -564,7 +564,7 @@ namespace Formats::Chiptune
-           const auto& block = data.GetField<EMUL::ModuleBlock>(&moddata.BlocksOffset, blockIdx);
-           const uint16_t blockAddr = block.Address;
-           const std::size_t blockSize = block.Size;
--          Dbg("Block {} bytes at {} located at {}", blockSize, blockAddr, block.Offset);
-+          Dbg("Block {} bytes at {} located at {}", blockSize, uint_t(blockAddr), int_t(block.Offset)); // rePlayer
-           if (const auto blockData = data.GetBlob(&block.Offset, blockSize))
-           {
-             target.AddBlock(blockAddr, blockData);
-diff --git "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\spc.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\spc.cpp"
-index 36fb73f..f7e6200 100644
---- "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\spc.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\spc.cpp"
-@@ -48,7 +48,7 @@ namespace Formats::Chiptune
-     template<std::size_t D>
-     inline StringView GetTrimmed(const std::array<char, D>& str)
-     {
--      return GetTrimmed(str.begin(), str.end());
-+      return GetTrimmed(str.data(), str.data() + str.size()); // rePlayer
-     }
+diff --git "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\playstation2soundformat.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\playstation2soundformat.cpp"
+index f4addcd..7cdb0ec 100644
+--- "a/external\\zxtune\\src\\formats\\chiptune\\emulation\\playstation2soundformat.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\emulation\\playstation2soundformat.cpp"
+@@ -20,6 +20,7 @@
+ #include "byteorder.h"
+ #include "make_ptr.h"
+ #include "string_view.h"
++#include "string_type.h" // rePlayer
  
-     template<std::size_t D>
-diff --git "a/external\\zxtune\\src\\formats\\chiptune\\music\\tags_id3.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
-index 4b2c8e6..78c7c35 100644
---- "a/external\\zxtune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\formats\\chiptune\\music\\tags_id3.cpp"
-@@ -20,7 +20,7 @@ namespace Formats::Chiptune::Id3
- {
-   StringView CutValid(StringView str)
-   {
--    const auto* const end =
-+      const auto end = // rePlayer
-         std::find_if(str.begin(), str.end(), [](Char c) { return c < ' ' && c != '\t' && c != '\r' && c != '\n'; });
-     return {str.begin(), end};
-   }
+ #include <map>
+ 
 diff --git "a/external\\zxtune\\src\\formats\\packed\\compiledasc.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledasc.cpp"
-index 81e7af9..2e4d2ec 100644
+index fe7c505..adbc077 100644
 --- "a/external\\zxtune\\src\\formats\\packed\\compiledasc.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledasc.cpp"
-@@ -15,7 +15,7 @@
- #include <byteorder.h>
- #include <contract.h>
- #include <make_ptr.h>
--#include <static_string.h>
-+//#include <static_string.h> // rePlayer
- // library includes
- #include <binary/format_factories.h>
- #include <debug/log.h>
+@@ -17,7 +17,7 @@
+ #include "byteorder.h"
+ #include "contract.h"
+ #include "make_ptr.h"
+-#include "static_string.h"
++//#include "static_string.h" // rePlayer
+ #include "string_view.h"
+ 
+ #include <algorithm>
 @@ -113,25 +113,25 @@ namespace Formats::Packed
        const ParseFunc Parse;
        const InsertMetaInfoFunc InsertMetaInformation;
@@ -593,10 +430,10 @@ index 81e7af9..2e4d2ec 100644
                                       "32??"  // ld (xxx),a
                                       "cd??"  // call xxxx
 -                                     ""_ss;
-+                                     ;
++                                     "";
      const VersionTraits VERSION0 = {
          sizeof(PlayerVer0),
-         "ASC Sound Master v0.x player",
+         "ASC Sound Master v0.x player"sv,
 @@ -150,7 +150,7 @@ namespace Formats::Packed
          &Formats::Chiptune::ASCSoundMaster::Ver0::InsertMetaInformation,
      };
@@ -614,7 +451,7 @@ index 81e7af9..2e4d2ec 100644
 +                                     "";
      const VersionTraits VERSION1 = {
          sizeof(PlayerVer0),
-         "ASC Sound Master v1.x player",
+         "ASC Sound Master v1.x player"sv,
 @@ -171,11 +171,11 @@ namespace Formats::Packed
          &Formats::Chiptune::ASCSoundMaster::Ver1::InsertMetaInformation,
      };
@@ -634,10 +471,10 @@ index 81e7af9..2e4d2ec 100644
          //+123
          "11??"  // data offset
 -        ""_ss;
-+        ;
++        "";
      const VersionTraits VERSION2 = {
          sizeof(PlayerVer2),
-         "ASC Sound Master v2.x player",
+         "ASC Sound Master v2.x player"sv,
 @@ -192,6 +192,7 @@ namespace Formats::Packed
          &Formats::Chiptune::ASCSoundMaster::Ver1::Parse,
          &Formats::Chiptune::ASCSoundMaster::Ver1::InsertMetaInformation,
@@ -646,11 +483,37 @@ index 81e7af9..2e4d2ec 100644
  
      bool IsInfoEmpty(Binary::View info)
      {
+diff --git "a/external\\zxtune\\src\\formats\\packed\\compiledst3.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledst3.cpp"
+index fcf3dff..98b5a59 100644
+--- "a/external\\zxtune\\src\\formats\\packed\\compiledst3.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledst3.cpp"
+@@ -88,7 +88,7 @@ namespace Formats::Packed
+     {
+       // 28 is fixed
+       // 27 is title
+-      const auto* const titleStart = info.begin() + 28;
++      auto titleStart = info.begin() + 28; // rePlayer
+       return std::none_of(titleStart, info.end(), [](auto c) { return c > ' '; });
+     }
+   }  // namespace CompiledST3
+diff --git "a/external\\zxtune\\src\\formats\\packed\\compiledstp.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledstp.cpp"
+index 184e2fa..68cea12 100644
+--- "a/external\\zxtune\\src\\formats\\packed\\compiledstp.cpp"
++++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\compiledstp.cpp"
+@@ -159,7 +159,7 @@ namespace Formats::Packed
+     {
+       // 28 is fixed
+       // 25 is title
+-      const auto* const titleStart = info.begin() + 28;
++      const auto titleStart = info.begin() + 28; // rePlayer
+       return std::none_of(titleStart, info.end(), [](auto b) { return b > ' '; });
+     }
+   }  // namespace CompiledSTP
 diff --git "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp" "b/source\\Replays\\ZXTune\\src\\formats\\packed\\zxzip_file.cpp"
-index b3cdaa4..b4fb795 100644
+index 6c60c3c..ee69070 100644
 --- "a/external\\zxtune\\src\\formats\\packed\\zxzip_file.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\formats\\packed\\zxzip_file.cpp"
-@@ -438,7 +438,7 @@ namespace Formats::Packed
+@@ -437,7 +437,7 @@ namespace Formats::Packed
            LZWTree tree;
            ResetTree(tree);
  
@@ -659,268 +522,54 @@ index b3cdaa4..b4fb795 100644
  
            uint_t codeSize = 9;
            uint_t oldCode = stream.GetBits(codeSize);
-diff --git "a/external\\zxtune\\src\\module\\players\\streaming.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.cpp"
-index 5d54d3e..a526d17 100644
---- "a/external\\zxtune\\src\\module\\players\\streaming.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.cpp"
-@@ -10,6 +10,7 @@
- 
- // local includes
- #include "module/players/streaming.h"
-+#include "module/players/stream_model.h"
- // common includes
- #include <make_ptr.h>
- // std includes
-@@ -22,6 +23,14 @@ namespace Module
-     uint_t TotalFrames = 0;
-     uint_t LoopFrame = 0;
-     Time::Microseconds FrameDuration;
-+
-+    void Sanitize()
-+    {
-+      if (LoopFrame >= TotalFrames)
-+      {
-+        LoopFrame = 0;
-+      }
-+    }
-   };
- 
-   class FramedStreamStateCursor : public State
-@@ -148,21 +157,23 @@ namespace Module
-     const FramedStreamStateCursor::Ptr Cursor;
-   };
- 
--  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
-+  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel& model)
-   {
-     FramedStream stream;
-     stream.FrameDuration = frameDuration;
--    stream.TotalFrames = model->GetTotalFrames();
--    stream.LoopFrame = model->GetLoopFrame();
-+    stream.TotalFrames = model.GetTotalFrames();
-+    stream.LoopFrame = model.GetLoopFrame();
-+    stream.Sanitize();
-     return MakePtr<FramedStreamInfo>(stream);
-   }
- 
--  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model)
-+  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel& model)
-   {
-     FramedStream stream;
-     stream.FrameDuration = frameDuration;
--    stream.TotalFrames = model->GetTotalFrames();
--    stream.LoopFrame = model->GetLoopFrame();
-+    stream.TotalFrames = model.GetTotalFrames();
-+    stream.LoopFrame = model.GetLoopFrame();
-+    stream.Sanitize();
-     return MakePtr<FramedStreamStateIterator>(stream);
-   }
- 
-diff --git "a/external\\zxtune\\src\\module\\players\\streaming.h" "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.h"
-index 56f63db..1b06fbb 100644
---- "a/external\\zxtune\\src\\module\\players\\streaming.h"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\streaming.h"
-@@ -12,15 +12,15 @@
- 
- // local includes
- #include "module/players/iterator.h"
--#include "module/players/stream_model.h"
- // library includes
- #include <module/information.h>
- #include <time/duration.h>
- 
- namespace Module
- {
--  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
--  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel::Ptr& model);
-+  class StreamModel;
-+  Information::Ptr CreateStreamInfo(Time::Microseconds frameDuration, const StreamModel& model);
-+  StateIterator::Ptr CreateStreamStateIterator(Time::Microseconds frameDuration, const StreamModel& model);
- 
-   Information::Ptr CreateTimedInfo(Time::Milliseconds duration);
-   Information::Ptr CreateTimedInfo(Time::Milliseconds duration, Time::Milliseconds loopDuration);
-diff --git "a/external\\zxtune\\src\\module\\players\\aym\\aym_base.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base.cpp"
-index 8e07f05..fc78545 100644
---- "a/external\\zxtune\\src\\module\\players\\aym\\aym_base.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base.cpp"
-@@ -97,7 +97,7 @@ namespace Module
-       }
-       else
-       {
--        return CreateStreamInfo(Tune->GetFrameDuration(), Tune->FindStreamModel());
-+        return CreateStreamInfo(Tune->GetFrameDuration(), *Tune->FindStreamModel());
-       }
-     }
- 
-diff --git "a/external\\zxtune\\src\\module\\players\\aym\\aym_base_stream.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base_stream.cpp"
-index 3e57202..9ec441c 100644
---- "a/external\\zxtune\\src\\module\\players\\aym\\aym_base_stream.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\aym_base_stream.cpp"
-@@ -85,7 +85,7 @@ namespace Module::AYM
- 
-     DataIterator::Ptr CreateDataIterator(TrackParameters::Ptr /*trackParams*/) const override
-     {
--      auto iter = CreateStreamStateIterator(FrameDuration, Data);
-+      auto iter = CreateStreamStateIterator(FrameDuration, *Data);
-       return MakePtr<StreamDataIterator>(std::move(iter), Data);
-     }
- 
-diff --git "a/external\\zxtune\\src\\module\\players\\aym\\turbosound.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\turbosound.cpp"
-index 3ea65bd..2dc2120 100644
---- "a/external\\zxtune\\src\\module\\players\\aym\\turbosound.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\aym\\turbosound.cpp"
-@@ -389,7 +389,7 @@ namespace Module::TurboSound
-       }
-       else
-       {
--        return CreateStreamInfo(Tune->GetFrameDuration(), Tune->FindStreamModel());
-+        return CreateStreamInfo(Tune->GetFrameDuration(), *Tune->FindStreamModel());
-       }
-     }
- 
-diff --git "a/external\\zxtune\\src\\module\\players\\tfm\\tfm_base_stream.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
-index c1905d9..a86b0e4 100644
---- "a/external\\zxtune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\tfm\\tfm_base_stream.cpp"
-@@ -69,7 +69,7 @@ namespace Module::TFM
- 
-     Information::Ptr GetInformation() const override
-     {
--      return CreateStreamInfo(FrameDuration, Data);
-+      return CreateStreamInfo(FrameDuration, *Data);
-     }
- 
-     Parameters::Accessor::Ptr GetProperties() const override
-@@ -79,7 +79,7 @@ namespace Module::TFM
- 
-     TFM::DataIterator::Ptr CreateDataIterator() const override
-     {
--      auto iter = CreateStreamStateIterator(FrameDuration, Data);
-+      auto iter = CreateStreamStateIterator(FrameDuration, *Data);
-       return MakePtr<StreamDataIterator>(std::move(iter), Data);
-     }
- 
-diff --git "a/external\\zxtune\\src\\module\\players\\xsf\\gsf_rom.cpp" "b/source\\Replays\\ZXTune\\src\\module\\players\\xsf\\gsf_rom.cpp"
-index d485284..9476d71 100644
---- "a/external\\zxtune\\src\\module\\players\\xsf\\gsf_rom.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\module\\players\\xsf\\gsf_rom.cpp"
-@@ -18,6 +18,7 @@
- 
- namespace Module::GSF
- {
-+  // Some details at https://github.com/loveemu/gsfopt/blob/master/src/gsfopt.cpp
-   class RomParser : public Formats::Chiptune::GameBoyAdvanceSoundFormat::Builder
-   {
-   public:
-@@ -27,15 +28,68 @@ namespace Module::GSF
- 
-     void SetEntryPoint(uint32_t addr) override
-     {
--      if (addr && !Rom.EntryPoint)
-+      if (addr)
-       {
--        Rom.EntryPoint = addr;
-+        addr = FixEntrypoint(addr);
-+        Require(addr == EWRAM_START || addr == PAKROM_START);
-+        if (!Rom.EntryPoint)
-+        {
-+          Rom.EntryPoint = addr;
-+        }
-+        else
-+        {
-+          Require(Rom.EntryPoint == addr);
-+        }
-       }
-     }
- 
-     void SetRom(uint32_t address, Binary::View content) override
-     {
--      Rom.Content.Update(address & 0x1fffffff, content);
-+      const auto entryArea = GetArea(Rom.EntryPoint);
-+      Require(entryArea != Area::Unknown);
-+      const auto realAddress = Rom.EntryPoint + (address & static_cast<uint32_t>(entryArea));
-+      Rom.Content.Update(realAddress, content);
-+    }
-+
-+  private:
-+    // https://www.coranac.com/tonc/text/hardware.htm
-+    static constexpr uint32_t EWRAM_START = 0x02000000;
-+    static constexpr uint32_t EWRAM_SIZE = 0x40000;
-+    static constexpr uint32_t PAKROM_START = 0x08000000;
-+    static constexpr uint32_t PAKROM_SIZE = 0x02000000;
-+
-+    static uint32_t FixEntrypoint(uint32_t addr)
-+    {
-+      switch (addr)
-+      {
-+      case 0x80000000:  // Crash Bandicoot 2
-+        return PAKROM_START;
-+      default:
-+        return addr;
-+      }
-+    }
-+
-+    enum class Area : uint32_t
-+    {
-+      Unknown,
-+      Multiboot = EWRAM_SIZE - 1,
-+      Rom = PAKROM_SIZE - 1
-+    };
-+
-+    static Area GetArea(uint32_t addr)
-+    {
-+      if (addr >= EWRAM_START && addr < EWRAM_START + EWRAM_SIZE)
-+      {
-+        return Area::Multiboot;
-+      }
-+      else if (addr >= PAKROM_START && addr < PAKROM_START + PAKROM_SIZE)
-+      {
-+        return Area::Rom;
-+      }
-+      else
-+      {
-+        return Area::Unknown;
-+      }
-     }
- 
-   private:
 diff --git "a/external\\zxtune\\src\\parameters\\identifier.h" "b/source\\Replays\\ZXTune\\src\\parameters\\identifier.h"
-index b3fcebb..e00755e 100644
+index 3f3cf4c..371e50f 100644
 --- "a/external\\zxtune\\src\\parameters\\identifier.h"
 +++ "b/source\\Replays\\ZXTune\\src\\parameters\\identifier.h"
-@@ -121,9 +121,15 @@ namespace Parameters
-     constexpr static const std::array<Char, sizeof...(Symbols)> Storage = {Symbols...};
+@@ -122,9 +122,15 @@ namespace Parameters
+     constexpr static const std::array<char, sizeof...(Symbols)> Storage = {Symbols...};
    };
  
--  template<typename CharType, CharType... Symbols>
 +/*
-+  template<StaticIdentifier Symbols>
+   template<typename CharType, CharType... Symbols>
    constexpr auto operator"" _id()
    {
--    return StaticIdentifier<Symbols...>{};
-+    return Symbols;
-+  }
+     return StaticIdentifier<Symbols...>{};
+   }
 +*/
 +  constexpr std::string operator"" _id(const char* str, std::size_t)
 +  {
 +      return str;
-   }
++  }
  }  // namespace Parameters
+diff --git "a/external\\zxtune\\src\\parameters\\types.h" "b/source\\Replays\\ZXTune\\src\\parameters\\types.h"
+index 007c432..0a7401b 100644
+--- "a/external\\zxtune\\src\\parameters\\types.h"
++++ "b/source\\Replays\\ZXTune\\src\\parameters\\types.h"
+@@ -14,7 +14,7 @@
+ #include "binary/view.h"
+ 
+ #include "string_type.h"
+-#include "types.h"
++#include <types.h> // rePlayer: this code is a mess...
+ 
+ //! @brief Namespace is used to keep parameters-working related types and functions
+ namespace Parameters
 diff --git "a/external\\zxtune\\src\\parameters\\src\\convert.cpp" "b/source\\Replays\\ZXTune\\src\\parameters\\src\\convert.cpp"
-index 721122f..591392e 100644
+index 5d0d31b..acdf015 100644
 --- "a/external\\zxtune\\src\\parameters\\src\\convert.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\parameters\\src\\convert.cpp"
-@@ -43,7 +43,7 @@ namespace
-   inline void DataFromString(StringView val, DataType& res)
+@@ -45,7 +45,7 @@ namespace
    {
-     res.resize((val.size() - 1) / 2);
+     const auto size = (val.size() - 1) / 2;
+     Binary::DataBuilder builder(size);
 -    const auto* src = val.begin();
 +    const auto* src = val.data(); // rePlayer
-     for (auto& re : res)
+     for (std::size_t i = 0; i < size; ++i)
      {
        const auto highNibble = FromHex(*++src);
 diff --git "a/external\\zxtune\\src\\strings\\conversion.h" "b/source\\Replays\\ZXTune\\src\\strings\\conversion.h"
-index e520777..08961f3 100644
+index b8acb61..960b7cc 100644
 --- "a/external\\zxtune\\src\\strings\\conversion.h"
 +++ "b/source\\Replays\\ZXTune\\src\\strings\\conversion.h"
 @@ -28,8 +28,8 @@ namespace Strings
@@ -934,35 +583,11 @@ index e520777..08961f3 100644
        const auto res = std::from_chars(it + (it != lim && *it == '+'), lim, result);
        if (res.ec == std::errc::result_out_of_range)
        {
-diff --git "a/external\\zxtune\\src\\strings\\format.h" "b/source\\Replays\\ZXTune\\src\\strings\\format.h"
-index 0e9b40e..dd64704 100644
---- "a/external\\zxtune\\src\\strings\\format.h"
-+++ "b/source\\Replays\\ZXTune\\src\\strings\\format.h"
-@@ -26,7 +26,7 @@ namespace Strings
-   template<class S, class... P>
-   String Format(S&& format, P&&... params)
-   {
--    return fmt::format(std::forward<S>(format), std::forward<P>(params)...);
-+    return fmt::vformat(std::forward<S>(format), fmt::make_format_args(std::forward<P>(params)...)); // rePlayer
-   }
- 
-   String FormatTime(uint_t hours, uint_t minutes, uint_t seconds, uint_t frames);
-diff --git "a/external\\zxtune\\src\\strings\\prefixed_index.h" "b/source\\Replays\\ZXTune\\src\\strings\\prefixed_index.h"
-index d6ddaa4..73daeb8 100644
---- "a/external\\zxtune\\src\\strings\\prefixed_index.h"
-+++ "b/source\\Replays\\ZXTune\\src\\strings\\prefixed_index.h"
-@@ -49,4 +49,4 @@ namespace Strings
-     const bool Valid;
-     const std::size_t Index;
-   };
--}  // namespace Strings
-+}  // namespace Strings
-\ No newline at end of file
 diff --git "a/external\\zxtune\\src\\strings\\src\\encoding.cpp" "b/source\\Replays\\ZXTune\\src\\strings\\src\\encoding.cpp"
-index 0f3c38f..945988d 100644
+index 46dffc6..815dc2f 100644
 --- "a/external\\zxtune\\src\\strings\\src\\encoding.cpp"
 +++ "b/source\\Replays\\ZXTune\\src\\strings\\src\\encoding.cpp"
-@@ -769,7 +769,7 @@ namespace Strings
+@@ -771,7 +771,7 @@ namespace Strings
    public:
      bool Check(StringView str) const override
      {
@@ -971,7 +596,7 @@ index 0f3c38f..945988d 100644
        {
          const uint8_t s1 = *it;
          if (s1 == 0x80 || s1 == 0xa0 || s1 >= 0xf0)
-@@ -805,7 +805,7 @@ namespace Strings
+@@ -807,7 +807,7 @@ namespace Strings
      {
        std::vector<uint32_t> result;
        result.reserve(str.size());
@@ -980,7 +605,7 @@ index 0f3c38f..945988d 100644
        {
          const uint8_t s1 = *it;
          if (s1 == 0x5c)
-@@ -921,7 +921,7 @@ namespace Strings
+@@ -923,7 +923,7 @@ namespace Strings
      Strings::Utf8Builder builder;
      builder.Reserve(str.size());
      bool needSwap = false;
@@ -989,14 +614,3 @@ index 0f3c38f..945988d 100644
      {
        const uint32_t sym = needSwap ? swapBytes(*it) : (*it);
        ++it;
-diff --git "a/external\\zxtune\\src\\strings\\src\\prefixed_index.cpp" "b/source\\Replays\\ZXTune\\src\\strings\\src\\prefixed_index.cpp"
-index 33f549c..3ff215f 100644
---- "a/external\\zxtune\\src\\strings\\src\\prefixed_index.cpp"
-+++ "b/source\\Replays\\ZXTune\\src\\strings\\src\\prefixed_index.cpp"
-@@ -35,4 +35,4 @@ namespace Strings
-   {
-     return PrefixedIndex(prefix.to_string() + ConvertFrom(index), true, index);
-   }
--}  // namespace Strings
-+}  // namespace Strings
-\ No newline at end of file

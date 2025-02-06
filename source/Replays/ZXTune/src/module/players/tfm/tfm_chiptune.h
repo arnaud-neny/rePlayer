@@ -10,11 +10,11 @@
 
 #pragma once
 
-// library includes
-#include <devices/tfm.h>
-#include <module/information.h>
-#include <module/players/iterator.h>
-#include <parameters/accessor.h>
+#include "module/players/iterator.h"
+
+#include "devices/tfm.h"
+#include "module/information.h"
+#include "parameters/accessor.h"
 
 namespace Module::TFM
 {
@@ -23,7 +23,7 @@ namespace Module::TFM
   class DataIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<DataIterator>;
+    using Ptr = std::unique_ptr<DataIterator>;
 
     virtual State::Ptr GetStateObserver() const = 0;
 
@@ -33,7 +33,7 @@ namespace Module::TFM
   class Chiptune
   {
   public:
-    using Ptr = std::shared_ptr<const Chiptune>;
+    using Ptr = std::unique_ptr<const Chiptune>;
     virtual ~Chiptune() = default;
 
     virtual Time::Microseconds GetFrameDuration() const = 0;

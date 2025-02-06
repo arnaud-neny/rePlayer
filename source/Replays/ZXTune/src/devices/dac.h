@@ -10,11 +10,13 @@
 
 #pragma once
 
-// library includes
-#include <devices/dac/sample.h>
-#include <math/fixedpoint.h>
-#include <sound/mixer.h>
-#include <time/instant.h>
+#include "devices/dac/sample.h"
+
+#include "math/fixedpoint.h"
+#include "sound/mixer.h"
+#include "time/instant.h"
+
+#include <memory>
 
 // supporting for multichannel sample-based DAC
 namespace Devices::DAC
@@ -98,12 +100,12 @@ namespace Devices::DAC
   class Chip
   {
   public:
-    using Ptr = std::shared_ptr<Chip>;
+    using Ptr = std::unique_ptr<Chip>;
 
     virtual ~Chip() = default;
 
     /// Set sample for work
-    virtual void SetSample(uint_t idx, Sample::Ptr sample) = 0;
+    virtual void SetSample(uint_t idx, const Sample& sample) = 0;
 
     /// Render single data chunk
     virtual void RenderData(const DataChunk& src) = 0;
@@ -121,7 +123,7 @@ namespace Devices::DAC
   class ChipParameters
   {
   public:
-    using Ptr = std::shared_ptr<const ChipParameters>;
+    using Ptr = std::unique_ptr<const ChipParameters>;
 
     virtual ~ChipParameters() = default;
 
@@ -129,6 +131,7 @@ namespace Devices::DAC
     virtual uint_t BaseSampleFreq() const = 0;
     virtual uint_t SoundFreq() const = 0;
     virtual bool Interpolate() const = 0;
+    virtual uint_t MuteMask() const = 0;
   };
 
   /// Virtual constructors

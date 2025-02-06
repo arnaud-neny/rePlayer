@@ -10,9 +10,8 @@
 
 #pragma once
 
-// library includes
-#include <sound/sample.h>
-// std includes
+#include "sound/sample.h"
+
 #include <memory>
 
 namespace Devices::DAC
@@ -20,7 +19,7 @@ namespace Devices::DAC
   class Sample
   {
   public:
-    using Ptr = std::shared_ptr<const Sample>;
+    using Ptr = std::unique_ptr<const Sample>;
     virtual ~Sample() = default;
 
     virtual Sound::Sample::Type Get(std::size_t pos) const = 0;

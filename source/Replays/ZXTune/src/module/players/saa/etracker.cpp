@@ -8,16 +8,17 @@
  *
  **/
 
-// local includes
 #include "module/players/saa/etracker.h"
+
+#include "formats/chiptune/saa/etracker.h"
+#include "module/players/platforms.h"
+#include "module/players/properties_meta.h"
 #include "module/players/saa/saa_base.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <formats/chiptune/saa/etracker.h>
-#include <module/players/platforms.h>
-#include <module/players/properties_meta.h>
-#include <module/players/simple_orderlist.h>
+#include "module/players/simple_orderlist.h"
+
+#include "make_ptr.h"
+
+#include <array>
 
 namespace Module::ETracker
 {

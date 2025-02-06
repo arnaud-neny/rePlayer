@@ -8,25 +8,24 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/fm/tfmmusicmaker.h"
+
 #include "formats/chiptune/container.h"
-// common includes
-#include <indices.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/crc.h>
-#include <binary/data_builder.h>
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <debug/log.h>
-#include <math/numeric.h>
-#include <strings/encoding.h>
-// std includes
+
+#include "binary/crc.h"
+#include "binary/data_builder.h"
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "debug/log.h"
+#include "math/numeric.h"
+#include "strings/sanitize.h"
+#include "tools/indices.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <array>
 #include <cassert>
-// boost includes
-#include <boost/algorithm/string/trim.hpp>
 
 namespace Formats::Chiptune
 {
@@ -62,7 +61,13 @@ namespace Formats::Chiptune
       }
     };
 
-    using InstrumentName = std::array<char, 16>;
+    struct InstrumentName : std::array<char, 16>
+    {
+      bool IsEmpty() const
+      {
+        return size() == std::count(begin(), end(), 0xff);
+      }
+    };
 
     struct RawInstrument
     {
@@ -405,7 +410,7 @@ namespace Formats::Chiptune
     };
 
     // ver1 0.1..0.4/0.5..1.2
-    const StringView Version05::DESCRIPTION = "TFM Music Maker v0.1-1.2"_sv;
+    const StringView Version05::DESCRIPTION = "TFM Music Maker v0.1-1.2"sv;
     const StringView Version05::FORMAT =
         // use more strict detection due to lack of format
         "11-13|21-25|32-35|42-46|52-57|62-68|76-79|87-89|98-9a|a6-a8"
@@ -415,15 +420,15 @@ namespace Formats::Chiptune
         "06-08|86-88"             // creation date year is between 2006 and 2008
         "%00001000-%11111101|80"  // month/2 between 0 and 5, day between 1 and 31
         "06-08|86-88|80"          // save date year is between 2006 and 2008 or saved at 16th (marker,marker)
-        ""_sv;
+        ""sv;
 
-    const StringView Version13::DESCRIPTION = "TFM Music Maker v1.3+"_sv;
+    const StringView Version13::DESCRIPTION = "TFM Music Maker v1.3+"sv;
     const StringView Version13::FORMAT =
         "'T'F'M'f'm't'V'2"  // signature
         "01-0f"             // even speed
         "01-0f|80"          // odd speed or marker
         "01-0f|81-8f"       // interleave or repeat
-        ""_sv;
+        ""sv;
 
     static_assert(sizeof(PackedDate) * alignof(PackedDate) == 2, "Invalid layout");
     static_assert(sizeof(RawInstrument) * alignof(RawInstrument) == 42, "Invalid layout");
@@ -763,17 +768,6 @@ namespace Formats::Chiptune
       Binary::DataBuilder Decoded;
     };
 
-    StringView Trim(StringView str)
-    {
-      // empty samples' names are filled with FF
-      return boost::algorithm::trim_copy_if(str, boost::is_from_range('\x00', '\x20') || boost::is_any_of("\xff"));
-    }
-
-    String DecodeString(StringView str)
-    {
-      return Strings::ToAutoUtf8(Trim(str));
-    }
-
     template<class Version>
     class VersionedFormat
     {
@@ -787,15 +781,18 @@ namespace Formats::Chiptune
         builder.SetTempo(Source.GetEvenSpeed(), Source.GetOddSpeed(), Source.SpeedInterleave);
         builder.SetDate(ConvertDate(Source.CreationDate), ConvertDate(Source.SaveDate));
         MetaBuilder& meta = builder.GetMetaBuilder();
-        meta.SetProgram(Version::DESCRIPTION.to_string());
-        meta.SetTitle(DecodeString(Source.Title));
-        meta.SetAuthor(DecodeString(Source.Author));
-        meta.SetComment(DecodeString(Source.Comment));
+        meta.SetProgram(Version::DESCRIPTION);
+        meta.SetTitle(Strings::Sanitize(MakeStringView(Source.Title)));
+        meta.SetAuthor(Strings::Sanitize(MakeStringView(Source.Author)));
+        meta.SetComment(Strings::SanitizeMultiline(MakeStringView(Source.Comment)));
         Strings::Array names;
         names.reserve(Source.InstrumentNames.size());
         for (const auto& name : Source.InstrumentNames)
         {
-          names.push_back(DecodeString(name));
+          if (!name.IsEmpty())
+          {
+            names.emplace_back(Strings::SanitizeKeepPadding(MakeStringView(name)));
+          }
         }
         meta.SetStrings(names);
       }
@@ -1044,9 +1041,9 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(Version::FORMAT, Version::MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
-        return Version::DESCRIPTION.to_string();
+        return Version::DESCRIPTION;
       }
 
       Binary::Format::Ptr GetFormat() const override

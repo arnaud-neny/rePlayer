@@ -8,17 +8,19 @@
  *
  **/
 
-// local includes
+#include "strings/encoding.h"
+
 #include "strings/src/utf8.h"
-// common includes
-#include <byteorder.h>
-#include <iterator.h>
-#include <types.h>
-// library includes
-#include <math/bitops.h>
-#include <strings/encoding.h>
-// std includes
+
+#include "math/bitops.h"
+#include "tools/iterators.h"
+
+#include "byteorder.h"
+#include "string_view.h"
+#include "types.h"
+
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <limits>
 #include <vector>
@@ -900,14 +902,14 @@ namespace Strings
     }
     else if (IsUtf8(str))
     {
-      return CutUtf8BOM(str).to_string();
+      return String{CutUtf8BOM(str)};
     }
     else if (IsUtf16(str))
     {
       std::vector<uint16_t> aligned(str.size() / 2);
       auto* target = aligned.data();
       std::memcpy(target, str.data(), aligned.size() * sizeof(*target));
-      return Utf16ToUtf8({target, target + aligned.size()});
+      return Utf16ToUtf8(MakeStringView(target, target + aligned.size()));
     }
     else
     {
@@ -915,7 +917,7 @@ namespace Strings
     }
   }
 
-  String Utf16ToUtf8(basic_string_view<uint16_t> str)
+  String Utf16ToUtf8(std::basic_string_view<uint16_t> str)
   {
     static const uint16_t BOM = 0xfeff;
     Strings::Utf8Builder builder;

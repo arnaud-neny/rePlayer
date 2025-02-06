@@ -8,20 +8,30 @@
  *
  **/
 
-// local includes
 #include "module/players/dac/dac_simple.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <devices/dac/sample_factories.h>
-#include <module/players/properties_meta.h>
-#include <module/players/simple_orderlist.h>
-#include <module/players/tracking.h>
-// std includes
+
+#include "devices/dac/sample_factories.h"
+#include "module/players/properties_meta.h"
+#include "module/players/simple_orderlist.h"
+#include "module/players/tracking.h"
+
+#include "make_ptr.h"
+
 #include <utility>
 
 namespace Module::DAC
 {
+  void SimpleModuleData::SetupSamples(Devices::DAC::Chip& chip) const
+  {
+    for (uint_t idx = 0, lim = Samples.Size(); idx != lim; ++idx)
+    {
+      if (const auto& smp = Samples.Get(idx))
+      {
+        chip.SetSample(idx, *smp);
+      }
+    }
+  }
+
   class SimpleDataBuilderImpl : public SimpleDataBuilder
   {
   public:
@@ -190,10 +200,7 @@ namespace Module::DAC
 
     void GetSamples(Devices::DAC::Chip& chip) const override
     {
-      for (uint_t idx = 0, lim = Data->Samples.Size(); idx != lim; ++idx)
-      {
-        chip.SetSample(idx, Data->Samples.Get(idx));
-      }
+      Data->SetupSamples(chip);
     }
 
   private:

@@ -17,7 +17,7 @@
 
 namespace rePlayer
 {
-    #define ZXtuneVersion "r5056+"
+    #define ZXtuneVersion "r5081"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::ZXTune,
@@ -43,7 +43,7 @@ namespace rePlayer
         std::string buffer;
         for (auto& plugin : ZXTune::PlayerPlugin::Enumerate())
         {
-            if (extensions.AddOnce(plugin->Id().to_string()).second)
+            if (extensions.AddOnce(plugin->Id().data()).second)
             {
                 if (!buffer.empty())
                     buffer += ';';
@@ -108,7 +108,7 @@ namespace rePlayer
                 auto chain = location.GetPluginsChain();
                 std::string firstInChain;
                 if (!chain->Empty())
-                    firstInChain = chain->GetIterator()->Get();
+                    firstInChain = chain->Elements()[0];
 
                 if (firstInChain.empty())
                     subsong->type = { decoder.Id().data(), eReplay::ZXTune };
@@ -132,16 +132,11 @@ namespace rePlayer
                     subsong->type.ext = eExtension::_pcd;
                 else
                 {
-                    if (firstInChain == "RAW")
+                    if (firstInChain == "RAW" && chain->Elements().size() > 1)
                     {
-                        auto chainIt = chain->GetIterator();
-                        chainIt->Next();
-                        if (chainIt->IsValid())
-                        {
-                            firstInChain = chainIt->Get();
-                            if (firstInChain == "HRUST1")
-                                firstInChain = "bin";
-                        }
+                        firstInChain = chain->Elements()[1];
+                        if (firstInChain == "HRUST1")
+                            firstInChain = "bin";
                     }
                     subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
                 }
@@ -377,13 +372,13 @@ namespace rePlayer
         const Parameters::Accessor::Ptr props = m_subsongs[m_subsongIndex].holder->GetModuleProperties();
 
         String str;
-        if (props->FindValue(Module::ATTR_TITLE, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_TITLE, str) && !str.empty())
         {
             metadata  = "Title    : ";
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_AUTHOR, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_AUTHOR, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -391,7 +386,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_DATE, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_DATE, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -399,7 +394,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_PROGRAM, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_PROGRAM, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -407,7 +402,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_PLATFORM, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_PLATFORM, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -415,7 +410,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_COMPUTER, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_COMPUTER, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -423,7 +418,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_COMMENT, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_COMMENT, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n";
@@ -431,7 +426,7 @@ namespace rePlayer
             metadata += str;
             str.clear();
         }
-        if (props->FindValue(Module::ATTR_STRINGS, str) && !str.empty())
+        if (Parameters::FindValue(*props, Module::ATTR_STRINGS, str) && !str.empty())
         {
             if (!metadata.empty())
                 metadata += "\n\n";

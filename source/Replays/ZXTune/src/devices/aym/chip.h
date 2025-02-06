@@ -10,9 +10,8 @@
 
 #pragma once
 
-// library includes
-#include <devices/aym.h>
-#include <sound/mixer.h>
+#include "devices/aym.h"
+#include "sound/mixer.h"
 
 // supporting for AY/YM-based modules
 namespace Devices::AYM
@@ -21,7 +20,7 @@ namespace Devices::AYM
   class Chip : public Device
   {
   public:
-    using Ptr = std::shared_ptr<Chip>;
+    using Ptr = std::unique_ptr<Chip>;
 
     virtual Sound::Chunk RenderTill(Stamp till) = 0;
   };
@@ -31,6 +30,8 @@ namespace Devices::AYM
     CHANNEL_MASK_A = 1,
     CHANNEL_MASK_B = 2,
     CHANNEL_MASK_C = 4,
+    CHANNEL_MASK_N = 8,
+    CHANNEL_MASK_E = 16,
   };
 
   enum LayoutType
@@ -62,7 +63,7 @@ namespace Devices::AYM
   class ChipParameters
   {
   public:
-    using Ptr = std::shared_ptr<const ChipParameters>;
+    using Ptr = std::unique_ptr<const ChipParameters>;
 
     virtual ~ChipParameters() = default;
 
@@ -75,6 +76,7 @@ namespace Devices::AYM
     virtual uint_t DutyCycleValue() const = 0;
     virtual uint_t DutyCycleMask() const = 0;
     virtual LayoutType Layout() const = 0;
+    virtual uint_t MuteMask() const = 0;
   };
 
   const uint_t SOUND_CHANNELS = 3;

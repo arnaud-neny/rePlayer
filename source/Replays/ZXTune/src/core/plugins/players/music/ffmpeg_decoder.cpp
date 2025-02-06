@@ -8,15 +8,16 @@
  *
  **/
 
-// local includes
 #include "core/plugins/players/music/ffmpeg_decoder.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-#include <pointers.h>
-// library includes
-#include <math/numeric.h>
-// 3rdparty
+
+#include "math/numeric.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "pointers.h"
+
+#include <array>
+
 extern "C"
 {
 #include "3rdparty/ffmpeg/libavcodec/avcodec.h"

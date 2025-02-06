@@ -8,19 +8,20 @@
  *
  **/
 
-// local includes
 #include "core/plugins/players/multitrack_plugin.h"
+
 #include "core/plugins/archives/archived.h"
-// common includes
-#include <make_ptr.h>
-#include <xrange.h>
-// library includes
-#include <core/module_detect.h>
-#include <core/plugin_attrs.h>
-#include <debug/log.h>
-#include <formats/archived/multitrack/filename.h>
-#include <module/players/properties_helper.h>
-// std includes
+#include "formats/archived/multitrack/filename.h"
+#include "module/players/properties_helper.h"
+
+#include "core/module_detect.h"
+#include "core/plugin_attrs.h"
+#include "debug/log.h"
+#include "tools/xrange.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <utility>
 
 namespace ZXTune
@@ -50,13 +51,8 @@ namespace ZXTune
 
   std::optional<std::size_t> FindTrackIndexIn(const Analysis::Path& path)
   {
-    String lastPathSegment;
-    // TODO: add method to Path
-    for (auto it = path.GetIterator(); it->IsValid(); it->Next())
-    {
-      lastPathSegment = it->Get();
-    }
-    return Filename::FindIndex(lastPathSegment);
+    const auto& elements = path.Elements();
+    return elements.empty() ? std::nullopt : Filename::FindIndex(elements.back());
   }
 
   template<class BasePluginType>
@@ -76,7 +72,7 @@ namespace ZXTune
       return Identifier;
     }
 
-    String Description() const override
+    StringView Description() const override
     {
       return Decoder->GetDescription();
     }
@@ -106,10 +102,10 @@ namespace ZXTune
       return Analysis::CreateUnmatchedResult(Decoder->GetFormat(), std::move(data));
     }
 
-    DataLocation::Ptr CreateSubtrackLocation(DataLocation::Ptr inputData, uint_t idx) const
+    DataLocation::Ptr CreateSubtrackLocation(DataLocation::Ptr inputData, Binary::Container::Ptr content,
+                                             uint_t idx) const
     {
-      auto blob = inputData->GetData();
-      return CreateNestedLocation(std::move(inputData), std::move(blob), Identifier, Filename::FromIndex(idx));
+      return CreateNestedLocation(std::move(inputData), std::move(content), Identifier, Filename::FromIndex(idx));
     }
 
   private:
@@ -161,7 +157,7 @@ namespace ZXTune
       bool result = false;
       for (auto index : xrange(container.TracksCount()))
       {
-        const auto subData = CreateSubtrackLocation(inputData, index);
+        const auto subData = CreateSubtrackLocation(inputData, inputData->GetData(), index);
         if (ProcessSubtrack(params, *subData, ChangedTrackIndexAdapter(container, index), callback))
         {
           result = true;
@@ -269,11 +265,12 @@ namespace ZXTune
                             Module::MultitrackFactory::Ptr factory)
       : MultitrackBasePlugin(id, Capabilities::Container::Type::MULTITRACK | Capabilities::Category::CONTAINER,
                              std::move(decoder), std::move(factory))
+      , Descr("Multitrack "s + Decoder->GetDescription())
     {}
 
-    String Description() const override
+    StringView Description() const override
     {
-      return "Multitrack " + Decoder->GetDescription();
+      return Descr;
     }
 
     Analysis::Result::Ptr Detect(const Parameters::Accessor& params, DataLocation::Ptr inputData,
@@ -287,10 +284,16 @@ namespace ZXTune
     {
       if (const auto index = Filename::FindIndex(pathToOpen.AsString()))
       {
-        return CreateSubtrackLocation(std::move(inputData), *index);
+        if (auto container = Decoder->Decode(*inputData->GetData()))
+        {
+          return CreateSubtrackLocation(std::move(inputData), std::move(container), *index);
+        }
       }
       return {};
     }
+
+  private:
+    const String Descr;
   };
 
   ArchivePlugin::Ptr CreateArchivePlugin(PluginId id, Formats::Multitrack::Decoder::Ptr decoder,

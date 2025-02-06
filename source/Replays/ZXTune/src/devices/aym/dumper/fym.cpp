@@ -8,16 +8,15 @@
  *
  **/
 
-// local includes
 #include "devices/aym/dumper/dump_builder.h"
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/compression/zlib_stream.h>
-#include <binary/data_builder.h>
-// std includes
+
+#include "binary/compression/zlib_stream.h"
+#include "binary/data_builder.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "make_ptr.h"
+
 #include <utility>
 
 namespace Devices::AYM
@@ -102,9 +101,9 @@ namespace Devices::AYM
     const FramedDumpBuilder::Ptr Delegate;
   };
 
-  Dumper::Ptr CreateFYMDumper(const FYMDumperParameters::Ptr& params)
+  Dumper::Ptr CreateFYMDumper(FYMDumperParameters::Ptr params)
   {
-    auto builder = MakePtr<FYMBuilder>(params);
+    auto builder = MakePtr<FYMBuilder>(std::move(params));
     return CreateDumper(*params, std::move(builder));
   }
 }  // namespace Devices::AYM

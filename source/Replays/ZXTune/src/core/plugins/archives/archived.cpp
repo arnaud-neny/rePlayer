@@ -8,17 +8,18 @@
  *
  **/
 
-// local includes
 #include "core/plugins/archives/archived.h"
+
 #include "core/plugins/archives/l10n.h"
-// common includes
-#include <make_ptr.h>
-#include <progress_callback.h>
-// library includes
-#include <core/plugin_attrs.h>
-#include <debug/log.h>
-#include <module/attributes.h>
-#include <strings/format.h>
+
+#include "core/plugin_attrs.h"
+#include "debug/log.h"
+#include "module/attributes.h"
+#include "strings/format.h"
+#include "tools/progress_callback.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
 
 namespace ZXTune
 {
@@ -31,7 +32,7 @@ namespace ZXTune
       : Delegate(path.empty() ? delegate : nullptr)  // track only toplevel container
       , ToPercent(total, 100)
       , Id(plugin)
-      , Path(path.to_string())
+      , Path(path)
     {}
 
     void Report(StringView name)
@@ -111,7 +112,7 @@ namespace ZXTune
       return Identifier;
     }
 
-    String Description() const override
+    StringView Description() const override
     {
       return Decoder->GetDescription();
     }
@@ -169,9 +170,9 @@ namespace ZXTune
                                           const Analysis::Path& path) const
     {
       auto resolved = Analysis::ParsePath(String(), Module::SUBPATH_DELIMITER);
-      for (const auto components = path.GetIterator(); components->IsValid(); components->Next())
+      for (const auto& element : path.Elements())
       {
-        resolved = resolved->Append(components->Get());
+        resolved = resolved->Append(element);
         const String filename = resolved->AsString();
         ArchivedDbg("Trying '{}'", filename);
         if (auto file = container.FindFile(filename))
@@ -203,13 +204,13 @@ namespace ZXTune
 
   String ProgressMessage(PluginId id, StringView path)
   {
-    return path.empty() ? Strings::Format(translate("{} processing"), id)
-                        : Strings::Format(translate("{0} processing at {1}"), id, path);
+    return path.empty() ? Strings::FormatRuntime(translate("{} processing"), id)
+                        : Strings::FormatRuntime(translate("{0} processing at {1}"), id, path);
   }
 
   String ProgressMessage(PluginId id, StringView path, StringView element)
   {
-    return path.empty() ? Strings::Format(translate("{0} processing for {1}"), id, element)
-                        : Strings::Format(translate("{0} processing for {1} at {2}"), id, element, path);
+    return path.empty() ? Strings::FormatRuntime(translate("{0} processing for {1}"), id, element)
+                        : Strings::FormatRuntime(translate("{0} processing for {1} at {2}"), id, element, path);
   }
 }  // namespace ZXTune

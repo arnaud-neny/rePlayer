@@ -8,30 +8,30 @@
  *
  **/
 
-// local includes
 #include "module/players/xsf/psf.h"
+
+#include "module/players/platforms.h"
+#include "module/players/streaming.h"
 #include "module/players/xsf/psf_bios.h"
 #include "module/players/xsf/psf_exe.h"
 #include "module/players/xsf/psf_vfs.h"
 #include "module/players/xsf/xsf.h"
-#include "module/players/xsf/xsf_factory.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/compression/zlib_container.h>
-#include <debug/log.h>
-#include <module/attributes.h>
-#include <module/players/platforms.h>
-#include <module/players/streaming.h>
-#include <sound/resampler.h>
-// 3rdparty includes
-#include <3rdparty/he/Core/bios.h>
-#include <3rdparty/he/Core/iop.h>
-#include <3rdparty/he/Core/psx.h>
-#include <3rdparty/he/Core/r3000.h>
-#include <3rdparty/he/Core/spu.h>
-// std includes
+
+#include "binary/compression/zlib_container.h"
+#include "debug/log.h"
+#include "module/attributes.h"
+#include "sound/resampler.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
+#include "3rdparty/he/Core/bios.h"
+#include "3rdparty/he/Core/iop.h"
+#include "3rdparty/he/Core/psx.h"
+#include "3rdparty/he/Core/r3000.h"
+#include "3rdparty/he/Core/spu.h"
+
 #include <utility>
 
 namespace Module::PSF
@@ -76,7 +76,7 @@ namespace Module::PSF
       if (auto data = Vfs->Find(path))
       {
         Dbg("Open '{}'", path);
-        CachedName = path.to_string();
+        CachedName = path;
         CachedData = std::move(data);
         return true;
       }
@@ -361,8 +361,7 @@ namespace Module::PSF
       {
         tune->Meta->Dump(*properties);
       }
-      properties->SetValue(ATTR_PLATFORM, tune->Version == 1 ? Platforms::PLAYSTATION.to_string()
-                                                             : Platforms::PLAYSTATION_2.to_string());
+      properties->SetValue(ATTR_PLATFORM, tune->Version == 1 ? Platforms::PLAYSTATION : Platforms::PLAYSTATION_2);
       return MakePtr<Holder>(std::move(tune), std::move(properties));
     }
 
@@ -541,8 +540,8 @@ namespace Module::PSF
     }
   };
 
-  Module::Factory::Ptr CreateFactory()
+  XSF::Factory::Ptr CreateFactory()
   {
-    return XSF::CreateFactory(MakePtr<Factory>());
+    return MakePtr<Factory>();
   }
 }  // namespace Module::PSF

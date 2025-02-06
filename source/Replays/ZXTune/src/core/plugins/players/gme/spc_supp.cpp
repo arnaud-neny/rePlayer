@@ -8,27 +8,27 @@
  *
  **/
 
-// local includes
 #include "core/plugins/player_plugins_registrator.h"
 #include "core/plugins/players/plugin.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/container_factories.h>
-#include <core/plugin_attrs.h>
-#include <core/plugins_parameters.h>
-#include <debug/log.h>
-#include <formats/chiptune/emulation/spc.h>
-#include <math/numeric.h>
-#include <module/players/duration.h>
-#include <module/players/platforms.h>
-#include <module/players/properties_meta.h>
-#include <module/players/streaming.h>
-#include <sound/resampler.h>
-// 3rdparty includes
-#include <3rdparty/snesspc/snes_spc/SNES_SPC.h>
-#include <3rdparty/snesspc/snes_spc/SPC_Filter.h>
+#include "formats/chiptune/emulation/spc.h"
+#include "module/players/duration.h"
+#include "module/players/platforms.h"
+#include "module/players/properties_meta.h"
+#include "module/players/streaming.h"
+
+#include "binary/container_factories.h"
+#include "core/plugin_attrs.h"
+#include "core/plugins_parameters.h"
+#include "debug/log.h"
+#include "math/numeric.h"
+#include "sound/resampler.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
+#include "3rdparty/snesspc/snes_spc/SNES_SPC.h"
+#include "3rdparty/snesspc/snes_spc/SPC_Filter.h"
 
 namespace Module::SPC
 {
@@ -53,7 +53,7 @@ namespace Module::SPC
     static const uint_t C_7_FREQ = 2093;
 
   public:
-    using Ptr = std::shared_ptr<SPC>;
+    using Ptr = std::unique_ptr<SPC>;
 
     explicit SPC(Binary::View data)
       : Data(data)
@@ -201,7 +201,7 @@ namespace Module::SPC
 
     void SetDumper(StringView dumper) override
     {
-      Meta.SetStrings({dumper.to_string()});
+      Meta.SetComment(dumper);
     }
 
     void SetDumpDate(StringView date) override

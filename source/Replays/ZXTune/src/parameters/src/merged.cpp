@@ -8,14 +8,15 @@
  *
  **/
 
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <parameters/merged_accessor.h>
-#include <parameters/merged_container.h>
-#include <parameters/src/names_set.h>
-#include <parameters/visitor.h>
-// std includes
+#include "parameters/src/names_set.h"
+
+#include "parameters/merged_accessor.h"
+#include "parameters/merged_container.h"
+#include "parameters/visitor.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <set>
 #include <utility>
 
@@ -73,19 +74,19 @@ namespace Parameters
       return First->Version() + Second->Version();
     }
 
-    bool FindValue(Identifier name, IntType& val) const override
+    std::optional<IntType> FindInteger(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val);
+      return Find(name, &Accessor::FindInteger);
     }
 
-    bool FindValue(Identifier name, StringType& val) const override
+    std::optional<StringType> FindString(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val);
+      return Find(name, &Accessor::FindString);
     }
 
-    bool FindValue(Identifier name, DataType& val) const override
+    Binary::Data::Ptr FindData(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val);
+      return Find(name, &Accessor::FindData);
     }
 
     void Process(Visitor& visitor) const override
@@ -98,6 +99,17 @@ namespace Parameters
   protected:
     const typename Type1::Ptr First;
     const typename Type2::Ptr Second;
+
+  private:
+    template<class R>
+    R Find(Identifier name, R (Accessor::*func)(Identifier) const) const
+    {
+      if (auto first = (First.get()->*func)(name))
+      {
+        return first;
+      }
+      return (Second.get()->*func)(name);
+    }
   };
 
   class TripleAccessor : public Accessor
@@ -114,19 +126,19 @@ namespace Parameters
       return First->Version() + Second->Version() + Third->Version();
     }
 
-    bool FindValue(Identifier name, IntType& val) const override
+    std::optional<IntType> FindInteger(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val) || Third->FindValue(name, val);
+      return Find(name, &Accessor::FindInteger);
     }
 
-    bool FindValue(Identifier name, StringType& val) const override
+    std::optional<StringType> FindString(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val) || Third->FindValue(name, val);
+      return Find(name, &Accessor::FindString);
     }
 
-    bool FindValue(Identifier name, DataType& val) const override
+    Binary::Data::Ptr FindData(Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val) || Third->FindValue(name, val);
+      return Find(name, &Accessor::FindData);
     }
 
     void Process(Visitor& visitor) const override
@@ -135,6 +147,21 @@ namespace Parameters
       First->Process(mergedVisitor);
       Second->Process(mergedVisitor);
       Third->Process(mergedVisitor);
+    }
+
+  private:
+    template<class R>
+    R Find(Identifier name, R (Accessor::*func)(Identifier) const) const
+    {
+      if (auto first = (First.get()->*func)(name))
+      {
+        return first;
+      }
+      if (auto second = (Second.get()->*func)(name))
+      {
+        return second;
+      }
+      return (Third.get()->*func)(name);
     }
 
   private:

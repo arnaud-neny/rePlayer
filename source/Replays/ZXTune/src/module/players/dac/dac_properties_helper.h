@@ -10,17 +10,14 @@
 
 #pragma once
 
-// local includes
-#include <module/players/properties_helper.h>
+#include "module/players/properties_helper.h"
 
 namespace Module::DAC
 {
   class PropertiesHelper : public Module::PropertiesHelper
   {
   public:
-    explicit PropertiesHelper(Parameters::Modifier& delegate)
-      : Module::PropertiesHelper(delegate)
-    {}
+    PropertiesHelper(Parameters::Modifier& delegate, uint_t channels);
 
     void SetSamplesFrequency(uint_t freq);
   };

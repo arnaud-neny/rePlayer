@@ -3938,25 +3938,16 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="boost\mpl\begin_end_fwd.hpp" />
     <ClInclude Include="include\api_dynamic.h" />
     <ClInclude Include="include\byteorder.h" />
-    <ClInclude Include="include\char_type.h" />
     <ClInclude Include="include\contract.h" />
-    <ClInclude Include="include\cycle_buffer.h" />
-    <ClInclude Include="include\data_streaming.h" />
     <ClInclude Include="include\error.h" />
     <ClInclude Include="include\error_tools.h" />
-    <ClInclude Include="include\indices.h" />
-    <ClInclude Include="include\iterator.h" />
     <ClInclude Include="include\lazy.h" />
-    <ClInclude Include="include\locale_helpers.h" />
     <ClInclude Include="include\make_ptr.h" />
     <ClInclude Include="include\pointers.h" />
-    <ClInclude Include="include\progress_callback.h" />
-    <ClInclude Include="include\range_checker.h" />
     <ClInclude Include="include\source_location.h" />
     <ClInclude Include="include\static_string.h" />
     <ClInclude Include="include\string_view.h" />
     <ClInclude Include="include\types.h" />
-    <ClInclude Include="include\xrange.h" />
     <ClInclude Include="ReplayZXTune.h" />
     <ClInclude Include="src\analysis\path.h" />
     <ClInclude Include="src\analysis\result.h" />
@@ -4178,7 +4169,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="src\module\attributes.h" />
     <ClInclude Include="src\module\conversion\api.h" />
     <ClInclude Include="src\module\conversion\parameters.h" />
-    <ClInclude Include="src\module\conversion\types.h" />
     <ClInclude Include="src\module\holder.h" />
     <ClInclude Include="src\module\information.h" />
     <ClInclude Include="src\module\loop.h" />
@@ -4352,6 +4342,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="src\parameters\accessor.h" />
     <ClInclude Include="src\parameters\container.h" />
     <ClInclude Include="src\parameters\convert.h" />
+    <ClInclude Include="src\parameters\delegated.h" />
     <ClInclude Include="src\parameters\identifier.h" />
     <ClInclude Include="src\parameters\merged_accessor.h" />
     <ClInclude Include="src\parameters\merged_container.h" />
@@ -4396,8 +4387,10 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="src\strings\map.h" />
     <ClInclude Include="src\strings\optimize.h" />
     <ClInclude Include="src\strings\prefixed_index.h" />
+    <ClInclude Include="src\strings\sanitize.h" />
     <ClInclude Include="src\strings\set.h" />
     <ClInclude Include="src\strings\split.h" />
+    <ClInclude Include="src\strings\src\find.h" />
     <ClInclude Include="src\strings\src\utf8.h" />
     <ClInclude Include="src\strings\template.h" />
     <ClInclude Include="src\strings\trim.h" />
@@ -4408,7 +4401,15 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="src\time\oscillator.h" />
     <ClInclude Include="src\time\serialize.h" />
     <ClInclude Include="src\time\timer.h" />
+    <ClInclude Include="src\tools\cycle_buffer.h" />
+    <ClInclude Include="src\tools\data_streaming.h" />
+    <ClInclude Include="src\tools\indices.h" />
+    <ClInclude Include="src\tools\iterators.h" />
+    <ClInclude Include="src\tools\locale_helpers.h" />
+    <ClInclude Include="src\tools\progress_callback.h" />
     <ClInclude Include="src\tools\progress_callback_helpers.h" />
+    <ClInclude Include="src\tools\range_checker.h" />
+    <ClInclude Include="src\tools\xrange.h" />
     <ClInclude Include="src\zxtune.h" />
   </ItemGroup>
   <ItemGroup>
@@ -5090,6 +5091,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="src\strings\src\format.cpp" />
     <ClCompile Include="src\strings\src\optimize.cpp" />
     <ClCompile Include="src\strings\src\prefixed_index.cpp" />
+    <ClCompile Include="src\strings\src\sanitize.cpp" />
     <ClCompile Include="src\strings\src\template.cpp" />
     <ClCompile Include="src\strings\src\trim.cpp" />
     <ClCompile Include="src\tools\src\error.cpp" />
@@ -5137,14 +5139,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="src\strings\src\sjis2unicode.inc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\core\plugins\players\sid\Songlengths.txt">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </Text>
+    <None Include="ZXTune.diff" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

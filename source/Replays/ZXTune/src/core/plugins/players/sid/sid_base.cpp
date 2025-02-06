@@ -8,39 +8,43 @@
  *
  **/
 
-// local includes
 #include "core/plugins/archive_plugins_registrator.h"
 #include "core/plugins/player_plugins_registrator.h"
 #include "core/plugins/players/multitrack_plugin.h"
 #include "core/plugins/players/sid/roms.h"
 #include "core/plugins/players/sid/songlengths.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <core/core_parameters.h>
-#include <core/plugin_attrs.h>
-#include <core/plugins_parameters.h>
-#include <debug/log.h>
-#include <formats/multitrack/decoders.h>
-#include <module/attributes.h>
-#include <module/players/duration.h>
-#include <module/players/platforms.h>
-#include <module/players/properties_helper.h>
-#include <module/players/streaming.h>
-#include <parameters/tracking_helper.h>
-#include <strings/encoding.h>
-#include <strings/trim.h>
-// 3rdparty includes
-#include <3rdparty/sidplayfp/builders/resid-builder/resid.h>
-#include <3rdparty/sidplayfp/sidplayfp/SidInfo.h>
-#include <3rdparty/sidplayfp/sidplayfp/SidTune.h>
-#include <3rdparty/sidplayfp/sidplayfp/SidTuneInfo.h>
-#include <3rdparty/sidplayfp/sidplayfp/sidplayfp.h>
+#include "formats/multitrack/decoders.h"
+#include "module/players/duration.h"
+#include "module/players/platforms.h"
+#include "module/players/properties_helper.h"
+#include "module/players/streaming.h"
+
+#include "core/core_parameters.h"
+#include "core/plugin_attrs.h"
+#include "core/plugins_parameters.h"
+#include "debug/log.h"
+#include "module/attributes.h"
+#include "parameters/tracking_helper.h"
+#include "strings/format.h"
+#include "strings/sanitize.h"
+#include "tools/xrange.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+
+#include "3rdparty/sidplayfp/src/builders/resid-builder/resid.h"
+#include "3rdparty/sidplayfp/src/config.h"
+#include "3rdparty/sidplayfp/src/sidmd5.h"
+#include "3rdparty/sidplayfp/src/sidplayfp/SidInfo.h"
+#include "3rdparty/sidplayfp/src/sidplayfp/SidTune.h"
+#include "3rdparty/sidplayfp/src/sidplayfp/SidTuneInfo.h"
+#include "3rdparty/sidplayfp/src/sidplayfp/sidplayfp.h"
 
 namespace Module::Sid
 {
   const Debug::Stream Dbg("Core::SIDSupp");
+
+  const uint_t VOICES = 3;
 
   void CheckSidplayError(bool ok)
   {
@@ -57,17 +61,20 @@ namespace Module::Sid
       , Index(selectSong(idx + 1))
     {
       CheckSidplayError(getStatus());
+      libsidplayfp::sidmd5 md5;
+      md5.append(data.Start(), data.Size());
+      md5.finish();
+      MD5 = md5.getDigest();
     }
 
     void FillDuration(const Parameters::Accessor& params)
     {
-      const auto* md5 = createMD5();
-      Duration = GetSongLength(md5, Index - 1);
+      Duration = GetSongLength(MD5, Index - 1);
       if (!Duration)
       {
         Duration = GetDefaultDuration(params);
       }
-      Dbg("Duration for {}/{} is {}ms", md5, Index, Duration.Get());
+      Dbg("Duration for {}/{} is {}ms", MD5, Index, Duration.Get());
     }
 
     Time::Milliseconds GetDuration() const
@@ -78,11 +85,12 @@ namespace Module::Sid
   private:
     uint_t Index = 0;
     Time::Milliseconds Duration;
+    std::string MD5;
   };
 
-  inline const uint8_t* GetData(const Parameters::DataType& dump, const uint8_t* defVal)
+  inline const uint8_t* GetData(const Binary::Data::Ptr& data, const uint8_t* defVal)
   {
-    return dump.empty() ? defVal : dump.data();
+    return !data || !data->Size() ? defVal : static_cast<const uint8_t*>(data->Start());
   }
 
   /*
@@ -119,17 +127,21 @@ namespace Module::Sid
 
     bool GetUseFilter() const
     {
-      Parameters::IntType val = Parameters::ZXTune::Core::SID::FILTER_DEFAULT;
-      Params->FindValue(Parameters::ZXTune::Core::SID::FILTER, val);
-      return static_cast<bool>(val);
+      using namespace Parameters::ZXTune::Core::SID;
+      return 0 != Parameters::GetInteger(*Params, FILTER, FILTER_DEFAULT);
+    }
+
+    uint_t GetMuteMask() const
+    {
+      using namespace Parameters::ZXTune::Core;
+      return Parameters::GetInteger<uint_t>(*Params, CHANNELS_MASK, CHANNELS_MASK_DEFAULT);
     }
 
   private:
     Parameters::IntType GetInterpolation() const
     {
-      Parameters::IntType val = Parameters::ZXTune::Core::SID::INTERPOLATION_DEFAULT;
-      Params->FindValue(Parameters::ZXTune::Core::SID::INTERPOLATION, val);
-      return val;
+      using namespace Parameters::ZXTune::Core::SID;
+      return Parameters::GetInteger(*Params, INTERPOLATION, INTERPOLATION_DEFAULT);
     }
 
   private:
@@ -139,7 +151,7 @@ namespace Module::Sid
   class SidEngine
   {
   public:
-    using Ptr = std::shared_ptr<SidEngine>;
+    using Ptr = std::unique_ptr<SidEngine>;
 
     SidEngine()
       : Builder("resid")
@@ -148,16 +160,14 @@ namespace Module::Sid
 
     void Init(uint_t samplerate, const Parameters::Accessor& params)
     {
-      Parameters::DataType kernal;
-      Parameters::DataType basic;
-      Parameters::DataType chargen;
-      params.FindValue(Parameters::ZXTune::Core::Plugins::SID::KERNAL, kernal);
-      params.FindValue(Parameters::ZXTune::Core::Plugins::SID::BASIC, basic);
-      params.FindValue(Parameters::ZXTune::Core::Plugins::SID::CHARGEN, chargen);
+      const auto kernal = params.FindData(Parameters::ZXTune::Core::Plugins::SID::KERNAL);
+      const auto basic = params.FindData(Parameters::ZXTune::Core::Plugins::SID::BASIC);
+      const auto chargen = params.FindData(Parameters::ZXTune::Core::Plugins::SID::CHARGEN);
       Player.setRoms(GetData(kernal, GetKernalROM()), GetData(basic, GetBasicROM()), GetData(chargen, GetChargenROM()));
       const uint_t chipsCount = Player.info().maxsids();
       Builder.create(chipsCount);
       Config.frequency = samplerate;
+      Config.powerOnDelay = SidConfig::MAX_POWER_ON_DELAY - 1;
     }
 
     void Load(SidTune& tune)
@@ -170,6 +180,7 @@ namespace Module::Sid
       const auto newFastSampling = sidParams.GetFastSampling();
       const auto newSamplingMethod = sidParams.GetSamplingMethod();
       const auto newFilter = sidParams.GetUseFilter();
+      const auto newMuteMask = sidParams.GetMuteMask();
       if (Config.fastSampling != newFastSampling || Config.samplingMethod != newSamplingMethod
           || UseFilter != newFilter)
       {
@@ -178,15 +189,21 @@ namespace Module::Sid
         Config.fastSampling = newFastSampling;
         Config.samplingMethod = newSamplingMethod;
         Builder.filter(UseFilter = newFilter);
+        Builder.bias(0.);
 
         Config.sidEmulation = &Builder;
         CheckSidplayError(Player.config(Config));
       }
-    }
-
-    void Stop()
-    {
-      Player.stop();
+      for (uint_t chan = 0, diff = MuteMask ^ newMuteMask; diff != 0; ++chan, diff >>= 1)
+      {
+        if (diff & 1)
+        {
+          const auto chip = chan / VOICES;
+          const auto voice = chan % VOICES;
+          Player.mute(chip, voice, newMuteMask & (1 << chan));
+        }
+      }
+      MuteMask = newMuteMask;
     }
 
     uint_t GetSoundFreq() const
@@ -214,6 +231,7 @@ namespace Module::Sid
 
     // cache filter flag
     bool UseFilter = false;
+    uint_t MuteMask = 0;
   };
 
   const auto FRAME_DURATION = Time::Milliseconds(100);
@@ -229,7 +247,7 @@ namespace Module::Sid
     {
       Engine->Init(samplerate, *params);
       ApplyParameters();
-      Engine->Load(*Tune);
+      Reset();
     }
 
     Module::State::Ptr GetState() const override
@@ -239,22 +257,22 @@ namespace Module::Sid
 
     Sound::Chunk Render() override
     {
+      ApplyParameters();
       const auto avail = State->ConsumeUpTo(FRAME_DURATION);
       return Engine->Render(GetSamples(avail));
     }
 
     void Reset() override
     {
-      SidParams.Reset();
-      Engine->Stop();
       State->Reset();
+      Engine->Load(*Tune);
     }
 
     void SetPosition(Time::AtMillisecond request) override
     {
       if (request < State->At())
       {
-        Engine->Stop();
+        Engine->Load(*Tune);
       }
       if (const auto toSkip = State->Seek(request))
       {
@@ -312,11 +330,6 @@ namespace Module::Sid
     const Parameters::Accessor::Ptr Properties;
   };
 
-  String DecodeString(StringView str)
-  {
-    return Strings::ToAutoUtf8(Strings::TrimSpaces(str));
-  }
-
   class Factory : public Module::MultitrackFactory
   {
   public:
@@ -337,19 +350,20 @@ namespace Module::Sid
         default:
         case 3:
           // copyright/publisher really
-          props.SetComment(DecodeString(tuneInfo.infoString(2)));
+          props.SetComment(Strings::SanitizeMultiline(tuneInfo.infoString(2)));
           [[fallthrough]];
         case 2:
-          props.SetAuthor(DecodeString(tuneInfo.infoString(1)));
+          props.SetAuthor(Strings::Sanitize(tuneInfo.infoString(1)));
           [[fallthrough]];
         case 1:
-          props.SetTitle(DecodeString(tuneInfo.infoString(0)));
+          props.SetTitle(Strings::Sanitize(tuneInfo.infoString(0)));
           [[fallthrough]];
         case 0:
           break;
         }
 
         props.SetPlatform(Platforms::COMMODORE_64);
+        props.SetChannels(BuildChannelsNames(tuneInfo.sidChips()));
 
         tune->FillDuration(params);
         return MakePtr<Holder>(std::move(tune), std::move(properties));
@@ -358,6 +372,18 @@ namespace Module::Sid
       {
         return {};
       }
+    }
+
+  private:
+    static Strings::Array BuildChannelsNames(int chipsCount)
+    {
+      const auto channels = chipsCount * VOICES;
+      Strings::Array result(channels);
+      for (int idx : xrange(channels))
+      {
+        result[idx] = Strings::Format("SID.{}"sv, idx);
+      }
+      return result;
     }
   };
 }  // namespace Module::Sid

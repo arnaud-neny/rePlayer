@@ -8,28 +8,29 @@
  *
  **/
 
-// local includes
 #include "core/plugins/archives/raw_supp.h"
+
+#include "core/plugins/archive_plugins_registrator.h"
 #include "core/plugins/archives/archived.h"
-#include <core/plugins/archive_plugins_registrator.h>
-#include <core/plugins/archives/l10n.h>
-#include <core/plugins/players/plugin.h>
-// common includes
-#include <error_tools.h>
-#include <make_ptr.h>
-#include <progress_callback.h>
-// library includes
-#include <binary/container.h>
-#include <core/plugin_attrs.h>
-#include <core/plugins_parameters.h>
-#include <debug/log.h>
-#include <math/scale.h>
-#include <strings/conversion.h>
-#include <strings/prefixed_index.h>
-#include <time/duration.h>
-#include <time/serialize.h>
-#include <time/timer.h>
-// std includes
+#include "core/plugins/archives/l10n.h"
+#include "core/plugins/players/plugin.h"
+
+#include "binary/container.h"
+#include "core/plugin_attrs.h"
+#include "core/plugins_parameters.h"
+#include "debug/log.h"
+#include "math/scale.h"
+#include "strings/conversion.h"
+#include "strings/prefixed_index.h"
+#include "time/duration.h"
+#include "time/serialize.h"
+#include "time/timer.h"
+#include "tools/progress_callback.h"
+
+#include "error_tools.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <algorithm>
 #include <array>
 #include <list>
@@ -263,10 +264,10 @@ namespace ZXTune::Raw
 {
   const Debug::Stream Dbg("Core::RawScaner");
 
-  const auto PLUGIN_PREFIX = "+"_sv;
+  const auto PLUGIN_PREFIX = "+"sv;
 
   const auto ID = "RAW"_id;
-  const auto INFO = "Raw scaner"_sv;
+  const auto INFO = "Raw scaner"sv;
   const uint_t CAPS = Capabilities::Category::CONTAINER | Capabilities::Container::Type::SCANER;
 
   const std::size_t SCAN_STEP = 1;
@@ -287,21 +288,19 @@ namespace ZXTune::Raw
 
     std::size_t GetMinimalSize() const
     {
-      Parameters::IntType minRawSize = Parameters::ZXTune::Core::Plugins::Raw::MIN_SIZE_DEFAULT;
-      if (Accessor.FindValue(Parameters::ZXTune::Core::Plugins::Raw::MIN_SIZE, minRawSize)
-          && minRawSize < Parameters::IntType(MIN_MINIMAL_RAW_SIZE))
+      using namespace Parameters::ZXTune::Core::Plugins::Raw;
+      const auto minRawSize = Parameters::GetInteger<std::size_t>(Accessor, MIN_SIZE, MIN_SIZE_DEFAULT);
+      if (minRawSize < MIN_MINIMAL_RAW_SIZE)
       {
         throw MakeFormattedError(THIS_LINE, translate("Specified minimal scan size ({0}). Should be more than {1}."),
                                  minRawSize, MIN_MINIMAL_RAW_SIZE);
       }
-      return static_cast<std::size_t>(minRawSize);
+      return minRawSize;
     }
 
     bool GetDoubleAnalysis() const
     {
-      Parameters::IntType doubleAnalysis = 0;
-      Accessor.FindValue(Parameters::ZXTune::Core::Plugins::Raw::PLAIN_DOUBLE_ANALYSIS, doubleAnalysis);
-      return doubleAnalysis != 0;
+      return 0 != Parameters::GetInteger(Accessor, Parameters::ZXTune::Core::Plugins::Raw::PLAIN_DOUBLE_ANALYSIS);
     }
 
   private:
@@ -462,12 +461,23 @@ namespace ZXTune::Raw
 
     Analysis::Path::Ptr GetPath() const override
     {
-      return Parent->GetPath()->Append(CreateFilename(Start));
+      auto parentPath = Parent->GetPath();
+      if (Start)
+      {
+        const auto subPath = CreateFilename(Start);
+        return parentPath->Append(subPath);
+      }
+      return parentPath;
     }
 
     Analysis::Path::Ptr GetPluginsChain() const override
     {
-      return Parent->GetPluginsChain()->Append(ID);
+      auto parentPlugins = Parent->GetPluginsChain();
+      if (Start)
+      {
+        return parentPlugins->Append(ID);
+      }
+      return parentPlugins;
     }
 
   private:
@@ -594,7 +604,7 @@ namespace ZXTune::Raw
       return Delegate->Id();
     }
 
-    String Description() const override
+    StringView Description() const override
     {
       return Delegate->Description();
     }
@@ -751,9 +761,9 @@ namespace ZXTune::Raw
       return ID;
     }
 
-    String Description() const override
+    StringView Description() const override
     {
-      return INFO.to_string();
+      return INFO;
     }
 
     uint_t Capabilities() const override
@@ -821,7 +831,7 @@ namespace ZXTune::Raw
     DataLocation::Ptr TryOpen(const Parameters::Accessor& /*params*/, DataLocation::Ptr location,
                               const Analysis::Path& inPath) const override
     {
-      const auto& pathComp = inPath.GetIterator()->Get();
+      const auto& pathComp = inPath.Elements().front();
       const auto pathIndex = Strings::PrefixedIndex::Parse(PLUGIN_PREFIX, pathComp);
       if (pathIndex.IsValid())
       {

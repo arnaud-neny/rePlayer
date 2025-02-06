@@ -8,14 +8,13 @@
  *
  **/
 
-// local includes
+#include "devices/turbosound.h"
+
 #include "devices/aym/src/psg.h"
 #include "devices/aym/src/soundchip.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <devices/turbosound.h>
-// std includes
+
+#include "make_ptr.h"
+
 #include <utility>
 
 namespace Devices::TurboSound
@@ -32,6 +31,12 @@ namespace Devices::TurboSound
     {
       Chip0.SetDutyCycle(value, mask);
       Chip1.SetDutyCycle(value, mask);
+    }
+
+    void SetMuteMask(uint_t mask)
+    {
+      Chip0.SetMuteMask(mask);
+      Chip1.SetMuteMask(mask >> AYM::VOICES);
     }
 
     void Reset()

@@ -10,15 +10,14 @@
 
 #pragma once
 
-// local includes
 #include "module/players/aym/aym_parameters.h"
+#include "module/players/iterator.h"
 #include "module/players/stream_model.h"
+#include "module/players/streaming.h"
 #include "module/players/track_model.h"
-// library includes
-#include <devices/aym.h>
-#include <module/players/iterator.h>
-#include <module/players/streaming.h>
-#include <module/players/tracking.h>
+#include "module/players/tracking.h"
+
+#include "devices/aym.h"
 
 namespace Module::AYM
 {
@@ -27,7 +26,7 @@ namespace Module::AYM
   class DataIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<DataIterator>;
+    using Ptr = std::unique_ptr<DataIterator>;
 
     virtual State::Ptr GetStateObserver() const = 0;
 

@@ -8,20 +8,21 @@
  *
  **/
 
-// local includes
 #include "module/players/aym/turbosound.h"
+
 #include "module/players/streaming.h"
-// common includes
-#include <error.h>
-#include <iterator.h>
-#include <make_ptr.h>
-// library includes
-#include <module/attributes.h>
-#include <parameters/merged_accessor.h>
-#include <parameters/src/names_set.h>
-#include <parameters/visitor.h>
-#include <sound/mixer_factory.h>
-// std includes
+#include "parameters/src/names_set.h"
+
+#include "module/attributes.h"
+#include "parameters/merged_accessor.h"
+#include "parameters/visitor.h"
+#include "sound/mixer_factory.h"
+#include "tools/iterators.h"
+
+#include "error.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <map>
 #include <set>
 
@@ -58,7 +59,7 @@ namespace Module::TurboSound
         const auto it = Strings.find(static_cast<StringView>(name));
         if (it == Strings.end())
         {
-          Strings.emplace(name.AsString(), val.to_string());
+          Strings.emplace(name.AsString(), val);
         }
         else
         {
@@ -101,32 +102,34 @@ namespace Module::TurboSound
       return 1;
     }
 
-    bool FindValue(Parameters::Identifier name, Parameters::IntType& val) const override
+    std::optional<Parameters::IntType> FindInteger(Parameters::Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val);
+      if (auto first = First->FindInteger(name))
+      {
+        return first;
+      }
+      return Second->FindInteger(name);
     }
 
-    bool FindValue(Parameters::Identifier name, Parameters::StringType& val) const override
+    std::optional<Parameters::StringType> FindString(Parameters::Identifier name) const override
     {
-      String val1;
-      String val2;
-      const bool res1 = First->FindValue(name, val1);
-      const bool res2 = Second->FindValue(name, val2);
-      if (res1 && res2)
+      auto val1 = First->FindString(name);
+      auto val2 = Second->FindString(name);
+      if (val1 && val2)
       {
-        MergeStringProperty(name, val1, val2);
-        val = val1;
+        MergeStringProperty(name, *val1, *val2);
+        return val1;
       }
-      else if (res1 != res2)
-      {
-        val = res1 ? val1 : val2;
-      }
-      return res1 || res2;
+      return val1 ? val1 : val2;
     }
 
-    bool FindValue(Parameters::Identifier name, Parameters::DataType& val) const override
+    Binary::Data::Ptr FindData(Parameters::Identifier name) const override
     {
-      return First->FindValue(name, val) || Second->FindValue(name, val);
+      if (auto first = First->FindData(name))
+      {
+        return first;
+      }
+      return Second->FindData(name);
     }
 
     void Process(Parameters::Visitor& visitor) const override

@@ -8,24 +8,23 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/fm/tfd.h"
+
 #include "formats/chiptune/container.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <strings/encoding.h>
-#include <strings/trim.h>
-// std includes
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "strings/sanitize.h"
+
+#include "make_ptr.h"
+
 #include <array>
 
 namespace Formats::Chiptune
 {
   namespace TFD
   {
-    const Char DESCRIPTION[] = "TurboFM Dump";
+    const auto DESCRIPTION = "TurboFM Dump"sv;
 
     enum
     {
@@ -70,7 +69,7 @@ namespace Formats::Chiptune
       return 0 == std::memcmp(rawData.Start(), SIGNATURE.data(), SIGNATURE.size());
     }
 
-    const auto FORMAT = "'T'F'M'D"_sv;
+    const auto FORMAT = "'T'F'M'D"sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -79,7 +78,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -104,11 +103,6 @@ namespace Formats::Chiptune
       const Binary::Format::Ptr Format;
     };
 
-    String DecodeString(StringView str)
-    {
-      return Strings::ToAutoUtf8(Strings::TrimSpaces(str));
-    }
-
     Formats::Chiptune::Container::Ptr Parse(const Binary::Container& data, Builder& target)
     {
       if (!FastCheck(data))
@@ -120,9 +114,9 @@ namespace Formats::Chiptune
         Binary::InputStream stream(data);
         stream.Read<SignatureType>();
         auto& meta = target.GetMetaBuilder();
-        meta.SetTitle(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        meta.SetAuthor(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        meta.SetComment(DecodeString(stream.ReadCString(MAX_COMMENT_SIZE)));
+        meta.SetTitle(Strings::Sanitize(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetAuthor(Strings::Sanitize(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetComment(Strings::SanitizeMultiline(stream.ReadCString(MAX_COMMENT_SIZE)));
 
         const std::size_t fixedOffset = stream.GetPosition();
         std::size_t totalFrames = 0;

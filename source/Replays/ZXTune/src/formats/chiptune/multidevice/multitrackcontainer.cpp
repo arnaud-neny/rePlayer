@@ -8,19 +8,20 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/multidevice/multitrackcontainer.h"
-// common includes
-#include <byteorder.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/data_builder.h>
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <formats/chiptune/container.h>
-#include <math/numeric.h>
-#include <strings/encoding.h>
-// std includes
+
+#include "formats/chiptune/container.h"
+
+#include "binary/data_builder.h"
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "math/numeric.h"
+#include "strings/sanitize.h"
+
+#include "byteorder.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <array>
 #include <utility>
 
@@ -93,11 +94,15 @@ namespace IFF
     virtual void GetResult(Binary::DataBuilder& builder) const = 0;
   };
 
+  StringView GetStringView(Binary::View data)
+  {
+    return StringView(data.As<char>(), data.Size());
+  }
+
   // Store in plain string, possibly UTF-8
   String GetString(Binary::View data)
   {
-    const StringView str(data.As<char>(), data.Size());
-    return Strings::ToAutoUtf8(str);
+    return Strings::Sanitize(GetStringView(data));
   }
 
   class BlobChunkSourceBase : public ChunkSource
@@ -160,7 +165,7 @@ namespace IFF
   public:
     StringChunkSource(Identifier::Type id, StringView str)
       : BlobChunkSourceBase(id)
-      , Data(str.to_string())
+      , Data(str)
     {}
 
   protected:
@@ -242,7 +247,7 @@ namespace Formats::Chiptune
 {
   namespace MultiTrackContainer
   {
-    const Char DESCRIPTION[] = "Multitrack Container";
+    const auto DESCRIPTION = "Multitrack Container"sv;
 
     class StubBuilder : public Builder
     {
@@ -267,9 +272,9 @@ namespace Formats::Chiptune
     const auto FORMAT =
         "'M'T'C'1"
         "00 00-10 ? ?"  // max 1Mb
-        ""_sv;
+        ""sv;
 
-    const auto PROPERTY_DELIMITER = "="_sv;
+    const auto PROPERTY_DELIMITER = "="sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -278,7 +283,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -340,7 +345,8 @@ namespace Formats::Chiptune
         Require(name.npos == name.find_first_of(PROPERTY_DELIMITER));
         if (!value.empty())
         {
-          Context->OnString(IFF::Identifier::PROPERTY, name.to_string().append(PROPERTY_DELIMITER).append(value));
+          // TODO: make Concat(StringView str...)
+          Context->OnString(IFF::Identifier::PROPERTY, String{name} + PROPERTY_DELIMITER + value);
         }
         else
         {
@@ -418,8 +424,7 @@ namespace Formats::Chiptune
         }
         else if (id == IFF::Identifier::PROPERTY)
         {
-          const auto propertyStr = IFF::GetString(*content);
-          const auto property = StringView(propertyStr);
+          const auto property = IFF::GetStringView(*content);
           const auto eqPos = property.find_first_of(PROPERTY_DELIMITER);
           const auto name = property.substr(0, eqPos);
           const auto value = eqPos != String::npos ? property.substr(eqPos + 1) : StringView();

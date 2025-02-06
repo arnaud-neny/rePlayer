@@ -10,10 +10,11 @@
 
 #pragma once
 
-// common includes
-#include <byteorder.h>
-#include <pointers.h>
-#include <types.h>
+#include "byteorder.h"
+#include "pointers.h"
+#include "types.h"
+
+#include <array>
 
 namespace Formats::Archived::ZXState
 {

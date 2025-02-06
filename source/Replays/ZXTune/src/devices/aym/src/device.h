@@ -10,26 +10,24 @@
 
 #pragma once
 
-// local includes
-#include "generators.h"
-// library includes
-#include <devices/aym/chip.h>
+#include "devices/aym/chip.h"
+#include "devices/aym/src/generators.h"
 
 namespace Devices::AYM
 {
   class AYMDevice
   {
   public:
-    AYMDevice()
-      : NoiseMask(HIGH_LEVEL)
-      , EnvelopeMask(LOW_LEVEL)
-    {}
-
     void SetDutyCycle(uint_t value, uint_t mask)
     {
       GenA.SetDutyCycle(0 != (mask & CHANNEL_MASK_A) ? value : NO_DUTYCYCLE);
       GenB.SetDutyCycle(0 != (mask & CHANNEL_MASK_B) ? value : NO_DUTYCYCLE);
       GenC.SetDutyCycle(0 != (mask & CHANNEL_MASK_C) ? value : NO_DUTYCYCLE);
+    }
+
+    void SetMuteMask(uint_t mask)
+    {
+      MuteMask = mask;
     }
 
     void SetMixer(uint_t mixer)
@@ -102,6 +100,7 @@ namespace Devices::AYM
       Levels = 0;
       NoiseMask = HIGH_LEVEL;
       EnvelopeMask = LOW_LEVEL;
+      MuteMask = LOW_LEVEL;
     }
 
     void Tick(uint_t ticks)
@@ -115,11 +114,11 @@ namespace Devices::AYM
 
     uint_t GetLevels() const
     {
-      const uint_t level = EnvelopeMask ? (EnvelopeMask * GenE.GetLevel()) | Levels : Levels;
-      const uint_t noise = NoiseMask != HIGH_LEVEL ? (NoiseMask | GenN.GetLevel()) : NoiseMask;
-      const uint_t toneA = GenA.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_A, HIGH_LEVEL>();
-      const uint_t toneB = GenB.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_B, HIGH_LEVEL>();
-      const uint_t toneC = GenC.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_C, HIGH_LEVEL>();
+      const uint_t level = (!(MuteMask & CHANNEL_MASK_E) && EnvelopeMask) ? (EnvelopeMask * GenE.GetLevel()) | Levels : Levels;
+      const uint_t noise = (!(MuteMask & CHANNEL_MASK_N) && NoiseMask != HIGH_LEVEL) ? (NoiseMask | GenN.GetLevel()) : NoiseMask;
+      const uint_t toneA = (MuteMask & CHANNEL_MASK_A) ? HIGH_LEVEL : GenA.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_A, HIGH_LEVEL>();
+      const uint_t toneB = (MuteMask & CHANNEL_MASK_B) ? HIGH_LEVEL : GenB.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_B, HIGH_LEVEL>();
+      const uint_t toneC = (MuteMask & CHANNEL_MASK_C) ? HIGH_LEVEL : GenC.GetLevel<HIGH_LEVEL ^ HIGH_LEVEL_C, HIGH_LEVEL>();
 
       return level & toneA & toneB & toneC & noise;
     }
@@ -145,7 +144,8 @@ namespace Devices::AYM
     NoiseGenerator GenN;
     EnvelopeGenerator GenE;
     uint_t Levels = 0;
-    uint_t NoiseMask;
-    uint_t EnvelopeMask;
+    uint_t NoiseMask = HIGH_LEVEL;
+    uint_t EnvelopeMask = LOW_LEVEL;
+    uint_t MuteMask = LOW_LEVEL;
   };
 }  // namespace Devices::AYM

@@ -12,14 +12,13 @@
 
 #pragma once
 
-// common includes
-#include <error.h>
-// library includes
-#include <strings/format.h>
+#include "strings/format.h"
+
+#include "error.h"
 
 //! @brief Building error object with formatted text
 template<class S, class... P>
 Error MakeFormattedError(Error::Location loc, S&& fmt, P&&... p)
 {
-  return Error(loc, Strings::Format(std::forward<S>(fmt), std::forward<P>(p)...));
+  return Error(loc, Strings::FormatRuntime(std::forward<S>(fmt), std::forward<P>(p)...));
 }

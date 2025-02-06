@@ -8,18 +8,20 @@
  *
  **/
 
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <binary/container_base.h>
-#include <binary/input_stream.h>
-#include <debug/log.h>
-#include <formats/archived.h>
-#include <formats/packed/decoders.h>
-#include <formats/packed/zip_supp.h>
-#include <strings/encoding.h>
-#include <strings/map.h>
-// std includes
+#include "formats/packed/decoders.h"
+#include "formats/packed/zip_supp.h"
+
+#include "binary/container_base.h"
+#include "binary/input_stream.h"
+#include "debug/log.h"
+#include "formats/archived.h"
+#include "strings/encoding.h"
+#include "strings/map.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
+
+#define assert(...) // rePlayer
 #include <memory>
 #include <numeric>
 
@@ -34,7 +36,7 @@ namespace Formats::Archived
     public:
       File(const Packed::Decoder& decoder, StringView name, std::size_t size, Binary::Container::Ptr data)
         : Decoder(decoder)
-        , Name(name.to_string())
+        , Name(name)
         , Size(size)
         , Data(std::move(data))
       {}
@@ -180,7 +182,7 @@ namespace Formats::Archived
         {
           const StringView rawName(header->Name, header->NameSize);
           const bool isUtf8 = 0 != (header->Flags & Packed::Zip::FILE_UTF8);
-          return isUtf8 ? rawName.to_string() : Strings::ToAutoUtf8(rawName);
+          return isUtf8 ? String{rawName} : Strings::ToAutoUtf8(rawName);
         }
         assert(!"Failed to get name");
         return {};
@@ -322,7 +324,7 @@ namespace Formats::Archived
       : FileDecoder(Formats::Packed::CreateZipDecoder())
     {}
 
-    String GetDescription() const override
+    StringView GetDescription() const override
     {
       return FileDecoder->GetDescription();
     }

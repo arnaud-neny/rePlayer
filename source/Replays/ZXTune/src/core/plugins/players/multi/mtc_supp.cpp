@@ -8,25 +8,24 @@
  *
  **/
 
-// local includes
 #include "core/plugins/player_plugins_registrator.h"
 #include "core/plugins/players/multi/multi_base.h"
 #include "core/plugins/players/plugin.h"
-// common includes
-#include <contract.h>
-#include <error.h>
-#include <make_ptr.h>
-// library includes
-#include <core/plugin_attrs.h>
-#include <debug/log.h>
-#include <formats/chiptune/multidevice/multitrackcontainer.h>
-#include <module/attributes.h>
-#include <module/players/properties_helper.h>
-#include <parameters/convert.h>
-#include <parameters/merged_accessor.h>
-#include <parameters/merged_container.h>
-#include <parameters/tools.h>
-// std includes
+#include "formats/chiptune/multidevice/multitrackcontainer.h"
+#include "module/players/properties_helper.h"
+
+#include "core/plugin_attrs.h"
+#include "debug/log.h"
+#include "module/attributes.h"
+#include "parameters/merged_accessor.h"
+#include "parameters/merged_container.h"
+#include "parameters/serialize.h"
+
+#include "contract.h"
+#include "error.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <algorithm>
 #include <list>
 #include <utility>
@@ -76,22 +75,7 @@ namespace Module::MTC
 
     void SetProperty(StringView name, StringView value) override
     {
-      Parameters::IntType asInt = 0;
-      Parameters::DataType asData;
-      Parameters::StringType asString;
-      auto& out = GetCurrentProperties();
-      if (Parameters::ConvertFromString(value, asInt))
-      {
-        out.SetValue(name, asInt);
-      }
-      else if (Parameters::ConvertFromString(value, asData))
-      {
-        out.SetValue(name, asData);
-      }
-      else if (Parameters::ConvertFromString(value, asString))
-      {
-        out.SetValue(name, asString);
-      }
+      Parameters::Convert(name, value, GetCurrentProperties());
     }
 
     void StartTrack(uint_t idx) override
@@ -120,8 +104,6 @@ namespace Module::MTC
     class TrackEntity
     {
     public:
-      using Ptr = std::shared_ptr<TrackEntity>;
-
       virtual ~TrackEntity() = default;
 
       virtual Module::Holder::Ptr GetHolder() const = 0;
@@ -187,7 +169,7 @@ namespace Module::MTC
       {
         if (Type.empty())
         {
-          Require(GetHolder()->GetModuleProperties()->FindValue(Module::ATTR_TYPE, Type));
+          Require(Parameters::FindValue(*GetHolder()->GetModuleProperties(), Module::ATTR_TYPE, Type));
         }
         return Type;
       }

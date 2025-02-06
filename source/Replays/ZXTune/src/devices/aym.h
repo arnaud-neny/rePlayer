@@ -10,11 +10,10 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// library includes
-#include <time/instant.h>
-// std includes
+#include "time/instant.h"
+
+#include "types.h"
+
 #include <array>
 #include <memory>
 #include <vector>
@@ -169,7 +168,7 @@ namespace Devices::AYM
   class Device
   {
   public:
-    using Ptr = std::shared_ptr<Device>;
+    using Ptr = std::unique_ptr<Device>;
     virtual ~Device() = default;
 
     /// Render single data chunk

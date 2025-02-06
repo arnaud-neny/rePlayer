@@ -8,23 +8,23 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/music/flac.h"
+
 #include "formats/chiptune/container.h"
 #include "formats/chiptune/music/tags_id3.h"
 #include "formats/chiptune/music/tags_vorbis.h"
-// common includes
-#include <byteorder.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+
+#include "byteorder.h"
+#include "make_ptr.h"
 
 namespace Formats::Chiptune
 {
   namespace Flac
   {
-    const Char DESCRIPTION[] = "Free Lossless Audio Codec";
+    const auto DESCRIPTION = "Free Lossless Audio Codec"sv;
 
     // https://www.xiph.org/flac/format
     class Format
@@ -76,6 +76,7 @@ namespace Formats::Chiptune
             break;
           }
           Binary::DataInputStream payload(Stream.ReadData(payloadSize));
+          // See FLAC/format.h for FLAC_METADATA_TYPE_* enum
           if (type == 0)
           {
             ParseStreamInfo(payload, target);
@@ -83,6 +84,10 @@ namespace Formats::Chiptune
           else if (type == 4)
           {
             Vorbis::ParseComment(payload, target.GetMetaBuilder());
+          }
+          else if (type == 6)
+          {
+            ParsePicture(payload, target.GetMetaBuilder());
           }
           if (isLast)
           {
@@ -110,6 +115,18 @@ namespace Formats::Chiptune
         Require(sampleRate != 0);
         target.SetStreamParameters(sampleRate, channels, bitsPerSample);
         target.SetTotalSamples(totalSamples);
+      }
+
+      static void ParsePicture(Binary::DataInputStream& input, MetaBuilder& target)
+      {
+        input.Skip(4);  // type
+        const auto typeSize = input.Read<be_uint32_t>();
+        input.Skip(typeSize);
+        const auto descriptionSize = input.Read<be_uint32_t>();
+        input.Skip(descriptionSize);
+        input.Skip(4 * 4);  // width, height, depth, colors count
+        const auto dataSize = input.Read<be_uint32_t>();
+        target.SetPicture(input.ReadData(dataSize));
       }
 
       bool ParseFrames(Builder& target)
@@ -232,7 +249,7 @@ namespace Formats::Chiptune
         "'3         |'a"
         "00-04      |'C"
         "00-0a      |00"  // streaminfo metatag
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -241,7 +258,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateMatchOnlyFormat(FORMAT))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }

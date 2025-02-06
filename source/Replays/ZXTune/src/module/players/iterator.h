@@ -10,15 +10,14 @@
 
 #pragma once
 
-// library includes
-#include <module/state.h>
+#include "module/state.h"
 
 namespace Module
 {
   class Iterator
   {
   public:
-    using Ptr = std::shared_ptr<Iterator>;
+    using Ptr = std::unique_ptr<Iterator>;
 
     virtual ~Iterator() = default;
 
@@ -29,7 +28,7 @@ namespace Module
   class StateIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<StateIterator>;
+    using Ptr = std::unique_ptr<StateIterator>;
 
     virtual uint_t CurrentFrame() const = 0;
 

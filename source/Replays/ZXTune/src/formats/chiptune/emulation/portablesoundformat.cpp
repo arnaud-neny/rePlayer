@@ -8,23 +8,24 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/emulation/portablesoundformat.h"
-// common includes
-#include <byteorder.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/crc.h>
-#include <binary/data_builder.h>
-#include <binary/input_stream.h>
-#include <debug/log.h>
-#include <formats/chiptune/container.h>
-#include <strings/casing.h>
-#include <strings/encoding.h>
-#include <strings/prefixed_index.h>
-#include <strings/trim.h>
-#include <time/duration.h>
-// std includes
+
+#include "formats/chiptune/container.h"
+
+#include "binary/crc.h"
+#include "binary/data_builder.h"
+#include "binary/input_stream.h"
+#include "debug/log.h"
+#include "strings/casing.h"
+#include "strings/prefixed_index.h"
+#include "strings/sanitize.h"
+#include "strings/trim.h"
+#include "time/duration.h"
+
+#include "byteorder.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <set>
 
 namespace Formats::Chiptune::PortableSoundFormat
@@ -36,25 +37,20 @@ namespace Formats::Chiptune::PortableSoundFormat
   namespace Tags
   {
     const uint8_t SIGNATURE[] = {'[', 'T', 'A', 'G', ']'};
-    const auto LIB_PREFIX = "_lib"_sv;
+    const auto LIB_PREFIX = "_lib"sv;
 
-    const auto UTF8 = "utf8"_sv;
-    const auto TITLE = "title"_sv;
-    const auto ARTIST = "artist"_sv;
-    const auto GAME = "game"_sv;
-    const auto YEAR = "year"_sv;
-    const auto GENRE = "genre"_sv;
-    const auto COMMENT = "comment"_sv;
-    const auto COPYRIGHT = "copyright"_sv;
-    const auto XSFBY_SUFFIX = "sfby"_sv;
-    const auto LENGTH = "length"_sv;
-    const auto FADE = "fade"_sv;
-    const auto VOLUME = "volume"_sv;
-
-    bool Match(StringView str, StringView tag)
-    {
-      return Strings::EqualNoCaseAscii(str, tag);
-    }
+    const auto UTF8 = "utf8"sv;
+    const auto TITLE = "title"sv;
+    const auto ARTIST = "artist"sv;
+    const auto GAME = "game"sv;
+    const auto YEAR = "year"sv;
+    const auto GENRE = "genre"sv;
+    const auto COMMENT = "comment"sv;
+    const auto COPYRIGHT = "copyright"sv;
+    const auto XSFBY_SUFFIX = "sfby"sv;
+    const auto LENGTH = "length"sv;
+    const auto FADE = "fade"sv;
+    const auto VOLUME = "volume"sv;
   }  // namespace Tags
 
   class Format
@@ -103,49 +99,20 @@ namespace Formats::Chiptune::PortableSoundFormat
       }
     }
 
-    class TagsParser
+    bool ParseTag(StringView line, String& name, String& value)
     {
-    public:
-      bool Parse(StringView line)
+      const auto eqPos = line.find('=');
+      if (eqPos != line.npos)
       {
-        const auto eqPos = line.find('=');
-        if (eqPos != line.npos)
-        {
-          Name = Strings::TrimSpaces(line.substr(0, eqPos));
-          Value = Strings::TrimSpaces(line.substr(eqPos + 1));
-          if (!IsUtf8)
-          {
-            ValueUtf8 = Strings::ToAutoUtf8(Value);
-          }
-          return true;
-        }
-        else
-        {
-          return false;
-        }
+        name = Strings::ToLowerAscii(Strings::TrimSpaces(line.substr(0, eqPos)));
+        value = Strings::Sanitize(line.substr(eqPos + 1));
+        return true;
       }
-
-      void SetUtf8()
+      else
       {
-        IsUtf8 = true;
+        return false;
       }
-
-      StringView GetName() const
-      {
-        return Name;
-      }
-
-      StringView GetValue() const
-      {
-        return IsUtf8 ? Value : ValueUtf8;
-      }
-
-    private:
-      bool IsUtf8 = false;
-      StringView Name;
-      StringView Value;
-      String ValueUtf8;
-    };
+    }
 
     void ParseTags(Builder& target)
     {
@@ -153,50 +120,48 @@ namespace Formats::Chiptune::PortableSoundFormat
       {
         return;
       };
-      TagsParser tag;
       String comment;
       auto& meta = target.GetMetaBuilder();
       while (Stream.GetRestSize())
       {
-        if (!tag.Parse(Stream.ReadString()))
+        String name;
+        String value;
+        if (!ParseTag(Stream.ReadString(), name, value))
         {
           // Blank lines, or lines not of the form "variable=value", are ignored.
           continue;
         }
-        const auto name = tag.GetName();
-        const auto value = tag.GetValue();
         Dbg("tags[{}]={}", name, value);
         if (const auto num = FindLibraryNumber(name))
         {
-          target.SetLibrary(num, value);
+          target.SetLibrary(num, std::move(value));
           continue;
         }
         else if (name == Tags::UTF8)
         {
-          tag.SetUtf8();
           continue;
         }
-        if (Tags::Match(name, Tags::TITLE))
+        if (name == Tags::TITLE)
         {
-          meta.SetTitle(value);
+          meta.SetTitle(std::move(value));
         }
-        else if (Tags::Match(name, Tags::ARTIST))
+        else if (name == Tags::ARTIST)
         {
-          meta.SetAuthor(value);
+          meta.SetAuthor(std::move(value));
         }
-        else if (Tags::Match(name, Tags::GAME))
+        else if (name == Tags::GAME)
         {
-          meta.SetProgram(value);
+          meta.SetProgram(std::move(value));
         }
-        else if (Tags::Match(name, Tags::YEAR))
+        else if (name == Tags::YEAR)
         {
-          target.SetYear(value);
+          target.SetYear(std::move(value));
         }
-        else if (Tags::Match(name, Tags::GENRE))
+        else if (name == Tags::GENRE)
         {
-          target.SetGenre(value);
+          target.SetGenre(std::move(value));
         }
-        else if (Tags::Match(name, Tags::COMMENT))
+        else if (name == Tags::COMMENT)
         {
           if (!comment.empty())
           {
@@ -204,34 +169,34 @@ namespace Formats::Chiptune::PortableSoundFormat
           }
           comment.append(value);
         }
-        else if (Tags::Match(name, Tags::COPYRIGHT))
+        else if (name == Tags::COPYRIGHT)
         {
-          target.SetCopyright(value);
+          target.SetCopyright(std::move(value));
         }
         else if (name.npos != name.find(Tags::XSFBY_SUFFIX))
         {
-          target.SetDumper(value);
+          target.SetDumper(std::move(value));
         }
-        else if (Tags::Match(name, Tags::LENGTH))
+        else if (name == Tags::LENGTH)
         {
-          target.SetLength(ParseTime(value.to_string()));
+          target.SetLength(ParseTime(value));
         }
-        else if (Tags::Match(name, Tags::FADE))
+        else if (name == Tags::FADE)
         {
-          target.SetFade(ParseTime(value.to_string()));
+          target.SetFade(ParseTime(value));
         }
-        else if (Tags::Match(name, Tags::VOLUME))
+        else if (name == Tags::VOLUME)
         {
-          target.SetVolume(ParseVolume(value.to_string()));
+          target.SetVolume(ParseVolume(value));
         }
         else
         {
-          target.SetTag(name, value);
+          target.SetTag(std::move(name), std::move(value));
         }
       }
       if (!comment.empty())
       {
-        meta.SetComment(comment);
+        meta.SetComment(std::move(comment));
       }
     }
 
@@ -253,7 +218,7 @@ namespace Formats::Chiptune::PortableSoundFormat
 
     static uint_t FindLibraryNumber(StringView tagName)
     {
-      if (Tags::Match(tagName, Tags::LIB_PREFIX))
+      if (tagName == Tags::LIB_PREFIX)
       {
         return 1;
       }

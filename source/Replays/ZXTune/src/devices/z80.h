@@ -10,12 +10,11 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// library includes
-#include <binary/view.h>
-#include <time/oscillator.h>
-// std includes
+#include "binary/view.h"
+#include "time/oscillator.h"
+
+#include "types.h"
+
 #include <array>
 #include <memory>
 
@@ -65,7 +64,7 @@ namespace Devices::Z80
   class Chip
   {
   public:
-    using Ptr = std::shared_ptr<Chip>;
+    using Ptr = std::unique_ptr<Chip>;
     virtual ~Chip() = default;
 
     virtual void Reset() = 0;

@@ -8,10 +8,13 @@
  *
  **/
 
-// library includes
-#include <parameters/convert.h>
-#include <strings/conversion.h>
-// std includes
+#include "parameters/convert.h"
+
+#include "binary/data_builder.h"
+#include "strings/conversion.h"
+
+#include "string_view.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -19,8 +22,6 @@
 namespace
 {
   using namespace Parameters;
-
-  static_assert(1 == sizeof(DataType::value_type), "Invalid DataType::value_type");
 
   template<class It>
   inline bool DoTest(const It it, const It lim, int (*fun)(int))
@@ -34,28 +35,30 @@ namespace
            && DoTest(str.begin() + 1, str.end(), &std::isxdigit);
   }
 
-  inline uint8_t FromHex(Char val)
+  inline uint8_t FromHex(char val)
   {
     assert(std::isxdigit(val));
     return val >= 'A' ? val - 'A' + 10 : val - '0';
   }
 
-  inline void DataFromString(StringView val, DataType& res)
+  inline Binary::Data::Ptr DataFromString(StringView val)
   {
-    res.resize((val.size() - 1) / 2);
+    const auto size = (val.size() - 1) / 2;
+    Binary::DataBuilder builder(size);
     const auto* src = val.data(); // rePlayer
-    for (auto& re : res)
+    for (std::size_t i = 0; i < size; ++i)
     {
       const auto highNibble = FromHex(*++src);
       const auto lowNibble = FromHex(*++src);
-      re = highNibble * 16 | lowNibble;
+      builder.AddByte(highNibble * 16 | lowNibble);
     }
+    return builder.CaptureResult();
   }
 
-  inline Char ToHex(uint_t val)
+  inline auto ToHex(uint_t val)
   {
     assert(val < 16);
-    return static_cast<Char>(val >= 10 ? val + 'A' - 10 : val + '0');
+    return val >= 10 ? 'A' + val - 10 : '0' + val;
   }
 
   inline String DataToString(Binary::View dmp)
@@ -96,7 +99,7 @@ namespace
   {
     if (IsQuoted(val))
     {
-      return {val.begin() + 1, val.end() - 1};
+      return MakeStringView(val.begin() + 1, val.end() - 1);
     }
     return val;
   }
@@ -110,7 +113,7 @@ namespace
       res += STRING_QUOTE;
       return res;
     }
-    return str.to_string();
+    return String{str};
   }
 }  // namespace
 
@@ -131,33 +134,30 @@ namespace Parameters
     return DataToString(val);
   }
 
-  bool ConvertFromString(StringView str, IntType& res)
+  std::optional<IntType> ConvertIntegerFromString(StringView str)
   {
     if (IsInteger(str))
     {
-      res = IntegerFromString(str);
-      return true;
+      return IntegerFromString(str);
     }
-    return false;
+    return std::nullopt;
   }
 
-  bool ConvertFromString(StringView str, StringType& res)
+  std::optional<StringType> ConvertStringFromString(StringView str)
   {
     if (!IsInteger(str) && !IsData(str))
     {
-      res = StringFromString(str);
-      return true;
+      return String{StringFromString(str)};
     }
-    return false;
+    return std::nullopt;
   }
 
-  bool ConvertFromString(StringView str, DataType& res)
+  Binary::Data::Ptr ConvertDataFromString(StringView str)
   {
     if (IsData(str))
     {
-      DataFromString(str, res);
-      return true;
+      return DataFromString(str);
     }
-    return false;
+    return {};
   }
 }  // namespace Parameters

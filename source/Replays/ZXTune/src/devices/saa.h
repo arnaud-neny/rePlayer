@@ -10,14 +10,14 @@
 
 #pragma once
 
-// common includes
-#include <data_streaming.h>
-#include <types.h>
-// library includes
-#include <sound/chunk.h>
-#include <time/instant.h>
-// std includes
+#include "sound/chunk.h"
+#include "time/instant.h"
+#include "tools/data_streaming.h"
+
+#include "types.h"
+
 #include <array>
+#include <memory>
 
 namespace Devices::SAA
 {
@@ -80,7 +80,7 @@ namespace Devices::SAA
   class Device
   {
   public:
-    using Ptr = std::shared_ptr<Device>;
+    using Ptr = std::unique_ptr<Device>;
     virtual ~Device() = default;
 
     /// render single data chunk
@@ -94,7 +94,7 @@ namespace Devices::SAA
   class Chip : public Device
   {
   public:
-    using Ptr = std::shared_ptr<Chip>;
+    using Ptr = std::unique_ptr<Chip>;
 
     virtual Sound::Chunk RenderTill(Stamp till) = 0;
   };
@@ -109,7 +109,7 @@ namespace Devices::SAA
   class ChipParameters
   {
   public:
-    using Ptr = std::shared_ptr<const ChipParameters>;
+    using Ptr = std::unique_ptr<const ChipParameters>;
 
     virtual ~ChipParameters() = default;
 

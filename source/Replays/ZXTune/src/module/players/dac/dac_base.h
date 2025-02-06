@@ -10,11 +10,10 @@
 
 #pragma once
 
-// local includes
 #include "module/players/dac/dac_chiptune.h"
-// library includes
-#include <module/players/tracking.h>
-#include <module/renderer.h>
+#include "module/players/tracking.h"
+
+#include "module/renderer.h"
 
 namespace Module::DAC
 {
@@ -96,7 +95,7 @@ namespace Module::DAC
   class DataRenderer
   {
   public:
-    using Ptr = std::shared_ptr<DataRenderer>;
+    using Ptr = std::unique_ptr<DataRenderer>;
 
     virtual ~DataRenderer() = default;
 

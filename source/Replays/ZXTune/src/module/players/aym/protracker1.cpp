@@ -8,19 +8,20 @@
  *
  **/
 
-// local includes
 #include "module/players/aym/protracker1.h"
+
+#include "formats/chiptune/aym/protracker1.h"
 #include "module/players/aym/aym_base.h"
 #include "module/players/aym/aym_base_track.h"
 #include "module/players/aym/aym_properties_helper.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <formats/chiptune/aym/protracker1.h>
-#include <math/numeric.h>
-#include <module/players/platforms.h>
-#include <module/players/properties_meta.h>
-#include <module/players/simple_orderlist.h>
+#include "module/players/properties_meta.h"
+#include "module/players/simple_orderlist.h"
+
+#include "math/numeric.h"
+
+#include "make_ptr.h"
+
+#include <array>
 
 namespace Module::ProTracker1
 {
@@ -299,7 +300,6 @@ namespace Module::ProTracker1
       if (const auto container = Formats::Chiptune::ProTracker1::Parse(rawData, dataBuilder))
       {
         props.SetSource(*container);
-        props.SetPlatform(Platforms::ZX_SPECTRUM);
         return MakePtr<AYM::TrackingChiptune<ModuleData, DataRenderer>>(dataBuilder.CaptureResult(),
                                                                         std::move(properties));
       }

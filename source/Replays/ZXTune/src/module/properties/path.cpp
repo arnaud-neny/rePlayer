@@ -8,15 +8,15 @@
  *
  **/
 
-// local includes
-#include "path.h"
-// common includes
-#include <error_tools.h>
-#include <make_ptr.h>
-// library includes
-#include <io/api.h>
-#include <module/attributes.h>
-#include <parameters/visitor.h>
+#include "module/properties/path.h"
+
+#include "io/api.h"
+#include "module/attributes.h"
+#include "parameters/visitor.h"
+
+#include "error_tools.h"
+#include "make_ptr.h"
+#include "string_view.h"
 
 namespace Module
 {
@@ -24,7 +24,7 @@ namespace Module
   {
   public:
     explicit UnresolvedPathPropertiesAccessor(StringView uri)
-      : Uri(uri.to_string())
+      : Uri(uri)
     {}
 
     uint_t Version() const override
@@ -32,24 +32,23 @@ namespace Module
       return 1;
     }
 
-    bool FindValue(Parameters::Identifier /*name*/, Parameters::IntType& /*val*/) const override
+    std::optional<Parameters::IntType> FindInteger(Parameters::Identifier /*name*/) const override
     {
-      return false;
+      return std::nullopt;
     }
 
-    bool FindValue(Parameters::Identifier name, Parameters::StringType& val) const override
+    std::optional<Parameters::StringType> FindString(Parameters::Identifier name) const override
     {
       if (name == ATTR_FULLPATH)
       {
-        val = Uri;
-        return true;
+        return Uri;
       }
-      return false;
+      return std::nullopt;
     }
 
-    bool FindValue(Parameters::Identifier /*name*/, Parameters::DataType& /*val*/) const override
+    Binary::Data::Ptr FindData(Parameters::Identifier /*name*/) const override
     {
-      return false;
+      return {};
     }
 
     void Process(Parameters::Visitor& visitor) const override
@@ -73,44 +72,39 @@ namespace Module
       return 1;
     }
 
-    bool FindValue(Parameters::Identifier /*name*/, Parameters::IntType& /*val*/) const override
+    std::optional<Parameters::IntType> FindInteger(Parameters::Identifier /*name*/) const override
     {
-      return false;
+      return std::nullopt;
     }
 
-    bool FindValue(Parameters::Identifier name, Parameters::StringType& val) const override
+    std::optional<Parameters::StringType> FindString(Parameters::Identifier name) const override
     {
       if (name == ATTR_SUBPATH)
       {
-        val = Id->Subpath();
-        return true;
+        return Id->Subpath();
       }
       else if (name == ATTR_FILENAME)
       {
-        val = Id->Filename();
-        return true;
+        return Id->Filename();
       }
       else if (name == ATTR_EXTENSION)
       {
-        val = Id->Extension();
-        return true;
+        return Id->Extension();
       }
       else if (name == ATTR_PATH)
       {
-        val = Id->Path();
-        return true;
+        return Id->Path();
       }
       else if (name == ATTR_FULLPATH)
       {
-        val = Id->Full();
-        return true;
+        return Id->Full();
       }
-      return false;
+      return std::nullopt;
     }
 
-    bool FindValue(Parameters::Identifier /*name*/, Parameters::DataType& /*val*/) const override
+    Binary::Data::Ptr FindData(Parameters::Identifier /*name*/) const override
     {
-      return false;
+      return {};
     }
 
     void Process(Parameters::Visitor& visitor) const override

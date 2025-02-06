@@ -10,20 +10,26 @@
 
 #pragma once
 
-// local includes
 #include "module/players/aym/aym_base_track.h"
-// library includes
-#include <devices/turbosound.h>
-#include <module/holder.h>
+
+#include "devices/turbosound.h"
+#include "module/holder.h"
+#include "strings/array.h"
 
 namespace Module::TurboSound
 {
   const uint_t TRACK_CHANNELS = AYM::TRACK_CHANNELS * Devices::TurboSound::CHIPS;
 
+  inline Strings::Array MakeChannelsNames()
+  {
+    static_assert(TRACK_CHANNELS == 6);
+    return {"A1"s, "B1"s, "C1"s, "N1"s, "E1"s, "A2"s, "B2"s, "C2"s, "N2"s, "E2"s};
+  }
+
   class DataIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<DataIterator>;
+    using Ptr = std::unique_ptr<DataIterator>;
 
     virtual State::Ptr GetStateObserver() const = 0;
 
@@ -33,7 +39,7 @@ namespace Module::TurboSound
   class Chiptune
   {
   public:
-    using Ptr = std::shared_ptr<const Chiptune>;
+    using Ptr = std::unique_ptr<const Chiptune>;
     virtual ~Chiptune() = default;
 
     virtual Time::Microseconds GetFrameDuration() const = 0;

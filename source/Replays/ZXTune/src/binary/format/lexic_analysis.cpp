@@ -8,12 +8,12 @@
  *
  **/
 
-// local includes
 #include "binary/format/lexic_analysis.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// std includes
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <algorithm>
 #include <list>
 #include <vector>
@@ -97,7 +97,7 @@ namespace LexicalAnalysis
                      [](const Tokenizer::Ptr& obj) { return obj.get(); });
       for (auto lexemeEnd = lexemeStart + 1; !candidates.empty(); ++lexemeEnd) // rePlayer
       {
-        const StringView lexeme(lexemeStart, lexemeEnd);
+        const auto lexeme = MakeStringView(lexemeStart, lexemeEnd);
         auto tokens = MakeRWPtr<TokensSet>(lexeme);
         std::vector<const Tokenizer*> passedCandidates;
         passedCandidates.reserve(candidates.size());

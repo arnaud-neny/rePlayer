@@ -10,10 +10,9 @@
 
 #pragma once
 
-// library includes
-#include <binary/container.h>
-#include <module/holder.h>
-#include <parameters/container.h>
+#include "binary/container.h"
+#include "module/holder.h"
+#include "parameters/container.h"
 
 namespace Module
 {
@@ -21,7 +20,7 @@ namespace Module
   class BaseFactory
   {
   public:
-    using Ptr = std::shared_ptr<const BaseFactory>;
+    using Ptr = std::unique_ptr<const BaseFactory>;
     virtual ~BaseFactory() = default;
 
     virtual Holder::Ptr CreateModule(const Parameters::Accessor& params, const ContainerType& data,

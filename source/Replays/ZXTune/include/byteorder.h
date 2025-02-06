@@ -10,23 +10,20 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// boost includes
-#include <boost/predef/other/endian.h>
+#include "types.h"
+
+#include <bit>
+#include <cstring>
 
 //! @brief Checking if current platform is Little-Endian
 constexpr bool isLE()
 {
-#if BOOST_ENDIAN_LITTLE_BYTE
-  return true;
-#elif BOOST_ENDIAN_BIG_BYTE
-  return false
-#else
-#  error Invalid byte order
-#endif
+  static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+                "Invalid byte order");
+  return std::endian::native == std::endian::little;
 }
 
+// TODO: remove at std++23
 constexpr uint16_t swapBytes(uint16_t a)
 {
   return uint16_t(a << 8) | uint16_t(a >> 8);

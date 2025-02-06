@@ -10,8 +10,10 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
+#include "string_view.h"
+#include "types.h"
+
+#include <array>
 
 #ifndef DO_LITERAL
 #  define DO_LITERAL_IMPL(str, lit) str##lit
@@ -64,22 +66,20 @@ namespace Debug
   }
 }  // namespace Debug
 
+// rePlayer begin
 class SourceFile
 {
 public:
   using TagType = uint32_t;
 
-  const basic_string_view<Char> StaticLocation;
-  const TagType StaticTag = 0;
-
   constexpr auto Location() const
   {
-    return StaticLocation;
+    return "";
   }
 
   constexpr auto Tag() const
   {
-    return StaticTag;
+    return 0;
   }
 
   class SourceLine
@@ -91,7 +91,7 @@ public:
 
     constexpr auto Location() const
     {
-      return basic_string_view<Char>();
+        return "";
     }
 
     constexpr TagType Tag() const
@@ -118,10 +118,10 @@ namespace Debug
 {
 #ifdef SOURCES_ROOT
 #  define STR(a) #  a
-  constexpr auto ROOT = DO_LITERAL(SOURCES_ROOT, _sv);
+  constexpr auto ROOT = DO_LITERAL(SOURCES_ROOT, sv);
 #  undef STR
 #else
-  constexpr auto ROOT = ""_sv;
+  constexpr auto ROOT = ""sv;
 #endif
 //   template<std::size_t Offset, typename C, C Head, C... Tail>
 //   constexpr auto MakeSourceFile()
@@ -149,6 +149,7 @@ constexpr auto operator"" _source(const char* /*str*/, std::size_t /*size*/) noe
 {
   return SourceFile();
 }
+// rePlayer end
 
 #define ThisFile() DO_LITERAL(__FILE__, _source)
 #define ThisLine() ThisFile().Line(__LINE__)

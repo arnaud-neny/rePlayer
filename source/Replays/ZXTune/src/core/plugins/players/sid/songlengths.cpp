@@ -8,46 +8,54 @@
  *
  **/
 
-// local includes
 #include "core/plugins/players/sid/songlengths.h"
-// common includes
-#include <contract.h>
-#include <pointers.h>
-// library includes
-#include <binary/crc.h>
-// std includes
+
+#include "binary/crc.h"
+
+#include "string_view.h"
+
 #include <algorithm>
 
 namespace Module::Sid
 {
-  struct SongEntry
-  {
-    const uint32_t HashCrc32;
-    const uint32_t Seconds;
-
-    bool operator<(uint32_t hashCrc32) const
-    {
-      return HashCrc32 < hashCrc32;
-    }
-  };
-
-  const SongEntry SONGS[] = {
 #include "core/plugins/players/sid/songlengths_db.inc"
-  };
 
-  TimeType GetSongLength(const char* md5digest, uint_t idx)
+  TimeType DecodeGroup(std::size_t offset, uint_t idx)
   {
-    const uint32_t hashCrc32 = Binary::Crc32(Binary::View(md5digest, 32));
-    const SongEntry* const end = std::end(SONGS);
-    const SongEntry* const lower = std::lower_bound(SONGS, end, hashCrc32);
-    if (lower + idx < end && lower->HashCrc32 == hashCrc32)
+    const auto* src = GROUPS + offset;
+    for (uint_t pos = 0;; ++pos)
     {
-      const SongEntry* const entry = lower + idx;
-      if (lower->HashCrc32 == entry->HashCrc32)
+      uint_t val = *src++;
+      if (val & 128)
       {
-        return Time::Seconds(entry->Seconds);
+        val = (val & 127) | (uint_t(*src++) << 7);
+      }
+      if (pos == idx)
+      {
+        return Time::Seconds(val);
       }
     }
-    return {};
+  }
+
+  TimeType GetSongLength(StringView md5digest, uint_t idx)
+  {
+    const auto hashCrc32 = Binary::Crc32(Binary::View(md5digest.data(), md5digest.size()));
+    const auto* const end = std::end(ENTRIES);
+    const auto* const it = std::upper_bound(ENTRIES, end, uint64_t(hashCrc32) << 32);
+    if (it == end || (*it) >> 32 != hashCrc32)
+    {
+      return {};
+    }
+    const auto value = *it & VALUE_MASK;
+    const auto groupSize = (*it & GROUP_SIZE_MASK) >> GROUP_SIZE_SHIFT;
+    if (!groupSize)
+    {
+      return idx != 0 ? TimeType{} : Time::Seconds(value);
+    }
+    else if (idx >= groupSize)
+    {
+      return {};
+    }
+    return DecodeGroup(value, idx);
   }
 }  // namespace Module::Sid

@@ -10,11 +10,10 @@
 
 #pragma once
 
-// local includes
-#include "renderers.h"
-#include "volume_table.h"
-// library includes
-#include <parameters/tracking_helper.h>
+#include "devices/aym/src/renderers.h"
+#include "devices/aym/src/volume_table.h"
+
+#include "parameters/tracking_helper.h"
 
 namespace Devices::AYM
 {
@@ -97,6 +96,7 @@ namespace Devices::AYM
 
       if (Params.IsChanged())
       {
+        PSG.SetMuteMask(Params->MuteMask());
         PSG.SetDutyCycle(Params->DutyCycleValue(), Params->DutyCycleMask());
         const uint64_t clock = Params->ClockFreq() / AYM_CLOCK_DIVISOR;
         const uint_t sndFreq = Params->SoundFreq();

@@ -10,9 +10,8 @@
 
 #pragma once
 
-// library includes
-#include <binary/container.h>
-#include <binary/format.h>
+#include "binary/container.h"
+#include "binary/format.h"
 
 namespace Analysis
 {
@@ -21,7 +20,7 @@ namespace Analysis
   class Result
   {
   public:
-    using Ptr = std::shared_ptr<const Result>;
+    using Ptr = std::unique_ptr<const Result>;
     virtual ~Result() = default;
 
     //! @brief Returns data size that is processed in current data position

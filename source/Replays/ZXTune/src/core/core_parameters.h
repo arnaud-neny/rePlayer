@@ -10,14 +10,20 @@
 
 #pragma once
 
-// library includes
-#include <parameters/types.h>
-#include <zxtune.h>
+#include "zxtune.h"
+
+#include "parameters/types.h"
 
 namespace Parameters::ZXTune::Core
 {
   //! @brief Parameters#ZXTune#Core namespace prefix
   const auto PREFIX = ZXTune::PREFIX + "core"_id;
+
+  //@{
+  //! @name Masking for each of ATTR_CHANNELS_NAMES channels
+  const auto CHANNELS_MASK = PREFIX + "channels_mask"_id;
+  const IntType CHANNELS_MASK_DEFAULT = 0;
+  //@}
 
   //! @brief AYM-chip related parameters namespace
   namespace AYM
@@ -30,7 +36,7 @@ namespace Parameters::ZXTune::Core
 
     //! Default value- 1.75MHz
     const IntType CLOCKRATE_DEFAULT = 1750000;
-    const IntType CLOCKRATE_MIN = 1000000;
+    const IntType CLOCKRATE_MIN = 100000;
     const IntType CLOCKRATE_MAX = UINT64_C(10000000);
     //! Parameter name
     const auto CLOCKRATE = PREFIX + "clockrate"_id;

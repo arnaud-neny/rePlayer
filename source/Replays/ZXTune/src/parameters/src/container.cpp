@@ -8,11 +8,15 @@
  *
  **/
 
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <parameters/container.h>
-// std includes
+#include "parameters/container.h"
+
+#include "binary/container_factories.h"
+#include "parameters/delegated.h"
+
+#include "make_ptr.h"
+#include "pointers.h"
+#include "string_view.h"
+
 #include <map>
 #include <utility>
 
@@ -36,19 +40,31 @@ namespace Parameters
       return VersionValue;
     }
 
-    bool FindValue(Identifier name, IntType& val) const override
+    std::optional<IntType> FindInteger(Identifier name) const override
     {
-      return Integers.Find(name, val);
+      if (const auto* ptr = Integers.Find(name))
+      {
+        return *ptr;
+      }
+      return std::nullopt;
     }
 
-    bool FindValue(Identifier name, StringType& val) const override
+    std::optional<StringType> FindString(Identifier name) const override
     {
-      return Strings.Find(name, val);
+      if (const auto* ptr = Strings.Find(name))
+      {
+        return *ptr;
+      }
+      return std::nullopt;
     }
 
-    bool FindValue(Identifier name, DataType& val) const override
+    Binary::Data::Ptr FindData(Identifier name) const override
     {
-      return Datas.Find(name, val);
+      if (const auto* ptr = Datas.Find(name))
+      {
+        return *ptr;
+      }
+      return {};
     }
 
     void Process(Visitor& visitor) const override
@@ -102,17 +118,24 @@ namespace Parameters
         : Storage(rh.Storage)
       {}
 
-      bool Find(StringView name, T& res) const
+      const T* Find(StringView name) const
       {
         const auto it = Storage.find(name);
-        return it != Storage.end() ? (res = it->second, true) : false;
+        return it != Storage.end() ? &(it->second) : nullptr;
       }
 
       void Visit(Visitor& visitor) const
       {
         for (const auto& entry : Storage)
         {
-          visitor.SetValue(entry.first, entry.second);
+          if constexpr (std::is_same_v<T, Binary::Data::Ptr>)
+          {
+            visitor.SetValue(entry.first, *entry.second);
+          }
+          else
+          {
+            visitor.SetValue(entry.first, entry.second);
+          }
         }
       }
 
@@ -130,7 +153,7 @@ namespace Parameters
         {
           return Update(lower->second, value);
         }
-        const auto it = Storage.insert(lower, {name.to_string(), {}});
+        const auto it = Storage.emplace_hint(lower, name, T{});
         return Update(it->second, value);
       }
 
@@ -142,13 +165,21 @@ namespace Parameters
 
       static bool Update(StringType& ref, StringView update)
       {
-        return ref != update ? (ref = update.to_string(), true) : false;
+        return ref != update ? (ref = StringType{update}, true) : false;
       }
 
-      static bool Update(DataType& ref, Binary::View update)
+      static bool Update(Binary::Data::Ptr& ref, Binary::View update)
       {
-        const auto* raw = update.As<uint8_t>();
-        ref.assign(raw, raw + update.Size());
+        // TODO: remove support of empty containers
+        if (update.Size())
+        {
+          ref = Binary::CreateContainer(update);
+        }
+        else
+        {
+          static const EmptyData INSTANCE;
+          ref = MakeSingletonPointer(INSTANCE);
+        }
         return true;
       }
 
@@ -156,46 +187,34 @@ namespace Parameters
       std::map<String, T, std::less<>> Storage;
     };
 
+    class EmptyData : public Binary::Data
+    {
+    public:
+      const void* Start() const
+      {
+        return this;
+      }
+
+      std::size_t Size() const
+      {
+        return 0;
+      }
+    };
+
   private:
     uint_t VersionValue = 0;
     TransientMap<IntType> Integers;
     TransientMap<StringType> Strings;
-    TransientMap<DataType> Datas;
+    TransientMap<Binary::Data::Ptr> Datas;
   };
 
-  class CompositeContainer : public Container
+  class CompositeContainer : public Delegated<Container, Accessor::Ptr>
   {
   public:
     CompositeContainer(Accessor::Ptr accessor, Modifier::Ptr modifier)
-      : AccessDelegate(std::move(accessor))
+      : Delegated(std::move(accessor))
       , ModifyDelegate(std::move(modifier))
     {}
-
-    // accessor virtuals
-    uint_t Version() const override
-    {
-      return AccessDelegate->Version();
-    }
-
-    bool FindValue(Identifier name, IntType& val) const override
-    {
-      return AccessDelegate->FindValue(name, val);
-    }
-
-    bool FindValue(Identifier name, StringType& val) const override
-    {
-      return AccessDelegate->FindValue(name, val);
-    }
-
-    bool FindValue(Identifier name, DataType& val) const override
-    {
-      return AccessDelegate->FindValue(name, val);
-    }
-
-    void Process(Visitor& visitor) const override
-    {
-      return AccessDelegate->Process(visitor);
-    }
 
     // visitor virtuals
     void SetValue(Identifier name, IntType val) override
@@ -220,7 +239,6 @@ namespace Parameters
     }
 
   private:
-    const Accessor::Ptr AccessDelegate;
     const Modifier::Ptr ModifyDelegate;
   };
 

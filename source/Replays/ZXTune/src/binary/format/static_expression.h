@@ -10,11 +10,10 @@
 
 #pragma once
 
-// local includes
-#include "expression.h"
-// common includes
-#include <contract.h>
-// std includes
+#include "binary/format/expression.h"
+
+#include "contract.h"
+
 #include <array>
 #include <vector>
 
@@ -111,7 +110,7 @@ namespace Binary::FormatDSL
   class StaticPattern
   {
   public:
-    explicit StaticPattern(const Pattern& pat)
+    explicit StaticPattern(std::span<const Predicate* const> pat)
     {
       Data.reserve(pat.size());
       for (const auto& pred : pat)

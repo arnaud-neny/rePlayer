@@ -10,11 +10,10 @@
 
 #pragma once
 
-// local includes
+#include "module/players/factory.h"
 #include "module/players/xsf/xsf_file.h"
-// library includes
-#include <module/players/factory.h>
-#include <strings/map.h>
+
+#include "strings/map.h"
 
 namespace Module::XSF
 {
@@ -23,6 +22,7 @@ namespace Module::XSF
   class Factory
   {
   public:
+    // May be used across multiple plugins
     using Ptr = std::shared_ptr<const Factory>;
     virtual ~Factory() = default;
 
@@ -31,5 +31,5 @@ namespace Module::XSF
                                               Parameters::Container::Ptr properties) const = 0;
   };
 
-  Module::Factory::Ptr CreateFactory(XSF::Factory::Ptr delegate);
+  Module::Factory::Ptr CreateModuleFactory(XSF::Factory::Ptr delegate);
 }  // namespace Module::XSF

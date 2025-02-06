@@ -8,14 +8,13 @@
  *
  **/
 
-// local includes
 #include "core/plugins/archive_plugins_registrator.h"
 #include "core/plugins/archives/archived.h"
 #include "core/plugins/archives/plugins.h"
-// library includes
-#include <core/plugin_attrs.h>
-#include <formats/archived/decoders.h>
-#include <formats/archived/multitrack/decoders.h>
+#include "formats/archived/decoders.h"
+#include "formats/archived/multitrack/decoders.h"
+
+#include "core/plugin_attrs.h"
 
 namespace ZXTune
 {
@@ -34,10 +33,10 @@ namespace ZXTune
   const ContainerPluginDescription UNARCHIVES[] =
   {
     {"ZIP"_id,     &CreateZipDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
-//     {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+//    {"RAR"_id,     &CreateRarDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
     {"LHA"_id,     &CreateLhaDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
     {"UMX"_id,     &CreateUMXDecoder,     Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::PLAIN},
-//     {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
+//    {"7ZIP"_id,    &Create7zipDecoder,    Capabilities::Container::Type::ARCHIVE | Capabilities::Container::Traits::DIRECTORIES},
   };
 
   const ContainerPluginDescription ZXUNARCHIVES[] =

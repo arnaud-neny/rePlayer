@@ -13,7 +13,7 @@
 #define __Z80EX_SELF_INCLUDE
 
 #include "typedefs.h"
-#include "include/z80ex.h"
+#include "include/z80ex.h" // rePlayer
 #include "macros.h"
 
 #define temp_byte cpu->tmpbyte
@@ -33,16 +33,18 @@
 /*#define _DOQUOTE(x) #x
 #define DOQUOTE(x) _DOQUOTE(x)*/
 
+/* rePlayer
 #define DOQUOTE(x) #x
 
-// static char revision_type[]=DOQUOTE(Z80EX_RELEASE_TYPE);
-// static char ver_str[]=DOQUOTE(Z80EX_VERSION_STR);
-// static Z80EX_VERSION version = {Z80EX_API_REVISION, Z80EX_VERSION_MAJOR, Z80EX_VERSION_MINOR, revision_type, ver_str};
-// 
-// LIB_EXPORT Z80EX_VERSION *z80ex_get_version()
-// {
-// 	return(&version);
-// }
+static char revision_type[]=DOQUOTE(Z80EX_RELEASE_TYPE);
+static char ver_str[]=DOQUOTE(Z80EX_VERSION_STR);
+static Z80EX_VERSION version = {Z80EX_API_REVISION, Z80EX_VERSION_MAJOR, Z80EX_VERSION_MINOR, revision_type, ver_str};
+
+LIB_EXPORT Z80EX_VERSION *z80ex_get_version()
+{
+	return(&version);
+}
+*/
 
 /* do one opcode (instruction or prefix) */
 LIB_EXPORT int z80ex_step(Z80EX_CONTEXT *cpu)

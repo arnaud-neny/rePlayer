@@ -10,11 +10,10 @@
 
 #pragma once
 
-// local includes
 #include "module/players/saa/saa_parameters.h"
-// library includes
-#include <module/holder.h>
-#include <module/players/tracking.h>
+#include "module/players/tracking.h"
+
+#include "module/holder.h"
 
 namespace Module::SAA
 {
@@ -78,7 +77,7 @@ namespace Module::SAA
   class DataRenderer
   {
   public:
-    using Ptr = std::shared_ptr<DataRenderer>;
+    using Ptr = std::unique_ptr<DataRenderer>;
 
     virtual ~DataRenderer() = default;
 
@@ -89,7 +88,7 @@ namespace Module::SAA
   class DataIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<DataIterator>;
+    using Ptr = std::unique_ptr<DataIterator>;
 
     virtual State::Ptr GetStateObserver() const = 0;
 
@@ -99,7 +98,7 @@ namespace Module::SAA
   class Chiptune
   {
   public:
-    using Ptr = std::shared_ptr<const Chiptune>;
+    using Ptr = std::unique_ptr<const Chiptune>;
     virtual ~Chiptune() = default;
 
     virtual Time::Microseconds GetFrameDuration() const = 0;

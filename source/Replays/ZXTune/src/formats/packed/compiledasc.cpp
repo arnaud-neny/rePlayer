@@ -8,18 +8,18 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/aym/ascsoundmaster.h"
 #include "formats/packed/container.h"
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <make_ptr.h>
-//#include <static_string.h> // rePlayer
-// library includes
-#include <binary/format_factories.h>
-#include <debug/log.h>
-// std includes
+
+#include "binary/format_factories.h"
+#include "debug/log.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "make_ptr.h"
+//#include "static_string.h" // rePlayer
+#include "string_view.h"
+
 #include <algorithm>
 #include <array>
 
@@ -107,7 +107,7 @@ namespace Formats::Packed
     struct VersionTraits
     {
       const std::size_t MinSize;
-      const Char* Description;
+      const StringView Description;
       const StringView Format;
       const CreatePlayerFunc CreatePlayer;
       const ParseFunc Parse;
@@ -140,10 +140,10 @@ namespace Formats::Packed
                                      "13"    // inc de
                                      "32??"  // ld (xxx),a
                                      "cd??"  // call xxxx
-                                     ;
+                                     "";
     const VersionTraits VERSION0 = {
         sizeof(PlayerVer0),
-        "ASC Sound Master v0.x player",
+        "ASC Sound Master v0.x player"sv,
         VERSION0_FORMAT,
         &PlayerTraits::Create<PlayerVer0>,
         &Formats::Chiptune::ASCSoundMaster::Ver0::Parse,
@@ -164,7 +164,7 @@ namespace Formats::Packed
                                      "";
     const VersionTraits VERSION1 = {
         sizeof(PlayerVer0),
-        "ASC Sound Master v1.x player",
+        "ASC Sound Master v1.x player"sv,
         VERSION1_FORMAT,
         &PlayerTraits::Create<PlayerVer0>,
         &Formats::Chiptune::ASCSoundMaster::Ver1::Parse,
@@ -183,10 +183,10 @@ namespace Formats::Packed
         "?{35}"
         //+123
         "11??"  // data offset
-        ;
+        "";
     const VersionTraits VERSION2 = {
         sizeof(PlayerVer2),
-        "ASC Sound Master v2.x player",
+        "ASC Sound Master v2.x player"sv,
         VERSION2_FORMAT,
         &PlayerTraits::Create<PlayerVer2>,
         &Formats::Chiptune::ASCSoundMaster::Ver1::Parse,
@@ -204,7 +204,7 @@ namespace Formats::Packed
       const auto* const ignoreStart = authorStart + 20;
       const auto* const titleStart = ignoreStart + 4;
       const auto* const end = titleStart + 20;
-      const auto isVisible = [](Char c) { return c > ' '; };
+      const auto isVisible = [](auto c) { return c > ' '; };
       return std::none_of(authorStart, ignoreStart, isVisible) && std::none_of(titleStart, end, isVisible);
     }
   }  // namespace CompiledASC
@@ -217,7 +217,7 @@ namespace Formats::Packed
       , Player(Binary::CreateFormat(Version.Format, Version.MinSize))
     {}
 
-    String GetDescription() const override
+    StringView GetDescription() const override
     {
       return Version.Description;
     }

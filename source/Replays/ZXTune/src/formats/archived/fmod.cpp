@@ -8,13 +8,12 @@
  *
  **/
 
-// local includes
 #include "formats/archived/fmod.h"
-// common includes
-#include <byteorder.h>
-// library includes
-#include <binary/input_stream.h>
-#include <strings/format.h>
+
+#include "binary/input_stream.h"
+#include "strings/format.h"
+
+#include "byteorder.h"
 
 namespace Formats::Archived::Fmod
 {
@@ -203,7 +202,7 @@ namespace Formats::Archived::Fmod
           {
             Stream.Seek(idx * sizeof(uint32_t));
             Stream.Seek(Stream.Read<le_uint32_t>());
-            return Stream.ReadCString(Stream.GetRestSize()).to_string();
+            return String{Stream.ReadCString(Stream.GetRestSize())};
           }
           else
           {

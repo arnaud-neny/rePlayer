@@ -8,13 +8,13 @@
  *
  **/
 
-// local includes
-#include "chip.h"
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <devices/tfm.h>
-// std includes
+#include "devices/tfm.h"
+
+#include "devices/fm/chip.h"
+
+#include "make_ptr.h"
+
+#include <array>
 #include <functional>
 
 namespace Devices::TFM

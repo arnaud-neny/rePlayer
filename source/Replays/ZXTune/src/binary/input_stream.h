@@ -10,17 +10,18 @@
 
 #pragma once
 
-// library includes
-#include <binary/container.h>
-#include <binary/view.h>
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <pointers.h>
-#include <types.h>
-// std includes
+#include "binary/container.h"
+#include "binary/view.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "pointers.h"
+#include "string_view.h"
+#include "types.h"
+
 #include <algorithm>
 #include <cstring>
+#include <utility>
 
 namespace Binary
 {
@@ -50,13 +51,11 @@ namespace Binary
     //! @brief Read ASCIIZ string with specified maximal size
     StringView ReadCString(std::size_t maxSize)
     {
-      static_assert(sizeof(StringView::value_type) == sizeof(uint8_t), "Invalid char size");
       const auto* const limit = std::min(Cursor + maxSize, Finish);
       const auto* const strEnd = std::find(Cursor, limit, 0);
       Require(strEnd != limit);
-      StringView res(safe_ptr_cast<const Char*>(Cursor), safe_ptr_cast<const Char*>(strEnd));
-      Cursor = strEnd + 1;
-      return res;
+      const auto* begin = std::exchange(Cursor, strEnd + 1);
+      return MakeStringView(begin, strEnd);
     }
 
     //! @brief Read string till EOL
@@ -77,9 +76,8 @@ namespace Binary
           ++nextLine;
         }
       }
-      StringView result(safe_ptr_cast<const Char*>(Cursor), safe_ptr_cast<const Char*>(eolPos));
-      Cursor = nextLine;
-      return result;
+      const auto* start = std::exchange(Cursor, nextLine);
+      return MakeStringView(start, eolPos);
     }
 
     template<class T>
@@ -150,6 +148,13 @@ namespace Binary
       const uint8_t* const res = Cursor;
       Cursor += size;
       return res;
+    }
+
+    static inline StringView MakeStringView(const uint8_t* start, const uint8_t* end)
+    {
+      using Char = StringView::value_type;
+      static_assert(sizeof(Char) == sizeof(uint8_t), "Invalid char size");
+      return ::MakeStringView(safe_ptr_cast<const Char*>(start), safe_ptr_cast<const Char*>(end));
     }
 
   protected:

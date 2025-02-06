@@ -8,12 +8,14 @@
  *
  **/
 
-// library includes
-#include <l10n/api.h>
-#include <l10n/control.h>
-#include <resource/api.h>
-#include <strings/split.h>
-// std includes
+#include "l10n/control.h"
+
+#include "l10n/api.h"
+#include "resource/api.h"
+#include "strings/split.h"
+
+#include "string_view.h"
+
 #include <vector>
 
 namespace
@@ -29,15 +31,14 @@ namespace
 
   bool ParseFilename(StringView path, L10n::Translation& trans)
   {
-    std::vector<StringView> elements;
-    Strings::Split(path, R"(/\)"_sv, elements);
+    const auto& elements = Strings::Split(path, R"(/\)"sv);
     if (elements.size() == PATH_ELEMENTS)
     {
       const auto& filename = elements[FILENAME_POS];
       const auto dotPos = filename.find_last_of('.');
-      trans.Domain = (dotPos == filename.npos ? filename : filename.substr(0, dotPos)).to_string();
-      trans.Language = elements[TRANSLATION_POS].to_string();
-      trans.Type = dotPos == filename.npos ? String() : filename.substr(dotPos + 1).to_string();
+      trans.Domain = dotPos == filename.npos ? filename : filename.substr(0, dotPos);
+      trans.Language = elements[TRANSLATION_POS];
+      trans.Type = dotPos == filename.npos ? StringView() : filename.substr(dotPos + 1);
       return true;
     }
     return false;

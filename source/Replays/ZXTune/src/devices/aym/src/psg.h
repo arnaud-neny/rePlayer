@@ -10,9 +10,10 @@
 
 #pragma once
 
-// local includes
-#include "device.h"
-#include "volume_table.h"
+#include "devices/aym/src/device.h"
+#include "devices/aym/src/volume_table.h"
+
+#include <array>
 
 namespace Devices::AYM
 {
@@ -29,6 +30,11 @@ namespace Devices::AYM
     void SetDutyCycle(uint_t value, uint_t mask)
     {
       Device.SetDutyCycle(value, mask);
+    }
+
+    void SetMuteMask(uint_t mask)
+    {
+      Device.SetMuteMask(mask);
     }
 
     void Reset()

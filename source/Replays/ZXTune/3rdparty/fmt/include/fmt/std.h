@@ -29,15 +29,12 @@
 #  if FMT_HAS_INCLUDE(<variant>)
 #    include <variant>
 #  endif
-#  if FMT_HAS_INCLUDE(<optional>)
-#    include <optional>
-#  endif
 #endif
 
 // GCC 4 does not support FMT_HAS_INCLUDE.
 #if FMT_HAS_INCLUDE(<cxxabi.h>) || defined(__GLIBCXX__)
 #  include <cxxabi.h>
-// Android NDK with gabi++ library on some architectures does not implement
+// Android NDK with gabi++ library on some archtectures does not implement
 // abi::__cxa_demangle().
 #  ifndef __GABIXX_CXXABI_H__
 #    define FMT_HAS_ABI_CXA_DEMANGLE
@@ -56,13 +53,12 @@ void write_escaped_path(basic_memory_buffer<Char>& quoted,
 }
 #  ifdef _WIN32
 template <>
-inline void write_escaped_path<char>(memory_buffer& quoted,
+inline void write_escaped_path<char>(basic_memory_buffer<char>& quoted,
                                      const std::filesystem::path& p) {
-  auto buf = basic_memory_buffer<wchar_t>();
-  write_escaped_string<wchar_t>(std::back_inserter(buf), p.native());
-  // Convert UTF-16 to UTF-8.
-  if (!unicode_to_utf8<wchar_t>::convert(quoted, {buf.data(), buf.size()}))
-    FMT_THROW(std::runtime_error("invalid utf16"));
+  auto s = p.u8string();
+  write_escaped_string<char>(
+      std::back_inserter(quoted),
+      string_view(reinterpret_cast<const char*>(s.c_str()), s.size()));
 }
 #  endif
 template <>
@@ -75,19 +71,13 @@ inline void write_escaped_path<std::filesystem::path::value_type>(
 
 }  // namespace detail
 
-FMT_MODULE_EXPORT
 template <typename Char>
 struct formatter<std::filesystem::path, Char>
     : formatter<basic_string_view<Char>> {
-  template <typename ParseContext> FMT_CONSTEXPR auto parse(ParseContext& ctx) {
-    auto out = formatter<basic_string_view<Char>>::parse(ctx);
-    this->set_debug_format(false);
-    return out;
-  }
   template <typename FormatContext>
   auto format(const std::filesystem::path& p, FormatContext& ctx) const ->
       typename FormatContext::iterator {
-    auto quoted = basic_memory_buffer<Char>();
+    basic_memory_buffer<Char> quoted;
     detail::write_escaped_path(quoted, p);
     return formatter<basic_string_view<Char>>::format(
         basic_string_view<Char>(quoted.data(), quoted.size()), ctx);
@@ -97,58 +87,12 @@ FMT_END_NAMESPACE
 #endif
 
 FMT_BEGIN_NAMESPACE
-FMT_MODULE_EXPORT
 template <typename Char>
 struct formatter<std::thread::id, Char> : basic_ostream_formatter<Char> {};
 FMT_END_NAMESPACE
 
-#ifdef __cpp_lib_optional
-FMT_BEGIN_NAMESPACE
-FMT_MODULE_EXPORT
-template <typename T, typename Char>
-struct formatter<std::optional<T>, Char,
-                 std::enable_if_t<is_formattable<T, Char>::value>> {
- private:
-  formatter<T, Char> underlying_;
-  static constexpr basic_string_view<Char> optional =
-      detail::string_literal<Char, 'o', 'p', 't', 'i', 'o', 'n', 'a', 'l',
-                             '('>{};
-  static constexpr basic_string_view<Char> none =
-      detail::string_literal<Char, 'n', 'o', 'n', 'e'>{};
-
-  template <class U>
-  FMT_CONSTEXPR static auto maybe_set_debug_format(U& u, bool set)
-      -> decltype(u.set_debug_format(set)) {
-    u.set_debug_format(set);
-  }
-
-  template <class U>
-  FMT_CONSTEXPR static void maybe_set_debug_format(U&, ...) {}
-
- public:
-  template <typename ParseContext> FMT_CONSTEXPR auto parse(ParseContext& ctx) {
-    maybe_set_debug_format(underlying_, true);
-    return underlying_.parse(ctx);
-  }
-
-  template <typename FormatContext>
-  auto format(std::optional<T> const& opt, FormatContext& ctx) const
-      -> decltype(ctx.out()) {
-    if (!opt) return detail::write<Char>(ctx.out(), none);
-
-    auto out = ctx.out();
-    out = detail::write<Char>(out, optional);
-    ctx.advance_to(out);
-    out = underlying_.format(*opt, ctx);
-    return detail::write(out, ')');
-  }
-};
-FMT_END_NAMESPACE
-#endif  // __cpp_lib_optional
-
 #ifdef __cpp_lib_variant
 FMT_BEGIN_NAMESPACE
-FMT_MODULE_EXPORT
 template <typename Char> struct formatter<std::monostate, Char> {
   template <typename ParseContext>
   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
@@ -197,6 +141,7 @@ auto write_variant_alternative(OutputIt out, const T& v) -> OutputIt {
 }
 
 }  // namespace detail
+
 template <typename T> struct is_variant_like {
   static constexpr const bool value = detail::is_variant_like_<T>::value;
 };
@@ -206,7 +151,6 @@ template <typename T, typename C> struct is_variant_formattable {
       detail::is_variant_formattable_<T, C>::value;
 };
 
-FMT_MODULE_EXPORT
 template <typename Variant, typename Char>
 struct formatter<
     Variant, Char,
@@ -223,15 +167,11 @@ struct formatter<
     auto out = ctx.out();
 
     out = detail::write<Char>(out, "variant(");
-    try {
-      std::visit(
-          [&](const auto& v) {
-            out = detail::write_variant_alternative<Char>(out, v);
-          },
-          value);
-    } catch (const std::bad_variant_access&) {
-      detail::write<Char>(out, "valueless by exception");
-    }
+    std::visit(
+        [&](const auto& v) {
+          out = detail::write_variant_alternative<Char>(out, v);
+        },
+        value);
     *out++ = ')';
     return out;
   }
@@ -240,7 +180,7 @@ FMT_END_NAMESPACE
 #endif  // __cpp_lib_variant
 
 FMT_BEGIN_NAMESPACE
-FMT_MODULE_EXPORT
+
 template <typename Char> struct formatter<std::error_code, Char> {
   template <typename ParseContext>
   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
@@ -251,14 +191,14 @@ template <typename Char> struct formatter<std::error_code, Char> {
   FMT_CONSTEXPR auto format(const std::error_code& ec, FormatContext& ctx) const
       -> decltype(ctx.out()) {
     auto out = ctx.out();
-    out = detail::write_bytes(out, ec.category().name(), format_specs<Char>());
+    out = detail::write_bytes(out, ec.category().name(),
+                              basic_format_specs<Char>());
     out = detail::write<Char>(out, Char(':'));
     out = detail::write<Char>(out, ec.value());
     return out;
   }
 };
 
-FMT_MODULE_EXPORT
 template <typename T, typename Char>
 struct formatter<
     T, Char,
@@ -282,7 +222,7 @@ struct formatter<
   template <typename OutputIt>
   auto format(const std::exception& ex,
               basic_format_context<OutputIt, Char>& ctx) const -> OutputIt {
-    format_specs<Char> spec;
+    basic_format_specs<Char> spec;
     auto out = ctx.out();
     if (!with_typename_)
       return detail::write_bytes(out, string_view(ex.what()), spec);

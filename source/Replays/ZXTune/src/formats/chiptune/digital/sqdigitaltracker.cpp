@@ -8,22 +8,23 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/digital/sqdigitaltracker.h"
+
 #include "formats/chiptune/container.h"
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <indices.h>
-#include <make_ptr.h>
-#include <range_checker.h>
-// library includes
-#include <binary/format_factories.h>
-#include <debug/log.h>
-#include <math/numeric.h>
-#include <strings/format.h>
-#include <strings/optimize.h>
-// std includes
+
+#include "binary/format_factories.h"
+#include "debug/log.h"
+#include "math/numeric.h"
+#include "strings/format.h"
+#include "strings/optimize.h"
+#include "tools/indices.h"
+#include "tools/range_checker.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <array>
 #include <cstring>
 
@@ -33,7 +34,7 @@ namespace Formats::Chiptune
   {
     const Debug::Stream Dbg("Formats::Chiptune::SQDigitalTracker");
 
-    const Char DESCRIPTION[] = "SQ Digital Tracker";
+    const auto DESCRIPTION = "SQ Digital Tracker"sv;
 
     // const std::size_t MAX_MODULE_SIZE = 0x4400 + 8 * 0x4000;
     const std::size_t MAX_POSITIONS_COUNT = 100;
@@ -311,15 +312,15 @@ namespace Formats::Chiptune
         target.SetInitialTempo(Source.Tempo);
         MetaBuilder& meta = target.GetMetaBuilder();
         const auto title = *Source.Title.begin() == '|' && *Source.Title.rbegin() == '|'
-                               ? StringView(Source.Title.data() + 1, &Source.Title.back())
-                               : StringView(Source.Title);
+                               ? MakeStringView(Source.Title.data() + 1, &Source.Title.back())
+                               : MakeStringView(Source.Title.begin(), Source.Title.end());
         meta.SetTitle(Strings::OptimizeAscii(title));
         meta.SetProgram(DESCRIPTION);
         Strings::Array names;
         names.reserve(SAMPLES_COUNT);
         for (const auto& name : Source.SampleNames)
         {
-          names.push_back(Strings::OptimizeAscii(name));
+          names.emplace_back(Strings::OptimizeAscii(name));
         }
         meta.SetStrings(names);
       }
@@ -495,7 +496,7 @@ namespace Formats::Chiptune
         "00-63"
         // length
         "01-64"
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -504,7 +505,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }

@@ -8,16 +8,18 @@
  *
  **/
 
-// local includes
 #include "module/players/xsf/xsf.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <formats/chiptune/emulation/portablesoundformat.h>
-#include <strings/conversion.h>
-#include <strings/join.h>
-#include <strings/split.h>
+
+#include "formats/chiptune/emulation/portablesoundformat.h"
+
+#include "strings/casing.h"
+#include "strings/conversion.h"
+#include "strings/join.h"
+#include "strings/split.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
 
 namespace Module::XSF
 {
@@ -31,7 +33,8 @@ namespace Module::XSF
   public:
     explicit FilePath(StringView str)
     {
-      Strings::Split(str, R"(/\)"_sv, Components);
+      const auto& elements = Strings::Split(str, R"(/\)"sv);
+      Components.assign(elements.begin(), elements.end());
     }
 
     FilePath RelativeTo(const FilePath& rh) const
@@ -60,7 +63,7 @@ namespace Module::XSF
 
     String ToString() const
     {
-      return Strings::Join(Components, "/"_sv);
+      return Strings::Join(Components, "/"sv);
     }
 
   private:
@@ -92,24 +95,24 @@ namespace Module::XSF
       Result.PackedProgramSection = std::move(blob);
     }
 
-    void SetYear(StringView date) override
+    void SetYear(String date) override
     {
-      GetMeta().Year = date.to_string();
+      GetMeta().Year = std::move(date);
     }
 
-    void SetGenre(StringView genre) override
+    void SetGenre(String genre) override
     {
-      GetMeta().Genre = genre.to_string();
+      GetMeta().Genre = std::move(genre);
     }
 
-    void SetCopyright(StringView copyright) override
+    void SetCopyright(String copyright) override
     {
-      GetMeta().Copyright = copyright.to_string();
+      GetMeta().Copyright = std::move(copyright);
     }
 
-    void SetDumper(StringView dumper) override
+    void SetDumper(String dumper) override
     {
-      GetMeta().Dumper = dumper.to_string();
+      GetMeta().Dumper = std::move(dumper);
     }
 
     void SetLength(Time::Milliseconds duration) override
@@ -127,19 +130,19 @@ namespace Module::XSF
       GetMeta().Volume = vol;
     }
 
-    void SetTag(StringView name, StringView value) override
+    void SetTag(String name, String value) override
     {
-      if (name == "_refresh"_sv)
+      if (name == "_refresh"sv)
       {
         GetMeta().RefreshRate = Strings::ConvertTo<uint_t>(value);
       }
       else
       {
-        GetMeta().Tags.emplace_back(name.to_string(), value.to_string());
+        GetMeta().Tags.emplace_back(std::move(name), std::move(value));
       }
     }
 
-    void SetLibrary(uint_t num, StringView filename) override
+    void SetLibrary(uint_t num, String filename) override
     {
       Result.Dependencies.resize(std::max<std::size_t>(Result.Dependencies.size(), num));
       Result.Dependencies[num - 1] = FilePath(filename).ToString();
@@ -148,22 +151,22 @@ namespace Module::XSF
     // MetaBuilder
     void SetProgram(StringView program) override
     {
-      GetMeta().Game = program.to_string();
+      GetMeta().Game = program;
     }
 
     void SetTitle(StringView title) override
     {
-      GetMeta().Title = title.to_string();
+      GetMeta().Title = title;
     }
 
     void SetAuthor(StringView author) override
     {
-      GetMeta().Artist = author.to_string();
+      GetMeta().Artist = author;
     }
     void SetStrings(const Strings::Array& /*strings*/) override {}
     void SetComment(StringView comment) override
     {
-      GetMeta().Comment = comment.to_string();
+      GetMeta().Comment = comment;
     }
 
     void MakeDependenciesRelativeTo(StringView filename)

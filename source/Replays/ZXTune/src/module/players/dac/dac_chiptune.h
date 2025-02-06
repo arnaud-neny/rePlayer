@@ -10,11 +10,11 @@
 
 #pragma once
 
-// library includes
-#include <devices/dac.h>
-#include <module/players/iterator.h>
-#include <module/players/track_model.h>
-#include <parameters/accessor.h>
+#include "module/players/iterator.h"
+#include "module/players/track_model.h"
+
+#include "devices/dac.h"
+#include "parameters/accessor.h"
 
 namespace Module::DAC
 {
@@ -23,7 +23,7 @@ namespace Module::DAC
   class DataIterator : public Iterator
   {
   public:
-    using Ptr = std::shared_ptr<DataIterator>;
+    using Ptr = std::unique_ptr<DataIterator>;
 
     virtual State::Ptr GetStateObserver() const = 0;
 
@@ -33,7 +33,7 @@ namespace Module::DAC
   class Chiptune
   {
   public:
-    using Ptr = std::shared_ptr<const Chiptune>;
+    using Ptr = std::unique_ptr<const Chiptune>;
     virtual ~Chiptune() = default;
 
     static Time::Microseconds GetFrameDuration()

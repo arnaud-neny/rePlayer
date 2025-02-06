@@ -8,12 +8,13 @@
  *
  **/
 
-// library includes
-#include <time/duration.h>
+#include "time/duration.h"
+
+#include "string_view.h"
 
 namespace Module::Sid
 {
   using TimeType = Time::Milliseconds;
 
-  TimeType GetSongLength(const char* md5digest, uint_t idx);
+  TimeType GetSongLength(StringView md5digest, uint_t idx);
 }  // namespace Module::Sid

@@ -23,7 +23,7 @@ template <typename T>
 using is_exotic_char = bool_constant<!std::is_same<T, char>::value>;
 
 inline auto write_loc(std::back_insert_iterator<detail::buffer<wchar_t>> out,
-                      loc_value value, const format_specs<wchar_t>& specs,
+                      loc_value value, const basic_format_specs<wchar_t>& specs,
                       locale_ref loc) -> bool {
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
   auto& numpunct =
@@ -37,7 +37,7 @@ inline auto write_loc(std::back_insert_iterator<detail::buffer<wchar_t>> out,
 }
 }  // namespace detail
 
-FMT_BEGIN_EXPORT
+FMT_MODULE_EXPORT_BEGIN
 
 using wstring_view = basic_string_view<wchar_t>;
 using wformat_parse_context = basic_format_parse_context<wchar_t>;
@@ -52,9 +52,7 @@ inline auto runtime(wstring_view s) -> wstring_view { return s; }
 #else
 template <typename... Args>
 using wformat_string = basic_format_string<wchar_t, type_identity_t<Args>...>;
-inline auto runtime(wstring_view s) -> runtime_format_string<wchar_t> {
-  return {{s}};
-}
+inline auto runtime(wstring_view s) -> basic_runtime<wchar_t> { return {{s}}; }
 #endif
 
 template <> struct is_char<wchar_t> : std::true_type {};
@@ -170,7 +168,7 @@ inline auto vformat_to(
   auto&& buf = detail::get_buffer<Char>(out);
   vformat_to(buf, detail::to_string_view(format_str), args,
              detail::locale_ref(loc));
-  return detail::get_iterator(buf, out);
+  return detail::get_iterator(buf);
 }
 
 template <
@@ -181,7 +179,7 @@ template <
 inline auto format_to(OutputIt out, const Locale& loc, const S& format_str,
                       Args&&... args) ->
     typename std::enable_if<enable, OutputIt>::type {
-  return vformat_to(out, loc, detail::to_string_view(format_str),
+  return vformat_to(out, loc, to_string_view(format_str),
                     fmt::make_format_args<buffer_context<Char>>(args...));
 }
 
@@ -238,22 +236,13 @@ template <typename... T> void print(wformat_string<T...> fmt, T&&... args) {
   return vprint(wstring_view(fmt), fmt::make_wformat_args(args...));
 }
 
-template <typename... T>
-void println(std::FILE* f, wformat_string<T...> fmt, T&&... args) {
-  return print(f, L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
-}
-
-template <typename... T> void println(wformat_string<T...> fmt, T&&... args) {
-  return print(L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
-}
-
 /**
   Converts *value* to ``std::wstring`` using the default format for type *T*.
  */
 template <typename T> inline auto to_wstring(const T& value) -> std::wstring {
   return format(FMT_STRING(L"{}"), value);
 }
-FMT_END_EXPORT
+FMT_MODULE_EXPORT_END
 FMT_END_NAMESPACE
 
 #endif  // FMT_XCHAR_H_

@@ -8,25 +8,26 @@
  *
  **/
 
-// local includes
 #include "core/plugins/archive_plugins_registrator.h"
 #include "core/src/location.h"
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <error.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/base64.h>
-#include <binary/compression/zlib_container.h>
-#include <binary/compression/zlib_stream.h>
-#include <binary/crc.h>
-#include <binary/data_builder.h>
-#include <core/plugin_attrs.h>
-#include <debug/log.h>
-#include <strings/prefixed_index.h>
-// std includes
+
+#include "binary/base64.h"
+#include "binary/compression/zlib_container.h"
+#include "binary/compression/zlib_stream.h"
+#include "binary/crc.h"
+#include "binary/data_builder.h"
+#include "core/plugin_attrs.h"
+#include "debug/log.h"
+#include "strings/prefixed_index.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "error.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <algorithm>
+#include <array>
 
 namespace ZXTune::Zdata
 {
@@ -232,7 +233,7 @@ namespace ZXTune::Zdata
 namespace ZXTune::Zdata
 {
   const auto ID = "ZDATA"_id;
-  const auto INFO = "Zdata"_sv;
+  const auto INFO = "Zdata"sv;
   const uint_t CAPS = Capabilities::Category::CONTAINER | Capabilities::Container::Type::ARCHIVE;
 }  // namespace ZXTune::Zdata
 
@@ -245,7 +246,7 @@ namespace ZXTune
     const Zdata::Header hdr = Zdata::Compress(input, builder);
     hdr.ToRaw(builder.Get<Zdata::RawHeader>(0));
     auto data = Zdata::Convert(builder.GetView());
-    return CreateLocation(std::move(data), Zdata::ID.to_string(),
+    return CreateLocation(std::move(data), String{Zdata::ID},
                           Strings::PrefixedIndex::Create(Zdata::PLUGIN_PREFIX, hdr.Crc).ToString());
   }
 }  // namespace ZXTune
@@ -262,9 +263,9 @@ namespace ZXTune::Zdata
       return ID;
     }
 
-    String Description() const override
+    StringView Description() const override
     {
-      return INFO.to_string();
+      return INFO;
     }
 
     uint_t Capabilities() const override
@@ -286,7 +287,7 @@ namespace ZXTune::Zdata
     DataLocation::Ptr TryOpen(const Parameters::Accessor& /*params*/, DataLocation::Ptr location,
                               const Analysis::Path& inPath) const override
     {
-      const auto& pathComp = inPath.GetIterator()->Get();
+      const auto& pathComp = inPath.Elements().front();
       const auto pathIndex = Strings::PrefixedIndex::Parse(PLUGIN_PREFIX, pathComp);
       if (pathIndex.IsValid())
       {

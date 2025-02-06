@@ -8,26 +8,25 @@
  *
  **/
 
-// local includes
 #include "module/players/aym/protracker3.h"
+
 #include "module/players/aym/aym_base.h"
 #include "module/players/aym/aym_base_track.h"
 #include "module/players/aym/aym_properties_helper.h"
 #include "module/players/aym/turbosound.h"
 #include "module/players/aym/vortex.h"
-// common includes
-#include <pointers.h>
-// library includes
-#include <module/players/platforms.h>
-#include <module/players/properties_meta.h>
-#include <module/players/simple_orderlist.h>
-#include <parameters/tracking_helper.h>
+#include "module/players/properties_meta.h"
+#include "module/players/simple_orderlist.h"
+
+#include "parameters/tracking_helper.h"
+
+#include "pointers.h"
 
 namespace Module::ProTracker3
 {
   using ModuleData = Vortex::ModuleData;
 
-  const Char TURBOSOUND_COMMENT[] = "TurboSound module";
+  const auto TURBOSOUND_COMMENT = "TurboSound module"sv;
 
   class DataBuilder : public Formats::Chiptune::ProTracker3::Builder
   {
@@ -52,7 +51,7 @@ namespace Module::ProTracker3
 
     void SetNoteTable(Formats::Chiptune::ProTracker3::NoteTable table) override
     {
-      const String freqTable = Vortex::GetFreqTable(static_cast<Vortex::NoteTable>(table), Data->Version);
+      const auto freqTable = Vortex::GetFreqTable(static_cast<Vortex::NoteTable>(table), Data->Version);
       Properties.SetFrequencyTable(freqTable);
     }
 
@@ -485,13 +484,13 @@ namespace Module::ProTracker3
       if (const auto container = Decoder->Parse(rawData, dataBuilder))
       {
         props.SetSource(*container);
-        props.SetPlatform(Platforms::ZX_SPECTRUM);
         const uint_t patOffset = dataBuilder.GetPatOffset();
         auto modData = dataBuilder.CaptureResult();
         if (patOffset != Formats::Chiptune::ProTracker3::SINGLE_AY_MODE)
         {
           // TurboSound modules
           props.SetComment(TURBOSOUND_COMMENT);
+          props.SetChannels(TurboSound::MakeChannelsNames());
           modData->Patterns = TS::CreatePatterns(patOffset, std::move(modData->Patterns));
           auto chiptune = MakePtr<TS::Chiptune>(std::move(modData), std::move(properties));
           return TurboSound::CreateHolder(std::move(chiptune));

@@ -8,26 +8,27 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/multidevice/sound98.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-#include <range_checker.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <formats/chiptune/container.h>
-#include <math/numeric.h>
-#include <strings/casing.h>
-#include <strings/encoding.h>
-#include <strings/trim.h>
+
+#include "formats/chiptune/container.h"
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "math/numeric.h"
+#include "strings/casing.h"
+#include "strings/sanitize.h"
+#include "strings/trim.h"
+#include "tools/range_checker.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
 
 namespace Formats::Chiptune
 {
   namespace Sound98
   {
-    const Char DESCRIPTION[] = "Sound 98";
+    const auto DESCRIPTION = "Sound 98"sv;
 
     const uint32_t VER0 = 0x53393830;
     const uint32_t VER1 = 0x53393831;
@@ -55,7 +56,7 @@ namespace Formats::Chiptune
         "00000000"  // not compressed
         "???00"     // offset to tag
         "??0000"    // offset to data
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -64,7 +65,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -98,10 +99,10 @@ namespace Formats::Chiptune
     namespace Tags
     {
       const uint8_t SIGNATURE[] = {'[', 'S', '9', '8', ']'};
-      const auto TITLE = "title"_sv;
-      const auto ARTIST = "artist"_sv;
-      const auto GAME = "game"_sv;
-      const auto COMMENT = "comment"_sv;
+      const auto TITLE = "title"sv;
+      const auto ARTIST = "artist"sv;
+      const auto GAME = "game"sv;
+      const auto COMMENT = "comment"sv;
 
       bool Match(StringView str, StringView tag)
       {
@@ -168,12 +169,12 @@ namespace Formats::Chiptune
         Stream.Seek(offset);
         if (sign < VER3)
         {
-          target.SetTitle(Strings::ToAutoUtf8(Stream.ReadCString(areas.GetAreaSize(TAG))));
+          target.SetTitle(Strings::Sanitize(Stream.ReadCString(areas.GetAreaSize(TAG))));
           return true;
         }
         else if (ReadTagSignature())
         {
-          const auto value = Strings::ToAutoUtf8(ReadMaybeTruncatedString(areas.GetAreaSize(TAG)));
+          const auto value = Strings::Sanitize(ReadMaybeTruncatedString(areas.GetAreaSize(TAG)));
           return ParsePSFTags(value, target);
         }
         else
@@ -189,7 +190,7 @@ namespace Formats::Chiptune
         const auto* end = start + std::min(maxSize, Stream.GetRestSize());
         const auto* limit = std::find(start, end, 0);
         Stream.Skip(limit - start + (limit != end));
-        return {safe_ptr_cast<const Char*>(start), static_cast<std::size_t>(limit - start)};
+        return {safe_ptr_cast<const char*>(start), static_cast<std::size_t>(limit - start)};
       }
 
       bool ReadTagSignature()
@@ -221,19 +222,19 @@ namespace Formats::Chiptune
           }
           else if (Tags::Match(name, Tags::TITLE))
           {
-            target.SetTitle(value);
+            target.SetTitle(Strings::Sanitize(value));
           }
           else if (Tags::Match(name, Tags::GAME))
           {
-            target.SetProgram(value);
+            target.SetProgram(Strings::Sanitize(value));
           }
           else if (Tags::Match(name, Tags::ARTIST))
           {
-            target.SetAuthor(value);
+            target.SetAuthor(Strings::Sanitize(value));
           }
           else if (Tags::Match(name, Tags::COMMENT))
           {
-            target.SetStrings({value.to_string()});
+            target.SetComment(Strings::SanitizeMultiline(value));
           }
           result = true;
         }
@@ -247,7 +248,7 @@ namespace Formats::Chiptune
         if (eqPos != line.npos)
         {
           name = Strings::TrimSpaces(line.substr(0, eqPos));
-          value = Strings::TrimSpaces(line.substr(eqPos + 1));
+          value = line.substr(eqPos + 1);
           return true;
         }
         else

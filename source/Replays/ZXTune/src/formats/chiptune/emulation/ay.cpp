@@ -8,25 +8,26 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/emulation/ay.h"
+
 #include "formats/chiptune/container.h"
-// common includes
-#include <byteorder.h>
-#include <contract.h>
-#include <make_ptr.h>
-#include <pointers.h>
-#include <range_checker.h>
-// library includes
-#include <binary/container_factories.h>
-#include <binary/crc.h>
-#include <binary/data_builder.h>
-#include <binary/format_factories.h>
-#include <debug/log.h>
-#include <formats/chiptune.h>
-#include <math/numeric.h>
-#include <strings/optimize.h>
-// std includes
+
+#include "binary/container_factories.h"
+#include "binary/crc.h"
+#include "binary/data_builder.h"
+#include "binary/format_factories.h"
+#include "debug/log.h"
+#include "formats/chiptune.h"
+#include "math/numeric.h"
+#include "strings/optimize.h"
+#include "tools/range_checker.h"
+
+#include "byteorder.h"
+#include "contract.h"
+#include "make_ptr.h"
+#include "pointers.h"
+#include "string_view.h"
+
 #include <array>
 #include <cstring>
 #include <list>
@@ -203,6 +204,7 @@ namespace Formats::Chiptune
       void AddBlock(uint16_t /*addr*/, Binary::View /*data*/) override {}
     };
 
+    const auto DESCRIPTION = "AY/EMUL"sv;
     const auto HEADER_FORMAT =
         "'Z'X'A'Y"  // uint8_t Signature[4];
         "'E'M'U'L"  // only one type is supported now
@@ -212,9 +214,7 @@ namespace Formats::Chiptune
         "??"        // misc offset
         "00"        // first module
         "00"        // last module
-        ""_sv;
-
-    const Char DESCRIPTION[] = "AY/EMUL";
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -223,7 +223,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(HEADER_FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -378,17 +378,17 @@ namespace Formats::Chiptune
 
       void SetTitle(StringView title) override
       {
-        Title = title.to_string();
+        Title = title;
       }
 
       void SetAuthor(StringView author) override
       {
-        Author = author.to_string();
+        Author = author;
       }
 
       void SetComment(StringView comment) override
       {
-        Comment = comment.to_string();
+        Comment = comment;
       }
 
       void SetProgram(StringView /*program*/) override {}
@@ -462,7 +462,7 @@ namespace Formats::Chiptune
           dst->Address = it->first;
           dst->Size = static_cast<uint16_t>(it->second->Size());
           SetPointer(&dst->Offset, result.Add(*it->second));
-          Dbg("Stored block {} bytes at {} stored at {}", uint_t(dst->Size), uint_t(dst->Address), uint_t(dst->Offset));
+          Dbg("Stored block {} bytes at {} stored at {}", dst->Size, dst->Address, dst->Offset);
         }
         return result.CaptureResult();
       }
@@ -564,7 +564,7 @@ namespace Formats::Chiptune
           const auto& block = data.GetField<EMUL::ModuleBlock>(&moddata.BlocksOffset, blockIdx);
           const uint16_t blockAddr = block.Address;
           const std::size_t blockSize = block.Size;
-          Dbg("Block {} bytes at {} located at {}", blockSize, uint_t(blockAddr), int_t(block.Offset)); // rePlayer
+          Dbg("Block {} bytes at {} located at {}", blockSize, blockAddr, block.Offset);
           if (const auto blockData = data.GetBlob(&block.Offset, blockSize))
           {
             target.AddBlock(blockAddr, blockData);

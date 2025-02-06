@@ -8,15 +8,18 @@
  *
  **/
 
-// local includes
 #include "core/plugins/players/vgm/videogamemusic.h"
-// common includes
-#include <byteorder.h>
-// library includes
-#include <binary/input_stream.h>
-#include <module/players/platforms.h>
-// std includes
+
+#include "module/players/platforms.h"
+
+#include "binary/input_stream.h"
+
+#include "byteorder.h"
+#include "string_type.h"
+#include "string_view.h"
+
 #include <map>
+#include <span>
 
 namespace Module::VideoGameMusic
 {
@@ -64,6 +67,7 @@ namespace Module::VideoGameMusic
     X1_010,
     C352,
     GA20,
+    MIKEY,
 
     GAMEGEAR_STEREO,
 
@@ -307,7 +311,14 @@ namespace Module::VideoGameMusic
         {
           {AY8910, {1500000}},
         }
-      }
+      },
+      // https://en.wikipedia.org/wiki/Atari_Lynx
+      {
+        Platforms::ATARI_LYNX,
+        {
+          {MIKEY, {16000000}},
+        }
+      },
     };
   // clang-format on
 
@@ -503,7 +514,7 @@ namespace Module::VideoGameMusic
       return Input.Read<le_uint32_t>();
     }
 
-    basic_string_view<le_uint16_t> ReadUtf16()
+    std::span<const le_uint16_t> ReadUtf16()
     {
       const auto symbolsAvailable = Input.GetRestSize() / sizeof(le_uint16_t);
       const auto* begin = safe_ptr_cast<const le_uint16_t*>(Input.PeekRawData(symbolsAvailable * sizeof(le_uint16_t)));
@@ -524,15 +535,15 @@ namespace Module::VideoGameMusic
       // clang-format off
         static const PlatformName PLATFORMS[] =
         {
-          {"Sega Master System"_sv, Platforms::SEGA_MASTER_SYSTEM},
-          {"Sega Game Gear"_sv, Platforms::GAME_GEAR},
-          {"Sega Mega Drive"_sv, Platforms::SEGA_GENESIS},
-          {"Sega Genesis"_sv, Platforms::SEGA_GENESIS},
-          {"Sega Game 1000"_sv, Platforms::SG_1000},
-          {"Sega Computer 3000"_sv, Platforms::SEGA_MASTER_SYSTEM},
-          {"Sega System 16"_sv, Platforms::SEGA_MASTER_SYSTEM},
-          {"Coleco"_sv, Platforms::COLECOVISION},
-          {"BBC M"_sv, Platforms::BBC_MICRO},
+          {"Sega Master System"sv, Platforms::SEGA_MASTER_SYSTEM},
+          {"Sega Game Gear"sv, Platforms::GAME_GEAR},
+          {"Sega Mega Drive"sv, Platforms::SEGA_GENESIS},
+          {"Sega Genesis"sv, Platforms::SEGA_GENESIS},
+          {"Sega Game 1000"sv, Platforms::SG_1000},
+          {"Sega Computer 3000"sv, Platforms::SEGA_MASTER_SYSTEM},
+          {"Sega System 16"sv, Platforms::SEGA_MASTER_SYSTEM},
+          {"Coleco"sv, Platforms::COLECOVISION},
+          {"BBC M"sv, Platforms::BBC_MICRO},
         };
       // clang-format on
       for (const auto& pair : PLATFORMS)
@@ -626,7 +637,8 @@ namespace Module::VideoGameMusic
           {ES5506, 0xd0},
           {X1_010, 0xd8},
           {C352, 0xdc},
-          {GA20, 0xe0}
+          {GA20, 0xe0},
+          {MIKEY, 0xe4},
         };
       // clang-format on
 
@@ -806,6 +818,7 @@ namespace Module::VideoGameMusic
       // clang-format off
         static const FixedCmd DUAL_PARAMETER_COMMANDS[] =
         {
+          {0x40, 0x40, 2, MIKEY},
           {0xa0, 0xa0, 2, AY8910},
           {0xb3, 0xb3, 2, LR35902},
           {0xb4, 0xb4, 2, N2A03},
@@ -907,7 +920,7 @@ namespace Module::VideoGameMusic
 
     static DeviceType GetDeviceTypeByBlockType(uint8_t type)
     {
-      static const DeviceType STREAMS[64] = {YM2612, RF5C68, RF5C164, PWM, OKIM6258, HUC6280, SCSP, N2A03};
+      static const DeviceType STREAMS[64] = {YM2612, RF5C68, RF5C164, PWM, OKIM6258, HUC6280, SCSP, N2A03, MIKEY};
 
       static const DeviceType DUMPS[64] = {SEGA_PCM, YM2608, YM2610,    YM2610,  YMF278B,  YMF271,  YMZ280B,
                                            YMF278B,  Y8950,  MULTI_PCM, UPD7759, OKIM6295, K054539, C140,

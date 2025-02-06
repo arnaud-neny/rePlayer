@@ -8,17 +8,17 @@
  *
  **/
 
-// local includes
 #include "module/players/dac/sqdigitaltracker.h"
+
+#include "devices/dac/sample_factories.h"
+#include "formats/chiptune/digital/sqdigitaltracker.h"
 #include "module/players/dac/dac_properties_helper.h"
 #include "module/players/dac/dac_simple.h"
-// library includes
-#include <devices/dac/sample_factories.h>
-#include <formats/chiptune/digital/sqdigitaltracker.h>
-#include <module/players/platforms.h>
-#include <module/players/properties_meta.h>
-#include <module/players/simple_orderlist.h>
-#include <module/players/tracking.h>
+#include "module/players/properties_meta.h"
+#include "module/players/simple_orderlist.h"
+#include "module/players/tracking.h"
+
+#include <array>
 
 namespace Module::SQDigitalTracker
 {
@@ -283,10 +283,7 @@ namespace Module::SQDigitalTracker
 
     void GetSamples(Devices::DAC::Chip& chip) const override
     {
-      for (uint_t idx = 0, lim = Data->Samples.Size(); idx != lim; ++idx)
-      {
-        chip.SetSample(idx, Data->Samples.Get(idx));
-      }
+      Data->SetupSamples(chip);
     }
 
   private:
@@ -300,12 +297,11 @@ namespace Module::SQDigitalTracker
     DAC::Chiptune::Ptr CreateChiptune(const Binary::Container& rawData,
                                       Parameters::Container::Ptr properties) const override
     {
-      DAC::PropertiesHelper props(*properties);
+      DAC::PropertiesHelper props(*properties, CHANNELS_COUNT);
       DataBuilder dataBuilder(props);
       if (const auto container = Formats::Chiptune::SQDigitalTracker::Parse(rawData, dataBuilder))
       {
         props.SetSource(*container);
-        props.SetPlatform(Platforms::ZX_SPECTRUM);
         return MakePtr<Chiptune>(dataBuilder.CaptureResult(), std::move(properties));
       }
       else

@@ -8,12 +8,14 @@
  *
  **/
 
-// library includes
-#include <parameters/accessor.h>
-#include <parameters/convert.h>
-#include <parameters/serialize.h>
-#include <parameters/visitor.h>
-// std includes
+#include "parameters/serialize.h"
+
+#include "parameters/accessor.h"
+#include "parameters/convert.h"
+#include "parameters/visitor.h"
+
+#include "string_view.h"
+
 #include <algorithm>
 
 namespace
@@ -40,34 +42,31 @@ namespace
       emplace(name.AsString(), ConvertToString(val));
     }
   };
-
-  void SetValue(Visitor& visitor, StringView name, StringView val)
-  {
-    IntType asInt;
-    DataType asData;
-    StringType asString;
-    if (ConvertFromString(val, asInt))
-    {
-      visitor.SetValue(name, asInt);
-    }
-    else if (ConvertFromString(val, asData))
-    {
-      visitor.SetValue(name, asData);
-    }
-    else if (ConvertFromString(val, asString))
-    {
-      visitor.SetValue(name, asString);
-    }
-  }
 }  // namespace
 
 namespace Parameters
 {
+  void Convert(StringView name, StringView value, class Visitor& visitor)
+  {
+    if (const auto asInt = ConvertIntegerFromString(value))
+    {
+      visitor.SetValue(name, *asInt);
+    }
+    else if (const auto asData = ConvertDataFromString(value))
+    {
+      visitor.SetValue(name, *asData);
+    }
+    else if (const auto asString = ConvertStringFromString(value))
+    {
+      visitor.SetValue(name, *asString);
+    }
+  }
+
   void Convert(const Strings::Map& map, Visitor& visitor)
   {
     for (const auto& entry : map)
     {
-      SetValue(visitor, entry.first, entry.second);
+      Convert(entry.first, entry.second, visitor);
     }
   }
 

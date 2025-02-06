@@ -8,29 +8,30 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/multidevice/videogamemusic.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <formats/chiptune/container.h>
-#include <math/numeric.h>
-#include <strings/split.h>
+
+#include "formats/chiptune/container.h"
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "math/numeric.h"
+#include "strings/sanitize.h"
+#include "strings/split.h"
+
+#include "contract.h"
+#include "make_ptr.h"
 
 namespace Formats::Chiptune
 {
   namespace VideoGameMusic
   {
-    const Char DESCRIPTION[] = "Video Game Music";
+    const auto DESCRIPTION = "Video Game Music"sv;
 
     const uint32_t SIGNATURE = 0x56676d20;
 
     const uint32_t GD3_SIGNATURE = 0x47643320;
     const uint_t VERSION_MIN = 100;
-    const uint_t VERSION_MAX = 171;
+    const uint_t VERSION_MAX = 172;
 
     class StubBuilder : public Builder
     {
@@ -49,9 +50,9 @@ namespace Formats::Chiptune
         "'V'g'm' "  // signature
         "????"      // eof offset
         // version
-        "00-09|10-19|20-29|30-39|40-49|50-59|60-69|70-71"
+        "00-09|10-19|20-29|30-39|40-49|50-59|60-69|70-72"
         "01 00 00"
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -60,7 +61,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -191,24 +192,24 @@ namespace Formats::Chiptune
       static void ParseTags(Binary::View tags, MetaBuilder& target)
       {
         Binary::DataInputStream input(tags);
-        const auto titleEn = ReadUTF16(input);
-        const auto titleJa = ReadUTF16(input);
+        const auto titleEn = ReadUTF16Sanitized(input);
+        const auto titleJa = ReadUTF16Sanitized(input);
         target.SetTitle(DispatchString(titleEn, titleJa));
-        const auto gameEn = ReadUTF16(input);
-        const auto gameJa = ReadUTF16(input);
+        const auto gameEn = ReadUTF16Sanitized(input);
+        const auto gameJa = ReadUTF16Sanitized(input);
         target.SetProgram(DispatchString(gameEn, gameJa));
         /*const auto systemEn = */ ReadUTF16(input);
         /*const auto systemJa = */ ReadUTF16(input);
-        const auto authorEn = ReadUTF16(input);
-        const auto authorJa = ReadUTF16(input);
+        const auto authorEn = ReadUTF16Sanitized(input);
+        const auto authorJa = ReadUTF16Sanitized(input);
         /*const auto date = */ ReadUTF16(input);
-        const auto ripper = ReadUTF16(input);
+        const auto ripper = ReadUTF16Sanitized(input);
         target.SetAuthor(DispatchString(authorEn, DispatchString(authorJa, ripper)));
         const auto comment = ReadUTF16(input);
-        Strings::Array strings;
-        Strings::Split(comment, "\r\n"_sv, strings);
-        if (!strings.empty())
+        if (const auto splitted = Strings::Split(comment, "\r\n"sv); !splitted.empty())
         {
+          Strings::Array strings(splitted.size());
+          std::transform(splitted.begin(), splitted.end(), strings.begin(), &Strings::Sanitize);
           target.SetStrings(strings);
         }
       }
@@ -220,21 +221,26 @@ namespace Formats::Chiptune
         {
           if (utf <= 0x7f)
           {
-            value += static_cast<Char>(utf);
+            value += static_cast<uint8_t>(utf);
           }
           else if (utf <= 0x7ff)
           {
-            value += static_cast<Char>(0xc0 | ((utf & 0x3c0) >> 6));
-            value += static_cast<Char>(0x80 | (utf & 0x3f));
+            value += static_cast<uint8_t>(0xc0 | ((utf & 0x3c0) >> 6));
+            value += static_cast<uint8_t>(0x80 | (utf & 0x3f));
           }
           else
           {
-            value += static_cast<Char>(0xe0 | ((utf & 0xf000) >> 12));
-            value += static_cast<Char>(0x80 | ((utf & 0x0fc0) >> 6));
-            value += static_cast<Char>(0x80 | ((utf & 0x003f)));
+            value += static_cast<uint8_t>(0xe0 | ((utf & 0xf000) >> 12));
+            value += static_cast<uint8_t>(0x80 | ((utf & 0x0fc0) >> 6));
+            value += static_cast<uint8_t>(0x80 | ((utf & 0x003f)));
           }
         }
         return value;
+      }
+
+      static String ReadUTF16Sanitized(Binary::DataInputStream& input)
+      {
+        return Strings::Sanitize(ReadUTF16(input));
       }
 
       static const String& DispatchString(const String& lh, const String& rh)

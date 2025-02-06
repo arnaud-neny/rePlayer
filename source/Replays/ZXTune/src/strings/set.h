@@ -10,12 +10,11 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// std includes
+#include "string_type.h"
+
 #include <set>
 
 namespace Strings
 {
-  using Set = std::set<String>;
+  using Set = std::set<String, std::less<>>;
 }

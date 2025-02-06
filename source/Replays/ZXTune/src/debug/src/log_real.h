@@ -10,14 +10,14 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// std includes
+#include "strings/format.h"
+
+#include "string_view.h"
+#include "types.h"
+
 #include <cassert>
 #include <string>
 #include <utility>
-// library includes
-#include <strings/format.h>
 
 namespace Debug
 {
@@ -47,7 +47,7 @@ namespace Debug
   {
   public:
     explicit Stream(StringView module)
-      : Module(module.to_string())
+      : Module(module)
       , Enabled(IsEnabledFor(Module))
     {}
 
@@ -63,9 +63,8 @@ namespace Debug
 
     //! @brief Conditionally outputs formatted debug message from specified module
     template<class... P>
-    void operator()(const char* msg, P&&... p) const
+    constexpr void operator()(Strings::FormatString<P...> msg, P&&... p) const
     {
-      assert(msg);
       if (Enabled)
       {
         Message(Module, Strings::Format(msg, std::forward<P>(p)...));

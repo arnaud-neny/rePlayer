@@ -8,12 +8,12 @@
  *
  **/
 
-// local includes
 #include "module/players/xsf/xsf_metainformation.h"
-// library includes
-#include <module/players/properties_helper.h>
-#include <parameters/modifier.h>
-#include <sound/sound_parameters.h>
+
+#include "module/players/properties_helper.h"
+
+#include "parameters/modifier.h"
+#include "sound/sound_parameters.h"
 
 namespace Module::XSF
 {
@@ -41,7 +41,8 @@ namespace Module::XSF
     MergeVal(Duration, rh.Duration);
     MergeVal(Fadeout, rh.Fadeout);
     MergeVal(Volume, rh.Volume);
-    // TODO: merge tags
+    // Just add as low-priority at end
+    std::copy(rh.Tags.begin(), rh.Tags.end(), std::back_inserter(Tags));
   }
 
   void MetaInformation::Dump(Parameters::Modifier& out) const

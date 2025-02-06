@@ -10,13 +10,9 @@
 
 #pragma once
 
-// local includes
 #include "formats/chiptune/aym/protracker3.h"
-// common includes
-#include <indices.h>
-// library includes
-#include <strings/encoding.h>
-#include <strings/trim.h>
+
+#include "tools/indices.h"
 
 namespace Formats::Chiptune::ProTracker3
 {
@@ -217,10 +213,4 @@ namespace Formats::Chiptune::ProTracker3
     Indices UsedOrnaments;
     Indices AvailableOrnaments;
   };
-
-  // may contain CP1251 symbols from VortexTracker
-  inline String DecodeString(StringView str)
-  {
-    return Strings::ToAutoUtf8(Strings::TrimSpaces(str));
-  }
 }  // namespace Formats::Chiptune::ProTracker3

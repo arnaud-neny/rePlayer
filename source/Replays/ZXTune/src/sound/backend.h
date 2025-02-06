@@ -10,14 +10,12 @@
 
 #pragma once
 
-// common includes
-#include <error.h>
-#include <iterator.h>
-// library includes
-#include <module/state.h>
-#include <sound/analyzer.h>
-#include <sound/backend_attrs.h>
-#include <sound/gain.h>
+#include "module/state.h"
+#include "sound/analyzer.h"
+#include "sound/backend_attrs.h"
+#include "sound/gain.h"
+
+#include "error.h"
 
 namespace Sound
 {
@@ -27,8 +25,6 @@ namespace Sound
   public:
     //! Pointer type
     using Ptr = std::shared_ptr<const BackendInformation>;
-    //! Iterator type
-    using Iterator = ObjectIterator<Ptr>;
 
     virtual ~BackendInformation() = default;
 

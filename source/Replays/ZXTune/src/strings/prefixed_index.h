@@ -10,8 +10,8 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
+#include "string_type.h"
+#include "string_view.h"
 
 namespace Strings
 {
@@ -34,7 +34,7 @@ namespace Strings
 
     String ToString() const
     {
-      return Str;
+      return String{Str};
     }
 
   private:

@@ -14,7 +14,7 @@
 #include <stdarg.h>
  
 #define __Z80EX_SELF_INCLUDE
-#include "include/z80ex_dasm.h"
+#include "include/z80ex_dasm.h" // rePlayer
 
 #ifdef _MSC_VER
 #define snprintf _snprintf

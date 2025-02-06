@@ -8,25 +8,25 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/fm/tfc.h"
+
 #include "formats/chiptune/container.h"
-// common includes
-#include <byteorder.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <strings/encoding.h>
-#include <strings/trim.h>
-// std includes
+
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "strings/sanitize.h"
+
+#include "byteorder.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <array>
 
 namespace Formats::Chiptune
 {
   namespace TFC
   {
-    const Char DESCRIPTION[] = "TurboFM Compiled Dump";
+    const auto DESCRIPTION = "TurboFM Compiled Dump"sv;
 
     using SignatureType = std::array<uint8_t, 6>;
 
@@ -86,7 +86,7 @@ namespace Formats::Chiptune
         "'T'F'M'c'o'm"
         "???"
         "32|3c"
-        ""_sv;
+        ""sv;
 
     class Decoder : public Formats::Chiptune::Decoder
     {
@@ -95,7 +95,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -272,11 +272,6 @@ namespace Formats::Chiptune
       mutable std::size_t Max = 0;
     };
 
-    String DecodeString(StringView str)
-    {
-      return Strings::ToAutoUtf8(Strings::TrimSpaces(str));
-    }
-
     Formats::Chiptune::Container::Ptr Parse(const Binary::Container& rawData, Builder& target)
     {
       const Binary::View data(rawData);
@@ -291,9 +286,9 @@ namespace Formats::Chiptune
         target.SetVersion({header.Version.data(), header.Version.size()});
         target.SetIntFreq(header.IntFreq);
         auto& meta = target.GetMetaBuilder();
-        meta.SetTitle(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        meta.SetAuthor(DecodeString(stream.ReadCString(MAX_STRING_SIZE)));
-        meta.SetComment(DecodeString(stream.ReadCString(MAX_COMMENT_SIZE)));
+        meta.SetTitle(Strings::Sanitize(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetAuthor(Strings::Sanitize(stream.ReadCString(MAX_STRING_SIZE)));
+        meta.SetComment(Strings::SanitizeMultiline(stream.ReadCString(MAX_COMMENT_SIZE)));
 
         const Container container(data);
         for (uint_t chan = 0; chan != 6; ++chan)

@@ -8,28 +8,28 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/aym/protracker3_detail.h"
 #include "formats/chiptune/container.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <binary/container_factories.h>
-#include <binary/format_factories.h>
-#include <binary/input_stream.h>
-#include <debug/log.h>
-#include <math/numeric.h>
-#include <strings/casing.h>
-#include <strings/conversion.h>
-#include <strings/format.h>
-#include <strings/split.h>
-// std includes
+
+#include "binary/container_factories.h"
+#include "binary/format_factories.h"
+#include "binary/input_stream.h"
+#include "debug/log.h"
+#include "math/numeric.h"
+#include "strings/casing.h"
+#include "strings/conversion.h"
+#include "strings/format.h"
+#include "strings/sanitize.h"
+#include "strings/split.h"
+#include "strings/trim.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <array>
 #include <cctype>
 #include <sstream>
-// boost includes
-#include <boost/algorithm/string/predicate.hpp>
 
 namespace Formats::Chiptune
 {
@@ -37,21 +37,21 @@ namespace Formats::Chiptune
   {
     const Debug::Stream Dbg("Formats::Chiptune::VortexTracker2");
 
-    const Char EDITOR[] = "VortexTracker (Pro Tracker v{}.{})";
+    constexpr auto EDITOR = "VortexTracker (Pro Tracker v{}.{})"sv;
 
     namespace Headers
     {
-      const auto MODULE = "Module"_sv;
-      const auto ORNAMENT = "Ornament"_sv;
-      const auto SAMPLE = "Sample"_sv;
-      const auto PATTERN = "Pattern"_sv;
+      const auto MODULE = "Module"sv;
+      const auto ORNAMENT = "Ornament"sv;
+      const auto SAMPLE = "Sample"sv;
+      const auto PATTERN = "Pattern"sv;
 
-      const auto VERSION = "Version"_sv;
-      const auto TITLE = "Title"_sv;
-      const auto AUTHOR = "Author"_sv;
-      const auto NOTETABLE = "NoteTable"_sv;
-      const auto SPEED = "Speed"_sv;
-      const auto PLAYORDER = "PlayOrder"_sv;
+      const auto VERSION = "Version"sv;
+      const auto TITLE = "Title"sv;
+      const auto AUTHOR = "Author"sv;
+      const auto NOTETABLE = "NoteTable"sv;
+      const auto SPEED = "Speed"sv;
+      const auto PLAYORDER = "PlayOrder"sv;
     }  // namespace Headers
 
     /*
@@ -303,13 +303,13 @@ namespace Formats::Chiptune
 
     public:
       SectionHeader(StringView category, StringView hdr)
-        : Category(category.to_string())
+        : Category(category)
         , Index(NO_INDEX)
         , Valid(false)
       {
         const auto start = '[' + Category;
-        const auto stop = "]"_sv;
-        if (boost::algorithm::istarts_with(hdr, start) && boost::algorithm::ends_with(hdr, stop))
+        const auto stop = "]"sv;
+        if (hdr.starts_with(start) && hdr.ends_with(stop))
         {
           Valid = true;
           const auto numStr = hdr.substr(start.size(), hdr.size() - start.size() - stop.size());
@@ -318,13 +318,13 @@ namespace Formats::Chiptune
       }
 
       explicit SectionHeader(StringView category)
-        : Category(category.to_string())
+        : Category(category)
         , Index(NO_INDEX)
         , Valid(true)
       {}
 
       SectionHeader(StringView category, int_t idx)
-        : Category(category.to_string())
+        : Category(category)
         , Index(idx)
         , Valid(true)
       {}
@@ -369,8 +369,7 @@ namespace Formats::Chiptune
       {
         const std::size_t NO_LOOP = ~std::size_t(0);
 
-        std::vector<StringView> elems;
-        Strings::Split(str, ',', elems);
+        const auto elems = Strings::Split(str, ',');
         Parent::resize(elems.size());
         std::size_t resLoop = NO_LOOP;
         for (std::size_t idx = 0; idx != elems.size(); ++idx)
@@ -465,8 +464,8 @@ namespace Formats::Chiptune
           Dbg(" {}={}", entry.Name, entry.Value);
           if (Strings::EqualNoCaseAscii(entry.Name, Headers::VERSION))
           {
-            static const String VERSION("3.");
-            Require(boost::algorithm::starts_with(entry.Value, VERSION));
+            constexpr auto VERSION = "3."sv;
+            Require(entry.Value.starts_with(VERSION));
             const String minorVal = entry.Value.substr(VERSION.size());
             const auto minor = Strings::ConvertTo<uint_t>(minorVal);
             Require(minor < 10);
@@ -534,13 +533,13 @@ namespace Formats::Chiptune
           Require(sepPos != str.npos);
           const auto first = str.substr(0, sepPos);
           const auto second = str.substr(sepPos + 1);
-          Name = Strings::TrimSpaces(first).to_string();
-          Value = Strings::TrimSpaces(second).to_string();
+          Name = Strings::TrimSpaces(first);
+          Value = Strings::Sanitize(second);
         }
 
         Entry(StringView name, StringView value)
-          : Name(name.to_string())
-          , Value(value.to_string())
+          : Name(name)
+          , Value(value)
         {}
 
         Entry(Entry&& rh) noexcept = default;
@@ -671,12 +670,11 @@ namespace Formats::Chiptune
         explicit LineObject(const StringView str)
           : Looped(false)
         {
-          std::vector<StringView> fields;
-          Strings::Split(str, ' ', fields);
+          const auto& fields = Strings::Split(str, ' ');
           switch (fields.size())
           {
           case 5:
-            Require(fields[4] == "L"_sv);
+            Require(fields[4] == "L"sv);
             Looped = true;
             [[fallthrough]];
           case 4:
@@ -796,7 +794,7 @@ namespace Formats::Chiptune
       {}
 
       explicit NoteObject(StringView val)
-        : Val(val.to_string())
+        : Val(val)
       {
         Require(val.size() == 3);
       }
@@ -1002,8 +1000,7 @@ namespace Formats::Chiptune
 
       explicit ChannelObject(StringView str)
       {
-        std::vector<StringView> fields;
-        Strings::Split(str, ' ', fields);
+        const auto& fields = Strings::Split(str, ' ');
         Require(fields.size() == 3);
         Note = NoteObject(fields[0]);
         Parameters = NoteParametersObject(fields[1]);
@@ -1034,8 +1031,7 @@ namespace Formats::Chiptune
 
       explicit PatternLineObject(StringView str)
       {
-        std::vector<StringView> fields;
-        Strings::Split(str, '|', fields);
+        const auto& fields = Strings::Split(str, '|');
         Require(fields.size() == 5);
         Envelope = EnvelopeBase(fields[0]);
         Noise = NoiseBase(fields[1]);
@@ -1160,8 +1156,8 @@ namespace Formats::Chiptune
         MetaBuilder& meta = Target.GetMetaBuilder();
         meta.SetProgram(Strings::Format(EDITOR, 3, hdr.Version));
         Target.SetVersion(hdr.Version);
-        meta.SetTitle(DecodeString(hdr.Title));
-        meta.SetAuthor(DecodeString(hdr.Author));
+        meta.SetTitle(Strings::Sanitize(hdr.Title));
+        meta.SetAuthor(Strings::Sanitize(hdr.Author));
         Target.SetNoteTable(hdr.Table);
         Target.SetInitialTempo(hdr.Tempo);
         Positions pos;
@@ -1210,8 +1206,8 @@ namespace Formats::Chiptune
       Builder& Target;
     };
 
-    const Char DESCRIPTION[] = "VortexTracker II";
-    const auto FORMAT = "'['M'o'd'u'l'e']"_sv;
+    const auto DESCRIPTION = "VortexTracker II"sv;
+    const auto FORMAT = "'['M'o'd'u'l'e']"sv;
 
     const std::size_t MIN_SIZE = 256;
 
@@ -1254,7 +1250,7 @@ namespace Formats::Chiptune
         : Format(Binary::CreateFormat(FORMAT, MIN_SIZE))
       {}
 
-      String GetDescription() const override
+      StringView GetDescription() const override
       {
         return DESCRIPTION;
       }
@@ -1307,12 +1303,12 @@ namespace Formats::Chiptune
 
       void SetTitle(StringView title) override
       {
-        Header.Title = title.to_string();
+        Header.Title = title;
       }
 
       void SetAuthor(StringView author) override
       {
-        Header.Author = author.to_string();
+        Header.Author = author;
       }
 
       void SetStrings(const Strings::Array& /*strings*/) override {}

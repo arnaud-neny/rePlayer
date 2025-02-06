@@ -8,15 +8,15 @@
  *
  **/
 
-// local includes
 #include "module/players/properties_helper.h"
-// library includes
-#include <binary/crc.h>
-#include <module/attributes.h>
-#include <sound/sound_parameters.h>
-#include <strings/join.h>
-// boost includes
-#include <boost/algorithm/string/trim_all.hpp>
+
+#include "binary/crc.h"
+#include "module/attributes.h"
+#include "sound/sound_parameters.h"
+#include "strings/join.h"
+#include "strings/trim.h"
+
+#include "string_view.h"
 
 namespace Module
 {
@@ -26,6 +26,11 @@ namespace Module
     {
       Delegate.SetValue(name, value);
     }
+  }
+
+  void PropertiesHelper::SetBinaryProperty(StringView name, Binary::View value)
+  {
+    Delegate.SetValue(name, value);
   }
 
   void PropertiesHelper::SetType(StringView type)
@@ -72,9 +77,10 @@ namespace Module
 
   void PropertiesHelper::SetStrings(const Strings::Array& strings)
   {
-    auto joined = Strings::Join(strings, "\n"_sv);
-    boost::algorithm::trim_all_if(joined, boost::algorithm::is_any_of("\n"));
-    SetNonEmptyProperty(ATTR_STRINGS, joined);
+    // TODO: Join(begin, end, delimiter)
+    const auto joined = Strings::Join(strings, "\n"sv);
+    const auto trimmed = Strings::Trim(joined, '\n');
+    SetNonEmptyProperty(ATTR_STRINGS, trimmed);
   }
 
   void PropertiesHelper::SetVersion(uint_t major, uint_t minor)
@@ -97,6 +103,14 @@ namespace Module
   void PropertiesHelper::SetPlatform(StringView platform)
   {
     Delegate.SetValue(ATTR_PLATFORM, platform);
+  }
+
+  void PropertiesHelper::SetChannels(const Strings::Array& names)
+  {
+    // TODO: Join(begin, end, delimiter)
+    const auto joined = Strings::Join(names, "\n"sv);
+    const auto trimmed = Strings::Trim(joined, '\n');
+    SetNonEmptyProperty(ATTR_CHANNELS_NAMES, trimmed);
   }
 
   void PropertiesHelper::SetFadein(Time::Milliseconds fadein)

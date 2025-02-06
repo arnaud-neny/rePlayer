@@ -10,24 +10,33 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// std includes
+#include "string_type.h"
+#include "types.h"
+
+#include "3rdparty/fmt/include/fmt/core.h"
+
 #include <utility>
-// other includes
-#include <3rdparty/fmt/include/fmt/core.h>
 
 namespace Strings
 {
+  template<class... P>
+  using FormatString = fmt::format_string<P...>;
+
   //! @brief Format functions
   //! @code
   //! const String& txt = Strings::Format(FORMAT_STRING, param1, param2);
   //! @endcode
-  template<class S, class... P>
-  String Format(S&& format, P&&... params)
+  template<class... P>
+  String Format(FormatString<P...> format, P&&... params) noexcept
   {
-    return fmt::vformat(std::forward<S>(format), fmt::make_format_args(std::forward<P>(params)...)); // rePlayer
+    return fmt::format(format, std::forward<P>(params)...);
   }
 
-  String FormatTime(uint_t hours, uint_t minutes, uint_t seconds, uint_t frames);
+  template<class... P>
+  String FormatRuntime(fmt::string_view format, P&&... params)
+  {
+    return fmt::format(fmt::runtime(format), std::forward<P>(params)...);
+  }
+
+  String FormatTime(uint_t hours, uint_t minutes, uint_t seconds, uint_t frames) noexcept;
 }  // namespace Strings

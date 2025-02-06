@@ -8,19 +8,19 @@
  *
  **/
 
-// common includes
-#include <make_ptr.h>
-// library includes
-#include <debug/log.h>
-#include <module/holder.h>
-#include <module/loop.h>
-#include <module/players/pipeline.h>
-#include <parameters/merged_accessor.h>
-#include <parameters/tracking_helper.h>
-#include <sound/gainer.h>
-#include <sound/render_params.h>
-#include <sound/sound_parameters.h>
-// std includes
+#include "module/players/pipeline.h"
+
+#include "debug/log.h"
+#include "module/holder.h"
+#include "module/loop.h"
+#include "parameters/merged_accessor.h"
+#include "parameters/tracking_helper.h"
+#include "sound/gainer.h"
+#include "sound/render_params.h"
+#include "sound/sound_parameters.h"
+
+#include "make_ptr.h"
+
 #include <algorithm>
 
 namespace Module
@@ -32,8 +32,7 @@ namespace Module
   Time::Duration<TimeUnit> GetDurationValue(const Parameters::Accessor& params, Parameters::Identifier name,
                                             Parameters::IntType def, Parameters::IntType precision)
   {
-    auto value = def;
-    params.FindValue(name, value);
+    const auto value = Parameters::GetInteger(params, name, def);
     return Time::Duration<TimeUnit>::FromRatio(value, precision);
   }
 
@@ -178,8 +177,7 @@ namespace Module
       if (Params.IsChanged())
       {
         using namespace Parameters::ZXTune::Sound;
-        auto val = GAIN_DEFAULT;
-        Params->FindValue(GAIN, val);
+        const auto val = Parameters::GetInteger(*Params, GAIN, GAIN_DEFAULT);
         Preamp = Sound::Gain::Type(val, GAIN_PRECISION);
         Debug("Preamp: {}%", val);
         Loop = Sound::GetLoopParameters(*Params);

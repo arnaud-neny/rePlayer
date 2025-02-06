@@ -8,26 +8,24 @@
  *
  **/
 
-// library includes
-#include <strings/array.h>
-#include <strings/fields.h>
-#include <strings/template.h>
-// common includes
-#include <make_ptr.h>
-// std includes
+#include "strings/template.h"
+
+#include "strings/array.h"
+#include "strings/fields.h"
+
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <algorithm>
 #include <cassert>
 
 namespace Strings
 {
-  const Char Template::FIELD_START = '[';
-  const Char Template::FIELD_END = ']';
-
   class PreprocessingTemplate : public Template
   {
   public:
     explicit PreprocessingTemplate(StringView templ)
-      : Value(templ.to_string())
+      : Value(templ)
     {
       const std::size_t fieldsAvg = std::count(templ.begin(), templ.end(), FIELD_START);
       FixedStrings.reserve(fieldsAvg);

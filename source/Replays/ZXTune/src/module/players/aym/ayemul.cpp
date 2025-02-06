@@ -8,24 +8,24 @@
  *
  **/
 
-// local includes
 #include "module/players/aym/ayemul.h"
+
+#include "formats/chiptune/emulation/ay.h"
 #include "module/players/aym/aym_base.h"
 #include "module/players/aym/aym_properties_helper.h"
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <core/core_parameters.h>
-#include <debug/log.h>
-#include <devices/beeper.h>
-#include <devices/z80.h>
-#include <formats/chiptune/emulation/ay.h>
-#include <module/players/duration.h>
-#include <module/players/properties_helper.h>
-#include <module/players/properties_meta.h>
-#include <module/players/streaming.h>
-// std includes
+#include "module/players/duration.h"
+#include "module/players/properties_helper.h"
+#include "module/players/properties_meta.h"
+#include "module/players/streaming.h"
+
+#include "core/core_parameters.h"
+#include "debug/log.h"
+#include "devices/beeper.h"
+#include "devices/z80.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+
 #include <algorithm>
 #include <utility>
 
@@ -453,17 +453,13 @@ namespace Module::AYEMUL
     uint_t IntTicks() const override
     {
       using namespace Parameters::ZXTune::Core::Z80;
-      Parameters::IntType intTicks = INT_TICKS_DEFAULT;
-      Params->FindValue(INT_TICKS, intTicks);
-      return static_cast<uint_t>(intTicks);
+      return Parameters::GetInteger<uint_t>(*Params, INT_TICKS, INT_TICKS_DEFAULT);
     }
 
     uint64_t ClockFreq() const override
     {
-      using namespace Parameters::ZXTune::Core;
-      Parameters::IntType cpuClock = Z80::CLOCKRATE_DEFAULT;
-      Params->FindValue(Z80::CLOCKRATE, cpuClock);
-      return static_cast<uint_t>(cpuClock);
+      using namespace Parameters::ZXTune::Core::Z80;
+      return Parameters::GetInteger<uint64_t>(*Params, CLOCKRATE, CLOCKRATE_DEFAULT);
     }
 
   private:
@@ -501,7 +497,7 @@ namespace Module::AYEMUL
   class Computer
   {
   public:
-    using Ptr = std::shared_ptr<Computer>;
+    using Ptr = std::unique_ptr<Computer>;
 
     Computer(ModuleData::Ptr data, Devices::Z80::ChipParameters::Ptr params, PortsPlexer::Ptr cpuPorts)
       : Data(std::move(data))
@@ -693,10 +689,9 @@ namespace Module::AYEMUL
     uint64_t ClockFreq() const override
     {
       const uint_t MIN_Z80_TICKS_PER_OUTPUT = 10;
-      using namespace Parameters::ZXTune::Core;
-      Parameters::IntType cpuClock = Z80::CLOCKRATE_DEFAULT;
-      Params->FindValue(Z80::CLOCKRATE, cpuClock);
-      return static_cast<uint_t>(cpuClock) / MIN_Z80_TICKS_PER_OUTPUT;
+      using namespace Parameters::ZXTune::Core::Z80;
+      const auto cpuClock = Parameters::GetInteger<uint64_t>(*Params, CLOCKRATE, CLOCKRATE_DEFAULT);
+      return cpuClock / MIN_Z80_TICKS_PER_OUTPUT;
     }
 
     uint_t SoundFreq() const override

@@ -8,14 +8,14 @@
  *
  **/
 
-// common includes
-#include <contract.h>
-#include <make_ptr.h>
-// library includes
-#include <debug/log.h>
-#include <l10n/api.h>
-#include <strings/map.h>
-// boost includes
+#include "debug/log.h"
+#include "l10n/api.h"
+#include "strings/map.h"
+
+#include "contract.h"
+#include "make_ptr.h"
+#include "string_view.h"
+
 #include <boost/locale/gnu_gettext.hpp>
 #include <boost/locale/util.hpp>
 
@@ -30,29 +30,29 @@ namespace
   public:
     DomainVocabulary(LocalePtr locale, StringView domain)
       : Locale(std::move(locale))
-      , Domain(domain.to_string())
+      , Domain(domain)
     {
       Dbg("Created vocabulary for domain '{}'", Domain);
     }
 
     String GetText(const char* text) const override
     {
-      return boost::locale::dgettext<Char>(Domain.c_str(), text, *Locale);
+      return boost::locale::dgettext(Domain.c_str(), text, *Locale);
     }
 
     String GetText(const char* single, const char* plural, int count) const override
     {
-      return boost::locale::dngettext<Char>(Domain.c_str(), single, plural, count, *Locale);
+      return boost::locale::dngettext(Domain.c_str(), single, plural, count, *Locale);
     }
 
     String GetText(const char* context, const char* text) const override
     {
-      return boost::locale::dpgettext<Char>(Domain.c_str(), context, text, *Locale);
+      return boost::locale::dpgettext(Domain.c_str(), context, text, *Locale);
     }
 
     String GetText(const char* context, const char* single, const char* plural, int count) const override
     {
-      return boost::locale::dnpgettext<Char>(Domain.c_str(), context, single, plural, count, *Locale);
+      return boost::locale::dnpgettext(Domain.c_str(), context, single, plural, count, *Locale);
     }
 
   private:
@@ -129,7 +129,8 @@ namespace
       {
         if (const auto* info = Locales.FindPtr(translation))
         {
-          auto* const facet = gnu_gettext::create_messages_facet<Char>(*info);
+          // TODO: leak?
+          auto* const facet = gnu_gettext::create_messages_facet<StringView::value_type>(*info);
           Require(facet != nullptr);
           *CurrentLocale = std::locale(std::locale::classic(), facet);
           Dbg("Selected translation {}", translation);
@@ -138,7 +139,7 @@ namespace
       }
       catch (const std::exception& e)
       {
-        Dbg("Failed to select translation {}: {}", e.what());
+        Dbg("Failed to select translation {}: {}", translation, e.what());
       }
       *CurrentLocale = std::locale();
       Dbg("Selected unknown translation {}", translation);

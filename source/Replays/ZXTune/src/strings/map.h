@@ -10,15 +10,15 @@
 
 #pragma once
 
-// common includes
-#include <types.h>
-// std includes
+#include "string_type.h"
+#include "string_view.h"
+
 #include <map>
 #include <stdexcept>
 
 namespace Strings
 {
-  using Map = std::map<String, String>;
+  using Map = std::map<String, String, std::less<>>;
 
   template<class T>
   class ValueMap : public std::map<String, T, std::less<>>
@@ -37,6 +37,7 @@ namespace Strings
     using parent::emplace;
     using parent::erase;
 
+    // TODO: remove at c++26
     auto& operator[](StringView key)
     {
       const auto it = find(key);
@@ -44,25 +45,27 @@ namespace Strings
       {
         return it->second;
       }
-      return emplace(key.to_string(), T()).first->second;
+      return emplace(key, T()).first->second;
     }
 
+    // TODO: remove at c++26
     auto& at(StringView key)
     {
       const auto it = find(key);
       if (it == end())
       {
-        throw std::out_of_range("No key " + key.to_string());
+        throw std::out_of_range("No key "s + key);
       }
       return it->second;
     }
 
+    // TODO: remove at c++26
     const auto& at(StringView key) const
     {
       const auto it = find(key);
       if (it == cend())
       {
-        throw std::out_of_range("No key " + key.to_string());
+        throw std::out_of_range("No key "s + key);
       }
       return it->second;
     }

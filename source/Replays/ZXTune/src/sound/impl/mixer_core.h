@@ -10,9 +10,10 @@
 
 #pragma once
 
-// library includes
-#include <sound/gain.h>
-#include <sound/multichannel_sample.h>
+#include "sound/gain.h"
+#include "sound/multichannel_sample.h"
+
+#include <array>
 
 namespace Sound
 {

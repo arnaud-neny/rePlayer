@@ -8,15 +8,15 @@
  *
  **/
 
-// local includes
 #include "formats/chiptune/music/tags_vorbis.h"
-// common includes
-#include <byteorder.h>
-// library includes
-#include <strings/casing.h>
-#include <strings/encoding.h>
-#include <strings/trim.h>
-// std includes
+
+#include "binary/base64.h"
+#include "strings/casing.h"
+#include "strings/sanitize.h"
+
+#include "byteorder.h"
+#include "string_view.h"
+
 #include <array>
 
 namespace Formats::Chiptune::Vorbis
@@ -28,41 +28,36 @@ namespace Formats::Chiptune::Vorbis
     return {utf8, size};
   }
 
-  String Decode(StringView str)
-  {
-    // do not trim before- it may break some encodings
-    auto decoded = Strings::ToAutoUtf8(str);
-    auto trimmed = Strings::TrimSpaces(decoded);
-    return decoded.size() == trimmed.size() ? decoded : trimmed.to_string();
-  }
-
   void ParseCommentField(StringView field, MetaBuilder& target)
   {
     const auto eqPos = field.find('=');
     if (eqPos == StringView::npos)
     {
-      target.SetStrings({Decode(field)});
+      target.SetComment(Strings::SanitizeMultiline(field));
       return;
     }
     const auto name = field.substr(0, eqPos);
     const auto value = field.substr(eqPos + 1);
-    Strings::Array strings;
-    if (Strings::EqualNoCaseAscii(name, "TITLE"_sv))
+    if (Strings::EqualNoCaseAscii(name, "TITLE"sv))
     {
-      target.SetTitle(Decode(value));
+      target.SetTitle(Strings::Sanitize(value));
     }
-    else if (Strings::EqualNoCaseAscii(name, "ARTIST"_sv) || Strings::EqualNoCaseAscii(name, "PERFORMER"_sv))
+    else if (Strings::EqualNoCaseAscii(name, "ARTIST"sv) || Strings::EqualNoCaseAscii(name, "PERFORMER"sv))
     {
-      target.SetAuthor(Decode(value));
+      target.SetAuthor(Strings::Sanitize(value));
     }
-    else if (Strings::EqualNoCaseAscii(name, "COPYRIGHT"_sv) || Strings::EqualNoCaseAscii(name, "DESCRIPTION"_sv))
+    else if (Strings::EqualNoCaseAscii(name, "COPYRIGHT"sv) || Strings::EqualNoCaseAscii(name, "DESCRIPTION"sv))
     {
-      strings.emplace_back(Decode(value));
+      target.SetComment(Strings::SanitizeMultiline(value));
     }
-    // TODO: meta.SetComment
-    if (!strings.empty())
+    else if (Strings::EqualNoCaseAscii(name, "COVERART"sv))
     {
-      target.SetStrings(strings);
+      try
+      {
+        target.SetPicture(Binary::Base64::Decode(value));
+      }
+      catch (const std::exception&)
+      {}
     }
   }
 
