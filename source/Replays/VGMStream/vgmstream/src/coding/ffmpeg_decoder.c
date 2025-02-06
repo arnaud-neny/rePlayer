@@ -238,6 +238,10 @@ static int ffmpeg_read(void* opaque, uint8_t* buf, int read_size) {
 
     /* main read */
     bytes = read_streamfile(buf, data->offset, read_size, data->sf);
+    // rePlayer begin: handle file error
+    if (bytes == 0 && read_size)
+        return AVERROR_EOF;
+    // rePlayer end
     data->logical_offset += bytes;
     data->offset += bytes;
     return bytes + max_to_copy;
