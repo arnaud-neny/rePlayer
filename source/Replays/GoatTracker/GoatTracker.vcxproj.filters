@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{72798978-f64a-4878-b4de-4fd04b664f8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\resid">
+      <UniqueIdentifier>{cb8350a1-a043-4839-8cba-897056714763}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\resid-fp">
+      <UniqueIdentifier>{bb62ea9e-83a9-40b5-be40-d58fb5937104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\bme">
+      <UniqueIdentifier>{b92307d7-9f17-4c2c-8a86-ce7353c3c449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\asm">
+      <UniqueIdentifier>{6e5d81c4-ff22-4852-a7f0-b273f6ed8e4c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayGoatTracker.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\envelope.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\extfilt.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\filter.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\pot.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\sid.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\siddefs.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\spline.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\voice.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid\wave.h">
+      <Filter>Source Files\src\resid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\envelopefp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\extfiltfp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\filterfp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\potfp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\siddefsfp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\sidfp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\voicefp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resid-fp\wavefp.h">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsong.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gcommon.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\goattrk2.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gfile.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ginstr.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gtable.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gplay.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gpattern.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gorder.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\greloc.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsid.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsound.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gdisplay.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme_main.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gconsole.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\parse.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\membuf.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\int.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\vec.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\callback.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\expr.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\asmtab.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme_win.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme_cfg.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\log.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\chnkpool.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\namedbuf.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\pc.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asm\membufio.h">
+      <Filter>Source Files\src\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme_end.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bme\bme_io.h">
+      <Filter>Source Files\src\bme</Filter>
+    </ClInclude>
+    <ClInclude Include="stdio_wrap.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayGoatTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\envelope.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\extfilt.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\filter.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\pot.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\sid.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\version.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\voice.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave6581__ST.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave6581_P_T.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave6581_PS_.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave6581_PST.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave8580__ST.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave8580_P_T.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave8580_PS_.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid\wave8580_PST.cpp">
+      <Filter>Source Files\src\resid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\envelopefp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\extfiltfp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\filterfp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\potfp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\sidfp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\versionfp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\voicefp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resid-fp\wavefp.cpp">
+      <Filter>Source Files\src\resid-fp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsong.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gplay.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsid.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gpattern.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gorder.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ginstr.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtable.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\greloc.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\membuf.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\asmtab.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\lexyy.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\vec.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\expr.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\parse.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\log.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\chnkpool.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\namedbuf.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\membufio.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asm\pc.c">
+      <Filter>Source Files\src\asm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="authors" />
+    <None Include="copying" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+    <Text Include="readme_resid.txt" />
+  </ItemGroup>
+</Project>

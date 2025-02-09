@@ -61,7 +61,7 @@ EXTENSION(v2m)
 EXTENSION(sndh)
 EXTENSION(sc68)
 EXTENSION(hsc)
-EXTENSION(sng)          // Adlib: ? : & UADE: ZoundMonitor & VGMStream: Electronic Arts SCHl
+EXTENSION(sng)          // Adlib: ? : & GoatTracker & UADE: ZoundMonitor & VGMStream: Electronic Arts SCHl
 EXTENSION(wlf)
 EXTENSION(adlib)
 EXTENSION(a2m)
