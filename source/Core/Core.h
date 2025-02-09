@@ -53,10 +53,10 @@ namespace core
         return T1((size + alignment - 1) & ~(alignment - 1));
     }
 
-    template <typename T, uint32_t NumItems>
-    inline constexpr uint32_t NumItemsOf(const T (&)[NumItems])
+    template <typename ReturnType = uint32_t, typename T, uint32_t NumItems>
+    inline constexpr ReturnType NumItemsOf(const T (&)[NumItems])
     {
-        return NumItems;
+        return ReturnType(NumItems);
     }
 
     /**
