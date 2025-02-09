@@ -25,7 +25,7 @@ namespace rePlayer
     int32_t Countries::GetIndex(const char* name)
     {
         int16_t countryIndex = -1;
-        for (int16_t i = 0; i < NumItemsOf(ms_countriesName); i++)
+        for (int16_t i = 0; i < NumItemsOf<int16_t>(ms_countriesName); i++)
         {
             if (_strnicmp(ms_countriesName[i], name, ms_countriesSize[i]) == 0)
             {
