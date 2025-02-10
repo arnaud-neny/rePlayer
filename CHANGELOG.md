@@ -1,3 +1,10 @@
+v0.17.0:
+- Added GoatTracker
+- Updated OpenMPT to 0.8.0-pre.12 r22871
+- Updated ZXTune to r5081
+- Updated libcurl to 8.12.0
+- Bug fixes
+
 v0.16.15:
 - Added XMP
 - Updated adplug to 2.3.3.890

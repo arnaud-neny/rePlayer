@@ -28,6 +28,7 @@
 - FutureComposer: https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder
 - game-music-emu: https://github.com/libgme/game-music-emu
 - gbsplay: https://github.com/mmitch/gbsplay
+- GoatTracker: https://sourceforge.net/p/goattracker2
 - Highly Advanced: https://bitbucket.org/losnoco/cog
 - Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
 - Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib

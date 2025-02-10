@@ -190,6 +190,7 @@ Or add some comments (and likes) there:
 - [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
 - [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
+- [GoatTracker](https://sourceforge.net/p/goattracker2): A crossplatform music editor for creating Commodore 64 music.
 - [Highly Advanced](https://bitbucket.org/losnoco/cog): Gameboy Advanced player.
 - [Highly Competitive/snsf9x](https://github.com/loveemu/snsf9x): Super Nintendo music player.
 - [Highly Experimental](https://bitbucket.org/losnoco/highly_experimental): Playstation and Playstation 2 music player.
