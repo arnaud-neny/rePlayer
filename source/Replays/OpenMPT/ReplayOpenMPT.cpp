@@ -6,7 +6,6 @@
 #include "ReplayOpenMPT.h"
 
 #include <Audio/AudioTypes.inl.h>
-#include <Core/log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
