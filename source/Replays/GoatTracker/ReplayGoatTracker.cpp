@@ -268,7 +268,9 @@ namespace rePlayer
     };
 
     ReplayGoatTracker::~ReplayGoatTracker()
-    {}
+    {
+        sid_uninit();
+    }
 
     ReplayGoatTracker::ReplayGoatTracker(uint32_t numSongs, uint32_t songId, bool isNtsc)
         : Replay(eExtension::_sng, eReplay::GoatTracker)

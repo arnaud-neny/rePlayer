@@ -180,6 +180,22 @@ void sid_init(int speed, unsigned m, unsigned ntsc, unsigned interpolate, unsign
   }
 }
 
+// rePlayer begin
+void sid_uninit(void)
+{
+  if (sidfp)
+  {
+    delete sidfp;
+    sidfp = NULL;
+  }
+  if (sid)
+  {
+    delete sid;
+    sid = NULL;
+  }
+}
+// rePlayer end
+
 unsigned char sid_getorder(unsigned char index)
 {
   if (adparam >= 0xf000)
