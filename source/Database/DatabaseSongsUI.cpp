@@ -183,14 +183,18 @@ namespace rePlayer
 
     void DatabaseSongsUI::DisplaySongsTable(bool& isDirty)
     {
+        float windowHeight = ImGui::GetContentRegionAvail().y;
         float trackingPos = FLT_MAX;
         // Create a child to be able to detect the focus and do the Ctrl-A
         std::string childId = m_header + "Child";
+        float childStart = 0.0f;
         if (ImGui::BeginChild(childId.c_str(), ImVec2(0.0f, 0.0f), m_isScrollingEnabled ? 0 : ImGuiChildFlags_AutoResizeY))
         {
             const ImGuiTableFlags flags = (m_isScrollingEnabled ? ImGuiTableFlags_ScrollY : ImGuiTableFlags_None)
                 | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
                 | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Hideable;
+
+            childStart = ImGui::GetCursorPosY();
 
             if (ImGui::BeginTable("songs", kNumIDs, flags))
             {
@@ -340,6 +344,13 @@ namespace rePlayer
                 for (auto& entry : m_entries)
                     entry.Select(true);
             }
+        }
+        if (!m_isScrollingEnabled)
+        {
+            // add a dummy item if we don't fill the window so if we click on these region, the child will have focus and Ctrl-A will work)
+            float height = ImGui::GetCursorPosY() - childStart;
+            if (height < windowHeight)
+                ImGui::Dummy(ImVec2(0.0f, windowHeight - height));
         }
         ImGui::EndChild();
 
@@ -1103,6 +1114,7 @@ namespace rePlayer
                                 for (auto& subsong : song->subsongs)
                                     subsong.isPlayed = false;
                             }
+                            song->subsongs[0].isInvalid = false;
                         }
                     }
                     m_db.Raise(Database::Flag::kSaveSongs);
