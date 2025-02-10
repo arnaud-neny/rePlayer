@@ -24,8 +24,8 @@ namespace rePlayer
 
     int32_t Countries::GetIndex(const char* name)
     {
-        int16_t countryIndex = -1;
-        for (int16_t i = 0; i < NumItemsOf<int16_t>(ms_countriesName); i++)
+        int32_t countryIndex = -1;
+        for (int32_t i = 0; i < NumItemsOf<int32_t>(ms_countriesName); i++)
         {
             if (_strnicmp(ms_countriesName[i], name, ms_countriesSize[i]) == 0)
             {
@@ -47,7 +47,7 @@ namespace rePlayer
 
     const char* Countries::GetName(int16_t code)
     {
-        for (int32_t i = 0; i < NumItemsOf(ms_countriesId); i++)
+        for (uint32_t i = 0; i < NumItemsOf(ms_countriesId); i++)
         {
             if (ms_countriesId[i] == code)
                 return ms_countriesName[i];
@@ -60,7 +60,7 @@ namespace rePlayer
     {
         Array<const char*> list;
 
-        for (int32_t i = 1; i < NumItemsOf(ms_countriesId); i++)
+        for (uint32_t i = 1; i < NumItemsOf(ms_countriesId); i++)
         {
             if (excluded.Remove(ms_countriesId[i]) < 0)
                 list.Add(ms_countriesName[i]);
