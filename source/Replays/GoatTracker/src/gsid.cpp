@@ -10,10 +10,10 @@
 #include "resid-fp/sidfp.h"
 
 // rePlayer begin
+#include <string.h>
 #include <utility>
 namespace rePlayer
 {
-    extern int stereosid;
     template <typename SidType>
     struct SidT
     {
@@ -42,16 +42,10 @@ namespace rePlayer
             sid[0].reset();
             sid[1].reset();
         }
-        void write(reg8 offset, reg8 value)
+        void write(reg8 offset, reg8 value1, reg8 value2)
         {
-            if (stereosid && (offset == 0x4 || offset == 0x4 + 7 * 2))
-                sid[0].write(offset, 0x08);
-            else
-                sid[0].write(offset, value);
-            if (stereosid && offset == 0x4 + 7)
-                sid[1].write(offset, 0x08);
-            else
-                sid[1].write(offset, value);
+            sid[0].write(offset, value1);
+            sid[1].write(offset, value2);
         }
     };
 }
@@ -60,6 +54,8 @@ typedef rePlayer::SidT<SID> SIDS;
 typedef rePlayer::SidT<SIDFP> SIDSFP;
 
 extern "C" {
+extern int stereosid;
+extern int numchannels;
 // rePlayer end
 
 #include "gsid.h"
@@ -68,6 +64,7 @@ extern "C" {
 int clockrate;
 int samplerate;
 unsigned char sidreg[NUMSIDREGS];
+unsigned char sidreg2[NUMSIDREGS];
 
 unsigned char sidorder[] =
   {0x15,0x16,0x18,0x17,
@@ -211,11 +208,39 @@ int sid_fillbuffer(short *ptr, int samples)
   int result = 0;
   int total = 0;
   int c;
+  unsigned char *s1, *s2; // rePlayer
+  unsigned char s1copy[NUMSIDREGS], s2copy[NUMSIDREGS]; // rePlayer
 
   int badline = rand() % NUMSIDREGS;
 
   tdelta = clockrate * samples / samplerate;
   if (tdelta <= 0) return total;
+
+   // rePlayer begin
+  if (numchannels == 3)
+  {
+    if (stereosid)
+    {
+      memcpy(s1copy, sidreg, sizeof(sidreg));
+      memcpy(s2copy, sidreg, sizeof(sidreg));
+      s1copy[0x4 + 7 * 0] = 0x08;
+      s2copy[0x4 + 7 * 1] = 0x08;
+      s1copy[0x4 + 7 * 2] = 0x08;
+      s1 = s1copy;
+      s2 = s2copy;
+    }
+    else
+    {
+      s1 = sidreg;
+      s2 = sidreg;
+    }
+  }
+  else
+  {
+    s1 = sidreg;
+    s2 = sidreg2;
+  }
+  // rePlayer end
 
   for (c = 0; c < NUMSIDREGS; c++)
   {
@@ -233,8 +258,8 @@ int sid_fillbuffer(short *ptr, int samples)
       tdelta -= residdelay;
     }
 
-    if (sid) sid->write(o, sidreg[o]);
-    if (sidfp) sidfp->write(o, sidreg[o]);
+    if (sid) sid->write(o, s1[o], s2[o]); // rePlayer
+    if (sidfp) sidfp->write(o, s1[o], s2[o]); // rePlayer
 
     tdelta2 = SIDWRITEDELAY;
     if (sid) result = sid->clock(tdelta2, ptr, samples);

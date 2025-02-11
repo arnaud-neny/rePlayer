@@ -40,6 +40,11 @@ unsigned char filtertype = 0;
 unsigned char filtercutoff = 0;
 unsigned char filtertime = 0;
 unsigned char filterptr = 0;
+unsigned char filter2ctrl = 0;
+unsigned char filter2type = 0;
+unsigned char filter2cutoff = 0;
+unsigned char filter2time = 0;
+unsigned char filter2ptr = 0;
 unsigned char funktable[2];
 unsigned char masterfader = 0x0f;
 int psnum = 0;
@@ -58,8 +63,8 @@ void initchannels(void)
 
   for (c = 0; c < MAX_CHN; c++)
   {
-    chn[c].trans = 0;
-    chn[c].instr = 1;
+  	chn[c].trans = 0;
+  	chn[c].instr = 1;
     if (multiplier)
       cptr->tempo = 6*multiplier-1;
     else
@@ -129,8 +134,16 @@ void playtestnote(int note, int ins, int chnnum)
     chn[chnnum].gate = 0xfe; // Keyoff
     if (!(instr[ins].gatetimer & 0x80))
     {
-      sidreg[0x5+chnnum*7] = adparam>>8; // Hardrestart
-      sidreg[0x6+chnnum*7] = adparam&0xff;
+      if (chnnum < 3)
+      {
+        sidreg[0x5+chnnum*7] = adparam>>8; // Hardrestart
+        sidreg[0x6+chnnum*7] = adparam&0xff;
+      }
+      else
+      {
+        sidreg2[0x5+(chnnum-3)*7] = adparam>>8; // Hardrestart
+        sidreg2[0x6+(chnnum-3)*7] = adparam&0xff;
+      }
     }
   }
 
@@ -173,13 +186,18 @@ void playroutine(void)
 
     filterctrl = 0;
     filterptr = 0;
+    filter2ctrl = 0;
+    filter2ptr = 0;
 
     resettime();
 
     if ((songinit == 0x02) || (songinit == 0x03))
     {
-      if ((espos[0] >= songlen[psnum][0]) || (espos[1] >= songlen[psnum][1]) || (espos[2] >= songlen[psnum][2]))
-         songinit = 0x01;
+      for (c = 0; c< MAX_CHN; c++)
+      {
+        if (espos[c] >= songlen[psnum][c])
+          songinit = 0x01;
+      }
     }
 
     for (c = 0; c < MAX_CHN; c++)
@@ -243,7 +261,8 @@ void playroutine(void)
       songinit = 0;
     else
       songinit = PLAY_STOPPED;
-    if ((!songlen[psnum][0]) || (!songlen[psnum][1]) || (!songlen[psnum][2]))
+    if ((!songlen[psnum][0]) || (!songlen[psnum][1]) || (!songlen[psnum][2]) ||
+        (!songlen[psnum][3]) || (!songlen[psnum][4]) || (!songlen[psnum][5]))
       songinit = PLAY_STOPPED; // Zero length song
 
     startpattpos = 0;
@@ -300,6 +319,58 @@ void playroutine(void)
     sidreg[0x16] = filtercutoff;
     sidreg[0x17] = filterctrl;
     sidreg[0x18] = filtertype | masterfader;
+
+    if (filter2ptr)
+    {
+      // Filter jump
+      if (ltable[FTBL][filter2ptr-1] == 0xff)
+      {
+        filter2ptr = rtable[FTBL][filter2ptr-1];
+        if (!filter2ptr) goto FILTER2STOP;
+      }
+
+      if (!filter2time)
+      {
+        // Filter set
+        if (ltable[FTBL][filter2ptr-1] >= 0x80)
+        {
+          filter2type = ltable[FTBL][filter2ptr-1] & 0x70;
+          filter2ctrl = rtable[FTBL][filter2ptr-1];
+          filter2ptr++;
+          // Can be combined with cutoff set
+          if (ltable[FTBL][filter2ptr-1] == 0x00)
+          {
+            filter2cutoff = rtable[FTBL][filter2ptr-1];
+            filter2ptr++;
+          }
+        }
+        else
+        {
+          // New modulation step
+          if (ltable[FTBL][filter2ptr-1])
+            filter2time = ltable[FTBL][filter2ptr-1];
+          else
+          {
+            // Cutoff set
+            filter2cutoff = rtable[FTBL][filter2ptr-1];
+            filter2ptr++;
+          }
+        }
+      }
+      // Filter modulation
+      if (filter2time)
+      {
+        filter2cutoff += rtable[FTBL][filter2ptr-1];
+        filter2time--;
+        if (!filter2time) filter2ptr++;
+      }
+    }
+
+    FILTER2STOP:
+    sidreg2[0x15] = 0x00;
+    sidreg2[0x16] = filter2cutoff;
+    sidreg2[0x17] = filter2ctrl;
+    sidreg2[0x18] = filter2type | masterfader;
 
     for (c = 0; c < MAX_CHN; c++)
     {
@@ -385,17 +456,39 @@ void playroutine(void)
           }
           if (iptr->ptr[FTBL])
           {
-            filterptr = iptr->ptr[FTBL];
-            filtertime = 0;
-            if (filterptr)
+            if (c < 3)
             {
-              // Stop the song in case of jumping into a jump
-              if (ltable[FTBL][filterptr-1] == 0xff)
-                stopsong();
+              filterptr = iptr->ptr[FTBL];
+              filtertime = 0;
+              if (filterptr)
+              {
+                // Stop the song in case of jumping into a jump
+                if (ltable[FTBL][filterptr-1] == 0xff)
+                  stopsong();
+              }
+            }
+            else
+            {
+              filter2ptr = iptr->ptr[FTBL];
+              filter2time = 0;
+              if (filter2ptr)
+              {
+                // Stop the song in case of jumping into a jump
+                if (ltable[FTBL][filter2ptr-1] == 0xff)
+                  stopsong();
+              }
             }
           }
-          sidreg[0x5+7*c] = iptr->ad;
-          sidreg[0x6+7*c] = iptr->sr;
+          if (c < 3)
+          {
+            sidreg[0x5+7*c] = iptr->ad;
+            sidreg[0x6+7*c] = iptr->sr;
+          }
+          else
+          {
+            sidreg2[0x5+7*(c-3)] = iptr->ad;
+            sidreg2[0x6+7*(c-3)] = iptr->sr;
+          }
         }
       }
 
@@ -422,11 +515,17 @@ void playroutine(void)
         break;
 
         case CMD_SETAD:
-        sidreg[0x5+7*c] = cptr->newcmddata;
+        if (c < 3)
+          sidreg[0x5+7*c] = cptr->newcmddata;
+        else
+          sidreg2[0x5+7*(c-3)] = cptr->newcmddata;
         break;
 
         case CMD_SETSR:
-        sidreg[0x6+7*c] = cptr->newcmddata;
+        if (c < 3)
+          sidreg[0x6+7*c] = cptr->newcmddata;
+        else
+          sidreg2[0x6+7*(c-3)] = cptr->newcmddata;
         break;
 
         case CMD_SETWAVE:
@@ -456,23 +555,48 @@ void playroutine(void)
         break;
 
         case CMD_SETFILTERPTR:
-        filterptr = cptr->newcmddata;
-        filtertime = 0;
-        if (filterptr)
+        if (c < 3)
         {
-          // Stop the song in case of jumping into a jump
-          if (ltable[FTBL][filterptr-1] == 0xff)
-            stopsong();
+          filterptr = cptr->newcmddata;
+          filtertime = 0;
+          if (filterptr)
+          {
+            // Stop the song in case of jumping into a jump
+            if (ltable[FTBL][filterptr-1] == 0xff)
+              stopsong();
+          }
+        }
+        else
+        {
+          filter2ptr = cptr->newcmddata;
+          filter2time = 0;
+          if (filter2ptr)
+          {
+            // Stop the song in case of jumping into a jump
+            if (ltable[FTBL][filter2ptr-1] == 0xff)
+              stopsong();
+          }
         }
         break;
 
         case CMD_SETFILTERCTRL:
-        filterctrl = cptr->newcmddata;
-        if (!filterctrl) filterptr = 0;
+        if (c < 3)
+        {
+          filterctrl = cptr->newcmddata;
+          if (!filterctrl) filterptr = 0;
+        }
+        else
+        {
+          filter2ctrl = cptr->newcmddata;
+          if (!filter2ctrl) filter2ptr = 0;
+        }
         break;
 
         case CMD_SETFILTERCUTOFF:
-        filtercutoff = cptr->newcmddata;
+        if (c < 3)
+          filtercutoff = cptr->newcmddata;
+        else
+          filter2cutoff = cptr->newcmddata;
         break;
 
         case CMD_SETMASTERVOL:
@@ -486,9 +610,11 @@ void playroutine(void)
           funktable[0] = ltable[STBL][cptr->newcmddata-1]-1;
           funktable[1] = rtable[STBL][cptr->newcmddata-1]-1;
         }
-        chn[0].tempo = 0;
-        chn[1].tempo = 0;
-        chn[2].tempo = 0;
+        {
+          int d;
+          for (d = 0; d < MAX_CHN; d++)
+            chn[d].tempo = 0;
+        }
         break;
 
         case CMD_SETTEMPO:
@@ -500,9 +626,9 @@ void playroutine(void)
             cptr->tempo = newtempo;
           else
           {
-            chn[0].tempo = newtempo;
-            chn[1].tempo = newtempo;
-            chn[2].tempo = newtempo;
+            int d;
+            for (d = 0; d < MAX_CHN; d++)
+              chn[d].tempo = newtempo;
           }
         }
         break;
@@ -521,21 +647,21 @@ void playroutine(void)
 
         if (wave > WAVELASTDELAY)
         {
-          // Normal waveform values
-          if (wave < WAVESILENT) cptr->wave = wave;
+        	// Normal waveform values
+        	if (wave < WAVESILENT) cptr->wave = wave;
           // Values without waveform selected
           if ((wave >= WAVESILENT) && (wave <= WAVELASTSILENT)) cptr->wave = wave & 0xf;
           // Command execution from wavetable
           if ((wave >= WAVECMD) && (wave <= WAVELASTCMD))
           {
-            unsigned char param = rtable[WTBL][cptr->ptr[WTBL]-1];
-            switch (wave & 0xf)
-            {
-              case CMD_DONOTHING:
-              case CMD_SETWAVEPTR:
-              case CMD_FUNKTEMPO:
-              stopsong();
-              break;
+          	unsigned char param = rtable[WTBL][cptr->ptr[WTBL]-1];
+          	switch (wave & 0xf)
+          	{
+          		case CMD_DONOTHING:
+          		case CMD_SETWAVEPTR:
+          		case CMD_FUNKTEMPO:
+          		stopsong();
+          		break;
 
               case CMD_PORTAUP:
               {
@@ -549,7 +675,7 @@ void playroutine(void)
                   speed = freqtbllo[cptr->lastnote + 1] | (freqtblhi[cptr->lastnote + 1] << 8);
                   speed -= freqtbllo[cptr->lastnote] | (freqtblhi[cptr->lastnote] << 8);
                   speed >>= rtable[STBL][param-1];
-                }
+                }                
                 cptr->freq += speed;
               }
               break;
@@ -644,11 +770,17 @@ void playroutine(void)
               break;
 
               case CMD_SETAD:
-              sidreg[0x5+7*c] = param;
+              if (c < 3)
+                sidreg[0x5+7*c] = param;
+              else
+                sidreg2[0x5+7*(c-3)] = param;
               break;
 
               case CMD_SETSR:
-              sidreg[0x6+7*c] = param;;
+              if (c < 3)
+                sidreg[0x6+7*c] = param;
+              else
+                sidreg2[0x6+7*(c-3)] = param;
               break;
 
               case CMD_SETWAVE:
@@ -667,23 +799,48 @@ void playroutine(void)
               break;
 
               case CMD_SETFILTERPTR:
-              filterptr = param;
-              filtertime = 0;
-              if (filterptr)
+              if (c < 3)
               {
-                // Stop the song in case of jumping into a jump
-                if (ltable[FTBL][filterptr-1] == 0xff)
-                stopsong();
+                filterptr = param;
+                filtertime = 0;
+                if (filterptr)
+                {
+                  // Stop the song in case of jumping into a jump
+                  if (ltable[FTBL][filterptr-1] == 0xff)
+                  stopsong();
+                }
+              }
+              else
+              {
+                filter2ptr = param;
+                filter2time = 0;
+                if (filter2ptr)
+                {
+                  // Stop the song in case of jumping into a jump
+                  if (ltable[FTBL][filter2ptr-1] == 0xff)
+                  stopsong();
+                }
               }
               break;
 
               case CMD_SETFILTERCTRL:
-              filterctrl = param;
-              if (!filterctrl) filterptr = 0;
+              if (c < 3)
+              {
+                filterctrl = param;
+                if (!filterctrl) filterptr = 0;
+              }
+              else
+              {
+                filter2ctrl = param;
+                if (!filter2ctrl) filter2ptr = 0;
+              }
               break;
 
               case CMD_SETFILTERCUTOFF:
-              filtercutoff = param;
+              if (c < 3)
+                filtercutoff = param;
+              else
+                filter2cutoff = param;
               break;
 
               case CMD_SETMASTERVOL:
@@ -932,8 +1089,16 @@ void playroutine(void)
               cptr->gate = 0xfe;
               if (!(instr[cptr->instr].gatetimer & 0x80))
               {
-                sidreg[0x5+7*c] = adparam>>8;
-                sidreg[0x6+7*c] = adparam&0xff;
+                if (c < 3)
+                {
+                  sidreg[0x5+7*c] = adparam>>8;
+                  sidreg[0x6+7*c] = adparam&0xff;
+                }
+                else
+                {
+                  sidreg2[0x5+7*(c-3)] = adparam>>8;
+                  sidreg2[0x6+7*(c-3)] = adparam&0xff;
+                }
               }
             }
           }
@@ -941,14 +1106,30 @@ void playroutine(void)
       }
       NEXTCHN:
       if (cptr->mute)
-        sidreg[0x4+7*c] = cptr->wave = 0x08;
+      {
+        if (c < 3)
+          sidreg[0x4+7*c] = cptr->wave = 0x08;
+        else
+          sidreg2[0x4+7*(c-3)] = cptr->wave = 0x08;
+      }
       else
       {
-        sidreg[0x0+7*c] = cptr->freq & 0xff;
-        sidreg[0x1+7*c] = cptr->freq >> 8;
-        sidreg[0x2+7*c] = cptr->pulse & 0xfe;
-        sidreg[0x3+7*c] = cptr->pulse >> 8;
-        sidreg[0x4+7*c] = cptr->wave & cptr->gate;
+        if (c < 3)
+        {
+          sidreg[0x0+7*c] = cptr->freq & 0xff;
+          sidreg[0x1+7*c] = cptr->freq >> 8;
+          sidreg[0x2+7*c] = cptr->pulse & 0xfe;
+          sidreg[0x3+7*c] = cptr->pulse >> 8;
+          sidreg[0x4+7*c] = cptr->wave & cptr->gate;
+        }
+        else
+        {
+          sidreg2[0x0+7*(c-3)] = cptr->freq & 0xff;
+          sidreg2[0x1+7*(c-3)] = cptr->freq >> 8;
+          sidreg2[0x2+7*(c-3)] = cptr->pulse & 0xfe;
+          sidreg2[0x3+7*(c-3)] = cptr->pulse >> 8;
+          sidreg2[0x4+7*(c-3)] = cptr->wave & cptr->gate;
+        }
       }
       cptr++;
     }

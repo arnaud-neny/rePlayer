@@ -67,6 +67,9 @@ namespace rePlayer
         char textbuffer[MAX_PATHNAME];
 
         extern int songinit;
+        extern int numchannels;
+
+        int stereosid = 1;
 
         // stdio_wrap
         FILE* replayer_fopen(const char* filename, const char* mode)
@@ -97,6 +100,10 @@ namespace rePlayer
         void replayer_fclose(FILE* stream)
         {
             reinterpret_cast<io::Stream*>(stream)->Release();
+        }
+        int replayer_ftell(FILE* stream)
+        {
+            return int(reinterpret_cast<io::Stream*>(stream)->GetPosition());
         }
         int replayer_fprintf(void* const, char const* const, ...) { return 0; }
 
@@ -141,7 +148,6 @@ namespace rePlayer
         //
         void waitkeynoupdate(void) {}
     }
-    int stereosid = 1;
 
     bool ReplayGoatTracker::Init(SharedContexts* ctx, Window& window)
     {
@@ -210,7 +216,10 @@ namespace rePlayer
         {
             if ((songlen[c][0]) &&
                 (songlen[c][1]) &&
-                (songlen[c][2]))
+                (songlen[c][2]) &&
+                (songlen[c][3]) &&
+                (songlen[c][4]) &&
+                (songlen[c][5]))
                 songs++;
         }
 
@@ -220,10 +229,9 @@ namespace rePlayer
             , globals.isFiltering
             , 0
             , globals.isDistortion);
-        for (uint32_t i = 0; i < 16384; ++i)
-            playroutine();
 
         initsong(esnum, PLAY_BEGINNING);
+        playroutine();
 
         stream->Seek(0, io::Stream::kSeekBegin);
         uint32_t songId;
@@ -458,8 +466,6 @@ namespace rePlayer
     void ReplayGoatTracker::ResetPlayback()
     {
         stopsong();
-        for (uint32_t i = 0; i < 16384; ++i)
-            playroutine();
 
         m_hasFailed = m_hasNoticedFailure = false;
 
@@ -468,7 +474,10 @@ namespace rePlayer
         {
             if ((songlen[subsongIndex][0]) &&
                 (songlen[subsongIndex][1]) &&
-                (songlen[subsongIndex][2]))
+                (songlen[subsongIndex][2]) &&
+                (songlen[subsongIndex][3]) &&
+                (songlen[subsongIndex][4]) &&
+                (songlen[subsongIndex][5]))
             {
                 if (songs == m_subsongIndex)
                     break;
@@ -476,6 +485,7 @@ namespace rePlayer
             }
         }
         initsong(subsongIndex, PLAY_BEGINNING);
+        playroutine();
         m_remainingSamples = 0;
         m_hasLooped = false;
         m_sequence.Clear();
@@ -544,7 +554,10 @@ namespace rePlayer
     std::string ReplayGoatTracker::GetInfo() const
     {
         std::string info;
-        info = "3 channels\n";
+        char txt[3];
+        _ultoa_s(numchannels, txt, 10);
+        info = txt;
+        info += " channels\n";
         info.append(reinterpret_cast<const char*>(&m_songId), 4);
         if (m_updatedSettings.multiplier != 1)
         {
@@ -553,7 +566,6 @@ namespace rePlayer
                 info += "0.5";
             else
             {
-                char txt[3];
                 _ultoa_s(m_updatedSettings.multiplier, txt, 10);
                 info += txt;
             }

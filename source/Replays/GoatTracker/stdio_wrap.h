@@ -20,6 +20,7 @@ int replayer_fprintf(void* const, char const* const, ...);
 #define fwrite(...)	replayer_fwrite(__VA_ARGS__)
 #define fseek(...) replayer_fseek(__VA_ARGS__)
 #define fclose(...) replayer_fclose(__VA_ARGS__)
+#define ftell(...) replayer_ftell(__VA_ARGS__)
 
 #define fprintf(...) replayer_fprintf(__VA_ARGS__)
 #define stdin  (0)

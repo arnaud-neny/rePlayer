@@ -19,6 +19,8 @@ int pattlen[MAX_PATT];
 int songlen[MAX_SONGS][MAX_CHN];
 int highestusedpattern;
 int highestusedinstr;
+int determinechannels(FILE* handle);
+int numchannels = 0; // rePlayer
 
 int savesong(void)
 {
@@ -181,6 +183,7 @@ void loadsong(void)
   int ok = 0;
   char ident[4];
   FILE *handle;
+  int channelstoload = MAX_CHN;
 
   handle = fopen(songfilename, "rb");
 
@@ -202,10 +205,11 @@ void loadsong(void)
       fread(copyrightname, sizeof copyrightname, 1, handle);
 
       // Read songorderlists
+      channelstoload = determinechannels(handle);
       amount = fread8(handle);
       for (d = 0; d < amount; d++)
       {
-        for (c = 0; c < MAX_CHN; c++)
+        for (c = 0; c < channelstoload; c++)
         {
           length = fread8(handle);
           loadsize = length;
@@ -262,10 +266,11 @@ void loadsong(void)
       fread(copyrightname, sizeof copyrightname, 1, handle);
 
       // Read songorderlists
+      channelstoload = determinechannels(handle);
       amount = fread8(handle);
       for (d = 0; d < amount; d++)
       {
-        for (c = 0; c < MAX_CHN; c++)
+        for (c = 0; c < channelstoload; c++)
         {
           length = fread8(handle);
           loadsize = length;
@@ -354,10 +359,11 @@ void loadsong(void)
       fread(copyrightname, sizeof copyrightname, 1, handle);
 
       // Read songorderlists
+      channelstoload = determinechannels(handle);
       amount = fread8(handle);
       for (d = 0; d < amount; d++)
       {
-        for (c = 0; c < MAX_CHN; c++)
+        for (c = 0; c < channelstoload; c++)
         {
           length = fread8(handle);
           loadsize = length;
@@ -842,6 +848,52 @@ void loadsong(void)
             }
             if (!instr[c].firstwave) instr[c].gatetimer |= 0x40;
         }
+    }
+
+
+    // If was a mono song, create empty orderlists for channels 4-6
+    numchannels = channelstoload; // rePlayer
+    if (channelstoload < MAX_CHN)
+    {
+      int emptypatt = MAX_PATT-1;
+
+      findusedpatterns();
+      for (c = 0; c < MAX_PATT; c++)
+      {
+        if (!pattused[c])
+        {
+          int d;
+          int ok = 1;
+          for (d = 0; d < pattlen[c]; d++)
+          {
+            if ((pattern[c][d*4] != REST) || (pattern[c][d*4+1] != 0x00) ||
+                (pattern[c][d*4+2] != 0x00) || (pattern[c][d*4+3] != 0x00))
+              ok = 0;
+          }
+
+          if (ok)
+          {
+            emptypatt = c;
+            break;
+          }
+        }
+      }
+
+      for (c = 0; c < MAX_SONGS; c++)
+      {
+        if (songlen[c][0])
+        {
+          int d;
+          for (d = channelstoload; d < MAX_CHN; d++)
+          {
+            songorder[c][d][0] = emptypatt;
+            songorder[c][d][1] = 0xff;
+            songorder[c][d][2] = 0x00;
+            songlen[c][d] = 1;
+          }
+        }
+      }
+      songchange();
     }
   }
 }
@@ -1576,6 +1628,36 @@ void optimizeeverything(int oi, int ot)
   }
 }
 
+int determinechannels(FILE* handle)
+{
+  int returnpos = ftell(handle);
+  int c, d;
+  int songs = fread8(handle);
+  unsigned char songbuffer[257];
+
+  for (d = 0; d < songs; d++)
+  {
+    for (c = 0; c < MAX_CHN; c++)
+    {
+      int loadsize = fread8(handle);
+      loadsize++;
+      memset(songbuffer, 0, 257);
+      fread(songbuffer, loadsize, 1, handle);
+
+      // Check that each track of each song has a valid endmark.
+      // Should fail if it's a mono song (not certain)
+      if ((songbuffer[loadsize - 2] != 0xff) || (songbuffer[loadsize - 1] >= loadsize))
+      {
+        fseek(handle, returnpos, SEEK_SET);
+        return 3;
+      }
+    }
+  }
+
+  fseek(handle, returnpos, SEEK_SET);
+  return MAX_CHN;
+}
+
 void mergesong(void)
 {
   int c;
@@ -1604,7 +1686,10 @@ void mergesong(void)
   {
     if ((songlen[c][0])&&
        (songlen[c][1])&&
-       (songlen[c][2])) break;
+       (songlen[c][2])&&
+       (songlen[c][3])&&
+       (songlen[c][4])&&
+       (songlen[c][5])) break;
     if (c == 0) break;
     c--;
   }     
@@ -1630,17 +1715,20 @@ void mergesong(void)
       int length;
       int amount;
       int loadsize;
+      int channelstoload;
 
       // Skip infotexts
       fseek(handle, sizeof songname + sizeof authorname + sizeof copyrightname, SEEK_CUR);
 
       // Read songorderlists
+      channelstoload = determinechannels(handle);
       amount = fread8(handle);
       if (amount + songbase > MAX_SONGS)
         goto ABORT;
+
       for (d = 0; d < amount; d++)
       {
-        for (c = 0; c < MAX_CHN; c++)
+        for (c = 0; c < channelstoload; c++)
         {
           length = fread8(handle);
           loadsize = length;

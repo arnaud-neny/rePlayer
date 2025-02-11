@@ -29,6 +29,7 @@ unsigned char sid_getorder(unsigned char index);
 
 #ifndef GSID_C
 extern unsigned char sidreg[NUMSIDREGS];
+extern unsigned char sidreg2[NUMSIDREGS];
 extern FILTERPARAMS filterparams;
 #endif
 
