@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,6 @@
 #elif !defined(__REPLAYER__)
 #include "../include/variables.h"
 #include "../ui/include/misc_draw.h"
-#else
-#include <include/variables.h>
 #endif
 
 #if defined(__WIN32__)

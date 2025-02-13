@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@
 #elif defined(__HAIKU__)
 #include "../sounddriver/include/sounddriver_haiku.h"
 #else
-//rePlayer: #error "Can't work without a sound driver !"
+//rePlayer: #error "No sound driver defined !"
 #include "sounddriver_dummy.h"
 #endif
 #include "samples_unpack.h"
@@ -196,9 +196,11 @@ float FastPow2(float a);
 float FastLog(float i);
 #define POWF(x, y) FastPow(x, y)
 #define POWF2(x) FastPow2(x)
+#define LOG(x) FastLog(x)
 #else
 #define POWF(x, y) powf(x, y)
 #define POWF2(x) powf(2.0f, x)
+#define LOG(x) logf(x)
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)

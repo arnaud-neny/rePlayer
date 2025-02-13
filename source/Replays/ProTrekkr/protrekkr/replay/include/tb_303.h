@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -141,8 +141,8 @@ class gear303
 {
     public:
 
-        unsigned int tbPattern;   // From 0 to 31, 255 - Off
-        unsigned char tbLine;      // From 0 to 15, 255 - Off
+        unsigned int tbPattern;     // From 0 to 31, 255 - Off
+        unsigned char tbLine;       // From 0 to 15, 255 - Off
 
         gear303();
 

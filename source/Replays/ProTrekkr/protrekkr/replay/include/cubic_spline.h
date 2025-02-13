@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 inline float Cubic_Work(float ym, float input, float y1, float y2, unsigned int res)
 {
     // 0..1.0f
-    float x = (float) (((double) res) / 4294967296.0);
+    float x = (float) (((double) res) / 4294967296.0f);
   
     // -0.5..0.5
     float z = x - 0.5f;

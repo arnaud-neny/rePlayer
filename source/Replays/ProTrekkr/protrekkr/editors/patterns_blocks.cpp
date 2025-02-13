@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1299,8 +1299,8 @@ void Randomize_Block(int Position, int step)
     int value;
     int value2;
     COLUMN_TYPE type;
-    int max_columns = Get_Max_Nibble_All_Tracks();
 
+    int max_columns = Get_Max_Nibble_All_Tracks();
     SELECTION Sel = Get_Real_Selection(TRUE);
 
     if(step)
@@ -2560,24 +2560,31 @@ int Are_Columns_Compatible(int type_src, int type_dst)
     return 0;
 }
 
+
 // ------------------------------------------------------
-// Reset a track to it's initial structure
-void Reset_Track(int Position, int Track)
+// Reset the data of a track  of a pattern to it's initial structure
+void Reset_Pattern(int Pattern, int Track)
 {
     int i;
     int offset;
-    int pattern;
 
-    pattern = pSequence[Position];
-
-    for(i = 0 ; i < patternLines[pattern]; i++)
+    for(i = 0 ; i < patternLines[Pattern]; i++)
     {
-        offset = Get_Pattern_Offset(pattern, Track, i);
+        offset = Get_Pattern_Offset(Pattern, Track, i);
         Clear_Track_Data(offset);
     }
+}
+
+// ------------------------------------------------------
+// Reset a track to it's initial structure
+void Reset_Track(int Track)
+{
+    int i;
+
     Channels_Polyphony[Track] = 1;
     Channels_MultiNotes[Track] = 1;
     Channels_Effects[Track] = 1;
+    Chan_Mute_State[Track] = FALSE;
 
     TPan[Track] = Default_Pan[Track];
     old_TPan[Track] = TPan[Track];
@@ -2607,12 +2614,12 @@ void Reset_Track(int Position, int Track)
     FRez[Track] = 64;
 
     DThreshold[Track] = 32767;
-
     DClamp[Track] = 32767;
     Disclap[Track] = 0;
 
     DSend[Track] = 0;
     CSend[Track] = 0;
+    CCoef[Track] = float((float) CSend[Track] / 127.0f);
 
     Track_Volume[Track] = 1.0f;
     Track_Surround[Track] = FALSE;
@@ -2620,7 +2627,6 @@ void Reset_Track(int Position, int Track)
     FLANGER_ON[Track] = 0;
     FLANGER_AMOUNT[Track] = -0.8f;
     FLANGER_DEPHASE[Track] = 0.0174532f;
-    FLANGER_ON[Track] = 0;
     FLANGER_RATE[Track] = 0.0068125f / 57.29578f;
     FLANGER_AMPL[Track] = 0.001f;
     FLANGER_GR[Track] = 0;
@@ -2632,7 +2638,6 @@ void Reset_Track(int Position, int Track)
 
     Init_Equ(&EqDat[Track]);
 
-    Chan_Mute_State[Track] = FALSE;
     for(i = 0; i < Song_Length; i++)
     {
         Chan_Active_State[i][Track] = TRUE;
@@ -2644,21 +2649,17 @@ void Reset_Track(int Position, int Track)
 }
 
 // ------------------------------------------------------
-// Copy the data & structure of a track into another
-void Copy_Track(int Position, int Track_Src, int Track_Dst)
+// Copy the data of track of a pattern into another
+void Copy_Pattern(int Pattern, int Track_Src, int Track_Dst)
 {
     int i;
     int j;
     int offset_src;
     int offset_dst;
-    int pattern;
-
-    pattern = pSequence[Position];
-
-    for(i = 0 ; i < patternLines[pattern]; i++)
+    for(i = 0 ; i < patternLines[Pattern]; i++)
     {
-        offset_src = Get_Pattern_Offset(pattern, Track_Src, i);
-        offset_dst = Get_Pattern_Offset(pattern, Track_Dst, i);
+        offset_src = Get_Pattern_Offset(Pattern, Track_Src, i);
+        offset_dst = Get_Pattern_Offset(Pattern, Track_Dst, i);
 
         for(j = 0; j < MAX_POLYPHONY; j++)
         {
@@ -2676,58 +2677,69 @@ void Copy_Track(int Position, int Track_Src, int Track_Dst)
         *(RawPatterns + offset_dst + PATTERN_FX4) = *(RawPatterns + offset_src + PATTERN_FX4);
         *(RawPatterns + offset_dst + PATTERN_FXDATA4) = *(RawPatterns + offset_src + PATTERN_FXDATA4);
     }
-    Channels_Polyphony[Track_Dst] = Channels_Polyphony[Track_Src];
-    Channels_MultiNotes[Track_Dst] = Channels_MultiNotes[Track_Src];
-    Channels_Effects[Track_Dst] = Channels_Effects[Track_Src];
-    Chan_Mute_State[Track_Dst] = Chan_Mute_State[Track_Src];
+}
 
-    Compress_Track[Track_Dst] = Compress_Track[Track_Src];
+// ------------------------------------------------------
+// Copy the data & structure of a track into another
+void Copy_Track(int Track_Src, int Track_Dst)
+{
+    int i;
+
+    Channels_Polyphony[Track_Dst] =     Channels_Polyphony[Track_Src];
+    Channels_MultiNotes[Track_Dst] =    Channels_MultiNotes[Track_Src];
+    Channels_Effects[Track_Dst] =       Channels_Effects[Track_Src];
+    Chan_Mute_State[Track_Dst] =        Chan_Mute_State[Track_Src];
+
+    Compress_Track[Track_Dst] =         Compress_Track[Track_Src];
     mas_comp_threshold_Track[Track_Dst] = mas_comp_threshold_Track[Track_Src];
-    mas_comp_ratio_Track[Track_Dst] = mas_comp_ratio_Track[Track_Src];
+    mas_comp_ratio_Track[Track_Dst] =   mas_comp_ratio_Track[Track_Src];
 
-    TPan[Track_Dst] = TPan[Track_Src];
-    old_TPan[Track_Dst] = old_TPan[Track_Src];
-    TCut[Track_Dst] = TCut[Track_Src];
-    ICut[Track_Dst] = ICut[Track_Src];
-    FType[Track_Dst] = FType[Track_Src];
-
-    oldspawn[Track_Dst] = oldspawn[Track_Src];
-    roldspawn[Track_Dst] = roldspawn[Track_Src];
-
-    Chan_Midi_Prg[Track_Dst] = Chan_Midi_Prg[Track_Src];
-
-    FRez[Track_Dst] = FRez[Track_Src];
+    TPan[Track_Dst] =                   TPan[Track_Src];
+    old_TPan[Track_Dst] =               old_TPan[Track_Src];
     
-    DThreshold[Track_Dst] = DThreshold[Track_Src];
-    DClamp[Track_Dst] = DClamp[Track_Src];
-    Disclap[Track_Dst] = Disclap[Track_Src];
+    TCut[Track_Dst] =                   TCut[Track_Src];
+    ICut[Track_Dst] =                   ICut[Track_Src];
+    FType[Track_Dst] =                  FType[Track_Src];
+
+    oldspawn[Track_Dst] =               oldspawn[Track_Src];
+    roldspawn[Track_Dst] =              roldspawn[Track_Src];
+
+    Chan_Midi_Prg[Track_Dst] =          Chan_Midi_Prg[Track_Src];
+
+    FRez[Track_Dst] =                   FRez[Track_Src];
     
-    DSend[Track_Dst] = DSend[Track_Src];
-    CSend[Track_Dst] = CSend[Track_Src];
+    DThreshold[Track_Dst] =             DThreshold[Track_Src];
+    DClamp[Track_Dst] =                 DClamp[Track_Src];
+    Disclap[Track_Dst] =                Disclap[Track_Src];
     
-    Track_Volume[Track_Dst] = Track_Volume[Track_Src];
+    DSend[Track_Dst] =                  DSend[Track_Src];
+    CSend[Track_Dst] =                  CSend[Track_Src];
+    CCoef[Track_Dst] =                  CCoef[Track_Src];
+        
+    Track_Volume[Track_Dst] =           Track_Volume[Track_Src];
+    Track_Surround[Track_Dst] =         Track_Surround[Track_Src];
 
-    Track_Surround[Track_Dst] = Track_Surround[Track_Src];
+    LFO_ON[Track_Dst] =                 LFO_ON[Track_Src];
+    LFO_RATE[Track_Dst] =               LFO_RATE[Track_Src];
+    LFO_RATE_SCALE[Track_Dst] =         LFO_RATE_SCALE[Track_Src];
+    LFO_AMPL_FILTER[Track_Dst] =        LFO_AMPL_FILTER[Track_Src];
+    LFO_AMPL_VOLUME[Track_Dst] =        LFO_AMPL_VOLUME[Track_Src];
+    LFO_AMPL_PANNING[Track_Dst] =       LFO_AMPL_PANNING[Track_Src];
+    LFO_CARRIER_FILTER[Track_Dst] =     LFO_CARRIER_FILTER[Track_Src];
+    LFO_CARRIER_VOLUME[Track_Dst] =     LFO_CARRIER_VOLUME[Track_Src];
+    LFO_CARRIER_PANNING[Track_Dst] =    LFO_CARRIER_PANNING[Track_Src];
 
-    LFO_ON[Track_Dst] = LFO_ON[Track_Src];
-    LFO_RATE[Track_Dst] = LFO_RATE[Track_Src];
-    LFO_RATE_SCALE[Track_Dst] = LFO_RATE_SCALE[Track_Src];
-    LFO_AMPL_FILTER[Track_Dst] = LFO_AMPL_FILTER[Track_Src];
-    LFO_AMPL_VOLUME[Track_Dst] = LFO_AMPL_VOLUME[Track_Src];
-    LFO_AMPL_PANNING[Track_Dst] = LFO_AMPL_PANNING[Track_Src];
-
-    FLANGER_ON[Track_Dst] = FLANGER_ON[Track_Src];
-    FLANGER_AMOUNT[Track_Dst] = FLANGER_AMOUNT[Track_Src];
-    FLANGER_DEPHASE[Track_Dst] = FLANGER_DEPHASE[Track_Src];
-    FLANGER_ON[Track_Dst] = FLANGER_ON[Track_Src];
-    FLANGER_RATE[Track_Dst] = FLANGER_RATE[Track_Src];
-    FLANGER_AMPL[Track_Dst] = FLANGER_AMPL[Track_Src];
-    FLANGER_GR[Track_Dst] = FLANGER_GR[Track_Src];
-    FLANGER_FEEDBACK[Track_Dst] = FLANGER_FEEDBACK[Track_Src];
-    FLANGER_DELAY[Track_Dst] = FLANGER_DELAY[Track_Src];
-    FLANGER_OFFSET[Track_Dst] = FLANGER_OFFSET[Track_Src];
-    FLANGER_OFFSET2[Track_Dst] = FLANGER_OFFSET2[Track_Src];
-    FLANGER_OFFSET1[Track_Dst] = FLANGER_OFFSET1[Track_Src];
+    FLANGER_ON[Track_Dst] =             FLANGER_ON[Track_Src];
+    FLANGER_AMOUNT[Track_Dst] =         FLANGER_AMOUNT[Track_Src];
+    FLANGER_DEPHASE[Track_Dst] =        FLANGER_DEPHASE[Track_Src];
+    FLANGER_RATE[Track_Dst] =           FLANGER_RATE[Track_Src];
+    FLANGER_AMPL[Track_Dst] =           FLANGER_AMPL[Track_Src];
+    FLANGER_GR[Track_Dst] =             FLANGER_GR[Track_Src];
+    FLANGER_FEEDBACK[Track_Dst] =       FLANGER_FEEDBACK[Track_Src];
+    FLANGER_DELAY[Track_Dst] =          FLANGER_DELAY[Track_Src];
+    FLANGER_OFFSET[Track_Dst] =         FLANGER_OFFSET[Track_Src];
+    FLANGER_OFFSET2[Track_Dst] =        FLANGER_OFFSET2[Track_Src];
+    FLANGER_OFFSET1[Track_Dst] =        FLANGER_OFFSET1[Track_Src];
 
     memcpy(&EqDat[Track_Dst], &EqDat[Track_Src], sizeof(EQSTATE));
 
@@ -2747,12 +2759,17 @@ void Copy_Track(int Position, int Track_Src, int Track_Dst)
 void Delete_Track(void)
 {
     int i;
+    int j;
 
-    for(i = Track_Under_Caret; i < Song_Tracks; i++)
+    // Copy to the left
+    for(j = Track_Under_Caret; j < Song_Tracks; j++)
     {
-        Copy_Track(Song_Position, i + 1, i);
+        for(i = 0; i < MAX_PATTERNS; i++)
+        {
+            Copy_Pattern(i, j + 1, j);
+        }
+        Copy_Track(j + 1, j);
     }
-    Reset_Track(Song_Position, Song_Tracks);
     Column_Under_Caret = 0;
 }
 
@@ -2761,14 +2778,21 @@ void Delete_Track(void)
 void Insert_Track(void)
 {
     int i;
+    int j;
 
     if(Song_Tracks < 16)
     {
-        for(i = Song_Tracks - 1; i > Track_Under_Caret; i--)
+        // Copy to the right
+        for(j = Song_Tracks - 1; j > Track_Under_Caret; j--)
         {
-            Copy_Track(Song_Position, i - 1, i);
+            for(i = 0; i < MAX_PATTERNS; i++)
+            {
+                Copy_Pattern(i, j - 1, j);
+                Reset_Pattern(i, j - 1);
+            }
+            // Create a new one
         }
-        Reset_Track(Song_Position, Track_Under_Caret);
+        Reset_Track(Track_Under_Caret);
         Column_Under_Caret = 0;
     }
 }

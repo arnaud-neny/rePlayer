@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -175,6 +175,8 @@ int Load_Ptk(ReplayerFile replayerFile)
     int Track_Srnd = FALSE;
     int Long_Midi_Prg = FALSE;
     int Var_Disto = FALSE;
+    int Osc_Sync = FALSE;
+    int Osc_3_Interval = FALSE;
     char Comp_Flag;
     int i;
     int j;
@@ -222,6 +224,10 @@ int Load_Ptk(ReplayerFile replayerFile)
 
         switch(extension[7])
         {
+            case 'V':
+                Osc_3_Interval = TRUE;
+            case 'U':
+                Osc_Sync = TRUE;
             case 'T':
                 extended_LFO = TRUE;
             case 'S':
@@ -496,9 +502,13 @@ Read_Mod_File:
             PARASynth[swrite].lfo_2_sustain = 128;
             PARASynth[swrite].lfo_2_release = 0x10000;
 
+            PARASynth[swrite].osc_sync = FALSE;
+            PARASynth[swrite].osc_3_interval = 12;
+
             Read_Synth_Params(Read_Mod_Data, Read_Mod_Data_Swap, in, swrite,
                               new_disto, New_adsr, Portable, Env_Modulation,
-                              New_Env, Ntk_Beta, Combine, Var_Disto);
+                              New_Env, Ntk_Beta, Combine, Var_Disto,
+                              Osc_Sync, Osc_3_Interval);
 
             // Fix some very old Ntk bugs
             if(PARASynth[swrite].lfo_1_period > 128) PARASynth[swrite].lfo_1_period = 128;
@@ -1590,7 +1600,7 @@ Uint8 *Pack_Data(Uint8 *Memory, int *Size)
     *Size = c_stream.total_out;
     return(Final_Mem_Out);
 }
-#endif // __WINAMP__
+#endif // !defined(__WINAMP__)
 
 // ------------------------------------------------------
 // Depack a compressed module
@@ -1705,7 +1715,7 @@ int Pack_Module(char *FileName)
     output = fopen(Temph, "wb");
     if(output)
     {
-        sprintf(extension, "PROTREKT");
+        sprintf(extension, "PROTREKV");
         Write_Data(extension, sizeof(char), 9, output);
         Write_Data_Swap(&Depack_Size, sizeof(int), 1, output);
         Write_Data(Final_Mem_Out, sizeof(char), Len, output);
@@ -2131,7 +2141,7 @@ void Clear_Instrument_Dat(int n_index, int split, int lenfir)
         Synthprg[n_index] = SYNTH_WAVE_OFF;
         Beat_Sync[n_index] = FALSE;
 
-        // Internal is default compression
+        // Internal wavpack is default compression
 #if !defined(__WINAMP__)
         SampleCompression[n_index] = SMP_PACK_WAVPACK;
         SamplesSwap[n_index] = FALSE;

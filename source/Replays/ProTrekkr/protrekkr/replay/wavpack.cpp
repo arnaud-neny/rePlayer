@@ -2,10 +2,10 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
-// This file is :
+// This file is:
 // Copyright (c) 1998-2007 Conifer Software.
 // All right reserved.
 //

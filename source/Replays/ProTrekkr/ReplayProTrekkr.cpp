@@ -43,7 +43,7 @@ namespace rePlayer
         .replayId = eReplay::ProTrekkr, .isThreadSafe = false,
         .name = TITLE,
         .extensions = "ptk",
-        .about = TITLE " " VER_VER "." VER_REV "." VER_REVSMALL "\nCopyright (c) 2008-2024 Franck Charlet",
+        .about = TITLE " " VER_VER "." VER_REV "." VER_REVSMALL "\nCopyright (c) 2008-2025 Franck Charlet",
         .load = ReplayProTrekkr::Load
     };
 

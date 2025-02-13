@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -158,7 +158,8 @@ void Clear_Buff(int Idx);
 int Are_Columns_Compatible(int type_src, int type_dst);
 void Delete_Track(void);
 void Insert_Track(void);
-void Reset_Track(int Position, int Track);
+void Reset_Pattern(int Pattern, int Track);
+void Reset_Track(int Track);
 void Sanitize_Sliders_Block(void);
 void Set_Slider_Value(int delta);
 void Reset_Transpose_Block(void);

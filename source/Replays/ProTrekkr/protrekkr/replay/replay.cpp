@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,10 @@
 #include "../../../../src/midi/include/midi.h"
 #include "../../../../src/include/variables.h"
 #include "../../../../src/include/ptk.h"
+#endif
+
+#if defined(BZR2)
+#include <cstdio>
 #endif
 
 // ------------------------------------------------------
@@ -229,7 +233,7 @@ float delay_left_final;
 float delay_right_final;
 int PosInTick;
 
-#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
+#if !defined(__STAND_ALONE__)
     char rawrender;
     char rawrender_32float;
     char rawrender_multi;
@@ -237,6 +241,9 @@ int PosInTick;
     int rawrender_range;
     int rawrender_from;
     int rawrender_to;
+#endif
+
+#if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float mas_vol = 1.0f;
 #else
     float mas_vol;
@@ -798,11 +805,6 @@ float xi0[2][MAX_TRACKS];
 float xi1[2][MAX_TRACKS];
 float xi2[2][MAX_TRACKS];
 
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-extern int gui_thread_action;
-extern int gui_bpm_action;
-#endif
-
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
     float lchorus_feedback = 0.6f;
     float rchorus_feedback = 0.5f;
@@ -872,8 +874,10 @@ int delay_time;
     int R_MaxLevel;
     extern int Chan_Midi_Prg[MAX_TRACKS];
     float *Scope_Dats[MAX_TRACKS];
-    float *Scope_Dats_L[MAX_TRACKS];
-    float *Scope_Dats_R[MAX_TRACKS];
+    float *VuMeters_Dats_L[MAX_TRACKS];
+    float *VuMeters_Dats_R[MAX_TRACKS];
+    float VuMeters_Level_Dats_L[MAX_TRACKS];
+    float VuMeters_Level_Dats_R[MAX_TRACKS];
     float *Scope_Dats_LeftRight[2];
     int pos_scope;
     int pos_scope_latency;
@@ -892,21 +896,6 @@ int delay_time;
     extern int32 sed_range_end;
 #else
     unsigned char nPatterns;
-#endif
-
-#if defined(PTK_SYNTH_PINK)
-unsigned int dice[7];
-static unsigned long ctz[64] =
-{
-    6, 0, 1, 0, 2, 0, 1, 0,
-    3, 0, 1, 0, 2, 0, 1, 0,
-    4, 0, 1, 0, 2, 0, 1, 0,
-    3, 0, 1, 0, 2, 0, 1, 0,
-    5, 0, 1, 0, 2, 0, 1, 0,
-    3, 0, 1, 0, 2, 0, 1, 0,
-    4, 0, 1, 0, 2, 0, 1, 0,
-    3, 0, 1, 0, 2, 0, 1, 0,
-};
 #endif
 
 #if !defined(__STAND_ALONE__)
@@ -980,6 +969,9 @@ float absf(float x)
     return(x);
 }
 
+#define DENORMAL 0
+
+#if DENORMAL
 __inline float denormal(float sample)
 {
     unsigned int isample;
@@ -990,6 +982,90 @@ __inline float denormal(float sample)
     int aDen = exponent > 0;
     return sample * (aNaN & aDen);
 }
+#endif
+
+#if defined(USE_FASTPOW)
+void ToFloat(int *dest, int val)
+{
+    *dest = val;
+}
+
+#if defined(__GCC__) && !(__MACOSX_X86__) && !(__LINUX__)  && !(__HAIKU__)
+static __inline__ float FastFloor(float f)
+{
+    float b, c, d, e, g, h, t;
+
+    c = (f >= 0.0f) ? -8388608.0f: 8388608.0f;
+    b = absf(f);
+    d = f - c;
+    e = b - 8388608.0f;
+#if defined(__LINUX__)
+    __asm__("" : "+mf" (d));
+#else
+#if defined(__AROS__)
+    __asm__("" : "+d" (d));
+#else
+    __asm__("" : "+f" (d));
+#endif
+#endif
+    d = d + c;
+    g = f - d;
+    h = (g >= 0.0f) ? 0.0f: 1.0f;
+    t = d - h;
+    return (e >= 0.0f) ? f: t;
+}
+#endif
+
+#if defined(__PSP__)
+float FastPow2(float x)
+{
+    float result;
+
+    __asm__ volatile(
+    "mtv      %1, S000\n"
+    "vexp2.s  S000, S000\n"
+    "mfv      %0, S000\n"
+    : "=r"(result) : "r"(x));
+    return result;
+}
+#else
+float FastPow2(float i)
+{
+    float x;
+#if defined(__GCC__) && !(__MACOSX_X86__) && !(__LINUX__) && !(__HAIKU__)
+    float y = i - FastFloor(i);
+#else
+    float y = i - floorf(i);
+#endif
+    y = (y - y * y) * 0.33971f;
+    x = i + 127 - y;
+    x *= (1 << 23);
+    ToFloat((int *) &x, (int) x);
+    return x;
+}
+#endif
+
+float FastLog(float i)
+{
+    float x;
+    float y;
+    x = (float) (*(int *) &i);
+    x *= 1.0f / (1 << 23);
+    x = x - 127;
+#if defined(__GCC__) && !(__MACOSX_X86__) && !(__LINUX__) && !(__HAIKU__)
+    y = x - FastFloor(x);
+#else
+    y = x - floorf(x);
+#endif
+    y = (y - y * y) * 0.346607f;
+    return x + y;
+}
+float FastPow(float a, float b)
+{
+    return FastPow2(b * FastLog(a));
+}
+#endif
+
 // ------------------------------------------------------
 // Audio mixer
 Uint32 STDCALL Mixer(Uint8 *Buffer, Uint32 Len)
@@ -1159,8 +1235,8 @@ int STDCALL Ptk_InitDriver(void)
 
 #if defined(PTK_SYNTH)
     // Create the stock waveforms
-    float incr = 1.0f / fMIX_RATE;
-    float stop = 2.0f;
+    float incr = 1.0f / 360.0f;
+    float stop = 1.0f;
     float x;
 
 #if defined(PTK_SYNTH_SAW)
@@ -1169,27 +1245,26 @@ int STDCALL Ptk_InitDriver(void)
 
 #if defined(PTK_SYNTH_SIN)
     short *wav_sin = STOCK_SIN;
+    memset(STOCK_SIN, 0, sizeof(STOCK_SIN));
 #endif
 
 #if defined(PTK_SYNTH_SAW)
     short *wav_saw = STOCK_SAW;
+    memset(STOCK_SAW, 0, sizeof(STOCK_SAW));
 #endif
 
 #if defined(PTK_SYNTH_PULSE)
     short *wav_pul = STOCK_PULSE;
+    memset(STOCK_PULSE, 0, sizeof(STOCK_PULSE));
 #endif
 
-#if defined(PTK_SYNTH_WHITE)
-    short *wav_wit = STOCK_WHITE;
-#endif
-
-#if defined(PTK_SYNTH_PINK)
-    short *wav_pin = STOCK_PINK;
-    unsigned int newrand;
-    unsigned int prevrand;
-    unsigned int k;
-    unsigned int seed = 0x12345678;
-    unsigned int total = 0;
+#if defined(PTK_SYNTH_TRI)
+    int tri_carrier;
+    int tri_carrier_step;
+    short *wav_tri = STOCK_TRI;
+    tri_carrier = 0;
+    tri_carrier_step = 1;
+    memset(STOCK_TRI, 0, sizeof(STOCK_TRI));
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -1204,12 +1279,11 @@ int STDCALL Ptk_InitDriver(void)
 #endif
 #endif
 
+
     SIZE_WAVEFORMS = 0;
-    for(x = 0; x < (stop - incr / 2); x += incr)
+    for(x = 0; x < 360.0f; x += 1.0f)
     {
-        float value = (float) ((PI * 2.0f) * x);
-        //      float value2 = (float) ((PI * 2.0f) * (x * 2.0f));
-        //    value2 = sinf(value + sinf(value2));
+        float value = x * 0.0174532f;
 
 #if defined(PTK_SYNTH_PULSE)
         if(sinf(value) < 0.0f) *wav_pul++ = 32767;
@@ -1218,38 +1292,41 @@ int STDCALL Ptk_InitDriver(void)
 
 #if defined(PTK_SYNTH_SAW)
         // There's a problem with fmodf->signed short in mingw here
-        temp_saw = (unsigned short) (fmodf(x * 2.0f, 64.0f) * 32767.0f);
+        temp_saw = (unsigned short) ((fmodf(x / 360.0f, 64.0f) * 32767.0f) * 2.0f);
         *wav_saw++ = (short) (((float) (short) temp_saw));
 #endif
 
-        //*wav_pul++ = (short) (value2 * 16384.0f);
-        //value = (float) ((PI * 2.0) * x);
-        //value2 = sinf(value + sinf(value));
-        //*wav_saw++ = (short) (value2 * 16384.0f);
+#if defined(PTK_SYNTH_TRI)
+        if((((int) x) % 180) == 0)
+        {
+            tri_carrier_step = -tri_carrier_step;
+        }
+        *wav_tri++ = (short) (((((float) tri_carrier / 180.0f) + 0.5f) * 32767.0f) * 2.0f);
+        tri_carrier += tri_carrier_step;
+#endif
 
 #if defined(PTK_SYNTH_SIN)
-        *wav_sin++ = (unsigned short) (sinf(value) * 32767.0f);
-#endif
-
-#if defined(PTK_SYNTH_WHITE)
-        *wav_wit++ = (short) (rand() - 16384);
-#endif
-
-#if defined(PTK_SYNTH_PINK)
-        // McCartney pink noise generator
-        k = ctz[SIZE_WAVEFORMS & 63];
-        prevrand = dice[k];
-        seed = 1664525 * seed + 1013904223;
-        newrand = seed >> 3;
-        dice[k] = newrand;
-        total += (newrand - prevrand);
-        seed = 1103515245 * seed + 12345;
-        newrand = seed >> 3;
-        *wav_pin++ = (short) ((((total + newrand) * (1.0f / (3 << 29)) - 1) - .25f) * 16384.0f);
+        *wav_sin++ = (short) (sinf(value) * 32767.0f);
 #endif
 
         SIZE_WAVEFORMS++;
     }
+
+#if defined(PTK_SYNTH_WHITE)
+    short *wav_wit = STOCK_WHITE;
+    int carrier;
+    
+    memset(STOCK_WHITE, 0, sizeof(STOCK_WHITE));
+    incr = 1.0f / fMIX_RATE;
+    stop = 2.0f;
+    carrier = 0;
+
+    for(x = 0; x < (stop - incr / 2); x += incr)
+    {
+        *wav_wit++ = (short) (rand() - 16384) * 2;
+    }
+#endif
+
 #endif // PTK_SYNTH
 
     // Initializing work SINETABLE
@@ -2077,10 +2154,6 @@ void Reset_Values(void)
         Done_Reset = TRUE;
 #endif
 
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-        gui_thread_action = TRUE;
-#endif
-
     }
 }
 
@@ -2177,7 +2250,7 @@ void Pre_Song_Init(void)
 
     glide = 0;
 
-#if !defined(__STAND_ALONE__)
+#if !defined(__STAND_ALONE__) || defined(BZR2)
     sprintf(artist, "Somebody");
     sprintf(style, "Anything Goes");
 #endif
@@ -2213,7 +2286,7 @@ void Pre_Song_Init(void)
 #endif
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
-        Chan_Mute_State[ini] = 0;
+        Chan_Mute_State[ini] = FALSE;
 #endif
 
 #if defined(PTK_LFO)
@@ -2552,7 +2625,21 @@ void Post_Song_Init(void)
     PosInTick = 0;
     PosInTick_Delay = 0;
     SamplesPerSub = SamplesPerTick / 6;
+    Delay_Sound_Buffer = 0;
     Cur_Delay_Sound_Buffer = 0;
+    Song_Playing_Pattern = FALSE;
+    
+    for(i = 0; i < 256; i++)
+    {
+        Delays_Pos_Sound_Buffer[i].Line = 0;
+        Delays_Pos_Sound_Buffer[i].Pos = 0;
+        Delays_Pos_Sound_Buffer[i].SamplesPerTick = 0;
+
+#if defined(PTK_SHUFFLE)
+        Delays_Pos_Sound_Buffer[i].shufflestep = 0;
+#endif
+
+    }
 
     Pattern_Line_Visual = Pattern_Line;
     Song_Position_Visual = Song_Position;
@@ -2575,26 +2662,16 @@ void Post_Song_Init(void)
         Fix_Stereo(spl);
     }
 
-    Song_Playing_Pattern = 0;
     AUDIO_ResetTimer();
-    Delay_Sound_Buffer = 0;
-    for(i = 0; i < 256; i++)
-    {
-        Delays_Pos_Sound_Buffer[i].Line = 0;
-        Delays_Pos_Sound_Buffer[i].Pos = 0;
-        Delays_Pos_Sound_Buffer[i].SamplesPerTick = 0;
-
-#if defined(PTK_SHUFFLE)
-        Delays_Pos_Sound_Buffer[i].shufflestep = 0;
-#endif
-
-    }
 }
 
 // ------------------------------------------------------
 // Record and set the visual patterns lines and song positions
 void Record_Delay_Event()
 {
+    Cur_Delay_Sound_Buffer++;
+    if(Cur_Delay_Sound_Buffer >= 512) Cur_Delay_Sound_Buffer = 0;
+
     // Record a complete sequence for latency calibration
 #if defined(PTK_SHUFFLE)
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].shufflestep = shufflestep;
@@ -2603,8 +2680,6 @@ void Record_Delay_Event()
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].SamplesPerTick = SamplesPerTick;
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Line = Pattern_Line;
     Delays_Pos_Sound_Buffer[Cur_Delay_Sound_Buffer].Pos = Song_Position;
-    Cur_Delay_Sound_Buffer++;
-    if(Cur_Delay_Sound_Buffer >= 512) Cur_Delay_Sound_Buffer = 0;
 }
 
 // ------------------------------------------------------
@@ -2915,7 +2990,7 @@ void Sp_Player(void)
 #if defined(PTK_SYNTH)
                         if(!glide)
                         {
-                            Synthesizer[ct][j].NoteOff();
+                            Synthesizer[ct][j].Note_Off();
                             sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
                         }
                         else
@@ -2927,7 +3002,7 @@ void Sp_Player(void)
 #if !defined(__NO_MIDI__)
                         if(Midi_Current_Notes[Chan_Midi_Prg[ct]][j])
                         {
-                            Midi_NoteOff(ct, Midi_Current_Notes[Chan_Midi_Prg[ct]][j]);
+                            Midi_Note_Off(ct, Midi_Current_Notes[Chan_Midi_Prg[ct]][j]);
                             Midi_Current_Notes[Chan_Midi_Prg[ct]][j] = 0;
                         }
 #endif
@@ -3019,7 +3094,7 @@ void Sp_Player(void)
 #endif
 
 #if defined(PTK_SYNTH)
-                            Synthesizer[ct][j].NoteOff();
+                            Synthesizer[ct][j].Note_Off();
                             sp_Stage[ct][j] = PLAYING_SAMPLE_NOTEOFF;
 #endif
                             Reserved_Sub_Channels[ct][i] = -1;
@@ -3029,7 +3104,7 @@ void Sp_Player(void)
 #if !defined(__NO_MIDI__)
                             if(Midi_Current_Notes[Chan_Midi_Prg[ct]][i])
                             {
-                                Midi_NoteOff(ct, Midi_Current_Notes[Chan_Midi_Prg[ct]][i]);
+                                Midi_Note_Off(ct, Midi_Current_Notes[Chan_Midi_Prg[ct]][i]);
                                 Midi_Current_Notes[Chan_Midi_Prg[ct]][i] = 0;
                             }
 #endif
@@ -3272,7 +3347,10 @@ void Sp_Player(void)
         }
 
         // Replay the recorded song sequence with the sound card latency delay
-        if(Song_Playing_Pattern) Proc_Next_Visual_Line();
+        if(Song_Playing_Pattern)
+        {
+            Proc_Next_Visual_Line();
+        }
     }
 
     // -------------------------------------------
@@ -3628,8 +3706,12 @@ ByPass_Wav:
 #endif // PTK_SYNTH
 
             // Gather the signals of all the sub channels
+
+#if DENORMAL
             Curr_Signal_L[i] = denormal(Curr_Signal_L[i]);
             Curr_Signal_R[i] = denormal(Curr_Signal_R[i]);
+#endif
+
             All_Signal_L += Curr_Signal_L[i];
             All_Signal_R += Curr_Signal_R[i];
         }
@@ -3678,7 +3760,7 @@ ByPass_Wav:
 #endif
 
 #if defined(PTK_SYNTH)
-                Synthesizer[c][i].NoteOff();
+                Synthesizer[c][i].Note_Off();
 #endif
             }
 
@@ -3688,7 +3770,7 @@ ByPass_Wav:
 
 #if !defined(__STAND_ALONE__)
     #if !defined(__NO_MIDI__)
-            Midi_NoteOff(c, -1);
+            Midi_Note_Off(c, -1);
     #endif
 #endif
 
@@ -3714,8 +3796,10 @@ ByPass_Wav:
             Segue_SamplesR[c] = All_Signal_R;
         }
 
+#if DENORMAL
         All_Signal_L = denormal(All_Signal_L);
         All_Signal_R = denormal(All_Signal_R);
+#endif
 
         // -----------------------------------------------
 
@@ -3962,8 +4046,11 @@ ByPass_Wav:
                                                        FLANGER_AMOUNT[c] +
                                                        roldspawn[c] *
                                                        FLANGER_FEEDBACK[c];
+
+#if DENORMAL
             FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]] = denormal(FLANGE_LEFTBUFFER[c][FLANGER_OFFSET[c]]);
             FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]] = denormal(FLANGE_RIGHTBUFFER[c][FLANGER_OFFSET[c]]);
+#endif
             
             float fstep1;
             float fstep2;
@@ -3974,8 +4061,12 @@ ByPass_Wav:
                 de_value -= 6.283185f;
             }
             de_value = ((de_value / 6.283185f));
+
+#if DENORMAL
             gr_value = denormal(gr_value);
             de_value = denormal(de_value);
+#endif
+
             fstep1 = POWF2(SIN[(int) (gr_value * 359.0f)] * FLANGER_AMPL[c]);
             fstep2 = POWF2(SIN[(int) (de_value * 359.0f)] * FLANGER_AMPL[c]);
 
@@ -4013,8 +4104,10 @@ ByPass_Wav:
         }
 #endif
 
+#if DENORMAL
         All_Signal_L = denormal(All_Signal_L);
         All_Signal_R = denormal(All_Signal_R);
+#endif
 
 #if defined(PTK_LIMITER_TRACKS)
         // Compress the track signal
@@ -4048,8 +4141,10 @@ ByPass_Wav:
             All_Signal_R = -All_Signal_R;
         }
 
+#if DENORMAL
         All_Signal_L = denormal(All_Signal_L);
         All_Signal_R = denormal(All_Signal_R);
+#endif
 
         Compute_Stereo_Quick(c);
 
@@ -4123,13 +4218,18 @@ ByPass_Wav:
 #if !defined(__STAND_ALONE__)
         if(!Chan_Mute_State[c])
         {
-            Scope_Dats_L[c][pos_scope] = denormal(All_Signal_L / 32767.0f);
-            Scope_Dats_R[c][pos_scope] = denormal(All_Signal_R / 32767.0f);
+#if DENORMAL
+            VuMeters_Dats_L[c][pos_scope] = denormal(All_Signal_L / 32767.0f);
+            VuMeters_Dats_R[c][pos_scope] = denormal(All_Signal_R / 32767.0f);
+#else
+            VuMeters_Dats_L[c][pos_scope] = All_Signal_L / 32767.0f;
+            VuMeters_Dats_R[c][pos_scope] = All_Signal_R / 32767.0f;
+#endif
         }
         else
         {
-            Scope_Dats_L[c][pos_scope] = 0.0f;
-            Scope_Dats_R[c][pos_scope] = 0.0f;
+            VuMeters_Dats_L[c][pos_scope] = 0.0f;
+            VuMeters_Dats_R[c][pos_scope] = 0.0f;
         }
 #endif
     } // Song_Tracks
@@ -4233,6 +4333,7 @@ void Schedule_Instrument(int channel,
         Instrument_Schedule_Dat[channel][sub_channel].inote = inote;
         Instrument_Schedule_Dat[channel][sub_channel].sample = sample;
         Instrument_Schedule_Dat[channel][sub_channel].vol = Sample_Vol[sample] * vol;
+
 #if defined(PTK_SYNTH)
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = PARASynth[sample].GLB_VOLUME * vol;
@@ -4240,11 +4341,12 @@ void Schedule_Instrument(int channel,
         Instrument_Schedule_Dat[channel][sub_channel].vol_synth = (PARASynth[sample].glb_volume * 0.0078125f) * vol;
 #endif
 #endif
+
         Instrument_Schedule_Dat[channel][sub_channel].offset = offset;
         Instrument_Schedule_Dat[channel][sub_channel].glide = glide;
         Instrument_Schedule_Dat[channel][sub_channel].Play_Selection = Play_Selection;
         Instrument_Schedule_Dat[channel][sub_channel].midi_sub_channel = midi_sub_channel;
-        Instrument_Schedule_Dat[channel][sub_channel].age = (Pos << 8) | Row;
+        Instrument_Schedule_Dat[channel][sub_channel].age = AUDIO_GetSamples();
 
         sp_Cvol_Ramp_Dest[channel][sub_channel] = 10.0f;
 
@@ -4267,6 +4369,7 @@ void Play_Instrument(int channel, int sub_channel)
     int sample;
     float vol;
     float vol_synth;
+    float channel_vol;
     unsigned int offset;
     int glide;
     int Play_Selection;
@@ -4283,6 +4386,7 @@ void Play_Instrument(int channel, int sub_channel)
     int no_retrig_adsr = FALSE;
     int no_retrig_note = FALSE;
 
+    channel_vol = sp_Tvol_Mod[channel];
     Cur_Position = Song_Position;
 
     // Check if the channel have to be played
@@ -4334,6 +4438,7 @@ void Play_Instrument(int channel, int sub_channel)
 
         if(associated_sample != 255)
         {
+
 #if defined(PTK_INSTRUMENTS)
             for(int revo = 0; revo < MAX_INSTRS_SPLITS; revo++)
             {
@@ -4358,6 +4463,7 @@ void Play_Instrument(int channel, int sub_channel)
 #if defined(PTK_SYNTH_OSC_3)
                         sp_Position_osc_3[channel][sub_channel].absolu = 0;
 #endif
+
                     }
 
                 }
@@ -4401,11 +4507,13 @@ void Play_Instrument(int channel, int sub_channel)
                 }
                 if(Synthprg[sample])
                 {
+
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
                     Synthesizer[channel][sub_channel].ChangeParameters(&PARASynth[sample]);
 #else
                     Synthesizer[channel][sub_channel].ChangeParameters(PARASynth[sample]);
 #endif
+
                     Synthesizer[channel][sub_channel].NoteOn(note2,
                                                              vol,
                                                              LoopType[associated_sample][split],
@@ -4755,14 +4863,14 @@ void Play_Instrument(int channel, int sub_channel)
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
-            if(Chan_Mute_State[channel] == 0 &&
+            if(Chan_Mute_State[channel] == FALSE &&
                c_midiout != -1 &&
                Midiprg[associated_sample] != -1)
             {
                 // Remove the previous note
                 if(midi_sub_channel >= 1 && Midi_Current_Notes[Chan_Midi_Prg[channel]][midi_sub_channel - 1])
                 {
-                    Midi_NoteOff(channel, Midi_Current_Notes[Chan_Midi_Prg[channel]][midi_sub_channel - 1]);
+                    Midi_Note_Off(channel, Midi_Current_Notes[Chan_Midi_Prg[channel]][midi_sub_channel - 1]);
                     Midi_Current_Notes[Chan_Midi_Prg[channel]][midi_sub_channel - 1] = 0;
                 }
 
@@ -4775,7 +4883,7 @@ void Play_Instrument(int channel, int sub_channel)
                 }
 
                 // Send the note to the midi device
-                float veloc = vol * mas_vol * local_mas_vol * local_ramp_vol;
+                float veloc = vol * channel_vol * mas_vol * local_mas_vol * local_ramp_vol;
 
                 Midi_Send(0x90 + Chan_Midi_Prg[channel], mnote, (int) (veloc * 127));
                 if(midi_sub_channel < 0) Midi_Current_Notes[Chan_Midi_Prg[channel]][(-midi_sub_channel) - 1] = mnote;
@@ -4855,11 +4963,6 @@ void Do_Effects_Tick_0(void)
                 case 0x25:
                     shuffle_amount = (int) ((float) pltr_dat_row[j] * 0.39216f);
                     Update_Shuffle();
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-                    gui_bpm_action = TRUE;
-#endif
-
                     break;
 #endif
 
@@ -5056,11 +5159,6 @@ void Do_Effects_Tick_0(void)
                         SamplesPerTick = (int) ((60 * MIX_RATE) / (Beats_Per_Min * Ticks_Per_Beat));
                         SamplesPerSub = SamplesPerTick / 6;
                     }
-
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-                    gui_bpm_action = TRUE;
-#endif
-
                     break;
 #endif
 
@@ -5088,9 +5186,6 @@ void Do_Effects_Tick_0(void)
                     Update_Shuffle();
 #endif
 
-#if !defined(__STAND_ALONE__) && !defined(__WINAMP__)
-                    gui_bpm_action = TRUE;
-#endif
                     break;
 #endif
 
@@ -5254,14 +5349,14 @@ void Do_Effects_Ticks_X(void)
 #endif
 
 #if defined(PTK_SYNTH)
-                        Synthesizer[trackef][i].NoteOff();
+                        Synthesizer[trackef][i].Note_Off();
 #endif
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
                         if(Midi_Current_Notes[Chan_Midi_Prg[trackef]][i])
                         {
-                            Midi_NoteOff(trackef, Midi_Current_Notes[Chan_Midi_Prg[trackef]][i]);
+                            Midi_Note_Off(trackef, Midi_Current_Notes[Chan_Midi_Prg[trackef]][i]);
                             Midi_Current_Notes[Chan_Midi_Prg[trackef]][i] = 0;
                         }
 #endif
@@ -5637,14 +5732,14 @@ void Do_Effects_Ticks_X(void)
 #endif
 
 #if defined(PTK_SYNTH)
-                                Synthesizer[trackef][j].NoteOff();
+                                Synthesizer[trackef][j].Note_Off();
 #endif
 
 #if !defined(__STAND_ALONE__)
 #if !defined(__NO_MIDI__)
                                 if(Midi_Current_Notes[Chan_Midi_Prg[trackef]][j])
                                 {
-                                    Midi_NoteOff(trackef, Midi_Current_Notes[Chan_Midi_Prg[trackef]][j]);
+                                    Midi_Note_Off(trackef, Midi_Current_Notes[Chan_Midi_Prg[trackef]][j]);
                                     Midi_Current_Notes[Chan_Midi_Prg[trackef]][j] = 0;
                                 }
 #endif
@@ -6014,7 +6109,7 @@ void Get_Player_Values(void)
     // Wait for the audio latency before starting to play
     if(Song_Playing)
     {
-        if(Song_Playing_Pattern == 0)
+        if(!Song_Playing_Pattern)
         {
             int Max_Latency = AUDIO_Latency;
             if(AUDIO_GetSamples() >= Max_Latency)
@@ -6022,7 +6117,7 @@ void Get_Player_Values(void)
                 // Start from the top of the buffer
                 Delay_Sound_Buffer = 0;
                 PosInTick_Delay = 0;
-                Song_Playing_Pattern = 1;
+                Song_Playing_Pattern = TRUE;
             }
         }
     }
@@ -6034,8 +6129,10 @@ void Get_Player_Values(void)
     if(++lchorus_counter2 > (MIX_RATE * 2)) lchorus_counter2 = MIX_RATE;
     if(++rchorus_counter2 > (MIX_RATE * 2)) rchorus_counter2 = MIX_RATE;
 
+#if DENORMAL
     lbuff_chorus[lchorus_counter2] = denormal(lbuff_chorus[lchorus_counter2]);
     rbuff_chorus[lchorus_counter2] = denormal(rbuff_chorus[lchorus_counter2]);
+#endif
 
     float rchore = lbuff_chorus[lchorus_counter2];
     float lchore = rbuff_chorus[rchorus_counter2];
@@ -6051,8 +6148,10 @@ void Get_Player_Values(void)
     left_float /= 32767.0f;
     right_float /= 32767.0f;
 
+#if DENORMAL
     left_float = denormal(left_float);
     right_float = denormal(right_float);
+#endif
     
 #if defined(PTK_LIMITER_MASTER)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -6122,28 +6221,53 @@ void Get_Player_Values(void)
     {
         if(!Chan_Mute_State[c])
         {
-            Scope_Dats_L[c][pos_scope] = denormal(((((Scope_Dats_L[c][pos_scope]
-                                         ) * left_compress
-                                         ) * mas_vol
-                                         ) * local_curr_mas_vol
-                                         ) * local_curr_ramp_vol);
+            VuMeters_Dats_L[c][pos_scope] = ((((VuMeters_Dats_L[c][pos_scope]
+                                            ) * left_compress
+                                            ) * mas_vol
+                                            ) * local_curr_mas_vol
+                                            ) * local_curr_ramp_vol;
 
-            Scope_Dats_R[c][pos_scope] = denormal(((((Scope_Dats_R[c][pos_scope]
-                                         ) * right_compress
-                                         ) * mas_vol
-                                         ) * local_curr_mas_vol
-                                         ) * local_curr_ramp_vol);
+            VuMeters_Dats_R[c][pos_scope] = ((((VuMeters_Dats_R[c][pos_scope]
+                                            ) * right_compress
+                                            ) * mas_vol
+                                            ) * local_curr_mas_vol
+                                            ) * local_curr_ramp_vol;
 
-            Scope_Dats[c][pos_scope] = (Scope_Dats_L[c][pos_scope] + Scope_Dats_R[c][pos_scope]) * 1.2f;
+            Scope_Dats[c][pos_scope] = (VuMeters_Dats_L[c][pos_scope] + VuMeters_Dats_R[c][pos_scope]) * 1.2f;
+            
+            if(absf(VuMeters_Dats_L[c][pos_scope]) > VuMeters_Level_Dats_L[c])
+            {
+                VuMeters_Level_Dats_L[c] = absf(VuMeters_Dats_L[c][pos_scope]);
+            }
+            if(absf(VuMeters_Dats_R[c][pos_scope]) > VuMeters_Level_Dats_R[c])
+            {
+                VuMeters_Level_Dats_R[c] = absf(VuMeters_Dats_R[c][pos_scope]);
+            }
         }
         else
         {
-            Scope_Dats_L[c][pos_scope] = 0.0f;
-            Scope_Dats_R[c][pos_scope] = 0.0f;
+            VuMeters_Dats_L[c][pos_scope] = 0.0f;
+            VuMeters_Dats_R[c][pos_scope] = 0.0f;
+            VuMeters_Level_Dats_L[c] = 0.0f;
+            VuMeters_Level_Dats_R[c] = 0.0f;
             Scope_Dats[c][pos_scope] = 0.0f;
         }
-
-
+        if(VuMeters_Level_Dats_L[c] > 0.0f) 
+        {
+            VuMeters_Level_Dats_L[c] -= 0.00002f;
+        }
+        else
+        {
+            VuMeters_Level_Dats_L[c] = 0.0f;
+        }
+        if(VuMeters_Level_Dats_R[c] > 0.0f) 
+        {
+            VuMeters_Level_Dats_R[c] -= 0.00002f;
+        }
+        else
+        {
+            VuMeters_Level_Dats_R[c] = 0.0f;
+        }
     }
 #endif
 
@@ -6950,6 +7074,9 @@ void Reset_Synth_Parameters(Synth_Parameters *TSP)
     TSP->osc_1_waveform = WAVEFORM_SAW;
     TSP->osc_2_waveform = WAVEFORM_PULSE;
     TSP->osc_combine = COMBINE_ADD;
+    TSP->osc_sync = FALSE;
+    TSP->osc_3_interval = 12;
+
     TSP->osc_1_pw = 256;
 
     TSP->osc_2_pw = 256;
@@ -7175,8 +7302,12 @@ void Reverb_work(void)
             }
             nev_l *= Reverb_Damp;
             nev_r *= Reverb_Damp;
+
+#if DENORMAL
             nev_l = denormal(nev_l);
             nev_r = denormal(nev_r);
+#endif
+
             if(++counters_L[i] > 99999) counters_L[i] -= 99999;
             if(++counters_R[i] > 99999) counters_R[i] -= 99999;
             delay_left_buffer[i][counters_L[i]] = nev_l;
@@ -7190,8 +7321,12 @@ void Reverb_work(void)
         {
             l_rout = allpass_filter(allBuffer_L[i], l_rout, delayedCounterL[i]);
             r_rout = allpass_filter(allBuffer_R[i], r_rout, delayedCounterR[i]);
+
+#if DENORMAL
             l_rout = denormal(l_rout);
             r_rout = denormal(r_rout);
+#endif
+            
             if(++delayedCounterL[i] > 5759) delayedCounterL[i] -= 5759;
             if(++delayedCounterR[i] > 5759) delayedCounterR[i] -= 5759;
         }
@@ -7311,7 +7446,7 @@ float Mas_Compressor_Track(int Track, float input, float *rms_sum, float *buffer
     gain = 1.0f;
     if(*env > mas_threshold_Track[Track])
     {
-        gain = expf((FastLog(mas_threshold_Track[Track]) - FastLog(*env)) * mas_ratio_Track[Track]);
+        gain = expf((LOG(mas_threshold_Track[Track]) - LOG(*env)) * mas_ratio_Track[Track]);
     }
     return input * gain;
 }
@@ -7343,7 +7478,7 @@ float Mas_Compressor_Master(float input, float *rms_sum, float *buffer, float *e
     gain = 1.0f;
     if(*env > mas_threshold_Master)
     {
-        gain = expf((FastLog(mas_threshold_Master) - FastLog(*env)) * mas_ratio_Master);
+        gain = expf((LOG(mas_threshold_Master) - LOG(*env)) * mas_ratio_Master);
     }
     return gain;
 }
@@ -7364,7 +7499,8 @@ void Set_Spline_Boundaries(unsigned int Position,
                            unsigned int LoopWay,
                            unsigned int Length,
                            unsigned int LoopEnd,
-                           unsigned int LoopStart)
+                           unsigned int LoopStart
+                          )
 {
     Boundaries[0] = Position;
     Boundaries[3] = 0;
@@ -7484,54 +7620,6 @@ float Process_Sample(short *Data, int c, int i, unsigned int res_dec)
     }
 #endif
 }
-
-#if defined(USE_FASTPOW)
-void ToFloat(int *dest, int val)
-{
-    *dest = val;
-}
-
-#if defined(__PSP__)
-float FastPow2(float x)
-{
-	float result;
-
-	__asm__ volatile(
-		"mtv      %1, S000\n"
-		"vexp2.s  S000, S000\n"
-		"mfv      %0, S000\n"
-	: "=r"(result) : "r"(x));
-	return result;
-}
-#else
-float FastPow2(float i)
-{
-	float x;
-	float y = i - floorf(i);
-	y = (y - y * y) * 0.33971f;
-	x = i + 127 - y;
-	x *= (1 << 23);
-	ToFloat((int *) &x, (int) x);
-    return x;
-}
-#endif
-
-float FastLog(float i)
-{
-	float x;
-	float y;
-	x = (float) (*(int *) &i);
-	x *= 1.0f / (1 << 23);
-	x = x - 127;
-	y = x - floorf(x);
-	y = (y - y * y) * 0.346607f;
-	return x + y;
-}
-float FastPow(float a, float b)
-{
-    return FastPow2(b * FastLog(a));
-}
-#endif
 
 #if defined(PTK_TRACK_EQ)
 // Public domain stuff from Neil C. / Etanza Systems

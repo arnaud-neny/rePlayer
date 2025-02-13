@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -80,21 +80,10 @@ void Load_303(char *FileName)
         // Reading and checking extension...
         char extension[10];
         fread(extension, sizeof(char), 9, in);
-
-        if(strcmp(extension, "TWNN3031") == 0)
-        {
-            // Ok, extension matched!
-            Status_Box("Loading 303 Pattern...", TRUE);
-
-            Load_303_Data(Read_Data, Read_Data_Swap, in, sl3, tb303[sl3].selectedpattern);
-
-            Actualize_303_Ed(0);
-            Status_Box("303 Pattern Loaded Successfully.", TRUE);
-        }
-        else
-        {
-            Status_Box("That File Is Not A " TITLE " 303 Pattern File...", TRUE);
-        }
+        Status_Box("Loading 303 Pattern...", TRUE);
+        Load_303_Data(Read_Data, Read_Data_Swap, in, sl3, tb303[sl3].selectedpattern);
+        Actualize_303_Ed(0);
+        Status_Box("303 Pattern Loaded Successfully.", TRUE);
         fclose(in);
     }
     else
@@ -111,7 +100,7 @@ void Save_303(void)
     char Temph[MAX_PATH];
     char extension[10];
 
-    sprintf(extension, "TWNN3031");
+    sprintf(extension, "PROT3031");
     sprintf(Temph, "Saving '%s.303' Pattern In Patterns Directory...",
             tb303[sl3].pattern_name[tb303[sl3].selectedpattern]);
     Status_Box(Temph, TRUE);

@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,10 @@
 
 // ------------------------------------------------------
 // Constants
-#define TITLE "Protrekkr"
+#define TITLE "ProTrekkr"
 #define VER_VER "2"
 #define VER_REV "8"
-#define VER_REVSMALL "1 PRE"
+#define VER_REVSMALL "2"
 #define VERSION TITLE " v" VER_VER "." VER_REV "." VER_REVSMALL
 
 #endif

@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@
 #define WAVEFORM_NONE 4
 #define WAVEFORM_WAV 5
 #define WAVEFORM_PINK 6
+#define WAVEFORM_TRI 6
 
 #define COMBINE_ADD 0
 #define COMBINE_SUB 1
@@ -80,13 +81,22 @@ extern float SIN[360];
 
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
 
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    #if !defined(__GCC__)
+    #pragma pack(push)
+    #pragma pack(1)
+    #else
+    #pragma pack(push, 1)
+    #endif
+#endif
+
 struct Synth_Parameters
 {
     char Preset_Name[20];
 
     unsigned char osc_1_waveform;
     unsigned char osc_2_waveform;
-    unsigned char osc_combine;
+    char osc_combine;
 
     int osc_1_pw;
     int osc_2_pw;
@@ -173,7 +183,14 @@ struct Synth_Parameters
     unsigned char lfo_2_disto;
     unsigned char env_1_disto;
     unsigned char env_2_disto;
+
+    char osc_sync;
+    char osc_3_interval;
 };
+
+#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
+    #pragma pack(pop)
+#endif
 
 #endif      // !defined(__STAND_ALONE__) || defined(__WINAMP__)
 
@@ -198,8 +215,8 @@ extern short STOCK_PULSE[SIZE_WAVEFORMS_SPACE];
 extern short STOCK_WHITE[SIZE_WAVEFORMS_SPACE];
 #endif
 
-#if defined(PTK_SYNTH_PINK)
-    extern short STOCK_PINK[SIZE_WAVEFORMS_SPACE];
+#if defined(PTK_SYNTH_TRI)
+extern short STOCK_TRI[SIZE_WAVEFORMS_SPACE];
 #endif
 
 extern int SIZE_WAVEFORMS;
@@ -222,7 +239,7 @@ typedef struct
         float OSC_2_PW; 
         
         float OSC_2_DETUNE;
-        float OSC_2_FINETUNE; 
+        float OSC_2_FINETUNE;
         
         float VCF_CUTOFF;
         float VCF_RESONANCE;
@@ -300,6 +317,9 @@ typedef struct
         float LFO_2_RELEASE;
 
         char OSC_COMBINE;
+        char OSC_SYNC;
+        char OSC_3_INTERVAL;
+
 } SYNTH_DATA, *LPSYNTH_DATA;
 
 #if defined(__STAND_ALONE__) && !defined(__WINAMP__)
@@ -353,13 +373,13 @@ class CSynth
 #endif
                     , int glide
                    );
-        void NoteOff(void);
+        void Note_Off(void);
 
-        float FilterL(void);
-        float FilterR(void);
+        float Filter_L(void);
+        float Filter_R(void);
 
-        float MoogFilterL(void);
-        float MoogFilterR(void);
+        float Moog_Filter_L(void);
+        float Moog_Filter_R(void);
 
         char ENV_1_LOOP_BACKWARD;
         char ENV_2_LOOP_BACKWARD;
@@ -369,8 +389,8 @@ class CSynth
 
         /* Internal Use */
 
-        void LfoAdvance(void);
-        void EnvRun(int *track, int *track2);
+        void Lfo_Advance(void);
+        void Env_Run(int *track, int *track2);
         float Math_Func(float in_old, float in_new);
 
         /* Synthesizer properties */
@@ -384,7 +404,7 @@ class CSynth
         float T_OSC_PW;
         float T_OSC_1_VOLUME;
         float T_OSC_2_VOLUME;
-
+        
         int64 OSC_1_SPEED;
         int64 OSC_2_SPEED;
         int64 OSC_3_SPEED;
@@ -481,8 +501,8 @@ class CSynth
         float sbuf0R;
         float sbuf1R;
 
-        float GS_VAL;
-        float GS_VAL2;
+        float GS_VAL_L;
+        float GS_VAL_R;
 };
 
 #endif // PTK_SYNTH

@@ -2,7 +2,7 @@
 // Protrekkr
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
-// Copyright (C) 2008-2024 Franck Charlet.
+// Copyright (C) 2008-2025 Franck Charlet.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -52,11 +52,15 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, ReplayerFile&),
                        int New_Env,
                        int Ntk_Beta,
                        int Combine,
-                       int Var_Disto);
+                       int Var_Disto,
+                       int Sync,
+                       int Osc_3_Interval
+                      );
 void Write_Synth_Params(int (*Write_Function)(void *, int ,int, FILE *),
                         int (*Write_Function_Swap)(void *, int ,int, FILE *),
                         FILE *in,
-                        int idx);
+                        int idx
+                       );
 void Load_Synth(char *FileName);
 void Save_Synth(void);
 
