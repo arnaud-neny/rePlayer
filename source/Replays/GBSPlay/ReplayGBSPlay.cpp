@@ -20,7 +20,7 @@ namespace rePlayer
         .replayId = eReplay::GBSPlay,
         .name = "GBSPlay",
         .extensions = "gbs;gbr;gb;vgm;vgz",
-        .about = "GBSPlay " GBS_VERSION "\nCopyright (c) 2003-2022 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>\nChristian Garbs <mitch@cgarbs.de>\nMaximilian Rehkopf <otakon@gmx.net>\nVegard Nossum <vegardno@ifi.uio.no>",
+        .about = "GBSPlay " GBS_VERSION "\nCopyright (c) 2003-2025 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>\nChristian Garbs <mitch@cgarbs.de>\nMaximilian Rehkopf <otakon@gmx.net>\nVegard Nossum <vegardno@ifi.uio.no>\nLisa Riedler <dev@riedler.wien>",
         .settings = "GBSPlay " GBS_VERSION,
         .init = ReplayGBSPlay::Init,
         .release = ReplayGBSPlay::Release,

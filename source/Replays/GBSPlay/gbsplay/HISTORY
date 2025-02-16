@@ -2,6 +2,34 @@
 gbsplay HISTORY
 
 
+2025/02/16  -  0.0.98
+~~~~~~~~~~~~~~~~~~~~~
+
+Bugfixes:
+
+- gbsplay:
+  - don't mess up the screen with underrun errors from the ALSA plugout
+    when resuming from a pause
+  - fix Pipewire plugout for Pipewire versions greater than 0.3.x
+
+- build process:
+  - fix i18n on brew/MaOS
+  - disable i8n during unit tests
+
+Enhancements:
+
+- gbsplay:
+  - add proper pause handling to ALSA plugout
+
+- contrib:
+  - add Zsh command completion for gbsplay, gbsinfo, gbs2gb and gbs2ogg
+  - add missiong options to bash completion script and fix some edge cases
+
+- documentation:
+  - document -- option to end option parsing
+  - update xgbsplay(1) manpage
+
+
 2024/04/17  -  0.0.97
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -13,12 +41,12 @@ Bugfixes:
   - reset cartridge RAM on subsong change to prevent the state of a
     subsong from influencing later subsongs
 
-- gbsplay
+- gbsplay:
   - fix display of unknown version number (gbsplay -V)
 
 Enhancements:
 
-- build process
+- build process:
   - display version number during configure
   - automatically provide a .tar.gz on the GitHub release page that
     contains proper version information like the old manual releases
