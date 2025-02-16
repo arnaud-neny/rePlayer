@@ -144,7 +144,7 @@ EXTENSION(kss)          // KSS & GME & NEZplug
 EXTENSION(nsf)          // GME & NEZplug
 EXTENSION(nsfe)         // GME & NEZplug
 EXTENSION(spc)
-EXTENSION(rsn)
+EXTENSION(rsn)			// deprecated
 EXTENSION(mdx)          // MDX
 EXTENSION(rk)           // UADE: CustomMade
 EXTENSION(s98)

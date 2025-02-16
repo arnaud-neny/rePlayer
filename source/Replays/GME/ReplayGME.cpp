@@ -11,14 +11,14 @@
 
 namespace rePlayer
 {
-    static_assert(GME_VERSION == 0x000700);
-    #define GME_VERSION_STRING "0.6.3+" // @6cd4bdb
+    static_assert(GME_VERSION == 0x000604);
+    #define GME_VERSION_STRING "0.6.4"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::GME,
         .name = "Game-Music-Emu",
-        .extensions = "ay;gbs;gym;hes;kss;nsf;nsfe;sap;spc;rsn;vgm;vgz",
-        .about = "Game-Music-Emu " GME_VERSION_STRING "\nShay Green & Michael Pyne",
+        .extensions = "ay;gbs;gym;hes;kss;nsf;nsfe;sap;spc;vgm;vgz",
+        .about = "Game-Music-Emu " GME_VERSION_STRING "\nShay Green, Vitaly Novichkov & Michael Pyne",
         .settings = "Game-Music-Emu " GME_VERSION_STRING,
         .init = ReplayGME::Init,
         .load = ReplayGME::Load,
@@ -180,8 +180,8 @@ namespace rePlayer
         if (gmeInfo->loop_length > 0)
             m_currentLoopDuration = (gmeInfo->loop_length * kSampleRate) / 1000;
         gme_free_info(gmeInfo);
-        // disable fade, we handle it ourself (and it doesn't work anyway)
-        gme_set_fade(m_emu, -1, 0);
+        // disable fade, we handle it ourself
+        gme_set_fade_msecs(m_emu, -1, 0);
     }
 
     void ReplayGME::ApplySettings(const CommandBuffer metadata)

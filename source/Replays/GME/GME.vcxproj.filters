@@ -215,9 +215,6 @@
     <ClInclude Include="gme\gme\ext\emutypes.h">
       <Filter>Source Files\gme\ext</Filter>
     </ClInclude>
-    <ClInclude Include="gme\gme\ext\mamedef.h">
-      <Filter>Source Files\gme\ext</Filter>
-    </ClInclude>
     <ClInclude Include="gme\gme\ext\panning.h">
       <Filter>Source Files\gme\ext</Filter>
     </ClInclude>
