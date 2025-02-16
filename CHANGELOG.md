@@ -1,8 +1,11 @@
-v0.17.0:
+v0.17.1:
 - Added GoatTracker
-- Updated OpenMPT to 0.8.0-pre.12 r22871
+- Updated gbsplay to 0.0.98
+- Updated libgme to 0.6.4
+- Updated OpenMPT to 0.8.0-pre.14 r22961
+- Updated ProTrekkr to 2.8.2
 - Updated ZXTune to r5081
-- Updated libcurl to 8.12.0
+- Updated libcurl to 8.12.1
 - Bug fixes
 
 v0.16.15:
