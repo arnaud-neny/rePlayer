@@ -274,6 +274,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="soundlib\pattern.h" />
     <ClInclude Include="soundlib\patternContainer.h" />
     <ClInclude Include="soundlib\Paula.h" />
+    <ClInclude Include="soundlib\PlaybackTest.h" />
     <ClInclude Include="soundlib\PlayState.h" />
     <ClInclude Include="soundlib\plugins\DigiBoosterEcho.h" />
     <ClInclude Include="soundlib\plugins\dmo\Chorus.h" />
@@ -422,6 +423,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="soundlib\pattern.cpp" />
     <ClCompile Include="soundlib\patternContainer.cpp" />
     <ClCompile Include="soundlib\Paula.cpp" />
+    <ClCompile Include="soundlib\PlaybackTest.cpp" />
     <ClCompile Include="soundlib\PlayState.cpp" />
     <ClCompile Include="soundlib\plugins\DigiBoosterEcho.cpp" />
     <ClCompile Include="soundlib\plugins\dmo\Chorus.cpp" />

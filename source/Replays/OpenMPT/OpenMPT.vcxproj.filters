@@ -398,6 +398,9 @@
     <ClInclude Include="soundlib\MIDIMacroParser.h">
       <Filter>Source Files\soundlib</Filter>
     </ClInclude>
+    <ClInclude Include="soundlib\PlaybackTest.h">
+      <Filter>Source Files\soundlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayOpenMPT.cpp">
@@ -851,6 +854,9 @@
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
     <ClCompile Include="soundlib\Load_tcb.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
+    <ClCompile Include="soundlib\PlaybackTest.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
   </ItemGroup>
