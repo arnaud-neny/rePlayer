@@ -365,6 +365,7 @@ int hio_error(HIO_HANDLE *h)
 
 HIO_HANDLE *hio_open(const char *path, const char *mode)
 {
+/* rePlayer begin
 	HIO_HANDLE *h;
 
 	h = (HIO_HANDLE *) calloc(1, sizeof(HIO_HANDLE));
@@ -387,6 +388,7 @@ HIO_HANDLE *hio_open(const char *path, const char *mode)
     err2:
 	free(h);
     err:
+rePlayer end */
 	return NULL;
 }
 

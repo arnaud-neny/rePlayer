@@ -445,6 +445,11 @@ static int gdm_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	m->quirk |= QUIRK_ARPMEM | QUIRK_FINEFX;
 
+	/* BWSB actually gets several aspects of this wrong, but this
+	 * seems to be the intent. No original GDMs exist so it's not
+	 * likely there's a reason to simulate its mistakes here. */
+	m->flow_mode = FLOW_MODE_ST3_321;
+
 	mod->ext = kExtension_gdm; // rePlayer
 
 	return 0;
