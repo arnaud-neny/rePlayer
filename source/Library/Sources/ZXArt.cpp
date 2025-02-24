@@ -419,9 +419,23 @@ namespace rePlayer
                     sscanf_s(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
                     song->releaseYear = uint16_t(year);
                 }
-                song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
-                if (song->type.ext == eExtension::Unknown)
-                    song->name.String() += std::string(".") + zxMusic["type"].get<std::string>();
+                if (zxMusic.contains("type"))
+                {
+                    song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
+                    if (song->type.ext == eExtension::Unknown)
+                        song->name.String() += std::string(".") + zxMusic["type"].get<std::string>();
+                }
+                else if (zxMusic.contains("originalFileName"))
+                {
+                    auto filename = zxMusic["originalFileName"].get<std::string>();
+                    auto pos = filename.rfind('.');
+                    if (pos != filename.npos)
+                    {
+                        song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
+                        if (song->type.ext == eExtension::Unknown)
+                            song->name.String() += filename.c_str() + pos;
+                    }
+                }
                 for (auto& author : zxMusic["authorIds"])
                 {
                     auto authorId = author.get<uint32_t>();
