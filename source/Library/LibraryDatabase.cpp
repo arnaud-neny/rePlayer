@@ -165,7 +165,7 @@ namespace rePlayer
                     }
                     if (isLostFile)
                     {
-                        Log::Warning("Cache: deleting \"%s\"\n", filePath.c_str());
+                        Log::Warning("Cache: deleting \"%s\"\n", filePath.u8string().c_str());
                         std::filesystem::remove(filePath);
                     }
                 }
@@ -177,7 +177,7 @@ namespace rePlayer
                 auto& filePath = directories[i];
                 if (std::filesystem::is_empty(filePath))
                 {
-                    Log::Warning("Cache: deleting \"%s\"\n", filePath.c_str());
+                    Log::Warning("Cache: deleting \"%s\"\n", filePath.u8string().c_str());
                     std::filesystem::remove(filePath);
                 }
             }
