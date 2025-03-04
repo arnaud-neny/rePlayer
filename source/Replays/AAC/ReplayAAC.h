@@ -2,6 +2,7 @@
 
 #include <Replay.h>
 
+#include "config.h"
 #include <neaacdec.h>
 #include <atomic>
 

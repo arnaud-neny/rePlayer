@@ -6,13 +6,12 @@
 
 namespace rePlayer
 {
-    #define FAADVersion "2.11.1"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::AAC,
         .name = "Advanced Audio Coding",
         .extensions = "aac",
-        .about = "Freeware Advanced Audio Codec " FAADVersion "\nCopyright (c) 2003-2005 M. Bakker, Nero AG, http://www.nero.com",
+        .about = "Freeware Advanced Audio Codec " FAAD2_VERSION "\nCopyright (c) 2003-2005 M. Bakker, Nero AG, http://www.nero.com",
         .load = ReplayAAC::Load
     };
 
@@ -283,7 +282,7 @@ namespace rePlayer
         char buf[32];
         sprintf(buf, "%u kb/s - %u hz", m_bitRate.average.load(), m_sampleRate);
         info += buf;
-        info += "\nFAAD " FAADVersion;
+        info += "\nFAAD " FAAD2_VERSION;
         return info;
     }
 
