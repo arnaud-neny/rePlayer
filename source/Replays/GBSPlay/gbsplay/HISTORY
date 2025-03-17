@@ -2,6 +2,43 @@
 gbsplay HISTORY
 
 
+2025/03/15  -  0.0.99
+~~~~~~~~~~~~~~~~~~~~~
+
+Bugfixes:
+
+- configuration:
+  - fix the deprecated 'loop' option to work as described in the manpage:
+    'loop=2' selects range loop mode, not single loop mode
+
+- build process:
+  - fix version number detection in GitHub CI builds
+
+Enhancements:
+
+- automatically build Windows binaries and add them to the GitHub
+  release page (marked experimental for now)
+
+- xgbsplay:
+  - loop mode can be changed interactively (use the 'l' key)
+  - display pause status when playback is paused
+  - display current loop mode
+  - add i18n
+
+- configuration:
+  - deprecate 'loop' option in gbsplayrc in favor of new 'loop_mode'
+    with values 'none', 'range' and 'single'
+  - add 'play_mode' option to gbsplayrc with values 'linear', 'random'
+    and 'shuffle'
+  - support 'native', 'little' and 'big' values for 'endian' option in
+    gbsplayrc instead of just 'n', 'l' and 'b'
+
+- documentation:
+  - describe loop mode keybinding in gbsplay(1) manpage
+  - describe 'filter_type' option in gbsplayrc(5) manpage
+  - add LICENCE to tarball
+
+
 2025/02/16  -  0.0.98
 ~~~~~~~~~~~~~~~~~~~~~
 

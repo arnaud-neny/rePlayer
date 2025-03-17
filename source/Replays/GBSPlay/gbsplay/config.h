@@ -1,5 +1,5 @@
 #ifndef _CONFIG_H_
-#define GBS_VERSION "0.0.98"
+#define GBS_VERSION "0.0.99"
 #define LOCALE_PREFIX ""
 #define SYSCONF_PREFIX ""
 #undef PLUGOUT_ALSA
