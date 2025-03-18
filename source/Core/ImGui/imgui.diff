@@ -49,10 +49,10 @@ index a1e29e8..954a2af 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index 8bb56ab..521c287 100644
+index fcc1d5a..dccbe67 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
-@@ -531,6 +531,7 @@ namespace ImGui
+@@ -529,6 +529,7 @@ namespace ImGui
      IMGUI_API void          PushID(const char* str_id);                                     // push string into the ID stack (will hash string).
      IMGUI_API void          PushID(const char* str_id_begin, const char* str_id_end);       // push string into the ID stack (will hash string).
      IMGUI_API void          PushID(const void* ptr_id);                                     // push pointer into the ID stack (will hash pointer).
@@ -60,7 +60,7 @@ index 8bb56ab..521c287 100644
      IMGUI_API void          PushID(int int_id);                                             // push integer into the ID stack (will hash integer).
      IMGUI_API void          PopID();                                                        // pop from the ID stack.
      IMGUI_API ImGuiID       GetID(const char* str_id);                                      // calculate unique ID (hash of whole ID stack + given parameter). e.g. if you want to query into ImGuiStorage yourself
-@@ -611,7 +612,7 @@ namespace ImGui
+@@ -609,7 +610,7 @@ namespace ImGui
      IMGUI_API bool          DragInt3(const char* label, int v[3], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragInt4(const char* label, int v[4], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragIntRange2(const char* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
@@ -70,10 +70,10 @@ index 8bb56ab..521c287 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 4fd5e53..4ecc6e1 100644
+index 573efe2..4a190e5 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -2491,8 +2491,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+@@ -2492,8 +2492,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
          // One byte is consumed in case of invalid first byte of in_text.
          // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
          // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
@@ -86,7 +86,7 @@ index 4fd5e53..4ecc6e1 100644
      }
  
      return wanted;
-@@ -6826,7 +6828,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
+@@ -6827,7 +6829,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -95,7 +95,7 @@ index 4fd5e53..4ecc6e1 100644
          return false;
      if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
          return false;
-@@ -9168,6 +9170,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
+@@ -9169,6 +9171,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
      return id;
  }
  
@@ -116,7 +116,7 @@ index 4fd5e53..4ecc6e1 100644
  ImGuiID ImGuiWindow::GetID(int n)
  {
      ImGuiID seed = IDStack.back();
-@@ -9223,6 +9239,16 @@ void ImGui::PushID(const void* ptr_id)
+@@ -9224,6 +9240,16 @@ void ImGui::PushID(const void* ptr_id)
      window->IDStack.push_back(id);
  }
  
@@ -134,7 +134,7 @@ index 4fd5e53..4ecc6e1 100644
  {
      ImGuiContext& g = *GImGui;
 diff --git "a/external\\imgui-docking\\imgui_internal.h" "b/source\\Core\\ImGui\\imgui_internal.h"
-index 4623467..cb6a2ea 100644
+index 0f106d4..e37379e 100644
 --- "a/external\\imgui-docking\\imgui_internal.h"
 +++ "b/source\\Core\\ImGui\\imgui_internal.h"
 @@ -2837,6 +2837,7 @@ public:
@@ -146,7 +146,7 @@ index 4623467..cb6a2ea 100644
      ImGuiID     GetIDFromPos(const ImVec2& p_abs);
      ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index b9538ad..bc39948 100644
+index 45428e7..9e191c8 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
 @@ -2622,7 +2622,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
