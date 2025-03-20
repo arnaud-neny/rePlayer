@@ -83,7 +83,6 @@
     <ClInclude Include="liblzma\check\crc64_table_be.h" />
     <ClInclude Include="liblzma\check\crc64_table_le.h" />
     <ClInclude Include="liblzma\check\crc_common.h" />
-    <ClInclude Include="liblzma\check\crc_macros.h" />
     <ClInclude Include="liblzma\check\crc_x86_clmul.h" />
     <ClInclude Include="liblzma\common\alone_decoder.h" />
     <ClInclude Include="liblzma\common\block_buffer_encoder.h" />

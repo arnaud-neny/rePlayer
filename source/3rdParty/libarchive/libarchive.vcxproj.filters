@@ -283,9 +283,6 @@
     <ClInclude Include="liblzma\check\check.h">
       <Filter>Source Files\liblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="liblzma\check\crc_macros.h">
-      <Filter>Source Files\liblzma\check</Filter>
-    </ClInclude>
     <ClInclude Include="liblzma\check\crc32_table_be.h">
       <Filter>Source Files\liblzma\check</Filter>
     </ClInclude>

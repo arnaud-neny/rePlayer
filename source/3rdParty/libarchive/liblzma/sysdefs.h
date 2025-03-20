@@ -21,6 +21,7 @@
 
 #ifdef HAVE_CONFIG_H
 #	include <config.h>
+// rePlayer begin
 #	define HAVE_CHECK_CRC32 1
 #	define HAVE_CHECK_CRC64 1
 #	define HAVE_CHECK_SHA256 1
@@ -53,19 +54,32 @@
 #	define HAVE_MF_BT2 1
 #	define HAVE_MF_BT3 1
 #	define HAVE_MF_BT4 1
+// rePlayer end
 #endif
 
-// This #define ensures that C99 and POSIX compliant stdio functions are
-// available with MinGW-w64 (both 32-bit and 64-bit). Modern MinGW-w64 adds
-// this automatically, for example, when the compiler is in C99 (or later)
-// mode when building against msvcrt.dll. It still doesn't hurt to be explicit
-// that we always want this and #define this unconditionally.
+// Choose if MinGW-w64's stdio replacement functions should be used.
+// The default has varied slightly in the past so it's clearest to always
+// set it explicitly.
 //
-// With Universal CRT (UCRT) this is less important because UCRT contains
-// C99-compatible stdio functions. It's still nice to #define this as UCRT
-// doesn't support the POSIX thousand separator flag in printf (like "%'u").
-#ifdef __MINGW32__
+// Modern MinGW-w64 enables the replacement functions even with UCRT
+// when _GNU_SOURCE is defined. That's good because UCRT doesn't support
+// the POSIX thousand separator flag in printf (like "%'u"). Otherwise
+// XZ Utils works with the UCRT stdio functions.
+//
+// The replacement functions add over 20 KiB to each executable. For
+// size-optimized builds (HAVE_SMALL), disable the replacements.
+// Then thousand separators aren't shown in xz's messages but this is
+// a minor downside compare to the slower speed of the HAVE_SMALL builds.
+//
+// The legacy MSVCRT is pre-C99 and it's best to always use the stdio
+// replacements functions from MinGW-w64.
+#if defined(__MINGW32__) && !defined(__USE_MINGW_ANSI_STDIO)
 #	define __USE_MINGW_ANSI_STDIO 1
+#	include <_mingw.h>
+#	if defined(_UCRT) && defined(HAVE_SMALL)
+#		undef __USE_MINGW_ANSI_STDIO
+#		define __USE_MINGW_ANSI_STDIO 0
+#	endif
 #endif
 
 // size_t and NULL

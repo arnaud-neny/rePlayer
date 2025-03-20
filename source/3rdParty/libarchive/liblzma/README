@@ -95,9 +95,9 @@ XZ Utils
 
     The command-line tools are documented as man pages. In source code
     releases (and possibly also in some binary packages), the man pages
-    are also provided in plain text (ASCII only) and PDF formats in the
-    directory "doc/man" to make the man pages more accessible to those
-    whose operating system doesn't provide an easy way to view man pages.
+    are also provided in plain text (ASCII only) format in the directory
+    "doc/man" to make the man pages more accessible to those whose
+    operating system doesn't provide an easy way to view man pages.
 
 
 1.3. Documentation for liblzma
@@ -298,7 +298,13 @@ XZ Utils
 6. Contact information
 ----------------------
 
-    Email: Lasse Collin <lasse.collin@tukaani.org>
-    IRC: Larhzu on #tukaani on Libera Chat
-    GitHub: https://github.com/tukaani-project/xz
+    XZ Utils in general:
+      - Home page: https://tukaani.org/xz/
+      - Email to maintainer(s): xz@tukaani.org
+      - IRC: #tukaani on Libera Chat
+      - GitHub: https://github.com/tukaani-project/xz
+
+    Lead maintainer:
+      - Email: Lasse Collin <lasse.collin@tukaani.org>
+      - IRC: Larhzu on Libera Chat
 
