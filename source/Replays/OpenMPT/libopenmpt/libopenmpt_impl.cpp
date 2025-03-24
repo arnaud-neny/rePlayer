@@ -46,7 +46,6 @@
 
 #include "common/version.h"
 #include "common/misc_util.h"
-#include "common/Dither.h"
 #include "common/FileReader.h"
 #include "common/Logging.h"
 #include "soundlib/Sndfile.h"
@@ -76,6 +75,14 @@ MPT_WARNING("Warning: Platform (Windows) supports multi-threading, however the t
 #if MPT_CLANG_AT_LEAST(5,0,0) && MPT_CLANG_BEFORE(11,0,0) && defined(__powerpc__) && !defined(__powerpc64__)
 MPT_WARNING("Warning: libopenmpt is known to trigger bad code generation with Clang 5..10 on powerpc (32bit) when using -O3. See <https://bugs.llvm.org/show_bug.cgi?id=46683>.")
 #endif
+
+#if defined(ENABLE_TESTS)
+#if defined(MPT_COMPILER_QUIRK_WINDOWS_FSTREAM_NO_WCHAR)
+#if MPT_GCC_BEFORE(9,1,0)
+MPT_WARNING("Warning: MinGW with GCC earlier than 9.1 detected. Standard library does neither provide std::fstream wchar_t overloads nor std::filesystem with wchar_t support. Unicode filename support is thus unavailable.")
+#endif // MPT_GCC_AT_LEAST(9,1,0)
+#endif // MPT_COMPILER_QUIRK_WINDOWS_FSTREAM_NO_WCHAR
+#endif // ENABLE_TESTS
 
 #endif // !MPT_BUILD_SILENCE_LIBOPENMPT_CONFIGURATION_WARNINGS
 
@@ -224,7 +231,7 @@ std::string get_string( const std::string & key ) {
 		return get_source_revision_string();
 	} else if ( key == "source_is_modified" ) {
 		return OpenMPT::SourceInfo::Current().IsDirty() ? "1" : "0";
-	} else if ( key == "source_has_mixed_revision" ) {
+	} else if ( key == "source_has_mixed_revisions" ) {
 		return OpenMPT::SourceInfo::Current().HasMixedRevisions() ? "1" : "0";
 	} else if ( key == "source_is_package" ) {
 		return OpenMPT::SourceInfo::Current().IsPackage() ? "1" : "0";

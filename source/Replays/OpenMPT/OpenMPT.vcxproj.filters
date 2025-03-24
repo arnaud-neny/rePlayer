@@ -296,9 +296,6 @@
     <ClInclude Include="common\ComponentManager.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="common\Dither.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="common\FileReader.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
@@ -761,12 +758,6 @@
       <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="common\Logging.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="common\mptFileIO.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="common\mptFileTemporary.cpp">
       <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="common\mptFileType.cpp">

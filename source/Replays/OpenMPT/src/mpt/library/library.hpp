@@ -9,6 +9,7 @@
 #include "mpt/base/macros.hpp"
 #include "mpt/base/namespace.hpp"
 #include "mpt/base/saturate_cast.hpp"
+#include "mpt/base/utility.hpp"
 #include "mpt/detect/dl.hpp"
 #include "mpt/detect/ltdl.hpp"
 #include "mpt/fs/common_directories.hpp"
@@ -315,8 +316,8 @@ public:
 		return library{hModule};
 	}
 
-	func_ptr get_address(const std::string & symbol) const {
-		return reinterpret_cast<func_ptr>(::GetProcAddress(m_hModule, symbol.c_str()));
+	auto get_address(const std::string & symbol) const {
+		return ::GetProcAddress(m_hModule, symbol.c_str());
 	}
 
 	~library() {
@@ -370,8 +371,8 @@ public:
 		return library{handle};
 	}
 
-	func_ptr get_address(const std::string & symbol) const {
-		return reinterpret_cast<func_ptr>(dlsym(handle, symbol.c_str()));
+	auto get_address(const std::string & symbol) const {
+		return dlsym(handle, symbol.c_str());
 	}
 
 	~library() {
@@ -428,8 +429,8 @@ public:
 		return library{handle};
 	}
 
-	func_ptr get_address(const std::string & symbol) const {
-		return reinterpret_cast<func_ptr>(dlsym(handle, symbol.c_str()));
+	auto get_address(const std::string & symbol) const {
+		return lt_dlsym(handle, symbol.c_str());
 	}
 
 	~library() {
@@ -468,7 +469,7 @@ public:
 		return std::nullopt;
 	}
 
-	func_ptr get_address(const std::string & symbol) const {
+	void * get_address(const std::string & symbol) const {
 		MPT_UNUSED(symbol);
 		return nullptr;
 	}
@@ -480,15 +481,41 @@ public:
 #endif
 
 	template <typename Tfunc>
-	bool bind(Tfunc *& f, const std::string & symbol) const {
-#if !(MPT_OS_WINDOWS && MPT_COMPILER_GCC)
+	bool bind_function(Tfunc *& f, const std::string & symbol) const {
+#if !defined(MPT_LIBCXX_QUIRK_INCOMPLETE_IS_FUNCTION)
 		// MinGW64 std::is_function is always false for non __cdecl functions.
 		// Issue is similar to <https://connect.microsoft.com/VisualStudio/feedback/details/774720/stl-is-function-bug>.
 		static_assert(std::is_function<Tfunc>::value);
 #endif
-		const func_ptr addr = get_address(symbol);
-		f = reinterpret_cast<Tfunc *>(addr);
-		return (addr != nullptr);
+		auto sym_ptr = get_address(symbol);
+		if (!sym_ptr) {
+			return false;
+		}
+		if constexpr (std::is_same<decltype(sym_ptr), void *>::value) {
+			f = reinterpret_cast<Tfunc *>(sym_ptr);
+		} else {
+			f = mpt::function_pointer_cast<Tfunc *>(sym_ptr);
+		}
+		return true;
+	}
+
+	template <typename Tdata>
+	bool bind_data(Tdata *& d, const std::string & symbol) const {
+#if !defined(MPT_LIBCXX_QUIRK_INCOMPLETE_IS_FUNCTION)
+		// MinGW64 std::is_function is always false for non __cdecl functions.
+		// Issue is similar to <https://connect.microsoft.com/VisualStudio/feedback/details/774720/stl-is-function-bug>.
+		static_assert(!std::is_function<Tdata>::value);
+#endif
+		auto sym_ptr = get_address(symbol);
+		if (!sym_ptr) {
+			return false;
+		}
+		if constexpr (std::is_same<decltype(sym_ptr), void *>::value) {
+			d = static_cast<Tdata *>(sym_ptr);
+		} else {
+			d = reinterpret_cast<Tdata *>(sym_ptr);
+		}
+		return true;
 	}
 };
 

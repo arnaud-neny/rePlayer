@@ -192,7 +192,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="common\BuildSettings.h" />
     <ClInclude Include="common\BuildSettingsCompiler.h" />
     <ClInclude Include="common\ComponentManager.h" />
-    <ClInclude Include="common\Dither.h" />
     <ClInclude Include="common\FileReader.h" />
     <ClInclude Include="common\FileReaderFwd.h" />
     <ClInclude Include="common\GzipWriter.h" />
@@ -317,8 +316,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
   <ItemGroup>
     <ClCompile Include="common\ComponentManager.cpp" />
     <ClCompile Include="common\Logging.cpp" />
-    <ClCompile Include="common\mptFileIO.cpp" />
-    <ClCompile Include="common\mptFileTemporary.cpp" />
     <ClCompile Include="common\mptFileType.cpp" />
     <ClCompile Include="common\mptPathString.cpp" />
     <ClCompile Include="common\mptRandom.cpp" />
