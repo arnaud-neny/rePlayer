@@ -362,6 +362,11 @@ namespace rePlayer
         m_isDirty = true;
     }
 
+    std::string SourceHighVoltageSIDCollection::GetArtistStub(SourceID artistId) const
+    {
+        return m_artists[artistId.internalId].name(m_strings);
+    }
+
     bool SourceHighVoltageSIDCollection::IsValidationEnabled() const
     {
         // validation is only possible when the database has been downloaded

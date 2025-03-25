@@ -23,6 +23,8 @@ namespace rePlayer
         void DiscardSong(SourceID sourceId, SongID newSongId) final;
         void InvalidateSong(SourceID sourceId, SongID newSongId) final;
 
+        std::string GetArtistStub(SourceID artistId) const final;
+
         bool IsValidationEnabled() const final;
         Status Validate(SourceID sourceId, SongID songId) final;
         Status Validate(SourceID sourceId, ArtistID artistId) final;

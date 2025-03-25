@@ -102,6 +102,8 @@ namespace rePlayer
         virtual void DiscardSong(SourceID sourceId, SongID newSongId) = 0;
         virtual void InvalidateSong(SourceID sourceId, SongID newSongId) = 0;
 
+        virtual std::string GetArtistStub(SourceID artistId) const { UnusedArg(artistId); return {}; }
+
         virtual bool IsValidationEnabled() const { return false; }
         virtual Status Validate(SourceID sourceId, SongID songId) { (void)sourceId; (void)songId; return Status::kOk; }
         virtual Status Validate(SourceID sourceId, ArtistID artistId) { (void)sourceId; (void)artistId; return Status::kOk; }

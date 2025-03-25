@@ -26,6 +26,8 @@ namespace rePlayer
         void DiscardSong(SourceID sourceId, SongID newSongId) final;
         void InvalidateSong(SourceID sourceId, SongID newSongId) final;
 
+        std::string GetArtistStub(SourceID artistId) const final;
+
         void Load() final;
         void Save() const final;
 

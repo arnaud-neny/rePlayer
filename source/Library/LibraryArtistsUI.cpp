@@ -48,6 +48,12 @@ namespace rePlayer
                 sprintf_s(txt, "----/--/-- --:-- %06X %s", source.id.internalId, source.GetName());
             ImGui::SetNextItemWidth(-FLT_MIN);
             ImGui::InputText("##source", txt, sizeof(txt), ImGuiInputTextFlags_ReadOnly);
+            if (ImGui::GetIO().KeyShift && ImGui::IsItemHovered())
+            {
+                auto stub = GetLibrary().m_sources[source.id.sourceId]->GetArtistStub(source.id);
+                if (!stub.empty())
+                    ImGui::Tooltip(stub.c_str(), stub.c_str() + stub.size());
+            }
             if (ImGui::BeginPopupContextItem("Source popup"))
             {
                 ImGui::SetNextWindowSizeConstraints(ImVec2(128.0f, ImGui::GetTextLineHeightWithSpacing()), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));

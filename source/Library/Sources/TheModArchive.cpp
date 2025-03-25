@@ -591,6 +591,13 @@ namespace rePlayer
         }
     }
 
+    std::string SourceTheModArchive::GetArtistStub(SourceID artistId) const
+    {
+        if (artistId.internalId & 0x800000)
+            return m_strings.Items(m_guessedArtists[artistId.internalId & 0x7fFFff].nameOffset);
+        return {};
+    }
+
     void SourceTheModArchive::Load()
     {
         auto file = io::File::OpenForRead(ms_filename);

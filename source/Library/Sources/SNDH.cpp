@@ -462,6 +462,11 @@ namespace rePlayer
         }
     }
 
+    std::string SourceSNDH::GetArtistStub(SourceID artistId) const
+    {
+        return m_strings.Items(m_artists[artistId.internalId].urlOffset);
+    }
+
     void SourceSNDH::Load()
     {
         auto file = io::File::OpenForRead(ms_filename);

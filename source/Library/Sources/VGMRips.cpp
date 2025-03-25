@@ -1097,6 +1097,15 @@ namespace rePlayer
         }
     }
 
+    std::string SourceVGMRips::GetArtistStub(SourceID artistId) const
+    {
+        auto artistSourceIndex = m_artists.FindIf<uint32_t>([&](auto& item)
+        {
+            return item.id == artistId.internalId;
+        });
+        return m_artists[artistSourceIndex].url(m_data);
+    }
+
     void SourceVGMRips::Load()
     {
         auto file = io::File::OpenForRead(ms_filename);
