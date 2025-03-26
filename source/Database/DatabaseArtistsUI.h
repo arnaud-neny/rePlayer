@@ -22,6 +22,8 @@ namespace rePlayer
         virtual void SourcesUI(Artist* selectedArtist);
         virtual void OnSavedChanges(Artist* selectedArtist);
 
+        ArtistID PickArtist(ArtistID skippedArtistId);
+
     private:
         static void OnArtistFilterLoaded(uintptr_t userData, void*, const char*);
         static void OnArtistSelectionLoaded(uintptr_t userData, void*, const char*);
@@ -35,11 +37,17 @@ namespace rePlayer
         void MergeUI();
         void SongUI();
 
-        bool SelectMasterArtist(ArtistID artistId);
-
     protected:
         Array<ArtistID> m_artists;
         ImGuiTextFilter* m_artistFilter;
+
+        struct
+        {
+            ImGuiTextFilter* filter;
+            Array<ArtistID> artists;
+            uint32_t revision = 0;
+            bool isOpened = false;
+        } m_artistPicker;
 
         ArtistSheet m_selectedArtistCopy;
 
@@ -47,8 +55,6 @@ namespace rePlayer
 
         struct
         {
-            ImGuiTextFilter* filter;
-            Array<ArtistID> artists;
             ArtistID masterArtistId;
             ArtistID mergedArtistId;
             bool isActive = false;

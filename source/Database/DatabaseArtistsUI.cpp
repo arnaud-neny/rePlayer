@@ -19,7 +19,7 @@ namespace rePlayer
     DatabaseArtistsUI::DatabaseArtistsUI(DatabaseID databaseId, Window& owner)
         : DatabaseSongsUI(databaseId, owner, false, (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kState) + (1 << kRating) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay),"Artists")
         , m_artistFilter(new ImGuiTextFilter())
-        , m_artistMerger{ new ImGuiTextFilter() }
+        , m_artistPicker{ new ImGuiTextFilter() }
     {
         owner.RegisterSerializedData(m_artistFilter->InputBuf, "ArtistsFilter", &OnArtistFilterLoaded, uintptr_t(m_artistFilter));
         owner.RegisterSerializedData(m_selectedArtistCopy.id, "ArtistsSelection", &OnArtistSelectionLoaded, uintptr_t(this));
@@ -28,7 +28,7 @@ namespace rePlayer
     DatabaseArtistsUI::~DatabaseArtistsUI()
     {
         delete m_artistFilter;
-        delete m_artistMerger.filter;
+        delete m_artistPicker.filter;
     }
 
     void DatabaseArtistsUI::OnDisplay()
@@ -160,6 +160,7 @@ namespace rePlayer
             ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_FirstUseEver);
             if (ImGui::BeginPopupModal("Merge Artist", NULL, ImGuiWindowFlags_AlwaysAutoResize))
             {
+                m_artistMerger.isActive = false;
                 auto mergedArtistId = m_artistMerger.mergedArtistId;
                 auto masterArtistId = m_artistMerger.masterArtistId;
                 auto* masterArtist = m_db[masterArtistId];
@@ -322,6 +323,46 @@ namespace rePlayer
         selectedArtistEdit->countries = m_selectedArtistCopy.countries;
         selectedArtistEdit->groups = m_selectedArtistCopy.groups;
         m_db.Raise(Database::Flag::kSaveArtists);
+    }
+
+    ArtistID DatabaseArtistsUI::PickArtist(ArtistID skippedArtistId)
+    {
+        if (m_artistPicker.filter->Draw("##filter", -1) || !m_artistPicker.isOpened || m_artistPicker.revision != m_dbArtistsRevision)
+        {
+            m_artistPicker.artists.Clear();
+            m_artistPicker.artists.Reserve(m_db.NumArtists());
+
+            for (auto artist : m_db.Artists())
+            {
+                if (artist->GetId() != skippedArtistId && m_artistPicker.filter->PassFilter(artist->GetHandle()))
+                    m_artistPicker.artists.Add(artist->GetId());
+            }
+            m_artistPicker.isOpened = true;
+            m_artistPicker.revision = m_dbArtistsRevision;
+        }
+
+        ArtistID pickedArtistId = ArtistID::Invalid;
+        ImGuiListClipper clipper;
+        clipper.Begin(m_artistPicker.artists.NumItems<int32_t>());
+        while (clipper.Step())
+        {
+            for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
+            {
+                auto* artist = m_db[m_artistPicker.artists[rowIdx]];
+                ImGui::PushID(static_cast<int>(artist->GetId()));
+                std::string label = artist->GetHandle();
+                if (artist->NumSources() != 0)
+                {
+                    label += " / ";
+                    label += artist->GetSource(0).GetName();
+                }
+                if (ImGui::MenuItem(label.c_str()))
+                    pickedArtistId = artist->GetId();
+                ImGui::PopID();
+            }
+        }
+
+        return pickedArtistId;
     }
 
     void DatabaseArtistsUI::OnArtistFilterLoaded(uintptr_t userData, void*, const char*)
@@ -568,10 +609,13 @@ namespace rePlayer
         if (ImGui::BeginPopupContextItem("MergeArtist"))
         {
             m_artistMerger.mergedArtistId = m_selectedArtistCopy.id;
-            if (SelectMasterArtist(m_artistMerger.mergedArtistId))
-                ImGui::CloseCurrentPopup();
+            m_artistMerger.masterArtistId = PickArtist(m_artistMerger.mergedArtistId);
+            if (m_artistMerger.masterArtistId != ArtistID::Invalid)
+                m_artistMerger.isActive = true;
             ImGui::EndPopup();
         }
+        else
+            m_artistPicker.isOpened = false;
         ImGui::EndDisabled();
     }
 
@@ -580,43 +624,6 @@ namespace rePlayer
         ImGui::SeparatorText("Songs");
 
         DatabaseSongsUI::OnDisplay();
-    }
-
-    bool DatabaseArtistsUI::SelectMasterArtist(ArtistID artistId)
-    {
-        if (m_artistMerger.filter->Draw("##filter", -1) || m_artistMerger.filter->IsActive() || !m_artistMerger.isActive)
-        {
-            m_artistMerger.artists.Clear();
-
-            for (auto artist : m_db.Artists())
-            {
-                if (artist->GetId() != artistId && m_artistMerger.filter->PassFilter(artist->GetHandle()))
-                    m_artistMerger.artists.Add(artist->GetId());
-            }
-        }
-        m_artistMerger.isActive = true;
-
-        ImGuiListClipper clipper;
-        clipper.Begin(m_artistMerger.artists.NumItems<int32_t>());
-        while (clipper.Step())
-        {
-            for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
-            {
-                auto* artist = m_db[m_artistMerger.artists[rowIdx]];
-                ImGui::PushID(static_cast<int>(artist->GetId()));
-                std::string label = artist->GetHandle();
-                if (artist->NumSources() != 0)
-                {
-                    label += " / ";
-                    label += artist->GetSource(0).GetName();
-                }
-                if (ImGui::MenuItem(label.c_str()))
-                    m_artistMerger.masterArtistId = artist->GetId();
-                ImGui::PopID();
-            }
-        }
-
-        return m_artistMerger.masterArtistId != ArtistID::Invalid;
     }
 }
 // namespace rePlayer

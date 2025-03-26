@@ -59,36 +59,16 @@ namespace rePlayer
                 ImGui::SetNextWindowSizeConstraints(ImVec2(128.0f, ImGui::GetTextLineHeightWithSpacing()), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
                 if (ImGui::BeginMenu("Move to artist"))
                 {
-                    // Build and sort the artist list
-                    Array<Artist*> artists(size_t(0), m_db.NumArtists() - 1);
-                    for (Artist* artist : m_db.Artists())
+                    ArtistID pickedArtistId = PickArtist(selectedArtist->GetId());
+                    if (pickedArtistId != ArtistID::Invalid)
                     {
-                        if (artist != selectedArtist)
-                            artists.Add(artist);
-                    }
-                    std::sort(artists.begin(), artists.end(), [this](auto l, auto r)
-                    {
-                        return _stricmp(l->GetHandle(), r->GetHandle()) < 0;
-                    });
-
-                    // Select
-                    ImGuiListClipper clipper;
-                    clipper.Begin(artists.NumItems<int32_t>());
-                    while (clipper.Step())
-                    {
-                        for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
-                        {
-                            ImGui::PushID(static_cast<int>(artists[rowIdx]->GetId()));
-                            if (ImGui::Selectable(artists[rowIdx]->GetHandle(), false))
-                            {
-                                moveToArtist = artists[rowIdx];
-                                moveToArtistSourceIndex = uint32_t(&source - selectedArtist->Sources().begin());
-                            }
-                            ImGui::PopID();
-                        }
+                        moveToArtist = m_db[pickedArtistId];
+                        moveToArtistSourceIndex = uint32_t(&source - selectedArtist->Sources().begin());
                     }
                     ImGui::EndMenu();
                 }
+                else
+                    m_artistPicker.isOpened = false;
                 ImGui::EndPopup();
             }
             ImGui::PopID();
