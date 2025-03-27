@@ -55,13 +55,7 @@
     <ClCompile Include="HTMLtree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="legacy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="list.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nanoftp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nanohttp.c">
@@ -86,9 +80,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="runxmlconf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SAX.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SAX2.c">
@@ -119,9 +110,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="testrecurse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="testThreads.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="threads.c">
@@ -190,7 +178,10 @@
     <ClCompile Include="xzlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rngparser.c">
+    <ClCompile Include="lintmain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shell.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,9 +194,6 @@
     </ClInclude>
     <ClInclude Include="timsort.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\win32config.h">
-      <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\wsockcompat.h">
       <Filter>Source Files\include</Filter>
@@ -402,5 +390,22 @@
     <ClInclude Include="include\private\xzlib.h">
       <Filter>Source Files\include\private</Filter>
     </ClInclude>
+    <ClInclude Include="include\private\cata.h">
+      <Filter>Source Files\include\private</Filter>
+    </ClInclude>
+    <ClInclude Include="include\private\lint.h">
+      <Filter>Source Files\include\private</Filter>
+    </ClInclude>
+    <ClInclude Include="include\private\unicode.h">
+      <Filter>Source Files\include\private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="html5ent.inc">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="iso8859x.inc">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

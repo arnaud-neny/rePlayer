@@ -32,14 +32,13 @@
     <ClCompile Include="hash.c" />
     <ClCompile Include="HTMLparser.c" />
     <ClCompile Include="HTMLtree.c" />
-    <ClCompile Include="legacy.c" />
-    <ClCompile Include="list.c" />
-    <ClCompile Include="nanoftp.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    <ClCompile Include="lintmain.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="list.c" />
     <ClCompile Include="nanohttp.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -50,12 +49,6 @@
     <ClCompile Include="parserInternals.c" />
     <ClCompile Include="pattern.c" />
     <ClCompile Include="relaxng.c" />
-    <ClCompile Include="rngparser.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="runsuite.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -74,7 +67,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="SAX.c" />
     <ClCompile Include="SAX2.c" />
     <ClCompile Include="schematron.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -82,6 +74,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="shell.c" />
     <ClCompile Include="testapi.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -125,12 +118,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="testrecurse.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="testThreads.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -223,6 +210,7 @@
     <ClInclude Include="include\libxml\xpathInternals.h" />
     <ClInclude Include="include\libxml\xpointer.h" />
     <ClInclude Include="include\private\buf.h" />
+    <ClInclude Include="include\private\cata.h" />
     <ClInclude Include="include\private\dict.h" />
     <ClInclude Include="include\private\enc.h" />
     <ClInclude Include="include\private\entities.h" />
@@ -230,6 +218,7 @@
     <ClInclude Include="include\private\globals.h" />
     <ClInclude Include="include\private\html.h" />
     <ClInclude Include="include\private\io.h" />
+    <ClInclude Include="include\private\lint.h" />
     <ClInclude Include="include\private\memory.h" />
     <ClInclude Include="include\private\parser.h" />
     <ClInclude Include="include\private\regexp.h" />
@@ -237,13 +226,17 @@
     <ClInclude Include="include\private\string.h" />
     <ClInclude Include="include\private\threads.h" />
     <ClInclude Include="include\private\tree.h" />
+    <ClInclude Include="include\private\unicode.h" />
     <ClInclude Include="include\private\xinclude.h" />
     <ClInclude Include="include\private\xpath.h" />
     <ClInclude Include="include\private\xzlib.h" />
-    <ClInclude Include="include\win32config.h" />
     <ClInclude Include="include\wsockcompat.h" />
     <ClInclude Include="libxml.h" />
     <ClInclude Include="timsort.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="html5ent.inc" />
+    <None Include="iso8859x.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
