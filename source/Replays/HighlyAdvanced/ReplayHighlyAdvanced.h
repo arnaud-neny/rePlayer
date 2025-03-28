@@ -97,7 +97,8 @@ namespace rePlayer
             uint32_t entry = 0;
             uint8_t* data = nullptr;
             size_t data_size = 0;
-            ~gsf_loader_state() { if (data) free(data); }
+            void Reset() { if (data) free(data); }
+            ~gsf_loader_state() { Reset(); }
         } m_gbaRom;
         mCore* m_gbaCore = nullptr;
         struct GbaStream : public mAVStream

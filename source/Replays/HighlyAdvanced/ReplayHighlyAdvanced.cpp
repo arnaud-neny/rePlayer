@@ -418,6 +418,7 @@ namespace rePlayer
         auto subsongIndex = m_subsongIndex;
         if (m_currentSubsongIndex != subsongIndex)
         {
+            m_gbaRom.Reset();
             m_gbaRom = {};
             m_tags.Clear();
             m_title.clear();
