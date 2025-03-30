@@ -1,5 +1,5 @@
 #ifdef _WIN64
-#include "Graphics.h"
+#include "GraphicsDX12.h"
 #include "GraphicsPremulDx12.h"
 
 namespace rePlayer
@@ -7,30 +7,31 @@ namespace rePlayer
     #include "GraphicsPremulVS.h"
     #include "GraphicsPremulPS.h"
 
-    SmartPtr<GraphicsPremul> GraphicsPremul::Create()
+    SmartPtr<GraphicsPremulDX12> GraphicsPremulDX12::Create(const GraphicsDX12* graphics)
     {
-        SmartPtr<GraphicsPremul> graphicsPremul(kAllocate);
-        if (graphicsPremul->Init())
+        SmartPtr<GraphicsPremulDX12> GraphicsPremulDX12(kAllocate, graphics);
+        if (GraphicsPremulDX12->Init())
             return nullptr;
-        return graphicsPremul;
+        return GraphicsPremulDX12;
     }
 
-    GraphicsPremul::GraphicsPremul()
+    GraphicsPremulDX12::GraphicsPremulDX12(const GraphicsDX12* graphics)
+        : m_graphics(graphics)
     {
     }
 
-    GraphicsPremul::~GraphicsPremul()
+    GraphicsPremulDX12::~GraphicsPremulDX12()
     {
     }
 
-    bool GraphicsPremul::Init()
+    bool GraphicsPremulDX12::Init()
     {
         bool isSuccessFull = CreateRootSignature()
             && CreatePipelineState();
         return !isSuccessFull;
     }
 
-    bool GraphicsPremul::CreateRootSignature()
+    bool GraphicsPremulDX12::CreateRootSignature()
     {
         D3D12_ROOT_PARAMETER param = {};
 
@@ -51,20 +52,14 @@ namespace rePlayer
 
         SmartPtr<ID3DBlob> blob;
         if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) < S_OK)
-        {
-            MessageBox(nullptr, "Premul: serialize root signature", "rePlayer", MB_ICONERROR);
             return false;
-        }
 
-        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature)) < S_OK)
-        {
-            MessageBox(nullptr, "Premul: root signature", "rePlayer", MB_ICONERROR);
+        if (m_graphics->GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&mRootSignature)) < S_OK)
             return false;
-        }
         return true;
     }
 
-    bool GraphicsPremul::CreatePipelineState()
+    bool GraphicsPremulDX12::CreatePipelineState()
     {
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
         psoDesc.NodeMask = 1;
@@ -126,16 +121,13 @@ namespace rePlayer
 */
         }
 
-        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) < S_OK)
-        {
-            MessageBox(nullptr, "Premul: pipeline state", "rePlayer", MB_ICONERROR);
+        if (m_graphics->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState)) < S_OK)
             return false;
-        }
         return true;
     }
 
     // Render function
-    void GraphicsPremul::Render(GraphicsWindow* window, float blendingFactor)
+    void GraphicsPremulDX12::Render(GraphicsWindowDX12* window, float blendingFactor)
     {
         float color[4] = { 1.0f, 1.0f, 1.0f, blendingFactor };
 

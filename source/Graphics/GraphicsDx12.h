@@ -6,12 +6,14 @@
 #include <Containers/SmartPtr.h>
 #include <Core/RefCounted.h>
 
+#include "Graphics.h"
+
 namespace rePlayer
 {
     using namespace core;
 
-    class GraphicsImGui;
-    class GraphicsPremul;
+    class GraphicsImGuiDX12;
+    class GraphicsPremulDX12;
 
     struct ScopedHandle
     {
@@ -34,7 +36,7 @@ namespace rePlayer
         HANDLE handle = NULL;
     };
 
-    struct GraphicsWindow
+    struct GraphicsWindowDX12
     {
         enum
         {
@@ -76,48 +78,48 @@ namespace rePlayer
         FrameContext* m_currentFrameContext = m_frameContexts;
         uint64_t m_frameIndex = 0;
 
-        class GraphicsImpl* m_graphics;
+        class GraphicsDX12* m_graphics;
         SmartPtr<Item> m_items[kItemIdCount];//replace with render graph
 
         bool m_isMainWindow;
 
-        GraphicsWindow(GraphicsImpl* graphics, bool isMainWindow)
+        GraphicsWindowDX12(GraphicsDX12* graphics, bool isMainWindow)
             : m_graphics(graphics)
             , m_isMainWindow(isMainWindow)
         {}
-        ~GraphicsWindow();
+        ~GraphicsWindowDX12();
         bool Resize(uint32_t width, uint32_t height);
         void WaitForLastSubmittedFrame();
     };
 
-    class GraphicsImpl
+    class GraphicsDX12 : public Graphics
     {
-        friend struct GraphicsWindow;
+        friend struct GraphicsWindowDX12;
     public:
-        GraphicsImpl();
-        ~GraphicsImpl();
+        GraphicsDX12(HWND hWnd);
+        bool OnInit() override;
+        ~GraphicsDX12() override;
 
-        bool Init(HWND hWnd);
-        void Destroy();
+        GraphicsWindowDX12* OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow = false);
 
-        GraphicsWindow* OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow = false);
-
-        void BeginFrame();
-        bool EndFrame(float blendingFactor);
+        void OnBeginFrame() override;
+        bool OnEndFrame(float blendingFactor) override;
 
         auto GetDevice() const;
 
-        int32_t Get3x5BaseRect() const;
+        int32_t OnGet3x5BaseRect() const override;
+
+        HWND GetHWND() const { return m_hWnd; }
 
     public:
         static constexpr uint32_t kNumFrames = 3;
-        static constexpr uint32_t kNumBackBuffers = GraphicsWindow::kNumBackBuffers;
+        static constexpr uint32_t kNumBackBuffers = GraphicsWindowDX12::kNumBackBuffers;
 
     private:
         SmartPtr<ID3D12CommandQueue> CreateCommandQueue();
-        bool CreateSwapChainForComposition(HWND hWnd, GraphicsWindow* window);
+        bool CreateSwapChainForComposition(HWND hWnd, GraphicsWindowDX12* window);
 
-        void CreateRenderTargets(GraphicsWindow* window);
+        void CreateRenderTargets(GraphicsWindowDX12* window);
         void ReleaseRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
     private:
@@ -127,18 +129,19 @@ namespace rePlayer
         SmartPtr<ID3D12DescriptorHeap> m_rtvDescriptorHeap;
         uint64_t m_rtvDescritorUsage = 0;
 
-        GraphicsWindow* m_mainWindow = nullptr;
+        HWND m_hWnd;
+        GraphicsWindowDX12* m_mainWindow = nullptr;
 
         uint32_t m_dxgiFactoryFlags = 0;
 
-        SmartPtr<GraphicsImGui> m_imGui;
-        SmartPtr<GraphicsPremul> m_premul;
+        SmartPtr<GraphicsImGuiDX12> m_imGui;
+        SmartPtr<GraphicsPremulDX12> m_premul;
 
         bool m_isCrashed = false;
     };
 }
 // namespace rePlayer
 
-#include "GraphicsImplDx12.inl"
+#include "GraphicsDx12.inl"
 
 #endif // _WIN64

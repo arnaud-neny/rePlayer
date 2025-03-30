@@ -11,7 +11,10 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/RePlayer.h>
 
+#include <windows.h>
+
 #include <ctime>
+#include <ole2.h>
 #include <shellapi.h>
 #include <winternl.h>
 
@@ -198,14 +201,10 @@ void ImGuiInit()
     style.FrameBorderSize = 0.f;
     style.PopupBorderSize = 0.f;
     style.PopupRounding = 0.f;
-
-    ImGui_ImplWin32_Init(s_hWnd);
 }
 
 void ImGuiRelease()
 {
-    ImGui_ImplWin32_Shutdown();
-
     ImGui::DestroyContext();
 }
 
@@ -336,7 +335,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 ImGui::NewFrame();
 
                 if (s_rePlayer->UpdateFrame() != core::Status::kOk)
+                {
+                    ImGui::EndFrame();
                     break;
+                }
 
 #if _DEBUG
                 static bool show_demo_window = false;

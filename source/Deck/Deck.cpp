@@ -242,9 +242,8 @@ namespace rePlayer
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
                 }
             }
-#ifdef _WIN64
-            ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
-#endif
+            if (Window::ms_isPassthroughAvailable == Window::Passthrough::IsAvailable)
+                ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
             ImGui::SliderFloat("Scale", &m_scale, 1.0f, 4.0f, "%1.2f", ImGuiSliderFlags_AlwaysClamp);
             Log::DisplaySettings();
         }
@@ -1029,9 +1028,8 @@ namespace rePlayer
                 m_hSystrayWnd = nullptr;
             }
             ImGui::MenuItem("Always On Top", nullptr, &m_windowStates.isAlwaysOnTop);
-#ifdef _WIN64
-            ImGui::MenuItem("Passthrough", nullptr, &m_windowStates.isPassthrough);
-#endif
+            if (Window::ms_isPassthroughAvailable == Passthrough::IsAvailable)
+                ImGui::MenuItem("Passthrough", nullptr, &m_windowStates.isPassthrough);
             ImGui::MenuItem("Minimal", nullptr, &m_windowStates.isMinimal);
             ImGui::Separator();
             if (ImGui::MenuItem("Invert states"))

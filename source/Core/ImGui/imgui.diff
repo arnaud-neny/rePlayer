@@ -177,6 +177,7 @@ index f5939e8..e55e7b2 100644
  
 -static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style)
 +// rePlayer begin
++DWORD g_imguiWindowDefaultStyle = 0;
 +static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style, bool isChild)
  {
      if (flags & ImGuiViewportFlags_NoDecoration)
@@ -186,11 +187,7 @@ index f5939e8..e55e7b2 100644
  
 -    if (flags & ImGuiViewportFlags_NoTaskBarIcon)
 -        *out_ex_style = WS_EX_TOOLWINDOW;
-+#ifdef _WIN64
-+    DWORD exStyle = WS_EX_NOREDIRECTIONBITMAP; // transparent window
-+#else
-+    DWORD exStyle = 0;
-+#endif
++    DWORD g_imguiWindowDefaultStyle = 0;
 +
 +    if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
 +        *out_ex_style = WS_EX_TOOLWINDOW | exStyle;

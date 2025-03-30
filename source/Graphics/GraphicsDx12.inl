@@ -1,11 +1,11 @@
 #pragma once
 
 #ifdef _WIN64
-#include "GraphicsImplDx12.h"
+#include "GraphicsDx12.h"
 
 namespace rePlayer
 {
-    inline auto GraphicsImpl::GetDevice() const
+    inline auto GraphicsDX12::GetDevice() const
     {
         return m_device.Get();
     }

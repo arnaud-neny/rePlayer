@@ -9,21 +9,21 @@ struct ImDrawData;
 
 namespace rePlayer
 {
-    class GraphicsImGui : public RefCounted
+    class GraphicsImGuiDX12 : public RefCounted
     {
-        friend class SmartPtr<GraphicsImGui>;
+        friend class SmartPtr<GraphicsImGuiDX12>;
     public:
-        static SmartPtr<GraphicsImGui> Create();
+        static SmartPtr<GraphicsImGuiDX12> Create(const GraphicsDX12* graphics);
 
-        void Render(GraphicsWindow* window, const ImDrawData& drawData);
+        void Render(GraphicsWindowDX12* window, const ImDrawData& drawData);
 
-        void OnCreateWindow(GraphicsWindow* window);
+        void OnCreateWindow(GraphicsWindowDX12* window);
 
         int32_t Get3x5BaseRect() const { return m_3x5BaseRect; }
 
     protected:
-        GraphicsImGui();
-        ~GraphicsImGui() override;
+        GraphicsImGuiDX12(const GraphicsDX12* graphics);
+        ~GraphicsImGuiDX12() override;
 
     private:
         struct Item;
@@ -42,9 +42,10 @@ namespace rePlayer
         bool CreatePipelineState();
         bool CreateTextureFont();
 
-        void SetupRenderStates(GraphicsWindow* window, const ImDrawData& drawData, FrameResources* frameResources);
+        void SetupRenderStates(GraphicsWindowDX12* window, const ImDrawData& drawData, FrameResources* frameResources);
 
     private:
+        const GraphicsDX12* m_graphics;
         SmartPtr<ID3D12RootSignature> m_rootSignature;
         SmartPtr<ID3D12PipelineState> m_pipelineState;
         SmartPtr<ID3D12Resource> m_fontTextureResource;

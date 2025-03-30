@@ -1,5 +1,4 @@
-#ifndef _WIN64
-#include "GraphicsImplDx11.h"
+#include "GraphicsDx11.h"
 #include "GraphicsImGuiDx11.h"
 
 #include <Core/Log.h>
@@ -15,16 +14,16 @@
 
 namespace rePlayer
 {
-    GraphicsWindow::GraphicsWindow(GraphicsImpl* graphics, bool isMainWindow)
+    GraphicsWindowDX11::GraphicsWindowDX11(GraphicsDX11* graphics, bool isMainWindow)
         : m_device(graphics->m_device)
         , m_deviceContext(graphics->m_deviceContext)
         , m_isMainWindow(isMainWindow)
     {}
 
-    GraphicsWindow::~GraphicsWindow()
+    GraphicsWindowDX11::~GraphicsWindowDX11()
     {}
 
-    bool GraphicsWindow::Resize(uint32_t width, uint32_t height)
+    bool GraphicsWindowDX11::Resize(uint32_t width, uint32_t height)
     {
         if (width == 0 || height == 0)
             return false;
@@ -45,13 +44,15 @@ namespace rePlayer
         return false;
     }
 
-    GraphicsImpl::GraphicsImpl()
-    {}
+    GraphicsDX11::GraphicsDX11(HWND hWnd)
+        : m_hWnd(hWnd)
+    {
+        Window::ms_isPassthroughAvailable = Window::Passthrough::IsNotAvailable;
+        auto mainWindowExStyle = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
+        ::SetWindowLongW(hWnd, GWL_EXSTYLE, mainWindowExStyle & ~WS_EX_NOREDIRECTIONBITMAP);
+    }
 
-    GraphicsImpl::~GraphicsImpl()
-    {}
-
-    bool GraphicsImpl::Init(HWND hWnd)
+    bool GraphicsDX11::OnInit()
     {
         // Create the device
         {
@@ -76,7 +77,7 @@ namespace rePlayer
         }
 
         // Create ImGui Renderer
-        m_imGui = GraphicsImGui::Create();
+        m_imGui = GraphicsImGuiDX11::Create(this);
         if (!m_imGui)
             return true;
 
@@ -87,14 +88,14 @@ namespace rePlayer
             static void OnCreateWindow(ImGuiViewport* viewport)
             {
                 ImGuiIO& io = ImGui::GetIO();
-                auto graphics = reinterpret_cast<GraphicsImpl*>(io.BackendRendererUserData);
+                auto graphics = reinterpret_cast<GraphicsDX11*>(io.BackendRendererUserData);
                 viewport->RendererUserData = graphics->OnCreateWindow(viewport->PlatformHandleRaw ? (HWND)viewport->PlatformHandleRaw : (HWND)viewport->PlatformHandle
                     , static_cast<uint32_t>(viewport->Size.x)
                     , static_cast<uint32_t>(viewport->Size.y));
             }
             static void OnDestroyWindow(ImGuiViewport* viewport)
             {
-                if (auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData))
+                if (auto window = reinterpret_cast<GraphicsWindowDX11*>(viewport->RendererUserData))
                 {
                     delete window;
                     viewport->RendererUserData = nullptr;
@@ -102,7 +103,7 @@ namespace rePlayer
             }
             static void OnResize(ImGuiViewport* viewport, ImVec2 size)
             {
-                auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+                auto window = reinterpret_cast<GraphicsWindowDX11*>(viewport->RendererUserData);
                 window->Resize(static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y));
             }
         } callbacks;
@@ -112,12 +113,12 @@ namespace rePlayer
         platform_io.Renderer_DestroyWindow = callbacks.OnDestroyWindow;
         platform_io.Renderer_SetWindowSize = callbacks.OnResize;
 
-        m_mainWindow = OnCreateWindow(hWnd, 1, 1, true);
+        m_mainWindow = OnCreateWindow(m_hWnd, 1, 1, true);
 
         return false;
     }
 
-    void GraphicsImpl::Destroy()
+    GraphicsDX11::~GraphicsDX11()
     {
         ImGuiIO& io = ImGui::GetIO();
         if (m_isCrashed)
@@ -132,16 +133,14 @@ namespace rePlayer
         io.BackendRendererUserData = nullptr;
 
         delete m_mainWindow;
-
-        *this = GraphicsImpl();
     }
 
-    void GraphicsImpl::BeginFrame()
+    void GraphicsDX11::OnBeginFrame()
     {
         ImGui::UpdatePlatformWindows();
     }
 
-    bool GraphicsImpl::EndFrame(float blendingFactor)
+    bool GraphicsDX11::OnEndFrame(float blendingFactor)
     {
         (void)blendingFactor;
         float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -156,7 +155,7 @@ namespace rePlayer
             if (viewport->Flags & ImGuiViewportFlags_IsMinimized)
                 continue;
 
-            auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+            auto window = reinterpret_cast<GraphicsWindowDX11*>(viewport->RendererUserData);
 
             m_deviceContext->OMSetRenderTargets(1, &window->m_rtView, nullptr);
             m_deviceContext->ClearRenderTargetView(window->m_rtView, clear_color);
@@ -170,7 +169,7 @@ namespace rePlayer
             if (viewport->Flags & ImGuiViewportFlags_IsMinimized)
                 continue;
 
-            auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+            auto window = reinterpret_cast<GraphicsWindowDX11*>(viewport->RendererUserData);
             window->m_swapChain->Present(0, 0); // Present without vsync
         }
 
@@ -178,9 +177,9 @@ namespace rePlayer
         return m_isCrashed;
     }
 
-    GraphicsWindow* GraphicsImpl::OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow)
+    GraphicsWindowDX11* GraphicsDX11::OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow)
     {
-        auto window = new GraphicsWindow(this, isMainWindow);
+        auto window = new GraphicsWindowDX11(this, isMainWindow);
         window->m_width = width;
         window->m_height = height;
 
@@ -215,11 +214,9 @@ namespace rePlayer
         return window;
     }
 
-    int32_t GraphicsImpl::Get3x5BaseRect() const
+    int32_t GraphicsDX11::OnGet3x5BaseRect() const
     {
         return m_imGui->Get3x5BaseRect();
     }
 }
 // namespace rePlayer
-
-#endif // _WIN64

@@ -157,7 +157,7 @@ namespace core
 
         // and flush the current log depending on our new settings
         if (m_mode == Mode::kUndefined)
-            m_mode = Mode::kDisabled;
+            m_mode = Mode::kFull;
         if (m_mode >= Mode::kFileOnly)
         {
             auto file = io::File::OpenForAppend(m_filename);

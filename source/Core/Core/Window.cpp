@@ -42,15 +42,14 @@ namespace core
     void Window::Handle::ApplyPassthrough() const
     {
         auto hWndStyle = ::GetWindowLongW(HWND(hWnd), GWL_EXSTYLE);
-#ifdef _WIN64
-        if (states.isPassthrough)
+        if (Window::ms_isPassthroughAvailable == Passthrough::IsAvailable && states.isPassthrough)
             hWndStyle |= WS_EX_TRANSPARENT | WS_EX_LAYERED;
         else
-#endif
             hWndStyle &= ~(WS_EX_TRANSPARENT | WS_EX_LAYERED);
         ::SetWindowLongW(HWND(hWnd), GWL_EXSTYLE, hWndStyle);
     }
 
+    Window::Passthrough Window::ms_isPassthroughAvailable;
     Window* Window::ms_windows = nullptr;
 
     Window::Window(std::string&& name, ImGuiWindowFlags flags, bool isMaster)

@@ -7,17 +7,19 @@
 
 namespace rePlayer
 {
-    class GraphicsPremul : public RefCounted
-    {
-        friend class SmartPtr<GraphicsPremul>;
-    public:
-        static SmartPtr<GraphicsPremul> Create();
+    class GraphicsDX12;
 
-        void Render(GraphicsWindow* window, float blendingFactor);
+    class GraphicsPremulDX12 : public RefCounted
+    {
+        friend class SmartPtr<GraphicsPremulDX12>;
+    public:
+        static SmartPtr<GraphicsPremulDX12> Create(const GraphicsDX12* graphics);
+
+        void Render(GraphicsWindowDX12* window, float blendingFactor);
 
     protected:
-        GraphicsPremul();
-        ~GraphicsPremul() override;
+        GraphicsPremulDX12(const GraphicsDX12* graphics);
+        ~GraphicsPremulDX12() override;
 
     private:
         bool Init();
@@ -25,6 +27,7 @@ namespace rePlayer
         bool CreatePipelineState();
 
     private:
+        const GraphicsDX12* m_graphics;
         SmartPtr<ID3D12RootSignature> mRootSignature;
         SmartPtr<ID3D12PipelineState> mPipelineState;
     };

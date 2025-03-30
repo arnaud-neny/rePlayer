@@ -1083,6 +1083,7 @@ struct ImGui_ImplWin32_ViewportData
 };
 
 // rePlayer begin
+DWORD g_imguiWindowDefaultStyle = 0;
 static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags flags, DWORD* out_style, DWORD* out_ex_style, bool isChild)
 {
     if (flags & ImGuiViewportFlags_NoDecoration)
@@ -1090,11 +1091,7 @@ static void ImGui_ImplWin32_GetWin32StyleFromViewportFlags(ImGuiViewportFlags fl
     else
         *out_style = WS_OVERLAPPEDWINDOW;
 
-#ifdef _WIN64
-    DWORD exStyle = WS_EX_NOREDIRECTIONBITMAP; // transparent window
-#else
-    DWORD exStyle = 0;
-#endif
+    DWORD exStyle = g_imguiWindowDefaultStyle;
 
     if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
         *out_ex_style = WS_EX_TOOLWINDOW | exStyle;

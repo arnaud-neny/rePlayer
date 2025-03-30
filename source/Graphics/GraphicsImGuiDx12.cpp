@@ -1,45 +1,59 @@
 #ifdef _WIN64
+#include <Core/Log.h>
 #include <Imgui.h>
+#include <ImGui/imgui_impl_win32.h>
 
-#include "Graphics.h"
+#include "GraphicsDX12.h"
 #include "GraphicsFont3x5.h"
 #include "GraphicsFontLog.h"
 #include "GraphicsImGuiDx12.h"
 #include "MediaIcons.h"
+
+extern DWORD g_imguiWindowDefaultStyle;
 
 namespace rePlayer
 {
     #include "GraphicsImGuiVS.h"
     #include "GraphicsImGuiPS.h"
 
-    struct GraphicsImGui::Item : GraphicsWindow::Item
+    struct GraphicsImGuiDX12::Item : GraphicsWindowDX12::Item
     {
-        FrameResources m_frameResources[GraphicsWindow::kNumBackBuffers];
+        FrameResources m_frameResources[GraphicsWindowDX12::kNumBackBuffers];
     };
 
-    SmartPtr<GraphicsImGui> GraphicsImGui::Create()
+    SmartPtr<GraphicsImGuiDX12> GraphicsImGuiDX12::Create(const GraphicsDX12* graphics)
     {
-        SmartPtr<GraphicsImGui> graphicsImGui(kAllocate);
+        SmartPtr<GraphicsImGuiDX12> graphicsImGui(kAllocate, graphics);
         if (graphicsImGui->Init())
             return nullptr;
         return graphicsImGui;
     }
 
-    GraphicsImGui::GraphicsImGui()
-    {}
-
-    GraphicsImGui::~GraphicsImGui()
-    {}
-
-    bool GraphicsImGui::Init()
+    GraphicsImGuiDX12::GraphicsImGuiDX12(const GraphicsDX12* graphics)
+        : m_graphics(graphics)
     {
+        g_imguiWindowDefaultStyle = WS_EX_NOREDIRECTIONBITMAP;
+    }
+
+    GraphicsImGuiDX12::~GraphicsImGuiDX12()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.Fonts->Clear();
+
+        ImGui_ImplWin32_Shutdown();
+    }
+
+    bool GraphicsImGuiDX12::Init()
+    {
+        ImGui_ImplWin32_Init(m_graphics->GetHWND());
+
         bool isSuccessFull = CreateRootSignature()
             && CreatePipelineState()
             && CreateTextureFont();
         return !isSuccessFull;
     }
 
-    bool GraphicsImGui::CreateRootSignature()
+    bool GraphicsImGuiDX12::CreateRootSignature()
     {
         D3D12_DESCRIPTOR_RANGE descRange = {};
         descRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
@@ -90,19 +104,19 @@ namespace rePlayer
         SmartPtr<ID3DBlob> blob;
         if (D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, NULL) < S_OK)
         {
-            MessageBox(nullptr, "ImGui: serialize root signature", "rePlayer", MB_ICONERROR);
+            Log::Error("ImGui: serialize root signature\n");
             return false;
         }
 
-        if (Graphics::GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)) < S_OK)
+        if (m_graphics->GetDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)) < S_OK)
         {
-            MessageBox(nullptr, "ImGui: root signature", "rePlayer", MB_ICONERROR);
+            Log::Error("ImGui: root signature\n");
             return false;
         }
         return true;
     }
 
-    bool GraphicsImGui::CreatePipelineState()
+    bool GraphicsImGuiDX12::CreatePipelineState()
     {
         D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
         psoDesc.NodeMask = 1;
@@ -175,15 +189,15 @@ namespace rePlayer
 */
         }
 
-        if (Graphics::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)) < S_OK)
+        if (m_graphics->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)) < S_OK || 1)
         {
-            MessageBox(nullptr, "ImGui: pipeline state", "rePlayer", MB_ICONERROR);
+            Log::Error("ImGui: pipeline state\n");
             return false;
         }
         return true;
     }
 
-    bool GraphicsImGui::CreateTextureFont()
+    bool GraphicsImGuiDX12::CreateTextureFont()
     {
         // Build texture atlas
         ImGuiIO& io = ImGui::GetIO();
@@ -267,9 +281,9 @@ namespace rePlayer
         heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
         heapDesc.NumDescriptors = 1;
         heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        if (Graphics::GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_srvDescHeap)) < S_OK)
+        if (m_graphics->GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_srvDescHeap)) < S_OK)
         {
-            MessageBox(nullptr, "ImGui: descriptor heap", "rePlayer", MB_ICONERROR);
+            Log::Error("ImGui: descriptor heap\n");
             return false;
         }
 
@@ -299,7 +313,7 @@ namespace rePlayer
             desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
             SmartPtr<ID3D12Resource> pTexture;
-            Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+            m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
                 D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
 
             UINT uploadPitch = (width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
@@ -321,7 +335,7 @@ namespace rePlayer
             props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
             SmartPtr<ID3D12Resource> uploadBuffer;
-            HRESULT hr = Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+            HRESULT hr = m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
                 D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
             IM_ASSERT(SUCCEEDED(hr));
 
@@ -356,7 +370,7 @@ namespace rePlayer
             barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
             SmartPtr<ID3D12Fence> fence;
-            hr = Graphics::GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+            hr = m_graphics->GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
             IM_ASSERT(SUCCEEDED(hr));
 
             HANDLE event = CreateEvent(0, 0, 0, 0);
@@ -368,15 +382,15 @@ namespace rePlayer
             queueDesc.NodeMask = 1;
 
             SmartPtr<ID3D12CommandQueue> cmdQueue;
-            hr = Graphics::GetDevice()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
+            hr = m_graphics->GetDevice()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
             IM_ASSERT(SUCCEEDED(hr));
 
             SmartPtr<ID3D12CommandAllocator> cmdAlloc;
-            hr = Graphics::GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+            hr = m_graphics->GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
             IM_ASSERT(SUCCEEDED(hr));
 
             SmartPtr<ID3D12GraphicsCommandList> cmdList;
-            hr = Graphics::GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
+            hr = m_graphics->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
             IM_ASSERT(SUCCEEDED(hr));
 
             cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
@@ -406,7 +420,7 @@ namespace rePlayer
                 D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
                 D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
                 D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_3);
-            Graphics::GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, m_fontSrvCpuDescHandle);
+            m_graphics->GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, m_fontSrvCpuDescHandle);
             m_fontTextureResource = pTexture;
         }
 
@@ -417,7 +431,7 @@ namespace rePlayer
         return true;
     }
 
-    void GraphicsImGui::SetupRenderStates(GraphicsWindow* window, const ImDrawData& drawData, FrameResources* frameResources)
+    void GraphicsImGuiDX12::SetupRenderStates(GraphicsWindowDX12* window, const ImDrawData& drawData, FrameResources* frameResources)
     {
         // Setup orthographic projection matrix into our constant buffer
         // Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right).
@@ -470,13 +484,13 @@ namespace rePlayer
 */
     }
 
-    void GraphicsImGui::OnCreateWindow(GraphicsWindow* window)
+    void GraphicsImGuiDX12::OnCreateWindow(GraphicsWindowDX12* window)
     {
-        window->m_items[GraphicsWindow::kImGuiItemId] = new Item();
+        window->m_items[GraphicsWindowDX12::kImGuiItemId] = new Item();
     }
 
     // Render function
-    void GraphicsImGui::Render(GraphicsWindow* window, const ImDrawData& drawData)
+    void GraphicsImGuiDX12::Render(GraphicsWindowDX12* window, const ImDrawData& drawData)
     {
         // Avoid rendering when minimized
         if (drawData.DisplaySize.x <= 0.0f || drawData.DisplaySize.y <= 0.0f)
@@ -485,7 +499,7 @@ namespace rePlayer
         window->m_commandList->SetDescriptorHeaps(1, &m_srvDescHeap);
 
         auto frameIndex = window->m_frameIndex;
-        auto frameResources = window->m_items[GraphicsWindow::kImGuiItemId].As<Item>()->m_frameResources + (frameIndex % Graphics::kNumFrames);
+        auto frameResources = window->m_items[GraphicsWindowDX12::kImGuiItemId].As<Item>()->m_frameResources + (frameIndex % GraphicsDX12::kNumFrames);
         if (frameResources->frameIndex != frameIndex)
         {
             auto totalVtxCount = static_cast<uint32_t>(drawData.TotalVtxCount);
@@ -510,7 +524,7 @@ namespace rePlayer
                 desc.SampleDesc.Count = 1;
                 desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
                 desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->vertexBuffer)) < S_OK)
+                if (m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->vertexBuffer)) < S_OK)
                     return;
             }
             if (frameResources->indexBuffer == nullptr || frameResources->indexBufferSize < totalIdxCount)
@@ -531,7 +545,7 @@ namespace rePlayer
                 desc.SampleDesc.Count = 1;
                 desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
                 desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-                if (Graphics::GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->indexBuffer)) < S_OK)
+                if (m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&frameResources->indexBuffer)) < S_OK)
                     return;
             }
 

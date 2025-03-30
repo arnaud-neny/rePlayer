@@ -13,6 +13,13 @@ namespace core
     class Window
     {
     public:
+        enum class Passthrough : bool
+        {
+            IsNotAvailable = false,
+            IsAvailable = true
+
+        };
+
         struct States
         {
             bool isEnabled = false;
@@ -61,6 +68,8 @@ namespace core
         using OnSaveCallback = void (*)(void* data, ImGuiTextBuffer* buf);
 
     public:
+        static Passthrough ms_isPassthroughAvailable;
+
         Window(std::string&& name, ImGuiWindowFlags flags = 0, bool isMaster = false);
         virtual ~Window() {}
 
@@ -119,7 +128,7 @@ namespace core
         std::string m_name;
         ImGuiWindowFlags m_flags;
         Handle m_handle;
-        bool m_isMaster;
+        const bool m_isMaster;
 
         struct SerializedData
         {

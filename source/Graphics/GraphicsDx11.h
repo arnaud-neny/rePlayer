@@ -1,16 +1,18 @@
 #pragma once
 
-#ifndef _WIN64
 #include <d3d11.h>
 #include <Containers/SmartPtr.h>
 #include <Core/RefCounted.h>
+
+#include "Graphics.h"
 
 namespace rePlayer
 {
     using namespace core;
 
-    class GraphicsImGui;
+    class GraphicsImGuiDX11;
 
+/*
     struct ScopedHandle
     {
         ~ScopedHandle()
@@ -31,8 +33,9 @@ namespace rePlayer
 
         HANDLE handle = NULL;
     };
+*/
 
-    struct GraphicsWindow
+    struct GraphicsWindowDX11
     {
         static constexpr uint32_t kNumBackBuffers = 3;
 
@@ -48,48 +51,47 @@ namespace rePlayer
 
         bool m_isMainWindow;
 
-        GraphicsWindow(class GraphicsImpl* graphics, bool isMainWindow);
-        ~GraphicsWindow();
+        GraphicsWindowDX11(class GraphicsDX11* graphics, bool isMainWindow);
+        ~GraphicsWindowDX11();
         bool Resize(uint32_t width, uint32_t height);
     };
 
-    class GraphicsImpl
+    class GraphicsDX11 : public Graphics
     {
-        friend struct GraphicsWindow;
+        friend struct GraphicsWindowDX11;
     public:
-        GraphicsImpl();
-        ~GraphicsImpl();
+        GraphicsDX11(HWND hWnd);
+        bool OnInit() override;
+        ~GraphicsDX11() override;
 
-        bool Init(HWND hWnd);
-        void Destroy();
+        GraphicsWindowDX11* OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow = false);
 
-        GraphicsWindow* OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow = false);
-
-        void BeginFrame();
-        bool EndFrame(float blendingFactor);
+        void OnBeginFrame() override;
+        bool OnEndFrame(float blendingFactor) override;
 
         auto GetDevice() const;
 
-        int32_t Get3x5BaseRect() const;
+        int32_t OnGet3x5BaseRect() const override;
+
+        HWND GetHWND() const { return m_hWnd; }
 
     public:
         static constexpr uint32_t kNumFrames = 3;
-        static constexpr uint32_t kNumBackBuffers = GraphicsWindow::kNumBackBuffers;
+        static constexpr uint32_t kNumBackBuffers = GraphicsWindowDX11::kNumBackBuffers;
 
     private:
         SmartPtr<ID3D11Device> m_device;
         SmartPtr<ID3D11DeviceContext> m_deviceContext;
         SmartPtr<IDXGIFactory> m_dxgiFactory;
 
-        GraphicsWindow* m_mainWindow = nullptr;
+        HWND m_hWnd;
+        GraphicsWindowDX11* m_mainWindow = nullptr;
 
-        SmartPtr<GraphicsImGui> m_imGui;
+        SmartPtr<GraphicsImGuiDX11> m_imGui;
 
         bool m_isCrashed = false;
     };
 }
 // namespace rePlayer
 
-#include "GraphicsImplDx11.inl"
-
-#endif // _WIN64
+#include "GraphicsDx11.inl"

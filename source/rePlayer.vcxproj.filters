@@ -50,7 +50,7 @@
     <ClCompile Include="Graphics\Graphics.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsImplDx12.cpp">
+    <ClCompile Include="Graphics\GraphicsDx12.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GraphicsPremulDx12.cpp">
@@ -185,7 +185,7 @@
     <ClCompile Include="IO\StreamArchiveRaw.cpp">
       <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsImplDx11.cpp">
+    <ClCompile Include="Graphics\GraphicsDx11.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GraphicsImGuiDx11.cpp">
@@ -214,7 +214,7 @@
     <ClInclude Include="Graphics\Graphics.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsImplDx12.h">
+    <ClInclude Include="Graphics\GraphicsDx12.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\GraphicsPremulDx12.h">
@@ -406,7 +406,7 @@
     <ClInclude Include="IO\StreamArchiveRaw.h">
       <Filter>Source Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsImplDx11.h">
+    <ClInclude Include="Graphics\GraphicsDx11.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\GraphicsImGuiDx11.h">
@@ -432,7 +432,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Graphics\GraphicsImplDx12.inl">
+    <None Include="Graphics\GraphicsDx12.inl">
       <Filter>Source Files\Graphics</Filter>
     </None>
     <None Include="..\README.md" />
@@ -465,7 +465,7 @@
     <None Include="..\LICENSE" />
     <None Include="..\TODO.md" />
     <None Include="..\CHANGELOG.md" />
-    <None Include="Graphics\GraphicsImplDx11.inl">
+    <None Include="Graphics\GraphicsDx11.inl">
       <Filter>Source Files\Graphics</Filter>
     </None>
     <None Include="..\BUILD.md" />

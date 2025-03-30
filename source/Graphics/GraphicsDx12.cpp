@@ -1,5 +1,5 @@
 #ifdef _WIN64
-#include "GraphicsImplDx12.h"
+#include "GraphicsDx12.h"
 #include "GraphicsImGuiDx12.h"
 #include "GraphicsPremulDx12.h"
 
@@ -27,14 +27,14 @@
 
 namespace rePlayer
 {
-    GraphicsWindow::~GraphicsWindow()
+    GraphicsWindowDX12::~GraphicsWindowDX12()
     {
         WaitForLastSubmittedFrame();
         for (auto& rt : m_backBuffers)
             m_graphics->ReleaseRenderTargetView(rt.descriptor);
     }
 
-    bool GraphicsWindow::Resize(uint32_t width, uint32_t height)
+    bool GraphicsWindowDX12::Resize(uint32_t width, uint32_t height)
     {
         if (width == 0 || height == 0)
             return false;
@@ -58,7 +58,7 @@ namespace rePlayer
         return false;
     }
 
-    void GraphicsWindow::WaitForLastSubmittedFrame()
+    void GraphicsWindowDX12::WaitForLastSubmittedFrame()
     {
         auto& frame = m_frameContexts[m_frameIndex % kNumBackBuffers];
 
@@ -74,13 +74,13 @@ namespace rePlayer
         }
     }
 
-    GraphicsImpl::GraphicsImpl()
-    {}
+    GraphicsDX12::GraphicsDX12(HWND hWnd)
+        : m_hWnd(hWnd)
+    {
+        Window::ms_isPassthroughAvailable = Window::Passthrough::IsAvailable;
+    }
 
-    GraphicsImpl::~GraphicsImpl()
-    {}
-
-    bool GraphicsImpl::Init(HWND hWnd)
+    bool GraphicsDX12::OnInit()
     {
         m_dxgiFactoryFlags = 0;
 #if IS_DX12_DEBUG_ENABLED
@@ -125,13 +125,13 @@ namespace rePlayer
                 {
                     char desc[128];
                     ::WideCharToMultiByte(CP_UTF8, 0, adapterDesc.Description, 128, desc, 128, nullptr, nullptr);
-                    Log::Info("D3D12 Adapter: %s\n", desc);
+                    Log::Info("Graphics: D3D12 Adapter \"%s\"\n", desc);
                     break;
                 }
             }
             if (m_device.IsInvalid())
             {
-                MessageBox(nullptr, "D3D12: device error", "rePlayer", MB_ICONERROR);
+                Log::Error("Graphics: can't find a valid D3D12 Device\n");
                 return true;
             }
         }
@@ -177,7 +177,7 @@ namespace rePlayer
         // Create the DirectComposition device
         if (DCompositionCreateDevice(nullptr, IID_PPV_ARGS(&m_dcompDevice)) < S_OK)
         {
-            MessageBox(nullptr, "DComp: device errror", "rePlayer", MB_ICONERROR);
+            Log::Error("Graphics: DComp device\n");
             return true;
         }
 
@@ -190,18 +190,18 @@ namespace rePlayer
             desc.NodeMask = 1;
             if (m_device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvDescriptorHeap)) < S_OK)
             {
-                MessageBox(nullptr, "D3D12: RTV descriptor heap", "rePlayer", MB_ICONERROR);
+                Log::Error("Graphics: D3D12 RTV descriptor heap\n");
                 return true;
             }
         }
 
         // Create ImGui Renderer
-        m_imGui = GraphicsImGui::Create();
+        m_imGui = GraphicsImGuiDX12::Create(this);
         if (!m_imGui)
             return true;
 
         // Create PreMul Renderer
-        m_premul = GraphicsPremul::Create();
+        m_premul = GraphicsPremulDX12::Create(this);
         if (!m_premul)
             return true;
 
@@ -212,14 +212,14 @@ namespace rePlayer
             static void OnCreateWindow(ImGuiViewport* viewport)
             {
                 ImGuiIO& io = ImGui::GetIO();
-                auto graphics = reinterpret_cast<GraphicsImpl*>(io.BackendRendererUserData);
+                auto graphics = reinterpret_cast<GraphicsDX12*>(io.BackendRendererUserData);
                 viewport->RendererUserData = graphics->OnCreateWindow(viewport->PlatformHandleRaw ? (HWND)viewport->PlatformHandleRaw : (HWND)viewport->PlatformHandle
                     , static_cast<uint32_t>(viewport->Size.x)
                     , static_cast<uint32_t>(viewport->Size.y));
             }
             static void OnDestroyWindow(ImGuiViewport* viewport)
             {
-                if (auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData))
+                if (auto window = reinterpret_cast<GraphicsWindowDX12*>(viewport->RendererUserData))
                 {
                     delete window;
                     viewport->RendererUserData = nullptr;
@@ -227,7 +227,7 @@ namespace rePlayer
             }
             static void OnResize(ImGuiViewport* viewport, ImVec2 size)
             {
-                auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+                auto window = reinterpret_cast<GraphicsWindowDX12*>(viewport->RendererUserData);
                 window->Resize(static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y));
             }
         } callbacks;
@@ -237,12 +237,12 @@ namespace rePlayer
         platform_io.Renderer_DestroyWindow = callbacks.OnDestroyWindow;
         platform_io.Renderer_SetWindowSize = callbacks.OnResize;
 
-        m_mainWindow = OnCreateWindow(hWnd, 1, 1, true);
+        m_mainWindow = OnCreateWindow(m_hWnd, 1, 1, true);
 
         return false;
     }
 
-    void GraphicsImpl::Destroy()
+    GraphicsDX12::~GraphicsDX12()
     {
         ImGuiIO& io = ImGui::GetIO();
         if (m_isCrashed)
@@ -258,7 +258,11 @@ namespace rePlayer
 
         delete m_mainWindow;
 
-        *this = GraphicsImpl();
+        m_imGui.Reset();
+        m_premul.Reset();
+        m_rtvDescriptorHeap.Reset();
+        m_dcompDevice.Reset();
+        m_device.Reset();
 
 #if IS_DX12_DEBUG_ENABLED
         SmartPtr<IDXGIDebug1> dxgiDebug;
@@ -269,7 +273,7 @@ namespace rePlayer
 #endif
     }
 
-    void GraphicsImpl::BeginFrame()
+    void GraphicsDX12::OnBeginFrame()
     {
         auto nextFrameIndex = m_mainWindow->m_frameIndex + 1;
         m_mainWindow->m_frameIndex = nextFrameIndex;
@@ -318,7 +322,7 @@ namespace rePlayer
             if (viewport->Flags & ImGuiViewportFlags_IsMinimized || viewport->RendererUserData == nullptr)
                 continue;
 
-            auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+            auto window = reinterpret_cast<GraphicsWindowDX12*>(viewport->RendererUserData);
 
             nextFrameIndex = window->m_frameIndex + 1;
             window->m_frameIndex = nextFrameIndex;
@@ -340,7 +344,7 @@ namespace rePlayer
         }
     }
 
-    bool GraphicsImpl::EndFrame(float blendingFactor)
+    bool GraphicsDX12::OnEndFrame(float blendingFactor)
     {
         auto backBufferIdx = m_mainWindow->m_swapChain->GetCurrentBackBufferIndex();
 
@@ -364,7 +368,7 @@ namespace rePlayer
             if (viewport->Flags & ImGuiViewportFlags_IsMinimized)
                 continue;
 
-            auto window = reinterpret_cast<GraphicsWindow*>(viewport->RendererUserData);
+            auto window = reinterpret_cast<GraphicsWindowDX12*>(viewport->RendererUserData);
             backBufferIdx = window->m_swapChain->GetCurrentBackBufferIndex();
 
             m_imGui->Render(window, *viewport->DrawData);
@@ -396,7 +400,7 @@ namespace rePlayer
         return false;
     }
 
-    SmartPtr<ID3D12CommandQueue> GraphicsImpl::CreateCommandQueue()
+    SmartPtr<ID3D12CommandQueue> GraphicsDX12::CreateCommandQueue()
     {
         D3D12_COMMAND_QUEUE_DESC desc = {};
         desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -408,7 +412,7 @@ namespace rePlayer
         return commandQueue;
     }
 
-    bool GraphicsImpl::CreateSwapChainForComposition(HWND hWnd, GraphicsWindow* window)
+    bool GraphicsDX12::CreateSwapChainForComposition(HWND hWnd, GraphicsWindowDX12* window)
     {
         SmartPtr<IDXGIFactory6> dxgiFactory;
         if (CreateDXGIFactory2(m_dxgiFactoryFlags, IID_PPV_ARGS(&dxgiFactory)) < 0)
@@ -463,7 +467,7 @@ namespace rePlayer
         return false;
     }
 
-    void GraphicsImpl::CreateRenderTargets(GraphicsWindow* window)
+    void GraphicsDX12::CreateRenderTargets(GraphicsWindowDX12* window)
     {
         for (uint32_t i = 0; i < kNumBackBuffers; i++)
         {
@@ -473,16 +477,16 @@ namespace rePlayer
         }
     }
 
-    void GraphicsImpl::ReleaseRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
+    void GraphicsDX12::ReleaseRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE descriptor)
     {
         auto descriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         auto descriptorHandle = m_rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
         m_rtvDescritorUsage &= ~(1ull << ((descriptor.ptr - descriptorHandle.ptr) / descriptorSize));
     }
 
-    GraphicsWindow* GraphicsImpl::OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow)
+    GraphicsWindowDX12* GraphicsDX12::OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow)
     {
-        auto window = new GraphicsWindow(this, isMainWindow);
+        auto window = new GraphicsWindowDX12(this, isMainWindow);
         window->m_width = width;
         window->m_height = height;
 
@@ -492,7 +496,7 @@ namespace rePlayer
 
         auto descriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         auto descriptorHandle = m_rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-        for (uint32_t i = 0; i < GraphicsWindow::kNumBackBuffers; i++)
+        for (uint32_t i = 0; i < GraphicsWindowDX12::kNumBackBuffers; i++)
         {
             auto count = std::countr_one(m_rtvDescritorUsage);
             assert(count != 64);
@@ -530,7 +534,7 @@ namespace rePlayer
         return window;
     }
 
-    int32_t GraphicsImpl::Get3x5BaseRect() const
+    int32_t GraphicsDX12::OnGet3x5BaseRect() const
     {
         return m_imGui->Get3x5BaseRect();
     }

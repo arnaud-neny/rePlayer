@@ -1,6 +1,5 @@
 #pragma once
 
-#ifndef _WIN64
 #include <d3d11.h>
 #include <Containers/SmartPtr.h>
 #include <Core/RefCounted.h>
@@ -9,28 +8,29 @@ struct ImDrawData;
 
 namespace rePlayer
 {
-    class GraphicsImGui : public RefCounted
+    class GraphicsImGuiDX11 : public RefCounted
     {
-        friend class SmartPtr<GraphicsImGui>;
+        friend class SmartPtr<GraphicsImGuiDX11>;
     public:
-        static SmartPtr<GraphicsImGui> Create();
+        static SmartPtr<GraphicsImGuiDX11> Create(const GraphicsDX11* graphics);
 
-        void Render(GraphicsWindow* window, const ImDrawData& drawData);
+        void Render(GraphicsWindowDX11* window, const ImDrawData& drawData);
 
         int32_t Get3x5BaseRect() const { return m_3x5BaseRect; }
 
     protected:
-        GraphicsImGui();
-        ~GraphicsImGui() override;
+        GraphicsImGuiDX11(const GraphicsDX11* graphics);
+        ~GraphicsImGuiDX11() override;
 
     private:
         bool Init();
         bool CreateStates();
         bool CreateTextureFont();
 
-        void SetupRenderStates(GraphicsWindow* window, const ImDrawData& drawData);
+        void SetupRenderStates(GraphicsWindowDX11* window, const ImDrawData& drawData);
 
     private:
+        const GraphicsDX11* m_graphics;
         SmartPtr<ID3D11Buffer> m_indexBuffer;
         SmartPtr<ID3D11Buffer> m_vertexBuffer;
         uint32_t m_indexBufferSize = 0;
@@ -50,5 +50,3 @@ namespace rePlayer
     };
 }
 // namespace rePlayer
-
-#endif // _WIN64

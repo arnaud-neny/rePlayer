@@ -1,32 +1,31 @@
 #pragma once
 
-#ifdef _WIN64
-#include "GraphicsImplDx12.h"
-#else
-#include "GraphicsImplDx11.h"
-#endif
+#include <Core.h>
 
 namespace rePlayer
 {
     class Graphics
     {
     public:
-        static constexpr uint32_t kNumBackBuffers{ GraphicsImpl::kNumBackBuffers };
-        static constexpr uint32_t kNumFrames{ GraphicsImpl::kNumFrames };
+        static bool Init(void* hWnd);
+        static void Destroy() { delete ms_instance; }
 
-    public:
-        static bool Init(HWND hWnd) { return ms_instance.Init(hWnd); }
-        static void Destroy() { ms_instance.Destroy(); }
+        static void BeginFrame() { ms_instance->OnBeginFrame(); }
+        static bool EndFrame(float blendingFactor) { return ms_instance->OnEndFrame(blendingFactor); }
 
-        static void BeginFrame() { ms_instance.BeginFrame(); }
-        static bool EndFrame(float blendingFactor) { return ms_instance.EndFrame(blendingFactor); }
+        static int32_t Get3x5BaseRect() { return ms_instance->OnGet3x5BaseRect(); }
 
-        static auto GetDevice() { return ms_instance.GetDevice(); }
+    protected:
+        virtual ~Graphics() {}
+        virtual bool OnInit() = 0;
 
-        static int32_t Get3x5BaseRect() { return ms_instance.Get3x5BaseRect(); }
+        virtual void OnBeginFrame() = 0;
+        virtual bool OnEndFrame(float blendingFactor) = 0;
+
+        virtual int32_t OnGet3x5BaseRect() const = 0;
 
     private:
-        static GraphicsImpl ms_instance;
+        static Graphics* ms_instance;
     };
 }
 // namespace rePlayer
