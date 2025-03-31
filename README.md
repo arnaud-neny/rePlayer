@@ -224,6 +224,3 @@ Or add some comments (and likes) there:
 - [XMP](https://xmp.sourceforge.net): Libxmp is a library that renders module files to PCM data.
 - [zingzong](https://github.com/benjihan/zingzong): A simple Microdeal quartet music file player.
 - [ZXTune](https://zxtune.bitbucket.io): Crossplatform chiptunes player (without already owned libraries).
-
-## Known issues
-- x64 version doesn't work on Intel® HD Graphics 4600 (fails in root signature or pipeline state creation, but without the hardware, I can't pinpoint the cause)

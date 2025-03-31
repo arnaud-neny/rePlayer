@@ -1,7 +1,10 @@
 # rePlayer (another multi-formats music player)
 
+- extension vs replay (extensions.inc with 2 columns: ext name, default replay)
+- sanitize songs and artists strings fields on import (remove "\n" "\r")
+- viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
-- fallback to dx11 for unsupported gpus
+- process detection to allow only one instance
 - seek: return the number of loops
 - playlist add files: rework for faster add
 - add the replay selection for each extension in the global settings
@@ -44,4 +47,8 @@
 - 64klang: https://github.com/hzdgopher/64klang missing official file format
 - sointu: https://github.com/vsariola/sointu annoying language
 - WaveSabre: https://github.com/logicomacorp/WaveSabre missing official file format
+- Full EdLib support (doh!): https://blog.chordian.net/
 - single channel export
+- accessibility?
+- GTUltra: https://github.com/jpage8580/GTUltra
+- BambooTracker: https://github.com/BambooTracker/BambooTracker
