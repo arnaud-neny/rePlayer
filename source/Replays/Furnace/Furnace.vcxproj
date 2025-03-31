@@ -94,7 +94,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -138,7 +138,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -168,7 +168,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -195,6 +195,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\extern\adpcm\yma_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\ymb_codec.h" />
     <ClInclude Include="furnace\extern\adpcm\ymz_codec.h" />
+    <ClInclude Include="furnace\extern\blip_buf\blip_buf.h" />
     <ClInclude Include="furnace\extern\emu2413\emu2413.h" />
     <ClInclude Include="furnace\extern\ESFMu\esfm.h" />
     <ClInclude Include="furnace\extern\fmt\include\fmt\args.h" />
@@ -253,7 +254,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\audio\pipe.h" />
     <ClInclude Include="furnace\src\audio\taAudio.h" />
     <ClInclude Include="furnace\src\baseutils.h" />
-    <ClInclude Include="furnace\src\engine\blip_buf.h" />
     <ClInclude Include="furnace\src\engine\brrUtils.h" />
     <ClInclude Include="furnace\src\engine\bsr.h" />
     <ClInclude Include="furnace\src\engine\chipUtils.h" />
@@ -267,6 +267,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\engine.h" />
     <ClInclude Include="furnace\src\engine\export.h" />
     <ClInclude Include="furnace\src\engine\export\amigaValidation.h" />
+    <ClInclude Include="furnace\src\engine\export\sapr.h" />
     <ClInclude Include="furnace\src\engine\export\tiuna.h" />
     <ClInclude Include="furnace\src\engine\export\zsm.h" />
     <ClInclude Include="furnace\src\engine\fileOps\fileOpsCommon.h" />
@@ -323,8 +324,10 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\platform\rf5c68.h" />
     <ClInclude Include="furnace\src\engine\platform\saa.h" />
     <ClInclude Include="furnace\src\engine\platform\scc.h" />
+    <ClInclude Include="furnace\src\engine\platform\scvtone.h" />
     <ClInclude Include="furnace\src\engine\platform\segapcm.h" />
     <ClInclude Include="furnace\src\engine\platform\sid2.h" />
+    <ClInclude Include="furnace\src\engine\platform\sid3.h" />
     <ClInclude Include="furnace\src\engine\platform\sm8521.h" />
     <ClInclude Include="furnace\src\engine\platform\sms.h" />
     <ClInclude Include="furnace\src\engine\platform\snes.h" />
@@ -405,6 +408,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\platform\sound\sid2\spline.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sid2\voice.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sid2\wave.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\sid3.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sm8521.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\sn76496.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_common.h" />
@@ -413,16 +417,20 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\platform\sound\snes\blargg_source.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\snes\SPC_DSP.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\su.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\supervision.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\swan.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\swan_mdfn.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\t6w28\T6W28_Oscs.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ted-sound.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\tia\Audio.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\tia\AudioChannel.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\upd1771.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vera_pcm.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vera_psg.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vic20sound.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\vsu.h" />
+    <ClInclude Include="furnace\src\engine\platform\sound\ymf278b\ymf278.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_fm.h" />
@@ -434,6 +442,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClInclude Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.h" />
     <ClInclude Include="furnace\src\engine\platform\sound\ymz280b.h" />
     <ClInclude Include="furnace\src\engine\platform\su.h" />
+    <ClInclude Include="furnace\src\engine\platform\supervision.h" />
     <ClInclude Include="furnace\src\engine\platform\swan.h" />
     <ClInclude Include="furnace\src\engine\platform\t6w28.h" />
     <ClInclude Include="furnace\src\engine\platform\ted.h" />
@@ -481,6 +490,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\extern\adpcm\yma_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\ymb_codec.c" />
     <ClCompile Include="furnace\extern\adpcm\ymz_codec.c" />
+    <ClCompile Include="furnace\extern\blip_buf\blip_buf.c" />
     <ClCompile Include="furnace\extern\emu2413\emu2413.c" />
     <ClCompile Include="furnace\extern\ESFMu\esfm.c" />
     <ClCompile Include="furnace\extern\ESFMu\esfm_registers.c" />
@@ -533,7 +543,6 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\audio\midi.cpp" />
     <ClCompile Include="furnace\src\audio\pipe.cpp" />
     <ClCompile Include="furnace\src\baseutils.cpp" />
-    <ClCompile Include="furnace\src\engine\blip_buf.c" />
     <ClCompile Include="furnace\src\engine\brrUtils.c" />
     <ClCompile Include="furnace\src\engine\cmdStream.cpp" />
     <ClCompile Include="furnace\src\engine\cmdStreamOps.cpp" />
@@ -547,6 +556,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\exportDef.cpp" />
     <ClCompile Include="furnace\src\engine\export\abstract.cpp" />
     <ClCompile Include="furnace\src\engine\export\amigaValidation.cpp" />
+    <ClCompile Include="furnace\src\engine\export\sapr.cpp" />
     <ClCompile Include="furnace\src\engine\export\tiuna.cpp" />
     <ClCompile Include="furnace\src\engine\export\zsm.cpp" />
     <ClCompile Include="furnace\src\engine\fileOpsIns.cpp" />
@@ -621,8 +631,10 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\platform\rf5c68.cpp" />
     <ClCompile Include="furnace\src\engine\platform\saa.cpp" />
     <ClCompile Include="furnace\src\engine\platform\scc.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\scvtone.cpp" />
     <ClCompile Include="furnace\src\engine\platform\segapcm.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sid2.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sid3.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sm8521.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sms.cpp" />
     <ClCompile Include="furnace\src\engine\platform\snes.cpp" />
@@ -672,9 +684,9 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\platform\sound\lynx\Mikey.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\namco.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nds.cpp" />
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c" />
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c" />
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_apu.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\5e01_dmc.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp" />
@@ -702,19 +714,24 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_PS_.cc" />
     <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580_P_T.cc" />
     <ClCompile Include="furnace\src\engine\platform\sound\sid2\wave8580__ST.cc" />
+    <ClCompile Include="furnace\src\engine\platform\sound\sid3.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\sm8521.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\sn76496.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\snes\SPC_DSP.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\su.cpp" />
-    <ClCompile Include="furnace\src\engine\platform\sound\swan.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\supervision.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\swan.c" />
+    <ClCompile Include="furnace\src\engine\platform\sound\swan_mdfn.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\t6w28\T6W28_Apu.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ted-sound.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\tia\Audio.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\tia\AudioChannel.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\upd1771.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\vera_pcm.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\vera_psg.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\vic20sound.c" />
     <ClCompile Include="furnace\src\engine\platform\sound\vsu.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\sound\ymf278b\ymf278.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_adpcm.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opl.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_opm.cpp" />
@@ -724,6 +741,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\
     <ClCompile Include="furnace\src\engine\platform\sound\ymfm\ymfm_ssg.cpp" />
     <ClCompile Include="furnace\src\engine\platform\sound\ymz280b.cpp" />
     <ClCompile Include="furnace\src\engine\platform\su.cpp" />
+    <ClCompile Include="furnace\src\engine\platform\supervision.cpp" />
     <ClCompile Include="furnace\src\engine\platform\swan.cpp" />
     <ClCompile Include="furnace\src\engine\platform\t6w28.cpp" />
     <ClCompile Include="furnace\src\engine\platform\ted.cpp" />

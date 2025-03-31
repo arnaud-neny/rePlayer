@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2024 tildearrow and contributors
+ * Copyright (C) 2021-2025 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ class DivPlatformSNES: public DivDispatch {
   bool writeDryVol;
   bool echoOn;
   bool interpolationOff;
+  bool antiClick;
 
   bool initEchoOn;
   signed char initEchoVolL;
@@ -82,8 +83,10 @@ class DivPlatformSNES: public DivDispatch {
   struct QueuedWrite {
     unsigned char addr;
     unsigned char val;
-    QueuedWrite(): addr(0), val(0) {}
-    QueuedWrite(unsigned char a, unsigned char v): addr(a), val(v) {}
+    unsigned char delay;
+    unsigned char padding;
+    QueuedWrite(): addr(0), val(0), delay(0), padding(0) {}
+    QueuedWrite(unsigned char a, unsigned char v, unsigned char d=0): addr(a), val(v), delay(d), padding(0) {}
   };
   FixedQueue<QueuedWrite,256> writes;
 
@@ -103,7 +106,7 @@ class DivPlatformSNES: public DivDispatch {
     void* getChanState(int chan);
     DivMacroInt* getChanMacroInt(int ch);
     unsigned short getPan(int chan);
-    DivChannelPair getPaired(int chan);
+    void getPaired(int ch, std::vector<DivChannelPair>& ret);
     DivChannelModeHints getModeHints(int chan);
     DivSamplePos getSamplePos(int ch);
     DivDispatchOscBuffer* getOscBuffer(int chan);

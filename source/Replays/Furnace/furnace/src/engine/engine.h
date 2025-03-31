@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2024 tildearrow and contributors
+ * Copyright (C) 2021-2025 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ class DivWorkPool;
 
 //#define DIV_UNSTABLE
 
-#define DIV_VERSION "0.6.7"
-#define DIV_ENGINE_VERSION 219
+#define DIV_VERSION "0.6.8"
+#define DIV_ENGINE_VERSION 227
 // for imports
 #define DIV_VERSION_MOD 0xff01
 #define DIV_VERSION_FC 0xff02
@@ -261,8 +261,8 @@ struct DivDispatchContainer {
   void setRates(double gotRate);
   void setQuality(bool lowQual, bool dcHiPass);
   void grow(size_t size);
-  void acquire(size_t offset, size_t count);
-  void flush(size_t count);
+  void acquire(size_t count);
+  void flush(size_t offset, size_t count);
   void fillBuf(size_t runtotal, size_t offset, size_t size);
   void clear();
   void init(DivSystem sys, DivEngine* eng, int chanCount, double gotRate, const DivConfig& flags, bool isRender=false);
@@ -432,6 +432,7 @@ enum DivChanTypes {
 };
 
 extern const char* cmdName[];
+extern int curEngineState;
 
 class DivEngine {
   DivDispatchContainer disCont[DIV_MAX_CHIPS];
@@ -447,6 +448,7 @@ class DivEngine {
   bool playing;
   bool freelance;
   bool shallStop, shallStopSched;
+  bool reverse;
   bool endOfSong;
   bool consoleMode;
   bool disableStatusOut;
@@ -476,9 +478,9 @@ class DivEngine {
   float midiVolExp;
   int softLockCount;
 public: // rePlayer begin
-  int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, curExportChan, nextSpeed, elapsedBars, elapsedBeats, curSpeed;
+    int subticks, ticks, curRow, curOrder, prevRow, prevOrder, remainingLoops, totalLoops, lastLoopPos, exportLoopCount, curExportChan, nextSpeed, prevSpeed, elapsedBars, elapsedBeats, curSpeed;
 private: // rePlayer end
-  size_t curSubSongIndex;
+    size_t curSubSongIndex;
   size_t bufferPos;
   double divider;
   int cycles;
@@ -489,6 +491,7 @@ private: // rePlayer end
   double midiTimeDrift;
   int stepPlay;
   int changeOrd, changePos, totalSeconds, totalTicks, totalTicksR, curMidiClock, curMidiTime, totalCmds, lastCmds, cmdsPerSecond, globalPitch;
+  double totalTicksOff;
   int curMidiTimePiece, curMidiTimeCode;
   unsigned char extValue, pendingMetroTick;
   DivGroovePattern speeds;
@@ -520,6 +523,7 @@ private: // rePlayer end
   std::vector<DivCommand> cmdStream;
   std::vector<DivInstrumentType> possibleInsTypes;
   std::vector<DivEffectContainer> effectInst;
+  std::vector<int> curChanMask;
   static DivSysDef* sysDefs[DIV_MAX_CHIP_DEFS];
   static DivSystem sysFileMapFur[DIV_MAX_CHIP_DEFS];
   static DivSystem sysFileMapDMF[DIV_MAX_CHIP_DEFS];
@@ -672,6 +676,7 @@ private: // rePlayer end
   // add every export method here
   friend class DivROMExport;
   friend class DivExportAmigaValidation;
+  friend class DivExportSAPR;
   friend class DivExportTiuna;
   friend class DivExportZSM;
 
@@ -804,10 +809,10 @@ private: // rePlayer end
     double calcBaseFreq(double clock, double divider, int note, bool period);
 
     // calculate base frequency in f-num/block format
-    int calcBaseFreqFNumBlock(double clock, double divider, int note, int bits);
+    int calcBaseFreqFNumBlock(double clock, double divider, int note, int bits, int fixedBlock);
 
     // calculate frequency/period
-    int calcFreq(int base, int pitch, int arp, bool arpFixed, bool period=false, int octave=0, int pitch2=0, double clock=1.0, double divider=1.0, int blockBits=0);
+    int calcFreq(int base, int pitch, int arp, bool arpFixed, bool period=false, int octave=0, int pitch2=0, double clock=1.0, double divider=1.0, int blockBits=0, int fixedBlock=0);
 
     // calculate arpeggio
     int calcArp(int note, int arp, int offset=0);
@@ -837,6 +842,9 @@ private: // rePlayer end
 
     // reset playback state
     void syncReset();
+
+    // get C-4 rate for samples
+    double getCenterRate();
 
     // sample preview query
     bool isPreviewingSample();
@@ -907,6 +915,8 @@ private: // rePlayer end
 
     // get ROM export definition
     const DivROMExportDef* getROMExportDef(DivROMExportOptions opt);
+    // check whether ROM export option is viable for current song
+    bool isROMExportViable(DivROMExportOptions opt);
 
     // convert sample rate format
     int fileToDivRate(int frate);
@@ -959,6 +969,7 @@ private: // rePlayer end
 
     // synchronous get order/row
     void getPlayPos(int& order, int& row);
+    void getPlayPosTick(int& order, int& row, int& tick, int& speed);
 
     // get beat/bar
     int getElapsedBars();
@@ -1104,6 +1115,11 @@ private: // rePlayer end
     bool moveWaveDown(int which);
     bool moveSampleDown(int which);
 
+    // swap things
+    bool swapInstruments(int a, int b);
+    bool swapWaves(int a, int b);
+    bool swapSamples(int a, int b);
+
     // automatic patchbay
     void autoPatchbay();
     void autoPatchbayP();
@@ -1152,7 +1168,7 @@ private: // rePlayer end
     void* getDispatchChanState(int chan);
 
     // get channel pairs
-    DivChannelPair getChanPaired(int chan);
+    void getChanPaired(int chan, std::vector<DivChannelPair>& ret);
 
     // get channel mode hints
     DivChannelModeHints getChanModeHints(int chan);
@@ -1388,6 +1404,7 @@ private: // rePlayer end
       freelance(false),
       shallStop(false),
       shallStopSched(false),
+      reverse(false),
       endOfSong(false),
       consoleMode(false),
       disableStatusOut(false),
@@ -1427,6 +1444,7 @@ private: // rePlayer end
       exportLoopCount(0),
       curExportChan(0),
       nextSpeed(3),
+      prevSpeed(6),
       elapsedBars(0),
       elapsedBeats(0),
       curSpeed(0),
@@ -1451,6 +1469,7 @@ private: // rePlayer end
       lastCmds(0),
       cmdsPerSecond(0),
       globalPitch(0),
+      totalTicksOff(0.0),
       curMidiTimePiece(0),
       curMidiTimeCode(0),
       extValue(0),

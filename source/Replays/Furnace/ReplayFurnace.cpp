@@ -8,6 +8,7 @@
 // - fileutils.cpp
 // - ftm.cpp
 // - nes.cpp
+// - extern\vgsound_emu\src\scc\scc.cpp
 // - tia.cpp
 #include "ReplayFurnace.h"
 
@@ -27,7 +28,7 @@ namespace rePlayer
         .replayId = eReplay::Furnace, .isThreadSafe = false,
         .name = "Furnace",
         .extensions = "fur;dmf;ftm;dnm;0cc;eft;tfm;tfe",
-        .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2024 tildearrow and contributors",
+        .about = "Furnace " DIV_VERSION "\nCopyright (c) 2021-2025 tildearrow and contributors",
         .load = ReplayFurnace::Load,
     };
 
@@ -63,7 +64,37 @@ namespace rePlayer
     ReplayFurnace::ReplayFurnace(DivEngine* engine, const char* name, uint64_t magic)
         : Replay(engine->song.isDMF ? eExtension::_dmf : ((engine->song.systemName == "Sega Genesis/Mega Drive or TurboSound FM") ? (memcmp(&magic, DIV_TFM_MAGIC, sizeof(magic)) == 0) ? eExtension::_tfm : eExtension::_tfe : (engine->song.version == DIV_VERSION_FTM ? GetFamitrackerExtension(name) : eExtension::_fur)), eReplay::Furnace)
         , m_engine(engine)
-    {}
+    {
+        uint8_t sysCount[DIV_MAX_CHIPS] = {};
+        DivSystem sysId[DIV_MAX_CHIPS];
+        uint8_t numSys = 0;
+
+        for (uint8_t i = 0; i < engine->song.systemLen; ++i)
+        {
+            uint8_t curSys = 0;
+            for (; curSys < numSys; ++curSys)
+            {
+                if (sysId[curSys] == engine->song.system[i])
+                    break;
+            }
+            sysId[curSys] = engine->song.system[i];
+            if (sysCount[curSys]++ == 0)
+                numSys++;
+        }
+        for (uint8_t i = 0; i < numSys; ++i)
+        {
+            if (i > 0)
+                m_systems += '+';
+
+            if (sysCount[i] > 1)
+            {
+                char buf[8];
+                sprintf(buf, "[%dx]", sysCount[i]);
+                m_systems += buf;
+            }
+            m_systems += engine->getSystemDef(sysId[i])->name;
+        }
+    }
 
     uint32_t ReplayFurnace::GetSampleRate() const
     {
@@ -192,13 +223,10 @@ namespace rePlayer
         info = buf;
         info += " channels\n";
         if (m_engine->song.version == DIV_VERSION_FTM)
-            info += "Famitracker";
-        else
-        {
-            info += m_engine->song.isDMF ? "DefleMask v" : "Furnace v";
-            sprintf(buf, "%d", m_engine->song.version);
-            info += buf;
-        }
+            info += "Famitracker: ";
+        else if (m_engine->song.isDMF)
+            info += "DefleMask: ";
+        info += m_systems;
         info += "\nFurnace " DIV_VERSION;
         return info;
     }

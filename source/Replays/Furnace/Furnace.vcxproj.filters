@@ -180,6 +180,12 @@
     <Filter Include="Source Files\itcompress">
       <UniqueIdentifier>{018db14b-abcf-4e26-b377-b23355c378e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\furnace\engine\platform\sound\ymf278b">
+      <UniqueIdentifier>{6a7f2f40-37bd-46d3-b4ff-8240142f3417}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\blip_buf">
+      <UniqueIdentifier>{0fa24c94-51bc-4f94-a375-0530b4cfd755}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayFurnace.h">
@@ -190,9 +196,6 @@
     </ClInclude>
     <ClInclude Include="furnace\src\pch.h">
       <Filter>Source Files\furnace</Filter>
-    </ClInclude>
-    <ClInclude Include="furnace\src\engine\blip_buf.h">
-      <Filter>Source Files\furnace\engine</Filter>
     </ClInclude>
     <ClInclude Include="furnace\src\engine\brrUtils.h">
       <Filter>Source Files\furnace\engine</Filter>
@@ -1034,6 +1037,36 @@
     <ClInclude Include="furnace\extern\itcompress\compression.h">
       <Filter>Source Files\itcompress</Filter>
     </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\ymf278b\ymf278.h">
+      <Filter>Source Files\furnace\engine\platform\sound\ymf278b</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\sid3.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\supervision.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\swan_mdfn.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sound\upd1771.h">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\scvtone.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\sid3.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\platform\supervision.h">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\extern\blip_buf\blip_buf.h">
+      <Filter>Source Files\blip_buf</Filter>
+    </ClInclude>
+    <ClInclude Include="furnace\src\engine\export\sapr.h">
+      <Filter>Source Files\furnace\engine\export</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFurnace.cpp">
@@ -1155,15 +1188,6 @@
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\pce_psg.cpp">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.c">
-      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.c">
-      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.c">
-      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\nes_nsfplay\nes_apu.cpp">
       <Filter>Source Files\furnace\engine\platform\sound\nes_nsfplay</Filter>
@@ -1324,9 +1348,6 @@
     <ClCompile Include="furnace\src\engine\platform\sound\su.cpp">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\src\engine\platform\sound\swan.cpp">
-      <Filter>Source Files\furnace\engine\platform\sound</Filter>
-    </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\sound\vic20sound.c">
       <Filter>Source Files\furnace\engine\platform\sound</Filter>
     </ClCompile>
@@ -1374,9 +1395,6 @@
     </ClCompile>
     <ClCompile Include="furnace\src\engine\platform\ym2610Interface.cpp">
       <Filter>Source Files\furnace\engine\platform</Filter>
-    </ClCompile>
-    <ClCompile Include="furnace\src\engine\blip_buf.c">
-      <Filter>Source Files\furnace\engine</Filter>
     </ClCompile>
     <ClCompile Include="furnace\src\engine\brrUtils.c">
       <Filter>Source Files\furnace\engine</Filter>
@@ -1881,6 +1899,48 @@
     </ClCompile>
     <ClCompile Include="furnace\extern\itcompress\compression.c">
       <Filter>Source Files\itcompress</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\apu.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\fds.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\nes\mmc5.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\nes</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\ymf278b\ymf278.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound\ymf278b</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\sid3.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\supervision.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\swan.c">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\swan_mdfn.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sound\upd1771.cpp">
+      <Filter>Source Files\furnace\engine\platform\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\scvtone.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\sid3.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\platform\supervision.cpp">
+      <Filter>Source Files\furnace\engine\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\extern\blip_buf\blip_buf.c">
+      <Filter>Source Files\blip_buf</Filter>
+    </ClCompile>
+    <ClCompile Include="furnace\src\engine\export\sapr.cpp">
+      <Filter>Source Files\furnace\engine\export</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

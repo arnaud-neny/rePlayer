@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2024 tildearrow and contributors
+ * Copyright (C) 2021-2025 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -518,9 +518,6 @@ void DivZSM::flushTicks() {
 
 /// ZSM export
 
-constexpr int MASTER_CLOCK_PREC=(sizeof(void*)==8)?8:0;
-constexpr int MASTER_CLOCK_MASK=(sizeof(void*)==8)?0xff:0;
-
 void DivExportZSM::run() {
   // settings
   unsigned int zsmrate=conf.getInt("zsmrate",60);
@@ -598,7 +595,6 @@ void DivExportZSM::run() {
     bool done=false;
     bool loopNow=false;
     int loopPos=-1;
-    int fracWait=0; // accumulates fractional ticks
     if (VERA>=0) e->disCont[VERA].dispatch->toggleRegisterDump(true);
     if (YM>=0) {
       e->disCont[YM].dispatch->toggleRegisterDump(true);
@@ -674,7 +670,10 @@ void DivExportZSM::run() {
         if (writes.size()>0)
           logD("zsmOps: Writing %d messages to chip %d",writes.size(),i);
         for (DivRegWrite& write: writes) {
-          if (i==YM) zsm.writeYM(write.addr&0xff,write.val);
+          if (i==YM) {
+            if (done && write.addr==0x08 && (write.val&0x78)>0) continue; // don't process keydown on lookahead
+            zsm.writeYM(write.addr&0xff,write.val);
+          }
           if (i==VERA) {
             if (done && write.addr>=64) continue; // don't process any PCM or sync events on the loop lookahead
             zsm.writePSG(write.addr&0xff,write.val);
@@ -684,10 +683,7 @@ void DivExportZSM::run() {
       }
 
       // write wait
-      int totalWait=e->cycles>>MASTER_CLOCK_PREC;
-      fracWait+=e->cycles&MASTER_CLOCK_MASK;
-      totalWait+=fracWait>>MASTER_CLOCK_PREC;
-      fracWait&=MASTER_CLOCK_MASK;
+      int totalWait=e->cycles;
       if (totalWait>0 && !done) {
         zsm.tick(totalWait);
         //tickCount+=totalWait;

@@ -42,6 +42,8 @@ namespace rePlayer
         uint64_t m_position = 0;
         int32_t m_lastLoopPos = -1;
         uint32_t m_numRemainingSamples = 0;
+
+        std::string m_systems;
     };
 }
 // namespace rePlayer

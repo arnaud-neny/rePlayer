@@ -1,6 +1,6 @@
 /**
  * Furnace Tracker - multi-system chiptune tracker
- * Copyright (C) 2021-2024 tildearrow and contributors
+ * Copyright (C) 2021-2025 tildearrow and contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,11 +54,19 @@ const char** DivPlatformArcade::getRegisterSheet() {
 void DivPlatformArcade::acquire_nuked(short** buf, size_t len) {
   thread_local int o[2];
 
+  for (int i=0; i<8; i++) {
+    oscBuf[i]->begin(len);
+  }
+
   for (size_t h=0; h<len; h++) {
+    if (delay>0) delay--;
     for (int i=0; i<8; i++) {
-      if (!writes.empty() && !fm.write_busy) {
+      if (delay<=0 && !writes.empty() && !fm.write_busy) {
         QueuedWrite& w=writes.front();
-        if (w.addrOrVal) {
+        if (w.addr==0xfffffffe) {
+          delay=w.val*2;
+          writes.pop_front();
+        } else if (w.addrOrVal) {
           OPM_Write(&fm,1,w.val);
           regPool[w.addr&0xff]=w.val;
           //printf("write: %x = %.2x\n",w.addr,w.val);
@@ -77,7 +85,7 @@ void DivPlatformArcade::acquire_nuked(short** buf, size_t len) {
 
     for (int i=0; i<8; i++) {
       int chOut=(int16_t)fm.ch_out[i];
-      oscBuf[i]->data[oscBuf[i]->needle++]=CLAMP(chOut<<1,-32768,32767);
+      oscBuf[i]->putSample(h,CLAMP(chOut<<1,-32768,32767));
     }
 
     if (o[0]<-32768) o[0]=-32768;
@@ -89,6 +97,10 @@ void DivPlatformArcade::acquire_nuked(short** buf, size_t len) {
     buf[0][h]=o[0];
     buf[1][h]=o[1];
   }
+
+  for (int i=0; i<8; i++) {
+    oscBuf[i]->end(len);
+  }
 }
 
 void DivPlatformArcade::acquire_ymfm(short** buf, size_t len) {
@@ -96,16 +108,24 @@ void DivPlatformArcade::acquire_ymfm(short** buf, size_t len) {
 
   ymfm::ym2151::fm_engine* fme=fm_ymfm->debug_engine();
 
+  for (int i=0; i<8; i++) {
+    oscBuf[i]->begin(len);
+  }
+
   for (size_t h=0; h<len; h++) {
     os[0]=0; os[1]=0;
     if (!writes.empty()) {
       if (--delay<1) {
         QueuedWrite& w=writes.front();
-        fm_ymfm->write(0x0+((w.addr>>8)<<1),w.addr);
-        fm_ymfm->write(0x1+((w.addr>>8)<<1),w.val);
-        regPool[w.addr&0xff]=w.val;
+        if (w.addr==0xfffffffe) {
+          delay=w.val;
+        } else {
+          fm_ymfm->write(0x0+((w.addr>>8)<<1),w.addr);
+          fm_ymfm->write(0x1+((w.addr>>8)<<1),w.val);
+          regPool[w.addr&0xff]=w.val;
+          delay=1;
+        }
         writes.pop_front();
-        delay=1;
       }
     }
 
@@ -113,7 +133,7 @@ void DivPlatformArcade::acquire_ymfm(short** buf, size_t len) {
 
     for (int i=0; i<8; i++) {
       int chOut=fme->debug_channel(i)->debug_output(0)+fme->debug_channel(i)->debug_output(1);
-      oscBuf[i]->data[oscBuf[i]->needle++]=CLAMP(chOut,-32768,32767);
+      oscBuf[i]->putSample(h,CLAMP(chOut,-32768,32767));
     }
 
     os[0]=out_ymfm.data[0];
@@ -126,6 +146,10 @@ void DivPlatformArcade::acquire_ymfm(short** buf, size_t len) {
 
     buf[0][h]=os[0];
     buf[1][h]=os[1];
+  }
+
+  for (int i=0; i<8; i++) {
+    oscBuf[i]->end(len);
   }
 }
 
@@ -362,6 +386,7 @@ void DivPlatformArcade::tick(bool sysTick) {
           chan[i].freq+=chan[i].arpOff<<7;
         }
       }
+      chan[i].freq+=OFFSET_LINEAR;
       if (chan[i].freq<0) chan[i].freq=0;
       if (chan[i].freq>=(95<<7)) chan[i].freq=(95<<7)-1;
       immWrite(i+0x28,hScale(chan[i].freq>>7));
@@ -379,9 +404,7 @@ void DivPlatformArcade::tick(bool sysTick) {
 
   // hard reset handling
   if (mustHardReset) {
-    for (unsigned int i=hardResetElapsed; i<hardResetCycles; i++) {
-      immWrite(0x1f,i&0xff);
-    }
+    immWrite(0xfffffffe,hardResetCycles-hardResetElapsed);
     for (int i=0; i<8; i++) {
       if ((chan[i].keyOn || chan[i].opMaskChanged) && chan[i].hardReset) {
         // restore SL/RR
@@ -957,7 +980,7 @@ void DivPlatformArcade::setFlags(const DivConfig& flags) {
 
   rate=chipClock/64;
   for (int i=0; i<8; i++) {
-    oscBuf[i]->rate=rate;
+    oscBuf[i]->setRate(rate);
   }
 }
 
