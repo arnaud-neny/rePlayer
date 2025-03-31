@@ -189,7 +189,7 @@ namespace rePlayer
 */
         }
 
-        if (m_graphics->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)) < S_OK || 1)
+        if (m_graphics->GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)) < S_OK)
         {
             Log::Error("ImGui: pipeline state\n");
             return false;
