@@ -52,6 +52,7 @@
     <ClInclude Include="lib\connect.h" />
     <ClInclude Include="lib\content_encoding.h" />
     <ClInclude Include="lib\cookie.h" />
+    <ClInclude Include="lib\cshutdn.h" />
     <ClInclude Include="lib\curlx.h" />
     <ClInclude Include="lib\curl_addrinfo.h" />
     <ClInclude Include="lib\curl_base64.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="lib\curl_threads.h" />
     <ClInclude Include="lib\curl_trc.h" />
     <ClInclude Include="lib\cw-out.h" />
+    <ClInclude Include="lib\cw-pause.h" />
     <ClInclude Include="lib\dict.h" />
     <ClInclude Include="lib\doh.h" />
     <ClInclude Include="lib\dynbuf.h" />
@@ -101,6 +103,7 @@
     <ClInclude Include="lib\getinfo.h" />
     <ClInclude Include="lib\gopher.h" />
     <ClInclude Include="lib\hash.h" />
+    <ClInclude Include="lib\hash_offt.h" />
     <ClInclude Include="lib\headers.h" />
     <ClInclude Include="lib\hostip.h" />
     <ClInclude Include="lib\hsts.h" />
@@ -126,6 +129,7 @@
     <ClInclude Include="lib\mqtt.h" />
     <ClInclude Include="lib\multihandle.h" />
     <ClInclude Include="lib\multiif.h" />
+    <ClInclude Include="lib\multi_ev.h" />
     <ClInclude Include="lib\netrc.h" />
     <ClInclude Include="lib\nonblock.h" />
     <ClInclude Include="lib\noproxy.h" />
@@ -158,8 +162,6 @@
     <ClInclude Include="lib\strdup.h" />
     <ClInclude Include="lib\strerror.h" />
     <ClInclude Include="lib\strparse.h" />
-    <ClInclude Include="lib\strtok.h" />
-    <ClInclude Include="lib\strtoofft.h" />
     <ClInclude Include="lib\system_win32.h" />
     <ClInclude Include="lib\telnet.h" />
     <ClInclude Include="lib\tftp.h" />
@@ -170,7 +172,6 @@
     <ClInclude Include="lib\urlapi-int.h" />
     <ClInclude Include="lib\urldata.h" />
     <ClInclude Include="lib\vauth\digest.h" />
-    <ClInclude Include="lib\vauth\ntlm.h" />
     <ClInclude Include="lib\vauth\vauth.h" />
     <ClInclude Include="lib\version_win32.h" />
     <ClInclude Include="lib\vquic\curl_msh3.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="lib\connect.c" />
     <ClCompile Include="lib\content_encoding.c" />
     <ClCompile Include="lib\cookie.c" />
+    <ClCompile Include="lib\cshutdn.c" />
     <ClCompile Include="lib\curl_addrinfo.c" />
     <ClCompile Include="lib\curl_des.c" />
     <ClCompile Include="lib\curl_endian.c" />
@@ -239,6 +241,7 @@
     <ClCompile Include="lib\curl_threads.c" />
     <ClCompile Include="lib\curl_trc.c" />
     <ClCompile Include="lib\cw-out.c" />
+    <ClCompile Include="lib\cw-pause.c" />
     <ClCompile Include="lib\dict.c" />
     <ClCompile Include="lib\doh.c" />
     <ClCompile Include="lib\dynbuf.c" />
@@ -257,6 +260,7 @@
     <ClCompile Include="lib\getinfo.c" />
     <ClCompile Include="lib\gopher.c" />
     <ClCompile Include="lib\hash.c" />
+    <ClCompile Include="lib\hash_offt.c" />
     <ClCompile Include="lib\headers.c" />
     <ClCompile Include="lib\hmac.c" />
     <ClCompile Include="lib\hostasyn.c" />
@@ -291,6 +295,7 @@
     <ClCompile Include="lib\mprintf.c" />
     <ClCompile Include="lib\mqtt.c" />
     <ClCompile Include="lib\multi.c" />
+    <ClCompile Include="lib\multi_ev.c" />
     <ClCompile Include="lib\netrc.c" />
     <ClCompile Include="lib\nonblock.c" />
     <ClCompile Include="lib\noproxy.c" />
@@ -320,10 +325,9 @@
     <ClCompile Include="lib\splay.c" />
     <ClCompile Include="lib\strcase.c" />
     <ClCompile Include="lib\strdup.c" />
+    <ClCompile Include="lib\strequal.c" />
     <ClCompile Include="lib\strerror.c" />
     <ClCompile Include="lib\strparse.c" />
-    <ClCompile Include="lib\strtok.c" />
-    <ClCompile Include="lib\strtoofft.c" />
     <ClCompile Include="lib\system_win32.c" />
     <ClCompile Include="lib\telnet.c" />
     <ClCompile Include="lib\tftp.c" />

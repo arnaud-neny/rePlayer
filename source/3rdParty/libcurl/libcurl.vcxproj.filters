@@ -439,12 +439,6 @@
     <ClInclude Include="lib\strerror.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\strtok.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\strtoofft.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\system_win32.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -482,9 +476,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\vauth\digest.h">
-      <Filter>Source Files\lib\vauth</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vauth\ntlm.h">
       <Filter>Source Files\lib\vauth</Filter>
     </ClInclude>
     <ClInclude Include="lib\vauth\vauth.h">
@@ -575,6 +566,18 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\strparse.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cshutdn.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cw-pause.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\hash_offt.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\multi_ev.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -927,12 +930,6 @@
     <ClCompile Include="lib\strerror.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\strtok.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\strtoofft.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\system_win32.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -1093,6 +1090,21 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strparse.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cshutdn.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cw-pause.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\hash_offt.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\multi_ev.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\strequal.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
