@@ -239,7 +239,7 @@ namespace rePlayer
 
         m_mainWindow = OnCreateWindow(m_hWnd, 1, 1, true);
 
-        return false;
+        return m_mainWindow == nullptr;
     }
 
     GraphicsDX12::~GraphicsDX12()
@@ -486,7 +486,18 @@ namespace rePlayer
 
     GraphicsWindowDX12* GraphicsDX12::OnCreateWindow(HWND hWnd, uint32_t width, uint32_t height, bool isMainWindow)
     {
-        auto window = new GraphicsWindowDX12(this, isMainWindow);
+        struct Scoped
+        {
+            Scoped(GraphicsWindowDX12* ptr) : m_ptr(ptr) {}
+            ~Scoped() { if (m_ptr) delete m_ptr; }
+
+            operator GraphicsWindowDX12*() { return m_ptr; }
+            GraphicsWindowDX12* operator->() { return m_ptr; }
+            GraphicsWindowDX12* Detach() { auto* ptr = m_ptr; m_ptr = nullptr; return ptr; }
+
+            GraphicsWindowDX12* m_ptr;
+        } window (new GraphicsWindowDX12(this, isMainWindow));
+
         window->m_width = width;
         window->m_height = height;
 
@@ -531,7 +542,7 @@ namespace rePlayer
 
         m_imGui->OnCreateWindow(window);
 
-        return window;
+        return window.Detach();
     }
 
     int32_t GraphicsDX12::OnGet3x5BaseRect() const
