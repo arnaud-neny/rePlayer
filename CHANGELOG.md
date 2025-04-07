@@ -1,17 +1,18 @@
-v0.17.2:
+v0.17.3:
 - Added GoatTracker
+- Updated adplug to 2.4 r905
 - Updated FAAD2 to 2.11.2
-- Updated Furnace to 0.6.8
+- Updated Furnace to 0.6.8.1
 - Updated gbsplay to 0.0.99
 - Updated libgme to 0.6.4
 - Updated libxmp to 4.6.2
-- Updated OpenMPT to 0.9.0-pre.0 r23113
+- Updated OpenMPT to 0.9.0-pre.0 r23127
 - Updated ProTrekkr to 2.8.2
 - Updated ZXTune to r5081
 - Updated ImGui to 1.91.9b
 - Updated libarchive to 3.7.9
-- Updated libcurl to 8.12.1
-- Updated libxml2 to 2.14.0
+- Updated libcurl to 8.13.0
+- Updated libxml2 to 2.14.1
 - Dx11 fallback when Dx12 is failing
 - Bug fixes
 
