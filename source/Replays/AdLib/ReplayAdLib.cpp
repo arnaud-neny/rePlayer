@@ -23,7 +23,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::AdLib,
         .name = "AdPlug",
-        .about = "AdPlug " ADPLUG_VERSION "\nCopyright (c) 1999-2017 Simon Peter, et al.",
+        .about = "AdPlug " ADPLUG_VERSION "\nCopyright (c) 1999-2025 Simon Peter, et al.",
         .init = ReplayAdLib::Init,
         .release = ReplayAdLib::Release,
         .load = ReplayAdLib::Load,
