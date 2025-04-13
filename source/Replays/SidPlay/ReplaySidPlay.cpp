@@ -36,7 +36,7 @@ namespace rePlayer
         .replayId = eReplay::SidPlay,
         .name = "SidPlay",
         .extensions = "psid;rsid;sid;mus",
-        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2024 Leandro Nini",
+        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2025 Leandro Nini",
         .settings = "SidPlay " PACKAGE_VERSION,
         .init = ReplaySidPlay::Init,
         .release = ReplaySidPlay::Release,
@@ -194,7 +194,7 @@ namespace rePlayer
     bool ReplaySidPlay::ms_isNtsc = false;
     bool ReplaySidPlay::ms_isResampling = false;
     int32_t ReplaySidPlay::ms_surround = 1;
-    int32_t ReplaySidPlay::ms_powerOnDelay = 32;
+    int32_t ReplaySidPlay::ms_powerOnDelay = 4096;
     int32_t ReplaySidPlay::ms_combinedWaveforms = SidConfig::AVERAGE;
 
     void ReplaySidPlay::Release()
@@ -335,21 +335,6 @@ namespace rePlayer
             }
             m_numSamples = numCachedSamples;
         }
-        if (auto numBootSamples = m_numBootSamples)
-        {
-            //remove the boot sound glitch...
-            auto maxBootSamples = GetMaxBootingSamples();
-            auto offset = maxBootSamples - numBootSamples;
-            numBootSamples = Min(numBootSamples, numSamples);
-            for (uint32_t i = 0; i < numBootSamples; i++)
-            {
-                auto p = i + offset;
-                output->left *= output->left * (p * p) / (maxBootSamples * maxBootSamples);
-                output->right *= output->right * (p * p) / (maxBootSamples * maxBootSamples);
-                output++;
-            }
-            m_numBootSamples -= numBootSamples;
-        }
 
         return numSamples;
     }
@@ -362,7 +347,6 @@ namespace rePlayer
             m_sidplayfp[1]->stop();
         m_currentPosition = 0;
         m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
-        m_numBootSamples = GetMaxBootingSamples();
         m_sidplayfp[0]->play(nullptr, 0);
         if (m_sidplayfp[1])
             m_sidplayfp[1]->play(nullptr, 0);
@@ -500,11 +484,6 @@ namespace rePlayer
         info += m_sidTune[0]->getInfo()->formatString();
         info += "\n" PACKAGE_STRING;
         return info;
-    }
-
-    inline uint32_t ReplaySidPlay::GetMaxBootingSamples() const
-    {
-        return kSampleRate / 16;
     }
 
     void ReplaySidPlay::SetupMetadata(CommandBuffer metadata)

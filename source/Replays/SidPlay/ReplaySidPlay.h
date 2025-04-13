@@ -80,8 +80,6 @@ namespace rePlayer
     private:
         ReplaySidPlay(SidTune* sidTune1, SidTune* sidTune2, CommandBuffer metadata);
 
-        uint32_t GetMaxBootingSamples() const;
-
         static eExtension GetExtension(SidTune* sidTune);
         void SetupMetadata(CommandBuffer metadata);
 
@@ -99,7 +97,6 @@ namespace rePlayer
         uint32_t* m_durations = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
-        uint32_t m_numBootSamples = 0;
 
         int16_t m_samples[kNumSamples * 2];
         uint32_t m_numSamples = 0;
