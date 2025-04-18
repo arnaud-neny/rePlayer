@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{4B4B330D-B744-492B-A10A-7D0EFDFA3503}</ProjectGuid>
+    <RootNamespace>SunVox</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>SUNVOX_STATIC_LIB;NOMAIN;NOGUI;NDEBUG;MIN_SAMPLE_RATE=44100;SUNVOX_LIB;NOVIDEO;NOVCAP;NOLIST;NOFILEUTILS;NOIMAGEFORMATS;NOMIDI;NOASIO;PS_STYPE_FLOAT32;COLOR16BITS;SMEM_FAST_MODE;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)lib_dsp;$(ProjectDir)lib_flac\libFLAC;$(ProjectDir)lib_mp3;$(ProjectDir)lib_sundog;$(ProjectDir)lib_sunvox;$(ProjectDir)lib_vorbis\libogg;$(ProjectDir)lib_vorbis\libvorbis;$(ProjectDir)lib_vorbis\tremor</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>SUNVOX_STATIC_LIB;NOMAIN;NOGUI;NDEBUG;MIN_SAMPLE_RATE=44100;SUNVOX_LIB;NOVIDEO;NOVCAP;NOLIST;NOFILEUTILS;NOIMAGEFORMATS;NOMIDI;NOASIO;PS_STYPE_FLOAT32;COLOR16BITS;SMEM_FAST_MODE;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)lib_dsp;$(ProjectDir)lib_flac\libFLAC;$(ProjectDir)lib_mp3;$(ProjectDir)lib_sundog;$(ProjectDir)lib_sunvox;$(ProjectDir)lib_vorbis\libogg;$(ProjectDir)lib_vorbis\libvorbis;$(ProjectDir)lib_vorbis\tremor</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>SUNVOX_STATIC_LIB;NOMAIN;NOGUI;NDEBUG;MIN_SAMPLE_RATE=44100;SUNVOX_LIB;NOVIDEO;NOVCAP;NOLIST;NOFILEUTILS;NOIMAGEFORMATS;NOMIDI;NOASIO;PS_STYPE_FLOAT32;COLOR16BITS;SMEM_FAST_MODE;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)lib_dsp;$(ProjectDir)lib_flac\libFLAC;$(ProjectDir)lib_mp3;$(ProjectDir)lib_sundog;$(ProjectDir)lib_sunvox;$(ProjectDir)lib_vorbis\libogg;$(ProjectDir)lib_vorbis\libvorbis;$(ProjectDir)lib_vorbis\tremor</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>SUNVOX_STATIC_LIB;NOMAIN;NOGUI;NDEBUG;MIN_SAMPLE_RATE=44100;SUNVOX_LIB;NOVIDEO;NOVCAP;NOLIST;NOFILEUTILS;NOIMAGEFORMATS;NOMIDI;NOASIO;PS_STYPE_FLOAT32;COLOR16BITS;SMEM_FAST_MODE;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)lib_dsp;$(ProjectDir)lib_flac\libFLAC;$(ProjectDir)lib_mp3;$(ProjectDir)lib_sundog;$(ProjectDir)lib_sunvox;$(ProjectDir)lib_vorbis\libogg;$(ProjectDir)lib_vorbis\libvorbis;$(ProjectDir)lib_vorbis\tremor</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays-win32 &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="lib_dsp\dsp.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\all.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\assert.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\callback.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\export.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\format.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\metadata.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\ordinals.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\stream_decoder.h" />
+    <ClInclude Include="lib_flac\libFLAC\FLAC\stream_encoder.h" />
+    <ClInclude Include="lib_flac\libFLAC\flac_config.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\all.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\bitmath.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\bitreader.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\bitwriter.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\cpu.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\crc.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\fixed.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\float.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\format.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\lpc.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\macros.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\md5.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\memory.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\metadata.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\stream_encoder.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\stream_encoder_framing.h" />
+    <ClInclude Include="lib_flac\libFLAC\private\window.h" />
+    <ClInclude Include="lib_sundog\file\file.h" />
+    <ClInclude Include="lib_sundog\log\log.h" />
+    <ClInclude Include="lib_sundog\main\main.h" />
+    <ClInclude Include="lib_sundog\memory\memory.h" />
+    <ClInclude Include="lib_sundog\misc\misc.h" />
+    <ClInclude Include="lib_sundog\sound\sound.h" />
+    <ClInclude Include="lib_sundog\sundog.h" />
+    <ClInclude Include="lib_sundog\thread\thread.h" />
+    <ClInclude Include="lib_sundog\time\time.h" />
+    <ClInclude Include="lib_sundog\video\video.h" />
+    <ClInclude Include="lib_sunvox\midi_file\midi_file.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_adsr.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_dc_blocker.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_metamodule.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui_env.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui_smp.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynths_vorbis_player.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth_dsp.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth_freq_table.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth_gui_utils.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth_net.h" />
+    <ClInclude Include="lib_sunvox\psynth\psynth_strings.h" />
+    <ClInclude Include="lib_sunvox\sunvox_engine.h" />
+    <ClInclude Include="lib_sunvox\sunvox_engine_helper.h" />
+    <ClInclude Include="lib_sunvox\xm\xm.h" />
+    <ClInclude Include="lib_vorbis\libogg\crctable.h" />
+    <ClInclude Include="lib_vorbis\libogg\ogg\config_types.h" />
+    <ClInclude Include="lib_vorbis\libogg\ogg\ogg.h" />
+    <ClInclude Include="lib_vorbis\libogg\ogg\os_types.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\backends.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\bitrate.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\codebook.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\codec_internal.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\envelope.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\highlevel.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\lpc.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\lsp.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\mdct.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\psy.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\registry.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\smallft.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\codec.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\vorbisenc.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\vorbisfile.h" />
+    <ClInclude Include="lib_vorbis\libvorbis\window.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\asm_arm.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\codebook_tremor.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\codec_internal.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\config_types.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\ivorbiscodec.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\ivorbisfile.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\lsp_lookup.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\mdct.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\mdct_lookup.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\misc.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\ogg.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\os.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\os_types.h" />
+    <ClInclude Include="lib_vorbis\tremor\tremor\window_lookup.h" />
+    <ClInclude Include="ReplaySunVox.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lib_dsp\dsp_functions.cpp" />
+    <ClCompile Include="lib_dsp\dsp_tables.cpp" />
+    <ClCompile Include="lib_flac\libFLAC\bitmath.c" />
+    <ClCompile Include="lib_flac\libFLAC\bitreader.c" />
+    <ClCompile Include="lib_flac\libFLAC\bitwriter.c" />
+    <ClCompile Include="lib_flac\libFLAC\cpu.c" />
+    <ClCompile Include="lib_flac\libFLAC\crc.c" />
+    <ClCompile Include="lib_flac\libFLAC\fixed.c" />
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_sse2.c" />
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_sse42.c" />
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_ssse3.c" />
+    <ClCompile Include="lib_flac\libFLAC\format.c" />
+    <ClCompile Include="lib_flac\libFLAC\lpc.c" />
+    <ClCompile Include="lib_flac\libFLAC\lpc_intrin_sse2.c" />
+    <ClCompile Include="lib_flac\libFLAC\lpc_intrin_sse41.c" />
+    <ClCompile Include="lib_flac\libFLAC\md5.c" />
+    <ClCompile Include="lib_flac\libFLAC\memory.c" />
+    <ClCompile Include="lib_flac\libFLAC\stream_decoder.c" />
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder.c" />
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_framing.c" />
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_intrin_sse2.c" />
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_intrin_ssse3.c" />
+    <ClCompile Include="lib_flac\libFLAC\window.c" />
+    <ClCompile Include="lib_flac\libFLAC\win_utf8_io.c" />
+    <ClCompile Include="lib_sundog\file\file.cpp" />
+    <ClCompile Include="lib_sundog\file\file_format.cpp" />
+    <ClCompile Include="lib_sundog\file\file_format_rw.cpp" />
+    <ClCompile Include="lib_sundog\log\log.cpp" />
+    <ClCompile Include="lib_sundog\main\main.cpp" />
+    <ClCompile Include="lib_sundog\memory\memory.cpp" />
+    <ClCompile Include="lib_sundog\misc\misc.cpp" />
+    <ClCompile Include="lib_sundog\sound\sound.cpp" />
+    <ClCompile Include="lib_sundog\thread\thread.cpp" />
+    <ClCompile Include="lib_sundog\time\time.cpp" />
+    <ClCompile Include="lib_sundog\video\video.cpp" />
+    <ClCompile Include="lib_sunvox\midi_file\midi_file.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_adsr.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_amplifier.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_compressor.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_ctl2note.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_dc_blocker.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_delay.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_distortion.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_drumsynth.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_echo.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_eq.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_feedback.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_fft.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_filter.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_filter2.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_flanger.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_fm.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_fm2.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_generator.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_generator2.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_glide.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_gpio.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_input.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_kicker.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_lfo.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_loop.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_metamodule.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_modulator.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_multictl.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_multisynth.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch2ctl.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch_detector.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch_shifter.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_reverb.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_sampler.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_smooth.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_sound2ctl.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_spectravoice.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_velocity2ctl.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_vibrato.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_vocal_filter.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_vorbis_player.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynths_waveshaper.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynth_dsp.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynth_gui_utils.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynth_net.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynth_net_midi_in.cpp" />
+    <ClCompile Include="lib_sunvox\psynth\psynth_strings.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_action_handler.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_audio_callback.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_export.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_load_module.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_load_proj.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_patterns.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_record.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_save_module.cpp" />
+    <ClCompile Include="lib_sunvox\sunvox_engine_save_proj.cpp" />
+    <ClCompile Include="lib_sunvox\xm\xm_instrum.cpp" />
+    <ClCompile Include="lib_sunvox\xm\xm_pattern.cpp" />
+    <ClCompile Include="lib_sunvox\xm\xm_sample.cpp" />
+    <ClCompile Include="lib_sunvox\xm\xm_song.cpp" />
+    <ClCompile Include="lib_vorbis\libogg\bitwise.c" />
+    <ClCompile Include="lib_vorbis\libogg\framing.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\analysis.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\bitrate.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\block.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\codebook.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\envelope.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\floor0.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\floor1.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\info.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\lpc.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\lsp.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\mapping0.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\mdct.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\psy.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\registry.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\res0.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\sharedbook.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\smallft.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\vorbisenc.c" />
+    <ClCompile Include="lib_vorbis\libvorbis\window.c" />
+    <ClCompile Include="lib_vorbis\tremor\bitwise.c" />
+    <ClCompile Include="lib_vorbis\tremor\codebook.c" />
+    <ClCompile Include="lib_vorbis\tremor\dsp.c" />
+    <ClCompile Include="lib_vorbis\tremor\floor0.c" />
+    <ClCompile Include="lib_vorbis\tremor\floor1.c" />
+    <ClCompile Include="lib_vorbis\tremor\floor_lookup.c" />
+    <ClCompile Include="lib_vorbis\tremor\framing.c" />
+    <ClCompile Include="lib_vorbis\tremor\info.c" />
+    <ClCompile Include="lib_vorbis\tremor\mapping0.c" />
+    <ClCompile Include="lib_vorbis\tremor\mdct.c" />
+    <ClCompile Include="lib_vorbis\tremor\res012.c" />
+    <ClCompile Include="lib_vorbis\tremor\vorbisfile.c" />
+    <ClCompile Include="ReplaySunVox.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

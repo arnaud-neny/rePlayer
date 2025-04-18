@@ -1,0 +1,1 @@
+#define DEVICE_VIDEO_FUNCTIONS

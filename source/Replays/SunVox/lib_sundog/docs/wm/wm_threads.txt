@@ -1,0 +1,20 @@
+[ SunDog Engine
+  Window Manager ]
+
+
+Threads of the app based on the SunDog Window Manager (WM):
+
+1) main loop: WM message handling, WM graphics redrawing, etc.;
+   all graphic operations are only performed between win_draw_lock() and win_draw_unlock();
+   if OpenGL enabled, win_draw_lock/unlock() will call gl_lock/unlock();
+   other threads can change some data of the main thread by using the appropriate lock/unlock functions of WM:
+     WM events: smutex_lock/unlock( &wm->events_mutex );
+     OpenGL: gl_lock/unlock( wm );
+
+2) user-defined threads (created in the main loop);
+   for example: Pixilang-based app with its own internal threads;
+                the graphics (Pixilang screen redraw) and the sound (buffer play) operations will be performed in threads 1 and 3 in sync with 2;
+
+3) sound thread;
+
+4) auxiliary "system-dependent" threads;

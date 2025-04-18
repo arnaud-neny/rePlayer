@@ -1,0 +1,757 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\lib_sunvox">
+      <UniqueIdentifier>{bf7d374d-e723-41d2-924e-f57a8d41b336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog">
+      <UniqueIdentifier>{3ede47c2-5868-42e5-b22c-bc14834ad7ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_dsp">
+      <UniqueIdentifier>{311ba234-1b35-4cb1-b953-3f8537b35b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sunvox\psynth">
+      <UniqueIdentifier>{e6626f3b-a486-4d12-bcd8-e219a2cead9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis">
+      <UniqueIdentifier>{b59584ca-d4e0-4081-945d-ae9c83baa11f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\tremor">
+      <UniqueIdentifier>{92970f05-11ba-4343-add3-6df55306db73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\tremor\tremor">
+      <UniqueIdentifier>{6c58fd50-8dbc-4a81-8017-fcde592fe6fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\misc">
+      <UniqueIdentifier>{2b0c8c7f-cd91-4e49-a81b-7aa9cb8f2d19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\memory">
+      <UniqueIdentifier>{4576f14f-69a3-4aeb-89f5-181c1ad8f9c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\thread">
+      <UniqueIdentifier>{0e77bf8d-fc25-4bf0-a711-633c0d766e47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\log">
+      <UniqueIdentifier>{3539070a-ddaa-498d-a697-71374910b5e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\file">
+      <UniqueIdentifier>{774b3755-27e0-4396-8a4f-8dc308be563b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\time">
+      <UniqueIdentifier>{11cbc272-3a45-43b3-8408-190259955409}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\main">
+      <UniqueIdentifier>{a906d859-dc42-4bef-8caa-998188934762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\sound">
+      <UniqueIdentifier>{38f9b52a-a187-4310-ab98-5eb607ec0366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sundog\video">
+      <UniqueIdentifier>{26310ecf-ce39-4593-86f6-38826b5aa55a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_flac">
+      <UniqueIdentifier>{2383810e-78c9-43f7-8dcb-733063c53e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_flac\libFLAC">
+      <UniqueIdentifier>{aeef7308-f18b-4912-b26c-07b94d703081}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sunvox\midi_file">
+      <UniqueIdentifier>{f650bedc-caaf-475d-9d88-f770b5c62976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_sunvox\xm">
+      <UniqueIdentifier>{fee91436-5836-466b-974b-66c32966883c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\libvorbis">
+      <UniqueIdentifier>{2e246f4a-e5f8-4157-bedc-2ad69d2fee17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\libvorbis\vorbis">
+      <UniqueIdentifier>{64659a96-2203-4b37-b5a5-f9c933543a85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\libogg">
+      <UniqueIdentifier>{96321a93-1211-4899-8866-58afc2c61f2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_vorbis\libogg\ogg">
+      <UniqueIdentifier>{04e248f5-fb85-4a97-9642-49273c19c623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_flac\libFLAC\FLAC">
+      <UniqueIdentifier>{06de61f2-bc51-40e8-ab9d-01dc687918d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib_flac\libFLAC\private">
+      <UniqueIdentifier>{0db71765-9345-4a23-a5a5-502f5c585755}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplaySunVox.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\sundog.h">
+      <Filter>Source Files\lib_sundog</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_dsp\dsp.h">
+      <Filter>Source Files\lib_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\sunvox_engine.h">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth_dsp.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth_freq_table.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth_gui_utils.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth_net.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynth_strings.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_adsr.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_dc_blocker.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_metamodule.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui_env.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_sampler_gui_smp.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\psynth\psynths_vorbis_player.h">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\asm_arm.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\codebook_tremor.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\codec_internal.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\config_types.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\ivorbiscodec.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\ivorbisfile.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\lsp_lookup.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\mdct.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\mdct_lookup.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\misc.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\ogg.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\os.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\os_types.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\tremor\tremor\window_lookup.h">
+      <Filter>Source Files\lib_vorbis\tremor\tremor</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\misc\misc.h">
+      <Filter>Source Files\lib_sundog\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\memory\memory.h">
+      <Filter>Source Files\lib_sundog\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\thread\thread.h">
+      <Filter>Source Files\lib_sundog\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\log\log.h">
+      <Filter>Source Files\lib_sundog\log</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\file\file.h">
+      <Filter>Source Files\lib_sundog\file</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\time\time.h">
+      <Filter>Source Files\lib_sundog\time</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\main\main.h">
+      <Filter>Source Files\lib_sundog\main</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\sound\sound.h">
+      <Filter>Source Files\lib_sundog\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sundog\video\video.h">
+      <Filter>Source Files\lib_sundog\video</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\sunvox_engine_helper.h">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\flac_config.h">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\midi_file\midi_file.h">
+      <Filter>Source Files\lib_sunvox\midi_file</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_sunvox\xm\xm.h">
+      <Filter>Source Files\lib_sunvox\xm</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\codec.h">
+      <Filter>Source Files\lib_vorbis\libvorbis\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\vorbisenc.h">
+      <Filter>Source Files\lib_vorbis\libvorbis\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\vorbis\vorbisfile.h">
+      <Filter>Source Files\lib_vorbis\libvorbis\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\bitrate.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\registry.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\codebook.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\window.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\psy.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\smallft.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\mdct.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\lsp.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\lpc.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\envelope.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\backends.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\codec_internal.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libvorbis\highlevel.h">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libogg\crctable.h">
+      <Filter>Source Files\lib_vorbis\libogg</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libogg\ogg\config_types.h">
+      <Filter>Source Files\lib_vorbis\libogg\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libogg\ogg\ogg.h">
+      <Filter>Source Files\lib_vorbis\libogg\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_vorbis\libogg\ogg\os_types.h">
+      <Filter>Source Files\lib_vorbis\libogg\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\all.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\assert.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\callback.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\export.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\format.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\metadata.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\ordinals.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\stream_decoder.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\FLAC\stream_encoder.h">
+      <Filter>Source Files\lib_flac\libFLAC\FLAC</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\all.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\bitmath.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\bitreader.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\bitwriter.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\cpu.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\crc.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\fixed.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\float.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\format.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\lpc.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\macros.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\md5.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\memory.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\metadata.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\stream_encoder.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\stream_encoder_framing.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_flac\libFLAC\private\window.h">
+      <Filter>Source Files\lib_flac\libFLAC\private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplaySunVox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_drumsynth.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynth_dsp.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynth_gui_utils.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynth_net.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynth_net_midi_in.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynth_strings.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_adsr.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_amplifier.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_compressor.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_ctl2note.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_dc_blocker.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_delay.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_distortion.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_echo.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_eq.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_feedback.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_fft.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_filter.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_filter2.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_flanger.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_fm.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_fm2.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_generator.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_generator2.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_glide.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_gpio.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_input.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_kicker.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_lfo.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_loop.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_metamodule.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_modulator.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_multictl.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_multisynth.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch_detector.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch_shifter.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_pitch2ctl.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_reverb.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_sampler.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_smooth.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_sound2ctl.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_spectravoice.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_velocity2ctl.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_vibrato.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_vocal_filter.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_vorbis_player.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\psynth\psynths_waveshaper.cpp">
+      <Filter>Source Files\lib_sunvox\psynth</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\misc\misc.cpp">
+      <Filter>Source Files\lib_sundog\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\memory\memory.cpp">
+      <Filter>Source Files\lib_sundog\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\thread\thread.cpp">
+      <Filter>Source Files\lib_sundog\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\log\log.cpp">
+      <Filter>Source Files\lib_sundog\log</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\file\file.cpp">
+      <Filter>Source Files\lib_sundog\file</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\time\time.cpp">
+      <Filter>Source Files\lib_sundog\time</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\main\main.cpp">
+      <Filter>Source Files\lib_sundog\main</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\sound\sound.cpp">
+      <Filter>Source Files\lib_sundog\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\video\video.cpp">
+      <Filter>Source Files\lib_sundog\video</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_dsp\dsp_functions.cpp">
+      <Filter>Source Files\lib_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_dsp\dsp_tables.cpp">
+      <Filter>Source Files\lib_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_load_proj.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_save_proj.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_action_handler.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_audio_callback.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_export.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_load_module.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_patterns.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_record.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\sunvox_engine_save_module.cpp">
+      <Filter>Source Files\lib_sunvox</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\file\file_format.cpp">
+      <Filter>Source Files\lib_sundog\file</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sundog\file\file_format_rw.cpp">
+      <Filter>Source Files\lib_sundog\file</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\vorbisfile.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\framing.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\info.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\dsp.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\bitwise.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\codebook.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\stream_decoder.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\mapping0.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\mdct.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\floor0.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\floor1.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\res012.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\tremor\floor_lookup.c">
+      <Filter>Source Files\lib_vorbis\tremor</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\midi_file\midi_file.cpp">
+      <Filter>Source Files\lib_sunvox\midi_file</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\xm\xm_instrum.cpp">
+      <Filter>Source Files\lib_sunvox\xm</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\xm\xm_pattern.cpp">
+      <Filter>Source Files\lib_sunvox\xm</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\xm\xm_sample.cpp">
+      <Filter>Source Files\lib_sunvox\xm</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_sunvox\xm\xm_song.cpp">
+      <Filter>Source Files\lib_sunvox\xm</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\vorbisenc.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\bitrate.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\analysis.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\block.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\registry.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\mapping0.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\res0.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\codebook.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\floor1.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\floor0.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\window.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\psy.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\smallft.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\mdct.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\lsp.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\sharedbook.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\lpc.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\envelope.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libvorbis\info.c">
+      <Filter>Source Files\lib_vorbis\libvorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libogg\bitwise.c">
+      <Filter>Source Files\lib_vorbis\libogg</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_vorbis\libogg\framing.c">
+      <Filter>Source Files\lib_vorbis\libogg</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\format.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\window.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_framing.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\bitwriter.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_intrin_ssse3.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\stream_encoder_intrin_sse2.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\memory.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\lpc.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\lpc_intrin_sse2.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\lpc_intrin_sse41.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\fixed.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_sse2.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_sse42.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\fixed_intrin_ssse3.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\crc.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\md5.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\bitreader.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\cpu.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\win_utf8_io.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_flac\libFLAC\bitmath.c">
+      <Filter>Source Files\lib_flac\libFLAC</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

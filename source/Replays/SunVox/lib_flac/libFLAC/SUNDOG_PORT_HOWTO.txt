@@ -1,0 +1,45 @@
+1. Change flac_config.h (based on the config.cmake.h.in)
+
+2. In every file replace this:
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+by this:
+#include "flac_config.h"
+
+We don't need most of functions from win_utf8_io.c in SunDog-based apps...
+
+3. win_utf8_io.c
+ADD
+#ifdef OS_WIN
+#endif
+
+4. win_utf8_io.c
+DELETE FUNCTIONS:
+utime_utf8
+win_get_console_width
+
+5. win_utf8_io.c
+MAKE THE FOLLOWING FNS EMPTY IN CASE OF OS_WINCE:
+wprint_console
+stat64_utf8
+chmod_utf8
+utime_utf8
+unlink_utf8
+rename_utf8
+
+6. share/compat.h
+CHANGE:
+#ifdef _WIN32
+#define flac_stat_s __stat64
+TO:
+#if defined(_WIN32) && !defined(OS_WINCE)
+#define flac_stat_s __stat64
+
+7. stream_encoder.h
+CHANGE
+#ifdef _WIN32
+if(GetFileType...
+TO:
+#if defined(_WIN32) && !defined(OS_WINCE)
+if(GetFileType...

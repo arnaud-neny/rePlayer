@@ -1,0 +1,40 @@
+Recommended coding style for the SunDog-based apps
+
+Naming convention: adding SunDog abbreviation (s) to the module name;
+
+File naming convention: modname_x.cpp modname_x.h,
+where the modname is the module (subsystem/manager) name, 
+and the x is some addition (platform dependent?).
+
+g_smodname_var; //global variable
+struct smodname_data {};
+enum smodname_x { SMODNAME_ENUM1, SMODNAME_ENUM2 };
+#define SOME_DEFINE; //inside of the module only
+#define SMODNAME_SOME_DEFINE; //global
+static void function_name(); //inside of the module only
+void smodname_function_name(); //global
+void sundog_modname_function_name(); //global
+
+It is also allowed (but not recommended) to use the names without the modname 
+for some small functions, if you are sure that there will be no name conflicts.
+
+It is also allowed (and even recommended starting from 2023) to use classes and namespaces for new components:
+namespace sundog
+{
+class modname : public smem_wrapper {}
+}
+
+Indentation and spaces:
+while( v < 5 )
+{
+[4 spaces]if( v == 1 )
+[4 spaces]{
+[8 spaces tab]call_some_fn( v1, v2, v3 );
+[4 spaces]}
+[4 spaces]v++;
+}
+
+Data types: see stdint.h
+
+Programming language: any.
+SunDog was originally written in C, so now mostly the procedural C with some C++ elements is used.
