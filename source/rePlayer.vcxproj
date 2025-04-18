@@ -171,7 +171,7 @@
     </ProjectReference>
     <PostBuildEvent>
       <Command>del $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -204,7 +204,7 @@ $(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir).
     </ProjectReference>
     <PostBuildEvent>
       <Command>del $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --ultra-brute --compress-exports=0 -o $(SolutionDir)..\data\$(TargetFileName) $(TargetPath)</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

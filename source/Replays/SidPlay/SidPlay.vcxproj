@@ -154,8 +154,7 @@
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
-del $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(TargetFileName) $(TargetPath)</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -184,8 +183,7 @@ $(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays\$(Targ
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays-win32 &gt; nul 2&gt;&amp;1
-del $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1
-$(SolutionDir)..\tools\upx --ultra-brute -o $(SolutionDir)..\data\replays-win32\$(TargetFileName) $(TargetPath)</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
