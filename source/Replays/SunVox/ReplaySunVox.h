@@ -15,6 +15,20 @@ namespace rePlayer
 
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
+        struct Settings : public Command<Settings, eReplay::SunVox>
+        {
+            union
+            {
+                uint32_t value = 0;
+                struct
+                {
+                    uint32_t extraTime : 16;
+                };
+            };
+
+            static void Edit(ReplayMetadataContext& context);
+        };
+
     public:
         ~ReplaySunVox() override;
 
@@ -46,6 +60,7 @@ namespace rePlayer
         sunvox_engine* m_engine;
         const uint32_t m_numFrames;
         uint32_t m_currentFrame = 0;
+        uint32_t m_extraTime = 0;
     };
 }
 // namespace rePlayer

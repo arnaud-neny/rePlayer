@@ -75,7 +75,8 @@ namespace rePlayer
         .about = "SunVox " SUNVOX_ENGINE_VERSION_STR "\nCopyright(c) 2012-2024 Alexander Zolotov <nightradio@gmail.com>",
         .init = ReplaySunVox::Init,
         .release = ReplaySunVox::Release,
-        .load = ReplaySunVox::Load
+        .load = ReplaySunVox::Load,
+        .editMetadata = ReplaySunVox::Settings::Edit
     };
 
     bool ReplaySunVox::Init(SharedContexts* ctx, Window& window)
@@ -114,6 +115,20 @@ namespace rePlayer
         return new ReplaySunVox(engine);
     }
 
+    void ReplaySunVox::Settings::Edit(ReplayMetadataContext& context)
+    {
+        Settings dummy;
+        auto* entry = context.metadata.Find(&dummy);
+
+        int tmpExtraTime = entry->extraTime;
+        ImGui::SliderInt("##Slider", &tmpExtraTime, 0, 60000, "Extra Time %dms", ImGuiSliderFlags_ClampOnInput);
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Time to add at the end of the song (can't loop)");
+        entry->extraTime = uint32_t(tmpExtraTime);
+
+        context.metadata.Update(entry, entry->value == 0);
+    }
+
     ReplaySunVox::~ReplaySunVox()
     {
         sunvox_engine_close(m_engine);
@@ -149,21 +164,23 @@ namespace rePlayer
 
     uint32_t ReplaySunVox::Render(StereoSample* output, uint32_t numSamples)
     {
+        auto extraTime = m_extraTime;
+        auto numFrames = m_numFrames + extraTime;
         auto currentFrame = m_currentFrame;
         auto nextFrame = currentFrame + numSamples;
-        if (nextFrame > m_numFrames)
+        if (nextFrame > numFrames)
         {
-            numSamples = m_numFrames - currentFrame;
-            nextFrame = m_numFrames;
+            numSamples = numFrames - currentFrame;
+            nextFrame = numFrames;
         }
         if (numSamples == 0)
-        {
             m_currentFrame = 0;
-            return 0;
+        else
+        {
+            m_currentFrame = nextFrame;
+            m_engine->stop_at_the_end_of_proj = extraTime != 0;
+            user_controlled_sound_callback(&m_sound, output, numSamples, 0, 0);
         }
-        m_currentFrame = nextFrame;
-
-        user_controlled_sound_callback(&m_sound, output, numSamples, 0, 0);
         return numSamples;
     }
 
@@ -209,7 +226,8 @@ namespace rePlayer
 
     void ReplaySunVox::ApplySettings(const CommandBuffer metadata)
     {
-        UnusedArg(metadata);
+        auto* settings = metadata.Find<Settings>();
+        m_extraTime = settings ? settings->extraTime : 0;
     }
 
     void ReplaySunVox::SetSubsong(uint32_t subsongIndex)
