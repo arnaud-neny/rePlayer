@@ -1,3 +1,10 @@
+v0.18.0:
+- Added SunVox
+- Updated libsidplay to 2.13.0
+- Updated OpenMPT to 0.9.0-pre.0 r23145
+- Updated WavPack to 5.8.1
+- Updated libxml2 to 2.14.2
+
 v0.17.3:
 - Added GoatTracker
 - Updated adplug to 2.4 r905

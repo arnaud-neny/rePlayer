@@ -57,7 +57,7 @@ namespace rePlayer
         ImGui::TextUnformatted("\nSystem 3rd parties:");
         ImGui::Bullet();
         ImGui::TextUnformatted("Dear ImGui " IMGUI_VERSION "\n"
-            "Copyright (c) 2014-2024 Omar Cornut");
+            "Copyright (c) 2014-2025 Omar Cornut");
         ImGui::Bullet();
         ImGui::TextUnformatted("stb\n"
             "Copyright (c) 2017 Sean Barrett");

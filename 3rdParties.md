@@ -56,6 +56,7 @@
   Partially rewritten and fixed from original code.
 - StSound: https://github.com/arnaud-carre/StSound  
   Patched some players for continuous play and loop/end detection, added stereo support.
+- SunVox: https://warmplace.ru/soft/sunvox
 - TIATracker: https://bitbucket.org/kylearan/tiatracker
 - UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade
 - vgmstream: https://github.com/vgmstream/vgmstream

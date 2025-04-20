@@ -213,6 +213,7 @@ Or add some comments (and likes) there:
 - [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
 - SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
 - [StSound](https://github.com/arnaud-carre/StSound): ym files.
+- [SunVox](https://warmplace.ru/soft/sunvox): SunVox is a small, fast and powerful modular synthesizer with pattern-based sequencer (tracker).
 - TFMX: library to play Chris Huelsbeck files (customized).
 - [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
 - [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.

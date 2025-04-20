@@ -52,3 +52,5 @@
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
 - BambooTracker: https://github.com/BambooTracker/BambooTracker
+- Psycle: https://sourceforge.net/projects/psycle/ (songs from Manwe)
+- Skale Tracker: https://www.pouet.net/prod.php?which=20929 (songs from Manwe)
