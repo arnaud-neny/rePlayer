@@ -121,6 +121,7 @@ namespace rePlayer
         auto* entry = context.metadata.Find(&dummy);
 
         int tmpExtraTime = entry->extraTime;
+        ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::SliderInt("##Slider", &tmpExtraTime, 0, 60000, "Extra Time %dms", ImGuiSliderFlags_ClampOnInput);
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Time to add at the end of the song (can't loop)");
