@@ -5,6 +5,7 @@ ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twit
 
 # Versions
 
+- v0.80 : fix minizip library when dealing with weird zip path name
 - v0.79 : minor STE DAC potential fix
 - v0.78 : fix oscilloscope scale issue in v0.77
 - v0.77 : ym2149 has now proper 32 steps volume enveloppe
