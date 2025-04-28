@@ -125,10 +125,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
             case WM_LBUTTONUP:
                 if (s_windows11HasMiddleButton || s_windows11FixTrayMiddleButton >= 4)
-                {
                     s_rePlayer->SystrayMouseLeft(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
-                    break;
-                }
+                else
+                    s_rePlayer->SystrayMouseMiddle(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
+                break;
             case WM_MBUTTONUP:
                 // Windows 11 bug: the middle button is returned as left button
                 s_rePlayer->SystrayMouseMiddle(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
