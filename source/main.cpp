@@ -29,6 +29,7 @@ static HWND s_hWnd = nullptr;
 static HICON s_hIcon = nullptr;
 static bool s_isWindows11 = false;
 static uint32_t s_windows11FixTrayMiddleButton = 4;
+static bool s_windows11HasMiddleButton = false;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //
@@ -123,7 +124,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             switch (LOWORD(lParam))
             {
             case WM_LBUTTONUP:
-                if (s_windows11FixTrayMiddleButton >= 4)
+                if (s_windows11HasMiddleButton || s_windows11FixTrayMiddleButton >= 4)
                 {
                     s_rePlayer->SystrayMouseLeft(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
                     break;
@@ -131,6 +132,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case WM_MBUTTONUP:
                 // Windows 11 bug: the middle button is returned as left button
                 s_rePlayer->SystrayMouseMiddle(static_cast<int16_t>(wParam & 0xffFF), static_cast<int16_t>((wParam >> 16) & 0xffFF));
+                s_windows11HasMiddleButton = true;
                 break;
             case WM_RBUTTONUP:
             case WM_CONTEXTMENU:
@@ -316,7 +318,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
             MSG msg = {};
             while (msg.message != WM_QUIT)
             {
-                if (s_isWindows11 && ::GetAsyncKeyState(VK_MBUTTON))
+                if (s_isWindows11 && !s_windows11HasMiddleButton && ::GetAsyncKeyState(VK_MBUTTON))
                     s_windows11FixTrayMiddleButton = 0;
 
                 // Poll and handle messages (inputs, window resize, etc.)
@@ -366,7 +368,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                 if (rePlayer::Graphics::EndFrame(s_rePlayer->GetBlendingFactor()))
                     break;
 
-                if (s_windows11FixTrayMiddleButton < 4)
+                if (!s_windows11HasMiddleButton && s_windows11FixTrayMiddleButton < 4)
                     s_windows11FixTrayMiddleButton++;
 
                 static bool isFirstLaunch = true;
