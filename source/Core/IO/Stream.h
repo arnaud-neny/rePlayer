@@ -24,6 +24,7 @@ namespace core::io
         virtual Status Seek(int64_t offset, SeekWhence whence) = 0;
 
         virtual [[nodiscard]] uint64_t GetSize() const = 0;
+        virtual [[nodiscard]] int64_t GetAvailableSize() const { return int64_t(GetSize()); }
         virtual [[nodiscard]] uint64_t GetPosition() const = 0;
 
         virtual void SetName(const std::string& name) { (void)name; }
@@ -46,6 +47,9 @@ namespace core::io
         virtual [[nodiscard]] const Span<const uint8_t> Read();
 
         [[nodiscard]] Array<std::string> GetFilenames() const;
+
+        // for streaming, read can wait for data
+        virtual bool EnableLatency(bool isEnabled) { UnusedArg(isEnabled); return false; }
 
     protected:
         Stream(Stream* root);

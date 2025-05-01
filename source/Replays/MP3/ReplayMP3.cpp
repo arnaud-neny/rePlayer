@@ -24,6 +24,10 @@ namespace rePlayer
             .isSeekable = stream->GetSize() != 0,
             .isInit = true
         };
+        core::Scope scope = {
+            [stream]() { stream->EnableLatency(true); },
+            [stream]() { stream->EnableLatency(false); },
+        };
         if (!drmp3_init(mp3, OnRead, OnSeek, streamData, nullptr))
         {
             delete mp3;
@@ -116,7 +120,9 @@ namespace rePlayer
             drmp3_uninit(m_mp3);
             m_streamData->isInit = true;
             m_streamData->stream->Seek(0, io::Stream::kSeekBegin);
+            m_streamData->stream->EnableLatency(true);
             drmp3_init(m_mp3, OnRead, OnSeek, m_streamData, nullptr);
+            m_streamData->stream->EnableLatency(false);
             m_streamData->isInit = false;
         }
     }
@@ -158,9 +164,14 @@ namespace rePlayer
         std::string info;
         info = m_mp3->channels == 1 ? "1 channel\n" : "2 channels\n";
         char buf[128];
-        sprintf(buf, "%d kb/s - %d hz\n", m_mp3->frameInfo.bitrate_kbps, m_mp3->frameInfo.hz);
+        sprintf(buf, "%d kb/s - %d hz", m_mp3->frameInfo.bitrate_kbps, m_mp3->frameInfo.hz);
         info += buf;
-        info += "dr_mp3 " DRMP3_VERSION_STRING;
+        if (IsStreaming())
+        {
+            sprintf(buf, " (%.2f KB cache)", m_streamData->stream->GetAvailableSize() / 1024.0);
+            info += buf;
+        }
+        info += "\ndr_mp3 " DRMP3_VERSION_STRING;
         return info;
     }
 }

@@ -22,6 +22,11 @@ namespace rePlayer
 
     Replay* ReplayOpus::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        core::Scope scope = {
+            [stream]() { stream->EnableLatency(true); },
+            [stream]() { stream->EnableLatency(false); },
+        };
+
         OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
         auto* opus = op_open_callbacks(stream, &cb, nullptr, 0, nullptr);
         if (opus)
@@ -158,7 +163,9 @@ namespace rePlayer
         m_stream->Seek(0, io::Stream::kSeekBegin);
         op_free(m_opus);
         OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
+        m_stream->EnableLatency(true);
         m_opus = op_open_callbacks(m_stream.Get(), &cb, nullptr, 0, nullptr);
+        m_stream->EnableLatency(false);
     }
 
     void ReplayOpus::ApplySettings(const CommandBuffer /*metadata*/)
@@ -238,8 +245,13 @@ namespace rePlayer
     {
         std::string info;
         char buf[128];
-        sprintf(buf, "%u channel%s%u kb/s - %u hz\nOpus " PACKAGE_VERSION, m_numChannels, m_numChannels > 1 ? "s\n" : "\n", m_bitRate, m_originalSampleRate);
+        if (IsStreaming())
+            sprintf(buf, "%u channel%s%u kb/s - %u hz (%.2f KB cache)", m_numChannels, m_numChannels > 1 ? "s\n" : "\n", m_bitRate, m_originalSampleRate, m_stream->GetAvailableSize() / 1024.0);
+        else
+            sprintf(buf, "%u channel%s%u kb/s - %u hz", m_numChannels, m_numChannels > 1 ? "s\n" : "\n", m_bitRate, m_originalSampleRate);
         info = buf;
+        info += "\nOpus " PACKAGE_VERSION;
+
         return info;
     }
 }

@@ -18,11 +18,6 @@ namespace rePlayer
     Replay* ReplayAAC::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
         auto* replay = new ReplayAAC(stream);
-
-        replay->m_isSeekable = stream->Seek(0, io::Stream::kSeekEnd) == Status::kOk;
-
-        stream->Seek(0, io::Stream::kSeekBegin);
-
         if (replay->Init() == Status::kOk)
             return replay;
 
@@ -50,7 +45,10 @@ namespace rePlayer
     ReplayAAC::ReplayAAC(io::Stream* stream)
         : Replay(eExtension::_aac, eReplay::AAC)
         , m_stream(stream)
-    {}
+        , m_isSeekable(stream->Seek(0, io::Stream::kSeekEnd) == Status::kOk)
+    {
+        stream->Seek(0, io::Stream::kSeekBegin);
+    }
 
     bool ReplayAAC::IsSeekable() const
     {
@@ -282,6 +280,11 @@ namespace rePlayer
         char buf[32];
         sprintf(buf, "%u kb/s - %u hz", m_bitRate.average.load(), m_sampleRate);
         info += buf;
+        if (IsStreaming())
+        {
+            sprintf(buf, " (%.2f KB cache)", m_stream->GetAvailableSize() / 1024.0);
+            info += buf;
+        }
         info += "\nFAAD " FAAD2_VERSION;
         return info;
     }
@@ -289,6 +292,10 @@ namespace rePlayer
     Status ReplayAAC::Init()
     {
         m_stream->Seek(0, io::Stream::kSeekBegin);
+        core::Scope scope = {
+            [stream = m_stream.Get()]() { stream->EnableLatency(true); },
+            [stream = m_stream.Get()]() { stream->EnableLatency(false); },
+        };
 
         auto bytesRead = m_stream->Read(m_buffer, sizeof(m_buffer));
         m_bytesIntoBuffer = uint32_t(bytesRead);

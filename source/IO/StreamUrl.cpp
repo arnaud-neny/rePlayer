@@ -3,6 +3,7 @@
 // Core
 #include <Core/Log.h>
 #include <Core/String.h>
+#include <Thread/Thread.h>
 
 // rePlayer
 #include <Replayer/Core.h>
@@ -33,34 +34,53 @@ namespace rePlayer
         auto* output = reinterpret_cast<uint8_t*>(buffer);
         auto remainingSize = size;
         auto tail = m_tail;
+        bool isStarving = false;
         if (m_type == Type::kStreaming)
         {
             while (remainingSize > 0)
             {
-                auto chunkSize = atomicHead - tail;
-                if (chunkSize >= kCacheSize)
+                auto head = atomicHead.load();
+                auto chunkSize = head - tail;
+                // too far behind or connection reset ?
+                if (head < tail || chunkSize > kCacheWindow)
                 {
-                    tail += chunkSize & ~kCacheMask;
-                    chunkSize &= kCacheMask;
+                    tail = Max(0, head - kCacheSize + kCacheWindow - size);
+                    Log::Warning("StreamUrl: skip (overflow)\n");
+                    continue;
                 }
-                // in a perfect world, we shouldn't wait
-                while (chunkSize == 0)
+
+                // cancel or something wrong (slow connection)?
+                if (chunkSize == 0)
                 {
-                    ::Sleep(1);
-                    chunkSize = atomicHead - tail;
                     if (std::atomic_ref(m_state) >= State::kEnd)
                     {
-                        m_tail = atomicHead;
+                        m_tail = head;
                         return size - remainingSize;
                     }
+                    // slow connection? to early reads?
+                    if (m_isLatencyEnabled)
+                    {
+                        // wait
+                        thread::Sleep(1);
+                        if (!isStarving)
+                            Log::Warning("StreamUrl: wait (starving)\n");
+                    }
+                    else
+                    {
+                        // rewind
+                        tail = Max(0, head - kCacheSize + kCacheWindow - size);
+                        if (!isStarving)
+                            Log::Warning("StreamUrl: skip (starving)\n");
+                    }
+                    isStarving = true;
+                    continue;
                 }
-                chunkSize = uint32_t(Min(remainingSize, chunkSize));
+                chunkSize = uint32_t(Min(remainingSize, uint64_t(chunkSize)));
 
                 auto dataPos = tail & kCacheMask;
                 if (dataPos + chunkSize > kCacheSize)
                 {
                     auto splitSize = kCacheSize - dataPos;
-                    assert(splitSize <= kCacheSize);
                     memcpy(output, m_data.Items(dataPos), splitSize);
                     output += splitSize;
                     tail += splitSize;
@@ -69,7 +89,6 @@ namespace rePlayer
                     remainingSize -= splitSize;
                 }
 
-                assert(chunkSize <= kCacheSize);
                 memcpy(output, m_data.Items(dataPos), chunkSize);
                 output += chunkSize;
                 tail += chunkSize;
@@ -89,11 +108,11 @@ namespace rePlayer
                         return size - remainingSize;
                     }
 
-                    ::Sleep(1);
+                    thread::Sleep(1);
                     availableSize = atomicHead - tail;
                 }
 
-                availableSize = uint32_t(Min(remainingSize, availableSize));
+                availableSize = uint32_t(Min(remainingSize, uint64_t(availableSize)));
                 m_mutex.lock();
                 memcpy(output, m_data.Items(tail), availableSize);
                 m_mutex.unlock();
@@ -115,6 +134,7 @@ namespace rePlayer
                 std::atomic_ref atomicHead(m_head);
                 if (m_tail != 0 && atomicHead < kCacheSize / 2)
                 {
+                    Log::Warning("StreamUrl: Seek reset\n");
                     m_tail = 0;
                 }
                 else
@@ -134,7 +154,7 @@ namespace rePlayer
                         Update();
                     });
                     while (std::atomic_ref(m_state) < State::kDownload)
-                        ::Sleep(1);
+                        thread::Sleep(1);
                 }
                 return Status::kOk;
             }
@@ -146,11 +166,11 @@ namespace rePlayer
             else if (whence == SeekWhence::kSeekEnd)
             {
                 while (std::atomic_ref(m_state) < State::kEnd)
-                    ::Sleep(1);
+                    thread::Sleep(1);
                 offset += m_head;
             }
             while (offset > int64_t(std::atomic_ref(m_head)) && std::atomic_ref(m_state) < State::kEnd)
-                ::Sleep(1);
+                thread::Sleep(1);
             if (offset >= 0 && offset <= int64_t(std::atomic_ref(m_head)))
             {
                 m_tail = uint32_t(offset);
@@ -165,8 +185,15 @@ namespace rePlayer
         if (m_type == Type::kStreaming)
             return 0;
         while (std::atomic_ref(m_state) < State::kEnd)
-            ::Sleep(1);
+            thread::Sleep(1);
         return m_head;
+    }
+
+    int64_t StreamUrl::GetAvailableSize() const
+    {
+        if (m_type == Type::kStreaming)
+            return std::atomic_ref(m_head) - std::atomic_ref(m_tail);
+        return std::atomic_ref(m_head);
     }
 
     uint64_t StreamUrl::GetPosition() const
@@ -226,8 +253,14 @@ namespace rePlayer
             return { nullptr, size_t(0) };
 
         while (std::atomic_ref(m_state) < State::kEnd)
-            ::Sleep(1);
-        return { m_data.Items(), m_head };
+            thread::Sleep(1);
+        return { m_data.Items(), uint32_t(m_head) };
+    }
+
+    bool StreamUrl::EnableLatency(bool isEnabled)
+    {
+        std::swap(m_isLatencyEnabled, isEnabled);
+        return isEnabled;
     }
 
     StreamUrl::StreamUrl(const std::string& url, bool isClone, io::Stream* root)
@@ -272,7 +305,7 @@ namespace rePlayer
             Update();
         });
         while (std::atomic_ref(m_state) < State::kDownload)
-            ::Sleep(1);
+            thread::Sleep(1);
     }
 
     StreamUrl::~StreamUrl()
@@ -352,7 +385,7 @@ namespace rePlayer
             return nullptr;
 
         while (std::atomic_ref(m_state) < State::kEnd)
-            ::Sleep(1);
+            thread::Sleep(1);
 
         SmartPtr<StreamUrl> stream(kAllocate, m_url, true, GetRoot());
         stream->m_url = m_url;
@@ -400,7 +433,7 @@ namespace rePlayer
     {
         std::atomic_ref(this->m_state).store(State::kCancel);
         while (!std::atomic_ref(m_isJobDone).load())
-            ::Sleep(1);
+            thread::Sleep(1);
     }
 
     void StreamUrl::Update()
@@ -410,13 +443,23 @@ namespace rePlayer
         {
             curlCode = curl_easy_perform(m_curl);
             assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST || curlCode == CURLE_URL_MALFORMAT || curlCode == CURLE_RECV_ERROR);
-            if (curlCode != CURLE_RECV_ERROR || m_type != Type::kStreaming)
+            if (m_type == Type::kStreaming)
+            {
+                if (curlCode == CURLE_WRITE_ERROR || std::atomic_ref(m_state).load() == State::kCancel)
+                    break;
+                else if (curlCode != CURLE_OK && curlCode != CURLE_RECV_ERROR)
+                    break;
+            }
+            else
                 break;
+            Log::Warning("StreamUrl: connection reset \"%s\"\n", curl_easy_strerror(curlCode));
+            m_tail = 0;
             m_metadataSize = 0;
             m_chunkSize = 0;
             m_isReadingChunk = true;
         }
 
+        Log::Warning("StreamUrl: %s\n", curl_easy_strerror(curlCode));
         if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
             std::atomic_ref(m_state).store(State::kEnd);
         else
@@ -521,7 +564,7 @@ namespace rePlayer
                             chunkSize = ((chunkSize - 1) & kCacheMask) + 1;
 
                             // split the copy on ring buffer overflow
-                            auto head = stream->m_head & kCacheMask;
+                            auto head = uint32_t(stream->m_head & kCacheMask);
                             if (head + chunkSize > kCacheSize)
                             {
                                 auto splitSize = kCacheSize - head;
@@ -572,7 +615,7 @@ namespace rePlayer
                     auto head = stream->m_head & kCacheMask;
                     if (head + remainingSize > kCacheSize)
                     {
-                        auto splitSize = kCacheSize - head;
+                        auto splitSize = uint32_t(kCacheSize - head);
                         assert((splitSize <= kCacheSize) && ((head + splitSize) <= kCacheSize));
                         memcpy(stream->m_data.Items(head), data, splitSize);
                         head = 0;

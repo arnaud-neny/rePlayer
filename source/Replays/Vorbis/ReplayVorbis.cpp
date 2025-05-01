@@ -24,6 +24,11 @@ namespace rePlayer
 
     Replay* ReplayVorbis::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
+        core::Scope scope = {
+            [stream]() { stream->EnableLatency(true); },
+            [stream]() { stream->EnableLatency(false); },
+        };
+
         auto* vorbis = new OggVorbis_File;;
         if (ov_open_callbacks(stream, vorbis, nullptr, 0, { OnRead, OnSeek, nullptr, OnTell }) || vorbis->vi->channels > 2)
         {
@@ -121,7 +126,9 @@ namespace rePlayer
             ov_raw_seek(m_vorbis, 0);
         m_stream->Seek(0, io::Stream::kSeekBegin);
         ov_clear(m_vorbis);
+        m_stream->EnableLatency(true);
         ov_open_callbacks(m_stream.Get(), m_vorbis, nullptr, 0, { OnRead, OnSeek, nullptr, OnTell });
+        m_stream->EnableLatency(false);
     }
 
     void ReplayVorbis::ApplySettings(const CommandBuffer /*metadata*/)
@@ -203,9 +210,14 @@ namespace rePlayer
         auto vi = ov_info(m_vorbis, -1);
         info = vi->channels == 1 ? "1 channel\n" : "2 channels\n";
         char buf[64];
-        sprintf(buf, "%d kb/s - %d hz\n", (vi->bitrate_upper > 0 && vi->bitrate_lower > 0) ? (vi->bitrate_upper + vi->bitrate_lower + 1999) / 2000 : ((vi->bitrate_nominal + 999) / 1000), vi->rate);
+        sprintf(buf, "%d kb/s - %d hz", (vi->bitrate_upper > 0 && vi->bitrate_lower > 0) ? (vi->bitrate_upper + vi->bitrate_lower + 1999) / 2000 : ((vi->bitrate_nominal + 999) / 1000), vi->rate);
         info += buf;
-        info += "minivorbis 1.3.4/1.3.7";
+        if (IsStreaming())
+        {
+            sprintf(buf, " (%.2f KB cache)", m_stream->GetAvailableSize() / 1024.0);
+            info += buf;
+        }
+        info += "\nminivorbis 1.3.4/1.3.7";
         return info;
     }
 }

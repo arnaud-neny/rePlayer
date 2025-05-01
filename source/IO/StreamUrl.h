@@ -23,6 +23,7 @@ namespace rePlayer
         Status Seek(int64_t offset, SeekWhence whence) final;
 
         uint64_t GetSize() const final;
+        int64_t GetAvailableSize() const override;
         uint64_t GetPosition() const final;
 
         const std::string& GetName() const final { return m_url; }
@@ -32,9 +33,12 @@ namespace rePlayer
 
         const Span<const uint8_t> Read() final;
 
+        bool EnableLatency(bool isEnabled) override;
+
     private:
-        static constexpr uint32_t kCacheSize = 512 * 1024;
+        static constexpr uint32_t kCacheSize = 1024 * 1024;
         static constexpr uint32_t kCacheMask = kCacheSize - 1;
+        static constexpr uint32_t kCacheWindow = kCacheSize - 65536;
 
     private:
         StreamUrl(const std::string& filename, bool isClone, io::Stream* root);
@@ -67,12 +71,13 @@ namespace rePlayer
 
         std::string m_title;
 
-        uint32_t m_tail = 0;
-        uint32_t m_head = 0;
+        int64_t m_tail = 0;
+        int64_t m_head = 0;
         uint32_t m_icySize = 0;
         uint32_t m_metadataSize = 0;
         uint32_t m_chunkSize = 0;
         bool m_isReadingChunk = true;
+        bool m_isLatencyEnabled = true;
 
         enum class State : uint8_t
         {
