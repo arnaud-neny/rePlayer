@@ -114,5 +114,24 @@ namespace core
         UnusedArg(std::forward<T>(a));
         UnusedArg(std::forward<Ts>(others)...);
     }
+
+    template<typename Dtor>
+    class [[nodiscard]] Scope
+    {
+    public:
+        template <typename Ctor>
+        Scope(Ctor&& ctor, Dtor&& dtor)
+            : m_dtor(std::forward<Dtor>(dtor))
+        {
+            std::forward<Ctor>(ctor)();
+        }
+        ~Scope()
+        {
+            m_dtor();
+        }
+
+    private:
+        Dtor m_dtor;
+    };
 }
 // namespace core
