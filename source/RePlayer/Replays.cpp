@@ -300,11 +300,16 @@ namespace rePlayer
         {
             if (dirEntry.path().extension() == ".dll")
             {
-                auto hModule = LoadLibrary(dirEntry.path().string().c_str());
-                auto getReplayPlugin = reinterpret_cast<GetReplayPlugin>(GetProcAddress(hModule, "getReplayPlugin"));
-                if (auto replayPlugin = getReplayPlugin())
+                auto hModule = LoadLibrary(LPCSTR(dirEntry.path().u8string().c_str()));
+                if (!hModule)
                 {
-                    replayPlugin->dllName = _strdup(dirEntry.path().stem().string().c_str());
+                    Log::Error("Replay: can't load \"%s\"\n", LPCSTR(dirEntry.path().filename().u8string().c_str()));
+                    continue;
+                }
+                auto getReplayPlugin = reinterpret_cast<GetReplayPlugin>(GetProcAddress(hModule, "getReplayPlugin"));
+                if (auto replayPlugin = getReplayPlugin ? getReplayPlugin() : nullptr)
+                {
+                    replayPlugin->dllName = _strdup(LPCSTR(dirEntry.path().stem().u8string().c_str()));
                     replayPlugin->download = [](const char* url)
                     {
                         CURL* curl = curl_easy_init();
@@ -353,12 +358,15 @@ namespace rePlayer
                     }
                     else
                     {
-                        Log::Error("Replay: can't register \"%s\", slot \"%s\" is already used\n", dirEntry.path().filename().string().c_str(), MediaType(eExtension::Unknown, replayPlugin->replayId).GetReplay());
+                        Log::Error("Replay: can't register \"%s\", slot \"%s\" is already used\n", LPCSTR(dirEntry.path().filename().u8string().c_str()), MediaType(eExtension::Unknown, replayPlugin->replayId).GetReplay());
                         FreeLibrary(hModule);
                     }
                 }
-                else if (hModule)
+                else
+                {
+                    Log::Error("Replay: \"%s\" is not valid\n", LPCSTR(dirEntry.path().filename().u8string().c_str()));
                     FreeLibrary(hModule);
+                }
             }
         }
 
