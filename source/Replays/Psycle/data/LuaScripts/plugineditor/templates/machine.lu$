@@ -1,0 +1,13 @@
+-- $(machinename).lua
+
+machine = require("psycle.machine"):new()
+
+-- add your requires here
+
+function machine:init(samplerate)  
+end
+
+function machine:work(num)  
+end
+
+return machine

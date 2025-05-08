@@ -1,0 +1,1132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{B02E43EF-DDE8-4B9D-ADF2-03409D96C3E0}</ProjectGuid>
+    <RootNamespace>Psycle</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;UNIVERSALIS__DECL=;UNIVERSALIS__COMPILER__CONST_FUNCTION=;_HAS_AUTO_PTR_ETC;_HAS_STREAM_INSERTION_OPERATORS_DELETED_IN_CXX20=1;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)external-packages\boost-1.55.0;$(ProjectDir)external-packages\fluidsynth\include;$(ProjectDir)external-packages\ladspa;$(ProjectDir)external-packages\lua-5.2\src;$(ProjectDir)external-packages\scintilla\include;$(ProjectDir)external-packages\stk-4.5.0;$(ProjectDir)external-packages\vst-2.4;$(ProjectDir)universalis\src;$(ProjectDir)diversalis\src;$(ProjectDir)psycle\src;$(ProjectDir)psycle-core\src;$(ProjectDir)psycle-helpers\src;$(ProjectDir)psycle-plugins\src</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;UNIVERSALIS__DECL=;UNIVERSALIS__COMPILER__CONST_FUNCTION=;_HAS_AUTO_PTR_ETC;_HAS_STREAM_INSERTION_OPERATORS_DELETED_IN_CXX20=1;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)external-packages\boost-1.55.0;$(ProjectDir)external-packages\fluidsynth\include;$(ProjectDir)external-packages\ladspa;$(ProjectDir)external-packages\lua-5.2\src;$(ProjectDir)external-packages\scintilla\include;$(ProjectDir)external-packages\stk-4.5.0;$(ProjectDir)external-packages\vst-2.4;$(ProjectDir)universalis\src;$(ProjectDir)diversalis\src;$(ProjectDir)psycle\src;$(ProjectDir)psycle-core\src;$(ProjectDir)psycle-helpers\src;$(ProjectDir)psycle-plugins\src</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;UNIVERSALIS__DECL=;UNIVERSALIS__COMPILER__CONST_FUNCTION=;_HAS_AUTO_PTR_ETC;_HAS_STREAM_INSERTION_OPERATORS_DELETED_IN_CXX20=1;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)external-packages\boost-1.55.0;$(ProjectDir)external-packages\fluidsynth\include;$(ProjectDir)external-packages\ladspa;$(ProjectDir)external-packages\lua-5.2\src;$(ProjectDir)external-packages\scintilla\include;$(ProjectDir)external-packages\stk-4.5.0;$(ProjectDir)external-packages\vst-2.4;$(ProjectDir)universalis\src;$(ProjectDir)diversalis\src;$(ProjectDir)psycle\src;$(ProjectDir)psycle-core\src;$(ProjectDir)psycle-helpers\src;$(ProjectDir)psycle-plugins\src</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\Psycle &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\Psycle\LadspaPlugins &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\Psycle\LuaScripts &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\Psycle\VstPlugins &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\Psycle\VstPlugins64 &gt; nul 2&gt;&amp;1
+xcopy /Y /R /E $(ProjectDir)data $(SolutionDir)..\data\replays\Psycle &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;UNIVERSALIS__DECL=;UNIVERSALIS__COMPILER__CONST_FUNCTION=;_HAS_AUTO_PTR_ETC;_HAS_STREAM_INSERTION_OPERATORS_DELETED_IN_CXX20=1;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;_WINDOWS;_USRDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)external-packages\boost-1.55.0;$(ProjectDir)external-packages\fluidsynth\include;$(ProjectDir)external-packages\ladspa;$(ProjectDir)external-packages\lua-5.2\src;$(ProjectDir)external-packages\scintilla\include;$(ProjectDir)external-packages\stk-4.5.0;$(ProjectDir)external-packages\vst-2.4;$(ProjectDir)universalis\src;$(ProjectDir)diversalis\src;$(ProjectDir)psycle\src;$(ProjectDir)psycle-core\src;$(ProjectDir)psycle-helpers\src;$(ProjectDir)psycle-plugins\src</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays-win32 &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\Psycle &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\Psycle\LadspaPlugins &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\Psycle\LuaScripts &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\Psycle\VstPlugins &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\Psycle\VstPlugins64 &gt; nul 2&gt;&amp;1
+xcopy /Y /R /E $(ProjectDir)data $(SolutionDir)..\data\replays-win32\Psycle &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="diversalis\src\diversalis.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\compiler.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\cpu.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\detail\config.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\detail\message.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\detail\project.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\detail\stringize.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\os.hpp" />
+    <ClInclude Include="diversalis\src\diversalis\stdlib.hpp" />
+    <ClInclude Include="external-packages\boost-1.55.0\libs\filesystem\src\windows_file_codecvt.hpp" />
+    <ClInclude Include="external-packages\boost-1.55.0\libs\system\src\local_free_on_destruction.hpp" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\event.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\gen.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\log.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\midi.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\misc.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\mod.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\ramsfont.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\settings.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\sfont.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\synth.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\types.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\version.h" />
+    <ClInclude Include="external-packages\fluidsynth\include\fluidsynth\voice.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\config_win32.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\fake_glib.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\midi\fluid_midi.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_adsr_env.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_chorus.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_iir_filter.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_lfo.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_phase.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_rev.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice_event.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice_mixer.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\sfloader\fluid_defsfont.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\sfloader\fluid_ramsfont.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\sfloader\fluid_sfont.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_chan.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_event_priv.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_event_queue.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_gen.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_mod.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_synth.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_tuning.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\synth\fluid_voice.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluidsynth_priv.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_conv.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_hash.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_list.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_ringbuffer.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_settings.h" />
+    <ClInclude Include="external-packages\fluidsynth\src\utils\fluid_sys.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lapi.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lauxlib.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lcode.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lctype.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\ldebug.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\ldo.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lfunc.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lgc.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\llex.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\llimits.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lmem.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lobject.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lopcodes.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lparser.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lstate.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lstring.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\ltable.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\ltm.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lua.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lua.hpp" />
+    <ClInclude Include="external-packages\lua-5.2\src\luaconf.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lualib.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lundump.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lvm.h" />
+    <ClInclude Include="external-packages\lua-5.2\src\lzio.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\ADSR.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Asymp.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BandedWG.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BeeThree.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BiQuad.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Blit.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BlitSaw.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BlitSquare.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BlowBotl.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BlowHole.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Bowed.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\BowTable.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Brass.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Chorus.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Clarinet.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Cubic.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Delay.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\DelayA.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\DelayL.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Drummer.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Echo.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Effect.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Envelope.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FileLoop.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FileRead.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FileWrite.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FileWvIn.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FileWvOut.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Filter.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Fir.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Flute.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FM.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FMVoices.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FormSwep.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\FreeVerb.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Function.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Generator.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Granulate.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Guitar.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\HevyMetl.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Iir.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\InetWvIn.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\InetWvOut.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Instrmnt.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\JCRev.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\JetTable.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\LentPitShift.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Mandolin.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Mesh2D.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Messager.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\MidiFileIn.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Modal.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\ModalBar.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Modulate.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Moog.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Mutex.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Noise.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\NRev.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\OnePole.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\OneZero.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\PercFlut.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Phonemes.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\PitShift.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Plucked.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\PoleZero.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\PRCRev.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\ReedTable.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Resonate.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Rhodey.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\RtAudio.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\RtMidi.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\RtWvIn.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\RtWvOut.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Sampler.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Saxofony.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Shakers.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Simple.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\SineWave.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\SingWave.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Sitar.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Skini.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Socket.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Sphere.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\StifKarp.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Stk.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TapDelay.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TcpClient.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TcpServer.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Thread.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TubeBell.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Twang.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TwoPole.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\TwoZero.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\UdpSocket.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Vector3D.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Voicer.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\VoicForm.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Whistle.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\Wurley.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\WvIn.h" />
+    <ClInclude Include="external-packages\stk-4.5.0\stk\WvOut.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\commands.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\constants.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\convert_internal_machines.private.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\cpu_time_clock.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\detail\config.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\detail\config.private.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\detail\project.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\detail\project.private.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\eventdriver.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\exceptions.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\fileio.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\filterhelper.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\fwd.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\instpreview.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\instrument.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\internalhost.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\internalkeys.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\internal_machines.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\ladspa.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\ladspahost.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\ladspamachine.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\machine.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\machinefactory.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\machinehost.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\machinekey.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\mixer.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\nativehost.hpp" />
+    <ClInclude Include="psycle-core\src\psycle\core\pattern.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\patternevent.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\player.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\playertimeinfo.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\plugin.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\plugincache.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\pluginfinder.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\plugininfo.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\preset.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\psy2filter.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\psy3filter.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\psy4filter.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\psyfilterbase.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\sampler.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\sequence.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\sequencer.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\song.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\songserializer.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\timesignature.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\vsthost.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\vstplugin.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\xminstrument.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\xml.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\xmsampler.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\zipreader.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\zipwriter.h" />
+    <ClInclude Include="psycle-core\src\psycle\core\zipwriterstream.h" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\abstractiff.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\amigasvx.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\appleaiff.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\binread.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\datacompression.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\dither.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\dsp.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\dspslide.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\eaiff.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\endiantypes.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\fft.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\filetypedetector.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\filter.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\hexstring_to_binary.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\hexstring_to_integer.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\math.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\mersennetwister.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\msriff.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\pathname_validate.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\resampler.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\riff.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\riffwave.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\ring_buffer.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\sampleconverter.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\scale.hpp" />
+    <ClInclude Include="psycle-helpers\src\psycle\helpers\value_mapper.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\arguru_reverb\AllPass.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\arguru_reverb\CombFilter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\arguru_reverb\LowPass.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\arguru_synth_2_final\filter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\arguru_synth_2_final\SynthTrack.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\audacity\compressor\Compressor.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\blwtbl\blwtbl.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\blwtbl\Waveform.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Biquad.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\CDsp.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\CEnvelope.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Chorus.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\DLineN.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Dsp.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\DspAlgs.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\DspMath.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Envelope.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Formant.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Inertia.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Phaser.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\dsp\wtfmlib.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\FeedMe\CTrack.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\Phantom\CVoice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\PluckedString\BiQuad.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\PluckedString\CVoice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Globals.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Shared.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\dw\dw_filter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\gverb\gverb.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\gverb\gverbdsp.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\gzero_synth\filter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\gzero_synth\SynthTrack.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitz12\blitz.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitz12\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitz12\lfo.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitz12\pwm.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitz12\voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\aaf.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\atlantisfilter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\blitz.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\lfo.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\pwm.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\blitzn\voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\gamefx13\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\gamefx13\voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\aaf.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\atlantisfilter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jm_drums\drum.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\jm_drums\oscillator.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\legasynth\303\303_voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\legasynth\lib\chorus.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\legasynth\lib\voice.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\m3\track.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\moreamp_eq\maEqualizer.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\plugin.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\pooplog_delay\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\pooplog_filter\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\pooplog_synth\filter.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\pooplog_synth\SynthTrack.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\surround\biquad.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdabout.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdAllPass\allpassfilter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdAllPass\vdAllPass.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdEcho\combfilter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdEcho\vdEcho.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdNoiseGate\lowpassfilter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdNoiseGate\vdNoiseGate.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vsFastVerb\fastverbfilter.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vsFastVerb\vdFastVerb.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\AllPass.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\comb.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\RevModel.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\tuning.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\y_midi\gmnames.h" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\y_midi\y_midi.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugins\zephod_super_fm\envelope.hpp" />
+    <ClInclude Include="psycle-plugins\src\psycle\plugin_interface.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ASIOConfig.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ASIOInterface.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\AudioDriver.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\BaseParamView.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Bitmap.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Canvas.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\CanvasItems.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ChannelMappingDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ChildView.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\CmdDef.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ConfigDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ConfigStorage.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Configuration.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Constants.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\convert_internal_machines.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\cpu_time_clock.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\detail\config.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\detail\config.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\detail\project.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\detail\project.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\DirectoryDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\DirectSound.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\DPI.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\DSoundConfig.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\EnvelopeEditor.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\EnvelopeEditorDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ExclusiveLock.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ExtensionBar.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\FileIO.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\FrameMachine.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\GearRackDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\GearTracker.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Global.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\GreetDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InfoDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InputHandler.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstPreview.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrIndividualMap.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrNoteMap.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Instrument.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentAmpDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentEditor.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentEditorUI.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentFilDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentGenDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InstrumentPanDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\internal_machines.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\InterpolateCurveDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\KeybHandler.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\KeyConfigDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\KeyPresetIO.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ladspahost.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LoaderHelper.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LockIF.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LoggingWindow.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaArray.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaGui.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaHelper.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaHost.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaInternals.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\LuaPlugin.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Machine.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MachineBar.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\machineloader.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MachineView.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MacProp.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MainFrm.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MasterDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Menu.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MfcUi.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MidiInput.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MidiInputDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MidiMonitorDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MixerFrameView.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\MouseHandler.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\NativeGraphics.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\NativeView.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\NewMachine.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\NewVal.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\OutputDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ParamList.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ParamMap.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PatDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PatViewNew.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Player.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PlotterDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Plugin.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\plugincatcher.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\plugininfo.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Preset.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PresetIO.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PresetsDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ProgressDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Psycle.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PsycleConfig.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\PsycleGlobal.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Registry.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SampleAssignEditor.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Sampler.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SaveWavDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\ScrollableDlgBar.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SequenceBar.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SeqView.private.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SkinDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SkinIO.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Song.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SongBar.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SongpDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SongStructs.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SpecialKeys.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\SwingFillDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\TransformPatternDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Ui.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Version.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\VolumeDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\VstEffectWnd.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\VstHost24.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WasapiConfig.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WasapiDriver.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdAmplifyDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdChildView.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdCrossfadeDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdFrame.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdInsertSilenceDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveEdMixDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveInMacDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveOut.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveOutDialog.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WaveScopeCtrl.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WavFileDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WinIniFile.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\WireDlg.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMFile.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMInstrument.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSampler.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSamplerMixerPage.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSamplerUI.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSamplerUIGeneral.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSamplerUIInst.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSamplerUISample.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSongExport.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XMSongLoader.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\XUi.hpp" />
+    <ClInclude Include="psycle\src\psycle\host\Zap.hpp" />
+    <ClInclude Include="psycle\src\Seib-vsthost\CVSTHost.Seib.hpp" />
+    <ClInclude Include="psycle\src\Seib-vsthost\CVSTPreset.hpp" />
+    <ClInclude Include="psycle\src\Seib-vsthost\EffectWnd.hpp" />
+    <ClInclude Include="psycle\src\Seib-vsthost\JBridgeEnabler.hpp" />
+    <ClInclude Include="ReplayPsycle.h" />
+    <ClInclude Include="universalis\src\universalis.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\align.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\asm.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\attribute.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\auto_link.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\calling_convention.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\concat.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\constexpr.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\const_function.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\deprecated.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\dyn_link.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\exception.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\location.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\message.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\noexcept.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\pack.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\pragma.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\pure_function.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\restrict.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\stringize.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\thread_local.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\token.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\typenameof.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\virtual.hpp" />
+    <ClInclude Include="universalis\src\universalis\compiler\weak.hpp" />
+    <ClInclude Include="universalis\src\universalis\cpu\atomic_compare_and_swap.hpp" />
+    <ClInclude Include="universalis\src\universalis\cpu\exception.hpp" />
+    <ClInclude Include="universalis\src\universalis\cpu\memory_barriers.hpp" />
+    <ClInclude Include="universalis\src\universalis\detail\config.hpp" />
+    <ClInclude Include="universalis\src\universalis\detail\config.private.hpp" />
+    <ClInclude Include="universalis\src\universalis\detail\project.hpp" />
+    <ClInclude Include="universalis\src\universalis\detail\project.private.hpp" />
+    <ClInclude Include="universalis\src\universalis\exception.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\aligned_alloc.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\clocks.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\detail\clocks.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\dyn_link.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\eol.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\exception.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\fs.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\include_windows_without_crap.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\loggers.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\sched.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\terminal.hpp" />
+    <ClInclude Include="universalis\src\universalis\os\thread_name.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\chrono.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\cmath.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\condition_variable.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\cstdint.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\detail\chrono\duration_and_time_point.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\detail\chrono\measure_clock.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\exception.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\mutex.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\ratio.hpp" />
+    <ClInclude Include="universalis\src\universalis\stdlib\thread.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\codecvt_error_category.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\operations.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\path.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\path_traits.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\portability.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\filesystem\src\windows_file_codecvt.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\signals\src\connection.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\signals\src\named_slot_map.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\signals\src\signal_base.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\signals\src\slot.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\signals\src\trackable.cpp" />
+    <ClCompile Include="external-packages\boost-1.55.0\libs\system\src\error_code.cpp" />
+    <ClCompile Include="external-packages\fluidsynth\src\fake_glib.cpp" />
+    <ClCompile Include="external-packages\fluidsynth\src\midi\fluid_midi.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_adsr_env.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_chorus.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_iir_filter.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_lfo.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_rev.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice_dsp.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice_event.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\rvoice\fluid_rvoice_mixer.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\sfloader\fluid_defsfont.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\sfloader\fluid_ramsfont.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_chan.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_event.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_gen.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_mod.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_synth.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_tuning.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\synth\fluid_voice.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_conv.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_hash.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_list.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_ringbuffer.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_settings.c" />
+    <ClCompile Include="external-packages\fluidsynth\src\utils\fluid_sys.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lapi.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lauxlib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lbaselib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lbitlib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lcode.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lcorolib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lctype.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ldblib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ldebug.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ldo.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ldump.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lfunc.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lgc.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\linit.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\liolib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\llex.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lmathlib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lmem.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\loadlib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lobject.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lopcodes.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\loslib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lparser.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lstate.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lstring.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lstrlib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ltable.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ltablib.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\ltm.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lua.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lundump.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lvm.c" />
+    <ClCompile Include="external-packages\lua-5.2\src\lzio.c" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\ADSR.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\Delay.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\DelayA.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\JCRev.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\Noise.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\NRev.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\OnePole.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\OneZero.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\Plucked.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\PRCRev.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\Shakers.cpp" />
+    <ClCompile Include="external-packages\stk-4.5.0\stk\Stk.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\abstractiff.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\amigasvx.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\appleaiff.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\datacompression.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\dither.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\dsp.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\dspslide.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\eaiff.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\fft.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\filetypedetector.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\filter.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\hexstring_to_binary.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\hexstring_to_integer.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\mersennetwister.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\msriff.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\resampler.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\riff.cpp" />
+    <ClCompile Include="psycle-helpers\src\psycle\helpers\riffwave.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\alk_muter\alk_muter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_compressor\arguru_compressor.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_distortion\arguru_distortion.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_goaslicer\arguru_goaslicer.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_reverb\AllPass.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_reverb\arguru_reverb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_reverb\CombFilter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_reverb\LowPass.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_synth_2_final\arguru_synth_2_final.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_synth_2_final\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_synth_2_final\SynthTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\arguru_xfilter\arguru_xfilter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\audacity\compressor\Compressor.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\audacity\compressor\plugin.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\audacity\phaser.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\audacity\wahwah.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\bexphase\bexphase.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\crasher.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\delay.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\distortion.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\blwtbl\blwtbl.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Biquad.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\CEnvelope.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\DLineN.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Dsp.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Envelope.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Formant.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\dsp\Inertia.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\eq3\eq3.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\FeedMe\CTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\FeedMe\FeedMe.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\Koruz\Koruz.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\Phantom\CVoice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\Phantom\Phantom.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\PluckedString\BiQuad.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\PluckedString\CVoice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\PluckedString\PluckedString.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\slicit\Slicit.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Globals.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Sublime.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\druttis\sublime\Voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\dw\dw_filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\dw\eq\dw_eq.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\dw\granulizer\dw_granulizer.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\dw\iopan\dw_iopan.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\dw\tremolo\dw_tremolo.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\filter_2_poles.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\flanger.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\fluid_synth_sf2_player\FS_sf2_player.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gainer.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\graue\softsat\softsat.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gverb\gverb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gverb\gverbdsp.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gverb\ladspa_gverb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gzero_synth\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gzero_synth\gzero_synth.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\gzero_synth\SynthTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\haas.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitz12\blitz.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitz12\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitz12\lfo.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitz12\pwm.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitz12\voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\aaf.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\atlantisfilter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\blitz.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\lfo.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\pwm.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\blitzn\voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefx13\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefx13\gamefx.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefx13\voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\aaf.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\atlantisfilter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\gamefx.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jme\gamefxn\voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jm_drums\drum.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jm_drums\jm_drums.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\jm_drums\oscillator.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\legasynth\303\303_voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\legasynth\legasynth_303.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\legasynth\lib\chorus.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\legasynth\lib\voice.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\m3\m3.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\m3\track.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\moreamp_eq\moreamp_eq.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\negative.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\ninereeds_7900\fractal.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_autopan\pooplog_autopan.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_delay\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_delay\pooplog_delay.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_delay_light\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_delay_light\pooplog_delay.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_filter\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_filter\pooplog_filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_lofi\pooplog_lofi.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_scratch\pooplog_scratch.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_scratch_2\pooplog_scratch_2.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth\pooplog_synth.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth\SynthTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_light\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_light\pooplog_synth.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_light\SynthTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_ultralight\filter.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_ultralight\pooplog_synth.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\pooplog_synth_ultralight\SynthTrack.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\ring_modulator.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\SChorus.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\stk\stk.plucked.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\stk\stk.reverbs.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\stk\stk.shakers.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\surround\surround.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdAllPass\vdAllPass.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdEcho\vdEcho.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vdNoiseGate\vdNoiseGate.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\vincenzo_demasi\vsFastVerb\vdFastVerb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\AllPass.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\comb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\RevModel.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\yezar_freeverb\yezar_freeverb.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\y_midi\y_midi.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\zephod_super_fm\envelope.cpp" />
+    <ClCompile Include="psycle-plugins\src\psycle\plugins\zephod_super_fm\zephod_superfm.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\AudioDriver.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Canvas.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\CanvasItems.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ChannelMappingDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ChildView.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ConfigDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Configuration.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\DirectoryDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\EnvelopeEditor.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\EnvelopeEditorDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ExclusiveLock.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ExListBox.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ExtensionBar.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\FileIO.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\FrameMachine.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\GearRackDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\GearTracker.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Global.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\GreetDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InfoDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InputHandler.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstPreview.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrIndividualMap.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrNoteMap.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Instrument.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentAmpDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentEditor.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentEditorUI.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentFilDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentGenDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InstrumentPanDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\internal_machines.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\InterpolateCurveDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ITModule2.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\KeyConfigDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\KeyPresetIO.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ladspahost.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ladspamachine.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LoaderHelper.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LockIF.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LuaArray.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LuaGui.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="psycle\src\psycle\host\LuaHost.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LuaInternals.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\LuaPlugin.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Machine.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MachineBar.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MacProp.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MainFrm.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MasterDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MidiInput.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MidiInputDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MidiMonitorDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\MixerFrameView.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\NativeGraphics.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\NativeView.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\NewMachine.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\NewVal.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\OutputDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ParamList.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ParamMap.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PatDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Player.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PlotterDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Plugin.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\plugincatcher.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\plugininfo.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Preset.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PresetIO.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PresetsDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ProgressDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Psycle.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PsycleConfig.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\PsycleGlobal.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Registry.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SampleAssignEditor.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Sampler.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SaveWavDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\ScrollableDlgBar.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SequenceBar.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SInstance.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SkinDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SkinIO.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Song.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SongBar.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SongpDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SpecialKeys.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\SwingFillDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\TransformPatternDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\Ui.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\VolumeDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\VstEffectWnd.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\VstHost24.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdAmplifyDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdChildView.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdCrossfadeDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdFrame.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdInsertSilenceDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveEdMixDialog.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveInMacDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WaveScopeCtrl.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WavFileDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WinIniFile.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\WireDlg.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMInstrument.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSampler.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSamplerMixerPage.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSamplerUI.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSamplerUIGeneral.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSamplerUIInst.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSamplerUISample.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSongExport.cpp" />
+    <ClCompile Include="psycle\src\psycle\host\XMSongLoader.cpp" />
+    <ClCompile Include="psycle\src\Seib-vsthost\CVSTHost.Seib.cpp" />
+    <ClCompile Include="psycle\src\Seib-vsthost\CVSTPreset.cpp" />
+    <ClCompile Include="psycle\src\Seib-vsthost\EffectWnd.cpp" />
+    <ClCompile Include="psycle\src\Seib-vsthost\JBridgeEnabler.cpp" />
+    <ClCompile Include="ReplayPsycle.cpp" />
+    <ClCompile Include="universalis\src\universalis\compiler\exception.compiler.cpp" />
+    <ClCompile Include="universalis\src\universalis\compiler\typenameof.cpp" />
+    <ClCompile Include="universalis\src\universalis\cpu\exception.cpu.cpp" />
+    <ClCompile Include="universalis\src\universalis\exception.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\clocks.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\exception.os.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\fs.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\loggers.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\sched.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\terminal.cpp" />
+    <ClCompile Include="universalis\src\universalis\os\thread_name.cpp" />
+    <ClCompile Include="universalis\src\universalis\stdlib\exception.stdlib.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,47 @@
+// resources.rc2 - resources Microsoft Visual C++ does not edit directly
+#include <psycle/host/detail/project.private.hpp>
+
+#ifdef APSTUDIO_INVOKED
+	#error this file is not editable by Microsoft Visual C++
+#endif
+
+#include <psycle/host/Version.hpp>
+
+// http://msdn.microsoft.com/en-us/library/aa381058.aspx
+VS_VERSION_INFO VERSIONINFO
+	PRODUCTVERSION PSYCLE__VERSION__MAJOR,PSYCLE__VERSION__MINOR,PSYCLE__VERSION__PATCH
+	FILEVERSION    PSYCLE__VERSION__MAJOR,PSYCLE__VERSION__MINOR,PSYCLE__VERSION__PATCH
+	FILEFLAGSMASK VS_FF_DEBUG
+	#ifdef NDEBUG
+		FILEFLAGS 0
+	#else
+		FILEFLAGS VS_FF_DEBUG
+	#endif
+	FILEOS VOS_NT_WINDOWS32
+	FILETYPE VFT_UNKNOWN
+	FILESUBTYPE 0
+	{
+		BLOCK "StringFileInfo"
+		{
+			BLOCK "040904b0" // 0x0409 == lang-id for en_US, 0x04b0 == 1200 == unicode charset
+			{
+				VALUE "CompanyName", PSYCLE__BRANCH
+				VALUE "LegalCopyright", PSYCLE__COPYRIGHT
+				VALUE "License", PSYCLE__LICENSE
+
+				VALUE "ProductName", PSYCLE__TITLE
+				VALUE "ProductVersion", PSYCLE__VERSION
+
+				VALUE "OriginalFilename", PSYCLE__NAME ".exe"
+				VALUE "InternalName", PSYCLE__NAME
+				VALUE "FileDescription", PSYCLE__TITLE " - Host"
+				VALUE "FileVersion", PSYCLE__VERSION
+
+				VALUE "Comments", PSYCLE__BUILD__IDENTIFIER("\r\n")
+			}
+	}
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x409, 1200 // 0x0409 == lang-id for en_US, 0x04b0 == 1200 == unicode charset
+	}
+END

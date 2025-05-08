@@ -1,0 +1,11 @@
+preprocessor definitions describing the platform
+
+Diversalis is a set of preprocessor definitions which describe the platform.
+
+Platform specificities can be categorized into:
+ - conformance with the C++ standard library
+ - compiler extensions to the C++ standard
+ - operating system features
+ - CPU features
+
+This is a header-only library; there is no runtime package.

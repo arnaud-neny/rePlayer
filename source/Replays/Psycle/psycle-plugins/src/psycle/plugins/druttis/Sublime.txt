@@ -1,0 +1,3 @@
+Sublime bugfix by Druttis
+
+After putting 0xc00 and using glide on next note, that note never played ( got velocity 0 )

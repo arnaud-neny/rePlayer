@@ -1,0 +1,20 @@
+-- $(machinename)
+-- register file for psycle's lua plugin system
+
+$(link)
+
+function psycle.info()
+  local machinemodes = require("psycle.machinemodes")  
+  return {
+    vendor = "$(vendor)",
+    name = "$(machinename)",
+    mode = $(machmode),
+    version = 0,
+    api = 0
+  }
+end
+
+function psycle.start()  
+  psycle.setmachine(require("$(machinename).machine"))
+end
+

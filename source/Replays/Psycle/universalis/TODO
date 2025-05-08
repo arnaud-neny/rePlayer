@@ -1,0 +1,11 @@
+# This is a sorted list, top priority at the top!
+
+*	create a wrapper for setenv/SetEnvironmentVariable since putenv has memory policy issues as magnus pointed out.
+
+*	cygwin:
+	need to find where the symbols __dso_handle __cxa_atexit are defined,
+	and/or why they are needed.
+	-- bohan
+	
+*	have a look at gnulib
+	-- bohan

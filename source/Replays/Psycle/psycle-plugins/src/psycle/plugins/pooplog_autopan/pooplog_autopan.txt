@@ -1,0 +1,36 @@
+Pooplog Autopan psycle plugin
+Jeremy Evers
+negspect@runandgun.com
+
+
+//////////////////////////////////////////////////////////////////////
+// pooplog autopan
+/////////////////////////////////////////////////////////////////////
+/*
+Version History
+
+v0.06b
+3:30 AM 12/20/2002
+- optimizations adjusted for safety
+
+v0.05b
+10:55 PM 12/14/2002
+- fixed lfo phase knob
+
+v0.04b
+1:28 PM 11/21/2002
+- works correctly at any sample rate
+- fixed inertia
+
+v0.03b
+6:35 PM 10/23/2002
+- fixed possible crosstalk issue
+
+v0.02b
+1:49 PM 10/14/2002
+- initial public release
+
+v0.01b
+- initial beta release
+
+/////////////////////////////////////////////////////////////////////

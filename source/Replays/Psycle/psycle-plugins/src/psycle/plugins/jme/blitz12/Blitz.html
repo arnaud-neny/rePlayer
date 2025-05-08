@@ -1,0 +1,200 @@
+<html>
+<head>
+<title>Blitz Documentation</title>
+<style>
+<!--
+html,body,p,td,a { font-family:Arial }
+table { border-collapse: collapse }
+td { padding:4; margin:0 }
+ul { list-style-type:circle }
+.f { background-color:#d8d8d8 }
+.g { background-color:#e8e8e8 }
+.a { background-color:#e8e8e8 }
+.b { background-color:#f0f0f0 }
+.c { background-color:#f8f8f8 }
+.d { background-color:#fcfcfc }
+
+-->
+</style>
+</head>
+<body bgcolor=white text=black>
+
+<table><tr><td width="160"></td>
+<td>
+
+<h2>Blitz</h2>
+
+<h4>Features</h4>
+
+<table>
+<tr><td class='f'><b>Component</b></td><td class='g'><b>Description</b></td></tr>
+<tr><td class='a'>Oscillators</td><td class='c'>
+<ul>
+<li>4 Oscillators</li>
+<li>34 waveforms</li>
+<li>47 double buffered waveform modulation functions</li>
+<li>oversampling</li>
+<li>syncronizable</li>
+<li>variable phase feedback</li>
+</ul>
+</td></tr>
+<tr><td class='b'>Ring Modulators</td><td class='d'>
+<ul>
+<li>2 Ring Modulators</li>
+<li>can also do Amplitude Modulation if using RM-to-AM function</li>
+</ul>
+</td></tr>
+<tr><td class='a'>Arpeggiator</td><td class='c'>
+<ul>
+<li>12 Patterns</li>
+<li>Shuffle</li>
+<li>2 types of optional retrig</li>
+<li>special routing options for each oscillator</li>
+</ul>
+</td></tr>
+<tr><td class='b'>LFO</td><td class='d'>
+<ul>
+<li>8 LFO for symmetry control</li>
+<li>1 LFO for parallel routable vibrato</li>
+<li>1 LFO for filter sweeps</li>
+</ul>
+</td></tr>
+<tr><td class='a'>Envelopes</td><td class='c'>
+<ul>
+<li>2 ADSDR envelopes with keyscaling and velocity</li>
+<li>1 AD envelope for pitch modulation</li>
+</ul>
+</td></tr>
+<tr><td class='b'>Filter</td><td class='d'>
+<ul><li>1 optional filter with 10 modes and keytrack </li></ul>
+</td></tr>
+</table>
+</ul>
+
+
+<h4>Oscillator Options</h4>
+<table>
+<tr><td class='f'><b>Option</b></td><td class='g'><b>Description</b></td></tr>
+<tr><td class='a'>Off</td><td class='c'>Normal behaviour</td></tr>
+<tr><td class='b'>Sync</td><td class='d'>Oscillator is syncronized by the left neighbour (4->1, 1->2, 2->3, 3->4).</td></tr>
+<tr><td class='a'>Arpless Sync</td><td class='c'>Same as above but the arpeggio is not routed to this oscillator.</td></tr>
+<tr><td class='b'>Arp Note 1</td><td class='d'>No arpeggio and use 1st arp note (base note) as transpose.</td></tr>
+<tr><td class='a'>Arp Note 2</td><td class='c'>No arpeggio and use 2nd arp note as transpose.</td></tr>
+<tr><td class='b'>Arp Note 3</td><td class='d'>No arpeggio and use 3rd arp note as transpose.</td></tr>
+<tr><td class='a'>Arp Note 4</td><td class='c'>No arpeggio and use 4th arp note as transpose.</td></tr>
+<tr><td class='b'>No Track</td><td class='d'>Oscillator does not respond keyboard.</td></tr>
+<tr><td class='a'>No Track + Sync</td><td class='c'>As above but using Sync.</td></tr>
+
+</table>
+
+<h4>Functions</h4>
+<table>
+<tr><td class='f'><b>Function</b></td><td class='g'><b>Description</b></td></tr>
+<tr><td class='a'>Off</td><td class='c'>No Function used.</td></tr>
+<tr><td class='b'>Pulsewidth</td><td class='d'>Stretches one half of the waveform while squashing the other.</td></tr>
+<tr><td class='a'>Pulsewidth Medium</td><td class='c'>Same as Pulsewidth, but the first half is the wave and the rest is zero.</td></tr>
+<tr><td class='b'>Pulsewidth Light</td><td class='d'>Specified range of waveform will be half volume.</td></tr>
+<tr><td class='a'>Dual Squash</td><td class='c'>Each half of the wave will be squashed.</td></tr>
+<tr><td class='b'>Muted Sync</td><td class='d'>Very similar to Pulsewidth Light but using other scaling.</td></tr>
+<tr><td class='a'>Sync Up</td><td class='c'>Wave will be squashed and the rest of the buffer is filled with repeats.</td></tr>
+<tr><td class='b'>Sync Down</td><td class='d'>Wave will be stretched and Data that does not fit into buffer is lost.</td></tr>
+<tr><td class='a'>Negator</td><td class='c'>Specified range will be negated (inverted).</td></tr>
+<tr><td class='b'>Dual Negator</td><td class='d'>Same but with two negators act from both sides and meet in the middle.</td></tr>
+<tr><td class='a'>Rect Negator</td><td class='c'>Negates 50% of the wave at once, symmetry defines the phase of the negator.</td></tr>
+<tr><td class='b'>Octaver</td><td class='d'>Mixes wave with the same wave but one octave higher.</td></tr>
+<tr><td class='a'>Frequency Shift Keying</td><td class='c'>At the symmetry point the wave doubles the frequency.</td></tr>
+<tr><td class='b'>Mixer</td><td class='d'>Mixes the wave with itself while changing the phase of the mix-in-wave.</td></tr>
+<tr><td class='a'>Dual Mixer</td><td class='c'>Same but mixes twice of itself into it.</td></tr>
+<tr><td class='b'>Feedback Mixer</td><td class='d'>Mixes the wave with a buffer which is also the output for the operation.</td></tr>
+<tr><td class='a'>Invert Mixer</td><td class='c'>Mixes itself with a inverted copy of itself. Using a Saw you can produce PWM with this.</td></tr>
+<tr><td class='b'>Triangle Mixer</td><td class='d'>Mixes wave with a Triangle. Symmetry defines the balance.</td></tr>
+<tr><td class='a'>Sawtooth Mixer</td><td class='c'>Mixes wave with a Sawtooth. Symmetry defines the balance.</td></tr>
+<tr><td class='b'>Square Mixer</td><td class='d'>Mixes wave with a Square. Symmetry defines the balance.</td></tr>
+<tr><td class='a'>Tremelo</td><td class='c'>Symmetry regulates Volume.</td></tr>
+<tr><td class='b'>Sine PM 1</td><td class='d'>Symmetry regulates depth of modulating a sine wave.</td></tr>
+<tr><td class='a'>Sine PM 2</td><td class='c'>Same but modulation frequency is doubled.</td></tr>
+<tr><td class='b'>Sine PM 3</td><td class='d'>Same but modulation frequency is trepled.</td></tr>
+<tr><td class='a'>Adlib2 PM 1</td><td class='c'>See Sine PM 1 but modulates Adlib2 wave.</td></tr>
+<tr><td class='b'>Adlib2 PM 2</td><td class='d'>See Sine PM 2 but modulates Adlib2 wave.</td></tr>
+<tr><td class='a'>Adlib2 PM 3</td><td class='c'>See Sine PM 3 but modulates Adlib2 wave.</td></tr>
+<tr><td class='b'>Adlib3 PM 1</td><td class='d'>See Sine PM 1 but modulates Adlib3 wave.</td></tr>
+<tr><td class='a'>Adlib3 PM 2</td><td class='c'>See Sine PM 2 but modulates Adlib3 wave.</td></tr>
+<tr><td class='b'>Adlib3 PM 3</td><td class='d'>See Sine PM 3 but modulates Adlib3 wave.</td></tr>
+<tr><td class='a'>Adlib4 PM 1</td><td class='c'>See Sine PM 1 but modulates Adlib4 wave.</td></tr>
+<tr><td class='b'>Adlib4 PM 2</td><td class='d'>See Sine PM 2 but modulates Adlib4 wave.</td></tr>
+<tr><td class='a'>Adlib4 PM 3</td><td class='c'>See Sine PM 3 but modulates Adlib4 wave.</td></tr>
+<tr><td class='b'>Wave PM 1</td><td class='d'>See Sine PM 1 but carrier wave is the also the selected wave.</td></tr>
+<tr><td class='a'>Wave PM 2</td><td class='c'>See Sine PM 2 but carrier wave is the also the selected wave.</td></tr>
+<tr><td class='b'>Wave PM 3</td><td class='d'>See Sine PM 3 but carrier wave is the also the selected wave.</td></tr>
+<tr><td class='a'>Dual Fix PM</td><td class='c'>Wave is phase modulated two times by itself with constant depth but the modulators phase depends on symmetry.</td></tr>
+<tr><td class='b'>Multiply</td><td class='d'>Wave is multiplied with itself and symmetry controls the phase.</td></tr>
+<tr><td class='a'>AND Gate</td><td class='c'>Wave binary tied using AND with itself and symmetry controls the phase.</td></tr>
+<tr><td class='b'>XOR Gate</td><td class='d'>Wave is binary tied using XOR with itself and symmetry controls the phase.</td></tr>
+<tr><td class='a'>Clipper</td><td class='c'>Wave is Clipped and symmetry controls depth.</td></tr>
+<tr><td class='b'>RM to AM (Upright)</td><td class='d'>Changes the signal to make the ring modulator disfunction. The ring modulator will then only amplitude modulate the other oscillator. Symmetry regulates AM depth.</td></tr>
+<tr><td class='a'>RM to AM (Flipped)</td><td class='c'>Same as above but the signal is negated before it is changed.</td></tr>
+<tr><td class='b'>Feedback Control</td><td class='d'>Control the amount of feedback and allows inverted feedbacks too.</td></tr>
+<tr><td class='a'>FM next Oscillator (+)</td><td class='c'>Frequency Modulate the next Oscillator.</td></tr>
+<tr><td class='b'>FM next Oscillator (-)</td><td class='d'>As above but using inverted values.</td></tr>
+<tr><td class='a'>Filter Modulation</td><td class='c'>Modulate filter cutoff frequency with audio data.</td></tr>
+<tr><td class='b'>Master Saturation</td><td class='d'>Regulates the hidden Master Saturator (has nothing to do with the oscillators waveform).</td></tr>
+</table>
+
+
+<h4>Some knobs explained</h4>
+<table>
+<tr><td class='f'><b>Knob</b></td><td class='g'><b>Description</b></td></tr>
+<tr><td class='a'>Stereo Switching</td><td class='c'>Places a new note either more left or more right.</td></tr>
+<tr><td class='b'>Arpeggiator Retrig</td><td class='d'>On: Retrig on new arp note. Even: Retrig every second arp note.</td></tr>
+<tr><td class='a'>Symmetry Drift</td><td class='c'>Varies the symmetry start position when playing a new note.</td></tr>
+<tr><td class='b'>Symmetry LFO</td><td class='d'>Makes the symmetry slide (initialized every new note).</td></tr>
+<tr><td class='a'>Envelope Decay 2</td><td class='c'>Decay while Sustain (like a guitar sound decays while the sustain).</td></tr>
+<tr><td class='b'>Envelope Keyscaling</td><td class='d'>Makes the envelope speed up the higher the key is.</td></tr>
+<tr><td class='a'>Soften High Notes</td><td class='c'>Smoothes high notes by reducing volume (suggested by alk)</td></tr>
+</table>
+
+<h4>Pattern Effects</h4>
+
+<table>
+<tr><td class='f'><b>Command</b></td><td class='g'><b>Description</b></td></tr>
+<tr><td class='a'>C1xx</td><td class='c'><b>Slide Up</b><br>Frequency will rise</td></tr>
+<tr><td class='b'>C2xx</td><td class='d'><b>Slide Down</b><br>Frequency will fall</td></tr>
+<tr><td class='a'>C3xx</td><td class='c'><b>Tone Portamento</b><br>if a new Note is played then frequency will morph to the frequency</td></tr>
+<tr><td class='b'>C4xx</td><td class='d'><b>Tone Portamento with Retrig</b></td></tr>
+<tr><td class='a'>C5xx</td><td class='c'><b>Interval</b><br>Frequency will vary between current and current+param in arp speed (higher than 127 means minus)</td></tr>
+<tr><td class='b'>C6xx</td><td class='d'><b>Touch Taping</b><br>Simple Transpose (higher than 127 means minus)</td></tr>
+<tr><td class='a'>C7xx</td><td class='c'><b>Touch Taping with Retrig</b></td></tr>
+<tr><td class='b'>C8xx</td><td class='d'><b>Retrig Bits</b><br>
+If you want to render the song always exactly the same,<br>
+then initialize the synth with these bits.<br>
+Bit 1 (Decimal 1) = Drift<br>
+Bit 2 (Decimal 2) = Vibrato<br>
+Bit 3 (Decimal 4) = Sweep<br>
+If you want to reset all three then enter C807 (1+2+4=7)
+</td></tr>
+<tr><td class='a'>CCxx and 0Cxx</td><td class='c'><b>Set Track Volume</b><br>Change Volume of current Track</td></tr>
+<tr><td class='b'>Dxyy</td><td class='d'><b>Semi Portamento</b><br>Bend x tones down with rate yy</td></tr>
+<tr><td class='a'>Exyy</td><td class='c'><b>Semi Portamento</b><br>Bend x tones up with rate yy</td></tr>
+<tr><td class='b'>BFFF and lower</td><td class='d'>
+<b>Arpeggio</b><br>
+An Arpeggio is a classic method to simulate chords used
+in days where the soundchips could only do 3-4 voices.
+Instead of playing the notes simultanously, they are
+played one after one.
+To define an arpeggio, or short arp, you split the
+16Bit parameter in three parts, say x, y and zz.
+x is the 2nd note, y the 3rd, and zz is optional for the
+4th note. the notes are entered relative to the base note.
+so C-4 4700 gives C-4 E-4 G-4, the standard major chord.
+as said you can enter also a fourth note, so if you would
+enter C-4 4711 you get C-4 E-4 G-4 F-5.
+Using the routing in the oscillator options you can
+use this data also to route notes of the chords to
+transpose to individual oscillators.</td></tr>
+</table>
+<br>
+(c)2005 jme
+</td></tr></table>
+</body>
+</html>
+

@@ -1,0 +1,128 @@
+				------------------------------------------------
+				]==-> Psycle Modular Music Creation Studio <-==[
+				------------------------------- 1.9  -----------
+--------------------------------------------------------------------------------------------
+
+contents:
+---------
+
+1. About PSYCLE
+2. OpenSource Notes/Licensing
+3. Developement
+4. Psycledelics Community
+
+--------------------------------------------------------------------------------------------
+1. About PSYCLE:
+
+
+PSYCLE is a free OpenSource Music Production Studio
+that offers unlimited (opinions may vary) possibilites
+for creating your own music in a professional way.
+
+PSYCLE has an Old-School Tracker interface, but it
+supports VST Plugins and VST Instruments in addition
+to samples, to let your wildest music ideas come true.
+
+Here some facts about Psycle:
+
+- 64Tracks Pattern Editor
+- Internal Stereo Sampler unit, that supports high quality
+  stereo .wav files and .iff samples as well (more formats will eventually come)
+- 60+ Native Plugins (Generators & effects), with opensource code, and open API for third-party plugins.
+- VST + VSTi Host (still limited but most plugins will work fine)
+- Internal .wav output
+- Configurable Keyboard Layout
+- .fxb loading for VST's
+- Midi-In Support
+
+and much much more...
+
+Note:
+Psycle supports VST1.0 and VST2.0 plugins, but not completely (Some plugins will not work)
+Plans for supporting DXi are there, but it's not a primary work.
+
+If you need help starting with Psycle, you can find a tutorial on our wiki site:
+
+	http://psycle.sourceforge.net/wiki
+	
+For a reference documentation, please read the help file "psycle.chm".
+Also don't hesitate to ask for help in the Psycledelics community (See the links at the bottom of this document).
+
+--------------------------------------------------------------------------------------------
+2. OpenSource Notes:
+
+PSYCLE is OpenSource. This Means: Everyone who thinks that he/she is the right person/alien
+for coding on PSYCLE can contact the Team of developers and ask/tell what he/she can do for
+Psycle. 
+
+Source Page is set at SourceForge site following this link:
+
+	http://psycle.sourceforge.net
+
+
+Arguru Licensed Psycle 1.0 sources as "Public Domain".
+This means that the sources of Psycle can be used in whatever form you want.
+
+This licensing applies ONLY to his sources, which day by day are less and less.
+
+
+The current team preffers to enforce that psycle sources remain Free to everyone, which
+means everyone can see and modify the source, but If he does it, he cannot distribute them
+in a closed way. (This means, if you do so, you have to give the sources as well)
+
+You might, on the other hand, distrubute them as your own work, specifying that it
+is A DERIVED WORK FROM PSYCLE
+
+
+Also, the team would appreciate that any work done over Psycle sources, are mixed back with
+the current sources, which would mean that Psycle grows instead of being divided.
+
+There are open Forums and Bug trackers in SourceForge site and in Psycledelics site
+where you can contact us.  We check the Psycledelics site often.
+
+If you need to contact specifically the developers, write an e-mail to
+
+	[JAZ] at jaz@pastnotecut.org for that matter.
+
+
+You are allowed to develop psycle Machines without any restriction
+There's no SDK ready, but you can download Psycle plugins' sourcecode from
+SourceForge Site (link above)
+
+A Buzz2Psycle SDK is avaiable at the site, but it is untested.
+Hint: Check M3 sources too, which are derived from a buzz plugin.
+
+--------------------------------------------------------------------------------------------
+3. Development:
+
+Psycle 1: (The only active one right now)
+
+	1.8: Current labeled stable version. Development will follow in bugfixing and adding
+			needed features which doesn't correspond to big changes.
+
+	1.9/2.0: Current development branch. It is expected to be a big change from current
+				sources, separating them on different libs, and moving to other toolkits.
+
+
+For up to date information, don't forget to visit the Developement forums on Psycledelics
+site. For further info, read the HACKING file.
+
+--------------------------------------------------------------------------------------------
+4. Psycledelics' Community:
+
+This is the place to find the answers for your burning questions.
+The Psycledelics community is still small but growing.
+
+	http://psycle.pastnotecut.org/
+
+Feel free to ask other users for help, publish your tunes, download tunes made by other
+PSYCLE users, find usefull links to VST & other Audio related resources, or simply discuss
+in the PSY-Boards.
+
+Also, chat with other PSYCLE users or developers in our IRC - Channel:
+/join #psycle on EFNet network (servers list of EFNet: http://www.efnet.org/servers.html)
+If you don't have an irc client, you can use:
+	http://psycle.sourceforge.net/irc.html
+or
+	http://psycle.free.fr/irc
+with any "web" browser.

@@ -1,0 +1,214 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resources.hpp"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <afxres.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Catalan resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CAT)
+#ifdef _WIN32
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x0L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040304b0"
+        BEGIN
+            VALUE "CompanyName", "Psycledelics"
+            VALUE "FileDescription", "Psycle Winamp Plugin"
+            VALUE "FileVersion", "1, 10, 0, 0"
+            VALUE "InternalName", "foo_psy.dll"
+            VALUE "LegalCopyright", "(c) Psycledelics 2001-2011"
+            VALUE "OriginalFilename", "foo_psy.dll"
+            VALUE "ProductName", "Psycle Playback Engine"
+            VALUE "ProductVersion", "1, 10, 1, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x403, 1200
+    END
+END
+
+#endif    // Catalan resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONFIG DIALOGEX 0, 0, 284, 231
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Sampling rate ",IDC_SAMPLING_LABEL,14,28,50,9
+    COMBOBOX        IDC_SRATE,95,25,64,12,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Native Plugins Directory",IDC_FRAME,36,96,206,33
+    EDITTEXT        IDC_NATIVEPATH,70,111,137,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BWNATIVE,215,111,18,13
+    LTEXT           "Warning : new sample rate will take effect **immediatly**",IDC_STATIC,14,44,179,11
+    EDITTEXT        IDC_VSTPATH,71,148,137,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BWVST,215,148,18,13
+    GROUPBOX        "Vst Plugins Directory",IDC_STATIC,35,135,206,61
+    LTEXT           "32 bit",IDC_STATIC,47,151,19,8
+    EDITTEXT        IDC_VSTPATH64,71,165,137,13,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BWVST64,215,165,18,13,WS_DISABLED
+    LTEXT           "64 bit",IDC_STATIC,47,168,19,8
+    CONTROL         "Enable 32<->64 bit bridging",IDC_CKBRIDGING,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,72,181,136,10
+    CONTROL         "Autostop Machines",IDC_AUTOSTOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,11,77,10
+    LTEXT           "Audio Threads",IDC_STATIC,14,60,47,8
+    EDITTEXT        IDC_NUMBER_THREADS,95,58,55,12,ES_AUTOHSCROLL
+    LTEXT           "Use the value 0 to autodetect your cpu threads",IDC_STATIC,14,75,198,8
+    EDITTEXT        IDC_RUNNING_THREADS,164,58,49,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Regenerate Cache File",IDC_REGENERATE,52,202,92,14
+    LTEXT           "Text",IDC_CACHEVALID,163,203,75,11,0,WS_EX_STATICEDGE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 277
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 224
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CONFIG DLGINIT
+BEGIN
+    IDC_SRATE, 0x403, 6, 0
+0x3131, 0x3230, 0x0035, 
+    IDC_SRATE, 0x403, 6, 0
+0x3231, 0x3030, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3232, 0x3530, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3432, 0x3030, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3434, 0x3031, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3834, 0x3030, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3838, 0x3032, 0x0030, 
+    IDC_SRATE, 0x403, 6, 0
+0x3639, 0x3030, 0x0030, 
+    0
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resources.hpp\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <afxres.h>\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

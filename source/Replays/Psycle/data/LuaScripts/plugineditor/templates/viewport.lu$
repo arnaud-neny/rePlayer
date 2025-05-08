@@ -1,0 +1,28 @@
+-- $(classname).lua
+
+local point = require("psycle.ui.point")
+local dimension = require("psycle.ui.dimension")
+local rect = require("psycle.ui.rect")
+local ornamentfactory = require("psycle.ui.ornamentfactory"):new()
+local boxspace = require("psycle.ui.boxspace")
+local alignstyle = require("psycle.ui.alignstyle")
+local keycodes = require("psycle.ui.keycodes")
+local group = require("psycle.ui.group")
+local viewport = require("psycle.ui.viewport")
+$(requirecode)
+
+local $(classname) = viewport:new()
+
+function $(classname):new()
+  local m = viewport:new()
+  setmetatable(m, self)
+  self.__index = self    
+  m:init()
+  return m
+end
+
+function $(classname):init()  
+  $(initcode)
+end
+
+return $(classname)

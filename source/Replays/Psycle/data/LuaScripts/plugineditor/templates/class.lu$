@@ -1,0 +1,16 @@
+-- $(classname).lua
+
+local $(classname) = {}
+
+function $(classname):new()
+  local m = {}
+  setmetatable(m, self)
+  self.__index = self    
+  m:init()
+  return m
+end
+
+function $(classname):init()  
+end
+
+return $(classname)

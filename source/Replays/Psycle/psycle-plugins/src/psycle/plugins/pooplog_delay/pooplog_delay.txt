@@ -1,0 +1,32 @@
+//////////////////////////////////////////////////////////////////////
+//Pooplog Delay
+/////////////////////////////////////////////////////////////////////
+
+Notes:
+
+1) Follow Tempo should be set to OFF for songs that use extreme swings
+   to avoid artifacts on frequent buffer size changes.
+
+2) Feedback: I recomend setting the feedback waveshaper to a softclip
+   function, and NOT using a lot of resonance.
+
+/////////////////////////////////////////////////////////////////////
+
+Version History
+
+v0.04b
+5/19/2003
+- more anti-denormal code
+
+v0.03b
+5:41 PM 1/1/2003
+- added method to bypass tempo follow
+
+v0.02b
+3:27 AM 12/20/2002
+- initial release version
+
+v0.01b
+- initial test beta
+
+/////////////////////////////////////////////////////////////////////

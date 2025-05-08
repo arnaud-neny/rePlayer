@@ -1,0 +1,209 @@
+Pooplog FM series of psycle plugin synths
+Jeremy Evers
+negspect@runandgun.com
+
+/////////////////////////////////////////////////////////////////////
+
+Notes: sending a clipping signal (> 0db) into some filter algorithms can cause artifacts.
+
+Instructions:
+-to install, put in psycle plugins folder
+-remember to delete or overwrite old one
+-refresh the list in psycle if you want correct version number to appear
+
+Faq:
+1.
+<bohan> pooplog, are songs made with previous versions of your synth 
+	series compatible with new ones ?
+<pooplog> yes
+<pooplog> i make a point NOT to disturb the file format, at all costs
+
+2.
+<AlkCapone> phase selecting
+<pooplog> command 2xyy
+<pooplog> x is oscilator #
+<pooplog> yy is waveform phase - check the built in docs, all oscilators and
+	  lfo phases can be set manually
+
+3.
+<AlkCapone> poop: can you put delay on the OSC W lfo depth?
+<pooplog> yes turn the very top knob
+<pooplog> env type
+<pooplog> it is 3 different routings for the envelope
+<pooplog> all of the dadsr+lfos have them
+
+/////////////////////////////////////////////////////////////////////
+
+Version History
+
+v0.68b
+5/21/2003
+- arpeggio works correctly with fast envelopes now
+
+v0.67b
+5/19/2003
+- more anti-denormal code
+
+v0.66b
+3:28 AM 12/20/2002
+- optimizations adjusted for safety
+
+v0.65b
+10:10 PM 11/22/2002
+- fixed denormals in filters
+- made so works with any sample rate
+- fixed note-cut bug
+- fixed sticky envelopes bug
+
+v0.64b
+10:02 PM 11/12/2002
+- fixed the help screen
+- sync now works as it should, sync selects the osc to PASS sync to
+
+v0.63b
+2:00 AM 10/24/2002
+- updated so can be used with 64 track version of psycle that is apparenty coming soon
+- fixed handling of BPM changes so it syncs to songs with swings.
+
+v0.62b
+1:49 PM 10/14/2002
+- fixed cutoff being lost when changing filters
+- fixed moog filter B being able to blow up by compressing feedback if it is over 0db
+- fixed global tuning due to popular request - you may have to tweak your songs back
+
+v0.61b
+11:29 AM 17/04/2002
+- improved accuracy of WM tune
+- added note delay and retrigger
+
+v0.60b
+8:56 AM 14/04/2002
+- added tracker arpeggio rate command
+- fixed a bug with wm where it could overflow the waveform position index
+- added delays to the vibrato and tremolo
+
+v0.59b
+9:22 AM 13/04/2002
+- since everyone complained so much, i fixed the WM detuning.  I kinda liked it.
+- added tracker style arpeggios
+- fixed some text in tracker command help window
+- removed warning screen. hopefully i won't need to put it back in.
+
+v0.58b
+6:09 PM 15/03/2002
+- fixed an inevitable bug with the tweak inertia knob not working
+
+v0.57b
+2:39 PM 14/03/2002
+- added the long awaited tweak inertia knob
+
+v0.56b
+1:04 PM 08/03/2002
+- did some major optimizations, including making internal range -1.0 to 1.0
+- removed all pointer access and uses arrays instead for speed
+- overhauled some overdrives
+- fixed multiplication mix modes
+- separated antialias filter from filter struct for speed reasons
+- changed default osc vol to 100%
+- fixed divide mix mode to max at 200%
+
+v0.55b
+6:09 PM 05/03/2002
+- fixed all lfos that i forgot to update to new sync method
+- fixed vcf lfo depth display
+- added more vcf routings ( sorry if you have to change it in your settings )
+- fixed it so that syncs are polled each seq tick
+
+v0.54b
+1:11 PM 05/03/2002
+- increased accuracy of lfo wrapping
+- fixed sync times and expanded amounts
+- fixed parameter update rate to be correct (it was updating on 33 samples, not the desired 32)
+- fixed display of lfo rates to be more accurate
+- recoded arpeggio rate code to be more accurate
+- added more arpeggio sync rates so it behaves like lfos
+- did some more optimizing
+
+v0.53b
+3:35 PM 04/03/2002
+- fixed tremolo depth-it was behaving very weird
+- fixed zipper noise on vca
+- increased resolution of source waveforms to float for greater speed and accuracy
+- removed unused portion of source waveforms
+
+v0.52b
+1:40 PM 03/03/2002
+- made 0f00 the cancel command and ignore 0000
+- fixed it so that envelopes update per sample to get rid of vca zipper noise
+
+v0.51b
+12:41 PM 03/03/2002
+- improved interpolation algorithm to provide better antialiasing
+- made antialias filter reset when switched to "off"
+- did some major performance optimizations (f2i)
+- made oscilator phase cycle much more accurate
+
+v0.45b-0.50b
+- internal versions
+- fixed bug with vcf mix modes not being described correctly
+- added ksn's arpeggio patterns
+- switched to new save method
+- fixed envelope bypass function
+- made cutoff range wider
+
+v0.44b
+2:13 PM 28/02/2002
+- made it so the splash message doesn't pop up on reinit
+- added some track effects, and fixed some broken ones
+- song sync rate initializes correctly on new synth
+
+v0.43b
+6:33 PM 26/02/2002
+- fixed bug where ultralight interpolate was screwey
+- now syncs waveform phases on noteon if portamento is off and no note playing
+- fixed bug where arpeggios stopped on short envelopes
+
+v0.42b
+2:31 AM 26/02/2002
+- added 'ultralight' version
+- made it so that filters don't reset if knob touched when they don't need to
+- fixed bug where vcf 2 crashed due to bad lfo wave pointer
+- fixed bug where tweaking global tune parameter didn't affect realtime
+- fixed bug where tweaking osc volume parameters didn't affect realtime
+- fixed bug where silence waveform wasn't silent
+- removed silent waveform from lfo selections
+
+v0.41b
+1:17 PM 25/02/2002
+- added 'light' version
+- fixed a bug with using more than 2 oscs - noteoffs were writing data to bad parts of ram
+- fixed width knob, works in correct direction
+- limited feedback on moog type a to 128x max so it doesn't explode any more on full res
+- added real white and brown noise generators for waveforms so you don't have to stick with crappy looped noise
+- made it so osc 1 cannot use multiplication mix modes
+- changed redundant osc mix mode *- to /
+
+v0.40b 
+10:17 PM 16/02/2002
+- initial public release
+
+/////////////////////////////////////////////////////////////////////
+
+BUG LIST
+
+TODO LIST
+
+- add tremolo track commands like the vib commands?
+- have been told that 03xx command rate is bad, that it is slow until 03f2 or so
+- adjust the 04xx command, make depths non-linear, so 041a is between 040a and 041a now
+- could optimize more filters by removing from filter_struct and inlining with track struct
+- optimize antialias code some more
+- add morphing chipsynth sync version
+- delays on vib and trem have been requested... add more knobs or don't add more knobs?
+- add syncs to things other than lfos (adsr, porta, inertia, etc.)?
+- synth is hardcoded to 44.1khz, should i make it flexible?
+- sampler thinks i should make filters go to 0hz, but that throws ranges out of whack and probably blows up some algorithms
+- credits
+- docs
+
+/////////////////////////////////////////////////////////////////////

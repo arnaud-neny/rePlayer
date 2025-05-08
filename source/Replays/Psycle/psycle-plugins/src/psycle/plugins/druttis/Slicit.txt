@@ -1,0 +1,33 @@
+Slicit by Druttis
+
+
+
+A slicer to add rythms to chords, bass lines etc.
+
+
+
+Up to 16 steps / program ( max 16 programs )
+
+
+
+Per program settings are :
+
+Number of Steps
+
+Tick Speed Factor ( 1, 2, 4 or 8 )
+
+Filter type ( LP or HP, both one pole )
+
+
+
+Per step settings are : Volume, Attack, Pan & Filter frequency
+
+
+
+Very low CPU usage
+
+
+
+Enjoy!
+
+// Druttis

@@ -1,0 +1,10 @@
+platform abstraction layer library
+
+Universalis is a library which abstracts the few platform specificities
+which are not handled by the boost and glibmm libraries themselves.
+
+Those abstractions of platforms specificities can be categorized into:
+ - tweaks for conformance with the C++ standard library
+ - widespread compiler extensions to the C++ standard
+ - widespread operating system features
+ - widespread CPU features

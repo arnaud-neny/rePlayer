@@ -1,0 +1,847 @@
+Pooplog FM Series of Psycle plugin synths. (v0.67b)
+Jeremy Evers
+negspect@runandgun.com
+
+Doc by Jim Redfern.
+
+/////////////////////////////////////////////////////////////////////
+
+1. 	Introduction
+1.1.	Features
+2. 	The Parameters
+3. 	The Pattern Commands
+
+/////////////////////////////////////////////////////////////////////
+
+1. 	Introduction
+
+There are 3 synths in this range, the Laboratory (Lab), the Light and the UltraLight, the latter being cutdown versions of the former. As such the Lab will be described in this doc.
+
+/////////////////////////////////////////////////////////////////////
+
+1.1.	Features
+
+* 1 to 6 bi-part syncable oscillators
+	(31 types of waveform).
+* 64 voices (1 per track)
+* per osc volume, tuning
+* per osc LFOs + envelopes:
+	width
+	phase
+	frequency
+* LFO phase settable from pattern
+* LFO syncable to tempo
+* 2 variable type VCFs (with variable mix mode)
+	(42 types of filter)
+* VCFs have env, lfo
+* Overdrive, Gain with env, lfo
+* VCA env
+* Tremelo, Vibrato, Arpeggio, Portamento
+* 0x - 32x over sampling antialiasing
+* many classic tracker pattern commands
+	pitch slide
+	portamento
+	vibrato
+	panning slide
+	volume slide
+	note delay/retrig
+	tracker arpeggio
+
+/////////////////////////////////////////////////////////////////////
+
+2. 	The Parameters.
+
+////////////////////
+
+parameter number
+
+name
+
+description
+
+////////////////////
+
+1
+
+OSC Select
+
+Selects which osc is currently being edited (1-6). Certain parameters are per osc and some are global. The per osc parameters are stored seperately per osc and so you may see some dials move as the settings for that particular osc are recalled.
+
+////////////////////
+
+2
+
+OSC Volume A
+
+The volume of the first part of the currently selected osc (0% - 200%). (Oscs are bi-part)
+
+////////////////////
+
+3
+
+OSC Volume B
+
+The volume of the second part of the currently selected osc (0% - 200%). (Oscs are bi-part) Can be set to be the same as OSC A.
+
+////////////////////
+
+4
+
+OSC Wave A
+
+The waveform of the first part of the currently selected OSC. See diagram 1 below.
+
+////////////////////
+
+5
+
+OSC Wave B
+
+The waveform of the second part of the currently selected OSC. See diagram 1 below.
+
+////////////////////
+
+
+Wave A (The left part above 0)
+        ||
+	||
+	\/
+ 1   _______
+     |      |
+     |      |
+ 0 --------------------
+            |       |
+            |_______|
+-1       	/\
+		||
+		||		
+Wave B (The right part below 0)
+
+
+Diagram 1
+
+
+////////////////////
+
+6
+
+OSC width A:B
+
+The ratio of the width of the left part to the right part (a:B) of the waveform. See diagram 2 below.
+
+////////////////////
+
+
+Osc Width 50:50			Osc width 20:80
+	||				||
+	\/				\/
+
+
+ 1   _______			  ___
+     |      |			  | |
+     |      |			  | |
+ 0 --------------------		--------------------
+            |       |		    |            |
+            |_______|		    |____________|
+-1
+
+
+Diagram 2
+
+
+////////////////////
+
+7
+
+OSC Mix Method
+
+Only applies to oscs 2 to 6. How the osc is combined with all preceeding oscs. Modes are: add, subtract, multiply, divide.
+e.g. ((((1+2)*3)-4)/5)+6
+
+////////////////////
+
+8
+
+OSC Sync
+
+When the master waveform completes a cycle, it forces the slave osc to reset. Generally have the lowest pitched osc sync to a higher pitched osc and turn the volume down on the low pitched one.
+
+////////////////////
+
+9
+
+OSC Tune
+
+Tuning of the selected OSC (-36 to +36 semitones).
+
+////////////////////
+
+10
+
+OSC Finetune
+
+Fine tuning of the selected OSC (-1 to +1 semitone).
+
+////////////////////
+
+11
+
+OSC W Env Type
+
+The Osc width envelope affects the currently selected OSC.
+
+Envelopes have 3 modes. In each mode the envelope alters a different parameter.
+
+* 'LFO+Env' means that the envelope controls the OSC width parameter - it's value is the sum of the lfo value PLUS the env value.
+
+* 'LFO Depth += env' means that the envelope controls the DEPTH of the lfo - it's value is the OSC W Depth setting plus the value from the OSC W envelope.
+
+* 'LFO Rate += env' means that the envelope controls the RATE of the lfo - it's value is the OSC W LFO Rate setting plus the value from the OSC W envelope.
+
+////////////////////
+
+12
+
+OSC W Env Mod
+
+Set the influence of the Envelope on the OSC Width parameter for the currently selected OSC (-100% to +100%).
+
+////////////////////
+
+13
+
+Osc W Delay
+
+The time delay before the OSC W envelope begins.
+
+////////////////////
+
+14
+
+OSC W Attack
+
+
+
+////////////////////
+
+15
+
+OSC W Decay
+
+
+
+////////////////////
+
+16
+
+OSC W Sustain
+
+
+
+////////////////////
+
+17
+
+OSC W Release
+
+
+
+////////////////////
+
+18
+
+OSC W LFO Depth
+
+
+
+////////////////////
+
+19
+
+OSC W LFO Wave
+
+
+
+////////////////////
+
+20
+
+OSC W LFO Rate
+
+
+
+////////////////////
+
+21
+
+OSC Phase Mix
+
+
+
+////////////////////
+
+22
+
+OSC Phase
+
+
+
+////////////////////
+
+23
+
+OSC Ph Env Type
+
+
+
+////////////////////
+
+24
+
+OSC Ph Env Mod
+
+
+
+////////////////////
+
+25
+
+OSC Ph Delay
+
+
+
+////////////////////
+
+26
+
+OSC Ph Attack
+
+
+
+////////////////////
+
+27
+
+OSC Ph Decay
+
+
+
+////////////////////
+
+28
+
+OSC Ph Sustain
+
+
+
+////////////////////
+
+29
+
+OSC Ph Release
+
+
+
+////////////////////
+
+30
+
+OSC PH LFO Depth
+
+
+
+////////////////////
+
+31
+
+OSC PH LFO Wave
+
+
+
+////////////////////
+
+32
+
+OSC PH LFO Rate
+
+
+
+////////////////////
+
+33
+
+OSC Frq Env Type
+
+
+
+////////////////////
+
+34
+
+OSC Frq Env Mod
+
+
+
+////////////////////
+
+35
+
+OSC Frq Delay
+
+
+
+////////////////////
+
+36
+
+OSC Frq Attack
+
+
+
+////////////////////
+
+37
+
+OSC Frq Decay
+
+
+
+////////////////////
+
+38
+
+OSC Frq Sustain
+
+
+
+////////////////////
+
+39
+
+OSC Frq Release
+
+
+
+////////////////////
+
+40
+
+OSC Frq LFO Depth
+
+
+
+////////////////////
+
+41
+
+OSC Frq LFO Wave
+
+
+
+////////////////////
+
+42
+
+OSC Frq LFO Rate
+
+
+
+////////////////////
+
+43
+
+VCF Mix Mode
+
+
+
+////////////////////
+
+44
+
+VCF Select
+
+
+
+////////////////////
+
+45
+
+VCF Type
+
+
+
+////////////////////
+
+46
+
+VCF Cutoff
+
+
+
+////////////////////
+
+47
+
+VCF Resonance
+
+
+
+////////////////////
+
+48
+
+VCF Env Type
+
+
+
+////////////////////
+
+49
+
+VCF Env Mod
+
+
+
+////////////////////
+
+50
+
+VCF Delay
+
+
+
+////////////////////
+
+51
+
+VCF Attack
+
+
+
+////////////////////
+
+52
+
+VCF Decay
+
+
+
+////////////////////
+
+53
+
+VCF Sustain
+
+
+
+////////////////////
+
+54
+
+VCF Release
+
+
+
+////////////////////
+
+55
+
+VCF LFO Depth
+
+
+
+////////////////////
+
+56
+
+VCF Lfo Wave
+
+
+
+////////////////////
+
+57
+
+VCF LFO Rate
+
+
+
+////////////////////
+
+58
+
+Overdrive Method
+
+
+
+////////////////////
+
+59
+
+Overdrive Gain
+
+
+
+////////////////////
+
+60
+
+Gain Env Type
+
+
+
+////////////////////
+
+61
+
+Gain Env Mod
+
+
+
+////////////////////
+
+62
+
+Gain Delay
+
+
+
+////////////////////
+
+63
+
+Gain Attack
+
+
+
+////////////////////
+
+64
+
+Gain Decay
+
+
+
+////////////////////
+
+65
+
+Gain Sustain
+
+
+
+////////////////////
+
+66
+
+Gain Decay
+
+
+
+////////////////////
+
+67
+
+Gain Release
+
+
+
+////////////////////
+
+68
+
+Gain LFO Depth
+
+
+
+////////////////////
+
+69
+
+Gain LFO Wave
+
+
+
+////////////////////
+
+70
+
+Gain LFO Rate
+
+
+
+////////////////////
+
+71
+
+VCA Attack
+
+
+
+////////////////////
+
+72
+
+VCA Decay
+
+
+
+////////////////////
+
+73
+
+VCA Sustain
+
+
+
+////////////////////
+
+74
+
+VCA Release
+
+
+
+////////////////////
+
+75
+
+Global Tune
+
+
+
+////////////////////
+
+76
+
+Global Finetune
+
+
+
+////////////////////
+
+77
+
+Tremelo
+
+
+
+////////////////////
+
+78
+
+Tremelo Wave
+
+
+
+////////////////////
+
+79
+
+Tremelo Rate
+
+
+
+////////////////////
+
+80
+
+Tremelo Delay
+
+
+
+////////////////////
+
+81
+
+Vibrato
+
+
+
+////////////////////
+
+82
+
+Vibrato Wave
+
+
+
+////////////////////
+
+83
+
+Vibrato Rate
+
+
+
+////////////////////
+
+84
+
+Vibrato Delay
+
+
+
+////////////////////
+
+85
+
+Arpeggio Type
+
+
+
+////////////////////
+
+86
+
+Arpeggio BPM
+
+
+
+////////////////////
+
+87
+
+Arpeggio Steps
+
+
+
+////////////////////
+
+88
+
+Portamento
+
+
+
+////////////////////
+
+89
+
+Tweak Inertia
+
+
+
+////////////////////
+
+90
+
+Antialias
+
+
+
+////////////////////
+
+91
+
+Volume
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+
+3. 	The Pattern commands.
+
+
+

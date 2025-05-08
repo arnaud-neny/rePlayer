@@ -1,0 +1,1456 @@
+﻿mspsycle (0) unstable; urgency=low
+
+  * for more details, see http://sourceforge.net/p/psycle/code/commit_browser
+
+	2006-03-18 psycle 1.9.7 bohan
+
+		* boost serialization test added to the menu item "File" -> "Save as...", as a new type option.
+		* boost serialization test code entirely moved to serialization.private.hpp.
+		
+	2006-03-17 psycle 1.9.7 bohan
+
+		* some portability fixes
+		* boost serialization test
+		
+	2006-03-16 psycle 1.9.7 bohan
+
+		* reviewed numeric type sizes in psycle::host::Song::Save and prettified it
+		* old fileformat loaders: moved remaining code to psycle/host/legacy/old_file_format.cpp.
+		* vst: removed debug logging of the effEditIdle opcode
+		
+	2006-03-15 psycle 1.9.7 bohan
+
+		* moved changlog from src/psycle/host/version.hpp to a newly created Changelog file
+		  and also added files NEWS and TODO, with just a little text referring to the corresponding files of the doc dir.
+		* microsofism->std: in function signatures, removed "throw(...)" which is implicit anyway.
+		* microsofism->std: corrected a few syntactic problems where the name of a variable was the same as its type.
+		* microsofism->std: removed some unused MFC CString in the VST host that was already replaced with std::string.
+		* microsofism->std: replaced microsoft's _strlwr with std::tolower in psycle::host::Plugin::LoadOldFileFormat(RiffFile*).
+		* old fileformat loaders: changed compiler numeric types to std::*int_t and moved code to psycle/host/legacy/old_file_format.cpp.
+		* changed a bit the initialization of the static psycle::host::logger::default_logger_ostream() in psycle/host/global.cpp.
+		* plugin dir: temporary work around for msvc8 manifests.
+		* replaced most of src/legacy with src/universalis ; only src/legacy/loggers.{c,h}pp left.
+		* src/legacy/operating_system/logger.cpp: fixed a #if which was taking out some code that should have been enabled on mswindows.
+		* 64-bit: got rid of a few size reduction problems.
+
+	2006/03/13 20:35:04  jaz001
+
+		* Fix for EOL (now for sure, windiff says it)
+
+	2006/03/12 20:11:17  jaz001
+
+		* fixed wrong EOL coming from recent commits.
+
+	2006/03/09 18:44:10  johan-boule
+
+		* increasing version after tagging
+
+	2006/03/09 18:41:53  johan-boule
+
+		* increasing version and tagging
+
+	2006/03/09 17:56:43  johan-boule
+
+		* more work on portability
+
+	2006/03/07 14:09:14  johan-boule
+
+		* replaced some ms numeric types with std types
+		* some global changes concerning #includes
+		* other fixes here and there for portability
+
+	2006/02/28 11:44:35  johan-boule
+
+		* reference to the AUTHORS file
+
+	2006/01/10 18:35:43 psycle 1.9.3 johan-boule
+
+		* added dw's code for shadows on the wire arrows
+
+	2006/01/10 00:27:40 psycle 1.9.2 johan-boule
+
+		* version 1.9.2
+
+	2006/01/09 03:14:46 psycle 1.9.1 johan-boule
+
+		* version 1.9.1
+
+	2006/01/08 03:28:19  johan-boule
+
+		* Happy New Year Psycle! (added to copyrights)
+
+	2005/11/04 17:13:22  johan-boule
+
+		* not a stable release
+
+	2005/07/24 16:59:02  jaz001
+
+		* fixed baground bitmap bug.
+		* changed default colours for new release
+		* rearranged the skin dialog buttons
+		* fixed but with skin vu-meters.
+		* muting note duplicator stops sending events.
+
+	2005/07/17 03:51:09  johan-boule
+
+		* bugfix for midi controllers config dialog
+
+	2005/07/11 01:22:01  johan-boule
+
+		* various little cleanup for 1.8 release
+
+	2005/07/10 21:08:20  jaz001
+
+		* New defaults for machine parameters
+		* New skin for machine parameters' knobs.
+		* Importing configuration from older psycle's and psycle alpha.
+		* removing unimplemented alk's mixer.
+		* added comments about unfinished features.
+		* fixed small but in "recent files".
+		* Note: this is labeled 1.8.-1, since configuration will be saved as 1.8, but it might have still small changes for the official 1.8
+
+	2005/06/29 22:26:51  johan-boule
+
+		* closes bug: sourceforge bug tracker [ 1229490 ] Velocity / volume data with MIDI keyboard
+
+	2005/06/27 15:52:39 psycle 1.7.58 johan-boule
+
+		* version 1.7.58
+		* <alk> moved the checkbox for move cursor when pasting to the sequencer panel
+
+	2005/06/26 11:08:29 psycle 1.8RC1.1 jaz001
+
+		* 1.8 RC1.1
+
+	2005/06/19 21:04:29 psycle 1.7.56 (pre-release 1 of 1.8) johan-boule
+
+		* Version 1.7.56 (pre-release 1 of 1.8)
+		* [jaz] fix bugs with Note Duplicator (load/save and deadlock).
+		* [jaz] fix bug with render to wav, where in some specific situations where playing some instruments incorrectly.
+
+	2005/06/09 22:49:00 psycle 1.7.55 (alpha) johan-boule
+
+		* Version 1.7.55 (alpha)
+		* just increasing the version number to reflect the presence of a bug fix concerning loading of skins
+
+	2005/06/07 18:16:55 psycle 1.7.54 (alpha) johan-boule
+
+		* Version 1.7.54 (alpha)
+		* oops, fix for bug introduced in 1.7.53 concerning midi device selection in the configuration
+
+	2005/06/04 00:20:25  johan-boule
+
+		* closing sourceforge bug #1087788.
+		* rearranged the midi variables which had the channel
+		* number appended to their names into arrays, and replaced the
+		* related repetitive code with loops.
+
+		* The interface of the registry class used to require we
+		  specify the type and size of the each value we read or
+		  write. I've changed it to use function overloading for types
+		  like bool, all variants of int, and std::string, and to use
+		  a template for other types so they just use REG_BINARY
+		  (which means any type). So we can simply pass the variable
+		  to load/save and its type and size are implicit ; it's less
+		  error prone and looks nicer.
+
+		  It works correctly, but i've noticed problems loading my
+		  existing registry settings because some of the types used to
+		  be REG_BINARY for values that should have been REG_DWORD
+		  (and iirc vice-versa), and the registry class complains
+		  about type missmatch. To work around it i've changed the
+		  path of the "root" key to software/psycle/psycledelics-1.7
+		  (it's actually determined from the values in
+		  version.hpp).... the drawback is that people "loose" their
+		  old settings.
+
+	2005/05/30 05:13:43 psycle 1.7.51 (alpha) johan-boule
+
+		* Version 1.7.51 (alpha)
+		* change to let plugins find other .dll files that are in any intermediate dir between their own dir and the configured root dir for plugins
+
+	2005/05/29 23:21:23 psycle 1.7.50 (alpha) johan-boule
+
+		* Version 1.7.50 (alpha)
+		* change to let plugins find other .dll files that are in the same dir as their own .dll
+		  for example, blwtbl.dll can be put along with druttis plugins instead of psycle.exe's dir.
+
+	2005/05/29 00:34:58  johan-boule
+
+		* cvs $File -> $Id
+
+	2005/05/25 20:20:35 psycle 1.7.49 (alpha) johan-boule
+
+		* Version 1.7.49 (alpha)
+		* removed scary pointer and index stuff from the directsound config
+		  (the device index value in the registry can be deleted as it's not used anymore)
+
+	2005/05/25 04:02:17 psycle 1.7.48 (alpha) johan-boule
+
+		* Version 1.7.48 (alpha)
+		* fixed bug for fingersoup's directsound driver (null GUID)
+
+	2005/05/24 01:09:17  johan-boule
+
+		* bug fix + special 0xff voice to send the same command to all voices
+
+	2005/05/23 23:41:23  johan-boule
+
+		* to be tested...
+		  change that allows the player to send commands (Machine::Tick function) from any pattern track with a given channel (or "voice") number:
+
+		  if the machine is not a vst, and if the note is a "mcm" (hmm, poor name if it's not related with midi),
+		  then, the fields in the event are interpreted as <channel> <machine> <command> <parameter>.
+		  for example, 1122334444, means:
+		  11 is the channel (or "voice"),
+		  22 is the machine,
+		  33 is the command, and
+		  4444 is the parameter
+		  The player calls the Machine::Tick function with those values, and the instrument value set to 0.
+
+	2005/05/18 06:55:47  johan-boule
+
+		* releasing voskomo's blitz plugin
+
+	2005/05/14 15:32:57  johan-boule
+
+		* bug fix: operating_system::exceptions::translated::what() returned the address of a temporary stack object
+
+	2005/05/12 22:18:39  johan-boule
+
+		* increased version number for alpha release
+		* includes jaz's bug fixes
+		* fpu exceptions disabled in the configuration "by default" as it's only useful for crazy debugging hell
+
+	2005/05/12 14:55:49  johan-boule
+
+		* Added handling of fpu exceptions.
+		  It's a build configuration option, so it can be disabled.
+		  It only catches fpu exceptions in the machines' work functions, but this could be extended to other functions as well.
+		  Each exception type is reported only once per machine it occurs, by growing the fpu exception mask.
+		  "Inexact result" fpu exceptions are initially already masked.
+
+		* Also, made exceptions which happen in machines appear not only in the lof, but also in a message box, because many people wondered why some machines were automagically set to bypassed/muted (The message box wouldn't be needed if the MFC logging window worked.)
+
+	2005/05/01 14:10:59  jaz001
+
+		* More Work on Sampulse (IT Filtering, improving commands, bugfixing).
+		* Removed an cleaned (a bit) old sample sources (removed the never used sample layers)
+		* Added a new internal machine "Note Duplicator". It just resends the Tick comand to the specificed machines
+		* Some other small changes ( Changed the way interpolation is modified, and others)
+
+	2005/04/18 02:00:41  johan-boule
+
+		* added src/configuration.hpp to psycle.vcproj
+
+	2005/04/10 20:11:37 psycle 1.7.39 (alpha) johan-boule
+
+		 * releasing alpha version 1.7.39 -- with voskomo's gamefx plugin
+
+	2005/04/06 04:32:03  johan-boule
+
+		* Attempt to use boost::read_write_mutex instead of an exclusive mutex for Song's lock.
+		  Curiously, it dead-locks.
+		  So, i made it a build option that can be enabled/disabled in src/configuration.hpp
+		  
+		* The version info and the about box is modified to show what build options were used (multiline text).
+
+	2005/04/02 21:48:37 psycle 1.7.37 (alpha) johan-boule
+
+		* releasing alpha version 1.7.37
+
+	2005/03/29 19:57:53  johan-boule
+
+		* full rebuild fixes problem with sampler machine (was prolly a wrong file date)
+
+	2005/03/26 13:31:05  johan-boule
+
+		* fixed an error in the description of the versioning scheme in <psycle/host/version.hpp>
+
+	2005/03/24 16:22:52  johan-boule
+
+		* added special handling of labels in the machine parameter combo box for native plugins
+
+	2005/03/22 01:23:57  johan-boule
+
+		* increased version patch number and released alpha build
+		  (alk's fix for karlkox surround)
+
+	2005/03/12 02:37:02  johan-boule
+
+		* increased version patch number and released alpha build
+		  (sampler's keyboard handler fix)
+
+	2005/02/19 20:51:13  jaz001
+
+		* fix bug in song.hpp "_ptrack" and "_ptrackline" functions where it didn't return the correct value
+		* fix bug in XMSampler/XMInstrument where "&" and  "|" were being used erroneously in place of "&&"and "||".
+		* Added IT loader
+		* Converted XMSampler "Layers (waves) per instrument" to independent sample bank and instrument bank.
+		* Work in progress -> Convert XMSampler to the default Psycle sampler. (Psampler)
+
+	2005/02/07 10:48:20  johan-boule
+
+		* bug fix
+
+	2005/01/29 18:25:43  johan-boule
+
+		* fixing problems for msvc's resource editor
+
+	2005/01/24 17:36:22  johan-boule
+
+		* there was a nasty backslash at the end of a line preventing the psycle namespace from closing and creating a nested psycle namespace inside the psycle namespace itself.
+		  new alpha version 1.7.26 released.
+
+	2005/01/24 15:54:03  johan-boule
+
+		* path for resources.rc
+
+	2005/01/07 22:27:47  johan-boule
+		* std::ostringstream.clear missuses fixed (3 occurences)
+
+	2004/12/22 22:43:41  johan-boule
+
+		* fix closing bug [ 1087782 ] psycle MFC's version number is spread in several places
+
+  * 2003-12-13
+    * psycle msvc 7.1 project stable
+  * 2003-12-11
+    * fixed class sine_sequence ... was missing clipped(-1, sin, +1)
+  * 2003-12-07
+    * added psycle msvc 7.1 project
+  * 2003-11-02
+    * added a snap dial to the delay plugin
+  * 2003-10-10
+    * upgraded msvc from 7.0 to 7.1 ... and, of course, the solution does not compile anymore
+  * 2003-06-29
+    * created the gui library, based on fltk-2, to allow overlapping non-rectangular widgets
+  * 2003-06-01
+    * added phase commands
+    * added events samples_per_second_changed and sequencer_ticks_per_second_changed
+      these events are not triggered by the host but by the psycle::plugin::Plugin class,
+      but the plugins see them just like any other events :-)
+  * 2003-05-31
+    * added all cvs plugins to this project structure
+  * 2003-05-25
+    * added ring_modulator
+  * 2003-05-24
+    * added flanger
+  * 2003-05-21
+    * added delay
+    * added distortion
+  * 2003-05-16
+    * conversion internal->native done, added calls to converter in song.cpp
+    * scale facilities now in scale.h and shared between plugins and converter
+  * 2003-05-08
+    * plugin.h now stable and pretty
+    * added gainer
+    * added filter_2_poles
+
+	----------------------------------------------------------------------------------------------------
+	Version | Date | Type of release             | Authors
+	--------|------|-----------------------------|------------------------------------------------------
+	xpsycle | 2006 | alpha                       | prodos
+	1.9.x   | 2006 | alpha                       | bohan & magnus & [JAZ] & dw & sartorius & trancemyriad
+	1.8.2   | 2005 | bugfix                      | 
+	1.8.1   | 2005 | bugfix                      | 
+	1.8     | 2005 | stable                      | psycledelics combined effort :-)
+	1.7.x   | 2005 | alpha, beta                 | alk & bohan & magnus & [JAZ] & logywang & sampler
+	1.7.6.2 | 2004 | bugfix (w98 compatibility)  | alk & bohan
+	1.7.6.1 | 2003 | bugfix                      | alk
+	1.7.6   | 2003 | stable                      | alk
+	1.7.5   | 2003 | beta                        | pooplog & [JAZ]
+	1.7.4   | 2003 | stable                      | pooplog & [JAZ]
+	1.7.3   | 2002 | beta                        | pooplog & [JAZ] & bohan
+	1.7.2   | 2002 | bugfix                      | [JAZ]
+	1.7.1   | 2002 | bugfix                      | [JAZ]
+	1.7     | 2002 | release                     | pooplog & [JAZ]
+	1.6+/66 | 2002 | maintenance                 | [JAZ]
+	1.6     | 2002 | alpha, beta, stable         | [JAZ] & Dan/Dub & Fideloop
+	1.5     | 2001 | alpha, beta, stable         | [JAZ] & Mark
+	1.1/11  | 2000 | bugfix                      | Mats
+	1.0/01  | 2000 | bugfix                      | arguru
+	0.x     |      | alpha, beta                 | arguru
+	----------------------------------------------------------------------------------------------------
+
+
+	Versions are composed this way since 1.7.24:
+	M.m.p , where:
+		- M = major version number.
+		- m = minor version number:
+			- if even, then it's a stable release.
+			- if odd, then it's an unstable build or release candidate for next stable minor version number.
+		- p = patch number:
+			- if the minor version number is even (stable release), then this patch number is used for bug fixes, so, it's hopefully rarely incremented.
+			- if the minor version number is odd (unstable builds), then this patch number is incremented very often, each cvs commit.
+
+
+	----------------------------------------------------------------
+	Legend :       + = addition        * = change        ! = bugfix
+	----------------------------------------------------------------
+
+	v1.8.2
+	------
+	! Fix for the Message window appearing in the background sometimes. (It seemed that psycle hung up)
+	+ Added Extended commands for machine mute and bypass
+	! Fixed a compatibility problem opening files for read.
+	! Fixed a bug introduced in 1.8.1 that deleted the instrument when there was an mcm command.
+	! Arrows in the generators combobox didn't cycle correctly when reaching end.
+	+ Added customizable 3D arrows in machine view.
+	! Fixed a possible hang bug in note duplicator.
+	! Fixed a quite rare bug where Psycle would crash loading a sample from a song.
+
+	v1.8.0
+	------
+	+ added an option to make pattern navigation (cursors by default) doesn't be affected by Pattern Step, jumping always 1 row (sampler)
+	+ added a shortcut (ALT+S) for Psycle Settings Dialog (sampler)
+	+ added right mouse button to join machines and moving destination machine (when clicking over a triangle) (sampler & JosepMa)
+	+ added PgUp/PgDn (or assigned keys) to move backward/fordward 16 rows while playing (sampler)
+	+ added a question to autoincrease a pattern length if you paste a block bigger (sampler)
+	+ skin for machine parameters' knobs (alk)
+	+ added crop command in the wave editor (lobywang)
+	! fixed bug in the vst host that occured sending midi note offs + reset all controlers (alk & pooplog)
+	! fixed bug where unmuting vsts produced note blasts (alk)
+	+ added a message/error logging system (see file psycle.log.txt) (bohan & alk & magnus)
+	! fixed bug for some directsound drivers that are semi-bogus (the symptom was that the configuration dialog kept poping up asking you to reconfigure forever) (bohan)
+	* moved the checkbox for move cursor when pasting to the sequencer panel (alk)
+	+ native machines can now have labels ("titles") to group several parameters that are related together. (bohan)
+	+ added a new internal machine "Note Duplicator". It just resends the Tick comand to the specificed machines (jaz)
+	+ allow the player to send commands to a machine from any pattern track with a given channel (or "voice") number (bohan)
+	+ new sampler machine, "sampulse" (jaz):
+		+Added IT loader (jaz)
+		*Converted XMSampler "Layers (waves) per instrument" to independent sample bank and instrument bank. (jaz)
+		*Removed an cleaned (a bit) old sample sources (removed the never used sample layers) (jaz)
+		*More Work on Sampulse (IT Filtering, improving commands, bugfixing).
+	+ new native plugins:
+		+stk plugins (sartorius)
+		+chorus plugin (sartorius)
+		+whawha plugin (sartorius)
+		+gamefx plugin (voskomo)
+		+blitz plugin (voskomo)
+	+ some native plugins are now opensource (druttis & pooplog):
+		* all druttis' plugins now opensource
+		* all pooplog's plugins now opensource
+	* the plugin host now resists to plugin crashes (both native and vsts)
+	! fix for karlkox surround (alk)
+
+
+
+	v1.7.x
+	______
+
+	1.7.x were transitional versions, the changelog here keeps only the internal/technical details,
+	and all the changes important from the point of view of the user are moved or summarized above in the v1.8 log.
+
+	build and distribution process:
+		! fix closing bug [ 1087782 ] psycle MFC's version number is spread in several places
+		+ added automatized compilation + packaging + update of psycle sourceforge site for faster and more frequent updates (bohan)
+		* new versionning scheme, with three numbers
+		+ The version info and the about box is modified to show what build options were used (multiline text) (bohan)
+		+ added cpu specific builds for 6th and 7th generation x86 CPUs (bohan)
+
+	internal changes in the source code:
+		* refactoring of the source code: cleaner internally, but no visible changes for the users (bohan & magnus)
+		* rewriting of the native and vst plugin hosts with exception handling (bohan & magnus)
+		* ported the open source native plugins to the new compiler (bohan)
+		+ let plugins find other .dll files that are in any intermediate dir between their own dir and the configured root dir for plugins (bohan)
+			plugins which need helper .dll files (like druttis' sublime), can now find it even if it's not placed in the same dir as psycle.exe ; it can be placed along with the plugin (or actually, in any "intermediate" dir). (bohan)
+			note from bohan:
+				i still think it would be better to simply disallow having a deep directory tree of libraries and rather put them all, flat, in the same dir.
+				it would be a lot simpler, and even have some technical advantages: what if a plugin depends on other plugins for example?
+		* attempt to use boost::read_write_mutex instead of an exclusive mutex for Song's lock. (bohan, doesn't work, dead locks)
+		+ added optional (masked otherwise) handling of fpu exceptions (bohan)
+		! rearranged the midi code ; closing sourceforge bug #1087788 (bohan)
+		* interface of the registry class more "c++ oriented" (if that term exist ;p) and independent from the winapi (bohan)
+		* Importing configuration from older psycle's and psycle alpha (jaz)
+		- removing unimplemented alk's mixer (jaz)
+
+	bugfixes:
+		! bug fix with psycle::Machine::GetNumParams() and its redefinition in derived classes (the bug only existed in previous 1.7.x versions). (bohan)
+		+ added special handling of labels in the machine parameter combo box for native plugins (bohan)
+		! fixed bug for fingersoup's directsound driver (null GUID) and removed scary pointer and index stuff from the directsound config (bohan)
+		! fix bugs with Note Duplicator (load/save and deadlock). (jaz)
+		! fix bug with render to wav, where in some specific situations where playing some instruments incorrectly. (jaz)
+		! closes bug: sourceforge bug tracker [ 1229490 ] Velocity / volume data with MIDI keyboard (jaz & bohan)
+		! fixed small but in "recent files" (jaz)
+		* comments about unfinished features (jaz)
+
+
+	v1.7.6.2
+	--------
+
+	!fixed bug in the flanger's optimized sine sequence generator: 32-bit floating point numbers were not accurate enough, now it's 64-bit (bohan)
+	!back in 1998, you were using mswin98, and nowadays? ... hmm, shame on you, but psycle still works on it. (alk & bohan)
+
+
+	v1.7.6.1
+	--------
+
+	!fixed OLD bug, VSTi data slider would send data to the VSTi whenever the slider was repainted, if tweak record is enabled then the data gets written to the pattern (alk)
+	*final port (merged again) of the source code to the latest microsoft compiler, msvc7.1. needs new dll to be distributed. (bohan)
+
+
+	v1.7.6
+	------
+
+	!fixed bug, master volume does not release focus! (alk)
+	!realigned widgets and controls so they are neater ;) (alk)
+	+added key "select bar" (ctrl-k, you need to reset keysettings or assign your own key) (quickselects 16, 32, 64 lines etc, ala 	IT, multiples of TPB) (alk)
+	+added keypress for follow song (ctrl-f, you need to reset keysettings or assign your own key) (alk)
+	+added move wire source (ctrl + mouse button on wire to change it's source) (alk)
+	+pattern step now affects navigation (alk)
+	+swing fill defaults are nicer :) (alk)
+	+added selected machine highlighting (alk)
+	+changed machine selection to be more intuitive, now just click on a gen to select it (alk)
+	+added maximise pattern view (ctrl-tab, you need to reset keysettings or assign your own key) (alk)
+	+changed the preview wave volume to 25% (it was too loud) (alk)
+	!fixed master volume slider and master volume dialog master slider (alk)
+	!disabled the master volume dialog wire volumes (they were screwing up 	the wire vols!) (alk)
+	!fixed bug when loopmode was off, it played the first line of the song 	after the song finished (alk)
+	!fixed bug, playbar was not being drawn when changing pattern (alk)
+	!changed midi config default to not write mcm from midi data input (alk)
+	+made move cursor when pasting optional (set in the config dialog) (alk)
+
+
+	v1.7.5
+	------
+
+	+"MIDI RAW" recording mode - records incoming midi to noteons and mcms, passes them to vst (pooplog)
+	! fixes for multichannel jamming and recording and mcm recording loosing held notes (pooplog)
+	! vst window layout for machines with way too many parameters and using the default gui (pooplog)
+
+
+	v1.7.4
+	------
+
+	+ Added seminote tunning to sample instruments.
+	! VSTs that call the psycle host callback with a NULL pointer can't crash psycle any more (pooplog)
+	! XM import doesn't spam machine columns with 00 any more. (pooplog)
+	! Old Fileformat songs did not load the master volume (was set always to 0)
+	! Crash with Linplug's VST's when loading songs with the new fileformat.
+	! Bug with VST's GetTimeInfo. This affected VST's that try to sync with the host.
+	! small Memory leak fixed (had to do with new ASIO implementation)
+	! Bug with Machine exchange (volumes where messed for several reasons)
+	! asio hard clips for the babies who don't leave any headroom (pooplog)
+	! some memory leaks and access violation [JAZ]
+	! cloning locates the new machine better and numbers it correctly (pooplog)
+	! Icon in "alt-tab" now shows correctly (a line of code was missing, duh!)
+	! fix for trying to allocate patterns greater than 7F (pooplog)
+	! fix for panning not being properly set on load (pooplog)
+	! fix for pasting out of range bug (pooplog)
+	* changed so that 255 unique patterns can be stored, although only 127 can be sequenced (pooplog)
+	+ wave writer can write separate waves per generator now (pooplog)
+
+
+	v1.7.3 RC2
+	----------
+
+	! whoops - fixed the dsound config dialog (pooplog)
+	! whoops - fixed the unable to load many types of wave files issue (pooplog)
+	! whoops - fixed the note-off bug while recording (pooplog)
+	! whoops - loading a song moves to the top of the sequence again (pooplog)
+	! whoops - fixed the tempo not set before machines loaded bug- made crossdelay
+	  have wrong tempo on tick mode (pooplog)
+	! whoops - there were 2 warnings on loading a song (pooplog)
+	+ vu meter can be turned off from the theme dialog (pooplog)
+	* All-new high-performance ASIO implementation - MSB float mode not done yet (pooplog)
+
+
+	v1.7.3 RC1
+	----------
+
+	+ double clicking on pattern highlights that track (pooplog)
+	+ 64 tracks available! (might break some machines?) (pooplog)
+	+ play from start button (pooplog)
+	+ psycle now appends names of new machines with a counter if duplicate name exists (pooplog)
+	+ psycle can display machines' number (ie 02:Sampler) - toggleable (pooplog)
+	+ psycle now marks missing machines that were replaced by dummy with an X (pooplog)
+	+ machine and instrument cloning (from gear rack or right-click window) (pooplog)
+	+ moving wires, preserving volume, dragging triangles with shift moves destination. [alk] (pooplog)
+	+ background bitmaps in machine view - to clear it, pick cancel in file dialog (pooplog)
+	+ you can now select the size of the polygons/triangles (pooplog)
+	+ lots of new options for wav file output (pooplog)
+	* new file format fixing a lot of problems, and incorporating FAST lossless data compression (pooplog)
+	* better memory management of pattern data (up to 10mb savings!) (pooplog)
+	* optimized machine indexing and also machine view rendering (pooplog)
+	* new cache.map file format with many improvements - making psycle open quicker for your pleasure (pooplog)
+	* machine names can be longer now (pooplog)
+	* more exceptions trapped on loading of vsts, more accurate data sent to pluginlog.txt (pooplog)
+	* replace and exchange functions in gear rack maintain connections (pooplog)
+	* Internal effects moved to native plugins and improved them in some cases. (bohan)
+	* more work in the VstTimeInfo. samplePos is correctly indicated now and improved ppqPos. [JAZ]
+	* psycle tracks changes to machines and instruments so it doesn't warn you if you haven't changed your file (pooplog)
+	! sampler doesn't crash when no instrument is specified any more (pooplog)
+	! vst initializing improved, more vsts should work now (pooplog)
+	! save as - pick an existing song, and it now asks if it is ok to overwrite (pooplog)
+	! error messages on file read/write problems (pooplog)
+	! vsts don't immediately crash psycle when they give an exception on save/load/instance any more (pooplog)
+	! master machine does not let clipping samples through when decrease on clip is set (pooplog)
+	! folders with .s are now working for plugins, vsts, skins, etc. (pooplog)
+	! songs with invalid connections are dealt with correctly (pooplog)
+	! pattern lengths no longer can be randomly changed by adding new/cloning patterns (pooplog)
+	! can't delete the master any more (pooplog)
+	! various other small bugfixes (pooplog)
+	! some memory leaks fixed [JAZ]
+	! Sample loading routine is now more flexible.This allows to load files that previously didn't. [JAZ]
+
+
+	v1.7.2
+	------
+
+	! bug where the sampler didn't stop the notes sometimes.
+
+
+	v1.7.1
+	------
+
+	+ Added option (not) to loop the Song/block at the end.
+	+ (NEEDS TESTING!)Added "mcm" option in the MidiInput dialog, to record midi commands directly.
+	! Crash bug when opening the minimixer when it had connected machines with a name of 15 letters.
+	! New default size not working with the keyboard shortcut of moving next (which adds a new pattern)
+	! Values not being shown when adding them at the last line of pattern, with wrap around disabled.
+	! Play block now does work correctly
+	! Fixed Saving to wav. options "save pattern" and "save sequence position" didn't ever stop.
+
+
+	v1.7RC6 (Official 1.7)
+	-------
+
+	+ Tweak Slide command. Slides a Tweak to make it smoother. (pooplog)
+	+ Psycle now creates a log of the loaded plugins at start, to help you know which one made it crash, if any.
+	+ Implemented "Exchange" button in Gear Rack and added Instruments as well.
+	* Speeded up some of the internals thanks to Dan.
+	! Fixed the Crashes reported by people when opening the Settings dialog (Happened in Win9X systems with many fonts)
+	! Fixed a problem with Tweak recording with VST's with Native GUI.
+	! Fixed bug with some VST's not playing the first note.
+	! Fixed bug where a few VST's became monophonic after pressing play (Wrong MIDI command sent)
+	! Fixed Length (in time) counter error when FFxx or FExx values were present for Tweaks or mcm's
+
+
+	v1.7RC1
+	-------
+	+ added ASIO support through "PortAudio" library (in its version 18). (LegoStar)
+	+ revert to saved option (pooplog) [alk]
+	+ added "Save to wav..." (offline mode) so that you don't need to play all the song.
+	+ Added colour boxes to "Visual" configuration to show the actual configuration. (Updates when changing preset
+	  too)
+	+ You can drag songs onto the window to load them now (pooplog)
+	+ Visual Presets load and saving (pooplog)
+	+ Machine and Pattern Header Skinning (pooplog)
+	+ Look of Machine Wires can be changed in the visual dialog (pooplog)
+	+ options for default length of pattern, etc. (pooplog) [doktor, sue]
+	+ Autosave option, and interval is user configurable now.
+	+ Modifications to the VST Host ( Added VstTimeInfo, audioMasterPinConnected, GetBlockSize, audioMasterAutomate and HostCanDo)
+	+ Basic Mousewheel support for pattern edit mode, scrollbars detach from cursor, etc. (pooplog)
+	+ added record button that sets edit and follow mode (pooplog)
+	+ Added functioning Track record arm buttons- new graphics required (pooplog)
+	+ Added Swing Fill command (pooplog)
+	+ Gear rack (pooplog) [JAZ]
+	+ Added midi velocity, modwheel, pitchbend, etc mapping to twks/cmds!! (pooplog)
+	+ UNDO/REDO for pattern and sequence editing!!! (pooplog)
+	+ Added "new" Clone,Copy,Cut and Paste buttons in sequencer, changed insert button to behave as an insert button
+	 should [Alk] [sue] (pooplog)
+	+ Native and VST Plugins realtime mouse tweak recording!!! (pooplog&[JAZ])
+	+ Value Dialog in machines shows offset hex values so they can be used easily with rest of program (pooplog)
+	+ VST:Added Hex display + Param list update when tweaking the GUI (indicates which param is being modified)
+	+ Added commands FDxx and FBxx (trigger delay and retrigger, xx/256 lines speed) and FAxy for all generator types. (pooplog)
+	+ SHIFT+Left mouse button moves cursor with selection drags, or drops cursor without disturbing selection (pooplog)
+	+ Wire Dialog contains some diagnostic tools, and has a more functional +12db->-inf range (pooplog)
+	+ in the plugs gui: control + right mouse button on a knob to capture respective param in the pulldown menu [sue] (pooplog)
+	+ tws "smooth" tweak mode, where it interpolates from the current param value to the desired one over the course of one line [sue] (pooplog)
+	* Complete pattern display overhaul, including many new features and bugfixes (pooplog)
+	* Made Master Machine Dialog modeless, updates display if volume attenuated
+	* All native machines can now recieve pattern data, not just generators (pooplog) [Druttis]
+	* Increased max lines/pattern to 256 (pooplog)
+	* Cleaned up Status Bar (pooplog)
+	* VU Meters are all nicer
+	* slight reordering of interface due to user request for more intuitive use (pooplog)
+	* Litte redesign in the Toolbar and control bars.
+	* Changed Master Vu-meter logic. Range from -45db to 0db (as opposed to -90 to 0db before), made
+	  faster and added a 2nd bar which decreases slowly to show the peaks.
+	* Changed default values for sound buffers (both DX and WO), set WO as default output
+	  (as opposed to silent) and disabled the DX "exclusive mode" by default.
+	* Changed double click on pattern (in sequence) to open that pattern in patternview for edit (pooplog)
+	* Many small Optimizations and improvements
+	* Plugin Enumeration Log (pooplog)
+	! When having "autostop Machines" and recording to wav, some machines could become muted.
+	! Manually editing sample name didn't update the combobox.
+	! When the "MIDI/Params/Waves" combobox was showing "Params", and the user tried to decrease the selected
+	  one with the arrows, the position 0 was unreachable ( it stopped at 1 ).
+	! Using "Enter" key to get the generator and instrument/wave under cursor (In pattern editor) did
+	  not update the sample in the instrument editor, which in turn made the wave loader function to
+	  load over an incorrect position.
+	! Loading songs with VST plugins didn't restore the name of them (was set back to default one). Fixed
+	! Fixed minusminus button to decrease to 0 (pooplog)
+	! Fixed song bpm and tpb being misreported to machines if FF or FE commands where used
+	! Fixed two memory leaks when loading songs with plugins (native as well as VST)
+	! Fixed noteoff recording to work correctly, moved toggle to seq menu with other commonly accessed toggles (pooplog)
+	! Fixed wave recording bug where it had an extra silent tick at the beggining and missing tick at the end.
+	! Fix several GDI Leaks.
+	! Fixed problem with saving songs (affected TPB) when using a Sample Rate different than 44100.
+	! "Couldn't Save file" error when trying to save "autosave.psy" doesn't pop up now.
+	! Fixed the Song information message box (in song loading) not being Modal (stay on top).
+	! fixed wave header reading (pooplog) [Druttis]
+	! fix for chord entering (shift+note) so it works correctly (pooplog)
+	! Fixed the crash bug happening when changing from waveout to Directound (and viceversa).
+	! millions of other tiny bugfixes (pooplog & JAZ)
+
+
+	v1.66
+	-----
+
+	+ Added elapsed playtime (by KooPer)
+	+ Now loading songs with machines outside of the screen moves them to a visible area.
+	+ VST host correctly does "idle" calls to VST's now. This supposedly makes AbSynth work.
+	+ VST host now replies to "GetParameterQuantization". Some plugins use this to round correctly.
+	+ Added Patch to make VSTi sc-101 from SC developers work. (Not an awesome plugin anyway, and crashes)
+	+ New machine graphics thanks to /\/\ark.
+	+ Added four colour themes selectable via a comboox in configuration-settings, "visual" folder.
+	* Important change in the Song Loading routine to load better the VST Plugins.
+	  Also, now saves the program number, so VST's like "Triangle II", "Vivaldi" and "Ganymed" work!
+	  New Files wont load VST's in previous versions of Psycle. It's sort of a security for newer files.
+	* Changed the sequencer a bit:
+	  Now only shows the patterns within the sequence length. (Following a request made some time ago)
+	  Added "add 10" and "dec 10" to pattern position (This will make some happy too)
+	  Now Insert inserts after the current position (previously, it was before).
+	  "Next Pattern" keyboard key now auto inserts new pattern when reaching the end.
+	  Removed "setLen", since now it is a bit useless.
+	  Removed "Spread" and replaced by "Sort patterns".
+	* Changed Wav loading routines to use RIFF loader. This allows to see SoundForge's loops settings.
+	* Pattern editor now hides the "0000" value in effects column (when it is not used as twk or mcm)
+	* Cleaned up a bit the Instrument editor Dialog (No new functionality yet) and fixed little errors in the envelopes editor.
+	! Fixed several problems with VST's and presets. (pooplog made changes to allow his plugins to
+	  save extra data, but he didn't realize that VST's do save in .prs format too)
+	! Fixed that annoying "param increased by 1" bug with some VST's. ( int(intvar-b) != intvar-(int)b )
+	! Fixed Wave editor Pasting but where pasting to an empty slot overwrote the previous instrument.
+	! Fixed a crash when deleting a machine and playing back (removed bug from all possible places)
+	! Fixed Sampler Retrig Command. (Now it really behaves like it should)
+	! Fixed Native machines window now correctly shown in windows XP/nonstandard-titlebar-sizes.
+	! Fixed Instrument editor. Changing Instrument number with arrows didn't update the main combobox.
+	  Also, now it shows in HEX, to be like the combobox.
+	! Fixed a cause for crash when loading songs/closing Psycle. (paint updating while deleting song)
+	! Fixed : Flanger Machine could become unstable and use all the CPU avaiable when
+			  the feedback was higher than 50% and the input sound stopped.
+	! Fixed : Loading bug that causes volumes to be damaged between native<->VST<->native connections.
+	          Generally, you won't notice it, but the file is damaged (meaning, not complying to what
+			  there should be in the file). The saving routine has been fixed and the loader routine
+			  has been modified to be aware of this problem.
+	! Fixed : Loading a sample with a name longer than 32chars, activated the "Tempo Syncronized Loop"
+	! Fixed : Rare "divide by zero" error at startup fixed ( thanks to Gulrak for this )
+	! Fixed : Doubleclicking over "mute" "solo" or "bypass" machine buttons now acts like two single clicks
+	! Fixed : Rightclicking the mouse (to show the popup menu) moved the cursor. Fixed. (Why did I move it?)
+
+
+	V1.6plus
+	--------
+	+ Added: Enter Key now Selects the Machine and Instrument under the cursor.
+	+ Added: Loop Setting in wave Editor. Ctrl+Left Click = Start . Ctrl+Rigth Click = End.
+	+ Added: Right Clicking in the Wave Ed does Zoom in if selection and Zoom Out if no selection.
+	+ Added: Added shortcut Ctrl+P to show up the Presets dialog.
+	+ Added: Sampler Retrig Command ( 15xy )
+	+ Added: Saving a song now also adds it to the recent songs Popup.
+	+ Added: New compiled M3, AS2f and JMDrum Machines.
+	  M3: ported again (and better?)
+	  AS2f: Random mode made like ABass (noise)
+	  JMDrum : Some voice allocation changes (no more crashes?)
+	+ Added: New "toy" : PluckedString.dll from Druttis
+	* Change: Parameter windows now are showed centered on the screen.
+	* Change: Machine box created also centered on the mouse
+	* Change: WaveEd shortcutkey for amplify is now Ctrl+M and Ctrl+A is select all (Del is Delete)
+	* Change: Now the "autosave.psy"'s are created ALWAYS on your songs Root Directory.
+	* Change: Due to a previous fix, you couldn't change the BPM nor the TPB when a song was playing.
+	  now this is possible again.
+	* Change: To select a machine in the Machine view now you have to press Control Key. Previus method
+	  used to cause troubles when tweaking effects.
+	! bug: Sequence selection was not correcly updated when stopping sometimes.
+	! bug: Note entering with MIDI keyboards didn't enter the velocity as previous versions did.
+
+	V1.6
+	----
+	+ Added Song Autosave. Each 10 minutes, a file named "autosave.psy" is saved with your current data.
+	+ Added a confirmation dialog when pressing the Save Button. (As it seems, some people press it by mistake)
+	+ Added : "Arguru Bass", "Arguru Synth", "Arguru Synth 2" and "ASynth21" are replaced by "Argury Synth 2f"
+	  when loading songs that used those old plugins.
+	+ Added Dll Name in the "New Machine" dialog and posibility to show Dll name instead of name.
+	+ Added : Now machine Dialogs' title indicate the machine number too.
+	+ Added Feature: Clicking on a machine selects it in the combobox.
+	+ Added : Option in Master Dialog to autoDecrease Master volume when clipping
+	  (Note: like all other machine's _dialog_ boxes, the slidebar is not updated till you reopen it)
+	+ Added "Shift+Mouse Move" to move the knobs of parameters in steps of 1.
+	+ Added back Space Bar -> Stop Song. To enable it, go to Keyboard Configuration and Make sure
+	  that the checkbox named "Right CTRL stop / Space play" is active.
+	+ Shift+Note (add note and jump to the next track) works again. Also, modified Pattern Step 0
+	  to do this as well.
+	+ Added Feature: Player now remembers the last machine used in each track.
+	+ Added Mcm Command. Replaces the VST's 10xx Command which did the same thing.
+	- twf Command removed. Now you can do the same with the twk command (old songs will STILL show
+	  twf).
+	- Removed code that makes a sampler machine change the polyphony to 8 when loading a song
+	  where it is 2. This was needed for old (<1.1) songs.
+	* GUI Improved: Little placement changes, new combobox and a new internal logic to update
+	  automatically these comboboxes when needed.
+	* Set "Use Gfx Double buffer" On by default (It has been proved enough, and it's better)
+	* Changed : Effect Machines are now numbered from 40(hex) to 7F(hex)
+	* CTRL+X does not Unselect now.
+	* Doubleclick on the sequencer now sets that position to the first not used pattern.
+	* "Insert" on the sequencer now inserts the first not used in that position and increases Length.
+	* Little changes in the Native Machine interface made by pooplog. This improves the visuals.
+	* Changes in the MachineInterface.h definition file. (made by pooplog)
+	  This causes all older machines to cease function.This concretely means that M3, AS2.1 and Guru6
+	  work no more (They were considered "Old/buggy" machines anyway).
+	  Note: We have the sources of the M3 Buzz machine, so soon we will have a Psycle version of it again.
+	* New Machine Dialog (Plugin Browser) now supports up to 512 Plugins (256 was the limit before)
+	* Changed the function which obtains the name of the VST plugins. You should Refresh the machine list.
+	  (thanks to Destroy FX ( http://www.smartelectronix.com/~destroyfx ) for making us notice this)
+	  Note: ZR-1 shows up as "flp" (which was the old name).
+	* Modified also the way to get the Version Number. Most of the time you will get "0" now. Don't
+	  know what is worse...
+	* Playing engine Changes. Now it executes tracker (Fxxx) and twk/Mcm commands before than notes.
+	* Set default Amplitude for sampler to Minimum (So that it acts like being disabled)
+	! Fixed: Starting Psycle, needed to swap to the pattern view to have MIDI In working.
+	! Fixed crash while playing MIDI and then loading a song.
+	! Fixed crash when loading an invalid (non existant) wave file.
+	! Fixed bug where you could no longer play samples if you loaded a sample and pressed OK/Cancel
+	  while it was still playing (prelistening) (Reported by alk)
+	! Fixed some playback Issues with the sampler in other sampleRate than 44100Hz
+	! Fixed the "New Machine" dialog resetting to "Sort by Type" each time.
+	! Fixed tweaks in some Internal Machines not working as expected.
+	! Fixed bug(crash, sometimes) when delete unexistent machine (dummy machine which came from loading
+	  a song and having a .dll missing) Entry on generators was not removed.
+	! Fixed "Arguru Synth"(all versions) not Stopping/noteoff right when using arpeggio.
+	! Fixed VST Flickering ocurring when a song was tweaking a _native_ plugin.
+	! Fixed: selecting a group of patterns in the sequencer and "playblock" looped at songlength
+	  if this was previous to the block end.
+	! Fixed Crash bug when not indicating the wire Index with the FCxx command
+	! F8 Should now Stop all notes started in the pattern.
+	  (EXCLUDING those started by MIDI commands if the plugin doesn't support "all notes off" event)
+	! Chords with VSTi's didn't work well if you did like : F-4 | A-4 | C-5  and in the next lines
+	  A-4 | C-5 | E-5 . It will STILL not work if you do: F-4 | A-4 | C-5 and A-4 | off | off.
+	  Can't fix it completely without recoding.
+	! Fixed bug: Entering "twk" or "twf" command in the pattern was innecessary executed.
+	  This could have caused many parameters to get changed without notice.
+	! Fixed graphical bug in selection where "ctrl+b , ctrl+e and Tab" sequence was made at the end
+	  of the pattern. (Wrong variable used).
+	! Fixed "Tracks" Combobox not being updated on open/import/new file.
+	! Fixed Scrolling bug. Shift+Tab on the first Track and pressing play showed that the "row" numbers
+	  got overwritten.
+	! Fixed Double Buffered Screen Resize problem (It really didn't resize)
+	! Fixed ENORMOUS GUI bug in the pattern editor when you used FExx command to change the TPB.
+	  Bugfix has consisted on changing the value only in the Player, not in the song.
+
+
+
+	V1.6RC4
+	-------
+
+	* Dropped new Stop for VST's and put back the old one. (was worse, since not all plugs implement it)
+	+ Added pattern MIDI Command for VST's. Please, check "Tweakings and commands.txt" for more info.
+	! Fixed the value showed for filter sustain (showed up to 127%)
+	* Put default Attack value (in synthesis) to 0.02ms. (almost 0) (phongshade asked for this)
+
+
+	V1.6RC3
+	-------
+
+	Dropped source of 1.6RC2. Took from V1.6RC1
+
+	+ Fixed all bugs and added all the features of RC2
+	! Fixed a bug in finetune loading in XM importing (thanks Bohan)
+	! Psycle no more crashes when you accidentally make a loop with machines (like: A->B->C->A).
+	  It will IGNORE the loop. (Better approach would be don't let the user do so)
+	! Fixed some little bugs with the Scrollbars being incorrectly activated/deactivated.
+	* Space bar now doesn't stop the song.
+	+ Added MIDI channel support for VSTi's. Use the AUX/Inst colum to indicate the MIDI channel,
+	  starting from 0 to F. Nothing means channel 0.
+	! VST's now send "All notes off" message when "Stop". This should fix some rare cases where notes
+	  didn't stop.
+	+ Added ShortCut keys to VST Editor (CTRL+R , Randomize parameters)
+	+ Added ShortCut keys to Wave Editor.
+
+
+	V1.6RC2
+	-------
+
+	+ Added option to don't show the about dialog on psycle startup.
+	+ New nice Graphics thanks to frown!
+
+	! Fixed bug with FFxx FExx FCxx and F8xx commands, which DELETED themselves after being played.
+	  (Sorry, a wrong approach for a tiny detail)
+	! Fixed Pattern editor bug when resizing Psycle (well.. I never do that).
+	! Fixed Pattern editor selection "bug", where you could select past the end of the pattern.
+	! Dll's are now removed from the Name Cache if they are no longer valid.
+	! Manually changed Directories in the configuration, weren't saved.(I didn't completely fix this)
+	! Fixed still another crash bug in the wave editor, when cutting and the end.
+	  (more signed-unsigned problems, which weren't reported as warnings this time)
+	! Playing notes from a VST dialog didn't stop the notes if it wasn't the machine selected in
+	  the combobox of Generators (in psycle main screen). Fixed.
+
+
+	V1.6RC1
+	-------
+
+	* Wave Editor
+	  * Changed zooming criteria
+	  ! Fixed crash while editing (modifying) samples being played.
+	  ! Fixed a crash bug when zooming at the very beginning of a sample (Reported by sampler)
+	  ! Fixed selection bug when mouse went over the left side.
+	  ! Removed all the compiler warnigs (one of them caused the previous error)
+
+	* Pattern Editor
+	  * Changed shift+left/right(cursor selection) to jump a track instead of a column. (asked by sampler)
+	  * Added again the "unselect when cursor moving" option (Asked by sampler)
+	    ADVISE: If "Shift+Arrows Do Selection" is activated, you won't be able to select with
+	    CTRL+B CTRL+E keys.
+	  + Added Home/End/Prior/Next to selection keys. (Shift+Home = select to top) (Asked by sampler)
+	  + Added "Cursor Always Down" Checkbox, which makes the cursor behave like the older Psycle versions.
+	    If it is deactivated, it acts like ModPlug/IT, where cursor moves right in Gens/instr/Fx columns
+	  - Removed feature which made pattern go back to the starting one when stopping playback and
+	    "follow song" was active. It used to cause confusion.
+	  ! Graphic bug: Enabling follow song didn't refresh the pattern properly.
+	  ! Graphic bug where scrolling up/down made the cursor move (This was entered as a side effect of
+	    a new feature)
+	  ! Graphic bug: When selecting and moving the mouse out of the pattern (to scroll), it
+	    showed a wrong selection (usually everything selected from that track to left). This might have
+	    caused other graphical bugs, since a variable was changed to an incorrect value.
+	    (Reported by Kris)
+	  ! Fixed pattern changing when having follow song selected and going to Machine view and back.
+	  ! Fixed bug: Changing generator with keyboard didn't refresh the Pars/Waves combobox.(Rep. by sampler)
+
+	+ Added Graphics Double Buffering (No flicker). You should enable it in the configuration Dialog.
+	  Note: This is just a temporary double buffer. The code should be optimized.
+	+ Added a spin edit in VST parameters dialog, to change the program. (asked by Athl0nXP)
+
+	+ Added (FINALLY!!) Name Caching for Plugins (both native and VST) for fast Psycle loading times.
+
+	! Fixed Noise with Flanger Effect at high speeds (mainly everything higher than 1/4th)
+	  Note: CPU usage increased by a factor of 1.5 and RAM usage decreased (no relation within them).
+	  Note2: Used some code from http://www.smartelectronix.com/musicdsp for FAST sine calculation
+	! Fixed (possible) Crash bug when specifying a machine number bigger than 40 (hex). This even
+	  prevented from being able to change wire volume (FCxx) for effects. (Reported by Pikari)
+	! Fixed bug: Wave editor amplify changed only the left channel on stereo wavs (Reported by Kris)
+	! Fixed bug: Sampler new "smooth volume change" was a bit faulty (not initialized properly).
+	  (Reported by Pikari)
+
+	  BTW: Thanks to beta testers for finding bugs in the new things I added/fixed.
+
+
+
+	V1.6b4
+	------
+
+	+ More work done by Fideloop on the Wave Editor. Here's a few:
+	  + Added Clipboard cut/copy/paste support
+	  + Added Sample Reversion, Convert to mono and Adjust volume.
+	  * Modified a bit the visual layout
+	  * Recoded the internals.
+
+	* Reverted to previous way of selection (whole column). It's alot easier to work with.
+	* Various little fixes and improvements in the pattern input.
+	* Very little change in the combobox behaviour in the VST parameters editor.
+
+	! Various memory and resource leaks fixed (hopefully! Hard work done towards it!)
+	! Fixed pattern editor bugs related to Scrollbars (not scrolling properly). This might have
+	  caused other graphical bugs as well.
+	! Fixed CPU meter for VSTi's ( "=" , "+=" ...)
+	! Fixed "click" in fast volume changes with the Sampler.
+
+
+	V1.6b3b
+	-------
+	! Corrected serious XM import transpose bug
+	! Wave loader bugfixes
+	  * faster
+	  * loads 24 bit WAV
+	  * loads WAV with PAD chunk
+	! Fixed sampler default "resampling = linear" omission
+	! Fixed CPU performance again. (Still has a bit of multitasking effect, but works)
+	! Cancel in Presets Dialog didn't cancelled (wondering how I did the code...)
+
+	V1.6b3 (mainly bugfix)
+	----------------------
+
+	+ Preliminary XM Import
+	  Advise: It transposes the notes in the pattern so that the samples are played acordingly
+	 * Still todo: 
+	  * volume/pan envelope translation
+	  * dedicated volume effect channel
+	  * multi-sample instruments
+	  * lots of unsupported XM commands - esp. tempo change
+
+	* Partial Internal-plugins rebuild.
+	  - Tweaks don't go out of the range now.
+	  - You can indicate negative values adding 8000  (8004 = -4)
+
+	+ Waves' combobox now show parameters when a non-Sampler machine is selected.
+	  (addition thanks to the previous change)
+	+ twk twf commands now automatically add the parameter number (IF a valid machine is selected).
+	+ 2pFilter now display its units. Note: Frequency indicator might not be accurate.
+	+ Colours are saved now.
+	+ "Reset Default Colours" button added to Configuration.
+
+	* Changed Sampler Default Resampling to "Linear".
+	* Changed CPU performance logic a big. ("Routing" is real now. "Total" is weird sometimes(Multitasking effect))
+	* Master Machine now uses around 25% less CPU time. (Removed non important calcs from loop)
+
+	- Moving the cursor automatically unselected the marked block. This made selection with
+	  "CTRL+B/CTRL+E" impossible so now this is removed.
+
+	! Fixed bug where Vertical Scrollbar had invalid values (one more position than the real))
+	! Fixed bug when changing number of tracks/patternlines didn't update correctly.
+	! Doubleclicking to create a machine does create it on the clicked position again (not randomly).
+	! Fixed WrapAround/centerCursor being always on/off after Restart. (Reported by alk)
+	! Fixed "save" Dialog not appearing when song had \ / | : * " < or > in the Songname.
+	! Fixed changing directories in Configuration needed of a restart of psycle. Now it doesn't.
+	! Fixed one graphical bug in Machine view (panning to incorrect values. Reported by Tecknocide)
+	! Fixed two graphical bugs with Playing cursor. (Not being resized properly and not dissapearing)
+	! Fixed bug. Pressing CTRL+A/B/C/D/E/F over a non-note column caused the letter to be inserted instead
+	  of the command being executed (when in editmode).
+	! Fixed a bug(?) where some wire volumes could change after saving a song (at least theoretically)
+	! Fixed bug. Selecting with CTRL+B/CTRL+E (and also with CTRL+A and CTRL+R) didn't work. (Rep. Gerwin)
+	! Fixed bug. Pasting a whole pattern (CTRL+F5) didn't update the number of rows. (Rep. Gerwin)
+
+
+	V1.6b2
+	------
+	* NEW PATTERN EDITOR (lot of new code!!!)
+	 * Faaaaaaster! (it flickers and it's a bit buggy. I will add a Double buffer to fix it after)
+	 + ScrollBars!!! They behave a bit different from usual windows. Waiting for oppinions.
+	 + CenterCursor Feature can be disabled.
+	 + Option: Shift+Arrows can be used for selection
+	 + Option: Delete behaviour configurable between FT2/IT
+	 + Colours are Configurable. (Note: they are not saved yet!)
+	 - Muted Columns are not displayed in a different colour now (this made the code a bit simplier)
+	 + Selection allows to select a single element (ex: note).
+	   Note: functions are not converted yet, so it is quite useless.
+
+	* New Wave Editor From Fideloop. (He is still improving it further)
+
+	* Generators and instruments are shown in hex numbers now. (To easily write them
+	  to the pattern)
+	! You cannot put machines out of the screen now.(Reported by ADVANZE)
+	! Select Column/Select all caused a crash when copying. (Reported by |SOLARIS|)
+	! -0.1db Vol. bug (Reported by Pikari)
+	! Fixed a VST display bug when opening the dialog (Reported by cubic Elements)
+
+
+
+	V1.6b1
+	------
+	Thanks to Dan (our newest coder) for most of this:
+
+	+ Configurable InputHandler class to handle input events (accessible from Global::)
+	  This means now you can Configure the Hotkeys of nearly all actions.
+	  ADVISE! Some keys have changed!
+	+ Save/loadable key config, uses %windowsdir%\psyclekeys.ini
+	+ Can now audition notes in FX dialogs AND in machine view!
+	+ FT2 style 'edit' mode toggle.
+	+ FT2 style multi-channel audition, now usable as a live audio source (toggleable)
+	+ Added keyboard commands for some more things (eg. note skip inc/dec, block unmark..)
+	+ MIDI input now velocity sensitive (CMidiInput::fnMidiCallback_Step, CChildView::MidiPatternNote)
+	+ MIDI input now records velocity sensitive data using 0Cxx command
+	+ MIDI behaviour now toggleable between audition mode/sequencer mode from Config menu
+	+ MIDI note-off record now toggleable from Config menu
+	+ Toggle for FT2/IT style home/end behaviour in Keyboard Config
+	+ Toggle for Right CTRL to Play in Keyboard Config (seems not to work on all keybs)
+	+ Added .fxb Loading(if same name than plugin .dll) and importing.
+	  This will become the default preset format for VST's in next versions.
+	  Thanks to Frederic (reflex) for info on fileformat.
+	+ Pasting now moves the cursor downwards.
+
+	- Removed keyboard selection menu - to be replaced with custom INI files ASAP
+
+	* Cleanups/fixes to KeyUp and KeyDown events in many places
+	* keybdhandler code changed to use InputHandler
+	* MIDI changed to use InputHandler
+	* CMainFrame::Psybar2Init cleanups
+
+	! Key skip and page up/down now cycle past end/start of pattern properly
+	! Fixed crashing bug in CChildView::DrawMachine if invalid machine
+	! Fixed crashing bug in CMainFrame::UpdatePlayOrder if editposition out of range
+	! Fixed crashing bug in CMainFrame::OnSelchangeSeqList if editposition out of range
+	! Fixed a bug in Importing presets where sometimes it associated a preset with the wrong name.
+	! Fixed a visual bug in Parameters' dialogs in previous version (affecting especially VST's).
+	! Fixed a crash when loading VST machines that had a name longer than 32 chars.(now limited to 64)
+	! Fixed a tiny bug where a bypassed machine didn't have the switch "bypass" activated.
+	! When two machines were overlapped, trying to move the topmost, moved the bottommost.
+
+
+	V1.5b3r5
+	--------
+	+ Added "Random Parameters" to VST's as a request of an user.
+	+ Added Command 0Cxx to VST's (Set volume). Only works in noteon right now.
+	+ Added VST Chunk Saving. (Not tested, but should work).
+
+	! Saving a Preset with an existing name corrupted the file. Fixed.
+	! Importing didn't saved to the file. Fixed.
+	! Volumes between VST's and other Machines were loaded at MAX value ALWAYS. Fixed (thanks ksn)
+	! Fixed a few bugs on the German Keyb Setting
+	! Finally fixed the loss of focus (not able to play) in the VST Params Dialog when 
+	  changing parameters/Program.
+	! Fixed once more, and for all, the Loading/Saving of Blocks.
+
+
+	V1.5b3+
+	-------
+
+	+ Added IFF loader (thanks to krokpitr for info about the fileformat)
+	+ Two new Global Commands that allow to do Three (yes, three) new actions: Machine panning,
+	  global volume and Wire volume. check the "Tweaking and commands" file for details.
+
+	* Made Tempo sincronized editbox (In instruments dialog) AutoHScroll. An user reported that
+	  he couldn't add more than two digits. This should fix that.
+
+	! "Missing VST plugin" message didn't show the Plugin Name.
+	! It also didn't skip the parameters' values, so most of the time it chashed after this.
+	! Sampler noteoff didn't worked. I added code not to start a note if no valid instrument was
+	  selected, but I put it previous to noteoff check.
+	! "Couldn't open file" error message appeared when opening the presets dialog of a machine that
+	  had no presets. This error wouldn't have to be reported.
+
+
+	V1.5b3
+	------
+	* MIDI Improved in many ways:
+	  + Added Sync codes so that you can use Psycle in conjuntion with other Soft/Hardware Synths
+	    controlled by a sequencer.
+	  + MIDI monitor Added. Just to know what is happening.
+	  + Note Entering in pattern using a MIDI keyboard now Possible (basic.Better in newer versions)
+	  - Removed MIDI support when using DirectSound. Directsound routines need to be updated.
+
+	* VST's
+	  * NEW host based on Arguru's Aodix/Freebase one! (implemented really different)
+	    Still basic, but more plugins work now (reported A lot more)
+		Warning: Mono VST effects (like DB Compressor) will output a mono signal. (before they
+		processed only the left channel)
+	  * Now allows for multinote on the same pattern row (This doesn't work on all VSTi's)
+	  * Changed Parameters' Editor, hope it is nicer now.!!Reported to crash with some plugins!!
+	  + Added Native Psycle gui to VST's that don't have Gui.
+	  ! Now, the sliders (and gui) are updated when selecting a preset.
+
+	* Native Plugins
+	  * Changed partially the Loading implementation, made it similar to the new VST implementation.
+	  ! Found & Fixed the Memory leak! dlls were unloaded from memory, but not the machines themselves.
+	  * Also, now the dll's are unloaded from memory after psycle's startup.
+	    Thanks to these two things, Psycle now uses a lot less RAM!
+	  * Arguru Synth 2f comes to replace all other AS's (Also ABass). Its Glide is different from
+	    the one in AS2.2, but a formula to convert to the new one is provided.
+
+	* New Machine Dialog
+	  + Added Nice icons to identify Plugins! (Waiting for better ones from alk)
+	  + Added Support for Subdirectories
+
+	* Source Code Cleanup. Removed unused files and made the Splash smaller (256color paletted)
+	  This is the main reason of the filesize decrease.
+
+	+ Added RealTime Note Entering (for both, PC and MIDI keyboards). You'll need to activate
+	  "follow song" in the Sequencer (and press play, of course).
+	+ Added another keyshortcut: Shift+Enter Pops Up the Selected Machine's Parameters.
+	+ Machine Soloing Now Implemented.
+	+ Presets IMPORT/EXPORT added (finally!)
+	  Note: you can only export one preset at a time, but you can specify the same file, so that
+	  they are appended.
+	+ German Keyboard added.
+	  Note: I will not add any other one. It is planned to allow keyboard mapping from the
+	  Configuration in the next version.
+
+	! Incorrect sample finetune loading bug fixed!
+	  (This affected an old great song from Gerwin: ThreeTimesBU.psy)
+	! F6 (play sequence block) didn't worked.. fixed.
+	! Pressing CTRL+Del removed the first line of the following pattern. fixed.
+	! Some (most of the) dialogs had wrong TAB order. Now fixed
+	! Fixed a little bug in the load/save block (It didn't save what was supposed to be saved)
+
+
+
+	V1.5b2
+	------
+	+ _MIDI_ in Support added thanks to Mark McCormark!! Read the file "Psycle Midi.doc" for Info.
+	+ _Presets_ support Added (only Native Plugins and VST's by now);
+	+ Added Posibility to play a sequence Block (like play a single pattern,for example)
+	  Note: you _can_ select non consecutive patterns (Use CTRL+Click)
+	  Fast Selection: Drag.
+	+ Follow pattern now also updates the current pattern
+	  Other optimizations in the Follow song feature (return to previous seq. position,etc..)
+	+ Added Right Click Popup Menu in the Pattern Editor (cut/copy/paste/interpolate...)
+	  (I know it doesn't appear correctly sometimes... I would need to check screen size, popup size
+	  and mouse position and I don't do it)
+	+ Made changes in the "New Machine" dialog to show "Internal,Native,Vst" or "Generator/Effects"
+	+ Added Machine Stopping when Idle. It stops a machine that has not produced sound the last
+	  time it has been called. Activate it when editing or previewing to turn down the CPU usage.
+	  Note: Some machines don't respond properly in this mode (specifically delayed ones).
+	+ Added Bypass!!! (You can click on the little button on the machine. The same for Mute)
+	+ Added FineTweak of Parameters. Hold the Control key for a 10x finer tweak.
+	+ Added a bunch of new Key Shorcuts. SOME OF THEM HAVE CHANGED. Take a look at the new keys.txt
+	  CTRL+Q and CTRL+A are NOT inverted with french keyb now. Don't know what is better...
+	+ Entering numbers with the Numpad is possible now.
+	+ Added Option (not) to wrap the cursor around in the Pattern Editor.
+	+ Save option added (save without asking the name)
+	+ Sample Preview works again! Select the wave file to hear it.(Asked many times)
+	+ "Kill" button in the Instruments Editor works now. (i.e. Deletes that instrument)
+	+ MANY GUI changes. Some of them (like the new Splash) thanks to bunny. More to come. :·)
+
+	- Removed changing the selected instrument/Generator with the combobox (Most of the time
+	  users changed it accidentally)
+
+	* Sampler:
+	  + Added PortaUp(01xx), PortaDown(02xx) (both Linear), Panning(08xx), NoteCut in x frames(0ECx)
+	    and NoteDelay in x frames(0EDx)
+	  + Removed NoteOff in x frames (yyCx) I think nobody knew it anyway.
+	  ! Fixed Volume command (0Cxx) Now works also if there's no note.
+	  IMPORTANT! Don't forget that in Psycle you need to indicate the Generator Number also.
+	* Loading and saving of block now use the internal clipboard. This means you will have to copy
+	  the block before saving, and pasting the block where you want after loading.
+	* Edit Quantize = 0 Now moves the cursor to the next row in track (i.e. like writing)
+
+	! Wav Writting bugs (Clipping and Wrong content being written) fixed.
+	! FIXED Psycle losing focus when closing Machines' parameters in some cases.
+	  (It was not a bug but a wrong window creating option choosed!)
+	! Fixed crash when loading a song with missing VST's and another one when unloading.
+	! Playback of notes in the Machine View now don't repeat the note while keypressed.
+	! CTRL+F3 (pattern cut) didn't copied the pattern properly.
+	! CTRL+DEL (delete one row) added FFFF in the command/parameter column and deleted first
+	  entry. Fixed.
+	! _Some_ of the gui faults (being not drawn completely) fixed.
+	! A few problems with the focus being kept by the sequencer have been fixed
+	! Fixed lost of directory when loading samples (the same bug again, but in a different place)
+	! Machine Panning was not properly initialized when loading a song. Fixed.
+	! TPB and BPM are now updated when changed in pattern (FFxx and FExx commands)
+
+
+	Note: There's a serious memory leak (at least since 1.1b2) in the loading/unloading function
+		  (most probably a bad destruction of machines).
+		  Don't load many(5~10) songs per session or psycle will eat your resources.
+		  This bug won't be fixed for 1.5betas, but maybe I'll look at it in newer 1.x ones.
+
+
+	V1.5b1+ (bugfix!)
+	-----------------
+
+	+ Added parameter numbering to the internal Effects (I forgot that, sorry)
+	+ Block Transpose Added. Use CTRL+Q to move upwards and CTRL+A downwards
+	  (if french keyb conf is used, then CTRL+Q is downwards and CTRL+A upwards)
+	  (well.. It was added in V1.5b1, but I forgot to add it in the whatsnew)
+
+
+	! !!!!___Changed TPB command from FDxx to FExx___!!!! (Mistaken internally)
+
+	! Fixed bug where setting FF00/FD00 crashed psycle
+	! Fixed bug where also using twk/twf and FFxx/FDxx, the tempo/TPB was changed
+	! Interpolation now iterpolates the full command/parameter row, not only the parameter part.
+	! Now trully fixed the lost of directory when loading (I fixed it when saving, but for some
+	  reason I didn't for loading)
+
+	Ps. Yes.. Commands for the Sampler will be in the next beta.
+	Ps2. The key for the "twf" command is the same than the "twk", but pressing Shift
+
+
+	V1.5b1
+	------
+
+	+ "twf" command added and slightly changed the Generators Bar. This allow tweaking
+	  effects in the same way you do with the twk command.
+	+ Note playback on Machine View! This allows to play notes while tweaking the
+	  machines.
+	  _Known bug_: on VSTi's, notes are played only if you don't select anything.
+	  This means that you can only play&tweak on Graphical VSTi's.
+	  (trick for long sounds : play the note and, just after that, click on the machine title
+	  bar. weird but works)
+	+ Mouse support (Cursor positioning and block selecting) Mute still avaiable
+	  clicking on the header of the tracks (clicking over the M or the red light)
+	+ Track Soloing (Clicking over S or the green light). When Unsoloing, it unmutes ALL
+	  tracks. If you find it problematic, I will add more code to unmute only those
+	  that where muted when soloing that track.
+	+ Added Interpolation of command parameters. The Key is CTRL+I" (select a block with the
+	  mouse then CTRL+I)
+	+ Tempo and TPB pattern commands added. They are FFxx and FExx respectively
+	  Known bugs: They don't update the display and remain changed after stopping.
+	  It will be fixed in next version.
+	+ ".psy" extension is added automatically when saving.
+	+ Added posibility to change the Generator/Instrument of the Selected Block.
+	  Select a block and change it using the _Combobox_.
+	  (a Rightclick Popup menu will be added in next version)
+	+ Added < > to change the Generator. Right now it only works on a spanish keyboard
+	  It will change in the future.. I hope you can wait.
+	  If you have a block selected, then they will change it on the Block.
+	+ Added the missing code to the "Dec" and "Clear" buttons in the Sequencer.
+	+ Added Block Saving as a Request of Gerwin. Saves the selected block to a file
+
+	! Crash when showing the properties dialog (the one showed when right clicking) of
+	  machines with a name longer than 15 chars (ex: VB-1 Virtual Instrument)
+	! Patched (not fixed, but at least doesn't crash) the crash bug when loading
+	  (in fact, when unloading) some psycle songs that use VST's.
+	  Note: There are other (less frequent) crashes not related to this one that
+	  are not fixed.
+	! Fixed strange crash with some old songs (1.1b1?) that had a wrong TPB (thanks bunny)
+	! Fixed bug where Parameters of machines weren't shown if the total number wasn't
+	  divisible by the number of columns. (Example: Arguru Bass HAD Volume parameter)
+	! Fixed (I hope) a loss of the current directory after loading or saving songs.
+	! Changes in the "NewValue" Dialog (the one that lets you specify the value of a
+	  machine parameter).
+	  -Title changed so that it is shown completely.
+	  -Editbox Changed, gets activated and text is selected when it's shown. Also, allows
+	   adding the minus "-" sign. (also letters, but it ignores them)
+	  -Also fixed: Cancel didn't cancelled (Values were changed)
+	! Fixed the Machine moving bug when the Machine frame got the focus after some
+	  operations (example:clicking a machine, clicking the arrow of a combobox and
+	  clicking over the machine view again)
+	! Instrument change with the arrows correctly changes the instrument in the
+	  instrument dialog.
+	! TPB correctly updated when loading a song.
+
+	Note: This is a maintenance version. It's only aimed to make the usage
+	      of the program easier and less buggy.
+	      Psycle 2 is being rebuilt from the ground up to catch all the bugs
+	      (specially VST's related) and make it even better.
+
+	Note2:Yes, the interface is still quite slow...
+
+
+
+	V1.1b2
+	------
+	*Reimplemented WAV recording (it automatically stops when song loops
+	 and doesn't start until 'play' is clicked)
+	*Changed the VST interface slightly - some machines still crash when
+	 selecting the common GUI, although e.g. the Model-E works now.
+	*Fixed a CPU cost calculation bug
+	*Implemented "follow song" mode in sequencer
+	*Added safer thread synchronization - less crashes :)
+	*Initial configuration dialog should now work
+	*Fixed a bunch of Load/Save bugs
+	*Added "Length" value to sequencer - this shows the song's length in minutes:seconds
+	*Fixed sampler note off bug - now a note off command only affects voices
+	 assigned to that track
+	*Fixed New Machine refresh bug
+
+
+	V1.1b1
+	------
+
+	*Machine muting now works, a muted machine is indicated by the red light
+	 being lit
+	*Loads and saves the 1.0x file format, although I had to bend over backwards
+	 to support this! The file format WILL change...
+	*Ticks Per Beat implemented - even compatible with the old file format :)
+	*Added "Refresh" button to New Machine dialog - now you can add plugins
+	 without restarting :)
+	*Sampler polyphony is now per-machine rather than per-track. When a track
+	 is loaded and the polyphony is less than 4, it is automatically set to 8.
+	*INSERT moves pattern data down and CTRL+DELETE move patterndata up
+	*VST dialogs & host totally redesigned - you now create VST plug-ins the same
+	 way as native plug-ins, and all configuration is accessed by double-clicking on
+	 the machine. One VST machine means one VST plugin instance.
+	*Changed configuration dialog to include default directories for Songs, Instruments
+	 Native and VST Plug-ins
+	*All configuration now stored in the registry except skins, which aren't saved at all
+	 (yet)
+	*MASSIVE internal recoding
+
+	V1.02
+	-----
+
+	*Added DirectX (DirectSound) output driver
+	*Added output driver selection dialog
+	*Audio drivers now use the registry to store configuration
+	*Internal reorganizations
+
+	v1.0
+	-----
+	Wav Recorder implemented.
+	Finetune for samples.
+	Sourcecode released.
+
+	v0.95beta
+	---------
+	Plugin GUI improved. Knobs, multiple windows, etc...
+	Bugfixes
+
+	v0.92beta
+	---------
+	Now u listen "OnClick" wav files on waveload filebrowser, cooler to browse samples.
+	Loop tempo-autofit [lines measured] for instruments.
+	Bugfixes.
+
+	v0.91beta
+	---------
+	Added built in wave editor [1st version]
+	Fixed language resource bug [some tooltips never were displayed]
+	Fix bug when loading/overwriting waves while they are beign played
+	Fixed some GDI bugs
+	Audio devices displayed fine on audio config
+	Playing position indicated in status bar
+	Added next/prev buttons both Instrument & Generator (toolbar)
+	New help revision
+
+	v0.70beta
+	---------
+	general:
+	Graphic sequencer [ft2 style] included.
+	Upgraded to 32 tracks
+	New/Open/Save as buttons on toolbar/menu
+	New logo
+
+	machine view:
+	New machine button on toolbar.
+	New machine dialog style.
+	Master volume control added on master machine [doubleclick master]
+
+	pattern view:
+	SHIFT+notes to enter chords [it2 style]
+	Copy and paste now adapt number of lines [of source pattern]
+
+	new plugs:
+	xFreeverb [+width space parameter]
+	Crossdelay
+	Distortion
+
+	+ lots of stuff, bugfixes, etc....
+
+	v0.50beta
+	---------
+	Loading/Saving songs bugs removed
+	Some code cleaning
+	Changes on plugin API
+	Added X-Freeverb plugin
+
+	v0.45beta
+	---------
+	First beta release
+
+
+	V0.25 Alpha (2-Jun-2000)
+	------------------------
+	- Added Arguru remixed/recoded version of the Zephod SuperFMSynthesizer.
+	- Fixed bugs and stuff on Arguru Synth.
+	- General code cleanup.
+	- Improved interface, better looking.
+	- Improved generator plugin handler.
+	- Machine dragging bugfix.
+	- Lot of changes and bug fixes.
+
+	V0.20 Alpha (1-Jun-2000)
+	------------------------
+	- Added Generator hadling for plug-ins (new substractive synthesis Arguru Synth plugin included)
+	- Bug fixes
+
+	V0.16 Alpha (18-May-2000)
+	-------------------------
+	- Added patttern step jump in pattern editor.
+	- Added 3rd party plugin support [alpha API]
+	- Bug fixes
+
+	V0.15 Alpha (16-May-2000)
+	-------------------------
+	- Added flanger machine
+
+ -- noone <noone@nowhere.org>  Tue, 21 Mar 2006 02:36:18 +0000
+
+mspsycle (-1) unstable; urgency=low
+
+  * nothing
+
+ -- noone <noone@nowhere.org>  Mon,  1 Jan 2000 00:00:00 +0000
+
+Local variables:
+mode: debian-changelog
+End:

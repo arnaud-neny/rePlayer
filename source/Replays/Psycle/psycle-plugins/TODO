@@ -1,0 +1,53 @@
+*	many plugins don't work fine with compiler optimisation -O3
+
+*	the external-packages/stk code is too old and incompatible with current distributions 
+
+*	fix pooplog synth loading/saving for big-endian cpus + have a look at other pooplog plugins for loading/saving
+
+*	need to reverse-engineer arguru-compressor
+
+*	ayeternal flanger:
+	add interpolation support. half done by sartorius
+	-- bohan
+
+*	cyanphase vibrasynth:
+	has an access violation bug
+	need source code to fix, blake!
+	-- anonymous
+
+*	JMdrum:
+	crashes psycle (or gets muted) when using FBxx and/or FAxx.
+	-- JAL7OH
+
+*	JMDrum:
+	is buggy (Crashes after changing settings sometimes)
+	-- anonymous
+
+*   JMdrum:
+	ah, it bugs if i hold down a note while editing (to fill the pattern with notes)
+	-- lobyaway
+
+*	m3:
+	m3 in 22050 mode just makes a click, nothing more.
+	are there any bug-less buzz-ported machines?
+	-- sue
+	
+*	pooplog synths:
+	routing in pooplog synths for vcf->od modes only works when both vcfs are active?
+	-- anonymous
+
+*	pooplog synths:
+	clicking in pooplog synths when vca sustain is off
+	-- anonymous
+
+*	pooplog synths:
+	don't have gain lfo phase cmd?
+	-- anonymous
+
+*	pooplog delay:
+	panning knobs fuck with my brain because they work counter-intuitively
+	-- anonymous
+
+*	pooplog fm lab:
+	i noticed that the appegiator in the lab causes constant retriggering of VCA
+	-- alk

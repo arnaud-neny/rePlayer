@@ -1,0 +1,26 @@
+Pooplog Lofi Processor psycle plugin
+Jeremy Evers
+negspect@runandgun.com
+
+//////////////////////////////////////////////////////////////////////
+/* pooplog lofi
+/////////////////////////////////////////////////////////////////////
+Version History
+
+v0.04b
+3:30 AM 12/20/2002
+- optimizations adjusted for safety
+
+v0.03b
+1:52 PM 11/21/2002
+- fixed to work at any sample rate
+
+v0.02b
+6:33 PM 10/23/2002
+- fixed crosstalk issue
+- added input gain knob
+
+v0.01b
+- initial release
+
+/////////////////////////////////////////////////////////////////////

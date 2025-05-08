@@ -1,0 +1,50 @@
+Pooplog Filter psycle plugin
+Jeremy Evers
+negspect@runandgun.com
+
+Hints: try setting the routing to shape->filter and using a lowpass filter
+	with some of the new distortion settings to get nice distortion tones
+
+Notes: sending a clipping signal (> 0db) into some filter algorithms can cause artifacts.
+
+//////////////////////////////////////////////////////////////////////
+//Pooplog Filter
+/*
+/////////////////////////////////////////////////////////////////////
+Version History
+
+v0.06b
+5/19/2003
+- optimizations adjusted for safety
+- more anti-denormal code
+
+v0.05b
+10:50 PM 12/14/2002
+- added many distortion and remapping methods
+- fixed a bug no one would ever notice
+- renamed overdrive to shape, as it does more than just overdrive now
+- fixed lfo phase knob
+
+v0.04b
+4:26 AM 11/21/2002
+- fixed denormalization
+- made it sample-rate independant
+- fixed inertia
+
+v0.03b
+2:00 AM 10/24/2002
+- fixed right/left unbalance text
+
+v0.02b
+1:49 PM 10/14/2002
+- fixed moog b filters
+- added route control
+- added lfo phase control
+- added od gain lfo control
+- added unbalance lfo control
+- initial public release
+
+v0.01b
+- initial beta release
+
+/////////////////////////////////////////////////////////////////////

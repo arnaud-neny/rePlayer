@@ -1,0 +1,37 @@
+Pooplog Scratch Master psycle plugin
+Jeremy Evers
+negspect@runandgun.com
+
+/////////////////////////////////////////////////////////////////////
+Version History
+
+v0.06b
+5/19/2003
+- added some anti-denormal code
+
+v0.05b
+3:27 AM 12/20/2002
+- fixed buffer length to be accurate (sorry if you have to change your settings)
+
+v0.04b
+10:55 PM 12/14/2002
+- fixed lfo phase knobs
+
+v0.03b
+1:42 PM 11/21/2002
+- fixed to work at any sample rate
+
+v0.02b
+7:06 PM 10/23/2002
+- fixed buffer issues
+- fixed crosstalk issues
+- fixed unbalance right/left text
+- added more buffer lengths in the "fun range"
+- added input gain
+
+v0.01b
+- initial release
+
+to do:
+ some sort of smoothing flag for wrap, or even entire interpolation mode
+/////////////////////////////////////////////////////////////////////

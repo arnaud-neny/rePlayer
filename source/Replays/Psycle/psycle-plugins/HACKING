@@ -1,0 +1,19 @@
+- Developement -
+----------------
+
+=====
+ FAQ
+=====
+
+Q)	How can I develop a Psycle Machine?
+A)	There's no SDK yet, and format will change in Psycle 2, but right now,you can download
+	Psycle plugins' sourcecode and using one of them as a template for your plugin.
+	You can download them from Psycle's Source Forge Site at:
+	http://sourceforge.net/projects/psycle
+
+Q)	How can I port a Buzz machine to Psycle?
+A)	I've just developed a little SDK to do this. Find it on SourceForge Site as well:
+	http:www.sourceforge.net/projects/psycle
+	Note: Not tested.
+	Note2: You can check the sources of the M3 Psycle machine, which is a port of the
+	original M3 buzz machine.

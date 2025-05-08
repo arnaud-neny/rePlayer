@@ -1,0 +1,124 @@
+TODO: Update
+
+- Developement -
+----------------
+
+===================
+directory structure
+===================
+
+	include/: public headers of third party libraries
+	src/: sources (*.cpp), private headers (*.private.hpp), and public headers (*.hpp) of this package
+		psycle/:
+			host/: psycle host
+			plugins/: psycle plugins
+	make/: build systems for various compilers (only msvc so far!)
+		msvc_7.1/: solution and project files for msvc 7.1
+		msvc_8.0/: solution and project files for msvc 8.0
+			solution.sln: solution (.sln) file
+			projects/: project (.vcproj) files
+			output/*/: output files produced by the various config of the projects (not included in the source repository)
+				intermediate/: intermediate files (.pch, .obj, .ilk, .idb, ...) produced during compilation (not included in the source repository)
+				lib/: .lib and .exp files (not included in the source repository)
+				bin/: .dll and .exe (and .pdb) files (not included in the source repository)
+
+=====
+ FAQ
+=====
+
+Q)	How can I develop a Psycle Machine?
+A)	There's no SDK yet, and format will change in Psycle 2, but right now,you can download
+	Psycle plugins' sourcecode and using one of them as a template for your plugin.
+	You can download them from Psycle's Source Forge Site at:
+	http://sourceforge.net/projects/psycle
+
+Q)	How can I port a Buzz machine to Psycle?
+A)	I've just developed a little SDK to do this. Find it on SourceForge Site as well:
+	http:www.sourceforge.net/projects/psycle
+	Note: Not tested.
+	Note2: You can check the sources of the M3 Psycle machine, which is a port of the
+	original M3 buzz machine.
+
+Q)	When will Psycle 2 be out?/ In which stage is Psycle 2 developement? What do you
+	plan for Psycle 2?
+A)	"History" Part one:
+
+	Psycle 2 has been in a few stages since it was first talked about. On December 2000
+	Mats (the one that made the 1.1 versions ) started developing what was called Psycle 2.
+	When he had to left, Psycle 2 stopped, and Psycle 1.5 was done by [JAZ].
+	After some months, it was clear that Psycle needed a change to be improved further more
+	so it was time to think with Psycle 2 again, but instead of continuing Mats's work,
+	[JAZ] started to think on a newer design.
+	This design has been codenamed PsyClean, but has never really started to be
+	developed.
+
+	Then, There was a version that was temporarily called 1.9. This was started by Dan,
+	but left it because of work.
+	This version had some Data structure changes which aimed to give more tracks, volume
+	column (panning too?) , more lines per pattern, new song fileformat, and so on.
+
+
+	"History" Part two:
+
+	One guy called Dilvie contacted with the Psycle team, interested in developing a
+	tracker with similar aims to what Psycle had, and expand on his own ideas.
+
+	To make this a reality, Psycle was branched in Psycle 1 and PsycleII
+
+	Psycle 1 continued to be maintained by [JAZ] and pooplog. The aims where to continue
+	offering a version which was simple enough, stable and still powerfull, and to
+	fill the gap until PsycleII came out.
+
+	PsycleII wanted to be an audio studio (audio and video mixing, mastering...)
+	It was initially coded by Majick_ / MJK. He had most of the core ready, but left
+	for work too. Dilvie, on the other hand, started working on the GUI,
+	trying Mozilla XUL language as a start. Unfortunately, he was busy with work too
+	(yep... one more).
+	The latest news, unluckily, are that this branch is vapourware.
+
+
+	"Nowadays"
+
+	And here we go again. What's up?
+
+	In the last year there has been something called "freepsycle". This is nothing more
+	than yet another rewrite of it, with two aims: portability (multiplatform), and
+	more importantly (and hence the name), developped entirely with free tools (from
+	compilers to libraries as well as OSes). Bohan is the main person under this version.
+
+	Psycle 1 has undergone many internal changes, most of them thanks to Bohan aswell,
+	others, by [JAZ] and several other contributions by alk, sampler, zealmange and others.
+
+	Psycle 1.8 is released. This is mostly a maintenance version. It contains internal
+	code changes to a more standard way of coding, bugfixes and small additions in
+	several places. Also, some new machines are on the way, with Sampulse as the big name.
+	So there is, at least, some toys to play with.
+
+	"A step further"
+
+	So, what now? Well, these are the paths:
+
+	* Psycle 1.8.x : Of course, there will be several minor versions, with bugfixes and
+	small improvements on the vsthost and Sampulse. (since they are not finished for 1.8).
+
+	* Psycle 1.9 : This is the key branch. It consists of two big changes:
+		a) Engine moved to a librarly, allowing 3rd party players to be coded relatively easy.
+		b) Gui changes.
+
+		from a), there are the following subtasks:
+
+		a.1) Add multiIO ability, both in the sense of more than two channels (ex: surround) and
+				in the sense of multi outs ( like a mixer table ).
+		a.2) Add event based playback engine. (efficiency with memory handling and playback), 
+			as well as adding multipattern playback.
+		a.3) Change the VSThost. Use a new implementation which is avaible as GPL, which outperforms
+				Psycle's one. This needs work to adapt to psycle's internals.
+		a.4) change the native Host. Allow upgrade paths, as well as adding optional user defined GUI.
+		a.5) And the obvious changes to the fileformat.
+	
+		and b) could be divided in these tasks:
+
+		b.1) Move out of MFC ( at least of GDI, which is painfully slow ).
+		b.2) New editing views : sequence editor, multipattern view (sort of playback view), changes in
+				the machine editor (for multi-io wires), etc.
+		b.3) Tools : several import/export features.

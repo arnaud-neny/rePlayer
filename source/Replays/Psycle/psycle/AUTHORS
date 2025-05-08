@@ -1,0 +1,45 @@
+
+Psycle is copyright 2000-2007 the following people:
+
+=============
+Active coders
+=============
+Josep Maria Antolin Segura <jaz001@users.sourceforge.net>
+johan boule <johan-boule@users.sourceforge.net>
+Magnus Jonsson <zealmange@users.sourceforge.net>
+
+==============
+Retired coders
+==============
+Juan Antonio Arguelles Rius <arguru@users.sourceforge.net>
+Mats Hojlund <cbr@users.sourceforge.net>
+Daniel Arena <dubdub@users.sourceforge.net>
+Mark McCormack <mark_jj_mccormak@yahoo.co.uk>
+Marcin Kowalski "FideLoop" <mikowal@posejdon.wpk.p.lodz.pl>
+Lukasz Langa "kSh" <lukasz_langa@users.sourceforge.net>
+Jeremy Evers <pooplog@users.sourceforge.net>
+Martin Etnestad Johansen <lobywang@users.sourceforge.net>
+James Redfern <alkenstein@users.sourceforge.net>
+Jose Enrique <sampler@users.sourceforge.net>
+Guido Vranken <guidovranken@users.sourceforge.net>
+Patrick Haworth <trancemyriad@users.sourceforge.net>
+
+=============
+plugin coders 
+=============
+Joakim Dahlstrom <druttis@users.sourceforge.net>
+Dmitry Kulikov <sartorius@users.sourceforge.net>
+Jan-Marco Edelmann <voskomo@users.sourceforge.net>
+
+Note: Some plugins contain source code from other sources, as noted in their
+respective README files.
+
+
+=======================================================
+
+Psycle also uses source code or modifications of source code from other
+authors, as noted in each respective source file. The authors of those sources
+include:
+
+Satoshi Fujiwara <sfpg@users.sourceforge.jp>
+Hermann Seib (http://www.hermannseib.com/english/vsthost.htm)

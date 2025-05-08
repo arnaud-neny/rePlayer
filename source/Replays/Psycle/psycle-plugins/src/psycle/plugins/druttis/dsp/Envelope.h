@@ -1,0 +1,117 @@
+//////////////////////////////////////////////////////////////////////
+//
+//				Envelope.h
+//
+//				druttis@darkface.pp.se
+//
+//////////////////////////////////////////////////////////////////////
+#pragma once
+namespace psycle::plugins::druttis {
+//////////////////////////////////////////////////////////////////////
+//
+//				Constants
+//
+//////////////////////////////////////////////////////////////////////
+#define ENVELOPE_IDLE 0
+#define ENVELOPE_DELAY 1
+#define ENVELOPE_ATTACK 2
+#define ENVELOPE_DECAY 3
+#define ENVELOPE_SUSTAIN 4
+#define ENVELOPE_RELEASE 5
+#define ENVELOPE_DONE 6
+#define ENVELOPE_MAXTICKS 32767
+//////////////////////////////////////////////////////////////////////
+//
+//				Envelope class
+//
+//////////////////////////////////////////////////////////////////////
+class Envelope
+{
+	//////////////////////////////////////////////////////////////////
+	//
+	//				Properties
+	//
+	//////////////////////////////////////////////////////////////////
+private:
+	int								m_delay;
+	int								m_attack;
+	int								m_decay;
+	float				m_sustain;
+	int								m_length;
+	int								m_release;
+	//////////////////////////////////////////////////////////////////
+	//
+	//				Internal variables
+	//
+	//////////////////////////////////////////////////////////////////
+	int								m_state;
+	int								m_ticks;
+	int								m_decr;
+	float				m_value;
+	float				m_coeff;
+	//////////////////////////////////////////////////////////////////
+	//
+	//				Constructor & Destructor
+	//
+	//////////////////////////////////////////////////////////////////
+public:
+	Envelope();
+	~Envelope();
+	//////////////////////////////////////////////////////////////////
+	//
+	//				Get / Set Methods
+	//
+	//////////////////////////////////////////////////////////////////
+	int GetDelay();
+	void SetDelay(int delay);
+	int GetAttack();
+	void SetAttack(int attack);
+	int GetDecay();
+	void SetDecay(int decay);
+	float GetSustain();
+	void SetSustain(float sustain);
+	int GetLength();
+	void SetLength(int length);
+	int GetRelease();
+	void SetRelease(int release);
+	inline float GetValue()
+	{
+		return m_value;
+	}
+	//////////////////////////////////////////////////////////////////
+	//
+	//				Methods
+	//
+	//////////////////////////////////////////////////////////////////
+	//				Inline
+	inline void Reset()
+	{
+		m_state = ENVELOPE_IDLE;
+		m_ticks = ENVELOPE_MAXTICKS;
+		m_decr = 0;
+		m_value = 0.0f;
+		m_coeff = 0.0f;
+	}
+	//				Normal
+	void Start();
+	void Stop();
+	//				Inline
+	inline bool IsIdle()
+	{
+		return (m_state == ENVELOPE_IDLE);
+	}
+	//				Normal
+	int Clip(int nsamples);
+	//				Inline
+	inline float Next()
+	{
+		m_ticks -= m_decr;
+		m_value += m_coeff;
+		return m_value;
+	}
+	//				Normal
+	void Skip(int nsamples);
+	void Fill(float *pout, int nsamples);
+	void Add(float *pout, float *pin, int nsamples);
+};
+}
