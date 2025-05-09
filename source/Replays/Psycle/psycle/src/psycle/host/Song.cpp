@@ -300,7 +300,8 @@ namespace psycle
 			{
 				char buf[128];
 				std::sprintf(buf,"Cannot exchange the mixer with any other machine, or any send effect of the mixer");
-				MessageBox(0, buf, "Exchange Machine", 0);
+				//MessageBox(0, buf, "Exchange Machine", 0);
+				psycle::host::Global::pLogCallback(buf, "Exchange Machine");
 				return false;
 			}
 			// if they are both valid
@@ -457,7 +458,8 @@ namespace psycle
 							///\todo wtf? duplicate machine? could happen if loader messes up?
 							char buf[128];
 							std::sprintf(buf,"%d and %d have duplicate pointers", c, j);
-							MessageBox(0, buf, "Duplicate Machine", 0);
+							//MessageBox(0, buf, "Duplicate Machine", 0);
+							psycle::host::Global::pLogCallback(buf, "Duplicate Machine");
 							_pMachine[j] = 0;
 						}
 					}
@@ -2433,7 +2435,8 @@ namespace psycle
 								// Since we don't know if the plugin saved it or not, 
 								// we're stuck on letting the loading crash/behave incorrectly.
 								// There should be a flag, like in the VST loading Section to be correct.
-								MessageBox(NULL,"Missing or Corrupted VST plug-in has chunk, trying not to crash.", "Loading Error", MB_OK);
+								//MessageBox(NULL,"Missing or Corrupted VST plug-in has chunk, trying not to crash.", "Loading Error", MB_OK);
+								psycle::host::Global::pLogCallback("Missing or Corrupted VST plug-in has chunk, trying not to crash.", "Loading Error");
 							}
 						}
 						else if (( pMac[i]->_type == MACH_VST ) || ( pMac[i]->_type == MACH_VSTFX))
@@ -2566,7 +2569,8 @@ namespace psycle
 			}
 
 			// load did not work
-			MessageBox(NULL,"Incorrect file format","Error",MB_OK);
+			//MessageBox(NULL,"Incorrect file format","Error",MB_OK);
+			psycle::host::Global::pLogCallback("Incorrect file format", "Error");
 			return false;
 		}
 

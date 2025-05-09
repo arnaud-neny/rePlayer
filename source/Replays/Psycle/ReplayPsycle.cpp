@@ -94,12 +94,11 @@ namespace rePlayer
 
     Replay* ReplayPsycle::Load(io::Stream* stream, CommandBuffer metadata)
     {
-        auto data = stream->Read();
-        if (data.Size() < 8)
-            return nullptr;
+        char header[8] = {};
+        stream->Read(header, 8);
 
-        bool isPsyCle3 = memcmp(data.Items(), "PSY3SONG", 8) == 0;
-        bool isPsyCle2 = !isPsyCle3 && memcmp(data.Items(), "PSY2SONG", 8) == 0;
+        bool isPsyCle3 = memcmp(header, "PSY3SONG", 8) == 0;
+        bool isPsyCle2 = !isPsyCle3 && memcmp(header, "PSY2SONG", 8) == 0;
         if (isPsyCle2 || isPsyCle3)
         {
             psycle::plugins::druttis::InitLibrary();
@@ -131,6 +130,7 @@ namespace rePlayer
             psycle::host::CProgressDialog dlg;
             StreamRiffFile riffFile;
             riffFile.m_stream = stream;
+            stream->Seek(0, io::Stream::kSeekBegin);
             if (psycle::host::Global::song().Load(&riffFile, dlg))
                 return new ReplayPsycle(isPsyCle3);
 
