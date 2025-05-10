@@ -434,7 +434,10 @@ namespace psycle
 				loggers::warning()(s.str(), UNIVERSALIS__COMPILER__LOCATION);
 			} else accumulated_routing_time_ += d;
 		}
-		
+
+		public:
+            std::vector<bool> m_currentPlayedOrder;
+            std::vector<bool> m_playedOrder;
 		};
 	}
 }

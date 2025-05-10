@@ -53,6 +53,7 @@ namespace rePlayer
         psycle::host::Song* m_song;
         std::vector<char*> m_clipboardMem;
         uint32_t m_clipboarMemSize = 0;
+        uint32_t m_numSubsongs;
         bool m_isPsycle3;
     };
 }

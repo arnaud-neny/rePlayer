@@ -176,7 +176,8 @@ namespace rePlayer
         m_clipboardMem.push_back(reinterpret_cast<char*>(&m_clipboarMemSize));
         m_clipboardMem.push_back(nullptr);
         psycle::host::Global::player().StartRecording("", 32, kSampleRate, psycle::host::no_mode, true, false, 0, 0, &m_clipboardMem);
-        psycle::host::Global::player().Start(0, 0);
+        m_numSubsongs = psycle::host::Global::player().NumSubsongs(psycle::host::Global::song());
+        psycle::host::Global::player().Start(psycle::host::Global::player().NumSubsongs(psycle::host::Global::song(), 0), 0);
     }
 
     uint32_t ReplayPsycle::Render(StereoSample* output, uint32_t numSamples)
@@ -189,7 +190,7 @@ namespace rePlayer
 
     void ReplayPsycle::ResetPlayback()
     {
-        psycle::host::Global::player().Start(0, 0);
+        psycle::host::Global::player().Start(psycle::host::Global::player().NumSubsongs(psycle::host::Global::song(), m_subsongIndex), 0);
     }
 
     void ReplayPsycle::ApplySettings(const CommandBuffer metadata)
@@ -199,7 +200,7 @@ namespace rePlayer
 
     void ReplayPsycle::SetSubsong(uint32_t subsongIndex)
     {
-        UnusedArg(subsongIndex);
+        m_subsongIndex = subsongIndex;
         ResetPlayback();
     }
 
@@ -209,13 +210,13 @@ namespace rePlayer
         int pos = -1;
         int time = -1;
         int linecountloc = -1;
-        psycle::host::Global::player().CalcPosition(psycle::host::Global::song(), seq, pos, time, linecountloc);
+        psycle::host::Global::player().CalcPosition(psycle::host::Global::song(), seq, pos, time, linecountloc, false, psycle::host::Global::player().NumSubsongs(psycle::host::Global::song(), m_subsongIndex));
         return uint32_t(time);
     }
 
     uint32_t ReplayPsycle::GetNumSubsongs() const
     {
-        return 1;
+        return m_numSubsongs;
     }
 
     std::string ReplayPsycle::GetExtraInfo() const

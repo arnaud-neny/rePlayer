@@ -154,6 +154,8 @@ void Player::start_threads(int thread_count) {
 				sampleCount=0;
 				runninglineCount=0;
 			}
+            Global::song().m_currentPlayedOrder = Global::song().m_playedOrder;
+            Global::song().m_currentPlayedOrder[_playPosition] = true;
 
 			if (initialize)
 			{
@@ -615,7 +617,20 @@ void Player::clear_plan() {
 		{
 			Song& song = Global::song();
 			int prevpattern = _playPosition;
-			if ( _patternjump!=-1 ) _playPosition= _patternjump;
+			auto checkLoop = [&]()
+			{
+				if (song.m_currentPlayedOrder[_playPosition])
+				{
+					_looped = true;
+					song.m_currentPlayedOrder = song.m_playedOrder;
+				}
+				song.m_currentPlayedOrder[_playPosition] = true;
+			};
+			if (_patternjump != -1)
+			{
+				_playPosition = _patternjump;
+				checkLoop();
+			}
 			if ( _SPRChanged ) { RecalcSPR(); _SPRChanged = false; }
 			if ( _linejump!=-1 ) _lineCounter=_linejump;
 			else _lineCounter++;
@@ -633,7 +648,11 @@ void Player::clear_plan() {
 			{
 				_lineCounter = 0;
 				if(!_playBlock)
-					_playPosition++;
+                {
+                    _playPosition++;
+					if (_playPosition < song.playLength)
+						checkLoop();
+                }
 				else
 				{
 					_playPosition++;
@@ -648,6 +667,8 @@ void Player::clear_plan() {
 				if( _loopSong )
 				{
 					_looped = true;
+                    song.m_currentPlayedOrder = song.m_playedOrder;
+					song.m_currentPlayedOrder[0] = true;
 					if(( _playBlock) && (song.playOrderSel[_playPosition] == false))
 					{
 						while((!song.playOrderSel[_playPosition]) && ( _playPosition< song.playLength)) _playPosition++;
@@ -683,7 +704,7 @@ void Player::SeekToPosition(Song& song, int seektime_ms,bool allowLoop)
 	Start(seq,pos);
 }
 
-int Player::CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &inoutseektime_ms,int &inoutlinecount,bool allowLoop)
+int Player::CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &inoutseektime_ms,int &inoutlinecount,bool allowLoop, int startPos)
 {
 	const double seektime = inoutseektime_ms/1000.0;
 	double songLength = 0;
@@ -700,10 +721,16 @@ int Player::CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &i
 	double lineSeconds = secsPerTick*(extratick_calc + ticksperline);
 */
 
+	song.m_currentPlayedOrder = song.m_playedOrder;
+
 	inoutlinecount=0;
-	int playPos=0;
+	int playPos= startPos;
 	while(playPos <song.playLength)
 	{
+		if (song.m_currentPlayedOrder[playPos] && inoutseqPos == -1)
+			break;
+		song.m_currentPlayedOrder[playPos] = true;
+
 		int pattern = song.playOrder[playPos];
 		unsigned char* const plineOffset = song._ppattern(pattern);
 		int loopCount=0;
@@ -858,6 +885,134 @@ int Player::CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &i
 	}
 	inoutseektime_ms = round<int>(songLength*1000.0);
 	return round<int>(songLength*m_SampleRate);
+}
+
+int Player::NumSubsongs(Song& song, int subsongIndex)
+{
+	song.m_playedOrder.resize(song.playLength);
+	std::fill(song.m_playedOrder.begin(), song.m_playedOrder.end(), false);
+	int numPlayedOrder = 0;
+	int numSubsongs = 0;
+
+	while (numPlayedOrder < song.playLength)
+	{
+		int playPos;
+		for (playPos = 0; playPos < song.playLength; playPos++)
+		{
+			if (!song.m_playedOrder[playPos])
+			{
+				if (subsongIndex == -1)
+					numSubsongs++;
+				else if (subsongIndex-- == 0)
+                {
+					song.m_currentPlayedOrder = song.m_playedOrder;
+                    return playPos;
+                }
+				break;
+			}
+		}
+
+		while (playPos < song.playLength)
+		{
+			if (song.m_playedOrder[playPos])
+				break;
+			song.m_playedOrder[playPos] = true;
+			numPlayedOrder++;
+
+			auto parse = [&]()
+			{
+				int pattern = song.playOrder[playPos];
+				unsigned char* const plineOffset = song._ppattern(pattern);
+				int loopCount = 0;
+				int loopLine = 0;
+				int patternJump = -1;
+				int playLine = 0;
+				int l = 0;
+				while (playLine < song.patternLines[pattern])
+				{
+					int lineJump = -1;
+					for (int track = 0; track < song.SONGTRACKS; track++)
+					{
+						PatternEntry* pEntry = reinterpret_cast<PatternEntry*>(plineOffset + l + track * EVENT_SIZE);
+
+						if (pEntry->_note < notecommands::tweak || pEntry->_note == notecommands::empty) // If This isn't a tweak (twk/tws/mcm) then do
+						{
+							switch (pEntry->_cmd)
+							{
+							case PatternCmd::EXTENDED:
+								if (pEntry->_parameter != 0)
+								{
+									if ((pEntry->_parameter & 0xE0) == 0) // range from 0 to 1F for LinesPerBeat.
+									{
+									}
+									else if ((pEntry->_parameter & 0xF0) == PatternCmd::PATTERN_LOOP)
+									{
+										int value = pEntry->_parameter & 0x0F;
+										if (value == 0)
+										{
+											loopLine = playLine;
+										}
+										else if (loopCount == 0) {
+											loopCount = value;
+											lineJump = loopLine;
+										}
+										else {
+											if (--loopCount) lineJump = loopLine;
+											else loopLine = playLine + 1; //This prevents infinite loop in specific cases.
+										}
+									}
+								}
+								break;
+							case PatternCmd::JUMP_TO_ORDER:
+								if (pEntry->_parameter < song.playLength) {
+									if (pEntry->_parameter <= playPos) {
+										return;
+									}
+									patternJump = pEntry->_parameter;
+									lineJump = 0;
+								}
+								break;
+							case PatternCmd::BREAK_TO_LINE:
+								if (patternJump == -1)
+								{
+									if (playPos + 1 >= song.playLength) {
+										return;
+									}
+									else patternJump = playPos + 1;
+								}
+								else if (patternJump == playPos && pEntry->_parameter <= playLine) {
+									return;
+								}
+								//No need to check limits. That is done by the loop.
+								lineJump = pEntry->_parameter;
+								break;
+							default:break;
+							}
+						}
+					}
+					if (patternJump != -1) {
+						playPos = patternJump;
+						playLine = lineJump;
+						l = playLine * MULTIPLY;
+						break;
+					}
+					else if (lineJump != -1) {
+						playLine = lineJump;
+						l = playLine * MULTIPLY;
+					}
+					else {
+						playLine++;
+						l += MULTIPLY;
+					}
+				}
+				if (patternJump == -1) {
+					playPos++;
+				}
+			};
+			parse();
+		}
+	}
+	return numSubsongs;
 }
 
 void Player::CalculatePPQforVst()
@@ -1114,8 +1269,8 @@ void Player::stop_threads() {
 			Master::_pMasterSamples = _pBuffer;
 			cpu_time_clock::time_point const t0(cpu_time_clock::now());
 			sampleOffset = 0;
-            if (_looped)
-                _looped = false;
+			if (_looped)
+				_looped = false;
 			else do
 			{
 				// Song play
@@ -1277,7 +1432,7 @@ void Player::stop_threads() {
 			int *length = reinterpret_cast<int*>((*pClipboardmem)[0]);
 			//position in this buffer.
 // 			int pos = *length%1000000;
-            int pos = *length;
+			int pos = *length;
 
 // 			int d(0);
 // 			if(sample > 32767.0f) sample = 32767.0f;

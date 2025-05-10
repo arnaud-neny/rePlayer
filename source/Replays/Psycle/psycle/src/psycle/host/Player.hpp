@@ -41,7 +41,9 @@ namespace psycle
 			void ExecuteLine();
 			/// Calculates position (by line or by time) and returns the samples and the time to that position.
 			/// if all are -1, then it returns total time.
-			int Player::CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &inoutseektime_ms, int& inoutlinecount, bool allowLoop=false);
+			int CalcPosition(Song& song, int &inoutseqPos, int& inoutpatLine, int &inoutseektime_ms, int& inoutlinecount, bool allowLoop=false, int startPos = 0);
+			int NumSubsongs(Song& song, int subsongIndex = -1);
+
 			/// seeks to a position seektime_ms  in milliseconds
 			void SeekToPosition(psycle::host::Song& song, int seektime_ms = -1,bool allowLoop=false);
 			void CalculatePPQforVst();
