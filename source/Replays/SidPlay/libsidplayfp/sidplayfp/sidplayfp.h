@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2000 Simon White
  *
@@ -109,6 +109,35 @@ public:
      *         to get a detailed message.
      */
     uint_least32_t play(short *buffer, uint_least32_t count);
+
+    /**
+     * Get the buffer pointers for each of the installed SID chip.
+     *
+     * @param buffers pointer to the array of buffer pointers.
+     * @since 2.14
+     */
+    void buffers(short** buffers) const;
+
+    /**
+     * Run the emulation for selected number of cycles.
+     * The value will be limited to a reasonable amount
+     * if too large.
+     *
+     * @param cycles the number of cycles to run.
+     * @return the number of produced samples or zero
+     * for hardware devices. If negative an error occurred,
+     * use #error() to get a detailed message.
+     * @since 2.14
+     */
+    int play(unsigned int cycles);
+
+    /**
+     * Get the number of installed SID chips.
+     *
+     * @return the number of SID chips.
+     * @since 2.14
+     */
+    unsigned int installedSIDs() const;
 
     /**
      * Check if the engine is playing or stopped.

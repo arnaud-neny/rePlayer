@@ -135,7 +135,7 @@ void Player::initialise()
     const SidTuneInfo* tuneInfo = m_tune->getInfo();
 
     const uint_least32_t size = static_cast<uint_least32_t>(tuneInfo->loadAddr()) + tuneInfo->c64dataLen() - 1;
-    if (size > 0xffff)
+    if (size > 0xffff) UNLIKELY
     {
         throw configError(ERR_UNSUPPORTED_SIZE);
     }
@@ -157,7 +157,7 @@ void Player::initialise()
     }
 
     psiddrv driver(m_tune->getInfo());
-    if (!driver.drvReloc())
+    if (!driver.drvReloc()) UNLIKELY
     {
         throw configError(driver.errorString());
     }
@@ -168,7 +168,7 @@ void Player::initialise()
 
     driver.install(m_c64.getMemInterface(), videoSwitch);
 
-    if (!m_tune->placeSidTuneInC64mem(m_c64.getMemInterface()))
+    if (!m_tune->placeSidTuneInC64mem(m_c64.getMemInterface())) UNLIKELY
     {
         throw configError(m_tune->statusString());
     }
@@ -190,10 +190,10 @@ bool Player::load(SidTune *tune)
 {
     m_tune = tune;
 
-    if (tune != nullptr)
+    if (tune != nullptr) UNLIKELY
     {
         // Must re-configure on fly for stereo support!
-        if (!config(m_cfg, true))
+        if (!config(m_cfg, true)) UNLIKELY
         {
             // Failed configuration with new tune, reject it
             m_tune = nullptr;
@@ -216,6 +216,60 @@ void Player::filter(unsigned int sidNum, bool enable)
     sidemu *s = m_mixer.getSid(sidNum);
     if (s != nullptr)
         s->filter(enable);
+}
+
+void Player::buffers(short** buffers) const
+{
+    for (unsigned int i = 0; i < Mixer::MAX_SIDS; i++)
+    {
+        sidemu *s = m_mixer.getSid(i);
+        buffers[i] = s ? s->buffer() : nullptr;
+    }
+}
+
+int Player::play(unsigned int cycles)
+{
+    // Make sure a tune is loaded
+    if (m_tune == nullptr) UNLIKELY
+    {
+        m_errorString = "No tune loaded";
+        return -1;
+    }
+
+    // Limit to roughly 20ms
+    constexpr unsigned int max_cycles = 20000;
+    if (cycles > max_cycles)
+    {
+        cycles = max_cycles;
+    }
+
+    try
+    {
+        for (unsigned int i = 0; i < cycles; i++)
+            m_c64.clock();
+
+        int sampleCount = 0;
+        for (unsigned int i = 0; i < Mixer::MAX_SIDS; i++)
+        {
+            sidemu *s = m_mixer.getSid(i);
+            if (s)
+            {
+                // clock the chip and get the buffer
+                // buffersize is expected to be the same
+                // for all chips
+                s->clock();
+                sampleCount = s->bufferpos();
+                // Reset the buffer
+                s->bufferpos(0);
+            }
+        }
+        return sampleCount;
+    }
+    catch (MOS6510::haltInstruction const &)
+    {
+        m_errorString = "Illegal instruction executed";
+        return -1;
+    }
 }
 
 /**
@@ -339,7 +393,7 @@ bool Player::config(const SidConfig &cfg, bool force)
     }
 
     // Check for a sane sampling frequency
-    if ((cfg.frequency < 8000) || (cfg.frequency > 192000))
+    if ((cfg.frequency < 8000) || (cfg.frequency > 192000)) UNLIKELY
     {
         m_errorString = ERR_UNSUPPORTED_FREQ;
         return false;
@@ -563,7 +617,7 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
         // Setup base SID
         const SidConfig::sid_model_t userModel = getSidModel(tuneInfo->sidModel(0), defaultModel, forced);
         sidemu *s = builder->lock(m_c64.getEventScheduler(), userModel, digiboost);
-        if (!builder->getStatus())
+        if (!builder->getStatus()) UNLIKELY
         {
             throw configError(builder->error());
         }
@@ -585,12 +639,12 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
                 const SidConfig::sid_model_t userModel = getSidModel(tuneInfo->sidModel(i+1), defaultModel, forced);
 
                 sidemu *s = builder->lock(m_c64.getEventScheduler(), userModel, digiboost);
-                if (!builder->getStatus())
+                if (!builder->getStatus()) UNLIKELY
                 {
                     throw configError(builder->error());
                 }
 
-                if (!m_c64.addExtraSid(s, extraSidAddresses[i]))
+                if (!m_c64.addExtraSid(s, extraSidAddresses[i])) UNLIKELY
                     throw configError(ERR_UNSUPPORTED_SID_ADDR);
 
                 m_mixer.addSid(s);

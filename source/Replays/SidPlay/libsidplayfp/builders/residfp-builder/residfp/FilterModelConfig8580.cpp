@@ -30,6 +30,12 @@
 #include <mutex>
 #include <thread>
 
+// rePlayer begin: to get rid of msvcpxxx_atomic_wait.dll
+#if defined(__cpp_lib_jthread)
+#undef __cpp_lib_jthread
+#endif
+// rePlayer end
+
 namespace reSIDfp
 {
 

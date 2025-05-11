@@ -94,12 +94,6 @@ constexpr uint_least32_t MAX_FILELEN = MAX_MEMORY + 2 + 0x7C;
 /// Minimum load address for real c64 only tunes
 constexpr uint_least16_t SIDTUNE_R64_MIN_LOAD_ADDR = 0x07e8;
 
-SidTuneBase* SidTuneBase::load(const char* fileName, const char **fileNameExt,
-                 bool separatorIsSlash)
-{
-    return load(nullptr, nullptr, fileName, fileNameExt, separatorIsSlash);
-}
-
 SidTuneBase* SidTuneBase::load(LoaderFunc loader, void* loaderData, const char* fileName,
                  const char **fileNameExt, bool separatorIsSlash)
 {
@@ -112,11 +106,6 @@ SidTuneBase* SidTuneBase::load(LoaderFunc loader, void* loaderData, const char* 
         return getFromStdIn();
 #endif
     return getFromFiles(loader, loaderData, fileName, fileNameExt, separatorIsSlash);
-}
-
-SidTuneBase* SidTuneBase::read(const uint_least8_t* sourceBuffer, uint_least32_t bufferLen)
-{
-    return getFromBuffer(sourceBuffer, bufferLen);
 }
 
 SidTuneBase* SidTuneBase::read(const uint_least8_t* firstSourceBuffer, uint_least32_t firstBufferLen, const uint_least8_t* secondSourceBuffer, uint_least32_t secondBufferLen)
@@ -139,17 +128,6 @@ SidTuneBase* SidTuneBase::read(const uint_least8_t* firstSourceBuffer, uint_leas
 
     s->acceptSidTune("-", "-", buf1, false);
     return s.release();
-}
-
-const SidTuneInfo* SidTuneBase::getInfo() const
-{
-    return info.get();
-}
-
-const SidTuneInfo* SidTuneBase::getInfo(unsigned int songNum)
-{
-    selectSong(songNum);
-    return info.get();
 }
 
 unsigned int SidTuneBase::selectSong(unsigned int selectedSong)
@@ -384,11 +362,6 @@ void SidTuneBase::createNewFileName(std::string& destString,
 }
 
 // Initializing the object based upon what we find in the specified file.
-
-SidTuneBase* SidTuneBase::getFromFiles(const char* fileName, const char **fileNameExtensions, bool separatorIsSlash)
-{
-    return getFromFiles(nullptr, nullptr, fileName, fileNameExtensions, separatorIsSlash);
-}
 
 SidTuneBase* SidTuneBase::getFromFiles(LoaderFunc loader, void* loaderData, const char* fileName, const char **fileNameExtensions, bool separatorIsSlash)
 {
