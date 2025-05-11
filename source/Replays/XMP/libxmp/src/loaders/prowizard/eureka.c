@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_eu(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_eu(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1080];
 	uint8 c1;
@@ -42,7 +42,7 @@ static int depack_eu(HIO_HANDLE *in, mem_out *out) // rePlayer
 
 	/* read header ... same as ptk */
 	hio_read(tmp, 1080, 1, in);
-	bwrite(tmp, 1080, 1, out); // rePlayer
+	fwrite(tmp, 1080, 1, out);
 
 	/* now, let's sort out that a bit :) */
 	/* first, the whole sample size */
@@ -98,7 +98,7 @@ static int depack_eu(HIO_HANDLE *in, mem_out *out) // rePlayer
 				}
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	hio_seek(in, smp_addr, SEEK_SET);

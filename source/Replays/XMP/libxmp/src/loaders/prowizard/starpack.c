@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_starpack(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_starpack(HIO_HANDLE *in, FILE *out)
 {
 	uint8 pnum[128];
 	uint8 pnum_tmp[128];
@@ -164,7 +164,7 @@ static int depack_starpack(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 
 	write8(out, 0x7f);			/* write noisetracker byte */
-	bwrite(pnum, 128, 1, out);		/* write pattern list */ // rePlayer
+	fwrite(pnum, 128, 1, out);		/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);		/* M.K. */
 
 	/* read sample data address */
@@ -196,7 +196,7 @@ static int depack_starpack(HIO_HANDLE *in, mem_out *out) // rePlayer
 				buffer[ofs + 2] |= (c5 << 4) & 0xf0;
 			}
 		}
-		bwrite(buffer, 1024, 1, out); // rePlayer
+		fwrite(buffer, 1024, 1, out);
 		/*printf ( "+" ); */
 	}
 	/*printf ( "\n" ); */

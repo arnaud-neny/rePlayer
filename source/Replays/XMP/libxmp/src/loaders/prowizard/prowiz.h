@@ -29,13 +29,13 @@
 struct pw_format {
 	const char *name;
 	int (*test)(const uint8 *, char *, int);
-	int (*depack)(HIO_HANDLE *, mem_out *); // rePlayer
+	int (*depack)(HIO_HANDLE *, FILE *);
 	/*struct list_head list;*/
 };
 
-int pw_wizardry(HIO_HANDLE *, mem_out *, const char **); // rePlayer
-int pw_move_data(mem_out *, HIO_HANDLE *, int); // rePlayer
-int pw_write_zero(mem_out *, int); // rePlayer
+int pw_wizardry(HIO_HANDLE *, FILE *, const char **);
+int pw_move_data(FILE *, HIO_HANDLE *, int);
+int pw_write_zero(FILE *, int);
 /* int pw_enable(char *, int); */
 const struct pw_format *pw_check(HIO_HANDLE *, struct xmp_test_info *);
 void pw_read_title(const unsigned char *, char *, int);

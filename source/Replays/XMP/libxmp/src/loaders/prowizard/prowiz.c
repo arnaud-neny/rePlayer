@@ -81,21 +81,21 @@ const struct pw_format *const pw_formats[NUM_PW_FORMATS + 1] = {
 	NULL
 };
 
-int pw_move_data(mem_out *out, HIO_HANDLE *in, int len) // rePlayer
+int pw_move_data(FILE *out, HIO_HANDLE *in, int len)
 {
 	uint8 buf[1024];
 	int l;
 
 	do {
 		l = hio_read(buf, 1, len > 1024 ? 1024 : len, in);
-		bwrite(buf, 1, l, out); // rePlayer
+		fwrite(buf, 1, l, out);
 		len -= l;
 	} while (l > 0 && len > 0);
 
 	return 0;
 }
 
-int pw_write_zero(mem_out *out, int len) // rePlayer
+int pw_write_zero(FILE *out, int len)
 {
 	uint8 buf[1024];
 	int l;
@@ -103,14 +103,14 @@ int pw_write_zero(mem_out *out, int len) // rePlayer
 	do {
 		l = len > 1024 ? 1024 : len;
 		memset(buf, 0, l);
-		bwrite(buf, 1, l, out);	// rePlayer
+		fwrite(buf, 1, l, out);
 		len -= l;
 	} while (l > 0 && len > 0);
 
 	return 0;
 }
 
-int pw_wizardry(HIO_HANDLE *file_in, mem_out *file_out, const char **name) // rePlayer
+int pw_wizardry(HIO_HANDLE *file_in, FILE *file_out, const char **name)
 {
 	const struct pw_format *format;
 
@@ -156,11 +156,11 @@ const struct pw_format *pw_check(HIO_HANDLE *f, struct xmp_test_info *info)
 		b = NULL;
 
 	} else {
-	b = (unsigned char *) calloc(1, BUF_SIZE);
-	if (b == NULL)
-		return NULL;
+		b = (unsigned char *) calloc(1, BUF_SIZE);
+		if (b == NULL)
+			return NULL;
 
-	s = hio_read(b, 1, s, f);
+		s = hio_read(b, 1, s, f);
 		src = b;
 	}
 

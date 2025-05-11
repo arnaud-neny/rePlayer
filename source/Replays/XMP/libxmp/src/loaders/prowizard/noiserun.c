@@ -37,7 +37,7 @@ static const int fine_table[] = {
 };
 
 
-static int depack_nru(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_nru(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1025];
 	uint8 ptable[128];
@@ -86,7 +86,7 @@ static int depack_nru(HIO_HANDLE *in, mem_out *out) // rePlayer
 	/* pattern table */
 	max_pat = 0;
 	hio_read(ptable, 128, 1, in);
-	bwrite(ptable, 128, 1, out); // rePlayer
+	fwrite(ptable, 128, 1, out);
 	for (i = 0; i < 128; i++) {
 		if (ptable[i] > max_pat)
 			max_pat = ptable[i];
@@ -125,7 +125,7 @@ static int depack_nru(HIO_HANDLE *in, mem_out *out) // rePlayer
 			pat_data[j * 4 + 2] |= fxt;
 			pat_data[j * 4 + 3] = fxp;
 		}
-		bwrite (pat_data, 1024, 1, out); // rePlayer
+		fwrite (pat_data, 1024, 1, out);
 	}
 
 	pw_move_data(out, in, ssize);		/* sample data */

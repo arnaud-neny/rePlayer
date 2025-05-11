@@ -30,6 +30,9 @@
     <Filter Include="Source Files\libxmp\src\depackers\lhasa">
       <UniqueIdentifier>{86d00a33-a3cd-4cc1-b0d1-cb93b6c0fc0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\wrap">
+      <UniqueIdentifier>{2c2d9f42-3fce-4a5a-9cca-ae1094b8358e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayXMP.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="libxmp\src\depackers\lhasa\macbinary.h">
       <Filter>Source Files\libxmp\src\depackers\lhasa</Filter>
+    </ClInclude>
+    <ClInclude Include="wrap\stdio.h">
+      <Filter>Source Files\wrap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

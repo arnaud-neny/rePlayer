@@ -204,13 +204,13 @@ static int pw_load(struct module_data *m, HIO_HANDLE *h, const int start)
 	// rePlayer end
 
 	hio_close(f);
-	bclose(&temp);//unlink_temp_file(temp_name); // rePlayee
+	fclose(&temp);//unlink_temp_file(temp_name); // rePlayer
 	return 0;
 
     err3:
 	hio_close(f);
     err2:
-	bclose(&temp);//unlink_temp_file(temp_name); // rePlayer
+	fclose(&temp);//unlink_temp_file(temp_name); // rePlayer
     err:
 	return -1;
 }

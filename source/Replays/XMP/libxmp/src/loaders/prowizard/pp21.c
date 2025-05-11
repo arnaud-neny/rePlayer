@@ -39,7 +39,7 @@
 #include "prowiz.h"
 
 
-static int depack_pp21_pp30(HIO_HANDLE *in, mem_out *out, int is_30) // rePlayer
+static int depack_pp21_pp30(HIO_HANDLE *in, FILE *out, int is_30)
 {
 	uint8 ptable[128];
 	int max = 0;
@@ -130,7 +130,7 @@ static int depack_pp21_pp30(HIO_HANDLE *in, mem_out *out, int is_30) // rePlayer
 			memcpy(b + 8, tab + tptr[trk[2][i]][j] * 4, 4);
 			memcpy(b + 12, tab + tptr[trk[3][i]][j] * 4, 4);
 		}
-		bwrite (buf, 1024, 1, out); // rePlayer
+		fwrite (buf, 1024, 1, out);
 	}
 
 	free (tab);
@@ -141,12 +141,12 @@ static int depack_pp21_pp30(HIO_HANDLE *in, mem_out *out, int is_30) // rePlayer
 	return 0;
 }
 
-static int depack_pp21(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_pp21(HIO_HANDLE *in, FILE *out)
 {
 	return depack_pp21_pp30(in, out, 0);
 }
 
-static int depack_pp30(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_pp30(HIO_HANDLE *in, FILE *out)
 {
 	return depack_pp21_pp30(in, out, 1);
 }

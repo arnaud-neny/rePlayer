@@ -29,7 +29,7 @@
 #include "prowiz.h"
 
 
-static int depack_hrt(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_hrt(HIO_HANDLE *in, FILE *out)
 {
 	uint8 buf[1024];
 	uint8 c1, c2, c3, c4;
@@ -44,7 +44,7 @@ static int depack_hrt(HIO_HANDLE *in, mem_out *out) // rePlayer
 		uint8 *pos = buf + 38 + 30 * i;
 		pos[0] = pos[1] = pos[2] = pos[3] = 0;
 	}
-	bwrite(buf, 950, 1, out);		/* write header */ // rePlayer
+	fwrite(buf, 950, 1, out);		/* write header */
 
 	for (i = 0; i < 31; i++)		/* samples size */
 		ssize += readmem16b(buf + 42 + 30 * i) * 2;
@@ -53,7 +53,7 @@ static int depack_hrt(HIO_HANDLE *in, mem_out *out) // rePlayer
 	write8(out, hio_read8(in));			/* nst byte */
 
 	hio_read(buf, 1, 128, in);			/* pattern list */
-	bwrite(buf, 128, 1, out); // rePlayer
+	fwrite(buf, 128, 1, out);
 
 	npat = 0;				/* number of patterns */
 	for (i = 0; i < 128; i++) {

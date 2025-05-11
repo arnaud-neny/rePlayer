@@ -115,7 +115,7 @@ static int amf_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		for (i = 0; i < pan_len; i++) {
 			mod->xxc[i].pan = 0x80 + 2 * (int8)buf[i];
 		}
-		}
+	}
 
 	if (ver >= 0x0d) {
 		mod->bpm = hio_read8(f);

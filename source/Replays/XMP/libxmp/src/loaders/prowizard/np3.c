@@ -34,7 +34,7 @@
 #include "prowiz.h"
 
 
-static int depack_np3(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_np3(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1024];
 	uint8 c1, c2, c3, c4;
@@ -71,15 +71,15 @@ static int depack_np3(HIO_HANDLE *in, mem_out *out) // rePlayer
 		ssize += size * 2;
 		write8(out, tmp[0]);		/* write finetune */
 		write8(out, tmp[1]);		/* write volume */
-		bwrite(tmp + 14, 2, 1, out);	/* write loop start */ // rePlayer
-		bwrite(tmp + 12, 2, 1, out);	/* write loop size */ // rePlayer
+		fwrite(tmp + 14, 2, 1, out);	/* write loop start */
+		fwrite(tmp + 12, 2, 1, out);	/* write loop size */
 	}
 
 	/* fill up to 31 samples */
 	memset(tmp, 0, 30);
 	tmp[29] = 0x01;
 	for (; i < 31; i++)
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 
 	write8(out, len);		/* write size of pattern list */
 	write8(out, 0x7f);		/* write noisetracker byte */
@@ -96,7 +96,7 @@ static int depack_np3(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 	npat++;
 
-	bwrite(ptable, 128, 1, out);	/* write pattern table */ // rePlayer
+	fwrite(ptable, 128, 1, out);	/* write pattern table */
 	write32b(out, PW_MOD_MAGIC);	/* write ptk ID */
 
 	/* read tracks addresses per pattern */
@@ -173,7 +173,7 @@ static int depack_np3(HIO_HANDLE *in, mem_out *out) // rePlayer
 				smp_addr = x;
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

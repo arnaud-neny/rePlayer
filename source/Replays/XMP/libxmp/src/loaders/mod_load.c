@@ -949,7 +949,7 @@ skip_test:
 	break;
     case TRACKER_DIGITALTRACKER:
 	tracker = "Digital Tracker";
-	m->flow_mode = FLOW_MODE_DTM_203;
+	m->flow_mode = FLOW_MODE_DTM_2015;
 	break;
     case TRACKER_FLEXTRAX:
 	tracker = "Flextrax";
@@ -1010,10 +1010,10 @@ skip_test:
 
 	flags = (ptkloop && mod->xxs[i].lps == 0) ? SAMPLE_FLAG_FULLREP : 0;
 
-	#ifdef LIBXMP_CORE_PLAYER
+#ifdef LIBXMP_CORE_PLAYER
 	if (libxmp_load_sample(m, f, flags, &mod->xxs[i], NULL) < 0)
 		return -1;
-	#else
+#else
 	if (ptsong) {
 	    HIO_HANDLE *s;
 	    char sn[XMP_MAXPATH];
@@ -1033,7 +1033,7 @@ skip_test:
 		hio_close(s);
 		return -1;
 	    }
-		hio_close(s);
+	    hio_close(s);
 	} else {
 	    uint8 buf[5];
 	    long pos;
@@ -1053,7 +1053,7 @@ skip_test:
 	    if (libxmp_load_sample(m, f, flags, &mod->xxs[i], NULL) < 0)
 		return -1;
 	}
-	#endif
+#endif
     }
 
     #ifdef LIBXMP_CORE_PLAYER

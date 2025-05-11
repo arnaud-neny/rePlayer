@@ -91,7 +91,7 @@ static void fix_effect(struct xmp_event *event, int hexvol)
 			event->fxt = FX_EXTENDED;
 			event->fxp = (EX_DELAY << 4) | 3;
 		} else if (event->fxp == 0xf3) {
-			/* Retriger every 2 ticks (TODO: buggy) */
+			/* Retrigger every 2 ticks (TODO: buggy) */
 			event->fxt = FX_MED_RETRIG;
 			event->fxp = 0x02;
 		} else if (event->fxp <= 0xf0) {
@@ -933,7 +933,7 @@ static int med4_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 		if (med4_load_instrument(f, m, i, length, type,
 		    &smp_idx, temp_inst) < 0) {
-				return -1;
+			return -1;
 		}
 	}
 

@@ -30,7 +30,7 @@
 
 #include "prowiz.h"
 
-static int depack_pp10(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_pp10(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1;
 	uint8 trk_num[4][128];
@@ -60,12 +60,12 @@ static int depack_pp10(HIO_HANDLE *in, mem_out *out) // rePlayer
 			tmp[5] = 1;
 		}
 
-		if (bwrite(tmp, 1, 8, out) != 8) { // rePlayer
+		if (fwrite(tmp, 1, 8, out) != 8) {
 			return -1;
 		}
 	}
 
-	len = hio_read8(in);			/* pattern table lenght */
+	len = hio_read8(in);			/* pattern table length */
 	write8(out, len);
 
 	c1 = hio_read8(in);			/* Noisetracker byte */
@@ -97,7 +97,7 @@ static int depack_pp10(HIO_HANDLE *in, mem_out *out) // rePlayer
 				hio_read(pdata + k * 16 + j * 4, 1, 4, in);
 			}
 		}
-		bwrite(pdata, 1024, 1, out); // rePlayer
+		fwrite(pdata, 1024, 1, out);
 	}
 
 	/* now, lets put file pointer at the beginning of the sample datas */

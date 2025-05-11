@@ -9,11 +9,11 @@
 extern "C" {
 #endif
 
-#define XMP_VERSION "4.6.2"
-#define XMP_VERCODE 0x040602
+#define XMP_VERSION "4.6.3"
+#define XMP_VERCODE 0x040603
 #define XMP_VER_MAJOR 4
 #define XMP_VER_MINOR 6
-#define XMP_VER_RELEASE 2
+#define XMP_VER_RELEASE 3
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # if defined(LIBXMP_STATIC)
@@ -346,7 +346,7 @@ struct xmp_callbacks {
 	int		(*seek_func)(void *priv, long offset, int whence);
 	long		(*tell_func)(void *priv);
 	int		(*close_func)(void *priv);
-	struct HIO_HANDLE*		(*open_func)(const char* filename, void *priv); // rePlayer
+	struct HIO_HANDLE*	(*open_func)(const char* filename, void *priv); // rePlayer
 	const char* (*get_name)(void* priv); // rePlayer
 };
 

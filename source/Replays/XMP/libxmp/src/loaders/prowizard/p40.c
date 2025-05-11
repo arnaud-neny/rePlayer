@@ -78,7 +78,7 @@ struct smp {
 	uint8 vol;
 };
 
-static int depack_p4x(HIO_HANDLE *in, mem_out *out)
+static int depack_p4x(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4, c5;
 	uint8 tmp[1024];
@@ -180,7 +180,7 @@ static int depack_p4x(HIO_HANDLE *in, mem_out *out)
 	memset(tmp, 0, 30);
 	tmp[29] = 0x01;
 	for (; i < 31; i++)
-		bwrite (tmp, 30, 1, out); // rePlayer
+		fwrite (tmp, 30, 1, out);
 
 	write8(out, len);		/* write size of pattern list */
 	write8(out, 0x7f);		/* write noisetracker byte */
@@ -301,7 +301,7 @@ static int depack_p4x(HIO_HANDLE *in, mem_out *out)
 				tmp[x + 3] = tr[3];
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* read and write sample data */

@@ -33,7 +33,7 @@
 #include "prowiz.h"
 
 
-static int depack_crb(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_crb(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1;
 	uint8 ptable[128];
@@ -123,7 +123,7 @@ static int depack_crb(HIO_HANDLE *in, mem_out *out) // rePlayer
 				pat[y + 3] = hio_read8(in);
 			}
 		}
-		bwrite (pat, 1024, 1, out); // rePlayer
+		fwrite (pat, 1024, 1, out);
 	}
 
 	/* sample data */

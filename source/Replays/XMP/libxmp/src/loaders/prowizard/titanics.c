@@ -40,7 +40,7 @@ static int cmplong(const void *a, const void *b)
 }
 
 
-static int depack_titanics(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_titanics(HIO_HANDLE *in, FILE *out)
 {
 	uint8 buf[1024];
 	long pat_addr[128];
@@ -105,7 +105,7 @@ static int depack_titanics(HIO_HANDLE *in, mem_out *out) // rePlayer
 		if (j > max)
 			max = j;
 	}
-	bwrite(buf, 128, 1, out); // rePlayer
+	fwrite(buf, 128, 1, out);
 	write32b(out, PW_MOD_MAGIC);	/* write M.K. */
 
 	/* pattern data */
@@ -139,7 +139,7 @@ static int depack_titanics(HIO_HANDLE *in, mem_out *out) // rePlayer
 			k += x & 0x7f;
 		}
 
-		bwrite(&buf[0], 1024, 1, out); // rePlayer
+		fwrite(&buf[0], 1024, 1, out);
 	}
 
 	/* sample data */

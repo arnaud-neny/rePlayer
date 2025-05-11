@@ -620,7 +620,7 @@ static int mmd1_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	mod->ext = kExtension_med; // rePlayer
 
-err_cleanup:
+    err_cleanup:
 	free(exp_smp);
 	free(blockarr);
 	free(smplarr);

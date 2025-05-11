@@ -29,7 +29,7 @@
 #include "prowiz.h"
 
 
-static int depack_ntp(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_ntp(HIO_HANDLE *in, FILE *out)
 {
 	uint8 buf[1024];
 	int i, j;
@@ -79,7 +79,7 @@ static int depack_ntp(HIO_HANDLE *in, mem_out *out) // rePlayer
 		buf[x + 28] = hio_read8(in);	/* loop size */
 		buf[x + 29] = hio_read8(in);
 	}
-	bwrite(buf, 930, 1, out); // rePlayer
+	fwrite(buf, 930, 1, out);
 
 	write8(out, len);
 	write8(out, 0x7f);
@@ -94,7 +94,7 @@ static int depack_ntp(HIO_HANDLE *in, mem_out *out) // rePlayer
 
 		buf[i] = pat;
 	}
-	bwrite(buf, 128, 1, out); // rePlayer
+	fwrite(buf, 128, 1, out);
 
 	/* pattern addresses now */
 	/* Where is on it */
@@ -121,7 +121,7 @@ static int depack_ntp(HIO_HANDLE *in, mem_out *out) // rePlayer
 			if (x & 0x0008)
 				hio_read(buf + j * 16 + 12, 1, 4, in);
 		}
-		bwrite(buf, 1024, 1, out); // rePlayer
+		fwrite(buf, 1024, 1, out);
 	}
 
 	/* samples */

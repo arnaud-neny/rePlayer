@@ -32,14 +32,14 @@
  * note: A most worked-up prog ... took some time to finish this !.
  *      there's what lot of my other depacker are missing : the correct
  *      pattern order (most of the time the list is generated badly ..).
- *      Dont know why I did it for this depacker because I've but one
- *      exemple file ! :)
+ *      Don't know why I did it for this depacker because I've but one
+ *      example file ! :)
  */
 
 #include "prowiz.h"
 
 
-static int depack_fuzz(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_fuzz(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1;
 	uint8 data[1024];
@@ -153,7 +153,7 @@ static int depack_fuzz(HIO_HANDLE *in, mem_out *out) // rePlayer
 		status = 1;
 	}
 
-	bwrite(ord, 128, 1, out);	/* write pattern list */ // rePlayer
+	fwrite(ord, 128, 1, out);	/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);	/* write ID */
 
 	/* pattern data */
@@ -182,7 +182,7 @@ static int depack_fuzz(HIO_HANDLE *in, mem_out *out) // rePlayer
 			memcpy(&data[j * 16 + 12], &track[3][j * 4], 4);
 			data[j * 16 + 15] = track[3][j * 4 + 3];
 		}
-		bwrite(data, 1024, 1, out); // rePlayer
+		fwrite(data, 1024, 1, out);
 	}
 
 	/* sample data */

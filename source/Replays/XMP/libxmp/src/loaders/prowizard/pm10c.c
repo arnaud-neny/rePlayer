@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_p10c(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_p10c(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2;
 	int pat_max;
@@ -155,7 +155,7 @@ restart:
 		pnum[i] = pnum1[i];
 
 	/* write pattern table */
-	bwrite(pnum, 128, 1, out); // rePlayer
+	fwrite(pnum, 128, 1, out);
 
 	write32b(out, PW_MOD_MAGIC);
 
@@ -247,7 +247,7 @@ restart:
 				break;
 			}
 		}
-		bwrite(pat[j], 1024, 1, out); // rePlayer
+		fwrite(pat[j], 1024, 1, out);
 	}
 
 	free(reftab);

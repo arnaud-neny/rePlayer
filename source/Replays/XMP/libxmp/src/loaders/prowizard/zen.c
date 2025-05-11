@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_zen(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_zen(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 finetune, vol;
@@ -120,7 +120,7 @@ static int depack_zen(HIO_HANDLE *in, mem_out *out) // rePlayer
 		}
 	}
 
-	bwrite(ptable, 128, 1, out);		/* write pattern table */ // rePlayer
+	fwrite(ptable, 128, 1, out);		/* write pattern table */
 	write32b(out, PW_MOD_MAGIC);		/* write ptk ID */
 
 	/* pattern data */
@@ -155,7 +155,7 @@ static int depack_zen(HIO_HANDLE *in, mem_out *out) // rePlayer
 
 			j = c1;
 		}
-		bwrite (pat, 1024, 1, out); // rePlayer
+		fwrite (pat, 1024, 1, out);
 	}
 
 	/* sample data */

@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_tp23(HIO_HANDLE *in, mem_out *out, int ver) // rePlayer
+static int depack_tp23(HIO_HANDLE *in, FILE *out, int ver)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 pnum[128];
@@ -73,7 +73,7 @@ static int depack_tp23(HIO_HANDLE *in, mem_out *out, int ver) // rePlayer
 	tmp[29] = 0x01;
 
 	for (; i < 31; i++) {
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 	}
 
 	/* read size of pattern table */
@@ -110,7 +110,7 @@ static int depack_tp23(HIO_HANDLE *in, mem_out *out, int ver) // rePlayer
 		}
 	}
 
-	bwrite(pnum, 128, 1, out);		/* write pattern list */ // rePlayer
+	fwrite(pnum, 128, 1, out);		/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);		/* ID string */
 
 	pat_ofs = hio_tell(in) + 2;
@@ -224,7 +224,7 @@ static int depack_tp23(HIO_HANDLE *in, mem_out *out, int ver) // rePlayer
 				max_trk_ofs = where;
 			}
 		}
-		bwrite(pdata, 1024, 1, out); // rePlayer
+		fwrite(pdata, 1024, 1, out);
 	}
 
 	/* Sample data */
@@ -238,12 +238,12 @@ static int depack_tp23(HIO_HANDLE *in, mem_out *out, int ver) // rePlayer
 	return 0;
 }
 
-static int depack_tp3(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_tp3(HIO_HANDLE *in, FILE *out)
 {
 	return depack_tp23(in, out, 3);
 }
 
-static int depack_tp2(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_tp2(HIO_HANDLE *in, FILE *out)
 {
 	return depack_tp23(in, out, 2);
 }

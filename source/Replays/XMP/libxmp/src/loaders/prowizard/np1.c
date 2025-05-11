@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_np1(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_np1(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1024];
 	uint8 c1, c2, c3, c4;
@@ -81,7 +81,7 @@ static int depack_np1(HIO_HANDLE *in, mem_out *out) // rePlayer
 	memset(tmp, 0, 30);
 	tmp[29] = 0x01;
 	for (; i < 31; i++) {
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 	}
 
 	write8(out, len);		/* write size of pattern list */
@@ -99,7 +99,7 @@ static int depack_np1(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 	npat++;
 
-	bwrite(ptable, 128, 1, out);	/* write pattern table */ // rePlayer
+	fwrite(ptable, 128, 1, out);	/* write pattern table */
 	write32b(out, PW_MOD_MAGIC);	/* write ptk ID */
 
 	/* read tracks addresses per pattern */
@@ -157,7 +157,7 @@ static int depack_np1(HIO_HANDLE *in, mem_out *out) // rePlayer
 				tmp[x + 3] = c3;
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

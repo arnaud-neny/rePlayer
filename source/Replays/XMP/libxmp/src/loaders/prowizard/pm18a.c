@@ -33,7 +33,7 @@
 #include "prowiz.h"
 
 
-static int depack_p18a(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_p18a(HIO_HANDLE *in, FILE *out)
 {
 	short pat_max;
 	int refmax;
@@ -118,7 +118,7 @@ static int depack_p18a(HIO_HANDLE *in, mem_out *out) // rePlayer
 			pnum[i] = (++pat_max);
 	}
 
-	bwrite(pnum, 128, 1, out);		/* pattern table */ // rePlayer
+	fwrite(pnum, 128, 1, out);		/* pattern table */
 	write32b(out, PW_MOD_MAGIC);		/* M.K. */
 
 
@@ -206,7 +206,7 @@ static int depack_p18a(HIO_HANDLE *in, mem_out *out) // rePlayer
 				break;
 			}
 		}
-		bwrite(pat[j], 1024, 1, out); // rePlayer
+		fwrite(pat[j], 1024, 1, out);
 	}
 
 	/* printf ( "Highest value in pattern data : %d\n" , refmax ); */

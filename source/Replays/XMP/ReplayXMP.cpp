@@ -9,6 +9,73 @@
 extern "C" {
 #   include "libxmp/src/common.h"
     struct HIO_HANDLE* hio_open_callbacks(void*, struct xmp_callbacks);
+
+    // wrap stdio
+
+    typedef struct {
+        char* buf;
+        int pos;
+        int size;
+    } mem_out;
+
+    FILE* replayer_fopen(const char* filename, const char* mode)
+    {
+        core::UnusedArg(filename, mode);
+        assert(0);
+        return nullptr;
+    }
+    int replayer_fread(void* buffer, size_t size, size_t count, mem_out* out)
+    {
+        core::UnusedArg(buffer, size, count, out);
+        assert(0);
+        return 0;
+    }
+    int replayer_fwrite(const void* buf, size_t l, size_t n, mem_out* out)
+    {
+        int s = out->pos + l * n;
+        if (s > out->size) {
+            out->size = (s * 3 + 1) / 2;
+            char* b = (char*)malloc(out->size);
+            if (out->buf)
+            {
+                memcpy(b, out->buf, out->pos);
+                free(out->buf);
+            }
+            out->buf = b;
+        }
+        memcpy(out->buf + out->pos, buf, l * n);
+        out->pos = s;
+        return n;
+    }
+    int replayer_fseek(FILE* stream, long offset, int origin)
+    {
+        core::UnusedArg(stream, offset, origin);
+        assert(0);
+        return 0;
+    }
+    int replayer_fclose(mem_out* out)
+    {
+        if (out->buf)
+        {
+            free(out->buf);
+            out->buf = NULL;
+            out->pos = 0;
+            out->size = 0;
+        }
+        return 0;
+    }
+    int replayer_ftell(mem_out* stream)
+    {
+        core::UnusedArg(stream);
+        assert(0);
+        return 0;
+    }
+    int replayer_fputc(uint8_t c, mem_out* stream)
+    {
+        replayer_fwrite(&c, 1, 1, stream);
+        return c;
+    }
+    int replayer_fprintf(void* const, char const* const, ...) { return 0; }
 }
 
 namespace rePlayer

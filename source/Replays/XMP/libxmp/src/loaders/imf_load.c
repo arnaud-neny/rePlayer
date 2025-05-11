@@ -573,7 +573,7 @@ static int imf_load(struct module_data *m, HIO_HANDLE *f, const int start)
     m->mvolbase = 48;
     CLAMP(m->mvol, 4, 127);
 
-	mod->ext = kExtension_imf; // rePlayer
+    mod->ext = kExtension_imf; // rePlayer
 
-	return 0;
+    return 0;
 }

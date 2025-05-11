@@ -223,50 +223,19 @@ uint32 readmem32b(const uint8 *m)
 
 #ifndef LIBXMP_CORE_PLAYER
 
-// rePlayer begin
-size_t bwrite(const void* buf, size_t l, size_t n, mem_out* out)
-{
-	int s = out->pos + l * n;
-	if (s > out->size) {
-		out->size = (s * 3 + 1) / 2;
-		char* b = malloc(out->size);
-		if (out->buf)
-		{
-			memcpy(b, out->buf, out->pos);
-			free(out->buf);
-		}
-		out->buf = b;
-	}
-	memcpy(out->buf + out->pos, buf, l * n);
-	out->pos = s;
-	return n;
-}
-
-void bclose(mem_out* out)
-{
-	if (out->buf)
-	{
-		free(out->buf);
-		out->buf = NULL;
-		out->pos = 0;
-		out->size = 0;
-	}
-}
-// rePlayer end
-
-void write16l(mem_out *f, uint16 w)
+void write16l(FILE *f, uint16 w)
 {
 	write8(f, w & 0x00ff);
 	write8(f, (w & 0xff00) >> 8);
 }
 
-void write16b(mem_out *f, uint16 w)
+void write16b(FILE *f, uint16 w)
 {
 	write8(f, (w & 0xff00) >> 8);
 	write8(f, w & 0x00ff);
 }
 
-void write32l(mem_out *f, uint32 w)
+void write32l(FILE *f, uint32 w)
 {
 	write8(f, w & 0x000000ff);
 	write8(f, (w & 0x0000ff00) >> 8);
@@ -274,7 +243,7 @@ void write32l(mem_out *f, uint32 w)
 	write8(f, (w & 0xff000000) >> 24);
 }
 
-void write32b(mem_out *f, uint32 w)
+void write32b(FILE *f, uint32 w)
 {
 	write8(f, (w & 0xff000000) >> 24);
 	write8(f, (w & 0x00ff0000) >> 16);

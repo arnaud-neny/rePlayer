@@ -30,7 +30,7 @@
 
 #include "prowiz.h"
 
-static int depack_tp1(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_tp1(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 pnum[128];
@@ -105,7 +105,7 @@ static int depack_tp1(HIO_HANDLE *in, mem_out *out) // rePlayer
 		}
 	}
 
-	bwrite(pnum, 128, 1, out);		/* write pattern list */ // rePlayer
+	fwrite(pnum, 128, 1, out);		/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);		/* ID string */
 
 	/* pattern datas */
@@ -148,7 +148,7 @@ static int depack_tp1(HIO_HANDLE *in, mem_out *out) // rePlayer
 			p[3] = fxp;
 		}
 
-		bwrite(pdata, 1024, 1, out); // rePlayer
+		fwrite(pdata, 1024, 1, out);
 	}
 
 	/* Sample data */

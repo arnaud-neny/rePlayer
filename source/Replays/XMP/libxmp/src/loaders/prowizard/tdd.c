@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_tdd(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_tdd(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1024];
 	uint8 pat[1024];
@@ -78,7 +78,7 @@ static int depack_tdd(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 
 	/* write pattern list + size and ntk byte */
-	bwrite(tmp, 130, 1, out); // rePlayer
+	fwrite(tmp, 130, 1, out);
 
 	/* write ptk's ID string */
 	write32b(out, PW_MOD_MAGIC);
@@ -118,7 +118,7 @@ static int depack_tdd(HIO_HANDLE *in, mem_out *out) // rePlayer
 				}
 			}
 		}
-		if (bwrite(pat, 1, 1024, out) != 1024) { // rePlayer
+		if (fwrite(pat, 1, 1024, out) != 1024) {
 			return -1;
 		}
 	}
@@ -155,7 +155,7 @@ static int test_tdd(const uint8 *data, char *t, int s)
 		if (d[137] > 0x40)
 			return -1;
 
-		/* loop start addy < sampl addy ? */
+		/* loop start addy < sample addy ? */
 		if (sadr < addr)
 			return -1;
 

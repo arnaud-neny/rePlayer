@@ -33,7 +33,7 @@
 #define MAGIC_TRK1	MAGIC4('T','R','K','1')
 
 
-static int depack_mp(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_mp(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1;
 	uint8 ptable[128];

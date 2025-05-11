@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_unic2(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_unic2(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 npat, maxpat;
@@ -90,7 +90,7 @@ static int depack_unic2(HIO_HANDLE *in, mem_out *out) // rePlayer
 	hio_read8(in);
 
 	hio_read(tmp, 128, 1, in);
-	bwrite(tmp, 128, 1, out);		/* pat table */ // rePlayer
+	fwrite(tmp, 128, 1, out);		/* pat table */
 
 	/* get highest pattern number */
 	for (maxpat = i = 0; i < 128; i++) {
@@ -131,7 +131,7 @@ static int depack_unic2(HIO_HANDLE *in, mem_out *out) // rePlayer
 			tmp[j * 4 + 2] = ((ins << 4) & 0xf0) | fxt;
 			tmp[j * 4 + 3] = fxp;
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

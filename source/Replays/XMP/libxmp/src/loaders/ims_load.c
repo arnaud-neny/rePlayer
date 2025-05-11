@@ -289,7 +289,7 @@ static int ims_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	    return -1;
     }
 
-	mod->ext = kExtension_ims; // rePlayer
+    mod->ext = kExtension_ims; // rePlayer
 
-	return 0;
+    return 0;
 }

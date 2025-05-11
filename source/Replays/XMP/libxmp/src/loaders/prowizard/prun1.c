@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_pru1 (HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_pru1 (HIO_HANDLE *in, FILE *out)
 {
 	uint8 header[2048];
 	uint8 c1, c2, c3, c4;
@@ -45,7 +45,7 @@ static int depack_pru1 (HIO_HANDLE *in, mem_out *out) // rePlayer
 
 	/* read and write whole header */
 	hio_read(header, 950, 1, in);
-	bwrite(header, 950, 1, out); // rePlayer
+	fwrite(header, 950, 1, out);
 
 	/* get whole sample size */
 	for (i = 0; i < 31; i++) {
@@ -59,7 +59,7 @@ static int depack_pru1 (HIO_HANDLE *in, mem_out *out) // rePlayer
 
 	/* read and write ntk byte and pattern list */
 	hio_read(header, 129, 1, in);
-	bwrite(header, 129, 1, out); // rePlayer
+	fwrite(header, 129, 1, out);
 
 	/* write ID */
 	write32b(out, PW_MOD_MAGIC);

@@ -30,7 +30,7 @@
 #include "prowiz.h"
 
 
-static int depack_ksm(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_ksm(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1024];
 	uint8 c1, c5;
@@ -73,7 +73,7 @@ static int depack_ksm(HIO_HANDLE *in, mem_out *out) // rePlayer
 	memset(tmp, 0, 30);
 	tmp[29] = 1;
 	for (i = 0; i < 16; i++)
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 
 	/* pattern list */
 	hio_seek(in, 512, SEEK_SET);
@@ -155,7 +155,7 @@ static int depack_ksm(HIO_HANDLE *in, mem_out *out) // rePlayer
 		status = 1;
 	}
 
-	bwrite(plist, 128, 1, out);	/* write pattern list */ // rePlayer
+	fwrite(plist, 128, 1, out);	/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);	/* write ID */
 
 	/* pattern data */
@@ -186,7 +186,7 @@ static int depack_ksm(HIO_HANDLE *in, mem_out *out) // rePlayer
 			}
 		}
 
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

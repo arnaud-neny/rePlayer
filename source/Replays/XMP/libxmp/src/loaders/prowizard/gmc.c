@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_GMC(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_GMC(HIO_HANDLE *in, FILE *out)
 {
 	uint8 tmp[1024];
 	uint8 ptable[128];
@@ -65,7 +65,7 @@ static int depack_GMC(HIO_HANDLE *in, mem_out *out) // rePlayer
 	memset(tmp, 0, 30);
 	tmp[29] = 0x01;
 	for (i = 0; i < 16; i++)
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 
 	hio_seek(in, 0xf3, 0);
 	write8(out, pat_pos = hio_read8(in));	/* pattern list size */
@@ -75,7 +75,7 @@ static int depack_GMC(HIO_HANDLE *in, mem_out *out) // rePlayer
 	/*printf ( "Creating the pattern table ... " ); */
 	for (i = 0; i < 100; i++)
 		ptable[i] = hio_read16b(in) / 1024;
-	bwrite(ptable, 128, 1, out); // rePlayer
+	fwrite(ptable, 128, 1, out);
 
 	/* get number of pattern */
 	for (max = i = 0; i < 128; i++) {
@@ -115,7 +115,7 @@ static int depack_GMC(HIO_HANDLE *in, mem_out *out) // rePlayer
 				break;
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

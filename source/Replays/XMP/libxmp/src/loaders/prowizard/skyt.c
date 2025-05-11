@@ -29,7 +29,7 @@
 #include "prowiz.h"
 
 
-static int depack_skyt(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_skyt(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 ptable[128];
@@ -61,7 +61,7 @@ static int depack_skyt(HIO_HANDLE *in, mem_out *out) // rePlayer
 	hio_read32b(in);
 	hio_read32b(in);			/* bypass "SKYT" ID */
 
-	pat_pos = hio_read8(in) + 1;		/* pattern table lenght */
+	pat_pos = hio_read8(in) + 1;		/* pattern table length */
 	if (pat_pos >= 128) {
 		return -1;
 	}
@@ -118,7 +118,7 @@ static int depack_skyt(HIO_HANDLE *in, mem_out *out) // rePlayer
 				pat[x + 3] = c4;
 			}
 		}
-		bwrite(pat, 1024, 1, out); // rePlayer
+		fwrite(pat, 1024, 1, out);
 	}
 
 	/* skip to the end of the tracks/the start of the sample data. */

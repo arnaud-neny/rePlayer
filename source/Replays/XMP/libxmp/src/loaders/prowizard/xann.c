@@ -34,7 +34,7 @@
 #define PAT_DATA_ADDRESS 0x43C
 
 
-static int depack_xann(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_xann(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c5;
 	uint8 ptable[128];
@@ -90,7 +90,7 @@ static int depack_xann(HIO_HANDLE *in, mem_out *out) // rePlayer
 	write8(out, c5);		/* write number of pattern */
 	write8(out, 0x7f);		/* write noisetracker byte */
 
-	bwrite(ptable, 128, 1, out);	/* write pattern list */ // rePlayer
+	fwrite(ptable, 128, 1, out);	/* write pattern list */
 	write32b(out, PW_MOD_MAGIC);	/* write Protracker's ID */
 
 	/* pattern data */
@@ -182,7 +182,7 @@ static int depack_xann(HIO_HANDLE *in, mem_out *out) // rePlayer
 				fxt = 0x0E;
 				fxp |= 0x20;
 				break;
-			case 0x84:	/* retriger */
+			case 0x84:	/* retrigger */
 				fxt = 0x0E;
 				fxp |= 0x90;
 				break;
@@ -215,7 +215,7 @@ static int depack_xann(HIO_HANDLE *in, mem_out *out) // rePlayer
 			p[3] = fxp;
 		}
 
-		bwrite(pdata, 1024, 1, out); // rePlayer
+		fwrite(pdata, 1024, 1, out);
 	}
 
 	/* sample data */

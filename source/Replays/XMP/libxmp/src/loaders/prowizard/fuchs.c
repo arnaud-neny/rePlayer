@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int depack_fuchs(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_fuchs(HIO_HANDLE *in, FILE *out)
 {
 	uint8 *tmp;
 	uint8 max_pat;
@@ -102,7 +102,7 @@ static int depack_fuchs(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 
 	/* write ptk's ID */
-	if (bwrite(data, 1, 1080, out) != 1080) { // rePlayer
+	if (fwrite(data, 1, 1080, out) != 1080) {
 		return -1;
 	}
 	write32b(out, PW_MOD_MAGIC);
@@ -136,7 +136,7 @@ static int depack_fuchs(HIO_HANDLE *in, mem_out *out) // rePlayer
 	}
 
 	/* write pattern data */
-	bwrite(tmp, pat_size, 1, out); // rePlayer
+	fwrite(tmp, pat_size, 1, out);
 	free(tmp);
 
 	/* read/write sample data */

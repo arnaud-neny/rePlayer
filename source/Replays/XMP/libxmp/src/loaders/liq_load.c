@@ -747,8 +747,8 @@ next_pattern:
     m->mvol = 48 * 2 * 2;
     m->mvolbase = 48;
 
-	mod->ext = kExtension_liq; // rePlayer
+    mod->ext = kExtension_liq; // rePlayer
 
-	return 0;
+    return 0;
 }
 

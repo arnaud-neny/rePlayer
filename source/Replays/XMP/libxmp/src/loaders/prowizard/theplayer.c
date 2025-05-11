@@ -209,7 +209,7 @@ static int decode_pattern(HIO_HANDLE *in, int npat, uint8 *tdata, int taddr[128]
 }
 
 
-static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlayer
+static int theplayer_depack(HIO_HANDLE *in, FILE *out, int version)
 {
     uint8 c1, c3;
     signed char *smp_buffer;
@@ -326,7 +326,7 @@ static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlay
     memset(buf, 0, 30);
     buf[29] = 0x01;
     for (; i < 31; i++)
-	bwrite(buf, 30, 1, out); // rePlayer
+	fwrite(buf, 30, 1, out);
 
     /* read tracks addresses per pattern */
     for (i = 0; i < npat; i++) {
@@ -343,7 +343,7 @@ static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlay
     }
     write8(out, pat_pos);		/* write size of pattern list */
     write8(out, 0x7f);			/* write noisetracker byte */
-    bwrite(ptable, 128, 1, out);	/* write pattern table */ // rePlayer
+    fwrite(ptable, 128, 1, out);	/* write pattern table */
     write32b(out, PW_MOD_MAGIC);	/* M.K. */
 
     /* patterns */
@@ -353,7 +353,7 @@ static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlay
     }
 
     /* write pattern data */
-    bwrite(tdata, 1024, npat, out); // rePlayer
+    fwrite(tdata, 1024, npat, out);
     /*
     for (i = 0; i < npat; i++) {
 	memset(buf, 0, sizeof(buf));
@@ -361,7 +361,7 @@ static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlay
 	    for (k = 0; k < 4; k++)
 		memcpy(&buf[j * 16 + k * 4], &track(i, k, j), 4);
 	}
-	bwrite(buf, 1024, 1, out); // rePlayer
+	fwrite(buf, 1024, 1, out);
     }
     */
 
@@ -379,7 +379,7 @@ static int theplayer_depack(HIO_HANDLE *in, mem_out *out, int version) // rePlay
 		smp_buffer[j] = c3;
 	    }
 	}
-	bwrite(smp_buffer, smp_size[i], 1, out); // rePlayer
+	fwrite(smp_buffer, smp_size[i], 1, out);
 	free(smp_buffer);
     }
 
@@ -511,7 +511,7 @@ static int theplayer_test(const uint8 *data, char *t, int s, int version)
 }
 
 
-static int depack_p50a(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_p50a(HIO_HANDLE *in, FILE *out)
 {
 	return theplayer_depack(in, out, 0x50);
 }
@@ -528,7 +528,7 @@ const struct pw_format pw_p50a = {
 };
 
 
-static int depack_p60a(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_p60a(HIO_HANDLE *in, FILE *out)
 {
 	return theplayer_depack(in, out, 0x60);
 }
@@ -659,7 +659,7 @@ void testP60A_pack (void)
 	/* test pattern table */
 	l = 0;
 	o = 0;
-	/* first, test if we dont oversize the input file */
+	/* first, test if we don't oversize the input file */
 	if ((k * 6 + 8 + m * 8) > in_size) {
 /*printf ( "8,0 Start:%ld\n" , start );*/
 		Test = BAD;

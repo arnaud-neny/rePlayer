@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2021 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -95,7 +95,7 @@ static int masi_test(HIO_HANDLE *f, char *t, const int start)
 	if (hio_read8(f) != 0)
 		return -1;
 
-	if (hio_read32b(f) != MAGIC_FILE)
+	if (hio_read32b(f) != MAGIC_FILE) 
 		return -1;
 
 	hio_read32b(f);
@@ -399,16 +399,16 @@ D_(D_CRIT "p%d r%d c%d: compressed event %02x %02x\n", i, r, chan, fxt, fxp);
 					break;
 				case 0x16:		/* vibrato waveform */
 					fxt = FX_EXTENDED;
-					fxp = (EX_VIBRATO_WF << 4) | (fxp & 0x0f);
+					fxp = (EX_VIBRATO_WF << 4) | (fxp & 0x0f); 
 					break;
 				case 0x17:		/* vibrato + vslide up */
 					fxt = FX_VIBRA_VSLIDE;
 					fxp >>= 4;
-					break;
+					break;	
 				case 0x18:		/* vibrato + vslide down */
 					fxt = FX_VIBRA_VSLIDE;
 					fxp = fxp & 0x0f;
-					break;
+					break;	
 
 				/* Tremolo */
 				case 0x1f:		/* tremolo */
@@ -417,7 +417,7 @@ D_(D_CRIT "p%d r%d c%d: compressed event %02x %02x\n", i, r, chan, fxt, fxp);
 					break;
 				case 0x20:		/* tremolo waveform */
 					fxt = FX_EXTENDED;
-					fxp = (EX_TREMOLO_WF << 4) | (fxp & 0x0f);
+					fxp = (EX_TREMOLO_WF << 4) | (fxp & 0x0f); 
 					break;
 
 				/* Sample commands */
@@ -430,15 +430,15 @@ D_(D_CRIT "p%d r%d c%d: compressed event %02x %02x\n", i, r, chan, fxt, fxp);
 					break;
 				case 0x2a:		/* retrig note */
 					fxt = FX_EXTENDED;
-					fxp = (EX_RETRIG << 4) | (fxp & 0x0f);
+					fxp = (EX_RETRIG << 4) | (fxp & 0x0f); 
 					break;
 				case 0x2b:		/* note cut */
 					fxt = FX_EXTENDED;
-					fxp = (EX_CUT << 4) | (fxp & 0x0f);
+					fxp = (EX_CUT << 4) | (fxp & 0x0f); 
 					break;
 				case 0x2c:		/* note delay */
 					fxt = FX_EXTENDED;
-					fxp = (EX_DELAY << 4) | (fxp & 0x0f);
+					fxp = (EX_DELAY << 4) | (fxp & 0x0f); 
 					break;
 
 				/* Position change */
@@ -455,11 +455,11 @@ D_(D_CRIT "p%d r%d c%d: compressed event %02x %02x\n", i, r, chan, fxt, fxp);
 					break;
 				case 0x35:		/* pattern loop */
 					fxt = FX_EXTENDED;
-					fxp = (EX_PATTERN_LOOP << 4) | (fxp & 0x0f);
+					fxp = (EX_PATTERN_LOOP << 4) | (fxp & 0x0f); 
 					break;
 				case 0x36:		/* pattern delay */
 					fxt = FX_EXTENDED;
-					fxp = (EX_PATT_DELAY << 4) | (fxp & 0x0f);
+					fxp = (EX_PATT_DELAY << 4) | (fxp & 0x0f); 
 					break;
 
 				/* Speed change */
@@ -476,11 +476,11 @@ D_(D_CRIT "p%d r%d c%d: compressed event %02x %02x\n", i, r, chan, fxt, fxp);
 					break;
 				case 0x48:		/* set finetune */
 					fxt = FX_EXTENDED;
-					fxp = (EX_FINETUNE << 4) | (fxp & 0x0f);
+					fxp = (EX_FINETUNE << 4) | (fxp & 0x0f); 
 					break;
 				case 0x49:		/* set pan */
 					fxt = FX_SETPAN;
-					fxp <<= 4;
+					fxp <<= 4; 
 					break;
 
 				default:
@@ -686,6 +686,8 @@ static int get_song_2(struct module_data *m, int size, HIO_HANDLE *f, void *parm
 
 		magic = hio_read32b(f);
 		subchunk_size = hio_read32l(f);
+		size -= 8;
+
 		if (subchunk_size <= 0 || hio_error(f)) {
 			return -1;
 		}
@@ -694,13 +696,13 @@ static int get_song_2(struct module_data *m, int size, HIO_HANDLE *f, void *parm
 
 		switch (magic) {
 		case MAGIC_OPLH:
-			if (subchunk_oplh(m, size, f, parm) < 0) {
+			if (subchunk_oplh(m, subchunk_size, f, parm) < 0) {
 				return -1;
 			}
 			break;
 
 		case MAGIC_PPAN:
-			if (subchunk_ppan(m, size, f, parm) < 0) {
+			if (subchunk_ppan(m, subchunk_size, f, parm) < 0) {
 				return -1;
 			}
 			break;

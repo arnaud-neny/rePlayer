@@ -28,7 +28,7 @@
  * The Player 6.1a to Protracker.
  *
  * note: As for version 5.0A and 6.0A, it's a REAL mess !.
- *      It's VERY badly coded, I know. Just dont forget it was mainly done
+ *      It's VERY badly coded, I know. Just don't forget it was mainly done
  *      to test the description I made of P61a format.
  *      I certainly wont dare to beat Gryzor on the ground :). His Prowiz IS
  *      the converter to use !!!. Though, using the official depacker could
@@ -38,7 +38,7 @@
 #include "prowiz.h"
 
 
-static int depack_p61a(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_p61a(HIO_HANDLE *in, FILE *out)
 {
     uint8 c1, c2, c3, c4, c5, c6;
     long max_row;
@@ -148,7 +148,7 @@ static int depack_p61a(HIO_HANDLE *in, mem_out *out) // rePlayer
     memset(tmp, 0, 30);
     tmp[29] = 0x01;
     for (; i < 31; i++)
-	bwrite(tmp, 30, 1, out); // rePlayer
+	fwrite(tmp, 30, 1, out);
 
     /* read tracks addresses per pattern */
     for (i = 0; i < npat; i++) {
@@ -166,7 +166,7 @@ static int depack_p61a(HIO_HANDLE *in, mem_out *out) // rePlayer
 
     write8(out, len);			/* write size of pattern list */
     write8(out, 0x7f);			/* write noisetracker byte */
-    bwrite(ptable, 128, 1, out);	/* write pattern table */ // rePlayer
+    fwrite(ptable, 128, 1, out);	/* write pattern table */
     write32b(out, PW_MOD_MAGIC);	/* write ptk ID */
 
     if ((tdata_addr = hio_tell(in)) < 0) {
@@ -544,7 +544,7 @@ static int depack_p61a(HIO_HANDLE *in, mem_out *out) // rePlayer
 	    for (k = 0; k < 4; k++)
 		memcpy(&tmp[j * 16 + k * 4], &tdata[k + i * 4][j * 4], 4);
 	}
-	bwrite (tmp, 1024, 1, out); // rePlayer
+	fwrite (tmp, 1024, 1, out);
     }
 
     /* go to sample data address */
@@ -567,7 +567,7 @@ static int depack_p61a(HIO_HANDLE *in, mem_out *out) // rePlayer
 	        c1 = c3;
 	    }
 	}
-	bwrite(smp_buffer, smp_size[i], 1, out); // rePlayer
+	fwrite(smp_buffer, smp_size[i], 1, out);
 	free(smp_buffer);
     }
 
@@ -859,7 +859,7 @@ void testP61A_pack (void)
     /* test pattern table */
     l = 0;
     o = 0;
-    /* first, test if we dont oversize the input file */
+    /* first, test if we don't oversize the input file */
     if ((k * 6 + 8 + m * 8) > in_size) {
 /*printf ( "8,0 Start:%ld\n" , start );*/
 	Test = BAD;

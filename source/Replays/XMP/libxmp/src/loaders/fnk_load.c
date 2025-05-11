@@ -338,7 +338,7 @@ static int fnk_load(struct module_data *m, HIO_HANDLE *f, const int start)
     m->volbase = 0xff;
     m->quirk = QUIRK_VSALL;
 
-	mod->ext = kExtension_fnk; // rePlayer
+    mod->ext = kExtension_fnk; // rePlayer
 
-	return 0;
+    return 0;
 }

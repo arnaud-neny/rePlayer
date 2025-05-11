@@ -31,7 +31,7 @@
 #include "prowiz.h"
 
 
-static int write_event(uint8 c1, uint8 c2, uint8 fxp, mem_out *out) // rePlayer
+static int write_event(uint8 c1, uint8 c2, uint8 fxp, FILE *out)
 {
 	uint8 note, ins, fxt;
 	uint8 p[4];
@@ -40,7 +40,7 @@ static int write_event(uint8 c1, uint8 c2, uint8 fxp, mem_out *out) // rePlayer
 	if (!PTK_IS_VALID_NOTE(note)) {
 		/* di.nightmare has note 49! */
 		uint32 x = 0;
-		bwrite(&x, 4, 1, out); // rePlayer
+		fwrite(&x, 4, 1, out);
 		return 0;
 	}
 	p[0] = ptk_table[note][0];
@@ -51,12 +51,12 @@ static int write_event(uint8 c1, uint8 c2, uint8 fxp, mem_out *out) // rePlayer
 	fxt = c2 & 0x0f;
 	p[2] |= fxt;
 	p[3] = fxp;
-	bwrite(p, 4, 1, out); // rePlayer
+	fwrite(p, 4, 1, out);
 
 	return 0;
 }
 
-static int depack_di(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_di(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3;
 	uint8 nins, npat, max;
@@ -96,7 +96,7 @@ static int depack_di(HIO_HANDLE *in, mem_out *out) // rePlayer
 
 	memset(tmp, 0, sizeof(tmp));
 	for (i = nins; i < 31; i++) {
-		bwrite(tmp, 30, 1, out); // rePlayer
+		fwrite(tmp, 30, 1, out);
 	}
 
 	if ((pos = hio_tell(in)) < 0) {
@@ -144,7 +144,7 @@ static int depack_di(HIO_HANDLE *in, mem_out *out) // rePlayer
 				}
 			} else if (c1 == 0xff) {
 				uint32 x = 0;
-				bwrite(&x, 1, 4, out); // rePlayer
+				fwrite(&x, 1, 4, out);
 			} else {
 				c2 = hio_read8(in);
 				c3 = hio_read8(in);

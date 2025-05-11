@@ -34,7 +34,7 @@
 
 #define NO_NOTE 0xff
 
-static int depack_ac1d(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_ac1d(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 npos;
@@ -146,7 +146,7 @@ static int depack_ac1d(HIO_HANDLE *in, mem_out *out) // rePlayer
 				tmp[x + 3] = fxp;
 			}
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */

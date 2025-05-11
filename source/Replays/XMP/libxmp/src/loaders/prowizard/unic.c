@@ -36,7 +36,7 @@
 #define MAGIC_0000	MAGIC4(0x0,0x0,0x0,0x0)
 
 
-static int depack_unic(HIO_HANDLE *in, mem_out *out) // rePlayer
+static int depack_unic(HIO_HANDLE *in, FILE *out)
 {
 	uint8 c1, c2, c3, c4;
 	uint8 npat;
@@ -96,7 +96,7 @@ static int depack_unic(HIO_HANDLE *in, mem_out *out) // rePlayer
 	hio_read8(in);
 
 	hio_read(tmp, 128, 1, in);			/* pat table */
-	bwrite(tmp, 128, 1, out); // rePlayer
+	fwrite(tmp, 128, 1, out);
 
 	/* get highest pattern number */
 	for (i = 0; i < 128; i++) {
@@ -147,7 +147,7 @@ static int depack_unic(HIO_HANDLE *in, mem_out *out) // rePlayer
 			tmp[j * 4 + 2] = ((ins << 4) & 0xf0) | fxt;
 			tmp[j * 4 + 3] = fxp;
 		}
-		bwrite(tmp, 1024, 1, out); // rePlayer
+		fwrite(tmp, 1024, 1, out);
 	}
 
 	/* sample data */
