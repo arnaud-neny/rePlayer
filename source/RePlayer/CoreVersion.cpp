@@ -4,6 +4,7 @@
 #include <Containers/Array.h>
 #include <Core/String.h>
 #include <IO/File.h>
+#include <Thread/Thread.h>
 
 // curl
 #include <curl/curl.h>
@@ -41,6 +42,23 @@ namespace rePlayer
         if (IsDebuggerPresent())
             return Status::kOk;
 
+        // Allow only one instance
+        for (int numRetries = 4;;)
+        {
+            ::CreateMutex(0, false, "Local\\$rePlayer$");
+            if (GetLastError() == ERROR_ALREADY_EXISTS)
+            {
+                thread::Sleep(500);
+                if (--numRetries == 0)
+                {
+                    MessageBox(nullptr, "Already running", "rePlayer", MB_OK);
+                    return Status::kFail;
+                }
+            }
+            else
+                break;
+        }
+
         auto mainPath = std::filesystem::current_path();
 
         // clean old files
@@ -69,9 +87,10 @@ namespace rePlayer
                 uint32_t majorVersion = 0;
                 uint32_t minorVersion = 0;
                 uint32_t patchVersion = 0;
-                if (sscanf_s(url, "https://github.com/arnaud-neny/rePlayer/releases/tag/v%u.%u.%u", &majorVersion, &minorVersion, &patchVersion) >= 2
+                if (!std::filesystem::exists(mainPath / "replays" REPLAYER_OS_STUB / "Psycle") || // extra check to re-update if the previous version was older than the 0.19.0
+                    (sscanf_s(url, "https://github.com/arnaud-neny/rePlayer/releases/tag/v%u.%u.%u", &majorVersion, &minorVersion, &patchVersion) >= 2
                     && majorVersion < 16 && minorVersion < 16384 && patchVersion < 16384
-                    && ((majorVersion << 28) + (minorVersion << 14) + patchVersion) > kVersion)
+                    && ((majorVersion << 28) + (minorVersion << 14) + patchVersion) > kVersion))
                 {
                     // download
                     struct Buffer : public Array<uint8_t>
@@ -97,7 +116,6 @@ namespace rePlayer
                     {
                         // rename
                         std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".exe", std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".old");
-                        std::filesystem::rename(std::filesystem::path(mainPath) / "replays" REPLAYER_OS_STUB "/", std::filesystem::path(mainPath) / "replays" REPLAYER_OS_STUB ".old/");
                         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
                         {
                             if (dirEntry.is_regular_file() && _stricmp(dirEntry.path().extension().generic_string().c_str(), ".dll") == 0)
@@ -109,29 +127,47 @@ namespace rePlayer
                         }
 
                         // unzip
+                        std::string errors;
                         auto archive = archive_read_new();
                         archive_read_support_format_all(archive);
                         archive_read_open_memory(archive, downloadBuffer.Items(), downloadBuffer.Size<size_t>());
                         archive_entry* entry;
                         while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
                         {
-                            auto fileSize = archive_entry_size(entry);
-                            if (fileSize > 0)
+                            // rebuild the path (remove the root path from the archive files)
+                            auto entryPath = std::filesystem::path(archive_entry_pathname(entry));
+                            auto path = mainPath;
+                            for (auto it = ++entryPath.begin(), end = entryPath.end(); it != end; it++)
+                                path /= *it;
+
+                            // extract
+                            if ((archive_entry_mode(entry) & S_IFMT) == S_IFDIR)
+                                std::filesystem::create_directory(path);
+                            else
                             {
+                                auto fileSize = archive_entry_size(entry);
+
                                 Array<uint8_t> unpackedData;
                                 unpackedData.Resize(uint32_t(fileSize));
                                 archive_read_data(archive, unpackedData.Items(), size_t(fileSize));
 
-                                // rebuild the path (remove the root path from the archive files)
-                                auto entryPath = std::filesystem::path(archive_entry_pathname(entry));
-                                auto path = mainPath;
-                                for (auto it = ++entryPath.begin(), end = entryPath.end(); it != end; it++)
-                                    path /= *it;
                                 auto file = io::File::OpenForWrite(path.c_str());
-                                file.Write(unpackedData.Items(), fileSize);
+                                if (file.IsValid())
+                                    file.Write(unpackedData.Items(), fileSize);
+                                else
+                                {
+                                    if (errors.empty())
+                                        errors = "Can't write:";
+                                    char txt[256];
+                                    sprintf(txt, "\n- \"%s\"", archive_entry_pathname(entry));
+                                    errors += txt;
+                                }
                             }
                         }
                         archive_read_free(archive);
+
+                        if (!errors.empty())
+                            MessageBox(nullptr, errors.c_str(), "rePlayer", MB_OK);
                     }
 
                     isReloadNeeded = true;
