@@ -33,6 +33,7 @@ int replayer_fprintf(void* const, char const* const, ...);
 
 #define fprintf(...) replayer_fprintf(__VA_ARGS__)
 #define snprintf(...) stbsp_snprintf(__VA_ARGS__)
+#define vsnprintf(...) stbsp_vsnprintf(__VA_ARGS__)
 #define stdin  (0)
 #define stdout (1)
 #define stderr (2)
