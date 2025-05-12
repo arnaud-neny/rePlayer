@@ -169,7 +169,7 @@ int g_timer_period = 0;
 #endif
 static void sundog_set_timer_resolution( void )
 {
-#ifdef OS_WIN
+#if 0// rePlayer: def OS_WIN
     int res = sconfig_get_int_value( APP_CFG_TIMER_RESOLUTION, 1000, 0 ); //Hz
     TIMECAPS tc;
     if( timeGetDevCaps( &tc, sizeof( tc ) ) == MMSYSERR_NOERROR )
@@ -189,7 +189,7 @@ static void sundog_set_timer_resolution( void )
 
 static void sundog_reset_timer_resolution( void )
 {
-#ifdef OS_WIN
+#if 0// rePlayer: def OS_WIN
     if( g_timer_period )
     {
         timeEndPeriod( g_timer_period );

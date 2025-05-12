@@ -1,6 +1,10 @@
 // minor changes for rePlayer and MSVC:
 // - lib_flac\libFLAC\flac_config.h
+// - lib_sundog\file\file.cpp
+// - lib_sundog\file\file.h
+// - lib_sundog\main\main.cpp
 // - lib_sundog\sound\sound.cpp
+// - lib_sundog\sound\sound_win.hpp
 // - lib_sundog\sundog.h
 // - lib_sundog\time\time.cpp
 // - lib_sunvox\sunvox_engine.h
@@ -13,8 +17,6 @@
 
 #include <Audio/AudioTypes.inl.h>
 #include <ReplayDll.h>
-
-#pragma comment(lib, "winmm.lib")
 
 const char* g_app_config[] = { nullptr };
 const char* g_app_log = nullptr;

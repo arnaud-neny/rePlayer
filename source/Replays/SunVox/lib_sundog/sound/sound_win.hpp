@@ -695,7 +695,7 @@ init_dsound_end:
 //
 // Waveform Audio (MMSYSTEM)
 //
-
+#if 0 // rePlayer being
 void WaveOutSendBuffer( sundog_sound* ss, WAVEHDR* waveHdr )
 {
     device_sound* d = (device_sound*)ss->device_specific;
@@ -1028,7 +1028,7 @@ init_mmsound_end:
 
     return rv;
 }
-
+#endif // rePlayer end
 //
 // ASIO
 //
@@ -2007,7 +2007,7 @@ int device_sound_init( sundog_sound* ss )
 	switch( ss->driver )
 	{
 	    case SDRIVER_MMSOUND:
-		sound_err = device_sound_init_mmsound( ss, false );
+			sound_err = 0;// rePlayer: device_sound_init_mmsound(ss, false);
 		break;
 #ifdef DSOUND
 	    case SDRIVER_DSOUND:
@@ -2062,6 +2062,7 @@ int device_sound_deinit( sundog_sound* ss )
     switch( ss->driver )
     {
 	case SDRIVER_MMSOUND:
+#if 0 // rePlayer begin
 	    if( d->mm )
 	    {
 		device_sound_mmsound* mm = d->mm;
@@ -2099,6 +2100,7 @@ int device_sound_deinit( sundog_sound* ss )
 		smem_free( d->mm );
 		d->mm = 0;
 	    }
+#endif // rePlayer end
 	    break;
 #ifdef DSOUND
 	case SDRIVER_DSOUND:
@@ -2180,7 +2182,7 @@ void device_sound_input( sundog_sound* ss, bool enable )
         switch( ss->driver )
         {
             case SDRIVER_MMSOUND:
-        	sound_err = device_sound_init_mmsound( ss, true );
+				sound_err = 0;// rePlayer: device_sound_init_mmsound(ss, true);
         	break;
 #ifdef DSOUND
             case SDRIVER_DSOUND:
@@ -2210,6 +2212,7 @@ void device_sound_input( sundog_sound* ss, bool enable )
         switch( ss->driver )
         {
             case SDRIVER_MMSOUND:
+#if 0 // rePlayer begin
         	if( d->mm )
         	{
 		    device_sound_mmsound* mm = d->mm;
@@ -2245,6 +2248,7 @@ void device_sound_input( sundog_sound* ss, bool enable )
             	    mm->waveInStream = 0;
             	    d->input_enabled = false;
         	}
+#endif // rePlayer end
         	break;
 #ifdef DSOUND
             case SDRIVER_DSOUND:
@@ -2314,6 +2318,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
     switch( drv_num )
     {
 	case SDRIVER_MMSOUND:
+#if 0 // rePlayer begin
 	    {
 		int devices;
 		if( input )
@@ -2361,6 +2366,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 		smem_free( ts2 );
 #endif
 	    }
+#endif // rePlayer end
 	    break;
 #ifdef DSOUND
 	case SDRIVER_DSOUND:

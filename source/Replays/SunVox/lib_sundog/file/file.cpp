@@ -99,6 +99,7 @@ int sfs_get_disk_num( const char* path )
 
 void sfs_refresh_disks( void )
 {
+#if 0 // rePlayer begin
     char temp[ 512 ];
     int len, p, dp, tmp;
     g_disk_count = 0;
@@ -114,23 +115,27 @@ void sfs_refresh_disks( void )
 	if( temp[ p ] == 0 ) { g_disk_count++; dp = 0; continue; }
 	dp++;
     }
+#endif // rePlayer end
 }
 
 uint sfs_get_current_disk( void )
 {
     int rv = 0;
+#if 0 // rePlayer begin
     char cur_dir[ MAX_DIR_LEN ];
     GetCurrentDirectory( MAX_DIR_LEN, cur_dir );
     if( cur_dir[ 0 ] > 0x60 && cur_dir[ 0 ] < 0x7B )
 	cur_dir[ 0 ] -= 0x20; //Make it capital
     int d = sfs_get_disk_num( cur_dir );
     if( d >= 0 ) rv = d;
+#endif // rePlayer end
     return rv;
 }
 
 char g_current_path[ MAX_DIR_LEN ] = { 0 };
 const char* sfs_get_work_path( void )
 {
+#if 0 // rePlayer begin
     if( g_sfs_cant_write_disk1 ) return sfs_get_conf_path();
     if( g_current_path[ 0 ] == 0 )
     {
@@ -146,12 +151,14 @@ const char* sfs_get_work_path( void )
 	g_current_path[ len ] = '/';
 	g_current_path[ len + 1 ] = 0;
     }
+#endif // rePlayer end
     return g_current_path;
 }
 
 char g_user_path[ MAX_DIR_LEN ] = { 0 };
 const char* sfs_get_conf_path( void )
 {
+#if 0 // rePlayer begin
     if( g_user_path[ 0 ] == 0 ) 
     {
 	{
@@ -166,12 +173,14 @@ const char* sfs_get_conf_path( void )
 	g_user_path[ len ] = '/';
 	g_user_path[ len + 1 ] = 0;
     }
+#endif // rePlayer end
     return g_user_path;
 }
 
 char g_temp_path[ MAX_DIR_LEN ] = { 0 };
 const char* sfs_get_temp_path( void )
 {
+#if 0 // rePlayer begin
     if( g_temp_path[ 0 ] == 0 )
     {
 	{
@@ -186,6 +195,7 @@ const char* sfs_get_temp_path( void )
 	g_temp_path[ len ] = '/';
 	g_temp_path[ len + 1 ] = 0;
     }
+#endif // rePlayer end
     return g_temp_path;
 }
 
@@ -355,7 +365,7 @@ int sfs_global_init( void )
     sfs_refresh_disks();
     smem_clear( g_sfs_fd, sizeof( void* ) * SFS_MAX_DESCRIPTORS );
 
-#if defined(OS_LINUX) || defined(OS_MACOS) || defined(OS_WIN)
+#if 0// rePlayer: defined(OS_LINUX) || defined(OS_MACOS) || defined(OS_WIN)
     {
 	g_sfs_cant_write_disk1 = 0;
 	sfs_file f = sfs_open( "1:/file_write_test", "wb" );

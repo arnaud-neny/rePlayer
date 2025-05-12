@@ -29,7 +29,7 @@ Reserved characters (don't use it in the file name):
 //This library assumes that the paths to disks and working folders are the same within a single process
 
 #if defined(OS_WIN) || defined(OS_WINCE)
-    #include <shlobj.h>
+// rePlayer:    #include <shlobj.h>
 #endif
 
 #ifdef OS_UNIX
