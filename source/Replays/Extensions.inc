@@ -191,7 +191,7 @@ EXTENSION(fw)           // UADE: ForgottenWorlds_Game
 EXTENSION(glue)         // UADE: GlueMon
 EXTENSION(gmc)          // UADE: GMC
 EXTENSION(ea)           // UADE: EarAche
-EXTENSION(hd)           // UADE: HowieDavies
+EXTENSION(hd)           // UADE: HowieDavies & VGMStream
 EXTENSION(hipc)         // UADE: JochenHippel-CoSo
 EXTENSION(emod)         // UADE & XMP: QuadraComposer
 EXTENSION(dum)          // UADE: Infogrames
@@ -323,7 +323,7 @@ EXTENSION(minissf)      // Highly Theoretical
 EXTENSION(liq)          // XMP: Liquid Tracker
 EXTENSION(minidsf)      // Highly Theoretical
 EXTENSION(rtm)          // XMP: Real Tracker
-EXTENSION(ssf)          // Highly Theoretical
+EXTENSION(ssf)          // Highly Theoretical & VGMStream
 EXTENSION(dsf)          // Highly Theoretical & DSD & VGMStream: Ocean DSF
 EXTENSION(gsf)          // Highly Advanced & VGMStream: Electronic Arts SCHl
 EXTENSION(2sf)          // vio2sf
@@ -664,7 +664,7 @@ EXTENSION(mib)          // VGMStream: Headerless PS-ADPCM raw
 EXTENSION(mic)          // VGMStream: KOEI .MIC
 EXTENSION(msx)          // VGMStream
 EXTENSION(mjb)          // VGMStream
-EXTENSION(mnstr)        // VGMStream
+EXTENSION(2dx)			// VGMStream
 EXTENSION(mogg)         // VGMStream
 EXTENSION(mov)          // VGMStream
 EXTENSION(mp2)          // MP3 & VGMStream
@@ -715,7 +715,7 @@ EXTENSION(oma)          // VGMStream: Sony OpenMG audio
 EXTENSION(omu)          // VGMStream
 EXTENSION(opu)          // VGMStream
 EXTENSION(opusx)        // VGMStream: Nintendo Switch OPUS
-EXTENSION(otm)          // VGMStream
+EXTENSION(3ds)          // VGMStream
 EXTENSION(p2bt)         // VGMStream
 EXTENSION(p3d)          // VGMStream
 EXTENSION(past)         // VGMStream
@@ -734,7 +734,7 @@ EXTENSION(rak)          // VGMStream
 EXTENSION(ras)          // VGMStream
 EXTENSION(rda)          // VGMStream
 EXTENSION(rkv)          // VGMStream
-EXTENSION(rnd)          // VGMStream
+EXTENSION(audiopkg)     // VGMStream
 EXTENSION(rof)          // VGMStream
 EXTENSION(rpgmvo)       // VGMStream: Ogg Vorbis Encrypted
 EXTENSION(rrds)         // VGMStream
@@ -888,7 +888,7 @@ EXTENSION(wd)           // VGMStream
 EXTENSION(wem)          // VGMStream: Audiokinetic Wwise RIFF
 EXTENSION(nfx)          // VGMStream
 EXTENSION(wma)          // VGMStream: FFmpeg
-EXTENSION(wmus)         // VGMStream
+EXTENSION(hbd)          // VGMStream
 EXTENSION(wp2)          // VGMStream
 EXTENSION(wpd)          // VGMStream
 EXTENSION(wsd)          // VGMStream
@@ -924,7 +924,7 @@ EXTENSION(xsf)          // VGMStream
 EXTENSION(xsh)          // VGMStream
 EXTENSION(xss)          // VGMStream
 EXTENSION(xvag)         // VGMStream: Sony XVAG
-EXTENSION(v)			// VGMStream
+EXTENSION(v)            // VGMStream
 EXTENSION(xwav)         // VGMStream: RIFF Wave (XBOX)
 EXTENSION(xwb)          // VGMStream: Microsoft XWB
 EXTENSION(xwc)          // VGMStream
@@ -937,7 +937,7 @@ EXTENSION(ymf)          // VGMStream
 EXTENSION(zic)          // VGMStream
 EXTENSION(zsd)          // VGMStream: Z-Axis ZSND
 EXTENSION(zss)          // VGMStream
-EXTENSION(zwdsp)        // VGMStream
+EXTENSION(hd2)			// VGMStream
 EXTENSION(zwv)          // VGMStream
 EXTENSION(wsr)          // WonderSwan
 EXTENSION(org)          // Organya
@@ -960,3 +960,21 @@ EXTENSION(sdd)          // VGMStream
 EXTENSION(sd1)          // VGMStream
 EXTENSION(plx)          // Adlib: PALLADIX Sound System
 EXTENSION(psy)          // Psycle
+EXTENSION(ixa)          // VGMStream
+EXTENSION(k2sb)         // VGMStream
+EXTENSION(ka1a)         // VGMStream
+EXTENSION(mio)          // VGMStream
+EXTENSION(oga)          // VGMStream
+EXTENSION(ogs)          // VGMStream
+EXTENSION(oor)          // VGMStream
+EXTENSION(opusnx)       // VGMStream
+EXTENSION(paf)          // VGMStream
+EXTENSION(patch3audio)  // VGMStream
+EXTENSION(phd)          // VGMStream
+EXTENSION(shaa)         // VGMStream
+EXTENSION(shsa)         // VGMStream
+EXTENSION(skx)          // VGMStream
+EXTENSION(sn0)          // VGMStream
+EXTENSION(swar)         // VGMStream
+EXTENSION(xhd)          // VGMStream
+EXTENSION(xst)          // VGMStream

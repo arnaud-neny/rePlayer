@@ -1,5 +1,4 @@
 #include "api_internal.h"
-#if LIBVGMSTREAM_ENABLE
 
 
 static int get_internal_log_level(libvgmstream_loglevel_t level) {
@@ -13,28 +12,33 @@ static int get_internal_log_level(libvgmstream_loglevel_t level) {
     }
 }
 
-LIBVGMSTREAM_API void libvgmstream_set_log(libvgmstream_log_t* cfg) {
-    if (!cfg)
-        return;
-
-    int ilevel = get_internal_log_level(cfg->level);
-    if (cfg->stdout_callback) {
-        //vgmstream_set_log_stdout(ilevel);
-        vgm_log_set_callback(NULL, ilevel, 1, NULL);
+LIBVGMSTREAM_API void libvgmstream_set_log(libvgmstream_loglevel_t level, void (*callback)(int level, const char* str)) {
+    int ilevel = get_internal_log_level(level);
+    if (callback) {
+        vgm_log_set_callback(NULL, ilevel, 0, callback);
     }
     else {
-        //vgmstream_set_log_callback(ilevel, cfg->callback);
-        vgm_log_set_callback(NULL, ilevel, 0, cfg->callback);
+        vgm_log_set_callback(NULL, ilevel, 1, NULL);
     }
 }
 
 
-LIBVGMSTREAM_API const char** libvgmstream_get_extensions(size_t* size) {
-    return vgmstream_get_formats(size);
+LIBVGMSTREAM_API const char** libvgmstream_get_extensions(int* size) {
+    if (!size)
+        return NULL;
+    size_t tmp = 0;
+    const char** list = vgmstream_get_formats(&tmp);
+    *size = tmp;
+    return list;
 }
 
-LIBVGMSTREAM_API const char** libvgmstream_get_common_extensions(size_t* size) {
-    return vgmstream_get_common_formats(size);
+LIBVGMSTREAM_API const char** libvgmstream_get_common_extensions(int* size) {
+    if (!size)
+        return NULL;
+    size_t tmp = 0;
+    const char** list = vgmstream_get_common_formats(&tmp);
+    *size = tmp;
+    return list;
 }
 
 
@@ -60,7 +64,7 @@ LIBVGMSTREAM_API bool libvgmstream_is_valid(const char* filename, libvgmstream_v
 
     vgmstream_ctx_valid_cfg icfg = {
         .is_extension = cfg->is_extension,
-        .skip_standard = cfg->skip_default,
+        .skip_standard = cfg->skip_standard,
         .reject_extensionless = cfg->reject_extensionless,
         .accept_unknown = cfg->accept_unknown,
         .accept_common = cfg->accept_common
@@ -70,11 +74,11 @@ LIBVGMSTREAM_API bool libvgmstream_is_valid(const char* filename, libvgmstream_v
 
 
 LIBVGMSTREAM_API int libvgmstream_get_title(libvgmstream_t* lib, libvgmstream_title_t* cfg, char* buf, int buf_len) {
-    if (!buf || !buf_len || !cfg)
+    if (!buf || !buf_len)
         return LIBVGMSTREAM_ERROR_GENERIC;
 
     buf[0] = '\0';
-    if (!lib || !lib->priv)
+    if (!lib || !lib->priv || !cfg)
         return LIBVGMSTREAM_ERROR_GENERIC;
 
     libvgmstream_priv_t* priv = lib->priv;
@@ -91,5 +95,3 @@ LIBVGMSTREAM_API int libvgmstream_get_title(libvgmstream_t* lib, libvgmstream_ti
 LIBVGMSTREAM_API bool libvgmstream_is_virtual_filename(const char* filename) {
     return vgmstream_is_virtual_filename(filename);
 }
-
-#endif

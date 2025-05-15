@@ -22,7 +22,7 @@ static int ffmpeg_make_riff_atrac3(uint8_t* buf, size_t buf_size, size_t sample_
     put_u16le(buf+0x14, 0x0270); /* ATRAC3 codec */
     put_u16le(buf+0x16, channels);
     put_u32le(buf+0x18, sample_rate);
-    put_u32le(buf+0x1c, sample_rate * channels / sizeof(sample_t)); /* average bytes per second (wrong) */
+    put_u32le(buf+0x1c, sample_rate * channels / sizeof(int16_t)); /* average bytes per second (wrong) */
     put_u16le(buf+0x20, block_align); /* block align */
 
     put_u16le(buf+0x24, 0x0e); /* extra data size */
@@ -108,14 +108,29 @@ ffmpeg_codec_data* init_ffmpeg_atrac3_riff(STREAMFILE* sf, off_t offset, int* p_
 
     /* well behaved .at3 define "fact" but official tools accept files without it */
     if (find_chunk_le(sf, get_id32be("fact"), offset + 0x0c,0, &fact_offset, &fact_size)) {
-        if (fact_size == 0x08) { /* early AT3 (mainly PSP games) */
+        if (fact_size == 0x08) {
+            /* early AT3 (mainly PSP games) */
             fact_samples = read_s32le(fact_offset + 0x00, sf);
             skip_samples = read_s32le(fact_offset + 0x04, sf); /* base skip samples */
         }
-        else if (fact_size == 0x0c) { /* late AT3 (mainly PS3 games and few PSP games) */
+        else if (fact_size == 0x0c) {
+            /* late AT3 (mainly PS3 games and few PSP games) */
             fact_samples = read_s32le(fact_offset + 0x00, sf);
             /* 0x04: base skip samples, ignored by decoder */
             skip_samples = read_s32le(fact_offset + 0x08, sf); /* skip samples with implicit skip of 184 added */
+        }
+        else if (fact_size == 0x04) {
+            /* some ATRAC3 in rare cases [Up (PSP), Flash Motor Karen (PSP)-SND0.at3, Harajuku Tantei Gakuen (PSP)] */
+            if (is_at3) // observed default vs sony's tools
+                skip_samples = 1024; // 1 frame
+            else if (is_at3p)
+                skip_samples = 2048; // 1 frame
+            else
+                skip_samples = 0;
+            fact_samples = read_s32le(fact_offset + 0x00, sf);
+
+            //TODO: seems like some at3 made by soundforge may define more fact samples than possible;
+            // original tools only decode up to EOF [Up (PSP)]
         }
         else {
             VGM_LOG("ATRAC3: unknown fact size\n");
@@ -125,9 +140,9 @@ ffmpeg_codec_data* init_ffmpeg_atrac3_riff(STREAMFILE* sf, off_t offset, int* p_
     else {
         fact_samples = 0; /* tools output 0 samples in this case unless loop end is defined */
         if (is_at3)
-            skip_samples = 1024; /* 1 frame */
+            skip_samples = 1024; // 1 frame
         else if (is_at3p)
-            skip_samples = 2048; /* 1 frame */
+            skip_samples = 2048; // 1 frame
         else
             skip_samples = 0;
     }
@@ -215,7 +230,7 @@ static int ffmpeg_make_riff_atrac3plus(uint8_t* buf, int buf_size, uint32_t data
     put_u16le(buf+0x14, 0xfffe); /* WAVEFORMATEXTENSIBLE */
     put_u16le(buf+0x16, channels);
     put_u32le(buf+0x18, sample_rate);
-    put_u32le(buf+0x1c, sample_rate * channels / sizeof(sample_t)); /* average bytes per second (wrong) */
+    put_u32le(buf+0x1c, sample_rate * channels / sizeof(int16_t)); /* average bytes per second (wrong) */
     put_u32le(buf+0x20, block_align); /* block align */
 
     put_u16le(buf+0x24, 0x22); /* extra data size */
@@ -417,7 +432,7 @@ static int ffmpeg_make_riff_xma1(uint8_t* buf, size_t buf_size, size_t data_size
             }
         }
 
-        put_u32le(buf+off+0x00, sample_rate*stream_channels / sizeof(sample_t)); /* average bytes per second (wrong, unneeded) */
+        put_u32le(buf+off+0x00, sample_rate*stream_channels / sizeof(int16_t)); /* average bytes per second (wrong, unneeded) */
         put_u32le(buf+off+0x04, sample_rate);
         put_u32le(buf+off+0x08, 0); /* loop start */
         put_u32le(buf+off+0x0c, 0); /* loop end */
@@ -477,7 +492,7 @@ static int ffmpeg_make_riff_xma2(uint8_t* buf, size_t buf_size, size_t data_size
         default: speakers = 0; break;
     }
 
-    bytecount = sample_count * channels * sizeof(sample_t);
+    bytecount = sample_count * channels * sizeof(int16_t);
 
     memcpy   (buf+0x00, "RIFF", 0x04);
     put_u32le(buf+0x04, buf_max - (0x04 * 2) + data_size); /* riff size */
@@ -488,8 +503,8 @@ static int ffmpeg_make_riff_xma2(uint8_t* buf, size_t buf_size, size_t data_size
     put_u16le(buf+0x14, 0x0166); /* XMA2 */
     put_u16le(buf+0x16, channels);
     put_u32le(buf+0x18, sample_rate);
-    put_u32le(buf+0x1c, sample_rate * channels / sizeof(sample_t)); /* average bytes per second (wrong, unneeded) */
-    put_u16le(buf+0x20, (uint16_t)(channels * sizeof(sample_t))); /* block align */
+    put_u32le(buf+0x1c, sample_rate * channels / sizeof(int16_t)); /* average bytes per second (wrong, unneeded) */
+    put_u16le(buf+0x20, (uint16_t)(channels * sizeof(int16_t))); /* block align */
     put_u16le(buf+0x22, 16); /* bits per sample */
 
     put_u16le(buf+0x24, 0x22); /* extra data size */

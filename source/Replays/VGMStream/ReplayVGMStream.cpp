@@ -1,4 +1,5 @@
 // vgmstream customed files:
+// - base/render.c
 // - coding/coding.h
 // - coding/ffmpeg_decoder.c
 // - formats.c
@@ -300,7 +301,7 @@ namespace rePlayer
         auto* buf = reinterpret_cast<sample_t*>(output);
         if (isMono)
             buf = reinterpret_cast<sample_t*>(reinterpret_cast<float*>(output + numSamples) - numSamples);
-        auto numRendered = render_vgmstream(buf, int32_t(numSamples), m_vgmstream);
+        auto numRendered = render_vgmstream2(buf, int32_t(numSamples), m_vgmstream);
         if (isMono)
             output->ConvertMono(reinterpret_cast<float*>(buf), numRendered);
 

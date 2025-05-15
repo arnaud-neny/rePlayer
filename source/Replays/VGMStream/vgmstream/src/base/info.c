@@ -134,7 +134,7 @@ void describe_vgmstream(VGMSTREAM* vgmstream, char* desc, int length) {
             case coding_MSADPCM_ck:
             case coding_MS_IMA:
             case coding_MS_IMA_mono:
-            case coding_MC3:
+            case coding_MPC3:
             case coding_WWISE_IMA:
             case coding_REF_IMA:
             case coding_PSX_cfg:
@@ -171,6 +171,24 @@ void describe_vgmstream(VGMSTREAM* vgmstream, char* desc, int length) {
         concatn(length,desc,temp);
     }
 
+    sfmt_t sfmt = mixing_get_input_sample_type(vgmstream);
+    if (sfmt != SFMT_S16) {
+        const char* sfmt_desc;
+        switch(sfmt) {
+            case SFMT_FLT: sfmt_desc = "float"; break;
+            case SFMT_F16: sfmt_desc = "float16"; break;
+            case SFMT_S16: sfmt_desc = "pcm16"; break;
+            case SFMT_S24: sfmt_desc = "pcm24"; break;
+            case SFMT_S32: sfmt_desc = "pcm32"; break;
+            case SFMT_O24: sfmt_desc = "pcm24"; break;
+            default: sfmt_desc = "???";
+        }
+
+        snprintf(temp,TEMPSIZE, "sample type: %s\n", sfmt_desc);
+        concatn(length,desc,temp);
+    }
+
+
     if (vgmstream->config_enabled) {
         int32_t samples = vgmstream->pstate.play_duration;
 
@@ -178,6 +196,7 @@ void describe_vgmstream(VGMSTREAM* vgmstream, char* desc, int length) {
         snprintf(temp,TEMPSIZE, "play duration: %d samples (%1.0f:%06.3f seconds)\n", samples, time_mm, time_ss);
         concatn(length,desc,temp);
     }
+
 }
 
 void describe_vgmstream_info(VGMSTREAM* vgmstream, vgmstream_info* info) {
@@ -239,7 +258,7 @@ void describe_vgmstream_info(VGMSTREAM* vgmstream, vgmstream_info* info) {
         case coding_MSADPCM_ck:
         case coding_MS_IMA:
         case coding_MS_IMA_mono:
-        case coding_MC3:
+        case coding_MPC3:
         case coding_WWISE_IMA:
         case coding_REF_IMA:
         case coding_PSX_cfg:
@@ -314,7 +333,7 @@ static STREAMFILE* get_vgmstream_average_bitrate_channel_streamfile(VGMSTREAM* v
     }
 
     if (vgmstream->coding_type == coding_COMPRESSWAVE) {
-        return compresswave_get_streamfile(vgmstream->codec_data);
+        return compresswave_get_streamfile(vgmstream);
     }
 
 #ifdef VGM_USE_VORBIS

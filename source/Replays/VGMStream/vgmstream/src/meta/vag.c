@@ -28,8 +28,9 @@ VGMSTREAM* init_vgmstream_vag(STREAMFILE* sf) {
      * .snd: Alien Breed (Vita)
      * .svg: ModernGroove: Ministry of Sound Edition (PS2)
      * (extensionless): The Urbz (PS2), The Sims series (PS2)
-     * .wav: Sniper Elite (PS2), The Simpsons Game (PS2/PSP) */
-    if (!check_extensions(sf,"vag,swag,str,vig,l,r,vas,xa2,snd,svg,,wav,lwav"))
+     * .wav: Sniper Elite (PS2), The Simpsons Game (PS2/PSP) 
+     * .msv: Casper and the Ghostly Trio (PS2), Earache Extreme Metal Racing (PS2) */
+    if (!check_extensions(sf,"vag,swag,str,vig,l,r,vas,xa2,snd,svg,,wav,lwav,msv"))
         return NULL;
 
     file_size = get_streamfile_size(sf);
@@ -305,6 +306,15 @@ VGMSTREAM* init_vgmstream_vag(STREAMFILE* sf) {
                 channels = 1;
 
                 channel_size -= 0x40;
+                loop_flag = ps_find_loop_offsets(sf, start_offset, channel_size, channels, interleave, &loop_start_sample, &loop_end_sample);
+            }
+            else if (version == 0x00000020 && is_id64be(0x20, sf, "KAudioDL") &&  ( (channel_size + 0x30) * 2 == file_size 
+                || align_size(channel_size + 0x30, 0x800) * 2 == file_size ||  align_size(channel_size + 0x30, 0x400) * 2 == file_size) ) {
+                /* .SKX stereo vag (name is always KAudioDLL and streams are padded unlike memory audio) [NBA 06 (PS2)] */
+                start_offset = 0x30;
+                interleave = file_size / 2;
+                channels = 2; // mono KAudioDLL streams also exist
+
                 loop_flag = ps_find_loop_offsets(sf, start_offset, channel_size, channels, interleave, &loop_start_sample, &loop_end_sample);
             }
             else {

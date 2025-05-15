@@ -73,7 +73,6 @@ void render_reset(VGMSTREAM* vgmstream) {
 }
 
 int render_layout(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
-    void* buf = sbuf->buf;
     int sample_count = sbuf->samples;
 
     if (sample_count == 0)
@@ -90,10 +89,10 @@ int render_layout(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
 
     switch (vgmstream->layout_type) {
         case layout_interleave:
-            render_vgmstream_interleave(buf, sample_count, vgmstream);
+            render_vgmstream_interleave(sbuf, vgmstream);
             break;
         case layout_none:
-            render_vgmstream_flat(buf, sample_count, vgmstream);
+            render_vgmstream_flat(sbuf, vgmstream);
             break;
         case layout_blocked_mxch:
         case layout_blocked_ast:
@@ -108,8 +107,8 @@ int render_layout(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
         case layout_blocked_dec:
         case layout_blocked_vs_mh:
         case layout_blocked_mul:
-        case layout_blocked_gsb:
-        case layout_blocked_xvas:
+        case layout_blocked_gsnd:
+        case layout_blocked_vas_kceo:
         case layout_blocked_thp:
         case layout_blocked_filp:
         case layout_blocked_rage_aud:
@@ -134,7 +133,7 @@ int render_layout(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
         case layout_blocked_ubi_sce:
         case layout_blocked_tt_ad:
         case layout_blocked_vas:
-            render_vgmstream_blocked(buf, sample_count, vgmstream);
+            render_vgmstream_blocked(sbuf, vgmstream);
             break;
         case layout_segmented:
             render_vgmstream_segmented(sbuf, vgmstream);
@@ -346,9 +345,11 @@ int render_main(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
     return sbuf->filled;
 }
 
-int render_vgmstream(sample_t* buf, int32_t sample_count, VGMSTREAM* vgmstream) {
+int render_vgmstream2(sample_t* buf, int32_t sample_count, VGMSTREAM* vgmstream) {
     sbuf_t sbuf = {0};
-    sbuf_init_s16(&sbuf, buf, sample_count, vgmstream->channels);
-
+    // rePlayer begin
+    sfmt_t sfmt = mixing_get_input_sample_type(vgmstream);
+    sbuf_init(&sbuf, sfmt, buf, sample_count, vgmstream->channels);
+    // rePlayer end
     return render_main(&sbuf, vgmstream);
 }

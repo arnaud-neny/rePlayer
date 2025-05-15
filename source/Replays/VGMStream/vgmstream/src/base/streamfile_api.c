@@ -1,5 +1,4 @@
 #include "api_internal.h"
-#if LIBVGMSTREAM_ENABLE
 /* STREAMFILE for internal use, that bridges calls to external libstreamfile_t */
 
 
@@ -16,8 +15,7 @@ typedef struct {
 static size_t api_read(API_STREAMFILE* sf, uint8_t* dst, offv_t offset, size_t length) {
     void* user_data = sf->libsf->user_data;
 
-    sf->libsf->seek(sf->libsf->user_data, offset, LIBSTREAMFILE_SEEK_SET);
-    return sf->libsf->read(user_data, dst, length);
+    return sf->libsf->read(user_data, dst, offset, length);
 }
 
 static size_t api_get_size(API_STREAMFILE* sf) {
@@ -90,5 +88,3 @@ static STREAMFILE* open_api_streamfile_internal(libstreamfile_t* libsf, bool ext
 STREAMFILE* open_api_streamfile(libstreamfile_t* libsf) {
     return open_api_streamfile_internal(libsf, true);
 }
-
-#endif

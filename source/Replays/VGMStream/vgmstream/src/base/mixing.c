@@ -7,6 +7,7 @@
 #include "mixer.h"
 #include "mixer_priv.h"
 #include "sbuf.h"
+#include "codec_info.h"
 
 /* Wrapper/helpers for vgmstream's "mixer", which does main sample buffer transformations */
 
@@ -143,9 +144,36 @@ void mixing_info(VGMSTREAM* vgmstream, int* p_input_channels, int* p_output_chan
 }
 
 sfmt_t mixing_get_input_sample_type(VGMSTREAM* vgmstream) {
-    // TODO: check vgmstream
+
+    if (vgmstream->layout_type == layout_layered) {
+        layered_layout_data* data = vgmstream->layout_data;
+        if (data)
+            return data->fmt;
+    }
+
+    if (vgmstream->layout_type == layout_segmented) {
+        segmented_layout_data* data = vgmstream->layout_data;
+        if (data)
+            return data->fmt;
+    }
+
+    const codec_info_t* codec_info = codec_get_info(vgmstream);
+    if (codec_info) {
+        if (codec_info->sample_type)
+            return codec_info->sample_type;
+        if (codec_info->get_sample_type)
+            return codec_info->get_sample_type(vgmstream);
+    }
+
     // TODO: on layered/segments, detect biggest value and use that (ex. if one of the layers uses flt > flt)
-    return SFMT_S16;
+    switch(vgmstream->coding_type) {
+#ifdef VGM_USE_VORBIS
+        case coding_VORBIS_custom:
+#endif
+            return SFMT_FLT;
+        default:
+            return SFMT_S16;
+    }
 }
 
 sfmt_t mixing_get_output_sample_type(VGMSTREAM* vgmstream) {

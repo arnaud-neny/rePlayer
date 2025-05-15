@@ -29,18 +29,20 @@ VGMSTREAM* init_vgmstream_ffmpeg(STREAMFILE* sf) {
 
     /* no checks */
     //if (!check_extensions(sf, "..."))
-    //    goto fail;
+    //    return NULL;
 
     /* don't try to open headers and other mini files */
     if (get_streamfile_size(sf) <= 0x1000)
-        goto fail;
+        return NULL;
 
-    // many PSP rips have poorly demuxed videos with a failty RIFF, allow for now
-#if 0
     /* reject some formats handled elsewhere (better fail and check there than let buggy FFmpeg take over) */
-    if (check_extensions(sf, "at3"))
-        goto fail;
-#endif
+    uint32_t id = read_u32be(0x00, sf);
+    // rejected FSB may play as wonky .mp3
+    if ((id & 0xFFFFFF00) == get_id32be("FSB\0"))
+        return NULL;
+    // typically incorrectly extracted files with padding, best handle in riff.c that reads loops points
+    if (id == get_id32be("RIFF") && (read_u16le(0x14, sf) == 0x0270 || check_extensions(sf, "at3")))
+        return NULL;
 
     if (target_subsong == 0) target_subsong = 1;
 
@@ -68,6 +70,10 @@ VGMSTREAM* init_vgmstream_ffmpeg(STREAMFILE* sf) {
     /* try to read Ogg/Flac loop tags (abridged) */
     if (!loop_flag && (is_id32be(0x00, sf, "OggS") || is_id32be(0x00, sf, "fLaC"))) {
         loop_flag = find_meta_loops(data, &loop_start, &loop_end);
+    }
+
+    if (is_id32be(0x00, sf, "fLaC")) {
+        ffmpeg_set_allow_pcm24(data);
     }
 
     /* hack for AAC files (will return 0 samples if not an actual file) */

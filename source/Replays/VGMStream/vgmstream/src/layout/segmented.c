@@ -80,16 +80,18 @@ void render_vgmstream_segmented(sbuf_t* sbuf, VGMSTREAM* vgmstream) {
             ssrc->buf = buf_filled;
         }
 
-        render_main(ssrc, data->segments[data->current_segment]);
-
+        int samples_done = render_main(ssrc, data->segments[data->current_segment]);
+        samples_done = samples_to_do;
         // returned buf may have changed
         if (ssrc->buf != buf_filled) {
-            sbuf_copy_segments(sbuf, ssrc);
+            sbuf_copy_segments(sbuf, ssrc, samples_done);
+        } else {
+            //TODO ???
+            sbuf->filled += samples_done;
         }
 
-        sbuf->filled += samples_to_do;
-        vgmstream->current_sample += samples_to_do;
-        vgmstream->samples_into_block += samples_to_do;
+        vgmstream->current_sample += samples_done;
+        vgmstream->samples_into_block += samples_done;
     }
 
     return;
@@ -153,7 +155,7 @@ fail:
 bool setup_layout_segmented(segmented_layout_data* data) {
     int max_input_channels = 0;
     int max_output_channels = 0;
-    int max_sample_size = 0;
+    sfmt_t max_sample_type = SFMT_NONE;
     bool mixed_channels = false;
 
     /* setup each VGMSTREAM (roughly equivalent to vgmstream.c's init_vgmstream_internal stuff) */
@@ -210,9 +212,9 @@ bool setup_layout_segmented(segmented_layout_data* data) {
             //    goto fail;
         }
 
-        int current_sample_size = sfmt_get_sample_size( mixing_get_input_sample_type(data->segments[i]) );
-        if (max_sample_size < current_sample_size)
-            max_sample_size = current_sample_size;
+        sfmt_t current_sample_type = mixing_get_input_sample_type(data->segments[i]);
+        if (max_sample_type < current_sample_type && max_sample_type != SFMT_FLT) //float has priority
+            max_sample_type = current_sample_type;
 
         /* init mixing */
         mixing_setup(data->segments[i], VGMSTREAM_SEGMENT_SAMPLE_BUFFER);
@@ -223,6 +225,10 @@ bool setup_layout_segmented(segmented_layout_data* data) {
 
     if (max_output_channels > VGMSTREAM_MAX_CHANNELS || max_input_channels > VGMSTREAM_MAX_CHANNELS)
         return false;
+
+    // needed for codecs like FFMpeg where base vgmstream's sample type is unknown
+    data->fmt = max_sample_type;
+    int max_sample_size = sfmt_get_sample_size(max_sample_type);
 
     /* create internal buffer big enough for mixing */
     free(data->buffer);

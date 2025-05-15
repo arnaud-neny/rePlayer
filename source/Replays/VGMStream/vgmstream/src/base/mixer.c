@@ -70,54 +70,81 @@ bool mixer_is_active(mixer_t* mixer) {
     return false;
 }
 
+// TODO: probably could be pre-initialized
+static void setup_mixbuf(mixer_t* mixer, sbuf_t* sbuf) {
+    sbuf_t* smix = &mixer->smix;
+
+    // mixbuf (float) can be interpreted as F16, for 1:1 mapping with PCM16 (and possibly less rounding errors with mixops)
+    // for PCM24 regular float seems ok and 1:1 as well
+    if (sbuf->fmt == SFMT_S16)
+        sbuf_init(smix, SFMT_F16, mixer->mixbuf, sbuf->filled, sbuf->channels);
+    else
+        sbuf_init(smix, sbuf->fmt, mixer->mixbuf, sbuf->filled, sbuf->channels);
+
+    // remix to temp buf (somehow using float buf rather than int32 is faster?)
+    sbuf_copy_segments(smix, sbuf, sbuf->filled);
+}
+
+static void setup_outbuf(mixer_t* mixer, sbuf_t* sbuf) {
+    sbuf_t* smix = &mixer->smix; //TODO: probably could be pre-initialized
+
+    // setup + remix to output buf (buf is expected to be big enough to handle config)
+    sbuf->channels = mixer->output_channels;
+    sbuf->filled = 0;
+    smix->channels = mixer->output_channels;
+    if (mixer->force_type) {
+        sbuf->fmt = mixer->force_type;
+    }
+
+    sbuf_copy_segments(sbuf, smix, smix->filled);
+}
+
 void mixer_process(mixer_t* mixer, sbuf_t* sbuf, int32_t current_pos) {
 
-    /* external */
+    // external
     //if (!mixer_is_active(mixer))
     //    return;
 
-    /* try to skip if no fades apply (set but does nothing yet) + only has fades 
-     * (could be done in mix op but avoids upgrading bufs in some cases) */
-    mixer->current_subpos = 0;
+#if 0
+    // TODO: not possible to copy from src to dst directly at the moment, since src doubles as dst
+    // optimize copy only ops to skip temp buffer
+    if (mixer->chain_count == 0 && mixer->force_type != SFMT_NONE) {
+        ...
+    }
+#endif
+
+    // try to skip if no fades apply (set but does nothing yet) + only has fades 
+    // (could be done in mix op but avoids upgrading bufs in some cases)
     if (mixer->has_fade) {
         //;VGM_LOG("MIX: fade test %i, %i\n", data->has_non_fade, mixer_op_fade_is_active(data, current_pos, current_pos + sample_count));
         if (!mixer->has_non_fade && !mixer_op_fade_is_active(mixer, current_pos, current_pos + sbuf->filled))
             return;
-
-        //;VGM_LOG("MIX: fade pos=%i\n", current_pos);
-        mixer->current_subpos = current_pos;
     }
 
-    // remix to temp buf for mixing (somehow using float buf rather than int32 is faster?)
-    sbuf_copy_to_f32(mixer->mixbuf, sbuf);
+    mixer->current_subpos = current_pos;
 
-    // apply mixing ops in order. current_channels may increase or decrease per op
+    setup_mixbuf(mixer, sbuf);
+
+    // apply mixing ops in order. channels in mixers may increase or decrease per op (set in sbuf)
     // - 2ch w/ "1+2,1u" = ch1+ch2, ch1(add and push rest) = 3ch: ch1' ch1+ch2 ch2
     // - 2ch w/ "1u"     = downmix to 1ch (current_channels decreases once)
-    mixer->current_channels = mixer->input_channels;
     for (int m = 0; m < mixer->chain_count; m++) {
         mix_op_t* mix = &mixer->chain[m];
 
         //TO-DO: set callback
         switch(mix->type) {
-            case MIX_SWAP:      mixer_op_swap(mixer, sbuf->filled, mix); break;
-            case MIX_ADD:       mixer_op_add(mixer, sbuf->filled, mix); break;
-            case MIX_VOLUME:    mixer_op_volume(mixer, sbuf->filled, mix); break;
-            case MIX_LIMIT:     mixer_op_limit(mixer, sbuf->filled, mix); break;
-            case MIX_UPMIX:     mixer_op_upmix(mixer, sbuf->filled, mix); break;
-            case MIX_DOWNMIX:   mixer_op_downmix(mixer, sbuf->filled, mix); break;
-            case MIX_KILLMIX:   mixer_op_killmix(mixer, sbuf->filled, mix); break;
-            case MIX_FADE:      mixer_op_fade(mixer, sbuf->filled, mix);
+            case MIX_SWAP:      mixer_op_swap(mixer, mix); break;
+            case MIX_ADD:       mixer_op_add(mixer, mix); break;
+            case MIX_VOLUME:    mixer_op_volume(mixer, mix); break;
+            case MIX_LIMIT:     mixer_op_limit(mixer, mix); break;
+            case MIX_UPMIX:     mixer_op_upmix(mixer, mix); break;
+            case MIX_DOWNMIX:   mixer_op_downmix(mixer, mix); break;
+            case MIX_KILLMIX:   mixer_op_killmix(mixer, mix); break;
+            case MIX_FADE:      mixer_op_fade(mixer, mix);
             default:
                 break;
         }
     }
 
-    // setup + remix to output buf (buf is expected to be big enough to handle config)
-    sbuf->channels = mixer->output_channels;
-    if (mixer->force_type) {
-        sbuf->fmt = mixer->force_type;
-    }
-
-    sbuf_copy_from_f32(sbuf, mixer->mixbuf);
+    setup_outbuf(mixer, sbuf);
 }
