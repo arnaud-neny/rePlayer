@@ -16,17 +16,21 @@ namespace core
     char Log::ms_callbackBuf[STB_SPRINTF_MIN];
     Log* Log::ms_instance{ nullptr };
 
+    static const char* s_logType[] = {
+            "[v]",
+            "[i]",
+            "[w]",
+            "[e]"
+    };
+
     void Log::DisplaySettings()
     {
-        bool isEnabled = ms_instance->m_mode == Mode::kMemoryOnly || ms_instance->m_mode == Mode::kFull;
-        ImGui::Checkbox("Log", &isEnabled);
-        ImGui::SameLine();
-        bool isFileEnabled = ms_instance->m_mode == Mode::kFileOnly || ms_instance->m_mode == Mode::kFull;
-        ImGui::Checkbox("To File", &isFileEnabled);
+        bool isEnabled = ms_instance->m_mode == Mode::kFull;
+        ImGui::Checkbox("Display Log", &isEnabled);
         if (isEnabled)
-            ms_instance->m_mode = isFileEnabled ? Mode::kFull : Mode::kMemoryOnly;
+            ms_instance->m_mode = Mode::kFull;
         else
-            ms_instance->m_mode = isFileEnabled ? Mode::kFileOnly : Mode::kDisabled;
+            ms_instance->m_mode = Mode::kFileOnly;
         uint32_t logMin = 1;
         uint32_t logMax = 100;
         ImGui::SameLine();
@@ -36,6 +40,8 @@ namespace core
     Log::Log()
         : Window("Log", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground)
     {
+        static_assert(NumItemsOf(s_logType) == LogType::kCount);
+
         time_t sessionTime;
         std::time(&sessionTime);
         m_timeRef = sessionTime;
@@ -156,7 +162,7 @@ namespace core
         }
 
         // and flush the current log depending on our new settings
-        if (m_mode == Mode::kUndefined)
+        if (m_mode == Mode::kUndefined || m_mode < Mode::kFileOnly)
             m_mode = Mode::kFull;
         if (m_mode >= Mode::kFileOnly)
         {
@@ -260,8 +266,9 @@ namespace core
         {
             if (m_mode >= Mode::kFileOnly)
             {
-                auto timeStr = PrintTime(m_linePages[m_currentLine].time);
                 auto file = io::File::OpenForAppend(m_filename);
+                file.Write(s_logType[m_stringPages[m_currentString].id.type], 3);
+                auto timeStr = PrintTime(m_linePages[m_currentLine].time);
                 file.Write(timeStr.buf, timeStr.length);
                 PageHandle h(m_stringPages[m_currentString].charIndex, m_stringPages[m_currentString].charOffset);
                 file.Write(&m_charPages[h], m_stringPages[m_currentString].numChars);
@@ -271,6 +278,7 @@ namespace core
             else if (m_mode == Mode::kUndefined)
             {
                 auto timeStr = PrintTime(m_linePages[m_currentLine].time);
+                m_undefined.Add(s_logType[m_stringPages[m_currentString].id.type], 3);
                 m_undefined.Add(timeStr.buf, timeStr.length);
                 PageHandle h(m_stringPages[m_currentString].charIndex, m_stringPages[m_currentString].charOffset);
                 m_undefined.Add(&m_charPages[h], m_stringPages[m_currentString].numChars);

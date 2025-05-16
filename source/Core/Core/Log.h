@@ -18,7 +18,7 @@ namespace core
             kInfo,
             kWarning,
             kError,
-            kUnknown = 0xff
+            kCount
         };
 
     public:
