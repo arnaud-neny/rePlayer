@@ -79,9 +79,6 @@
     <ClInclude Include="libarchive\archive_entry_private.h">
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
-    <ClInclude Include="libarchive\archive_getdate.h">
-      <Filter>Source Files\libarchive</Filter>
-    </ClInclude>
     <ClInclude Include="libarchive\archive_hmac_private.h">
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
@@ -394,6 +391,9 @@
     <ClInclude Include="liblzma\simple\simple_private.h">
       <Filter>Source Files\liblzma\simple</Filter>
     </ClInclude>
+    <ClInclude Include="libarchive\archive_time_private.h">
+      <Filter>Source Files\libarchive</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libarchive\archive_acl.c">
@@ -451,9 +451,6 @@
       <Filter>Source Files\libarchive</Filter>
     </ClCompile>
     <ClCompile Include="libarchive\archive_entry_xattr.c">
-      <Filter>Source Files\libarchive</Filter>
-    </ClCompile>
-    <ClCompile Include="libarchive\archive_getdate.c">
       <Filter>Source Files\libarchive</Filter>
     </ClCompile>
     <ClCompile Include="libarchive\archive_hmac.c">
@@ -1070,6 +1067,12 @@
     </ClCompile>
     <ClCompile Include="liblzma\simple\x86.c">
       <Filter>Source Files\liblzma\simple</Filter>
+    </ClCompile>
+    <ClCompile Include="libarchive\archive_parse_date.c">
+      <Filter>Source Files\libarchive</Filter>
+    </ClCompile>
+    <ClCompile Include="libarchive\archive_time.c">
+      <Filter>Source Files\libarchive</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

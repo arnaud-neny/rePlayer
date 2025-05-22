@@ -34,7 +34,6 @@
     <ClInclude Include="libarchive\archive_entry.h" />
     <ClInclude Include="libarchive\archive_entry_locale.h" />
     <ClInclude Include="libarchive\archive_entry_private.h" />
-    <ClInclude Include="libarchive\archive_getdate.h" />
     <ClInclude Include="libarchive\archive_hmac_private.h" />
     <ClInclude Include="libarchive\archive_openssl_evp_private.h" />
     <ClInclude Include="libarchive\archive_openssl_hmac_private.h" />
@@ -54,6 +53,7 @@
     <ClInclude Include="libarchive\archive_read_private.h" />
     <ClInclude Include="libarchive\archive_string.h" />
     <ClInclude Include="libarchive\archive_string_composition.h" />
+    <ClInclude Include="libarchive\archive_time_private.h" />
     <ClInclude Include="libarchive\archive_windows.h" />
     <ClInclude Include="libarchive\archive_write_disk_private.h" />
     <ClInclude Include="libarchive\archive_write_private.h" />
@@ -164,11 +164,11 @@
     <ClCompile Include="libarchive\archive_entry_stat.c" />
     <ClCompile Include="libarchive\archive_entry_strmode.c" />
     <ClCompile Include="libarchive\archive_entry_xattr.c" />
-    <ClCompile Include="libarchive\archive_getdate.c" />
     <ClCompile Include="libarchive\archive_hmac.c" />
     <ClCompile Include="libarchive\archive_match.c" />
     <ClCompile Include="libarchive\archive_options.c" />
     <ClCompile Include="libarchive\archive_pack_dev.c" />
+    <ClCompile Include="libarchive\archive_parse_date.c" />
     <ClCompile Include="libarchive\archive_pathmatch.c" />
     <ClCompile Include="libarchive\archive_ppmd7.c" />
     <ClCompile Include="libarchive\archive_ppmd8.c" />
@@ -224,6 +224,7 @@
     <ClCompile Include="libarchive\archive_read_support_format_zip.c" />
     <ClCompile Include="libarchive\archive_string.c" />
     <ClCompile Include="libarchive\archive_string_sprintf.c" />
+    <ClCompile Include="libarchive\archive_time.c" />
     <ClCompile Include="libarchive\archive_util.c" />
     <ClCompile Include="libarchive\archive_version_details.c" />
     <ClCompile Include="libarchive\archive_virtual.c" />
