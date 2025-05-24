@@ -49,6 +49,7 @@
 - Opus: https://opus-codec.org
 - Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
+- Psycle: https://sourceforge.net/projects/psycle
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp
 - SNDH-Player: https://github.com/arnaud-carre/sndh-player

@@ -1,3 +1,14 @@
+v0.19.0:
+- Added Psycle
+- Updated adplug to 2.4 r916
+- Updated libsidplay to 2.14.0
+- Updated libxmp to 4.6.3
+- Updated SNDH-Player to 0.80
+- Updated vgmstream to r2023
+- Updated libarchive to 3.8.0
+- Updated libxml2 to 2.14.3
+- Bug fixes
+
 v0.18.0:
 - Added SunVox
 - Updated libsidplay to 2.13.0

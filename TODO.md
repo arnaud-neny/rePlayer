@@ -4,7 +4,6 @@
 - sanitize songs and artists strings fields on import (remove "\n" "\r")
 - viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
-- process detection to allow only one instance
 - seek: return the number of loops
 - playlist add files: rework for faster add
 - add the replay selection for each extension in the global settings
@@ -36,6 +35,8 @@
 - https://www.demozoo.org/ importer?
 - https://www.zophar.net/ importer?
 - https://vgm.hcs64.com/ importer?
+- https://zxtunes.com importer?
+- https://ocremix.org importer?
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
 - check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
 - check NostalgicPlayer for more players: https://github.com/neumatho/NostalgicPlayer
@@ -52,5 +53,4 @@
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
 - BambooTracker: https://github.com/BambooTracker/BambooTracker
-- Psycle: https://sourceforge.net/projects/psycle/ (songs from Manwe)
 - Skale Tracker: https://www.pouet.net/prod.php?which=20929 (songs from Manwe)

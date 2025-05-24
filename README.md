@@ -208,6 +208,7 @@ Or add some comments (and likes) there:
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
 - [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
+- [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
 - [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
