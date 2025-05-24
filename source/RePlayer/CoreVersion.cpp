@@ -87,10 +87,10 @@ namespace rePlayer
                 uint32_t majorVersion = 0;
                 uint32_t minorVersion = 0;
                 uint32_t patchVersion = 0;
-                if (!std::filesystem::exists(mainPath / "replays" REPLAYER_OS_STUB / "Psycle") || // extra check to re-update if the previous version was older than the 0.19.0
-                    (sscanf_s(url, "https://github.com/arnaud-neny/rePlayer/releases/tag/v%u.%u.%u", &majorVersion, &minorVersion, &patchVersion) >= 2
+                if ((sscanf_s(url, "https://github.com/arnaud-neny/rePlayer/releases/tag/v%u.%u.%u", &majorVersion, &minorVersion, &patchVersion) >= 2
                     && majorVersion < 16 && minorVersion < 16384 && patchVersion < 16384
-                    && ((majorVersion << 28) + (minorVersion << 14) + patchVersion) > kVersion))
+                    && ((majorVersion << 28) + (minorVersion << 14) + patchVersion) > kVersion)
+                    || !std::filesystem::exists(mainPath / "replays" REPLAYER_OS_STUB / "Psycle")) // extra check to re-update if the previous version was older than the 0.19.0)
                 {
                     // download
                     struct Buffer : public Array<uint8_t>
