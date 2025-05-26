@@ -359,43 +359,43 @@
     <ClInclude Include="furnace\extern\opn\ym3438.h">
       <Filter>Source Files\opn</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\core\vox\vox.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\core\vox\vox.hpp">
       <Filter>Source Files\vgsound_emu\core\vox</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es550x.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x.hpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5504.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5504.hpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5505.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5505.hpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5506.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5506.hpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k005289\k005289.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k005289\k005289.hpp">
       <Filter>Source Files\vgsound_emu\k005289</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k007232\k007232.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k007232\k007232.hpp">
       <Filter>Source Files\vgsound_emu\k007232</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k053260\k053260.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k053260\k053260.hpp">
       <Filter>Source Files\vgsound_emu\k053260</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\msm6295\msm6295.hpp">
       <Filter>Source Files\vgsound_emu\msm6295</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\n163\n163.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\n163\n163.hpp">
       <Filter>Source Files\vgsound_emu\n163</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\x1_010\x1_010.hpp">
       <Filter>Source Files\vgsound_emu\x1_010</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\vrcvi\vrcvi.hpp">
       <Filter>Source Files\vgsound_emu\vrcvi</Filter>
     </ClInclude>
-    <ClInclude Include="furnace\extern\vgsound_emu\src\scc\scc.hpp">
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\scc\scc.hpp">
       <Filter>Source Files\vgsound_emu\scc</Filter>
     </ClInclude>
     <ClInclude Include="furnace\src\engine\platform\sound\sn76496.h">
@@ -1108,49 +1108,49 @@
     <ClCompile Include="furnace\extern\opn\ym3438.c">
       <Filter>Source Files\opn</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\core\vox\vox.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\core\vox\vox.cpp">
       <Filter>Source Files\vgsound_emu\core\vox</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_alu.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x_alu.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_filter.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x_filter.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5504.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5504.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5505.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5505.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5506.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5506.cpp">
       <Filter>Source Files\vgsound_emu\es550x</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k005289\k005289.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k005289\k005289.cpp">
       <Filter>Source Files\vgsound_emu\k005289</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k007232\k007232.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k007232\k007232.cpp">
       <Filter>Source Files\vgsound_emu\k007232</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k053260\k053260.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k053260\k053260.cpp">
       <Filter>Source Files\vgsound_emu\k053260</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\msm6295\msm6295.cpp">
       <Filter>Source Files\vgsound_emu\msm6295</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\n163\n163.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\n163\n163.cpp">
       <Filter>Source Files\vgsound_emu\n163</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\x1_010\x1_010.cpp">
       <Filter>Source Files\vgsound_emu\x1_010</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\vrcvi\vrcvi.cpp">
       <Filter>Source Files\vgsound_emu\vrcvi</Filter>
     </ClCompile>
-    <ClCompile Include="furnace\extern\vgsound_emu\src\scc\scc.cpp">
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\scc\scc.cpp">
       <Filter>Source Files\vgsound_emu\scc</Filter>
     </ClCompile>
     <ClCompile Include="furnace\src\baseutils.cpp">

@@ -8,7 +8,6 @@
 // - fileutils.cpp
 // - ftm.cpp
 // - nes.cpp
-// - extern\vgsound_emu\src\scc\scc.cpp
 // - tia.cpp
 #include "ReplayFurnace.h"
 

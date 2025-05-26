@@ -94,7 +94,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\extern\vgsound_emu-modified;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\extern\vgsound_emu-modified;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -138,7 +138,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\extern\vgsound_emu-modified;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -167,7 +167,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)furnace\extern;$(ProjectDir)furnace\extern\blip_buf;$(ProjectDir)furnace\extern\fmt\include;$(ProjectDir)furnace\extern\IconFontCppHeaders;$(ProjectDir)furnace\extern\vgsound_emu-modified;$(ProjectDir)furnace\src\icon;$(SolutionDir)3rdParty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 /Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -228,19 +228,19 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="furnace\extern\SAASound\src\SAASndC.h" />
     <ClInclude Include="furnace\extern\SAASound\src\SAASound.h" />
     <ClInclude Include="furnace\extern\SAASound\src\types.h" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\core\vox\vox.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5504.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5505.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es5506.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\es550x\es550x.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k005289\k005289.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k007232\k007232.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\k053260\k053260.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\n163\n163.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\scc\scc.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.hpp" />
-    <ClInclude Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\core\vox\vox.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5504.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5505.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5506.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k005289\k005289.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k007232\k007232.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k053260\k053260.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\msm6295\msm6295.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\n163\n163.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\scc\scc.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\vrcvi\vrcvi.hpp" />
+    <ClInclude Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\x1_010\x1_010.hpp" />
     <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2608.h" />
     <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2610.h" />
     <ClInclude Include="furnace\extern\YM2608-LLE\fmopna_2612.h" />
@@ -510,21 +510,21 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="furnace\extern\SAASound\src\SAANoise.cpp" />
     <ClCompile Include="furnace\extern\SAASound\src\SAASndC.cpp" />
     <ClCompile Include="furnace\extern\SAASound\src\SAASound.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\core\vox\vox.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5504.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5505.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es5506.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_alu.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\es550x\es550x_filter.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k005289\k005289.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k007232\k007232.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\k053260\k053260.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\msm6295\msm6295.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\n163\n163.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\scc\scc.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\vrcvi\vrcvi.cpp" />
-    <ClCompile Include="furnace\extern\vgsound_emu\src\x1_010\x1_010.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\core\vox\vox.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5504.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5505.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es5506.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x_alu.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\es550x\es550x_filter.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k005289\k005289.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k007232\k007232.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\k053260\k053260.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\msm6295\msm6295.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\n163\n163.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\scc\scc.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\vrcvi\vrcvi.cpp" />
+    <ClCompile Include="furnace\extern\vgsound_emu-modified\vgsound_emu\src\x1_010\x1_010.cpp" />
     <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2608.c" />
     <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2610.c" />
     <ClCompile Include="furnace\extern\YM2608-LLE\fmopna_2612.c" />
