@@ -1,8 +1,10 @@
-v0.19.0:
+v0.19.1:
 - Added Psycle
 - Updated adplug to 2.4 r916
+- Updated Furnace to 0.6.8.2
 - Updated libsidplay to 2.14.0
 - Updated libxmp to 4.6.3
+- Updated OpenMPT to 0.9.0-pre.0 r23214
 - Updated SNDH-Player to 0.80
 - Updated vgmstream to r2023
 - Updated libarchive to 3.8.0
