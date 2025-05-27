@@ -7,7 +7,7 @@
 - seek: return the number of loops
 - playlist add files: rework for faster add
 - add the replay selection for each extension in the global settings
-- add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod/) and import from selected songs
+- add source browser (directly browse from websites in the same way as https://www.wothke.ch/playmod) and import from selected songs
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
 - add a project to make rePlayer as a lib/dll (so people can use the replays too): rePlayback (stripped from database and ui)
 - improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
@@ -27,16 +27,17 @@
 - handle properly gpucrash/device lost
 - profiler (cpu + gpu)
 - async song load?
-- https://www.amigaremix.com/ importer
-- https://remix.kwed.org/ importer
-- https://www.exotica.org.uk/ importer?
+- https://www.amigaremix.com importer
+- https://remix.kwed.org importer
+- https://www.exotica.org.uk importer?
 - http://janeway.exotica.org.uk/search.php importer
-- https://www.modules.pl/ importer?
-- https://www.demozoo.org/ importer?
-- https://www.zophar.net/ importer?
-- https://vgm.hcs64.com/ importer?
+- https://www.modules.pl importer?
+- https://www.demozoo.org importer?
+- https://www.zophar.net importer?
+- https://vgm.hcs64.com importer?
 - https://zxtunes.com importer?
 - https://ocremix.org importer?
+- https://downloads.khinsider.com importer?
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
 - check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
 - check NostalgicPlayer for more players: https://github.com/neumatho/NostalgicPlayer
@@ -48,7 +49,7 @@
 - 64klang: https://github.com/hzdgopher/64klang missing official file format
 - sointu: https://github.com/vsariola/sointu annoying language
 - WaveSabre: https://github.com/logicomacorp/WaveSabre missing official file format
-- Full EdLib support (doh!): https://blog.chordian.net/
+- Full EdLib support (doh!): https://blog.chordian.net
 - single channel export
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
