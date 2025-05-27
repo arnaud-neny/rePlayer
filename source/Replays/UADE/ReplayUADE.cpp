@@ -692,8 +692,8 @@ namespace rePlayer
                 mediaType = { uadeInfo->detectioninfo.ep->extensions[i], eReplay::UADE };
             if (mediaType.ext == eExtension::Unknown)
             {
-                static const char* const extensionNames[] = { "emsv6", "TFMX7V", "TFMX1.5"};
-                static eExtension extensions[] = { eExtension::_ems, eExtension::_mdat, eExtension::_mdat };
+                static const char* const extensionNames[] = { "emsv6", "TFMX7V", "TFMX1.5", "sa_old" };
+                static eExtension extensions[] = { eExtension::_ems, eExtension::_mdat, eExtension::_mdat, eExtension::_sa };
                 for (auto& extensionName : extensionNames)
                 {
                     if (_stricmp(uadeInfo->detectioninfo.ext, extensionName) == 0)
