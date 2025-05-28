@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TIMEDIFF_H
-#define HEADER_CURL_TIMEDIFF_H
+#ifndef HEADER_CURL_BASE64_H
+#define HEADER_CURL_BASE64_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -24,29 +24,13 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+CURLcode curlx_base64_encode(const char *inputbuff, size_t insize,
+                             char **outptr, size_t *outlen);
+CURLcode curlx_base64url_encode(const char *inputbuff, size_t insize,
+                                char **outptr, size_t *outlen);
+CURLcode curlx_base64_decode(const char *src,
+                             unsigned char **outptr, size_t *outlen);
 
-/* Use a larger type even for 32-bit time_t systems so that we can keep
-   microsecond accuracy in it */
-typedef curl_off_t timediff_t;
-#define FMT_TIMEDIFF_T FMT_OFF_T
+extern const char Curl_base64encdec[];
 
-#define TIMEDIFF_T_MAX CURL_OFF_T_MAX
-#define TIMEDIFF_T_MIN CURL_OFF_T_MIN
-
-/*
- * Converts number of milliseconds into a timeval structure.
- *
- * Return values:
- *    NULL IF tv is NULL or ms < 0 (eg. no timeout -> blocking select)
- *    tv with 0 in both fields IF ms == 0 (eg. 0ms timeout -> polling select)
- *    tv with converted fields IF ms > 0 (eg. >0ms timeout -> waiting select)
- */
-struct timeval *curlx_mstotv(struct timeval *tv, timediff_t ms);
-
-/*
- * Converts a timeval structure into number of milliseconds.
- */
-timediff_t curlx_tvtoms(struct timeval *tv);
-
-#endif /* HEADER_CURL_TIMEDIFF_H */
+#endif /* HEADER_CURL_BASE64_H */

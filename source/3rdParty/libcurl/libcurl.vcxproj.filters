@@ -26,6 +26,9 @@
     <Filter Include="Source Files\lib\vtls">
       <UniqueIdentifier>{4242e60c-040a-4e79-b825-9c9cc7c7d74a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\lib\curlx">
+      <UniqueIdentifier>{8d9bf75e-e399-4080-a234-5916bcd897d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\curl\curl.h">
@@ -130,9 +133,6 @@
     <ClInclude Include="lib\curl_addrinfo.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_base64.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_ctype.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -175,9 +175,6 @@
     <ClInclude Include="lib\curl_memrchr.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_multibyte.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_ntlm_core.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -214,9 +211,6 @@
     <ClInclude Include="lib\curl_trc.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curlx.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\cw-out.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -224,9 +218,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\doh.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\dynbuf.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\dynhds.h">
@@ -322,9 +313,6 @@
     <ClInclude Include="lib\inet_ntop.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\inet_pton.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\llist.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -347,9 +335,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\netrc.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\nonblock.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\noproxy.h">
@@ -448,12 +433,6 @@
     <ClInclude Include="lib\tftp.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\timediff.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\timeval.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\transfer.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -464,12 +443,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\urldata.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\version_win32.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\warnless.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\ws.h">
@@ -565,19 +538,61 @@
     <ClInclude Include="lib\httpsrr.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\strparse.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\cshutdn.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\cw-pause.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\hash_offt.h">
+    <ClInclude Include="lib\multi_ev.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\multi_ev.h">
+    <ClInclude Include="lib\curlx\base64.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\curlx.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\dynbuf.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\inet_pton.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\multibyte.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\nonblock.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\strparse.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\timediff.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\timeval.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\version_win32.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\warnless.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\winapi.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uint-bset.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uint-hash.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uint-spbset.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uint-table.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -589,12 +604,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\asyn-ares.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\asyn-thread.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\base64.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\bufq.c">
@@ -657,9 +666,6 @@
     <ClCompile Include="lib\curl_memrchr.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\curl_multibyte.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\curl_ntlm_core.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -691,9 +697,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\doh.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\dynbuf.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\dynhds.c">
@@ -747,9 +750,6 @@
     <ClCompile Include="lib\hmac.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\hostasyn.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\hostip.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -757,9 +757,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\hostip6.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\hostsyn.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\hsts.c">
@@ -804,9 +801,6 @@
     <ClCompile Include="lib\inet_ntop.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\inet_pton.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\krb5.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -841,9 +835,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\netrc.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\nonblock.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\noproxy.c">
@@ -939,12 +930,6 @@
     <ClCompile Include="lib\tftp.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\timediff.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\timeval.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\transfer.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -955,12 +940,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\version.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\version_win32.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\warnless.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\ws.c">
@@ -1089,22 +1068,67 @@
     <ClCompile Include="lib\httpsrr.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\strparse.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\cshutdn.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\cw-pause.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\hash_offt.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\multi_ev.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strequal.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\base64.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\dynbuf.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\inet_pton.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\multibyte.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\nonblock.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\strparse.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\timediff.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\timeval.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\version_win32.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\warnless.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\winapi.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\asyn-base.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\asyn-thrdd.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\uint-bset.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\uint-hash.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\uint-spbset.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\uint-table.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>

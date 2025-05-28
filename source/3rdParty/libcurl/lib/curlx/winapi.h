@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_INET_PTON_H
-#define HEADER_CURL_INET_PTON_H
+#ifndef HEADER_CURLX_WINAPI_H
+#define HEADER_CURLX_WINAPI_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -24,25 +24,10 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
-
-int curlx_inet_pton(int, const char *, void *);
-
-#ifdef HAVE_INET_PTON
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
-#ifdef __AMIGA__
-#define curlx_inet_pton(x,y,z) inet_pton(x,(unsigned char *)CURL_UNCONST(y),z)
-#else
-#define curlx_inet_pton(x,y,z) inet_pton(x,y,z)
-#endif
+#ifdef _WIN32
+#define WINAPI_ERROR_LEN 100
+const char *curlx_get_winapi_error(int err, char *buf, size_t buflen);
+const char *curlx_winapi_strerror(DWORD err, char *buf, size_t buflen);
 #endif
 
-#endif /* HEADER_CURL_INET_PTON_H */
+#endif /* HEADER_CURLX_WINAPI_H */
