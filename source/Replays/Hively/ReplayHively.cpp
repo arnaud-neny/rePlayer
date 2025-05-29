@@ -46,7 +46,7 @@ namespace rePlayer
             return nullptr;
 
         auto data = stream->Read();
-        auto module = hvl_ParseTune(data.Items(), static_cast<uint32_t>(data.Size()), kSampleRate, 2, [](size_t size) { return Alloc(size); }, [](void* ptr) { Free(ptr); });
+        auto module = hvl_ParseTune(data.Items(), static_cast<uint32_t>(data.Size()), kSampleRate, 2, [](size_t size) { auto* ptr = Alloc(size); memset(ptr, 0, size); return ptr; }, [](void* ptr) { Free(ptr); });
         if (!module)
             return nullptr;
 
@@ -66,7 +66,7 @@ namespace rePlayer
             extension = "hvl";
         }
 
-        return new ReplayHively(module, hvl_ParseTune(data.Items(), static_cast<uint32_t>(data.Size()), kSampleRate, 2, [](size_t size) { return Alloc(size); }, [](void* ptr) { Free(ptr); }), extension);
+        return new ReplayHively(module, hvl_ParseTune(data.Items(), static_cast<uint32_t>(data.Size()), kSampleRate, 2, [](size_t size) { auto* ptr = Alloc(size); memset(ptr, 0, size); return ptr; }, [](void* ptr) { Free(ptr); }), extension);
     }
 
     bool ReplayHively::DisplaySettings()
