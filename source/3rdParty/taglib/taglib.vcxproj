@@ -116,7 +116,12 @@
     <ClInclude Include="taglib\riff\wav\wavproperties.h" />
     <ClInclude Include="taglib\s3m\s3mfile.h" />
     <ClInclude Include="taglib\s3m\s3mproperties.h" />
+    <ClInclude Include="taglib\shorten\shortenfile.h" />
+    <ClInclude Include="taglib\shorten\shortenproperties.h" />
+    <ClInclude Include="taglib\shorten\shortentag.h" />
+    <ClInclude Include="taglib\shorten\shortenutils.h" />
     <ClInclude Include="taglib\tag.h" />
+    <ClInclude Include="taglib\taglib_config.h" />
     <ClInclude Include="taglib\taglib_export.h" />
     <ClInclude Include="taglib\tagunion.h" />
     <ClInclude Include="taglib\tagutils.h" />
@@ -233,6 +238,9 @@
     <ClCompile Include="taglib\riff\wav\wavproperties.cpp" />
     <ClCompile Include="taglib\s3m\s3mfile.cpp" />
     <ClCompile Include="taglib\s3m\s3mproperties.cpp" />
+    <ClCompile Include="taglib\shorten\shortenfile.cpp" />
+    <ClCompile Include="taglib\shorten\shortenproperties.cpp" />
+    <ClCompile Include="taglib\shorten\shortentag.cpp" />
     <ClCompile Include="taglib\tag.cpp" />
     <ClCompile Include="taglib\tagunion.cpp" />
     <ClCompile Include="taglib\tagutils.cpp" />
@@ -340,7 +348,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -360,7 +368,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -382,7 +390,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -406,7 +414,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

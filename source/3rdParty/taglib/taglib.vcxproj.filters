@@ -95,6 +95,9 @@
     <Filter Include="Source Files\3rdparty\utfcpp\utf8">
       <UniqueIdentifier>{f675e9f8-7add-4a33-8942-0beecf6fa8ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\taglib\shorten">
+      <UniqueIdentifier>{e5c8ceaf-4e15-4f59-81b0-6f349813a0df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="taglib\audioproperties.h">
@@ -475,6 +478,21 @@
     <ClInclude Include="3rdparty\utfcpp\utf8\unchecked.h">
       <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
     </ClInclude>
+    <ClInclude Include="taglib\taglib_config.h">
+      <Filter>Source Files\taglib</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\shorten\shortenfile.h">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\shorten\shortenproperties.h">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\shorten\shortentag.h">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\shorten\shortenutils.h">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="taglib\audioproperties.cpp">
@@ -806,6 +824,15 @@
     </ClCompile>
     <ClCompile Include="taglib\toolkit\tversionnumber.cpp">
       <Filter>Source Files\taglib\toolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\shorten\shortenfile.cpp">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\shorten\shortenproperties.cpp">
+      <Filter>Source Files\taglib\shorten</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\shorten\shortentag.cpp">
+      <Filter>Source Files\taglib\shorten</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
