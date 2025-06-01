@@ -121,6 +121,7 @@ AutoSave frequency of the rePlayer. (it will save on quit anyway).
 Enable/disable the media hot keys (for playback and volume).  
 Transparency of the windows (not available on the win32 release).  
 Live log can be enabled/disabled as well as its save on the disk. The logs retention can be changed too (older log files than the retention days limit are deleted).  
+Extension can be associated with a replay or let the scanner choose the first available one.  
 You can change the global settings of each players. I will not enter into the details here, I'm too lazy (I've just enabled by default my simple surround filter because I like it).
 
 ## The tray icon

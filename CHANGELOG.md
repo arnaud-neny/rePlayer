@@ -1,14 +1,17 @@
-v0.19.1:
+v0.19.2:
 - Added Psycle
 - Updated adplug to 2.4 r916
 - Updated Furnace to 0.6.8.2
 - Updated libsidplay to 2.14.0
 - Updated libxmp to 4.6.3
-- Updated OpenMPT to 0.9.0-pre.0 r23214
+- Updated OpenMPT to 0.9.0-pre.1 r23283
 - Updated SNDH-Player to 0.80
 - Updated vgmstream to r2023
 - Updated libarchive to 3.8.0
+- Updated libcurl to 8.14.0
 - Updated libxml2 to 2.14.3
+- Updated TagLib to 2.1.0
+- Associate extension with replay in settings
 - Bug fixes
 
 v0.18.0:

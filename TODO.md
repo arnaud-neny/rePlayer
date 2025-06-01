@@ -1,6 +1,5 @@
 # rePlayer (another multi-formats music player)
 
-- extension vs replay (extensions.inc with 2 columns: ext name, default replay)
 - sanitize songs and artists strings fields on import (remove "\n" "\r")
 - viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
