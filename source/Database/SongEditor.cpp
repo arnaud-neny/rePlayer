@@ -23,20 +23,7 @@ namespace rePlayer
 {
     SongEditor::SongEditor()
         : Window("SongEditor", ImGuiWindowFlags_NoCollapse)
-    {
-        for (int32_t i = 0; i < int32_t(eExtension::Count); i++)
-            m_sortedExtensions[i] = eExtension(i);
-        std::sort(m_sortedExtensions + 1, m_sortedExtensions + int32_t(eExtension::Count), [this](eExtension l, eExtension r)
-        {
-            return strcmp(MediaType::extensionNames[int32_t(l)], MediaType::extensionNames[int32_t(r)]) < 0;
-        });
-        for (int32_t i = 0; i < int32_t(eExtension::Count); i++)
-        {
-            m_mappedExtensions[int32_t(m_sortedExtensions[i])] = eExtension(i);
-            m_sortedExtensionNames[i] = MediaType::extensionNames[int32_t(m_sortedExtensions[i])];
-        }
-        m_sortedExtensionNames[0] = "";
-    }
+    {}
 
     SongEditor::~SongEditor()
     {
@@ -534,10 +521,10 @@ namespace rePlayer
 
             ImGui::TableNextColumn();
             ImGui::BeginDisabled(m_song.edited.subsongs[0].isArchive);
-            auto extIndex = int32_t(m_mappedExtensions[int32_t(m_song.edited.type.ext)]);
+            auto extIndex = MediaType::mapSortedExtensions[int32_t(m_song.edited.type.ext)];
             ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
-            ImGui::Combo("##Extension", &extIndex, m_sortedExtensionNames, int32_t(eExtension::Count));
-            m_song.edited.type.ext = m_sortedExtensions[extIndex];
+            ImGui::Combo("##Extension", &extIndex, MediaType::sortedExtensionNames, int32_t(eExtension::Count));
+            m_song.edited.type.ext = MediaType::sortedExtensions[extIndex];
             ImGui::EndDisabled();
 
             ImGui::EndTable();

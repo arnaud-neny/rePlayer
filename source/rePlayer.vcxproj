@@ -351,7 +351,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <None Include="Database\Types\Countries.inc" />
     <None Include="Database\Types\Countries.inl" />
     <None Include="Database\Types\MusicID.inl.h" />
-    <None Include="Database\Types\SongTypes.inc" />
     <None Include="Database\Types\SubsongID.inl" />
     <None Include="Database\Types\Tags.inc" />
     <None Include="Deck\Player.inl" />

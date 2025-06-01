@@ -24,6 +24,10 @@ namespace rePlayer
     };
     #undef REPLAY
 
+    const char* MediaType::sortedExtensionNames[int32_t(eExtension::Count)];
+    eExtension MediaType::sortedExtensions[int32_t(eExtension::Count)];
+    int32_t MediaType::mapSortedExtensions[int32_t(eExtension::Count)];
+
     MediaType::MediaType(const char* const otherExt, eReplay otherReplay)
         : replay{ otherReplay }
         , ext{ eExtension::Unknown }

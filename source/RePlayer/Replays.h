@@ -6,6 +6,7 @@
 #include <string>
 
 class DllManager;
+struct ImGuiTextBuffer;
 
 namespace core::io
 {
@@ -66,13 +67,16 @@ namespace rePlayer
         bool DisplaySettings() const;
         void DisplayAbout() const;
 
+        bool LoadSettings(const char* line);
+        void SaveSettings(ImGuiTextBuffer* buf);
+
         const FileFilters& GetFileFilters() const;
 
         void EditMetadata(eReplay replayId, ReplayMetadataContext& context) const;
 
         const char* GetName(eReplay replay) const;
 
-        void SetSelectedSettings(eReplay replay);
+        void SetSelectedSettings(MediaType type);
 
     private:
         struct DllEntry
@@ -93,9 +97,15 @@ namespace rePlayer
         ReplayPlugin* m_sortedPlugins[uint16_t(eReplay::Count)];
         ReplayPlugin* m_settingsPlugins[uint16_t(eReplay::Count)];
         uint8_t m_replayToIndex[uint16_t(eReplay::Count)];
+        mutable eReplay m_extensionToReplay[uint16_t(eExtension::Count)] = { eReplay::Unknown };
         uint16_t m_dllIdGenerator = 0;
         uint16_t m_numSettings = 0;
         mutable int32_t m_selectedSettings = 0;
+        mutable int32_t m_selectedExtension = 0;
+
+        mutable const char* m_sortedReplayNames[int32_t(eReplay::Count)];
+        eReplay m_sortedReplays[int32_t(eReplay::Count)];
+        int32_t m_mapSortedReplays[int32_t(eReplay::Count)];
 
         FileFilters* m_fileFilters = nullptr;
 

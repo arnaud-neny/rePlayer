@@ -10,7 +10,18 @@ namespace rePlayer
 {
     Settings::Settings()
         : Window("Settings", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse)
-    {}
+    {
+        RegisterSerializedCustomData(nullptr, [](void* data, const char* line)
+        {
+            UnusedArg(data);
+            return Core::GetReplays().LoadSettings(line);
+
+        }, [](void* data, ImGuiTextBuffer* buf)
+        {
+            UnusedArg(data);
+            Core::GetReplays().SaveSettings(buf);
+        });
+    }
 
     Settings::~Settings()
     {}

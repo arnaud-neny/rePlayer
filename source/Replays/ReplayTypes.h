@@ -59,6 +59,10 @@ namespace rePlayer
         static const char* const extensionNames[];
         static const size_t extensionLengths[];
         static const char* const replayNames[];
+    
+        static const char* sortedExtensionNames[];
+        static eExtension sortedExtensions[];
+        static int32_t mapSortedExtensions[];
     };
 
     template <typename T>

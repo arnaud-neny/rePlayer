@@ -43,9 +43,6 @@ namespace rePlayer
         bool m_isMetadataOpened = false;
         uint16_t m_selectedSubsong = 0;
         Replayables m_playables;
-        const char* m_sortedExtensionNames[int32_t(eExtension::Count)];
-        eExtension m_sortedExtensions[int32_t(eExtension::Count)];
-        eExtension m_mappedExtensions[int32_t(eExtension::Count)];
 
         SongEndEditor* m_songEndEditor = nullptr;
 

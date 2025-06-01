@@ -449,9 +449,6 @@
     <None Include="Database\Types\MusicID.inl.h">
       <Filter>Source Files\Database\Types</Filter>
     </None>
-    <None Include="Database\Types\SongTypes.inc">
-      <Filter>Source Files\Database\Types</Filter>
-    </None>
     <None Include="Database\Types\SubsongID.inl">
       <Filter>Source Files\Database\Types</Filter>
     </None>

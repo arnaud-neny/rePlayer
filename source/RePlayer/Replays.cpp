@@ -40,6 +40,20 @@ namespace rePlayer
         LoadPlugins();
 
         m_dllManager->EnableDllRedirection();
+
+        // build the list of sorted extension and mapping tables
+        for (int32_t i = 0; i < int32_t(eExtension::Count); i++)
+            MediaType::sortedExtensions[i] = eExtension(i);
+        std::sort(MediaType::sortedExtensions + 1, MediaType::sortedExtensions + int32_t(eExtension::Count), [this](eExtension l, eExtension r)
+        {
+            return strcmp(MediaType::extensionNames[int32_t(l)], MediaType::extensionNames[int32_t(r)]) < 0;
+        });
+        for (int32_t i = 0; i < int32_t(eExtension::Count); i++)
+        {
+            MediaType::mapSortedExtensions[int32_t(MediaType::sortedExtensions[i])] = i;
+            MediaType::sortedExtensionNames[i] = MediaType::extensionNames[int32_t(MediaType::sortedExtensions[i])];
+        }
+        MediaType::sortedExtensionNames[0] = "";
     }
 
     Replays::~Replays()
@@ -65,6 +79,10 @@ namespace rePlayer
 
     Replay* Replays::Load(io::Stream* stream, CommandBuffer metadata, MediaType type)
     {
+        // try the remap
+        if (type.replay == eReplay::Unknown)
+            type.replay = m_extensionToReplay[int(type.ext)];
+
         // default load
         if (auto plugin = m_plugins[int32_t(type.replay)])
         {
@@ -208,8 +226,12 @@ namespace rePlayer
 
     MediaType Replays::Find(const char* extension) const
     {
-        if (extension != nullptr)
+        MediaType type(extension, eReplay::Unknown);
+        // force the replay?
+        type.replay = m_extensionToReplay[int32_t(type.ext)];
+        if (extension != nullptr && type.replay == eReplay::Unknown)
         {
+            // look for the first plugin allowing this extension
             auto length = strlen(extension);
             for (auto* plugin : m_sortedPlugins)
             {
@@ -220,11 +242,11 @@ namespace rePlayer
                         ++exts;
 
                     if (size_t(exts - ext) == length && _strnicmp(ext, extension, length) == 0)
-                        return { extension, plugin->replayId };
+                        return { type.ext, plugin->replayId };
                 }
             }
         }
-        return MediaType(extension, eReplay::Unknown);
+        return type;
     }
 
     bool Replays::DisplaySettings() const
@@ -232,6 +254,20 @@ namespace rePlayer
         bool changed = false;
         if (ImGui::CollapsingHeader("Replays", ImGuiTreeNodeFlags_DefaultOpen))
         {
+            ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
+            ImGui::Combo("##Extension", &m_selectedExtension, MediaType::sortedExtensionNames + 1, int32_t(eExtension::Count) - 1);
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("extension vs replay");
+            ImGui::SameLine();
+            m_sortedReplayNames[0] = "- Default -";
+            int32_t selectedReplay = m_mapSortedReplays[int32_t(m_extensionToReplay[int32_t(MediaType::sortedExtensions[m_selectedExtension + 1])])];
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            ImGui::Combo("##Replay", &selectedReplay, m_sortedReplayNames, int32_t(eReplay::Count));
+            if (ImGui::IsItemHovered())
+                ImGui::Tooltip("extension vs replay");
+            m_extensionToReplay[int32_t(MediaType::sortedExtensions[m_selectedExtension + 1])] = m_sortedReplays[selectedReplay];
+            m_sortedReplayNames[0] = "";
+
             struct
             {
                 static const char* getter(void* data, int32_t index) { return reinterpret_cast<Replays*>(data)->m_settingsPlugins[index]->settings; }
@@ -255,6 +291,25 @@ namespace rePlayer
         }
     }
 
+    bool Replays::LoadSettings(const char* line)
+    {
+        uint32_t ext = 0;
+        uint32_t replay = 0;
+        if (sscanf_s(line, "ExtensionVsReplay%u=%u", &ext, &replay) == 2)
+        {
+            if (ext > 0 && ext < uint32_t(eExtension::Count) && replay < uint32_t(eReplay::Count))
+                m_extensionToReplay[ext] = eReplay(replay);
+            return true;
+        }
+        return false;
+    }
+
+    void Replays::SaveSettings(ImGuiTextBuffer* buf)
+    {
+        for (uint32_t i = 1; i < uint32_t(eExtension::Count); i++)
+            buf->appendf("ExtensionVsReplay%u=%u\n", i, uint32_t(m_extensionToReplay[i]));
+    }
+
     const Replays::FileFilters& Replays::GetFileFilters() const
     {
         if (m_fileFilters == nullptr)
@@ -275,19 +330,21 @@ namespace rePlayer
         return "!!! Missing Plugin !!!";
     }
 
-    void Replays::SetSelectedSettings(eReplay replay)
+    void Replays::SetSelectedSettings(MediaType type)
     {
-        if (replay != eReplay::Unknown)
+        if (type.replay != eReplay::Unknown)
         {
             for (int32_t selectedSettings = 0, e = m_numSettings; selectedSettings < e; selectedSettings++)
             {
-                if (m_settingsPlugins[selectedSettings]->replayId == replay)
+                if (m_settingsPlugins[selectedSettings]->replayId == type.replay)
                 {
                     m_selectedSettings = selectedSettings;
                     break;
                 }
             }
         }
+        if (type.ext != eExtension::Unknown)
+            m_selectedExtension = MediaType::mapSortedExtensions[int32_t(type.ext)] - 1;
     }
 
     void Replays::LoadPlugins()
@@ -405,6 +462,20 @@ namespace rePlayer
                 break;
             }
         }
+
+        // build the list of sorted replays and mapping tables
+        for (int32_t i = 0; i < int32_t(eReplay::Count); i++)
+            m_sortedReplays[i] = eReplay(i);
+        std::sort(m_sortedReplays + 1, m_sortedReplays + int32_t(eReplay::Count), [this](eReplay l, eReplay r)
+        {
+            return strcmp(m_plugins[int32_t(l)]->name, m_plugins[int32_t(r)]->name) < 0;
+        });
+        for (int32_t i = 0; i < int32_t(eReplay::Count); i++)
+        {
+            m_mapSortedReplays[int32_t(m_sortedReplays[i])] = i;
+            m_sortedReplayNames[i] = m_plugins[int32_t(m_sortedReplays[i])]->name;
+        }
+        m_sortedReplayNames[0] = "";
     }
 
     void Replays::BuildFileFilters()

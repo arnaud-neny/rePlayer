@@ -607,7 +607,7 @@ namespace rePlayer
             {
                 Core::GetSettings().Enable(isEnabled);
                 if (isEnabled && player)
-                    Core::GetReplays().SetSelectedSettings(player->GetMediaType().replay);
+                    Core::GetReplays().SetSelectedSettings(player->GetMediaType());
             }
             ImGui::Separator();
             isEnabled = Core::GetLibrary().IsEnabled();
