@@ -248,11 +248,10 @@ namespace rePlayer
                                 m_isRenaming = false;
 
                                 auto oldFileName = songs.m_db.GetFullpath(song);
+                                song->Edit()->name = m_renamedString;
                                 if (io::File::IsExisting(oldFileName.c_str()))
-                                {
-                                    song->Edit()->name = m_renamedString;
                                     songs.m_db.Move(oldFileName, song, "Merge");
-                                }
+                                songs.m_db.Raise(Database::Flag::kSaveSongs);
                             }
                             else if (ImGui::IsItemDeactivated())
                                 m_isRenaming = false;
