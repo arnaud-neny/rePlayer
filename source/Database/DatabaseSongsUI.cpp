@@ -240,7 +240,26 @@ namespace rePlayer
                         UpdateRowBackground(rowIdx, song, musicId.subsongId, currentPlayingSong);
                         UpdateSelection(rowIdx, musicId);
                         ImGui::SameLine(0.0f, 0.0f);//no spacing
-                        ImGui::TextUnformatted(m_db.GetTitle(musicId.subsongId).c_str());
+                        if (m_isRenaming && m_renamedEntry == musicId.subsongId)
+                        {
+                            ImGui::SetScrollHereY();
+                            ImGui::SetKeyboardFocusHere();
+                            ImGui::SetNextItemWidth(-FLT_MIN);
+                            if (ImGui::InputText("##edit", &m_renamedString, ImGuiInputTextFlags_EnterReturnsTrue))
+                            {
+                                m_isRenaming = false;
+
+                                auto oldFileName = m_db.GetFullpath(song);
+                                song->Edit()->name = m_renamedString;
+                                if (io::File::IsExisting(oldFileName.c_str()))
+                                    m_db.Move(oldFileName, song, "Rename");
+                                m_db.Raise(Database::Flag::kSaveSongs);
+                            }
+                            else if (ImGui::IsItemDeactivated())
+                                m_isRenaming = false;
+                        }
+                        else
+                            ImGui::TextUnformatted(m_db.GetTitle(musicId.subsongId).c_str());
                         if (ImGui::IsItemHovered())
                             musicId.SongTooltip();
                         ImGui::TableNextColumn();
@@ -338,11 +357,30 @@ namespace rePlayer
                 ImGui::EndTable();
             }
 
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A))
+            // Invalidate the renaming in case the song is gone (automerge...)
+            if (m_isRenaming && m_db[m_renamedEntry] == nullptr)
+                m_isRenaming = false;
+
+            // Handle global hot keys
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && m_isRenaming == false)
             {
-                m_numSelectedEntries = m_entries.NumItems();
-                for (auto& entry : m_entries)
-                    entry.Select(true);
+                // start renaming the song?
+                if (m_lastSelectedSubsong.IsValid() && ImGui::IsKeyPressed(ImGuiKey_F2))
+                {
+                    if (auto* song = m_db[m_lastSelectedSubsong])
+                    {
+                        m_isRenaming = true;
+                        m_renamedString = song->GetName();
+                        m_renamedEntry = m_lastSelectedSubsong;
+                    }
+                }
+                // select all
+                if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A))
+                {
+                    m_numSelectedEntries = m_entries.NumItems();
+                    for (auto& entry : m_entries)
+                        entry.Select(true);
+                }
             }
         }
         if (!m_isScrollingEnabled)

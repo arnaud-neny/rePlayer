@@ -144,6 +144,11 @@ namespace rePlayer
         // WAV export
         bool m_isExportAsWavTriggered = false;
         Export* m_export = nullptr;
+
+        // renaming
+        bool m_isRenaming = false;
+        std::string m_renamedString;
+        SubsongID m_renamedEntry;
     };
 }
 // namespace rePlayer
