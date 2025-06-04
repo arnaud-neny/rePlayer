@@ -198,15 +198,18 @@ namespace rePlayer
 
     void LibraryDatabase::MoveInternal(const char* oldFilename, Song* song, const char* logId) const
     {
-        auto newFilename = GetFullpath(song);
-        if (!io::File::Move(oldFilename, newFilename.c_str()))
+        if (std::filesystem::exists(oldFilename))
         {
-            io::File::Copy(oldFilename, newFilename.c_str());
-            Log::Warning("%s: Can't move file \"%s\" to \"%s\"\n", logId, oldFilename, newFilename.c_str());
-            m_hasFailedDeletes = true;
+            auto newFilename = GetFullpath(song);
+            if (!io::File::Move(oldFilename, newFilename.c_str()))
+            {
+                io::File::Copy(oldFilename, newFilename.c_str());
+                Log::Warning("%s: Can't move file \"%s\" to \"%s\"\n", logId, oldFilename, newFilename.c_str());
+                m_hasFailedDeletes = true;
+            }
+            else
+                Log::Message("%s: \"%s\" moved to \"%s\"\n", logId, oldFilename, newFilename.c_str());
         }
-        else
-            Log::Message("%s: \"%s\" moved to \"%s\"\n", logId, oldFilename, newFilename.c_str());
     }
 
     std::string LibraryDatabase::GetDirectory(Artist* artist) const
