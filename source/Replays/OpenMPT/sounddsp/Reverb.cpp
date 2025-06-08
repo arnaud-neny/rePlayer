@@ -19,11 +19,16 @@
 #include "../soundlib/MixerLoops.h"
 #include "mpt/base/numbers.hpp"
 
+#include <cstring>
+
 #if defined(MPT_WANT_ARCH_INTRINSICS_X86_SSE2) && defined(MPT_ARCH_INTRINSICS_X86_SSE2)
 #if MPT_COMPILER_MSVC
 #include <intrin.h>
 #endif
 #include <emmintrin.h>
+#if defined(MPT_ARCH_QUIRK_SSE2_UNALIGNED_LOAD_STORE_REQUIRES_IMMINTRIN_H)
+#include <immintrin.h>
+#endif
 #endif
 
 #endif // NO_REVERB
@@ -36,13 +41,24 @@ OPENMPT_NAMESPACE_BEGIN
 
 
 #if defined(MPT_WANT_ARCH_INTRINSICS_X86_SSE2) && defined(MPT_ARCH_INTRINSICS_X86_SSE2)
-// Load two 32-bit values
-static MPT_FORCEINLINE __m128i Load64SSE(const int32 *x) { return _mm_loadl_epi64(reinterpret_cast<const __m128i *>(x)); }
-// Load four 16-bit values
-static MPT_FORCEINLINE __m128i Load64SSE(const LR16 (&x)[2]) { return _mm_loadl_epi64(&reinterpret_cast<const __m128i &>(x)); }
-// Store two 32-bit or four 16-bit values from register
-static MPT_FORCEINLINE void Store64SSE(int32 *dst, __m128i src) { return _mm_storel_epi64(reinterpret_cast<__m128i *>(dst), src); }
-static MPT_FORCEINLINE void Store64SSE(LR16 (&dst)[2], __m128i src) { return _mm_storel_epi64(&reinterpret_cast<__m128i &>(dst), src); }
+#if defined(MPT_ARCH_QUIRK_SSE2_NO_UNALIGNED_LOAD_STORE)
+static MPT_FORCEINLINE __m128i mpt_mm_loadu_si64(void const *mem_addr) {
+	__m128i tmp;
+	std::memset(&tmp, 0, sizeof(__m128i));
+	std::memcpy(&tmp, mem_addr, 8);
+	return _mm_loadl_epi64(&tmp);
+}
+static MPT_FORCEINLINE void mpt_mm_storeu_si64(void *mem_addr, __m128i a) {
+	std::memcpy(mem_addr, &a, 8);
+}
+#else
+static MPT_FORCEINLINE __m128i mpt_mm_loadu_si64(void const *mem_addr) {
+	return _mm_loadu_si64(mem_addr);
+}
+static MPT_FORCEINLINE void mpt_mm_storeu_si64(void *mem_addr, __m128i a) {
+	_mm_storeu_si64(mem_addr, a);
+}
+#endif
 #endif
 
 
@@ -597,24 +613,24 @@ void CReverb::ReverbProcessPostFiltering1x(const int32 * MPT_RESTRICT pRvb, int3
 #if defined(MPT_WANT_ARCH_INTRINSICS_X86_SSE2) && defined(MPT_ARCH_INTRINSICS_X86_SSE2)
 	if(CPU::HasFeatureSet(CPU::feature::sse2) && CPU::HasModesEnabled(CPU::mode::xmm128sse))
 	{
-		__m128i nDCRRvb_Y1 = Load64SSE(gnDCRRvb_Y1);
-		__m128i nDCRRvb_X1 = Load64SSE(gnDCRRvb_X1);
+		__m128i nDCRRvb_Y1 = mpt_mm_loadu_si64(gnDCRRvb_Y1);
+		__m128i nDCRRvb_X1 = mpt_mm_loadu_si64(gnDCRRvb_X1);
 		__m128i in = _mm_set1_epi32(0);
 		while(nSamples--)
 		{
-			in = Load64SSE(pRvb);
+			in = mpt_mm_loadu_si64(pRvb);
 			pRvb += 2;
 			// x(n-1) - x(n)
 			__m128i diff = _mm_sub_epi32(nDCRRvb_X1, in);
 			nDCRRvb_X1 = _mm_add_epi32(nDCRRvb_Y1, _mm_sub_epi32(_mm_srai_epi32(diff, DCR_AMOUNT + 1), diff));
-			__m128i out = _mm_add_epi32(Load64SSE(pDry), nDCRRvb_X1);
+			__m128i out = _mm_add_epi32(mpt_mm_loadu_si64(pDry), nDCRRvb_X1);
 			nDCRRvb_Y1 = _mm_sub_epi32(nDCRRvb_X1, _mm_srai_epi32(nDCRRvb_X1, DCR_AMOUNT));
 			nDCRRvb_X1 = in;
-			Store64SSE(pDry, out);
+			mpt_mm_storeu_si64(pDry, out);
 			pDry += 2;
 		}
-		Store64SSE(gnDCRRvb_X1, in);
-		Store64SSE(gnDCRRvb_Y1, nDCRRvb_Y1);
+		mpt_mm_storeu_si64(gnDCRRvb_X1, in);
+		mpt_mm_storeu_si64(gnDCRRvb_Y1, nDCRRvb_Y1);
 		return;
 	}
 #endif
@@ -659,20 +675,20 @@ void CReverb::ReverbDCRemoval(int32 * MPT_RESTRICT pBuffer, uint32 nSamples)
 #if defined(MPT_WANT_ARCH_INTRINSICS_X86_SSE2) && defined(MPT_ARCH_INTRINSICS_X86_SSE2)
 	if(CPU::HasFeatureSet(CPU::feature::sse2) && CPU::HasModesEnabled(CPU::mode::xmm128sse))
 	{
-		__m128i nDCRRvb_Y1 = Load64SSE(gnDCRRvb_Y1);
-		__m128i nDCRRvb_X1 = Load64SSE(gnDCRRvb_X1);
+		__m128i nDCRRvb_Y1 = mpt_mm_loadu_si64(gnDCRRvb_Y1);
+		__m128i nDCRRvb_X1 = mpt_mm_loadu_si64(gnDCRRvb_X1);
 		while(nSamples--)
 		{
-			__m128i in = Load64SSE(pBuffer);
+			__m128i in = mpt_mm_loadu_si64(pBuffer);
 			__m128i diff = _mm_sub_epi32(nDCRRvb_X1, in);
 			__m128i out = _mm_add_epi32(nDCRRvb_Y1, _mm_sub_epi32(_mm_srai_epi32(diff, DCR_AMOUNT + 1), diff));
-			Store64SSE(pBuffer, out);
+			mpt_mm_storeu_si64(pBuffer, out);
 			pBuffer += 2;
 			nDCRRvb_Y1 = _mm_sub_epi32(out, _mm_srai_epi32(out, DCR_AMOUNT));
 			nDCRRvb_X1 = in;
 		}
-		Store64SSE(gnDCRRvb_X1, nDCRRvb_X1);
-		Store64SSE(gnDCRRvb_Y1, nDCRRvb_Y1);
+		mpt_mm_storeu_si64(gnDCRRvb_X1, nDCRRvb_X1);
+		mpt_mm_storeu_si64(gnDCRRvb_Y1, nDCRRvb_Y1);
 		return;
 	}
 #endif
@@ -729,7 +745,7 @@ void CReverb::ProcessPreDelay(SWRvbRefDelay * MPT_RESTRICT pPreDelay, const int3
 		__m128i preDifCoeffs = _mm_cvtsi32_si128(pPreDelay->nPreDifCoeffs.lr);
 		while(nSamples--)
 		{
-			__m128i in32 = Load64SSE(pIn);					// 16-bit unsaturated reverb input [  r  |  l  ]
+			__m128i in32 = mpt_mm_loadu_si64(pIn);					// 16-bit unsaturated reverb input [  r  |  l  ]
 			__m128i inSat = _mm_packs_epi32(in32, in32);	// [ r | l | r | l ] (16-bit saturated)
 			pIn += 2;
 			// Low-pass
@@ -806,10 +822,10 @@ void CReverb::ProcessReflections(SWRvbRefDelay * MPT_RESTRICT pPreDelay, LR16 * 
 		__m128i delayPos = _mm_set_epi16(GETDELAY(7), GETDELAY(6), GETDELAY(5), GETDELAY(4), GETDELAY(3), GETDELAY(2), GETDELAY(1), GETDELAY(0));
 #undef GETDELAY
 		delayPos = _mm_sub_epi16(_mm_set1_epi16(static_cast<int16>(pPreDelay->nDelayPos - 1)), delayPos);
-		__m128i gain12 = _mm_unpacklo_epi64(Load64SSE(pPreDelay->Reflections[0].Gains), Load64SSE(pPreDelay->Reflections[1].Gains));
-		__m128i gain34 = _mm_unpacklo_epi64(Load64SSE(pPreDelay->Reflections[2].Gains), Load64SSE(pPreDelay->Reflections[3].Gains));
-		__m128i gain56 = _mm_unpacklo_epi64(Load64SSE(pPreDelay->Reflections[4].Gains), Load64SSE(pPreDelay->Reflections[5].Gains));
-		__m128i gain78 = _mm_unpacklo_epi64(Load64SSE(pPreDelay->Reflections[6].Gains), Load64SSE(pPreDelay->Reflections[7].Gains));
+		__m128i gain12 = _mm_unpacklo_epi64(mpt_mm_loadu_si64(pPreDelay->Reflections[0].Gains), mpt_mm_loadu_si64(pPreDelay->Reflections[1].Gains));
+		__m128i gain34 = _mm_unpacklo_epi64(mpt_mm_loadu_si64(pPreDelay->Reflections[2].Gains), mpt_mm_loadu_si64(pPreDelay->Reflections[3].Gains));
+		__m128i gain56 = _mm_unpacklo_epi64(mpt_mm_loadu_si64(pPreDelay->Reflections[4].Gains), mpt_mm_loadu_si64(pPreDelay->Reflections[5].Gains));
+		__m128i gain78 = _mm_unpacklo_epi64(mpt_mm_loadu_si64(pPreDelay->Reflections[6].Gains), mpt_mm_loadu_si64(pPreDelay->Reflections[7].Gains));
 		// For 28-bit final output: 16+15-3 = 28
 		__m128i refGain = _mm_srai_epi32(_mm_set_epi32(0, 0, pPreDelay->ReflectionsGain.c.r, pPreDelay->ReflectionsGain.c.l), 3);
 		__m128i delayInc = _mm_set1_epi16(1), delayMask = _mm_set1_epi16(SNDMIX_REFLECTIONS_DELAY_MASK);
@@ -836,7 +852,7 @@ void CReverb::ProcessReflections(SWRvbRefDelay * MPT_RESTRICT pPreDelay, LR16 * 
 
 			__m128i out = _mm_madd_epi16(_mm_unpacklo_epi16(refOut, refOut), refGain);	// Apply reflections gain
 			// At this, point, this is the only output of the reverb
-			Store64SSE(pOut, out);
+			mpt_mm_storeu_si64(pOut, out);
 			pOut += 2;
 		}
 		return;
@@ -892,10 +908,10 @@ void CReverb::ProcessLateReverb(SWLateReverb * MPT_RESTRICT pReverb, LR16 * MPT_
 	if(CPU::HasFeatureSet(CPU::feature::sse2) && CPU::HasModesEnabled(CPU::mode::xmm128sse))
 	{
 		int delayPos = pReverb->nDelayPos & RVBDLY_MASK;
-		__m128i rvbOutGains = Load64SSE(pReverb->RvbOutGains);
-		__m128i difCoeffs = Load64SSE(pReverb->nDifCoeffs);
-		__m128i decayLP = Load64SSE(pReverb->nDecayLP);
-		__m128i lpHistory = Load64SSE(pReverb->LPHistory);
+		__m128i rvbOutGains = mpt_mm_loadu_si64(pReverb->RvbOutGains);
+		__m128i difCoeffs = mpt_mm_loadu_si64(pReverb->nDifCoeffs);
+		__m128i decayLP = mpt_mm_loadu_si64(pReverb->nDecayLP);
+		__m128i lpHistory = mpt_mm_loadu_si64(pReverb->LPHistory);
 		while(nSamples--)
 		{
 			__m128i refIn = _mm_cvtsi32_si128(pRefOut->lr);	// 16-bit stereo input
@@ -918,7 +934,7 @@ void CReverb::ProcessLateReverb(SWLateReverb * MPT_RESTRICT pReverb, LR16 * MPT_
 			lpHistory = _mm_adds_epi16(_mm_adds_epi16(lpDecay, lpDecay), delay2);	// Low-passed decay
 
 			// Apply decay gain
-			__m128i histDecay = _mm_srai_epi32(_mm_madd_epi16(Load64SSE(pReverb->nDecayDC), lpHistory), 15);
+			__m128i histDecay = _mm_srai_epi32(_mm_madd_epi16(mpt_mm_loadu_si64(pReverb->nDecayDC), lpHistory), 15);
 			__m128i histDecayPacked = _mm_shuffle_epi32(_mm_packs_epi32(histDecay, histDecay), _MM_SHUFFLE(2, 0, 2, 0));
 			__m128i histDecayIn = _mm_adds_epi16(histDecayPacked, _mm_srai_epi16(_mm_unpacklo_epi32(refIn, refIn), 2));
 			__m128i histDecayInDiff = _mm_subs_epi16(histDecayIn, _mm_mulhi_epi16(_mm_cvtsi32_si128(diffusion1), difCoeffs));
@@ -934,23 +950,23 @@ void CReverb::ProcessLateReverb(SWLateReverb * MPT_RESTRICT pReverb, LR16 * MPT_
 				_mm_cvtsi32_si128(pReverb->Delay1[DELAY_OFFSET(RVBDLY1L_LEN)].lr),
 				_mm_cvtsi32_si128(pReverb->Delay1[DELAY_OFFSET(RVBDLY1R_LEN)].lr));
 
-			__m128i delay1Gains = _mm_srai_epi32(_mm_madd_epi16(delay1, Load64SSE(pReverb->Dif2InGains)), 15);
+			__m128i delay1Gains = _mm_srai_epi32(_mm_madd_epi16(delay1, mpt_mm_loadu_si64(pReverb->Dif2InGains)), 15);
 			__m128i delay1GainsSat = _mm_shuffle_epi32(_mm_packs_epi32(delay1Gains, delay1Gains), _MM_SHUFFLE(2, 0, 2, 0));
 			__m128i histDelay1 = _mm_subs_epi16(_mm_adds_epi16(histDecayInDelay, delay1), delay1GainsSat);	// accumulate with reverb output
 			__m128i diff2out = _mm_subs_epi16(delay1GainsSat, _mm_mulhi_epi16(_mm_cvtsi32_si128(diffusion2), difCoeffs));
 			__m128i diff2outCoeffs = _mm_mulhi_epi16(difCoeffs, diff2out);
 			pReverb->Diffusion2[delayPos].lr = _mm_cvtsi128_si32(diff2out);
 
-			__m128i mixOut = Load64SSE(pMixOut);
+			__m128i mixOut = mpt_mm_loadu_si64(pMixOut);
 			__m128i delay2out = _mm_adds_epi16(diff2outCoeffs, _mm_cvtsi32_si128(diffusion2));
 			pReverb->Delay2[delayPos].lr = _mm_cvtsi128_si32(delay2out);
 			delayPos = (delayPos + 1) & RVBDLY_MASK;
 			// Accumulate with reverb output
 			__m128i out = _mm_add_epi32(_mm_madd_epi16(_mm_adds_epi16(histDelay1, delay2out), rvbOutGains), mixOut);
-			Store64SSE(pMixOut, out);
+			mpt_mm_storeu_si64(pMixOut, out);
 			pMixOut += 2;
 		}
-		Store64SSE(pReverb->LPHistory, lpHistory);
+		mpt_mm_storeu_si64(pReverb->LPHistory, lpHistory);
 		pReverb->nDelayPos = delayPos;
 		return;
 	}

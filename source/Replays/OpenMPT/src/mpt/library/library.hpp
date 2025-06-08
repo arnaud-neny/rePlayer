@@ -20,6 +20,7 @@
 #include "mpt/string_transcode/transcode.hpp"
 
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -180,7 +181,7 @@ public:
 	}
 
 public:
-	static std::optional<library> load(mpt::library::path path) {
+	static std::optional<library> load_optional(mpt::library::path path) {
 
 		HMODULE hModule = NULL;
 
@@ -351,7 +352,7 @@ public:
 	}
 
 public:
-	static std::optional<library> load(mpt::library::path path) {
+	static std::optional<library> load_optional(mpt::library::path path) {
 		std::optional<mpt::native_path> optionalfilename = path.get_effective_filename();
 		if (!optionalfilename) {
 			return std::nullopt;
@@ -406,7 +407,7 @@ public:
 	}
 
 public:
-	static std::optional<library> load(mpt::library::path path) {
+	static std::optional<library> load_optional(mpt::library::path path) {
 		if (lt_dlinit() != 0) {
 			return std::nullopt;
 		}
@@ -464,7 +465,7 @@ public:
 	}
 
 public:
-	static std::optional<library> load(mpt::library::path path) {
+	static std::optional<library> load_optional(mpt::library::path path) {
 		MPT_UNUSED(path);
 		return std::nullopt;
 	}
@@ -479,6 +480,14 @@ public:
 	}
 
 #endif
+
+	static library load(mpt::library::path path) {
+		std::optional<library> result = load_optional(path);
+		if (!result) {
+			throw std::runtime_error("library not loadable");
+		}
+		return std::move(result.value());
+	}
 
 	template <typename Tfunc>
 	bool bind_function(Tfunc *& f, const std::string & symbol) const {
@@ -516,6 +525,65 @@ public:
 			d = reinterpret_cast<Tdata *>(sym_ptr);
 		}
 		return true;
+	}
+
+	template <typename Tfunc>
+	class optional_function {
+#if !defined(MPT_LIBCXX_QUIRK_INCOMPLETE_IS_FUNCTION)
+		static_assert(std::is_function<Tfunc>::value);
+#endif
+	private:
+		Tfunc * f = nullptr;
+	public:
+		optional_function(const std::optional<library> & library, const std::string & symbol) {
+			if (!library.has_value()) {
+				return;
+			}
+			if (!library->bind_function(f, symbol)) {
+				return;
+			}
+		}
+		optional_function(const library & library, const std::string & symbol) {
+			if (!library.bind_function(f, symbol)) {
+				return;
+			}
+		}
+		explicit operator bool() const {
+			return f != nullptr;
+		}
+		bool operator!() const {
+			return f == nullptr;
+		}
+		template <typename... Targs>
+		auto operator()(Targs &&... args) const -> typename std::conditional<std::is_same<void, decltype(std::declval<Tfunc *>()(std::forward<Targs>(args)...))>::value, bool, std::optional<decltype(std::declval<Tfunc *>()(std::forward<Targs>(args)...))>>::type {
+			if constexpr (std::is_same<void, decltype(std::declval<Tfunc *>()(std::forward<Targs>(args)...))>::value) {
+				if (!f) {
+					return false;
+				}
+				f(std::forward<Targs>(args)...);
+				return true;
+			} else {
+				if (!f) {
+					return std::nullopt;
+				}
+				return std::make_optional(f(std::forward<Targs>(args)...));
+			}
+		}
+	};
+
+	template <typename Tfunc, typename... Targs>
+	auto optional_call(const std::string & symbol, Targs &&... args) const {
+		return optional_function<Tfunc>{*this, symbol}(std::forward<Targs>(args)...);
+	}
+
+	template <typename Tfunc, typename... Targs>
+	static inline auto optional_call(const std::optional<library> & lib, const std::string & symbol, Targs &&... args) {
+		return optional_function<Tfunc>{lib, symbol}(std::forward<Targs>(args)...);
+	}
+
+	template <typename Tfunc, typename... Targs>
+	static inline auto optional_call(const library::path & path, const std::string & symbol, Targs &&... args) {
+		return optional_call<Tfunc>(library::load_optional(path), symbol, std::forward<Targs>(args)...);
 	}
 };
 
