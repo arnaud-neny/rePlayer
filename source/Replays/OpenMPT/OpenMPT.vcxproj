@@ -187,12 +187,12 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\arnaud.neny\Downloads\openmpt-master\common\zlib_helper.h" />
     <ClInclude Include="common\BuildSettings.h" />
     <ClInclude Include="common\BuildSettingsCompiler.h" />
     <ClInclude Include="common\ComponentManager.h" />
     <ClInclude Include="common\FileReader.h" />
     <ClInclude Include="common\FileReaderFwd.h" />
-    <ClInclude Include="common\GzipWriter.h" />
     <ClInclude Include="common\Logging.h" />
     <ClInclude Include="common\misc_util.h" />
     <ClInclude Include="common\mptAssert.h" />

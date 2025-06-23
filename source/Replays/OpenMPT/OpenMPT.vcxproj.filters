@@ -377,9 +377,6 @@
     <ClInclude Include="libopenmpt\libopenmpt_stream_callbacks_file_posix_lfs64.h">
       <Filter>Source Files\libopenmpt</Filter>
     </ClInclude>
-    <ClInclude Include="common\GzipWriter.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="soundlib\InstrumentSynth.h">
       <Filter>Source Files\soundlib</Filter>
     </ClInclude>
@@ -397,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="soundlib\PlaybackTest.h">
       <Filter>Source Files\soundlib</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\arnaud.neny\Downloads\openmpt-master\common\zlib_helper.h">
+      <Filter>Source Files\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

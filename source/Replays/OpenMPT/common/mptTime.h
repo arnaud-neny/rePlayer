@@ -12,16 +12,17 @@
 
 #include "openmpt/all/BuildSettings.hpp"
 
+#include "mpt/chrono/system_clock.hpp"
+#include "mpt/chrono/unix_clock.hpp"
+
+#if !defined(MPT_LIBCXX_QUIRK_NO_CHRONO)
+#include <chrono>
+#endif
 #if MPT_CXX_AT_LEAST(20) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO_DATE)
-#include <chrono>
 #include <exception>
-#elif MPT_CXX_AT_LEAST(17) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO) && defined(MODPLUG_TRACKER)
-#include <chrono>
 #endif
 
-#if MPT_CXX_BEFORE(20) || defined(MPT_LIBCXX_QUIRK_NO_CHRONO) || defined(MPT_LIBCXX_QUIRK_NO_CHRONO_DATE)
-#include <ctime>
-#endif
+
 
 #if MPT_WINNT_AT_LEAST(MPT_WIN_8)
 #define MPT_FALLBACK_TIMEZONE_WINDOWS_HISTORIC
@@ -36,13 +37,10 @@
 
 
 
-OPENMPT_NAMESPACE_BEGIN
-
-
-
 #if defined(MODPLUG_TRACKER) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO)
 
 namespace mpt {
+inline namespace MPT_INLINE_NS {
 namespace chrono {
 #if MPT_CXX_AT_LEAST(20)
 using days = std::chrono::days;
@@ -57,35 +55,23 @@ using months = std::chrono::duration<int, std::ratio_divide<mpt::chrono::years::
 #endif
 }
 }
+}
 
 #endif // !MPT_LIBCXX_QUIRK_NO_CHRONO
 
 
 
+OPENMPT_NAMESPACE_BEGIN
+
+
+
 namespace mpt
 {
+
+
+
 namespace Date
 {
-
-
-
-#if defined(MODPLUG_TRACKER)
-
-#if MPT_OS_WINDOWS
-
-namespace ANSI
-{
-// uint64 counts 100ns since 1601-01-01T00:00Z
-
-uint64 Now();
-
-mpt::ustring ToUString(uint64 time100ns); // i.e. 2015-01-15 18:32:01.718
-
-} // namespacee ANSI
-
-#endif // MPT_OS_WINDOWS
-
-#endif // MODPLUG_TRACKER
 
 
 
@@ -101,26 +87,27 @@ enum class LogicalTimezone
 template <LogicalTimezone tz>
 struct Gregorian
 {
-	int          year    = 0;
-	unsigned int month   = 0;
-	unsigned int day     = 0;
-	int32        hours   = 0;
-	int32        minutes = 0;
-	int64        seconds = 0;
+	int          year        = 0;
+	unsigned int month       = 0;
+	unsigned int day         = 0;
+	int32        hours       = 0;
+	int32        minutes     = 0;
+	int32        seconds     = 0;
+	int32        nanoseconds = 0;
 	friend bool operator==(const Gregorian<tz>& lhs, const Gregorian<tz>& rhs)
 	{
-		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds)
-			== std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds);
+		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds, lhs.nanoseconds)
+			== std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds, rhs.nanoseconds);
 	}
 	friend bool operator!=(const Gregorian<tz>& lhs, const Gregorian<tz>& rhs)
 	{
-		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds)
-			!= std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds);
+		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds, lhs.nanoseconds)
+			!= std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds, rhs.nanoseconds);
 	}
 	friend bool operator<(const Gregorian<tz> &lhs, const Gregorian<tz> &rhs)
 	{
-		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds)
-			< std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds);
+		return std::tie(lhs.year, lhs.month, lhs.day, lhs.hours, lhs.minutes, lhs.seconds, lhs.nanoseconds)
+			< std::tie(rhs.year, rhs.month, rhs.day, rhs.hours, rhs.minutes, rhs.seconds, rhs.nanoseconds);
 	}
 };
 
@@ -142,6 +129,7 @@ inline Gregorian<TZ> interpret_as_timezone(AnyGregorian gregorian)
 	result.hours = gregorian.hours;
 	result.minutes = gregorian.minutes;
 	result.seconds = gregorian.seconds;
+	result.nanoseconds = gregorian.nanoseconds;
 	return result;
 }
 
@@ -155,79 +143,38 @@ inline Gregorian<LogicalTimezone::Unspecified> forget_timezone(Gregorian<TZ> gre
 	result.hours = gregorian.hours;
 	result.minutes = gregorian.minutes;
 	result.seconds = gregorian.seconds;
+	result.nanoseconds = gregorian.nanoseconds;
 	return result;
 }
 
-namespace nochrono
+
+
+} // namespace Date
+
+
+
+namespace Date
 {
 
-// int64 counts 1s since 1970-01-01T00:00Z
-struct Unix
-{
-	int64 value{};
-	friend bool operator==(const Unix &a, const Unix &b)
-	{
-		return a.value == b.value;
-	}
-	friend bool operator!=(const Unix &a, const Unix &b)
-	{
-		return a.value != b.value;
-	}
-};
 
-#if MPT_CXX_BEFORE(20) || defined(MPT_LIBCXX_QUIRK_NO_CHRONO) || defined(MPT_LIBCXX_QUIRK_NO_CHRONO_DATE)
 
-inline Unix UnixNow()
-{
-	return Unix{static_cast<int64>(std::time(nullptr))};
-}
+mpt::chrono::unix_clock::time_point unix_from_UTC(mpt::Date::UTC timeUtc);
 
-#endif
-
-inline int64 UnixAsSeconds(Unix tp)
-{
-	return tp.value;
-}
-
-inline Unix UnixFromSeconds(int64 seconds)
-{
-	return Unix{seconds};
-}
-
-Unix UnixFromUTC(UTC timeUtc);
-
-UTC UnixAsUTC(Unix tp);
+mpt::Date::UTC UTC_from_unix(mpt::chrono::unix_clock::time_point tp);
 
 #if defined(MODPLUG_TRACKER)
 
-Unix UnixFromLocal(Local timeLocal);
+mpt::chrono::unix_clock::time_point unix_from_local(mpt::Date::Local timeLocal);
 
-Local UnixAsLocal(Unix tp);
+mpt::Date::Local local_from_unix(mpt::chrono::unix_clock::time_point tp);
 
 #endif // MODPLUG_TRACKER
 
-} // namespace nochrono
+
 
 #if MPT_CXX_AT_LEAST(20) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO_DATE)
 
-using Unix = std::chrono::system_clock::time_point;
-
-inline Unix UnixNow()
-{
-	return std::chrono::system_clock::now();
-}
-
-inline int64 UnixAsSeconds(Unix tp)
-{
-	return std::chrono::duration_cast<std::chrono::seconds>(tp.time_since_epoch()).count();
-}
-
-inline Unix UnixFromSeconds(int64 seconds)
-{
-	return std::chrono::system_clock::time_point{std::chrono::seconds{seconds}};
-}
-
-inline mpt::Date::Unix UnixFromUTC(UTC utc)
+inline mpt::chrono::system_clock::time_point system_from_UTC(mpt::Date::UTC utc)
 {
 	try
 	{
@@ -239,14 +186,15 @@ inline mpt::Date::Unix UnixFromUTC(UTC utc)
 			} +
 			std::chrono::hours{ utc.hours } +
 			std::chrono::minutes{ utc.minutes } +
-			std::chrono::seconds{ utc.seconds }};
+			std::chrono::seconds{ utc.seconds } +
+			std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds{ utc.nanoseconds })};
 	} catch(const std::exception &)
 	{
-		return mpt::Date::UnixFromSeconds(mpt::Date::nochrono::UnixAsSeconds(mpt::Date::nochrono::UnixFromUTC(utc)));
+		return mpt::chrono::system_clock::from_unix_nanoseconds(mpt::chrono::unix_clock::to_unix_nanoseconds(mpt::Date::unix_from_UTC(utc)));
 	}
 }
 
-inline mpt::Date::UTC UnixAsUTC(Unix tp)
+inline mpt::Date::UTC UTC_from_system(mpt::chrono::system_clock::time_point tp)
 {
 	try
 	{
@@ -259,22 +207,23 @@ inline mpt::Date::UTC UnixAsUTC(Unix tp)
 		result.day = static_cast<unsigned int>(ymd.day());
 		result.hours = static_cast<int32>(hms.hours().count());
 		result.minutes = static_cast<int32>(hms.minutes().count());
-		result.seconds = static_cast<int64>(hms.seconds().count());
+		result.seconds = static_cast<int32>(hms.seconds().count());
+		result.nanoseconds = static_cast<int32>(std::chrono::duration_cast<std::chrono::nanoseconds>(hms.subseconds()).count());
 		return result;
 	} catch(const std::exception &)
 	{
-		return mpt::Date::nochrono::UnixAsUTC(mpt::Date::nochrono::UnixFromSeconds(mpt::Date::UnixAsSeconds(tp)));
+		return mpt::Date::UTC_from_unix(mpt::chrono::unix_clock::from_unix_nanoseconds(mpt::chrono::system_clock::to_unix_nanoseconds(tp)));
 	}
 }
 
 #if defined(MODPLUG_TRACKER)
 
-inline mpt::Date::Unix UnixFromLocal(Local local)
+inline mpt::chrono::system_clock::time_point system_from_local(mpt::Date::Local local)
 {
 #if !defined(MPT_LIBCXX_QUIRK_CHRONO_DATE_NO_ZONED_TIME)
 	try
 	{
-		std::chrono::time_point<std::chrono::local_t, std::chrono::seconds> local_tp =
+		std::chrono::time_point<std::chrono::local_t, std::chrono::system_clock::duration> local_tp =
 			std::chrono::local_days {
 				std::chrono::year{ local.year } /
 				std::chrono::month{ local.month } /
@@ -282,7 +231,8 @@ inline mpt::Date::Unix UnixFromLocal(Local local)
 			} +
 			std::chrono::hours{ local.hours } +
 			std::chrono::minutes{ local.minutes } +
-			std::chrono::seconds{ local.seconds };
+			std::chrono::seconds{ local.seconds } +
+			std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds{ local.nanoseconds });
 #if defined(MPT_LIBCXX_QUIRK_CHRONO_DATE_BROKEN_ZONED_TIME)
 		return std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::current_zone()->to_sys(local_tp)}.get_sys_time();
 #else
@@ -291,11 +241,11 @@ inline mpt::Date::Unix UnixFromLocal(Local local)
 	} catch(const std::exception &)
 #endif
 	{
-		return mpt::Date::UnixFromSeconds(mpt::Date::nochrono::UnixAsSeconds(mpt::Date::nochrono::UnixFromLocal(local)));
+		return mpt::chrono::system_clock::from_unix_nanoseconds(mpt::chrono::unix_clock::to_unix_nanoseconds(mpt::Date::unix_from_local(local)));
 	}
 }
 
-inline mpt::Date::Local UnixAsLocal(Unix tp)
+inline mpt::Date::Local local_from_system(mpt::chrono::system_clock::time_point tp)
 {
 #if !defined(MPT_LIBCXX_QUIRK_CHRONO_DATE_NO_ZONED_TIME)
 	try
@@ -310,36 +260,106 @@ inline mpt::Date::Local UnixAsLocal(Unix tp)
 		result.day = static_cast<unsigned int>(ymd.day());
 		result.hours = static_cast<int32>(hms.hours().count());
 		result.minutes = static_cast<int32>(hms.minutes().count());
-		result.seconds = static_cast<int64>(hms.seconds().count());
+		result.seconds = static_cast<int32>(hms.seconds().count());
+		result.nanoseconds = static_cast<int32>(std::chrono::duration_cast<std::chrono::nanoseconds>(hms.subseconds()).count());
 		return result;
 	} catch(const std::exception &)
 #endif
 	{
-		return mpt::Date::nochrono::UnixAsLocal(mpt::Date::nochrono::UnixFromSeconds(mpt::Date::UnixAsSeconds(tp)));
+		return mpt::Date::local_from_unix(mpt::chrono::unix_clock::from_unix_nanoseconds(mpt::chrono::system_clock::to_unix_nanoseconds(tp)));
 	}
+}
+
+#endif // MODPLUG_TRACKER
+
+#endif
+
+
+
+#if MPT_CXX_AT_LEAST(20) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO) && !defined(MPT_LIBCXX_QUIRK_NO_CHRONO_DATE) && 0
+
+inline mpt::chrono::default_system_clock::time_point default_from_UTC(mpt::Date::UTC timeUtc)
+{
+	return mpt::Date::system_from_UTC(timeUtc);
+}
+inline mpt::Date::UTC UTC_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::UTC_from_system(tp);
+}
+
+#if defined(MODPLUG_TRACKER)
+
+inline mpt::chrono::default_system_clock::time_point default_from_local(mpt::Date::Local timeLocal)
+{
+	return mpt::Date::system_from_local(timeLocal);
+}
+inline mpt::Date::Local local_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::local_from_system(tp);
+}
+
+#endif // MODPLUG_TRACKER
+
+#elif !defined(MPT_LIBCXX_QUIRK_NO_CHRONO)
+
+inline mpt::chrono::default_system_clock::time_point default_from_UTC(mpt::Date::UTC timeUtc)
+{
+	return mpt::chrono::default_system_clock::from_unix_nanoseconds(mpt::chrono::unix_clock::to_unix_nanoseconds(mpt::Date::unix_from_UTC(timeUtc)));
+}
+inline mpt::Date::UTC UTC_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::UTC_from_unix(mpt::chrono::unix_clock::from_unix_nanoseconds(mpt::chrono::default_system_clock::to_unix_nanoseconds(tp)));
+}
+
+#if defined(MODPLUG_TRACKER)
+
+inline mpt::chrono::default_system_clock::time_point default_from_local(mpt::Date::Local timeLocal)
+{
+	return mpt::chrono::default_system_clock::from_unix_nanoseconds(mpt::chrono::unix_clock::to_unix_nanoseconds(mpt::Date::unix_from_local(timeLocal)));
+}
+inline mpt::Date::Local local_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::local_from_unix(mpt::chrono::unix_clock::from_unix_nanoseconds(mpt::chrono::default_system_clock::to_unix_nanoseconds(tp)));
 }
 
 #endif // MODPLUG_TRACKER
 
 #else
 
-using Unix = nochrono::Unix;
-
-using nochrono::UnixNow;
-using nochrono::UnixAsSeconds;
-using nochrono::UnixFromSeconds;
-
-using nochrono::UnixFromUTC;
-using nochrono::UnixAsUTC;
+inline mpt::chrono::default_system_clock::time_point default_from_UTC(mpt::Date::UTC timeUtc)
+{
+	return mpt::Date::unix_from_UTC(timeUtc);
+}
+inline mpt::Date::UTC UTC_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::UTC_from_unix(tp);
+}
 
 #if defined(MODPLUG_TRACKER)
 
-using nochrono::UnixFromLocal;
-using nochrono::UnixAsLocal;
+inline mpt::chrono::default_system_clock::time_point default_from_local(mpt::Date::Local timeLocal)
+{
+	return mpt::Date::unix_from_local(timeLocal);
+}
+inline mpt::Date::Local local_from_default(mpt::chrono::default_system_clock::time_point tp)
+{
+	return mpt::Date::local_from_unix(tp);
+}
 
 #endif // MODPLUG_TRACKER
 
 #endif
+
+
+
+} // namespace Date
+
+
+
+namespace Date
+{
+
+
 
 mpt::ustring ToShortenedISO8601(AnyGregorian date); // i.e. 2015-01-15T18:32:01
 
@@ -349,7 +369,20 @@ mpt::ustring ToShortenedISO8601(UTC date); // i.e. 2015-01-15T18:32:01Z
 mpt::ustring ToShortenedISO8601(Local date); // i.e. 2015-01-15T18:32:01
 #endif // MODPLUG_TRACKER
 
+mpt::ustring ToISO8601(AnyGregorian date);
+
+mpt::ustring ToISO8601(UTC date);
+
+#ifdef MODPLUG_TRACKER
+mpt::ustring ToISO8601(Local date);
+#endif // MODPLUG_TRACKER
+
+
+
 } // namespace Date
+
+
+
 } // namespace mpt
 
 
