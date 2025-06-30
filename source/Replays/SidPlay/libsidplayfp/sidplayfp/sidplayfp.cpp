@@ -71,6 +71,11 @@ int sidplayfp::play(unsigned int cycles)
     return sidplayer.play(cycles);
 }
 
+bool sidplayfp::reset()
+{
+    return sidplayer.reset();
+}
+
 bool sidplayfp::load(SidTune *tune)
 {
     return sidplayer.load(tune);
@@ -145,4 +150,14 @@ bool sidplayfp::getSidStatus(unsigned int sidNum, uint8_t regs[32])
 unsigned int sidplayfp::installedSIDs() const
 {
     return sidplayer.installedSIDs();
+}
+
+void sidplayfp::initMixer(bool stereo)
+{
+    return sidplayer.initMixer(stereo);
+}
+
+unsigned int sidplayfp::mix(short *buffer, unsigned int samples)
+{
+    return sidplayer.mix(buffer, samples);
 }

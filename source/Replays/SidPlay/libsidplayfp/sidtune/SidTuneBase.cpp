@@ -108,28 +108,6 @@ SidTuneBase* SidTuneBase::load(LoaderFunc loader, void* loaderData, const char* 
     return getFromFiles(loader, loaderData, fileName, fileNameExt, separatorIsSlash);
 }
 
-SidTuneBase* SidTuneBase::read(const uint_least8_t* firstSourceBuffer, uint_least32_t firstBufferLen, const uint_least8_t* secondSourceBuffer, uint_least32_t secondBufferLen)
-{
-    if (firstSourceBuffer == nullptr || firstBufferLen == 0 || secondSourceBuffer == nullptr || secondBufferLen == 0)
-    {
-        throw loadError(ERR_EMPTY);
-    }
-
-    if (firstBufferLen > MAX_FILELEN || secondBufferLen > MAX_FILELEN)
-    {
-        throw loadError(ERR_FILE_TOO_LONG);
-    }
-
-    buffer_t buf1(firstSourceBuffer, firstSourceBuffer + firstBufferLen);
-    buffer_t buf2(secondSourceBuffer, secondSourceBuffer + secondBufferLen);
-
-    std::unique_ptr<SidTuneBase> s(MUS::load(buf1, buf2, 0, true));
-    if (s.get() == nullptr) throw loadError(ERR_UNRECOGNIZED_FORMAT);
-
-    s->acceptSidTune("-", "-", buf1, false);
-    return s.release();
-}
-
 unsigned int SidTuneBase::selectSong(unsigned int selectedSong)
 {
     // Check whether selected song is valid, use start song if not

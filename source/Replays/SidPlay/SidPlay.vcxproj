@@ -277,6 +277,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\sidtune\SidTuneInfoImpl.h" />
     <ClInclude Include="libsidplayfp\sidtune\SidTuneTools.h" />
     <ClInclude Include="libsidplayfp\sidtune\SmartPtr.h" />
+    <ClInclude Include="libsidplayfp\simpleMixer.h" />
     <ClInclude Include="libsidplayfp\stringutils.h" />
     <ClInclude Include="libsidplayfp\utils\iMd5.h" />
     <ClInclude Include="libsidplayfp\utils\iniParser.h" />
@@ -746,6 +747,12 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\simpleMixer.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;HAVE_CONFIG_H;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;HAVE_CONFIG_H;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="libsidplayfp\utils\iniParser.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

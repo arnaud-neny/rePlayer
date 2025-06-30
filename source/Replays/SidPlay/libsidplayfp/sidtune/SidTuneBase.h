@@ -129,9 +129,6 @@ public:  // ----------------------------------------------------------------
     {
         return getFromBuffer(sourceBuffer, bufferLen);
     }
-    // rePlayer begin
-    static SidTuneBase* read(const uint_least8_t* firstSourceBuffer, uint_least32_t firstBufferLen, const uint_least8_t* secondSourceBuffer, uint_least32_t secondBufferLen);
-    // rePlayer end
 
     /**
      * Select sub-song (0 = default starting song)

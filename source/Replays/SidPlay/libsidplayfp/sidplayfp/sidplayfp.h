@@ -86,7 +86,9 @@ public:
      * Set the fast-forward factor.
      *
      * @param percent
+     * @deprecated
      */
+    SID_DEPRECATED
     bool fastForward(unsigned int percent);
 
     /**
@@ -107,7 +109,9 @@ public:
      * @return the number of produced samples. If less than requested
      *         or #isPlaying() is false an error occurred, use #error()
      *         to get a detailed message.
+     * @deprecated use #play(unsigned int)
      */
+    SID_DEPRECATED
     uint_least32_t play(short *buffer, uint_least32_t count);
 
     /**
@@ -132,6 +136,15 @@ public:
     int play(unsigned int cycles);
 
     /**
+     * Reinitialize the engine.
+     *
+     * @return false in case of error, use #error()
+     * to get a detailed message.
+     * @since 2.15
+     */
+    bool reset();
+
+    /**
      * Get the number of installed SID chips.
      *
      * @return the number of SID chips.
@@ -140,15 +153,37 @@ public:
     unsigned int installedSIDs() const;
 
     /**
+     * Init mixer.
+     *
+     * @param stereo whether to mix in stereo or mono
+     * @since 2.15
+     */
+    void initMixer(bool stereo);
+
+    /**
+     * Mix buffers.
+     *
+     * @param buffer the output buffer
+     * @param samples number of samples to mix, returned from the #play(unsigned int) function
+     * @return number of samples generated (samples for mono, samples*2 for stereo)
+     * @since 2.15
+     */
+    unsigned int mix(short *buffer, unsigned int samples);
+
+    /**
      * Check if the engine is playing or stopped.
      *
      * @return true if playing, false otherwise.
+     * @deprecated
      */
+    SID_DEPRECATED
     bool isPlaying() const;
 
     /**
      * Stop the engine.
+     * @deprecated
      */
+    SID_DEPRECATED
     void stop();
 
     /**
