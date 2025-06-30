@@ -295,10 +295,10 @@ namespace rePlayer
         return Flag(atomicFlags.exchange(Flag::kNone));
     }
 
-    void Database::TrackSubsong(SubsongID subsongId)
+    void Database::TrackSubsong(SubsongID subsongId, bool isTrackingArtist)
     {
         for (auto* ui : m_ui)
-            ui->TrackSubsong(subsongId);
+            ui->TrackSubsong(subsongId, isTrackingArtist);
     }
 
     void Database::Freeze()

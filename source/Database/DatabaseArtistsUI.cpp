@@ -123,13 +123,50 @@ namespace rePlayer
                             if (m_selectedArtistCopy.id != artistId)
                             {
                                 m_dbSongsRevision = m_db.SongsRevision() + 1;
-                                artist->CopyTo(&m_selectedArtistCopy);
+                                selectedArtist->CopyTo(&m_selectedArtistCopy);
                             }
                         }
                         ImGui::SameLine(0.0f, 0.0f);//no spacing
                         ImGui::TextUnformatted(artist->GetHandle());
                         ImGui::PopID();
                     }
+                }
+
+                // build the tracking position and set it if the scrolling is enabled for the table
+                if (m_isTrackingArtist && m_trackedSubsongId.IsValid())
+                {
+                    auto* song = m_db[m_trackedSubsongId];
+                    ArtistID selectedArtistId = ArtistID::Invalid;
+                    for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
+                    {
+                        if (song->GetArtistId(i) == m_selectedArtistCopy.id)
+                        {
+                            // already tracking the current artist, just jump to the next
+                            selectedArtistId = song->GetArtistId((i + 1) % e);
+                            break;
+                        }
+                        else if (i == 0)
+                            selectedArtistId = song->GetArtistId(0);
+                    }
+
+                    auto trackedArtistIndex = m_artists.FindIf<int32_t>([this, selectedArtistId](auto& entry)
+                    {
+                        return entry == selectedArtistId;
+                    });
+                    if (trackedArtistIndex >= 0)
+                    {
+                        float trackingPos = clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex;
+                        ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
+
+                        selectedArtist = m_db[selectedArtistId];
+                        if (m_selectedArtistCopy.id != selectedArtistId)
+                        {
+                            m_dbSongsRevision = m_db.SongsRevision() + 1;
+                            selectedArtist->CopyTo(&m_selectedArtistCopy);
+                        }
+                    }
+
+                    m_isTrackingArtist = false;
                 }
 
                 ImGui::EndTable();

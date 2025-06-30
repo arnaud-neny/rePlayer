@@ -14,7 +14,7 @@ namespace rePlayer
         DatabaseArtistsUI(DatabaseID databaseId, Window& owner);
         virtual ~DatabaseArtistsUI();
 
-        void OnDisplay();
+        void OnDisplay() override;
 
     protected:
         Array<SubsongEntry> GatherEntries() const override;

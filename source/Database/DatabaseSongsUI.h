@@ -27,7 +27,7 @@ namespace rePlayer
         DatabaseSongsUI(DatabaseID databaseId, Window& owner, bool isScrollingEnabled = true, uint16_t defaultHiddenColumns = (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay), const char* header = "Songs");
         virtual ~DatabaseSongsUI();
 
-        void TrackSubsong(SubsongID subsongId);
+        void TrackSubsong(SubsongID subsongId, bool isTrackingArtist);
 
         uint32_t NumSubsongs() const;
         uint32_t NumSelectedSubsongs() const;
@@ -135,6 +135,7 @@ namespace rePlayer
 
         const bool m_isScrollingEnabled = true;
 
+        bool m_isTrackingArtist = false;
         SubsongID m_trackedSubsongId;
 
         // selection

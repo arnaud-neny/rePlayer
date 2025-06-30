@@ -99,9 +99,11 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>
+      </TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,9 +126,11 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>
+      </TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,9 +155,11 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>
+      </TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,9 +190,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libcurl\include;$(SolutionDir)3rdParty\libarchive;$(SolutionDir)3rdParty\libxml2\include;$(SolutionDir)3rdParty\taglib\taglib;$(SolutionDir)3rdParty\taglib\taglib\mpeg\id3v2;$(SolutionDir)3rdParty\taglib\taglib\toolkit;$(SolutionDir)3rdParty\dr_libs;$(SolutionDir)3rdParty\dllloader</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>
+      </TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

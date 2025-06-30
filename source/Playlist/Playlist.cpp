@@ -936,7 +936,7 @@ namespace rePlayer
                             char label[16];
                             sprintf(label, indexFormat, rowIdx + 1);
                             if (ImGui::Button(label, ImVec2(ImGui::GetColumnWidth(), 0.f)))
-                                curEntry.Track();
+                                curEntry.Track(ImGui::GetIO().KeyShift);
                         }
                         ImGui::TableNextColumn();
                         ImGui::TextUnformatted(curEntry.GetTitle().data());

@@ -61,7 +61,7 @@ namespace rePlayer
         std::string GetFullpath() const;
 
         void MarkForSave();
-        void Track() const;
+        void Track(bool isTrackingArtist = false) const;
 
         // Helpers
         SmartPtr<core::io::Stream> GetStream() const;

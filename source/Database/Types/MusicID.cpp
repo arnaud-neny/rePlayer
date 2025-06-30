@@ -47,9 +47,9 @@ namespace rePlayer
         Core::GetDatabase(databaseId).Raise(Database::Flag::kSaveSongs);
     }
 
-    void MusicID::Track() const
+    void MusicID::Track(bool isTrackingArtist) const
     {
-        Core::GetDatabase(databaseId).TrackSubsong(subsongId);
+        Core::GetDatabase(databaseId).TrackSubsong(subsongId, isTrackingArtist);
     }
 
     SmartPtr<core::io::Stream> MusicID::GetStream() const
