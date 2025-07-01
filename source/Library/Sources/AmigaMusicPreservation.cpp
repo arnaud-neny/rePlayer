@@ -510,6 +510,8 @@ namespace rePlayer
             {
                 if (collectedSong.ext == "FST")
                     song->type = { eExtension::_mod, eReplay::OpenMPT };
+                else if (collectedSong.ext == "OSS")
+                    song->type = { eExtension::_med, eReplay::OpenMPT };
                 else
                 {
                     song->name.String() += ".";
@@ -600,6 +602,8 @@ namespace rePlayer
                 {
                     if (searchSong.ext == "FST")
                         song->type = { eExtension::_mod, eReplay::OpenMPT };
+                    else if (searchSong.ext == "OSS")
+                        song->type = { eExtension::_med, eReplay::OpenMPT };
                     else
                     {
                         song->name.String() += ".";
