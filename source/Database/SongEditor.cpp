@@ -398,7 +398,7 @@ namespace rePlayer
                     artists.Add(artist);
                 }
             }
-            artistMaxWidth += ImGui::GetIO().FontGlobalScale * 16.0f;
+            artistMaxWidth += style.FontScaleMain * 16.0f;
             m_artistMaxWidth = artistMaxWidth;
             std::sort(artists.begin(), artists.end(), [this](auto l, auto r)
             {

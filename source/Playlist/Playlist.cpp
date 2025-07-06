@@ -978,7 +978,7 @@ namespace rePlayer
                 {
                     if (m_currentEntryIndex >= 0)
                     {
-                        float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex;
+                        float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex);
                         ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
                     }
                     m_isCurrentEntryFocus = false;

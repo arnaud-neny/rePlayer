@@ -200,6 +200,9 @@
     <ClCompile Include="Playlist\PlaylistDatabase.cpp">
       <Filter>Source Files\Playlist</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\GraphicsImGui.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -429,6 +432,9 @@
     </ClInclude>
     <ClInclude Include="Library\LibrarySongMerger.inl.h">
       <Filter>Source Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsImGui.h">
+      <Filter>Source Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

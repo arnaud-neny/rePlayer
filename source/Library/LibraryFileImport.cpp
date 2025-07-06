@@ -319,7 +319,7 @@ namespace rePlayer
                 "Root Path",
                 "Parent Path"
             };
-            ImGui::SetNextItemWidth(ImGui::CalcTextSize(artistModes[3]).x + 32.0f * ImGui::GetIO().FontGlobalScale);
+            ImGui::SetNextItemWidth(ImGui::CalcTextSize(artistModes[3]).x + 32.0f * ImGui::GetStyle().FontScaleMain);
             ImGui::Combo("##ArtistCB", reinterpret_cast<int*>(&m_artistMode), artistModes, NumItemsOf(artistModes));
             ImGui::SameLine();
 

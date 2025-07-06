@@ -2,13 +2,13 @@
 
 #include <d3d11.h>
 #include <Containers/SmartPtr.h>
-#include <Core/RefCounted.h>
+#include "GraphicsImGui.h"
 
 struct ImDrawData;
 
 namespace rePlayer
 {
-    class GraphicsImGuiDX11 : public RefCounted
+    class GraphicsImGuiDX11 : public GraphicsImGui
     {
         friend class SmartPtr<GraphicsImGuiDX11>;
     public:
@@ -16,18 +16,23 @@ namespace rePlayer
 
         void Render(GraphicsWindowDX11* window, const ImDrawData& drawData);
 
-        int32_t Get3x5BaseRect() const { return m_3x5BaseRect; }
-
     protected:
         GraphicsImGuiDX11(const GraphicsDX11* graphics);
-        ~GraphicsImGuiDX11() override;
 
     private:
-        bool Init();
+        struct Texture
+        {
+            SmartPtr<ID3D11Texture2D> m_texture;
+            SmartPtr<ID3D11ShaderResourceView> m_view;
+        };
+
+    private:
+        bool OnInit() override;
         bool CreateStates();
-        bool CreateTextureFont();
 
         void SetupRenderStates(GraphicsWindowDX11* window, const ImDrawData& drawData);
+        void UpdateTexture(GraphicsWindowDX11* window, ImTextureData& imTextureData);
+        void DestroyTexture(ImTextureData& imTextureData) override;
 
     private:
         const GraphicsDX11* m_graphics;
@@ -45,8 +50,6 @@ namespace rePlayer
         SmartPtr<ID3D11RasterizerState> m_rasterizerState;
         SmartPtr<ID3D11BlendState> m_blendState;
         SmartPtr<ID3D11DepthStencilState> m_depthStencilState;
-
-        int32_t m_3x5BaseRect = 0;
     };
 }
 // namespace rePlayer

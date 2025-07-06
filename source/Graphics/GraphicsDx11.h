@@ -60,7 +60,7 @@ namespace rePlayer
     {
         friend struct GraphicsWindowDX11;
     public:
-        GraphicsDX11(HWND hWnd);
+        GraphicsDX11();
         bool OnInit() override;
         ~GraphicsDX11() override;
 
@@ -73,8 +73,6 @@ namespace rePlayer
 
         int32_t OnGet3x5BaseRect() const override;
 
-        HWND GetHWND() const { return m_hWnd; }
-
     public:
         static constexpr uint32_t kNumFrames = 3;
         static constexpr uint32_t kNumBackBuffers = GraphicsWindowDX11::kNumBackBuffers;
@@ -84,7 +82,6 @@ namespace rePlayer
         SmartPtr<ID3D11DeviceContext> m_deviceContext;
         SmartPtr<IDXGIFactory> m_dxgiFactory;
 
-        HWND m_hWnd;
         GraphicsWindowDX11* m_mainWindow = nullptr;
 
         SmartPtr<GraphicsImGuiDX11> m_imGui;

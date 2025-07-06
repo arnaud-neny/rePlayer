@@ -155,7 +155,7 @@ namespace rePlayer
                     });
                     if (trackedArtistIndex >= 0)
                     {
-                        float trackingPos = clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex;
+                        float trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex);
                         ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
 
                         selectedArtist = m_db[selectedArtistId];

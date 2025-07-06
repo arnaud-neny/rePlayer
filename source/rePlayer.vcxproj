@@ -231,6 +231,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="Deck\Patterns.cpp" />
     <ClCompile Include="Deck\Player.cpp" />
     <ClCompile Include="Graphics\Graphics.cpp" />
+    <ClCompile Include="Graphics\GraphicsImGui.cpp" />
     <ClCompile Include="Graphics\GraphicsImGuiDx11.cpp" />
     <ClCompile Include="Graphics\GraphicsImGuiDx12.cpp" />
     <ClCompile Include="Graphics\GraphicsDx11.cpp" />
@@ -296,6 +297,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="Graphics\Graphics.h" />
     <ClInclude Include="Graphics\GraphicsFont3x5.h" />
     <ClInclude Include="Graphics\GraphicsFontLog.h" />
+    <ClInclude Include="Graphics\GraphicsImGui.h" />
     <ClInclude Include="Graphics\GraphicsImGuiDx11.h" />
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h" />
     <ClInclude Include="Graphics\GraphicsImGuiPS.h" />

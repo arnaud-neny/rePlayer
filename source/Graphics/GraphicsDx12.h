@@ -96,7 +96,7 @@ namespace rePlayer
     {
         friend struct GraphicsWindowDX12;
     public:
-        GraphicsDX12(HWND hWnd);
+        GraphicsDX12();
         bool OnInit() override;
         ~GraphicsDX12() override;
 
@@ -109,7 +109,7 @@ namespace rePlayer
 
         int32_t OnGet3x5BaseRect() const override;
 
-        HWND GetHWND() const { return m_hWnd; }
+        void FreeResource(SmartPtr<ID3D12Resource>&& resource);
 
     public:
         static constexpr uint32_t kNumFrames = 3;
@@ -129,7 +129,6 @@ namespace rePlayer
         SmartPtr<ID3D12DescriptorHeap> m_rtvDescriptorHeap;
         uint64_t m_rtvDescritorUsage = 0;
 
-        HWND m_hWnd;
         GraphicsWindowDX12* m_mainWindow = nullptr;
 
         uint32_t m_dxgiFactoryFlags = 0;
@@ -138,6 +137,15 @@ namespace rePlayer
         SmartPtr<GraphicsPremulDX12> m_premul;
 
         bool m_isCrashed = false;
+
+        struct ResourceToFree
+        {
+            uint64_t fenceValue;
+            SmartPtr<ID3D12Resource> resource;
+            ResourceToFree* next;
+        };
+        ResourceToFree* m_resourceToFree = nullptr;
+        ResourceToFree* m_lastResourceToFree = nullptr;
     };
 }
 // namespace rePlayer

@@ -74,8 +74,7 @@ namespace rePlayer
         }
     }
 
-    GraphicsDX12::GraphicsDX12(HWND hWnd)
-        : m_hWnd(hWnd)
+    GraphicsDX12::GraphicsDX12()
     {
         Window::ms_isPassthroughAvailable = Window::Passthrough::IsAvailable;
     }
@@ -237,7 +236,7 @@ namespace rePlayer
         platform_io.Renderer_DestroyWindow = callbacks.OnDestroyWindow;
         platform_io.Renderer_SetWindowSize = callbacks.OnResize;
 
-        m_mainWindow = OnCreateWindow(m_hWnd, 1, 1, true);
+        m_mainWindow = OnCreateWindow(HWND(m_hWnd), 1, 1, true);
 
         return m_mainWindow == nullptr;
     }
@@ -346,6 +345,15 @@ namespace rePlayer
 
     bool GraphicsDX12::OnEndFrame(float blendingFactor)
     {
+        while (m_resourceToFree && m_resourceToFree->fenceValue != m_mainWindow->m_fenceLastSignaledValue)
+        {
+            auto* next = m_resourceToFree->next;
+            delete m_resourceToFree;
+            m_resourceToFree = next;
+            if (next == nullptr)
+                m_lastResourceToFree = nullptr;
+        }
+
         auto backBufferIdx = m_mainWindow->m_swapChain->GetCurrentBackBufferIndex();
 
         D3D12_RESOURCE_BARRIER barrier = {};
@@ -398,6 +406,19 @@ namespace rePlayer
         m_mainWindow->m_currentFrameContext->fenceValue = fenceValue;
 
         return false;
+    }
+
+    void GraphicsDX12::FreeResource(SmartPtr<ID3D12Resource>&& resource)
+    {
+        auto* resourceToFree = new ResourceToFree;
+        resourceToFree->next = nullptr;
+        resourceToFree->fenceValue = m_mainWindow->m_fenceLastSignaledValue + kNumFrames + 1;
+        resourceToFree->resource = std::move(resource);
+        if (m_lastResourceToFree)
+            m_lastResourceToFree->next = resourceToFree;
+        else
+            m_resourceToFree = resourceToFree;
+        m_lastResourceToFree = resourceToFree;
     }
 
     SmartPtr<ID3D12CommandQueue> GraphicsDX12::CreateCommandQueue()

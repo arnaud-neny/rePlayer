@@ -1,12 +1,8 @@
 #include <Core/Log.h>
 #include <Imgui.h>
-#include <ImGui/imgui_impl_win32.h>
 
 #include "GraphicsDx11.h"
-#include "GraphicsFont3x5.h"
-#include "GraphicsFontLog.h"
 #include "GraphicsImGuiDx11.h"
-#include "MediaIcons.h"
 
 extern DWORD g_imguiWindowDefaultStyle;
 
@@ -18,28 +14,21 @@ namespace rePlayer
     SmartPtr<GraphicsImGuiDX11> GraphicsImGuiDX11::Create(const GraphicsDX11* graphics)
     {
         SmartPtr<GraphicsImGuiDX11> graphicsImGui(kAllocate, graphics);
-        if (graphicsImGui->Init())
+        if (graphicsImGui->Init(true))
             return nullptr;
         return graphicsImGui;
     }
 
     GraphicsImGuiDX11::GraphicsImGuiDX11(const GraphicsDX11* graphics)
-        : m_graphics(graphics)
+        : GraphicsImGui(graphics->GetHWND())
+        , m_graphics(graphics)
     {
         g_imguiWindowDefaultStyle = 0;
     }
 
-    GraphicsImGuiDX11::~GraphicsImGuiDX11()
+    bool GraphicsImGuiDX11::OnInit()
     {
-        ImGui_ImplWin32_Shutdown();
-    }
-
-    bool GraphicsImGuiDX11::Init()
-    {
-        ImGui_ImplWin32_Init(m_graphics->GetHWND());
-
-        bool isSuccessFull = CreateStates()
-            && CreateTextureFont();
+        bool isSuccessFull = CreateStates();
         return !isSuccessFull;
     }
 
@@ -117,134 +106,6 @@ namespace rePlayer
             desc.BackFace = desc.FrontFace;
             m_graphics->GetDevice()->CreateDepthStencilState(&desc, &m_depthStencilState);
         }
-        return true;
-    }
-
-    bool GraphicsImGuiDX11::CreateTextureFont()
-    {
-        // Build texture atlas
-        ImGuiIO& io = ImGui::GetIO();
-
-        auto* font = io.Fonts->AddFontDefault();
-
-        // add media icons
-        int32_t widths[] = { 19, 19, 15, 14, 14, 25, 25, 25, 21, 25, 25, 15, 15, 15 };
-        int32_t rectIds[NumItemsOf(widths)];
-        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
-            rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xE000 + i), widths[i], 15, float(widths[i]), ImVec2(0, -1));
-/*
-        {
-            ImFontConfig fontConfig;
-            fontConfig.SizePixels = 12.0f;
-            fontConfig.OversampleH = fontConfig.OversampleV = 1;
-            fontConfig.PixelSnapH = true;
-            fontConfig.GlyphOffset.y = 0.0f;
-            strcpy_s(fontConfig.Name, "test");
-            io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_font_compressed_data_base85, 0, &fontConfig);
-        }
-*/
-        {
-            ImFontConfig fontConfig;
-            fontConfig.SizePixels = 9.0f;
-            fontConfig.OversampleH = fontConfig.OversampleV = 1;
-            fontConfig.PixelSnapH = true;
-            fontConfig.GlyphOffset.y = 0.0f;
-#ifdef _DEBUG
-            strcpy_s(fontConfig.Name, "Log");
-#endif
-            io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_fontLog_compressed_data_base85, 0, &fontConfig);
-        }
-        {
-            m_3x5BaseRect = io.Fonts->AddCustomRectRegular(3, 5); // first character is '!' (we don't need the ' ')
-            for (int32_t i = 2; i < 16 * 6 - 1; ++i)
-            {
-                auto b = io.Fonts->AddCustomRectRegular(3, 5);
-                assert(b == (m_3x5BaseRect + i - 1));
-                (void)b;
-            }
-        }
-
-        uint8_t* pixels;
-        int width, height;
-        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-        uint32_t mediaIconsOffset = 0;
-        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
-        {
-            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(rectIds[i]))
-            {
-                for (int32_t y = 0; y < rect->Height; y++)
-                {
-                    const uint8_t* src = ((const uint8_t*)s_mediaIcons) + mediaIconsOffset + 272 * y;
-                    uint8_t* dst = pixels + ((rect->Y + y) * width + rect->X) * 4;
-                    for (int32_t x = 0; x < widths[i]; x++)
-                    {
-                        *dst++ = 0xff;
-                        *dst++ = 0xff;
-                        *dst++ = 0xff;
-                        *dst++ = *src++;
-                    }
-                }
-            }
-            mediaIconsOffset += widths[i];
-        }
-        for (int32_t i = 1; i < 16 * 6 - 1; i++)
-        {
-            auto x = i % 16;
-            auto y = i / 16;
-            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(m_3x5BaseRect + i - 1))
-            {
-                for (int32_t p = 0; p < 5; p++)
-                {
-                    auto* src = ((const uint8_t*)s_font3x5_data) + x * 3 + (y * 5 + p) * 48;
-                    auto* dst = pixels + ((rect->Y + p) * width + rect->X) * 4;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = *src++ * 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = *src++ * 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = 0xff;
-                    *dst++ = *src++ * 0xff;
-                }
-            }
-        }
-
-        // Upload texture to graphics system
-        {
-            D3D11_TEXTURE2D_DESC desc = {};
-            desc.Width = width;
-            desc.Height = height;
-            desc.MipLevels = 1;
-            desc.ArraySize = 1;
-            desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            desc.SampleDesc.Count = 1;
-            desc.Usage = D3D11_USAGE_DEFAULT;
-            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-            desc.CPUAccessFlags = 0;
-
-            SmartPtr<ID3D11Texture2D> texture;
-            D3D11_SUBRESOURCE_DATA subResource;
-            subResource.pSysMem = pixels;
-            subResource.SysMemPitch = desc.Width * 4;
-            subResource.SysMemSlicePitch = 0;
-            m_graphics->GetDevice()->CreateTexture2D(&desc, &subResource, &texture);
-
-            // Create texture view
-            D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Texture2D.MipLevels = desc.MipLevels;
-            srvDesc.Texture2D.MostDetailedMip = 0;
-            m_graphics->GetDevice()->CreateShaderResourceView(texture, &srvDesc, &m_fontTextureView);
-        }
-
-        // Store our identifier
-        io.Fonts->SetTexID((ImTextureID)m_fontTextureView.Get());
 
         // Create texture sampler
         // (Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling)
@@ -304,6 +165,13 @@ namespace rePlayer
         // Avoid rendering when minimized
         if (drawData.DisplaySize.x <= 0.0f || drawData.DisplaySize.y <= 0.0f)
             return;
+
+        // Catch up with texture updates. Most of the times, the list will have 1 element with an OK status, aka nothing to do.
+        // (This almost always points to ImGui::GetPlatformIO().Textures[] but is part of ImDrawData to allow overriding or disabling texture updates).
+        if (drawData.Textures != nullptr)
+            for (ImTextureData* tex : *drawData.Textures)
+                if (tex->Status != ImTextureStatus_OK)
+                    UpdateTexture(window, *tex);
 
         ID3D11DeviceContext* ctx = window->m_deviceContext;
 
@@ -482,6 +350,118 @@ namespace rePlayer
         ctx->IASetIndexBuffer(old.IndexBuffer, old.IndexBufferFormat, old.IndexBufferOffset); if (old.IndexBuffer) old.IndexBuffer->Release();
         ctx->IASetVertexBuffers(0, 1, &old.VertexBuffer, &old.VertexBufferStride, &old.VertexBufferOffset); if (old.VertexBuffer) old.VertexBuffer->Release();
         ctx->IASetInputLayout(old.InputLayout); if (old.InputLayout) old.InputLayout->Release();
+    }
+
+    void GraphicsImGuiDX11::UpdateTexture(GraphicsWindowDX11* window, ImTextureData& imTextureData)
+    {
+        if (imTextureData.Status == ImTextureStatus_WantCreate)
+        {
+            // Create and upload new texture to graphics system
+            //IMGUI_DEBUG_LOG("UpdateTexture #%03d: WantCreate %dx%d\n", tex->UniqueID, tex->Width, tex->Height);
+            IM_ASSERT(imTextureData.TexID == ImTextureID_Invalid && imTextureData.BackendUserData == nullptr);
+            IM_ASSERT(imTextureData.Format == ImTextureFormat_RGBA32);
+            unsigned int* pixels = (unsigned int*)imTextureData.GetPixels();
+            auto* backend_tex = new Texture();
+
+            if (imTextureData.Status == ImTextureStatus_WantCreate)
+            {
+                ImGuiIO& io = ImGui::GetIO();
+
+                for (int32_t i = 1; i < 16 * 6 - 1; i++)
+                {
+                    auto x = i % 16;
+                    auto y = i / 16;
+                    ImFontAtlasRect rect;
+                    if (io.Fonts->GetCustomRect(Get3x5BaseRect() + i - 1, &rect))
+                    {
+                        for (int32_t p = 0; p < 5; p++)
+                        {
+                            auto* src = GetFont3x5Data() + x * 3 + (y * 5 + p) * 48;
+                            auto* dst = reinterpret_cast<uint8_t*>(imTextureData.GetPixelsAt(rect.x, rect.y + p));
+                            dst[0] = src[0] * 0xff;
+                            dst[1] = src[1] * 0xff;
+                            dst[2] = src[2] * 0xff;
+                        }
+                        for (int32_t p = 0; p < 5; p++)
+                        {
+                            auto* src = GetFont3x5Data() + x * 3 + (y * 5 + p) * 48;
+                            auto* dst = reinterpret_cast<uint8_t*>(imTextureData.GetPixelsAt(rect.x, rect.y + p));//pixels + ((rect->Y + p) * width + rect->X) * 4;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = *src++ * 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = *src++ * 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = 0xff;
+                            *dst++ = *src++ * 0xff;
+                        }
+                    }
+                }
+            }
+
+            // Create texture
+            D3D11_TEXTURE2D_DESC desc;
+            ZeroMemory(&desc, sizeof(desc));
+            desc.Width = (UINT)imTextureData.Width;
+            desc.Height = (UINT)imTextureData.Height;
+            desc.MipLevels = 1;
+            desc.ArraySize = 1;
+            desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            desc.SampleDesc.Count = 1;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            desc.CPUAccessFlags = 0;
+            D3D11_SUBRESOURCE_DATA subResource;
+            subResource.pSysMem = pixels;
+            subResource.SysMemPitch = desc.Width * 4;
+            subResource.SysMemSlicePitch = 0;
+            m_graphics->GetDevice()->CreateTexture2D(&desc, &subResource, &backend_tex->m_texture);
+            IM_ASSERT(backend_tex->m_texture != nullptr && "Backend failed to create texture!");
+
+            // Create texture view
+            D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+            ZeroMemory(&srvDesc, sizeof(srvDesc));
+            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MipLevels = desc.MipLevels;
+            srvDesc.Texture2D.MostDetailedMip = 0;
+            m_graphics->GetDevice()->CreateShaderResourceView(backend_tex->m_texture, &srvDesc, &backend_tex->m_view);
+            IM_ASSERT(backend_tex->m_view != nullptr && "Backend failed to create texture!");
+
+            // Store identifiers
+            imTextureData.SetTexID((ImTextureID)(intptr_t)backend_tex->m_view.Get());
+            imTextureData.SetStatus(ImTextureStatus_OK);
+            imTextureData.BackendUserData = backend_tex;
+        }
+        else if (imTextureData.Status == ImTextureStatus_WantUpdates)
+        {
+            // Update selected blocks. We only ever write to textures regions which have never been used before!
+            // This backend choose to use tex->Updates[] but you can use tex->UpdateRect to upload a single region.
+            auto* backend_tex = (Texture*)imTextureData.BackendUserData;
+            IM_ASSERT(backend_tex->m_view == (ID3D11ShaderResourceView*)(intptr_t)imTextureData.TexID);
+            for (ImTextureRect& r : imTextureData.Updates)
+            {
+                D3D11_BOX box = { (UINT)r.x, (UINT)r.y, (UINT)0, (UINT)(r.x + r.w), (UINT)(r.y + r.h), (UINT)1 };
+                window->m_deviceContext->UpdateSubresource(backend_tex->m_texture, 0, &box, imTextureData.GetPixelsAt(r.x, r.y), (UINT)imTextureData.GetPitch(), 0);
+            }
+            imTextureData.SetStatus(ImTextureStatus_OK);
+        }
+        if (imTextureData.Status == ImTextureStatus_WantDestroy && imTextureData.UnusedFrames > 0)
+            DestroyTexture(imTextureData);
+    }
+
+    void GraphicsImGuiDX11::DestroyTexture(ImTextureData& imTextureData)
+    {
+        auto* backend_tex = (Texture*)imTextureData.BackendUserData;
+        delete backend_tex;
+
+        imTextureData.SetTexID(ImTextureID_Invalid);
+        imTextureData.SetStatus(ImTextureStatus_Destroyed);
+        imTextureData.BackendUserData = nullptr;
     }
 }
 // namespace rePlayer

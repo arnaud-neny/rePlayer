@@ -346,7 +346,7 @@ namespace rePlayer
                     });
                     if (trackedSubsongIndex >= 0)
                     {
-                        trackingPos = clipper.StartPosY + clipper.ItemsHeight * trackedSubsongIndex;
+                        trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedSubsongIndex);
                         if (m_isScrollingEnabled)
                             ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
                     }

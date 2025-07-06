@@ -393,9 +393,9 @@ namespace rePlayer
                             continue;
                         if (cc >= 33 && cc <= 126)
                         {
-                            const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(baseRect + cc - 33);
-                            ImVec2 uv0, uv1;
-                            io.Fonts->CalcCustomRectUV(rect, &uv0, &uv1);
+                            ImFontAtlasRect rect;
+                            io.Fonts->GetCustomRect(baseRect + cc - 33, &rect);
+                            ImVec2 uv0 = rect.uv0, uv1 = rect.uv1;
 
                             drawList->PrimWriteVtx({ x, y }, uv0, color);
                             drawList->PrimWriteVtx({ x, y + 5.0f }, { uv0.x, uv1.y }, color);

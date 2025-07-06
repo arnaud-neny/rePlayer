@@ -1,5 +1,5 @@
 diff --git "a/external\\imgui-docking\\imconfig.h" "b/source\\Core\\ImGui\\imconfig.h"
-index a1e29e8..954a2af 100644
+index a1e29e84..954a2af9 100644
 --- "a/external\\imgui-docking\\imconfig.h"
 +++ "b/source\\Core\\ImGui\\imconfig.h"
 @@ -28,13 +28,15 @@
@@ -49,10 +49,10 @@ index a1e29e8..954a2af 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index fcc1d5a..dccbe67 100644
+index e9a0bfa8..22422e21 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
-@@ -529,6 +529,7 @@ namespace ImGui
+@@ -601,6 +601,7 @@ namespace ImGui
      IMGUI_API void          PushID(const char* str_id);                                     // push string into the ID stack (will hash string).
      IMGUI_API void          PushID(const char* str_id_begin, const char* str_id_end);       // push string into the ID stack (will hash string).
      IMGUI_API void          PushID(const void* ptr_id);                                     // push pointer into the ID stack (will hash pointer).
@@ -60,7 +60,7 @@ index fcc1d5a..dccbe67 100644
      IMGUI_API void          PushID(int int_id);                                             // push integer into the ID stack (will hash integer).
      IMGUI_API void          PopID();                                                        // pop from the ID stack.
      IMGUI_API ImGuiID       GetID(const char* str_id);                                      // calculate unique ID (hash of whole ID stack + given parameter). e.g. if you want to query into ImGuiStorage yourself
-@@ -609,7 +610,7 @@ namespace ImGui
+@@ -682,7 +683,7 @@ namespace ImGui
      IMGUI_API bool          DragInt3(const char* label, int v[3], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragInt4(const char* label, int v[4], float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", ImGuiSliderFlags flags = 0);
      IMGUI_API bool          DragIntRange2(const char* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* format = "%d", const char* format_max = NULL, ImGuiSliderFlags flags = 0);
@@ -70,10 +70,10 @@ index fcc1d5a..dccbe67 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index 573efe2..4a190e5 100644
+index cf311d63..847a58b8 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -2492,8 +2492,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+@@ -2635,8 +2635,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
          // One byte is consumed in case of invalid first byte of in_text.
          // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
          // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
@@ -86,16 +86,16 @@ index 573efe2..4a190e5 100644
      }
  
      return wanted;
-@@ -6827,7 +6829,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
+@@ -7060,7 +7062,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
--    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || window->AutoFitFramesX > 0 || window->AutoFitFramesY > 0)
-+    if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || (window->AutoFitFramesX > 0 && window->AutoFitFramesY > 0)) // rePlayer 
+-    if ((flags & ImGuiWindowFlags_NoResize) || window->AutoFitFramesX > 0 || window->AutoFitFramesY > 0)
++    if ((flags & ImGuiWindowFlags_NoResize) || (window->AutoFitFramesX > 0 && window->AutoFitFramesY > 0)) // rePlayer
          return false;
-     if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
+     if ((flags & ImGuiWindowFlags_AlwaysAutoResize) && (window->ChildFlags & (ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY)) == 0)
          return false;
-@@ -9169,6 +9171,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
+@@ -9580,6 +9582,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
      return id;
  }
  
@@ -116,7 +116,7 @@ index 573efe2..4a190e5 100644
  ImGuiID ImGuiWindow::GetID(int n)
  {
      ImGuiID seed = IDStack.back();
-@@ -9224,6 +9240,16 @@ void ImGui::PushID(const void* ptr_id)
+@@ -9635,6 +9651,16 @@ void ImGui::PushID(const void* ptr_id)
      window->IDStack.push_back(id);
  }
  
@@ -134,10 +134,10 @@ index 573efe2..4a190e5 100644
  {
      ImGuiContext& g = *GImGui;
 diff --git "a/external\\imgui-docking\\imgui_internal.h" "b/source\\Core\\ImGui\\imgui_internal.h"
-index 0f106d4..e37379e 100644
+index 51a4e1c3..fa2a22a1 100644
 --- "a/external\\imgui-docking\\imgui_internal.h"
 +++ "b/source\\Core\\ImGui\\imgui_internal.h"
-@@ -2837,6 +2837,7 @@ public:
+@@ -2915,6 +2915,7 @@ public:
  
      ImGuiID     GetID(const char* str, const char* str_end = NULL);
      ImGuiID     GetID(const void* ptr);
@@ -146,10 +146,10 @@ index 0f106d4..e37379e 100644
      ImGuiID     GetIDFromPos(const ImVec2& p_abs);
      ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 45428e7..9e191c8 100644
+index 2acb0921..8dd60acf 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-@@ -2622,7 +2622,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
+@@ -2666,7 +2666,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
  
  // Note: p_data, p_min and p_max are _pointers_ to a memory address holding the data. For a Drag widget, p_min and p_max are optional.
  // Read code of e.g. DragFloat(), DragInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
@@ -158,7 +158,7 @@ index 45428e7..9e191c8 100644
  {
      ImGuiWindow* window = GetCurrentWindow();
      if (window->SkipItems)
-@@ -2712,7 +2712,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
+@@ -2756,7 +2756,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
      const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
      if (g.LogEnabled)
          LogSetNextTextDecoration("{", "}");
@@ -168,10 +168,10 @@ index 45428e7..9e191c8 100644
      if (label_size.x > 0.0f)
          RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, frame_bb.Min.y + style.FramePadding.y), label);
 diff --git "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp" "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-index f5939e8..e55e7b2 100644
+index 4bc9c8f2..c0459c0d 100644
 --- "a/external\\imgui-docking\\backends\\imgui_impl_win32.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_impl_win32.cpp"
-@@ -1082,21 +1082,32 @@ struct ImGui_ImplWin32_ViewportData
+@@ -1098,21 +1098,29 @@ struct ImGui_ImplWin32_ViewportData
      ~ImGui_ImplWin32_ViewportData() { IM_ASSERT(Hwnd == nullptr); }
  };
  
@@ -187,7 +187,7 @@ index f5939e8..e55e7b2 100644
  
 -    if (flags & ImGuiViewportFlags_NoTaskBarIcon)
 -        *out_ex_style = WS_EX_TOOLWINDOW;
-+    DWORD g_imguiWindowDefaultStyle = 0;
++    DWORD exStyle = g_imguiWindowDefaultStyle;
 +
 +    if (flags & ImGuiViewportFlags_NoTaskBarIcon || isChild)
 +        *out_ex_style = WS_EX_TOOLWINDOW | exStyle;
@@ -205,7 +205,7 @@ index f5939e8..e55e7b2 100644
  
  static HWND ImGui_ImplWin32_GetHwndFromViewportID(ImGuiID viewport_id)
  {
-@@ -1112,7 +1123,9 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+@@ -1128,7 +1136,9 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
      viewport->PlatformUserData = vd;
  
      // Select style and parent window
@@ -216,7 +216,7 @@ index f5939e8..e55e7b2 100644
      vd->HwndParent = ImGui_ImplWin32_GetHwndFromViewportID(viewport->ParentViewportId);
  
      // Create window
-@@ -1193,7 +1206,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
+@@ -1209,7 +1219,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
      // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
      DWORD new_style;
      DWORD new_ex_style;
@@ -227,7 +227,7 @@ index f5939e8..e55e7b2 100644
  
      // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
      if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
-@@ -1346,12 +1361,16 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+@@ -1362,12 +1374,16 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
  
  namespace ImGui { extern ImGuiIO& GetIO(ImGuiContext*); extern ImGuiPlatformIO& GetPlatformIO(ImGuiContext*); }
  
@@ -245,7 +245,7 @@ index f5939e8..e55e7b2 100644
  
      ImGuiIO& io = ImGui::GetIO(ctx);
      ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(ctx);
-@@ -1362,6 +1381,14 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1378,6 +1394,14 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
      {
          switch (msg)
          {
@@ -259,8 +259,8 @@ index f5939e8..e55e7b2 100644
 +            // rePlayer end
          case WM_CLOSE:
              viewport->PlatformRequestClose = true;
-             break;
-@@ -1386,12 +1413,13 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+             return 0; // 0 = Operating system will ignore the message and not destroy the window. We close ourselves.
+@@ -1402,12 +1426,13 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
          }
      }
      if (result == 0)
@@ -275,7 +275,7 @@ index f5939e8..e55e7b2 100644
      WNDCLASSEXW wcex;
      wcex.cbSize = sizeof(WNDCLASSEXW);
      wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0);
-@@ -1399,13 +1427,14 @@ static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
+@@ -1415,13 +1440,14 @@ static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
      wcex.cbClsExtra = 0;
      wcex.cbWndExtra = 0;
      wcex.hInstance = ::GetModuleHandle(nullptr);

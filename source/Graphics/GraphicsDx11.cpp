@@ -44,12 +44,11 @@ namespace rePlayer
         return false;
     }
 
-    GraphicsDX11::GraphicsDX11(HWND hWnd)
-        : m_hWnd(hWnd)
+    GraphicsDX11::GraphicsDX11()
     {
         Window::ms_isPassthroughAvailable = Window::Passthrough::IsNotAvailable;
-        auto mainWindowExStyle = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
-        ::SetWindowLongW(hWnd, GWL_EXSTYLE, mainWindowExStyle & ~WS_EX_NOREDIRECTIONBITMAP);
+        auto mainWindowExStyle = ::GetWindowLongW(HWND(m_hWnd), GWL_EXSTYLE);
+        ::SetWindowLongW(HWND(m_hWnd), GWL_EXSTYLE, mainWindowExStyle & ~WS_EX_NOREDIRECTIONBITMAP);
     }
 
     bool GraphicsDX11::OnInit()
@@ -113,7 +112,7 @@ namespace rePlayer
         platform_io.Renderer_DestroyWindow = callbacks.OnDestroyWindow;
         platform_io.Renderer_SetWindowSize = callbacks.OnResize;
 
-        m_mainWindow = OnCreateWindow(m_hWnd, 1, 1, true);
+        m_mainWindow = OnCreateWindow(HWND(m_hWnd), 1, 1, true);
 
         return false;
     }

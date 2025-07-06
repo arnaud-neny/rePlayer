@@ -16,7 +16,10 @@ namespace core
     {
         std::atomic_ref atomicRef(m_refCount);
         if (--atomicRef == 0)
+        {
+            OnDelete();
             delete this;
+        }
     }
 }
 // namespace core

@@ -1,13 +1,9 @@
 #ifdef _WIN64
 #include <Core/Log.h>
 #include <Imgui.h>
-#include <ImGui/imgui_impl_win32.h>
 
 #include "GraphicsDX12.h"
-#include "GraphicsFont3x5.h"
-#include "GraphicsFontLog.h"
 #include "GraphicsImGuiDx12.h"
-#include "MediaIcons.h"
 
 extern DWORD g_imguiWindowDefaultStyle;
 
@@ -21,32 +17,23 @@ namespace rePlayer
         FrameResources m_frameResources[GraphicsWindowDX12::kNumBackBuffers];
     };
 
-    SmartPtr<GraphicsImGuiDX12> GraphicsImGuiDX12::Create(const GraphicsDX12* graphics)
+    SmartPtr<GraphicsImGuiDX12> GraphicsImGuiDX12::Create(GraphicsDX12* const graphics)
     {
         SmartPtr<GraphicsImGuiDX12> graphicsImGui(kAllocate, graphics);
-        if (graphicsImGui->Init())
+        if (graphicsImGui->Init(false))
             return nullptr;
         return graphicsImGui;
     }
 
-    GraphicsImGuiDX12::GraphicsImGuiDX12(const GraphicsDX12* graphics)
-        : m_graphics(graphics)
+    GraphicsImGuiDX12::GraphicsImGuiDX12(GraphicsDX12* const graphics)
+        : GraphicsImGui(graphics->GetHWND())
+        , m_graphics(graphics)
     {
         g_imguiWindowDefaultStyle = WS_EX_NOREDIRECTIONBITMAP;
     }
 
-    GraphicsImGuiDX12::~GraphicsImGuiDX12()
+    bool GraphicsImGuiDX12::OnInit()
     {
-        ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->Clear();
-
-        ImGui_ImplWin32_Shutdown();
-    }
-
-    bool GraphicsImGuiDX12::Init()
-    {
-        ImGui_ImplWin32_Init(m_graphics->GetHWND());
-
         bool isSuccessFull = CreateRootSignature()
             && CreatePipelineState()
             && CreateTextureFont();
@@ -199,87 +186,10 @@ namespace rePlayer
 
     bool GraphicsImGuiDX12::CreateTextureFont()
     {
-        // Build texture atlas
-        ImGuiIO& io = ImGui::GetIO();
-
-        auto* font = io.Fonts->AddFontDefault();
-
-        // add media icons
-        int32_t widths[] = { 19, 19, 15, 14, 14, 25, 25, 25, 21, 25, 25, 15, 15, 15 };
-        int32_t rectIds[NumItemsOf(widths)];
-        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
-            rectIds[i] = io.Fonts->AddCustomRectFontGlyph(font, ImWchar(0xE000 + i), widths[i], 15, float(widths[i]), ImVec2(0, -1));
-/*
-        {
-            ImFontConfig fontConfig;
-            fontConfig.SizePixels = 12.0f;
-            fontConfig.OversampleH = fontConfig.OversampleV = 1;
-            fontConfig.PixelSnapH = true;
-            fontConfig.GlyphOffset.y = 0.0f;
-            strcpy_s(fontConfig.Name, "test");
-            io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_font_compressed_data_base85, 0, &fontConfig);
-        }
-*/
-        {
-            ImFontConfig fontConfig;
-            fontConfig.SizePixels = 9.0f;
-            fontConfig.OversampleH = fontConfig.OversampleV = 1;
-            fontConfig.PixelSnapH = true;
-            fontConfig.GlyphOffset.y = 0.0f;
-#ifdef _DEBUG
-            strcpy_s(fontConfig.Name, "Log");
-#endif
-            io.Fonts->AddFontFromMemoryCompressedBase85TTF(s_fontLog_compressed_data_base85, 0, &fontConfig);
-        }
-        {
-            m_3x5BaseRect = io.Fonts->AddCustomRectRegular(3, 5); // first character is '!' (we don't need the ' ')
-            for (int32_t i = 2; i < 16 * 6 - 1; ++i)
-            {
-                auto b = io.Fonts->AddCustomRectRegular(3, 5);
-                assert(b == (m_3x5BaseRect + i - 1));
-                (void)b;
-            }
-        }
-
-        uint8_t* pixels;
-        int width, height;
-        io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
-
-        uint32_t mediaIconsOffset = 0;
-        for (uint32_t i = 0; i < NumItemsOf(widths); i++)
-        {
-            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(rectIds[i]))
-            {
-                for (int32_t y = 0; y < rect->Height; y++)
-                {
-                    const uint8_t* src = ((const uint8_t*)s_mediaIcons) + mediaIconsOffset + 272 * y;
-                    uint8_t* dst = pixels + (rect->Y + y) * width + rect->X;
-                    memcpy(dst, src, widths[i]);
-                }
-            }
-            mediaIconsOffset += widths[i];
-        }
-        for (int32_t i = 1; i < 16 * 6 - 1; i++)
-        {
-            auto x = i % 16;
-            auto y = i / 16;
-            if (const ImFontAtlasCustomRect* rect = io.Fonts->GetCustomRectByIndex(m_3x5BaseRect + i - 1))
-            {
-                for (int32_t p = 0; p < 5; p++)
-                {
-                    auto* src = ((const uint8_t*)s_font3x5_data) + x * 3 + (y * 5 + p) * 48;
-                    auto* dst = pixels + (rect->Y + p) * width + rect->X;
-                    dst[0] = src[0] * 0xff;
-                    dst[1] = src[1] * 0xff;
-                    dst[2] = src[2] * 0xff;
-                }
-            }
-        }
-
         //temporary: create the heap
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
         heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        heapDesc.NumDescriptors = 1;
+        heapDesc.NumDescriptors = kMaxDescriptors;
         heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         if (m_graphics->GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_srvDescHeap)) < S_OK)
         {
@@ -287,146 +197,10 @@ namespace rePlayer
             return false;
         }
 
-        m_fontSrvCpuDescHandle = m_srvDescHeap->GetCPUDescriptorHandleForHeapStart();
-        m_fontSrvGpuDescHandle = m_srvDescHeap->GetGPUDescriptorHandleForHeapStart();
-
-        // Upload texture to graphics system
-        {
-            D3D12_HEAP_PROPERTIES props;
-            memset(&props, 0, sizeof(D3D12_HEAP_PROPERTIES));
-            props.Type = D3D12_HEAP_TYPE_DEFAULT;
-            props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-            props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-
-            D3D12_RESOURCE_DESC desc;
-            ZeroMemory(&desc, sizeof(desc));
-            desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-            desc.Alignment = 0;
-            desc.Width = width;
-            desc.Height = height;
-            desc.DepthOrArraySize = 1;
-            desc.MipLevels = 1;
-            desc.Format = DXGI_FORMAT_A8_UNORM;
-            desc.SampleDesc.Count = 1;
-            desc.SampleDesc.Quality = 0;
-            desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-            desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-            SmartPtr<ID3D12Resource> pTexture;
-            m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
-                D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
-
-            UINT uploadPitch = (width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
-            UINT uploadSize = height * uploadPitch;
-            desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-            desc.Alignment = 0;
-            desc.Width = uploadSize;
-            desc.Height = 1;
-            desc.DepthOrArraySize = 1;
-            desc.MipLevels = 1;
-            desc.Format = DXGI_FORMAT_UNKNOWN;
-            desc.SampleDesc.Count = 1;
-            desc.SampleDesc.Quality = 0;
-            desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-            desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-            props.Type = D3D12_HEAP_TYPE_UPLOAD;
-            props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-            props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-
-            SmartPtr<ID3D12Resource> uploadBuffer;
-            HRESULT hr = m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
-                D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
-            IM_ASSERT(SUCCEEDED(hr));
-
-            void* mapped = NULL;
-            D3D12_RANGE range = { 0, uploadSize };
-            hr = uploadBuffer->Map(0, &range, &mapped);
-            IM_ASSERT(SUCCEEDED(hr));
-            for (int y = 0; y < height; y++)
-                memcpy((void*)((uintptr_t)mapped + y * uploadPitch), pixels + y * width, width);
-            uploadBuffer->Unmap(0, &range);
-
-            D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-            srcLocation.pResource = uploadBuffer;
-            srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-            srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_A8_UNORM;
-            srcLocation.PlacedFootprint.Footprint.Width = width;
-            srcLocation.PlacedFootprint.Footprint.Height = height;
-            srcLocation.PlacedFootprint.Footprint.Depth = 1;
-            srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
-
-            D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-            dstLocation.pResource = pTexture;
-            dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-            dstLocation.SubresourceIndex = 0;
-
-            D3D12_RESOURCE_BARRIER barrier = {};
-            barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-            barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-            barrier.Transition.pResource = pTexture;
-            barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-
-            SmartPtr<ID3D12Fence> fence;
-            hr = m_graphics->GetDevice()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-            IM_ASSERT(SUCCEEDED(hr));
-
-            HANDLE event = CreateEvent(0, 0, 0, 0);
-            IM_ASSERT(event != NULL);
-
-            D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-            queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-            queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-            queueDesc.NodeMask = 1;
-
-            SmartPtr<ID3D12CommandQueue> cmdQueue;
-            hr = m_graphics->GetDevice()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
-            IM_ASSERT(SUCCEEDED(hr));
-
-            SmartPtr<ID3D12CommandAllocator> cmdAlloc;
-            hr = m_graphics->GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
-            IM_ASSERT(SUCCEEDED(hr));
-
-            SmartPtr<ID3D12GraphicsCommandList> cmdList;
-            hr = m_graphics->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
-            IM_ASSERT(SUCCEEDED(hr));
-
-            cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
-            cmdList->ResourceBarrier(1, &barrier);
-
-            hr = cmdList->Close();
-            IM_ASSERT(SUCCEEDED(hr));
-
-            cmdQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
-            hr = cmdQueue->Signal(fence, 1);
-            IM_ASSERT(SUCCEEDED(hr));
-
-            fence->SetEventOnCompletion(1, event);
-            WaitForSingleObject(event, INFINITE);
-
-            CloseHandle(event);
-
-            // Create texture view
-            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
-            ZeroMemory(&srvDesc, sizeof(srvDesc));
-            srvDesc.Format = DXGI_FORMAT_A8_UNORM;
-            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-            srvDesc.Texture2D.MipLevels = desc.MipLevels;
-            srvDesc.Texture2D.MostDetailedMip = 0;
-            srvDesc.Shader4ComponentMapping = D3D12_ENCODE_SHADER_4_COMPONENT_MAPPING(
-                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
-                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
-                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
-                D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_3);
-            m_graphics->GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, m_fontSrvCpuDescHandle);
-            m_fontTextureResource = pTexture;
-        }
-
-        // Store our identifier
-        static_assert(sizeof(ImTextureID) >= sizeof(m_fontSrvGpuDescHandle.ptr), "Can't pack descriptor handle into TexID, 32-bit not supported yet.");
-        io.Fonts->SetTexID((ImTextureID)m_fontSrvGpuDescHandle.ptr);
+        m_srvCpuDescHandle = m_srvDescHeap->GetCPUDescriptorHandleForHeapStart();
+        m_srvGpuDescHandle = m_srvDescHeap->GetGPUDescriptorHandleForHeapStart();
+        for (uint32_t i = 0; i < kMaxDescriptors; ++i)
+            m_freeDescriptors[i] = kMaxDescriptors - i - 1;
 
         return true;
     }
@@ -495,6 +269,13 @@ namespace rePlayer
         // Avoid rendering when minimized
         if (drawData.DisplaySize.x <= 0.0f || drawData.DisplaySize.y <= 0.0f)
             return;
+
+        // Catch up with texture updates. Most of the times, the list will have 1 element with an OK status, aka nothing to do.
+        // (This almost always points to ImGui::GetPlatformIO().Textures[] but is part of ImDrawData to allow overriding or disabling texture updates).
+        if (drawData.Textures != nullptr)
+            for (ImTextureData* tex : *drawData.Textures)
+                if (tex->Status != ImTextureStatus_OK)
+                    UpdateTexture(window, *tex);
 
         window->m_commandList->SetDescriptorHeaps(1, &m_srvDescHeap);
 
@@ -603,7 +384,7 @@ namespace rePlayer
                     const D3D12_RECT r = { (LONG)(pcmd->ClipRect.x - clip_off.x), (LONG)(pcmd->ClipRect.y - clip_off.y), (LONG)(pcmd->ClipRect.z - clip_off.x), (LONG)(pcmd->ClipRect.w - clip_off.y) };
                     if (r.right > r.left && r.bottom > r.top)
                     {
-                        window->m_commandList->SetGraphicsRootDescriptorTable(1, *(D3D12_GPU_DESCRIPTOR_HANDLE*)&pcmd->TextureId);
+                        window->m_commandList->SetGraphicsRootDescriptorTable(1, D3D12_GPU_DESCRIPTOR_HANDLE(pcmd->GetTexID()));
                         window->m_commandList->RSSetScissorRects(1, &r);
                         window->m_commandList->DrawIndexedInstanced(pcmd->ElemCount, 1, pcmd->IdxOffset + global_idx_offset, pcmd->VtxOffset + global_vtx_offset, 0);
                     }
@@ -612,6 +393,202 @@ namespace rePlayer
             global_idx_offset += cmd_list->IdxBuffer.Size;
             global_vtx_offset += cmd_list->VtxBuffer.Size;
         }
+    }
+
+    void GraphicsImGuiDX12::UpdateTexture(GraphicsWindowDX12* window, ImTextureData& imTextureData)
+    {
+//         ImGui_ImplDX12_Data* bd = ImGui_ImplDX12_GetBackendData();
+        bool need_barrier_before_copy = true; // Do we need a resource barrier before we copy new data in?
+
+        if (imTextureData.Status == ImTextureStatus_WantCreate)
+        {
+            // Create and upload new texture to graphics system
+            IM_ASSERT(imTextureData.TexID == ImTextureID_Invalid && imTextureData.BackendUserData == nullptr);
+            IM_ASSERT(imTextureData.Format == ImTextureFormat_Alpha8);
+            auto* backend_tex = new Texture();
+
+            assert(m_lastFreeDescriptorIndex >= 0);
+            uint32_t textureIndex = m_freeDescriptors[m_lastFreeDescriptorIndex--];
+            backend_tex->m_srvCpuDescHandle.ptr = m_srvCpuDescHandle.ptr + m_graphics->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * textureIndex;
+            backend_tex->m_srvGpuDescHandle.ptr = m_srvGpuDescHandle.ptr + m_graphics->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) * textureIndex;
+
+            D3D12_HEAP_PROPERTIES props = {};
+            props.Type = D3D12_HEAP_TYPE_DEFAULT;
+            props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+            D3D12_RESOURCE_DESC desc = {};
+            desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+            desc.Alignment = 0;
+            desc.Width = imTextureData.Width;
+            desc.Height = imTextureData.Height;
+            desc.DepthOrArraySize = 1;
+            desc.MipLevels = 1;
+            desc.Format = DXGI_FORMAT_A8_UNORM;
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+            desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            SmartPtr<ID3D12Resource> pTexture;
+            m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pTexture));
+
+            // Create SRV
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+            srvDesc.Format = DXGI_FORMAT_A8_UNORM;
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MipLevels = desc.MipLevels;
+            srvDesc.Texture2D.MostDetailedMip = 0;
+            srvDesc.Shader4ComponentMapping = D3D12_ENCODE_SHADER_4_COMPONENT_MAPPING(
+                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
+                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
+                D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1,
+                D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_3);
+            m_graphics->GetDevice()->CreateShaderResourceView(pTexture, &srvDesc, backend_tex->m_srvCpuDescHandle);
+            backend_tex->m_resource = std::move(pTexture);
+
+            // Store identifiers
+            imTextureData.SetTexID(ImTextureID(backend_tex->m_srvGpuDescHandle.ptr));
+            imTextureData.BackendUserData = backend_tex;
+            need_barrier_before_copy = false; // Because this is a newly-created texture it will be in D3D12_RESOURCE_STATE_COMMON and thus we don't need a barrier
+            // We don't set imTextureData.Status to ImTextureStatus_OK to let the code fall through below.
+        }
+
+        if (imTextureData.Status == ImTextureStatus_WantCreate || imTextureData.Status == ImTextureStatus_WantUpdates)
+        {
+            Texture* backend_tex = (Texture*)imTextureData.BackendUserData;
+            IM_ASSERT(imTextureData.Format == ImTextureFormat_Alpha8);
+
+            // We could use the smaller rect on _WantCreate but using the full rect allows us to clear the texture.
+            // FIXME-OPT: Uploading single box even when using ImTextureStatus_WantUpdates. Could use tex->Updates[]
+            // - Copy all blocks contiguously in upload buffer.
+            // - Barrier before copy, submit all CopyTextureRegion(), barrier after copy.
+            const int upload_x = (imTextureData.Status == ImTextureStatus_WantCreate) ? 0 : imTextureData.UpdateRect.x;
+            const int upload_y = (imTextureData.Status == ImTextureStatus_WantCreate) ? 0 : imTextureData.UpdateRect.y;
+            const int upload_w = (imTextureData.Status == ImTextureStatus_WantCreate) ? imTextureData.Width : imTextureData.UpdateRect.w;
+            const int upload_h = (imTextureData.Status == ImTextureStatus_WantCreate) ? imTextureData.Height : imTextureData.UpdateRect.h;
+
+            if (imTextureData.Status == ImTextureStatus_WantCreate)
+            {
+                ImGuiIO& io = ImGui::GetIO();
+
+                for (int32_t i = 1; i < 16 * 6 - 1; i++)
+                {
+                    auto x = i % 16;
+                    auto y = i / 16;
+                    ImFontAtlasRect rect;
+                    if (io.Fonts->GetCustomRect(Get3x5BaseRect() + i - 1, &rect))
+                    {
+                        for (int32_t p = 0; p < 5; p++)
+                        {
+                            auto* src = GetFont3x5Data() + x * 3 + (y * 5 + p) * 48;
+                            auto* dst = reinterpret_cast<uint8_t*>(imTextureData.GetPixelsAt(rect.x, rect.y + p));
+                            dst[0] = src[0] * 0xff;
+                            dst[1] = src[1] * 0xff;
+                            dst[2] = src[2] * 0xff;
+                        }
+                    }
+                }
+            }
+
+            // Update full texture or selected blocks. We only ever write to textures regions which have never been used before!
+            // This backend choose to use tex->UpdateRect but you can use tex->Updates[] to upload individual regions.
+            UINT upload_pitch_src = upload_w * imTextureData.BytesPerPixel;
+            UINT upload_pitch_dst = (upload_pitch_src + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+            UINT upload_size = upload_pitch_dst * upload_h;
+
+            D3D12_RESOURCE_DESC desc = {};
+            desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            desc.Alignment = 0;
+            desc.Width = upload_size;
+            desc.Height = 1;
+            desc.DepthOrArraySize = 1;
+            desc.MipLevels = 1;
+            desc.Format = DXGI_FORMAT_UNKNOWN;
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            D3D12_HEAP_PROPERTIES props = {};
+            props.Type = D3D12_HEAP_TYPE_UPLOAD;
+            props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+
+            // FIXME-OPT: Can upload buffer be reused?
+            SmartPtr<ID3D12Resource> uploadBuffer;
+            HRESULT hr = m_graphics->GetDevice()->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+                D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer));
+            IM_ASSERT(SUCCEEDED(hr));
+
+            // Copy to upload buffer
+            void* mapped = nullptr;
+            D3D12_RANGE range = { 0, upload_size };
+            hr = uploadBuffer->Map(0, &range, &mapped);
+            IM_ASSERT(SUCCEEDED(hr));
+            for (int y = 0; y < upload_h; y++)
+                memcpy((void*)((uintptr_t)mapped + y * upload_pitch_dst), imTextureData.GetPixelsAt(upload_x, upload_y + y), upload_pitch_src);
+            uploadBuffer->Unmap(0, &range);
+
+            if (need_barrier_before_copy)
+            {
+                D3D12_RESOURCE_BARRIER barrier = {};
+                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+                barrier.Transition.pResource = backend_tex->m_resource;
+                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+                window->m_commandList->ResourceBarrier(1, &barrier);
+            }
+
+            D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+            D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+            {
+                srcLocation.pResource = uploadBuffer;
+                srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+                srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_A8_UNORM;
+                srcLocation.PlacedFootprint.Footprint.Width = upload_w;
+                srcLocation.PlacedFootprint.Footprint.Height = upload_h;
+                srcLocation.PlacedFootprint.Footprint.Depth = 1;
+                srcLocation.PlacedFootprint.Footprint.RowPitch = upload_pitch_dst;
+                dstLocation.pResource = backend_tex->m_resource;
+                dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+                dstLocation.SubresourceIndex = 0;
+            }
+            window->m_commandList->CopyTextureRegion(&dstLocation, upload_x, upload_y, 0, &srcLocation, nullptr);
+
+            {
+                D3D12_RESOURCE_BARRIER barrier = {};
+                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+                barrier.Transition.pResource = backend_tex->m_resource;
+                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+                window->m_commandList->ResourceBarrier(1, &barrier);
+            }
+
+            m_graphics->FreeResource(std::move(uploadBuffer));
+
+            imTextureData.SetStatus(ImTextureStatus_OK);
+        }
+
+        if (imTextureData.Status == ImTextureStatus_WantDestroy && imTextureData.UnusedFrames >= int(m_graphics->kNumFrames))
+            DestroyTexture(imTextureData);
+    }
+
+    void GraphicsImGuiDX12::DestroyTexture(ImTextureData& imTextureData)
+    {
+        auto* backend_tex = (Texture*)imTextureData.BackendUserData;
+
+        m_freeDescriptors[++m_lastFreeDescriptorIndex] = uint32_t((backend_tex->m_srvCpuDescHandle.ptr - m_srvCpuDescHandle.ptr) / m_graphics->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+
+        delete backend_tex;
+
+        imTextureData.SetTexID(ImTextureID_Invalid);
+        imTextureData.SetStatus(ImTextureStatus_Destroyed);
+        imTextureData.BackendUserData = nullptr;
     }
 }
 // namespace rePlayer

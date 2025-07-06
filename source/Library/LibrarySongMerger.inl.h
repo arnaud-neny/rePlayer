@@ -319,7 +319,7 @@ namespace rePlayer
                             uint32_t index = (lastCheckedEntry - i - 1) % e;
                             if (m_entries[index].isRoot)
                             {
-                                float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * index;
+                                float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * index);
                                 ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
                                 m_lastCheckedEntry = index;
                                 break;
@@ -334,7 +334,7 @@ namespace rePlayer
                             uint32_t index = (lastCheckedEntry + i + 1) % e;
                             if (m_entries[index].isRoot)
                             {
-                                float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * index;
+                                float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * index);
                                 ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
                                 m_lastCheckedEntry = index;
                                 break;

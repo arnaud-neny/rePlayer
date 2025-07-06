@@ -12,13 +12,15 @@ namespace rePlayer
     bool Graphics::Init(void* hWnd)
     {
 #ifdef _WIN64
-        ms_instance = new GraphicsDX12(HWND(hWnd));
+        ms_instance = new GraphicsDX12();
+        ms_instance->m_hWnd = hWnd;
         if (ms_instance->OnInit())
             delete ms_instance;
         else
             return false;
 #endif
-        ms_instance = new GraphicsDX11(HWND(hWnd));
+        ms_instance = new GraphicsDX11();
+        ms_instance->m_hWnd = hWnd;
         if (ms_instance->OnInit())
         {
             delete ms_instance;

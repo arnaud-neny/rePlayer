@@ -1,11 +1,11 @@
-#include "Deck.h"
-
+// core
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <ImGui.h>
 #include <ImGui/imgui_internal.h>
 
+// rePlayer
 #include <Database/SongEditor.h>
 #include <Deck/Patterns.h>
 #include <Deck/Player.h>
@@ -16,8 +16,12 @@
 #include <Replayer/Replays.h>
 #include <Replayer/Settings.h>
 
+#include "Deck.h"
+
+// system :(
 #include <windows.h>
 
+// stl
 #include <cmath>
 #include <ctime>
 
@@ -190,7 +194,7 @@ namespace rePlayer
 
     Status Deck::UpdateFrame()
     {
-        ImGui::GetIO().FontGlobalScale = m_scale;
+        ImGui::GetStyle().FontScaleMain = m_scale;
 
         auto windowStates = m_windowStates;
         Window::Update(windowStates);

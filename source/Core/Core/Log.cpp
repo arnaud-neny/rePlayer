@@ -72,7 +72,7 @@ namespace core
         if (m_mode == Mode::kFileOnly || m_mode == Mode::kDisabled)
             return;
 
-        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1], ImGui::GetIO().Fonts->Fonts[1]->LegacySize);
 
         ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None);
 
@@ -129,7 +129,7 @@ namespace core
 
         if (m_lastLineDisplayed != numLines)
         {
-            float item_pos_y = clipper.StartPosY + clipper.ItemsHeight * (numLines - 1);
+            float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * (numLines - 1));
             ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
             m_lastLineDisplayed = numLines;
         }

@@ -15,6 +15,8 @@ namespace rePlayer
 
         static int32_t Get3x5BaseRect() { return ms_instance->OnGet3x5BaseRect(); }
 
+        static void* GetHWND() { return ms_instance->m_hWnd; }
+
     protected:
         virtual ~Graphics() {}
         virtual bool OnInit() = 0;
@@ -26,6 +28,9 @@ namespace rePlayer
 
     private:
         static Graphics* ms_instance;
+
+    protected:
+        void* m_hWnd;
     };
 }
 // namespace rePlayer
