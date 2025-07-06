@@ -103,7 +103,7 @@ For some players, you can edit the song length. For that you can simply enter th
 
 Add songs from the library here (from the library context menu, or drag and drop a selection from the library there).  
 Or add songs from you disk drive (drag and drop).  
-You can select the songs and reorder these. Click on the numbered button to track the song in its database (library/playlist).  
+You can select the songs and reorder these. Click on the numbered button to track the song in its database (library/playlist); combined with Shift to track the artists too.  
 An Url button to add a list of links to the playlist.  
 Buttons to load, save or clear the playlist.  
 And a button to sort (by type, artists, duration, type or random/shuffle). If you press Ctrl, the sort will happen only for entries after the current playing one.  
