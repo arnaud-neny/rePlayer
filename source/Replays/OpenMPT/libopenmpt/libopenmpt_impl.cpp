@@ -88,7 +88,7 @@ MPT_WARNING("Warning: MinGW with GCC earlier than 9.1 detected. Standard library
 
 #if defined(MPT_ASSERT_HANDLER_NEEDED) && !defined(ENABLE_TESTS)
 
-MPT_NOINLINE void AssertHandler(const mpt::source_location &loc, const char *expr, const char *msg) {
+MPT_ATTR_NOINLINE MPT_DECL_NOINLINE void AssertHandler(const mpt::source_location &loc, const char *expr, const char *msg) {
 	if(msg) {
 		mpt::log::GlobalLogger().SendLogMessage(loc, LogError, "ASSERT",
 			MPT_USTRING("ASSERTION FAILED: ") + mpt::transcode<mpt::ustring>(mpt::source_encoding, msg) + MPT_USTRING(" (") + mpt::transcode<mpt::ustring>(mpt::source_encoding, expr) + MPT_USTRING(")")
@@ -1343,6 +1343,9 @@ std::int32_t module_impl::get_current_tempo() const {
 }
 double module_impl::get_current_tempo2() const {
 	return m_sndFile->m_PlayState.m_nMusicTempo.ToDouble();
+}
+std::int32_t module_impl::get_current_sequence() const {
+	return m_sndFile->Order.GetCurrentSequenceIndex();
 }
 std::int32_t module_impl::get_current_order() const {
 	return m_sndFile->GetCurrentOrder();

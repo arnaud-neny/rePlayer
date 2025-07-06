@@ -115,9 +115,17 @@
 
 
 
+#if !MPT_PLATFORM_MULTITHREADED
+#define MPT_LIBCXX_QUIRK_NO_STD_THREAD
+#elif !MPT_COMPILER_GENERIC && MPT_OS_WINDOWS && MPT_LIBCXX_GNU && !defined(_GLIBCXX_HAS_GTHREADS)
+#define MPT_LIBCXX_QUIRK_NO_STD_THREAD
+#endif
+
+
+
 #if MPT_OS_WINDOWS && MPT_COMPILER_MSVC
 #if MPT_WINNT_AT_LEAST(MPT_WIN_VISTA)
-#define MPT_COMPILER_QUIRK_COMPLEX_STD_MUTEX
+#define MPT_LIBCXX_QUIRK_COMPLEX_STD_MUTEX
 #endif
 #endif
 
@@ -199,8 +207,10 @@
 
 
 
-#if MPT_COMPILER_GCC && !defined(__arm__)
+#if MPT_COMPILER_GCC || MPT_COMPILER_CLANG
+
 #if defined(_SOFT_FLOAT)
+#ifndef MPT_COMPILER_QUIRK_FLOAT_EMULATED
 #define MPT_COMPILER_QUIRK_FLOAT_EMULATED 1
 #endif
 #endif
@@ -208,9 +218,9 @@
 #if defined(__arm__)
 
 #if defined(__SOFTFP__)
+#ifndef MPT_COMPILER_QUIRK_FLOAT_EMULATED
 #define MPT_COMPILER_QUIRK_FLOAT_EMULATED 1
-#else
-#define MPT_COMPILER_QUIRK_FLOAT_EMULATED 0
+#endif
 #endif
 #if defined(__VFP_FP__)
 // native-endian IEEE754
@@ -229,9 +239,11 @@
 #elif defined(__mips__)
 
 #if defined(__mips_soft_float)
+#ifndef MPT_COMPILER_QUIRK_FLOAT_EMULATED
 #define MPT_COMPILER_QUIRK_FLOAT_EMULATED 1
-#else
-#define MPT_COMPILER_QUIRK_FLOAT_EMULATED 0
+#endif
+#endif
+
 #endif
 
 #endif
@@ -358,6 +370,10 @@
 #endif
 #endif
 #if MPT_LIBCXX_GNU_BEFORE(13)
+#define MPT_LIBCXX_QUIRK_CHRONO_DATE_NO_ZONED_TIME
+#endif
+#if MPT_LIBCXX_LLVM
+// See <https://github.com/llvm/llvm-project/issues/99982>
 #define MPT_LIBCXX_QUIRK_CHRONO_DATE_NO_ZONED_TIME
 #endif
 #if MPT_MSVC_AT_LEAST(2022, 6) && MPT_MSVC_BEFORE(2022, 7)
