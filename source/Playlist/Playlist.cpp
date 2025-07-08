@@ -147,7 +147,7 @@ namespace rePlayer
 
                 auto status = LoadPlaylist(file, m_cue, version);
                 if (status == Status::kOk && m_currentEntryIndex >= 0)
-                    m_cue.entries[m_currentEntryIndex].Track();
+                    m_cue.entries[m_currentEntryIndex].Track(true);
             }
             else
             {
