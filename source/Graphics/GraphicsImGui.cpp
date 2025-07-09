@@ -24,12 +24,20 @@ namespace rePlayer
         return ImFontAtlasGetFontLoaderForStbTruetype()->FontSrcContainsGlyph(atlas, src, codepoint);
     }
 
-    static bool s_fontBakedLoadGlyph(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, ImWchar codepoint, ImFontGlyph* out_glyph)
+    static bool s_fontBakedLoadGlyph(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, ImWchar codepoint, ImFontGlyph* out_glyph, float* out_advance_x)
     {
         if (codepoint >= ImWchar(0xE000) && codepoint < ImWchar(0xE000 + NumItemsOf(s_widths)))
         {
             const int w = s_widths[codepoint - 0xe000];
             const int h = 15;
+
+            // Load metrics only mode
+            if (out_advance_x != NULL)
+            {
+                IM_ASSERT(out_glyph == NULL);
+                *out_advance_x = s_widths[codepoint - 0xE000] * ImGui::GetStyle().FontScaleMain;
+                return true;
+            }
 
             ImFontAtlasRectId pack_id = ImFontAtlasPackAddRect(atlas, w, h);
             if (pack_id == ImFontAtlasRectId_Invalid)
@@ -69,7 +77,7 @@ namespace rePlayer
 
             return true;
         }
-        return ImFontAtlasGetFontLoaderForStbTruetype()->FontBakedLoadGlyph(atlas, src, baked, loader_data_for_baked_src, codepoint, out_glyph);
+        return ImFontAtlasGetFontLoaderForStbTruetype()->FontBakedLoadGlyph(atlas, src, baked, loader_data_for_baked_src, codepoint, out_glyph, out_advance_x);
     }
 
     GraphicsImGui::GraphicsImGui(void* hWnd)
@@ -85,7 +93,7 @@ namespace rePlayer
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->TexDesiredFormat = isTextureRGBA ? ImTextureFormat_RGBA32 : ImTextureFormat_Alpha8;
 
-        ImFontAtlasBuildSetupFontLoader(io.Fonts, ImFontAtlasGetFontLoaderForStbTruetype());
+        io.Fonts->SetFontLoader(ImFontAtlasGetFontLoaderForStbTruetype());
 
         ImFontConfig imFontConfig = {};
         imFontConfig.OversampleH = imFontConfig.OversampleV = 1;

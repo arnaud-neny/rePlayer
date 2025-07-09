@@ -412,7 +412,7 @@ namespace rePlayer
     {
         auto* resourceToFree = new ResourceToFree;
         resourceToFree->next = nullptr;
-        resourceToFree->fenceValue = m_mainWindow->m_fenceLastSignaledValue + kNumFrames + 1;
+        resourceToFree->fenceValue = m_mainWindow->m_fenceLastSignaledValue + kNumFrames + 7;
         resourceToFree->resource = std::move(resource);
         if (m_lastResourceToFree)
             m_lastResourceToFree->next = resourceToFree;

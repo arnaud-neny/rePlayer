@@ -1,5 +1,5 @@
 diff --git "a/external\\imgui-docking\\imconfig.h" "b/source\\Core\\ImGui\\imconfig.h"
-index a1e29e84..954a2af9 100644
+index 4dab1b60..f5cca694 100644
 --- "a/external\\imgui-docking\\imconfig.h"
 +++ "b/source\\Core\\ImGui\\imconfig.h"
 @@ -28,13 +28,15 @@
@@ -49,7 +49,7 @@ index a1e29e84..954a2af9 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git "a/external\\imgui-docking\\imgui.h" "b/source\\Core\\ImGui\\imgui.h"
-index e9a0bfa8..22422e21 100644
+index fe093886..d850630e 100644
 --- "a/external\\imgui-docking\\imgui.h"
 +++ "b/source\\Core\\ImGui\\imgui.h"
 @@ -601,6 +601,7 @@ namespace ImGui
@@ -70,10 +70,10 @@ index e9a0bfa8..22422e21 100644
  
      // Widgets: Regular Sliders
 diff --git "a/external\\imgui-docking\\imgui.cpp" "b/source\\Core\\ImGui\\imgui.cpp"
-index cf311d63..847a58b8 100644
+index ae4ad95a..e0f63d1f 100644
 --- "a/external\\imgui-docking\\imgui.cpp"
 +++ "b/source\\Core\\ImGui\\imgui.cpp"
-@@ -2635,8 +2635,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
+@@ -2573,8 +2573,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
          // One byte is consumed in case of invalid first byte of in_text.
          // All available bytes (at most `len` bytes) are consumed on incomplete/invalid second to last bytes.
          // Invalid or incomplete input may consume less bytes than wanted, therefore every byte has to be inspected in s.
@@ -86,7 +86,7 @@ index cf311d63..847a58b8 100644
      }
  
      return wanted;
-@@ -7060,7 +7062,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
+@@ -7006,7 +7008,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -95,7 +95,7 @@ index cf311d63..847a58b8 100644
          return false;
      if ((flags & ImGuiWindowFlags_AlwaysAutoResize) && (window->ChildFlags & (ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY)) == 0)
          return false;
-@@ -9580,6 +9582,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
+@@ -9526,6 +9528,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
      return id;
  }
  
@@ -116,7 +116,7 @@ index cf311d63..847a58b8 100644
  ImGuiID ImGuiWindow::GetID(int n)
  {
      ImGuiID seed = IDStack.back();
-@@ -9635,6 +9651,16 @@ void ImGui::PushID(const void* ptr_id)
+@@ -9581,6 +9597,16 @@ void ImGui::PushID(const void* ptr_id)
      window->IDStack.push_back(id);
  }
  
@@ -134,10 +134,10 @@ index cf311d63..847a58b8 100644
  {
      ImGuiContext& g = *GImGui;
 diff --git "a/external\\imgui-docking\\imgui_internal.h" "b/source\\Core\\ImGui\\imgui_internal.h"
-index 51a4e1c3..fa2a22a1 100644
+index c7c282b9..d17cd366 100644
 --- "a/external\\imgui-docking\\imgui_internal.h"
 +++ "b/source\\Core\\ImGui\\imgui_internal.h"
-@@ -2915,6 +2915,7 @@ public:
+@@ -2923,6 +2923,7 @@ public:
  
      ImGuiID     GetID(const char* str, const char* str_end = NULL);
      ImGuiID     GetID(const void* ptr);
@@ -146,10 +146,10 @@ index 51a4e1c3..fa2a22a1 100644
      ImGuiID     GetIDFromPos(const ImVec2& p_abs);
      ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
 diff --git "a/external\\imgui-docking\\imgui_widgets.cpp" "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-index 2acb0921..8dd60acf 100644
+index d3c769c9..2f3e841c 100644
 --- "a/external\\imgui-docking\\imgui_widgets.cpp"
 +++ "b/source\\Core\\ImGui\\imgui_widgets.cpp"
-@@ -2666,7 +2666,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
+@@ -2667,7 +2667,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
  
  // Note: p_data, p_min and p_max are _pointers_ to a memory address holding the data. For a Drag widget, p_min and p_max are optional.
  // Read code of e.g. DragFloat(), DragInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
@@ -158,7 +158,7 @@ index 2acb0921..8dd60acf 100644
  {
      ImGuiWindow* window = GetCurrentWindow();
      if (window->SkipItems)
-@@ -2756,7 +2756,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
+@@ -2757,7 +2757,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
      const char* value_buf_end = value_buf + DataTypeFormatString(value_buf, IM_ARRAYSIZE(value_buf), data_type, p_data, format);
      if (g.LogEnabled)
          LogSetNextTextDecoration("{", "}");

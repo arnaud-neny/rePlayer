@@ -574,7 +574,7 @@ namespace rePlayer
             imTextureData.SetStatus(ImTextureStatus_OK);
         }
 
-        if (imTextureData.Status == ImTextureStatus_WantDestroy && imTextureData.UnusedFrames >= int(m_graphics->kNumFrames))
+        if (imTextureData.Status == ImTextureStatus_WantDestroy && imTextureData.UnusedFrames >= int(m_graphics->kNumFrames * 2))
             DestroyTexture(imTextureData);
     }
 
