@@ -345,7 +345,7 @@ namespace rePlayer
 
     bool GraphicsDX12::OnEndFrame(float blendingFactor)
     {
-        while (m_resourceToFree && m_resourceToFree->fenceValue != m_mainWindow->m_fenceLastSignaledValue)
+        while (m_resourceToFree && m_resourceToFree->fenceValue == m_mainWindow->m_fenceLastSignaledValue)
         {
             auto* next = m_resourceToFree->next;
             delete m_resourceToFree;
