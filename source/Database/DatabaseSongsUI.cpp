@@ -107,7 +107,7 @@ namespace rePlayer
 
     void DatabaseSongsUI::TrackSubsong(SubsongID subsongId, bool isTrackingArtist)
     {
-        m_isTrackingArtist = isTrackingArtist;
+        m_isTrackingArtist |= isTrackingArtist;
         m_trackedSubsongId = subsongId;
         if (!m_owner.IsVisible())
             m_subsongHighlights.RemoveAll();

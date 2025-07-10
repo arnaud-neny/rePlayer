@@ -135,38 +135,40 @@ namespace rePlayer
                 // build the tracking position and set it if the scrolling is enabled for the table
                 if (m_isTrackingArtist && m_trackedSubsongId.IsValid())
                 {
-                    auto* song = m_db[m_trackedSubsongId];
-                    ArtistID selectedArtistId = ArtistID::Invalid;
-                    for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
+                    if (auto* song = m_db[m_trackedSubsongId])
                     {
-                        if (song->GetArtistId(i) == m_selectedArtistCopy.id)
+                        ArtistID selectedArtistId = ArtistID::Invalid;
+                        for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
                         {
-                            // already tracking the current artist, just jump to the next
-                            selectedArtistId = song->GetArtistId((i + 1) % e);
-                            break;
+                            if (song->GetArtistId(i) == m_selectedArtistCopy.id)
+                            {
+                                // already tracking the current artist, just jump to the next
+                                selectedArtistId = song->GetArtistId((i + 1) % e);
+                                break;
+                            }
+                            else if (i == 0)
+                                selectedArtistId = song->GetArtistId(0);
                         }
-                        else if (i == 0)
-                            selectedArtistId = song->GetArtistId(0);
+
+                        auto trackedArtistIndex = m_artists.FindIf<int32_t>([this, selectedArtistId](auto& entry)
+                        {
+                            return entry == selectedArtistId;
+                        });
+                        if (trackedArtistIndex >= 0)
+                        {
+                            float trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex);
+                            ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
+
+                            selectedArtist = m_db[selectedArtistId];
+                            if (m_selectedArtistCopy.id != selectedArtistId)
+                            {
+                                m_dbSongsRevision = m_db.SongsRevision() + 1;
+                                selectedArtist->CopyTo(&m_selectedArtistCopy);
+                            }
+                        }
                     }
 
-                    auto trackedArtistIndex = m_artists.FindIf<int32_t>([this, selectedArtistId](auto& entry)
-                    {
-                        return entry == selectedArtistId;
-                    });
-                    if (trackedArtistIndex >= 0)
-                    {
-                        float trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex);
-                        ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
-
-                        selectedArtist = m_db[selectedArtistId];
-                        if (m_selectedArtistCopy.id != selectedArtistId)
-                        {
-                            m_dbSongsRevision = m_db.SongsRevision() + 1;
-                            selectedArtist->CopyTo(&m_selectedArtistCopy);
-                        }
-                    }
-
-                    m_isTrackingArtist = false;
+                    m_isTrackingArtist = ImGui::IsWindowAppearing();
                 }
 
                 ImGui::EndTable();
