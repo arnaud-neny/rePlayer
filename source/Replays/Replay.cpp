@@ -4,17 +4,21 @@
 namespace rePlayer
 {
     #define EXTENSION(a) #a,
+    #define NO_EXTENSION() "",
     const char* const MediaType::extensionNames[] = {
         "---",
         #include "Extensions.inc"
     };
+    #undef NO_EXTENSION
     #undef EXTENSION
 
     #define EXTENSION(a) sizeof(#a) - 1,
+    #define NO_EXTENSION() 0,
     const size_t MediaType::extensionLengths[] = {
         sizeof("---") - 1,
         #include "Extensions.inc"
     };
+    #undef NO_EXTENSION
     #undef EXTENSION
 
     #define REPLAY(a, b) #a,

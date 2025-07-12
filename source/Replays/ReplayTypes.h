@@ -24,7 +24,9 @@ namespace rePlayer
     {
         Unknown,
 #define EXTENSION(a) _##a,
+#define NO_EXTENSION() _,
 #include "extensions.inc"
+#undef NO_EXTENSION
 #undef EXTENSION
         Count
     };

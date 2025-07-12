@@ -469,7 +469,9 @@ enum eExtension
 {
 	kUnknownExtension,
 #	define EXTENSION(a) kExtension_##a,
+#	define NO_EXTENSION() kExtension_,
 #	include "../../../Extensions.inc"
+#	undef NO_EXTENSION
 #	undef EXTENSION
 	Count
 };

@@ -1,0 +1,31 @@
+* Must make it so individual drivers can have custom commandline switches.
+  -o handling currently is junky and suboptimal.
+* Split oss.c into OSS-specific and independant parts.  The mixer itself is 
+  fully portable.  This will make it easier to create the XMMS and WinAMP
+  plugins from the same codebase.
+* New Win32 command line, WinAMP, and XMMS versions.
+* Win32 can have multiple format drivers - DX software, DX hardware, WaveOut.
+* GUI (likely either Qt/KDE or GTK/GNOME based)
+
+* Other IIgs formats.
+
+  I have information for the following formats not in this release of MTP:
+
+  - synthLAB
+  - Will Harvey's modified SMUS (used in Zany Golf and The Immortal.  On ZG 
+    all songs except the main title are compressed somehow - has anyone
+    ever figured this scheme out?).
+  - Sierra modified MIDI (used in all Sierra IIgs games including Leisure Suit 
+    Larry, King's Quest, Thexder, and Silpheed.)  The format is actually almost 
+    identical to the one used in Sierra's later SCI games although no games of 
+    that type ever shipped for the IIgs.
+
+  I would like information on these formats if anyone knows anything:
+  - Music Studio (I believe some information on this did exist as there were 
+    some French music disks using this format with a custom player).
+  - Music Construction Set
+  - Cinemaware (used in Rocket Ranger, 3 Stooges, Defender of the Crown, and 
+    others).
+  - "Noise Blaster 2" (used by FTA for Nucleus and Photonix).
+  - Any other IIgs formats anyone knows about.
+

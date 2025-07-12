@@ -1,0 +1,69 @@
+4.3.1 - October 27, 2000
+- Now supports FreeBSD (and probably other BSDs using OSS as well).
+  Thanks to Bryan Ogawa for the patch!
+- Fixed some cosmetic problems, added 4.3's new switches to the
+  online help.  
+
+4.3 - October 7, 2000
+- Added -v (version) option to show the versions of all the 
+  song file format modules.
+- Added -o (old-style effects) option for the MT driver.  It's
+  hackishly implemented and not how I want to handle it, but
+  it'll have to do for now.  This fixes LeCube :-)
+
+4.2a - May 8, 2000
+Ian Schmidt
+- Removed ModPlug's DSP effects.  They weren't working anyway, and 
+  I must clean up MTPng's architecture more before I throw in 
+  silly candy :-)
+
+4.2 - March 25, 2000
+Ian Schmidt
+
+- Input filetypes are now C++-style objects.  This makes it much easier
+  to add support for new filetypes to MTPng.
+- Added noise reduction from new GPL version of ModPlug Player.
+- Partially integrated bass expansion (not working yet) from same source.
+- Added partial support for Will Harvey modified SMUS music, as used in
+  Zany Golf and The Immortal.  If you'd like to play with this driver,
+  you'll need the inst* and .smu files from either ZG or The Immortal.
+  For Zany Golf the only song that will play at all right now is the
+  title (MARQUEE.SMU).  The others are compressed.  The Immortal's
+  songs are not compressed, and you'll get recognizable playback on
+  several of them.  I'll put up easy(er) to use .zips with these
+  songs once playback is correct.
+
+4.1 - February 15, 2000
+Ian Schmidt
+- Fixed SS/MTvibrato effect to work properly (Unforgiven, Freewill)
+- Fixed problems with LinuxPPC "dmasound" driver.  This also effects some
+  other Linux versions - if you have a non-x86 Linux and MTPng works now,
+  please email me so I can update the documentation.
+
+4.0 - January 8, 2000
+Ian Schmidt
+- Corrected operation of STP command (BW.SONG from the FTA Xmas Demo)
+- Fixed tone portamento effect for SS/MT (Teen.Spirit, Freewill)
+- Fixed arpeggiato effect for SS/MT (Dugger, Jungle.2).  Now this effect
+  should be 100% correct vs. the IIgs (in the closed-source old MTP
+  codebase it had some inaccuracies)
+
+4.0a10 - January 2, 2000
+Ian Schmidt
+- Added newly re-coded NoiseTracker GS 1.x module support
+- Cleaned up some things so the filetype modules no longer go meddling in
+  oss.c's internal instrument record structure.
+- Added tabprot.h with prototypes for the tables in tables.h (which can
+  only be included once and should be turned into a .c file).
+- Minor cleanups elsewhere
+
+4.0a9 - December 24, 1999
+Ian Schmidt
+- Fixed errors with big-endian architectures (thanks to Chris Shepherd for 
+  letting me telnet into his Power Mac G3 running LinuxPPC and futz
+  around).  
+- Audio output driver now attempts to work on OSS drivers that don't
+  support sample position readback (the LinuxPPC driver in particular
+  doesn't, which really sucks).
+
+
