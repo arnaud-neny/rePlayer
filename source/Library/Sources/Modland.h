@@ -100,7 +100,8 @@ namespace rePlayer
                 kFACSoundTracker,
                 kDelitrackerCustom,
                 kIFFSmus,
-                kEuphony
+                kEuphony,
+                kSoundSmith
             };
 
             Chars name;

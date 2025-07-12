@@ -334,6 +334,13 @@ namespace rePlayer
             [](std::string& name) { auto extOffset = name.find_last_of('.'); name.resize(extOffset); return MediaType(eExtension::_kdm, eReplay::Ken); },
             [](const char* name) { return strstr(name, "waves.kwv") != nullptr; }
         },
+        { // MegaTracker
+            "SoundSmith",
+            ModlandReplay::kSoundSmith,
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { url += ".W"; name += ".W"; },
+            [](std::string& name) {  if (tolower(name[name.size() - 1]) == 'w' && name[name.size() - 2] == '.') name.resize(name.size() - 2); return MediaType(eExtension::_, eReplay::MegaTracker); },
+            [](const char* name) { auto l = strlen(name); return tolower(name[l - 1]) == 'w' && name[l - 2] == '.'; }
+        },
     };
 
     inline const char* SourceModland::Chars::operator()(const Array<char>& blob) const
