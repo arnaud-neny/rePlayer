@@ -30,6 +30,9 @@
 #include "ssmt.h"
 #include "oss.h"
 
+#define printf(...)
+#define sprintf(...)
+
 #define NUM_TRACKS	14
 
 #define MTP_DEBUG 0	// set to 1 for verbose debugging of this module

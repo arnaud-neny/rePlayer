@@ -30,6 +30,9 @@
 #include "oss.h"
 #include "tabprot.h"
 
+#define printf(...)
+#define sprintf(...)
+
 #define MTP_DEBUG 0	// set to 1 for verbose debugging of this module
 
 uint16 baseticks[64] = 

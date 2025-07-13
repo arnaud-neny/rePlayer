@@ -27,7 +27,8 @@
 #include "mtptypes.h"
 #include "oss.h"
 
-#define NULL 0
+#define printf(...)
+#define sprintf(...)
 
 // now deal with where autoconf says OSS is
 #ifdef HAVE_OSS

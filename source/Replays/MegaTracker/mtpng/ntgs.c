@@ -30,7 +30,8 @@
 #include "oss.h"
 #include "tabprot.h"
 
-#define NULL 0
+#define printf(...)
+#define sprintf(...)
 
 #define MTP_DEBUG 0	// set to 1 for verbose debugging of this module
 
