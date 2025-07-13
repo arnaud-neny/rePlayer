@@ -204,6 +204,7 @@ Or add some comments (and likes) there:
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
+- [MTPng](https://aminet.net/package/mus/play/mtpng_68k): MegaTracker Player (MTP or MTPng) is a program which will play most Apple IIgs SoundSmith and MegaTracker songs on your more modern computer.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.

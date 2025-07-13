@@ -1,3 +1,9 @@
+v0.20.0
+- Added MegaTracker
+- Updated OpenMPT to 0.9.0-pre.5 r23744
+- Updated ImGui to 1.92.1
+- Bug fixes
+
 v0.19.4:
 - Added Psycle
 - Updated adplug to 2.4 r916

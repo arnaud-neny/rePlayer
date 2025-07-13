@@ -44,6 +44,7 @@
 - libnezplug: https://github.com/jprjr/libnezplug
 - libvgm: https://github.com/ValleyBell/libvgm
 - mdxmini: https://github.com/mistydemeo/mdxmini
+- MTPng: https://aminet.net/package/mus/play/mtpng_68k (and https://github.com/mrkite/soundsmith)
 - OpenMPT: https://source.openmpt.org
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org
