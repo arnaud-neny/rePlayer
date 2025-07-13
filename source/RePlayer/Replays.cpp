@@ -468,12 +468,19 @@ namespace rePlayer
             m_sortedReplays[i] = eReplay(i);
         std::sort(m_sortedReplays + 1, m_sortedReplays + int32_t(eReplay::Count), [this](eReplay l, eReplay r)
         {
-            return strcmp(m_plugins[int32_t(l)]->name, m_plugins[int32_t(r)]->name) < 0;
+            const char* lName = "\x7f";
+            const char* rName = "\x7f";
+            if (m_plugins[int32_t(l)])
+                lName = m_plugins[int32_t(l)]->name;
+            if (m_plugins[int32_t(r)])
+                rName = m_plugins[int32_t(r)]->name;
+
+            return strcmp(lName, rName) < 0;
         });
         for (int32_t i = 0; i < int32_t(eReplay::Count); i++)
         {
             m_mapSortedReplays[int32_t(m_sortedReplays[i])] = i;
-            m_sortedReplayNames[i] = m_plugins[int32_t(m_sortedReplays[i])]->name;
+            m_sortedReplayNames[i] = m_plugins[int32_t(m_sortedReplays[i])] ? m_plugins[int32_t(m_sortedReplays[i])]->name : "";
         }
         m_sortedReplayNames[0] = "";
     }
