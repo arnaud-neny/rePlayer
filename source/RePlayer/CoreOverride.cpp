@@ -16,6 +16,7 @@
 // curl
 #include <curl/curl.h>
 #pragma comment(lib, "Crypt32.lib")
+#pragma comment(lib, "Secur32.lib")
 #pragma comment(lib, "Ws2_32.Lib")
 
 // stl

@@ -310,9 +310,6 @@
     <ClInclude Include="lib\imap.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\inet_ntop.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\llist.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -478,9 +475,6 @@
     <ClInclude Include="lib\vssh\ssh.h">
       <Filter>Source Files\lib\vssh</Filter>
     </ClInclude>
-    <ClInclude Include="lib\vtls\bearssl.h">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClInclude>
     <ClInclude Include="lib\vtls\gtls.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
@@ -506,9 +500,6 @@
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
     <ClInclude Include="lib\vtls\schannel_int.h">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vtls\sectransp.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
     <ClInclude Include="lib\vtls\vtls.h">
@@ -594,6 +585,15 @@
     </ClInclude>
     <ClInclude Include="lib\uint-table.h">
       <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\binmode.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\inet_ntop.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\wait.h">
+      <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -796,9 +796,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\imap.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\inet_ntop.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\krb5.c">
@@ -1011,9 +1008,6 @@
     <ClCompile Include="lib\vssh\wolfssh.c">
       <Filter>Source Files\lib\vssh</Filter>
     </ClCompile>
-    <ClCompile Include="lib\vtls\bearssl.c">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClCompile>
     <ClCompile Include="lib\vtls\gtls.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
@@ -1039,9 +1033,6 @@
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
     <ClCompile Include="lib\vtls\schannel_verify.c">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vtls\sectransp.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
     <ClCompile Include="lib\vtls\vtls.c">
@@ -1130,6 +1121,12 @@
     </ClCompile>
     <ClCompile Include="lib\uint-table.c">
       <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\inet_ntop.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\wait.c">
+      <Filter>Source Files\lib\curlx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
