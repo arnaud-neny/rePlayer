@@ -11,6 +11,8 @@ namespace core::thread
     void SpinMonitor(const void* ptr);
     void SpinWait();
 
+    int32_t KeepAwake(bool isEnabled); // return < 0 then will not be kept awake
+
     enum class ID
     {
         kUnknown,

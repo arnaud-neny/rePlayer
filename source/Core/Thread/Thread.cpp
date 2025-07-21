@@ -1,5 +1,8 @@
 #include "Thread.h"
 
+// stl
+#include <atomic>
+
 // Windows
 #include <windows.h>
 #include <intrin.h>
@@ -45,6 +48,22 @@ namespace core::thread
     void SetCurrentId(ID id)
     {
         s_id = id;
+    }
+
+    int32_t KeepAwake(bool isEnabled)
+    {
+        static std::atomic<int32_t> awakeCounter = 0;
+        if (isEnabled)
+        {
+            if (!awakeCounter++)
+                SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
+        }
+        else
+        {
+            if (!--awakeCounter)
+                SetThreadExecutionState(ES_CONTINUOUS);
+        }
+        return awakeCounter;
     }
 }
 // namespace core::thread
