@@ -59,6 +59,7 @@ namespace rePlayer
             m_status = Status::Playing;
             waveOutRestart(m_wave->outHandle);
             ResumeThread();
+            thread::KeepAwake(true);
         }
         else if (IsStopped())
         {
@@ -83,6 +84,7 @@ namespace rePlayer
 
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
             ResumeThread();
+            thread::KeepAwake(true);
         }
     }
 
@@ -93,6 +95,7 @@ namespace rePlayer
             waveOutPause(m_wave->outHandle);
             SuspendThread();
             m_status = Status::Paused;
+            thread::KeepAwake(false);
         }
     }
 
@@ -102,7 +105,10 @@ namespace rePlayer
         {
             waveOutPause(m_wave->outHandle);
             if (m_status == Status::Playing)
+            {
                 SuspendThread();
+                thread::KeepAwake(false);
+            }
             m_status = Status::Stopped;
             waveOutReset(m_wave->outHandle);
             m_songSeek = 0;
