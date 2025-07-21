@@ -143,8 +143,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 {
                     auto rc = GetTrayRect();
                     POINT pt = { rc.left, rc.top };
+                    ::PhysicalToLogicalPointForPerMonitorDPI(nullptr, &pt);
                     SIZE sz = { 96, 32 };
                     ::CalculatePopupWindowPosition(&pt, &sz, TPM_CENTERALIGN | TPM_BOTTOMALIGN, nullptr, &rc);
+                    ::LogicalToPhysicalPointForPerMonitorDPI(nullptr, PPOINT(&rc.right));
                     s_rePlayer->SystrayTooltipOpen(rc.right, rc.bottom);
                 }
                 else
