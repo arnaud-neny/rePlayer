@@ -58,7 +58,7 @@ namespace rePlayer
         }
 
         template <typename... Arguments>
-        void Fetch(Arguments&&... args)
+        Status Fetch(Arguments&&... args)
         {
             char url[1024];
             core::sprintf(url, std::forward<Arguments>(args)...);
@@ -88,6 +88,7 @@ namespace rePlayer
 
             curl_easy_setopt(curl, CURLOPT_URL, url);
 
+            Status status = Status::kOk;
             auto curlErr = curl_easy_perform(curl);
             if (curlErr == CURLE_OK)
             {
@@ -98,11 +99,18 @@ namespace rePlayer
                     xmlFreeDoc(doc);
                 }
                 else
+                {
                     Log::Error("libxml: can't parse html (%s)\n", url);
+                    status = Status::kFail;
+                }
                 xmlResetLastError();
             }
             else
+            {
                 Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), url);
+                status = Status::kFail;
+            }
+            return status;
         }
 
         std::string Escape(const char* buf)

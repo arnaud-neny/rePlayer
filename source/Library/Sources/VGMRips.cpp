@@ -783,7 +783,8 @@ namespace rePlayer
         for (uint32_t i = 0; !collector.isDone; i++)
         {
             collector.state = ArtistCollector::kStateInit;
-            collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", m_artists[artistSourceIndex].url(m_data), i);
+            if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", m_artists[artistSourceIndex].url(m_data), i) != Status::kOk)
+                collector.isDone = true;
         }
 
         // collect all songs
@@ -792,7 +793,8 @@ namespace rePlayer
             auto* pack = collector.data.Items<Pack>(packOffset);
 
             PackCollector packCollector;
-            packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(collector.data));
+            if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(collector.data)) != Status::kOk)
+                break;
 
             // build pack
             auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
@@ -881,7 +883,8 @@ namespace rePlayer
             for (uint32_t i = 0; !collector.isDone; i++)
             {
                 collector.state = PacksCollector::kStateInit;
-                collector.Fetch("https://vgmrips.net/packs/latest?p=%u", i);
+                if (collector.Fetch("https://vgmrips.net/packs/latest?p=%u", i) != Status::kOk)
+                    collector.isDone = true;
             }
         }
 
@@ -893,7 +896,8 @@ namespace rePlayer
             if (strstr(ToLower(pack->name(m_db.data)).c_str(), lName.c_str()))
             {
                 PackCollector packCollector;
-                packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(m_db.data));
+                if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(m_db.data)) != Status::kOk)
+                    break;
 
                 // build pack
                 auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
