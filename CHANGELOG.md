@@ -1,7 +1,9 @@
-v0.20.0
+v0.20.1
 - Added MegaTracker
-- Updated OpenMPT to 0.9.0-pre.5 r23744
+- Updated OpenMPT to 0.9.0-pre.5 r23878
 - Updated ImGui to 1.92.1
+- Updated libcurl to 8.15.0
+- Updated libxml2 to 2.14.5
 - Bug fixes
 
 v0.19.4:
