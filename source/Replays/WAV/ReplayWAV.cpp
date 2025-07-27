@@ -18,7 +18,7 @@ namespace rePlayer
     Replay* ReplayWAV::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
         auto* wav = new drwav;
-        if (!drwav_init_with_metadata(wav, OnRead, OnSeek, stream, 0, nullptr))
+        if (!drwav_init_with_metadata(wav, OnRead, OnSeek, OnTell, stream, 0, nullptr))
         {
             delete wav;
             return nullptr;
@@ -58,9 +58,16 @@ namespace rePlayer
     drwav_bool32 ReplayWAV::OnSeek(void* pUserData, int offset, drwav_seek_origin origin)
     {
         auto stream = reinterpret_cast<io::Stream*>(pUserData);
-        if (stream->Seek(offset, origin == drwav_seek_origin_start ? io::Stream::kSeekBegin : io::Stream::kSeekCurrent) == Status::kOk)
+        if (stream->Seek(offset, origin == DRWAV_SEEK_SET ? io::Stream::kSeekBegin : origin == DRWAV_SEEK_CUR ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd) == Status::kOk)
             return DRWAV_TRUE;
         return DRWAV_FALSE;
+    }
+
+    drwav_bool32 ReplayWAV::OnTell(void* pUserData, drwav_int64* pCursor)
+    {
+        auto stream = reinterpret_cast<io::Stream*>(pUserData);
+        *pCursor = stream->GetPosition();
+        return DRWAV_TRUE;
     }
 
     uint32_t ReplayWAV::Render(StereoSample* output, uint32_t numSamples)

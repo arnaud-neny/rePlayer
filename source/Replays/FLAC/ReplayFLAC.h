@@ -43,6 +43,7 @@ namespace rePlayer
 
         static size_t OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead);
         static drflac_bool32 OnSeek(void* pUserData, int offset, drflac_seek_origin origin);
+        static drflac_bool32 OnTell(void* pUserData, drflac_int64* pCursor);
         static void OnMetadata(void* pUserData, drflac_metadata* pMetadata);
 
     private:

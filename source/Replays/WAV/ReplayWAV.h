@@ -43,6 +43,7 @@ namespace rePlayer
 
         static size_t OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead);
         static drwav_bool32 OnSeek(void* pUserData, int offset, drwav_seek_origin origin);
+        static drwav_bool32 OnTell(void* pUserData, drwav_int64* pCursor);
 
     private:
         SmartPtr<io::Stream> m_stream;

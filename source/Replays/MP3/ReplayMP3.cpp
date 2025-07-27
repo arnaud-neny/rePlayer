@@ -28,7 +28,7 @@ namespace rePlayer
             [stream]() { stream->EnableLatency(true); },
             [stream]() { stream->EnableLatency(false); },
         };
-        if (!drmp3_init(mp3, OnRead, OnSeek, streamData, nullptr))
+        if (!drmp3_init(mp3, OnRead, OnSeek, OnTell, nullptr, streamData, nullptr))
         {
             delete mp3;
             delete streamData;
@@ -73,9 +73,16 @@ namespace rePlayer
     drmp3_bool32 ReplayMP3::OnSeek(void* pUserData, int offset, drmp3_seek_origin origin)
     {
         auto* streamData = reinterpret_cast<StreamData*>(pUserData);
-        if (streamData->stream->Seek(offset, origin == drmp3_seek_origin_start ? io::Stream::kSeekBegin : io::Stream::kSeekCurrent) == Status::kOk)
+        if (streamData->stream->Seek(offset, origin == DRMP3_SEEK_SET ? io::Stream::kSeekBegin : origin == DRMP3_SEEK_CUR ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd) == Status::kOk)
             return DRMP3_TRUE;
         return DRMP3_FALSE;
+    }
+
+    drmp3_bool32 ReplayMP3::OnTell(void* pUserData, drmp3_int64* pCursor)
+    {
+        auto* streamData = reinterpret_cast<StreamData*>(pUserData);
+        *pCursor = streamData->stream->GetPosition();
+        return DRMP3_TRUE;
     }
 
     bool ReplayMP3::IsSeekable() const
@@ -121,7 +128,7 @@ namespace rePlayer
             m_streamData->isInit = true;
             m_streamData->stream->Seek(0, io::Stream::kSeekBegin);
             m_streamData->stream->EnableLatency(true);
-            drmp3_init(m_mp3, OnRead, OnSeek, m_streamData, nullptr);
+            drmp3_init(m_mp3, OnRead, OnSeek, OnTell, nullptr, m_streamData, nullptr);
             m_streamData->stream->EnableLatency(false);
             m_streamData->isInit = false;
         }
@@ -164,7 +171,7 @@ namespace rePlayer
         std::string info;
         info = m_mp3->channels == 1 ? "1 channel\n" : "2 channels\n";
         char buf[128];
-        sprintf(buf, "%d kb/s - %d hz", m_mp3->frameInfo.bitrate_kbps, m_mp3->frameInfo.hz);
+        sprintf(buf, "%d kb/s - %d hz", m_mp3->frameInfo.bitrate_kbps, m_mp3->frameInfo.sample_rate);
         info += buf;
         if (IsStreaming())
         {

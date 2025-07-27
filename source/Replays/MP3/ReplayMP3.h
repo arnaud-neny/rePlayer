@@ -53,6 +53,7 @@ namespace rePlayer
 
         static size_t OnRead(void* pUserData, void* pBufferOut, size_t bytesToRead);
         static drmp3_bool32 OnSeek(void* pUserData, int offset, drmp3_seek_origin origin);
+        static drmp3_bool32 OnTell(void* pUserData, drmp3_int64* pCursor);
 
     private:
         StreamData* m_streamData;

@@ -18,7 +18,7 @@ namespace rePlayer
     Replay* ReplayFLAC::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
         auto replay = new ReplayFLAC(stream);
-        replay->m_flac = drflac_open_with_metadata(OnRead, OnSeek, OnMetadata, replay, nullptr);
+        replay->m_flac = drflac_open_with_metadata(OnRead, OnSeek, OnTell, OnMetadata, replay, nullptr);
         if (!replay->m_flac || replay->m_flac->channels != 2)
         {
             delete replay;
@@ -47,9 +47,16 @@ namespace rePlayer
     drflac_bool32 ReplayFLAC::OnSeek(void* pUserData, int offset, drflac_seek_origin origin)
     {
         auto stream = reinterpret_cast<ReplayFLAC*>(pUserData)->m_stream;
-        if (stream->Seek(offset, origin == drflac_seek_origin_start ? io::Stream::kSeekBegin : io::Stream::kSeekCurrent) == Status::kOk)
+        if (stream->Seek(offset, origin == DRFLAC_SEEK_SET ? io::Stream::kSeekBegin : origin == DRFLAC_SEEK_CUR ? io::Stream::kSeekCurrent : io::Stream::kSeekEnd) == Status::kOk)
             return DRFLAC_TRUE;
         return DRFLAC_FALSE;
+    }
+
+    drflac_bool32 ReplayFLAC::OnTell(void* pUserData, drflac_int64* pCursor)
+    {
+        auto stream = reinterpret_cast<ReplayFLAC*>(pUserData)->m_stream;
+        *pCursor = stream->GetPosition();
+        return DRFLAC_TRUE;
     }
 
     void ReplayFLAC::OnMetadata(void* pUserData, drflac_metadata* pMetadata)
