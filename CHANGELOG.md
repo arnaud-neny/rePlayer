@@ -1,6 +1,9 @@
-v0.20.1
+v0.20.2
 - Added MegaTracker
 - Updated OpenMPT to 0.9.0-pre.5 r23878
+- Updated dr_flac to 0.13.0
+- Updated dr_mp3 to 0.7.0
+- Updated dr_wav to 0.14.0
 - Updated ImGui to 1.92.1
 - Updated libcurl to 8.15.0
 - Updated libxml2 to 2.14.5
