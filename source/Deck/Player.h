@@ -54,8 +54,8 @@ namespace rePlayer
         StereoSample GetVuMeter() const;
         void DrawVisuals(float xMin, float yMin, float xMax, float yMax) const;
 
-        static uint32_t GetVolume();
-        static void SetVolume(uint32_t volume);
+        static uint32_t GetVolume(bool isLogarithmic);
+        static void SetVolume(uint32_t volume, bool isLogarithmic);
 
         void EnableEndless(bool isEnabled);
 

@@ -444,15 +444,27 @@ namespace rePlayer
         }
     }
 
-    uint32_t Player::GetVolume()
+    uint32_t Player::GetVolume(bool isLogarithmic)
     {
         DWORD value;
         waveOutGetVolume(nullptr, &value);
-        return Max(value & 0xffFF, value >> 16);
+        value = Max(value & 0xffFF, value >> 16);
+        if (isLogarithmic)
+        {
+            const auto volume = logf(1000.0f * value / float(0xffFF)) / logf(1000.0f);
+            value = DWORD(volume * 0xffFF);
+        }
+        return value;
     }
 
-    void Player::SetVolume(uint32_t volume)
+    void Player::SetVolume(uint32_t volume, bool isLogarithmic)
     {
+        if (isLogarithmic)
+        {
+            // https://www.dr-lex.be/info-stuff/volumecontrols.html
+            auto value = Saturate(exp(logf(1000.0f) * volume / float(0xffFF)) / 1000.0f);
+            volume = uint32_t(value * 0xffFF);
+        }
         waveOutSetVolume(nullptr, volume | (volume << 16));
     }
 

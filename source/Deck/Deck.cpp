@@ -32,8 +32,8 @@ namespace rePlayer
         , m_patterns(new Patterns)
     {
         Enable(true);
-        m_volume = Player::GetVolume();
-        Player::SetVolume(m_volume);
+        m_volume = Player::GetVolume(m_volumeCurve == VolumeCurve::Logarithmic);
+        Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
 
         auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
         ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_NEXTTRACK, MOD_NOREPEAT, VK_MEDIA_NEXT_TRACK);
@@ -119,13 +119,13 @@ namespace rePlayer
     void Deck::IncreaseVolume()
     {
         m_volume = Clamp(m_volume + 256, 0, 65535);
-        Player::SetVolume(m_volume);
+        Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
     }
 
     void Deck::DecreaseVolume()
     {
         m_volume = Clamp(m_volume - 256, 0, 65535);
-        Player::SetVolume(m_volume);
+        Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
     }
 
     void Deck::OnNewPlaylist()
@@ -194,6 +194,8 @@ namespace rePlayer
 
     Status Deck::UpdateFrame()
     {
+        m_volume = Player::GetVolume(m_volumeCurve == VolumeCurve::Logarithmic);
+
         ImGui::GetStyle().FontScaleMain = m_scale;
 
         auto windowStates = m_windowStates;
@@ -245,6 +247,14 @@ namespace rePlayer
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
                 }
+            }
+            const char* const volumeCurves[] = { "Linear", "Logarithmic" };
+            auto volumeCurve = m_volumeCurve.As<int32_t>();
+            if (ImGui::Combo("Volume curve", &volumeCurve, volumeCurves, NumItemsOf(volumeCurves)) && volumeCurve != m_volumeCurve.As<int32_t>())
+            {
+                auto volume = Player::GetVolume(VolumeCurve(volumeCurve) == VolumeCurve::Logarithmic);
+                m_volumeCurve = VolumeCurve(volumeCurve);
+                m_volume = int32_t(volume);
             }
             if (Window::ms_isPassthroughAvailable == Window::Passthrough::IsAvailable)
                 ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
@@ -441,7 +451,7 @@ namespace rePlayer
         ImGui::SameLine();
         ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 8);
         if (ImGui::VSliderInt("##Volume", ImVec2(10, m_VuMeterHeight), reinterpret_cast<int*>(&m_volume), 0, 65535, "", ImGuiSliderFlags_NoInput))
-            Player::SetVolume(m_volume);
+            Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
         ImGui::PopStyleVar();
         if (ImGui::IsItemHovered())
         {
@@ -456,7 +466,7 @@ namespace rePlayer
                 volume += speed * 65535 / ImGui::GetItemRectSize().y;
                 volume = Max(Min(65535.0f, volume), 0.0f);
                 m_volume = static_cast<uint32_t>(volume);
-                Player::SetVolume(m_volume);
+                Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
             }
         }
         ImGui::EndGroup();
@@ -705,7 +715,7 @@ namespace rePlayer
             m_mode = Mode::Playlist;
             m_nextPlayer = Core::GetPlaylist().LoadNextSong(false);
         }
-        Player::SetVolume(m_volume);
+        Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
 
         auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
         if (!m_arePlaybackMediaHotKeysEnabled)

@@ -130,6 +130,12 @@ namespace rePlayer
         bool m_isSystrayBalloonEnabled = false;
         bool m_isOpened = true;
 
+        enum class VolumeCurve : uint8_t
+        {
+            Linear,
+            Logarithmic
+        };
+        Serialized<VolumeCurve> m_volumeCurve = { "VolumeCurve", VolumeCurve::Linear };
         Serialized<int32_t> m_volume = { "Volume", 0xffFF };
         float m_VuMeterHeight = 100.f;
 
