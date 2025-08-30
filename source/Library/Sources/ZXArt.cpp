@@ -149,14 +149,11 @@ namespace rePlayer
 
         CURL* curl = curl_easy_init();
 
-        char url[128];
-        sprintf(url, "https://zxart.ee/api/export:zxMusic/language:eng/filter:authorId=%u", importedArtistID.internalId);
-
         char errorBuffer[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
         struct Buffer : public Array<uint8_t>
         {
@@ -167,11 +164,25 @@ namespace rePlayer
             }
         } buffer;
 
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        curl_easy_perform(curl);
+        CURLcode curlError = CURLE_OK;
+        for (uint32_t start = 0; curlError == CURLE_OK;)
+        {
+            buffer.Clear();
 
-        GetSongs(results, buffer, true, curl);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+
+            char url[1024];
+            sprintf(url, "https://zxart.ee/api/export:zxMusic/language:eng/start:%u/filter:authorId=%u", start, importedArtistID.internalId);
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            Log::Message("ZXArt: fetching author %u at %u\n", uint32_t(importedArtistID.internalId), start);
+            curlError = curl_easy_perform(curl);
+            if (curlError == CURLE_OK)
+            {
+                if (GetSongs(results, buffer, false, curl, start))
+                    break;
+            }
+        }
 
         curl_easy_cleanup(curl);
     }
@@ -180,16 +191,13 @@ namespace rePlayer
     {
         CURL* curl = curl_easy_init();
 
-        std::string url = "https://zxart.ee/api/types:zxMusic/export:zxMusic/language:eng/filter:zxMusicTitleSearch=";
-        auto e = curl_easy_escape(curl, name, int(strlen(name)));
-        url += e;
-        curl_free(e);
+        auto curlName = curl_easy_escape(curl, name, int(strlen(name)));
 
         char errorBuffer[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
         struct Buffer : public Array<uint8_t>
         {
@@ -200,11 +208,27 @@ namespace rePlayer
             }
         } buffer;
 
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        curl_easy_perform(curl);
+        CURLcode curlError = CURLE_OK;
+        for (uint32_t start = 0; curlError == CURLE_OK;)
+        {
+            buffer.Clear();
 
-        GetSongs(collectedSongs, buffer, false, curl);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+
+            char url[1024];
+            sprintf(url, "https://zxart.ee/api/types:zxMusic/export:zxMusic/language:eng/start:%u/filter:zxMusicTitleSearch=%s", start, curlName);
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            Log::Message("ZXArt: fetching zxMusicTitleSearch %s at %u\n", name, start);
+            curlError = curl_easy_perform(curl);
+            if (curlError == CURLE_OK)
+            {
+                if (GetSongs(collectedSongs, buffer, false, curl, start))
+                    break;
+            }
+        }
+
+        curl_free(curlName);
 
         curl_easy_cleanup(curl);
     }
@@ -384,81 +408,82 @@ namespace rePlayer
         return song != m_songs.end() && song->id == id ? const_cast<SongSource*>(song) : nullptr;
     }
 
-    void SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, CURL* curl) const
+    bool SourceZXArt::GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, CURL* curl, uint32_t& start) const
     {
-        if (buffer.IsNotEmpty())
+        auto json = nlohmann::json::parse(buffer.begin(), buffer.end());
+        uint32_t totalAmount = json.contains("totalAmount") ? json["totalAmount"].get<uint32_t>() : 0;
+        auto& jsonEntries = json["responseData"]["zxMusic"];
+        for (auto& zxMusic : jsonEntries)
         {
-            auto json = nlohmann::json::parse(buffer.begin(), buffer.end());
-            for (auto& zxMusic : json["responseData"]["zxMusic"])
+            auto song = new SongSheet();
+
+            auto searchSongId = zxMusic["id"].get<uint32_t>();
+            song->sourceIds.Add(SourceID(kID, searchSongId));
+
+            SourceResults::State state;
+            if (auto sourceSong = FindSong(searchSongId))
             {
-                auto song = new SongSheet();
+                song->id = sourceSong->songId;
+                if (sourceSong->isDiscarded)
+                    state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+                else
+                    song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable) : state.SetSongStatus(SourceResults::kOwned);
+            }
+            else
+            {
+                state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable);
+            }
 
-                auto searchSongId = zxMusic["id"].get<uint32_t>();
-                song->sourceIds.Add(SourceID(kID, searchSongId));
-
-                SourceResults::State state;
-                if (auto sourceSong = FindSong(searchSongId))
+            song->name = ConvertEntities(zxMusic["title"].get<std::string>());
+            if (zxMusic.contains("internalTitle"))
+                song->name.String() += " / " + ConvertEntities(zxMusic["internalTitle"].get<std::string>());
+            if (zxMusic.contains("year"))
+            {
+                uint32_t year = 0;
+                sscanf_s(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
+                song->releaseYear = uint16_t(year);
+            }
+            if (zxMusic.contains("type"))
+            {
+                song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
+                if (song->type.ext == eExtension::Unknown)
+                    song->name.String() += std::string(".") + zxMusic["type"].get<std::string>();
+            }
+            else if (zxMusic.contains("originalFileName"))
+            {
+                auto filename = zxMusic["originalFileName"].get<std::string>();
+                auto pos = filename.rfind('.');
+                if (pos != filename.npos)
                 {
-                    song->id = sourceSong->songId;
-                    if (sourceSong->isDiscarded)
-                        state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-                    else
-                        song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable) : state.SetSongStatus(SourceResults::kOwned);
+                    song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
+                    if (song->type.ext == eExtension::Unknown)
+                        song->name.String() += filename.c_str() + pos;
+                }
+            }
+            for (auto& author : zxMusic["authorIds"])
+            {
+                auto authorId = author.get<uint32_t>();
+                auto it = std::find_if(collectedSongs.artists.begin(), collectedSongs.artists.end(), [authorId](auto entry)
+                {
+                    return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == authorId;
+                });
+                auto newArtistId = static_cast<ArtistID>(it - collectedSongs.artists.begin());
+                if (it == collectedSongs.artists.end())
+                {
+                    if (auto newArtist = GetArtist(authorId, curl))
+                    {
+                        collectedSongs.artists.Add(newArtist);
+                        song->artistIds.Add(newArtistId);
+                    }
                 }
                 else
-                {
-                    state.SetSongStatus(SourceResults::kNew).SetChecked(isCheckable);
-                }
-
-                song->name = ConvertEntities(zxMusic["title"].get<std::string>());
-                if (zxMusic.contains("internalTitle"))
-                    song->name.String() += " / " + ConvertEntities(zxMusic["internalTitle"].get<std::string>());
-                if (zxMusic.contains("year"))
-                {
-                    uint32_t year = 0;
-                    sscanf_s(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
-                    song->releaseYear = uint16_t(year);
-                }
-                if (zxMusic.contains("type"))
-                {
-                    song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
-                    if (song->type.ext == eExtension::Unknown)
-                        song->name.String() += std::string(".") + zxMusic["type"].get<std::string>();
-                }
-                else if (zxMusic.contains("originalFileName"))
-                {
-                    auto filename = zxMusic["originalFileName"].get<std::string>();
-                    auto pos = filename.rfind('.');
-                    if (pos != filename.npos)
-                    {
-                        song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
-                        if (song->type.ext == eExtension::Unknown)
-                            song->name.String() += filename.c_str() + pos;
-                    }
-                }
-                for (auto& author : zxMusic["authorIds"])
-                {
-                    auto authorId = author.get<uint32_t>();
-                    auto it = std::find_if(collectedSongs.artists.begin(), collectedSongs.artists.end(), [authorId](auto entry)
-                    {
-                        return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == authorId;
-                    });
-                    auto newArtistId = static_cast<ArtistID>(it - collectedSongs.artists.begin());
-                    if (it == collectedSongs.artists.end())
-                    {
-                        if (auto newArtist = GetArtist(authorId, curl))
-                        {
-                            collectedSongs.artists.Add(newArtist);
-                            song->artistIds.Add(newArtistId);
-                        }
-                    }
-                    else
-                        song->artistIds.Add(newArtistId);
-                }
-                collectedSongs.songs.Add(song);
-                collectedSongs.states.Add(state);
+                    song->artistIds.Add(newArtistId);
             }
+            collectedSongs.songs.Add(song);
+            collectedSongs.states.Add(state);
         }
+        start += uint32_t(jsonEntries.size());
+        return start >= totalAmount;
     }
 
     ArtistSheet* SourceZXArt::GetArtist(uint32_t id, CURL* curl) const
@@ -481,8 +506,8 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
-        curl_easy_perform(curl);
-        if (buffer.IsNotEmpty())
+        CURLcode curlError = curl_easy_perform(curl);
+        if (curlError == CURLE_OK)
         {
             auto json = nlohmann::json::parse(buffer.begin(), buffer.end());
             if (json["totalAmount"].get<uint32_t>() != 0)
@@ -514,9 +539,9 @@ namespace rePlayer
                         curl_easy_setopt(curl, CURLOPT_URL, url);
 
                         buffer.Clear();
-                        curl_easy_perform(curl);
-
-                        if (buffer.IsNotEmpty())
+                        Log::Message("ZXArt: fetching authorAlias %u\n", alias.get<uint32_t>());
+                        curlError = curl_easy_perform(curl);
+                        if (curlError == CURLE_OK)
                         {
                             auto jsonAlias = nlohmann::json::parse(buffer.begin(), buffer.end());
                             auto aliases = jsonAlias["responseData"]["authorAlias"];
@@ -542,8 +567,8 @@ namespace rePlayer
             char errorBuffer[CURL_ERROR_SIZE];
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_easy_setopt(curl, CURLOPT_URL, "https://zxart.ee/api/export:authorAlias/language:eng/filter:authorAliasAll");
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+            curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
             struct Buffer : public Array<uint8_t>
             {
@@ -556,79 +581,119 @@ namespace rePlayer
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-            curl_easy_perform(curl);
-            if (buffer.IsNotEmpty())
+
+            CURLcode curlError = CURLE_OK;
+            Array<std::pair<uint32_t, std::string>> aliases;
+            for (uint32_t start = 0; curlError == CURLE_OK;)
             {
-                Array<std::pair<uint32_t, std::string>> aliases;
+                buffer.Clear();
+                char url[1024];
+                sprintf(url, "https://zxart.ee/api/export:authorAlias/language:eng/start:%u/filter:authorAliasAll", start);
+                curl_easy_setopt(curl, CURLOPT_URL, url);
+                Log::Message("ZXArt: fetching authorAliasAll at %u\n", start);
+                curlError = curl_easy_perform(curl);
+                if (curlError == CURLE_OK)
                 {
                     auto jsonAllAliases = nlohmann::json::parse(buffer.begin(), buffer.end());
-                    aliases.Reserve(uint32_t(jsonAllAliases["responseData"]["authorAlias"].size()));
+                    uint32_t totalAmount = jsonAllAliases.contains("totalAmount") ? jsonAllAliases["totalAmount"].get<uint32_t>() : 0;
+                    auto& jsonEntries = jsonAllAliases["responseData"]["authorAlias"];
+                    aliases.Reserve(uint32_t(jsonEntries.size()));
                     for (auto& jsonAlias : jsonAllAliases["responseData"]["authorAlias"])
                     {
+                        // Sanitize messy ZXArt database
                         if (jsonAlias.contains("title"))
                         {
-                            auto* alias = aliases.Push();
-                            alias->first = jsonAlias["id"].get<uint32_t>();
-                            alias->second = jsonAlias["title"].get<std::string>();
+                            auto entry = aliases.AddOnce({ jsonAlias["id"].get<uint32_t>(), jsonAlias["title"].get<std::string>() });
+                            if (!entry.second)
+                                Log::Warning("ZXArt: duplicated author alias %u (\"%s\")\n", entry.first->first, entry.first->second.c_str());
                         }
+                        else
+                            Log::Warning("ZXArt: missing title for author alias %u\n", jsonAlias["id"].get<uint32_t>());
                     }
+                    start += uint32_t(jsonEntries.size());
+                    if (start >= totalAmount)
+                        break;
                 }
-
-                buffer.Clear();
-                curl_easy_setopt(curl, CURLOPT_URL, "https://zxart.ee/api/export:author/language:eng/filter:authorAll");
-                curl_easy_perform(curl);
-                if (buffer.IsNotEmpty())
+            }
+            if (curlError == CURLE_OK && aliases.IsNotEmpty())
+            {
+                for (uint32_t start = 0; curlError == CURLE_OK;)
                 {
-                    auto jsonAllAuthors = nlohmann::json::parse(buffer.begin(), buffer.end());
-                    for (auto& author : jsonAllAuthors["responseData"]["author"])
+                    buffer.Clear();
+                    char url[1024];
+                    sprintf(url, "https://zxart.ee/api/export:author/language:eng/start:%u/filter:authorAll", start);
+                    curl_easy_setopt(curl, CURLOPT_URL, url);
+                    Log::Message("ZXArt: fetching authorAll at %u\n", start);
+                    curlError = curl_easy_perform(curl);
+                    if (curlError == CURLE_OK)
                     {
-                        if (!author.contains("tunesQuantity"))
-                            continue;
-
-                        auto* artist = m_db.artists.Push();
-                        artist->id = author["id"].get<uint32_t>();
-                        sscanf_s(author["tunesQuantity"].get<std::string>().c_str(), "%u", &artist->numSongs);
-
-                        auto title = author["title"].get<std::string>();
-                        artist->handles.Set(m_db.strings, title);
-
-                        if (author.contains("aliases"))
+                        auto jsonAllAuthors = nlohmann::json::parse(buffer.begin(), buffer.end());
+                        uint32_t totalAmount = jsonAllAuthors.contains("totalAmount") ? jsonAllAuthors["totalAmount"].get<uint32_t>() : 0;
+                        auto& jsonEntries = jsonAllAuthors["responseData"]["author"];
+                        for (auto& author : jsonEntries)
                         {
-                            artist->numHandles += uint16_t(author["aliases"].size());
-                            for (auto& authorAlias : author["aliases"])
+                            if (!author.contains("tunesQuantity"))
+                                continue;
+
+                            // ZXArt database requests are messy, so check for duplicates
+                            uint32_t artistId = author["id"].get<uint32_t>();
+                            auto* entry = m_db.artists.FindIf([artistId](auto& artist) { return artist.id == artistId; });
+                            if (entry != nullptr)
                             {
-                                auto aliasId = authorAlias.get<uint32_t>();
-                                if (auto* alias = aliases.FindIf([aliasId](auto& item)
+                                Log::Warning("ZXArt: duplicated author %u (\"%s\")\n", artistId, author["title"].get<std::string>().c_str());
+                                continue;
+                            }
+
+                            auto* artist = m_db.artists.Push();
+                            artist->id = artistId;
+                            sscanf_s(author["tunesQuantity"].get<std::string>().c_str(), "%u", &artist->numSongs);
+
+                            auto title = author["title"].get<std::string>();
+                            artist->handles.Set(m_db.strings, title);
+
+                            if (author.contains("aliases"))
+                            {
+                                artist->numHandles += uint16_t(author["aliases"].size());
+                                for (auto& authorAlias : author["aliases"])
                                 {
-                                    return item.first == aliasId;
-                                }))
+                                    auto aliasId = authorAlias.get<uint32_t>();
+                                    if (auto* alias = aliases.FindIf([aliasId](auto& item)
+                                    {
+                                        return item.first == aliasId;
+                                    }))
+                                    {
+                                        Chars c;
+                                        c.Set(m_db.strings, alias->second);
+                                        aliases.RemoveAtFast(alias - aliases);
+                                    }
+                                }
+                            }
+                            if (author.contains("realName"))
+                            {
+                                auto realName = author["realName"].get<std::string>();
+                                artist->realName.Set(m_db.strings, realName);
+                            }
+                            if (author.contains("country"))
+                            {
+                                auto country = author["country"].get<std::string>();
+                                if (country != "Information removed")
                                 {
-                                    Chars c;
-                                    c.Set(m_db.strings, alias->second);
-                                    aliases.RemoveAtFast(alias - aliases);
+                                    auto countryCode = Countries::GetCode(country.c_str());
+                                    if (countryCode == 0)
+                                        assert(0 && "todo find the right country");
+                                    else
+                                        artist->country = countryCode;
                                 }
                             }
                         }
-                        if (author.contains("realName"))
-                        {
-                            auto realName = author["realName"].get<std::string>();
-                            artist->realName.Set(m_db.strings, realName);
-                        }
-                        if (author.contains("country"))
-                        {
-                            auto country = author["country"].get<std::string>();
-                            if (country != "Information removed")
-                            {
-                                auto countryCode = Countries::GetCode(country.c_str());
-                                if (countryCode == 0)
-                                    assert(0 && "todo find the right country");
-                                else
-                                    artist->country = countryCode;
-                            }
-                        }
+                        start += uint32_t(jsonEntries.size());
+                        if (start >= totalAmount)
+                            break;
                     }
                 }
             }
+            if (curlError != CURLE_OK)
+                Log::Error("ZXArt: %s\n", curl_easy_strerror(curlError));
             curl_easy_cleanup(curl);
         }
         return m_db.artists.IsEmpty();
