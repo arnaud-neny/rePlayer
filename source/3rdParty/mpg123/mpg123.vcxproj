@@ -22,6 +22,7 @@
     <ClCompile Include="src\compat\compat.c" />
     <ClCompile Include="src\compat\compat_str.c" />
     <ClCompile Include="src\libmpg123\dct64.c" />
+    <ClCompile Include="src\libmpg123\dither.c" />
     <ClCompile Include="src\libmpg123\equalizer.c" />
     <ClCompile Include="src\libmpg123\feature.c" />
     <ClCompile Include="src\libmpg123\format.c" />
@@ -61,6 +62,8 @@
     <ClInclude Include="src\libmpg123\aarch64_defs.h" />
     <ClInclude Include="src\libmpg123\costabs.h" />
     <ClInclude Include="src\libmpg123\decode.h" />
+    <ClInclude Include="src\libmpg123\dither.h" />
+    <ClInclude Include="src\libmpg123\dither_impl.h" />
     <ClInclude Include="src\libmpg123\frame.h" />
     <ClInclude Include="src\libmpg123\getbits.h" />
     <ClInclude Include="src\libmpg123\getcpuflags.h" />

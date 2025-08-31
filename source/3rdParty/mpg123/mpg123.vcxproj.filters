@@ -93,6 +93,9 @@
     <ClCompile Include="src\libmpg123\lfs_wrap.c">
       <Filter>libmpg123</Filter>
     </ClCompile>
+    <ClCompile Include="src\libmpg123\dither.c">
+      <Filter>libmpg123</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\compat\compat.h">
@@ -216,6 +219,12 @@
       <Filter>libmpg123</Filter>
     </ClInclude>
     <ClInclude Include="src\libmpg123\decode.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\dither.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libmpg123\dither_impl.h">
       <Filter>libmpg123</Filter>
     </ClInclude>
   </ItemGroup>

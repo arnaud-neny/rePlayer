@@ -109,26 +109,176 @@
 /* also gapless playback! */
 #define GAPLESS 1
 
-/* new huffman decoding */
-#define USE_NEW_HUFFTABLE 1
-
 /* Debugging */
 
 /* #define DEBUG */
 /* #define EXTRA_DEBUG */
 
-/* Precision */
+/* CPU Features */
 
+#if defined(__GNUC__) || defined(__clang__)
+
+#if defined(_SOFT_FLOAT)
+#define MPT123_NOFPU
+#endif
+
+#if defined(__amd64__) || defined(__x86_64__)
+
+#elif defined(__i386__) || defined(_X86_)
+
+#ifndef MPG123_ISA_X86_386
+#define MPG123_ISA_X86_386
+#endif
+
+#if defined(__i486__)
+#ifndef MPG123_ISA_X86_486
+#define MPG123_ISA_X86_486
+#endif
+#endif
+
+#if defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
+#ifndef MPG123_ISA_X86_486
+#define MPG123_ISA_X86_486
+#endif
+#ifndef MPG123_ISA_X86_586
+#define MPG123_ISA_X86_586
+#endif
+#endif
+
+#if defined(__tune_i386__)
+#define MPG123_TUNE_386
+#endif
+#if defined(__tune_i486__)
+#define MPG123_TUNE_486
+#endif
+
+#elif defined(__arm__)
+
+#if defined(__SOFTFP__)
+#define MPT123_NOFPU
+#endif
+
+#elif defined(__mips__)
+
+#if defined(__mips_soft_float)
+#define MPT123_NOFPU
+#endif
+
+#endif
+
+#endif
+
+#if defined(MPG123_ISA_X86_386) && defined(MPG123_TUNE_386) && defined(MPT123_NOFPU)
+
+#ifndef OPT_I386
+#define OPT_I386
+#endif
+/* do not use floating point */
+#define REAL_IS_FIXED 1
+#define NO_SYNTH32 1
+
+#elif defined(MPT123_NOFPU)
+
+#ifndef OPT_GENERIC
+#define OPT_GENERIC
+#endif
+/* do not use floating point */
+#define REAL_IS_FIXED 1
+#define NO_SYNTH32 1
+
+#elif defined(MPG123_ISA_X86_386) && defined(MPG123_TUNE_386)
+
+#ifndef OPT_I386
+#define OPT_I386
+#endif
 /* use floating point */
 #define REAL_IS_FLOAT 1
 
-/* floating point is IEEE754 */
-#if defined(_WIN32)
-#define IEEE_FLOAT 1
-#endif
+#elif defined(MPG123_ISA_X86_486) && defined(MPG123_TUNE_486)
 
+#ifndef OPT_I486
+#define OPT_I486
+#endif
+/* use floating point */
+#define REAL_IS_FLOAT 1
+
+#else
+
+#ifndef OPT_MULTI
+#define OPT_MULTI
+#endif
+#ifndef OPT_GENERIC
+#define OPT_GENERIC
+#endif
+#ifndef OPT_GENERIC_DITHER
+#define OPT_GENERIC_DITHER
+#endif
+/* use floating point */
+#define REAL_IS_FLOAT 1
 /* use rounding instead of trunction */
 #define ACCURATE_ROUNDING 1
+/* new huffman decoding */
+#define USE_NEW_HUFFTABLE 1
+
+#endif
+
+/* Endian */
+#if defined(_MSC_VER)
+#define WORDS_LITTLEENDIAN 1
+#elif defined(__GNUC__) || defined(__clang__)
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define WORDS_BIGENDIAN 1
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define WORDS_LITTLEENDIAN 1
+#endif
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_LITTLE_ENDIAN__)
+#if __ORDER_BIG_ENDIAN__ != __ORDER_LITTLE_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define WORDS_BIGENDIAN 1
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define WORDS_LITTLEENDIAN 1
+#endif
+#endif
+#endif
+/* fallback */
+#if !defined(WORDS_BIGENDIAN) && !defined(WORDS_LITTLEENDIAN)
+#if (defined(_BIG_ENDIAN) && !defined(_LITTLE_ENDIAN)) || (defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__)) || (defined(_STLP_BIG_ENDIAN) && !defined(_STLP_LITTLE_ENDIAN))
+#define WORDS_BIGENDIAN 1
+#elif (defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN)) || (defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)) || (defined(_STLP_LITTLE_ENDIAN) && !defined(_STLP_BIG_ENDIAN))
+#define WORDS_LITTLEENDIAN 1
+#elif defined(__hpux) || defined(__hppa) || defined(_MIPSEB) || defined(__s390__)
+#define WORDS_BIGENDIAN 1
+#elif defined(__i386__) || defined(_M_IX86) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) || defined(__bfin__)
+#define WORDS_LITTLEENDIAN 1
+#endif
+#endif
+
+/* floating point is IEEE754 */
+#if defined(_WIN32)
+#ifndef IEEE_FLOAT
+#define IEEE_FLOAT 1
+#endif
+#endif
+#if defined(__STDC_VERSION__)
+#if (__STDC_VERSION__ >= 199901L)
+#if defined(__STDC_IEC_559__)
+#if (__STDC_IEC_559__ == 1)
+#ifndef IEEE_FLOAT
+#define IEEE_FLOAT 1
+#endif
+#endif
+#endif
+#endif
+#if (__STDC_VERSION__ >= 202311L)
+#if defined(__STDC_IEC_60559_BFP__)
+#if (__STDC_IEC_60559_BFP__ >= 202311L)
+#ifndef IEEE_FLOAT
+#define IEEE_FLOAT 1
+#endif
+#endif
+#endif
+#endif
+#endif
 
 /* Platform */
 
