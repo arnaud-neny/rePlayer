@@ -1,6 +1,7 @@
 .vs/
 /.output
 *.vcxproj.user
+*.DotSettings.user
 *.aps
 /data/
 /data-win32/
