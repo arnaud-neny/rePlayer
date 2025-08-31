@@ -32,9 +32,6 @@
     <ClInclude Include="libvgm\common_def.h">
       <Filter>Source Files\libvgm</Filter>
     </ClInclude>
-    <ClInclude Include="libvgm\stdbool.h">
-      <Filter>Source Files\libvgm</Filter>
-    </ClInclude>
     <ClInclude Include="libvgm\stdtype.h">
       <Filter>Source Files\libvgm</Filter>
     </ClInclude>
@@ -377,6 +374,18 @@
     <ClInclude Include="yrw801.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="libvgm\_stdbool.h">
+      <Filter>Source Files\libvgm</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\k005289.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\k007232.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\msm5205.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGM.cpp">
@@ -671,6 +680,15 @@
       <Filter>Source Files\libvgm\utils</Filter>
     </ClCompile>
     <ClCompile Include="libvgm\emu\cores\mikey.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\k005289.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\k007232.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\msm5205.c">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,6 +5,8 @@
 
 PlayerBase::PlayerBase() :
 	_outSmplRate(0),
+	_userDevList(NULL),
+	_devStartOpts(0x00),
 	_eventCbFunc(NULL),
 	_eventCbParam(NULL),
 	_fileReqCbFunc(NULL),
@@ -72,6 +74,14 @@ double PlayerBase::GetPlaybackSpeed(void) const
 UINT8 PlayerBase::SetPlaybackSpeed(double speed)
 {
 	return 0xFF;	// not implemented
+}
+
+void PlayerBase::SetUserDevices(const DEV_DECL** userDevList, UINT8 devStartOpts)
+{
+	_userDevList = userDevList;
+	_devStartOpts = devStartOpts;
+	
+	return;
 }
 
 void PlayerBase::SetEventCallback(PLAYER_EVENT_CB cbFunc, void* cbParam)

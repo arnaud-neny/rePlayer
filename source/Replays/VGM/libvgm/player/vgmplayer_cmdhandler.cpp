@@ -70,7 +70,7 @@
 	{0xFF, 0x00, &VGMPlayer::Cmd_invalid},              // 2F
 	{0x00, 0x02, &VGMPlayer::Cmd_SN76489},              // 30 SN76489 register write (2nd chip)
 	{0xFF, 0x02, &VGMPlayer::Cmd_AY_Stereo},            // 31 AY8910 stereo mask [chip type depends on data]
-	{0xFF, 0x02, &VGMPlayer::Cmd_unknown},              // 32
+	{0x2C, 0x02, &VGMPlayer::Cmd_MSM5205_Reg},          // 32 MSM5205 register write
 	{0xFF, 0x02, &VGMPlayer::Cmd_unknown},              // 33
 	{0xFF, 0x02, &VGMPlayer::Cmd_unknown},              // 34
 	{0xFF, 0x02, &VGMPlayer::Cmd_unknown},              // 35
@@ -85,8 +85,8 @@
 	{0xFF, 0x02, &VGMPlayer::Cmd_unknown},              // 3E
 	{0x00, 0x02, &VGMPlayer::Cmd_GGStereo},             // 3F GameGear stereo mask (2nd chip)
 	{0x29, 0x03, &VGMPlayer::Cmd_Ofs8_Data8},           // 40 Mikey register write
-	{0xFF, 0x03, &VGMPlayer::Cmd_unknown},              // 41
-	{0xFF, 0x03, &VGMPlayer::Cmd_unknown},              // 42
+	{0x2A, 0x03, &VGMPlayer::Cmd_K007232_Reg},          // 41 K007232 register write
+	{0x2B, 0x03, &VGMPlayer::Cmd_Ofs4_Data12},          // 42 K005289 register write
 	{0xFF, 0x03, &VGMPlayer::Cmd_unknown},              // 43
 	{0xFF, 0x03, &VGMPlayer::Cmd_unknown},              // 44
 	{0xFF, 0x03, &VGMPlayer::Cmd_unknown},              // 45
@@ -198,7 +198,7 @@
 	{0x0C, 0x03, &VGMPlayer::Cmd_CPort_Reg8_Data8},     // AF YMF262 register write, port 1 (2nd chip)
 	{0x05, 0x03, &VGMPlayer::Cmd_RF5C_Reg},             // B0 RF5C68 register write
 	{0x10, 0x03, &VGMPlayer::Cmd_RF5C_Reg},             // B1 RF5C164 register write
-	{0x11, 0x03, &VGMPlayer::Cmd_PWM_Reg},              // B2 PWM register write
+	{0x11, 0x03, &VGMPlayer::Cmd_Ofs4_Data12},          // B2 PWM register write
 	{0x13, 0x03, &VGMPlayer::Cmd_Ofs8_Data8},           // B3 GameBoy DMG register write
 	{0x14, 0x03, &VGMPlayer::Cmd_NES_Reg},              // B4 NES APU register write
 	{0x15, 0x03, &VGMPlayer::Cmd_Ofs8_Data8},           // B5 YMW258 (MultiPCM) register write
@@ -288,7 +288,7 @@
 	0x1B,	// 05 HuC6280
 	0x20,	// 06 SCSP
 	0x14,	// 07 NES APU
-	0xFF,	// 08
+	0x2B,	// 08 MSM5205
 	0xFF,	// 09
 	0xFF,	// 0A
 	0xFF,	// 0B
@@ -369,7 +369,7 @@
 	{0x26, 0},	// 91 X1-010
 	{0x27, 0},	// 92 C352
 	{0x28, 0},	// 93 GA20
-	{0xFF, 0},	// 94
+	{0x2A, 0},	// 94 K007232
 	{0xFF, 0},	// 95
 	{0xFF, 0},	// 96
 	{0xFF, 0},	// 97
@@ -421,7 +421,7 @@
 	0x05,	// C0 RF5C68
 	0x10,	// C1 RF5C164
 	0x14,	// C2 NES APU
-	0xFF,	// C3
+	0x2B,	// C3 K005289
 	0xFF,	// C4
 	0xFF,	// C5
 	0xFF,	// C6
@@ -1058,6 +1058,18 @@ void VGMPlayer::Cmd_Port_Reg8_Data8(void)
 	return;
 }
 
+void VGMPlayer::Cmd_MSM5205_Reg(void)
+{
+	UINT8 chipType = _CMD_INFO[fData[0x00]].chipType;
+	UINT8 chipID = (fData[0x01] & 0x80) >> 7;
+	CHIP_DEVICE* cDev = GetDevicePtr(chipType, chipID);
+	if (cDev == NULL || cDev->write8 == NULL)
+		return;
+
+	cDev->write8(cDev->base.defInf.dataPtr, (fData[0x01] >> 4) & 0x7, fData[0x01] & 0xF);
+	return;
+}
+
 void VGMPlayer::Cmd_Ofs8_Data8(void)
 {
 	UINT8 chipType = _CMD_INFO[fData[0x00]].chipType;
@@ -1183,15 +1195,15 @@ void VGMPlayer::Cmd_RF5C_Reg(void)
 	return;
 }
 
-void VGMPlayer::Cmd_PWM_Reg(void)
+void VGMPlayer::Cmd_Ofs4_Data12(void)
 {
 	UINT8 chipType = _CMD_INFO[fData[0x00]].chipType;
-	UINT8 chipID = 0;
+	UINT8 chipID = (fData[0x01] & 0x80) >> 7;
 	CHIP_DEVICE* cDev = GetDevicePtr(chipType, chipID);
 	if (cDev == NULL || cDev->writeD16 == NULL)
 		return;
 	
-	UINT8 ofs = (fData[0x01] >> 4) & 0x0F;
+	UINT8 ofs = (fData[0x01] >> 4) & 0x07;
 	UINT16 value = ReadBE16(&fData[0x01]) & 0x0FFF;
 	cDev->writeD16(cDev->base.defInf.dataPtr, ofs, value);
 	return;
@@ -1348,6 +1360,22 @@ void VGMPlayer::Cmd_OKIM6295_Reg(void)
 	}
 	
 	cDev->write8(cDev->base.defInf.dataPtr, ofs, data);
+	return;
+}
+
+void VGMPlayer::Cmd_K007232_Reg(void)
+{
+	UINT8 chipType = _CMD_INFO[fData[0x00]].chipType;
+	UINT8 chipID = (fData[0x01] & 0x80) >> 7;
+	CHIP_DEVICE* cDev = GetDevicePtr(chipType, chipID);
+	if (cDev == NULL || cDev->write8 == NULL)
+		return;
+
+	UINT8 ofs = fData[0x01] & 0x7F;
+	if (ofs == 0x1F)	// offset 0x1F: execute chip read
+		cDev->read8(cDev->base.defInf.dataPtr, fData[0x02]);	// the data value is the offset
+	else
+		cDev->write8(cDev->base.defInf.dataPtr, ofs, fData[0x02]);
 	return;
 }
 

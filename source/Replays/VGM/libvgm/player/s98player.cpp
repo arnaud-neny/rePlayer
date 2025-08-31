@@ -43,7 +43,7 @@ enum S98_DEVTYPES
 	S98DEV_DCSG = 16,	// SN76489
 	S98DEV_END
 };
-static const UINT8 S98_DEV_LIST[S98DEV_END] = {
+static const DEV_ID S98_DEV_LIST[S98DEV_END] = {
 	0xFF,
 	DEVID_AY8910, DEVID_YM2203, DEVID_YM2612, DEVID_YM2608,
 	DEVID_YM2151, DEVID_YM2413, DEVID_YM3526, DEVID_YM3812,
@@ -65,7 +65,7 @@ static const char* const S98_TAG_MAPPING[] =
 	NULL,
 };
 
-/*static*/ const UINT8 S98Player::_OPT_DEV_LIST[_OPT_DEV_COUNT] =
+/*static*/ const DEV_ID S98Player::_OPT_DEV_LIST[_OPT_DEV_COUNT] =
 {
 	DEVID_AY8910, DEVID_YM2203, DEVID_YM2612, DEVID_YM2608,
 	DEVID_YM2151, DEVID_YM2413, DEVID_YM3526, DEVID_YM3812,
@@ -567,12 +567,14 @@ UINT8 S98Player::GetSongDeviceInfo(std::vector<PLR_DEV_INFO>& devInfList) const
 		if (! _devices.empty())
 		{
 			const VGM_BASEDEV& cDev = _devices[curDev].base;
+			devInf.devDecl = cDev.defInf.devDecl;
 			devInf.core = (cDev.defInf.devDef != NULL) ? cDev.defInf.devDef->coreID : 0x00;
 			devInf.volume = (cDev.resmpl.volumeL + cDev.resmpl.volumeR) / 2;
 			devInf.smplRate = cDev.defInf.sampleRate;
 		}
 		else
 		{
+			devInf.devDecl = SndEmu_GetDevDecl(devInf.type, _userDevList, _devStartOpts);
 			devInf.core = 0x00;
 			devInf.volume = 0x100;
 			devInf.smplRate = 0;
@@ -605,7 +607,7 @@ UINT8 S98Player::GetDeviceInstance(size_t id) const
 
 size_t S98Player::DeviceID2OptionID(UINT32 id) const
 {
-	UINT8 type;
+	DEV_ID type;
 	UINT8 instance;
 	
 	if (id & 0x80000000)
@@ -967,7 +969,7 @@ UINT8 S98Player::Start(void)
 		DEV_GEN_CFG* devCfg = (DEV_GEN_CFG*)&_devCfgs[curDev].data[0];
 		VGM_BASEDEV* clDev;
 		PLR_DEV_OPTS* devOpts;
-		UINT8 deviceID;
+		DEV_ID deviceID;
 		UINT8 instance;
 		
 		cDev->base.defInf.dataPtr = NULL;
@@ -995,7 +997,7 @@ UINT8 S98Player::Start(void)
 		else
 			devCfg->smplRate = _outSmplRate;
 		
-		retVal = SndEmu_Start(deviceID, devCfg, &cDev->base.defInf);
+		retVal = SndEmu_Start2(deviceID, devCfg, &cDev->base.defInf, _userDevList, _devStartOpts);
 		if (retVal)
 		{
 			cDev->base.defInf.dataPtr = NULL;

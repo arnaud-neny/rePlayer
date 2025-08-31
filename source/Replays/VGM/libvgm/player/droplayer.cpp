@@ -397,12 +397,14 @@ UINT8 DROPlayer::GetSongDeviceInfo(std::vector<PLR_DEV_INFO>& devInfList) const
 		if (! _devices.empty())
 		{
 			const VGM_BASEDEV& cDev = _devices[curDev].base;
+			devInf.devDecl = cDev.defInf.devDecl;
 			devInf.core = (cDev.defInf.devDef != NULL) ? cDev.defInf.devDef->coreID : 0x00;
 			devInf.volume = (cDev.resmpl.volumeL + cDev.resmpl.volumeR) / 2;
 			devInf.smplRate = cDev.defInf.sampleRate;
 		}
 		else
 		{
+			devInf.devDecl = SndEmu_GetDevDecl(devInf.type, _userDevList, _devStartOpts);
 			devInf.core = 0x00;
 			devInf.volume = 0x100;
 			devInf.smplRate = 0;
@@ -417,7 +419,7 @@ UINT8 DROPlayer::GetSongDeviceInfo(std::vector<PLR_DEV_INFO>& devInfList) const
 
 size_t DROPlayer::DeviceID2OptionID(UINT32 id) const
 {
-	UINT8 type;
+	DEV_ID type;
 	UINT8 instance;
 	
 	if (id & 0x80000000)
@@ -718,7 +720,7 @@ UINT8 DROPlayer::Start(void)
 		else
 			devCfg->smplRate = _outSmplRate;
 		
-		retVal = SndEmu_Start(_devTypes[curDev], devCfg, &cDev->base.defInf);
+		retVal = SndEmu_Start2(_devTypes[curDev], devCfg, &cDev->base.defInf, _userDevList, _devStartOpts);
 		if (retVal)
 		{
 			cDev->base.defInf.dataPtr = NULL;

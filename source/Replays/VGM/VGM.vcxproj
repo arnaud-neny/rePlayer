@@ -213,10 +213,13 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\fmopn_2608rom.h" />
     <ClInclude Include="libvgm\emu\cores\gb.h" />
     <ClInclude Include="libvgm\emu\cores\iremga20.h" />
+    <ClInclude Include="libvgm\emu\cores\k005289.h" />
+    <ClInclude Include="libvgm\emu\cores\k007232.h" />
     <ClInclude Include="libvgm\emu\cores\k051649.h" />
     <ClInclude Include="libvgm\emu\cores\k053260.h" />
     <ClInclude Include="libvgm\emu\cores\k054539.h" />
     <ClInclude Include="libvgm\emu\cores\mikey.h" />
+    <ClInclude Include="libvgm\emu\cores\msm5205.h" />
     <ClInclude Include="libvgm\emu\cores\multipcm.h" />
     <ClInclude Include="libvgm\emu\cores\nesintf.h" />
     <ClInclude Include="libvgm\emu\cores\nes_apu.h" />
@@ -293,7 +296,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\player\playerbase.hpp" />
     <ClInclude Include="libvgm\player\s98player.hpp" />
     <ClInclude Include="libvgm\player\vgmplayer.hpp" />
-    <ClInclude Include="libvgm\stdbool.h" />
     <ClInclude Include="libvgm\stdtype.h" />
     <ClInclude Include="libvgm\utils\DataLoader.h" />
     <ClInclude Include="libvgm\utils\FileLoader.h" />
@@ -302,6 +304,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\utils\OSSignal.h" />
     <ClInclude Include="libvgm\utils\OSThread.h" />
     <ClInclude Include="libvgm\utils\StrUtils.h" />
+    <ClInclude Include="libvgm\_stdbool.h" />
     <ClInclude Include="ReplayVGM.h" />
     <ClInclude Include="yrw801.h" />
   </ItemGroup>
@@ -333,10 +336,13 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\fmopn.c" />
     <ClCompile Include="libvgm\emu\cores\gb.c" />
     <ClCompile Include="libvgm\emu\cores\iremga20.c" />
+    <ClCompile Include="libvgm\emu\cores\k005289.c" />
+    <ClCompile Include="libvgm\emu\cores\k007232.c" />
     <ClCompile Include="libvgm\emu\cores\k051649.c" />
     <ClCompile Include="libvgm\emu\cores\k053260.c" />
     <ClCompile Include="libvgm\emu\cores\k054539.c" />
     <ClCompile Include="libvgm\emu\cores\mikey.c" />
+    <ClCompile Include="libvgm\emu\cores\msm5205.c" />
     <ClCompile Include="libvgm\emu\cores\multipcm.c" />
     <ClCompile Include="libvgm\emu\cores\nesintf.c" />
     <ClCompile Include="libvgm\emu\cores\nes_apu.c" />
