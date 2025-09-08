@@ -154,6 +154,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         struct Buffer : public Array<uint8_t>
         {
@@ -198,6 +199,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         struct Buffer : public Array<uint8_t>
         {
@@ -249,6 +251,7 @@ namespace rePlayer
         Log::Message("ZX-Art: downloading \"%s\"...", url);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         struct Buffer : public Array<uint8_t>
@@ -307,6 +310,8 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         SmartPtr<ArtistSheet> newArtist = GetArtist(artist->sources[0].id.internalId, curl);
         artist->handles = std::move(newArtist->handles);
@@ -569,6 +574,7 @@ namespace rePlayer
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
             curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
 
             struct Buffer : public Array<uint8_t>
             {
