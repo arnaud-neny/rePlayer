@@ -41,6 +41,7 @@
     <ClInclude Include="lib\cf-h2-proxy.h" />
     <ClInclude Include="lib\cf-haproxy.h" />
     <ClInclude Include="lib\cf-https-connect.h" />
+    <ClInclude Include="lib\cf-ip-happy.h" />
     <ClInclude Include="lib\cf-socket.h" />
     <ClInclude Include="lib\cfilters.h" />
     <ClInclude Include="lib\config-mac.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="lib\curl_md5.h" />
     <ClInclude Include="lib\curl_memory.h" />
     <ClInclude Include="lib\curl_memrchr.h" />
+    <ClInclude Include="lib\curl_mem_undef.h" />
     <ClInclude Include="lib\curl_ntlm_core.h" />
     <ClInclude Include="lib\curl_printf.h" />
     <ClInclude Include="lib\curl_range.h" />
@@ -181,7 +183,6 @@
     <ClInclude Include="lib\urldata.h" />
     <ClInclude Include="lib\vauth\digest.h" />
     <ClInclude Include="lib\vauth\vauth.h" />
-    <ClInclude Include="lib\vquic\curl_msh3.h" />
     <ClInclude Include="lib\vquic\curl_ngtcp2.h" />
     <ClInclude Include="lib\vquic\curl_osslq.h" />
     <ClInclude Include="lib\vquic\curl_quiche.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="lib\cf-h2-proxy.c" />
     <ClCompile Include="lib\cf-haproxy.c" />
     <ClCompile Include="lib\cf-https-connect.c" />
+    <ClCompile Include="lib\cf-ip-happy.c" />
     <ClCompile Include="lib\cf-socket.c" />
     <ClCompile Include="lib\cfilters.c" />
     <ClCompile Include="lib\conncache.c" />
@@ -360,7 +362,6 @@
     <ClCompile Include="lib\vauth\spnego_sspi.c" />
     <ClCompile Include="lib\vauth\vauth.c" />
     <ClCompile Include="lib\version.c" />
-    <ClCompile Include="lib\vquic\curl_msh3.c" />
     <ClCompile Include="lib\vquic\curl_ngtcp2.c" />
     <ClCompile Include="lib\vquic\curl_osslq.c" />
     <ClCompile Include="lib\vquic\curl_quiche.c" />

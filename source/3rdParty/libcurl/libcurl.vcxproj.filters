@@ -451,9 +451,6 @@
     <ClInclude Include="lib\vauth\vauth.h">
       <Filter>Source Files\lib\vauth</Filter>
     </ClInclude>
-    <ClInclude Include="lib\vquic\curl_msh3.h">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClInclude>
     <ClInclude Include="lib\vquic\curl_ngtcp2.h">
       <Filter>Source Files\lib\vquic</Filter>
     </ClInclude>
@@ -594,6 +591,12 @@
     </ClInclude>
     <ClInclude Include="lib\curlx\wait.h">
       <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cf-ip-happy.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curl_mem_undef.h">
+      <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -981,9 +984,6 @@
     <ClCompile Include="lib\vauth\vauth.c">
       <Filter>Source Files\lib\vauth</Filter>
     </ClCompile>
-    <ClCompile Include="lib\vquic\curl_msh3.c">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClCompile>
     <ClCompile Include="lib\vquic\curl_ngtcp2.c">
       <Filter>Source Files\lib\vquic</Filter>
     </ClCompile>
@@ -1127,6 +1127,9 @@
     </ClCompile>
     <ClCompile Include="lib\curlx\wait.c">
       <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cf-ip-happy.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
