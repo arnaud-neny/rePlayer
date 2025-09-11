@@ -7,32 +7,21 @@
 #define MYTYPES_H
 
 #include "Config.h"
+#include <cstdint>
+
+// If the fixed width integer types are not available, define
+// strictly compatible types in the related section of 'Config.h'.
 
 // Wanted: 8-bit signed/unsigned.
-#if SIZEOF_CHAR > 1
-#error Platform unsupported.
-#endif  // SIZEOF_CHAR
-typedef signed char sbyte;
-typedef unsigned char ubyte;
+typedef int8_t sbyte;
+typedef uint8_t ubyte;
 
 // Wanted: 16-bit signed/unsigned.
-#if SIZEOF_SHORT_INT >= 2
-typedef signed short int sword;
-typedef unsigned short int uword;
-#else
-typedef signed int sword;
-typedef unsigned int uword;
-#endif  // SIZEOF_SHORT_INT
+typedef int16_t sword;
+typedef uint16_t uword;
 
 // Wanted: 32-bit signed/unsigned.
-#if SIZEOF_INT >= 4
-typedef signed int sdword;
-typedef unsigned int udword;
-#elif SIZEOF_LONG_INT >= 4
-typedef signed long int sdword;
-typedef unsigned long int udword;
-#else
-#error Platform not supported.
-#endif  // SIZEOF_INT
+typedef int32_t sdword;
+typedef uint32_t udword;
 
 #endif  // MYTYPES_H

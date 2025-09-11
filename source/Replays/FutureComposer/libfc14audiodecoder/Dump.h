@@ -10,6 +10,8 @@
 #include "SmartPtr.h"
 
 void dumpBlocks(smartPtr<ubyte>& fcBuf, udword startOffset, sdword length, int blockLen);
-void dumpLines(smartPtr<ubyte>& fcBuf, udword startOffset, sdword length, int blockLen);
+void dumpLines(smartPtr<ubyte>& fcBuf, udword startOffset, sdword length, int blockLen, int index=-1);
+void dumpByte(int b);
+void dumpTimestamp(udword ms);
 
 #endif  // DUMP_H

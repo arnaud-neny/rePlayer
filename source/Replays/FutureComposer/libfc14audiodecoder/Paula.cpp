@@ -9,12 +9,33 @@ void PaulaVoice::off() {
     // intentionally left blank
 }
 
-
 void PaulaVoice::on() {
     // intentionally left blank
 }
 
-
 void PaulaVoice::takeNextBuf() {
     // intentionally left blank
+}
+
+void PaulaMixer::init(ubyte) {
+    // intentionally left blank
+}
+
+PaulaVoice* PaulaMixer::getVoice(ubyte) {
+    // intentionally left blank
+    return 0;
+}
+
+ubyte PaulaMixer::playerRate(ubyte) {
+    // intentionally left blank
+    return 0;
+}
+
+void PaulaMixer::mute(ubyte, bool) {
+    // intentionally left blank
+}
+
+bool PaulaMixer::isMuted(ubyte) {
+    // intentionally left blank
+    return false;
 }

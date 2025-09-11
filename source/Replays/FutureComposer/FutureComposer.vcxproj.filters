@@ -26,9 +26,6 @@
     <ClInclude Include="libfc14audiodecoder\fc14audiodecoder.h">
       <Filter>Source Files\libfc14audiodecoder</Filter>
     </ClInclude>
-    <ClInclude Include="libfc14audiodecoder\LamePaula.h">
-      <Filter>Source Files\libfc14audiodecoder</Filter>
-    </ClInclude>
     <ClInclude Include="libfc14audiodecoder\MyEndian.h">
       <Filter>Source Files\libfc14audiodecoder</Filter>
     </ClInclude>
@@ -44,6 +41,21 @@
     <ClInclude Include="ReplayFutureComposer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="libfc14audiodecoder\Analyze.h">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="libfc14audiodecoder\Debug.h">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="libfc14audiodecoder\LamePaulaMixer.h">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="libfc14audiodecoder\LamePaulaVoice.h">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="libfc14audiodecoder\LiveFix.h">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFutureComposer.cpp">
@@ -53,9 +65,6 @@
       <Filter>Source Files\libfc14audiodecoder</Filter>
     </ClCompile>
     <ClCompile Include="libfc14audiodecoder\FC.cpp">
-      <Filter>Source Files\libfc14audiodecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libfc14audiodecoder\FC_Data.cpp">
       <Filter>Source Files\libfc14audiodecoder</Filter>
     </ClCompile>
     <ClCompile Include="libfc14audiodecoder\fc14audiodecoder.cpp">
@@ -70,5 +79,50 @@
     <ClCompile Include="libfc14audiodecoder\Paula.cpp">
       <Filter>Source Files\libfc14audiodecoder</Filter>
     </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Analyze.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\COSO.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Envelope.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Instrument.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\MCMD.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\ModPack.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Player.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Portamento.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Probe.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\SMOD.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\TFMX.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\TFMX7V.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\TraitsByChecksum.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="libfc14audiodecoder\Vibrato.cpp">
+      <Filter>Source Files\libfc14audiodecoder</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libfc14audiodecoder\README.md" />
   </ItemGroup>
 </Project>

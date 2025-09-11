@@ -187,11 +187,15 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="libfc14audiodecoder\Analyze.h" />
     <ClInclude Include="libfc14audiodecoder\Config.h" />
+    <ClInclude Include="libfc14audiodecoder\Debug.h" />
     <ClInclude Include="libfc14audiodecoder\Dump.h" />
     <ClInclude Include="libfc14audiodecoder\FC.h" />
     <ClInclude Include="libfc14audiodecoder\fc14audiodecoder.h" />
-    <ClInclude Include="libfc14audiodecoder\LamePaula.h" />
+    <ClInclude Include="libfc14audiodecoder\LamePaulaMixer.h" />
+    <ClInclude Include="libfc14audiodecoder\LamePaulaVoice.h" />
+    <ClInclude Include="libfc14audiodecoder\LiveFix.h" />
     <ClInclude Include="libfc14audiodecoder\MyEndian.h" />
     <ClInclude Include="libfc14audiodecoder\MyTypes.h" />
     <ClInclude Include="libfc14audiodecoder\Paula.h" />
@@ -199,14 +203,30 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="ReplayFutureComposer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="libfc14audiodecoder\Analyze.cpp" />
+    <ClCompile Include="libfc14audiodecoder\COSO.cpp" />
     <ClCompile Include="libfc14audiodecoder\Dump.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Envelope.cpp" />
     <ClCompile Include="libfc14audiodecoder\FC.cpp" />
     <ClCompile Include="libfc14audiodecoder\fc14audiodecoder.cpp" />
-    <ClCompile Include="libfc14audiodecoder\FC_Data.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Instrument.cpp" />
     <ClCompile Include="libfc14audiodecoder\LamePaulaMixer.cpp" />
     <ClCompile Include="libfc14audiodecoder\LamePaulaVoice.cpp" />
+    <ClCompile Include="libfc14audiodecoder\MCMD.cpp" />
+    <ClCompile Include="libfc14audiodecoder\ModPack.cpp" />
     <ClCompile Include="libfc14audiodecoder\Paula.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Player.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Portamento.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Probe.cpp" />
+    <ClCompile Include="libfc14audiodecoder\SMOD.cpp" />
+    <ClCompile Include="libfc14audiodecoder\TFMX.cpp" />
+    <ClCompile Include="libfc14audiodecoder\TFMX7V.cpp" />
+    <ClCompile Include="libfc14audiodecoder\TraitsByChecksum.cpp" />
+    <ClCompile Include="libfc14audiodecoder\Vibrato.cpp" />
     <ClCompile Include="ReplayFutureComposer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libfc14audiodecoder\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

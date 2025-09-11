@@ -1,3 +1,10 @@
+// some minor changes to make it compatible (tag scan and precise loop detection):
+// - FC.h
+// - fc14audiodecoder.cpp
+// - fc14audiodecoder.h
+// - LamePaulaMixer.cpp
+// - LamePaulaMixer.h
+// - Paula.h
 #include "ReplayFutureComposer.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -7,15 +14,18 @@
 #include <ReplayDll.h>
 
 #include "libfc14audiodecoder/fc14audiodecoder.h"
+#include "libfc14audiodecoder/FC.h"
 
 namespace rePlayer
 {
+#define FC14_VERSION "2.0.0"
+
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::FutureComposer,
         .name = "Future Composer",
-        .extensions = "smod;fc",
-        .about = "Future Composer 1.0.3",
-        .settings = "Future Composer 1.0.3",
+        .extensions = "smod;fc;hip;hip7;hipc;mcmd",
+        .about = "libfc14audiodecoder " FC14_VERSION "\nCopyright(c) Michael Schwendt",
+        .settings = "libfc14audiodecoder " FC14_VERSION,
         .init = ReplayFutureComposer::Init,
         .load = ReplayFutureComposer::Load,
         .displaySettings = ReplayFutureComposer::DisplaySettings,
@@ -38,7 +48,7 @@ namespace rePlayer
         if (stream->GetSize() > 1024 * 1024)
             return nullptr;
         auto decoder = fc14dec_new();
-        fc14dec_mixer_init(decoder, kSampleRate, 16, 2, 0);
+        fc14dec_mixer_init(decoder, kSampleRate, 16, 2, 0, 100);
         auto data = stream->Read();
         if (fc14dec_detect(decoder, const_cast<uint8_t*>(data.Items()), static_cast<unsigned long int>(data.Size())) == 0)
         {
@@ -46,7 +56,7 @@ namespace rePlayer
             return nullptr;
         }
 
-        if (fc14dec_init(decoder, const_cast<uint8_t*>(data.Items()), static_cast<unsigned long int>(data.Size())) == 0)
+        if (fc14dec_init(decoder, const_cast<uint8_t*>(data.Items()), static_cast<unsigned long int>(data.Size()), 0) == 0)
         {
             fc14dec_delete(decoder);
             return nullptr;
@@ -90,8 +100,26 @@ namespace rePlayer
         fc14dec_delete(m_decoder);
     }
 
+    static eExtension GetExtension(void* decoder)
+    {
+        auto* tag = fc14dec_format_id(decoder);
+        if (tag == FC::FC14_TAG)
+            return eExtension::_fc;
+        else if(tag == FC::SMOD_TAG)
+            return eExtension::_smod;
+        else if (tag == FC::TFMX_TAG)
+            return eExtension::_hip;
+        else if (tag == FC::TFMX_7V_ID)
+            return eExtension::_hip7;
+        else if (tag == FC::COSO_TAG)
+            return eExtension::_hipc;
+        else if (tag == FC::MCMD_TAG)
+            return eExtension::_mcmd;
+        return eExtension::Unknown;
+    }
+
     ReplayFutureComposer::ReplayFutureComposer(void* decoder)
-        : Replay(fc14dec_isFC14(decoder) == 0 ? eExtension::_smod : eExtension::_fc, eReplay::FutureComposer)
+        : Replay(GetExtension(decoder), eReplay::FutureComposer)
         , m_decoder(decoder)
         , m_surround(kSampleRate)
     {}
@@ -118,7 +146,7 @@ namespace rePlayer
 
     void ReplayFutureComposer::ResetPlayback()
     {
-        fc14dec_restart(m_decoder);
+        fc14dec_reinit(m_decoder, m_subsongIndex);
         m_surround.Reset();
     }
 
@@ -133,6 +161,7 @@ namespace rePlayer
     void ReplayFutureComposer::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
+        ResetPlayback();
     }
 
     uint32_t ReplayFutureComposer::GetDurationMs() const
@@ -142,7 +171,9 @@ namespace rePlayer
 
     uint32_t ReplayFutureComposer::GetNumSubsongs() const
     {
-        return 1;
+        fc14dec_mod_stats stats = {};
+        fc14dec_get_stats(m_decoder, &stats);
+        return stats.songs;
     }
 
     std::string ReplayFutureComposer::GetExtraInfo() const
@@ -157,7 +188,7 @@ namespace rePlayer
 
         info += "4 channels\n";
         info += fc14dec_format_name(m_decoder);
-        info += "\nlibfc14audiodecoder-1.0.3";
+        info += "\nlibfc14audiodecoder " FC14_VERSION;
 
         return info;
     }

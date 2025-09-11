@@ -1,6 +1,5 @@
-// C language wrapper library for Future Composer audio decoder
-// Copyright (C) 2008 Michael Schwendt
-//
+// C language wrapper library for FC & Hippel audio decoder library
+
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
@@ -16,9 +15,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "fc14audiodecoder.h"
-
 #include "FC.h"
-#include "LamePaula.h"
+#include "LamePaulaMixer.h"
 
 #define FC14_DECLARE_DECODER \
     fc14dec *p = (fc14dec*)ptr
@@ -39,72 +37,123 @@ void fc14dec_delete(void* ptr) {
     delete p;
 }
 
-int fc14dec_detect(void* ptr, void* data, unsigned long int length) {
+int fc14dec_detect(void* ptr, void* data, uint32_t length) {
     FC14_DECLARE_DECODER;
     return p->decoder.isOurData(data,length);
 }
 
-int fc14dec_init(void* ptr, void* data, unsigned long int length) {
+int fc14dec_init(void* ptr, void* data, uint32_t length, int songNumber) {
     FC14_DECLARE_DECODER;
-    return p->decoder.init(data,length);
+    return p->decoder.init(data,length,songNumber);
 }
 
-void fc14dec_restart(void* ptr) {
+int fc14dec_reinit(void* ptr, int songNumber) {
     FC14_DECLARE_DECODER;
-    p->decoder.restart();
+    return p->decoder.init(songNumber);
 }
 
-void fc14dec_seek(void* ptr, long int ms) {
+int fc14dec_restart(void* ptr) {
     FC14_DECLARE_DECODER;
-    p->decoder.restart();
+    return p->decoder.restart();
+}
+
+void fc14dec_seek(void* ptr, int32_t ms) {
+    FC14_DECLARE_DECODER;
+    if ( !p->decoder.restart() ) {
+        return;
+    }
     while (ms>=0) {
-        p->decoder.run(false);
-        ms -= 20;
+        ms -= p->decoder.run();
         if ( fc14dec_song_end(p) ) {
             break;
         }
     };
+    p->mixer.drain();
 }
 
-void fc14dec_mixer_init(void* ptr, int freq, int bits, int channels, int zero) {
+void fc14dec_mixer_init(void* ptr, int freq, int bits, int channels, int zero, int panning) {
     FC14_DECLARE_DECODER;
-    p->mixer.init(freq,bits,channels,zero);
+    p->mixer.init(freq,bits,channels,zero,panning);
 }
 
-unsigned long int fc14dec_buffer_fill(void* ptr, void* buffer, unsigned long int length) {
+uint32_t fc14dec_buffer_fill(void* ptr, void* buffer, uint32_t length) { // rePlayer
     FC14_DECLARE_DECODER;
-    return p->mixer.fillBuffer(buffer,length,&p->decoder);
+    return p->mixer.fillBuffer(buffer,length,&p->decoder); // rePlayer
 }
 
 int fc14dec_song_end(void* ptr) {
     FC14_DECLARE_DECODER;
-    return p->decoder.songEnd;
+    return p->decoder.getSongEndFlag();
 }
 
-unsigned long int fc14dec_duration(void* ptr) {
+uint32_t fc14dec_duration(void* ptr) {
     FC14_DECLARE_DECODER;
-    // Determine duration with a dry-run till song-end.
-    unsigned long int ms = 0;
-    do {
-        p->decoder.run(false);
-        ms += 20;
-    } while ( !fc14dec_song_end(p) );
-    p->decoder.restart();
-    return ms;
+    return p->decoder.getDuration();
+}
+
+const char* fc14dec_format_id(void* ptr) {
+    FC14_DECLARE_DECODER;
+    return p->decoder.getFormatID();
 }
 
 const char* fc14dec_format_name(void* ptr) {
     FC14_DECLARE_DECODER;
-    return p->decoder.formatName.c_str();
+    return p->decoder.getFormatName();
 }
 
-int fc14dec_isFC14(void* ptr) {
+int fc14dec_songs(void* ptr) {
     FC14_DECLARE_DECODER;
-    return p->decoder.isFC14 ? 1 : p->decoder.isSMOD ? 0 : -1;
+    return p->decoder.getSongs();
 }
 
+void fc14dec_end_shorts(void* ptr, int flag, int secs) {
+    FC14_DECLARE_DECODER;
+    p->decoder.endShorts(flag,secs);
+}
+
+void fc14dec_set_loop_mode(void* ptr, int flag) {
+    FC14_DECLARE_DECODER;
+    p->decoder.setLoopMode(flag);
+}
+
+int fc14dec_get_stats(void* ptr, struct fc14dec_mod_stats* stats) {
+    FC14_DECLARE_DECODER;
+    return p->decoder.copyStats(stats);
+}
+
+uint16_t fc14dec_get_sample_length(void* ptr, unsigned int num) {
+    FC14_DECLARE_DECODER;
+    return p->decoder.getSampleLength(num);
+}
+
+uint16_t fc14dec_get_sample_rep_offset(void* ptr, unsigned int num) {
+    FC14_DECLARE_DECODER;
+    return p->decoder.getSampleRepOffset(num);
+}
+
+uint16_t fc14dec_get_sample_rep_length(void* ptr, unsigned int num) {
+    FC14_DECLARE_DECODER;
+    return p->decoder.getSampleRepLength(num);
+}
+
+void fc14dec_mute_voice(void* ptr, bool mute, unsigned int voice) {
+    FC14_DECLARE_DECODER;
+    p->mixer.mute(voice,mute);
+}
+
+uint16_t fc14dec_get_voice_volume(void* ptr, unsigned int voice) {
+    FC14_DECLARE_DECODER;
+    if ( !p->mixer.isMuted(voice) ) {
+        return (p->mixer.getVoice(voice)->paula.volume/64.0)*100;
+    }
+    else {
+        return 0;
+    }
+}
+
+// rePlayer begin
 void fc14dec_enableNtsc(void* ptr, bool isEnabled) {
     FC14_DECLARE_DECODER;
-    return p->mixer.EnableNtsc(isEnabled);
+    return p->mixer.enableNtsc(isEnabled);
 }
-
+// rePlayer end
