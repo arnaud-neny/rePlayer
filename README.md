@@ -188,7 +188,6 @@ Or add some comments (and likes) there:
 - [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
 - [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
-- [FutureComposer](https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder): fc-smod formats.
 - [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
 - [GoatTracker](https://sourceforge.net/p/goattracker2): A crossplatform music editor for creating Commodore 64 music.
@@ -201,6 +200,7 @@ Or add some comments (and likes) there:
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [Ken](http://advsys.net/ken): in_ken plays all Ken Silverman's formats.
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
+- [libfc14audiodecoder](https://github.com/mschwendt/libfc14audiodecoder): Library for Future Composer & Hippel TFMX audio decoding.
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.

@@ -25,7 +25,6 @@
 - Farbrausch ViruZ II: https://github.com/farbrausch/fr_public  
   Made the x86 version available as "emulation" as it renders closer to the original than the C version.
 - Furnace: https://github.com/tildearrow/furnace
-- FutureComposer: https://sourceforge.net/projects/xmms-fc/files/libfc14audiodecoder
 - game-music-emu: https://github.com/libgme/game-music-emu
 - gbsplay: https://github.com/mmitch/gbsplay
 - GoatTracker: https://sourceforge.net/p/goattracker2
@@ -40,6 +39,7 @@
   Fixed some memory leaks and made it x64 compliant.
 - Ken: http://advsys.net/ken/ & https://bitbucket.org/wothke/webken
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2, https://gitlab.com/kode54/lazyusf2 and https://bitbucket.org/losnoco/psflib
+- libfc14audiodecoder: https://github.com/mschwendt/libfc14audiodecoder
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
 - libvgm: https://github.com/ValleyBell/libvgm
