@@ -22,9 +22,6 @@
 /* Define if readline library is there (-lreadline) */
 #undef HAVE_LIBREADLINE
 
-/* Define to 1 if you have the <poll.h> header file. */
-#define HAVE_POLL_H 0
-
 /* Have shl_load based dso */
 #undef HAVE_SHLLOAD
 

@@ -14,6 +14,9 @@
     <Filter Include="Source Files\include\private">
       <UniqueIdentifier>{52386b59-9620-4ca3-812e-d8426c3e0ed6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\codegen">
+      <UniqueIdentifier>{72b0404e-d63b-467b-82aa-b67f865e5fbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="buf.c">
@@ -163,9 +166,6 @@
     <ClCompile Include="xmlstring.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xmlunicode.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="xmlwriter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -173,9 +173,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xpointer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="xzlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lintmain.c">
@@ -194,9 +191,6 @@
     </ClInclude>
     <ClInclude Include="timsort.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\wsockcompat.h">
-      <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\libxml\c14n.h">
       <Filter>Source Files\include\libxml</Filter>
@@ -387,25 +381,28 @@
     <ClInclude Include="include\private\xpath.h">
       <Filter>Source Files\include\private</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\xzlib.h">
-      <Filter>Source Files\include\private</Filter>
-    </ClInclude>
     <ClInclude Include="include\private\cata.h">
       <Filter>Source Files\include\private</Filter>
     </ClInclude>
     <ClInclude Include="include\private\lint.h">
       <Filter>Source Files\include\private</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\unicode.h">
-      <Filter>Source Files\include\private</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="html5ent.inc">
-      <Filter>Source Files</Filter>
+    <None Include="codegen\charset.inc">
+      <Filter>Source Files\codegen</Filter>
     </None>
-    <None Include="iso8859x.inc">
-      <Filter>Source Files</Filter>
+    <None Include="codegen\escape.inc">
+      <Filter>Source Files\codegen</Filter>
+    </None>
+    <None Include="codegen\html5ent.inc">
+      <Filter>Source Files\codegen</Filter>
+    </None>
+    <None Include="codegen\ranges.inc">
+      <Filter>Source Files\codegen</Filter>
+    </None>
+    <None Include="codegen\unicode.inc">
+      <Filter>Source Files\codegen</Filter>
     </None>
   </ItemGroup>
 </Project>

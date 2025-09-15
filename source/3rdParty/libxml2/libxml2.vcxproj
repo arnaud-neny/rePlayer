@@ -155,11 +155,9 @@
     <ClCompile Include="xmlschemas.c" />
     <ClCompile Include="xmlschemastypes.c" />
     <ClCompile Include="xmlstring.c" />
-    <ClCompile Include="xmlunicode.c" />
     <ClCompile Include="xmlwriter.c" />
     <ClCompile Include="xpath.c" />
     <ClCompile Include="xpointer.c" />
-    <ClCompile Include="xzlib.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -226,17 +224,17 @@
     <ClInclude Include="include\private\string.h" />
     <ClInclude Include="include\private\threads.h" />
     <ClInclude Include="include\private\tree.h" />
-    <ClInclude Include="include\private\unicode.h" />
     <ClInclude Include="include\private\xinclude.h" />
     <ClInclude Include="include\private\xpath.h" />
-    <ClInclude Include="include\private\xzlib.h" />
-    <ClInclude Include="include\wsockcompat.h" />
     <ClInclude Include="libxml.h" />
     <ClInclude Include="timsort.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="html5ent.inc" />
-    <None Include="iso8859x.inc" />
+    <None Include="codegen\charset.inc" />
+    <None Include="codegen\escape.inc" />
+    <None Include="codegen\html5ent.inc" />
+    <None Include="codegen\ranges.inc" />
+    <None Include="codegen\unicode.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
