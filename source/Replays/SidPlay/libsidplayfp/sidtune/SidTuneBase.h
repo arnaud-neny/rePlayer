@@ -271,7 +271,7 @@ private:  // ---------------------------------------------------------------
 #endif
     static SidTuneBase* getFromFiles(const char* fileName, const char **fileNameExtensions, bool separatorIsSlash)
     {
-        return getFromFiles(nullptr, nullptr, fileName, fileNameExtensions, separatorIsSlash);
+        return getFromFiles(nullptr, nullptr, fileName, fileNameExtensions, separatorIsSlash); // rePlayer
     }
 
     // rePlayer begin
