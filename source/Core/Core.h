@@ -115,23 +115,79 @@ namespace core
         UnusedArg(std::forward<Ts>(others)...);
     }
 
-    template<typename Dtor>
+    // - auto scopeState = Scope([](){ do some stuff on constructor }, [](){ do some stuff on destructor });
+    // - auto scopeData = Scope([](){ return data on constructor }, [](data){ do some stuff on destructor with data });
+    template<typename Ctor, typename Dtor>
     class [[nodiscard]] Scope
     {
-    public:
-        template <typename Ctor>
-        Scope(Ctor&& ctor, Dtor&& dtor)
-            : m_dtor(std::forward<Dtor>(dtor))
+        using CtorDataType = std::invoke_result_t<Ctor&>;
+        static constexpr bool is_void = std::is_void_v<CtorDataType>;
+        using DataType = std::conditional_t<is_void, int, CtorDataType>;
+        static constexpr bool is_ptr = std::is_pointer_v<DataType>;
+        using DataPointerType = std::conditional_t<is_ptr, DataType, DataType*>;
+
+        struct StorageDtor
         {
-            std::forward<Ctor>(ctor)();
+            Dtor m_dtor;
+        };
+        struct StorageDtorData
+        {
+            Dtor m_dtor;
+            DataType m_data;
+        };
+        using Storage = std::conditional_t<is_void, StorageDtor, StorageDtorData>;
+
+    public:
+        Scope(Ctor&& ctor, Dtor&& dtor)
+            : m_storage{ .m_dtor = std::forward<Dtor>(dtor) }
+        {
+            if constexpr (!is_void)
+                m_storage.m_data = std::forward<Ctor>(ctor)();
+            else
+                std::forward<Ctor>(ctor)();
         }
+
         ~Scope()
         {
-            m_dtor();
+            if constexpr (!is_void)
+                m_storage.m_dtor(m_storage.m_data);
+            else
+                m_storage.m_dtor();
+        }
+
+        operator DataType& () requires (!is_void) { return m_storage.m_data; }
+        operator const DataType& () const requires (!is_void) { return m_storage.m_data; }
+        DataPointerType operator->() requires (!is_void)
+        {
+            if constexpr (is_ptr)
+                return m_storage.m_data;
+            else
+                return &m_storage.m_data;
+        }
+
+        template <typename OnDetach>
+        DataType Detach(OnDetach&& onDetach) requires (!is_void)
+        {
+            DataType data = m_storage.m_data;
+            m_storage.m_data = std::forward<OnDetach>(onDetach)();
+            return data;
+        }
+
+        DataType Detach() requires (!is_void)
+        {
+            DataType data = m_storage.m_data;
+            m_storage.m_data = {};
+            return data;
         }
 
     private:
-        Dtor m_dtor;
+        Scope(const Scope&) = delete;
+        Scope& operator=(const Scope&) = delete;
+        Scope(Scope&&) = delete;
+        Scope& operator=(Scope&&) = delete;
+
+    private:
+        Storage m_storage;
     };
 }
 // namespace core
