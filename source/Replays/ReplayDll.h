@@ -4,6 +4,10 @@
 
 #include <windows.h>
 
+#ifdef Yield
+#   undef Yield
+#endif
+
 namespace rePlayer
 {
     extern ReplayPlugin g_replayPlugin;

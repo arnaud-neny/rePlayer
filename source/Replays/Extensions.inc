@@ -980,3 +980,4 @@ EXTENSION(xhd)          // VGMStream
 EXTENSION(xst)          // VGMStream
 NO_EXTENSION()			// MegaTracker: SoundSmith
 EXTENSION(ntg)          // MegaTracker: NoiseTracker GS
+EXTENSION(skm)          // SkaleTracker
