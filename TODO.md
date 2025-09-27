@@ -52,4 +52,3 @@
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
 - BambooTracker: https://github.com/BambooTracker/BambooTracker
-- Skale Tracker: https://www.pouet.net/prod.php?which=20929 (songs from Manwe)

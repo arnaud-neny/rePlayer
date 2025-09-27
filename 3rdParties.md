@@ -53,6 +53,7 @@
 - Psycle: https://sourceforge.net/projects/psycle
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp
+- SkaleTracker: https://www.pouet.net/prod.php?which=20929
 - SNDH-Player: https://github.com/arnaud-carre/sndh-player
 - SoundMon: Brian Postma website is gone.  
   Partially rewritten and fixed from original code.

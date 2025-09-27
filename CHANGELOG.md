@@ -1,3 +1,9 @@
+v0.21.0
+- Added SkaleTracker
+- Updated libsidplay to 2.15.1
+- Updated ImGui to 1.92.3
+- Updated libxml2 to 2.15.0
+
 v0.20.4
 - Added MegaTracker
 - Updated libfc14audiodecoder to 2.0.0
