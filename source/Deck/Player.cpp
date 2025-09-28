@@ -285,31 +285,11 @@ namespace rePlayer
 
     void Player::DrawOscilloscope(float xMin, float yMin, float xMax, float yMax) const
     {
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        auto color = 0x98D9B27A; // ImGui::GetColorU32(ImGuiCol_FrameBgActive);
-        if (m_status == Status::Stopped)
+        if (m_status != Status::Stopped)
         {
-            drawList->PrimReserve(6, 4);
-            auto idxBase = drawList->_VtxCurrentIdx;
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            auto color = 0x98D9B27A; // ImGui::GetColorU32(ImGuiCol_FrameBgActive);
 
-            float y0 = (yMin + yMax) * 0.5f - 0.5f;
-            float y1 = (yMin + yMax) * 0.5f + 0.5f;
-
-            drawList->PrimWriteVtx(ImVec2(xMin, y0), drawList->_Data->TexUvWhitePixel, color);
-            drawList->PrimWriteVtx(ImVec2(xMin, y1), drawList->_Data->TexUvWhitePixel, color);
-            drawList->PrimWriteVtx(ImVec2(xMax, y0), drawList->_Data->TexUvWhitePixel, color);
-            drawList->PrimWriteVtx(ImVec2(xMax, y1), drawList->_Data->TexUvWhitePixel, color);
-
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 0));
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
-
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 2));
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 1));
-            drawList->PrimWriteIdx(ImDrawIdx(idxBase + 3));
-        }
-        else
-        {
             MMTIME mmt{};
             mmt.wType = TIME_BYTES;
             waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
@@ -317,46 +297,38 @@ namespace rePlayer
             auto wavePlayPos = mmt.u.cb;
             wavePlayPos += m_replay->GetSampleRate() / 30; // we should get our actual frame rate to guess the next 1 or 2 frames; here we are just predicting two frames at 60Hz
 
-            uint32_t numOscilloscopeSamples = 2 * m_replay->GetSampleRate() / 60;
+            uint32_t numOscilloscopeSamples = m_replay->GetSampleRate() / 100; // 10ms oscilloscope
 
             auto numSamplesMask = m_numSamples - 1;
             auto waveData = m_waveData;
 
-            drawList->PrimReserve((numOscilloscopeSamples - 1) * 6, numOscilloscopeSamples * 2);
-            auto idxBase = drawList->_VtxCurrentIdx;
+            drawList->PushClipRect({ xMin, yMin }, { xMax, yMax });
+
+            auto yCenter = (yMin + yMax) * 0.5f;
+            auto yScale = (yMax - yMin) * 0.5f;
 
             for (uint32_t i = 0; i < numOscilloscopeSamples; i++)
             {
                 float x = xMin + i * (xMax - xMin) / (numOscilloscopeSamples - 1.0f);
 
                 auto pos = (wavePlayPos + i) & numSamplesMask;
-                auto y0 = waveData[pos].left;
-                auto y1 = waveData[pos].right;
-                if (y1 < y0)
-                    std::swap(y0, y1);
-                y0 = yMin + (yMax - yMin) * Saturate((y0 + 1.0f) * 0.5f);
-                y1 = yMin + (yMax - yMin) * Saturate((y1 + 1.0f) * 0.5f);
-                auto d = y1 - y0;
-                if (d < 1.0f)
-                {
-                    y0 = y0 + d * 0.5f - 0.5f;
-                    y1 = y1 - d * 0.5f + 0.5f;
-                }
 
-                drawList->PrimWriteVtx(ImVec2(x, y0), drawList->_Data->TexUvWhitePixel, color);
-                drawList->PrimWriteVtx(ImVec2(x, y1), drawList->_Data->TexUvWhitePixel, color);
-
-                if (i != 0)
-                {
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2));
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2 + 1));
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2));
-
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2));
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + (i - 1) * 2 + 1));
-                    drawList->PrimWriteIdx(ImDrawIdx(idxBase + i * 2 + 1));
-                }
+                auto p = ImVec2(x, yCenter + yScale * waveData[pos].left);
+                drawList->PathLineTo(p);
             }
+            drawList->PathStroke(color, 0, 1);
+            for (uint32_t i = 0; i < numOscilloscopeSamples; i++)
+            {
+                float x = xMin + i * (xMax - xMin) / (numOscilloscopeSamples - 1.0f);
+
+                auto pos = (wavePlayPos + i) & numSamplesMask;
+
+                auto p = ImVec2(x, yCenter + yScale * waveData[pos].right);
+                drawList->PathLineTo(p);
+            }
+            drawList->PathStroke(color, 0, 1);
+
+            drawList->PopClipRect();
         }
     }
 
