@@ -38,7 +38,8 @@ typedef enum {
     coding_NGC_DSP,         /* Nintendo DSP ADPCM */
     coding_NGC_DSP_subint,  /* Nintendo DSP ADPCM with frame subinterframe */
     coding_NGC_DTK,         /* Nintendo DTK ADPCM (hardware disc), also called TRK or ADP */
-    coding_NGC_AFC,         /* Nintendo AFC ADPCM */
+    coding_AFC,             /* Nintendo AFC ADPCM */
+    coding_AFC_2bit,        /* Nintendo AFC ADPCM (2-bit) */
     coding_VADPCM,          /* Silicon Graphics VADPCM */
 
     coding_G721,            /* CCITT G.721 */
@@ -149,6 +150,10 @@ typedef enum {
     coding_KA1A,            /* Koei Tecmo codec (transform-based) */
     coding_UBI_MPEG,        /* Ubisoft MPEG codec (transform-based) */
     coding_MIO,             /* Entis MIO codec (transform-based) */
+    coding_BINKA,           /* RAD Game Tools Bink Audio codec (transform-based) */
+
+    coding_CF_DF_ADPCM_V40, /* Cyberflix DreamFactory v4.0 ADPCM */
+    coding_CF_DF_DPCM_V41,  /* Cyberflix DreamFactory v4.1 DPCM */
 
 #ifdef VGM_USE_VORBIS
     coding_OGG_VORBIS,      /* Xiph Vorbis with Ogg layer (transform-based) */
@@ -323,26 +328,26 @@ typedef enum {
     meta_VPK,               /* VPK Audio File */
     meta_PS2_BMDX,          /* Beatmania thing */
     meta_IIVB,
-    meta_PS2_SND,           /* some Might & Magics SSND header */
-    meta_SVS,               /* Square SVS */
+    meta_SSND,
+    meta_SVS,
     meta_XSS,               /* Dino Crisis 3 */
-    meta_SL3,               /* Test Drive Unlimited */
-    meta_HGC1,              /* Knights of the Temple 2 */
-    meta_AUS,               /* Various Capcom games */
-    meta_RWS,               /* RenderWare games (only when using RW Audio middleware) */
-    meta_FSB1,              /* FMOD Sample Bank, version 1 */
-    meta_FSB2,              /* FMOD Sample Bank, version 2 */
-    meta_FSB3,              /* FMOD Sample Bank, version 3.0/3.1 */
-    meta_FSB4,              /* FMOD Sample Bank, version 4 */
-    meta_FSB5,              /* FMOD Sample Bank, version 5 */
+    meta_SL3,
+    meta_HGC1,
+    meta_AUS,
+    meta_RWS,
+    meta_FSB1,
+    meta_FSB2,
+    meta_FSB3,
+    meta_FSB4,
+    meta_FSB5,
     meta_RWAX,
-    meta_XWB,               /* Microsoft XACT framework (Xbox, X360, Windows) */
-    meta_MUSC,              /* Krome PS2 games */
+    meta_XWB,
+    meta_MUSC,
     meta_MUSX,
-    meta_FILP,              /* Resident Evil - Dead Aim */
+    meta_FILP,
     meta_IKM,
     meta_STER,
-    meta_BG00,              /* Ibara, Mushihimesama */
+    meta_BG00,
     meta_RSTM_ROCKSTAR,
     meta_VIG_KCES,
     meta_HXD,
@@ -356,8 +361,8 @@ typedef enum {
     meta_STR_SEGA,
     meta_STR_SEGA_custom,
     meta_SAP,
-    meta_DC_IDVI,           /* Eldorado Gate */
-    meta_KRAW,              /* Geometry Wars - Galaxies */
+    meta_IDVI,
+    meta_KRAW,
     meta_OMU,
     meta_XA2_ACCLAIM,
     meta_NUB,
@@ -366,7 +371,7 @@ typedef enum {
     meta_SPT_SPD,           /* Various (SPT+SPT DSP) */
     meta_ISH_ISD,           /* Various (ISH+ISD DSP) */
     meta_GSND,
-    meta_YDSP,              /* WWE Day of Reckoning */
+    meta_YDSP,
     meta_STR_SQEX,
     meta_UBI_JADE,          /* Beyond Good & Evil, Rayman Raving Rabbids */
     meta_GCA,               /* Metal Slug Anthology */
@@ -376,11 +381,10 @@ typedef enum {
     meta_SADL,
     meta_FAG,               /* Jackie Chan - Stuntmaster */
     meta_MIC,
-    meta_NGC_PDT,           /* Mario Party 6 */
+    meta_PDT,
     meta_ASD_NAXAT,
     meta_SPSD,
     meta_RSD,
-    meta_PS2_ASS,
     meta_SEG,
     meta_RIFF_IMA,
     meta_KNON,
@@ -389,18 +393,18 @@ typedef enum {
     meta_SMP,
     meta_WII_SNG,           /* Excite Trucks */
     meta_MUL,
-    meta_SAT_BAKA,          /* Crypt Killer */
+    meta_BAKA,
     meta_VSF,
     meta_SMSS,
     meta_ADS_MIDWAY,
-    meta_PS2_SPS,           /* Ape Escape 2 */
     meta_UBI_CKD,           /* Ubisoft CKD RIFF header (Rayman Origins Wii) */
     meta_RAW_WAVM,
     meta_WVS,
     meta_XMU,
     meta_EA_SCHL,           /* Electronic Arts SCHl with variable header */
     meta_EA_SCHL_fixed,     /* Electronic Arts SCHl with fixed header */
-    meta_EA_BNK,            /* Electronic Arts BNK */
+    meta_EA_BNK,            /* Electronic Arts BNK with variable header */
+    meta_EA_BNK_fixed,      /* Electronic Arts BNK with fixed header */
     meta_EA_1SNH,           /* Electronic Arts 1SNh/EACS */
     meta_EA_EACS,
     meta_RAW_PCM,
@@ -424,8 +428,8 @@ typedef enum {
     meta_NWA,               /* Visual Art's NWA */
     meta_NWA_NWAINFOINI,    /* Visual Art's NWA w/ NWAINFO.INI for looping */
     meta_NWA_GAMEEXEINI,    /* Visual Art's NWA w/ Gameexe.ini for looping */
-    meta_SAT_DVI,           /* Konami KCE Nagoya DVI (SAT games) */
-    meta_DC_KCEY,           /* Konami KCE Yokohama KCEYCOMP (DC games) */
+    meta_DVI,
+    meta_KCEY,
     meta_ACM,               /* InterPlay ACM header */
     meta_MUS_ACM,           /* MUS playlist of InterPlay ACM files */
     meta_DEC,               /* Falcom PC games (Xanadu Next, Gurumin) */
@@ -436,8 +440,8 @@ typedef enum {
     meta_P2BT_MOVE_VISA,
     meta_GBTS,
     meta_NGC_DSP_IADP,      /* Gamecube Interleave DSP */
-    meta_ZSD,               /* Dragon Booster ZSD */
-    meta_REDSPARK,          /* "RedSpark" RSD (MadWorld) */
+    meta_ZSD,
+    meta_REDSPARK,
     meta_RAGE_AUD,          /* Rockstar AUD - MC:LA, GTA IV */
     meta_NDS_HWAS,          /* Spider-Man 3, Tony Hawk's Downhill Jam, possibly more... */
     meta_LPS,
@@ -446,9 +450,8 @@ typedef enum {
     meta_2DX9,
     meta_VGV,
     meta_GCUB,
-    meta_MAXIS_XA,          /* Sim City 3000 (PC) */
-    meta_NGC_SCK_DSP,       /* Scorpion King (NGC) */
-    meta_CAFF,              /* iPhone .caf */
+    meta_MAXIS_XA,
+    meta_CAFF,
     meta_EXAKT_SC,          /* Activision EXAKT .SC (PS2) */
     meta_WII_WAS,           /* DiRT 2 (WII) */
     meta_PONA_3DO,          /* Policenauts (3DO) */
@@ -475,7 +478,7 @@ typedef enum {
     meta_DSP_CABELAS,       /* Cabelas games */
     meta_PS2_ADM,           /* Dragon Quest V (PS2) */
     meta_LPCM_SHADE,
-    meta_PS2_VMS,           /* Autobahn Raser - Police Madness */
+    meta_VMS,
     meta_XAU,               /* XPEC Entertainment (Beat Down (PS2 Xbox), Spectral Force Chronicle (PS2)) */
     meta_GH3_BAR,           /* Guitar Hero III Mobile .bar */
     meta_DSP_DSPW,          /* Sengoku Basara 3 [WII] */
@@ -496,7 +499,7 @@ typedef enum {
     meta_LSF_N1NJ4N,        /* .lsf n1nj4n Fastlane Street Racing (iPhone) */
     meta_XWAV,
     meta_RAW_SNDS,
-    meta_HYPERSCAN_KVAG,    /* Hyperscan KVAG/BVG */
+    meta_KVAG,
     meta_PSND,
     meta_ADP_WILDFIRE,
     meta_QD_ADP,
@@ -506,7 +509,7 @@ typedef enum {
     meta_ALP,
     meta_WPD,
     meta_MCSS,
-    meta_PS2_HSF,           /* Lowrider (PS2) */
+    meta_HSF,
     meta_IVAG,
     meta_2PFS,
     meta_PS2_VBK,           /* Disney's Stitch - Experiment 626 */
@@ -576,7 +579,7 @@ typedef enum {
     meta_EA_WVE_AD10,       /* Electronic Arts PS movies [Wing Commander 3/4 (PS)] */
     meta_STHD,              /* STHD .stx [Kakuto Chojin (Xbox)] */
     meta_MP4,               /* MP4/AAC */
-    meta_PCM_SRE,           /* .PCM+SRE [Viewtiful Joe (PS2)] */
+    meta_SRE_PCM,
     meta_DSP_MCADPCM,       /* Skyrim (Switch) */
     meta_UBI_LYN,           /* Ubisoft LyN engine [The Adventures of Tintin (multi)] */
     meta_MSB_MSH,           /* sfx companion of MIH+MIB */
@@ -596,7 +599,6 @@ typedef enum {
     meta_HD3_BD3,           /* Sony PS3 bank */
     meta_BNK_SONY,          /* Sony Scream Tool bank */
     meta_SSCF,
-    meta_DSP_VAG,           /* Penny-Punching Princess (Switch) sfx */
     meta_DSP_ITL,           /* Charinko Hero (GC) */
     meta_A2M,               /* Scooby-Doo! Unmasked (PS2) */
     meta_AHV,               /* Headhunter (PS2) */
@@ -609,7 +611,7 @@ typedef enum {
     meta_APC,               /* MegaRace 3 (PC) */
     meta_WAV2,
     meta_SFXB,
-    meta_DERF,              /* Stupid Invaders (PC) */
+    meta_DERF,
     meta_SADF,
     meta_UTK,
     meta_NXA1,
@@ -721,6 +723,13 @@ typedef enum {
     meta_MIO,
     meta_AUDIOPKG,
     meta_SWAR,
+    meta_IVB,
+    meta_SRCD,
+    meta_MHWK,
+    meta_CF_DF,
+    meta_JAUDIO,
+    meta_BCF1,
+    meta_UEBA,
 } meta_t;
 
 #endif

@@ -21,14 +21,16 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGMStream,
         .name = "vgmstream",
-        .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2019 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
+        .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2025 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
             "Thealexbarney, CyberBotX, et al\n"
             "Portions Copyright (c) 2004-2008, Marko Kreen\n"
             "Portions Copyright (c) 2001-2007  jagarl/Kazunori Ueno <jagarl@creator.club.ne.jp>\n"
             "Portions Copyright (c) 1998, Justin Frankel/Nullsoft Inc.\n"
             "Portions Copyright (c) 2006 Nullsoft, Inc.\n"
-            "Portions Copyright (c) 2005-2007 Paul Hsieh",
+            "Portions Copyright (c) 2005-2007 Paul Hsieh\n"
+            "Portions Copyright (C) 2000-2004 Leshade Entis, Entis-soft.\n"
+            "Portions Public Domain originating with Sun Microsystems",
         .init = ReplayVGMStream::Init,
         .release = ReplayVGMStream::Release,
         .load = ReplayVGMStream::Load

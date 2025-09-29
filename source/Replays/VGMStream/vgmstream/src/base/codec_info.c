@@ -29,6 +29,10 @@ extern const codec_info_t celt_fsb_decoder;
 extern const codec_info_t mpeg_decoder;
 #endif
 extern const codec_info_t relic_decoder;
+extern const codec_info_t binka_decoder;
+
+extern const codec_info_t cf_df_v40_decoder;
+extern const codec_info_t cf_df_v41_decoder;
 
 const codec_info_t* codec_get_info(VGMSTREAM* v) {
     switch(v->coding_type) {
@@ -56,6 +60,8 @@ const codec_info_t* codec_get_info(VGMSTREAM* v) {
             return &imuse_decoder;
         case coding_MIO:
             return &mio_decoder;
+        case coding_BINKA:
+            return &binka_decoder;
         case coding_PCM32LE:
             return &pcm32_decoder;
         case coding_PCM24LE:
@@ -85,6 +91,10 @@ const codec_info_t* codec_get_info(VGMSTREAM* v) {
 #endif
         case coding_RELIC:
             return &relic_decoder;
+        case coding_CF_DF_ADPCM_V40:
+            return &cf_df_v40_decoder;
+        case coding_CF_DF_DPCM_V41:
+            return &cf_df_v41_decoder;
         default:
             return NULL;
     }

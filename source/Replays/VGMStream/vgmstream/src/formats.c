@@ -1,6 +1,7 @@
 #include "vgmstream.h"
 #include "coding/coding.h"
 #include "layout/layout.h"
+#include "base/plugins.h"
 
 
 /* Defines the list of accepted extensions. vgmstream doesn't use it internally so it's here
@@ -35,6 +36,7 @@ static const char* extension_list[] = {
     "a3c", //txth/reserved [Puyo Puyo 20th Anniversary (PSP)]
     //"aac", //common
     "aa3", //FFmpeg/not parsed (ATRAC3/ATRAC3PLUS/MP3/LPCM/WMA)
+    "aaf",
     "aax",
     "abc", //txth/reserved [Find My Own Way (PS2) tech demo]
     "abk",
@@ -77,7 +79,6 @@ static const char* extension_list[] = {
     "asd",
     "asf",
     "asr",
-    "ass",
     "ast",
     "at3",
     "at9",
@@ -95,8 +96,10 @@ static const char* extension_list[] = {
     "awb",
     "awc",
     "awd",
+    "awx",
 
     "b1s", //txth/reserved [7 Wonders of the Ancient World (PS2)]
+    "baa",
     "baf",
     "baka",
     "bank",
@@ -112,10 +115,10 @@ static const char* extension_list[] = {
     "bigrp",
     "bik",
     "bika", //fake extension for .bik (to be removed)
-    "bik2",
-    "binka", //FFmpeg/not parsed (BINK AUDIO)
+    "binka",
     //"bin", //common
     "bk2",
+    "bkh",
     "bkr",  //txth/reserved [P.N.03 (GC), Viewtiful Joe (GC)]
     "blk",
     "bmdx", //fake extension (to be removed?)
@@ -133,6 +136,7 @@ static const char* extension_list[] = {
     "btsnd",
     "bvg",
     "bwav",
+    "bx",
 
     "cads",
     "caf",
@@ -149,11 +153,14 @@ static const char* extension_list[] = {
     "cnk",
     "cpk",
     "cps",
+    "crd",
     "csa", //txth/reserved [LEGO Racers 2 (PS2)]
     "csb",
     "csmp",
     "cvs", //txth/reserved [Aladdin in Nasira's Revenge (PS1)]
     "cwav",
+    "cxb",
+    "cxk", // ,acb+cpk/reserved [Dariusburst: Another Chronicle (AC)]
     "cxs",
 
     "d2", //txth/reserved [Dodonpachi Dai-Ou-Jou (PS2)]
@@ -170,12 +177,14 @@ static const char* extension_list[] = {
     "dic",
     "diva",
     "dmsg", //fake extension/header id for .sgt (to be removed)
+    "drm", //txth/reserved [Ben 10 (HyperScan), IWL (HyperScan)]
     "ds2", //txth/reserved [Star Wars Bounty Hunter (GC)]
     "dsb",
     "dsf",
     "dsp",
     "dspw",
     "dtk",
+    "dty",
     "dvi",
     "dyx", //txth/reserved [Shrek 4 (iOS)]
 
@@ -192,7 +201,6 @@ static const char* extension_list[] = {
     "ezw",
 
     "fag",
-    "fcb", //FFmpeg/not parsed (BINK AUDIO)
     "fda",
     "filp",
     "fish",
@@ -347,6 +355,7 @@ static const char* extension_list[] = {
     "mds",
     "mdsp",
     "med",
+    "mhk",
     "mjb",
     "mi4", //fake extension for .mib (renamed, to be removed)
     "mib",
@@ -355,6 +364,7 @@ static const char* extension_list[] = {
     "mogg",
     //"m4a", //common
     //"m4v", //common
+    "mon",
     //"mov", //common
     "move",
     //"mp+", //common [Moonshine Runners (PC)]
@@ -404,6 +414,7 @@ static const char* extension_list[] = {
     "nfx",
     "nub",
     "nub2",
+    "nusnub",
     "nus3audio",
     "nus3bank",
     "nwa",
@@ -448,6 +459,7 @@ static const char* extension_list[] = {
     "psf",
     "psh", //fake extension for .vsv (to be removed)
     "psn",
+    "pth",
     "pwb",
 
     "qwv", //txth/reserved [Bishi Bashi Champ Online (AC)]
@@ -520,6 +532,7 @@ static const char* extension_list[] = {
     "sdf",
     "sdt",
     "se",
+    "se3", //txth/reserved (.nub container) [Tales of Vesperia (X360/PS3), Tales of Graces f (PS3)]
     "seb",
     "sed",
     "seg",
@@ -536,14 +549,14 @@ static const char* extension_list[] = {
     "skx",
     "slb", //txth/reserved [THE Nekomura no Hitobito (PS2)]
     "sli",
-    "smc",
+    "smh",
     "smk",
     "smp",
     "smv",
     "sn0",
     "snb",
     "snd",
-    "snds",
+    "snds", //fake extension for .wav (renamed, to be removed)
     "sng",
     "sngw",
     "snr",
@@ -552,18 +565,24 @@ static const char* extension_list[] = {
     "snz", //txth/reserved [Killzone HD (PS3)]
     "sod",
     "son",
-    "spd",
+    "spc",
+    "sph",
+    "spt",
     "spm",
     "sps",
     "spsd",
+    "spsis14",
+    "spsis22",
     "spw",
+    "srcd",
+    "sre",
     "srsa",
     "ss2",
     "ssd", //txth/reserved [Zack & Wiki (Wii)]
     "ssf",
     "ssm",
-    "sspr",
     "ssp",
+    "sspr",
     "sss",
     "ster",
     "sth",
@@ -600,12 +619,15 @@ static const char* extension_list[] = {
     "tra",
     "trk",
     "trs", //txth/semi [Kamiwaza (PS2), Shinobido (PS2)]
+    "tsdse3", //txth/reserved [Tales of Xillia (PS3)-nub container]
+    "tsdse4", //txth/reserved [Tales of Xillia (PS3)-nub container]
     "tun",
     "txth",
     "txtp",
 
     "u0",
     "ue4opus",
+    "ueba",
     "ulw", //txth/raw [Burnout (GC)]
     "um3",
     "utk",
@@ -684,6 +706,7 @@ static const char* extension_list[] = {
     "wvs",
     "wvx",
     "wxd",
+    "wxv",
 
     "x",
     "x360audio", //fake extension for Unreal Engine 3 XMA (real extension unknown)
@@ -695,6 +718,7 @@ static const char* extension_list[] = {
     "xau",
     "xav",
     "xb", //txth/reserved [Scooby-Doo! Unmasked (Xbox)]
+    "xbw",
     "xhd",
     "xen",
     "xma",
@@ -824,7 +848,8 @@ static const coding_info coding_info_list[] = {
         {coding_NGC_DSP,            "Nintendo DSP 4-bit ADPCM"},
         {coding_NGC_DSP_subint,     "Nintendo DSP 4-bit ADPCM (subinterleave)"},
         {coding_NGC_DTK,            "Nintendo DTK 4-bit ADPCM"},
-        {coding_NGC_AFC,            "Nintendo AFC 4-bit ADPCM"},
+        {coding_AFC,                "Nintendo AFC 4-bit ADPCM"},
+        {coding_AFC_2bit,           "Nintendo AFC 2-bit ADPCM"},
         {coding_VADPCM,             "Silicon Graphics VADPCM 4-bit ADPCM"},
 
         {coding_G721,               "CCITT G.721 4-bit ADPCM"},
@@ -832,10 +857,10 @@ static const coding_info coding_info_list[] = {
         {coding_XA,                 "CD-ROM XA 4-bit ADPCM"},
         {coding_XA8,                "CD-ROM XA 8-bit ADPCM"},
         {coding_XA_EA,              "Electronic Arts XA 4-bit ADPCM"},
-        {coding_PSX,                "Playstation 4-bit ADPCM"},
-        {coding_PSX_badflags,       "Playstation 4-bit ADPCM (bad flags)"},
-        {coding_PSX_cfg,            "Playstation 4-bit ADPCM (configurable)"},
-        {coding_PSX_pivotal,        "Playstation 4-bit ADPCM (Pivotal)"},
+        {coding_PSX,                "PlayStation 4-bit ADPCM"},
+        {coding_PSX_badflags,       "PlayStation 4-bit ADPCM (bad flags)"},
+        {coding_PSX_cfg,            "PlayStation 4-bit ADPCM (configurable)"},
+        {coding_PSX_pivotal,        "PlayStation 4-bit ADPCM (Pivotal)"},
         {coding_HEVAG,              "Sony HEVAG 4-bit ADPCM"},
 
         {coding_EA_XA,              "Electronic Arts EA-XA 4-bit ADPCM v1"},
@@ -930,6 +955,9 @@ static const coding_info coding_info_list[] = {
         {coding_KA1A,               "Koei Tecmo KA1A"},
         {coding_UBI_MPEG,           "Ubisoft MPEG"},
         {coding_MIO,                "Entis MIO"},
+        {coding_BINKA,              "RAD Game tools Bink Audio"},
+        {coding_CF_DF_ADPCM_V40,    "Cyberflix DreamFactory v4.0 ADPCM"},
+        {coding_CF_DF_DPCM_V41,     "Cyberflix DreamFactory v4.1 DPCM"},
 
 #ifdef VGM_USE_VORBIS
         {coding_OGG_VORBIS,         "Ogg Vorbis"},
@@ -1068,7 +1096,7 @@ static const meta_info meta_info_list[] = {
         {meta_PWB,                  "Double Fine WB header"},
         {meta_RAW_WAVM,             "Xbox .wavm raw header"},
         {meta_DSP_STR,              "Cauldron .STR header"},
-        {meta_EA_SCHL,              "Electronic Arts SCHl header"},
+        {meta_EA_SCHL,              "Electronic Arts SCHl header (variable)"},
         {meta_EA_SCHL_fixed,        "Electronic Arts SCHl header (fixed)"},
         {meta_CAF,                  "tri-Crescendo CAF header"},
         {meta_VPK,                  "SCE America VPK header"},
@@ -1107,8 +1135,8 @@ static const meta_info meta_info_list[] = {
         {meta_FILP,                 "cavia FILp header"},
         {meta_IKM,                  "MiCROViSiON IKM header"},
         {meta_STER,                 "ALCHEMY STER header"},
-        {meta_SAT_DVI,              "Konami DVI. header"},
-        {meta_DC_KCEY,              "Konami KCEY header"},
+        {meta_DVI,                  "Konami DVI. header"},
+        {meta_KCEY,                 "Konami KCEY header"},
         {meta_BG00,                 "Cave BG00 header"},
         {meta_RSTM_ROCKSTAR,        "Rockstar Games RSTM header"},
         {meta_ACM,                  "InterPlay ACM header"},
@@ -1137,7 +1165,7 @@ static const meta_info meta_info_list[] = {
         {meta_XMU,                  "Outrage XMU header"},
         {meta_XA2_ACCLAIM,          "Acclaim .XA2 header"},
         {meta_SAP,                  "VING .SAP header"},
-        {meta_DC_IDVI,              "Capcom IDVI header"},
+        {meta_IDVI,                 "Capcom IDVI header"},
         {meta_KRAW,                 "Geometry Wars: Galaxies KRAW header"},
         {meta_YMF,                  "Yuke's .YMF Header"},
         {meta_FAG,                  "Radical .FAG Header"},
@@ -1149,13 +1177,12 @@ static const meta_info meta_info_list[] = {
         {meta_SPSD,                 "Sega Naomi SPSD header"},
         {meta_BGW,                  "Square Enix BGMStream header"},
         {meta_SPW,                  "Square Enix SeWave header"},
-        {meta_PS2_ASS,              "SystemSoft .ASS header"},
         {meta_NUB,                  "Namco NUB header"},
         {meta_IDSP_NL,              "Next Level IDSP header"},
         {meta_IDSP_IE,              "Inevitable Entertainment IDSP Header"},
         {meta_UBI_JADE,             "Ubisoft Jade RIFF header"},
         {meta_SEG,                  "Stormfront SEG header"},
-        {meta_RIFF_IMA,             "Square Enix RIFF IMA eader"},
+        {meta_RIFF_IMA,             "Square Enix RIFF IMA header"},
         {meta_KNON,                 "Paon KNON header"},
         {meta_GCA,                  "GCA DSP Header"},
         {meta_SPT_SPD,              "SPT+SPD DSP Header"},
@@ -1175,11 +1202,11 @@ static const meta_info meta_info_list[] = {
         {meta_NGC_DSP_IADP,         "IADP Header"},
         {meta_RIFF_WAVE_ctrl,       "RIFF WAVE header (ctrl looping)"},
         {meta_STR_SQEX,             "Square Enix STR header"},
-        {meta_SAT_BAKA,             "Konami BAKA header"},
+        {meta_BAKA,                 "Konami BAKA header"},
         {meta_SWAV,                 "Nintendo SWAV header"},
         {meta_VSF,                  "Square Enix VSF header"},
         {meta_NDS_RRDS,             "Ridger Racer DS Header"},
-        {meta_PS2_SND,              "Might and Magic SSND Header"},
+        {meta_SSND,                 "The 3DO Company SSND Header"},
         {meta_SMSS,                 "Treasure SMSS header"},
         {meta_ADS_MIDWAY,           "Midway ADS header"},
         {meta_ZSD,                  "Konami ZSD header"},
@@ -1187,7 +1214,6 @@ static const meta_info meta_info_list[] = {
         {meta_RAGE_AUD,             "Rockstar AUD header"},
         {meta_DSP_WII_WSD,          ".WSD header"},
         {meta_WII_NDP,              "Icon Games NDP header"},
-        {meta_PS2_SPS,              "Ape Escape 2 SPS Header"},
         {meta_NDS_HWAS,             "Vicarious Visions HWAS header"},
         {meta_LPS,                  "Konami .LPS Header"},
         {meta_NAOMI_ADPCM,          "NAOMI/NAOMI2 Arcade games ADPCM header"},
@@ -1196,7 +1222,6 @@ static const meta_info meta_info_list[] = {
         {meta_DSP_KCEJE,            "Konami .DSP Header"},
         {meta_VGV,                  "Human Head .VGV header"},
         {meta_GCUB,                 "Sega GCub header"},
-        {meta_NGC_SCK_DSP,          "The Scorpion King SCK Header"},
         {meta_CAFF,                 "Apple Core Audio Format File header"},
         {meta_PC_MXST,              "Lego Island MxSt Header"},
         {meta_SAB,                  "Sensaura SAB header"},
@@ -1221,7 +1246,7 @@ static const meta_info meta_info_list[] = {
         {meta_SMPL,                 "Skonec SMPL header"},
         {meta_MSA,                  "Success .MSA header"},
         {meta_VOI,                  "Irem .VOI header"},
-        {meta_NGC_PDT,              "Hudson .PDT header"},
+        {meta_PDT,                  "Hudson .PDT header"},
         {meta_NGC_RKV,              "Legacy of Kain - Blood Omen 2 RKV GC header"},
         {meta_DSP_DDSP,             ".DDSP header"},
         {meta_P3D,                  "Radical P3D header"},
@@ -1232,7 +1257,7 @@ static const meta_info meta_info_list[] = {
         {meta_DSP_CABELAS,          "Cabelas games .DSP header"},
         {meta_PS2_ADM,              "Dragon Quest V .ADM raw header"},
         {meta_LPCM_SHADE,           "Shade LPCM header"},
-        {meta_PS2_VMS,              "VMS Header"},
+        {meta_VMS,                  "Davilex VMS header"},
         {meta_XAU,                  "XPEC XAU header"},
         {meta_GH3_BAR,              "Guitar Hero III Mobile .bar"},
         {meta_DSP_DSPW,             "Capcom DSPW header"},
@@ -1253,7 +1278,7 @@ static const meta_info meta_info_list[] = {
         {meta_LSF_N1NJ4N,           "Gizmondo Studios Helsingborg LSF header"},
         {meta_XWAV,                 "feelplus XWAV header"},
         {meta_RAW_SNDS,             "PC .snds raw header"},
-        {meta_HYPERSCAN_KVAG,       "Mattel Hyperscan KVAG"},
+        {meta_KVAG,                 "Mattel KVAG header"},
         {meta_PSND,                 "Polarbit PSND header"},
         {meta_ADP_WILDFIRE,         "Wildfire ADP! header"},
         {meta_QD_ADP,               "Quantic Dream .ADP header"},
@@ -1263,7 +1288,7 @@ static const meta_info meta_info_list[] = {
         {meta_ALP,                  "High Voltage ALP header"},
         {meta_WPD,                  "Navel WPD header"},
         {meta_MCSS,                 "Guerilla MCSS header"},
-        {meta_PS2_HSF,              "Lowrider 'HSF' header"},
+        {meta_HSF,                  "SoundBox HSF header"},
         {meta_IVAG,                 "Namco IVAG header"},
         {meta_2PFS,                 "Konami 2PFS header"},
         {meta_UBI_CKD,              "Ubisoft CKD RIFF header"},
@@ -1298,7 +1323,8 @@ static const meta_info meta_info_list[] = {
         {meta_XA_XA30,              "Reflections XA30 header"},
         {meta_XA_04SW,              "Reflections 04SW header"},
         {meta_TXTH,                 "TXTH generic header"},
-        {meta_EA_BNK,               "Electronic Arts BNK header"},
+        {meta_EA_BNK,               "Electronic Arts BNK header (variable)"},
+        {meta_EA_BNK_fixed,         "Electronic Arts BNK header (fixed)"},
         {meta_SK_AUD,               "Silicon Knights AUD header"},
         {meta_AHX,                  "CRI AHX header"},
         {meta_STMA,                 "Angel Studios/Rockstar San Diego STMA header"},
@@ -1334,7 +1360,7 @@ static const meta_info meta_info_list[] = {
         {meta_EA_WVE_AD10,          "Electronic Arts WVE (Ad10) header"},
         {meta_STHD,                 "Dream Factory STHD header"},
         {meta_MP4,                  "MP4/AAC header"},
-        {meta_PCM_SRE,              "Capcom .PCM+SRE header"},
+        {meta_SRE_PCM,              "Capcom .SRE+PCM header"},
         {meta_DSP_MCADPCM,          "Bethesda .mcadpcm header"},
         {meta_UBI_LYN,              "Ubisoft LyN RIFF header"},
         {meta_MSB_MSH,              "Sony MultiStream MSH+MSB header"},
@@ -1355,7 +1381,6 @@ static const meta_info meta_info_list[] = {
         {meta_HD3_BD3,              "Sony HD3+BD3 header"},
         {meta_BNK_SONY,             "Sony BNK header"},
         {meta_SSCF,                 "Square Enix SSCF header"},
-        {meta_DSP_VAG,              ".VAG DSP header"},
         {meta_DSP_ITL,              ".ITL DSP header"},
         {meta_A2M,                  "Artificial Mind & Movement A2M header"},
         {meta_AHV,                  "Amuze AHV header"},
@@ -1479,6 +1504,13 @@ static const meta_info meta_info_list[] = {
         {meta_MIO,                  "Entis .MIO header"},
         {meta_AUDIOPKG,             "Inevitable .AUDIOPKG header"},
         {meta_SWAR,                 "Nintendo SWAR header"},
+        {meta_IVB,                  "Metro IVB header"},
+        {meta_SRCD,                 "Capcom SRCD header"},
+        {meta_MHWK,                 "Broderbund MHWK header"},
+        {meta_CF_DF,                "Cyberflix DreamFactory header"},
+        {meta_JAUDIO,               "Nintendo JAudio header"},
+        {meta_BCF1,                 "RAD BCF1 header"},
+        {meta_UEBA,                 "Epic Games UEBA header"},
 };
 
 void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t out_size) {

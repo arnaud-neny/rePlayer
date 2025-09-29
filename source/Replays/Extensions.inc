@@ -144,7 +144,7 @@ EXTENSION(kss)          // KSS & GME & NEZplug
 EXTENSION(nsf)          // GME & NEZplug
 EXTENSION(nsfe)         // GME & NEZplug
 EXTENSION(spc)
-EXTENSION(sunvox)		// SunVox
+EXTENSION(sunvox)       // SunVox
 EXTENSION(mdx)          // MDX
 EXTENSION(rk)           // UADE: CustomMade
 EXTENSION(s98)
@@ -212,7 +212,7 @@ EXTENSION(kim)          // UADE: Kim_Christensen
 EXTENSION(kh)           // UADE: KrisHatlelid
 EXTENSION(pt)           // UADE: Laxity
 EXTENSION(lme)          // UADE: LegglessMusicEditor
-EXTENSION(mon)          // UADE: ManiacsOfNoise
+EXTENSION(mon)          // UADE: ManiacsOfNoise & VGMStream: NBA Live 95
 EXTENSION(mfp)          // UADE & XMP: MagneticFieldsPacker
 EXTENSION(hn)           // UADE: MajorTom
 EXTENSION(mc)           // UADE: Mark_Cooksey
@@ -390,9 +390,9 @@ EXTENSION(soc)          // UADE: Jochen_Hippel_ST
 EXTENSION(sog)          // UADE: Jochen_Hippel_ST
 EXTENSION(mcmd)         // UADE: JochenHippel
 EXTENSION(cba)          // OpenMPT
-EXTENSION(a2t)			// Adlib: Adlib Tracker 2
+EXTENSION(a2t)          // Adlib: Adlib Tracker 2
 EXTENSION(eup)          // Euphony
-EXTENSION(etx)			// OpenMPT
+EXTENSION(etx)          // OpenMPT
 EXTENSION(4v)           // Quartet
 EXTENSION(fur)          // Furnace
 EXTENSION(aac)          // AAC
@@ -439,7 +439,7 @@ EXTENSION(asbin)        // VGMStream
 EXTENSION(asd)          // VGMStream: ASD
 EXTENSION(asf)          // VGMStream: Electronic Arts SCHl
 EXTENSION(asr)          // VGMStream: Paon KNON
-EXTENSION(ass)          // VGMStream: SystemSoft .ASS
+EXTENSION(aaf)          // VGMStream: Nintendo JAudio
 EXTENSION(at3)          // VGMStream: ATRAC3+
 EXTENSION(at9)          // VGMStream: ATRAC9
 EXTENSION(atsl)         // VGMStream: Ogg Vorbis KOVS
@@ -468,7 +468,7 @@ EXTENSION(bgw)          // VGMStream: Square Enix .BGW
 EXTENSION(bigrp)        // VGMStream: Inti Creates .BIGRP
 EXTENSION(bik)          // VGMStream: RAD Game Tools Bink
 EXTENSION(bika)         // VGMStream: RAD Game Tools Bink
-EXTENSION(bik2)         // VGMStream
+EXTENSION(awx)          // VGMStream: Dariusburst - Chronicle Saviors
 EXTENSION(binka)        // VGMStream: Bink Audio
 EXTENSION(bk2)          // VGMStream: RAD Game Tools Bink
 EXTENSION(blk)          // VGMStream: Ubisoft SBx
@@ -530,7 +530,7 @@ EXTENSION(esf)          // VGMStream: Eurocom ESF
 EXTENSION(exa)          // VGMStream: Electronic Arts SCHl
 EXTENSION(ezw)          // VGMStream
 EXTENSION(fag)          // VGMStream: Radical .FAG
-EXTENSION(fcb)          // VGMStream: Bink Audio
+EXTENSION(baa)          // VGMStream: Nintendo JAudio
 EXTENSION(fda)          // VGMStream: Apple AIFF-C
 EXTENSION(amx)          // VGMStream
 EXTENSION(filp)         // VGMStream
@@ -664,7 +664,7 @@ EXTENSION(mib)          // VGMStream: Headerless PS-ADPCM raw
 EXTENSION(mic)          // VGMStream: KOEI .MIC
 EXTENSION(msx)          // VGMStream
 EXTENSION(mjb)          // VGMStream
-EXTENSION(2dx)			// VGMStream
+EXTENSION(2dx)          // VGMStream
 EXTENSION(mogg)         // VGMStream
 EXTENSION(mov)          // VGMStream
 EXTENSION(mp2)          // MP3 & VGMStream
@@ -786,7 +786,7 @@ EXTENSION(sm4)          // VGMStream
 EXTENSION(sm5)          // VGMStream
 EXTENSION(sm6)          // VGMStream
 EXTENSION(sm7)          // VGMStream
-EXTENSION(smc)          // VGMStream
+EXTENSION(bkh)          // VGMStream: FIFA 97
 EXTENSION(smk)          // VGMStream: RAD Game Tools SMACKER
 EXTENSION(smp)          // VGMStream: Infernal Engine .smp
 EXTENSION(smv)          // VGMStream
@@ -799,7 +799,7 @@ EXTENSION(sns)          // VGMStream
 EXTENSION(snu)          // VGMStream
 EXTENSION(sod)          // VGMStream
 EXTENSION(son)          // VGMStream
-EXTENSION(spd)          // VGMStream
+EXTENSION(bx)           // VGMStream: Nintendo JAudio
 EXTENSION(spm)          // VGMStream
 EXTENSION(sps)          // VGMStream: Electronic Arts SPS
 EXTENSION(spsd)         // VGMStream: Sega Naomi SPSD
@@ -937,7 +937,7 @@ EXTENSION(ymf)          // VGMStream
 EXTENSION(zic)          // VGMStream
 EXTENSION(zsd)          // VGMStream: Z-Axis ZSND
 EXTENSION(zss)          // VGMStream
-EXTENSION(hd2)			// VGMStream
+EXTENSION(hd2)          // VGMStream
 EXTENSION(zwv)          // VGMStream
 EXTENSION(wsr)          // WonderSwan
 EXTENSION(org)          // Organya
@@ -978,6 +978,22 @@ EXTENSION(sn0)          // VGMStream
 EXTENSION(swar)         // VGMStream
 EXTENSION(xhd)          // VGMStream
 EXTENSION(xst)          // VGMStream
-NO_EXTENSION()			// MegaTracker: SoundSmith
+NO_EXTENSION()          // MegaTracker: SoundSmith
 EXTENSION(ntg)          // MegaTracker: NoiseTracker GS
 EXTENSION(skm)          // SkaleTracker
+EXTENSION(crd)          // VGMStream
+EXTENSION(cxb)          // VGMStream
+EXTENSION(dty)          // VGMStream
+EXTENSION(mhk)          // VGMStream
+EXTENSION(nusnub)       // VGMStream
+EXTENSION(pth)          // VGMStream
+EXTENSION(smh)          // VGMStream
+EXTENSION(sph)          // VGMStream
+EXTENSION(spt)          // VGMStream
+EXTENSION(spsis14)      // VGMStream
+EXTENSION(spsis22)      // VGMStream
+EXTENSION(srcd)         // VGMStream
+EXTENSION(sre)          // VGMStream
+EXTENSION(ueba)         // VGMStream
+EXTENSION(wxv)          // VGMStream
+EXTENSION(xbw)          // VGMStream
