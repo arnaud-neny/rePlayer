@@ -86,6 +86,9 @@ bool FC::TFMX_findTag(const ubyte* buf, udword len) {
     const ubyte* r = std::search(buf,buf+len,TFMX_TAG.c_str(),TFMX_TAG.c_str()+4);
     if (r != (buf+len) ) {
         udword h = (udword)(r-buf);
+        if (buf[h+4] != 0) {  // require trailing zero
+            return false;
+        }
         // An earlier "COSO" header means this is not uncompressed TFMX,
         // then reject the module.
         if ( (h >= 0x20) && !memcmp(buf+h-0x20,COSO_TAG.c_str(),4) ) {
@@ -156,7 +159,7 @@ bool FC::TFMX_7V_findPlayer(const ubyte* buf, udword len) {
 
     smartPtr<const ubyte> sBuf(buf,len);
     bool foundVolSeqJmp = false;
-    bool foundSndSeqJmp = false;
+    //bool foundSndSeqJmp = false;  // avoid compiler warning
 
     const ubyte* r;
     udword pos = 0;
@@ -175,7 +178,7 @@ bool FC::TFMX_7V_findPlayer(const ubyte* buf, udword len) {
                 }
             }
             else if (sBuf[o] == 0x18) {  // TFMX 7V only
-                foundSndSeqJmp = true;
+                //foundSndSeqJmp = true;  // avoid compiler warning
             }
         }
         pos = o+1;
@@ -195,7 +198,7 @@ bool FC::TFMX_4V_maybe() {
     // The subsong table contains one undefined entry where
     // only the start speed may be set.
     udword probeOffset = offsets.subSongTab+TFMX_SONGTAB_ENTRY_SIZE*stats.songs;
-    if ( probeOffset >= fcBuf.tellLength() ||
+    if ( probeOffset >= inputLen ||
          readBEuword(fcBuf,probeOffset)!=0 ||
          readBEuword(fcBuf,probeOffset+2)!=0 ||
          fcBuf[probeOffset+4]!=0 ) {  // speed, ignore the lower byte here
@@ -212,7 +215,7 @@ bool FC::TFMX_4V_maybe() {
         }
         // Expecting sample start offsets to be within buffer area.
         udword startOffs = readBEudword(fcBuf,sh);
-        if ( startOffs+offsets.sampleData > fcBuf.tellLength() ) {
+        if ( startOffs+offsets.sampleData > inputLen ) {
             return false;
         }
         sh += (4+2+4+2);  // skip to next header
@@ -229,7 +232,7 @@ bool FC::TFMX_7V_maybe() {
     udword probeOffset = offsets.trackTable
         +stats.trackSteps*TFMX_7V_TRACKTAB_STEP_SIZE
         +stats.songs*TFMX_7V_SONGTAB_ENTRY_SIZE;
-    if ( probeOffset >= fcBuf.tellLength() ||
+    if ( probeOffset >= inputLen ||
          readBEudword(fcBuf,probeOffset)!=0 ||
          readBEudword(fcBuf,probeOffset+4)!=0 ) {
         return false;
@@ -245,7 +248,7 @@ bool FC::TFMX_7V_maybe() {
         }
         // Expecting sample start offsets to be within buffer area.
         udword startOffs = readBEudword(fcBuf,sh);
-        if ( startOffs+offsets.sampleData > fcBuf.tellLength() ) {
+        if ( startOffs+offsets.sampleData > inputLen ) {
             return false;
         }
         sh += traits.sampleStructSize;
@@ -304,7 +307,7 @@ bool FC::COSO_4V_maybe() {
     // The subsong table contains one undefined entry where
     // only the start speed may be set.
     udword probeOffset = offsets.subSongTab+TFMX_SONGTAB_ENTRY_SIZE*stats.songs;
-    if ( probeOffset >= fcBuf.tellLength() ||
+    if ( probeOffset >= inputLen ||
          readBEuword(fcBuf,probeOffset)!=0 ||
          readBEuword(fcBuf,probeOffset+2)!=0 ||
          fcBuf[probeOffset+4]!=0 ) {  // speed, ignore the lower byte here
@@ -322,7 +325,7 @@ bool FC::COSO_7V_maybe() {
     udword probeOffset = offsets.trackTable
         +stats.trackSteps*TFMX_7V_TRACKTAB_STEP_SIZE
         +stats.songs*TFMX_7V_SONGTAB_ENTRY_SIZE;
-    if ( probeOffset >= fcBuf.tellLength() ||
+    if ( probeOffset >= inputLen ||
          readBEudword(fcBuf,probeOffset)!=0 ||
          readBEudword(fcBuf,probeOffset+4)!=0 ) {
         return false;
@@ -332,7 +335,7 @@ bool FC::COSO_7V_maybe() {
     for (int s = 0; s < stats.samples; s++) {
         // Expecting sample start offsets to be within buffer area.
         udword startOffs = readBEudword(fcBuf,sh);
-        if ( startOffs+offsets.sampleData > fcBuf.tellLength() ) {
+        if ( startOffs+offsets.sampleData > inputLen ) {
             return false;
         }
         sh += traits.sampleStructSize;

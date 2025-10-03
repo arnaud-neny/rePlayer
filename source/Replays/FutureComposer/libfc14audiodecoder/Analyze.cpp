@@ -214,7 +214,7 @@ bool Analyze::usesE7setDiffWave(FC* decoder) {
             ubyte seq = it->first;
             udword seqOffs = decoder->getSndSeq(seq);
             udword seqOffsEnd = decoder->getSndSeqEnd(seq);
-            for (int i=0; i<(seqOffsEnd-seqOffs); i++) {
+            for (udword i=0; i<(seqOffsEnd-seqOffs); i++) {
                 if ( decoder->fcBuf[seqOffs+i] == 0xE0 ||
                      decoder->fcBuf[seqOffs+i] == 0xE1 ) {
                     return true;

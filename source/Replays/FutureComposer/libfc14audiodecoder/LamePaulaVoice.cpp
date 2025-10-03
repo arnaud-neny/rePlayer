@@ -48,6 +48,9 @@ void LamePaulaVoice::takeNextBuf() {
 }
 
 ubyte LamePaulaVoice::getSample() {
+    if (!isOn) {
+        return 0;
+    }
     stepSpeedAddPnt += stepSpeedPnt;
     start += ( stepSpeed + ( stepSpeedAddPnt > 65535 ) );
     stepSpeedAddPnt &= 65535;

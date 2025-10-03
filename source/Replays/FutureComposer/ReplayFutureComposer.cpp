@@ -4,6 +4,7 @@
 // - fc14audiodecoder.h
 // - LamePaulaMixer.cpp
 // - LamePaulaMixer.h
+// - LiveFix.h
 // - Paula.h
 #include "ReplayFutureComposer.h"
 
@@ -18,14 +19,12 @@
 
 namespace rePlayer
 {
-#define FC14_VERSION "2.0.0"
-
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::FutureComposer,
         .name = "Future Composer",
         .extensions = "smod;fc;hip;hip7;hipc;mcmd",
-        .about = "libfc14audiodecoder " FC14_VERSION "\nCopyright(c) Michael Schwendt",
-        .settings = "libfc14audiodecoder " FC14_VERSION,
+        .about = "libfc14audiodecoder " VERSION "\nCopyright(c) Michael Schwendt",
+        .settings = "libfc14audiodecoder " VERSION,
         .init = ReplayFutureComposer::Init,
         .load = ReplayFutureComposer::Load,
         .displaySettings = ReplayFutureComposer::DisplaySettings,
@@ -188,7 +187,7 @@ namespace rePlayer
 
         info += "4 channels\n";
         info += fc14dec_format_name(m_decoder);
-        info += "\nlibfc14audiodecoder " FC14_VERSION;
+        info += "\nlibfc14audiodecoder " VERSION;
 
         return info;
     }

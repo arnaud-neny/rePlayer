@@ -53,7 +53,7 @@ bool FC::TFMX_init(int songNumber) {
     stats.sndSeqs = 1+readBEuword(fcBuf,h+4);
     stats.volSeqs = 1+readBEuword(fcBuf,h+6);
     stats.patterns = 1+readBEuword(fcBuf,h+8);
-    stats.trackSteps = stats.trackSteps = 1+readBEuword(fcBuf,h+0xa);
+    stats.trackSteps = 1+readBEuword(fcBuf,h+0xa);
     traits.patternSize = fcBuf[h+0xd];
     if (traits.patternSize != PATTERN_LENGTH) {  // potentially never true
         return false;
@@ -80,13 +80,24 @@ bool FC::TFMX_init(int songNumber) {
     offsets.subSongTab = offs;
     
     offs += (stats.songs+1)*TFMX_SONGTAB_ENTRY_SIZE;  // subsong definitions, one is undefined
-    if ( offs >= fcBuf.tellLength() ) {  // something is fubar then
+    if ( offs >= inputLen ) {  // something is fubar then
         return false;
     }
     offsets.sampleHeaders = offs;
     
     offs += (stats.samples)*traits.sampleStructSize;  // skip sample headers
     offsets.sampleData = offs;
+
+    // Reject Atari ST TFMX modules. As it seems to use different sound
+    // sequence commands, a command like $E2 $E5 with less than $E5 samples
+    // would be invalid for TFMX on Amiga.
+    for (ubyte seq = 0; seq<stats.sndSeqs; seq++) {
+        udword seqOffs = getSndSeq(seq);
+        if ( stats.samples < 0xe5 && fcBuf[seqOffs] == 0xe2 &&
+             fcBuf[seqOffs+1] >= 0xe5 ) {
+            return false;
+        }
+    }
 
     bool maybe4V = TFMX_4V_maybe();
     bool maybe7V = TFMX_7V_maybe();

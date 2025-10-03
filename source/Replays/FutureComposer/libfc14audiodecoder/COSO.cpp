@@ -89,7 +89,7 @@ bool FC::COSO_init(int songNumber) {
     }
 
     // Traverse through found modules and select the right song number.
-    for (int i=0; i<vHeaders.size(); i++) {
+    for (udword i=0; i<vHeaders.size(); i++) {
         h = vHeaders[i];
         ubyte songsInThisMod = readBEuword(fcBuf,h+0x20+0x10);
         if (admin.startSong < songsInThisMod) {
@@ -132,6 +132,17 @@ bool FC::COSO_init(int songNumber) {
     
     trackTabLen = stats.trackSteps*trackStepLen;
     
+    // Reject Atari ST TFMX COSO modules. As it seems to use different sound
+    // sequence commands, a command like $E2 $E5 with less than $E5 samples
+    // would be invalid for TFMX on Amiga.
+    for (ubyte seq = 0; seq<stats.sndSeqs; seq++) {
+        udword seqOffs = getSndSeq(seq);
+        if ( stats.samples < 0xe5 && fcBuf[seqOffs] == 0xe2 &&
+             fcBuf[seqOffs+1] >= 0xe5 ) {
+            return false;
+        }
+    }
+
     udword sh = offsets.sampleHeaders;
     for (int sam = 0; sam < stats.samples; sam++) {
         udword startOffs = readBEudword(fcBuf,sh)+offsets.sampleData;

@@ -178,17 +178,18 @@ void LamePaulaMixer::initMixTables() {
     float panRight = (50+(panning-50))/100.0;
 
     ubyte voicesPerChannel;
-    if (voices == 7)
+    if (voices == 7) {
         voicesPerChannel = 4/channels;
-    else
+    }
+    else {
         // Ensure even number of voices per output channel.
         voicesPerChannel = ((voices+1)&0xfe)/channels;
+    }
 
-	uword ui;
+    uword ui;
     long si;
     for (udword vol=0; vol<=PaulaVoice::VOLUME_MAX; vol++) {
         long spc;
-        uword vui;
         // Input samples: 80,81,82,...,FE,FF,00,01,02,...,7E,7F
         // Array: 00/x, 01/x, 02/x,...,7E/x,7F/x,80/x,81/x,82/x,...,FE/x/,FF/x 
         ui = (vol<<8);
@@ -346,7 +347,6 @@ void* LamePaulaMixer::fill8bitMono(void* buffer, udword numberOfSamples) {
         return(buffer8bit);
 
     buffer8bit = (static_cast<ubyte*>(buffer));
-    int vph = 3;
     for (udword n = numberOfSamples; n>0; n--) {
         *buffer8bit += mix[0x4000+getSample_7V()];
         buffer8bit++;
@@ -438,7 +438,6 @@ void* LamePaulaMixer::fill16bitMono( void* buffer, udword numberOfSamples ) {
         return(buffer16bit);
 
     buffer16bit = (static_cast<sword*>(buffer));
-    int vph = 3;
     for (udword n = numberOfSamples; n>0; n--) {
         *buffer16bit += mix[0x4000+getSample_7V()];
         buffer16bit++;

@@ -268,7 +268,7 @@ bool FC::init(void *data, udword length, int songNumber) {
     restart();
     do {
         duration += run();
-    } while ( !songEnd );
+    } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
 
     analyze->dump();
@@ -433,7 +433,6 @@ int FC::run() {  // --> PaulaPlayer::run()
         }  // songEnd flag may have changed after this
     }
 
-    int tick = 0;
     for (ubyte v=0; v<stats.voices; v++) {
         if ( !songEnd || loopMode ) {
             // Next function will will decide whether to turn audio channel on.
@@ -462,12 +461,12 @@ int FC::run() {  // --> PaulaPlayer::run()
         else {  // cut off channel volume at song end
             voiceVars[v].ch->paula.volume = 0;
         }
-        // If all modules ran at 50 Hz, we could simply return 20 ms,
-        // but the rate for some modules is different. 
-        tickFPadd += tickFP;
-        tick = tickFPadd>>8;
-        tickFPadd &= 0xff;
     }
+    // If all modules ran at 50 Hz, we could simply return 20 ms,
+    // but the rate for some modules is different.
+    tickFPadd += tickFP;
+    int tick = tickFPadd>>8;
+    tickFPadd &= 0xff;
     songPosCurrent += tick;
     return tick;  // in [ms]
 }
@@ -480,7 +479,7 @@ void FC::setRate(ubyte f) {
 // --------------------------------------------------------------------------
 
 void FC::Sample::assertBoundaries(smartPtr<ubyte>& pB) {
-    udword bufLen = pB.tellLength();
+    udword bufLen = pB.tellLength()-8;  // FC::silenceData at the end!
     // Avoid potentially unprecise or corrupted sample buffer boundaries.
     if ( startOffs > bufLen-2 )
         startOffs = bufLen-2;

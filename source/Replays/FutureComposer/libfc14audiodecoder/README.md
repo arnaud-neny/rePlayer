@@ -1,4 +1,4 @@
-C language wrapper library for Future Composer & Hippel audio decoding  
+## C language wrapper library for Future Composer & Hippel TFMX audio decoding  
 https://github.com/mschwendt/libfc14audiodecoder
 
 The family of music files supported by this library typically uses one
@@ -20,9 +20,10 @@ origin of those music files) usually the file name extension was put at the
 beginning, and that still applies to some music collections found on the
 Internet.
 
-The primary audio player that is being used while developing this library
-is Audacious:  
- https://audacious-media-player.org/
+### Players & Plugins
 
-The input plug-in for Audacious is maintained here:  
-https://github.com/mschwendt/audacious-plugins-fc
+* [Audacious](https://audacious-media-player.org/) with [this input plugin](https://github.com/mschwendt/audacious-plugins-fc) as the primary audio player that is being used while developing this library.
+
+* [DeaDBeeF](https://deadbeef.sourceforge.io/) with [this input plugin](https://github.com/mschwendt/deadbeef-plugins-fc) as another cross-plattform audio player that has been tested with.
+
+* [rePlayer](https://github.com/arnaud-neny/rePlayer) includes a prebuilt plugin among a ton of others as to handle a high number of music file formats.

@@ -75,6 +75,7 @@ void dumpTimestamp(udword ms) {
 // --------------------------------------------------------------------------
 
 void FC::dumpModule() {
+    cout << getFormatName() << endl;
     cout << "Header at 0x" << hex << offsets.header << endl;
     cout << "Sample headers at 0x" << hex << offsets.sampleHeaders << endl;
     cout << "Sample data at 0x" << hex << offsets.sampleData << endl;

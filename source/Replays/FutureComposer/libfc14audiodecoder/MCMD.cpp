@@ -72,7 +72,7 @@ bool FC::MCMD_init(int songNumber) {
     stats.sndSeqs = readBEuword(fcBuf,h+4);
     stats.volSeqs = readBEuword(fcBuf,h+6);
     stats.patterns = readBEuword(fcBuf,h+8);
-    stats.trackSteps = stats.trackSteps = readBEuword(fcBuf,h+0xa);
+    stats.trackSteps = readBEuword(fcBuf,h+0xa);
     traits.patternSize = fcBuf[h+0xd];
     stats.songs = readBEuword(fcBuf,h+0xe);;
     stats.samples = readBEuword(fcBuf,h+0x10);
@@ -94,7 +94,7 @@ bool FC::MCMD_init(int songNumber) {
     offsets.subSongTab = offs;
     
     offs += stats.songs*TFMX_7V_SONGTAB_ENTRY_SIZE;  // subsong definitions
-    if ( offs >= fcBuf.tellLength() ) {  // something is fubar then
+    if ( offs >= inputLen ) {  // something is fubar then
         return false;
     }
     offsets.sampleHeaders = offs;
