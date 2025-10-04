@@ -66,7 +66,7 @@
 #define STDC_HEADERS 0
 
 /* Version number of package */
-#define VERSION "2.0.1"
+#define VERSION "2.0.2"
 #if 0
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the

@@ -186,33 +186,35 @@ void LamePaulaMixer::initMixTables() {
         voicesPerChannel = ((voices+1)&0xfe)/channels;
     }
 
+    // Input samples: 8-bit signed 80,81,82,...,FE,FF,00,01,02,...,7E,7F
+    // Array: 00->x, 01->x, ...,7E->x,7F->x,80->x,81->,82->,...,FE->x/,FF->x
     uword ui;
     long si;
     for (udword vol=0; vol<=PaulaVoice::VOLUME_MAX; vol++) {
         long spc;
-        // Input samples: 80,81,82,...,FE,FF,00,01,02,...,7E,7F
-        // Array: 00/x, 01/x, 02/x,...,7E/x,7F/x,80/x,81/x,82/x,...,FE/x/,FF/x 
+
         ui = (vol<<8);
         si = 0;
-        while (si++ < 128) {
-            mix8vol[ui] = 0x80 + (si*vol)/PaulaVoice::VOLUME_MAX;
+        while (si < 128) {
+            mix8vol[ui] = (si*vol)/PaulaVoice::VOLUME_MAX;
             spc = ((si/voicesPerChannel)*vol)/PaulaVoice::VOLUME_MAX;
             mix8mono[ui] = (sbyte)spc;
             mix8right[ui] = (sbyte)(spc*panRight);
             mix8left[ui] = (sbyte)(spc*panLeft);
             ui++;
+            si++;
         }
         si = -128;
-        while (si++ < 0) {
-            mix8vol[ui] = 0x80 + (si*vol)/PaulaVoice::VOLUME_MAX;
+        while (si < 0) {
+            mix8vol[ui] = (si*vol)/PaulaVoice::VOLUME_MAX;
             spc = ((si/voicesPerChannel)*vol)/PaulaVoice::VOLUME_MAX;
             mix8mono[ui] = (sbyte)spc;
             mix8right[ui] = (sbyte)(spc*panRight);
             mix8left[ui] = (sbyte)(spc*panLeft);
             ui++;
+            si++;
         }
-        // Input samples: 80,81,82,...,FE,FF,00,01,02,...,7E,7F
-        // Array: 0/x, 100/x, 200/x, ..., FF00/x
+
         ui = (vol<<8);
         si = 0;
         while (si < 128*256) {
@@ -282,11 +284,11 @@ void LamePaulaMixer::updateVoiceVolume() {
 }
 
 ubyte LamePaulaMixer::getSample_7V() {
-    uword sam = (ubyte)mix8vol[(voiceVol[3]<<8)+pVoice[3]->getSample()];
-    sam += (ubyte)mix8vol[(voiceVol[4]<<8)+pVoice[4]->getSample()];
-    sam += (ubyte)mix8vol[(voiceVol[5]<<8)+pVoice[5]->getSample()];
-    sam += (ubyte)mix8vol[(voiceVol[6]<<8)+pVoice[6]->getSample()];
-    return clipping4[sam];
+    sword sam = mix8vol[(voiceVol[3]<<8)+pVoice[3]->getSample()];
+    sam += mix8vol[(voiceVol[4]<<8)+pVoice[4]->getSample()];
+    sam += mix8vol[(voiceVol[5]<<8)+pVoice[5]->getSample()];
+    sam += mix8vol[(voiceVol[6]<<8)+pVoice[6]->getSample()];
+    return clipping4[0x200+sam];
 }
 
 udword LamePaulaMixer::fillBuffer(void* buffer, udword bufferLen, PaulaPlayer *player) { // rePlayer
