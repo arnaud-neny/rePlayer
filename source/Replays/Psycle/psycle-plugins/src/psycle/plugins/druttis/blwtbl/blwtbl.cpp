@@ -8,7 +8,7 @@
 namespace psycle::plugins::druttis {
 
 //Max sample rate = 96Khz
-int const MAX_FREQUENCY = 48000;
+int const MAX_FREQUENCY = 48000 * 2;
 
 //////////////////////////////////////////////////////////////////////
 //
