@@ -60,7 +60,7 @@ namespace rePlayer
         std::string GetInfo() const override;
 
     private:
-        static constexpr uint32_t kSampleRate = 48000/*32768*/;
+        static constexpr uint32_t kSampleRate = 44100;
         static constexpr uint32_t kDefaultSongDuration = 180 * 1000; // in milliseconds
 
         struct Subsong
