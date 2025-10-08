@@ -415,7 +415,7 @@ namespace rePlayer
         }
 
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(GetDurationMs()) * GetSampleRate()) / 1000;
         m_currentSubsongIndex = subsongIndex;
 
         if (m_loaderState.refresh)
@@ -443,7 +443,7 @@ namespace rePlayer
             auto durations = settings->GetDurations();
             for (uint16_t i = 0; i <= settings->numSongsMinusOne; i++)
                 m_subsongs[i].overriddenDuration = durations[i];
-            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+            m_currentDuration = (uint64_t(GetDurationMs()) * GetSampleRate()) / 1000;
         }
     }
 
@@ -515,7 +515,7 @@ namespace rePlayer
             for (uint16_t i = 0; i <= numSongsMinusOne; i++)
                 durations[i] = 0;
         }
-        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(GetDurationMs()) * GetSampleRate()) / 1000;
     }
 }
 // namespace rePlayer

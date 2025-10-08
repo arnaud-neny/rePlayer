@@ -47,7 +47,7 @@ namespace rePlayer
     public:
         ~ReplayHighlyExperimental() override;
 
-        uint32_t GetSampleRate() const override { return kSampleRate; }
+        uint32_t GetSampleRate() const override { return m_psfType == 1 ? 44100 : 48000; }
         bool IsSeekable() const override { return false; }
 
         uint32_t Render(StereoSample* output, uint32_t numSamples) override;
@@ -64,7 +64,6 @@ namespace rePlayer
         std::string GetInfo() const override;
 
     private:
-        static constexpr uint32_t kSampleRate = 48000/*32768*/;
         static constexpr uint32_t kDefaultSongDuration = 180 * 1000; // in milliseconds
 
         struct Subsong
