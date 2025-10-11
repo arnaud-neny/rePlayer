@@ -1,4 +1,4 @@
-v0.21.1
+v0.21.2:
 - Added SkaleTracker
 - Updated libfc14audiodecoder to 2.0.2
 - Updated libsidplay to 2.15.1
@@ -7,7 +7,7 @@ v0.21.1
 - Updated libxml2 to 2.15.0
 - Bug fixes
 
-v0.20.4
+v0.20.4:
 - Added MegaTracker
 - Updated libfc14audiodecoder to 2.0.0
 - Updated libgme to 0.6.4.414
