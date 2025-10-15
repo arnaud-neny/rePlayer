@@ -194,6 +194,7 @@ void ImGuiInit()
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
+    io.ConfigViewportsNoDefaultParent = false;
     io.IniSavingRate = 15.0f * 60.0f;
 
     ImGui::StyleColorsDark();
