@@ -42,6 +42,7 @@
     <ClInclude Include="libarchive\archive_pathmatch.h" />
     <ClInclude Include="libarchive\archive_platform.h" />
     <ClInclude Include="libarchive\archive_platform_acl.h" />
+    <ClInclude Include="libarchive\archive_platform_stat.h" />
     <ClInclude Include="libarchive\archive_platform_xattr.h" />
     <ClInclude Include="libarchive\archive_ppmd7_private.h" />
     <ClInclude Include="libarchive\archive_ppmd8_private.h" />
