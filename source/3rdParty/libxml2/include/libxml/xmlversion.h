@@ -16,17 +16,17 @@
 /**
  * the version string like "1.2.3"
  */
-#define LIBXML_DOTTED_VERSION "2.15.0"
+#define LIBXML_DOTTED_VERSION "2.15.1"
 
 /**
  * the version number: 1.2.3 value is 10203
  */
-#define LIBXML_VERSION 21500
+#define LIBXML_VERSION 21501
 
 /**
  * the version number string, 1.2.3 value is "10203"
  */
-#define LIBXML_VERSION_STRING "21500"
+#define LIBXML_VERSION_STRING "21501"
 
 /**
  * extra version information, used to show a git commit description
@@ -37,7 +37,7 @@
  * Macro to check that the libxml version in use is compatible with
  * the version the software has been compiled against
  */
-#define LIBXML_TEST_VERSION xmlCheckVersion(21500);
+#define LIBXML_TEST_VERSION xmlCheckVersion(21501);
 
 #if 0//@WITH_THREADS@
 /**
@@ -104,7 +104,7 @@
 /**
  * HTTP support was removed in 2.15
  */
-#define LIBXML_HTTP_ENABLED
+#define LIBXML_HTTP_STUBS_ENABLED
 #endif
 
 #if 0//@WITH_VALID@
