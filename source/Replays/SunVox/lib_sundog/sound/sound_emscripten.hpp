@@ -179,7 +179,7 @@ int device_sound_init_webaudio( sundog_sound* ss )
 	    }
 	    return sda_node.bufferSize;
 	}, d->buffer_size, ss->out_channels );
-	d->output_buffer = smem_new( sizeof( float ) * d->buffer_size * ss->out_channels * ss->out_channels ); //*ss->out_channels - for data split in webaudio_callback()
+	d->output_buffer = SMEM_ALLOC( sizeof( float ) * d->buffer_size * ss->out_channels * ss->out_channels ); //*ss->out_channels - for data split in webaudio_callback()
 	EM_ASM(
 	    sda_node.onaudioprocess = function(e) 
 	    {
@@ -289,8 +289,7 @@ int device_sound_init( sundog_sound* ss )
 {
     if( !ss->device_specific )
     {
-	ss->device_specific = smem_new( sizeof( device_sound ) );
-	smem_zero( ss->device_specific );
+	ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     }
     device_sound* d = (device_sound*)ss->device_specific;
 

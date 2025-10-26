@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -113,7 +113,7 @@ int sunvox_load_module_from_fd( int mod_num, int x, int y, int z, sfs_file f, ui
 	    case BID_CVAL:
 		if( c_num + 1 > smem_get_size( s_ctls ) / sizeof( PS_CTYPE ) )
 		{
-		    s_ctls = (PS_CTYPE*)smem_resize( s_ctls, ( c_num + 16 ) * sizeof( PS_CTYPE ) );
+		    s_ctls = SMEM_RESIZE2( s_ctls, PS_CTYPE, c_num + 16 );
 		    if( !s_ctls )
 		    {
 		        slog( "ERROR: ctls allocation error!\n" ); 
@@ -133,8 +133,7 @@ int sunvox_load_module_from_fd( int mod_num, int x, int y, int z, sfs_file f, ui
 		break;
 	    case BID_CHNK:
 		chunks_num = st->block_data_int;
-		chunks = (psynth_chunk*)smem_new( chunks_num * sizeof( psynth_chunk ) );
-		smem_zero( chunks );
+		chunks = SMEM_ZALLOC2( psynth_chunk, chunks_num );
 		continue;
 		break;
 	    case BID_CHNM: chunk_num = st->block_data_int; continue; break;

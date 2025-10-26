@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -39,13 +39,13 @@ void sunvox_sort_patterns( sunvox_engine* s )
     {
 	if( !s->sorted_pats )
 	{
-	    s->sorted_pats = (int*)smem_new( s->pats_num * sizeof( int ) );
+	    s->sorted_pats = SMEM_ALLOC2( int, s->pats_num );
 	}
 	else
 	{
 	    if( s->pats_num > (int)( smem_get_size( s->sorted_pats ) / sizeof( int ) ) )
 	    {
-		s->sorted_pats = (int*)smem_resize( s->sorted_pats, ( s->pats_num + 32 ) * sizeof( int ) );
+		s->sorted_pats = SMEM_RESIZE2( s->sorted_pats, int, s->pats_num + 32 );
 	    }
 	}
 	s->sorted_pats_num = 0;
@@ -98,7 +98,7 @@ void sunvox_sort_patterns( sunvox_engine* s )
 	if( pp > MAX_PLAYING_PATS ) pp = MAX_PLAYING_PATS;
 	if( pp > s->pat_state_size )
 	{
-	    s->pat_state = (sunvox_pattern_state*)smem_resize2( s->pat_state, sizeof( sunvox_pattern_state ) * pp );
+	    s->pat_state = SMEM_ZRESIZE2( s->pat_state, sunvox_pattern_state, pp );
 	    if( s->pat_state )
 	    {
 		for( int i = s->pat_state_size; i < pp; i++ )
@@ -247,12 +247,10 @@ int sunvox_get_free_pattern_num( sunvox_engine* s )
 {
     if( !s->pats )
     {
-	s->pats = (sunvox_pattern**)smem_new( 16 * sizeof( sunvox_pattern* ) );
+	s->pats = SMEM_ZALLOC2( sunvox_pattern*, 16 );
 	if( !s->pats ) return -1;
-	s->pats_info = (sunvox_pattern_info*)smem_new( 16 * sizeof( sunvox_pattern_info ) );
+	s->pats_info = SMEM_ZALLOC2( sunvox_pattern_info, 16 );
 	if( !s->pats_info ) return -1;
-	smem_zero( s->pats );
-	smem_zero( s->pats_info );
 	s->pats_num = 16;
     }
     int p = 0;
@@ -263,9 +261,9 @@ int sunvox_get_free_pattern_num( sunvox_engine* s )
     if( p >= s->pats_num )
     {
 	s->pats_num += 16;
-	s->pats = (sunvox_pattern**)smem_resize2( s->pats, s->pats_num * sizeof( sunvox_pattern* ) );
+	s->pats = SMEM_ZRESIZE2( s->pats, sunvox_pattern*, s->pats_num );
 	if( !s->pats ) return -1;
-	s->pats_info = (sunvox_pattern_info*)smem_resize2( s->pats_info, s->pats_num * sizeof( sunvox_pattern_info ) );
+	s->pats_info = SMEM_ZRESIZE2( s->pats_info, sunvox_pattern_info, s->pats_num );
 	if( !s->pats_info ) return -1;
     }
     return p;
@@ -319,20 +317,19 @@ void sunvox_new_pattern_with_num( int pat_num, int lines, int channels, int x, i
     if( (unsigned)pat_num >= (unsigned)s->pats_num )
     {
 	s->pats_num += 16;
-	s->pats = (sunvox_pattern**)smem_resize2( s->pats, s->pats_num * sizeof( sunvox_pattern* ) );
+	s->pats = SMEM_ZRESIZE2( s->pats, sunvox_pattern*, s->pats_num );
 	if( !s->pats ) return;
-	s->pats_info = (sunvox_pattern_info*)smem_resize2( s->pats_info, s->pats_num * sizeof( sunvox_pattern_info ) );
+	s->pats_info = SMEM_ZRESIZE2( s->pats_info, sunvox_pattern_info, s->pats_num );
 	if( !s->pats_info ) return;
     }
-    s->pats[ pat_num ] = (sunvox_pattern*)smem_new( sizeof( sunvox_pattern ) );
+    s->pats[ pat_num ] = SMEM_ALLOC2( sunvox_pattern, 1 );
     sunvox_pattern* pat = s->pats[ pat_num ];
     if( !pat ) return;
     sunvox_pattern_info* pat_info = &s->pats_info[ pat_num ];
     pat->lines = lines;
     pat->channels = channels;
-    pat->data = (sunvox_note*)smem_new( sizeof( sunvox_note ) * channels * lines );
+    pat->data = SMEM_ZALLOC2( sunvox_note, channels * lines );
     if( !pat->data ) return;
-    smem_zero( pat->data );
     pat->data_xsize = channels;
     pat->data_ysize = lines;
     pat->ysize = SUNVOX_PATTERN_DEFAULT_YSIZE( s );
@@ -390,9 +387,9 @@ int sunvox_new_pattern_clone( int pat_num, int x, int y, sunvox_engine *s )
 	}
 	if( p >= s->pats_num )
 	{
-	    s->pats = (sunvox_pattern**)smem_resize2( s->pats, ( s->pats_num + 16 ) * sizeof( sunvox_pattern* ) );
+	    s->pats = SMEM_ZRESIZE2( s->pats, sunvox_pattern*, s->pats_num + 16 );
 	    if( !s->pats ) return -1;
-	    s->pats_info = (sunvox_pattern_info*)smem_resize2( s->pats_info, ( s->pats_num + 16 ) * sizeof( sunvox_pattern_info ) );
+	    s->pats_info = SMEM_ZRESIZE2( s->pats_info, sunvox_pattern_info, s->pats_num + 16 );
 	    if( !s->pats_info ) return -1;
 	    s->pats_num += 16;
 	}
@@ -413,9 +410,9 @@ void sunvox_detach_clone( int pat_num, sunvox_engine* s )
     sunvox_pattern_info* pat_info = sunvox_get_pattern_info( pat_num, s );
     if( ( pat_info->flags & SUNVOX_PATTERN_INFO_FLAG_CLONE ) == 0 ) return;
     pat_info->flags &= ~SUNVOX_PATTERN_INFO_FLAG_CLONE;
-    sunvox_pattern* pat2 = (sunvox_pattern*)smem_clone( pat );
-    pat2->data = (sunvox_note*)smem_clone( pat->data );
-    pat2->name = (char*)smem_clone( pat->name );
+    sunvox_pattern* pat2 = (sunvox_pattern*)SMEM_CLONE( pat );
+    pat2->data = (sunvox_note*)SMEM_CLONE( pat->data );
+    pat2->name = (char*)SMEM_CLONE( pat->name );
     pat2->icon_num = -1; 
     pat2->id = s->pat_id_counter; s->pat_id_counter++;
     s->pats[ pat_num ] = pat2;
@@ -487,7 +484,7 @@ void sunvox_rename_pattern( int pat_num, const char* name, sunvox_engine* s )
     sunvox_pattern* pat = s->pats[ pat_num ];
     if( !pat ) return;
     smem_free( pat->name );
-    pat->name = smem_strdup( name );
+    pat->name = SMEM_STRDUP( name );
 }
 int sunvox_get_pattern_num_by_name( const char* name, sunvox_engine* s )
 {
@@ -525,8 +522,7 @@ int sunvox_get_free_icon_number( sunvox_engine *s )
     if( s->icons_map == 0 )
     {
 	s->icons_map = new_image( SUNVOX_ICON_MAP_XSIZE, 16, 0, SUNVOX_ICON_MAP_XSIZE, 16, IMAGE_ALPHA8, s->win->wm );
-	s->icons_flags = (int8_t*)smem_new( SUNVOX_ICON_MAP_XSIZE / 16 );
-	smem_zero( s->icons_flags );
+	s->icons_flags = SMEM_ZALLOC2( int8_t, SUNVOX_ICON_MAP_XSIZE / 16 );
     }
     int i;
     int icons_num = smem_get_size( s->icons_flags );
@@ -540,13 +536,13 @@ int sunvox_get_free_icon_number( sunvox_engine *s )
     if( i == icons_num )
     {
 	s->icons_map = resize_image( s->icons_map, 0, s->icons_map->xsize, s->icons_map->ysize * 2 );
-	s->icons_flags = (int8_t*)smem_resize2( s->icons_flags, icons_num * 2 );
+	s->icons_flags = SMEM_ZRESIZE2( s->icons_flags, int8_t, icons_num * 2 );
     }
     s->icons_flags[ i ] = 1;
     return i;
 #else
     return 0;
-#endif    
+#endif
 }
 void sunvox_remove_icon( int num, sunvox_engine *s )
 {
@@ -621,7 +617,7 @@ void sunvox_pattern_set_number_of_channels( int pat_num, int cnum, sunvox_engine
 	if( cnum > pat->data_xsize )
 	{
 	    size_t new_size = cnum * pat->data_ysize * sizeof( sunvox_note );
-	    sunvox_note* new_data = (sunvox_note*)smem_resize2( pat->data, new_size );
+	    sunvox_note* new_data = (sunvox_note*)SMEM_ZRESIZE( pat->data, new_size );
 	    if( new_data )
 	    {
 		int old_xsize = pat->data_xsize;
@@ -658,7 +654,7 @@ int sunvox_pattern_set_number_of_lines( int pat_num, int lnum, bool rescale_cont
     if( lnum > pat->data_ysize )
     {
         size_t new_size = pat->data_xsize * lnum * sizeof( sunvox_note );
-        sunvox_note* new_data = (sunvox_note*)smem_resize2( pat->data, new_size );
+        sunvox_note* new_data = (sunvox_note*)SMEM_ZRESIZE( pat->data, new_size );
         if( new_data )
         {
     	    pat->data = new_data;
@@ -821,7 +817,7 @@ sunvox_note* sunvox_load_pattern_buf( const char* filename, int* xsize, int* ysi
         if( *xsize > 0 && *ysize > 0 )
         {
             int s = xsize[0] * ysize[0];
-            buf = (sunvox_note*)smem_znew( s * sizeof( sunvox_note ) );
+            buf = SMEM_ZALLOC2( sunvox_note, s );
             if( buf )
             {
                 sfs_read( buf, sizeof( sunvox_note ), s, f );

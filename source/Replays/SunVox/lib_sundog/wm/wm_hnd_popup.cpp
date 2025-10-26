@@ -1,7 +1,7 @@
 /*
     wm_hnd_popup.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -179,7 +179,7 @@ int popup_handler( sundog_event* evt, window_manager* wm )
 		if( wm->opt_popup_text )
 		{
 		    //Text popup:
-		    data->text = (char*)smem_strdup( wm->opt_popup_text );
+		    data->text = (char*)SMEM_STRDUP( wm->opt_popup_text );
 		    data->lines_num = 0;
 		    data->lines[ 0 ] = 0;
 		    int nl_code = 0;

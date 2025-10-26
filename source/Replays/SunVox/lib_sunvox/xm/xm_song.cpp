@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -40,11 +40,10 @@ void xm_remove_song( xm_song* song )
     for( int i = 0; i < MAX_XM_INSTRUMENTS; i++ ) xm_remove_instrument( i, song );
     smem_free( song );
 }
-xm_song* xm_new_song( void )
+xm_song* xm_new_song()
 {
-    xm_song* song = (xm_song*)smem_new( sizeof( xm_song ) );
-    if( song == 0 ) return 0;
-    smem_zero( song );
+    xm_song* song = SMEM_ZALLOC2( xm_song, 1 );
+    if( !song ) return 0;
     char* temp_s = (char*)"Extended Module: ";
     for( int tp = 0; tp < 17; tp++ ) song->id_text[ tp ] = temp_s[ tp ];
     song->reserved1 = 0x1A;
@@ -465,7 +464,7 @@ static bool check_signature( sfs_file f )
 {
     bool rv = false;
     char sign[ 16 ];
-    smem_clear_struct( sign );
+    SMEM_CLEAR_STRUCT( sign );
     sfs_rewind( f );
     sfs_read( sign, 1, 15, f );
     if( smem_strcmp( sign, "Extended Module" ) == 0 )

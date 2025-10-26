@@ -1,7 +1,7 @@
 /*
     wm.cpp - SunDog window manager
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -85,7 +85,7 @@ int empty_device_start( const char* name, int xsize, int ysize, window_manager* 
 
     wm->fb_xsize = wm->screen_xsize;
     wm->fb_ysize = wm->screen_ysize;
-    wm->fb = (COLORPTR)smem_new( wm->fb_xsize * wm->fb_ysize * COLORLEN );
+    wm->fb = SMEM_ALLOC2( COLOR, wm->fb_xsize * wm->fb_ysize );
     wm->fb_offset = 0;
     wm->fb_ypitch = wm->fb_xsize;
     wm->fb_xpitch = 1;
@@ -176,9 +176,9 @@ static void load_font( int f, int zoom, uint8_t* tab, window_manager* wm )
 	int tmp_char_ysize = max_char_ysize + 4; // ...
 	int tmp_char2_xsize = ( max_char_xsize + 2 ) * zoom; // ZOOMED [ 0 [GLYPH] 0 ]
 	int tmp_char2_ysize = ( max_char_ysize + 2 ) * zoom; // ...
-	uint8_t* img = (uint8_t*)smem_znew( img_xsize * img_ysize );
-	uint8_t* tmp_char = (uint8_t*)smem_znew( tmp_char_xsize * tmp_char_ysize );
-	uint8_t* tmp_char2 = (uint8_t*)smem_znew( tmp_char2_xsize * tmp_char2_ysize );
+	uint8_t* img = SMEM_ZALLOC2( uint8_t, img_xsize * img_ysize );
+	uint8_t* tmp_char = SMEM_ZALLOC2( uint8_t, tmp_char_xsize * tmp_char_ysize );
+	uint8_t* tmp_char2 = SMEM_ZALLOC2( uint8_t, tmp_char2_xsize * tmp_char2_ysize );
 	font_data += 257;
 	int char_n = 0;
 	for( int yy = 0; yy < grid_cell_ysize * 16; yy += grid_cell_ysize )
@@ -355,7 +355,7 @@ static void load_font( int f, int zoom, uint8_t* tab, window_manager* wm )
 	int img_ysize = 16 * font->grid_cell_ysize;
 	img_xsize = round_to_power_of_two( img_xsize );
 	img_ysize = round_to_power_of_two( img_ysize );
-	uint8_t* img = (uint8_t*)smem_znew( img_xsize * img_ysize );
+	uint8_t* img = SMEM_ZALLOC2( uint8_t, img_xsize * img_ysize );
 	font_data += 257;
 	int grid_cell_xsize = font->grid_cell_xsize;
 	int grid_cell_ysize = font->grid_cell_ysize;
@@ -425,7 +425,7 @@ static void load_fonts( window_manager* wm )
     if( !( wm->flags & WIN_INIT_FLAG_NO_FONT_UPSCALE ) && zoom > 1 )
     {
 	int zoom2 = zoom * zoom;
-	tab = (uint8_t*)smem_znew( zoom2 * 16 );
+	tab = SMEM_ZALLOC2( uint8_t, zoom2 * 16 );
 	//Prepare the table:
 	for( int i = 1; i < 15; i++ )
 	{
@@ -567,7 +567,7 @@ int win_init( const char* name, int xsize, int ysize, uint flags, sundog_engine*
 
     //Save flags & name:
     wm->flags = flags;
-    wm->name = smem_strdup( name );
+    wm->name = SMEM_STRDUP( name );
 
     wm->screen_buffer_preserved = 1;
 #if defined(OPENGL) || defined(OPENGLES)
@@ -687,6 +687,7 @@ device_restart:
 	if( ( flags & WIN_INIT_FLAG_NOWINDOW ) == 0 )
 	{
 	    flags |= WIN_INIT_FLAG_NOWINDOW;
+	    wm->flags = flags;
 	    goto device_restart;
 	}
 #endif
@@ -865,7 +866,7 @@ device_restart:
 void win_change_name( const char* name, window_manager* wm )
 {
     smem_free( wm->name2 );
-    wm->name2 = smem_strdup( name );
+    wm->name2 = SMEM_STRDUP( name );
     if( wm->name2 )
     {
 	wm->device_change_name( wm->name2, wm );
@@ -1122,7 +1123,7 @@ void win_suspend( bool suspend, window_manager* wm )
     {
 	wm->suspended = suspend;
 	sundog_event evt;
-	smem_clear_struct( evt );
+	SMEM_CLEAR_STRUCT( evt );
 	evt.type = EVT_SUSPEND;
 	handle_event( &evt, wm );
     }
@@ -1140,7 +1141,7 @@ void win_suspend_devices( bool suspend, window_manager* wm )
     //So we should try to resume the sound, even if the wm->devices_suspended == false
 
     sundog_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     evt.type = EVT_DEVSUSPEND;
     handle_event( &evt, wm );
 
@@ -1209,7 +1210,9 @@ void win_deinit( window_manager* wm )
 #endif
 
 #if !defined(OS_IOS) && !defined(OS_ANDROID) && !defined(OS_WINCE) && !defined(OS_MACOS)
-    if( !( wm->flags & WIN_INIT_FLAG_NOWINDOW ) && !( wm->flags & WIN_INIT_FLAG_FULLSCREEN ) )
+    if( !( wm->flags & WIN_INIT_FLAG_NOWINDOW ) && 
+	!( wm->flags & WIN_INIT_FLAG_FULLSCREEN ) &&
+	!( wm->flags & WIN_INIT_DONT_SAVE_WINSIZE ) )
     {
 	if( sconfig_get_int_value( APP_CFG_DONT_SAVE_WINSIZE, -1, 0 ) == -1 )
 	{
@@ -1278,7 +1281,7 @@ WINDOWPTR new_window(
     WINDOWPTR win = get_from_trash( wm );
     if( win == NULL )
     {
-	win = (WINDOWPTR)smem_znew( sizeof( WINDOW ) );
+	win = SMEM_ZALLOC2( WINDOW, 1 );
 	win->id = (int16_t)wm->window_counter;
 	wm->window_counter++;
     }
@@ -1286,7 +1289,7 @@ WINDOWPTR new_window(
     //Setup properties:
     win->wm = wm;
     smem_free( win->name );
-    win->name = smem_strdup( name );
+    win->name = SMEM_STRDUP( name );
     win->flags = 0;
     win->x = x;
     win->y = y;
@@ -1316,7 +1319,7 @@ WINDOWPTR new_window(
 	int datasize = win_handler( evt, wm );
 	if( datasize > 0 )
 	{
-	    win->data = smem_znew( datasize );
+	    win->data = SMEM_ZALLOC( datasize );
 	}
 	evt->type = EVT_AFTERCREATE;
 	win_handler( evt, wm );
@@ -1354,7 +1357,7 @@ void rename_window( WINDOWPTR win, const char* name )
     if( smem_strcmp( win->name, name ) )
     {
 	smem_free( win->name );
-	win->name = smem_strdup( name );
+	win->name = SMEM_STRDUP( name );
     }
 }
 
@@ -1373,12 +1376,12 @@ void set_window_controller( WINDOWPTR win, int ctrl_num, window_manager* wm, ...
 	case 3: cmds = win->y2com; break;
     }
     if( cmds == 0 )
-	cmds = (WCMD*)smem_new( sizeof( WCMD ) * 4 );
+	cmds = SMEM_ALLOC2( WCMD, 4 );
     while( 1 )
     {
 	WCMD command = va_arg( p, WCMD );
 	if( smem_get_size( cmds ) / sizeof( WCMD ) <= ptr )
-	    cmds = (WCMD*)smem_resize( cmds, sizeof( WCMD ) * ( ptr + 4 ) );
+	    cmds = SMEM_RESIZE2( cmds, WCMD, ptr + 4 );
 	cmds[ ptr ] = command; 
 	if( command == CEND ) break;
 	ptr++;
@@ -1419,7 +1422,7 @@ static void move_to_trash( WINDOWPTR win, window_manager* wm )
 	wm->trash_ptr++; if( wm->trash_ptr >= trash_len ) wm->trash_ptr = 0;
     }
     wm->trash_ptr = trash_len;
-    wm->trash = (WINDOWPTR*)smem_resize2( wm->trash, ( trash_len + 256 ) * sizeof( WINDOWPTR ) );
+    wm->trash = SMEM_ZRESIZE2( wm->trash, WINDOWPTR, trash_len + 256 );
     wm->trash[ wm->trash_ptr ] = win;
 }
 
@@ -1477,13 +1480,13 @@ void add_child( WINDOWPTR win, WINDOWPTR child, window_manager* wm )
 
     if( win->childs == 0 )
     {
-	win->childs = (WINDOWPTR*)smem_new( sizeof( WINDOWPTR ) * 4 );
+	win->childs = SMEM_ALLOC2( WINDOWPTR, 4 );
     }
     else
     {
 	size_t old_size = smem_get_size( win->childs ) / sizeof( WINDOWPTR );
 	if( (unsigned)win->childs_num >= old_size )
-	    win->childs = (WINDOWPTR*)smem_resize( win->childs, ( old_size + 4 ) * sizeof( WINDOWPTR ) );
+	    win->childs = SMEM_RESIZE2( win->childs, WINDOWPTR, old_size + 4 );
     }
     win->childs[ win->childs_num ] = child;
     win->childs_num++;
@@ -2452,7 +2455,7 @@ int send_event(
 int send_event( WINDOWPTR win, int type, window_manager* wm )
 {
     sundog_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     evt.win = win;
     evt.type = type;
     return send_events( &evt, 1, wm );
@@ -2574,7 +2577,7 @@ static int check_event( sundog_event* evt, window_manager* wm )
 int handle_event( WINDOWPTR win, int type, window_manager* wm )
 {
     sundog_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     evt.type = type;
     evt.win = win;
     return handle_event( &evt, wm );
@@ -2602,7 +2605,7 @@ int handle_event_direct( WINDOWPTR win, int type )
 {
     if( !win ) return 0;
     sundog_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     evt.type = type;
     evt.win = win;
     return win->win_handler( &evt, win->wm );
@@ -2937,9 +2940,9 @@ void show_status_message( const char* msg, int t, window_manager* wm )
 	if( c == 0xA ) lines++;
     }
     smem_free( wm->status_message );
-    wm->status_message = (char*)smem_new( smem_strlen( msg ) + 1 );
+    wm->status_message = SMEM_ALLOC2( char, smem_strlen( msg ) + 1 );
     wm->status_message[ 0 ] = 0;
-    smem_strcat_resize( wm->status_message, msg );
+    SMEM_STRCAT_D( wm->status_message, msg );
     if( wm->status_window == 0 )
     {
 	wm->status_window = new_window( "status", 0, 0, 8, 8, wm->color0, wm->root_win, status_message_handler, wm );
@@ -3719,7 +3722,7 @@ void btn_autoalign_add( btn_autoalign_data* aa, WINDOWPTR w, uint32_t flags )
 {
     if( !w || !aa ) return;
 
-    if( smem_objarray_write_d( (void***)&aa->ww, w, false, aa->i ) ) return;
+    if( SMEM_OBJARRAY_WRITE_D( (void***)&aa->ww, w, false, aa->i ) ) return;
     aa->i++;
 }
 
@@ -4090,7 +4093,7 @@ void video_capture_set_in_name( const char* name, window_manager* wm )
 {
 #ifndef NOVCAP
     smem_free( wm->vcap_in_name );
-    wm->vcap_in_name = smem_strdup( name );
+    wm->vcap_in_name = SMEM_STRDUP( name );
 #endif
 }
 
@@ -4263,9 +4266,11 @@ const char* wm_get_string( wm_string str_id )
 
 		case STR_WM_PREFERENCES: str = "Настройки"; break;
 		case STR_WM_PREFS_CHANGED: str = "!Настройки были изменены.\nНужно перезапустить программу для активации новых настроек.\nПерезапустить сейчас?"; break;
-		case STR_WM_INTERFACE: str = "Интерфейс"; break;
-    		case STR_WM_AUDIO: str = "Звук"; break;
-    		case STR_WM_VIDEO: str = "Видео"; break;
+		case STR_WM_PREFS_MAIN: str = "Основные"; break;
+		case STR_WM_PREFS_INTERFACE: str = "Интерфейс"; break;
+    		case STR_WM_PREFS_AUDIO: str = "Звук"; break;
+    		case STR_WM_PREFS_VIDEO: str = "Видео"; break;
+    		case STR_WM_PREFS_CAMERA: str = "Камера"; break;
     		case STR_WM_CAMERA: str = "Камера"; break;
     		case STR_WM_BACK_CAM: str = "Задняя"; break;
     		case STR_WM_FRONT_CAM: str = "Передняя"; break;
@@ -4336,6 +4341,9 @@ const char* wm_get_string( wm_string str_id )
                 case STR_WM_BLUE: str = "Синий"; break;
                 case STR_WM_HIDE_RECENT_FILES: str = "Скрыть недавние файлы"; break;
                 case STR_WM_SHOW_HIDDEN_FILES: str = "Показ. скрытые файлы"; break;
+                case STR_WM_CLEAR_SETTINGS: str = "Сбросить настройки"; break;
+                case STR_WM_CLEAR_SETTINGS_MSG: str = "!Сбросить все настройки?\n(программа будет перезапущена)"; break;
+                case STR_WM_BROAD_FS_ACCESS: str = "Расширенный доступ к файлам"; break;
 
 		case STR_WM_OFF_ON_MENU: str = "Выкл\nВкл"; break;
 		case STR_WM_AUTO_ON_OFF_MENU: str = "Авто\nВкл\nВыкл"; break;
@@ -4433,9 +4441,11 @@ const char* wm_get_string( wm_string str_id )
 
 	    case STR_WM_PREFERENCES: str = "Preferences"; break;
 	    case STR_WM_PREFS_CHANGED: str = "!Some preferences changed.\nYou must restart the program to apply these changes.\nRestart now?"; break;
-	    case STR_WM_INTERFACE: str = "Interface"; break;
-	    case STR_WM_AUDIO: str = "Audio"; break;
-	    case STR_WM_VIDEO: str = "Video"; break;
+	    case STR_WM_PREFS_MAIN: str = "Main"; break;
+	    case STR_WM_PREFS_INTERFACE: str = "Interface"; break;
+	    case STR_WM_PREFS_AUDIO: str = "Audio"; break;
+	    case STR_WM_PREFS_VIDEO: str = "Video"; break;
+    	    case STR_WM_PREFS_CAMERA: str = "Camera"; break;
     	    case STR_WM_CAMERA: str = "Camera"; break;
     	    case STR_WM_BACK_CAM: str = "Back"; break;
     	    case STR_WM_FRONT_CAM: str = "Front"; break;
@@ -4506,6 +4516,9 @@ const char* wm_get_string( wm_string str_id )
             case STR_WM_BLUE: str = "Blue"; break;
             case STR_WM_HIDE_RECENT_FILES: str = "Hide recent files"; break;
             case STR_WM_SHOW_HIDDEN_FILES: str = "Show hidden files"; break;
+            case STR_WM_CLEAR_SETTINGS: str = "Clear settings"; break;
+            case STR_WM_CLEAR_SETTINGS_MSG: str = "!Clear all settings?\n(the app will restart)"; break;
+            case STR_WM_BROAD_FS_ACCESS: str ="Broad access to files"; break;
 
 	    case STR_WM_OFF_ON_MENU: str = "OFF\nON"; break;
 	    case STR_WM_AUTO_ON_OFF_MENU: str = "Auto\nON\nOFF"; break;
@@ -4679,11 +4692,28 @@ int edialog_action_handler( void* user_data, WINDOWPTR win, window_manager* wm )
     }
     if( res == 2 )
     {
+	//Copy:
+	char* log = slog_get_latest( wm->sd, 1024 * 512 );
+	if( log )
+	{
+	    sfs_file f = sfs_open( wm->sd, "3:/log_tmp_buf", "wb" );
+	    if( f )
+	    {
+		sfs_write( log, 1, strlen( log ), f );
+		sfs_close( f );
+		sclipboard_copy( wm->sd, "3:/log_tmp_buf", 0 );
+		sfs_remove_file( "3:/log_tmp_buf" );
+	    }
+    	    smem_free( log );
+	}
+    }
+    if( res == 3 )
+    {
 	//Send log by email:
 	char* log = slog_get_latest( wm->sd, 1024 * 1024 );
 	if( log )
 	{
-	    char* ts = (char*)smem_new( 1024 );
+	    char* ts = SMEM_ALLOC2( char, 1024 );
 	    if( ts )
 	    {
     		sprintf( ts, "%s log", g_app_name );
@@ -4704,9 +4734,9 @@ void edialog_open( const char* error_str1, const char* error_str2, window_manage
     if( len2 == 0 ) error_str2 = "";
     uint error_log_bytes = 256;
     size_t ts_len = len1 + len2 + 1024 + error_log_bytes;
-    char* ts = (char*)smem_new( ts_len );
+    char* ts = SMEM_ALLOC2( char, ts_len );
     char* log = slog_get_latest( wm->sd, error_log_bytes );
-    char* buttons = (char*)smem_new( 1024 );
+    char* buttons = SMEM_ALLOC2( char, 1024 );
     if( len1 || len2 )
     {
 	slog( "Error: %s %s\n", error_str1, error_str2 );
@@ -4724,12 +4754,14 @@ void edialog_open( const char* error_str1, const char* error_str2, window_manage
     	    sprintf( ts, "!%s %s", error_str1, error_str2 );
     }
     buttons[ 0 ] = 0;
-    smem_strcat_resize( buttons, wm_get_string( STR_WM_CLOSE ) );
-    smem_strcat_resize( buttons, ";" );
-    smem_strcat_resize( buttons, wm_get_string( STR_WM_SAVE_LOG ) );
+    SMEM_STRCAT_D( buttons, wm_get_string( STR_WM_CLOSE ) );
+    SMEM_STRCAT_D( buttons, ";" );
+    SMEM_STRCAT_D( buttons, wm_get_string( STR_WM_SAVE_LOG ) );
+    SMEM_STRCAT_D( buttons, ";" );
+    SMEM_STRCAT_D( buttons, wm_get_string( STR_WM_COPY ) );
 #ifdef CAN_SEND_TO_EMAIL
-    smem_strcat_resize( buttons, ";" );
-    smem_strcat_resize( buttons, wm_get_string( STR_WM_EMAIL_LOG ) );
+    SMEM_STRCAT_D( buttons, ";" );
+    SMEM_STRCAT_D( buttons, wm_get_string( STR_WM_EMAIL_LOG ) );
 #endif
     WINDOWPTR win = dialog_open( NULL, ts, buttons, 0, wm );
     if( win )
@@ -4760,7 +4792,12 @@ WINDOWPTR fdialog_open( const char* name, const char* mask, const char* id, cons
 #endif
 
 #ifdef OS_ANDROID
-    android_sundog_check_for_permissions( wm->sd, (1<<0) | (1<<3) | (1<<4) | (1<<5) | (1<<6) );
+    android_sundog_check_for_permissions( wm->sd, 
+	ANDROID_PERM_WRITE_EXTERNAL_STORAGE |
+	ANDROID_PERM_READ_EXTERNAL_STORAGE | 
+	ANDROID_PERM_READ_MEDIA_AUDIO | 
+	ANDROID_PERM_READ_MEDIA_IMAGES |
+	ANDROID_PERM_READ_MEDIA_VIDEO );
 #endif
 
     int xsize = wm->large_window_xsize;
@@ -4812,7 +4849,7 @@ static int fdialog_action_handler( void* user_data, WINDOWPTR win, window_manage
     {
 	if( fname[ 0 ] )
 	{
-	    wm->fdialog_filename = smem_strdup( fname );
+	    wm->fdialog_filename = SMEM_STRDUP( fname );
 	}
     }
     return 0;
@@ -4846,7 +4883,7 @@ char* fdialog( const char* name, const char* mask, const char* id, const char* d
 
 WINDOWPTR fdialog_overwrite_open( char* filename, window_manager* wm )
 {
-    char* ts = (char*)smem_new( smem_strlen( filename ) + 1024 );
+    char* ts = SMEM_ALLOC2( char, smem_strlen( filename ) + 1024 );
     sprintf( ts, "!%s?\n%s", wm_get_string( STR_WM_FILE_OVERWRITE ), sfs_get_filename_without_dir( filename ) );
     WINDOWPTR d = dialog_open( NULL, ts, wm_get_string( STR_WM_YESNO ), 0, wm );
     smem_free( ts );
@@ -4855,7 +4892,7 @@ WINDOWPTR fdialog_overwrite_open( char* filename, window_manager* wm )
 
 int dialog_overwrite( char* filename, window_manager* wm ) //0 - YES; 1 - NO;
 {
-    char* ts = (char*)smem_new( smem_strlen( filename ) + 1024 );
+    char* ts = SMEM_ALLOC2( char, smem_strlen( filename ) + 1024 );
     sprintf( ts, "!%s?\n%s", wm_get_string( STR_WM_FILE_OVERWRITE ), sfs_get_filename_without_dir( filename ) );
     int rv = dialog( 0, ts, wm_get_string( STR_WM_YESNO ), wm );
     smem_free( ts );
@@ -4937,19 +4974,24 @@ void prefs_add_sections( const char** names, void** handlers, int num, window_ma
     wm->prefs_section_names[ wm->prefs_sections ] = 0;
 }
 
-void prefs_add_default_sections( window_manager* wm )
+void prefs_add_default_sections( window_manager* wm, bool without_main )
 {
-    const char* def_names[ 3 ];
-    void* def_handlers[ 3 ];
+    const char* def_names[ 4 ];
+    void* def_handlers[ 4 ];
     int s = 0;
+    if( !without_main )
+    {
+	def_handlers[ s ] = (void*)prefs_main_handler;
+	def_names[ s ] = wm_get_string( STR_WM_PREFS_MAIN ); s++;
+    }
     def_handlers[ s ] = (void*)prefs_ui_handler;
-    def_names[ s ] = wm_get_string( STR_WM_INTERFACE ); s++;
+    def_names[ s ] = wm_get_string( STR_WM_PREFS_INTERFACE ); s++;
 #ifndef NOVIDEO
     def_handlers[ s ] = (void*)prefs_svideo_handler;
-    def_names[ s ] = wm_get_string( STR_WM_VIDEO ); s++;
+    def_names[ s ] = wm_get_string( STR_WM_PREFS_VIDEO ); s++;
 #endif
     def_handlers[ s ] = (void*)prefs_audio_handler;
-    def_names[ s ] = wm_get_string( STR_WM_AUDIO ); s++;
+    def_names[ s ] = wm_get_string( STR_WM_PREFS_AUDIO ); s++;
     prefs_add_sections( def_names, def_handlers, s, wm );
 }
 

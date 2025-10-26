@@ -1,7 +1,7 @@
 /*
     sundog_bridge1.hpp - SunDog1<->Android bridge
     This file is part of the SunDog engine.
-    Copyright (C) 2012 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2012 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 

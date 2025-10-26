@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -101,7 +101,7 @@ static void lfo_change_ctl_limits( int mod_num, psynth_net* pnet )
     if( ( CHECK_VERSION && pnet->base_host_version >= 0x01090300 ) || CHECK_VERSION == 0 ) \
     { \
 	psynth_event e; \
-        smem_clear_struct( e ); \
+        SMEM_CLEAR_STRUCT( e ); \
 	e.command = PS_CMD_SET_GLOBAL_CONTROLLER; \
         e.controller.ctl_num = 5; \
 	e.controller.ctl_val = data->ctl_set_phase << 7; \
@@ -171,7 +171,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    data->rand = 0;
 	    data->rand_prev = 0;
             data->rand_prev_phase = 0;
-            data->rand_seed = stime_ms() + mod_num * 22;
+            data->rand_seed = (uint32_t)stime_ns() + pseudo_random() + mod_num * 49157 + mod->id * 3079;
 	    data->sin_tab = (uint16_t*)psynth_get_sine_table( 2, false, 9, 65535 );
 	    data->recalc_delta = true;
 	    retval = 1;

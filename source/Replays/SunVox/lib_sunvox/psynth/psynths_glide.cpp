@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -254,7 +254,7 @@ PS_RETTYPE MODULE_HANDLER(
             		    if( data->ch_flags_on & ( 1 << c ) )
             		    {
                     		psynth_event e;
-                    		smem_clear_struct( e );
+                    		SMEM_CLEAR_STRUCT( e );
                     		e.command = PS_CMD_NOTE_OFF;
                     		e.offset = offset;
                     		e.note.velocity = 256;
@@ -271,7 +271,7 @@ PS_RETTYPE MODULE_HANDLER(
 	        if( r < 1 ) r = 1;
 	        float response = (float)r / (float)MAX_RESPONSE;
 		psynth_event freq_evt;
-		smem_clear_struct( freq_evt );
+		SMEM_CLEAR_STRUCT( freq_evt );
 		freq_evt.command = PS_CMD_SET_FREQ;
 		int first_ch = 0;
     		int last_ch = MAX_CHANNELS - 1;
@@ -540,7 +540,7 @@ PS_RETTYPE MODULE_HANDLER(
 		if( release_all_channels )
 		{
 		    psynth_event e;
-		    smem_clear_struct( e );
+		    SMEM_CLEAR_STRUCT( e );
 		    e.command = PS_CMD_ALL_NOTES_OFF;
 		    glide_multisend( mod, pnet, &e );
             	    glide_reset( data );

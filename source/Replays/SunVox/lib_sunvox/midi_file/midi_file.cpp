@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -42,11 +42,10 @@ void midi_file_remove( midi_file* mf )
     }
     smem_free( mf );
 }
-midi_file* midi_file_new( void )
+midi_file* midi_file_new()
 {
-    midi_file* mf = (midi_file*)smem_new( sizeof( midi_file ) );
-    if( mf == 0 ) return 0;
-    smem_zero( mf );
+    midi_file* mf = SMEM_ZALLOC2( midi_file, 1 );
+    if( !mf ) return 0;
     return mf;
 }
 void midi_track_remove( midi_track* mt )
@@ -55,18 +54,17 @@ void midi_track_remove( midi_track* mt )
     smem_free( mt->data );
     smem_free( mt );
 }
-midi_track* midi_track_new( void )
+midi_track* midi_track_new()
 {
-    midi_track* mt = (midi_track*)smem_new( sizeof( midi_track ) );
-    if( mt == 0 ) return 0;
-    smem_zero( mt );
+    midi_track* mt = SMEM_ZALLOC2( midi_track, 1 );
+    if( !mt ) return 0;
     return mt;
 }
 static bool check_signature( sfs_file f )
 {
     bool rv = false;
     char sign[ 5 ];
-    smem_clear_struct( sign );
+    SMEM_CLEAR_STRUCT( sign );
     sfs_rewind( f );
     sfs_read( sign, 1, 4, f );
     if( smem_strcmp( sign, "MThd" ) == 0 ) 
@@ -118,8 +116,8 @@ midi_file* midi_file_load_from_fd( sfs_file f )
 		    mf->ticks_per_quarter_note = mf->stime_div;
 		    slog( "MIDI Ticks per quarter note: %d\n", mf->ticks_per_quarter_note );
 		}
-		mf->tracks = (midi_track**)smem_new( sizeof( midi_track* ) * mf->tracks_num );
-		if( mf->tracks == 0 ) break;
+		mf->tracks = SMEM_ALLOC2( midi_track*, mf->tracks_num );
+		if( !mf->tracks ) break;
 		for( int i = 0; i < mf->tracks_num; i++ )
 		{
 		    mf->tracks[ i ] = midi_track_new();
@@ -129,8 +127,8 @@ midi_file* midi_file_load_from_fd( sfs_file f )
 	    if( smem_strcmp( chunk_id, "MTrk" ) == 0 )
 	    {
 	        slog( "MIDI Track %d; %d bytes\n", tnum, chunk_size );
-	        mf->tracks[ tnum ]->data = (uint8_t*)smem_new( chunk_size );
-	        if( mf->tracks[ tnum ]->data == 0 ) break;
+	        mf->tracks[ tnum ]->data = SMEM_ALLOC2( uint8_t, chunk_size );
+	        if( !mf->tracks[ tnum ]->data ) break;
 	        sfs_read( mf->tracks[ tnum ]->data, 1, chunk_size, f );
 	        tnum++;
 	        continue;

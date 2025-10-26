@@ -1,7 +1,7 @@
 /*
     wm_wbd.cpp - WBD (Window Buffer Draw)
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -57,7 +57,7 @@ void wbd_lock( WINDOWPTR win )
 	{
 	    if( !wm->screen_pixels )
 	    {
-		wm->screen_pixels = (COLORPTR)smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+		wm->screen_pixels = SMEM_ALLOC2( COLOR, wm->screen_xsize * wm->screen_ysize );
 	    }
 	    else
 	    {
@@ -66,7 +66,7 @@ void wbd_lock( WINDOWPTR win )
     		if( new_size > real_size )
     		{
     		    //Resize:
-    		    wm->screen_pixels = (COLORPTR)smem_resize( wm->screen_pixels, ( new_size + ( new_size / 4 ) ) * COLORLEN );
+    		    wm->screen_pixels = SMEM_RESIZE2( wm->screen_pixels, COLOR, new_size + ( new_size / 4 ) );
 		}
 	    }
 	}
@@ -146,9 +146,9 @@ void draw_points( int16_t* coord2d, COLOR color, uint count, window_manager* wm 
 	if( smem_get_size( wm->gl_points_array ) < bytes )
 	{
 	    if( wm->gl_points_array )
-		wm->gl_points_array = smem_resize( wm->gl_points_array, bytes );
+		wm->gl_points_array = SMEM_RESIZE( wm->gl_points_array, bytes );
 	    else
-		wm->gl_points_array = smem_new( bytes );
+		wm->gl_points_array = SMEM_ALLOC( bytes );
 	}
 	if( wm->gl_points_array == 0 ) return;
 	int16_t* new_points = (int16_t*)wm->gl_points_array;

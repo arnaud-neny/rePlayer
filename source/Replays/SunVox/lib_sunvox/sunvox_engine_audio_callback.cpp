@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -88,14 +88,14 @@ void sunvox_add_psynth_event_UNSAFE( int mod_num, psynth_event* evt, sunvox_engi
     psynth_module* mod = psynth_get_module( mod_num, s->net );
     if( !mod ) return;
     if( s->psynth_events == NULL )
-	s->psynth_events = (sunvox_psynth_event*)smem_new( sizeof( sunvox_psynth_event ) * 16 );
+	s->psynth_events = SMEM_ALLOC2( sunvox_psynth_event, 16 );
     s->psynth_events[ s->psynth_events_count ].mod = mod_num;
     smem_copy( &s->psynth_events[ s->psynth_events_count ].evt, evt, sizeof( psynth_event ) );
     s->psynth_events_count++;
     size_t prev_size = smem_get_size( s->psynth_events ) / sizeof( sunvox_psynth_event );
     if( s->psynth_events_count >= prev_size )
     {
-	s->psynth_events = (sunvox_psynth_event*)smem_resize( s->psynth_events, sizeof( sunvox_psynth_event ) * ( prev_size + 32 ) );
+	s->psynth_events = SMEM_RESIZE2( s->psynth_events, sunvox_psynth_event, prev_size + 32 );
     }
 }
 static uint sunvox_check_speed( int offset, sunvox_engine* s )
@@ -619,7 +619,7 @@ static void sunvox_handle_command(
 		if( s->playing )
                 {
 		    sunvox_note snote2;
-		    smem_clear_struct( snote2 );
+		    SMEM_CLEAR_STRUCT( snote2 );
 		    snote2.note = NOTECMD_STOP;
 		    sunvox_handle_command( offset, &snote2, net, pat_num, track_num, s );
 		}
@@ -636,7 +636,7 @@ static void sunvox_handle_command(
 		if( s->playing )
                 {
 		    sunvox_note snote2;
-		    smem_clear_struct( snote2 );
+		    SMEM_CLEAR_STRUCT( snote2 );
 		    snote2.note = NOTECMD_STOP;
 		    sunvox_handle_command( offset, &snote2, net, pat_num, track_num, s );
 		    snote2.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
@@ -1533,7 +1533,7 @@ static void sunvox_handle_kbd_event(
 void sunvox_handle_all_commands_UNSAFE( sunvox_engine* s )
 {
     sunvox_render_data rdata;
-    smem_clear_struct( rdata );
+    SMEM_CLEAR_STRUCT( rdata );
     int16_t buf[ 1 * 2 ];
     rdata.buffer_type = sound_buffer_int16;
     rdata.buffer = buf;
@@ -1576,7 +1576,7 @@ static bool sunvox_render_piece_of_sound_level2(
 	if( g_snd_rewind_request )
 	{
 	    sunvox_user_cmd cmd;
-	    smem_clear_struct( cmd );
+	    SMEM_CLEAR_STRUCT( cmd );
 	    cmd.n.note = NOTECMD_JUMP;
 	    sunvox_send_user_command( &cmd, s );
 	    g_snd_rewind_request = 0;
@@ -1584,7 +1584,7 @@ static bool sunvox_render_piece_of_sound_level2(
 	if( g_snd_play_request )
 	{
 	    sunvox_user_cmd cmd;
-	    smem_clear_struct( cmd );
+	    SMEM_CLEAR_STRUCT( cmd );
 	    if( s->line_counter >= 0 )
 	    {
 		cmd.n.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
@@ -1604,7 +1604,7 @@ static bool sunvox_render_piece_of_sound_level2(
 	if( g_snd_stop_request )
 	{
 	    sunvox_user_cmd cmd;
-	    smem_clear_struct( cmd );
+	    SMEM_CLEAR_STRUCT( cmd );
 	    cmd.n.note = NOTECMD_STOP;
 	    sunvox_send_user_command( &cmd, s );
 	    g_snd_stop_request = 0;
@@ -1707,7 +1707,7 @@ static bool sunvox_render_piece_of_sound_level2(
                                 {
                             	    if( s->sync_flags & SUNVOX_SYNC_FLAG_MIDI2 ) s->sync_mode = 1;
                                     sunvox_user_cmd cmd;
-				    smem_clear_struct( cmd );
+				    SMEM_CLEAR_STRUCT( cmd );
                                     cmd.t = midi_evt->t;
                                     cmd.n.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
                                     if( ( midi->kbd_status[ k ] & 15 ) == 0xA )
@@ -1733,7 +1733,7 @@ static bool sunvox_render_piece_of_sound_level2(
                                 {
                     		    s->sync_mode = 0;
                                     sunvox_user_cmd cmd;
-				    smem_clear_struct( cmd );
+				    SMEM_CLEAR_STRUCT( cmd );
                                     cmd.t = midi_evt->t;
                             	    cmd.n.note = NOTECMD_STOP;
                                     sunvox_send_user_command( &cmd, s );
@@ -1764,7 +1764,7 @@ static bool sunvox_render_piece_of_sound_level2(
                             	    if( midi_data[ 1 ] == 0x6D )
                             	    {
                             		sunvox_user_cmd cmd;
-					smem_clear_struct( cmd );
+					SMEM_CLEAR_STRUCT( cmd );
                                 	cmd.t = midi_evt->t;
                             		int arg1 = midi_data[ 2 ];
                             		union { uint32_t i; float f; } v;
@@ -1840,7 +1840,7 @@ static bool sunvox_render_piece_of_sound_level2(
                                 	int pos = ( (int)midi_data[ 0 ] + ( (int)midi_data[ 1 ] << 7 ) ) * ( SUNVOX_TPB / 4 );
                                 	pos /= s->speed;
 			    		sunvox_user_cmd cmd;
-					smem_clear_struct( cmd );
+					SMEM_CLEAR_STRUCT( cmd );
 					cmd.n.note = NOTECMD_JUMP;
 					cmd.n.ctl_val = pos;
 				    	sunvox_send_user_command( &cmd, s );
@@ -1880,7 +1880,7 @@ static bool sunvox_render_piece_of_sound_level2(
                                 		s );
                                 	}
                                         sunvox_kbd_event evt;
-                                        smem_clear_struct( evt );
+                                        SMEM_CLEAR_STRUCT( evt );
 					int v = midi_data[ 0 ] + midi->kbd_octave_offset * 12;
 					if( v >= 0 && v <= 127 )
 					{
@@ -1948,7 +1948,7 @@ static bool sunvox_render_piece_of_sound_level2(
                                 		s );
                                 	}
                                         sunvox_kbd_event evt;
-                                        smem_clear_struct( evt );
+                                        SMEM_CLEAR_STRUCT( evt );
 					int v = midi_data[ 0 ] + midi->kbd_octave_offset * 12;
 					if( v >= 0 && v <= 127 )
 					{

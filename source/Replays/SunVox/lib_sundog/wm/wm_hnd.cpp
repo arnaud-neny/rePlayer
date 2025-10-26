@@ -1,7 +1,7 @@
 /*
     wm_hnd.cpp - standard window handlers
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -659,6 +659,11 @@ struct text_data
     int xoffset;
     int last_action; //TEXT_ACTION_xxxx
     COLOR text_color;
+    int sel_pos; 	//beginning of the selection
+    int sel_len; 	//length of the selection
+			//  0 - no selection;
+			//  positive - starting from the sel_pos
+			//  negative - starting from the sel_pos+sel_len
     bool hide_zero : 1;
     bool ro : 1;
     bool editing : 1; //in focus and some data changed
@@ -670,7 +675,15 @@ struct text_data
     uint32_t show_char;
 };
 
-int text_dec_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+static bool is_text_win_valid( WINDOWPTR win )
+{
+    if( !win ) return false;
+    if( !win->data ) return false;
+    if( win->win_handler != text_handler ) return false;
+    return true;
+}
+
+static int text_dec_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 {
     text_data* data = (text_data*)user_data;
     if( data->numeric < 3 )
@@ -692,7 +705,7 @@ int text_dec_handler( void* user_data, WINDOWPTR win, window_manager* wm )
     return 0;
 }
 
-int text_inc_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+static int text_inc_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 {
     text_data* data = (text_data*)user_data;
     if( data->numeric < 3 )
@@ -714,7 +727,7 @@ int text_inc_handler( void* user_data, WINDOWPTR win, window_manager* wm )
     return 0;
 }
 
-int text_clear_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+static int text_clear_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 {
     text_data* data = (text_data*)user_data;
     text_set_text( data->win, "", wm );
@@ -740,10 +753,84 @@ static bool text_reinit_clear_button( text_data* data )
 
 static void text_change_prev_focus( WINDOWPTR win, WINDOWPTR prev_focus_win )
 {
-    if( !win ) return;
-    if( win->win_handler != text_handler ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->prev_focus_win = prev_focus_win;
+}
+
+static void text_reset_selection( WINDOWPTR win )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    data->sel_len = 0;
+}
+
+static void text_start_selection( WINDOWPTR win )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    if( data->sel_len == 0 )
+    {
+	data->sel_pos = data->cur_pos;
+    }
+}
+
+static void text_set_selection_len( WINDOWPTR win )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    data->sel_len = data->cur_pos - data->sel_pos;
+}
+
+static void text_select_all( WINDOWPTR win )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    data->sel_pos = 0;
+    data->sel_len = smem_strlen_utf32( data->text );
+}
+
+inline bool is_char_separator( uint32_t c )
+{
+    if( c >= 0 && c <= 0x2F ) return true;
+    if( c >= 0x3A && c <= 0x3F ) return true; //:;<=>?
+    return false;
+}
+
+static void text_select_word( WINDOWPTR win )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    int txt_len = smem_strlen_utf32( data->text );
+    if( !txt_len ) return;
+    if( data->cur_pos < 0 ) return;
+    if( data->cur_pos >= txt_len ) return;
+    if( is_char_separator( data->text[ data->cur_pos ] ) ) return;
+    int p1 = -111;
+    int p2 = -111;
+    for( int i = data->cur_pos - 1; i >= 0; i-- )
+    {
+	if( is_char_separator( data->text[ i ] ) )
+	{
+	    p1 = i + 1;
+	    break;
+	}
+    }
+    if( p1 == -111 ) p1 = 0;
+    for( int i = data->cur_pos + 1; i < txt_len; i++ )
+    {
+	if( is_char_separator( data->text[ i ] ) )
+	{
+	    p2 = i;
+	    break;
+	}
+    }
+    if( p2 == -111 ) p2 = txt_len;
+    if( p1 != p2 )
+    {
+	data->sel_pos = p1;
+	data->sel_len = p2 - p1;
+    }
 }
 
 int text_handler( sundog_event* evt, window_manager* wm )
@@ -759,7 +846,7 @@ int text_handler( sundog_event* evt, window_manager* wm )
 	    break;
 	case EVT_AFTERCREATE:
 	    data->win = win;
-	    data->text = (uint32_t*)smem_znew( 32 * sizeof( uint32_t ) );
+	    data->text = SMEM_ZALLOC2( uint32_t, 32 );
 	    data->zoom = 256;
 	    data->numeric = wm->opt_text_numeric;
 	    data->min = wm->opt_text_num_min;
@@ -826,6 +913,7 @@ int text_handler( sundog_event* evt, window_manager* wm )
 	    }
 	    if( data->active )
 	    {
+		text_reset_selection( win );
 		data->active = 0;
 		data->editing = false;
 		draw_window( win, wm );
@@ -848,6 +936,8 @@ int text_handler( sundog_event* evt, window_manager* wm )
     	    }
 	    if( evt->key == MOUSE_BUTTON_LEFT )
 	    {
+		text_reset_selection( win );
+
 		wbd_lock( win );
 		wm->cur_font_scale = data->zoom;
 		data->prev_focus_win = wm->prev_focus_win;
@@ -868,6 +958,11 @@ int text_handler( sundog_event* evt, window_manager* wm )
 		    }
 		    x += charx;
 		    if( c == 0 ) break;
+		}
+
+		if( evt->flags & EVT_FLAG_DOUBLECLICK )
+		{
+		    text_select_word( win );
 		}
 
 		//Auto-scroll:
@@ -925,16 +1020,20 @@ int text_handler( sundog_event* evt, window_manager* wm )
 	    if( data->ro ) break;
 	    if( evt->key >= KEY_UNKNOWN ) break;
 
-	    int cmd = 0; //1 - cut; 2 - copy; 3 - paste;
+	    int cmd = 0; //1 - cut; 2 - copy; 3 - paste; 4 - select all;
 	    if( evt->flags & EVT_FLAG_CTRL )
 	    {
-		if( evt->key == 'c' ) cmd = 2;
-		if( evt->key == 'v' ) cmd = 3;
+		if( evt->key == 'x' ) cmd = 1; //CUT
+		if( evt->key == 'c' ) cmd = 2; //COPY
+		if( evt->key == 'v' ) cmd = 3; //PASTE
+		if( evt->key == 'a' ) cmd = 4; //SELECT ALL
+		//if( evt->key == 'z' ) { retval = 0; break; } //UNDO
+		//if( evt->key == 'y' ) { retval = 0; break; } //REDO
     	    }
 	    if( evt->flags & EVT_FLAG_SHIFT )
 	    {
-		if( evt->key == KEY_DELETE ) cmd = 1;
-		if( evt->key == KEY_INSERT ) cmd = 3;
+		if( evt->key == KEY_DELETE ) cmd = 1; //CUT
+		if( evt->key == KEY_INSERT ) cmd = 3; //PASTE
 	    }
 	    if( cmd )
 	    {
@@ -945,6 +1044,11 @@ int text_handler( sundog_event* evt, window_manager* wm )
 		{
 		    if( data->flags & TEXT_FLAG_CALL_HANDLER_ON_ANY_CHANGES )
 			text_changed( win );
+		}
+		if( cmd == 4 )
+		{
+		    text_select_all( win );
+		    draw_window( win, wm );
 		}
 		retval = 1;
 		break;
@@ -1114,20 +1218,36 @@ int text_handler( sundog_event* evt, window_manager* wm )
 	    {
 	        if( evt->key == KEY_BACKSPACE )
 	        {
-	    	    if( data->cur_pos >= 1 )
+	    	    if( data->sel_len )
+	    	    {
+			text_delete_text( win, data->sel_pos, data->sel_len );
+	    		text_reset_selection( win );
+		    }
+		    else
 		    {
-		        data->cur_pos--;
-		        for( size_t i = data->cur_pos; i < text_size - 1; i++ ) 
-		    	    text_buf[ i ] = text_buf[ i + 1 ];
+	    		if( data->cur_pos >= 1 )
+			{
+		    	    data->cur_pos--;
+		    	    for( size_t i = data->cur_pos; i < text_size - 1; i++ ) 
+		    		text_buf[ i ] = text_buf[ i + 1 ];
+			}
 		    }
 		    changed = true;
 		}
 		else
 		if( evt->key == KEY_DELETE )
 		{
-		    if( data->text[ data->cur_pos ] != 0 )
-		        for( size_t i = data->cur_pos; i < text_size - 1; i++ ) 
-		            text_buf[ i ] = text_buf[ i + 1 ];
+	    	    if( data->sel_len )
+	    	    {
+			text_delete_text( win, data->sel_pos, data->sel_len );
+	    		text_reset_selection( win );
+		    }
+		    else
+		    {
+			if( data->text[ data->cur_pos ] != 0 )
+		    	    for( size_t i = data->cur_pos; i < text_size - 1; i++ ) 
+		        	text_buf[ i ] = text_buf[ i + 1 ];
+		    }
 		    changed = true;
 		}
 		else
@@ -1135,8 +1255,13 @@ int text_handler( sundog_event* evt, window_manager* wm )
 		{
 		    if( data->cur_pos >= 1 )
 		    {
+			if( evt->flags & EVT_FLAG_SHIFT )
+			    text_start_selection( win );
+			else
+			    text_reset_selection( win );
 		        data->cur_pos--;
 		        data->make_cursor_visible = true;
+			if( evt->flags & EVT_FLAG_SHIFT ) text_set_selection_len( win );
 		    }
 		}
 		else
@@ -1144,24 +1269,39 @@ int text_handler( sundog_event* evt, window_manager* wm )
 		{
 		    if( text_buf[ data->cur_pos ] != 0 )
 		    {
+			if( evt->flags & EVT_FLAG_SHIFT )
+			    text_start_selection( win );
+			else
+			    text_reset_selection( win );
 		        data->cur_pos++;
 		        data->make_cursor_visible = true;
+			if( evt->flags & EVT_FLAG_SHIFT ) text_set_selection_len( win );
 		    }
 		}
 		else
 		if( evt->key == KEY_END )
 		{
+		    if( evt->flags & EVT_FLAG_SHIFT )
+			text_start_selection( win );
+		    else
+		        text_reset_selection( win );
 		    size_t i = 0;
 		    for( i = 0; i < text_size; i++ ) 
 		        if( data->text[ i ] == 0 ) break;
 		    data->cur_pos = i;
 		    data->make_cursor_visible = true;
+		    if( evt->flags & EVT_FLAG_SHIFT ) text_set_selection_len( win );
 		}
 		else
 		if( evt->key == KEY_HOME )
 		{
+		    if( evt->flags & EVT_FLAG_SHIFT )
+			text_start_selection( win );
+		    else
+		        text_reset_selection( win );
 		    data->cur_pos = 0;
 		    data->make_cursor_visible = true;
+		    if( evt->flags & EVT_FLAG_SHIFT ) text_set_selection_len( win );
 		}
 		else
 		{
@@ -1172,9 +1312,11 @@ int text_handler( sundog_event* evt, window_manager* wm )
 	    else
 	    {
 	        //Add new char:
+	    	if( data->sel_len ) text_delete_text( win, data->sel_pos, data->sel_len );
+	    	text_reset_selection( win );
 		if( smem_strlen_utf32( (const uint32_t*)data->text ) + 16 > text_size )
 		{
-		    data->text = (uint32_t*)smem_resize2( data->text, ( text_size + 16 ) * sizeof( uint32_t ) );
+		    data->text = SMEM_ZRESIZE2( data->text, uint32_t, text_size + 16 );
 		    text_size += 16;
 		    text_buf = data->text;
 		}
@@ -1254,23 +1396,47 @@ int text_handler( sundog_event* evt, window_manager* wm )
 		    text_color = wm->color2;
 		}
 		wm->cur_font_color = text_color;
-		size_t p = 0;
+		int p = 0;
 		int cursor_x = 0;
 		int cursor_xsize = 0;
-		for( p = 0; p < smem_get_size( data->text ) / sizeof( uint32_t ); p++ )
+		for( p = 0; p < (int)( smem_get_size( data->text ) / sizeof( uint32_t ) ); p++ )
 		{
-	    	    uint32_t c = data->text[ p ];
+	    	    uint32_t c0 = data->text[ p ];
+	    	    uint32_t c = c0;
 		    if( c == 0 ) c = ' ';
 		    int charx = char_x_size( c, wm );
-	    	    if( data->cur_pos == (int)p && data->active )
-	    	    {
-	    		cursor_x = x;
-	    		cursor_xsize = charx;
-	    		draw_frect( x, 0, charx, win->ysize, blend( text_color, win->color, 128 ), wm );
+		    if( data->active )
+		    {
+			bool sel = 0;
+			int sel_len = data->sel_len;
+			if( sel_len )
+			{
+			    int sel_pos = data->sel_pos;
+			    if( sel_len > 0 )
+			    {
+				if( p >= sel_pos && p < sel_pos + sel_len ) sel = 1;
+			    }
+			    else
+			    {
+				if( p < sel_pos && p >= sel_pos + sel_len ) sel = 1;
+			    }
+			    if( sel )
+			    {
+				wm->cur_opacity = 128;
+	    			draw_frect( x, 0, charx, win->ysize, wm->selection_color, wm );
+				wm->cur_opacity = 255;
+			    }
+			}
+	    		if( data->cur_pos == p && !sel )
+	    		{
+	    		    cursor_x = x;
+	    		    cursor_xsize = charx;
+	    		    draw_frect( x, 0, charx, win->ysize, blend( text_color, win->color, 128 ), wm );
+	    		}
 	    	    }
 		    draw_char( c, x, y, wm );
 	    	    x += charx;
-	    	    if( data->text[ p ] == 0 ) break;
+	    	    if( c0 == 0 ) break;
 		}
 		if( p == 0 && !data->active )
 		{
@@ -1388,7 +1554,7 @@ int text_handler( sundog_event* evt, window_manager* wm )
 
 void text_changed( WINDOWPTR win )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     if( win->action_handler )
     {
@@ -1399,17 +1565,32 @@ void text_changed( WINDOWPTR win )
 
 void text_clipboard_cut( WINDOWPTR win )
 {
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
     text_clipboard_copy( win );
-    text_set_text( win, "", win->wm );
+    if( data->sel_len )
+    {
+	text_delete_text( win, data->sel_pos, data->sel_len );
+	text_reset_selection( win );
+    }
+    else
+    {
+	text_set_text( win, "", win->wm );
+    }
 }
 
 static const char* text_clipboard_filename = "3:/text_clipboard";
 void text_clipboard_copy( WINDOWPTR win )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
 #ifdef CAN_COPYPASTE
     window_manager* wm = win->wm;
-    char* txt = text_get_text( win, wm );
+    text_data* data = (text_data*)win->data;
+    char* txt = nullptr;
+    if( data->sel_len )
+	txt = text_get_text( win, data->sel_pos, data->sel_len );
+    if( !txt )
+	txt = text_get_text( win, wm );
     if( !txt ) return;
     sfs_file f = sfs_open( text_clipboard_filename, "wb" );
     if( f )
@@ -1423,7 +1604,7 @@ void text_clipboard_copy( WINDOWPTR win )
 
 void text_clipboard_paste( WINDOWPTR win )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
 #ifdef CAN_COPYPASTE
     window_manager* wm = win->wm;
     text_data* data = (text_data*)win->data;
@@ -1436,11 +1617,15 @@ void text_clipboard_paste( WINDOWPTR win )
 	    sfs_file f = sfs_open( fname, "rb" );
 	    if( f )
 	    {
-		char* txt = (char*)smem_new( len + 1 );
+		char* txt = SMEM_ALLOC2( char, len + 1 );
 		sfs_read( txt, 1, len, f );
 		txt[ len ] = 0;
 		sfs_close( f );
+
+		if( data->sel_len ) text_delete_text( win, data->sel_pos, data->sel_len );
+                text_reset_selection( win );
 		text_insert_text( win, txt, data->cur_pos );
+
 		smem_free( txt );
 	    }
 	}
@@ -1451,17 +1636,18 @@ void text_clipboard_paste( WINDOWPTR win )
 
 void text_set_text( WINDOWPTR win, const char* text, window_manager* wm )
 {
-    if( !win || !text ) return;
+    if( !is_text_win_valid( win ) ) return;
+    if( !text ) return;
     if( smem_strcmp( text, text_get_text( win, wm ) ) == 0 ) return;
     size_t len = smem_strlen( text ) + 1;
-    uint32_t* ts = (uint32_t*)smem_new( len * sizeof( uint32_t ) );
+    uint32_t* ts = SMEM_ALLOC2( uint32_t, len );
     utf8_to_utf32( ts, len, text );
     size_t len2 = smem_strlen_utf32( ts ) + 1;
     text_data* data = (text_data*)win->data;
     if( smem_get_size( data->text ) / sizeof( uint32_t ) < len2 )
     {
         //Resize text buffer:
-        data->text = (uint32_t*)smem_resize( data->text, len2 * sizeof( uint32_t ) );
+        data->text = SMEM_RESIZE2( data->text, uint32_t, len2 );
     }
     smem_copy( data->text, ts, len2 * sizeof( uint32_t ) );
     if( data->cur_pos > (int)len2 - 1 )
@@ -1469,21 +1655,22 @@ void text_set_text( WINDOWPTR win, const char* text, window_manager* wm )
     //if( text_reinit_clear_button( data ) ) recalc_regions( wm );
     data->can_show_clear_btn = false;
     data->recalc_str_size = true;
+    text_reset_selection( win );
     draw_window( win, wm );
     smem_free( ts );
 }
 
 void text_insert_text( WINDOWPTR win, const char* text, int pos )
 {
-    if( !win || !text ) return;
+    if( !is_text_win_valid( win ) ) return;
+    if( !text ) return;
     window_manager* wm = win->wm;
     text_data* data = (text_data*)win->data;
-    if( !data ) return;
     size_t text_len = strlen( text );
     size_t src_len = smem_strlen_utf32( data->text );
     size_t src_size = smem_get_size( data->text ) / sizeof( uint32_t );
     if( pos < 0 || pos > (int)src_len ) return;
-    uint32_t* text32 = (uint32_t*)smem_new( ( text_len + 1 ) * sizeof( uint32_t ) );
+    uint32_t* text32 = SMEM_ALLOC2( uint32_t, text_len + 1 );
     if( text32 )
     {
 	utf8_to_utf32( text32, text_len + 1, text );
@@ -1491,7 +1678,7 @@ void text_insert_text( WINDOWPTR win, const char* text, int pos )
 	if( text32_len )
 	{
 	    size_t final_len = src_len + text32_len;
-    	    uint32_t* final = (uint32_t*)smem_new( ( final_len + 1 ) * sizeof( uint32_t ) );
+    	    uint32_t* final = SMEM_ALLOC2( uint32_t, final_len + 1 );
     	    if( final )
     	    {
     		smem_copy( final, data->text, pos * sizeof( uint32_t ) );
@@ -1503,6 +1690,7 @@ void text_insert_text( WINDOWPTR win, const char* text, int pos )
     		data->cur_pos = pos + text32_len;
 		data->recalc_str_size = true;
 		data->make_cursor_visible = true;
+		text_reset_selection( win );
 	        draw_window( win, wm );
 	    }
 	}
@@ -1510,20 +1698,43 @@ void text_insert_text( WINDOWPTR win, const char* text, int pos )
     }
 }
 
+void text_delete_text( WINDOWPTR win, int pos, int len )
+{
+    if( !is_text_win_valid( win ) ) return;
+    text_data* data = (text_data*)win->data;
+    int txt_len = smem_strlen_utf32( data->text );
+    if( pos < 0 ) return;
+    if( len < 0 )
+    {
+	pos = pos + len;
+	len = -len;
+    }
+    if( pos + len > txt_len ) return;
+    smem_erase( data->text, ( txt_len + 1 ) * sizeof(uint32_t), pos * sizeof(uint32_t), len * sizeof(uint32_t) );
+    if( data->cur_pos >= pos )
+    {
+	data->cur_pos -= len;
+	if( data->cur_pos < pos ) data->cur_pos = pos;
+    }
+    data->recalc_str_size = true;
+    data->make_cursor_visible = true;
+    text_reset_selection( win );
+    draw_window( win, win->wm );
+}
+
 void text_set_label( WINDOWPTR win, const char* label )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     window_manager* wm = win->wm;
     text_data* data = (text_data*)win->data;
-    if( !data ) return;
     smem_free( data->label );
-    data->label = smem_strdup( label );
+    data->label = SMEM_STRDUP( label );
     if( data->label ) win->font = wm->font_small;
 }
 
 void text_set_cursor_position( WINDOWPTR win, int cur_pos, window_manager* wm )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->cur_pos = cur_pos;
     data->make_cursor_visible = true;
@@ -1532,7 +1743,7 @@ void text_set_cursor_position( WINDOWPTR win, int cur_pos, window_manager* wm )
 
 void text_set_value( WINDOWPTR win, int val, window_manager* wm )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     if( val < data->min ) val = data->min;
     if( val > data->max ) val = data->max;
@@ -1540,7 +1751,7 @@ void text_set_value( WINDOWPTR win, int val, window_manager* wm )
     switch( data->numeric )
     {
 	default: int_to_string( val, ts ); break;
-	case 2: hex_int_to_string( val, ts ); break;
+	case 2: int_to_string_hex( val, ts ); break;
 	case 4: time_to_str( ts, sizeof(ts), val, 1, 0 ); break;
     }
     if( data->hide_zero && val == 0 )
@@ -1552,7 +1763,7 @@ void text_set_value( WINDOWPTR win, int val, window_manager* wm )
 
 void text_set_fvalue( WINDOWPTR win, double val )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     window_manager* wm = win->wm;
     text_data* data = (text_data*)win->data;
     if( val < data->min ) val = data->min;
@@ -1561,7 +1772,7 @@ void text_set_fvalue( WINDOWPTR win, double val )
     switch( data->numeric )
     {
 	default: int_to_string( val, ts ); break;
-	case 2: hex_int_to_string( val, ts ); break;
+	case 2: int_to_string_hex( val, ts ); break;
 	case 3: snprintf( ts, sizeof(ts), "%f", val ); truncate_float_str( ts ); break;
 	case 4: time_to_str( ts, sizeof(ts), val * 1000, 1000, 0 ); break;
     }
@@ -1580,43 +1791,104 @@ void text_set_value2( WINDOWPTR win, int val, window_manager* wm )
 
 char* text_get_text( WINDOWPTR win, window_manager* wm )
 {
-    if( !win ) return NULL;
+    if( !is_text_win_valid( win ) ) return nullptr;
     text_data* data = (text_data*)win->data;
     size_t size = smem_get_size( data->text ) * 2;
     if( data->output_str ) 
     {
         if( smem_get_size( data->output_str ) < size )
         {
-    	    data->output_str = (char*)smem_resize( data->output_str, size );
+    	    data->output_str = SMEM_RESIZE2( data->output_str, char, size );
 	}
     }
     else
     {
-        data->output_str = (char*)smem_new( size );
+        data->output_str = SMEM_ALLOC2( char, size );
     }
     utf32_to_utf8( data->output_str, size, data->text );
     return data->output_str;
 }
 
+char* text_get_text( WINDOWPTR win, int pos, int len ) //pos/len - in utf32 chars
+{
+    if( !is_text_win_valid( win ) ) return nullptr;
+    if( len == 0 ) return nullptr;
+    text_data* data = (text_data*)win->data;
+    if( len < 0 )
+    {
+	pos = pos + len;
+	len = -len;
+    }
+    if( pos < 0 ) return nullptr;
+    int txt_len = smem_strlen_utf32( data->text );
+    if( pos + len > txt_len ) return nullptr;
+    uint32_t* tmp_str = SMEM_ALLOC2( uint32_t, ( len + 1 ) * sizeof(uint32_t) );
+    smem_copy( tmp_str, data->text + pos, len * sizeof(uint32_t) );
+    tmp_str[ len ] = 0;
+    size_t size = len * sizeof(uint32_t) * 2;
+    if( data->output_str )
+    {
+        if( smem_get_size( data->output_str ) < size )
+        {
+    	    data->output_str = SMEM_RESIZE2( data->output_str, char, size );
+	}
+    }
+    else
+    {
+        data->output_str = SMEM_ALLOC2( char, size );
+    }
+    utf32_to_utf8( data->output_str, size, tmp_str );
+    smem_free( tmp_str );
+    return data->output_str;
+}
+
 int text_get_cursor_position( WINDOWPTR win, window_manager* wm )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     text_data* data = (text_data*)win->data;
     return data->cur_pos;
 }
 
 int text_get_value( WINDOWPTR win, window_manager* wm )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     int val = 0;
     text_data* data = (text_data*)win->data;
     char* s = text_get_text( win, wm );
-    switch( data->numeric )
+    while( 1 )
     {
-	default: val = string_to_int( s ); break;
-	case 2: val = hex_string_to_int( s ); break;
-	case 3: val = atof( s ); break;
-	case 4: val = str_to_time( s, 1 ); break;
+	char* hex_prefix = strstr( s, "0x" );
+	if( hex_prefix )
+	{
+	    char c = hex_prefix[ 2 ];
+	    if( c != 0 && ( ( c >= '0' && c <= '9' ) || ( c >= 'A' && c <= 'F' ) || ( c >= 'a' && c <= 'f' ) ) )
+	    {
+		//HEX:
+		s = hex_prefix + 2;
+		val = string_to_int_hex( s );
+		break;
+	    }
+	}
+	hex_prefix = strstr( s, "0t" );
+	if( hex_prefix )
+	{
+	    char c = hex_prefix[ 2 ];
+	    if( c != 0 && ( c >= '0' && c <= '9' ) )
+	    {
+		//DEC:
+		s = hex_prefix + 2;
+		val = string_to_int( s );
+		break;
+	    }
+	}
+	switch( data->numeric )
+	{
+	    default: val = string_to_int( s ); break;
+	    case 2: val = string_to_int_hex( s ); break;
+	    case 3: val = atof( s ); break;
+	    case 4: val = str_to_time( s, 1 ); break;
+	}
+	break;
     }
     if( val < data->min ) val = data->min;
     if( val > data->max ) val = data->max;
@@ -1625,7 +1897,7 @@ int text_get_value( WINDOWPTR win, window_manager* wm )
 
 double text_get_fvalue( WINDOWPTR win )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     window_manager* wm = win->wm;
     double val = 0;
     text_data* data = (text_data*)win->data;
@@ -1633,7 +1905,7 @@ double text_get_fvalue( WINDOWPTR win )
     switch( data->numeric )
     {
 	default: val = string_to_int( s ); break;
-	case 2: val = hex_string_to_int( s ); break;
+	case 2: val = string_to_int_hex( s ); break;
 	case 3: val = atof( s ); break;
 	case 4: val = (double)str_to_time( s, 1000 ) / 1000; break;
     }
@@ -1644,14 +1916,14 @@ double text_get_fvalue( WINDOWPTR win )
 
 int text_get_last_action( WINDOWPTR win )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     text_data* data = (text_data*)win->data;
     return data->last_action;
 }
 
 void text_set_zoom( WINDOWPTR win, int zoom, window_manager* wm )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->zoom = zoom;
     data->recalc_str_size = true;
@@ -1659,14 +1931,14 @@ void text_set_zoom( WINDOWPTR win, int zoom, window_manager* wm )
 
 void text_set_color( WINDOWPTR win, COLOR c )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->text_color = c;
 }
 
 void text_set_range( WINDOWPTR win, int min, int max )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->min = min;
     data->max = max;
@@ -1675,7 +1947,7 @@ void text_set_range( WINDOWPTR win, int min, int max )
 
 void text_set_step( WINDOWPTR win, int step )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     data->step = step;
     draw_window( win, win->wm );
@@ -1683,32 +1955,30 @@ void text_set_step( WINDOWPTR win, int step )
 
 bool text_is_readonly( WINDOWPTR win )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     text_data* data = (text_data*)win->data;
     return data->ro;
 }
 
 bool text_get_editing_state( WINDOWPTR win )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     text_data* data = (text_data*)win->data;
     return data->editing;
 }
 
 void text_set_flags( WINDOWPTR win, uint32_t flags )
 {
-    if( !win ) return;
+    if( !is_text_win_valid( win ) ) return;
     text_data* data = (text_data*)win->data;
     if( data ) data->flags = flags;
 }
 
 uint32_t text_get_flags( WINDOWPTR win )
 {
-    if( !win ) return 0;
+    if( !is_text_win_valid( win ) ) return 0;
     text_data* data = (text_data*)win->data;
-    if( data )
-	return data->flags;
-    return 0;
+    return data->flags;
 }
 
 //
@@ -2058,14 +2328,22 @@ int button_handler( sundog_event* evt, window_manager* wm )
 			int xx = string_x_size( text, wm );
 			tx = ( win->xsize - xx ) / 2;
 			ty = ( win->ysize - char_y_size( wm ) ) / 2;
-			if( xx > win->xsize )
+			while( 1 )
 			{
-			    if( data->flags & BUTTON_FLAG_LEFT_ALIGNMENT_ON_OVERFLOW )
+			    if( xx > win->xsize )
 			    {
-				tx = 1;
+				if( data->flags & BUTTON_FLAG_LEFT_ALIGNMENT_ON_OVERFLOW )
+				{
+				    tx = 1;
+				    draw_string( text, tx, ty + data->pushed, wm );
+				    int xfade = char_x_size( '#', wm );
+				    draw_hgradient( win->xsize - xfade, 0, xfade, win->ysize, col, 0, 255, wm );
+				    break;
+				}
 			    }
+			    draw_string( text, tx, ty + data->pushed, wm );
+			    break;
 			}
-			draw_string( text, tx, ty + data->pushed, wm );
 		    }
 		}
 	    }
@@ -2112,7 +2390,7 @@ void button_set_menu( WINDOWPTR win, const char* menu )
     if( !win ) return;
     button_data* data = (button_data*)win->data;
     smem_free( data->menu );
-    data->menu = smem_strdup( menu );
+    data->menu = SMEM_STRDUP( menu );
     if( data->menu )
     {
 	data->menu_items = 1;
@@ -2155,7 +2433,7 @@ void button_set_text( WINDOWPTR win, const char* text )
     smem_free( data->text );
     if( text )
     {
-        data->text = smem_strdup( text );
+        data->text = SMEM_STRDUP( text );
     }
     else 
     {
@@ -2191,7 +2469,7 @@ void button_set_val( WINDOWPTR win, const char* val )
     smem_free( data->val );
     if( val )
     {
-        data->val = smem_strdup( val );
+        data->val = SMEM_STRDUP( val );
     }
     else 
     {
@@ -2480,7 +2758,7 @@ static void scrollbar_get_strings( WINDOWPTR win )
     const int text_val_size = 256;
 
     data->name_str = data->name;
-    if( !data->value_str ) data->value_str = (char*)smem_new( text_val_size + 64 );
+    if( !data->value_str ) data->value_str = SMEM_ALLOC2( char, text_val_size + 64 );
     data->value_str[ 0 ] = 0;
 
     if( data->compact_mode )
@@ -3553,13 +3831,13 @@ void scrollbar_set_name( WINDOWPTR win, const char* name, window_manager* wm )
 	    }
 	    if( data->name == NULL )
 	    {
-		data->name = (char*)smem_new( smem_strlen( name ) + 1 );
+		data->name = SMEM_ALLOC2( char, smem_strlen( name ) + 1 );
 	    }
 	    else
 	    {
 		if( smem_strlen( name ) + 1 > smem_get_size( data->name ) )
 		{
-		    data->name = (char*)smem_resize( data->name, smem_strlen( name ) + 1 );
+		    data->name = SMEM_RESIZE2( data->name, char, smem_strlen( name ) + 1 );
 		}
 	    }
 	    smem_copy( data->name, name, smem_strlen( name ) + 1 );
@@ -3574,22 +3852,22 @@ void scrollbar_set_values( WINDOWPTR win, const char* values, char delimiter )
 	scrollbar_data* data = (scrollbar_data*)win->data;
 	if( data )
 	{
-	    if( values == 0 )
+	    if( !values )
 	    {
 		smem_free( data->values );
 		data->values = 0;
 		return;
 	    }
 	    size_t len = smem_strlen( values );
-	    if( data->values == 0 )
+	    if( !data->values )
 	    {
-		data->values = (char*)smem_new( len + 1 );
+		data->values = SMEM_ALLOC2( char, len + 1 );
 	    }
 	    else
 	    {
 		if( len + 1 > smem_get_size( data->values ) )
 		{
-		    data->values = (char*)smem_resize( data->values, len + 1 );
+		    data->values = SMEM_RESIZE2( data->values, char, len + 1 );
 		}
 	    }
 	    smem_copy( data->values, values, len + 1 );

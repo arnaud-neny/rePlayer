@@ -165,7 +165,7 @@ int device_sound_init( sundog_sound* ss )
 
     if( ss->device_specific ) return -1; //Already open
 
-    ss->device_specific = smem_znew( sizeof( device_sound ) );
+    ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     device_sound* d = (device_sound*)ss->device_specific;
 
     if( ss->out_type == sound_buffer_default ) ss->out_type = sound_buffer_float32;
@@ -357,14 +357,13 @@ void device_sound_input( sundog_sound* ss, bool enable )
          
             set_input_defaults( ss );
             create_input_buffers( ss, 4096 );
-            if( d->input_buffer_list.mBuffers[ 0 ].mData == 0 )
+            if( d->input_buffer_list.mBuffers[ 0 ].mData == NULL )
             {
-        	smem_clear_struct( d->input_buffer_list );
+        	SMEM_CLEAR_STRUCT( d->input_buffer_list );
                 d->input_buffer_list.mNumberBuffers = 1;
                 d->input_buffer_list.mBuffers[ 0 ].mNumberChannels = 2;
                 d->input_buffer_list.mBuffers[ 0 ].mDataByteSize = 8192 * 4 * 2;
-                d->input_buffer_list.mBuffers[ 0 ].mData = smem_new( 8192 * 4 * 2 );
-                smem_zero( d->input_buffer_list.mBuffers[ 0 ].mData );
+                d->input_buffer_list.mBuffers[ 0 ].mData = SMEM_ZALLOC( 8192 * 4 * 2 );
             }
             
             //Describe audio component:
@@ -452,7 +451,7 @@ void device_sound_input( sundog_sound* ss, bool enable )
 	    }
 	    int val_count = size / (int)sizeof( AudioValueRange );
 	    slog( "AUDIO UNIT INPUT: Available %d Sample Rates\n", val_count );
-	    AudioValueRange* freqs = (AudioValueRange*)smem_new( size );
+	    AudioValueRange* freqs = (AudioValueRange*)SMEM_ALLOC( size );
 	    status = AudioObjectGetPropertyData( inputDevice, &property_address, 0, 0, &size, freqs );
 	    if( status != noErr )
 	    {

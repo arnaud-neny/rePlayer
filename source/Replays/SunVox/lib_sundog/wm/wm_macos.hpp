@@ -1,7 +1,7 @@
 /*
     wm_macos.h - platform-dependent module : macOS
     This file is part of the SunDog engine.
-    Copyright (C) 2009 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2009 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 

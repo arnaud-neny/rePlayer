@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -158,7 +158,7 @@ const char* g_sunvox_block_id_names[] =
 ssymtab* g_sunvox_block_ids = NULL;
 const uint8_t g_sunvox_sign[] = { 'S', 'V', 'O', 'X', 0, 0, 0, 0 };
 const uint8_t g_sunvox_module_sign[] = { 'S', 'S', 'Y', 'N', 0, 0, 0, 0 };
-int sunvox_global_init( void )
+int sunvox_global_init()
 {
     int rv = 0;
     if( strcmp( g_sunvox_block_id_names[ 64 ], "SLnk" ) )
@@ -181,11 +181,11 @@ int sunvox_global_init( void )
     if( psynth_global_init() ) rv = -4;
     return rv;
 }
-int sunvox_global_deinit( void )
+int sunvox_global_deinit()
 {
     int rv = 0;
     if( psynth_global_deinit() ) rv = -1;
-    ssymtab_remove( g_sunvox_block_ids ); g_sunvox_block_ids = NULL;
+    ssymtab_delete( g_sunvox_block_ids ); g_sunvox_block_ids = NULL;
     return rv;
 }
 void sunvox_engine_init(
@@ -225,9 +225,9 @@ void sunvox_engine_init(
     s->pat_id_counter = stime_ms() + ( pseudo_random() << 16 );
     char proj_name[ 128 ];
     sprintf( proj_name, "%d-%02d-%02d %02d-%02d", stime_year(), stime_month(), stime_day(), stime_hours(), stime_minutes() );
-    s->proj_name = (char*)smem_new( smem_strlen( proj_name ) + 1 );
+    s->proj_name = SMEM_ALLOC2( char, smem_strlen( proj_name ) + 1 );
     s->proj_name[ 0 ] = 0;
-    smem_strcat_resize( s->proj_name, proj_name );
+    SMEM_STRCAT_D( s->proj_name, proj_name );
     if( g_psynths_eff_num == 0 )
     {
 	int group = -1;
@@ -255,7 +255,7 @@ void sunvox_engine_init(
 	    }
 	}
     }
-    s->net = (psynth_net*)smem_new( sizeof( psynth_net ) );
+    s->net = SMEM_ALLOC2( psynth_net, 1 );
     uint psynth_flags = 0;
     if( flags & SUNVOX_FLAG_MAIN ) psynth_flags |= PSYNTH_NET_FLAG_MAIN;
     if( flags & SUNVOX_FLAG_CREATE_MODULES ) psynth_flags |= PSYNTH_NET_FLAG_CREATE_MODULES;
@@ -275,7 +275,7 @@ void sunvox_engine_init(
 	s->user_commands = sring_buf_new( sizeof( sunvox_user_cmd ) * MAX_USER_COMMANDS_FOR_METAMODULE, 0 );
     if( ( s->flags & SUNVOX_FLAG_NO_KBD_EVENTS ) == 0 )
     {
-	s->kbd = (sunvox_kbd_events*)smem_znew( sizeof( sunvox_kbd_events ) );
+	s->kbd = SMEM_ZALLOC2( sunvox_kbd_events, 1 );
 	s->kbd->prev_track = -1;
 	s->kbd->vel = 128;
     }
@@ -288,7 +288,7 @@ void sunvox_engine_init(
     if( !( flags & SUNVOX_FLAG_DYNAMIC_PATTERN_STATE ) )
     {
 	s->pat_state_size = MAX_PLAYING_PATS;
-	s->pat_state = (sunvox_pattern_state*)smem_znew( sizeof( sunvox_pattern_state ) * s->pat_state_size );
+	s->pat_state = SMEM_ZALLOC2( sunvox_pattern_state, s->pat_state_size );
 	for( int i = 0; i < s->pat_state_size; i++ ) 
 	    clean_pattern_state( &s->pat_state[ i ], s );
     }
@@ -307,7 +307,7 @@ void sunvox_engine_init(
 #ifndef NOMIDI
     if( ( flags & SUNVOX_FLAG_NO_MIDI ) == 0 )
     {
-	s->midi = (sunvox_midi*)smem_znew( sizeof( sunvox_midi ) );
+	s->midi = SMEM_ZALLOC2( sunvox_midi, 1 );
     }
     if( s->midi )
     {
@@ -396,8 +396,8 @@ void sunvox_engine_close( sunvox_engine* s )
     {
     }
     smem_free( s->psynth_events );
-    sring_buf_remove( s->user_commands );
-    sring_buf_remove( s->out_ui_events );
+    sring_buf_delete( s->user_commands );
+    sring_buf_delete( s->out_ui_events );
     smem_free( s->kbd );
 #ifndef NOMIDI
     smem_free( s->midi );
@@ -406,10 +406,10 @@ void sunvox_engine_close( sunvox_engine* s )
 void sunvox_rename( sunvox_engine* s, const char* proj_name )
 {
     if( !s ) return;
-    if( !s->proj_name ) s->proj_name = (char*)smem_new( 1 );
+    if( !s->proj_name ) s->proj_name = SMEM_ALLOC2( char, 1 );
     if( !s->proj_name ) return;
     s->proj_name[ 0 ] = 0;
-    smem_strcat_resize( s->proj_name, proj_name );
+    SMEM_STRCAT_D( s->proj_name, proj_name );
 }
 static int psynth_sunvox_stream_control( sunvox_stream_command cmd, void* user_data, sunvox_engine* s )
 {
@@ -437,24 +437,22 @@ static int psynth_sunvox_stream_control( sunvox_stream_command cmd, void* user_d
 psynth_sunvox* psynth_sunvox_new( psynth_net* pnet, uint mod_num, uint sunvox_engines_count, uint flags )
 {
     int err = 1;
-    psynth_sunvox* ps = (psynth_sunvox*)smem_new( sizeof( psynth_sunvox ) );
+    psynth_sunvox* ps = SMEM_ZALLOC2( psynth_sunvox, 1 );
     while( 1 )
     {
 	if( ps == NULL ) { err = 2; break; }
-	smem_zero( ps );
         ps->pnet = pnet;
 	ps->mod_num = mod_num;
 	ps->flags = 
             SUNVOX_FLAG_PLAYER_ONLY | SUNVOX_FLAG_NO_GUI | SUNVOX_FLAG_NO_SCOPE | SUNVOX_FLAG_NO_MIDI | SUNVOX_FLAG_NO_GLOBAL_SYS_EVENTS |
             SUNVOX_FLAG_NO_KBD_EVENTS | SUNVOX_FLAG_DYNAMIC_PATTERN_STATE |
             flags;
-        ps->s = (sunvox_engine**)smem_new( sizeof( sunvox_engine* ) * sunvox_engines_count );
+        ps->s = SMEM_ZALLOC2( sunvox_engine*, sunvox_engines_count );
         if( ps->s == NULL ) { err = 3; break; }
-        smem_zero( ps->s );
         ps->s_cnt = sunvox_engines_count;
         for( uint i = 0; i < sunvox_engines_count; i++ )
         {
-    	    ps->s[ i ] = (sunvox_engine*)smem_new( sizeof( sunvox_engine ) );
+    	    ps->s[ i ] = SMEM_ALLOC2( sunvox_engine, 1 );
     	    if( ps->s[ i ] == NULL ) continue;
             sunvox_engine_init( ps->flags, pnet->sampling_freq, 0, 0, psynth_sunvox_stream_control, ps, ps->s[ i ] );
         }
@@ -462,7 +460,7 @@ psynth_sunvox* psynth_sunvox_new( psynth_net* pnet, uint mod_num, uint sunvox_en
         {
 	    for( uint i = 0; i < PSYNTH_MAX_CHANNELS; i++ )
 	    {
-		ps->temp_bufs[ i ] = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * ps->s[ 0 ]->net->max_buf_size );
+		ps->temp_bufs[ i ] = SMEM_ALLOC2( PS_STYPE, ps->s[ 0 ]->net->max_buf_size );
 	    }
 	}
         err = 0;
@@ -636,7 +634,7 @@ PS_RETTYPE ( *get_module_handler_by_name( const char* name, sunvox_engine* s ) )
 }
 sunvox_load_state* sunvox_new_load_state( sunvox_engine* s, sfs_file f )
 {
-    sunvox_load_state* state = (sunvox_load_state*)smem_znew( sizeof( sunvox_load_state ) );
+    sunvox_load_state* state = SMEM_ZALLOC2( sunvox_load_state, 1 );
     if( !state ) return NULL;
     state->s = s;
     state->f = f;
@@ -644,7 +642,7 @@ sunvox_load_state* sunvox_new_load_state( sunvox_engine* s, sfs_file f )
 }
 sunvox_save_state* sunvox_new_save_state( sunvox_engine* s, sfs_file f )
 {
-    sunvox_save_state* state = (sunvox_save_state*)smem_znew( sizeof( sunvox_save_state ) );
+    sunvox_save_state* state = SMEM_ZALLOC2( sunvox_save_state, 1 );
     if( !state ) return NULL;
     state->s = s;
     state->f = f;
@@ -705,7 +703,7 @@ int load_block( sunvox_load_state* state )
 	if( smem_get_size( state->block_data ) != state->block_size )
 	{
 	    smem_free( state->block_data );
-	    state->block_data = smem_new( state->block_size );
+	    state->block_data = SMEM_ALLOC( state->block_size );
 	    if( !state->block_data ) return -1;
 	}
 	size_t r = sfs_read( state->block_data, 1, state->block_size, state->f );
@@ -804,10 +802,10 @@ void sunvox_play( int pos, bool jump_to_pos, int pat_num, sunvox_engine* s )
 	sunvox_sort_patterns( s );
 	sunvox_select_current_playing_patterns( 0, s );
 	s->line_counter--;
-	s->proj_len = sunvox_get_proj_frames( s );
+	s->proj_len = sunvox_get_proj_frames( 0, 0, s );
 	{
 	    sunvox_user_cmd cmd;
-	    smem_clear_struct( cmd );
+	    SMEM_CLEAR_STRUCT( cmd );
             cmd.t = stime_ticks();
 	    if( pat_num < 0 )
 	    {
@@ -845,7 +843,7 @@ void sunvox_play( int pos, bool jump_to_pos, int pat_num, sunvox_engine* s )
 	    if( s->single_pattern_play >= 0 )
 	    {
 		sunvox_user_cmd cmd;
-		smem_clear_struct( cmd );
+		SMEM_CLEAR_STRUCT( cmd );
 	        cmd.t = stime_ticks();
     		cmd.n.note = NOTECMD_PATPLAY_OFF;
 		sunvox_send_user_command( &cmd, s );
@@ -867,7 +865,7 @@ static int sunvox_just_stop( sunvox_engine* s )
 {
     int rv;
     sunvox_user_cmd cmd;
-    smem_clear_struct( cmd );
+    SMEM_CLEAR_STRUCT( cmd );
     if( s->playing )
     {
 	cmd.t = stime_ticks();
@@ -896,7 +894,7 @@ static int sunvox_just_stop( sunvox_engine* s )
 	cmd.n.note = NOTECMD_CLEAN_MODULES; 
 	sunvox_send_user_command( &cmd, s );
 	sunvox_render_data rdata;
-	smem_clear_struct( rdata );
+	SMEM_CLEAR_STRUCT( rdata );
 	int16_t temp_buf[ 8 ];
         rdata.buffer_type = sound_buffer_int16;
         rdata.buffer = temp_buf;

@@ -1,7 +1,7 @@
 /*
     wm_win.h - platform-dependent module : Windows
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -74,7 +74,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
     #ifdef DIRECTDRAW
 	wm->fb = 0;
     #else
-	wm->fb = (COLORPTR)smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+	wm->fb = SMEM_ALLOC2( COLOR, wm->screen_xsize * wm->screen_ysize );
 	wm->fb_xpitch = 1;
 	wm->fb_ypitch = wm->screen_xsize;
     #endif
@@ -104,7 +104,7 @@ void device_end( window_manager* wm )
     if( !( wm->flags & WIN_INIT_FLAG_FULLSCREEN ) )
     {
 	WINDOWPLACEMENT p;
-	smem_clear_struct( p );
+	SMEM_CLEAR_STRUCT( p );
 	p.length = sizeof(WINDOWPLACEMENT);
 	if( GetWindowPlacement( wm->hwnd, &p ) )
 	{
@@ -279,7 +279,7 @@ LRESULT OnTouch( HWND hWnd, WPARAM wParam, LPARAM lParam, window_manager* wm )
 {
     BOOL bHandled = FALSE;
     UINT cInputs = LOWORD( wParam );
-    PTOUCHINPUT pInputs = (PTOUCHINPUT)smem_new( sizeof( TOUCHINPUT ) * cInputs );
+    PTOUCHINPUT pInputs = SMEM_ALLOC2( TOUCHINPUT, cInputs );
     if( pInputs )
     {
 	if( GetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) )
@@ -605,8 +605,8 @@ WinProc(
 static int CreateWin( const char* name, HINSTANCE hCurrentInst, HINSTANCE hPreviousInst, LPSTR lpszCmdLine, int nCmdShow, window_manager* wm )
 {
     //Create temp strings:
-    uint16_t* windowName_utf16 = (uint16_t*)smem_new( 256 * sizeof( uint16_t ) );
-    char* windowName_ansi = (char*)smem_new( 256 );
+    uint16_t* windowName_utf16 = SMEM_ALLOC2( uint16_t, 256 );
+    char* windowName_ansi = SMEM_ALLOC2( char, 256 );
     utf8_to_utf16( windowName_utf16, 256, name );
     wcstombs( windowName_ansi, (const wchar_t*)windowName_utf16, 256 );
     
@@ -773,7 +773,7 @@ void device_change_name( const char* name, window_manager* wm )
 {
     if( !name ) return;
     int len = strlen( name ) + 1;
-    uint16_t* name16 = (uint16_t*)smem_new( len * sizeof( uint16_t ) );
+    uint16_t* name16 = SMEM_ALLOC2( uint16_t, len );
     utf8_to_utf16( name16, len, name );
     SetWindowTextW( wm->hwnd, (LPCWSTR)name16 );
     smem_free( name16 );

@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -274,8 +274,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    data->tick_size = ( pnet->sampling_freq * 256 ) / 1000;
 	    for( int ch = 0; ch < MODULE_OUTPUTS; ch++ )
 	    {
-		data->buf[ ch ] = (PS_STYPE*)smem_new( COMPRESSOR_BUF_SIZE * sizeof( PS_STYPE ) );
-		smem_zero( data->buf[ ch ] );
+		data->buf[ ch ] = SMEM_ZALLOC2( PS_STYPE, COMPRESSOR_BUF_SIZE );
 	    }
 	    data->buf_ptr = 0;
 	    data->peak = 0;

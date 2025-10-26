@@ -273,7 +273,16 @@ This barrier does not affect permutations at the CPU/cache level of the modern p
 #ifndef SUNDOG_NO_DEFAULT_INCLUDES2
 
 #include <stdbool.h>
-#include <stdint.h>
+#ifdef  __cplusplus
+    #if 0 // rePlayer __cplusplus < 201103L
+	#define __STDC_LIMIT_MACROS //to get UINT32_MAX, SIZE_MAX, etc. from stdint.h
+	#include <stdint.h>
+    #else
+	#include <cstdint>
+    #endif
+#else
+    #include <stdint.h>
+#endif
 typedef unsigned int uint;
 //int and uint are at least 16 bits in size; usually it is 32 on 32/64-bit systems;
 //BUT сarefully use this type on 8/16-bit systems!
@@ -282,6 +291,7 @@ typedef unsigned int uint;
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
+#include <new>
 #ifdef OS_EMSCRIPTEN
     #include <emscripten.h>
 #endif
@@ -289,10 +299,20 @@ typedef unsigned int uint;
     #include <windows.h>
 #endif
 
+/*#ifndef SIZE_MAX
+    #if defined(ARCH_X86_64) || defined(ARCH_ARM64) || defined(_LP64) || defined(__LP64__)
+        #define SIZE_MAX 0xFFFFFFFFFFFFFFFF
+    #else
+        #define SIZE_MAX 0xFFFFFFFF
+    #endif
+#endif*/
+
 #if 1 // rePlayer __cplusplus >= 201103L
-    #define SUNDOG_NOEXCEPT noexcept
+    #define CPP_NOEXCEPT noexcept
+    #define CPP_OVERRIDE override
 #else
-    #define SUNDOG_NOEXCEPT
+    #define CPP_OVERRIDE
+    #define CPP_NOEXCEPT
     #define nullptr NULL
 #endif
 
@@ -454,8 +474,10 @@ enum //SunDog result codes
 {
     SD_RES_SUCCESS = 0, //DON'T CHANGE THIS VALUE!
     SD_RES_TIMEOUT,
-    SD_RES_ERR_MALLOC,
-    SD_RES_ERR //unknown error
+    SD_RES_ERR, //unknown error
+    SD_RES_ERR_MALLOC, //memory allocation error
+    SD_RES_ERR_FOPEN, //can't open the file
+    SD_RES_ERR_FREAD, //can't read the file
 };
 
 #endif //SUNDOG_NO_DEFAULT_INCLUDES2

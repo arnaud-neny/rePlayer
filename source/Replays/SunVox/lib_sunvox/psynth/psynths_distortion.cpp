@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -128,8 +128,8 @@ PS_RETTYPE MODULE_HANDLER(
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_INTERPOLATION ), ps_get_string( STR_PS_INTERP_TYPES ), 0, 2, 0, 1, &data->ctl_interp, -1, 2, pnet );
 #endif
 	    data->cnt = 0;
-	    data->noise_seed = stime_ms() + mod_num * 123;
-	    smem_clear_struct( data->smp );
+	    data->noise_seed = (uint32_t)stime_ns() + mod_num * 49157 + mod->id * 3079;
+	    SMEM_CLEAR_STRUCT( data->smp );
 	    data->smp_clean = true;
 	    data->smp_ptr = 0;
 #ifndef PS_STYPE_FLOATINGPOINT
@@ -138,7 +138,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    retval = 1;
 	    break;
 	case PS_CMD_CLEAN:
-	    smem_clear_struct( data->smp );
+	    SMEM_CLEAR_STRUCT( data->smp );
 	    data->smp_clean = true;
 	    data->smp_ptr = 0;
 	    data->cnt = 0;

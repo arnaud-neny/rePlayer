@@ -17,8 +17,8 @@
 PS_RETTYPE psynth_empty( PSYNTH_MODULE_HANDLER_PARAMETERS );
 
 //Main functions:
-int psynth_global_init( void );
-int psynth_global_deinit( void );
+int psynth_global_init();
+int psynth_global_deinit();
 void psynth_init( uint flags, int freq, int bpm, int tpl, void* host, uint base_host_version, psynth_net* pnet );
 void psynth_close( psynth_net* pnet );
 void psynth_clear( psynth_net* pnet );

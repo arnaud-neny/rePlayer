@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -156,7 +156,7 @@ void vplayer_set_filename( int mod_num, char* filename, psynth_net* pnet )
     if( filename )
     {
 	int len = smem_strlen( filename ) + 1;
-	data->src_file = (char*)smem_new( len );
+	data->src_file = SMEM_ALLOC2( char, len );
 	smem_copy( data->src_file, filename, len );
     }
 }

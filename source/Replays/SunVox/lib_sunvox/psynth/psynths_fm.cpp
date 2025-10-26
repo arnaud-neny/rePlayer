@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -265,8 +265,8 @@ PS_RETTYPE MODULE_HANDLER(
                 for( int i = 0; i < MODULE_OUTPUTS; i++ ) psynth_resampler_input_buf( data->resamp, i );
             }
 #endif
-	    data->cvolume_table = (FM_TABLE_TYPE*)smem_new( FM_TABLE_SIZE * sizeof( FM_TABLE_TYPE ) );
-	    data->mvolume_table = (FM_TABLE_TYPE*)smem_new( FM_TABLE_SIZE * sizeof( FM_TABLE_TYPE ) );
+	    data->cvolume_table = SMEM_ALLOC2( FM_TABLE_TYPE, FM_TABLE_SIZE );
+	    data->mvolume_table = SMEM_ALLOC2( FM_TABLE_TYPE, FM_TABLE_SIZE );
 	    data->cvolume_table_size = 0;
 	    data->mvolume_table_size = 0;
 	    data->tables_render_request = 1;

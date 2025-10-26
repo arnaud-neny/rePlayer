@@ -29,7 +29,7 @@ struct macos_sundog_engine;
 
 #endif
 
-void macos_sundog_screen_redraw( void );
+void macos_sundog_screen_redraw();
 void macos_sundog_rename_window( const char* name );
 void macos_sundog_event_handler( window_manager* wm );
 int macos_sundog_copy( sundog_engine* s, const char* filename, uint32_t flags );

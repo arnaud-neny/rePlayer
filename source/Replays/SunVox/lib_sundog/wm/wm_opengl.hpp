@@ -1,7 +1,7 @@
 /*
     wm_opengl.h - platform-dependent module : OpenGL
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -294,7 +294,7 @@ int gl_init( window_manager* wm )
     	    WGL_GET_PROC_ADDRESS( PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate );
     	    if( not_found )
     	    {
-		char* ts = (char*)smem_new( 4096 );
+		char* ts = SMEM_ALLOC2( char, 4096 );
 		sprintf( ts, "Some functions (%d) could not be found. The app may crash unexpectedly. Please make sure that you have installed the latest video card drivers.", not_found );
 		MessageBox( wm->hwnd, ts, "OpenGL Error", MB_ICONERROR | MB_OK );
 		smem_free( ts );
@@ -326,7 +326,7 @@ int gl_init( window_manager* wm )
 	glClearDepth( 1 );
 #endif
 	//glClearStencil( 0 );
-	glDepthFunc( GL_LESS );
+	glDepthFunc( GL_LESS ); //Draw if the new Z is less than the old Z
 	glDisable( GL_DEPTH_TEST );
 	glEnable( GL_BLEND );
 	gl_set_default_blend_func( wm );
@@ -380,7 +380,7 @@ void gl_resize( window_manager* wm )
     //Initial:
     matrix_4x4_reset( wm->gl_projection_matrix );
     //Parallel projection:
-    //Z: map [GL_ORTHO_MAX_DEPTH (near), -GL_ORTHO_MAX_DEPTH (far)] to [-1,1] (OpenGL NDC, left-handed);
+    //Z: remap [GL_ORTHO_MAX_DEPTH (near), -GL_ORTHO_MAX_DEPTH (far)] to [-1,1] (OpenGL NDC, left-handed);
     matrix_4x4_ortho( 0, wm->real_window_width, wm->real_window_height, 0, -GL_ORTHO_MAX_DEPTH, GL_ORTHO_MAX_DEPTH, wm->gl_projection_matrix );
     //UI angle:
     switch( wm->screen_angle )
@@ -526,7 +526,7 @@ void gl_print_shader_info_log( GLuint shader )
     glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
     if( length ) 
     {
-	char* buffer = (char*)smem_new( length );
+	char* buffer = SMEM_ALLOC2( char, length );
         glGetShaderInfoLog( shader, length, NULL, buffer );
         slog( "Shader %d log:\n%s\n", shader, buffer );
         smem_free( buffer );
@@ -539,7 +539,7 @@ void gl_print_program_info_log( GLuint program )
     glGetProgramiv( program, GL_INFO_LOG_LENGTH, &length );
     if( length ) 
     {
-	char* buffer = (char*)smem_new( length );
+	char* buffer = SMEM_ALLOC2( char, length );
         glGetProgramInfoLog( program, length, NULL, buffer );
         slog( "Program %d log:\n%s\n", program, buffer );
         smem_free( buffer );
@@ -555,8 +555,8 @@ char* gl_get_source_with_line_nums( const char* src, int line_offset )
     for( size_t i = 0; i < len; i++ )
 	if( src[ i ] == 0xA )
 	    add_bytes += line_str_max_len;
-    char* new_src = (char*)smem_new( len + add_bytes + 1 );
-    if( new_src == 0 ) return NULL;
+    char* new_src = SMEM_ALLOC2( char, len + add_bytes + 1 );
+    if( !new_src ) return NULL;
     size_t i = 0;
     size_t i2 = 0;
     int line = line_offset;
@@ -654,7 +654,7 @@ GLuint gl_make_shader( const char* shader_source, GLenum type )
 	else
 	    glsl_defaults = glsl_defaults_f;
 
-	char* shader_source2 = (char*)smem_new( smem_strlen( glsl_defaults ) + smem_strlen( shader_source ) + 2 );
+	char* shader_source2 = SMEM_ALLOC2( char, smem_strlen( glsl_defaults ) + smem_strlen( shader_source ) + 2 );
 	sprintf( shader_source2, "%s%s", glsl_defaults, shader_source );
 
 	shader = glCreateShader( type );
@@ -751,7 +751,7 @@ gl_program_struct* gl_program_new( GLuint vertex_shader, GLuint fragment_shader 
 
     while( 1 )
     {
-	rv = (gl_program_struct*)smem_znew( sizeof( gl_program_struct ) );
+	rv = SMEM_ZALLOC2( gl_program_struct, 1 );
 	if( !rv ) break;
 	for( int i = 0; i < GL_PROG_ATT_MAX; i++ )
 	    rv->attributes[ i ] = -1;

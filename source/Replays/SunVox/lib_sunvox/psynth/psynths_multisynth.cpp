@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -234,7 +234,7 @@ int multisynth_opt_button_handler( void* user_data, WINDOWPTR win, window_manage
 {
     multisynth_visual_data* data = (multisynth_visual_data*)user_data;
     multisynth_options* opt = data->module_data->opt;
-    char* ts = (char*)smem_new( 2048 );
+    char* ts = SMEM_ALLOC2( char, 2048 );
     psynth_opt_menu* m = opt_menu_new( win );
     opt_menu_add( m, STR_PS_USE_STATIC_NOTE_C5, opt->static_freq, 127 );
     opt_menu_add( m, STR_PS_IGNORE_NOTES_WITH_ZERO_VEL, opt->ignore_vel0, 126 );
@@ -298,7 +298,7 @@ int multisynth_smooth_handler( void* user_data, WINDOWPTR win, window_manager* w
     multisynth_visual_data* data = (multisynth_visual_data*)user_data;
     multisynth_options* opt = data->module_data->opt;
     int len = g_curve_len[ opt->curve_num ];
-    int* temp = (int*)smem_new( len * sizeof( int ) );
+    int* temp = SMEM_ALLOC2( int, len );
     for( int a = 0; a < 2; a++ )
     {
         for( int i = 1; i < len - 1; i++ )
@@ -404,7 +404,7 @@ static int multisynth_set_dialog_handler( void* user_data, WINDOWPTR win, window
     	{
     	    char* str_val = dialog_get_item( dlist, 'val ' )->str_val;
     	    smem_free( data->set_freq_or_note );
-    	    data->set_freq_or_note = smem_strdup( str_val );
+    	    data->set_freq_or_note = SMEM_STRDUP( str_val );
     	    int n = psynth_str2note( str_val );
     	    if( n != PSYNTH_UNKNOWN_NOTE )
     	    {
@@ -594,7 +594,7 @@ int multisynth_visual_handler( sundog_event* evt, window_manager* wm )
     		data->set_start_note = 0;
     		data->set_end_note = 127;
     		data->set_vel = 255;
-    		data->set_freq_or_note = smem_strdup( "440" );
+    		data->set_freq_or_note = SMEM_STRDUP( "440" );
 		const char* bname;
 		int bxsize;
 		int bysize = wm->text_ysize;

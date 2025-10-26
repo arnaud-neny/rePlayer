@@ -9,7 +9,7 @@
 inline int svh_send_event( sunvox_engine* s, stime_ticks_t t, int track, int note, int vel, int module, int ctl, int ctl_val )
 {
     sunvox_user_cmd cmd;
-    smem_clear_struct( cmd );
+    SMEM_CLEAR_STRUCT( cmd );
     cmd.ch = track;
     cmd.t = t;
     cmd.n.note = note;

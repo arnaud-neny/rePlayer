@@ -1,7 +1,7 @@
 /*
     file_apple.mm - file functions for iOS and macOS (objc)
     This file is part of the SunDog engine.
-    Copyright (C) 2018 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2018 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -16,22 +16,22 @@ char* g_apple_caches_path = NULL;
 char* g_apple_tmp_path = NULL;
 char* g_apple_resources_path = NULL;
 
-const char* sfs_get_work_path( void )
+const char* sfs_get_work_path()
 {
     return (char*)g_apple_docs_path;
 }
 
-const char* sfs_get_conf_path( void )
+const char* sfs_get_conf_path()
 {
     return (char*)g_apple_appsupport_path;
 }
 
-const char* sfs_get_temp_path( void )
+const char* sfs_get_temp_path()
 {
     return (char*)g_apple_tmp_path;
 }
 
-int apple_sfs_global_init( void )
+int apple_sfs_global_init()
 {
     //Don't use SunDog file/log functions here!
 
@@ -146,7 +146,7 @@ int apple_sfs_global_init( void )
     return 0;
 }
 
-int apple_sfs_global_deinit( void )
+int apple_sfs_global_deinit()
 {
     //Don't use SunDog file/log functions here!
 

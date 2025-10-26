@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -109,15 +109,18 @@ int sunvox_get_proj_lines( sunvox_engine* s )
     }
     return number_of_lines;
 }
-uint sunvox_get_proj_frames( sunvox_engine* s ) 
+uint32_t sunvox_get_proj_frames( int start_line, int line_cnt, sunvox_engine* s ) 
 {
-    int line_cnt = sunvox_get_proj_lines( s );
-    if( line_cnt == 0 ) return 0;
-    uint frame_cnt = 0;
-    sunvox_time_map_item* map = (sunvox_time_map_item*)smem_new( sizeof( sunvox_time_map_item ) * line_cnt );
+    if( line_cnt == 0 )
+    {
+	line_cnt = sunvox_get_proj_lines( s ) - start_line;
+    }
+    if( line_cnt <= 0 ) return 0;
+    uint32_t frame_cnt = 0;
+    sunvox_time_map_item* map = SMEM_ALLOC2( sunvox_time_map_item, line_cnt );
     if( map )
     {
-	frame_cnt = sunvox_get_time_map( map, NULL, 0, line_cnt, s );
+	frame_cnt = sunvox_get_time_map( map, NULL, start_line, line_cnt, s );
 	smem_free( map );
     }
     return frame_cnt;

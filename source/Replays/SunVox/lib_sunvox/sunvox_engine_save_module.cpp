@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -30,7 +30,7 @@ IN THE SOFTWARE.
 #include "sunvox_engine.h"
 static int* check_links( int* links, int links_num, psynth_module* mod, uint save_flags, sunvox_save_state* st )
 {
-    int* new_links = (int*)smem_clone( links );
+    int* new_links = (int*)SMEM_CLONE( links );
     if( !new_links ) return NULL;
     for( int l = 0; l < links_num; l++ )
     {
@@ -60,7 +60,7 @@ static int* check_links( int* links, int links_num, psynth_module* mod, uint sav
 static int* get_links2( psynth_net* pnet, int mod_num, int* links, int links_num, bool input )
 {
     if( !links || links_num == 0 ) return NULL;
-    int* rv = (int*)smem_new( links_num * sizeof( int ) );
+    int* rv = SMEM_ALLOC2( int, links_num );
     if( !rv ) return NULL;
     bool empty = true; 
     for( int i = 0; i < links_num; i++ )
@@ -227,7 +227,7 @@ int sunvox_save_module_to_fd( int mod_num, sfs_file f, uint save_flags, sunvox_e
 		}
 		if( save_block( BID_CVAL, 4, ctl->val, st ) ) break;
 	    }
-	    uint* pars = (uint*)smem_new( mod->ctls_num * 2 * sizeof( uint ) );
+	    uint* pars = SMEM_ALLOC2( uint, mod->ctls_num * 2 );
 	    for( uint c = 0; c < mod->ctls_num; c++ )
 	    {
 		psynth_ctl* ctl = &mod->ctls[ c ];

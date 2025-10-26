@@ -62,7 +62,7 @@ struct app_parameter
     pars[ p ].def = DEF; \
     pars[ p ].flags = FLAGS; \
     p++;
-app_parameter* get_app_parameters( void ); //use system free() to remove the list
+app_parameter* get_app_parameters(); //use system free() to remove the list
 
 #ifdef SDL
 extern volatile bool g_sdl_initialized;
@@ -74,14 +74,14 @@ extern volatile bool g_sdl_initialized;
 
 struct sundog_engine;
 
-void sundog_denormal_numbers_check( void );
-int sundog_global_init( void );
-int sundog_global_deinit( void );
+void sundog_denormal_numbers_check();
+int sundog_global_init();
+int sundog_global_deinit();
 int sundog_main( sundog_engine* sd, bool global_init );
 
 //These functions will be called by the SunDog Engine:
-int app_global_init( void ); //Here you can initialize some global variables that require exclusive access
-int app_global_deinit( void );
+int app_global_init(); //Here you can initialize some global variables that require exclusive access
+int app_global_deinit();
 
 #ifndef SUNDOG_VER
 
@@ -100,7 +100,7 @@ struct sundog_engine
 
     //Links to some important objects of the app (may be nullptr):
     sundog_sound*		ss; //Primary sound stream; will be initialized in sound.cpp -> sundog_sound_init()
-    volatile uint32_t   	ss_idle_frame_counter;
+    volatile uint32_t   	ss_idle_frame_counter; //If the main audio stream is silent, this counter is incremented by the number of silent frames; otherwise, the counter is reset to zero
     uint32_t			ss_sample_rate;
 
     //Command line arguments:

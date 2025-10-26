@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -274,7 +274,7 @@ static void filter2_floating_step( MODULE_DATA* data )
     if( ( CHECK_VERSION && pnet->base_host_version >= 0x01090300 ) || CHECK_VERSION == 0 ) \
     { \
         psynth_event e; \
-        smem_clear_struct( e ); \
+        SMEM_CLEAR_STRUCT( e ); \
         e.command = PS_CMD_SET_GLOBAL_CONTROLLER; \
         e.controller.ctl_num = 15; \
         e.controller.ctl_val = data->ctl_set_lfo_phase << 7; \

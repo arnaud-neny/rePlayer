@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -32,7 +32,7 @@ void xm_new_instrument( uint16_t num, const char* name, uint16_t samples, xm_son
 {
     if( !song ) return;
     xm_instrument* ins;
-    ins = (xm_instrument*)smem_znew( sizeof( xm_instrument ) );
+    ins = SMEM_ZALLOC2( xm_instrument, 1 );
     for( int a = 0; a < 22; a++ )
     {
 	ins->name[ a ] = name[ a ];
@@ -75,7 +75,7 @@ void xm_save_instrument( uint16_t num, const char* filename, xm_song* song )
 	    sfs_write( (void*)"Extended Instrument: ", 1, 21, f );
 	    sfs_write( &ins->name, 1, 22, f ); 
 	    int8_t temp[ 30 ];
-	    smem_clear_struct( temp );
+	    SMEM_CLEAR_STRUCT( temp );
 	    temp[ 21 ] = 0x02;
 	    temp[ 22 ] = 0x01;
 	    if( save_psytexx_ext )
@@ -92,7 +92,7 @@ void xm_save_instrument( uint16_t num, const char* filename, xm_song* song )
 	    }
 	    else
 	    {
-		smem_clear_struct( temp );
+		SMEM_CLEAR_STRUCT( temp );
 		sfs_write( temp, 1, 22, f );
 	    }
 	    sfs_write( &ins->samples_num, 1, 2, f ); 

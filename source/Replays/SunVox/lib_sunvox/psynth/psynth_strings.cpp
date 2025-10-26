@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -92,7 +92,7 @@ const char* ps_get_string( ps_string str_id )
     		case STR_PS_CAPTURE_MODES: str = "выкл;однократно;постоянно"; break;
     	        case STR_PS_FM2_WAVE_TYPES: str = "пользовательская;треугольная;треугольная^3;пила;пила^3;прямоугольная;sin;hsin;asin;sin^3"; break;
     		case STR_PS_SIN_Q_MODES: str = "авто;низкое;среднее;высокое"; break;
-    		case STR_PS_PM_DELAY_LENS: str = "0.04 сек;0.08 ceк;0.2 сек;0.5 сек;1 сек;2 сек;4 сек"; break;
+    		case STR_PS_PM_DELAY_LENS: str = "0.04 сек;0.08 ceк;0.2 сек;0.5 сек;1 сек;2 сек;4 сек;8 сек;16 сек;32 сек"; break;
     		case STR_PS_SMOOTH_MODES: str = "линейный;НЧ фильтр"; break;
     		case STR_PS_SAMPLER_REC_MODES: str = "стоп;пауза;старт"; break;
     		case STR_PS_ALLPASS_MODES: str = "выкл;вкл;вкл (улучшенный)"; break;
@@ -281,6 +281,7 @@ const char* ps_get_string( ps_string str_id )
 		case STR_PS_FREQ_DIV_2: str = "Частота / 2"; break;
 		case STR_PS_SMOOTH_FREQ_CHANGE: str = "Плавное изменение частоты"; break;
 		case STR_PS_TRUE_ZERO_ATTACK_RELEASE: str = "Резкая атака/затухание"; break;
+		case STR_PS_ALWAYS_PLAY_OSC2: str = "Всегда играть Осц2"; break;
 		case STR_PS_USE_STATIC_NOTE_C5: str = "Всегда играть ноту C5"; break;
 		case STR_PS_IGNORE_NOTES_WITH_ZERO_VEL: str = "Отсекать ноты с нулевой динамикой"; break;
 		case STR_PS_TRIGGER: str = "Триггер"; break;
@@ -459,6 +460,7 @@ const char* ps_get_string( ps_string str_id )
         	case STR_PS_RESET: str = "Сброс"; break;
         	case STR_PS_RETAIN_PHASE: str = "Не сбрасывать фазу"; break;
         	case STR_PS_SET: str = "Установить"; break;
+        	case STR_PS_NOTE: str = "Нота"; break;
         	case STR_PS_START_NOTE: str = "Начальная нота:"; break;
         	case STR_PS_END_NOTE: str = "Конечная нота:"; break;
         	case STR_PS_FREQ_OR_NOTE: str = "Частота (Гц) или нота:"; break;
@@ -514,7 +516,8 @@ const char* ps_get_string( ps_string str_id )
 		case STR_PS_LENGTH: str = "Длина"; break;
 		case STR_PS_LENGTH_UNIT: str = "Единица длины"; break;
 		case STR_PS_MAX_BUF_SIZE: str = "Макс. размер буфера"; break;
-    		case STR_PS_MAX_PM_DELAY_LEN: str = "Макс. задержка фазовой модуляции"; break;
+    		case STR_PS_MAX_PM_DELAY_LEN: str = "Макс. задержка ФМ"; break;
+    		case STR_PS_PM_INTERPOLATION: str = "Интерполяция ФМ"; break;
 		case STR_PS_IGNORE_NOTEOFF: str = "Без Note OFF"; break;
 		case STR_PS_AUTO_BPM_TPL: str = "Авто BPM/TPL"; break;
 		case STR_PS_SET_SAVING_FORMAT: str = "Формат сохранения"; break;
@@ -527,7 +530,7 @@ const char* ps_get_string( ps_string str_id )
 		case STR_PS_IGNORE_EFF31_AFTER_LAST_NOTEOFF: str = "Игнор. эфф.31 после последней Note OFF"; break;
 		case STR_PS_JMP_TO_RL_PAT_AFTER_LAST_NOTEOFF: str = "Перейти на паттерн RL после последней Note OFF"; break;
 		case STR_PS_ADJUST_TO_LENGTH: str = "Подстроить под длину (без ресэмплинга)"; break;
-        	case STR_PS_NOTE: str = "Нота"; break;
+		case STR_PS_REVERSE: str = "Реверс"; break;
         	default: break;
             }
             if( str ) break;
@@ -588,7 +591,7 @@ const char* ps_get_string( ps_string str_id )
     	    case STR_PS_CAPTURE_MODES: str = "off;single cycle;continuous"; break;
     	    case STR_PS_FM2_WAVE_TYPES: str = "custom;triangle;triangle^3;saw;saw^3;square;sin;hsin;asin;sin^3"; break;
 	    case STR_PS_SIN_Q_MODES: str = "auto;low;middle;high"; break;
-    	    case STR_PS_PM_DELAY_LENS: str = "0.04 sec;0.08 sec;0.2 sec;0.5 sec;1 sec;2 sec;4 sec"; break;
+    	    case STR_PS_PM_DELAY_LENS: str = "0.04 sec;0.08 sec;0.2 sec;0.5 sec;1 sec;2 sec;4 sec;8 sec;16 sec;32 sec"; break;
 	    case STR_PS_SMOOTH_MODES: str = "linear;LP filter"; break;
 	    case STR_PS_SAMPLER_REC_MODES: str = "stop;pause;start"; break;
     	    case STR_PS_ALLPASS_MODES: str = "off;on;on (improved)"; break;
@@ -777,6 +780,7 @@ const char* ps_get_string( ps_string str_id )
 	    case STR_PS_FREQ_DIV_2: str = "Frequency / 2"; break;
 	    case STR_PS_SMOOTH_FREQ_CHANGE: str = "Smooth frequency change"; break;
 	    case STR_PS_TRUE_ZERO_ATTACK_RELEASE: str = "True zero attack/release"; break;
+	    case STR_PS_ALWAYS_PLAY_OSC2: str = "Always play Osc2"; break;
 	    case STR_PS_USE_STATIC_NOTE_C5: str = "Use static note C5"; break;
 	    case STR_PS_IGNORE_NOTES_WITH_ZERO_VEL: str = "Ignore notes with zero velocity"; break;
 	    case STR_PS_TRIGGER: str = "Trigger (ignore Note OFF)"; break;
@@ -955,6 +959,7 @@ const char* ps_get_string( ps_string str_id )
             case STR_PS_RESET: str = "Reset"; break;
             case STR_PS_RETAIN_PHASE: str = "Retain phase"; break;
             case STR_PS_SET: str = "Set"; break;
+    	    case STR_PS_NOTE: str = "Note"; break;
     	    case STR_PS_START_NOTE: str = "Start note:"; break;
     	    case STR_PS_END_NOTE: str = "End note:"; break;
     	    case STR_PS_FREQ_OR_NOTE: str = "Frequency (Hz) or note:"; break;
@@ -1010,7 +1015,8 @@ const char* ps_get_string( ps_string str_id )
 	    case STR_PS_LENGTH: str = "Length"; break;
 	    case STR_PS_LENGTH_UNIT: str = "Length unit"; break;
 	    case STR_PS_MAX_BUF_SIZE: str = "Max buffer size"; break;
-    	    case STR_PS_MAX_PM_DELAY_LEN: str = "Max phase modulation delay"; break;
+    	    case STR_PS_MAX_PM_DELAY_LEN: str = "Max PM delay"; break;
+    	    case STR_PS_PM_INTERPOLATION: str = "PM interpolation"; break;
 	    case STR_PS_IGNORE_NOTEOFF: str = "Ignore Note OFF"; break;
 	    case STR_PS_AUTO_BPM_TPL: str = "Auto BPM/TPL"; break;
 	    case STR_PS_SET_SAVING_FORMAT: str = "Set saving format"; break;
@@ -1024,7 +1030,7 @@ const char* ps_get_string( ps_string str_id )
 	    case STR_PS_IGNORE_EFF31_AFTER_LAST_NOTEOFF: str = "Ignore eff.31 after last Note OFF"; break;
 	    case STR_PS_JMP_TO_RL_PAT_AFTER_LAST_NOTEOFF: str = "Jump to RL pattern after last Note OFF"; break;
 	    case STR_PS_ADJUST_TO_LENGTH: str = "Adjust to specified length (without resampling)"; break;
-    	    case STR_PS_NOTE: str = "Note"; break;
+    	    case STR_PS_REVERSE: str = "Reverse"; break;
     	    default: break;
         }
         break;

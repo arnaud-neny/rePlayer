@@ -8,7 +8,9 @@
  * Thanks for the nice licence.
  *
  * Copyright 1993, 1994, 1995 Alexandre Julliard
- * Modifications and additions: Copyright 1998 Huw Davies
+ * Modifications and additions:
+ *   Copyright 1998 Huw Davies;
+ *   2006 - 2025: minor changes and bug fixes by Alexander Zolotov
  */
 /* **********************************************************************
 

@@ -188,10 +188,8 @@ static void create_input_buffers( sundog_sound* ss, uint frames )
     {
         int frame_size = g_sample_size[ ss->in_type ] * ss->in_channels;
         d->input_buffer_size = round_to_power_of_two( frames * g_input_buffers_count );
-        d->input_buffer = smem_new( d->input_buffer_size * frame_size );
-        smem_zero( d->input_buffer );
-        d->input_buffer2 = smem_new( frames * frame_size );
-        smem_zero( d->input_buffer2 );
+        d->input_buffer = SMEM_ZALLOC( d->input_buffer_size * frame_size );
+        d->input_buffer2 = SMEM_ZALLOC( frames * frame_size );
         d->input_buffer2_is_empty = true;
     }
 }

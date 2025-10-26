@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -32,14 +32,24 @@ IN THE SOFTWARE.
 #define MODULE_INPUTS	2
 #define MODULE_OUTPUTS	2
 #define CHANGED_MAX_DELAY	( 1 << 0 )
-#define INTERP( val1, val2, p )   ( ( val1 * ( PS_STYPE_ONE - p ) + val2 * p ) / PS_STYPE_ONE )
-#define INTERP2( val1, val2, p )   ( ( val1 * ( PS_STYPE_ONE*2 - p ) + val2 * p ) / (PS_STYPE_ONE*2) )
+#ifndef PS_STYPE_FLOATINGPOINT
+    #define INTERP( v1, v2, p )		( ( v1 * ( PS_STYPE_ONE - p ) + v2 * p ) / PS_STYPE_ONE )
+    #define INTERP2( v1, v2, p )	( ( v1 * ( PS_STYPE_ONE*2 - p ) + v2 * p ) / (PS_STYPE_ONE*2) )
+    #define INTERP_SPLINE( v1, v2, v3, v4, p )	catmull_rom_spline_interp_int16( v1, v2, v3, v4, p << ( 15 - PS_STYPE_BITS ) )
+    #define INTERP2_SPLINE( v1, v2, v3, v4, p )	catmull_rom_spline_interp_int16( v1, v2, v3, v4, p << ( 15 - (PS_STYPE_BITS+1) ) )
+#else
+    #define INTERP( v1, v2, p )		( v1 * (PS_STYPE_ONE-p) + v2 * p )
+    #define INTERP2( v1, v2, p )	( v1 * (PS_STYPE_ONE-p) + v2 * p )
+    #define INTERP_SPLINE( v1, v2, v3, v4, p )	catmull_rom_spline_interp_float32( v1, v2, v3, v4, p )
+    #define INTERP2_SPLINE( v1, v2, v3, v4, p )	catmull_rom_spline_interp_float32( v1, v2, v3, v4, p )
+#endif
 struct MODULE_DATA
 {
     PS_CTYPE   	ctl_volume;
     PS_CTYPE	ctl_type;
     PS_CTYPE	ctl_mono;
     PS_CTYPE	ctl_max_delay;
+    PS_CTYPE	ctl_interp;
     int     	max_delay;
     int		buf_size;
     PS_STYPE*  	buf[ MODULE_OUTPUTS ];
@@ -61,6 +71,9 @@ static void modulator_handle_changes( MODULE_DATA* data, psynth_net* pnet )
 	    case 4: data->max_delay = pnet->sampling_freq; break;
 	    case 5: data->max_delay = pnet->sampling_freq * 2; break;
 	    case 6: data->max_delay = pnet->sampling_freq * 4; break;
+	    case 7: data->max_delay = pnet->sampling_freq * 8; break;
+	    case 8: data->max_delay = pnet->sampling_freq * 16; break;
+	    case 9: data->max_delay = pnet->sampling_freq * 32; break;
 	}
 	int prev_buf_size = data->buf_size;
 	int new_buf_size = round_to_power_of_two( data->max_delay + 4 ); 
@@ -70,7 +83,7 @@ static void modulator_handle_changes( MODULE_DATA* data, psynth_net* pnet )
 	    data->buf_size = new_buf_size;
             for( int i = 0; i < MODULE_OUTPUTS; i++ )
             {
-                data->buf[ i ] = (PS_STYPE*)smem_resize( data->buf[ i ], data->buf_size * sizeof( PS_STYPE ) );
+                data->buf[ i ] = SMEM_RESIZE2( data->buf[ i ], PS_STYPE, data->buf_size );
                 smem_zero( data->buf[ i ] );
             }
     	    data->buf_clean = true;
@@ -80,6 +93,41 @@ static void modulator_handle_changes( MODULE_DATA* data, psynth_net* pnet )
     }
     data->changed = 0;
 }
+#ifndef PS_STYPE_FLOATINGPOINT
+    #define PHASE_MOD() \
+        int v = out[ p ]; \
+	v += PS_STYPE_ONE; \
+        if( v < 0 ) v = 0; \
+	if( v > PS_STYPE_ONE * 2 ) v = PS_STYPE_ONE * 2; \
+        v = v * data->max_delay;   \
+	int interp = v & ( ( PS_STYPE_ONE * 2 ) - 1 ); \
+        v >>= PS_STYPE_BITS + 1;
+    #define PHASE_MOD_ABS() \
+	int v = out[ p ]; \
+    	if( v < 0 ) v = -v; \
+	if( v > PS_STYPE_ONE ) v = PS_STYPE_ONE; \
+	v = v * data->max_delay; \
+	int interp = v & ( PS_STYPE_ONE - 1 ); \
+	v >>= PS_STYPE_BITS;
+#else
+    #define PHASE_MOD() \
+	PS_STYPE vf = out[ p ]; \
+        vf = ( vf + PS_STYPE_ONE ) * (PS_STYPE)0.5; \
+        if( vf < 0 ) vf = 0; \
+	if( vf > PS_STYPE_ONE ) vf = PS_STYPE_ONE; \
+        int64_t v = vf * (PS_STYPE)interp_max; \
+        v = v * data->max_delay; \
+	PS_STYPE interp = (PS_STYPE)( v & (interp_max-1) ) / (PS_STYPE)interp_max; \
+        v >>= interp_prec;
+    #define PHASE_MOD_ABS() \
+	PS_STYPE vf = out[ p ]; \
+	if( vf < 0 ) vf = -vf; \
+	if( vf > PS_STYPE_ONE ) vf = PS_STYPE_ONE; \
+	int64_t v = vf * (PS_STYPE)interp_max; \
+	v = v * data->max_delay; \
+	PS_STYPE interp = (PS_STYPE)( v & (interp_max-1) ) / (PS_STYPE)interp_max; \
+	v >>= interp_prec;
+#endif
 PS_RETTYPE MODULE_HANDLER( 
     PSYNTH_MODULE_HANDLER_PARAMETERS
     )
@@ -122,11 +170,12 @@ PS_RETTYPE MODULE_HANDLER(
 	case PS_CMD_GET_OUTPUTS_NUM: retval = MODULE_OUTPUTS; break;
 	case PS_CMD_GET_FLAGS: retval = PSYNTH_FLAG_EFFECT | PSYNTH_FLAG_DONT_FILL_INPUT; break;
 	case PS_CMD_INIT:
-	    psynth_resize_ctls_storage( mod_num, 4, pnet );
+	    psynth_resize_ctls_storage( mod_num, 5, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_VOLUME ), "", 0, 512, 256, 0, &data->ctl_volume, 256, 0, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_MODULATION_TYPE ), ps_get_string( STR_PS_MODULATION_TYPES ), 0, 10, 0, 1, &data->ctl_type, -1, 0, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_CHANNELS ), ps_get_string( STR_PS_STEREO_MONO ), 0, 1, 0, 1, &data->ctl_mono, -1, 0, pnet );
-	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_MAX_PM_DELAY_LEN ), ps_get_string( STR_PS_PM_DELAY_LENS ), 0, 6, 0, 1, &data->ctl_max_delay, -1, 0, pnet );
+	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_MAX_PM_DELAY_LEN ), ps_get_string( STR_PS_PM_DELAY_LENS ), 0, 9, 0, 1, &data->ctl_max_delay, -1, 0, pnet );
+	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_PM_INTERPOLATION ), ps_get_string( STR_PS_SAMPLE_INTERP_TYPES ), 0, 2, 1, 1, &data->ctl_interp, -1, 0, pnet );
 	    data->changed = 0xFFFFFFFF;
 	    retval = 1;
 	    break;
@@ -382,64 +431,74 @@ PS_RETTYPE MODULE_HANDLER(
 				buf_ptr = data->buf_ptr;
 				if( data->ctl_type == 1 )
 				{
-				    for( int p = 0; p < frames; p++, buf_ptr++ )
+				    switch( data->ctl_interp )
 				    {
-					cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
-#ifndef PS_STYPE_FLOATINGPOINT
-					int v = out[ p ];
-					v += PS_STYPE_ONE;
-					if( v < 0 ) v = 0;
-					if( v > PS_STYPE_ONE * 2 ) v = PS_STYPE_ONE * 2;
-					v = v * data->max_delay; 
-					int interp = v & ( ( PS_STYPE_ONE * 2 ) - 1 );
-					v >>= PS_STYPE_BITS + 1;
-					PS_STYPE2 v1 = cbuf[ ( buf_ptr - v ) & buf_mask ];
-					PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( v + 1 ) ) & buf_mask ];
-					PS_STYPE2 v3 = INTERP2( v1, v2, interp );
-#else
-					PS_STYPE vf = out[ p ];
-					vf = ( vf + PS_STYPE_ONE ) * (PS_STYPE)0.5;
-					if( vf < 0 ) vf = 0;
-					if( vf > PS_STYPE_ONE ) vf = PS_STYPE_ONE;
-					int64_t v = vf * (PS_STYPE)interp_max;
-					v = v * data->max_delay;
-					PS_STYPE interp = (PS_STYPE)( v & (interp_max-1) ) / (PS_STYPE)interp_max;
-					v >>= interp_prec;
-					PS_STYPE v1 = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
-					PS_STYPE v2 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
-					PS_STYPE v3 = v1 * (PS_STYPE_ONE-interp) + v2 * interp;
-#endif
-					out[ p ] = v3;
+					case 0: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD();
+					    out[ p ] = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
+					}
+					break;
+					case 1: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD();
+					    PS_STYPE2 v1 = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
+					    PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
+					    out[ p ] = INTERP2( v1, v2, interp );
+					}
+					break;
+					case 2: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD();
+					    PS_STYPE2 v1 = cbuf[ ( buf_ptr - ( (int)v - 1 ) ) & buf_mask ];
+					    PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( (int)v + 0 ) ) & buf_mask ];
+					    PS_STYPE2 v3 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
+					    PS_STYPE2 v4 = cbuf[ ( buf_ptr - ( (int)v + 2 ) ) & buf_mask ];
+					    out[ p ] = INTERP2_SPLINE( v1, v2, v3, v4, interp );
+					}
+					break;
 				    }
 				}
 				else
 				{
-				    for( int p = 0; p < frames; p++, buf_ptr++ )
+				    switch( data->ctl_interp )
 				    {
-					cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
-#ifndef PS_STYPE_FLOATINGPOINT
-					int v = out[ p ];
-					if( v < 0 ) v = -v;
-					if( v > PS_STYPE_ONE ) v = PS_STYPE_ONE;
-					v = v * data->max_delay;
-					int interp = v & ( PS_STYPE_ONE - 1 );
-					v >>= PS_STYPE_BITS;
-					PS_STYPE2 v1 = cbuf[ ( buf_ptr - v ) & buf_mask ];
-					PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( v + 1 ) ) & buf_mask ];
-					PS_STYPE2 v3 = INTERP( v1, v2, interp );
-#else
-					PS_STYPE vf = out[ p ];
-					if( vf < 0 ) vf = -vf;
-					if( vf > PS_STYPE_ONE ) vf = PS_STYPE_ONE;
-					int64_t v = vf * (PS_STYPE)interp_max;
-					v = v * data->max_delay;
-					PS_STYPE interp = (PS_STYPE)( v & (interp_max-1) ) / (PS_STYPE)interp_max;
-					v >>= interp_prec;
-					PS_STYPE v1 = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
-					PS_STYPE v2 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
-					PS_STYPE v3 = v1 * (PS_STYPE_ONE-interp) + v2 * interp;
-#endif
-					out[ p ] = v3;
+					case 0: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD_ABS();
+					    out[ p ] = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
+					}
+					break;
+					case 1: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD_ABS();
+					    PS_STYPE2 v1 = cbuf[ ( buf_ptr - (int)v ) & buf_mask ];
+					    PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
+					    out[ p ] = INTERP( v1, v2, interp );
+					}
+					break;
+					case 2: 
+					for( int p = 0; p < frames; p++, buf_ptr++ )
+					{
+					    cbuf[ buf_ptr & buf_mask ] = in[ p ]; 
+					    PHASE_MOD_ABS();
+					    PS_STYPE2 v1 = cbuf[ ( buf_ptr - ( (int)v - 1 ) ) & buf_mask ];
+					    PS_STYPE2 v2 = cbuf[ ( buf_ptr - ( (int)v + 0 ) ) & buf_mask ];
+					    PS_STYPE2 v3 = cbuf[ ( buf_ptr - ( (int)v + 1 ) ) & buf_mask ];
+					    PS_STYPE2 v4 = cbuf[ ( buf_ptr - ( (int)v + 2 ) ) & buf_mask ];
+					    out[ p ] = INTERP_SPLINE( v1, v2, v3, v4, interp );
+					}
+					break;
 				    }
 				}
 			    }

@@ -40,7 +40,17 @@ inline jobject android_get_activity_obj( struct android_app* app )
 
 JNIEnv* android_sundog_get_jni( sundog_engine* s );
 void android_sundog_release_jni( sundog_engine* s ); //-> DetachCurrentThread()
-int android_sundog_check_for_permissions( sundog_engine* s, int p ); //p: 1<<0 - write ext.storage; 1<<1 - record_audio; 1<<2 - camera; ...
+bool android_sundog_allfiles_access_supported( sundog_engine* s );
+int android_sundog_allfiles_access( sundog_engine* s ); //show screen for controlling if the app can manage external storage (broad access)
+#define ANDROID_PERM_WRITE_EXTERNAL_STORAGE		(1<<0)
+#define ANDROID_PERM_RECORD_AUDIO			(1<<1)
+#define ANDROID_PERM_CAMERA				(1<<2)
+#define ANDROID_PERM_READ_EXTERNAL_STORAGE		(1<<3)
+#define ANDROID_PERM_READ_MEDIA_AUDIO			(1<<4)
+#define ANDROID_PERM_READ_MEDIA_IMAGES			(1<<5)
+#define ANDROID_PERM_READ_MEDIA_VIDEO			(1<<6)
+#define ANDROID_PERM_MANAGE_EXTERNAL_STORAGE		(1<<7) //request all-files access (Android 11+; API LEVEL 30+)
+int android_sundog_check_for_permissions( sundog_engine* s, int p ); //p: set of ANDROID_PERM_*; retval: enabled permissions;
 //android_sundog_get_dir()
 //  n: 0 - primary; 1 - secondary;
 //  type: internal_files, external_files, internal_cache, external_cache;

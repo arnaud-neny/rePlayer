@@ -1,7 +1,7 @@
 /*
     sundog_bridge.cpp - SunDog<->Android bridge
     This file is part of the SunDog engine.
-    Copyright (C) 2012 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2012 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -98,7 +98,7 @@ char g_android_version_correct[ 16 ] = { 0 };
 int g_android_version_nums[ 8 ] = { 0 };
 char* g_android_lang = NULL;
 char* g_android_requested_permissions = NULL;
-int g_android_supported_permissions = 0xFFFFFFFF; //for android_sundog_check_for_permissions(): 1<<0 - write ext.storage; 1<<1 - record_audio; 1<<2 - camera; ...
+int g_android_supported_permissions = 0xFFFFFFFF; //for android_sundog_check_for_permissions(): set of ANDROID_PERM_*
 
 #ifndef NOMAIN
 
@@ -353,32 +353,57 @@ static char* java_call2_s_s( android_sundog_engine* sd, const char* method_name,
     return rv;
 }
 
+bool android_sundog_allfiles_access_supported( sundog_engine* s )
+{
+    if( g_android_supported_permissions & ANDROID_PERM_MANAGE_EXTERNAL_STORAGE ) return 1;
+    return 0;
+}
+
+int android_sundog_allfiles_access( sundog_engine* s )
+{
+    android_sundog_engine* sd = (android_sundog_engine*)s->device_specific;
+    if( g_android_supported_permissions & ANDROID_PERM_MANAGE_EXTERNAL_STORAGE )
+    {
+	//Show all-files access setgings (Android 11+; API LEVEL 30+)
+	java_call2_i_i( sd, "AllFilesAccess", 1, 0, 0, 0, 0 );
+    }
+    return 0;
+}
+
 int android_sundog_check_for_permissions( sundog_engine* s, int p )
 {
     android_sundog_engine* sd = (android_sundog_engine*)s->device_specific;
     p &= g_android_supported_permissions;
-    if( p == 0 ) return 0;
-    int rv = java_call2_i_i( sd, "CheckForPermissions", 1, p, 0, 0, 0 );
-    if( ( rv & p ) == p )
-	return rv;
-    rv = 0;
-    int t = 0;
+    p &= ~ANDROID_PERM_MANAGE_EXTERNAL_STORAGE;
+    int rv = 0;
     while( 1 )
     {
-	int rv2 = java_call2_i_i( sd, "CheckForPermissions", 1, -1, 0, 0, 0 );
-	if( rv2 != -1 )
+	if( p == 0 ) break;
+	int rv = java_call2_i_i( sd, "CheckForPermissions", 1, p, 0, 0, 0 );
+	if( ( rv & p ) == p )
 	{
-	    rv = rv2;
 	    break;
 	}
-	stime_sleep( 20 );
-        t += 100;
-        if( t > 60 * 1000 )
-        {
-    	    slog( "check_for_permissions() timeout\n" );
-            break;
-        }
-    };
+	rv = 0;
+	int t = 0;
+	while( 1 )
+	{
+	    int rv2 = java_call2_i_i( sd, "CheckForPermissions", 1, -1, 0, 0, 0 );
+	    if( rv2 != -1 )
+	    {
+		rv = rv2;
+		break;
+	    }
+	    stime_sleep( 20 );
+    	    t += 100;
+    	    if( t > 60 * 1000 )
+    	    {
+    	        slog( "check_for_permissions() timeout\n" );
+        	break;
+    	    }
+	}
+	break;
+    }
     return rv;
 }
 
@@ -524,7 +549,7 @@ void android_sundog_open_url( sundog_engine* s, const char* url_text )
 
 void android_sundog_send_file_to_gallery( sundog_engine* s, const char* path )
 {
-    if( g_android_version_nums[ 0 ] < 10 ) android_sundog_check_for_permissions( s, 1 << 0 );
+    if( g_android_version_nums[ 0 ] < 10 ) android_sundog_check_for_permissions( s, ANDROID_PERM_WRITE_EXTERNAL_STORAGE );
     android_sundog_engine* sd = (android_sundog_engine*)s->device_specific;
     java_call2_i_si( sd, "SendFileToGallery", path, 0 );
 }
@@ -659,7 +684,7 @@ int android_sundog_set_system_ui_visibility( sundog_engine* s, int v )
 int android_sundog_open_camera( sundog_engine* s, int cam_id, void* user_data )
 {
     android_sundog_engine* sd = (android_sundog_engine*)s->device_specific;
-    android_sundog_check_for_permissions( s, 1 << 2 );
+    android_sundog_check_for_permissions( s, ANDROID_PERM_CAMERA );
     int rv = java_call2_i_ii64( sd, "OpenCamera", cam_id, (int64_t)user_data );
     if( rv >= 0 )
     {
@@ -860,24 +885,35 @@ static int engine_global_init( android_sundog_engine* sd )
     g_android_supported_permissions = 0xFFFFFFFF;
     if( g_android_version_nums[ 0 ] < 13 )
     {
-        //Not supported: READ_MEDIA_AUDIO, READ_MEDIA_IMAGES, READ_MEDIA_VIDEO
-	g_android_supported_permissions &= ~( (1<<4) | (1<<5) | (1<<6) );
+        //Not supported:
+	g_android_supported_permissions &= ~( 
+	    ANDROID_PERM_READ_MEDIA_AUDIO |
+	    ANDROID_PERM_READ_MEDIA_IMAGES |
+	    ANDROID_PERM_READ_MEDIA_VIDEO
+	);
     }
     else
     {
-	//Android 13+
-	g_android_supported_permissions &= ~( 1 << 3 ); //READ_EXTERNAL_STORAGE has no effect
+	//Android 13+ (API LEVEL 33)
+	g_android_supported_permissions &= ~ANDROID_PERM_READ_EXTERNAL_STORAGE; //READ_EXTERNAL_STORAGE has no effect
 	if( strstr( g_android_requested_permissions, "READ_MEDIA_AUDIO" ) == nullptr )
-	    g_android_supported_permissions &= ~(1<<4);
+	    g_android_supported_permissions &= ~ANDROID_PERM_READ_MEDIA_AUDIO;
 	if( strstr( g_android_requested_permissions, "READ_MEDIA_IMAGES" ) == nullptr )
-	    g_android_supported_permissions &= ~(1<<5);
+	    g_android_supported_permissions &= ~ANDROID_PERM_READ_MEDIA_IMAGES;
 	if( strstr( g_android_requested_permissions, "READ_MEDIA_VIDEO" ) == nullptr )
-    	    g_android_supported_permissions &= ~(1<<6);
+    	    g_android_supported_permissions &= ~ANDROID_PERM_READ_MEDIA_VIDEO;
     }
-    if( g_android_version_nums[ 0 ] >= 11 )
+    if( g_android_version_nums[ 0 ] < 11 )
     {
-	//Android 11+
-	g_android_supported_permissions &= ~( 1 << 0 ); //WRITE_EXTERNAL_STORAGE has no effect
+        //Not supported:
+	g_android_supported_permissions &= ~( ANDROID_PERM_MANAGE_EXTERNAL_STORAGE );
+    }
+    else
+    {
+	//Android 11+ (API LEVEL 30)
+	g_android_supported_permissions &= ~ANDROID_PERM_WRITE_EXTERNAL_STORAGE; //WRITE_EXTERNAL_STORAGE has no effect
+	if( strstr( g_android_requested_permissions, "MANAGE_EXTERNAL_STORAGE" ) == nullptr )
+	    g_android_supported_permissions &= ~ANDROID_PERM_MANAGE_EXTERNAL_STORAGE;
     }
 
 #ifdef SUNDOG_MODULE

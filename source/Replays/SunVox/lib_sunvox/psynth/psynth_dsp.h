@@ -146,7 +146,7 @@ struct psynth_oversampler
     PS_STYPE2			down[ PSYNTH_OVERSAMPLER_DOWNSMP_VALS * PSYNTH_OVERSAMPLER_CHANNELS ]; //Downsampler filter values
 };
 
-psynth_oversampler* psynth_oversampler_new( void );
+psynth_oversampler* psynth_oversampler_new();
 void psynth_oversampler_remove( psynth_oversampler* os );
 void psynth_oversampler_stop( psynth_oversampler* os );
 void psynth_oversampler_init( psynth_oversampler* os, int scale, PS_STYPE* src, PS_STYPE* dest, size_t size );

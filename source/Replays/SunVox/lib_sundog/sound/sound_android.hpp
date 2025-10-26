@@ -179,9 +179,8 @@ int device_sound_init( sundog_sound* ss )
 
     slog( "device_sound_init() begin\n" );
 
-    ss->device_specific = smem_new( sizeof( device_sound ) );
+    ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     device_sound* d = (device_sound*)ss->device_specific;
-    smem_zero( d );
 
     int android_audio_buf_size = 0;
     int android_audio_sample_rate = 0;
@@ -238,8 +237,7 @@ int device_sound_init( sundog_sound* ss )
     }
 #endif
     if( d->buffer_size == 0 ) d->buffer_size = 1024;
-    d->output_buffer = (uint*)smem_new( d->buffer_size * 4 * 2 ); // *2 = double buffered
-    smem_zero( d->output_buffer );
+    d->output_buffer = SMEM_ZALLOC2( uint, d->buffer_size * 2 ); // *2 = double buffered
     ss->out_latency = d->buffer_size;
     ss->out_latency2 = d->buffer_size;
     ss->in_type = sound_buffer_int16;
@@ -491,15 +489,13 @@ void device_sound_input( sundog_sound* ss, bool enable )
     if( enable )
     {
 #ifndef NOMAIN
-	android_sundog_check_for_permissions( ss->sd, 1 << 1 );
+	android_sundog_check_for_permissions( ss->sd, ANDROID_PERM_RECORD_AUDIO );
 #endif
 
 	if( !d->input_buffer )
 	{
-	    d->input_buffer = (uint*)smem_new( d->buffer_size * 4 * g_input_buffers_count );
-	    smem_zero( d->input_buffer );
-	    d->input_silent_buffer = (uint*)smem_new( d->buffer_size * 4 );
-	    smem_zero( d->input_silent_buffer );
+	    d->input_buffer = SMEM_ZALLOC2( uint, d->buffer_size * g_input_buffers_count );
+	    d->input_silent_buffer = SMEM_ZALLOC2( uint, d->buffer_size );
 	}
 
 	if( !d->sl_recorder )

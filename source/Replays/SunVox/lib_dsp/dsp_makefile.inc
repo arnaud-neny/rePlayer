@@ -1,11 +1,13 @@
 FINAL_CFLAGS += -I$(DSP)
 
-OBJS += \
-    dsp_tables.o \
-    dsp_functions.o
+DSP_SRC = \
+    dsp_tables.cpp \
+    dsp_functions.cpp
 
-dsp_tables.o: $(DSP)dsp_tables.cpp $(DSP)dsp.h $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(DSP)dsp_tables.cpp
+DSP_OBJS = $(DSP_SRC:.cpp=.o)
+OBJS += $(DSP_OBJS)
 
-dsp_functions.o: $(DSP)dsp_functions.cpp $(DSP)dsp.h $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(DSP)dsp_functions.cpp
+DSP_DEPS = $(DSP)*.h
+
+$(DSP_OBJS): %.o: $(DSP)%.cpp $(DSP_DEPS) $(SD_DEPS)
+	$(CXX) $(FINAL_CFLAGS) -c $<

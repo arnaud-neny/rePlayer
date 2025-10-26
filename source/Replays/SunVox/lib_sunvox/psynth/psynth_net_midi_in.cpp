@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -49,10 +49,9 @@ void psynth_handle_midi_in_flags( uint mod_num, psynth_net* pnet )
     if( add )
     {
 	int i = -1;
-	if( pnet->midi_in_mods == 0 )
+	if( !pnet->midi_in_mods )
 	{
-	    pnet->midi_in_mods = (uint*)smem_new( sizeof( uint ) * 4 );
-	    smem_zero( pnet->midi_in_mods );
+	    pnet->midi_in_mods = SMEM_ZALLOC2( uint, 4 );
 	    i = 0;
 	}
 	else
@@ -69,7 +68,7 @@ void psynth_handle_midi_in_flags( uint mod_num, psynth_net* pnet )
 	    if( i >= old_size )
 	    {
 		size_t new_size = old_size + 4;
-		pnet->midi_in_mods = (uint*)smem_resize2( pnet->midi_in_mods, new_size * sizeof( uint ) );
+		pnet->midi_in_mods = SMEM_ZRESIZE2( pnet->midi_in_mods, uint, new_size );
 	    }
 	    pnet->midi_in_mods[ i ] = mod_num;
 	}
@@ -96,7 +95,7 @@ static void psynth_make_ctl_midi_in_name( char* str, uint midi_pars1, uint midi_
     str[ 2 ] = 0;
     if( type >= psynth_midi_note && type <= psynth_midi_prog )
     {
-	hex_int_to_string( PSYNTH_MIDI_PARS2_GET_PAR( midi_pars2 ), &str[ 2 ] );
+	int_to_string_hex( PSYNTH_MIDI_PARS2_GET_PAR( midi_pars2 ), &str[ 2 ] );
     }
 }
 int psynth_set_ctl_midi_in( uint mod_num, uint ctl_num, uint midi_pars1, uint midi_pars2, psynth_net* pnet )
@@ -109,7 +108,7 @@ int psynth_set_ctl_midi_in( uint mod_num, uint ctl_num, uint midi_pars1, uint mi
     psynth_ctl* ctl = &mod->ctls[ ctl_num ];
     char ts[ 64 ];
     SSYMTAB_VAL tv;
-    smem_clear_struct( tv );
+    SMEM_CLEAR_STRUCT( tv );
     int prev_type = PSYNTH_MIDI_PARS1_GET_TYPE( ctl->midi_pars1 );
     if( prev_type != psynth_midi_none )
     {
@@ -142,7 +141,7 @@ int psynth_set_ctl_midi_in( uint mod_num, uint ctl_num, uint midi_pars1, uint mi
 	{
 	    if( s->val.p == 0 )
 	    {
-		s->val.p = smem_new( sizeof( int ) );
+		s->val.p = SMEM_ALLOC( sizeof( int ) );
 		((int*)s->val.p)[ 0 ] = -1;
 	    }
 	    int* midi_links = (int*)s->val.p;
@@ -157,7 +156,7 @@ int psynth_set_ctl_midi_in( uint mod_num, uint ctl_num, uint midi_pars1, uint mi
 	    }
 	    if( i == midi_links_num )
 	    {
-		s->val.p = smem_resize( s->val.p, ( midi_links_num + 1 ) * sizeof( int ) );
+		s->val.p = SMEM_RESIZE( s->val.p, ( midi_links_num + 1 ) * sizeof( int ) );
 		midi_links = (int*)s->val.p;
 	    }
 	    midi_links[ i ] = mod_num | ( ctl_num << 16 );

@@ -14,7 +14,7 @@ extern int g_fonts_count;
 #define DEFAULT_FONT_BIG 		FONT_BIG
 #define DEFAULT_FONT_SMALL 		FONT_MEDIUM_MONO
 
-#include "regions/device.h"
+#include "regions/devrgn.h"
 #include "wm_struct.h"
 
 #define STR_SHORT_SPACE "\x01"
@@ -233,7 +233,9 @@ inline int window_handler_check_data( sundog_event* evt, window_manager* wm )
 //## (empty windows with some data)##
 //###################################
 
-WINDOWPTR add_data_container( WINDOWPTR win, const char* name, void* new_data_block ); //new_data_block - just created with smem_new(); pointer copy, NOT DATA!
+WINDOWPTR add_data_container( WINDOWPTR win, const char* name, void* new_data_block );
+//new_data_block - just created with smem_alloc(); pointer copy, NOT DATA!
+//the data will be deleted automatically when the container is deleted;
 void remove_data_container( WINDOWPTR win, const char* name );
 WINDOWPTR get_data_container( WINDOWPTR win, const char* name );
 void* get_data_container2( WINDOWPTR win, const char* name );
@@ -687,6 +689,7 @@ void remove_image( sdwm_image* img );
 //## KEYMAP FUNCTIONS:             ##
 //###################################
 
+int get_key_id( const char* name );
 const char* get_key_name( int key );
 sundog_keymap* keymap_new( window_manager* wm );
 void keymap_remove( sundog_keymap* km, window_manager* wm );
@@ -698,6 +701,8 @@ const char* keymap_get_action_name( sundog_keymap* km, int section_num, int acti
 const char* keymap_get_action_group_name( sundog_keymap* km, int section_num, int action_num, window_manager* wm );
 int keymap_bind2( sundog_keymap* km, int section_num, int key, uint flags, uint pars1, uint pars2, int action_num, int bind_num, int bind_flags, window_manager* wm );
 int keymap_bind( sundog_keymap* km, int section_num, int key, uint flags, int action_num, int bind_num, int bind_flags, window_manager* wm );
+int keymap_get_section( sundog_keymap* km, const char* section_id, window_manager* wm );
+int keymap_get_action( sundog_keymap* km, int section_num, const char* action_id, window_manager* wm );
 int keymap_get_action( sundog_keymap* km, int section_num, int key, uint flags, uint pars1, uint pars2, window_manager* wm );
 sundog_keymap_key* keymap_get_key( sundog_keymap* km, int section_num, int action_num, int key_num, window_manager* wm );
 bool keymap_midi_note_assigned( sundog_keymap* km, int note, int channel, window_manager* wm );
@@ -790,12 +795,14 @@ void text_clipboard_copy( WINDOWPTR win );
 void text_clipboard_paste( WINDOWPTR win );
 void text_set_text( WINDOWPTR win, const char* text, window_manager* wm );
 void text_insert_text( WINDOWPTR win, const char* text, int pos );
+void text_delete_text( WINDOWPTR win, int pos, int len );
 void text_set_label( WINDOWPTR win, const char* label );
 void text_set_cursor_position( WINDOWPTR win, int cur_pos, window_manager* wm );
 void text_set_value( WINDOWPTR win, int val, window_manager* wm );
 void text_set_value2( WINDOWPTR win, int val, window_manager* wm );
 void text_set_fvalue( WINDOWPTR win, double val );
 char* text_get_text( WINDOWPTR win, window_manager* wm );
+char* text_get_text( WINDOWPTR win, int pos, int len ); //pos/len - in utf32 chars
 int text_get_cursor_position( WINDOWPTR win, window_manager* wm );
 int text_get_value( WINDOWPTR win, window_manager* wm );
 double text_get_fvalue( WINDOWPTR win );
@@ -946,10 +953,12 @@ int ui_scale_handler( sundog_event* evt, window_manager* wm );
 
 int keymap_handler( sundog_event* evt, window_manager* wm );
 
+extern bool g_clear_settings;
 #define PREFS_FLAG_NO_COLOR_THEME		( 1 << 0 )
 #define PREFS_FLAG_NO_FONTS			( 1 << 1 )
 #define PREFS_FLAG_NO_CONTROL_TYPE		( 1 << 2 )
 #define PREFS_FLAG_NO_KEYMAP			( 1 << 3 )
+int prefs_main_handler( sundog_event* evt, window_manager* wm );
 int prefs_ui_handler( sundog_event* evt, window_manager* wm );
 int prefs_svideo_handler( sundog_event* evt, window_manager* wm );
 int prefs_audio_handler( sundog_event* evt, window_manager* wm );
@@ -982,7 +991,7 @@ int popup_menu( const char* name, const char* items, int x, int y, COLOR color, 
 int popup_menu( const char* name, const char* items, int x, int y, COLOR color, window_manager* wm ); //INTERNAL EVENT LOOP!
 void prefs_clear( window_manager* wm );
 void prefs_add_sections( const char** names, void** handlers, int num, window_manager* wm );
-void prefs_add_default_sections( window_manager* wm );
+void prefs_add_default_sections( window_manager* wm, bool without_main );
 void prefs_open( void* host, window_manager* wm );
 void colortheme_open( window_manager* wm );
 void ui_scale_open( window_manager* wm );

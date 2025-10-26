@@ -1,7 +1,7 @@
 /*
     wm_wince.h - platform-dependent module : Windows CE
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -50,7 +50,7 @@ tGXResume GXResume = 0;
 tGXSetViewport GXSetViewport = 0;
 GXDisplayProperties gx_dp;
 
-typedef void (*tSystemIdleTimerReset)( void );
+typedef void (*tSystemIdleTimerReset)();
 tSystemIdleTimerReset SD_SystemIdleTimerReset = 0;
 
 DWORD WINAPI SystemIdleTimerProc( LPVOID lpParameter )
@@ -256,7 +256,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
 	    wm->screen_xsize /= 2;
 	    wm->screen_ysize /= 2;
 	}
-	wm->fb = (COLORPTR)smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+	wm->fb = SMEM_ALLOC2( COLOR, wm->screen_xsize * wm->screen_ysize );
 	wm->fb_xpitch = 1;
 	wm->fb_ypitch = wm->screen_xsize;
     }
@@ -282,7 +282,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
     if( wm->screen_zoom > 1 )
     {
 	win_zoom_apply( wm );
-	wm->wince_zoom_buffer = smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+	wm->wince_zoom_buffer = SMEM_ALLOC( wm->screen_xsize * wm->screen_ysize * COLORLEN );
 	wm->fb_xpitch = 1;
 	wm->fb_ypitch = wm->screen_xsize;
     }

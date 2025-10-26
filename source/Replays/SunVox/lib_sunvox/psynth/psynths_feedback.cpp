@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -87,8 +87,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_VOLUME ), "", 0, 10000, 1000, 0, &data->ctl_volume, -1, 0, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_CHANNELS ), ps_get_string( STR_PS_STEREO_MONO ), 0, 1, 0, 1, &data->ctl_mono, -1, 0, pnet );
 	    data->buf_size = (int)round_to_power_of_two( pnet->max_buf_size * 2 );
-	    data->buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * data->buf_size * MODULE_OUTPUTS );
-	    smem_zero( data->buf );
+	    data->buf = SMEM_ZALLOC2( PS_STYPE, data->buf_size * MODULE_OUTPUTS );
 	    data->buf_wp = 0;
 	    data->buf_wp_start = 0;
 	    data->buf_clean = true;

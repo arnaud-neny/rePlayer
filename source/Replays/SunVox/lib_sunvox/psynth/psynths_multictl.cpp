@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -276,7 +276,7 @@ static int multictl_smooth_handler( void* user_data, WINDOWPTR win, window_manag
     int size = MULTICTL_CURVE_POINTS;
     uint16_t* curve = multictl_get_curve( data->mod_num, data->pnet );
     if( !curve ) return 0;
-    uint16_t* temp = (uint16_t*)smem_new( size * sizeof( uint16_t ) );
+    uint16_t* temp = SMEM_ALLOC2( uint16_t, size );
     for( int a = 0; a < 2; a++ )
     {
         for( int i = 1; i < size - 1; i++ )
@@ -691,7 +691,7 @@ static int multictl_visual_handler( sundog_event* evt, window_manager* wm )
 		        int x = 0;
 	        	{
 	        	    char ts[ 16 ];
-	        	    hex_int_to_string( l, ts );
+	        	    int_to_string_hex( l, ts );
 	        	    draw_string( ts, 0, y, wm ); x = string_x_size( ts, wm );
                     	    draw_string( str_dot, x, y, wm ); x += str_dot_xsize;
 	        	}

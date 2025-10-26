@@ -203,8 +203,8 @@ struct sundog_midi_client
 
     smutex 		ports_mutex; //Thread-safe access to the ports (new, remove, read, write);
                             	     //for device-dependent (internal) event threads - use other mutexes;
-    stime_ticks_t 	last_midi_in_activity;
-    stime_ticks_t 	last_midi_out_activity;
+    bool 		midi_in_activity;
+    bool 		midi_out_activity;
 };
 
 //Variables:
@@ -234,8 +234,8 @@ int user_controlled_sound_callback(
 //retval: 0 - buffer is filled with zeros; 1 - buffer is filled with some signal;
 int sundog_sound_callback( sundog_sound* ss, uint32_t flags );
 
-int sundog_sound_global_init( void );
-int sundog_sound_global_deinit( void );
+int sundog_sound_global_init();
+int sundog_sound_global_deinit();
 //Sound stream is an object associated with the selected sound card (driver->device);
 //you can use it for the sound output and input (optional).
 //Init sound stream:
@@ -262,7 +262,7 @@ void sundog_sound_input_request( sundog_sound* ss, bool enable ); //... or use t
 void sundog_sound_handle_input_requests( sundog_sound* ss );
 const char* sundog_sound_get_driver_name( sundog_sound* ss );
 const char* sundog_sound_get_driver_info( sundog_sound* ss );
-const char* sundog_sound_get_default_driver( void );
+const char* sundog_sound_get_default_driver();
 int sundog_sound_get_drivers( char*** names, char*** infos );
 int sundog_sound_get_devices( const char* driver, char*** names, char*** infos, bool input );
 int sundog_sound_capture_start( sundog_sound* ss, const char* filename, uint32_t flags ); //capture sound to the WAV file
@@ -270,8 +270,8 @@ void sundog_sound_capture_stop( sundog_sound* ss );
 
 //Functions (MIDI):
 
-int sundog_midi_global_init( void );
-int sundog_midi_global_deinit( void );
+int sundog_midi_global_init();
+int sundog_midi_global_deinit();
 //MIDI client is an object with several MIDI IN/OUT ports connected to different MIDI devices:
 //some clients (JACK,AUv3) can't work without the sound stream (ss);
 int sundog_midi_client_open( sundog_midi_client* c, sundog_engine* sd, sundog_sound* ss, const char* name, uint32_t flags ); //Open MIDI client

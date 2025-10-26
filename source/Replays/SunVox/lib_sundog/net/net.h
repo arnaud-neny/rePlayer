@@ -5,8 +5,8 @@
     #define SUNDOG_NET
 #endif
 
-int snet_global_init( void );
-int snet_global_deinit( void );
+int snet_global_init();
+int snet_global_deinit();
 int snet_get_host_info( sundog_engine* s, char** host_addr, char** addr_list );
 /*
     Example:

@@ -503,9 +503,6 @@ struct psynth_module
     uint8_t		th_id; //Current rendering thread
 #endif
 
-    char	    	name[ 32 + 1 ]; //Last char is always NULL
-    char*		name2; //External string pointer (no autoremove)
-
     PS_RETTYPE	    	(*handler)(
 			    PSYNTH_MODULE_HANDLER_PARAMETERS
 			);
@@ -516,27 +513,23 @@ struct psynth_module
     int		    	in_empty[ PSYNTH_MAX_CHANNELS ]; //Number of zero frames
     int		    	out_empty[ PSYNTH_MAX_CHANNELS ]; //Number of zero frames
 
-    int		    	x, y; //0 .. 1024 (100%)
-    uint8_t		z;
-    uint8_t	    	color[ 3 ];
-    uint16_t		scale; //Normal = 256
+    //Number of channels:
+    int		    	input_channels;
+    int		    	output_channels;
 
-    uint32_t		visualizer_pars;
+    //Parameters for PS_CMD_RENDER_REPLACE: (should be placed in psynth_event??????)
+    int                 frames; //Buffer size
+    int                 offset; //Time offset in frames
+    //==============================================================================
 
     int*      		events;
     uint		events_num;
-
-    volatile float	cpu_usage; //In percents (0..100)
-    int             	cpu_usage_ticks;
-    uint		render_counter;
 
     //Standard properties:
     int		    	finetune; //-256...256
     int		    	relative_note;
 
-    //Number of channels:
-    int		    	input_channels;
-    int		    	output_channels;
+    smutex        	mutex; //Render lock/unlock
 
     //Links to the input synths:
     int*		input_links; //Links can be changed in the main UI thread only! Not in the audio thread!
@@ -549,13 +542,20 @@ struct psynth_module
     //Scope buffers:
     PS_STYPE*		scope_buf[ PSYNTH_MAX_CHANNELS ];
 
+    volatile float	cpu_usage; //In percents (0..100)
+    int             	cpu_usage_ticks;
+
     //Controllers:
     psynth_ctl*  	ctls;
     uint	    	ctls_num;
     int			ctls_yoffset; //for UI only
 
+    //Data chunks:
+    psynth_chunk**	chunks; //In future updates we should add optional symtab (~100 elements), which will be enabled for modules with large amount of chunks
+
     //MIDI:
     uint		midi_in_flags;
+    uint		render_counter; //for MIDI IN (psynth_midi_toggle)
     char*		midi_out_name; //Device name
     int			midi_out;
     int			midi_out_ch;
@@ -566,6 +566,19 @@ struct psynth_module
     uint		midi_out_note_id[ 16 ];
     uint8_t		midi_out_note[ 16 ];
 #endif
+
+    //Gfx:
+
+    int		    	x, y; //0 .. 1024 (100%)
+    uint8_t		z;
+    uint8_t	    	color[ 3 ];
+    uint16_t		scale; //Normal = 256
+
+    uint32_t		visualizer_pars;
+
+    char	    	name[ 32 + 1 ]; //Last char is always NULL
+    char*		name2; //External string pointer (no autoremove)
+    uint32_t		id;
 
 #ifdef SUNVOX_GUI
     //Visual (optional) - window with some specific module elements (graphics)
@@ -579,14 +592,6 @@ struct psynth_module
     volatile uint16_t	full_redraw_request; //FULL REDRAW Signal to the UI host (window with controllers). With recalc_regions().
     uint16_t		full_redraw_request_answer; //...
 
-    //Data chunks:
-    psynth_chunk**	chunks; //In future updates we should add optional symtab (~100 elements), which will be enabled for modules with large amount of chunks
-
-    smutex        	mutex; //Render lock/unlock
-
-    //Parameters for PS_CMD_RENDER_REPLACE: (should be placed in psynth_event??????)
-    int                 frames; //Buffer size
-    int                 offset; //Time offset in frames
 };
 
 struct psynth_event_note
@@ -746,7 +751,9 @@ struct psynth_net
     void*		host; //sunvox_engine
     uint32_t		base_host_version;
     uint		render_counter;
-    int			change_counter;
+    int			change_counter; //any changes
+    int			change_counter2; //connection configuration, MSB, add/delete module
+    int			prev_change_counter2;
 
     //Threads:
 
@@ -832,6 +839,7 @@ int psynth_get_scaled_ctl_value( //Input = normal decimal ctl value; Output = sc
     int val,
     bool positive_val_without_offset,
     psynth_net* pnet );
+int psynth_get_scaled_ctl_value( uint mod_num, uint ctl_num, psynth_net* pnet ); //Output = scaled (0..32768) value for the pattern
 void psynth_get_ctl_val_str( //Input = 0...32768 (for any ctl types); Output = value string
     uint mod_num,
     uint ctl_num,
@@ -919,7 +927,7 @@ int psynth_resampler_end(
 //This data will be saved to the SunVox project file.
 void psynth_new_chunk( uint mod_num, uint num, size_t size, uint flags, int freq, psynth_net* pnet ); //Create new chunk of "size" bytes
 void psynth_new_chunk( uint mod_num, uint num, psynth_chunk* c, psynth_net* pnet );
-void psynth_replace_chunk_data( uint mod_num, uint num, void* data, psynth_net* pnet ); //Replace by new memory block (allocated by smem_new())
+void psynth_replace_chunk_data( uint mod_num, uint num, void* data, psynth_net* pnet ); //Replace by new memory block (allocated by smem_alloc())
 void* psynth_get_chunk_data( uint mod_num, uint num, psynth_net* pnet ); //Get chunk data, or NULL if chunk is not exists
 inline void* psynth_get_chunk_data( psynth_module* mod, uint num ) //Get chunk data (fast version)
 {
@@ -979,9 +987,9 @@ enum
 };
 #define PSYNTH_UNKNOWN_NOTE		(-999999)
 int psynth_str2note( const char* note_str ); //return note number or PSYNTH_UNKNOWN_NOTE
-int8_t* psynth_get_noise_table( void ); //int8_t * PSYNTH_NOISE_TABLE_SIZE
+int8_t* psynth_get_noise_table(); //int8_t * PSYNTH_NOISE_TABLE_SIZE
 void* psynth_get_sine_table( int bytes_per_sample, bool sign, int length_bits, int amp );
-PS_STYPE* psynth_get_base_wavetable( void );
+PS_STYPE* psynth_get_base_wavetable();
 
 #if defined(PS_STYPE_FLOATINGPOINT)
     //1/(1<<24) = 1/pow(2,24) = 0x1p-24;

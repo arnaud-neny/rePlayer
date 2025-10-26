@@ -9,7 +9,7 @@ void copy_resources( window_manager* wm )
     show_status_message( wm_get_string( STR_WM_RES_UNPACKING ), 0, wm );
     wm->device_redraw_framebuffer( wm );
     int rv = android_sundog_copy_resources( wm->sd );
-    char* ts = (char*)smem_new( 4096 );
+    char* ts = SMEM_ALLOC2( char, 4096 );
     switch( rv )
     {
 	case 0:

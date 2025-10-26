@@ -1,7 +1,7 @@
 /*
     sundog_bridge.mm - SunDog<->iOS bridge
     This file is part of the SunDog engine.
-    Copyright (C) 2009 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2009 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -327,41 +327,79 @@ sundog_state* sundog_state_get( sundog_engine* s, int io ) //io: 0 - app input; 
     return state;
 }
 
+NSString* imgfile_to_jpeg( const char* src_path, bool delete_src_file )
+{
+    NSString* src_path_ns = [NSString stringWithUTF8String:src_path];
+    NSData* src_file_data = [NSData dataWithContentsOfFile:src_path_ns];
+    if( !src_file_data ) return nullptr;
+    UIImage* image = [UIImage imageWithData:src_file_data];
+    if( !image ) return nullptr;
+    NSData* jpeg_data = UIImageJPEGRepresentation(image, 0.8);
+    if( !jpeg_data ) return nullptr;
+    
+    NSString* dest_path_ns = [ NSTemporaryDirectory() stringByAppendingString:@"converted_image.jpg" ];
+    if( [ jpeg_data writeToFile:dest_path_ns atomically:NO ] )
+    {
+        if( delete_src_file )
+        {
+            NSError* error;
+            [ [ NSFileManager defaultManager ] removeItemAtPath:src_path_ns error:&error ];
+        }
+        return dest_path_ns;
+    }
+    
+    return nullptr;
+}
+
 int sundog_state_import_from_url( ios_sundog_engine* sd, NSURL* url, uint32_t flags )
 {
     const char* path = [ [ url path ] UTF8String ];
     if( !path ) return -1;
     while( 1 )
     {
-	FILE* f = fopen( path, "rb" );
-	if( f )
-	{
-	    fclose( f );
-	    break;
-	}
-	flags |= SUNDOG_STATE_TEMP;
-	flags &= ~SUNDOG_STATE_ORIGINAL;
-	if( [ url startAccessingSecurityScopedResource ] )
-	{
-	    NSError* error;
-	    NSString* dest = [ NSTemporaryDirectory() stringByAppendingString:[ url lastPathComponent ] ];
-	    const char* dest_cstr = [ dest UTF8String ];
-	    [ [ NSFileManager defaultManager ] removeItemAtPath:dest error:&error ]; //remove previous copy of this file
-	    if( [ [ NSFileManager defaultManager ] copyItemAtPath:[ url path ] toPath:dest error:&error ] == YES )
-	    {
-		path = dest_cstr;
-	    }
-	    else
-	    {
-		printf( "Can't copy from %s to %s : %s\n", path, dest_cstr, [ [ error localizedDescription ] UTF8String ] );
-		path = NULL;
-	    }
-	    [ url stopAccessingSecurityScopedResource ];
-	    break;
-	}
-	printf( "Can't open %s\n", path );
-	path = NULL;
-	break;
+        FILE* f = fopen( path, "rb" );
+        if( f )
+        {
+            fclose( f );
+            break;
+        }
+        flags |= SUNDOG_STATE_TEMP;
+        flags &= ~SUNDOG_STATE_ORIGINAL;
+        if( [ url startAccessingSecurityScopedResource ] )
+        {
+            NSError* error;
+            NSString* dest = [ NSTemporaryDirectory() stringByAppendingString:[ url lastPathComponent ] ];
+            const char* dest_cstr = [ dest UTF8String ];
+            [ [ NSFileManager defaultManager ] removeItemAtPath:dest error:&error ]; //remove previous copy of this file
+            if( [ [ NSFileManager defaultManager ] copyItemAtPath:[ url path ] toPath:dest error:&error ] == YES )
+            {
+                path = dest_cstr;
+            }
+            else
+            {
+                printf( "Can't copy from %s to %s : %s\n", path, dest_cstr, [ [ error localizedDescription ] UTF8String ] );
+                path = NULL;
+            }
+            [ url stopAccessingSecurityScopedResource ];
+            break;
+        }
+        printf( "Can't open %s\n", path );
+        path = NULL;
+        break;
+    }
+    if( path )
+    {
+        if( strstr( path, ".heic" ) || strstr( path, ".heif" ) || strstr( path, ".HEIC" ) || strstr( path, ".HEIF" ) )
+        {
+            printf( "HEIC -> JPEG...\n" );
+            NSString* new_file = imgfile_to_jpeg( path, ( flags & SUNDOG_STATE_TEMP ) != 0 );
+            if( new_file )
+            {
+                path = [ new_file UTF8String ];
+                flags |= SUNDOG_STATE_TEMP;
+                flags &= ~SUNDOG_STATE_ORIGINAL;
+            }
+        }
     }
     if( path )
     {
@@ -594,24 +632,40 @@ char* ios_sundog_paste( sundog_engine* s, int type, uint32_t flags )
     return rv;
 }
 
-void ios_sundog_open_url( sundog_engine* s, const char* url_text )
+static UIApplication* get_UIApplication( sundog_engine* s )
 {
 #ifndef SUNDOG_MODULE
+    return [ UIApplication sharedApplication ];
+#endif
+    ios_sundog_engine* sd = (ios_sundog_engine*)s->device_specific;
+    if( !sd ) return nil;
+    if( !sd->view_controller ) return nil;
+    UIResponder* responder = sd->view_controller;
+    while ((responder = [responder nextResponder]) != nil) {
+        const char* n = object_getClassName( responder );
+        if( strcmp( n, "UIApplication" ) == 0 )
+        {
+            return (UIApplication*)responder;
+        }
+    }
+    return nil;
+}
+
+void ios_sundog_open_url( sundog_engine* s, const char* url_text )
+{
     NSAutoreleasePool* pool = [ [ NSAutoreleasePool alloc ] init ];
     
     NSURL* url = [ NSURL URLWithString:[ NSString stringWithUTF8String:url_text ] ];
-    //[ [ UIApplication sharedApplication ] openURL:url ];
     dispatch_async( dispatch_get_main_queue(), ^{
-    	[ [ UIApplication sharedApplication ] openURL:url ];
+        UIApplication* app = get_UIApplication( s );
+        if( app ) [ app openURL:url options:@{} completionHandler:nil ];
     } );
 
     [ pool release ];
-#endif
 }
 
 void ios_sundog_send_text_to_email( sundog_engine* s, const char* email_text, const char* subj_text, const char* body_text )
 {
-#ifndef SUNDOG_MODULE
     NSAutoreleasePool* pool = [ [ NSAutoreleasePool alloc ] init ];
     
     NSString* mailLinkTemplate = @"mailto:%@?subject=%@&body=%@"; // to subject body
@@ -622,13 +676,12 @@ void ios_sundog_send_text_to_email( sundog_engine* s, const char* email_text, co
     NSString* emailEncoded = [ [ NSString stringWithUTF8String:email_text ] stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding ];
     
     NSString* eMailURL = [ NSString stringWithFormat: mailLinkTemplate, emailEncoded, themeEncoded, bodyEncoded ];
-    //[ [ UIApplication sharedApplication ] openURL:[ NSURL URLWithString:eMailURL ] ];
     dispatch_async( dispatch_get_main_queue(), ^{
-	[ [ UIApplication sharedApplication ] openURL:[ NSURL URLWithString:eMailURL ] ];
+        UIApplication* app = get_UIApplication( s );
+        if( app ) [ app openURL:[ NSURL URLWithString:eMailURL ] options:@{} completionHandler:nil ];
     } );
 
     [ pool release ];
-#endif
 }
 
 void ios_sundog_send_file_to_gallery( sundog_engine* s, const char* file_path )
@@ -720,6 +773,17 @@ int ios_sundog_export_import_file( sundog_engine* s, const char* filename, uint3
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
+}
+
+- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures
+{
+    /*
+     Normally, the screen-edge gestures defined by the system take precedence over any gesture recognizers that you define.
+     The system uses its gestures to implement system-level behaviors, such as to display Control Center.
+     However, immersive apps can use this property to allow app-defined gestures to take precedence over the system gestures.
+     You do that by overriding this property and returning the screen edges for which your gestures should take precedence.
+    */
+    return UIRectEdgeTop; //чтобы control center не мешал элементам интерфейса в верхней части экрана
 }
 
 - (void)showStatusBar:(BOOL)show
@@ -1528,6 +1592,9 @@ static NSString* get_appsupport_file_content( NSString* fname )
     sundog_init( (MainViewController*)self.window.rootViewController, &g_sd );
     return YES;
 }
+
+//iOS 12.5.7: картинку нельзя передать напрямую из галереи в приложение; но можно это сделать из других мест: например, из Files;
+//в новых версиях системы возможность открывать из галереи появилась.
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {

@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -158,7 +158,7 @@ static void loop_handle_changes( psynth_module* mod, int mod_num )
         {
             for( int i = 0; i < MODULE_OUTPUTS; i++ )
             {
-                data->buf[ i ] = (PS_STYPE*)smem_resize2( data->buf[ i ], data->buf_size * sizeof( PS_STYPE ) );
+                data->buf[ i ] = SMEM_ZRESIZE2( data->buf[ i ], PS_STYPE, data->buf_size );
             }
         }
         data->len = len;

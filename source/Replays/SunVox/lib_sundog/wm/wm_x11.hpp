@@ -1,13 +1,14 @@
 /*
     wm_x11.h - platform-dependent module : X11 (X Window System) + OpenGL
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
 #pragma once
 
 #include <sched.h>	//sched_yield()
+#include <X11/extensions/Xrandr.h>
 
 #ifdef OPENGL
     #ifdef OPENGLES
@@ -42,6 +43,8 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
     }
     int xscr = XDefaultScreen( wm->dpy );
 
+//XSynchronize( wm->dpy, 1 ); //for debug only!
+
     wm->prev_frame_time = 0;
     wm->frame_len = 1000 / wm->max_fps;
     wm->ticks_per_frame = stime_ticks_per_second() / wm->max_fps;
@@ -60,6 +63,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
 	if( w > 1 && h > 1 )
 	{
 	    //FIXME: we should not use this size for the window on a multi-monitor setup?
+	    //       see the xrandr code below...
 	    xsize = w;
 	    ysize = h;
 	    slog( "X screen size: %d x %d\n", w, h );
@@ -74,19 +78,67 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
     if( wm->screen_ppi == 0 )
     {
 	wm->screen_ppi = 110;
+	/*
 	int w = DisplayWidth( wm->dpy, xscr );
-	int wmm = DisplayWidthMM( wm->dpy, xscr );
+	int wmm = DisplayWidthMM( wm->dpy, xscr ); //wrong result :(
 	if( w && wmm )
 	{
 	    int ppi = (float)w / ( wmm / 25.4F );
 	    if( ppi > wm->screen_ppi ) wm->screen_ppi = ppi;
+	}
+	*/
+	Window root = DefaultRootWindow( wm->dpy );
+	XRRScreenResources* screen_res = XRRGetScreenResources( wm->dpy, root );
+	if( screen_res )
+	{
+	    for( int i = 0; i < screen_res->noutput; i++ )
+	    {
+    		XRROutputInfo* output_info = XRRGetOutputInfo( wm->dpy, screen_res, screen_res->outputs[i] );
+		if( output_info && output_info->connection == RR_Connected && output_info->mm_width > 0 && output_info->mm_height > 0 )
+		{
+		    RRMode current_mode = 0;
+            	    XRRCrtcInfo* crtc_info = XRRGetCrtcInfo( wm->dpy, screen_res, output_info->crtc );
+            	    if( crtc_info )
+            	    {
+                	current_mode = crtc_info->mode;
+                	XRRFreeCrtcInfo( crtc_info );
+            	    }
+		    XRRModeInfo* mode_info = NULL;
+            	    for( int k = 0; k < screen_res->nmode; k++ )
+            	    {
+            		if( screen_res->modes[k].id == current_mode )
+            		{
+                    	    mode_info = &screen_res->modes[k];
+                    	    break;
+            		}
+            	    }
+            	    if( mode_info )
+            	    {
+            		int width_mm = output_info->mm_width;
+            		int height_mm = output_info->mm_height;
+            		if( width_mm > 0 && height_mm > 0 )
+            		{
+                	    float dpi_width = (float)mode_info->width / ( width_mm / 25.4F );
+                    	    float dpi_height = (float)mode_info->height / ( height_mm / 25.4F );
+			    int ppi = ( dpi_width + dpi_height ) / 2.0F;
+			    if( ppi > wm->screen_ppi ) wm->screen_ppi = ppi;
+                    	    //printf( "Monitor name: %s\n", output_info->name );
+                    	    //printf( "Size: %dx%d\n", mode_info->width, mode_info->height );
+                    	    //printf( "Physical size: %dx%d mm\n", width_mm, height_mm );
+                    	    //printf( "DPI: %f %f\n", dpi_width, dpi_height );
+            		}
+            	    }
+    		}
+    		if( output_info ) XRRFreeOutputInfo( output_info );
+	    }
+	    XRRFreeScreenResources( screen_res );
 	}
     }
     win_zoom_init( wm );
     win_zoom_apply( wm );
 
     XSetWindowAttributes swa;
-    smem_clear_struct( swa );
+    SMEM_CLEAR_STRUCT( swa );
     swa.event_mask = 
 	( 0
 	| ExposureMask 
@@ -129,7 +181,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
     wm->win = XCreateWindow( wm->dpy, XDefaultRootWindow( wm->dpy ), 0, 0, xsize, ysize, 0, CopyFromParent, InputOutput, CopyFromParent, CWEventMask, &swa );
 
     XSetWindowAttributes xattr;
-    smem_clear_struct( xattr );
+    SMEM_CLEAR_STRUCT( xattr );
     int one = 1;
 
     xattr.override_redirect = 0;
@@ -357,7 +409,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
 #endif //OPENGL
 
     XClassHint* hint = XAllocClassHint();
-    char* app_name = smem_strdup( g_app_name_short );
+    char* app_name = SMEM_STRDUP( g_app_name_short );
     make_string_lowercase( app_name, strlen( app_name ) + 1, app_name );
     hint->res_name = app_name; //application name
     hint->res_class = app_name; //application class
@@ -437,7 +489,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
 
 #ifdef FRAMEBUFFER
     //Create framebuffer:
-    wm->fb = (COLORPTR)smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+    wm->fb = SMEM_ALLOC2( COLOR, wm->screen_xsize * wm->screen_ysize );
     wm->fb_xpitch = 1;
     wm->fb_ypitch = wm->screen_xsize;
 #endif

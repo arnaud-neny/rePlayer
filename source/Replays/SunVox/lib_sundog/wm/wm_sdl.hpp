@@ -1,7 +1,7 @@
 /*
     wm_unix_sdl.h - platform-dependent module : SDL
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -210,7 +210,7 @@ static int sdl_init( window_manager* wm )
 	if( wm->screen_zoom > 1 )
         {
     	    win_zoom_apply( wm );
-    	    dd->sdl_zoom_buffer = smem_new( wm->screen_xsize * wm->screen_ysize * COLORLEN );
+    	    dd->sdl_zoom_buffer = SMEM_ALLOC( wm->screen_xsize * wm->screen_ysize * COLORLEN );
 	}
 #else
         //SDL 2:
@@ -243,7 +243,7 @@ static int sdl_init( window_manager* wm )
 	    break;
         }
         SDL_SetTextureBlendMode( dd->sdl_screen, SDL_BLENDMODE_NONE );
-	wm->fb = (COLORPTR)smem_new( wm->fb_xsize * wm->fb_ysize * COLORLEN );
+	wm->fb = SMEM_ALLOC2( COLOR, wm->fb_xsize * wm->fb_ysize );
 #endif
 
 	rv = 0;
@@ -506,7 +506,7 @@ static int sdl_handle_event( window_manager* wm )
 		wm->screen_ysize = event.resize.h;
 		win_zoom_apply( wm );
 		win_angle_apply( wm );
-		dd->sdl_zoom_buffer = smem_resize( dd->sdl_zoom_buffer, wm->screen_xsize * wm->screen_ysize * COLORLEN );
+		dd->sdl_zoom_buffer = SMEM_RESIZE( dd->sdl_zoom_buffer, wm->screen_xsize * wm->screen_ysize * COLORLEN );
 		if( wm->root_win )
 		{
 		    bool need_recalc = false;
@@ -549,7 +549,7 @@ static int sdl_handle_event( window_manager* wm )
     			SDL_SetTextureBlendMode( dd->sdl_screen, SDL_BLENDMODE_NONE );
     			{
     			    size_t new_fb_size = wm->fb_xsize * wm->fb_ysize * COLORLEN;
-			    if( new_fb_size > smem_get_size( wm->fb ) ) wm->fb = (COLORPTR)smem_resize( wm->fb, new_fb_size );
+			    if( new_fb_size > smem_get_size( wm->fb ) ) wm->fb = (COLORPTR)SMEM_RESIZE( wm->fb, new_fb_size );
 			}
 			if( wm->root_win )
 			{
@@ -632,8 +632,7 @@ int device_start( const char* name, int xsize, int ysize, window_manager* wm )
 {
     int retval = 1;
     
-    wm->dd = smem_new( sizeof( sdl_data ) );
-    smem_zero( wm->dd );
+    wm->dd = SMEM_ZALLOC( sizeof( sdl_data ) );
     sdl_data* dd = (sdl_data*)wm->dd;
     
     while( 1 )

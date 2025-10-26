@@ -1,5 +1,3 @@
-//Modified for the SunDog Window Manager
-
 /*
  * Portions Copyright (c) 1999, 2000 Greg Haerr <greg@censoft.com>
  *	Somewhat less shamelessly ripped from the Wine distribution
@@ -10,7 +8,9 @@
  * Thanks for the nice licence.
  *
  * Copyright 1993, 1994, 1995 Alexandre Julliard
- * Modifications and additions: Copyright 1998 Huw Davies
+ * Modifications and additions:
+ *   Copyright 1998 Huw Davies;
+ *   2006 - 2025: minor changes and bug fixes by Alexander Zolotov
  */
 /* **********************************************************************
 
@@ -86,12 +86,15 @@ SOFTWARE.
  */
 
 #include "sundog.h"
-#include "device.h"
+#include "devrgn.h"
 
 typedef void (*REGION_OverlapBandFunctionPtr) (MWCLIPREGION * pReg, MWRECT * r1,
     MWRECT * r1End, MWRECT * r2, MWRECT * r2End, MWCOORD top, MWCOORD bottom);
 typedef void (*REGION_NonOverlapBandFunctionPtr) (MWCLIPREGION * pReg, MWRECT * r,
     MWRECT * end, MWCOORD top, MWCOORD bottom);
+
+#define MWMIN(a,b)              ((a) < (b) ? (a) : (b))
+#define MWMAX(a,b)              ((a) > (b) ? (a) : (b))
 
 /*  1 if two RECTs overlap.
  *  0 if two RECTs do not overlap.
@@ -107,9 +110,8 @@ typedef void (*REGION_NonOverlapBandFunctionPtr) (MWCLIPREGION * pReg, MWRECT * 
  */
 #define MEMCHECK(reg, rect, firstrect){\
         if ((reg)->numRects >= ((reg)->size - 1)){\
-          (firstrect) = (MWRECT*)GdRealloc(\
-           (firstrect), ((sizeof(MWRECT)) * ((reg)->size)), \
-           (2 * (sizeof(MWRECT)) * ((reg)->size)));\
+          (firstrect) = (MWRECT*)SMEM_RESIZE(\
+           (firstrect), (2 * (sizeof(MWRECT)) * ((reg)->size)));\
           if ((firstrect) == 0)\
             return;\
           (reg)->size *= 2;\
@@ -140,16 +142,15 @@ typedef void (*REGION_NonOverlapBandFunctionPtr) (MWCLIPREGION * pReg, MWRECT * 
  * @param y Y co-ordinate of point to check.
  * @return TRUE iff point is in region
  */
-MWBOOL
-GdPtInRegion(MWCLIPREGION *rgn, MWCOORD x, MWCOORD y)
+bool GdPtInRegion(MWCLIPREGION *rgn, MWCOORD x, MWCOORD y)
 {
     int i;
 
     if (rgn->numRects > 0 && INRECT(rgn->extents, x, y))
 	for (i = 0; i < rgn->numRects; i++)
 	    if (INRECT (rgn->rects[i], x, y))
-		return TRUE;
-    return FALSE;
+		return 1;
+    return 0;
 }
 
 /**
@@ -162,9 +163,9 @@ GdAllocRegion(void)
 {
     MWCLIPREGION *rgn;
 
-    if ((rgn = (MWCLIPREGION*)smem_new( sizeof( MWCLIPREGION ) ) ))
+    if ((rgn = SMEM_ALLOC2( MWCLIPREGION, 1 ) ))
     {
-	if ((rgn->rects = (MWRECT*)smem_new( sizeof( MWRECT ) ) ))
+	if ((rgn->rects = SMEM_ALLOC2( MWRECT, 1 ) ))
 	{
 	    rgn->size = 1;
 	    EMPTY_REGION(rgn);
@@ -247,7 +248,7 @@ GdCopyRegion(MWCLIPREGION *dst, MWCLIPREGION *src)
     {  
 	if (dst->size < src->numRects)
 	{
-	    if (! (dst->rects = (MWRECT*)GdRealloc( dst->rects, dst->numRects * sizeof(MWRECT), src->numRects * sizeof(MWRECT))))
+	    if (! (dst->rects = (MWRECT*)SMEM_RESIZE( dst->rects, src->numRects * sizeof(MWRECT))))
 		return;
 	    dst->size = src->numRects;
 	}
@@ -526,7 +527,7 @@ REGION_RegionOp(
      */
     newReg->size = MWMAX(reg1->numRects,reg2->numRects) * 2;
 
-    if (! (newReg->rects = (MWRECT*)smem_new( sizeof(MWRECT) * newReg->size )))
+    if (! (newReg->rects = SMEM_ALLOC2( MWRECT, newReg->size )))
     {
 	newReg->size = 0;
 	return;
@@ -716,7 +717,7 @@ REGION_RegionOp(
 	if (REGION_NOT_EMPTY(newReg))
 	{
 	    MWRECT *prev_rects = newReg->rects;
-	    newReg->rects = (MWRECT*)GdRealloc( newReg->rects, sizeof(MWRECT) * newReg->size, sizeof(MWRECT) * newReg->numRects );
+	    newReg->rects = (MWRECT*)SMEM_RESIZE( newReg->rects, sizeof(MWRECT) * newReg->numRects );
 	    newReg->size = newReg->numRects;
 	    if (! newReg->rects)
 		newReg->rects = prev_rects;
@@ -729,7 +730,7 @@ REGION_RegionOp(
 	     */
 	    newReg->size = 1;
 	    smem_free( newReg->rects );
-	    newReg->rects = (MWRECT*)smem_new( sizeof(MWRECT) );
+	    newReg->rects = SMEM_ALLOC2( MWRECT, 1 );
 	}
     }
     smem_free( oldRects );
@@ -1058,7 +1059,7 @@ REGION_SubtractO(MWCLIPREGION *pReg, MWRECT *r1, MWRECT *r1End,
 		pNextRect++;
 	    }
 	    r1++;
-	    if (r1 != r1End) /* FIXED BY ALEX ZOLOTOV */
+	    if (r1 != r1End) /* fixed by NightRadio */
 		left = r1->left;
 	}
     }
@@ -1082,7 +1083,7 @@ REGION_SubtractO(MWCLIPREGION *pReg, MWRECT *r1, MWRECT *r1End,
 	}
     }
 }
-	
+
 /**
  * Finds the difference of two regions (regM - regS) - i.e. the
  * places which are in regM but not regS.

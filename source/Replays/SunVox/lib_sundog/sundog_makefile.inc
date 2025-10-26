@@ -2,7 +2,8 @@
 ## Defined in the app MakeFile:
 ##   TARGET_OS - system name & build features:
 ##     linux_android, linux_android16,
-##     linux_sdl, linux_sdl_nojack, linux_sdl_maemo, linux_x11_opengl, linux_x11_opengles,
+##     linux_sdl, linux_sdl_nojack, linux_x11_opengl, linux_x11_opengles,
+##     linux_armel, linux_armel_sdl_nojack, linux_armel_sdl_maemo,
 ##     windows, windows_opengl, windows_vst3, windowsce,
 ##     emscripten_sdl
 ##   TARGET_ARCH - architecture name: arm, arm64, x86, x86_64, mips, mips64; NOT ABI NAME! ABI can be selected by some additional options;
@@ -45,22 +46,24 @@ ifneq (,$(findstring android16,$(TARGET_OS)))
     ANDROID_NDK = /home/alex/soft/android-ndk-r23c
 else
     #Newest NDK:
-    ANDROID_NDK = /home/alex/soft/android-ndk-r27b
+    ANDROID_NDK = /home/alex/soft/android-ndk-r28
 endif
-ANDROID_GDK = /home/alex/soft/agdk-libraries
+ANDROID_GDK = /home/alex/soft/android-gdk
 MACOS_TOOLCHAIN_BIN = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-MACOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk
+MACOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk
 VST3_SDK = /home/alex/soft/VST_SDK/vst3sdk
 VST3_SDK_BASE = $(VST3_SDK)/base
 VST3_SDK_IF = $(VST3_SDK)/pluginterfaces
 VST3_SDK_HELPER = $(VST3_SDK)/public.sdk/source
 IOS_TOOLCHAIN_BIN = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 ifneq (,$(findstring x86,$(TARGET_ARCH)))
-    IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.1.sdk
+    IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk
 else
-    IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.1.sdk
+    IOS_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk
 endif
 RPI_SDK = /opt/vc
+MAEMO_TOOLCHAIN_BIN = /home/alex/soft/maemo/new/cs2007q3-glibc2.5-arm7/bin
+MAEMO_SYSROOT = /home/alex/soft/maemo/new/FREMANTLE_ARMEL
 
 ##
 ## Target configuration
@@ -72,12 +75,14 @@ DEFAULT_LIBS =
 
 TARGET_ABI = $(TARGET_ARCH)
 
+CPPSTD ?= -std=gnu++17
+
 ##
 ## Linux
 ##
 ifneq (,$(findstring linux,$(TARGET_OS)))
     CC = gcc
-    CXX = $(CC)
+    CXX = $(CC) $(CPPSTD)
     LD = $(CC)
     AR = ar
     OBJDUMP = objdump
@@ -103,6 +108,18 @@ endif
 ##
 ## Linux: Maemo
 ##
+ifneq (,$(findstring linux_armel,$(TARGET_OS)))
+    MAEMO_ARCH = -march=armv7a -mcpu=cortex-a8 -mfpu=vfp -mfloat-abi=softfp
+#softfp: hardware FPU + soft floating point ABI; SLOW! Compiler can make smart choices about when and if it generates emulated or real FPU instructions;
+    CC = $(MAEMO_TOOLCHAIN_BIN)/arm-none-linux-gnueabi-gcc $(MAEMO_ARCH)
+    CXX = $(CC) $(CPPSTD)
+    LD = $(CC)
+    AR = $(MAEMO_TOOLCHAIN_BIN)/arm-none-linux-gnueabi-ar $(MAEMO_ARCH)
+    OBJDUMP = $(MAEMO_TOOLCHAIN_BIN)/arm-none-linux-gnueabi-objdump
+    CFLAGS2 += --sysroot=$(MAEMO_SYSROOT)
+    LDFLAGS2 += --sysroot=$(MAEMO_SYSROOT)
+    DEFAULT_LIBS = -lpthread -lstdc++ -lasound -ldl
+endif
 ifneq (,$(findstring maemo,$(TARGET_OS)))
     CFLAGS2 += -DOS_MAEMO
 endif
@@ -114,14 +131,17 @@ ifneq (,$(findstring android,$(TARGET_OS)))
     CFLAGS2 += \
 	-I$(SYSROOT)/usr/include \
 	-I$(ANDROID_NDK)/sources/android/native_app_glue \
-	-Wno-gnu-inline-cpp-without-extern
-    DEFAULT_LIBS = -llog -landroid -lOpenSLES -lm -ldl
+	-Wno-gnu-inline-cpp-without-extern \
+	-fno-exceptions \
+	-fno-rtti
+    DEFAULT_LIBS = -llog -landroid -lOpenSLES -lm -ldl -lc++_static -lc++abi
 ifeq ($(SUNDOG_VER),)
     CFLAGS2 += -DGL_GLEXT_PROTOTYPES=1
 endif
 ifeq ($(SUNDOG_VER),2)
-    CFLAGS2 += -I$(ANDROID_GDK)/include
-    DEFAULT_LIBS += -lc++_static -lc++abi
+    CFLAGS2 += \
+	-I$(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/include \
+	-I$(ANDROID_GDK)/src/common
 endif
     OBJDUMP = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-objdump
     AR = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
@@ -131,17 +151,18 @@ ifeq ($(TARGET_ARCH),x86)
     else
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android24-clang
     endif
-    CXX = $(CC)++
+    CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
     TARGET_ABI = x86
 endif
 ifeq ($(TARGET_ARCH),x86_64)
     ifneq (,$(findstring android16,$(TARGET_OS)))
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang
+	LDFLAGS2 += -Wl,-z,max-page-size=16384
     else
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang
     endif
-    CXX = $(CC)++
+    CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
     TARGET_ABI = x86_64
 endif
@@ -151,17 +172,18 @@ ifeq ($(TARGET_ARCH),arm)
     else
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
     endif
-    CXX = $(CC)++
+    CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
     TARGET_ABI = armeabi-v7a
 endif
 ifeq ($(TARGET_ARCH),arm64)
     ifneq (,$(findstring android16,$(TARGET_OS)))
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
+	LDFLAGS2 += -Wl,-z,max-page-size=16384
     else
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
     endif
-    CXX = $(CC)++
+    CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
     TARGET_ABI = arm64-v8a
 endif
@@ -173,7 +195,7 @@ endif #linux
 ##
 ifeq ($(TARGET_OS),macos)
     CC = $(MACOS_TOOLCHAIN_BIN)/clang
-    CXX = $(CC) -x c++ -std\=gnu++17
+    CXX = $(CC) -x c++ $(CPPSTD)
     CMM = $(CC) -x objective-c++
     LD = $(CC)
     AR = $(MACOS_TOOLCHAIN_BIN)/ar
@@ -193,7 +215,7 @@ endif
 ##
 ifeq ($(TARGET_OS),ios)
     CC = $(IOS_TOOLCHAIN_BIN)/clang
-    CXX = $(CC) -std\=gnu++17
+    CXX = $(CC) $(CPPSTD)
     CMM = $(CC) -x objective-c++
     LD = $(CC)
     AR = $(IOS_TOOLCHAIN_BIN)/ar
@@ -214,7 +236,7 @@ ifneq (,$(findstring windows,$(TARGET_OS)))
 ifneq ($(TARGET_OS),windowsce) #not WinCE?
 ifeq ($(TARGET_ARCH),x86_64) 
     CC = x86_64-w64-mingw32-gcc
-    CXX = $(CC)
+    CXX = $(CC) $(CPPSTD)
 #   LD = x86_64-w64-mingw32-g++ - this is required for option -static-libstdc++ to work!
     LD = x86_64-w64-mingw32-g++
     AR = x86_64-w64-mingw32-ar
@@ -229,7 +251,7 @@ ifeq ($(TARGET_ARCH),x86_64)
 endif
 ifeq ($(TARGET_ARCH),x86)
     CC = i686-w64-mingw32-gcc
-    CXX = $(CC)
+    CXX = $(CC) $(CPPSTD)
     LD = i686-w64-mingw32-g++
     AR = i686-w64-mingw32-ar
     OBJDUMP = i686-w64-mingw32-objdump
@@ -254,7 +276,7 @@ endif #windows
 ##
 ifeq ($(TARGET_OS),windowsce)
     CC = arm-mingw32ce-gcc
-    CXX = $(CC)
+    CXX = arm-mingw32ce-g++ $(CPPSTD)
     LD = $(CC)
     AR = arm-mingw32ce-ar
     OBJDUMP = arm-mingw32ce-objdump
@@ -275,7 +297,7 @@ endif
 ##
 ifneq (,$(findstring emscripten,$(TARGET_OS)))
     CC = emcc
-    CXX = $(CC) -std=c++11
+    CXX = $(CC) $(CPPSTD)
     LD = $(CC)
     FILE_EXT = .html
     CFLAGS2 += \
@@ -359,7 +381,7 @@ ifeq ($(TARGET_ARCH),emscripten)
 endif
 
 ##
-## Handling additional MAKE_xxx options
+## Handling additional MAKE_* options
 ##
 
 ##
@@ -496,6 +518,7 @@ FINAL_LIBS = $(LIBS) $(DEFAULT_LIBS)
 ## Object files and dependencies
 ##
 
+SD_CONTAINER = $(SUNDOG)container/
 SD_FILE = $(SUNDOG)file/
 SD_LOG = $(SUNDOG)log/
 SD_MEM = $(SUNDOG)memory/
@@ -506,10 +529,12 @@ SD_THREAD = $(SUNDOG)thread/
 SD_TIME = $(SUNDOG)time/
 SD_VIDEO = $(SUNDOG)video/
 SD_VULKAN = $(SUNDOG)vulkan/
+SD_GPU = $(SUNDOG)gpu/
 SD_WM = $(SUNDOG)wm/
 SD_GUI = $(SUNDOG)gui/
 SD_MAIN = $(SUNDOG)main/
 
+SD_CONTAINER_OBJS = sd_container.o
 SD_FILE_OBJS = \
     sd_file.o \
     sd_file_format.o \
@@ -524,6 +549,7 @@ SD_THREAD_OBJS = sd_thread.o
 SD_TIME_OBJS = sd_time.o
 SD_VIDEO_OBJS = sd_video.o
 SD_VULKAN_OBJS = sd_vulkan.o
+SD_GPU_OBJS = sd_gpu.o sd_gpu_shaders.o
 SD_WM_OBJS = \
     wm.o \
     wm_fonts.o \
@@ -545,7 +571,6 @@ SD_WM_OBJS = \
     devrgn.o
 SD_GUI_OBJS = \
     sd_gui.o \
-    sd_gui_shaders.o \
     sd_gui_widgets_button.o \
     sd_gui_widgets_native.o \
     sd_gui_widgets_root.o
@@ -569,7 +594,7 @@ ifeq ($(SUNDOG_VER),2)
 endif
 endif
 ifeq ($(SUNDOG_VER),2)
-    OBJS += $(SD_VULKAN_OBJS)
+    OBJS += $(SD_CONTAINER_OBJS) $(SD_VULKAN_OBJS) $(SD_GPU_OBJS)
 endif
 
 ifeq ($(TARGET_OS),ios)
@@ -585,7 +610,7 @@ ifneq (,$(findstring android,$(TARGET_OS)))
 ifneq ($(MAKE_WITHOUT_MAIN),true)
     OBJS += android_native_app_glue.o
 ifeq ($(SUNDOG_VER),2)
-    OBJS += GameActivity.o GameActivityEvents.o gametextinput.o
+    OBJS += GameActivity.o GameActivityEvents.o gametextinput.o system_utils.o
 endif
 endif
 endif
@@ -648,7 +673,9 @@ endif
 ifeq ($(SUNDOG_VER),2)
     SD_DEPS += \
     $(SD_MAIN)main2.h \
+    $(SD_CONTAINER)sd_container.h \
     $(SD_VULKAN)sd_vulkan.h \
+    $(SD_GPU)sd_gpu.h \
     $(SD_GUI)sd_gui.h
 endif
 SD_MAIN_DEPS = 
@@ -768,167 +795,173 @@ all: $$(OBJS)
 endif
 
 #SUNDOG BASE
+sd_container.o: $(SD_CONTAINER)sd_container.cpp $(SD_DEPS)
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_file.o: $(SD_FILE)file.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_FILE)file.cpp -o sd_file.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_file_format.o: $(SD_FILE)file_format.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_FILE)file_format.cpp -o sd_file_format.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_file_format_rw.o: $(SD_FILE)file_format_rw.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_FILE)file_format_rw.cpp -o sd_file_format_rw.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_log.o: $(SD_LOG)log.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_LOG)log.cpp -o sd_log.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_main.o: $(SD_MAIN)main.cpp $(SD_MAIN_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_MAIN)main.cpp -o sd_main.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_memory.o: $(SD_MEM)memory.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_MEM)memory.cpp -o sd_memory.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_misc.o: $(SD_MISC)misc.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_MISC)misc.cpp -o sd_misc.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_net.o: $(SD_NET)net.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_NET)net.cpp -o sd_net.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_sound.o: $(SD_SOUND)sound.cpp $(SD_SOUND_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_SOUND)sound.cpp -o sd_sound.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_thread.o: $(SD_THREAD)thread.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_THREAD)thread.cpp -o sd_thread.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_time.o: $(SD_TIME)time.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_TIME)time.cpp -o sd_time.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_video.o: $(SD_VIDEO)video.cpp $(SD_VIDEO_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_VIDEO)video.cpp -o sd_video.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 sd_vulkan.o: $(SD_VULKAN)sd_vulkan.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_VULKAN)sd_vulkan.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
+sd_gpu.o: $(SD_GPU)sd_gpu.cpp $(SD_DEPS)
+	$(CXX) $(FINAL_CFLAGS) -c $<
+sd_gpu_shaders.o: $(SD_GPU)sd_gpu_shaders.cpp $(SD_DEPS)
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm.o: $(SD_WM)wm.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_fonts.o: $(SD_WM)wm_fonts.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_fonts.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_framebuffer.o: $(SD_WM)wm_framebuffer.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_framebuffer.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_image.o: $(SD_WM)wm_image.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_image.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_keymap.o: $(SD_WM)wm_keymap.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_keymap.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_wbd.o: $(SD_WM)wm_wbd.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_wbd.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd.o: $(SD_WM)wm_hnd.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_color_theme.o: $(SD_WM)wm_hnd_color_theme.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_color_theme.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_dialog.o: $(SD_WM)wm_hnd_dialog.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_dialog.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_fdialog.o: $(SD_WM)wm_hnd_fdialog.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_fdialog.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_keymap.o: $(SD_WM)wm_hnd_keymap.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_keymap.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_list.o: $(SD_WM)wm_hnd_list.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_list.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_popup.o: $(SD_WM)wm_hnd_popup.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_popup.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_preferences.o: $(SD_WM)wm_hnd_preferences.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_preferences.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_scale.o: $(SD_WM)wm_hnd_scale.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_scale.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_virtual_keyboard.o: $(SD_WM)wm_hnd_virtual_keyboard.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_virtual_keyboard.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 wm_hnd_webserver.o: $(SD_WM)wm_hnd_webserver.cpp $(SD_WM_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)wm_hnd_webserver.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 devrgn.o: $(SD_WM)regions/devrgn.cpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_WM)regions/devrgn.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 sd_gui.o: $(SD_GUI)sd_gui.cpp $(SD_GUI_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_GUI)sd_gui.cpp
-sd_gui_shaders.o: $(SD_GUI)sd_gui_shaders.cpp $(SD_GUI_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_GUI)sd_gui_shaders.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 sd_gui_widgets_button.o: $(SD_GUI)sd_gui_widgets_button.cpp $(SD_GUI_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_GUI)sd_gui_widgets_button.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 sd_gui_widgets_native.o: $(SD_GUI)sd_gui_widgets_native.cpp $(SD_GUI_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_GUI)sd_gui_widgets_native.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 sd_gui_widgets_root.o: $(SD_GUI)sd_gui_widgets_root.cpp $(SD_GUI_DEPS) $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_GUI)sd_gui_widgets_root.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 
 #ANDROID
 ifeq ($(SUNDOG_VER),)
 android_native_app_glue.o: $(ANDROID_NDK)/sources/android/native_app_glue/android_native_app_glue.c
-	$(CC) $(FINAL_CFLAGS) -c $(ANDROID_NDK)/sources/android/native_app_glue/android_native_app_glue.c
+	$(CC) $(FINAL_CFLAGS) -c $<
 sd_android_bridge.o: $(SUNDOG)main/android/sundog_bridge.cpp $(SUNDOG)main/android/sundog_bridge1.hpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SUNDOG)main/android/sundog_bridge.cpp -o sd_android_bridge.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 endif
 ifeq ($(SUNDOG_VER),2)
-android_native_app_glue.o: $(ANDROID_GDK)/include/game-activity/native_app_glue/android_native_app_glue.c
-	$(CC) $(FINAL_CFLAGS) -c $(ANDROID_GDK)/include/game-activity/native_app_glue/android_native_app_glue.c
-GameActivity.o: $(ANDROID_GDK)/include/game-activity/GameActivity.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(ANDROID_GDK)/include/game-activity/GameActivity.cpp
-GameActivityEvents.o: $(ANDROID_GDK)/include/game-activity/GameActivityEvents.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(ANDROID_GDK)/include/game-activity/GameActivityEvents.cpp
-gametextinput.o: $(ANDROID_GDK)/include/game-text-input/gametextinput.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(ANDROID_GDK)/include/game-text-input/gametextinput.cpp
+android_native_app_glue.o: $(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/src/game-activity/native_app_glue/android_native_app_glue.c
+	$(CC) $(FINAL_CFLAGS) -c $<
+GameActivity.o: $(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/src/game-activity/GameActivity.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
+GameActivityEvents.o: $(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/src/game-activity/GameActivityEvents.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
+gametextinput.o: $(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/src/game-text-input/gametextinput.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
+system_utils.o: $(ANDROID_GDK)/src/common/system_utils.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 sd_android_bridge.o: $(SUNDOG)main/android/sundog_bridge.cpp $(SUNDOG)main/android/sundog_bridge2.hpp $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SUNDOG)main/android/sundog_bridge.cpp -o sd_android_bridge.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 endif
 
 #IOS
 sd_sound_ios.o: $(SD_SOUND)sound_ios.mm $(SD_SOUND_DEPS) $(SD_DEPS)
-	$(CMM) $(FINAL_CFLAGS) -c $(SD_SOUND)sound_ios.mm -o sd_sound_ios.o
+	$(CMM) $(FINAL_CFLAGS) -c $< -o $@
 sd_file_apple.o: $(SD_FILE)file_apple.mm $(SD_DEPS)
-	$(CMM) $(FINAL_CFLAGS) -c $(SD_FILE)file_apple.mm -o sd_file_apple.o
+	$(CMM) $(FINAL_CFLAGS) -c $< -o $@
 
 #VST3
 sd_main_vst3.o: $(SD_MAIN)main_vst3.cpp $(SD_MAIN)main_vst3.h $(SD_DEPS)
-	$(CXX) $(FINAL_CFLAGS) -c $(SD_MAIN)main_vst3.cpp -o sd_main_vst3.o
+	$(CXX) $(FINAL_CFLAGS) -c $< -o $@
 #VST3 BASE
 baseiids.o: $(VST3_SDK_BASE)/source/baseiids.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/baseiids.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fbuffer.o: $(VST3_SDK_BASE)/source/fbuffer.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fbuffer.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fdebug.o: $(VST3_SDK_BASE)/source/fdebug.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fdebug.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fdynlib.o: $(VST3_SDK_BASE)/source/fdynlib.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fdynlib.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fobject.o: $(VST3_SDK_BASE)/source/fobject.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fobject.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fstreamer.o: $(VST3_SDK_BASE)/source/fstreamer.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fstreamer.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fstring.o: $(VST3_SDK_BASE)/source/fstring.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/fstring.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 timer.o: $(VST3_SDK_BASE)/source/timer.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/timer.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 updatehandler.o: $(VST3_SDK_BASE)/source/updatehandler.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/source/updatehandler.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 fcondition.o: $(VST3_SDK_BASE)/thread/source/fcondition.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/thread/source/fcondition.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 flock.o: $(VST3_SDK_BASE)/thread/source/flock.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_BASE)/thread/source/flock.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 #VST3 INTERFACES
 conststringtable.o: $(VST3_SDK_IF)/base/conststringtable.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_IF)/base/conststringtable.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 coreiids.o: $(VST3_SDK_IF)/base/coreiids.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_IF)/base/coreiids.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 funknown.o: $(VST3_SDK_IF)/base/funknown.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_IF)/base/funknown.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 ustring.o: $(VST3_SDK_IF)/base/ustring.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_IF)/base/ustring.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 #VST3 HELPER CLASSES
 commoniids.o: $(VST3_SDK_HELPER)/common/commoniids.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/commoniids.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 memorystream.o: $(VST3_SDK_HELPER)/common/memorystream.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/memorystream.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 openurl.o: $(VST3_SDK_HELPER)/common/openurl.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/openurl.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 pluginview.o: $(VST3_SDK_HELPER)/common/pluginview.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/pluginview.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 systemclipboard_win32.o: $(VST3_SDK_HELPER)/common/systemclipboard_win32.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/systemclipboard_win32.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 threadchecker_win32.o: $(VST3_SDK_HELPER)/common/threadchecker_win32.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/common/threadchecker_win32.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 dllmain.o: $(VST3_SDK_HELPER)/main/dllmain.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/main/dllmain.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 pluginfactory.o: $(VST3_SDK_HELPER)/main/pluginfactory.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/main/pluginfactory.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 vstbus.o: $(VST3_SDK_HELPER)/vst/vstbus.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/vst/vstbus.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 vstcomponentbase.o: $(VST3_SDK_HELPER)/vst/vstcomponentbase.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/vst/vstcomponentbase.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 vstinitiids.o: $(VST3_SDK_HELPER)/vst/vstinitiids.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/vst/vstinitiids.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 vstparameters.o: $(VST3_SDK_HELPER)/vst/vstparameters.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/vst/vstparameters.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 vstsinglecomponenteffect.o: $(VST3_SDK_HELPER)/vst/vstsinglecomponenteffect.cpp
-	$(CXX) $(FINAL_CFLAGS) -c $(VST3_SDK_HELPER)/vst/vstsinglecomponenteffect.cpp
+	$(CXX) $(FINAL_CFLAGS) -c $<
 
 clean:
 	rm -f *.o *.a *.optrpt

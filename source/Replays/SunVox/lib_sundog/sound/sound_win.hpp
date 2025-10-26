@@ -440,13 +440,13 @@ static BOOL CALLBACK DSEnumCallback (
     if( c->infos )
     {
 	char*** infos = (char***)c->infos;
-	if( *infos == 0 )
+	if( *infos == NULL )
 	{
-    	    *infos = (char**)smem_new( 512 * sizeof( void* ) );
+    	    *infos = SMEM_ALLOC2( char*, 512 );
 	}
-	char* ts = (char*)smem_new( 2048 );
+	char* ts = SMEM_ALLOC2( char, 2048 );
 	sprintf( ts, "%s (%d)", Description, c->guids_num );
-	(*infos)[ c->guids_num ] = (char*)smem_new( smem_strlen( ts ) + 1 ); (*infos)[ c->guids_num ][ 0 ] = 0; smem_strcat_resize( (*infos)[ c->guids_num ], ts );
+	(*infos)[ c->guids_num ] = SMEM_ALLOC2( char, smem_strlen( ts ) + 1 ); (*infos)[ c->guids_num ][ 0 ] = 0; SMEM_STRCAT_D( (*infos)[ c->guids_num ], ts );
 	smem_free( ts );
     }
     if( c->log )
@@ -472,7 +472,7 @@ int device_sound_init_dsound( sundog_sound* ss, bool input )
     if( !ds )
     {
 	slog( "DSOUND init...\n" );
-	ds = (device_sound_dsound*)smem_znew( sizeof( device_sound_dsound ) );
+	ds = SMEM_ZALLOC2( device_sound_dsound, 1 );
 	d->ds = ds;
     }
 
@@ -499,7 +499,7 @@ int device_sound_init_dsound( sundog_sound* ss, bool input )
         hWnd = GetDesktopWindow();
     }
     device_sound_dsound_enum EnumContext;
-    smem_clear_struct( EnumContext );
+    SMEM_CLEAR_STRUCT( EnumContext );
     EnumContext.log = true;
     LPCGUID guid = 0;
     if( input )
@@ -695,7 +695,7 @@ init_dsound_end:
 //
 // Waveform Audio (MMSYSTEM)
 //
-#if 0 // rePlayer being
+#if 0 // rePlayer beging
 void WaveOutSendBuffer( sundog_sound* ss, WAVEHDR* waveHdr )
 {
     device_sound* d = (device_sound*)ss->device_specific;
@@ -836,7 +836,7 @@ int device_sound_init_mmsound( sundog_sound* ss, bool input )
     device_sound_mmsound* mm = d->mm;
     if( mm == 0 )
     {
-        mm = (device_sound_mmsound*)smem_znew( sizeof( device_sound_mmsound ) );
+        mm = SMEM_ZALLOC2( device_sound_mmsound, 1 );
         d->mm = mm;
     }
 
@@ -1146,7 +1146,7 @@ iasio_outputReady_t g_iasio_outputReady;
 
 #define ASIOFN( ptrnum ) ( ((void**)( p + ( sizeof(void*) * ptrnum ) ))[ 0 ] )
 
-void iasio_load( void )
+void iasio_load()
 {
     int8_t* p = ((int8_t**)g_iasio)[ 0 ];
     g_iasio_release = (iasio_release_t)ASIOFN( 2 );
@@ -1173,7 +1173,7 @@ void iasio_load( void )
     g_iasio_outputReady = (iasio_outputReady_t)ASIOFN( 23 );
 }
 
-void iasio_release( void )
+void iasio_release()
 {
     g_iasio_release( g_iasio );
 }
@@ -1935,7 +1935,7 @@ create_bufs_again:
     if( old_buf_size < d->buffer_size )
     {
 	smem_free( d->output_buffer );
-	d->output_buffer = smem_new( d->buffer_size * d->frame_size );
+	d->output_buffer = SMEM_ALLOC( d->buffer_size * d->frame_size );
     }
 
 init_asio_end:
@@ -1984,14 +1984,13 @@ static void reinit_output_buffer( sundog_sound* ss )
     ss->out_latency = d->buffer_size;
     ss->out_latency2 = d->buffer_size;
     uint buf_size = d->buffer_size * d->frame_size;
-    d->output_buffer = smem_resize_if_smaller( d->output_buffer, buf_size, 0 );
+    d->output_buffer = SMEM_SMART_ZRESIZE( d->output_buffer, buf_size, 0 );
 }
 
 int device_sound_init( sundog_sound* ss )
 {
-    ss->device_specific = smem_new( sizeof( device_sound ) );
+    ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     device_sound* d = (device_sound*)ss->device_specific;
-    smem_zero( d );
 
     sundog_sound_set_defaults( ss );
 
@@ -2312,7 +2311,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 
     *names = 0;
     *infos = 0;
-    char* ts = (char*)smem_new( 2048 );
+    char* ts = SMEM_ALLOC2( char, 2048 );
     ts[ 0 ] = 0;
     
     switch( drv_num )
@@ -2328,13 +2327,13 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 	        if( devices == 0 ) break;
 #ifdef OS_WINCE
 		size_t ts2_size = 256;
-		char* ts2 = (char*)smem_new( ts2_size );
+		char* ts2 = SMEM_ALLOC2( char, ts2_size );
 		ts2[ 0 ] = 0;
 #endif
 		for( int d = 0; d < devices; d++ )
 		{
                     sprintf( ts, "%d", d );
-                    smem_objarray_write_d( (void***)names, ts, true, rv );
+                    SMEM_OBJARRAY_WRITE_D( (void***)names, ts, true, rv );
 		    if( input )
 		    {
     			WAVEINCAPS deviceCaps;
@@ -2359,7 +2358,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
     			sprintf( ts, "%s (%d)", deviceCaps.szPname, d );
 #endif
     		    }
-    		    smem_objarray_write_d( (void***)infos, ts, true, rv );
+    		    SMEM_OBJARRAY_WRITE_D( (void***)infos, ts, true, rv );
     		    rv++;
     		}
 #ifdef OS_WINCE
@@ -2373,7 +2372,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 	case SDRIVER_DSOUND2:
 	    {
 	        device_sound_dsound_enum e;
-	        smem_clear_struct( e );
+	        SMEM_CLEAR_STRUCT( e );
 		e.infos = infos;
 		if( input )
 		{
@@ -2389,7 +2388,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 		for( int d = 0; d < rv; d++ )
 		{
     		    sprintf( ts, "%d", d );
-    		    smem_objarray_write_d( (void***)names, ts, true, d );
+    		    SMEM_OBJARRAY_WRITE_D( (void***)names, ts, true, d );
 		}
 	    }
 	    break;
@@ -2409,9 +2408,9 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
     		    if( err == ERROR_SUCCESS )
     		    {
                         sprintf( ts, "%d", rv );
-                        smem_objarray_write_d( (void***)names, ts, true, rv );
+                        SMEM_OBJARRAY_WRITE_D( (void***)names, ts, true, rv );
                         sprintf( ts, "%s (%d)", keyname, rv );
-                        smem_objarray_write_d( (void***)infos, ts, true, rv );
+                        SMEM_OBJARRAY_WRITE_D( (void***)infos, ts, true, rv );
         		rv++;
     		    }
 		}
@@ -2419,8 +2418,8 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
     	    break;
 #endif
     }
-    
+
     smem_free( ts );
-    
+
     return rv;
 }

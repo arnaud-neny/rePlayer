@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -127,13 +127,13 @@ static void fft_reinit_bufs( psynth_module* mod, int mod_num )
     {
     	for( int ch = 0; ch < MODULE_OUTPUTS; ch++ )
     	{
-    	    data->bufs[ ch ] = (float*)smem_resize2( data->bufs[ ch ], new_size );
-    	    data->bufs2[ ch ] = (float*)smem_resize2( data->bufs2[ ch ], new_size );
-    	    data->feedback_bufs[ ch ] = (float*)smem_resize2( data->feedback_bufs[ ch ], new_size );
+    	    data->bufs[ ch ] = (float*)SMEM_ZRESIZE( data->bufs[ ch ], new_size );
+    	    data->bufs2[ ch ] = (float*)SMEM_ZRESIZE( data->bufs2[ ch ], new_size );
+    	    data->feedback_bufs[ ch ] = (float*)SMEM_ZRESIZE( data->feedback_bufs[ ch ], new_size );
     	}
-        data->fft_i = (float*)smem_resize2( data->fft_i, new_size );
-        data->fft_r = (float*)smem_resize2( data->fft_r, new_size );
-        data->fft_win = (float*)smem_resize( data->fft_win, new_size );
+        data->fft_i = (float*)SMEM_ZRESIZE( data->fft_i, new_size );
+        data->fft_r = (float*)SMEM_ZRESIZE( data->fft_r, new_size );
+        data->fft_win = (float*)SMEM_RESIZE( data->fft_win, new_size );
     }
     if( data->buf_size != buf_size )
     {
@@ -258,7 +258,7 @@ PS_RETTYPE MODULE_HANDLER(
 	}
 	case PS_CMD_SETUP_FINISHED:
             fft_handle_changes( mod, mod_num );
-            data->noise_seed = stime_ms() + pseudo_random() + mod_num * 371;
+            data->noise_seed = (uint32_t)stime_ns() + pseudo_random() + mod_num * 371 + mod->id * 3079;
             retval = 1;
             break;
 	case PS_CMD_CLEAN:

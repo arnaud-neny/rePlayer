@@ -1,7 +1,7 @@
 /*
     thread.cpp - thread management
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -27,12 +27,12 @@
     #endif
 #endif
 
-int sthread_global_init( void )
+int sthread_global_init()
 {
     return 0;
 }
 
-int sthread_global_deinit( void )
+int sthread_global_deinit()
 {
     return 0;
 }
@@ -223,7 +223,7 @@ int sthread_is_finished( sthread* th )
     return 0;
 }
 
-sthread_tid_t sthread_gettid( void )
+sthread_tid_t sthread_gettid()
 {
 #ifdef OS_LINUX
     return syscall( SYS_gettid );
@@ -239,7 +239,7 @@ sthread_tid_t sthread_gettid( void )
     return 0;
 }
 
-sthread_pid_t sthread_getpid( void )
+sthread_pid_t sthread_getpid()
 {
 #ifdef OS_LINUX
     return syscall( SYS_getpid );
@@ -262,25 +262,30 @@ int smutex_init( smutex* mutex, uint32_t flags )
     int retval = 0;
     if( !mutex ) return -1;
     mutex->flags = flags;
-#ifdef NO_BUILTIN_ATOMIC_OPS
-    mutex->flags &= ~SMUTEX_FLAG_ATOMIC_SPINLOCK;
-#else
-    if( mutex->flags & SMUTEX_FLAG_ATOMIC_SPINLOCK )
+    while( 1 )
     {
-	atomic_init( &mutex->lock, 0 );
-	return retval;
-    }
+#ifdef NO_BUILTIN_ATOMIC_OPS
+	mutex->flags &= ~SMUTEX_FLAG_ATOMIC_SPINLOCK;
+#else
+	if( mutex->flags & SMUTEX_FLAG_ATOMIC_SPINLOCK )
+	{
+	    atomic_init( &mutex->lock, 0 );
+	    break;
+	}
 #endif
 #ifdef OS_UNIX
-    pthread_mutexattr_t mutexattr;
-    pthread_mutexattr_init( &mutexattr );
-    pthread_mutexattr_settype( &mutexattr, PTHREAD_MUTEX_RECURSIVE );
-    retval = pthread_mutex_init( &mutex->mutex, &mutexattr );
-    pthread_mutexattr_destroy( &mutexattr );
+	pthread_mutexattr_t mutexattr;
+	pthread_mutexattr_init( &mutexattr );
+	pthread_mutexattr_settype( &mutexattr, PTHREAD_MUTEX_RECURSIVE );
+	retval = pthread_mutex_init( &mutex->mutex, &mutexattr );
+	pthread_mutexattr_destroy( &mutexattr );
 #endif
 #if defined(OS_WIN) || defined(OS_WINCE)
-    InitializeCriticalSection( &mutex->mutex );
+	InitializeCriticalSection( &mutex->mutex );
 #endif
+	break;
+    }
+    if( retval == 0 ) mutex->flags |= SMUTEX_FLAG_INITIALIZED;
     return retval;
 }
 
@@ -288,6 +293,14 @@ int smutex_destroy( smutex* mutex )
 {
     int retval = 0;
     if( !mutex ) return -1;
+    if( mutex->flags & SMUTEX_FLAG_INITIALIZED )
+    {
+	mutex->flags &= ~SMUTEX_FLAG_INITIALIZED;
+    }
+    else
+    {
+	return -1;
+    }
     if( mutex->flags & SMUTEX_FLAG_ATOMIC_SPINLOCK )
     {
 	return retval;
@@ -1049,19 +1062,19 @@ int sundog::lazy_init_helper::init_begin( const char* fn_name, int timeout_ms, i
     return 1; //ready for initialization
 }
 
-void sundog::lazy_init_helper::init_end( void )
+void sundog::lazy_init_helper::init_end()
 {
     atomic_store( &ready, 1 );
 }
 
-int sundog::lazy_init_helper::deinit_begin( void )
+int sundog::lazy_init_helper::deinit_begin()
 {
     //Global deinit once per process
     if( atomic_fetch_sub( &cnt, 1 ) != 1 ) return 0;
     return 1; //ready for deinitialization
 }
 
-void sundog::lazy_init_helper::deinit_end( void )
+void sundog::lazy_init_helper::deinit_end()
 {
     atomic_store( &ready, 0 );
 }

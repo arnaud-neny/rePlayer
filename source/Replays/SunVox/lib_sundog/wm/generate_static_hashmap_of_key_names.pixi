@@ -1,0 +1,147 @@
+shm_hash_coef = 7
+shm_tab_size = 7
+shm_best_tab_size = 0xFFFFFFF
+shm_best_tab = -1
+shm_best_coef = 0
+script_restart:
+shm_new_tab()
+
+shm_add( "backspace", "KEY_BACKSPACE" )
+shm_add( "tab", "KEY_TAB" )
+shm_add( "enter", "KEY_ENTER" )
+shm_add( "escape", "KEY_ESCAPE" )
+shm_add( "space", "KEY_SPACE" )
+shm_add( "f1", "KEY_F1" )
+shm_add( "f2", "KEY_F2" )
+shm_add( "f3", "KEY_F3" )
+shm_add( "f4", "KEY_F4" )
+shm_add( "f5", "KEY_F5" )
+shm_add( "f6", "KEY_F6" )
+shm_add( "f7", "KEY_F7" )
+shm_add( "f8", "KEY_F8" )
+shm_add( "f9", "KEY_F9" )
+shm_add( "f10", "KEY_F10" )
+shm_add( "f11", "KEY_F11" )
+shm_add( "f12", "KEY_F12" )
+shm_add( "up", "KEY_UP" )
+shm_add( "down", "KEY_DOWN" )
+shm_add( "left", "KEY_LEFT" )
+shm_add( "right", "KEY_RIGHT" )
+shm_add( "insert", "KEY_INSERT" )
+shm_add( "ins", "KEY_INSERT" )
+shm_add( "delete", "KEY_DELETE" )
+shm_add( "del", "KEY_DELETE" )
+shm_add( "home", "KEY_HOME" )
+shm_add( "end", "KEY_END" )
+shm_add( "pageup", "KEY_PAGEUP" )
+shm_add( "pgup", "KEY_PAGEUP" )
+shm_add( "pagedown", "KEY_PAGEDOWN" )
+shm_add( "pgdn", "KEY_PAGEDOWN" )
+shm_add( "capslock", "KEY_CAPS" )
+shm_add( "caps", "KEY_CAPS" )
+shm_add( "shift", "KEY_SHIFT" )
+shm_add( "ctrl", "KEY_CTRL" )
+shm_add( "ctl", "KEY_CTRL" )
+shm_add( "alt", "KEY_ALT" )
+shm_add( "menu", "KEY_MENU" )
+shm_add( "cmd", "KEY_CMD" )
+shm_add( "fn", "KEY_FN" )
+
+if shm_conflict
+{
+    shm_conflict = 0
+    remove( shm_tab )
+    while( 1 )
+    {
+	shm_tab_size + 1
+	if check_prime_number( shm_tab_size ) { break }
+    }
+    if shm_tab_size < 1200
+    {
+	goto script_restart
+    }
+}
+
+if shm_tab_size < shm_best_tab_size
+{
+    shm_best_tab_size = shm_tab_size
+    remove( shm_best_tab )
+    shm_best_tab = shm_tab
+    shm_tab = -1
+    shm_best_coef = shm_hash_coef
+}
+remove( shm_tab )
+shm_tab = -1
+shm_tab_size = 7
+shm_hash_coef + 1
+if shm_hash_coef < 1024 { goto script_restart }
+
+shm_show_results()
+halt
+
+fn shm_add( $name, $val )
+{
+    if shm_conflict { ret }
+    $hash = shm_get_hash( $name, shm_tab_size )
+    $prev_val = shm_tab[ $hash ]
+    if $prev_val != -1
+    {
+	//printf( "Conflict at %s (%d)\n", $name, $hash )
+	shm_conflict = 1
+	ret
+    }
+    shm_tab[ $hash ] = $val
+}
+
+fn shm_new_tab()
+{
+    printf( "TABLE SIZE %d; HASH COEF %d\n", shm_tab_size, shm_hash_coef );
+    shm_tab = new( shm_tab_size, 1, INT )
+    clean( shm_tab, -1 )
+}
+
+fn shm_get_hash( $name, $size )
+{
+    $h = 0
+    $p = 0
+    while $name[ $p ] != 0
+    {
+        $h = shm_hash_coef * $h + $name[ $p ]
+	$p + 1
+    }
+    $h = ( $h & 0x7FFFFFFF ) % $size
+    ret( $h )
+}
+
+fn check_prime_number( $n )
+{
+    $d = 0
+    $i = 2 while $i < $n
+    {
+        $v = $n div $i
+        if $v * $i == $n
+        {
+            $d + 1
+        }
+        $i + 1
+    }
+    if $d == 0
+    {
+	ret( 1 )
+    }
+    ret( 0 )
+}
+
+fn shm_show_results()
+{
+    printf( "BEST SIZE = %d\n", shm_best_tab_size )
+    printf( "BEST HASH COEF = %d\n", shm_best_coef )
+    printf( "\n\n" );
+    printf( "int map[ %d ] = { \n", shm_best_tab_size )
+    for( $i = 0; $i < shm_best_tab_size; $i + 1 )
+    {
+	$v = shm_best_tab[ $i ]
+	if $v == -1 { printf( "    0,\n" ) } else { printf( "    %s,\n", $v ) }
+    }
+    printf( "};\n\n" )
+}

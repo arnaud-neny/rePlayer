@@ -1,7 +1,7 @@
 /*
     wm_win_ddraw.h - platform-dependent module : DirectDraw
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 

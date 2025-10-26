@@ -107,22 +107,6 @@
 	struct utsname systemInfo;
         uname( &systemInfo );
     	slog( "Machine: %s\n", systemInfo.machine );
-        if( strstr( systemInfo.machine, "iPhone1" ) ||
-	    strstr( systemInfo.machine, "iPhone2" ) ||
-	    strstr( systemInfo.machine, "iPhone3" ) ||
-	    strstr( systemInfo.machine, "iPod1" ) ||
-	    strstr( systemInfo.machine, "iPod2" ) ||
-	    strstr( systemInfo.machine, "iPod3" ) ||
-	    strstr( systemInfo.machine, "iPod4" ) ||
-	    strstr( systemInfo.machine, "iPad1" ) )
-        {
-    	    slog( "HD mode will be disabled on slow devices (< A5 CPU) ...\n" );
-    	    device_hd_support = 0;
-        }
-	else
-	{
-	    slog( "CPU is ready for HD video processing.\n" );
-	}
 
 	// Create a device input with the device and add it to the session.
 	AVCaptureDeviceInput* input = [ AVCaptureDeviceInput deviceInputWithDevice:device error:&error ];

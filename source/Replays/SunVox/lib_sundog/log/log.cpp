@@ -1,7 +1,7 @@
 /*
     log.cpp - log management (thread-safe)
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -48,7 +48,7 @@ int slog_global_init( const char* filename )
     return 0;
 }
 
-int slog_global_deinit( void )
+int slog_global_deinit()
 {
     if( g_slog_ready == false ) return 0;
     smutex_destroy( &g_slog_mutex );
@@ -138,7 +138,7 @@ void slog_enable( bool console, bool file )
     smutex_unlock( &g_slog_mutex );
 }
 
-const char* slog_get_file( void )
+const char* slog_get_file()
 {
     return g_slog_file;
 }
@@ -148,7 +148,7 @@ char* slog_get_latest( sundog_engine* s, size_t size )
     size_t log_size = sfs_get_file_size( (const char*)g_slog_file );
     if( log_size == 0 ) return NULL;
     if( size > log_size ) size = log_size;
-    char* rv = (char*)smem_new( size + 1 );
+    char* rv = SMEM_ALLOC2( char, size + 1 );
     if( rv == NULL ) return NULL;
     rv[ 0 ] = 0;
     sfs_file f = sfs_open( g_slog_file, "rb" );

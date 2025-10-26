@@ -11,7 +11,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
@@ -22,6 +25,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.ExifInterface;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.AudioManager;
@@ -32,6 +36,7 @@ import android.media.midi.MidiManager;
 import android.media.midi.MidiOutputPort;
 import android.media.midi.MidiReceiver;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.HandlerThread;
@@ -41,6 +46,8 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import android.provider.Settings;
 import android.view.Surface;
 import android.view.View;
 import android.util.Log;
@@ -129,25 +136,44 @@ public class AndroidLib {
             case 4: perm = Manifest.permission.READ_MEDIA_AUDIO; break;
             case 5: perm = Manifest.permission.READ_MEDIA_IMAGES; break;
             case 6: perm = Manifest.permission.READ_MEDIA_VIDEO; break;
+            case 7: perm = Manifest.permission.MANAGE_EXTERNAL_STORAGE; break;
         }
         return perm;
+    }
+    int AllFilesAccess( int flags ) //show screen for controlling if the app can manage external storage (broad access)
+    {
+        if( sdk >= 30 ) {
+            //Android 11+; API LEVEL 30+
+            //if (Environment.isExternalStorageManager()) {}
+            Context ctx = activity.getApplicationContext();
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            Uri uri = Uri.fromParts("package", ctx.getPackageName(), null);
+            intent.setData(uri);
+            activity.startActivity(intent); //required: ALLOW_WORK_IN_BG (native code);
+            //activity.startActivityForResult(intent,1000); //required: ALLOW_WORK_IN_BG (native code) + onActivityResult (MyNativeActivity)
+        }
+        return 0;
     }
     //p (requested permissions): -1 - get the req. answer; 1<<0 - write ext.storage; 1<<1 - record_audio; 1<<2 - camera; ...
     //retval: enabled permissions;
     public int CheckForPermissions( int p )
     {
         int rv = 0;
-        if( sdk < 23 ) return 0xFFFF; // < 6.0
+        if( sdk < 23 ) return 0xFFFF; // Android 6 and lower
         if( p == -1 ) {
             return permResult;
         } else {
+            p &= ~(1<<7); //ignore MANAGE_EXTERNAL_STORAGE
             int reqcnt = 0;
             int reqbits = 0;
             for( int bit = 0; bit < 16; bit++ )
             {
                 if( ( p & (1<<bit) ) != 0 )
                 {
-                    if( ContextCompat.checkSelfPermission(activity,bit2perm(bit)) == PackageManager.PERMISSION_GRANTED ) {
+                    String perm = bit2perm(bit);
+                    if( perm == null ) continue;
+                    if( ContextCompat.checkSelfPermission(activity,perm) == PackageManager.PERMISSION_GRANTED ) {
                         rv |= (1 << bit);
                     }
                     else {
@@ -230,7 +256,7 @@ public class AndroidLib {
                 File f = ctx.getCacheDir();
                 return f.toString();
             } catch (Exception e) {
-                Log.e("GetDir( internal_cache )", "getCacheDir() error", e);
+                Log.e("GetDir(internal_cache)", "getCacheDir() error", e);
                 return null;
             }
         }
@@ -239,7 +265,7 @@ public class AndroidLib {
                 File f = ctx.getFilesDir();
                 return f.toString();
             } catch (Exception e) {
-                Log.e("GetDir( internal_files )", "getFilesDir() error", e);
+                Log.e("GetDir(internal_files)", "getFilesDir() error", e);
                 return null;
             }
         }
@@ -248,7 +274,7 @@ public class AndroidLib {
                 File f = ctx.getExternalCacheDir();
                 return f.toString();
             } catch (Exception e) {
-                Log.e("GetDir( external_cache )", "getFilesDir() error", e);
+                Log.e("GetDir(external_cache)", "getFilesDir() error", e);
                 return null;
             }
         }
@@ -259,7 +285,7 @@ public class AndroidLib {
                     File f = ctx.getExternalFilesDir(null);
                     return f.toString();
                 } catch (Exception e) {
-                    Log.e("GetDir( external_files )", "getExternalFilesDir() error", e);
+                    Log.e("GetDir(external_files)", "getExternalFilesDir() error", e);
                     return null;
                 }
             }
@@ -274,7 +300,7 @@ public class AndroidLib {
                             return f[n - 1].toString();
                         return null;
                     } catch (Exception e) {
-                        Log.e("GetDir( external_filesX )", "getExternalFilesDir() error", e);
+                        Log.e("GetDir(external_filesX)", "getExternalFilesDir() error", e);
                         return null;
                     }
                 }
@@ -287,7 +313,7 @@ public class AndroidLib {
                     File dcim = new File(f.getAbsolutePath() + "/" + Environment.DIRECTORY_PICTURES);
                     return dcim.toString();
                 } catch (Exception e) {
-                    Log.e("GetDir( external_pictures )", "getExternalFilesDir() error", e);
+                    Log.e("GetDir(external_pics)", "getExternalFilesDir() error", e);
                     return null;
                 }
             }
@@ -297,7 +323,7 @@ public class AndroidLib {
                     File dcim = new File(f.getAbsolutePath() + "/" + Environment.DIRECTORY_MOVIES);
                     return dcim.toString();
                 } catch (Exception e) {
-                    Log.e("GetDir( external_movies )", "getExternalFilesDir() error", e);
+                    Log.e("GetDir(external_movies)", "getExternalFilesDir() error", e);
                     return null;
                 }
             }
@@ -346,6 +372,68 @@ public class AndroidLib {
         return f.exists();
     }
 
+    boolean HEIC_to_JPEG( ContentResolver resolver, Uri input_uri, String output_path ) {
+        Log.i("HEIC_to_JPEG","Converting HEIC -> JPEG...");
+        try {
+            InputStream input = resolver.openInputStream(input_uri);
+            OutputStream out = new FileOutputStream(new File(output_path));
+            Bitmap bitmap = BitmapFactory.decodeStream(input);
+            if (bitmap != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    input.close();
+                    input = resolver.openInputStream(input_uri);
+                    ExifInterface exif = new ExifInterface(input);
+                    int orient = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                    Log.i("HEIC_to_JPEG", "orientation: " + orient);
+                    Matrix matrix = new Matrix();
+                    boolean changed = true;
+                    switch (orient) {
+                        case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                            matrix.setScale(-1, 1);
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            matrix.setRotate(180);
+                            break;
+                        case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                            matrix.setScale(1, -1);
+                            break;
+                        case ExifInterface.ORIENTATION_TRANSPOSE:
+                            matrix.setRotate(90);
+                            matrix.postScale(-1, 1);
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            matrix.setRotate(90);
+                            break;
+                        case ExifInterface.ORIENTATION_TRANSVERSE:
+                            matrix.setRotate(-90);
+                            matrix.postScale(-1, 1);
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            matrix.setRotate(-90);
+                            break;
+                        default:
+                            changed = false;
+                            break;
+                    }
+                    if (changed) {
+                        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                        if (rotatedBitmap != null) {
+                            bitmap.recycle();
+                            bitmap = rotatedBitmap;
+                        }
+                    }
+                }
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out);
+            }
+            out.close();
+            input.close();
+            return true;
+        } catch (Exception e) {
+            Log.e("HEIC_to_JPEG", "IO Stream exception: " + e.getMessage());
+            return false;
+        }
+    }
+
     public void SetNewIntent(Intent i) //Set Intent from onNewIntent(), when current activity is already running
     {
         newIntent = i;
@@ -390,19 +478,24 @@ public class AndroidLib {
             }
             rv = GetDir("external_files") + "/" + name;
             if (FileExists(rv)) rv = rv + "_temp";
+            String mime_type = resolver.getType(uri);
             Log.v("GetIntentFile", "action: " + action + " : " + intent.getDataString() + " : " + intent.getType());
-            Log.v("GetIntentFile", "uri: " + uri);
+            Log.v("GetIntentFile", "uri: " + uri + " : " + mime_type);
             Log.v("GetIntentFile", "file name: " + rv);
             try {
-                InputStream input = resolver.openInputStream(uri);
-                OutputStream out = new FileOutputStream(new File(rv));
-                int size = 0;
-                byte[] buffer = new byte[1024*4];
-                while ((size = input.read(buffer)) != -1) {
-                    out.write(buffer, 0, size);
+                if( mime_type.contains("heic") ) {
+                    HEIC_to_JPEG( resolver, uri, rv );
+                } else {
+                    InputStream input = resolver.openInputStream(uri);
+                    OutputStream out = new FileOutputStream(new File(rv));
+                    int size = 0;
+                    byte[] buffer = new byte[1024 * 4];
+                    while ((size = input.read(buffer)) != -1) {
+                        out.write(buffer, 0, size);
+                    }
+                    out.close();
+                    input.close();
                 }
-                out.close();
-                input.close();
             } catch (Exception e) {
                 Log.e("GetIntentFile", "IO Stream exception: " + e.getMessage());
                 rv = null;
@@ -1087,7 +1180,7 @@ public class AndroidLib {
                 try {
                     cam.setPreviewTexture(st);
                 } catch (Exception e) {
-                    Log.e("Camera.setPreviewDisplay()", "Exception:" + e.getMessage());
+                    Log.e("Cam.setPreviewDisplay", "Exception:" + e.getMessage());
                     if (a <= 1)
                         return -3;
                     else {

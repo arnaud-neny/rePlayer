@@ -1,7 +1,7 @@
 /*
     wm_hnd_keymap.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2014 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2014 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -228,7 +228,7 @@ int keymap_handler( sundog_event* evt, window_manager* wm )
                 slist_data* ldata = list_get_data( data->list_actions, wm );
 		slist_reset_items( ldata );
 		const char* prev_group = NULL;
-		char* group_ts = (char*)smem_new( 512 );
+		char* group_ts = SMEM_ALLOC2( char, 512 );
 		for( int i = 0; ; i++ )
 		{
 		    const char* action_name = keymap_get_action_name( NULL, 0, i, wm );

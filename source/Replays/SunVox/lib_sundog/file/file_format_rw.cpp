@@ -1,7 +1,7 @@
 /*
     file_format_rw.cpp - helper functions for reading and writing various file formats
     This file is part of the SunDog engine.
-    Copyright (C) 2022 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2022 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -28,73 +28,319 @@ const int g_sfs_sample_format_sizes[ SFMT_MAX ] =
 #include "jpgd.h"
 #include "jpge.h"
 
-int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img )
+struct sfs_exif : public smem_base
 {
-    int rv = -1;
-    
+    uint8_t* data; //EXIF data
+    uint32_t offset; //current offset
+    bool little_endian;
+    const char* manufacturer;
+    const char* model;
+    const char* datetime;
+    int orientation;	//the orientation of the camera relative to the scene:
+		        //1 = Horizontal (normal)
+		        //2 = Mirror horizontal
+			//3 = Rotate 180
+			//4 = Mirror vertical
+			//5 = Mirror horizontal and rotate 270 clockwise
+			//6 = Rotate 90 clockwise
+			//7 = Mirror horizontal and rotate 90 clockwise
+			//8 = Rotate 270 clockwise
+
+    sfs_exif()
+    {
+	data = nullptr;
+	offset = 0;
+	little_endian = true;
+	manufacturer = nullptr;
+	model = nullptr;
+	datetime = nullptr;
+	orientation = 0;
+    }
+    ~sfs_exif()
+    {
+	smem_free( data );
+    }
+
+    uint8_t read_int8()
+    {
+	uint8_t v;
+	if( offset+1 > smem_get_size( data ) ) return 0;
+	v = data[ offset++ ];
+	return v;
+    }
+    uint16_t read_int16()
+    {
+	uint16_t v;
+	if( offset+2 > smem_get_size( data ) ) return 0;
+	v = data[ offset++ ];
+	v |= (int16_t)data[ offset++ ] << 8;
+	if( !little_endian ) v = INT16_SWAP( v );
+	return v;
+    }
+    uint32_t read_int32()
+    {
+	uint32_t v;
+	if( offset+4 > smem_get_size( data ) ) return 0;
+	v = data[ offset++ ];
+	v |= (int32_t)data[ offset++ ] << 8;
+	v |= (int32_t)data[ offset++ ] << 16;
+	v |= (int32_t)data[ offset++ ] << 24;
+	if( !little_endian ) v = INT32_SWAP( v );
+	return v;
+    }
+    void seek( uint32_t new_offset )
+    {
+	if( new_offset >= smem_get_size( data ) ) return;
+	offset = new_offset;
+    }
+
+    void parse( sfs_file f, int len ) //len - without EXIF signature
+    {
+	//slog( "EXIF %d bytes\n", len );
+	data = SMEM_ALLOC2( uint8_t, len );
+	if( (int)sfs_read( data, 1, len, f ) != len )
+	{
+	    smem_free( data );
+	    return;
+	}
+
+	//TIFF header:
+
+	uint16_t v = read_int16(); //byte align (endianness)
+	if( v == 0x4d4d ) little_endian = false;
+	//slog( "EXIF little endian = %d\n", little_endian );
+	v = read_int16(); //0x002A
+	if( v != 0x002A )
+	{
+	    //slog( "EXIF incorrect endianness\n" );
+	    return;
+	}
+	uint32_t ifd0 = read_int32(); //IFD0 (Image File Directory) offset
+	//slog( "EXIF IFD0 offset = %d\n", ifd0 );
+	if( ifd0 > offset ) seek( ifd0 );
+
+	//IFD0 (Image File Directory):
+
+	while( 1 )
+	{
+	    uint16_t entry_cnt = read_int16(); //number of directory entry contains in this IFD
+	    //slog( "EXIF IFD entry count = %d\n", entry_cnt );
+	    for( uint16_t i = 0; i < entry_cnt; i++ )
+	    {
+		uint16_t tag = read_int16(); //tag ID
+		uint16_t format = read_int16(); //data format
+		uint32_t num_components = read_int32(); //number of components
+		int component_size = 1; //in bytes
+		switch( format )
+		{
+		    case 3: component_size = 2; break; //unsigned short
+		    case 4: component_size = 4; break; //unsigned long
+		    case 5: component_size = 8; break; //unsigned rational
+		    case 8: component_size = 2; break; //signed short
+		    case 9: component_size = 4; break; //signed long
+		    case 10: component_size = 8; break; //signed rational
+		    case 11: component_size = 4; break; //float32
+		    case 12: component_size = 8; break; //float64
+		    default: break;
+		}
+		uint8_t* val_ptr = &data[ offset ];
+		uint32_t val = 0; //data value or offset to data value
+		if( num_components * component_size > 4 )
+		{
+		    val = read_int32();
+		    val_ptr = &data[ val ];
+		}
+		else
+		{
+		    switch( component_size )
+		    {
+			case 1: val = read_int8(); offset += 3; break;
+			case 2: val = read_int16(); offset += 2; break;
+			default: val = read_int32(); break;
+		    }
+		}
+	        //slog( "EXIF IFD entry: tag=%x; format=%d; components=%d; data=%x;\n", tag, format, num_components, val );
+	        switch( tag )
+	        {
+	    	    case 0x010f:
+	    		//manufacturer:
+	    		//slog( "EXIF IFD manufacturer = %s\n", &data[ val ] );
+	    		manufacturer = (const char*)val_ptr;
+	    		break;
+	    	    case 0x0110:
+	    		//model:
+	    		//slog( "EXIF IFD model = %s\n", &data[ val ] );
+	    		model = (const char*)val_ptr;
+	    		break;
+	    	    case 0x0132:
+	    		//date/time:
+	    		//slog( "EXIF IFD date/time = %s\n", &data[ val ] );
+	    		datetime = (const char*)val_ptr;
+	    		break;
+	    	    case 0x0112:
+	    		//orientation:
+	    		//slog( "EXIF IFD orientation = %x\n", val );
+	    		orientation = val;
+	    		break;
+	        }
+	    }
+	    uint32_t next_ifd = read_int32(); //offset to the next IFD
+	    //slog( "NEXT IFD offset %d\n", next_ifd );
+	    if( next_ifd == 0 ) break;
+	    seek( next_ifd ); //go to the next IFD
+	}
+    }
+
+    bool load_from_jpeg( sfs_file f )
+    {
+	bool rv = 0;
+	uint16_t v;
+	sfs_read( &v, 1, 2, f ); //skip SOI marker (0xFFD8)
+	while( 1 )
+	{
+	    if( sfs_read( &v, 1, 2, f ) != 2 ) break;
+	    if( ( v & 0xFF ) != 0xFF ) break;
+	    uint8_t marker = ( v >> 8 ) & 0xFF;
+	    uint16_t len;
+	    if( sfs_read( &len, 1, 2, f ) != 2 ) break;
+	    len = INT16_SWAP( len );
+	    if( len < 2 ) break;
+	    if( marker == 0xE1 ) //APP1 marker = EXIF
+	    {
+		char sign[ 6 ];
+		if( sfs_read( &sign, 1, 6, f ) != 6 ) break;
+		if( sign[ 0 ] == 'E' && sign[ 1 ] == 'x' && sign[ 2 ] == 'i' && sign[ 3 ] == 'f' && sign[ 4 ] == 0 && sign[ 5 ] == 0 )
+		{
+		    //EXIF signature found:
+		    parse( f, len - 2 - 6 );
+		}
+		else break;
+		rv = 1;
+		break;
+	    }
+    	    sfs_seek( f, len - 2, SFS_SEEK_CUR );
+	}
+	return rv;
+    }
+};
+
+class jd_file_stream : public jpgd::jpeg_decoder_stream
+{
+    sfs_file f;
+    bool eof_flag, error_flag;
+
+public:
+    jd_file_stream()
+    {
+	f = 0;
+        eof_flag = false;
+        error_flag = false;
+    }
+
+    void attach( sfs_file new_f ) { f = new_f; }
+
+    int read( uint8_t* pBuf, int max_bytes_to_read, bool* pEOF_flag ) CPP_OVERRIDE
+    {
+    	if( !f )
+	    return -1;
+
+	if( eof_flag )
+	{
+	    *pEOF_flag = true;
+	    return 0;
+	}
+
+	if( error_flag )
+	    return -1;
+
+	int bytes_read = static_cast<int>(sfs_read(pBuf, 1, max_bytes_to_read, f));
+	if( bytes_read < max_bytes_to_read )
+	{
+	    if( sfs_eof( f ) )
+	    {
+		eof_flag = true;
+		*pEOF_flag = true;
+		return bytes_read;
+	    }
+	    error_flag = true;
+	    return -1;
+	}
+	return bytes_read;
+    }
+};
+
+int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, uint32_t flags )
+{
+    int rv = SD_RES_ERR;
+
     if( filename && f == 0 )
 	f = sfs_open( sd, filename, "rb" );
-    if( f == 0 ) return -1;
-	
+    if( f == 0 ) return SD_RES_ERR_FOPEN;
+
+    int exif_orientation = 0;
+    if( flags & LOAD_JPEG_FLAG_AUTOROTATE )
+    {
+	int64_t off0 = sfs_tell( f );
+	sfs_exif exif = sfs_exif();
+	exif.load_from_jpeg( f );
+	sfs_seek( f, off0, SFS_SEEK_SET );
+	exif_orientation = exif.orientation;
+    }
+
+    jd_file_stream stream;
+    stream.attach( f );
+
+    jpgd::jpeg_decoder* jd = nullptr;
+    uint8_t* dest = nullptr;
+
     while( 1 )
     {
-	jpeg_decoder jd;
-	jd_init( f, &jd );
-	if( jd.m_error_code != JPGD_SUCCESS )
+	uint32_t flags = 0;
+	jd = SMEM_NEW jpgd::jpeg_decoder( &stream, flags );
+	if( jd->get_error_code() != jpgd::JPGD_SUCCESS )
 	{
-	    slog( "JPEG loading: jd_init() error %d\n", jd.m_error_code );
+	    slog( "JPEG loading: jpeg_decoder() error %d\n", jd->get_error_code() );
 	    break;
 	}
-	
-	int width = jd.m_image_x_size;
-	int height = jd.m_image_y_size;
-	int channels = jd.m_comps_in_frame;
+
+	int width = jd->get_width();
+	int height = jd->get_height();
+	int channels = jd->get_num_components();
 	int pixel_format = img->format;
 	img->width = width;
 	img->height = height;
-    
-	if( jd_begin_decoding( &jd ) != JPGD_SUCCESS )
+
+	if( jd->begin_decoding() != jpgd::JPGD_SUCCESS )
 	{
-	    slog( "JPEG loading: jd_begin_decoding() error %d\n", jd.m_error_code );
+	    slog( "JPEG loading: begin_decoding() error %d\n", jd->get_error_code() );
 	    break;
 	}
-	
+
 	int dest_bpp = g_simage_pixel_format_size[ pixel_format ];
 	const int dest_bpl = width * dest_bpp;
 
-        uint8_t* dest = (uint8_t*)smem_new( dest_bpl * height );
-	if( !dest )
-	    break;
-	
+        dest = SMEM_ALLOC2( uint8_t, dest_bpl * height );
+	if( !dest ) break;
+
 	for( int y = 0; y < height; y++ )
 	{
 	    const uint8_t* scan_line;
 	    uint scan_line_len;
-	    if( jd_decode( (const void**)&scan_line, &scan_line_len, &jd ) != JPGD_SUCCESS )
+	    if( jd->decode( (const void**)&scan_line, &scan_line_len ) != jpgd::JPGD_SUCCESS )
 	    {
-		slog( "JPEG loading: jd_decode() error %d\n", jd.m_error_code );
-    		smem_free( dest );
-    		dest = NULL;
+		slog( "JPEG loading: decode() error %d\n", jd->get_error_code() );
     		break;
 	    }
 
 	    uint8_t* dest_line = dest + y * dest_bpl;
-	
+
 	    switch( pixel_format )
 	    {
-    	        case PFMT_GRAYSCALE_8:
+    	        case PFMT_GRAYSCALE8_SRGB:
     	    	    if( channels == 3 )
     		    {
-    		        /*int YR = 19595, YG = 38470, YB = 7471;
-    		        for( int x = 0; x < width * 4; x += 4 )
-    		        {
-        	    	    int r = scan_line[ x + 0 ];
-        		    int g = scan_line[ x + 1 ];
-        		    int b = scan_line[ x + 2 ];
-        		    *dest_line++ = static_cast<uint8_t>( ( r * YR + g * YG + b * YB + 32768 ) >> 16 );
-    			}*/
-    		        for( int x = 0; x < width * 4; x += 4 )
-    		        {
+    		    	for( int x = 0; x < width * 4; x += 4 )
+    		    	{
         	    	    int r = scan_line[ x + 0 ];
         		    int g = scan_line[ x + 1 ];
         		    int b = scan_line[ x + 2 ];
@@ -106,7 +352,7 @@ int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_d
 		        memcpy( dest_line, scan_line, dest_bpl );
     		    }
     		    break;
-    		case PFMT_RGBA_8888:
+    		case PFMT_R8G8B8A8_SRGB:
     		    if( channels == 3 )
     		    {
     		        for( int x = 0; x < width * 4; x += 4 )
@@ -156,139 +402,173 @@ int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_d
 	    }
 	}
 
-	jd_deinit( &jd );
-
 	img->data = dest;
-	rv = 0;
+	dest = nullptr;
+	rv = SD_RES_SUCCESS;
 	break;
     }
 
-    if( f && filename )
+    if( f && filename ) sfs_close( f );
+    SMEM_DELETE( jd );
+    smem_free( dest );
+
+    if( img->data )
     {
-        sfs_close( f );
+	bool hflip = 0;
+	bool vflip = 0;
+	int rotate = 0;
+	switch( exif_orientation )
+	{
+	    case 2: //Mirror horizontal
+		hflip = 1;
+		break;
+	    case 3: //Rotate 180
+		rotate = 2;
+		break;
+	    case 4: //Mirror vertical
+		vflip = 1;
+		break;
+	    case 5: //Mirror horizontal and rotate 270 clockwise
+		hflip = 1;
+		rotate = 3;
+		break;
+	    case 6: //Rotate 90 clockwise
+		rotate = 1;
+		break;
+	    case 7: //Mirror horizontal and rotate 90 clockwise
+		hflip = 1;
+		rotate = 1;
+		break;
+	    case 8: //Rotate 270 clockwise
+		rotate = 3;
+		break;
+	    default:
+		break;
+	}
+	if( hflip )
+	    hflip_2d_array( img->data, img->width, img->height, g_simage_pixel_format_size[img->format] );
+	if( vflip )
+	    vflip_2d_array( img->data, img->width, img->height, g_simage_pixel_format_size[img->format] );
+	if( rotate )
+	    rotate_2d_array( &img->data, img->width, img->height, g_simage_pixel_format_size[img->format], rotate, nullptr );
     }
 
     return rv;
 }
 
-#ifndef SUNDOG_VER
-const int YR = 19595, YG = 38470, YB = 7471, CB_R = -11059, CB_G = -21709, CB_B = 32768, CR_R = 32768, CR_G = -27439, CR_B = -5329;
-static inline uint8_t jpeg_clamp( int i ) { if( (uint)i > 255U ) { if( i < 0 ) i = 0; else if( i > 255 ) i = 255; } return (uint8_t)i; }
-static void sundog_color_to_YCC( uint8_t* dst, const uint8_t* src, int num_pixels )
+class je_file_stream : public jpge::output_stream
 {
-    const COLORPTR c = (const COLORPTR)src;
-    for( ; num_pixels; dst += 3, c++, num_pixels-- )
-    {
-        int r = red( c[ 0 ] );
-        int g = green( c[ 0 ] );
-        int b = blue( c[ 0 ] );
-        dst[ 0 ] = (uint8_t)( ( r * YR + g * YG + b * YB + 32768 ) >> 16 );
-        dst[ 1 ] = jpeg_clamp( 128 + ( ( r * CB_R + g * CB_G + b * CB_B + 32768 ) >> 16 ) );
-        dst[ 2 ] = jpeg_clamp( 128 + ( ( r * CR_R + g * CR_G + b * CR_B + 32768 ) >> 16 ) );
-    }
-}
-static void sundog_color_to_Y( uint8_t* dst, const uint8_t* src, int num_pixels )
-{
-    const COLORPTR c = (const COLORPTR)src;
-    for( ; num_pixels; dst++, c++, num_pixels-- )
-    {
-        int r = red( c[ 0 ] );
-        int g = green( c[ 0 ] );
-        int b = blue( c[ 0 ] );
-        dst[ 0 ] = (uint8_t)( ( r * YR + g * YG + b * YB + 32768 ) >> 16 );
-    }
-}
-#endif
+    sfs_file f;
 
-int sfs_save_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, sfs_jpeg_enc_params* pars )
-{
-    int rv = 0;
-    
-    int num_channels = 0;
-    int pixel_size = 0;
-    
-    je_comp_params encoder_pars;
-    init_je_comp_params( &encoder_pars );
-    encoder_pars.m_quality = pars->quality;
-    encoder_pars.m_two_pass_flag = pars->two_pass_flag;
-    switch( pars->subsampling )
+public:
+
+    je_file_stream()
     {
-	case JE_Y_ONLY: encoder_pars.m_subsampling = Y_ONLY; break;
-	case JE_H1V1: encoder_pars.m_subsampling = H1V1; break;
-	case JE_H2V1: encoder_pars.m_subsampling = H2V1; break;
-	case JE_H2V2: encoder_pars.m_subsampling = H2V2; break;
+	f = 0;
     }
 
-    switch( img->format )
+    void attach( sfs_file new_f ) { f = new_f; }
+
+    bool put_buf( const void* pBuf, int len ) CPP_OVERRIDE
     {
-        case PFMT_GRAYSCALE_8:
-    	    num_channels = 1;
-    	    pixel_size = 1;
-	    break;
-	case PFMT_RGBA_8888:
-    	    num_channels = 3;
-    	    pixel_size = 4;
-	    break;
-#ifndef SUNDOG_VER
-	case PFMT_SUNDOG_COLOR:
-    	    num_channels = 3;
-    	    pixel_size = COLORLEN;
-	    encoder_pars.convert_to_YCC = sundog_color_to_YCC;
-            encoder_pars.convert_to_Y = sundog_color_to_Y;
-	    break;
-#endif
-	default:
-	    rv = -1;
-	    goto save_jpeg_end;
-	    break;
+	if( sfs_write( pBuf, len, 1, f ) == 1 ) return true;
+	return false;
     }
-    
-    if( filename && f == 0 ) f = sfs_open( sd, filename, "wb" );
-    if( f )
+};
+
+int sfs_save_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, sfs_save_jpeg_pars* pars )
+{
+    int rv = SD_RES_ERR;
+
+    jpge::jpeg_encoder* je = nullptr;
+
+    while( 1 )
     {
-        jpeg_encoder je;
-    
-        je_init( &je );
-        if( !je_set_params( f, img->width, img->height, num_channels, &encoder_pars, &je ) ) 
+	jpge::params encoder_pars;
+	encoder_pars.m_quality = pars->quality;
+	encoder_pars.m_two_pass_flag = pars->two_pass_flag;
+	switch( pars->subsampling )
         {
-    	    rv = -2;
-	    goto save_jpeg_end;
+	    case JE_Y_ONLY: encoder_pars.m_subsampling = jpge::Y_ONLY; break;
+	    case JE_H1V1: encoder_pars.m_subsampling = jpge::H1V1; break;
+	    case JE_H2V1: encoder_pars.m_subsampling = jpge::H2V1; break;
+	    case JE_H2V2: encoder_pars.m_subsampling = jpge::H2V2; break;
 	}
- 
-	int width = img->width;
-	int height = img->height;
-        const uint8_t* buf = (const uint8_t*)img->data;
-        for( uint pass_index = 0; pass_index < ( encoder_pars.m_two_pass_flag ? 2 : 1 ); pass_index++ )
+#ifndef SUNDOG_VER
+    	encoder_pars.m_sundog_color = false;
+#endif
+
+	int num_channels = 0;
+	int pixel_size = 0;
+	switch( img->format )
+	{
+    	    case PFMT_GRAYSCALE8_SRGB:
+    		num_channels = 1;
+    		pixel_size = 1;
+		break;
+	    case PFMT_R8G8B8A8_SRGB:
+    		num_channels = 3;
+    		pixel_size = 4;
+		break;
+#ifndef SUNDOG_VER
+	    case PFMT_SUNDOG_COLOR:
+    		num_channels = 3;
+    		pixel_size = COLORLEN;
+    		encoder_pars.m_sundog_color = true;
+		break;
+#endif
+	    default:
+		break;
+	}
+	if( num_channels == 0 || pixel_size == 0 )
+	{
+	    slog( "JPEG saving: unsupported img format %d\n", img->format );
+	    break;
+	}
+	//num_channels == je->m_image_bpp
+	//je->m_num_components = 1 for Y_ONLY; and 3 for other values;
+
+	if( filename && f == 0 ) f = sfs_open( sd, filename, "wb" );
+	if( !f ) { rv = SD_RES_ERR_FOPEN; break; }
+	je_file_stream stream;
+	stream.attach( f );
+
+        je = SMEM_NEW jpge::jpeg_encoder();
+        if( !je->init( &stream, img->width, img->height, num_channels, encoder_pars ) )
         {
-            int line_size = width * pixel_size;
+	    slog( "JPEG saving: init() error\n" );
+    	    break;
+	}
+
+	const int width = img->width;
+	const int height = img->height;
+        const int line_size = width * pixel_size;
+        for( uint pass_index = 0; pass_index < je->get_total_passes(); pass_index++ )
+        {
+	    const uint8_t* buf = (const uint8_t*)img->data;
             for( int i = 0; i < height; i++ )
             {
-                if( !je_process_scanline( buf, &je ) )
+                if( !je->process_scanline( buf ) )
                 {
-            	    rv = -3;
-            	    goto save_jpeg_end;
+            	    break;
             	}
                 buf += line_size;
             }
-            if( !je_process_scanline( NULL, &je ) ) 
+            if( !je->process_scanline( NULL ) ) 
             {
-        	rv = -4;
-        	goto save_jpeg_end;
+        	break;
     	    }
         }
- 
-        je_deinit( &je );
+
+	rv = SD_RES_SUCCESS;
+	break;
     }
- 
-save_jpeg_end:
 
     if( filename && f ) sfs_close( f );
-    if( rv )
-    {
-	slog( "JPEG saving error: %d\n", rv );
-    }
+    if( rv ) slog( "JPEG saving error: %d\n", rv );
+    SMEM_DELETE( je );
 
-    return rv;    
+    return rv;
 }
 
 #endif //!NOJPEG
@@ -321,7 +601,7 @@ static void sfs_png_flush( png_structp png_ptr )
 
 int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img )
 {
-    int rv = -1;
+    int rv = SD_RES_ERR;
     
     if( filename && f == 0 )
 	f = sfs_open( sd, filename, "rb" );
@@ -330,10 +610,11 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
     png_structp png_ptr = NULL;
     png_infop info_ptr = NULL;
     png_bytep* row_pointers = NULL;
+    int8_t* pixels = NULL;
     int width = 0;
     int height = 0;
     void* palette = NULL;
-	
+
     while( 1 )
     {
 	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
@@ -350,20 +631,24 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
         int color_type = png_get_color_type( png_ptr, info_ptr );
         int bits_per_channel = png_get_bit_depth( png_ptr, info_ptr );
         int channels = png_get_channels( png_ptr, info_ptr );
-	
-	if( bits_per_channel != 8 )
+
+	if( bits_per_channel < 8 ) png_set_packing( png_ptr ); //Extract pixels with bit depths of 1/2/4 from a single byte into separate bytes (useful for paletted and grayscale images)
+
+	/*if( bits_per_channel != 8 )
 	{
 	    slog( "PNG load: unsupported number of bits per channel %d\n", bits_per_channel );
 	    break;
-	}
-	
+	}*/
+
 	int number_of_passes = png_set_interlace_handling( png_ptr );
         png_read_update_info( png_ptr, info_ptr );
 	
 	if( setjmp( png_jmpbuf( png_ptr ) ) ) break;
-        row_pointers = (png_bytep*)smem_new( sizeof( png_bytep ) * height );
+        row_pointers = SMEM_ALLOC2( png_bytep, height );
+        uint32_t row_bytes = png_get_rowbytes( png_ptr, info_ptr );
+        pixels = SMEM_ALLOC2( int8_t, row_bytes * height );
         for( int y = 0; y < height; y++ )
-            row_pointers[ y ] = (png_byte*)smem_new( png_get_rowbytes( png_ptr, info_ptr ) );
+            row_pointers[ y ] = (png_byte*)&pixels[ y * row_bytes ];
         png_read_image( png_ptr, row_pointers );
 
 	int dest_bpp = g_simage_pixel_format_size[ img->format ];
@@ -375,10 +660,10 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 	    int items = 0;
 	    if( png_get_PLTE( png_ptr, info_ptr, &pp, &items ) )
 	    {
-		palette = smem_new( items * dest_bpp );
+		palette = SMEM_ALLOC( items * dest_bpp );
 		switch( dest_format )
 		{
-		    case PFMT_GRAYSCALE_8:
+		    case PFMT_GRAYSCALE8_SRGB:
 			for( int i = 0; i < items; i++ )
 			{
 			    int r = pp[ i ].red;
@@ -387,7 +672,7 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 			    ((uint8_t*)palette)[ i ] = ( r + g + b ) / 3;
 			}
 			break;
-		    case PFMT_RGBA_8888:
+		    case PFMT_R8G8B8A8_SRGB:
 			for( int i = 0; i < items; i++ )
 			{
 			    int r = pp[ i ].red;
@@ -415,10 +700,10 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 	}
 
 	const int dest_bpl = width * dest_bpp;
-        uint8_t* dest = (uint8_t*)smem_new( dest_bpl * height );
+        uint8_t* dest = SMEM_ALLOC2( uint8_t, dest_bpl * height );
 	if( !dest ) break;
-	
-	if( bits_per_channel == 8 )
+
+	if( bits_per_channel <= 8 )
 	{
 	    for( int y = 0; y < height; y++ )
 	    {
@@ -431,14 +716,14 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 			{
 			    switch( dest_format )
 			    {
-				case PFMT_GRAYSCALE_8:
+				case PFMT_GRAYSCALE8_SRGB:
 				    for( int x = 0; x < width; x++ )
 				    {
 					int i = *src; src++;
 					*dest_line = ((uint8_t*)palette)[ i ]; dest_line++;
 				    }
 				    break;
-				case PFMT_RGBA_8888:
+				case PFMT_R8G8B8A8_SRGB:
 				    for( int x = 0; x < width; x++ )
 				    {
 					int i = *src; src++;
@@ -463,14 +748,14 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 			{
 			    switch( dest_format )
 			    {
-				case PFMT_GRAYSCALE_8:
+				case PFMT_GRAYSCALE8_SRGB:
 				    for( int x = 0; x < width; x++ )
 				    {
 					int v = *src; src++;
 					*dest_line = v; dest_line++;
 				    }
 				    break;
-				case PFMT_RGBA_8888:
+				case PFMT_R8G8B8A8_SRGB:
 				    for( int x = 0; x < width; x++ )
 				    {
 					int v = *src; src++;
@@ -495,16 +780,17 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 		    case 3:
 			switch( dest_format )
 			{
-			    case PFMT_GRAYSCALE_8:
+			    case PFMT_GRAYSCALE8_SRGB:
 				for( int x = 0; x < width; x++ )
 				{
 				    int r = *src; src++;
 				    int g = *src; src++;
 				    int b = *src; src++;
-				    *dest_line = ( r + g + b ) / 3; dest_line++;
+				    *dest_line = ( r + g + b ) / 3;
+				    dest_line++;
 				}
 				break;
-			    case PFMT_RGBA_8888:
+			    case PFMT_R8G8B8A8_SRGB:
 				for( int x = 0; x < width; x++ )
 				{
 				    int r = *src; src++;
@@ -532,17 +818,18 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 		    case 4:
 			switch( dest_format )
 			{
-			    case PFMT_GRAYSCALE_8:
+			    case PFMT_GRAYSCALE8_SRGB:
 				for( int x = 0; x < width; x++ )
 				{
 				    int r = *src; src++;
 				    int g = *src; src++;
 				    int b = *src; src++;
 				    /*int a = *src;*/ src++;
-				    *dest_line = ( r + g + b ) / 3; dest_line++;
+				    *dest_line = ( r + g + b ) / 3;
+				    dest_line++;
 				}
 				break;
-			    case PFMT_RGBA_8888:
+			    case PFMT_R8G8B8A8_SRGB:
 				for( int x = 0; x < width; x++ )
 				{
 				    int r = *src; src++;
@@ -572,18 +859,17 @@ int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_de
 		}
 	    }
 	}
-	
+
 	img->data = dest;
-	rv = 0;
+	rv = SD_RES_SUCCESS;
 	break;
     }
 
     png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
     if( row_pointers )
     {
-        for( int y = 0; y < height; y++ )
-            smem_free( row_pointers[ y ] );
         smem_free( row_pointers );
+        smem_free( pixels );
     }
     
     smem_free( palette );
@@ -647,7 +933,7 @@ static int vorbis_decoder_init( sfs_sound_decoder_data* d )
     vorbis_decoder* data = nullptr;
     while( 1 )
     {
-	d->format_decoder_data = smem_znew( sizeof( vorbis_decoder ) );
+	d->format_decoder_data = SMEM_ZALLOC( sizeof( vorbis_decoder ) );
 	data = (vorbis_decoder*)d->format_decoder_data;
 
 	data->vc.read_func = &ov_read;
@@ -777,7 +1063,7 @@ static int mp3_decoder_init( sfs_sound_decoder_data* d )
     mp3_decoder* data = nullptr;
     while( 1 )
     {
-	d->format_decoder_data = smem_znew( sizeof( mp3_decoder ) );
+	d->format_decoder_data = SMEM_ZALLOC( sizeof( mp3_decoder ) );
 	data = (mp3_decoder*)d->format_decoder_data;
 
 	//http://en.wikipedia.org/wiki/Gapless_playback
@@ -1028,7 +1314,7 @@ static int flac_decoder_init( sfs_sound_decoder_data* d )
     flac_decoder* data = nullptr;
     while( 1 )
     {
-	d->format_decoder_data = smem_znew( sizeof( flac_decoder ) );
+	d->format_decoder_data = SMEM_ZALLOC( sizeof( flac_decoder ) );
 	data = (flac_decoder*)d->format_decoder_data;
 
 	data->decoder = FLAC__stream_decoder_new();
@@ -1181,7 +1467,7 @@ static int wave_decoder_init( sfs_sound_decoder_data* d )
     wave_decoder* data = nullptr;
     while( 1 )
     {
-	d->format_decoder_data = smem_znew( sizeof( wave_decoder ) );
+	d->format_decoder_data = SMEM_ZALLOC( sizeof( wave_decoder ) );
 	data = (wave_decoder*)d->format_decoder_data;
 
 	size_t file_size = sfs_get_data_size( d->f );
@@ -1412,7 +1698,7 @@ static int aiff_decoder_init( sfs_sound_decoder_data* d )
     aiff_decoder* data = nullptr;
     while( 1 )
     {
-	d->format_decoder_data = smem_znew( sizeof( aiff_decoder ) );
+	d->format_decoder_data = SMEM_ZALLOC( sizeof( aiff_decoder ) );
 	data = (aiff_decoder*)d->format_decoder_data;
 
 	sfs_seek( d->f, 4, SFS_SEEK_SET );
@@ -1630,6 +1916,7 @@ int sfs_sound_decoder_init( sundog_engine* sd, const char* filename, sfs_file f,
 	d->f_close_req = 1;
     }
     if( f == 0 ) return -1;
+    d->filename = SMEM_STRDUP( filename );
     d->f = f;
     d->file_format = file_format;
     d->flags = flags;
@@ -1718,6 +2005,7 @@ void sfs_sound_decoder_deinit( sfs_sound_decoder_data* d )
     if( d->f_close_req ) sfs_close( d->f );
     smem_free( d->format_decoder_data ); d->format_decoder_data = nullptr;
     smem_free( d->tmp_buf ); d->tmp_buf = nullptr;
+    smem_free( d->filename ); d->filename = nullptr;
 
     d->initialized = false;
 }
@@ -1738,7 +2026,7 @@ size_t sfs_sound_decoder_read( sfs_sound_decoder_data* d, void* dest_buf, size_t
 	    size_t prev_size = smem_get_size( d->tmp_buf );
 	    size_t new_size = len * d->frame_size;
 	    if( new_size > prev_size )
-		d->tmp_buf = smem_resize( d->tmp_buf, new_size );
+		d->tmp_buf = SMEM_RESIZE( d->tmp_buf, new_size );
 	    dest_buf2 = d->tmp_buf;
 	}
 	r = d->read( d, dest_buf2, len );
@@ -1817,6 +2105,39 @@ int64_t sfs_sound_decoder_tell( sfs_sound_decoder_data* d )
 
 //
 
+struct rawaudio_encoder
+{
+    size_t ptr;
+};
+
+static int rawaudio_encoder_init( sfs_sound_encoder_data* e )
+{
+    int rv = -1;
+    rawaudio_encoder* data = nullptr;
+    while( 1 )
+    {
+	e->format_encoder_data = SMEM_ZALLOC( sizeof( rawaudio_encoder ) );
+	data = (rawaudio_encoder*)e->format_encoder_data;
+
+	rv = 0;
+	break;
+    }
+    return rv;
+}
+
+static void rawaudio_encoder_deinit( sfs_sound_encoder_data* e )
+{
+    rawaudio_encoder* data = (rawaudio_encoder*)e->format_encoder_data;
+    smem_free( e->format_encoder_data ); e->format_encoder_data = nullptr;
+}
+
+static size_t rawaudio_encoder_write( sfs_sound_encoder_data* e, void* src_buf, size_t len )
+{
+    rawaudio_encoder* data = (rawaudio_encoder*)e->format_encoder_data;
+    size_t w = sfs_write( src_buf, e->frame_size, len, e->f );
+    return w;
+}
+
 struct wave_encoder
 {
     size_t ptr1;
@@ -1830,7 +2151,7 @@ static int wave_encoder_init( sfs_sound_encoder_data* e )
     wave_encoder* data = nullptr;
     while( 1 )
     {
-	e->format_encoder_data = smem_znew( sizeof( wave_encoder ) );
+	e->format_encoder_data = SMEM_ZALLOC( sizeof( wave_encoder ) );
 	data = (wave_encoder*)e->format_encoder_data;
 
         int temp;
@@ -1998,7 +2319,7 @@ static int flac_encoder_init( sfs_sound_encoder_data* e )
     flac_encoder* data = nullptr;
     while( 1 )
     {
-	e->format_encoder_data = smem_znew( sizeof( flac_encoder ) );
+	e->format_encoder_data = SMEM_ZALLOC( sizeof( flac_encoder ) );
 	data = (flac_encoder*)e->format_encoder_data;
 
 	data->encoder = FLAC__stream_encoder_new();
@@ -2137,7 +2458,7 @@ static int vorbis_encoder_init( sfs_sound_encoder_data* e )
     vorbis_encoder* data = nullptr;
     while( 1 )
     {
-	e->format_encoder_data = smem_znew( sizeof( vorbis_encoder ) );
+	e->format_encoder_data = SMEM_ZALLOC( sizeof( vorbis_encoder ) );
 	data = (vorbis_encoder*)e->format_encoder_data;
 
 	vorbis_info_init( &data->vi );
@@ -2327,6 +2648,7 @@ int sfs_sound_encoder_init(
 	e->f_close_req = 1;
     }
     if( f == 0 ) return -1;
+    e->filename = SMEM_STRDUP( filename );
     e->f = f;
     e->file_format = file_format;
     e->sample_format = sample_format;
@@ -2342,6 +2664,11 @@ int sfs_sound_encoder_init(
 	e->init = nullptr;
 	switch( file_format )
 	{
+	    case SFS_FILE_FMT_UNKNOWN:
+		e->init = rawaudio_encoder_init;
+		e->deinit = rawaudio_encoder_deinit;
+		e->write = rawaudio_encoder_write;
+		break;
 	    case SFS_FILE_FMT_WAVE:
 		e->init = wave_encoder_init;
 		e->deinit = wave_encoder_deinit;
@@ -2389,6 +2716,7 @@ void sfs_sound_encoder_deinit( sfs_sound_encoder_data* e )
 
     if( e->f_close_req ) sfs_close( e->f );
     smem_free( e->format_encoder_data ); e->format_encoder_data = nullptr;
+    smem_free( e->filename ); e->filename = nullptr;
 
     e->initialized = false;
 }

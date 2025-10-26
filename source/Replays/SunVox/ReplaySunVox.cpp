@@ -3,6 +3,8 @@
 // - lib_sundog\file\file.cpp
 // - lib_sundog\file\file.h
 // - lib_sundog\main\main.cpp
+// - lib_sundog\memory\memory.h
+// - lib_sundog\misc\misc.h
 // - lib_sundog\sound\sound.cpp
 // - lib_sundog\sound\sound_win.hpp
 // - lib_sundog\sundog.h
@@ -48,7 +50,7 @@ int render_piece_of_sound(sundog_sound* ss, int slot_num)
     if (!s->initialized) return 0;
 
     sunvox_render_data rdata;
-    smem_clear_struct(rdata);
+    SMEM_CLEAR_STRUCT(rdata);
     rdata.buffer_type = ss->out_type;
     rdata.buffer = slot->buffer;
     rdata.frames = slot->frames;
@@ -74,7 +76,7 @@ namespace rePlayer
         .replayId = eReplay::SunVox,
         .name = "SunVox",
         .extensions = "sunvox",
-        .about = "SunVox " SUNVOX_ENGINE_VERSION_STR "\nCopyright(c) 2012-2024 Alexander Zolotov <nightradio@gmail.com>",
+        .about = "SunVox " SUNVOX_ENGINE_VERSION_STR "\nCopyright(c) 2012-2025 Alexander Zolotov <nightradio@gmail.com>",
         .init = ReplaySunVox::Init,
         .release = ReplaySunVox::Release,
         .load = ReplaySunVox::Load,
@@ -106,7 +108,7 @@ namespace rePlayer
         sfs_file f = sfs_open_in_memory((void*)data.Items(), data.Size());
         auto rv = sunvox_load_proj_from_fd(f, 0, engine);
         sfs_close(f);
-        if (rv)
+        if (rv || engine->type == 1 || engine->type == 2)
         {
             sunvox_engine_close(engine);
             delete engine;
@@ -141,9 +143,9 @@ namespace rePlayer
     }
 
     ReplaySunVox::ReplaySunVox(sunvox_engine* engine)
-        : Replay(eExtension::_sunvox, eReplay::SunVox)
+        : Replay(engine->type == 0 ? eExtension::_sunvox : eExtension::_midi, eReplay::SunVox)
         , m_engine(engine)
-        , m_numFrames(sunvox_get_proj_frames(engine))
+        , m_numFrames(sunvox_get_proj_frames(0, 0, engine))
     {
         sundog_sound_init(&m_sound, nullptr, sound_buffer_float32, kSampleRate, 2, SUNDOG_SOUND_FLAG_ONE_THREAD | SUNDOG_SOUND_FLAG_USER_CONTROLLED);
 
@@ -197,8 +199,8 @@ namespace rePlayer
         currentFrame -= frameToCheck;
 
         int numLines = sunvox_get_proj_lines(m_engine);
-        sunvox_time_map_item* map = (sunvox_time_map_item*)smem_new(sizeof(sunvox_time_map_item) * numLines);
-        uint32_t* frameMap = (uint32_t*)smem_new(sizeof(uint32_t) * (numLines + 1));
+        sunvox_time_map_item* map = SMEM_ALLOC2(sunvox_time_map_item, numLines);
+        uint32_t* frameMap = SMEM_ALLOC2(uint32_t, numLines + 1);
         sunvox_get_time_map(map, frameMap, 0, numLines, m_engine);
         smem_free(map);
         frameMap[numLines] = ~uint32_t(0);

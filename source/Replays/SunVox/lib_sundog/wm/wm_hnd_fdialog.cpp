@@ -1,7 +1,7 @@
 /*
     wm_hnd_fdialog.cpp - file dialog window (file browser)
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -82,7 +82,7 @@ static bool is_fdialog_win_valid( WINDOWPTR win )
     return true;
 }
 
-static int fdialog_get_disk_count( void )
+static int fdialog_get_disk_count()
 {
 #ifdef ONLY_WORKING_DIR
     return 1;
@@ -91,7 +91,7 @@ static int fdialog_get_disk_count( void )
 #endif
 }
 
-static void fdialog_refresh_disks( void )
+static void fdialog_refresh_disks()
 {
     sfs_refresh_disks();
 }
@@ -114,7 +114,7 @@ static int fdialog_get_disk_num( const char* path )
 #endif
 }
 
-static const char* fdialog_get_work_path( void )
+static const char* fdialog_get_work_path()
 {
 #ifdef ONLY_WORKING_DIR
     return "1:/";
@@ -127,10 +127,10 @@ static char* fdialog_make_final_path( fdialog_data* data )
 {
     window_manager* wm = data->win->wm;
     data->final_path[ 0 ] = 0;
-    smem_strcat_resize( data->final_path, fdialog_get_disk_name( data->prop_cur_disk ) );
+    SMEM_STRCAT_D( data->final_path, fdialog_get_disk_name( data->prop_cur_disk ) );
     if( data->prop_path[ data->prop_cur_disk ] )
     {
-        smem_strcat_resize( data->final_path, data->prop_path[ data->prop_cur_disk ] );
+        SMEM_STRCAT_D( data->final_path, data->prop_path[ data->prop_cur_disk ] );
     }
     return data->final_path;
 }
@@ -142,12 +142,12 @@ static char* fdialog_make_final_filename( fdialog_data* data )
     char* fname = text_get_text( data->name, wm );
     if( fname )
     {
-	smem_strcat_resize( data->final_filename, fdialog_get_disk_name( data->prop_cur_disk ) );
+	SMEM_STRCAT_D( data->final_filename, fdialog_get_disk_name( data->prop_cur_disk ) );
 	if( data->prop_path[ data->prop_cur_disk ] )
 	{
-	    smem_strcat_resize( data->final_filename, data->prop_path[ data->prop_cur_disk ] );
+	    SMEM_STRCAT_D( data->final_filename, data->prop_path[ data->prop_cur_disk ] );
 	}
-	smem_strcat_resize( data->final_filename, fname );
+	SMEM_STRCAT_D( data->final_filename, fname );
     }
     return data->final_filename;
 }
@@ -156,7 +156,7 @@ static char* fdialog_fix_list_item( const char* item_name )
 {
     if( !item_name ) return NULL;
     size_t len = smem_strlen( item_name );
-    char* new_item = smem_strdup( item_name );
+    char* new_item = SMEM_STRDUP( item_name );
     if( new_item )
     {
 	for( size_t i = 0; i < len; i++ )
@@ -236,9 +236,9 @@ static char* fdialog_fix_name( char* in_name, const char* mask )
 	if( ext_eq == 0 ) 
 	{
 	    //Add extension:
-	    out_name = (char*)smem_new( smem_strlen( in_name ) + 32 );
+	    out_name = SMEM_ALLOC2( char, smem_strlen( in_name ) + 32 );
 	    out_name[ 0 ] = 0;
-	    smem_strcat_resize( out_name, in_name );
+	    SMEM_STRCAT_D( out_name, in_name );
 	    a = smem_strlen( in_name );
 	    out_name[ a ] = '.';
 	    a++;
@@ -258,7 +258,7 @@ static char* fdialog_fix_name( char* in_name, const char* mask )
 	}
     }
     if( out_name == NULL )
-	out_name = smem_strdup( in_name );
+	out_name = SMEM_STRDUP( in_name );
     return out_name;
 }
 
@@ -336,7 +336,7 @@ static void fdialog_pos_load_table( fdialog_data* data )
 	if( r == 0 ) { err = 3; break; }
 	if( path_len >= 32768 ) { err = 4; break; } //path size is too large?
 	int path_size = path_len + 2; //plus "/" and null terminator
-	path_buf = (char*)smem_resize_if_smaller( path_buf, path_size, 32 );
+	path_buf = SMEM_SMART_ZRESIZE2( path_buf, char, path_size, 32 );
 	path_buf[ path_size - 1 ] = 0;
 	path_buf[ path_size - 2 ] = '/';
 
@@ -410,7 +410,7 @@ static void fdialog_pos_deinit( fdialog_data* data )
 {
     fdialog_pos_save_table( data );
 
-    ssymtab_remove( data->dir_pos );
+    ssymtab_delete( data->dir_pos );
 }
 
 //Associate the file position for the current directory:
@@ -479,7 +479,7 @@ static void fdialog_pos_restore( fdialog_data* data )
 
 static char* fdialog_edit_get_menu( fdialog_data* data )
 {
-    char* ts = (char*)smem_new( 4096 );
+    char* ts = SMEM_ALLOC2( char, 4096 );
     snprintf( ts, 4096, "%s\n%s\n%s\n%s\n%s\n%s\n%s", 
         wm_get_string( STR_WM_DELETE ),
         wm_get_string( STR_WM_RENAME ),
@@ -502,17 +502,17 @@ static int del_file_dialog_action_handler( void* user_data, WINDOWPTR win, windo
     {
 	if( !wm->fdialog_delfile_confirm && !strstr( win->name, wm_get_string( STR_WM_ARE_YOU_SURE ) ) )
 	{
-    	    char* ts = (char*)smem_new( 256 );
+    	    char* ts = SMEM_ALLOC2( char, 256 );
 	    ts[ 0 ] = 0;
-	    smem_strcat_resize( ts, "!" );
-	    smem_strcat_resize( ts, wm_get_string( STR_WM_ARE_YOU_SURE ) );
-	    smem_strcat_resize( ts, "\n" );
-	    smem_strcat_resize( ts, win->name + 1 );
+	    SMEM_STRCAT_D( ts, "!" );
+	    SMEM_STRCAT_D( ts, wm_get_string( STR_WM_ARE_YOU_SURE ) );
+	    SMEM_STRCAT_D( ts, "\n" );
+	    SMEM_STRCAT_D( ts, win->name + 1 );
 
 	    WINDOWPTR d = dialog_open( NULL, ts, wm_get_string( STR_WM_YESNO ), 0, wm );
 	    if( d )
 	    {
-		add_data_container( d->childs[ 0 ], "filename", smem_strdup( fname ) );
+		add_data_container( d->childs[ 0 ], "filename", SMEM_STRDUP( fname ) );
 		set_handler( d->childs[ 0 ], del_file_dialog_action_handler, fdialog_win, wm );
 	    }
 
@@ -574,22 +574,22 @@ static int rename_file_dialog_action_handler( void* user_data, WINDOWPTR win, wi
             if( new_name[ 0 ] != 0 )
             {
 		char* fixed_name = fdialog_fix_name( new_name, data->mask );
-                char* new_name2 = (char*)smem_new( smem_strlen( fixed_name ) + 8192 );
+                char* new_name2 = SMEM_ALLOC2( char, smem_strlen( fixed_name ) + 8192 );
                 new_name2[ 0 ] = 0;
-                smem_strcat_resize( new_name2, fdialog_get_disk_name( data->prop_cur_disk ) );
+                SMEM_STRCAT_D( new_name2, fdialog_get_disk_name( data->prop_cur_disk ) );
 		if( data->prop_path[ data->prop_cur_disk ] )
 		{
-		    smem_strcat_resize( new_name2, data->prop_path[ data->prop_cur_disk ] );
+		    SMEM_STRCAT_D( new_name2, data->prop_path[ data->prop_cur_disk ] );
 		}
-		smem_strcat_resize( new_name2, fixed_name );
+		SMEM_STRCAT_D( new_name2, fixed_name );
 		if( sfs_get_file_size( new_name2 ) )
 		{
 		    //Already exists:
 		    WINDOWPTR d = fdialog_overwrite_open( fixed_name, wm );
 		    if( d )
 		    {
-			add_data_container( d->childs[ 0 ], "filename", smem_strdup( new_name2 ) );
-			add_data_container( d->childs[ 0 ], "prevname", smem_strdup( prev_name ) );
+			add_data_container( d->childs[ 0 ], "filename", SMEM_STRDUP( new_name2 ) );
+			add_data_container( d->childs[ 0 ], "prevname", SMEM_STRDUP( prev_name ) );
 			set_handler( d->childs[ 0 ], rename_file_dialog_action_handler2, fdialog_win, wm );
 		    }
 		}
@@ -622,14 +622,14 @@ static int mkdir_dialog_action_handler( void* user_data, WINDOWPTR win, window_m
     {
         if( dir_name[ 0 ] != 0 )
         {
-            char* new_name = (char*)smem_new( smem_strlen( dir_name ) + 8192 );
+            char* new_name = SMEM_ALLOC2( char, smem_strlen( dir_name ) + 8192 );
             new_name[ 0 ] = 0;
-            smem_strcat_resize( new_name, fdialog_get_disk_name( data->prop_cur_disk ) );
+            SMEM_STRCAT_D( new_name, fdialog_get_disk_name( data->prop_cur_disk ) );
 	    if( data->prop_path[ data->prop_cur_disk ] )
 	    {
-	        smem_strcat_resize( new_name, data->prop_path[ data->prop_cur_disk ] );
+	        SMEM_STRCAT_D( new_name, data->prop_path[ data->prop_cur_disk ] );
 	    }
-	    smem_strcat_resize( new_name, dir_name );
+	    SMEM_STRCAT_D( new_name, dir_name );
 #ifdef OS_UNIX
 	    sfs_mkdir( new_name, S_IRWXU | S_IRWXG | S_IRWXO );
 #else
@@ -655,17 +655,17 @@ static int deldir_dialog_action_handler( void* user_data, WINDOWPTR win, window_
     {
 	if( !wm->fdialog_deldir_confirm && !strstr( win->name, wm_get_string( STR_WM_ARE_YOU_SURE ) ) )
 	{
-    	    char* ts = (char*)smem_new( 256 );
+    	    char* ts = SMEM_ALLOC2( char, 256 );
 	    ts[ 0 ] = 0;
-	    smem_strcat_resize( ts, "!" );
-	    smem_strcat_resize( ts, wm_get_string( STR_WM_ARE_YOU_SURE ) );
-	    smem_strcat_resize( ts, "\n" );
-	    smem_strcat_resize( ts, win->name + 1 );
+	    SMEM_STRCAT_D( ts, "!" );
+	    SMEM_STRCAT_D( ts, wm_get_string( STR_WM_ARE_YOU_SURE ) );
+	    SMEM_STRCAT_D( ts, "\n" );
+	    SMEM_STRCAT_D( ts, win->name + 1 );
 
 	    WINDOWPTR d = dialog_open( NULL, ts, wm_get_string( STR_WM_YESNO ), 0, wm );
 	    if( d )
 	    {
-		add_data_container( d->childs[ 0 ], "dirname", smem_strdup( dir_name ) );
+		add_data_container( d->childs[ 0 ], "dirname", SMEM_STRDUP( dir_name ) );
 		set_handler( d->childs[ 0 ], deldir_dialog_action_handler, fdialog_win, wm );
 	    }
 
@@ -715,15 +715,15 @@ static void fdialog_edit( fdialog_data* data, int op )
 		    dir_name = fdialog_fix_list_item( slist_get_item( ldata->selected_item, ldata ) );
 	    	    if( dir_name )
 	    	    {
-			dir_name2 = (char*)smem_new( 32 ); dir_name2[ 0 ] = 0;
+			dir_name2 = SMEM_ALLOC2( char, 32 ); dir_name2[ 0 ] = 0;
 			if( dir_name2 )
 			{
-			    smem_strcat_resize( dir_name2, fdialog_get_disk_name( data->prop_cur_disk ) );
+			    SMEM_STRCAT_D( dir_name2, fdialog_get_disk_name( data->prop_cur_disk ) );
 	    		    if( data->prop_path[ data->prop_cur_disk ] )
 	    		    {
-				smem_strcat_resize( dir_name2, data->prop_path[ data->prop_cur_disk ] );
+				SMEM_STRCAT_D( dir_name2, data->prop_path[ data->prop_cur_disk ] );
 	    		    }
-	    		    smem_strcat_resize( dir_name2, dir_name );
+	    		    SMEM_STRCAT_D( dir_name2, dir_name );
 	    		    name = dir_name;
 	    		    res = dir_name2;
 			}
@@ -752,22 +752,22 @@ static void fdialog_edit( fdialog_data* data, int op )
 	    //Delete file/dir:
 	    if( res && name )
 	    {
-	        char* ts = (char*)smem_new( smem_strlen( name ) + 256 );
+	        char* ts = SMEM_ALLOC2( char, smem_strlen( name ) + 256 );
 		ts[ 0 ] = 0;
-		smem_strcat_resize( ts, "!" );
+		SMEM_STRCAT_D( ts, "!" );
 		if( dir_selected )
-		    smem_strcat_resize( ts, wm_get_string( STR_WM_DELETE_DIR2 ) );
+		    SMEM_STRCAT_D( ts, wm_get_string( STR_WM_DELETE_DIR2 ) );
 		else
-		    smem_strcat_resize( ts, wm_get_string( STR_WM_DELETE2 ) );
-		smem_strcat_resize( ts, " " );
-		smem_strcat_resize( ts, name );
-		smem_strcat_resize( ts, "?" );
+		    SMEM_STRCAT_D( ts, wm_get_string( STR_WM_DELETE2 ) );
+		SMEM_STRCAT_D( ts, " " );
+		SMEM_STRCAT_D( ts, name );
+		SMEM_STRCAT_D( ts, "?" );
 		if( res[ 0 ] != 0 )
 		{
 		    WINDOWPTR d = dialog_open( NULL, ts, wm_get_string( STR_WM_YESNO ), 0, wm );
 		    if( d )
 		    {
-			add_data_container( d->childs[ 0 ], "filename", smem_strdup( res ) );
+			add_data_container( d->childs[ 0 ], "filename", SMEM_STRDUP( res ) );
 			set_handler( d->childs[ 0 ], del_file_dialog_action_handler, fdialog_win, wm );
 		    }
 		}
@@ -794,8 +794,8 @@ static void fdialog_edit( fdialog_data* data, int op )
             	    WINDOWPTR d = dialog_open( dname, NULL, wm_get_string( STR_WM_OKCANCEL ), 0, wm ); //retval = decorator
     		    if( !d ) break;
     		    
-		    add_data_container( d->childs[ 0 ], "filename", smem_strdup( res ) );
-		    add_data_container( d->childs[ 0 ], "prevname", smem_strdup( name ) );
+		    add_data_container( d->childs[ 0 ], "filename", SMEM_STRDUP( res ) );
+		    add_data_container( d->childs[ 0 ], "prevname", SMEM_STRDUP( name ) );
     		    set_handler( d->childs[ 0 ], rename_file_dialog_action_handler, fdialog_win, wm );
 	            dialog_set_flags( d, DIALOG_FLAG_AUTOREMOVE_ITEMS );
 	            dlist = NULL; //because we use DIALOG_FLAG_AUTOREMOVE_ITEMS
@@ -813,8 +813,8 @@ static void fdialog_edit( fdialog_data* data, int op )
 	    {
 	        smem_free( wm->fdialog_copy_file_name );
 	        smem_free( wm->fdialog_copy_file_name2 );
-	        wm->fdialog_copy_file_name = (char*)smem_strdup( res );
-	        wm->fdialog_copy_file_name2 = (char*)smem_strdup( name );
+	        wm->fdialog_copy_file_name = (char*)SMEM_STRDUP( res );
+	        wm->fdialog_copy_file_name2 = (char*)SMEM_STRDUP( name );
 	        if( op == 2 )
 	    	    wm->fdialog_cut_file_flag = true;
 		else
@@ -825,14 +825,14 @@ static void fdialog_edit( fdialog_data* data, int op )
 	    //Paste file:
 	    if( wm->fdialog_copy_file_name )
 	    {
-        	char* new_name = (char*)smem_new( smem_strlen( wm->fdialog_copy_file_name ) + 8192 );
+        	char* new_name = SMEM_ALLOC2( char, smem_strlen( wm->fdialog_copy_file_name ) + 8192 );
         	new_name[ 0 ] = 0;
-            	smem_strcat_resize( new_name, fdialog_get_disk_name( data->prop_cur_disk ) );
+            	SMEM_STRCAT_D( new_name, fdialog_get_disk_name( data->prop_cur_disk ) );
                 if( data->prop_path[ data->prop_cur_disk ] )
                 {
-                    smem_strcat_resize( new_name, data->prop_path[ data->prop_cur_disk ] );
+                    SMEM_STRCAT_D( new_name, data->prop_path[ data->prop_cur_disk ] );
 	        }
-	        smem_strcat_resize( new_name, wm->fdialog_copy_file_name2 );
+	        SMEM_STRCAT_D( new_name, wm->fdialog_copy_file_name2 );
 	        while( sfs_get_file_size( new_name ) )
 	        {
 	    	    //Already exists:
@@ -854,7 +854,7 @@ static void fdialog_edit( fdialog_data* data, int op )
 	    	    }
 	    	    else
 	    	    {
-	        	smem_strcat_resize( new_name, "_" );
+	        	SMEM_STRCAT_D( new_name, "_" );
 	    	    }
 	        }
     		sfs_copy_file( new_name, wm->fdialog_copy_file_name );
@@ -901,7 +901,7 @@ static void fdialog_edit( fdialog_data* data, int op )
 	        char* p = data->prop_path[ data->prop_cur_disk ];
 		if( p && p[ 0 ] != 0 )
 		{
-		    char* path = smem_strdup( p );
+		    char* path = SMEM_STRDUP( p );
 		    int size = strlen( path );
 		    if( path[ size - 1 ] == '/' ) { path[ size - 1 ] = 0; size--; }
 		    if( size > 0 )
@@ -913,24 +913,24 @@ static void fdialog_edit( fdialog_data* data, int op )
 		        }
 		        char* dir_name = path + i;
 
-		        char* ts = (char*)smem_new( smem_strlen( dir_name ) + 256 );
+		        char* ts = SMEM_ALLOC2( char, smem_strlen( dir_name ) + 256 );
 	    		ts[ 0 ] = 0;
-			smem_strcat_resize( ts, "!" );
-			smem_strcat_resize( ts, wm_get_string( STR_WM_DELETE_CUR_DIR2 ) );
-			smem_strcat_resize( ts, " (" );
-			smem_strcat_resize( ts, dir_name );
-			smem_strcat_resize( ts, ") " );
-			smem_strcat_resize( ts, wm_get_string( STR_WM_RECURS ) );
-			smem_strcat_resize( ts, "?" );
+			SMEM_STRCAT_D( ts, "!" );
+			SMEM_STRCAT_D( ts, wm_get_string( STR_WM_DELETE_CUR_DIR2 ) );
+			SMEM_STRCAT_D( ts, " (" );
+			SMEM_STRCAT_D( ts, dir_name );
+			SMEM_STRCAT_D( ts, ") " );
+			SMEM_STRCAT_D( ts, wm_get_string( STR_WM_RECURS ) );
+			SMEM_STRCAT_D( ts, "?" );
 
 			WINDOWPTR d = dialog_open( NULL, ts, wm_get_string( STR_WM_YESNO ), 0, wm );
 			if( d )
 			{
-			    char* full_path = (char*)smem_new( size + 1024 );
+			    char* full_path = SMEM_ALLOC2( char, size + 1024 );
 			    full_path[ 0 ] = 0;
-			    smem_strcat_resize( full_path, fdialog_get_disk_name( data->prop_cur_disk ) );
-			    smem_strcat_resize( full_path, path );
-			    add_data_container( d->childs[ 0 ], "dirname", smem_strdup( full_path ) );
+			    SMEM_STRCAT_D( full_path, fdialog_get_disk_name( data->prop_cur_disk ) );
+			    SMEM_STRCAT_D( full_path, path );
+			    add_data_container( d->childs[ 0 ], "dirname", SMEM_STRDUP( full_path ) );
 			    set_handler( d->childs[ 0 ], deldir_dialog_action_handler, fdialog_win, wm );
 		    	    smem_free( full_path );
 			}
@@ -957,19 +957,19 @@ static void fdialog_refresh_list( fdialog_data* data )
     slist_deinit( ldata );
     slist_init( ldata );
     sfs_find_struct fs;
-    smem_clear_struct( fs );
+    SMEM_CLEAR_STRUCT( fs );
     const char* disk_name = fdialog_get_disk_name( data->prop_cur_disk );
     char* path = data->prop_path[ data->prop_cur_disk ];
-    char* res = (char*)smem_new( smem_strlen( disk_name ) + smem_strlen( path ) + 1 );
+    char* res = SMEM_ALLOC2( char, smem_strlen( disk_name ) + smem_strlen( path ) + 1 );
     res[ 0 ] = 0;
-    smem_strcat_resize( res, disk_name );
-    smem_strcat_resize( res, path );
+    SMEM_STRCAT_D( res, disk_name );
+    SMEM_STRCAT_D( res, path );
     fs.opt |= SFS_FIND_OPT_FILESIZE;
     fs.start_dir = res;
     fs.mask = data->mask;
     if( sfs_find_first( &fs ) )
     {
-	char* temp_name = (char*)smem_new( MAX_DIR_LEN );
+	char* temp_name = SMEM_ALLOC2( char, MAX_DIR_LEN );
 	while( 1 )
 	{
 	    bool show = true;
@@ -1105,7 +1105,7 @@ static void fdialog_jump_to_path( fdialog_data* data, const char* path )
 	data->prop_cur_disk = d;
 	if( data->prop_path[ data->prop_cur_disk ] )
 	    smem_free( data->prop_path[ data->prop_cur_disk ] );
-	data->prop_path[ data->prop_cur_disk ] = smem_strdup( cdir );
+	data->prop_path[ data->prop_cur_disk ] = SMEM_STRDUP( cdir );
     
 	break;
     }
@@ -1123,10 +1123,10 @@ static char* fdialog_make_props_filename( const char* id )
     const char* conf_path = sfs_get_conf_path();
     size_t conf_path_len = smem_strlen( conf_path );
     size_t id_len = smem_strlen( id );
-    char* rv = (char*)smem_new( conf_path_len + id_len + 1 );
+    char* rv = SMEM_ALLOC2( char, conf_path_len + id_len + 1 );
     rv[ 0 ] = 0;
-    smem_strcat_resize( rv, conf_path );
-    smem_strcat_resize( rv, id );
+    SMEM_STRCAT_D( rv, conf_path );
+    SMEM_STRCAT_D( rv, id );
     return rv;
 }
 
@@ -1170,7 +1170,7 @@ static void fdialog_load_props( fdialog_data* data )
     if( f == 0 ) return;
     
     uint temp_str_size = 4096;
-    char* temp_str = (char*)smem_new( temp_str_size );
+    char* temp_str = SMEM_ALLOC2( char, temp_str_size );
 
     //Current disk:
     fdialog_load_string( f, temp_str, temp_str_size );
@@ -1196,7 +1196,7 @@ static void fdialog_load_props( fdialog_data* data )
 	    if( temp_str[ 0 ] )
 	    {
 	        //Set new path:
-	        data->prop_path[ d ] = smem_strdup( temp_str );
+	        data->prop_path[ d ] = SMEM_STRDUP( temp_str );
 	    }
 	    data->prop_cur_file[ d ] = file_num;
 	}
@@ -1281,7 +1281,7 @@ static void fdialog_fill_recent_window( fdialog_data* data, WINDOWPTR dest, slis
     {
 	//Dirs:
 	size_t tslen = MAX_DIR_LEN;
-	char* ts = (char*)smem_new( tslen );
+	char* ts = SMEM_ALLOC2( char, tslen );
 	if( ts == 0 ) return;
 	for( uint i = 0; i < num; i++ )
 	{
@@ -1523,14 +1523,14 @@ int fdialog_list_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 		fdialog_pos_store( data );
 		char* path = data->prop_path[ data->prop_cur_disk ];
 		if( path )
-		    path = (char*)smem_resize( path, smem_strlen( path ) + smem_strlen( item ) + 2 );
+		    path = SMEM_RESIZE2( path, char, smem_strlen( path ) + smem_strlen( item ) + 2 );
 		else
 		{
-		    path = (char*)smem_new( smem_strlen( item ) + 2 );
+		    path = SMEM_ALLOC2( char, smem_strlen( item ) + 2 );
 		    path[ 0 ] = 0;
 		}
-		smem_strcat_resize( path, item );
-		smem_strcat_resize( path, "/" );
+		SMEM_STRCAT_D( path, item );
+		SMEM_STRCAT_D( path, "/" );
 		data->prop_path[ data->prop_cur_disk ] = path;
 		fdialog_pos_restore( data );
 		fdialog_set_path( data, path );
@@ -1755,7 +1755,7 @@ static int fdialog_overwrite_action_handler( void* user_data, WINDOWPTR win, win
 	if( fname )
 	{
 	    data->final_filename[ 0 ] = 0;
-	    smem_strcat_resize( data->final_filename, fname );
+	    SMEM_STRCAT_D( data->final_filename, fname );
 
 	    save_recent( data );
 
@@ -1811,7 +1811,7 @@ int fdialog_ok_button_handler( void* user_data, WINDOWPTR win, window_manager* w
     			WINDOWPTR w = fdialog_overwrite_open( data->final_filename, wm );
     			if( w )
     			{
-			    add_data_container( w->childs[ 0 ], "filename", smem_strdup( data->final_filename ) );
+			    add_data_container( w->childs[ 0 ], "filename", SMEM_STRDUP( data->final_filename ) );
     			    set_handler( w->childs[ 0 ], fdialog_overwrite_action_handler, data->win, wm );
     			}
     			break;
@@ -1941,10 +1941,10 @@ int fdialog_handler( sundog_event* evt, window_manager* wm )
 		int y = 0;
 		int label_xsize = 0;
 
-		data->final_path = (char*)smem_new( 256 );
+		data->final_path = SMEM_ALLOC2( char, 256 );
 		data->final_path[ 0 ] = 0;
 
-		data->final_filename = (char*)smem_new( 256 );
+		data->final_filename = SMEM_ALLOC2( char, 256 );
 		data->final_filename[ 0 ] = 0;
 
 		data->show_hidden = ( sconfig_get_int_value( APP_CFG_FDIALOG_SHOWHIDDEN, -1, 0 ) != -1 );
@@ -1961,9 +1961,9 @@ int fdialog_handler( sundog_event* evt, window_manager* wm )
 		{
 		    data->props_file = fdialog_make_props_filename( wm->opt_fdialog_id );
 		    size_t plen = smem_strlen( data->props_file );
-		    data->props_file_recent_dirs = (char*)smem_new( plen + 32 );
-		    data->props_file_recent_files = (char*)smem_new( plen + 32 );
-		    data->props_file_dir_pos = (char*)smem_new( plen + 32 );
+		    data->props_file_recent_dirs = SMEM_ALLOC2( char, plen + 32 );
+		    data->props_file_recent_files = SMEM_ALLOC2( char, plen + 32 );
+		    data->props_file_dir_pos = SMEM_ALLOC2( char, plen + 32 );
 		    sprintf( data->props_file_recent_dirs, "%s_recent_dirs", data->props_file );
 		    sprintf( data->props_file_recent_files, "%s_recent_files", data->props_file );
 		    sprintf( data->props_file_dir_pos, "%s_dir_pos", data->props_file );
@@ -1975,8 +1975,8 @@ int fdialog_handler( sundog_event* evt, window_manager* wm )
 		    data->props_file_recent_files = NULL;
 		    data->props_file_dir_pos = NULL;
 		}
-		data->mask = smem_strdup( wm->opt_fdialog_mask );
-		data->preview = smem_strdup( wm->opt_fdialog_preview );
+		data->mask = SMEM_STRDUP( wm->opt_fdialog_mask );
+		data->preview = SMEM_STRDUP( wm->opt_fdialog_preview );
 		data->preview_handler = wm->opt_fdialog_preview_handler;
 		data->preview_data.user_data = wm->opt_fdialog_preview_user_data;
 		data->flags = wm->opt_fdialog_flags;

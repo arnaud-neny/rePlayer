@@ -92,7 +92,7 @@ int device_midi_client_send_event_jack( sundog_midi_client* c, int pnum, sundog_
     if( !f ) \
 	slog( "JACK: Function %s() not found.\n", fn_name ); \
 
-const char* jack_get_version_string( void )
+const char* jack_get_version_string()
 {
     JACK_GET_FN( "jack_get_version_string" );
     if( f ) return ( (const char*(*)(void))f ) ();
@@ -181,7 +181,7 @@ jack_nframes_t jack_last_frame_time( const jack_client_t* client )
     return 0;
 }
 
-jack_time_t jack_get_time( void )
+jack_time_t jack_get_time()
 {
     JACK_GET_FN( "jack_get_time" );
     if( f ) return ( (jack_time_t(*)(void))f ) ();
@@ -285,25 +285,23 @@ static int jack_process_callback( jack_nframes_t nframes, void* arg )
     size = nframes * out_sample_size * ss->out_channels;
     if( !d->jack_temp_input )
     {
-        d->jack_temp_input = smem_new( size );
-        smem_zero( d->jack_temp_input );
+        d->jack_temp_input = SMEM_ZALLOC( size );
     }
     old_size = smem_get_size( d->jack_temp_input );
     if( old_size < size )
     {
-        d->jack_temp_input = smem_resize2( d->jack_temp_input, size );
+        d->jack_temp_input = SMEM_ZRESIZE( d->jack_temp_input, size );
     }
 #endif
     size = nframes * in_sample_size * ss->in_channels;
     if( !d->jack_temp_output )
     {
-        d->jack_temp_output = smem_new( size );
-        smem_zero( d->jack_temp_output );
+        d->jack_temp_output = SMEM_ZALLOC( size );
     }
     old_size = smem_get_size( d->jack_temp_output );
     if( old_size < size )
     {
-        d->jack_temp_output = smem_resize2( d->jack_temp_output, size );
+        d->jack_temp_output = SMEM_ZRESIZE( d->jack_temp_output, size );
     }
     
     //Get latency:
@@ -606,13 +604,9 @@ int device_sound_init_jack( sundog_sound* ss )
     //Reset MIDI:
     d->jack_midi_clear_count = 0;
 
-#ifndef OS_IOS
-#if CPUMARK >= 10
     //Set 32bit mode:
     ss->out_type = sound_buffer_float32;
     ss->in_type = sound_buffer_float32;
-#endif
-#endif
     
     //Activate client:
     if( jack_activate( d->jack_client ) )
@@ -664,8 +658,8 @@ int device_midi_client_close_jack( sundog_midi_client* c )
 
 int device_midi_client_get_devices_jack( sundog_midi_client* c, char*** devices, uint32_t flags )
 {
-    *devices = (char**)smem_new( sizeof( void* ) * 1 );
-    (*devices)[ 0 ] = smem_strdup( "JACK" );
+    *devices = SMEM_ALLOC2( char*, 1 );
+    (*devices)[ 0 ] = SMEM_STRDUP( "JACK" );
     return 1;
 }
 
@@ -678,10 +672,9 @@ int device_midi_client_open_port_jack( sundog_midi_client* c, int pnum, const ch
     if( !ss_d->jack_client ) return -1;
     
     sundog_midi_port* sd_port = c->ports[ pnum ];
-    sd_port->device_specific = smem_new( sizeof( device_midi_port_jack ) );
+    sd_port->device_specific = SMEM_ZALLOC( sizeof( device_midi_port_jack ) );
     device_midi_port_jack* port = (device_midi_port_jack*)sd_port->device_specific;
     if( !port ) return -1;
-    smem_zero( port );
     if( flags & MIDI_PORT_READ )
     {
         port->port = jack_port_register( ss_d->jack_client, port_name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0 );
@@ -689,8 +682,8 @@ int device_midi_client_open_port_jack( sundog_midi_client* c, int pnum, const ch
 	{
 	    if( c->name && port_name ) //RESTORE CONNECTIONS
 	    {
-		char* fname = (char*)smem_new( 4096 );
-		char* con_name = (char*)smem_new( 4096 );
+		char* fname = SMEM_ALLOC2( char, 4096 );
+		char* con_name = SMEM_ALLOC2( char, 4096 );
 		sprintf( fname, "2:/.sundog_jackmidi_%s_%s", c->name, port_name );
 		sfs_file f = sfs_open( fname, "rb" );
 		if( f )
@@ -742,7 +735,7 @@ int device_midi_client_close_port_jack( sundog_midi_client* c, int pnum )
 	{
 	    if( c->name && sd_port->port_name ) //SAVE CONNECTIONS
 	    {
-		char* fname = (char*)smem_new( 4096 );
+		char* fname = SMEM_ALLOC2( char, 4096 );
 		sprintf( fname, "2:/.sundog_jackmidi_%s_%s", c->name, sd_port->port_name );
 		const char** con = jack_port_get_connections( port->port );
 		if( con )
@@ -820,11 +813,11 @@ sundog_midi_event* device_midi_client_get_event_jack( sundog_midi_client* c, int
 	int event_count = jack_midi_get_event_count( port->buffer );
 	if( event_count )
 	{
-            c->last_midi_in_activity = stime_ticks();
+            c->midi_in_activity = true;
     	    if( !port->r_data )
-	        port->r_data = (uint8_t*)smem_new( MIDI_BYTES );
+	        port->r_data = SMEM_ALLOC2( uint8_t, MIDI_BYTES );
     	    if( !port->r_events )
-    		port->r_events = (sundog_midi_event*)smem_new( MIDI_EVENTS * sizeof( sundog_midi_event ) );
+    		port->r_events = SMEM_ALLOC2( sundog_midi_event, MIDI_EVENTS );
 	    for( int i = 0; i < event_count; i++ )
 	    {
 		//Save data:
@@ -900,8 +893,6 @@ int device_midi_client_send_event_jack( sundog_midi_client* c, int pnum, sundog_
     
     sundog_midi_port* sd_port = c->ports[ pnum ];
     device_midi_port_jack* port = (device_midi_port_jack*)sd_port->device_specific;
-    
-    c->last_midi_out_activity = stime_ticks();
     
     //Save data:
     if( ss_d->jack_midi_out_data_wp + evt->size > MIDI_BYTES )

@@ -77,7 +77,7 @@ void* midi_out_thread( void* user_data )
 #endif
 
     int out_events_cnt = 0;
-    device_midi_event* out_events = (device_midi_event*)smem_znew( sizeof( device_midi_event ) * MIDI_EVENTS );
+    device_midi_event* out_events = SMEM_ZALLOC2( device_midi_event, MIDI_EVENTS );
 
     bool keep_running = true;
     while( keep_running )
@@ -138,7 +138,7 @@ void* midi_out_thread( void* user_data )
 		    int size = (int)smem_get_size( out_events ) / sizeof( device_midi_event );
 		    free_event = size;
 		    size *= 2;
-		    out_events = (device_midi_event*)smem_resize2( out_events, sizeof( device_midi_event ) * size );
+		    out_events = SMEM_ZRESIZE2( out_events, device_midi_event, size );
 		}
 		if( evt.t == 0 ) evt.t = stime_ticks() - stime_ticks_per_second() * 60;
 		out_events[ free_event ] = evt;
@@ -180,7 +180,7 @@ void* midi_out_thread( void* user_data )
 		{
 		    //SysEx:
 		    MIDIHDR mh;
-		    smem_clear_struct( mh );
+		    SMEM_CLEAR_STRUCT( mh );
 		    mh.lpData = (LPSTR)evt->data;
 		    mh.dwBufferLength = evt->size;
 		    mh.dwFlags = 0;
@@ -251,7 +251,7 @@ void CALLBACK midi_in_callback( HMIDIIN handle, UINT uMsg, DWORD_PTR dwInstance,
     slog( "midi_in_callback() begin\n" );
 #endif
 
-    c->last_midi_in_activity = stime_ticks();
+    c->midi_in_activity = true;
 
     if( uMsg == MIM_DATA )
     {
@@ -302,9 +302,8 @@ void CALLBACK midi_in_callback( HMIDIIN handle, UINT uMsg, DWORD_PTR dwInstance,
 
 int device_midi_client_open( sundog_midi_client* c, const char* name )
 {
-    c->device_specific = smem_new( sizeof( device_midi_client ) );
+    c->device_specific = SMEM_ZALLOC( sizeof( device_midi_client ) );
     device_midi_client* d = (device_midi_client*)c->device_specific;
-    smem_zero( d );
 
     //MIDI OUT:
     smutex_init( &d->out_mutex, 0 );
@@ -331,7 +330,7 @@ int device_midi_client_close( sundog_midi_client* c )
     sthread_destroy( &d->out_thread, 1000 );
     CloseHandle( d->out_thread_event );
     smutex_destroy( &d->out_mutex );
-    sring_buf_remove( d->out_events_buf );
+    sring_buf_delete( d->out_events_buf );
 
     //MIDI IN:
     smutex_destroy( &d->in_callback_mutex ); 
@@ -349,7 +348,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
     else 
 	devs = midiOutGetNumDevs();
 
-    char* name = (char*)smem_new( 1024 );
+    char* name = SMEM_ALLOC2( char, 1024 );
     char* prev_name = NULL;
     int name_cnt = 1;
     
@@ -370,10 +369,10 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 	    if( midiOutGetDevCapsW( i, &caps, sizeof( MIDIOUTCAPSW ) ) == MMSYSERR_NOERROR )
 		utf16_to_utf8( name, 1024, (const uint16_t*)caps.szPname );
 	}
-	char* name2 = (char*)smem_new( smem_strlen( name ) + 8 );
+	char* name2 = SMEM_ALLOC2( char, smem_strlen( name ) + 8 );
 	if( prev_name == 0 )
 	{
-	    prev_name = smem_strdup( name );
+	    prev_name = SMEM_STRDUP( name );
 	    sprintf( name2, "%s", name );
 	}
 	else 
@@ -387,11 +386,11 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 	    {
 	        name_cnt = 1;
 	        smem_free( prev_name );
-	        prev_name = smem_strdup( name );
+	        prev_name = SMEM_STRDUP( name );
 	        sprintf( name2, "%s", name );
 	    }
 	}
-	smem_objarray_write_d( (void***)devices, name2, false, i );
+	SMEM_OBJARRAY_WRITE_D( (void***)devices, name2, false, i );
     }
 
     smem_free( prev_name );
@@ -407,7 +406,7 @@ int device_midi_client_open_port( sundog_midi_client* c, int pnum, const char* p
     device_midi_client* d = (device_midi_client*)c->device_specific;
     if( !d ) return -1;
     sundog_midi_port* sd_port = c->ports[ pnum ];
-    sd_port->device_specific = smem_znew( sizeof( device_midi_port ) );
+    sd_port->device_specific = SMEM_ZALLOC( sizeof( device_midi_port ) );
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
 #ifndef NOMIDI
     init_common_midiport_vars( port );
@@ -563,7 +562,7 @@ int device_midi_client_close_port( sundog_midi_client* c, int pnum )
     	    else
 	    {
 		device_midi_event out_evt;
-	        smem_clear_struct( out_evt );
+	        SMEM_CLEAR_STRUCT( out_evt );
 		sring_buf_write_lock( d->out_events_buf );
 		out_evt.dev = port->out_dev;
 		out_evt.id = d->out_id; d->out_id++;
@@ -622,10 +621,8 @@ int device_midi_client_send_event( sundog_midi_client* c, int pnum, sundog_midi_
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
     if( !port ) return 0;
 
-    c->last_midi_out_activity = stime_ticks();
-
     device_midi_event out_evt;
-    smem_clear_struct( out_evt );
+    SMEM_CLEAR_STRUCT( out_evt );
 
     smutex_lock( &d->out_mutex );
     sring_buf_write_lock( d->out_events_buf );

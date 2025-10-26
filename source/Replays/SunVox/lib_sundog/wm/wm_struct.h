@@ -174,10 +174,10 @@
     #define COLORMASK 	0xFFFF
     #define CLEARCOLOR 	0
     #if !defined(RGB556) && !defined(RGB555) && !defined(RGB565)
-	#if defined(GDI) && !defined(OPENGL)
+	#if defined(OS_WIN) && defined(GDI) && !defined(OPENGL)
 	    #define RGB555
 	#else
-	    #define RGB565
+	    #define RGB565 //OpenGL, DirectDraw, X11, WinCE (including GDI)
 	#endif
     #endif
 #endif
@@ -297,9 +297,11 @@ enum wm_string
 
     STR_WM_PREFERENCES,
     STR_WM_PREFS_CHANGED,
-    STR_WM_INTERFACE,
-    STR_WM_AUDIO,
-    STR_WM_VIDEO,
+    STR_WM_PREFS_MAIN,
+    STR_WM_PREFS_INTERFACE,
+    STR_WM_PREFS_AUDIO,
+    STR_WM_PREFS_VIDEO,
+    STR_WM_PREFS_CAMERA,
     STR_WM_CAMERA,
     STR_WM_BACK_CAM,
     STR_WM_FRONT_CAM,
@@ -370,6 +372,9 @@ enum wm_string
     STR_WM_BLUE,
     STR_WM_HIDE_RECENT_FILES,
     STR_WM_SHOW_HIDDEN_FILES,
+    STR_WM_CLEAR_SETTINGS,
+    STR_WM_CLEAR_SETTINGS_MSG,
+    STR_WM_BROAD_FS_ACCESS,
 
     STR_WM_OFF_ON_MENU,
     STR_WM_AUTO_ON_OFF_MENU,
@@ -400,7 +405,8 @@ enum wm_string
 #define WIN_INIT_FLAG_NOSYSBARS		( 1 << 13 )
 #define WIN_INIT_FLAG_SHRINK_DESKTOP_TO_SAFE_AREA ( 1 << 14 )
 #define WIN_INIT_FLAG_NO_FONT_UPSCALE	( 1 << 15 )
-#define WIN_INIT_FLAGOFF		16
+#define WIN_INIT_DONT_SAVE_WINSIZE	( 1 << 16 )
+#define WIN_INIT_FLAGOFF		17
 #define WIN_INIT_FLAGOFF_ANGLE		( WIN_INIT_FLAGOFF ) //2bits (0..3)
 #define WIN_INIT_FLAGOFF_ZOOM           ( WIN_INIT_FLAGOFF + 2 ) //3bits (0..7)
 
@@ -514,7 +520,8 @@ enum
     KEY_MIDI_NRPN,
     KEY_MIDI_RPN,
     KEY_MIDI_PROG,
-    KEY_SHIFT, //only modifiers allowed between SHIFT and UNKNOWN! Otherwise the keymap_handler may not work correctly
+    KEY_SHORTCUT, //call specified shortcut (sundog_keymap): x = section_num, y = action_num;
+    KEY_SHIFT, //all modifiers MUST BE between SHIFT and UNKNOWN! Otherwise the keymap_handler may not work correctly
     KEY_CTRL,
     KEY_ALT,
     KEY_MENU,
@@ -650,15 +657,15 @@ struct sundog_keymap_key
 {
     uint32_t			key;
     uint16_t			flags;
-    uint			pars1;
+    uint			pars1; //( evt->x | evt->y << 16 ); MIDI: x = note/ctl; y = channel;
     uint			pars2;
 };
 
 struct sundog_keymap_action
 {
-    const char*			name; //External string pointer (no autoremove)
-    const char*			id; //...
-    const char*			group; //...
+    const char*			name; //action description; external string pointer (no autoremove)
+    const char*			id; //action id ("undo","pgup",etc.); ...
+    const char*			group; //group description (for example: "General"); taken from section->group; ...
     sundog_keymap_key		keys[ KEYMAP_ACTION_KEYS ];
     sundog_keymap_key		default_keys[ KEYMAP_ACTION_KEYS ];
 };
@@ -666,9 +673,9 @@ struct sundog_keymap_action
 struct sundog_keymap_section
 {
     int				last_added_action;
-    const char*			name; //External string pointer (no autoremove)
-    const char*			id; //...
-    const char*			group; //... group name for the new actions
+    const char*			name; //external string pointer (no autoremove);
+    const char*			id; //section id (for example: "main"); ...
+    const char*			group; //group description for the new actions; ...
     sundog_keymap_action*	actions;
     ssymtab*			bindings;
 };

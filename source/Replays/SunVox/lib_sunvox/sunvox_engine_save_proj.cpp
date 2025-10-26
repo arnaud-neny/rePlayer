@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -62,7 +62,7 @@ int* sunvox_save_get_mod_remap_table( sunvox_engine* s, uint32_t save_flags )
     psynth_net* net = s->net;
     int mods_num = sunvox_get_num_mods( s );
     int* rv = NULL;
-    rv = (int*)smem_new( mods_num * sizeof( int ) );
+    rv = SMEM_ALLOC2( int, mods_num );
     if( !rv ) return NULL;
     for( int i = 0; i < mods_num; i++ ) rv[ i ] = -1;
     int i2 = 0;
@@ -82,7 +82,7 @@ int* sunvox_save_get_pat_remap_table( sunvox_engine* s, uint32_t save_flags )
     psynth_net* net = s->net;
     int pats_num = sunvox_get_num_pats( s );
     int* rv = NULL;
-    rv = (int*)smem_znew( pats_num * sizeof( int ) );
+    rv = SMEM_ZALLOC2( int, pats_num );
     if( !rv ) return NULL;
     int i2 = 0;
     for( int i = 0; i < pats_num; i++ )
@@ -221,7 +221,7 @@ int sunvox_save_proj_to_fd( sfs_file f, uint32_t save_flags, sunvox_engine* s )
 		    }
 		    else
 		    {
-			sunvox_note* tpat = (sunvox_note*)smem_new( max_tracks * pat->lines * sizeof( sunvox_note ) );
+			sunvox_note* tpat = SMEM_ALLOC2( sunvox_note, max_tracks * pat->lines );
 			if( !tpat ) goto save_proj_error;
 			int pptr = 0;
 			for( int yy = 0; yy < pat->lines; yy++ )

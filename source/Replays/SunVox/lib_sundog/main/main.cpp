@@ -1,7 +1,7 @@
 /*
     main.cpp - SunDog engine main()
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -14,11 +14,12 @@
     #include "vulkan/sd_vulkan.h"
 #endif
 
-#ifndef NOGUI
 #if SUNDOG_VER == 2
+    #include "gpu/sd_gpu.h"
+#ifndef NOGUI
     #include "gui/sd_gui.h"
-#endif
-#endif
+#endif //#ifndef NOGUI
+#endif //SUNDOG_VER == 2
 
 #ifdef OS_IOS
     #include <sys/xattr.h>
@@ -145,7 +146,7 @@ static int sundog_denormal_numbers( bool enable )
     return rv;
 }
 
-static void sundog_denormal_numbers_init( void )
+static void sundog_denormal_numbers_init()
 {
 #ifdef DISABLE_DENORMAL_NUMBERS
     g_denormal_numbers = 0;
@@ -154,12 +155,12 @@ static void sundog_denormal_numbers_init( void )
     if( g_denormal_numbers >= 0 ) sundog_denormal_numbers( g_denormal_numbers == 1 );
 }
 
-static void sundog_denormal_numbers_deinit( void )
+static void sundog_denormal_numbers_deinit()
 {
     if( g_denormal_numbers >= 0 ) sundog_denormal_numbers( g_denormal_numbers == 0 );
 }
 
-void sundog_denormal_numbers_check( void )
+void sundog_denormal_numbers_check()
 {
     if( g_denormal_numbers >= 0 ) sundog_denormal_numbers( g_denormal_numbers == 1 );
 }
@@ -167,7 +168,7 @@ void sundog_denormal_numbers_check( void )
 #ifdef OS_WIN
 int g_timer_period = 0;
 #endif
-static void sundog_set_timer_resolution( void )
+static void sundog_set_timer_resolution()
 {
 #if 0// rePlayer: def OS_WIN
     int res = sconfig_get_int_value( APP_CFG_TIMER_RESOLUTION, 1000, 0 ); //Hz
@@ -187,7 +188,7 @@ static void sundog_set_timer_resolution( void )
 #endif
 }
 
-static void sundog_reset_timer_resolution( void )
+static void sundog_reset_timer_resolution()
 {
 #if 0// rePlayer: def OS_WIN
     if( g_timer_period )
@@ -202,7 +203,7 @@ static void sundog_reset_timer_resolution( void )
 static sundog::lazy_init_helper sundog_global;
 #endif
 
-int sundog_global_init( void )
+int sundog_global_init()
 {
 #ifdef SUNDOG_MODULE
     //Global init once per process
@@ -225,11 +226,12 @@ int sundog_global_init( void )
 #ifdef VULKAN
     sundog::vulkan_global_init();
 #endif
-#ifndef NOGUI
 #if SUNDOG_VER == 2
+    sundog::gpu_global_init();
+#ifndef NOGUI
     sundog::gui_global_init();
-#endif
-#endif
+#endif //#ifndef NOGUI
+#endif //SUNDOG_VER == 2
     sundog_denormal_numbers_init();
     app_global_init();
 #ifdef SUNDOG_MODULE
@@ -239,7 +241,7 @@ int sundog_global_init( void )
     return 0;
 }
 
-int sundog_global_deinit( void )
+int sundog_global_deinit()
 {
 #ifdef SUNDOG_MODULE
     //Global deinit once per process
@@ -251,6 +253,7 @@ int sundog_global_deinit( void )
 #ifndef NOGUI
 #if SUNDOG_VER == 2
     sundog::gui_global_deinit();
+    sundog::gpu_global_deinit();
 #endif
 #endif
 #ifdef VULKAN
@@ -514,7 +517,7 @@ static void make_arguments( char* cmd_line )
 int APIENTRY WinMain( HINSTANCE hCurrentInst, HINSTANCE hPreviousInst, LPSTR lpszCmdLine, int nCmdShow )
 {
     sundog_engine sd;
-    smem_clear_struct( sd );
+    SMEM_CLEAR_STRUCT( sd );
     sd.hCurrentInst = hCurrentInst;
     sd.hPreviousInst = hPreviousInst; 
     sd.lpszCmdLine = lpszCmdLine;
@@ -542,7 +545,7 @@ extern WCHAR* className; //defined in window manager (wm_wince.h)
 int WINAPI WinMain( HINSTANCE hCurrentInst, HINSTANCE hPreviousInst, LPWSTR lpszCmdLine, int nCmdShow )
 {
     sundog_engine sd;
-    smem_clear_struct( sd );
+    SMEM_CLEAR_STRUCT( sd );
     sd.hCurrentInst = hCurrentInst;
     sd.hPreviousInst = hPreviousInst;
     sd.lpszCmdLine = lpszCmdLine;
@@ -595,7 +598,7 @@ int main( int argc, char* argv[] )
 {
     signal( SIGINT, main_process_signal_handler ); //Interrupt program
     signal( SIGTERM, main_process_signal_handler ); //Software termination signal
-    smem_clear_struct( g_sd );
+    SMEM_CLEAR_STRUCT( g_sd );
     g_sd.argc = argc;
     g_sd.argv = argv;
     if( sundog_main( &g_sd, true ) == 0 )
@@ -613,12 +616,13 @@ int sundog_test( sundog_engine* sd )
     {
 	float f;
 	int i;
-	slog("\n"); i = stime_test( sd ); if( i ) { slog( "stime_test() ERROR %d\n", i ); rv++; }
-	slog("\n"); f = fft_test(); slog( "FFT TEST: %.16f\n", f ); if( f > 0.000001506 ) { slog( "fft_test() ERROR\n" ); rv++; }
-	slog("\n"); i = ssemaphore_test( sd ); if( i ) { slog( "ssemaphore_test() ERROR %d\n", i ); rv++; }
-	slog("\n"); i = srwlock_test( sd ); if( i ) { slog( "srwlock_test() ERROR %d\n", i ); rv++; }
-	slog("\n"); i = smutex_test( sd ); if( i ) { slog( "smutex_test() ERROR %d\n", i ); rv++; }
-	slog("\n");
+	//slog("\n"); i = stime_test( sd ); if( i ) { slog( "stime_test() ERROR %d\n", i ); rv++; }
+	//slog("\n"); f = fft_test(); slog( "FFT TEST: %.16f\n", f ); if( f > 0.000001506 ) { slog( "fft_test() ERROR\n" ); rv++; }
+	//slog("\n"); fft_speed_test();
+	//slog("\n"); i = ssemaphore_test( sd ); if( i ) { slog( "ssemaphore_test() ERROR %d\n", i ); rv++; }
+	//slog("\n"); i = srwlock_test( sd ); if( i ) { slog( "srwlock_test() ERROR %d\n", i ); rv++; }
+	//slog("\n"); i = smutex_test( sd ); if( i ) { slog( "smutex_test() ERROR %d\n", i ); rv++; }
+	//slog("\n");
 	break;
     }
     return rv;
@@ -755,7 +759,7 @@ main_begin:
 
     sd->mb = nullptr;
     COMPILER_MEMORY_BARRIER();
-    smbox_remove( mb );
+    smbox_delete( mb );
     mb = nullptr;
 
 #ifdef SUNDOG_MODULE

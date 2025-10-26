@@ -1,7 +1,7 @@
 /*
     file.cpp - file management (thread-safe open/close)
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -25,7 +25,7 @@
 #define WIN_MAKE_LONG_PATH( TYPE, NAME, LEN ) \
     if( LEN >= MAX_PATH ) \
     { \
-        char* name_ = (char*)smem_new( LEN + 4 ); \
+        char* name_ = SMEM_ALLOC2( char, LEN + 4 ); \
         name_[ 0 ] = '\\'; \
         name_[ 1 ] = '\\'; \
         name_[ 2 ] = '?'; \
@@ -54,7 +54,7 @@ bool g_sfs_cant_write_disk1 = false;
 uint g_disk_count = 0; //Number of local disks
 char disk_names[ DISKNAME_SIZE * MAX_DISKS ]; //Disk names (NULL-terminated strings: "C:/", "H:/", etc.)
 
-uint sfs_get_disk_count( void ) 
+uint sfs_get_disk_count() 
 {
     return g_disk_count; 
 }
@@ -97,7 +97,7 @@ int sfs_get_disk_num( const char* path )
 
 #ifdef OS_WIN
 
-void sfs_refresh_disks( void )
+void sfs_refresh_disks()
 {
 #if 0 // rePlayer begin
     char temp[ 512 ];
@@ -118,7 +118,7 @@ void sfs_refresh_disks( void )
 #endif // rePlayer end
 }
 
-uint sfs_get_current_disk( void )
+uint sfs_get_current_disk()
 {
     int rv = 0;
 #if 0 // rePlayer begin
@@ -133,7 +133,7 @@ uint sfs_get_current_disk( void )
 }
 
 char g_current_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_work_path( void )
+const char* sfs_get_work_path()
 {
 #if 0 // rePlayer begin
     if( g_sfs_cant_write_disk1 ) return sfs_get_conf_path();
@@ -156,7 +156,7 @@ const char* sfs_get_work_path( void )
 }
 
 char g_user_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_conf_path( void )
+const char* sfs_get_conf_path()
 {
 #if 0 // rePlayer begin
     if( g_user_path[ 0 ] == 0 ) 
@@ -178,7 +178,7 @@ const char* sfs_get_conf_path( void )
 }
 
 char g_temp_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_temp_path( void )
+const char* sfs_get_temp_path()
 {
 #if 0 // rePlayer begin
     if( g_temp_path[ 0 ] == 0 )
@@ -203,25 +203,25 @@ const char* sfs_get_temp_path( void )
 
 #ifdef OS_WINCE
 
-void sfs_refresh_disks( void )
+void sfs_refresh_disks()
 {
     g_disk_count = 1;
     disk_names[ 0 ] = '/';
     disk_names[ 1 ] = 0;
 }
 
-uint sfs_get_current_disk( void )
+uint sfs_get_current_disk()
 {
     return 0;
 }
 
-const char* sfs_get_work_path( void )
+const char* sfs_get_work_path()
 {
     return (char*)"";
 }
 
 char g_user_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_conf_path( void )
+const char* sfs_get_conf_path()
 {
     if( g_user_path[ 0 ] == 0 )
     {
@@ -241,7 +241,7 @@ const char* sfs_get_conf_path( void )
 }
 
 char g_temp_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_temp_path( void )
+const char* sfs_get_temp_path()
 {
     if( g_temp_path[ 0 ] == 0 )
     {
@@ -264,14 +264,14 @@ const char* sfs_get_temp_path( void )
 
 #ifdef OS_UNIX
 
-void sfs_refresh_disks( void )
+void sfs_refresh_disks()
 {
     g_disk_count = 1;
     disk_names[ 0 ] = '/';
     disk_names[ 1 ] = 0;
 }
 
-uint sfs_get_current_disk( void )
+uint sfs_get_current_disk()
 {
     return 0;
 }
@@ -280,14 +280,14 @@ uint sfs_get_current_disk( void )
 
 #ifdef OS_ANDROID
 
-const char* sfs_get_work_path( void ) { if( !g_android_files_ext_path ) return ""; else return g_android_files_ext_path; }
-const char* sfs_get_conf_path( void ) { if( !g_android_files_int_path ) return ""; else return g_android_files_int_path; }
-const char* sfs_get_temp_path( void ) { if( !g_android_cache_int_path ) return ""; else return g_android_cache_int_path; }
+const char* sfs_get_work_path() { if( !g_android_files_ext_path ) return ""; else return g_android_files_ext_path; }
+const char* sfs_get_conf_path() { if( !g_android_files_int_path ) return ""; else return g_android_files_int_path; }
+const char* sfs_get_temp_path() { if( !g_android_cache_int_path ) return ""; else return g_android_cache_int_path; }
 
 #else //Other *nix systems:
 
 char g_current_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_work_path( void )
+const char* sfs_get_work_path()
 {
     if( g_sfs_cant_write_disk1 ) return sfs_get_conf_path();
     if( g_current_path[ 0 ] == 0 )
@@ -301,7 +301,7 @@ const char* sfs_get_work_path( void )
 }
 
 char g_user_path[ MAX_DIR_LEN ] = { 0 };
-const char* sfs_get_conf_path( void )
+const char* sfs_get_conf_path()
 {
     if( g_user_path[ 0 ] == 0 )
     {
@@ -339,20 +339,20 @@ const char* sfs_get_conf_path( void )
     return g_user_path;
 }
 
-const char* sfs_get_temp_path( void )
+const char* sfs_get_temp_path()
 {
     return "/tmp/";
 }
 
-#endif //...UNIX
-#endif //...not Apple
+#endif //!defined(OS_ANDROID)
+#endif //!defined(OS_APPLE)
 #endif //UNIX
 
 //
 // Main functions:
 //
 
-int sfs_global_init( void )
+int sfs_global_init()
 {
 #if defined(OS_APPLE)
     apple_sfs_global_init();
@@ -375,24 +375,24 @@ int sfs_global_init( void )
 	}
 	else
 	{
-	    //Can't write to the 1:/
+	    //1:/ is write protected
 	    g_sfs_cant_write_disk1 = 1;
 	}
 	sfs_remove_file( "1:/file_write_test" );
     }
 #endif
 
-    sfs_fd_struct* fd = (sfs_fd_struct*)smem_new( sizeof( sfs_fd_struct ) );
+    sfs_fd_struct* fd = SMEM_ALLOC2( sfs_fd_struct, 1 );
     fd->filename = 0;
     fd->f = (void*)stdin;
     fd->type = SFS_FILE_NORMAL;
     g_sfs_fd[ SFS_STDIN - 1 ] = fd;
-    fd = (sfs_fd_struct*)smem_new( sizeof( sfs_fd_struct ) );
+    fd = SMEM_ALLOC2( sfs_fd_struct, 1 );
     fd->filename = 0;
     fd->f = (void*)stdout;
     fd->type = SFS_FILE_NORMAL;
     g_sfs_fd[ SFS_STDOUT - 1 ] = fd;
-    fd = (sfs_fd_struct*)smem_new( sizeof( sfs_fd_struct ) );
+    fd = SMEM_ALLOC2( sfs_fd_struct, 1 );
     fd->filename = 0;
     fd->f = (void*)stderr;
     fd->type = SFS_FILE_NORMAL;
@@ -405,7 +405,7 @@ int sfs_global_init( void )
     return 0;
 }
 
-int sfs_global_deinit( void )
+int sfs_global_deinit()
 {
     smutex_destroy( &g_sfs_mutex );
 
@@ -425,7 +425,7 @@ char* sfs_make_filename( sundog_engine* sd, const char* filename, bool expand )
     char* rv = NULL;
     if( filename == NULL ) return NULL;
     char* disk_path = NULL;
-    int disk_path_alloc = 0; //1 - malloc/free; 2 - smem_new/smem_free;
+    int disk_path_alloc = 0; //1 - malloc/free; 2 - SMEM_ALLOC/smem_free;
     if( expand )
     {
 	//1:/file -> virtual_disk_path/file
@@ -456,11 +456,11 @@ char* sfs_make_filename( sundog_engine* sd, const char* filename, bool expand )
 	    }
 	    if( disk_path )
 	    {
-		rv = (char*)smem_new( smem_strlen( disk_path ) + ( smem_strlen( filename ) - 3 ) + 1 );
+		rv = SMEM_ALLOC2( char, smem_strlen( disk_path ) + ( smem_strlen( filename ) - 3 ) + 1 );
 		if( rv == NULL ) return NULL;
 		rv[ 0 ] = 0;
-		smem_strcat_resize( rv, disk_path );
-		smem_strcat_resize( rv, filename + 3 );
+		SMEM_STRCAT_D( rv, disk_path );
+		SMEM_STRCAT_D( rv, filename + 3 );
 		if( disk_path_alloc == 1 ) { free( disk_path ); disk_path = NULL; disk_path_alloc = 0; }
 	    }
 	}
@@ -496,17 +496,17 @@ char* sfs_make_filename( sundog_engine* sd, const char* filename, bool expand )
 	    if( smem_strstr( filename, disk_path ) == filename )
 	    {
 		size_t disk_path_len = smem_strlen( disk_path );
-		rv = (char*)smem_new( smem_strlen( disk_path2 ) + ( smem_strlen( filename ) - disk_path_len ) + 1 );
+		rv = SMEM_ALLOC2( char, smem_strlen( disk_path2 ) + ( smem_strlen( filename ) - disk_path_len ) + 1 );
 		if( rv == NULL ) return NULL;
 		rv[ 0 ] = 0;
-		smem_strcat_resize( rv, disk_path2 );
-		smem_strcat_resize( rv, filename + disk_path_len );
+		SMEM_STRCAT_D( rv, disk_path2 );
+		SMEM_STRCAT_D( rv, filename + disk_path_len );
 		i = 128;
 	    }
 	    if( disk_path_alloc == 1 ) { free( disk_path ); disk_path = NULL; disk_path_alloc = 0; }
 	}
     }
-    if( rv == NULL ) rv = smem_strdup( filename );
+    if( rv == NULL ) rv = SMEM_STRDUP( filename );
     return rv;
 }
 
@@ -531,7 +531,7 @@ uint16_t* sfs_convert_filename_to_win_utf16( char* src )
 
 char* sfs_get_filename_path( const char* filename )
 {
-    char* rv = smem_strdup( filename );
+    char* rv = SMEM_STRDUP( filename );
     if( !rv ) return NULL;
     for( int i = (int)smem_strlen( rv ) - 1; i >= 0; i-- )
     {
@@ -647,7 +647,7 @@ sfs_file sfs_open_in_memory( sundog_engine* sd, void* data, size_t size )
 	return 0; //No free descriptors
     }
     //Create new descriptor:
-    g_sfs_fd[ a ] = (sfs_fd_struct*)smem_new( sizeof( sfs_fd_struct ) );
+    g_sfs_fd[ a ] = SMEM_ALLOC2( sfs_fd_struct, 1 );
 
     smutex_unlock( &g_sfs_mutex );
 
@@ -660,6 +660,61 @@ sfs_file sfs_open_in_memory( sundog_engine* sd, void* data, size_t size )
     g_sfs_fd[ a ]->virt_file_size = size;
 
     return a + 1;
+}
+
+static bool sfs_is_vfs( const char* filename )
+{
+    int p = 0;
+    if( !filename ) return false;
+    if( filename[ p ] && filename[ p ] == 'v' )
+    {
+	p++;
+	if( filename[ p ] && filename[ p ] == 'f' )
+	{
+	    p++;
+	    if( filename[ p ] && filename[ p ] == 's' )
+	    {
+		while( 1 )
+		{
+		    p++;
+		    char c = filename[ p ];
+		    if( !c ) break;
+		    if( c == ':' )
+		    {
+			if( filename[ p + 1 ] && filename[ p + 1 ] == '/' )
+			{
+			    return true;
+			}
+		    }
+		    if( c < '0' || c > '9' ) break;
+		}
+	    }
+	}
+    }
+    return false;
+}
+
+//get packed filesystem descriptor; example: vfs4:/FILE -> 4
+//filename2 = file path without "vfsX:/"
+static int sfs_get_vfs( const char* filename, const char** filename2 ) 
+{
+    if( sfs_is_vfs( filename ) == false ) return 0;
+    const char* dptr = smem_strstr( filename + 3, ":/" );
+    if( dptr )
+    {
+	char num[ 16 ];
+	size_t i = 0;
+	for( i = 3; i < 15; i++ )
+	{
+	    char c = filename[ i ];
+	    num[ i - 3 ] = c;
+	    if( c == ':' ) break;
+	}
+	num[ i - 3 ] = 0;
+	if( filename2 ) *filename2 = dptr + 2;
+	return string_to_int( num );
+    }
+    return 0;
 }
 
 sfs_file sfs_open( sundog_engine* sd, const char* filename, const char* filemode )
@@ -677,7 +732,7 @@ sfs_file sfs_open( sundog_engine* sd, const char* filename, const char* filemode
         return 0; //No free descriptors
     }
     //Create new descriptor:
-    g_sfs_fd[ a ] = (sfs_fd_struct*)smem_new( sizeof( sfs_fd_struct ) );
+    g_sfs_fd[ a ] = SMEM_ALLOC2( sfs_fd_struct, 1 );
     sfs_fd_struct* fd = g_sfs_fd[ a ];
 
     smutex_unlock( &g_sfs_mutex );
@@ -693,37 +748,15 @@ sfs_file sfs_open( sundog_engine* sd, const char* filename, const char* filemode
     }
     else
     {
-	//Check the filename. Is it some archive with packed filesystem?
-	size_t namelen = smem_strlen( fd->filename );
 	sfs_file packed_fs = 0;
-	char* dptr = NULL;
-	if( namelen > 5 )
-	{
-	    if( fd->filename[ 0 ] == 'v' &&
-		fd->filename[ 1 ] == 'f' &&
-		fd->filename[ 2 ] == 's' )
-	    {
-		dptr = smem_strstr( fd->filename, ":/" );
-		if( dptr )
-		{
-		    char num[ 16 ];
-		    size_t i = 0;
-		    for( i = 3; i < namelen && i < 15; i++ )
-		    {
-			char c = fd->filename[ i ];
-			num[ i - 3 ] = c;
-			if( c == ':' ) break;
-		    }
-		    num[ i - 3 ] = 0;
-		    packed_fs = string_to_int( num );
-		}
-	    }
-	}
+	const char* filename2 = nullptr; //without disk name
+	int vfs = sfs_get_vfs( fd->filename, &filename2 );
+	if( vfs > 0 ) packed_fs = vfs;
 	if( packed_fs )
 	{
 	    if( 1 )
 	    {
-		//Our file is in the TAR archive:
+		//File inside the TAR archive:
 		char next_file[ 100 ];
 		char temp[ 8 * 3 ];
 		sfs_rewind( packed_fs );
@@ -744,10 +777,10 @@ sfs_file sfs_open( sundog_engine* sd, const char* filename, const char* filemode
 			}
 		    }
 		    sfs_seek( packed_fs, 376, 1 );
-		    if( smem_strcmp( next_file, dptr + 2 ) == 0 )
+		    if( smem_strcmp( next_file, filename2 ) == 0 )
 		    {
 			//File found:
-			fd->virt_file_data = (int8_t*)smem_new( filelen );
+			fd->virt_file_data = SMEM_ALLOC2( int8_t, filelen );
 			fd->virt_file_data_autofree = true;
 			sfs_read( fd->virt_file_data, 1, filelen, packed_fs );
 			fd->virt_file_size = filelen;
@@ -776,7 +809,7 @@ sfs_file sfs_open( sundog_engine* sd, const char* filename, const char* filemode
 #if defined(OS_WIN) || defined(OS_WINCE)
 	    size_t len = smem_strlen( fd->filename ) + 1;
 	    WIN_MAKE_LONG_PATH( char*, fd->filename, len );
-	    uint16_t* ts = (uint16_t*)smem_new( len * 2 );
+	    uint16_t* ts = SMEM_ALLOC2( uint16_t, len );
 	    uint16_t ts2[ 16 ];
 	    utf8_to_utf16( ts, len, fd->filename );
 	    utf8_to_utf16( ts2, 16, filemode );
@@ -1000,8 +1033,8 @@ size_t sfs_write( const void* ptr, size_t el_size, size_t elements, sfs_file f )
 		    if( g_sfs_fd[ f ]->type == SFS_FILE_IN_MEMORY )
 		    {
 			size_t real_size = smem_get_size( g_sfs_fd[ f ]->virt_file_data );
-			if( new_size > real_size ) g_sfs_fd[ f ]->virt_file_data = (int8_t*)smem_resize( g_sfs_fd[ f ]->virt_file_data, new_size + VIRT_FILE_DATA_SIZE_STEP );
-			if( g_sfs_fd[ f ]->virt_file_data == 0 )
+			if( new_size > real_size ) g_sfs_fd[ f ]->virt_file_data = SMEM_RESIZE2( g_sfs_fd[ f ]->virt_file_data, int8_t, new_size + VIRT_FILE_DATA_SIZE_STEP );
+			if( !g_sfs_fd[ f ]->virt_file_data )
 			    size = 0;
 			g_sfs_fd[ f ]->virt_file_size = new_size;
 		    }
@@ -1075,7 +1108,7 @@ int sfs_putc( int val, sfs_file f )
 		    {
 			size_t new_size = g_sfs_fd[ f ]->virt_file_ptr + 1;
 			size_t real_size = smem_get_size( g_sfs_fd[ f ]->virt_file_data );
-			if( new_size > real_size ) g_sfs_fd[ f ]->virt_file_data = (int8_t*)smem_resize( g_sfs_fd[ f ]->virt_file_data, new_size + VIRT_FILE_DATA_SIZE_STEP );
+			if( new_size > real_size ) g_sfs_fd[ f ]->virt_file_data = SMEM_RESIZE2( g_sfs_fd[ f ]->virt_file_data, int8_t, new_size + VIRT_FILE_DATA_SIZE_STEP );
 			if( g_sfs_fd[ f ]->virt_file_data )
 			{
 			    g_sfs_fd[ f ]->virt_file_data[ g_sfs_fd[ f ]->virt_file_ptr ] = (int8_t)val;
@@ -1117,7 +1150,7 @@ int sfs_remove( const char* filename ) //remove a file or directory
 #if defined(OS_WIN) || defined(OS_WINCE)
     size_t len = smem_strlen( name ) + 1;
     WIN_MAKE_LONG_PATH( const char*, name, len );
-    uint16_t* ts = (uint16_t*)smem_new( ( len + 1 ) * 2 );
+    uint16_t* ts = SMEM_ALLOC2( uint16_t, len + 1 );
     utf8_to_utf16( ts, len, name );
     utf16_unix_slash_to_windows( ts );
     uint attr = GetFileAttributesW( (const WCHAR*)ts );
@@ -1158,9 +1191,9 @@ int sfs_remove( const char* filename ) //remove a file or directory
     {
 	//Directory with files?
 	sfs_find_struct fs;
-	smem_clear_struct( fs );
+	SMEM_CLEAR_STRUCT( fs );
 	bool first;
-	char* dir = (char*)smem_new( MAX_DIR_LEN );
+	char* dir = SMEM_ALLOC2( char, MAX_DIR_LEN );
 	fs.start_dir = filename;
 	fs.mask = 0;
 	first = true;
@@ -1204,7 +1237,7 @@ int sfs_remove_file( const char* filename )
 #if defined(OS_WIN) || defined(OS_WINCE)
     size_t len = smem_strlen( name ) + 1;
     WIN_MAKE_LONG_PATH( const char*, name, len );
-    uint16_t* ts = (uint16_t*)smem_new( ( len + 1 ) * 2 );
+    uint16_t* ts = SMEM_ALLOC2( uint16_t, len + 1 );
     utf8_to_utf16( ts, len, name );
     utf16_unix_slash_to_windows( ts );
     if( DeleteFileW( (const WCHAR*)ts ) == 0 )
@@ -1237,8 +1270,8 @@ int sfs_rename( const char* old_name, const char* new_name )
     size_t len2 = smem_strlen( name2 ) + 1;
     WIN_MAKE_LONG_PATH( const char*, name1, len1 );
     WIN_MAKE_LONG_PATH( const char*, name2, len2 );
-    uint16_t* ts1 = (uint16_t*)smem_new( len1 * 2 );
-    uint16_t* ts2 = (uint16_t*)smem_new( len2 * 2 );
+    uint16_t* ts1 = SMEM_ALLOC2( uint16_t, len1 );
+    uint16_t* ts2 = SMEM_ALLOC2( uint16_t, len2 );
     if( ts1 && ts2 )
     {
         utf8_to_utf16( ts1, len1, name1 );
@@ -1272,7 +1305,7 @@ int sfs_mkdir( const char* pathname, uint mode )
 #if defined(OS_WIN) || defined(OS_WINCE)
     size_t len = smem_strlen( name ) + 1;
     WIN_MAKE_LONG_PATH( const char*, name, len );
-    uint16_t* ts = (uint16_t*)smem_new( len * 2 );
+    uint16_t* ts = SMEM_ALLOC2( uint16_t, len );
     if( ts )
     {
         utf8_to_utf16( ts, len, name );
@@ -1322,51 +1355,72 @@ static int unix_get_file_info( const char* fname, struct stat* info )
 }
 #endif
 
-int64_t sfs_get_file_size( const char* filename )
+int64_t sfs_get_file_size( const char* filename, int* err )
 {
-    int64_t retval = 0;
+    int64_t rv = 0;
+    *err = 0;
+
+    if( !filename ) { *err = SD_RES_ERR_FOPEN; return 0; }
+
+    if( sfs_is_vfs( filename ) == false )
+    {
 
 #ifdef OS_UNIX
-    char* name = sfs_make_filename( NULL, filename, true );
-    if( !name ) return 0;
-    struct stat file_info;
-    if( unix_get_file_info( name, &file_info ) == 0 )
-        retval = file_info.st_size;
-    smem_free( name );
+	char* name = sfs_make_filename( NULL, filename, true );
+	if( !name ) return 0;
+	struct stat file_info;
+	if( unix_get_file_info( name, &file_info ) == 0 )
+	{
+    	    rv = file_info.st_size;
+	}
+	else
+	{
+    	    *err = SD_RES_ERR_FOPEN;
+	}
+	smem_free( name );
+	return rv;
 #endif
 
 #if defined(OS_WIN) || defined(OS_WINCE)
-    char* name = sfs_make_filename( NULL, filename, true );
-    if( !name ) return 0;
-    size_t len = smem_strlen( name ) + 1;
-    WIN_MAKE_LONG_PATH( char*, name, len );
-    uint16_t* ts = (uint16_t*)smem_new( len * 2 );
-    if( ts )
-    {
-	utf8_to_utf16( ts, len, name );
-        utf16_unix_slash_to_windows( ts );
-    	WIN32_FILE_ATTRIBUTE_DATA file_info;
-	if( GetFileAttributesExW( (LPCWSTR)ts, GetFileExInfoStandard, &file_info ) != 0 )
-    	{
-	    retval = file_info.nFileSizeLow | ( (int64_t)file_info.nFileSizeHigh << 32 );
-    	}
-	smem_free( ts );
-    }
-    smem_free( name );
+	char* name = sfs_make_filename( NULL, filename, true );
+	if( !name ) return 0;
+	size_t len = smem_strlen( name ) + 1;
+	WIN_MAKE_LONG_PATH( char*, name, len );
+	uint16_t* ts = SMEM_ALLOC2( uint16_t, len );
+	if( ts )
+	{
+	    utf8_to_utf16( ts, len, name );
+    	    utf16_unix_slash_to_windows( ts );
+    	    WIN32_FILE_ATTRIBUTE_DATA file_info;
+	    if( GetFileAttributesExW( (LPCWSTR)ts, GetFileExInfoStandard, &file_info ) != 0 )
+    	    {
+		rv = file_info.nFileSizeLow | ( (int64_t)file_info.nFileSizeHigh << 32 );
+    	    }
+    	    else
+    	    {
+    		*err = SD_RES_ERR_FOPEN;
+    	    }
+	    smem_free( ts );
+	}
+	smem_free( name );
+	return rv;
 #endif
 
-    if( retval == 0 )
-    {
-	sfs_file f = sfs_open( filename, "rb" );
-	if( f )
-	{
-	    sfs_seek( f, 0, 2 );
-	    retval = sfs_tell( f );
-	    sfs_close( f );
-	}
     }
 
-    return retval;
+    sfs_file f = sfs_open( filename, "rb" );
+    if( f )
+    {
+        sfs_seek( f, 0, 2 );
+        rv = sfs_tell( f );
+        sfs_close( f );
+    }
+    else
+    {
+        *err = SD_RES_ERR_FOPEN;
+    }
+
+    return rv;
 }
 
 int sfs_copy_file( const char* dest, const char* src )
@@ -1379,7 +1433,7 @@ int sfs_copy_file( const char* dest, const char* src )
         if( f2 )
         {
     	    int buf_size = 64 * 1024;
-    	    void* buf = smem_new( buf_size );
+    	    void* buf = SMEM_ALLOC( buf_size );
             if( buf )
             {
                 while( 1 )
@@ -1408,7 +1462,7 @@ int sfs_copy_files( const char* dest, const char* src, const char* mask, const c
     size_t src_strlen = smem_strlen( src );
     
     sfs_find_struct fs;
-    smem_clear_struct( fs );
+    SMEM_CLEAR_STRUCT( fs );
 
     fs.start_dir = src;
     fs.mask = mask;
@@ -1437,8 +1491,8 @@ int sfs_copy_files( const char* dest, const char* src, const char* mask, const c
 		if( !ignore )
 		{
 		    rv++;
-		    char* ts1 = (char*)smem_new( src_strlen + smem_strlen( fs.name ) + 4 );
-		    char* ts2 = (char*)smem_new( dest_strlen + smem_strlen( fs.name ) + 4 );
+		    char* ts1 = SMEM_ALLOC2( char, src_strlen + smem_strlen( fs.name ) + 4 );
+		    char* ts2 = SMEM_ALLOC2( char, dest_strlen + smem_strlen( fs.name ) + 4 );
 		    if( ts1 && ts2 )
 		    {
 			sprintf( ts1, "%s%s", src, fs.name );
@@ -1462,11 +1516,11 @@ int sfs_copy_files( const char* dest, const char* src, const char* mask, const c
 void sfs_remove_support_files( const char* prefix )
 {
     sfs_find_struct fs;
-    smem_clear_struct( fs );
+    SMEM_CLEAR_STRUCT( fs );
     bool first;
     int prefix_len = (int)strlen( prefix );
-    char* dir = (char*)smem_new( 8192 );
-    char* ts = (char*)smem_new( prefix_len + 8 );
+    char* dir = SMEM_ALLOC2( char, 8192 );
+    char* ts = SMEM_ALLOC2( char, prefix_len + 8 );
 
     fs.start_dir = "2:/";
     fs.mask = 0;
@@ -1574,7 +1628,7 @@ int sfs_find_first( sfs_find_struct* fs )
     WIN_MAKE_LONG_PATH( const char*, fs->start_dir, len );
 
     //convert start dir from "dir/dir/" to "dir\dir\*.*"
-    fs->win_start_dir = (char*)smem_new( len + 16 ); 
+    fs->win_start_dir = SMEM_ALLOC2( char, len + 16 ); 
     smem_copy( fs->win_start_dir, fs->start_dir, len );
     if( fs->win_start_dir[ len - 2 ] != '/' )
 	strcat( fs->win_start_dir, "/" );
@@ -1587,7 +1641,7 @@ int sfs_find_first( sfs_find_struct* fs )
     len = smem_strlen( fs->win_start_dir ) + 1;
 
     //do it:
-    uint16_t* ts = (uint16_t*)smem_new( len * 2 );
+    uint16_t* ts = SMEM_ALLOC2( uint16_t, len );
     utf8_to_utf16( ts, len, fs->win_start_dir );
 #ifdef OS_WINCE
     fs->find_handle = FindFirstFile( (const WCHAR*)ts, &fs->find_data );

@@ -1,7 +1,7 @@
 /*
     wm_hnd_color_theme.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2010 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2010 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 

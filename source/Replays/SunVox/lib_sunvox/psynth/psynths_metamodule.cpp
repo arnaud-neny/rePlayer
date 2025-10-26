@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -140,7 +140,7 @@ static void metamodule_make_user_ctl_name( int mod_num, uint ctl_num, psynth_net
 	{
 	    if( smem_strlen( name ) > 0 )
 	    {
-		data->ctl_names[ ctl_num ] = smem_strdup( name );
+		data->ctl_names[ ctl_num ] = SMEM_STRDUP( name );
 		break;
 	    }
 	}
@@ -157,7 +157,7 @@ static void metamodule_make_user_ctl_name( int mod_num, uint ctl_num, psynth_net
     		    if( (unsigned)link_ctl < (unsigned)mod->ctls_num )
     		    {
     			psynth_ctl* ctl2 = &mod->ctls[ link_ctl ];
-			data->ctl_names[ ctl_num ] = smem_strdup( ctl2->name );
+			data->ctl_names[ ctl_num ] = SMEM_STRDUP( ctl2->name );
     		    }
     		}
     	    }
@@ -303,7 +303,7 @@ static void metamodule_handle_ctl_play( MODULE_DATA* data, int prev_ctl_play )
 	if( stop )
 	{
     	    sunvox_user_cmd cmd;
-    	    smem_clear_struct( cmd );
+    	    SMEM_CLEAR_STRUCT( cmd );
     	    cmd.n.note = NOTECMD_STOP;
     	    sunvox_send_user_command( &cmd, s );
 	    if( data->active_channels > 0 )
@@ -468,7 +468,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    if( data->ps )
 	    {
 	        sunvox_engine* s = data->ps->s[ 0 ];
-		sfs_file f = sfs_open_in_memory( smem_new( 4 ), 4 );
+		sfs_file f = sfs_open_in_memory( SMEM_ALLOC( 4 ), 4 );
 		if( f )
 		{
 		    int err = sunvox_save_proj_to_fd( f, SUNVOX_PROJ_SAVE_OPTIMIZE_PAT_SIZE, s );
@@ -485,7 +485,7 @@ PS_RETTYPE MODULE_HANDLER(
     		    else
     		    {
 			void* sunvox_file = sfs_get_data( f );
-			sunvox_file = smem_resize( sunvox_file, sfs_tell( f ) );
+			sunvox_file = SMEM_RESIZE( sunvox_file, sfs_tell( f ) );
 			psynth_new_chunk( mod_num, 0, 1, 0, 0, pnet ); 
 			psynth_replace_chunk_data( mod_num, 0, sunvox_file, pnet );
 		    }
@@ -579,7 +579,7 @@ PS_RETTYPE MODULE_HANDLER(
             	    }
 		}
     		sunvox_render_data rdata;
-    		smem_clear_struct( rdata );
+    		SMEM_CLEAR_STRUCT( rdata );
         	rdata.buffer_type = sound_buffer_int16;
     		rdata.buffer = 0;
     		rdata.frames = frames;
@@ -687,7 +687,7 @@ PS_RETTYPE MODULE_HANDLER(
                     if( c < MAX_CHANNELS )
         	    {
         		sunvox_user_cmd cmd;
-        		smem_clear_struct( cmd );
+        		SMEM_CLEAR_STRUCT( cmd );
     			cmd.n.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
 			sunvox_send_user_command( &cmd, s );
 			metamodule_handle_ctl_play_simple( data );
@@ -793,7 +793,7 @@ PS_RETTYPE MODULE_HANDLER(
 			    if( data->ctl_play < 3 )
 			    {
 				sunvox_user_cmd cmd;
-                    		smem_clear_struct( cmd );
+                    		SMEM_CLEAR_STRUCT( cmd );
     				cmd.n.note = NOTECMD_STOP;
 				sunvox_send_user_command( &cmd, s );
 			    }
@@ -809,7 +809,7 @@ PS_RETTYPE MODULE_HANDLER(
                     		    if( pat_info )
                     		    {
         				sunvox_user_cmd cmd;
-        				smem_clear_struct( cmd );
+        				SMEM_CLEAR_STRUCT( cmd );
 					if( pat_info->x >= 0 )
 					{
     					    cmd.n.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
@@ -840,7 +840,7 @@ PS_RETTYPE MODULE_HANDLER(
             {
         	sunvox_engine* s = data->ps->s[ 0 ];
         	sunvox_user_cmd cmd;
-        	smem_clear_struct( cmd );
+        	SMEM_CLEAR_STRUCT( cmd );
     		cmd.n.note = NOTECMD_STOP;
 		sunvox_send_user_command( &cmd, s );
         	sunvox_add_psynth_event_UNSAFE( data->ctl_input, event, s );
@@ -858,7 +858,7 @@ PS_RETTYPE MODULE_HANDLER(
             {
         	sunvox_engine* s = data->ps->s[ 0 ];
         	sunvox_user_cmd cmd;
-        	smem_clear_struct( cmd );
+        	SMEM_CLEAR_STRUCT( cmd );
     		cmd.n.note = NOTECMD_STOP;
 		sunvox_send_user_command( &cmd, s );
     		cmd.n.note = NOTECMD_CLEAN_MODULES;
@@ -879,7 +879,7 @@ PS_RETTYPE MODULE_HANDLER(
                 if( data->ctl_play )
         	{
         	    sunvox_user_cmd cmd;
-        	    smem_clear_struct( cmd );
+        	    SMEM_CLEAR_STRUCT( cmd );
     		    cmd.n.note = NOTECMD_PREPARE_FOR_IMMEDIATE_JUMP;
                     if( event->command == PS_CMD_SET_SAMPLE_OFFSET )
         		cmd.n.ctl_val = event->sample_offset.sample_offset / 256;

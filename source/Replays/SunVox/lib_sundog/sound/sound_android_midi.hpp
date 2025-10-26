@@ -60,7 +60,7 @@ extern "C" JNIEXPORT jint JNICALL Java_nightradio_androidlib_AndroidLib_midi_1re
     sundog_midi_client* c = g_midi_clients[ client_index ];
     if( !c ) return 0;
 
-    c->last_midi_in_activity = now;
+    c->midi_in_activity = true;
 
     if( port_index >= c->ports_cnt ) return 0;
     sundog_midi_port* sd_port = c->ports[ port_index ];
@@ -100,10 +100,9 @@ extern "C" JNIEXPORT jint JNICALL Java_nightradio_androidlib_AndroidLib_midi_1re
 int device_midi_client_open( sundog_midi_client* c, const char* name )
 {
     int rv = 0;
-    c->device_specific = smem_new( sizeof( device_midi_client ) );
+    c->device_specific = SMEM_ZALLOC( sizeof( device_midi_client ) );
     device_midi_client* d = (device_midi_client*)c->device_specific;
     if( !d ) return -1;
-    smem_zero( d );
 
     while( 1 )
     {
@@ -174,7 +173,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 		if( !next ) break;
 		next = smem_split_str( dev_name, sizeof( dev_name ), next, '\n', 0 );
 		if( dev_name[ 0 ] == 0 ) break;
-		smem_objarray_write_d( (void***)devices, smem_strdup( dev_name ), false, rv );
+		SMEM_OBJARRAY_WRITE_D( (void***)devices, SMEM_STRDUP( dev_name ), false, rv );
 		rv++;
 	    }
 	}
@@ -191,7 +190,7 @@ int device_midi_client_open_port( sundog_midi_client* c, int pnum, const char* p
     if( !d ) return -1;
 
     sundog_midi_port* sd_port = c->ports[ pnum ];
-    sd_port->device_specific = smem_znew( sizeof( device_midi_port ) );
+    sd_port->device_specific = SMEM_ZALLOC( sizeof( device_midi_port ) );
     if( !sd_port->device_specific ) return -1;
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
 #ifndef NOMIDI
@@ -272,7 +271,6 @@ int device_midi_client_send_event( sundog_midi_client* c, int pnum, sundog_midi_
     if( !port ) return 0;
 
     stime_ticks_t now = stime_ticks();
-    c->last_midi_out_activity = now;
 
     stime_ticks_t t = evt->t - now;
     t *= 1000000000 / stime_ticks_per_second();

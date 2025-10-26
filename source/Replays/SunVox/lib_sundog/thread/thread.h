@@ -9,8 +9,8 @@
     #include <dispatch/dispatch.h>
 #endif
 
-int sthread_global_init( void );
-int sthread_global_deinit( void );
+int sthread_global_init();
+int sthread_global_deinit();
 
 #define STHREAD_TIMEOUT_INFINITE	0x7FFFFFFF
 
@@ -42,8 +42,8 @@ int sthread_is_finished( sthread* th );
 typedef uint64_t sthread_tid_t;
 typedef uint64_t sthread_pid_t;
 
-sthread_tid_t sthread_gettid( void );
-sthread_pid_t sthread_getpid( void );
+sthread_tid_t sthread_gettid();
+sthread_pid_t sthread_getpid();
 
 //
 // Mutex
@@ -61,6 +61,7 @@ sthread_pid_t sthread_getpid( void );
       (algorithm optimization required)
 */
 #define SMUTEX_FLAG_ATOMIC_SPINLOCK	( 1 << 0 )
+#define SMUTEX_FLAG_INITIALIZED		( 1 << 31 )
 
 struct smutex
 {
@@ -210,12 +211,12 @@ public:
     // -1 - timeout;
     // 1 - ready for initialization;
     int init_begin( const char* fn_name, int timeout_ms, int step_ms );
-    void init_end( void );
+    void init_end();
     //deinit_begin() retval:
     // 0 - do nothing;
     // 1 - ready for deinitialization;
-    int deinit_begin( void );
-    void deinit_end( void );
+    int deinit_begin();
+    void deinit_end();
 };
 
 } //namespace sundog

@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -129,7 +129,7 @@ atomic_vptr g_noise_table;
 #define MAX_SINE_TABLES 16
 atomic_vptr g_sine_tables[ MAX_SINE_TABLES ];
 atomic_vptr g_base_wavetable;
-int psynth_global_init( void )
+int psynth_global_init()
 {
     atomic_init( &g_noise_table, (void*)NULL );
     for( int i = 0; i < MAX_SINE_TABLES; i++ )
@@ -139,7 +139,7 @@ int psynth_global_init( void )
     atomic_init( &g_base_wavetable, (void*)NULL );
     return 0;
 }
-int psynth_global_deinit( void )
+int psynth_global_deinit()
 {
     void* p = atomic_exchange( &g_noise_table, (void*)NULL ); smem_free( p );
     for( int i = 0; i < MAX_SINE_TABLES; i++ )
@@ -202,18 +202,18 @@ void psynth_init( uint flags, int freq, int bpm, int tpl, void* host, uint base_
     smem_clear( pnet, sizeof( psynth_net ) ); 
     pnet->flags = flags;
     smutex_init( &pnet->mods_mutex, 0 );
-    pnet->mods = (psynth_module*)smem_znew( sizeof( psynth_module ) * 4 );
+    pnet->mods = SMEM_ZALLOC2( psynth_module, 4 );
     pnet->mods_num = 4;
     int heap_size = DEFAULT_HEAP_EVENTS_NUM;
 #ifdef PSYNTH_MULTITHREADED
     heap_size *= 4;
     atomic_init( &pnet->events_num, 0 );
 #endif
-    pnet->events_heap = (psynth_event*)smem_new( sizeof( psynth_event ) * heap_size );
+    pnet->events_heap = SMEM_ALLOC2( psynth_event, heap_size );
     pnet->th_num = 1;
 #ifdef PSYNTH_MULTITHREADED
 #endif
-    pnet->th = (psynth_thread*)smem_znew( pnet->th_num * sizeof( psynth_thread ) );
+    pnet->th = SMEM_ZALLOC2( psynth_thread, pnet->th_num );
     for( int i = 0; i < pnet->th_num; i++ ) psynth_thread_init( i, pnet );
     if( !( flags & PSYNTH_NET_FLAG_NO_MIDI ) )
     {
@@ -233,7 +233,7 @@ void psynth_init( uint flags, int freq, int bpm, int tpl, void* host, uint base_
 	pnet->fft_size = sconfig_get_int_value( "fft", PSYNTH_DEF_FFT_SIZE, 0 );
 	if( pnet->fft_size < 64 ) pnet->fft_size = 64;
 	if( pnet->fft_size > 32768 ) pnet->fft_size = 32768;
-	pnet->fft = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * pnet->fft_size );
+	pnet->fft = SMEM_ALLOC2( PS_STYPE, pnet->fft_size );
     }
     pnet->fft_mod = -1;
     pnet->sampling_freq = freq;
@@ -241,6 +241,7 @@ void psynth_init( uint flags, int freq, int bpm, int tpl, void* host, uint base_
     pnet->global_volume = 80;
     pnet->host = host;
     pnet->base_host_version = base_host_version;
+    pnet->prev_change_counter2 = -1;
     int out = psynth_add_module( -1, 0, "Output", PSYNTH_FLAG_OUTPUT, 512, 512, 0, bpm, tpl, pnet );
     if( flags & PSYNTH_NET_FLAG_CREATE_MODULES )
     {
@@ -270,7 +271,7 @@ void psynth_close( psynth_net* pnet )
 	    }
 	    smem_free( map );
 	}
-	ssymtab_remove( pnet->midi_in_map );
+	ssymtab_delete( pnet->midi_in_map );
     }
     smem_free( pnet->midi_in_mods );
     pnet->midi_in_mods_num = 0;
@@ -289,6 +290,7 @@ void psynth_clear( psynth_net* pnet )
 	for( uint i = 1; i < pnet->mods_num; i++ ) psynth_remove_module( i, pnet );
     }
 }
+uint32_t g_psynth_module_id_cnt = 0;
 int psynth_add_module(
     int n,
     psynth_handler_t handler,
@@ -303,6 +305,8 @@ int psynth_add_module(
 {
     int err = 0;
     if( handler == NULL ) handler = psynth_empty;
+    pnet->change_counter++;
+    pnet->change_counter2++;
     if( n < 0 )
     {
 	for( n = 0; (unsigned)n < pnet->mods_num; n++ )
@@ -311,7 +315,7 @@ int psynth_add_module(
 	}
 	if( (unsigned)n == pnet->mods_num )
 	{
-	    pnet->mods = (psynth_module*)smem_resize2( pnet->mods, sizeof( psynth_module ) * ( pnet->mods_num + 4 ) );
+	    pnet->mods = SMEM_ZRESIZE2( pnet->mods, psynth_module, pnet->mods_num + 4 );
 	    if( !pnet->mods ) return -1;
 	    n = pnet->mods_num;
 	    pnet->mods_num += 4;
@@ -335,8 +339,9 @@ int psynth_add_module(
     evt.command = PS_CMD_GET_COLOR;
     get_color_from_string( (char*)handler( n, &evt, pnet ), &s->color[ 0 ], &s->color[ 1 ], &s->color[ 2 ] );
     s->events_num = 0;
-    s->events = (int*)smem_new( sizeof( int ) * DEFAULT_MODULE_EVENTS_NUM );
+    s->events = SMEM_ALLOC2( int, DEFAULT_MODULE_EVENTS_NUM );
     if( !s->events ) return -1;
+    s->id = g_psynth_module_id_cnt++;
     if( name )
     {
 	smem_strcat( s->name, sizeof( s->name ), name );
@@ -411,7 +416,7 @@ int psynth_add_module(
     data_size = handler( n, &evt, pnet );
     if( data_size )
     {
-	s->data_ptr = smem_znew( data_size );
+	s->data_ptr = SMEM_ZALLOC( data_size );
 	if( !s->data_ptr ) return -1;
     }
     else
@@ -436,16 +441,14 @@ int psynth_add_module(
     {
 	for( int ch = 0; ch < max_channels; ch++ )
 	{
-	    PS_STYPE* ch_buf = (PS_STYPE*)smem_new( pnet->max_buf_size * sizeof( PS_STYPE ) );
+	    PS_STYPE* ch_buf = SMEM_ZALLOC2( PS_STYPE, pnet->max_buf_size );
 	    if( !ch_buf ) { err = 1; break; }
-	    smem_zero( ch_buf );
 	    s->channels_in[ ch ] = ch_buf;
 	    s->in_empty[ ch ] = pnet->max_buf_size;
 	    if( !( s->flags & PSYNTH_FLAG_OUTPUT ) )
 	    {
-		ch_buf = (PS_STYPE*)smem_new( pnet->max_buf_size * sizeof( PS_STYPE ) );
+		ch_buf = SMEM_ZALLOC2( PS_STYPE, pnet->max_buf_size );
 		if( !ch_buf ) { err = 2; break; }
-		smem_zero( ch_buf );
 		s->channels_out[ ch ] = ch_buf;
 		s->out_empty[ ch ] = pnet->max_buf_size;
 	    }
@@ -459,7 +462,7 @@ int psynth_add_module(
 		s->scope_buf[ ch ] = NULL;
 	    else
 	    {
-		s->scope_buf[ ch ] = (PS_STYPE*)smem_znew( PSYNTH_SCOPE_SIZE * sizeof( PS_STYPE ) );
+		s->scope_buf[ ch ] = SMEM_ZALLOC2( PS_STYPE, PSYNTH_SCOPE_SIZE );
 	    }
 	}
     }
@@ -481,7 +484,7 @@ int psynth_add_module(
     s->midi_out_prog = -1;
 #ifndef NOMIDI
     memset( s->midi_out_note_id, 255, sizeof( s->midi_out_note_id ) );
-    smem_clear_struct( s->midi_out_note );
+    SMEM_CLEAR_STRUCT( s->midi_out_note );
 #endif
     if( err )
     {
@@ -494,6 +497,8 @@ void psynth_remove_module( uint mod_num, psynth_net* pnet )
 {
     if( (unsigned)mod_num >= (unsigned)pnet->mods_num ) return;
     if( !( pnet->mods[ mod_num ].flags & PSYNTH_FLAG_EXISTS ) ) return;
+    pnet->change_counter++;
+    pnet->change_counter2++;
     psynth_module* mod = &pnet->mods[ mod_num ];
     psynth_event evt;
     evt.command = PS_CMD_CLOSE;
@@ -618,7 +623,7 @@ void psynth_remove_empty_modules_at_the_end( psynth_net* pnet )
     if( empty_mods )
     {
 	pnet->mods_num -= empty_mods;
-	pnet->mods = (psynth_module*)smem_resize2( pnet->mods, sizeof( psynth_module ) * pnet->mods_num );
+	pnet->mods = SMEM_ZRESIZE2( pnet->mods, psynth_module, pnet->mods_num );
     }
 }
 smutex* psynth_get_mutex( uint mod_num, psynth_net* pnet )
@@ -653,6 +658,7 @@ void psynth_rename( uint mod_num, const char* name, psynth_net* pnet )
 {
     if( !name ) return;
     if( (unsigned)mod_num >= (unsigned)pnet->mods_num ) return;
+    pnet->change_counter++;
     psynth_module* mod = &pnet->mods[ mod_num ];
     if( !( mod->flags & PSYNTH_FLAG_EXISTS ) ) return;
     for( size_t i = 0; i < smem_strlen( name ) + 1 && i < sizeof( mod->name ) - 1; i++ )
@@ -678,6 +684,8 @@ void psynth_add_link( bool input, uint mod_num, int link, int link_slot, psynth_
 {
     if( (unsigned)mod_num >= (unsigned)pnet->mods_num ) return;
     if( (unsigned)link >= (unsigned)pnet->mods_num ) return;
+    pnet->change_counter++;
+    pnet->change_counter2++;
     psynth_module* mod = &pnet->mods[ mod_num ];
     if( !( mod->flags & PSYNTH_FLAG_EXISTS ) ) return;
     int* links;
@@ -702,7 +710,7 @@ void psynth_add_link( bool input, uint mod_num, int link, int link_slot, psynth_
 	    links_num = 2;
 	else
 	    links_num = link_slot + 1;
-	links = (int*)smem_new( links_num * sizeof( int ) );
+	links = SMEM_ALLOC2( int, links_num );
 	for( i = 0; i < links_num; i++ ) links[ i ] = -1;
     }
     if( link_slot < 0 )
@@ -719,7 +727,7 @@ void psynth_add_link( bool input, uint mod_num, int link, int link_slot, psynth_
     if( i >= links_num )
     {
 	int new_count = i + 2;
-	links = (int*)smem_resize( links, new_count * sizeof( int ) );
+	links = SMEM_RESIZE2( links, int, new_count );
 	for( int i2 = links_num; i2 < new_count; i2++ ) 
 	    links[ i2 ] = -1;
 	links_num = new_count;
@@ -752,6 +760,8 @@ void psynth_make_link( int out, int in, int out_slot, int in_slot, psynth_net* p
 }
 int psynth_remove_link( int out, int in, psynth_net* pnet )
 {
+    pnet->change_counter++;
+    pnet->change_counter2++;
     int retval = 0;
     bool in_in = 0;
     bool in_out = 0;
@@ -824,9 +834,9 @@ int psynth_open_midi_out( uint mod_num, char* dev_name, int channel, psynth_net*
 	mod->midi_out_name = NULL;
 	if( dev_name )
 	{
-	    mod->midi_out_name = (char*)smem_new( smem_strlen( dev_name ) + 1 );
+	    mod->midi_out_name = SMEM_ALLOC2( char, smem_strlen( dev_name ) + 1 );
 	    mod->midi_out_name[ 0 ] = 0;
-	    smem_strcat_resize( mod->midi_out_name, dev_name );
+	    SMEM_STRCAT_D( mod->midi_out_name, dev_name );
 	}
 	sundog_midi_client_close_port( &pnet->midi_client, mod->midi_out );
 	mod->midi_out_ch = channel;
@@ -950,7 +960,7 @@ void psynth_add_event( uint mod_num, psynth_event* evt, psynth_net* pnet )
 #ifdef EVT_HEAP_DEBUG_MESSAGES
 	    printf( "EVT HEAP RESIZE: %d -> %d\n", (int)( smem_get_size( pnet->events_heap ) / sizeof( psynth_event ) ), (int)events_num * 2 );
 #endif
-	    pnet->events_heap = (psynth_event*)smem_resize( pnet->events_heap, ( events_num * 2 ) * sizeof( psynth_event ) );
+	    pnet->events_heap = SMEM_RESIZE2( pnet->events_heap, psynth_event, events_num * 2 );
 	}
 	else
 	{
@@ -965,7 +975,7 @@ void psynth_add_event( uint mod_num, psynth_event* evt, psynth_net* pnet )
 #ifdef EVT_HEAP_DEBUG_MESSAGES
 	printf( "EVT HEAP (%s) RESIZE: %d -> %d\n", mod->name, (int)( smem_get_size( mod->events ) / sizeof( int ) ), (int)mod->events_num * 2 );
 #endif
-	mod->events = (int*)smem_resize( mod->events, ( mod->events_num * 2 ) * sizeof( int ) );
+	mod->events = SMEM_RESIZE2( mod->events, int, mod->events_num * 2 );
     }
     mod->events[ mod->events_num++ ] = events_num;
     pnet->events_heap[ events_num ] = *evt;
@@ -1400,7 +1410,7 @@ static int psynth_render( int start_mod, psynth_net* pnet )
 {
     int retval = 0;
     psynth_module* mod = &pnet->mods[ start_mod ];
-    if( !( mod->flags & PSYNTH_FLAG_EXISTS ) ) return 0;
+    if( !( mod->flags & PSYNTH_FLAG_EXISTS ) ) return -1;
     if( mod->realtime_flags & PSYNTH_RT_FLAG_RENDERED ) return 0;
     if( mod->realtime_flags & PSYNTH_RT_FLAG_LOCKED ) return -1;
     int buf_size = pnet->buf_size;
@@ -1558,7 +1568,7 @@ static int psynth_render( int start_mod, psynth_net* pnet )
 		if( mod->flags2 & PSYNTH_FLAG2_GET_MUTED_COMMANDS )
 		{
 		    psynth_event module_evt;
-		    smem_clear_struct( module_evt );
+		    SMEM_CLEAR_STRUCT( module_evt );
 		    module_evt.command = PS_CMD_MUTED;
 		    mod->handler( start_mod, &module_evt, pnet );
 		}
@@ -1813,12 +1823,14 @@ static int psynth_render( int start_mod, psynth_net* pnet )
 			break;
 		    case PS_CMD_SET_MSB:
 			pnet->change_counter++;
+			pnet->change_counter2++;
 			if( !handled ) psynth_set_msb( mod, evt );
 			mod_handler2 = mod->handler;
 			if( mod->realtime_flags & PSYNTH_RT_FLAG_BYPASS ) mod_handler2 = psynth_bypass;
 			break;
 		    case PS_CMD_RESET_MSB:
 			pnet->change_counter++;
+			pnet->change_counter2++;
 			if( !handled ) psynth_reset_msb( mod, evt );
 			mod_handler2 = mod->handler;
 			if( mod->realtime_flags & PSYNTH_RT_FLAG_BYPASS ) mod_handler2 = psynth_bypass;
@@ -1987,6 +1999,18 @@ void psynth_render_all( psynth_net* pnet )
 		psynth_do_command( i, PS_CMD_RENDER_SETUP, pnet );
 	}
     }
+    if( pnet->prev_change_counter2 != pnet->change_counter2 )
+    {
+	pnet->prev_change_counter2 = pnet->change_counter2;
+	for( uint i = 0; i < pnet->mods_num; i++ ) 
+	{
+	    psynth_module* mod = &pnet->mods[ i ];
+	    if( mod->flags & PSYNTH_FLAG_EXISTS )
+	    {
+	        mod->realtime_flags &= ~( PSYNTH_RT_FLAG_MUTE | PSYNTH_RT_FLAG_SOLO | PSYNTH_RT_FLAG_BYPASS );
+	    }
+	}
+    }
 #ifdef PSYNTH_MULTITHREADED
     pnet->th_work_t = stime_ticks();
     pnet->th_work = true;
@@ -2041,10 +2065,12 @@ PS_RETTYPE psynth_handle_event( uint mod_num, psynth_event* evt, psynth_net* pne
 		break;
 	    case PS_CMD_SET_MSB:
 		pnet->change_counter++;
+		pnet->change_counter2++;
 		if( !res ) psynth_set_msb( mod, evt );
 		break;
 	    case PS_CMD_RESET_MSB:
 		pnet->change_counter++;
+		pnet->change_counter2++;
 		if( !res ) psynth_reset_msb( mod, evt );
 		break;
 	    case PS_CMD_FINETUNE:
@@ -2074,7 +2100,7 @@ PS_RETTYPE psynth_handle_event( uint mod_num, psynth_event* evt, psynth_net* pne
 PS_RETTYPE psynth_handle_ctl_event( uint mod_num, int ctl_num, int ctl_val, psynth_net* pnet )
 {
     psynth_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     evt.command = PS_CMD_SET_GLOBAL_CONTROLLER;
     evt.controller.ctl_num = ctl_num;
     evt.controller.ctl_val = ctl_val;
@@ -2090,7 +2116,7 @@ int psynth_curve( uint mod_num, int curve_num, float* data, int len, bool w, psy
 {
     if( !data ) return 0;
     psynth_event evt;
-    smem_clear_struct( evt );
+    SMEM_CLEAR_STRUCT( evt );
     if( w )
 	evt.command = PS_CMD_WRITE_CURVE;
     else
@@ -2107,8 +2133,8 @@ void psynth_resize_ctls_storage( uint mod_num, uint ctls_num, psynth_net* pnet )
     size_t new_size = ctls_num * sizeof( psynth_ctl );
     if( smem_get_size( m->ctls ) < new_size )
     {
-	m->ctls = (psynth_ctl*)smem_resize2( m->ctls, new_size );
-	if( m->ctls == 0 )
+	m->ctls = (psynth_ctl*)SMEM_ZRESIZE( m->ctls, new_size );
+	if( !m->ctls )
 	    m->ctls_num = 0;
     }
 }
@@ -2305,6 +2331,17 @@ int psynth_get_scaled_ctl_value(
     if( v > 0x8000 ) v = 0x8000;
     return v;
 }
+int psynth_get_scaled_ctl_value( uint mod_num, uint ctl_num, psynth_net* pnet )
+{
+    psynth_module* mod = psynth_get_module( mod_num, pnet );
+    if( !mod ) return -1;
+    psynth_ctl* ctl = psynth_get_ctl( mod, ctl_num, pnet );
+    if( !ctl ) return -1;
+    int val = ctl->val[ 0 ];
+    if( ctl->type == 0 )
+	val = ( ( val - ctl->min ) << 15 ) / ( ctl->max - ctl->min );
+    return val;
+}
 void psynth_get_ctl_val_str(
     uint mod_num, 
     uint ctl_num,
@@ -2383,7 +2420,7 @@ PS_STYPE* psynth_get_temp_buf( uint mod_num, psynth_net* pnet, uint buf_num )
     PS_STYPE* buf = th->temp_buf[ buf_num ];
     if( !buf )
     {
-        buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * pnet->max_buf_size );
+        buf = SMEM_ALLOC2( PS_STYPE, pnet->max_buf_size );
         th->temp_buf[ buf_num ] = buf;
     }
     return buf;
@@ -2415,7 +2452,7 @@ int psynth_resampler_change( psynth_resampler* r, int in_smprate, int out_smprat
 	    for( int i = 0; i < PSYNTH_MAX_CHANNELS; i++ )
 	    {
 		if( !r->input_delay_bufs_empty ) smem_zero( r->input_delay_bufs[ i ] );
-		r->input_delay_bufs[ i ] = (PS_STYPE*)smem_resize2( r->input_delay_bufs[ i ], new_size );
+		r->input_delay_bufs[ i ] = (PS_STYPE*)SMEM_ZRESIZE( r->input_delay_bufs[ i ], new_size );
 	    }
 	}
 	r->input_delay_bufs_empty = true;
@@ -2425,7 +2462,7 @@ int psynth_resampler_change( psynth_resampler* r, int in_smprate, int out_smprat
 }
 psynth_resampler* psynth_resampler_new( psynth_net* pnet, uint mod_num, int in_smprate, int out_smprate, int ratio_fp, uint32_t flags )
 {
-    psynth_resampler* r = (psynth_resampler*)smem_znew( sizeof( psynth_resampler ) );
+    psynth_resampler* r = SMEM_ZALLOC2( psynth_resampler, 1 );
     if( !r ) return NULL;
     psynth_module* mod = psynth_get_module( mod_num, pnet );
     if( !mod ) return NULL;
@@ -2458,12 +2495,12 @@ PS_STYPE* psynth_resampler_input_buf( psynth_resampler* r, uint buf_num )
 	{
 	    if( size > prev_size )
 	    {
-    		buf = (PS_STYPE*)smem_resize( buf, sizeof( PS_STYPE ) * ( size + 32 ) );
+    		buf = SMEM_RESIZE2( buf, PS_STYPE, size + 32 );
 	    }
 	}
 	else
 	{
-    	    buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * size );
+    	    buf = SMEM_ALLOC2( PS_STYPE, size );
 	}
 	th->resamp_buf[ buf_num + PSYNTH_MAX_CHANNELS * mode1 ] = buf;
     }
@@ -2488,7 +2525,7 @@ void psynth_resampler_reset( psynth_resampler* r )
     {
 	r->input_ptr_fp = ( PSYNTH_RESAMP_INTERP_BEFORE + 1 ) << 16;
     }
-    smem_clear_struct( r->input_buf_tail );
+    SMEM_CLEAR_STRUCT( r->input_buf_tail );
     r->input_empty_frames = 0;
     if( ( r->flags & PSYNTH_RESAMP_FLAG_MODE ) == PSYNTH_RESAMP_FLAG_MODE1 )
     {
@@ -2625,10 +2662,9 @@ int psynth_resampler_end(
 void psynth_new_chunk( uint mod_num, uint num, size_t size, uint flags, int freq, psynth_net* pnet )
 {
     psynth_chunk c;
-    c.data = smem_new( size );
+    c.data = SMEM_ZALLOC( size );
     if( c.data )
     {
-	smem_zero( c.data );
 	c.flags = flags;
 	c.freq = freq;
 	psynth_new_chunk( mod_num, num, &c, pnet );
@@ -2643,16 +2679,15 @@ void psynth_new_chunk( uint mod_num, uint num, psynth_chunk* c, psynth_net* pnet
 	{
 	    uint init_chunks = 4;
 	    if( num >= init_chunks ) init_chunks = num + 1;
-	    mod->chunks = (psynth_chunk**)smem_new( init_chunks * sizeof( psynth_chunk* ) );
-	    smem_zero( mod->chunks );
+	    mod->chunks = SMEM_ZALLOC2( psynth_chunk*, init_chunks );
 	}
-	psynth_chunk* chunk = (psynth_chunk*)smem_new( sizeof( psynth_chunk ) );
+	psynth_chunk* chunk = SMEM_ALLOC2( psynth_chunk, 1 );
 	if( chunk )
 	{
 	    *chunk = *c;
 	    if( num * sizeof( psynth_chunk* ) < smem_get_size( mod->chunks ) )
 		psynth_remove_chunk( mod_num, num, pnet );
-	    mod->chunks = (psynth_chunk**)smem_copy_d( mod->chunks, num * sizeof( psynth_chunk* ), 0, &chunk, sizeof( psynth_chunk* ) );
+	    mod->chunks = SMEM_COPY_D2( mod->chunks, psynth_chunk*, num, 0, &chunk, 1 );
 	}
     }
 }
@@ -2791,8 +2826,8 @@ void* psynth_resize_chunk( uint mod_num, uint num, size_t new_size, psynth_net* 
 		psynth_chunk* c = mod->chunks[ num ];
 		if( c )
 		{
-		    if( c->data ) 
-			c->data = smem_resize2( c->data, new_size );
+		    if( c->data )
+			c->data = SMEM_ZRESIZE( c->data, new_size );
 		    retval = c->data;
 		}
 	    }
@@ -2933,18 +2968,18 @@ int psynth_str2note( const char* note_str )
 	    }
 	    if( n >= 0 )
 	    {
-		int oct = hex_string_to_int( note_str + 1 );
+		int oct = string_to_int_hex( note_str + 1 );
 		return oct * 12 + n;
 	    }
 	}
     }
     return PSYNTH_UNKNOWN_NOTE;
 }
-int8_t* psynth_get_noise_table( void )
+int8_t* psynth_get_noise_table()
 {
     void* p = atomic_load( &g_noise_table );
     if( p ) return (int8_t*)p;
-    int8_t* t = (int8_t*)smem_new( PSYNTH_NOISE_TABLE_SIZE );
+    int8_t* t = SMEM_ALLOC2( int8_t, PSYNTH_NOISE_TABLE_SIZE );
     if( !t ) return NULL;
     uint32_t r = 12345;
     for( int s = 0; s < PSYNTH_NOISE_TABLE_SIZE; s++ )
@@ -2992,7 +3027,7 @@ void* psynth_get_sine_table( int bytes_per_sample, bool sign, int length_bits, i
 	}
 	if( !tdata )
 	{
-	    void* t = smem_new( sizeof( uint32_t ) + len * bytes_per_sample );
+	    void* t = SMEM_ALLOC( sizeof( uint32_t ) + len * bytes_per_sample );
     	    if( !t ) return NULL;
     	    ((uint32_t*)t)[ 0 ] = table_id;
 	    if( atomic_compare_exchange_strong( &g_sine_tables[ tnum ], &tdata, (void*)t ) )
@@ -3027,11 +3062,11 @@ void* psynth_get_sine_table( int bytes_per_sample, bool sign, int length_bits, i
     }
     return rv;
 }
-PS_STYPE* psynth_get_base_wavetable( void )
+PS_STYPE* psynth_get_base_wavetable()
 {
     void* p = atomic_load( &g_base_wavetable );
     if( p ) return (PS_STYPE*)p;
-    PS_STYPE* t = (PS_STYPE*)smem_new( PSYNTH_BASE_WAVES * PSYNTH_BASE_WAVE_SIZE * sizeof( PS_STYPE ) );
+    PS_STYPE* t = SMEM_ALLOC2( PS_STYPE, PSYNTH_BASE_WAVES * PSYNTH_BASE_WAVE_SIZE );
     if( !t ) return NULL;
     PS_STYPE* tt = t;
     for( int i = 0; i < PSYNTH_BASE_WAVE_SIZE; i++ )

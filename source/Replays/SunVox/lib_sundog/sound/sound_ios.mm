@@ -1,7 +1,7 @@
 /*
     sound_ios.cpp - iOS: audio session, JACK, audiobus
     This file is part of the SunDog engine.
-    Copyright (C) 2013 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2013 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -112,7 +112,7 @@ int audio_session_init( bool record, int preferred_sample_rate, int preferred_bu
     return rv;
 }
 
-int audio_session_deinit( void )
+int audio_session_deinit()
 {
     int rv = -1;
 
@@ -361,7 +361,7 @@ int audiobus_init( void* observer ) //Called from sundog_bridge.m (main iOS thre
     return 0;
 }
 
-void audiobus_deinit( void ) //Called from sundog_bridge.m (main thread)
+void audiobus_deinit() //Called from sundog_bridge.m (main thread)
 {
     if( g_no_audiobus ) return;
 
@@ -448,7 +448,7 @@ void audiobus_connection_state_update( sundog_engine* sd ) //called from sundog_
     }
 }
 
-void audiobus_triggers_update( void )
+void audiobus_triggers_update()
 {
     if( g_no_audiobus ) return;
 #ifdef AUDIOBUS_TRIGGER_PLAY

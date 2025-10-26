@@ -1,11 +1,11 @@
 #pragma once
 
 int slog_global_init( const char* filename );
-int slog_global_deinit( void );
+int slog_global_deinit();
 void slog( const char* format, ... );
 void slog_disable( bool console, bool file );
 void slog_enable( bool console, bool file );
-const char* slog_get_file( void );
+const char* slog_get_file();
 char* slog_get_latest( sundog_engine* s, size_t size );
 void slog_show_error_report( sundog_engine* s );
 

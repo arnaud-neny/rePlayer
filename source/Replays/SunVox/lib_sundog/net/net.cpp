@@ -1,7 +1,7 @@
 /*
     net.cpp - networking
     This file is part of the SunDog engine.
-    Copyright (C) 2017 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2017 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -21,12 +21,12 @@
     #include <ifaddrs.h>
 #endif
 
-int snet_global_init( void )
+int snet_global_init()
 {
     return 0;
 }
 
-int snet_global_deinit( void )
+int snet_global_deinit()
 {
     return 0;
 }
@@ -40,8 +40,8 @@ int snet_get_host_info( sundog_engine* s, char** host_addr, char** addr_list )
     //Delete it when the lower app limit will be >= API level 24 (Android 7.0)
     char* a = android_sundog_get_host_ips( s, 0 );
     char* alist = android_sundog_get_host_ips( s, 1 );
-    if( host_addr ) *host_addr = smem_strdup( a );
-    if( addr_list ) *addr_list = smem_strdup( alist );
+    if( host_addr ) *host_addr = SMEM_STRDUP( a );
+    if( addr_list ) *addr_list = SMEM_STRDUP( alist );
     free( a );
     free( alist );
     rv = 0;
@@ -54,7 +54,7 @@ int snet_get_host_info( sundog_engine* s, char** host_addr, char** addr_list )
     int status = 0;
     char buf[ 256 ];
     buf[ 0 ] = 0;
-    char* list = (char*)smem_new( 1 );
+    char* list = SMEM_ALLOC2( char, 1 );
     list[ 0 ] = 0;
 
     while( 1 )
@@ -85,17 +85,17 @@ int snet_get_host_info( sundog_engine* s, char** host_addr, char** addr_list )
             	    slog( "%s: %s\n", ifa->ifa_name, buf );
             	    if( addr_list && !smem_strstr( buf, "127.0.0.1" ) )
             	    {
-            		smem_strcat_resize( list, buf );
-            		smem_strcat_resize( list, " " );
+            		SMEM_STRCAT_D( list, buf );
+            		SMEM_STRCAT_D( list, " " );
             	    }
 		    if( strcmp( ifa->ifa_name, "en0" ) == 0 )
 		    {
-			if( host_addr && *host_addr == NULL ) *host_addr = smem_strdup( buf );
+			if( host_addr && *host_addr == NULL ) *host_addr = SMEM_STRDUP( buf );
 		    }
             	    uint8_t* a = (uint8_t*)&(s4->sin_addr);
             	    if( a[ 0 ] == 192 && a[ 1 ] == 168 )
             	    {
-			if( host_addr && *host_addr == NULL ) *host_addr = smem_strdup( buf );
+			if( host_addr && *host_addr == NULL ) *host_addr = SMEM_STRDUP( buf );
             	    }
         	}
         	continue;
@@ -113,8 +113,8 @@ int snet_get_host_info( sundog_engine* s, char** host_addr, char** addr_list )
             	    slog( "%s: %s\n", ifa->ifa_name, buf );
             	    if( addr_list )
             	    {
-            	        smem_strcat_resize( list, buf );
-            		smem_strcat_resize( list, " " );
+            	        SMEM_STRCAT_D( list, buf );
+            		SMEM_STRCAT_D( list, " " );
             	    }
         	}
         	continue;

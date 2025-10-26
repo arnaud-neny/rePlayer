@@ -2,7 +2,7 @@
     dsp_functions.cpp
     This file is an independent part of the SunDog engine.
     (SunDog headers are not required)
-    Copyright (C) 2008 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2008 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -16,7 +16,7 @@
 #endif
 
 template < typename T >
-static void do_fft( uint32_t flags, T* fi, T* fr, int size )
+static void do_fft( uint32_t flags, T* fi, T* fr, int size ) //fi[0...size-1], fr[0...size-1]
 {
     int size2 = size / 2;
 
@@ -104,10 +104,11 @@ static void do_fft( uint32_t flags, T* fi, T* fr, int size )
 
     if( flags & FFT_FLAG_INVERSE )
     {
+	T scale = (T)1.0 / size;
 	for( int i = 0; i < size; i++ ) 
 	{
-	    fr[ i ] = fr[ i ] / size;
-	    fi[ i ] = -fi[ i ] / size;
+	    fr[ i ] = fr[ i ] * scale;
+	    fi[ i ] = -fi[ i ] * scale;
 	}
     }
 }
@@ -123,6 +124,65 @@ void fft( uint32_t flags, double* fi, double* fr, int size )
 }
 
 #ifdef SUNDOG_TEST
+#include <complex.h>
+static void fft2( uint32_t flags, float _Complex* f, int size ) //complex number version - speed is identical to fft()... :(
+{
+    int size2 = size / 2;
+
+    float isign = -1;
+    if( flags & FFT_FLAG_INVERSE ) isign = 1;
+
+    //Bit-reversal permutation:
+    for( int i = 1, j = size2; i < size - 1; i++ )
+    {
+	if( i < j )
+	{
+	    float _Complex t = f[ j ];
+	    f[ j ] = f[ i ];
+	    f[ i ] = t;
+	}
+	int k = size2;
+	while( k <= j )
+	{
+	    j -= k;
+	    k >>= 1;
+	}
+	j += k;
+    }
+
+    //Danielson-Lanczos section:
+    int mmax = 1;
+    int istep;
+    while( mmax < size )
+    {
+	istep = mmax << 1; //istep = 2; mmax = 1; ... istep = size; mmax = size >> 1;
+	float theta = isign * M_PI / mmax; //Initialize the trigonometric recurrence
+	float wtemp = sin( 0.5 * theta );
+	float _Complex wp = -2.0 * wtemp * wtemp + I * sin( theta );
+	float _Complex w = 1.0 + I * 0.0;
+	for( int m = 0; m < mmax; m++ ) //m = 0..1; 0..2; ... 0..size/2;
+	{
+	    for( int i = m; i < size; i += istep ) 
+	    {
+		int j = i + mmax;
+		float _Complex t = w * f[ j ];
+		f[ j ] = f[ i ] - t;
+		f[ i ] += t;
+	    }
+	    w += w * wp;
+	}
+	mmax = istep;
+    }
+
+    if( flags & FFT_FLAG_INVERSE )
+    {
+	float scale = 1.0f / size;
+	for( int i = 0; i < size; i++ ) 
+	{
+	    f[ i ] = crealf(f[i]) * scale - I * cimagf(f[i]) * scale;
+	}
+    }
+}
 const int g_fft_test_size = 8;
 float g_fft_test_im[ g_fft_test_size ] = {};
 float g_fft_test_re[ g_fft_test_size ] = { 1, 1, 1, 1, 0, 0, 0, 0 };
@@ -138,7 +198,7 @@ float g_fft_test_im2[ g_fft_test_size ] =
     0x1.3504fp+1
 };
 float g_fft_test_re2[ g_fft_test_size ] = { 4, 1, 0, 1, 0, 1, 0, 1 };
-float fft_test( void )
+float fft_test()
 {
     float err = 0;
     float fft_im[ g_fft_test_size ];
@@ -164,6 +224,73 @@ float fft_test( void )
     }
     //13 feb 2023: err = 0.0000015050172806
     return err;
+}
+void fft_speed_test()
+{
+    int size = 512;
+
+    float* im = SMEM_ZALLOC2( float, size );
+    float* re_initial = SMEM_ZALLOC2( float, size );
+    float _Complex* buf1 = SMEM_ZALLOC2( float _Complex, size );
+    uint32_t rnd = 12345678;
+    for( int i = 0; i < size; i++ )
+    {
+	re_initial[ i ] = pseudo_random( &rnd ) / 32768.0f + sin( i / 256.0f );
+    }
+    for( int i = 0; i < size; i++ )
+    {
+	buf1[ i ] = re_initial[ i ] + I * 0.0;
+    }
+    float* re = SMEM_CLONE2( re_initial, float, size );
+    float _Complex* buf2 = SMEM_CLONE2( buf1, float _Complex, size );
+    float err = 0;
+    stime_ns_t t1, t2;
+
+    fft( 0, im, re, size );
+    fft( FFT_FLAG_INVERSE, im, re, size );
+    err = 0;
+    for( int i = 0; i < size; i++ )
+    {
+	err += fabs( re[ i ] - re_initial[ i ] );
+	//if( i < 64 ) slog( "%f\t%f\n", re[i], re_initial[i] );
+    }
+    slog( "FFT1 error = %f\n", err );
+
+    fft2( 0, buf2, size );
+    fft2( FFT_FLAG_INVERSE, buf2, size );
+    err = 0;
+    for( int i = 0; i < size; i++ )
+    {
+	err += fabs( crealf(buf2[ i ]) - re_initial[ i ] );
+	//if( i < 64 ) slog( "%f\t%f\n", re[i], re_initial[i] );
+    }
+    slog( "FFT2 error = %f\n", err );
+
+    int num_tests = 100000;
+
+    t1 = stime_ns();
+    for( int i = 0; i < num_tests; i++ )
+    {
+	fft( 0, im, re, size );
+	fft( FFT_FLAG_INVERSE, im, re, size );
+    }
+    t2 = stime_ns();
+    slog( "FFT1 time = %f ms\n", (double)(t2-t1)/1000000000*1000 );
+
+    t1 = stime_ns();
+    for( int i = 0; i < num_tests; i++ )
+    {
+	fft2( 0, buf2, size );
+	fft2( FFT_FLAG_INVERSE, buf2, size );
+    }
+    t2 = stime_ns();
+    slog( "FFT2 time = %f ms\n", (double)(t2-t1)/1000000000*1000 );
+
+    smem_free( im );
+    smem_free( re );
+    smem_free( re_initial );
+    smem_free( buf1 );
+    smem_free( buf2 );
 }
 #endif
 

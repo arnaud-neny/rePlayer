@@ -70,7 +70,7 @@ static int v4l2_read_frame( svideo_struct* vid )
 	    break;
 	case IO_METHOD_MMAP:
 	    {
-		smem_clear_struct( buf );
+		SMEM_CLEAR_STRUCT( buf );
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 buf.memory = V4L2_MEMORY_MMAP;
                 if( xioctl( vid->dev_fd, VIDIOC_DQBUF, &buf ) == -1 ) 
@@ -149,7 +149,7 @@ static int v4l2_init_mmap( svideo_struct* vid )
     while( 1 )
     {
 	struct v4l2_requestbuffers req;
-	smem_clear_struct( req );
+	SMEM_CLEAR_STRUCT( req );
 	req.count  = vid->buffers_num;
 	req.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	req.memory = V4L2_MEMORY_MMAP;
@@ -174,7 +174,7 @@ static int v4l2_init_mmap( svideo_struct* vid )
         }
         vid->buffers_num = req.count;
 
-        vid->buffers = smem_new( vid->buffers_num * sizeof( vbuffer ) );
+        vid->buffers = SMEM_ALLOC( vid->buffers_num * sizeof( vbuffer ) );
         if( vid->buffers == 0 ) 
         {
             slog( "Out of memory\n" );
@@ -186,7 +186,7 @@ static int v4l2_init_mmap( svideo_struct* vid )
         v4l2_buffer buf;
         for( int i = 0; i < vid->buffers_num; i++ ) 
         {
-	    smem_clear_struct( buf );
+	    SMEM_CLEAR_STRUCT( buf );
             buf.type        = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             buf.memory      = V4L2_MEMORY_MMAP;
             buf.index       = i;
@@ -217,7 +217,7 @@ static int v4l2_init_mmap( svideo_struct* vid )
     	buf_err = 0;
     	for( int i = 0; i < vid->buffers_num; i++ )
     	{
-            smem_clear_struct( buf );
+            SMEM_CLEAR_STRUCT( buf );
     	    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             buf.memory = V4L2_MEMORY_MMAP;
             buf.index = i;
@@ -324,7 +324,7 @@ static int v4l2_init( svideo_struct* vid )
         
         //Select video input, video standard and tune here:
         
-        smem_clear_struct( fmt );
+        SMEM_CLEAR_STRUCT( fmt );
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if( xioctl( vid->dev_fd, VIDIOC_G_FMT, &fmt ) == -1 )
         {

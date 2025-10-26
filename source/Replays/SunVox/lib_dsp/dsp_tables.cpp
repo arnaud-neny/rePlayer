@@ -2,7 +2,7 @@
     dsp_tables.cpp
     This file is an independent part of the SunDog engine.
     (SunDog headers are not required)
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 

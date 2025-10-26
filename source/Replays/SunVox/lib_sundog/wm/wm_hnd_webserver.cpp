@@ -1,7 +1,7 @@
 /*
     wm_hnd_webserver.cpp - Web Server with File Browser
     This file is part of the SunDog engine.
-    Copyright (C) 2009 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2009 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -192,7 +192,7 @@ struct bs_data
 
 static bs_data* bs_open( int s, int size )
 {
-    bs_data* bs = (bs_data*)smem_new( sizeof( bs_data ) );
+    bs_data* bs = SMEM_ALLOC2( bs_data, 1 );
     smem_clear( bs, sizeof( bs_data ) );
     bs->s = s;
     bs->size = size;
@@ -459,7 +459,7 @@ static int parse_HTTP_header( int line_num, char* buffer, req_info* reqinfo )
 		    int64_t pars_len = strlen( &buffer[ p + 1 ] );
 		    if( pars_len > 0 )
 		    {
-			reqinfo->resource_parameters = smem_strdup( &buffer[ p + 1 ] );
+			reqinfo->resource_parameters = SMEM_STRDUP( &buffer[ p + 1 ] );
 			break;
 		    }
 		}
@@ -473,8 +473,8 @@ static int parse_HTTP_header( int line_num, char* buffer, req_info* reqinfo )
 
 	//...and store it in the request information structure:
 	int64_t root_len = strlen( g_webserver_root );
-	reqinfo->resource = (char*)smem_new( root_len + len + 1 );
-	reqinfo->resource_name = (char*)smem_new( len + 1 );
+	reqinfo->resource = SMEM_ALLOC2( char, root_len + len + 1 );
+	reqinfo->resource_name = SMEM_ALLOC2( char, len + 1 );
 	memcpy( reqinfo->resource, g_webserver_root, root_len + 1 );
 	strcat( reqinfo->resource, buffer );
 	memcpy( reqinfo->resource_name, buffer, len + 1 );
@@ -500,7 +500,7 @@ static int parse_HTTP_header( int line_num, char* buffer, req_info* reqinfo )
 		    *bp2 = 0;
 		}
 		len = strlen( bp );
-		reqinfo->post_boundary = (char*)smem_new( len + 1 );
+		reqinfo->post_boundary = SMEM_ALLOC2( char, len + 1 );
 		memcpy( reqinfo->post_boundary, bp, len + 1 );
 	    }
 	}
@@ -518,7 +518,7 @@ static int parse_HTTP_header( int line_num, char* buffer, req_info* reqinfo )
 */
 static int get_request( int conn, req_info* reqinfo ) 
 {
-    char* buffer = (char*)smem_new( MAX_REQ_LINE );
+    char* buffer = SMEM_ALLOC2( char, MAX_REQ_LINE );
     if( buffer == 0 ) return -3;
     buffer[ 0 ] = 0;
     int rv = 0;
@@ -571,8 +571,8 @@ static int get_request( int conn, req_info* reqinfo )
 static int return_resource( int conn, int resource, req_info* reqinfo ) 
 {
     int rv = 0;
-    void* buf = smem_new( 32000 );
-    if( buf == 0 ) return -4;
+    void* buf = SMEM_ALLOC( 32000 );
+    if( !buf ) return -4;
 
     while( 1 )
     {
@@ -697,7 +697,7 @@ static int service_request( int conn )
 	    int status = 0;
 	    
 	    int64_t bound_size = smem_strlen( reqinfo.post_boundary ) + 4;
-	    uint8_t* bound = (uint8_t*)smem_new( bound_size );
+	    uint8_t* bound = SMEM_ALLOC2( uint8_t, bound_size );
 	    bound[ 0 ] = '\r';
 	    bound[ 1 ] = '\n';
 	    bound[ 2 ] = '-';
@@ -705,8 +705,8 @@ static int service_request( int conn )
 	    smem_copy( bound + 4, reqinfo.post_boundary, bound_size - 4 );
 	    int bound_p = 2;
 	    
-	    uint8_t* temp_buf = (uint8_t*)smem_new( bound_size );
-	    char* temp_str_buf = (char*)smem_new( MAX_REQ_LINE );
+	    uint8_t* temp_buf = SMEM_ALLOC2( uint8_t, bound_size );
+	    char* temp_str_buf = SMEM_ALLOC2( char, MAX_REQ_LINE );
 	    
 	    char* filename = 0;
 	    sfs_file fd = 0;
@@ -796,10 +796,10 @@ static int service_request( int conn )
 					    }
 					}
 					if( filename ) smem_free( filename );
-					filename = (char*)smem_new( root_len + filename_len + 1 );
+					filename = SMEM_ALLOC2( char, root_len + filename_len + 1 );
 					filename[ 0 ] = 0;
-					smem_strcat_resize( filename, reqinfo.resource );
-					smem_strcat_resize( filename, filename_ptr );
+					SMEM_STRCAT_D( filename, reqinfo.resource );
+					SMEM_STRCAT_D( filename, filename_ptr );
 					fd = sfs_open( filename, "wb" );
 				    }
 				}
@@ -904,9 +904,9 @@ static int service_request( int conn )
 		//Remove :(
 		int64_t root_len = smem_strlen( reqinfo.resource );
 		int64_t rem_len = smem_strlen( reqinfo.resource_parameters + 1 );
-		char* rem_name = (char*)smem_new( root_len + rem_len + 1 );
+		char* rem_name = SMEM_ALLOC2( char, root_len + rem_len + 1 );
 		smem_copy( rem_name, reqinfo.resource, root_len + 1 );
-		smem_strcat_resize( rem_name, reqinfo.resource_parameters + 1 );
+		SMEM_STRCAT_D( rem_name, reqinfo.resource_parameters + 1 );
 		sfs_remove( rem_name );
 		smem_free( rem_name );
 	    }
@@ -915,9 +915,9 @@ static int service_request( int conn )
                 //Create directory:
                 int64_t root_len = smem_strlen( reqinfo.resource );
 		int64_t dir_len = smem_strlen( reqinfo.resource_parameters + 2 );
-		char* dir_name = (char*)smem_new( root_len + dir_len + 2 );
+		char* dir_name = SMEM_ALLOC2( char, root_len + dir_len + 2 );
 		smem_copy( dir_name, reqinfo.resource, root_len + 2 );
-		smem_strcat_resize( dir_name, reqinfo.resource_parameters + 2 );
+		SMEM_STRCAT_D( dir_name, reqinfo.resource_parameters + 2 );
 		sfs_mkdir( dir_name, S_IRWXU | S_IRWXG | S_IRWXO );
 		smem_free( dir_name );
             }
@@ -940,14 +940,14 @@ static int service_request( int conn )
 	if( res_dir )
 	{
 	    char ts[ 256 ];
-	    char* fname_d = (char*)smem_new( 1 );
+	    char* fname_d = SMEM_ALLOC2( char, 1 );
 	    fname_d[ 0 ] = 0;
 	    
 	    slist_data ld;
 	    slist_init( &ld );
 
 	    sfs_find_struct fs;
-	    smem_clear_struct( fs );
+	    SMEM_CLEAR_STRUCT( fs );
 	    fs.start_dir = reqinfo.resource;
 	    fs.mask = 0;
 	    int fs_res = sfs_find_first( &fs );
@@ -1022,8 +1022,8 @@ static int service_request( int conn )
 		if( type == 0 )
 		{
 		    fname_d[ 0 ] = 0;
-		    smem_strcat_resize( fname_d, reqinfo.resource );
-	    	    smem_strcat_resize( fname_d, name );
+		    SMEM_STRCAT_D( fname_d, reqinfo.resource );
+	    	    SMEM_STRCAT_D( fname_d, name );
 		    size_t fsize = 0;
 		    const char* fsize_unit = "";
 		    struct tm* t = NULL;

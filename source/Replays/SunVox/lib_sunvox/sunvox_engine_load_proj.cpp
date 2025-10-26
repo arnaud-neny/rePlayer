@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -55,8 +55,8 @@ int set_bpm_map( midi_bpm** bpm_map, size_t offset, uint t, uint16_t bpm, uint16
     if( offset >= size )
     {
 	size_t new_size = size + 256;
-	*bpm_map = (midi_bpm*)smem_resize2( *bpm_map, new_size * sizeof( midi_bpm ) );
-	if( *bpm_map == 0 ) return 1;
+	*bpm_map = SMEM_ZRESIZE2( *bpm_map, midi_bpm, new_size );
+	if( *bpm_map == NULL ) return 1;
     }
     (*bpm_map)[ offset ].t = t;
     (*bpm_map)[ offset ].bpm = bpm;
@@ -263,7 +263,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
     	    if( ( load_flags & SUNVOX_PROJ_LOAD_WITHOUT_NAME ) == 0 )
     	    {
 		if( s->proj_name ) smem_free( s->proj_name );
-		s->proj_name = smem_strdup( song_name );
+		s->proj_name = SMEM_STRDUP( song_name );
 	    }
 	    if( xm->bpm == 0 ) xm->bpm = 125;
 	    if( xm->tempo == 0 ) xm->tempo = 6;
@@ -345,12 +345,12 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 	{
     	    int max_xm_channels = 64;
     	    int sunvox_y_pats = max_xm_channels / MAX_PATTERN_TRACKS;
-    	    int* sunvox_pats = (int*)smem_new( sizeof( int ) * 256 * sunvox_y_pats );
-    	    int16_t* chan_module = (int16_t*)smem_znew( sizeof( int16_t ) * max_xm_channels );
-    	    int16_t* chan_note = (int16_t*)smem_znew( sizeof( int16_t ) * max_xm_channels );
-    	    uint8_t* chan_instr = (uint8_t*)smem_znew( max_xm_channels );
-    	    uint8_t* chan_vol = (uint8_t*)smem_znew( max_xm_channels );
-    	    uint8_t* chan_eff_0A_par = (uint8_t*)smem_znew( max_xm_channels );
+    	    int* sunvox_pats = SMEM_ZALLOC2( int, 256 * sunvox_y_pats );
+    	    int16_t* chan_module = SMEM_ZALLOC2( int16_t, max_xm_channels );
+    	    int16_t* chan_note = SMEM_ZALLOC2( int16_t, max_xm_channels );
+    	    uint8_t* chan_instr = SMEM_ZALLOC2( uint8_t, max_xm_channels );
+    	    uint8_t* chan_vol = SMEM_ZALLOC2( uint8_t, max_xm_channels );
+    	    uint8_t* chan_eff_0A_par = SMEM_ZALLOC2( uint8_t, max_xm_channels );
     	    if( sunvox_pats && chan_module && chan_note )
     	    {
     		int x = 0;
@@ -634,9 +634,8 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
     	}
         uint lines_per_beat = 4 * ( 6 / s->speed );
         uint bpm_map_size = 0;
-        midi_bpm* bpm_map = (midi_bpm*)smem_new( 256 * sizeof( midi_bpm ) );
-        if( bpm_map == 0 ) goto sunvox_proj_load_end;
-        smem_zero( bpm_map );
+        midi_bpm* bpm_map = SMEM_ZALLOC2( midi_bpm, 256 );
+        if( !bpm_map ) goto sunvox_proj_load_end;
         set_bpm_map( &bpm_map, bpm_map_size, 0, 120, 4 );
         bpm_map_size++;
         int tempo_pat = -1;
@@ -783,7 +782,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 					cur_beat_len = bpm_map[ bpm_map_pos ].beat_len;
 					bpm_map_pos++;
 					sunvox_note n;
-					smem_clear_struct( n );
+					SMEM_CLEAR_STRUCT( n );
 					n.ctl = 0x1F;
 					n.ctl_val = cur_bpm;
 					set_pattern_note( tempo_pat, ( lines_per_beat * global_t ) / global_ticks_per_beat, 0, &n, s );
@@ -842,7 +841,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 					    if( midi_notes[ track_num ] == ( ( evt_chan << 8 ) | note ) ) 
 					    {
 						sunvox_note n;
-                                    		smem_clear_struct( n );
+                                    		SMEM_CLEAR_STRUCT( n );
                                     		n.note = NOTECMD_NOTE_OFF;
                                     		APPLY_MIDI_EVENT_OFFSET();
                                     		set_pattern_note( notes_pat, line, track_num, &n, s );
@@ -870,7 +869,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 					    {
 						midi_notes[ track_num ] = ( evt_chan << 8 ) | note;
 						sunvox_note n;
-                                    		smem_clear_struct( n );
+                                    		SMEM_CLEAR_STRUCT( n );
                                     		n.note = note + 1;
                                     		n.vel = vel + 1;
                                     		if( vel == 127 )
@@ -926,7 +925,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 					if( midi_notes[ track_num ] == 0xFFFF && track_filled == false )
 					{
 					    sunvox_note n;
-                                    	    smem_clear_struct( n );
+                                    	    SMEM_CLEAR_STRUCT( n );
                                     	    n.mod = cur_mod + 1;
                                     	    n.ctl = ( ctl_num + 0x80 ) << 8;
                                     	    n.ctl_val = ctl_val << 8;
@@ -991,7 +990,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 				    case 0x6:
 				    case 0x7:
 					{
-					    char* text = (char*)smem_new( meta_size + 1 );
+					    char* text = SMEM_ALLOC2( char, meta_size + 1 );
 					    if( text )
 					    {
 						smem_copy( text, tdata + p, meta_size );
@@ -1226,7 +1225,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
     		{
     		    pat_name = (char*)st->block_data; st->block_data = NULL;
     		    size_t old_size = smem_get_size( pat_name );
-    		    pat_name = (char*)smem_resize2( pat_name, old_size + 4 );
+    		    pat_name = SMEM_ZRESIZE2( pat_name, char, old_size + 4 );
     		    continue;
     		    break;
     		}
@@ -1407,7 +1406,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 		{
 		    if( c_num + 1 > smem_get_size( s_ctls ) / sizeof( PS_CTYPE ) )
         	    {
-            		s_ctls = (PS_CTYPE*)smem_resize( s_ctls, ( c_num + 16 ) * sizeof( PS_CTYPE ) );
+            		s_ctls = SMEM_RESIZE2( s_ctls, PS_CTYPE, c_num + 16 );
             		if( !s_ctls ) { rv = 4; loading = false; break; }
         	    }
         	    if( s_ctls )
@@ -1428,9 +1427,8 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 		case BID_CHNK:
 		{
 	    	    chunks_num = st->block_data_int;
-		    chunks = (psynth_chunk*)smem_new( chunks_num * sizeof( psynth_chunk ) );
+		    chunks = SMEM_ZALLOC2( psynth_chunk, chunks_num );
 		    if( !chunks ) { rv = 5; loading = false; break; }
-		    smem_zero( chunks );
 		    continue;
 		    break;
 		}
@@ -1488,7 +1486,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 			    }
 			    if( s_links2 )
 			    {
-				smem_objarray_write_d( (void***)&s_links2_list, s_links2, false, s_num );
+				SMEM_OBJARRAY_WRITE_D( (void***)&s_links2_list, s_links2, false, s_num );
 			    }
 			    if( s_cnt != s_num && s_remap == 0 )
 		    	    {
@@ -1509,7 +1507,7 @@ int sunvox_load_proj_from_fd( sfs_file f, uint load_flags, sunvox_engine* s )
 	    		    s_links0 = s_links;
 			    if( s_links2 )
 			    {
-				smem_objarray_write_d( (void***)&s_links2_list, s_links2, false, 0 );
+				SMEM_OBJARRAY_WRITE_D( (void***)&s_links2_list, s_links2, false, 0 );
 			    }
 			}
 	    		if( ( load_flags & SUNVOX_PROJ_LOAD_MERGE ) && s_cnt == 0 )
@@ -1724,8 +1722,8 @@ sunvox_proj_load_end:
     sunvox_print_patterns( s );
 #endif
     sunvox_update_icons( s );
-    ssymtab_remove( pat_remap );
-    ssymtab_remove( s_remap );
+    ssymtab_delete( pat_remap );
+    ssymtab_delete( s_remap );
     if( s_links2_list )
     {
 	for( size_t i = 0; i < smem_get_size( s_links2_list ) / sizeof( int* ); i++ )

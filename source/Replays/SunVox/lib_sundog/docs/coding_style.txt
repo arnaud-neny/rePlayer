@@ -21,7 +21,7 @@ for some small functions, if you are sure that there will be no name conflicts.
 It is also allowed (and even recommended starting from 2023) to use classes and namespaces for new components:
 namespace sundog
 {
-class modname : public smem_wrapper {}
+class modname : public smem_base {}
 }
 
 Indentation and spaces:

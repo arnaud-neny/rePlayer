@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -37,7 +37,7 @@ void xm_new_sample( uint16_t num, uint16_t ins_num, const char* name, int length
     xm_sample* smp; 
     int16_t* data;
     int created_size;
-    smp = (xm_sample*)smem_znew( sizeof( xm_sample ) );
+    smp = SMEM_ZALLOC2( xm_sample, 1 );
     for( int a = 0 ; a < 22 ; a++ )
     {
 	smp->name[ a ] = name[ a ];
@@ -46,7 +46,7 @@ void xm_new_sample( uint16_t num, uint16_t ins_num, const char* name, int length
     smp->data = NULL;
     if( length )
     {
-	data = (int16_t*)smem_new( length );
+	data = (int16_t*)SMEM_ALLOC( length );
 	smp->data = (int16_t*)data;
 	created_size = length;
     }

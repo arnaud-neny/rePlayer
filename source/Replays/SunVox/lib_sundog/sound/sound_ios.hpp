@@ -16,14 +16,14 @@
 #include <CoreMIDI/CoreMIDI.h>
 
 int audio_session_init( bool record, int preferred_sample_rate, int preferred_buffer_size );
-int audio_session_deinit( void );
+int audio_session_deinit();
 int get_audio_session_freq();
 #ifdef AUDIOBUS
     int audiobus_init( void* observer ); //Called from sundog_bridge.m (main thread)
-    void audiobus_deinit( void ); //Called from sundog_bridge.m (main thread)
+    void audiobus_deinit(); //Called from sundog_bridge.m (main thread)
     void audiobus_enable_ports( bool enable );
     void audiobus_connection_state_update( sundog_engine* sd );
-    void audiobus_triggers_update( void );
+    void audiobus_triggers_update();
     #ifdef AUDIOBUS_MIDI_IN
 	struct device_midi_port;
 	typedef void (*osx_midiin_callback_t)( device_midi_port* port, const MIDIPacketList* packetList );
@@ -114,14 +114,6 @@ OSStatus au_playback_callback(
     sundog_sound* ss = (sundog_sound*)inRefCon;
     device_sound* d = (device_sound*)ss->device_specific;
 
-    /*{
-	uint64 t = mach_absolute_time();
-	stime_ticks_t tt = convert_mach_absolute_time_to_sundog_ticks( t, 1 );
-	uint64 t2 = convert_sundog_ticks_to_mach_absolute_time( tt, 1 );
-	stime_ticks_t tt2 = convert_mach_absolute_time_to_sundog_ticks( t2, 1 );
-	printf( "%d ; %f ; %d ; %f\n", (int)t, (float)( (double)tt / stime_ticks_per_second() ), (int)t2, (float)( (double)tt2 / stime_ticks_per_second() ) );
-    }*/
-
     if( ioData->mNumberBuffers >= 1 )
     {
 	AudioBuffer* buf = &ioData->mBuffers[ 0 ];
@@ -203,7 +195,7 @@ OSStatus au_recording_callback(
     if( inNumberFrames > 8192 ) return noErr;
     
     AudioBufferList bufs;
-    smem_clear_struct( bufs );
+    SMEM_CLEAR_STRUCT( bufs );
     bufs.mNumberBuffers = 1;
     AudioBuffer* buf = &bufs.mBuffers[ 0 ];
     buf->mNumberChannels = ss->in_channels;
@@ -559,9 +551,8 @@ int device_sound_init( sundog_sound* ss )
 	return 0;
     }
 
-    ss->device_specific = smem_new( sizeof( device_sound ) );
+    ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     device_sound* d = (device_sound*)ss->device_specific;
-    smem_zero( d );
 
     ss->in_type = sound_buffer_int16;
     ss->in_channels = ss->out_channels;

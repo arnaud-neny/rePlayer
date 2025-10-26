@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -180,6 +180,7 @@ struct gen2_options
     uint8_t	filter_res_velocity_scaling; 
     uint8_t	fast_zero_attack_release; 
     uint8_t	freq_accuracy; 
+    uint8_t	always_play_osc2; 
 };
 enum {
     MODE_HQ = 0,
@@ -263,6 +264,7 @@ int gen2_opt_button_handler( void* user_data, WINDOWPTR win, window_manager* wm 
     opt_menu_add( m, STR_PS_RETAIN_PHASE, opt->retain_phase, 119 );
     opt_menu_add( m, STR_PS_RANDOM_PHASE, opt->random_phase, 118 );
     opt_menu_add( m, STR_PS_TRUE_ZERO_ATTACK_RELEASE, opt->fast_zero_attack_release, 115 );
+    opt_menu_add( m, STR_PS_ALWAYS_PLAY_OSC2, opt->always_play_osc2, 113 );
     int sel = opt_menu_show( m );
     opt_menu_remove( m );
     int ctl = -1;
@@ -283,6 +285,7 @@ int gen2_opt_button_handler( void* user_data, WINDOWPTR win, window_manager* wm 
 	case 11: ctl = 119; ctl_val = !opt->retain_phase; break;
 	case 12: ctl = 118; ctl_val = !opt->random_phase; break;
 	case 13: ctl = 115; ctl_val = !opt->fast_zero_attack_release; break;
+	case 14: ctl = 113; ctl_val = !opt->always_play_osc2; break;
     }
     if( ctl >= 0 ) psynth_handle_ctl_event( data->mod_num, ctl - 1, ctl_val, data->pnet );
     draw_window( data->win, wm );
@@ -602,7 +605,7 @@ static void gen2_prepare_channel( MODULE_DATA* data, gen2_channel* chan )
 	sc->pitch_delta = 0;
 	if( g_type_flags[ data->ctl_type ] & TYPE_FLAG_NOISE_COLORED )
 	{
-	    smem_clear_struct( sc->noise_smp );
+	    SMEM_CLEAR_STRUCT( sc->noise_smp );
 	}
     }
     chan->env_vol = 0;
@@ -1419,6 +1422,8 @@ static void gen2_apply_envelope( MODULE_DATA* data, gen2_channel* chan, PS_STYPE
     {
 	int sustain = chan->f_sustain;
 	int env_vol = chan->f_env_vol;
+	bool fixed_filter = 0;
+	if( data->pnet->base_host_version >= 0x02010300 ) fixed_filter = 1;
         if( data->opt->fast_zero_attack_release )
 	{
 	    if( data->ctl_f_attack == 0 )
@@ -1495,7 +1500,7 @@ static void gen2_apply_envelope( MODULE_DATA* data, gen2_channel* chan, PS_STYPE
 			}
 		    }
 		}
-	    }	    
+	    }
 	    int fs;
 	    PS_STYPE2 c, f, q;
 	    int bits = ( sizeof( PS_STYPE ) * 8 ) - 1;
@@ -1507,6 +1512,20 @@ static void gen2_apply_envelope( MODULE_DATA* data, gen2_channel* chan, PS_STYPE
 		f_cur_freq = ( f_cur_freq * ( env_vol >> ENV_VOL_PREC ) ) / 32768;
 	    if( data->ctl_f_exp && !data->opt->filter_pitch )
 		f_cur_freq = ( f_cur_freq * f_cur_freq ) / MAX_FILTER_FREQ;
+	    if( fixed_filter )
+	    {
+		if( data->ctl_mode >= MODE_LQ )
+		{ 
+		    if( data->opt->filter_pitch ) f_cur_freq *= 2;
+		    c = ( f_cur_freq * 32768 / 2 ) / fs;
+		}
+		else
+		{ 
+		    c = ( f_cur_freq * 32768 ) / ( fs * 2 );
+		}
+		f = ( 6433 * c ) / 32768;
+		if( f >= 1024 ) f = 1023;
+	    }
 	    for( int fnum = 0; fnum < rolloff_steps; fnum++ )
 	    {
 		gen2_filter_channel* fchan;
@@ -1515,11 +1534,13 @@ static void gen2_apply_envelope( MODULE_DATA* data, gen2_channel* chan, PS_STYPE
 		i = i1;
 		if( fnum < rolloff_steps - 1 ) res = 0;
 	    q = 1536 - res;
-	    if( data->ctl_mode > MODE_HQ_MONO )
-		f_cur_freq /= 2;
-	    c = ( f_cur_freq * 32768 ) / ( fs * 2 );
-	    f = ( 6433 * c ) / 32768;
-	    if( f >= 1024 ) f = 1023;
+	    if( !fixed_filter )
+	    {
+		if( data->ctl_mode > MODE_HQ_MONO ) f_cur_freq /= 2;
+		c = ( f_cur_freq * 32768 ) / ( fs * 2 );
+		f = ( 6433 * c ) / 32768;
+		if( f >= 1024 ) f = 1023;
+	    }
 	    PS_STYPE2 d1 = fchan->d1;
 	    PS_STYPE2 d2 = fchan->d2;
 	    PS_STYPE2 d3 = fchan->d3;
@@ -1974,7 +1995,7 @@ PS_RETTYPE MODULE_HANDLER(
 		for( int i = 0; i < MAX_SUBCHANNELS; i++ )
 		{
 		    gen2_subchannel* sc = &data->channels[ c ].sc[ i ];
-		    sc->noise_seed = stime_ms() + pseudo_random() + mod_num * 3 + i * 7;
+		    sc->noise_seed = (uint32_t)stime_ns() + pseudo_random() + mod_num * 3 + i * 7 + mod->id * 3079;
 		}
 	    }
 	    data->no_active_channels = 1;
@@ -1982,8 +2003,8 @@ PS_RETTYPE MODULE_HANDLER(
 	    memmove( data->drawn_wave, g_gen_drawn_waveform, 32 );
 	    data->linear_freq_tab = g_linear_freq_tab;
 	    data->vibrato_tab = g_hsin_tab;
-	    data->noise_seed = stime_ms() + pseudo_random() + 11;
-	    data->random_seed = stime_ms() + pseudo_random() + 22;
+	    data->noise_seed = (uint32_t)stime_ns() + pseudo_random() + 11 + mod->id * 3079;
+	    data->random_seed = (uint32_t)stime_ns() + pseudo_random() + 22 + mod->id * 3079;
 	    psmoother_init( &data->smoother_coefs, 100, pnet->sampling_freq );
 	    psynth_get_temp_buf( mod_num, pnet, 0 ); 
 #ifndef ONLY44100
@@ -2143,7 +2164,7 @@ PS_RETTYPE MODULE_HANDLER(
 				    }
 				}
 				gen2_render_waveform( data, chan, 0, no_wave, 0, render_buf + i, cur_size );
-				if( data->ctl_pitch2 == MAX_PITCH2 / 2 )
+				if( data->ctl_pitch2 == MAX_PITCH2 / 2 && data->opt->always_play_osc2 == 0 )
 				{
 				    gen2_render_waveform( data, chan, 1, 1, 1, render_buf + i, cur_size );
 				}
@@ -2584,6 +2605,7 @@ PS_RETTYPE MODULE_HANDLER(
                     case 116: opt->filter_res_velocity_scaling = v!=0; retval = 1; break;
                     case 115: opt->fast_zero_attack_release = v!=0; retval = 1; break;
                     case 114: opt->freq_accuracy = v!=0; retval = 1; break;
+                    case 113: opt->always_play_osc2 = v!=0; retval = 1; break;
                     default: break;
                 }
             }

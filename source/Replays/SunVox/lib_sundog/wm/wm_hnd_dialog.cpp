@@ -1,7 +1,7 @@
 /*
     wm_hnd_dialog.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -155,7 +155,7 @@ int dialog_item_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 			    if( act == TEXT_ACTION_CHANGED )
 			    {
 				smem_free( item->str_val );
-				item->str_val = smem_strdup( text_get_text( win, wm ) );
+				item->str_val = SMEM_STRDUP( text_get_text( win, wm ) );
 				changed = 1;
 			    }
 			}
@@ -235,7 +235,7 @@ int dialog_handler( sundog_event* evt, window_manager* wm )
 	case EVT_AFTERCREATE:
 	    {
 		data->win = win;
-		data->text = smem_strdup( wm->opt_dialog_text );
+		data->text = SMEM_STRDUP( wm->opt_dialog_text );
 		data->items = wm->opt_dialog_items;
 		data->items_created = false;
 		data->focus_on_item = NULL;
@@ -246,7 +246,7 @@ int dialog_handler( sundog_event* evt, window_manager* wm )
 		data->timer = -1;
 		if( data->text && data->text[ 0 ] == '!' )
 		{
-		    char* new_text = smem_strdup( data->text + 1 );
+		    char* new_text = SMEM_STRDUP( data->text + 1 );
 		    smem_free( data->text );
 		    data->text = new_text;
 		    data->timer = add_timer( dialog_timer, data, 0, wm );
@@ -267,8 +267,8 @@ int dialog_handler( sundog_event* evt, window_manager* wm )
 			if( wm->opt_dialog_buttons_text[ i ] == ';' )
 			    buttons_num++;
 		    }
-		    data->buttons_text = (char**)smem_new( sizeof( char* ) * buttons_num );
-		    data->buttons = (WINDOWPTR*)smem_new( sizeof( WINDOWPTR ) * buttons_num );
+		    data->buttons_text = SMEM_ALLOC2( char*, buttons_num );
+		    data->buttons = SMEM_ALLOC2( WINDOWPTR, buttons_num );
 		    data->buttons_num = buttons_num;
 		    smem_clear( data->buttons_text, sizeof( char* ) * buttons_num );
 		    int word_start = 0;
@@ -285,7 +285,7 @@ int dialog_handler( sundog_event* evt, window_manager* wm )
 			}
 			if( len > 0 )
 			{
-			    data->buttons_text[ i ] = (char*)smem_new( len + 1 );
+			    data->buttons_text[ i ] = SMEM_ALLOC2( char, len + 1 );
 			    for( p = word_start; p < word_start + len; p++ )
 			    {
 				data->buttons_text[ i ][ p - word_start ] = wm->opt_dialog_buttons_text[ p ];
@@ -508,7 +508,7 @@ void dialog_reinit_item( dialog_item* item ) //change item properties
 	    {
 	        text_set_text( w, (const char*)item->str_val, wm );
 	        if( data->items_created == false )
-	    	    item->str_val = smem_strdup( item->str_val );
+	    	    item->str_val = SMEM_STRDUP( item->str_val );
 	    }
 	    break;
 	case DIALOG_ITEM_LABEL:
@@ -696,7 +696,7 @@ dialog_item* dialog_new_item( dialog_item** itemlist )
     if( !itemlist ) return NULL;
     if( *itemlist == NULL )
     {
-	*itemlist = (dialog_item*)smem_znew( sizeof( dialog_item ) * 8 );
+	*itemlist = SMEM_ZALLOC2( dialog_item, 8 );
     }
     if( *itemlist == NULL ) return NULL;
     int size = (int)smem_get_size( *itemlist ) / sizeof( dialog_item );
@@ -707,7 +707,7 @@ dialog_item* dialog_new_item( dialog_item** itemlist )
     }
     if( i >= size - 1 )
     {
-	*itemlist = (dialog_item*)smem_resize2( *itemlist, sizeof( dialog_item ) * ( size + 8 ) );
+	*itemlist = SMEM_ZRESIZE2( *itemlist, dialog_item, size + 8 );
 	if( *itemlist == NULL ) return NULL;
     }
     return &((*itemlist)[ i ]);
@@ -745,7 +745,7 @@ void dialog_stack_add( WINDOWPTR win )
     window_manager* wm = win->wm;
 
     if( !wm->dstack )
-	wm->dstack = (dstack_item*)smem_znew( 2 * sizeof( dstack_item ) );
+	wm->dstack = SMEM_ZALLOC2( dstack_item, 2 );
     if( !wm->dstack ) return;
 
     int size = smem_get_size( wm->dstack ) / sizeof( dstack_item );
@@ -781,7 +781,7 @@ void dialog_stack_add( WINDOWPTR win )
     {
 	//Add item:
 	size = p + 1;
-	wm->dstack = (dstack_item*)smem_resize2( wm->dstack, size * sizeof( dstack_item ) );
+	wm->dstack = SMEM_ZRESIZE2( wm->dstack, dstack_item, size );
 	if( !wm->dstack ) return;
     }
     wm->dstack[ p ].win = win;

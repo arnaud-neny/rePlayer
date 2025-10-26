@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -102,9 +102,10 @@ struct sampler_envelope
 };
 #define GEN_CHANNEL_FLAG_PLAYING	( 1 << 0 )
 #define GEN_CHANNEL_FLAG_SUSTAIN	( 1 << 1 ) 
-#define GEN_CHANNEL_FLAG_LOOP		( 1 << 2 ) 
-#define GEN_CHANNEL_FLAG_BACK		( 1 << 3 ) 
+#define GEN_CHANNEL_FLAG_INLOOP		( 1 << 2 ) 
+#define GEN_CHANNEL_FLAG_REVERSE	( 1 << 3 ) 
 #define GEN_CHANNEL_FLAG_ENV_START	( 1 << 4 ) 
+#define GEN_CHANNEL_FLAG_READY_TO_PLAY	( 1 << 5 ) 
 struct gen_channel
 {
     uint	flags;
@@ -143,6 +144,7 @@ struct gen_channel
     int16_t    	smp_num;
     int16_t    	smp_note_num;
     PS_CTYPE   	local_pan;
+    PS_CTYPE	local_reverse;
 };
 struct MODULE_DATA
 {
@@ -154,6 +156,7 @@ struct MODULE_DATA
     PS_CTYPE	ctl_rec_threshold;
     PS_CTYPE	ctl_tick_scale;
     PS_CTYPE	ctl_record;
+    PS_CTYPE	ctl_reverse;
     gen_channel	channels[ MAX_CHANNELS ];
     bool    	no_active_channels;
     bool	editor_play; 
@@ -329,8 +332,7 @@ static void reset_sampler_channel( gen_channel* ch )
     ch->vol_step = 0;
     ch->ptr_h = 0;
     ch->ptr_l = 0;
-    ch->flags &= ~GEN_CHANNEL_FLAG_LOOP;
-    ch->flags &= ~GEN_CHANNEL_FLAG_BACK;
+    ch->flags &= ~( GEN_CHANNEL_FLAG_INLOOP | GEN_CHANNEL_FLAG_REVERSE );
     ch->tick_counter = 0xFFFFFFF; 
     ch->tick_counter2 = 0;
 }
@@ -466,7 +468,7 @@ static uint16_t* refresh_instrument_envelope(
     }
     if( new_len > len )
     {
-	dest = (uint16_t*)smem_resize2( dest, new_len * sizeof( uint16_t ) );
+	dest = SMEM_ZRESIZE2( dest, uint16_t, new_len );
 	if( dest == 0 ) return 0;
 	len = new_len;
     }
@@ -760,6 +762,7 @@ static void new_instrument( const char* name, int mod_num, psynth_net* pnet )
     ins->volume_old = 64;
     ins->sign = INS_SIGN;
     ins->version = INS_VERSION;
+    ins->max_version = INS_VERSION;
     make_default_envelopes( mod_num, pnet );
     pnet->change_counter++;
 }
@@ -1017,7 +1020,7 @@ static void load_xi_sample_data( sfs_file f, int mod_num, MODULE_DATA* module_da
 	int8_t c_new_s;
 	if( smp_stereo == 2 )
 	{
-	    int8_t* new_data = (int8_t*)smem_new( smp->length );
+	    int8_t* new_data = (int8_t*)SMEM_ALLOC( smp->length );
 	    int new_p = 0;
 	    for( uint sp = 0; sp < smp->length / 2; sp++ )
 	    {
@@ -1054,7 +1057,7 @@ static void load_xi_sample_data( sfs_file f, int mod_num, MODULE_DATA* module_da
 	int16_t new_s;
 	if( smp_stereo == 2 )
 	{
-	    int16_t* new_data = (int16_t*)smem_new( smp->length );
+	    int16_t* new_data = (int16_t*)SMEM_ALLOC( smp->length );
 	    int new_p = 0;
 	    for( uint sp = 0; sp < smp->length / 4; sp++ )
 	    {
@@ -1114,7 +1117,7 @@ static int load_xi_instrument(
     }
     else
     {
-	ins = (instrument*)smem_znew( sizeof( instrument ) );
+	ins = SMEM_ZALLOC2( instrument, 1 );
 	ins_need_free = true;
     }
     if( !ins ) return 1;
@@ -1127,7 +1130,7 @@ static int load_xi_instrument(
 	sfs_read( name, 21 - 12, 1, f ); 
 	sfs_read( name, 22, 1, f ); 
 	name[ 22 ] = 0;
-	if( empty_names ) smem_clear_struct( name );
+	if( empty_names ) SMEM_CLEAR_STRUCT( name );
 	sfs_read( temp, 23, 1, f );
 	temp[ 20 ] = 0;
 	if( strstr( (char*)temp, "amplicity" ) ) psytexx_ext = true;
@@ -1158,14 +1161,14 @@ static int load_xi_instrument(
 	    convert_old_envelopes_to_new( mod_num, net );
 	    refresh_envelopes( module_data, 0xFF );
 	}
-	sample* smps = (sample*)smem_znew( sizeof( sample ) * ins->samples_num );
+	sample* smps = SMEM_ZALLOC2( sample, ins->samples_num );
 	if( smps )
 	{
 	    for( int s = 0; s < ins->samples_num; s++ )
 	    {
 		sample* smp = &smps[ s ];
 		sfs_read( smp, 40, 1, f ); 
-		if( empty_names ) smem_clear_struct( smp->name );
+		if( empty_names ) SMEM_CLEAR_STRUCT( smp->name );
 		if( flags & LOAD_XI_FLAG_SET_MAX_VOLUME ) smp->volume = 64;
 	    }
 	    if( sample_num < 0 )
@@ -1281,7 +1284,7 @@ static int load_instrument_or_sample(
 	    char* src_name = sfs_make_filename( NULL, filename, true );
 	    char* dest_name = sfs_make_filename( NULL, "3:/sunvox_temp.wav", true );
 	    char* log_name = sfs_make_filename( NULL, "3:/ffmpeg_log.txt", true );
-	    char* cmd = (char*)smem_new( smem_strlen( src_name ) + smem_strlen( dest_name ) + 1024 );
+	    char* cmd = SMEM_ALLOC2( char, smem_strlen( src_name ) + smem_strlen( dest_name ) + 1024 );
 	    sfs_remove_file( dest_name );
 	    if( g_external_sample_converter == EXT_SMP_CONV_UNKNOWN )
 	    {
@@ -1533,7 +1536,7 @@ static inline uint sampler_render(
 	{
 	    if( smp_type & SAMPLE_TYPE_FLAG_LOOPRELEASE )
 	    {
-		chan->flags &= ~GEN_CHANNEL_FLAG_BACK;
+		chan->flags &= ~GEN_CHANNEL_FLAG_REVERSE;
 		replen = 0;
 	    }
 	}
@@ -1558,7 +1561,7 @@ static inline uint sampler_render(
 		    SMPPTR rep_part = ( chan->ptr_h - reppnt ) / replen; 
 		    if( rep_part & 1 )
 		    {
-			chan->flags |= GEN_CHANNEL_FLAG_BACK;
+			chan->flags |= GEN_CHANNEL_FLAG_REVERSE;
 			SMPPTR temp_ptr_h = chan->ptr_h;
 			int temp_ptr_l = chan->ptr_l;
 			chan->ptr_h = reppnt + replen * ( rep_part + 1 );
@@ -1573,12 +1576,12 @@ static inline uint sampler_render(
 		    }
 		    else
 		    {
-			chan->flags &= ~GEN_CHANNEL_FLAG_BACK;
+			chan->flags &= ~GEN_CHANNEL_FLAG_REVERSE;
 			chan->ptr_h -= replen * rep_part;
 		    }
 		}
 	    }
-	    if( ( chan->flags & GEN_CHANNEL_FLAG_BACK ) && chan->ptr_h < reppnt )
+	    if( ( chan->flags & GEN_CHANNEL_FLAG_REVERSE ) && chan->ptr_h < reppnt )
 	    {
 		SMPPTR temp_ptr_h2 = chan->ptr_h;
 		int temp_ptr_l2 = chan->ptr_l;
@@ -1589,7 +1592,7 @@ static inline uint sampler_render(
 		chan->ptr_h += reppnt;
 		if( rep_part & 1 )
 		{
-		    chan->flags |= GEN_CHANNEL_FLAG_BACK;
+		    chan->flags |= GEN_CHANNEL_FLAG_REVERSE;
 		    SMPPTR temp_ptr_h = chan->ptr_h;
 		    int temp_ptr_l = chan->ptr_l;
 		    chan->ptr_h = reppnt + replen * ( rep_part + 1 );
@@ -1599,7 +1602,7 @@ static inline uint sampler_render(
 		}
 		else
 		{
-		    chan->flags &= ~GEN_CHANNEL_FLAG_BACK;
+		    chan->flags &= ~GEN_CHANNEL_FLAG_REVERSE;
 		    chan->ptr_h -= replen * rep_part;
 		}
 	    }
@@ -1626,15 +1629,15 @@ static inline uint sampler_render(
 	        {
 		    if( loop_type == 1 )
 		    {
-		        if( ( chan->flags & GEN_CHANNEL_FLAG_LOOP ) && s_offset0 < reppnt ) s_offset0 = repend - 1;
+		        if( ( chan->flags & GEN_CHANNEL_FLAG_INLOOP ) && s_offset0 < reppnt ) s_offset0 = repend - 1;
 		        if( s_offset2 >= repend ) { s_offset2 -= replen; }
-		        if( s_offset3 >= repend ) { s_offset3 -= replen; chan->flags |= GEN_CHANNEL_FLAG_LOOP; if( s_offset3 >= smp_len ) s_offset3 = smp_len - 1; }
+		        if( s_offset3 >= repend ) { s_offset3 -= replen; chan->flags |= GEN_CHANNEL_FLAG_INLOOP; if( s_offset3 >= smp_len ) s_offset3 = smp_len - 1; }
 		    }
 		    else 
 		    {
-		        if( ( chan->flags & GEN_CHANNEL_FLAG_LOOP ) && s_offset0 < reppnt ) s_offset0 = reppnt;
+		        if( ( chan->flags & GEN_CHANNEL_FLAG_INLOOP ) && s_offset0 < reppnt ) s_offset0 = reppnt;
 		        if( s_offset2 >= repend ) { s_offset2 = ( repend - 1 ) - ( s_offset2 - repend ); }
-		        if( s_offset3 >= repend ) { s_offset3 = ( repend - 1 ) - ( s_offset3 - repend ); chan->flags |= GEN_CHANNEL_FLAG_LOOP; if( s_offset3 >= smp_len ) s_offset3 = smp_len - 1; }
+		        if( s_offset3 >= repend ) { s_offset3 = ( repend - 1 ) - ( s_offset3 - repend ); chan->flags |= GEN_CHANNEL_FLAG_INLOOP; if( s_offset3 >= smp_len ) s_offset3 = smp_len - 1; }
 		        if( s_offset3 < 0 ) s_offset3 = 0;
 		    }
 		}
@@ -1940,7 +1943,8 @@ static inline uint sampler_render(
 		out1[ i ] = s1;
 	    }
 	}
-	if( chan->flags & GEN_CHANNEL_FLAG_BACK )
+	bool reverse = ( chan->flags & GEN_CHANNEL_FLAG_REVERSE ) != 0;
+	if( reverse )
 	{
 	    PSYNTH_FP64_SUB( chan->ptr_h, chan->ptr_l, chan->delta_h, chan->delta_l )
 	}
@@ -2532,6 +2536,19 @@ static inline void sampler_subtick(
 	}
     }
 }
+static inline void init_reverse_flags( gen_channel* ch, sample* smp, int local_reverse, int ctl_reverse )
+{
+    ch->ptr_h = smp->start_pos;
+    bool reverse1 = ctl_reverse > 0;
+    bool reverse2 = local_reverse > 0;
+    if( reverse1 ^ reverse2 )
+    {
+	uint8_t loop_type = smp->type & 3;
+	if( ch->ptr_h == 0 ) ch->ptr_h = smp->length - 1;
+	if( loop_type && smp->replen ) ch->ptr_h = smp->reppnt + smp->replen - 1;
+	ch->flags |= GEN_CHANNEL_FLAG_REVERSE;
+    }
+}
 PS_RETTYPE MODULE_HANDLER( 
     PSYNTH_MODULE_HANDLER_PARAMETERS
     )
@@ -2559,10 +2576,10 @@ PS_RETTYPE MODULE_HANDLER(
                 {
                     if( smem_strstr( lang, "ru_" ) )
                     {
-			retval = (PS_RETTYPE)"Сэмплер позволяет загружать, проигрывать и записывать аудио-файлы (сэмплы). Поддерживаются следующие форматы: WAV, XI, AIFF, OGG, MP3, FLAC, RAW. В версии для Linux также поддерживаются все форматы, которые распознают ffmpeg и avconv.\nЛокальные контроллеры: Панорама";
+			retval = (PS_RETTYPE)"Сэмплер позволяет загружать, проигрывать и записывать аудио-файлы (сэмплы). Поддерживаются следующие форматы: WAV, XI, AIFF, OGG, MP3, FLAC, RAW. В версии для Linux также поддерживаются все форматы, которые распознают ffmpeg и avconv.\nЛокальные контроллеры: Панорама, Реверс";
                         break;
                     }
-		    retval = (PS_RETTYPE)"Sampler.\nSupported file formats: WAV, XI, AIFF, OGG (Vorbis), MP3, FLAC, RAW.\nLocal controllers: Panning";
+		    retval = (PS_RETTYPE)"Sampler.\nSupported file formats: WAV, XI, AIFF, OGG (Vorbis), MP3, FLAC, RAW.\nLocal controllers: Panning, Reverse";
                     break;
                 }
             }
@@ -2575,7 +2592,7 @@ PS_RETTYPE MODULE_HANDLER(
 	case PS_CMD_GET_FLAGS: retval = PSYNTH_FLAG_GENERATOR | PSYNTH_FLAG_GET_SPEED_CHANGES | PSYNTH_FLAG_EFFECT | PSYNTH_FLAG_USE_MUTEX; break;
 	case PS_CMD_INIT:
 	    {
-		psynth_resize_ctls_storage( mod_num, 8, pnet );
+		psynth_resize_ctls_storage( mod_num, 9, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_VOLUME ), "", 0, 512, 256, 0, &data->ctl_volume, -1, 0, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_PANNING ), "", 0, 256, 128, 0, &data->ctl_pan, 128, 0, pnet );
 		psynth_set_ctl_show_offset( mod_num, 1, -128, pnet );
@@ -2587,6 +2604,7 @@ PS_RETTYPE MODULE_HANDLER(
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_TICK_LENGTH ), "", 0, 2048, 128, 0, &data->ctl_tick_scale, 128, 4, pnet );
 		psynth_set_ctl_flags( mod_num, 6, PSYNTH_CTL_FLAG_EXP3, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_RECORD ), ps_get_string( STR_PS_SAMPLER_REC_MODES ), 0, 2, 0, 1, &data->ctl_record, -1, 3, pnet );
+		psynth_register_ctl( mod_num, ps_get_string( STR_PS_REVERSE ), ps_get_string( STR_PS_OFF_ON ), 0, 1, 0, 1, &data->ctl_reverse, -1, 4, pnet );
 		for( int c = 0; c < MAX_CHANNELS; c++ )
 		{
 		    smem_clear( &data->channels[ c ], sizeof( gen_channel ) );
@@ -2804,7 +2822,7 @@ PS_RETTYPE MODULE_HANDLER(
 		}
 		if( data->ps )
 		{
-		    sfs_file f = sfs_open_in_memory( smem_new( 4 ), 4 );
+		    sfs_file f = sfs_open_in_memory( SMEM_ALLOC( 4 ), 4 );
             	    if( f )
             	    {
             		int err = psynth_sunvox_save_module( f, data->ps );
@@ -2821,7 +2839,7 @@ PS_RETTYPE MODULE_HANDLER(
                 	else
                 	{
                     	    void* sunsynth_file = sfs_get_data( f );
-                    	    sunsynth_file = smem_resize( sunsynth_file, sfs_tell( f ) );
+                    	    sunsynth_file = SMEM_RESIZE( sunsynth_file, sfs_tell( f ) );
                     	    psynth_new_chunk( mod_num, CHUNK_EFFECT_MOD, 1, 0, 0, pnet );
                     	    psynth_replace_chunk_data( mod_num, CHUNK_EFFECT_MOD, sunsynth_file, pnet );
                 	}
@@ -3005,6 +3023,7 @@ PS_RETTYPE MODULE_HANDLER(
 		    if( !smp ) continue;
 		    if( !smp_data ) continue;
 		    data->no_active_channels = false;
+		    chan->flags &= ~GEN_CHANNEL_FLAG_READY_TO_PLAY;
     		    if( chan->tick_counter == 0xFFFFFFF )
     		    {
 		        chan->tick_counter = data->tick_size2;
@@ -3192,7 +3211,7 @@ PS_RETTYPE MODULE_HANDLER(
 		if( smp_note_num >= 128 ) smp_note_num = 127;
 		ch->smp_note_num = smp_note_num;
 		int smp_num = ins->smp_num[ smp_note_num ];
-		sample* smp;
+		sample* smp = nullptr;
 		if( ins->samples_num && smp_num < ins->samples_num )
 		{
 		    smp = (sample*)psynth_get_chunk_data( mod, CHUNK_SMP( smp_num ) );
@@ -3230,12 +3249,14 @@ PS_RETTYPE MODULE_HANDLER(
 			}
 		    }
 		}
-		ch->flags |= GEN_CHANNEL_FLAG_PLAYING;
+		ch->flags |= GEN_CHANNEL_FLAG_PLAYING | GEN_CHANNEL_FLAG_READY_TO_PLAY;
 		ch->vel = event->note.velocity;
 		ch->id = event->id;
 		ch->local_pan = 128;
+		ch->local_reverse = 0;
 		reset_sampler_channel( ch );
 		ch->ptr_h = smp->start_pos;
+		init_reverse_flags( ch, smp, ch->local_reverse, data->ctl_reverse );
 		data->no_active_channels = false;
 		retval = 1;
 	    }
@@ -3355,12 +3376,36 @@ PS_RETTYPE MODULE_HANDLER(
 	    {
 		if( data->channels[ c ].id == event->id )
 		{
-		    switch( event->controller.ctl_num )
+		    switch( event->controller.ctl_num + 1 )
 		    {
-			case 1:
-			    data->channels[ c ].local_pan = event->controller.ctl_val >> 7;
+			case 2:
+			{
+			    gen_channel* ch = &data->channels[ c ];
+			    ch->local_pan = event->controller.ctl_val >> 7;
 			    retval = 1;
 			    break;
+			}
+			case 9:
+			{
+			    gen_channel* ch = &data->channels[ c ];
+			    int prev = ch->local_reverse;
+			    int v = event->controller.ctl_val >= 1;
+			    if( prev != v )
+			    {
+				ch->local_reverse = v;
+				ch->flags ^= GEN_CHANNEL_FLAG_REVERSE;
+				if( ch->flags & GEN_CHANNEL_FLAG_READY_TO_PLAY )
+				{
+				    sample* smp = (sample*)psynth_get_chunk_data( mod, CHUNK_SMP( ch->smp_num ) );
+				    if( smp )
+				    {
+					init_reverse_flags( ch, smp, ch->local_reverse, data->ctl_reverse );
+				    }
+				}
+			    }
+			    retval = 1;
+			    break;
+			}
 		    }
 		    break;
 		}
@@ -3375,6 +3420,29 @@ PS_RETTYPE MODULE_HANDLER(
             	    case 8:
             	    {
             		sampler_rec( pnet, mod_num, SMP_REC_SS_FLAG_SYNTH_THREAD, v );
+            		break;
+            	    }
+            	    case 9:
+            	    {
+			int prev = data->ctl_reverse;
+			if( prev != v )
+			{
+			    if( data->no_active_channels ) break;
+			    for( int c = 0; c < MAX_CHANNELS; c++ )
+			    {
+				gen_channel* ch = &data->channels[ c ];
+				if( ( ch->flags & GEN_CHANNEL_FLAG_PLAYING ) == 0 ) continue;
+				ch->flags ^= GEN_CHANNEL_FLAG_REVERSE;
+				if( ch->flags & GEN_CHANNEL_FLAG_READY_TO_PLAY )
+				{
+				    sample* smp = (sample*)psynth_get_chunk_data( mod, CHUNK_SMP( ch->smp_num ) );
+				    if( smp )
+				    {
+					init_reverse_flags( ch, smp, ch->local_reverse, v );
+				    }
+				}
+			    }
+			}
             		break;
             	    }
                     case 127: opt->rec_on_play = v!=0; retval = 1; break;

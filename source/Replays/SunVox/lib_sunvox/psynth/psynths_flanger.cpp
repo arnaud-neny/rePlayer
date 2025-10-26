@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -64,7 +64,7 @@ struct MODULE_DATA
     if( ( CHECK_VERSION && pnet->base_host_version >= 0x01090300 ) || CHECK_VERSION == 0 ) \
     { \
         psynth_event e; \
-        smem_clear_struct( e ); \
+        SMEM_CLEAR_STRUCT( e ); \
         e.command = PS_CMD_SET_GLOBAL_CONTROLLER; \
         e.controller.ctl_num = 8; \
         e.controller.ctl_val = data->ctl_set_vibrato_phase << 7; \
@@ -130,7 +130,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    data->buf_size = pnet->sampling_freq / 64;
 	    for( int i = 0; i < MODULE_OUTPUTS; i++ )
 	    {
-		data->buf[ i ] = (PS_STYPE*)smem_znew( data->buf_size * sizeof( PS_STYPE ) );
+		data->buf[ i ] = SMEM_ZALLOC2( PS_STYPE, data->buf_size );
 	    }
 	    data->buf_ptr = 0;
 	    data->buf_empty = true;

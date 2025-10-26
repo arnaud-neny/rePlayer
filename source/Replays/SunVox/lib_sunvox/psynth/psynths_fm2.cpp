@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -1262,7 +1262,7 @@ PS_RETTYPE MODULE_HANDLER(
 		for( int opn = 0; opn < NUM_OPS; opn++ )
 		{
 		    sprintf( ts, "%d %s", opn + 1, ctl_name );
-		    char* new_name = smem_strdup( ts );
+		    char* new_name = SMEM_STRDUP( ts );
 		    data->par_names[ opn * FM2_PARS + p ] = new_name;
 		    PS_CTYPE def = desc->def;
 		    PS_CTYPE max = desc->max;
@@ -1329,7 +1329,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    {
 		gen_channel* chan = &data->channels[ c ];
 		gen_channel_reset( chan );
-		chan->noise_seed = stime_ms() + pseudo_random() + mod_num * 3 + c * 7;
+		chan->noise_seed = (uint32_t)stime_ns() + pseudo_random() + mod_num * 3 + c * 7 + mod->id * 3079;
 		for( int opn = 0; opn < NUM_OPS; opn++ )
 		{
 		    fm2_operator* op = &chan->ops[ opn ];
@@ -1355,12 +1355,12 @@ PS_RETTYPE MODULE_HANDLER(
             if( data->ctl_send )
             {
 	        if( !data->in_buf )
-	    	    data->in_buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * ( pnet->max_buf_size * g_rates[ NUM_RATES - 1 ] / pnet->sampling_freq + 8 ) );
+	    	    data->in_buf = SMEM_ALLOC2( PS_STYPE, pnet->max_buf_size * g_rates[ NUM_RATES - 1 ] / pnet->sampling_freq + 8 );
 	    }
             if( data->ctl_capture )
             {
 	        if( !data->cap_buf )
-	    	    data->cap_buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * pnet->max_buf_size );
+	    	    data->cap_buf = SMEM_ALLOC2( PS_STYPE, pnet->max_buf_size );
 	    }
             retval = 1;
             break;
@@ -1765,7 +1765,7 @@ PS_RETTYPE MODULE_HANDLER(
             		if( event->controller.ctl_val )
             		{
 	    		    if( !data->in_buf )
-	    			data->in_buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * ( pnet->max_buf_size * g_rates[ NUM_RATES - 1 ] / pnet->sampling_freq + 8 ) );
+	    			data->in_buf = SMEM_ALLOC2( PS_STYPE, pnet->max_buf_size * g_rates[ NUM_RATES - 1 ] / pnet->sampling_freq + 8 );
             		}
             		break;
             	    case 6: 
@@ -1774,7 +1774,7 @@ PS_RETTYPE MODULE_HANDLER(
 			    if( data->cap_buf_ptr == pnet->max_buf_size )
 				data->cap_buf_ptr = 0;
 			    if( !data->cap_buf )
-				data->cap_buf = (PS_STYPE*)smem_new( sizeof( PS_STYPE ) * pnet->max_buf_size );
+				data->cap_buf = SMEM_ALLOC2( PS_STYPE, pnet->max_buf_size );
 			}
 			else
 			{

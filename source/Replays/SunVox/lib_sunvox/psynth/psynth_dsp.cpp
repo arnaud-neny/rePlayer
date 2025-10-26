@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -29,7 +29,7 @@ IN THE SOFTWARE.
 #include "psynth.h"
 biquad_filter* biquad_filter_new( uint32_t flags )
 {
-    biquad_filter* f = (biquad_filter*)smem_znew( sizeof( biquad_filter ) );
+    biquad_filter* f = SMEM_ZALLOC2( biquad_filter, 1 );
     if( !f ) return NULL;
     f->type = 1 << BFT_STAGES_OFFSET;
     f->flags = flags;
@@ -509,11 +509,10 @@ biquad_filter_float biquad_filter_freq_response( biquad_filter* f, biquad_filter
 #ifndef PSYNTH_OVERSAMPLER_DISABLED
 const float g_psynth_oversampler_sinc_2x[ PSYNTH_OVERSAMPLER_DOWNSMP_VALS ] = { 1.75465e-09, -2.00738e-09, 0.222552, 0.554896, 0.222552, -2.00738e-09, 1.75465e-09 };
 const float g_psynth_oversampler_sinc_4x[ PSYNTH_OVERSAMPLER_DOWNSMP_VALS ] = { -1.94438e-09, 0.0359841, 0.246617, 0.434798, 0.246617, 0.0359841, -1.94438e-09 };
-psynth_oversampler* psynth_oversampler_new( void )
+psynth_oversampler* psynth_oversampler_new()
 {
-    psynth_oversampler* os = (psynth_oversampler*)smem_new( sizeof( psynth_oversampler ) );
-    smem_zero( os );
-    if( os == 0 ) return 0;
+    psynth_oversampler* os = SMEM_ZALLOC2( psynth_oversampler, 1 );
+    if( !os ) return NULL;
     return os;
 }
 void psynth_oversampler_remove( psynth_oversampler* os )

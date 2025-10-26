@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -38,7 +38,7 @@ volatile int16_t g_gpio_pins_usage[ MAX_GPIO_PINS ];
 volatile int8_t g_gpio_pins_direction[ MAX_GPIO_PINS ]; 
 volatile int g_gpio_users_counter = 0;
 #endif
-static void gpio_init( void )
+static void gpio_init()
 {
 #ifdef OS_LINUX
     if( g_gpio_users_counter == 0 )
@@ -52,7 +52,7 @@ static void gpio_init( void )
     g_gpio_users_counter++;
 #endif
 }
-static void gpio_deinit( void )
+static void gpio_deinit()
 {
 #ifdef OS_LINUX
     g_gpio_users_counter--;

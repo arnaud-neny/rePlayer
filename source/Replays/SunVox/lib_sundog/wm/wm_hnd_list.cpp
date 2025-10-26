@@ -1,7 +1,7 @@
 /*
     wm_hnd_list.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -126,7 +126,7 @@ int list_handler( sundog_event* evt, window_manager* wm )
 	    break;
 	case EVT_AFTERCREATE:
 	    data->win = win;
-	    data->list = (slist_data*)smem_new( sizeof( slist_data ) );
+	    data->list = SMEM_ALLOC2( slist_data, 1 );
 	    slist_init( data->list );
 	    data->flags = 0;
 	    data->prev_selected = -999;

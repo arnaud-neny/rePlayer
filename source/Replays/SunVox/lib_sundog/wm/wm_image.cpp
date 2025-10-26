@@ -1,7 +1,7 @@
 /*
     wm_image.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -24,7 +24,7 @@ sdwm_image* new_image(
 {
     sdwm_image* img = NULL;
     
-    img = (sdwm_image*)smem_new( sizeof( sdwm_image ) );
+    img = SMEM_ALLOC2( sdwm_image, 1 );
     if( img )
     {
 	img->wm = wm;
@@ -42,7 +42,7 @@ sdwm_image* new_image(
 	}
 	else
 	{
-	    img->data = smem_new( img->xsize * img->ysize * img->pixelsize );
+	    img->data = SMEM_ALLOC( img->xsize * img->ysize * img->pixelsize );
 	    if( flags & IMAGE_CLEAN ) smem_zero( img->data );
 	    if( src )
 	    {

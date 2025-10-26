@@ -275,8 +275,7 @@ void* input_sound_thread( void* arg )
     if( ( ss->in_type == sound_buffer_int16 && d->alsa_pcm_format[ 1 ] != SND_PCM_FORMAT_S16_LE ) ||
 	( ss->in_type == sound_buffer_float32 && d->alsa_pcm_format[ 1 ] != SND_PCM_FORMAT_FLOAT_LE ) )
     {
-	tmp_buf32 = (int32_t*)smem_new( sizeof( int32_t ) * read_buf_size * ss->in_channels );
-	smem_zero( tmp_buf32 );
+	tmp_buf32 = SMEM_ZALLOC2( int32_t, read_buf_size * ss->in_channels );
     }
     while( d->input_thread_exit_request == 0 ) 
     {
@@ -564,7 +563,7 @@ int device_sound_init_alsa( sundog_sound* ss, bool input )
 	    int frame_size2 = d->alsa_pcm_smp_size[ 0 ] * ss->out_channels;
 	    if( frame_size2 > frame_size ) frame_size = frame_size2;
     	    smem_free( d->output_buffer );
-	    d->output_buffer = smem_new( d->buffer_size * frame_size );
+	    d->output_buffer = SMEM_ALLOC( d->buffer_size * frame_size );
 	}
 
 	err = snd_pcm_prepare( *handle );
@@ -650,7 +649,7 @@ int device_sound_init_oss( sundog_sound* ss )
     
     int frame_size = g_sample_size[ ss->out_type ] * ss->out_channels;
     smem_free( d->output_buffer );
-    d->output_buffer = smem_new( d->buffer_size * frame_size );
+    d->output_buffer = SMEM_ALLOC( d->buffer_size * frame_size );
     
     //Create sound thread:
     if( pthread_create( &d->thread, NULL, sound_thread, ss ) != 0 )
@@ -707,9 +706,8 @@ int device_sound_init_sdl( sundog_sound* ss )
 
 int device_sound_init( sundog_sound* ss )
 {
-    ss->device_specific = smem_new( sizeof( device_sound ) );
+    ss->device_specific = SMEM_ZALLOC( sizeof( device_sound ) );
     device_sound* d = (device_sound*)ss->device_specific;
-    smem_zero( d );
 
     sundog_sound_set_defaults( ss );
 
@@ -907,7 +905,7 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
 
     *names = 0;
     *infos = 0;
-    char* ts = (char*)smem_new( 2048 );
+    char* ts = SMEM_ALLOC2( char, 2048 );
 
     switch( drv_num )
     {
@@ -968,10 +966,10 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
                             }
                             //Device name:
                             sprintf( ts, "hw:%d,%d", card, dev );
-                            smem_objarray_write_d( (void***)names, ts, true, rv );
+                            SMEM_OBJARRAY_WRITE_D( (void***)names, ts, true, rv );
                             //Device info:
                             sprintf( ts, "hw:%d,%d %s, %s", card, dev, snd_ctl_card_info_get_name( info ), snd_pcm_info_get_name( pcminfo ) );
-			    smem_objarray_write_d( (void***)infos, ts, true, rv );
+			    SMEM_OBJARRAY_WRITE_D( (void***)infos, ts, true, rv );
                             rv++;
                             //Subdevices:
                             if( 0 )
@@ -986,10 +984,10 @@ int device_sound_get_devices( const char* driver, char*** names, char*** infos, 
                         	    else
                         	    {
                         		sprintf( ts, "hw:%d,%d,%d", card, dev, idx );
-                        		(*names)[ rv ] = (char*)smem_new( smem_strlen( ts ) + 1 ); (*names)[ rv ][ 0 ] = 0; smem_strcat_resize( (*names)[ rv ], ts );
+                        		(*names)[ rv ] = SMEM_ALLOC2( char, smem_strlen( ts ) + 1 ); (*names)[ rv ][ 0 ] = 0; SMEM_STRCAT_D( (*names)[ rv ], ts );
                         		//Device info:
                         		sprintf( ts, "hw:%d,%d,%d %s", card, dev, idx, snd_pcm_info_get_subdevice_name( pcminfo ) );
-                        		(*infos)[ rv ] = (char*)smem_new( smem_strlen( ts ) + 1 ); (*infos)[ rv ][ 0 ] = 0; smem_strcat_resize( (*infos)[ rv ], ts );
+                        		(*infos)[ rv ] = SMEM_ALLOC2( char, smem_strlen( ts ) + 1 ); (*infos)[ rv ][ 0 ] = 0; SMEM_STRCAT_D( (*infos)[ rv ], ts );
                         		rv++;
                         	    }
                         	}

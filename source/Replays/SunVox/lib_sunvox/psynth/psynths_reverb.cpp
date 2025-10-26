@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -195,7 +195,7 @@ static void realloc_filter_bufs( MODULE_DATA* data, psynth_net* pnet )
         if( f->buf_size > (int)old_size )
         {
     	    size_t new_size = f->buf_size + 128;
-    	    f->buf = (PS_STYPE2*)smem_resize2( f->buf, new_size * sizeof( PS_STYPE2 ) );
+    	    f->buf = SMEM_ZRESIZE2( f->buf, PS_STYPE2, new_size );
         }
     }
     for( int i = 0; i < MAX_ALLPASSES * 2; i++ )
@@ -205,7 +205,7 @@ static void realloc_filter_bufs( MODULE_DATA* data, psynth_net* pnet )
         if( f->buf_size > (int)old_size )
         {
     	    size_t new_size = f->buf_size + 128;
-    	    f->buf = (PS_STYPE2*)smem_resize2( f->buf, new_size * sizeof( PS_STYPE2 ) );
+    	    f->buf = SMEM_ZRESIZE2( f->buf, PS_STYPE2, new_size );
         }
     }
 }
@@ -327,16 +327,14 @@ PS_RETTYPE MODULE_HANDLER(
 	    for( int i = 0; i < MAX_COMBS * 2; i++ )
 	    {
 		comb_filter* f = &data->combs[ i ];
-    		f->buf = (PS_STYPE2*)smem_new( f->buf_size * sizeof( PS_STYPE2 ) );
-    		smem_zero( f->buf );
+    		f->buf = SMEM_ZALLOC2( PS_STYPE2, f->buf_size );
 		f->buf_ptr = 0;
 		f->filterstore = 0;
 	    }
 	    for( int i = 0; i < MAX_ALLPASSES * 2; i++ )
 	    {
 		allpass_filter* f = &data->allpasses[ i ];
-    		f->buf = (PS_STYPE2*)smem_new( f->buf_size * sizeof( PS_STYPE2 ) );
-    		smem_zero( f->buf );
+    		f->buf = SMEM_ZALLOC2( PS_STYPE2, f->buf_size );
 		f->buf_ptr = 0;
 	    }
 	    clean_filters( data );

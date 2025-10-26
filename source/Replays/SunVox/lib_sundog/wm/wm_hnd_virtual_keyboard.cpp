@@ -1,7 +1,7 @@
 /*
     wm_hnd_virtual_keyboard.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -303,13 +303,13 @@ int keyboard_handler( sundog_event* evt, window_manager* wm )
 		    //Show menu:
 		    if( data->send_event_to )
 		    {
-			char* menu = (char*)smem_new( 8 );
+			char* menu = SMEM_ALLOC2( char, 8 );
 			if( menu )
 			{
 			    menu[ 0 ] = 0;
-			    smem_strcat_resize( menu, wm_get_string( STR_WM_COPY_ALL ) );
-			    smem_strcat_resize( menu, "\n" );
-			    smem_strcat_resize( menu, wm_get_string( STR_WM_PASTE ) );
+			    SMEM_STRCAT_D( menu, wm_get_string( STR_WM_COPY_ALL ) );
+			    SMEM_STRCAT_D( menu, "\n" );
+			    SMEM_STRCAT_D( menu, wm_get_string( STR_WM_PASTE ) );
 			    int v = popup_menu( wm_get_string( STR_WM_EDIT ), menu, win->screen_x + data->selected_key_x, win->screen_y + data->selected_key_y, wm->menu_color, wm );
 			    smem_free( menu );
 			    int keycode = 0;

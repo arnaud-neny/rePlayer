@@ -1,7 +1,7 @@
 /*
     wm_hnd_preferences.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2011 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2011 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -15,6 +15,8 @@
 #ifdef SUNVOX_GUI
     #include "../../sunvox/main/sunvox_gui.h"
 #endif
+
+bool g_clear_settings = false;
 
 struct prefs_data
 {
@@ -187,6 +189,108 @@ int prefs_handler( sundog_event* evt, window_manager* wm )
 	    if( !win->visible ) break; //recalc_controllers() will not be performed, so we will get the wrong window parameters
 	case EVT_BEFORESHOW:
 	    //resize_window_with_decorator( win, 0, data->correct_ysize, wm );
+	    break;
+    }
+    return retval;
+}
+
+//
+//
+//
+
+struct prefs_main_data
+{
+    WINDOWPTR win;
+
+    WINDOWPTR reset_all;
+    WINDOWPTR log;
+    WINDOWPTR broad_fs; //Android MANAGE_EXTERNAL_STORAGE
+};
+
+int prefs_main_reset_all_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+{
+    if( dialog( 0, wm_get_string( STR_WM_CLEAR_SETTINGS_MSG ), wm_get_string( STR_WM_YESNO ), wm ) == 0 )
+    {
+	wm->exit_request = 1;
+        wm->restart_request = 1;
+        g_clear_settings = true;
+    }
+    return 0;
+}
+
+int prefs_main_log_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+{
+    edialog_open( NULL, NULL, wm );
+    return 0;
+}
+
+int prefs_main_broad_fs_handler( void* user_data, WINDOWPTR win, window_manager* wm )
+{
+#ifdef OS_ANDROID
+    if( android_sundog_allfiles_access_supported( wm->sd ) )
+    {
+	android_sundog_allfiles_access( wm->sd ); //show screen for controlling if the app can manage external storage (broad access)
+    }
+#endif
+    return 0;
+}
+
+int prefs_main_handler( sundog_event* evt, window_manager* wm )
+{
+    if( window_handler_check_data( evt, wm ) ) return 0;
+    int retval = 0;
+    WINDOWPTR win = evt->win;
+    prefs_main_data* data = (prefs_main_data*)win->data;
+    switch( evt->type )
+    {
+	case EVT_GETDATASIZE:
+	    retval = sizeof( prefs_main_data );
+	    break;
+	case EVT_AFTERCREATE:
+	    {
+		data->win = win;
+
+		int y = 0;
+
+		wm->opt_button_flags = BUTTON_FLAG_LEFT_ALIGNMENT_ON_OVERFLOW;
+		data->reset_all = new_window( wm_get_string( STR_WM_CLEAR_SETTINGS ), 0, y, 1, wm->text_ysize, wm->button_color, win, button_handler, wm );
+		set_handler( data->reset_all, prefs_main_reset_all_handler, data, wm );
+		set_window_controller( data->reset_all, 0, wm, (WCMD)0, CEND );
+		set_window_controller( data->reset_all, 2, wm, CPERC, (WCMD)100, CEND );
+		y += wm->text_ysize + wm->interelement_space;
+
+		wm->opt_button_flags = BUTTON_FLAG_LEFT_ALIGNMENT_ON_OVERFLOW;
+		data->log = new_window( wm_get_string( STR_WM_LOG ), 0, y, 1, wm->text_ysize, wm->button_color, win, button_handler, wm );
+		set_handler( data->log, prefs_main_log_handler, data, wm );
+		set_window_controller( data->log, 0, wm, (WCMD)0, CEND );
+		set_window_controller( data->log, 2, wm, CPERC, (WCMD)100, CEND );
+		y += wm->text_ysize + wm->interelement_space;
+
+#ifdef OS_ANDROID
+		if( android_sundog_allfiles_access_supported( wm->sd ) )
+		{
+		    wm->opt_button_flags = BUTTON_FLAG_LEFT_ALIGNMENT_ON_OVERFLOW;
+		    data->broad_fs = new_window( wm_get_string( STR_WM_BROAD_FS_ACCESS ), 0, y, 1, wm->text_ysize, wm->button_color, win, button_handler, wm );
+		    set_handler( data->broad_fs, prefs_main_broad_fs_handler, data, wm );
+		    set_window_controller( data->broad_fs, 0, wm, (WCMD)0, CEND );
+		    set_window_controller( data->broad_fs, 2, wm, CPERC, (WCMD)100, CEND );
+		    y += wm->text_ysize + wm->interelement_space;
+		}
+#endif
+
+		wm->prefs_section_ysize = y;
+	    }
+	    retval = 1;
+	    break;
+	case EVT_MOUSEBUTTONDOWN:
+	case EVT_MOUSEMOVE:
+	case EVT_TOUCHBEGIN:
+	case EVT_TOUCHEND:
+	case EVT_TOUCHMOVE:
+	    retval = 1;
+	    break;
+	case EVT_BEFORECLOSE:
+	    retval = 1;
 	    break;
     }
     return retval;
@@ -616,23 +720,23 @@ static int prefs_ui_font_dialog_handler( void* user_data, WINDOWPTR win, window_
 
 static int prefs_ui_fonts_handler( void* user_data, WINDOWPTR win, window_manager* wm )
 {
-    char* fonts_menu = (char*)smem_new( 128 );
+    char* fonts_menu = SMEM_ALLOC2( char, 128 );
     fonts_menu[ 0 ] = 0;
-    smem_strcat_resize( fonts_menu, wm_get_string( STR_WM_AUTO ) );
+    SMEM_STRCAT_D( fonts_menu, wm_get_string( STR_WM_AUTO ) );
     for( int i = 0; i < g_fonts_count; i++ )
     {
-	smem_strcat_resize( fonts_menu, "\n" );
-	smem_strcat_resize( fonts_menu, g_font_names[ i ] );
+	SMEM_STRCAT_D( fonts_menu, "\n" );
+	SMEM_STRCAT_D( fonts_menu, g_font_names[ i ] );
     }
 
 #ifdef OPENGL
-    char* upscale_menu = (char*)smem_new( 128 );
+    char* upscale_menu = SMEM_ALLOC2( char, 128 );
     upscale_menu[ 0 ] = 0;
-    smem_strcat_resize( upscale_menu, wm_get_string( STR_WM_AUTO ) );
-    smem_strcat_resize( upscale_menu, "\n" );
-    smem_strcat_resize( upscale_menu, wm_get_string( STR_WM_OFF_CAP ) );
-    smem_strcat_resize( upscale_menu, "\n" );
-    smem_strcat_resize( upscale_menu, wm_get_string( STR_WM_ON_CAP ) );
+    SMEM_STRCAT_D( upscale_menu, wm_get_string( STR_WM_AUTO ) );
+    SMEM_STRCAT_D( upscale_menu, "\n" );
+    SMEM_STRCAT_D( upscale_menu, wm_get_string( STR_WM_OFF_CAP ) );
+    SMEM_STRCAT_D( upscale_menu, "\n" );
+    SMEM_STRCAT_D( upscale_menu, wm_get_string( STR_WM_ON_CAP ) );
     int font_upscaling = sconfig_get_int_value( APP_CFG_NO_FONT_UPSCALE, -1, 0 ) == -1;
     int font_fscaling = sconfig_get_int_value( "int_font_scaling", 0, 0 ) == 0;
 #endif
@@ -641,7 +745,7 @@ static int prefs_ui_fonts_handler( void* user_data, WINDOWPTR win, window_manage
     int font_med_mono = sconfig_get_int_value( APP_CFG_FONT_MEDIUM_MONO, DEFAULT_FONT_MEDIUM_MONO, 0 );
     int font_small = sconfig_get_int_value( APP_CFG_FONT_SMALL, DEFAULT_FONT_SMALL, 0 );
 
-    char* dialog_buttons = (char*)smem_new( 512 );
+    char* dialog_buttons = SMEM_ALLOC2( char, 512 );
     dialog_item* dlist = NULL;
     WINDOWPTR dwin = NULL;
     while( 1 )
@@ -872,6 +976,7 @@ static int prefs_ui_window_pars_handler( void* user_data, WINDOWPTR win, window_
         if( changed )
         {
     	    wm->prefs_restart_request = true;
+    	    wm->flags |= WIN_INIT_DONT_SAVE_WINSIZE;
     	    sconfig_save( 0 );
     	}
     }
@@ -1483,7 +1588,7 @@ static int prefs_audio_driver_handler( void* user_data, WINDOWPTR win, window_ma
     prefs_audio_data* data = (prefs_audio_data*)user_data;
     
     size_t menu_size = 8192;
-    char* menu = (char*)smem_new( menu_size );
+    char* menu = SMEM_ALLOC2( char, menu_size );
     menu[ 0 ] = 0;
     
     smem_strcat( menu, menu_size, wm_get_string( STR_WM_AUTO ) );
@@ -1563,7 +1668,7 @@ static int prefs_audio_device_handler( void* user_data, WINDOWPTR win, window_ma
     const char* cur_drv = prefs_audio_get_driver( wm );
     
     size_t menu_size = 8192;
-    char* menu = (char*)smem_new( menu_size );
+    char* menu = SMEM_ALLOC2( char, menu_size );
     menu[ 0 ] = 0;
     
     smem_strcat( menu, menu_size, wm_get_string( STR_WM_AUTO ) );
@@ -1650,7 +1755,7 @@ static int prefs_audio_buf_handler( void* user_data, WINDOWPTR win, window_manag
     sundog_sound* snd = wm->sd->ss;
     
     size_t menu_size = 8192;
-    char* menu = (char*)smem_new( menu_size );
+    char* menu = SMEM_ALLOC2( char, menu_size );
     menu[ 0 ] = 0;
     smem_strcat( menu, menu_size, wm_get_string( STR_WM_AUTO ) );
     

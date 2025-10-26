@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -125,7 +125,7 @@ static void add_event( MODULE_DATA* data, psynth_event* event, int vol, int mod_
     if( len >= data->evtbuf_size - 1 )
     {
     	data->evtbuf_size *= 4;
-	delay_evt* new_buf = (delay_evt*)smem_new( data->evtbuf_size * sizeof( delay_evt ) );
+	delay_evt* new_buf = SMEM_ALLOC2( delay_evt, data->evtbuf_size );
 	int rp = data->evtbuf_rp;
 	int p = 0;
 	while( rp != data->evtbuf_wp )
@@ -225,7 +225,7 @@ static void handle_changes( psynth_module* mod, int mod_num )
 	{
 	    for( int i = 0; i < MODULE_OUTPUTS; i++ )
     	    {
-    		data->buf[ i ] = (PS_STYPE*)smem_resize2( data->buf[ i ], buf_size * sizeof( PS_STYPE ) );
+    		data->buf[ i ] = SMEM_ZRESIZE2( data->buf[ i ], PS_STYPE, buf_size );
     	    }
     	    data->buf_size = buf_size;
 	}
@@ -294,14 +294,13 @@ PS_RETTYPE MODULE_HANDLER(
 	    data->buf_size = pnet->sampling_freq / 64;
 	    for( int i = 0; i < MODULE_OUTPUTS; i++ )
 	    {
-		data->buf[ i ] = (PS_STYPE*)smem_new( data->buf_size * sizeof( PS_STYPE ) );
-		smem_zero( data->buf[ i ] );
+		data->buf[ i ] = SMEM_ZALLOC2( PS_STYPE, data->buf_size );
 	    }
 	    data->buf_ptr = 0;
 	    data->buf_clean = true;
 	    data->empty_frames_counter = data->buf_size;
 	    data->evtbuf_size = 16;
-	    data->evtbuf = (delay_evt*)smem_new( data->evtbuf_size * sizeof( delay_evt ) );
+	    data->evtbuf = SMEM_ALLOC2( delay_evt, data->evtbuf_size );
 	    data->ctls_changed = 0xFFFFFFFF;
 	    retval = 1;
 	    break;

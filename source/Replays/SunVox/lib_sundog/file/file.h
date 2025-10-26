@@ -9,17 +9,21 @@ File system packed in a file:
     vfsX:/FILE		- FILE on a packed file system; where the X - filesystem descriptor (supported formats: TAR);
 Virtual disks (quick access to standard app directories):
     1:/FILE		- FILE in the current working directory (app documents, backups, last sessions, etc.):
-				Linux and Windows: current working directory of the calling process;
-				iOS: local storage for app docs;
-				macOS: path to the same directory where the application bundle is located;
-				Android: local storage for app docs - primary shared storage (internal memory);
-				WinCE: filesystem root (/);
-    2:/FILE		- FILE in the app/user directory for configs, templates and some hidden data:
-				Linux: /home/username/.config/appname;
-				Windows and WinCE: directory for application-specific data (/Documents and Settings/username/Application Data);
-		    		iOS: application support files;
-		    		macOS: application support files (/Users/username/Library/Application Support/appname);
-				Android: internal files directory;
+			    * Linux and Windows: current working directory of the calling process;
+				this is the folder you are in before launching the app;
+				if you launch the app from the desktop menu in Linux, the current working directory is /home/username
+			    * iOS: local storage for app docs;
+			    * macOS: the same directory where the app bundle is located OR the path to an isolated sandbox;
+				read more: https://www.warmplace.ru/forum/viewtopic.php?f=3&t=4399
+			    * Android: local storage for app docs - primary shared storage (internal memory);
+			    * WinCE: filesystem root (/);
+			    * if 1:/ is write protected, then 2:/ will be used instead;
+    2:/FILE		- FILE in the app/user directory for configs, templates, caches and some hidden data:
+			    * Linux: /home/username/.config/appname;
+			    * Windows and WinCE: directory for application-specific data (/Documents and Settings/username/Application Data);
+		    	    * iOS: application support files;
+		    	    * macOS: application support files (/Users/username/Library/Application Support/appname);
+			    * Android: internal files directory;
     3:/FILE		- FILE in the temporary directory;
     4,5,6,7...          - additional virtual disks (system dependent) from ADD_VIRT_DISK to 9;
 Reserved characters (don't use it in the file name):
@@ -46,17 +50,17 @@ Reserved characters (don't use it in the file name):
     #define MAX_DISKS	16
 #endif
 #define DISKNAME_SIZE	4
-#define MAX_DIR_LEN	2048 //Don't use it! Will be removed soon...
+#define MAX_DIR_LEN	2048 //Don't use it! Must be deleted in future updates!
 #define ADD_VIRT_DISK   4
 
-void sfs_refresh_disks( void ); //get info about local disks
+void sfs_refresh_disks(); //get info about local disks
 const char* sfs_get_disk_name( uint n ); //get disk name (for example: "C:/", "H:/", "/")
 int sfs_get_disk_num( const char* path );
-uint sfs_get_current_disk( void ); //get number of the current disk
-uint sfs_get_disk_count( void );
-const char* sfs_get_work_path( void ); //get current working directory (example: "C:/mydir/"); virtual disk 1:/
-const char* sfs_get_conf_path( void ); //get config directory; virtual disk 2:/
-const char* sfs_get_temp_path( void ); //virtual disk 3:/
+uint sfs_get_current_disk(); //get number of the current disk
+uint sfs_get_disk_count();
+const char* sfs_get_work_path(); //get current working directory (example: "C:/mydir/"); virtual disk 1:/
+const char* sfs_get_conf_path(); //get config directory; virtual disk 2:/
+const char* sfs_get_temp_path(); //virtual disk 3:/
 
 //
 // Main functions
@@ -85,8 +89,8 @@ enum sfs_fd_type
 //File format ID:
 enum sfs_file_fmt
 {
-    //Audio:
     SFS_FILE_FMT_UNKNOWN = 0,
+    //Audio:
     SFS_FILE_FMT_WAVE,
     SFS_FILE_FMT_AIFF,
     SFS_FILE_FMT_OGG, 	//currently only Vorbis is supported; for other codecs: use some additional options in the decoder/encoder structures
@@ -125,8 +129,8 @@ struct sfs_fd_struct
 
 typedef uint sfs_file;
 
-int sfs_global_init( void );
-int sfs_global_deinit( void );
+int sfs_global_init();
+int sfs_global_deinit();
 //expand/shring virtual disk name (e.g. expand: 1:/file -> /home/user/file; shrink: /home/user/file -> 1:/file):
 char* sfs_make_filename( sundog_engine* sd, const char* filename, bool expand ); //smem_free() required!
 uint16_t* sfs_convert_filename_to_win_utf16( char* src ); //for Windows only; retval = malloc()
@@ -158,7 +162,9 @@ int sfs_remove( const char* filename ); //remove a file or directory
 int sfs_remove_file( const char* filename );
 int sfs_rename( const char* old_name, const char* new_name );
 int sfs_mkdir( const char* pathname, uint mode );
-int64_t sfs_get_file_size( const char* filename );
+int64_t sfs_get_file_size( const char* filename, int* err );
+inline int64_t sfs_get_file_size( const char* filename ) { int err; return sfs_get_file_size( filename, &err ); }
+inline bool sfs_file_exists( const char* filename ) { int err; sfs_get_file_size( filename, &err ); return err == 0 ? 1 : 0; }
 int sfs_copy_file( const char* dest, const char* src );
 int sfs_copy_files( const char* dest, const char* src, const char* mask, const char* with_str_in_filename, bool move ); //Return value: number of files copied/moved; dest/src: "somedir/"; mask: "xm/mod/it" or NULL
 void sfs_remove_support_files( const char* prefix ); //Remove the app support files from the 2:/ ; prefix example: ".sunvox_"
@@ -224,7 +230,9 @@ int sfs_get_clipboard_type( sfs_file_fmt fmt );
 
 struct simage_desc; //misc.h
 
-enum sfs_jpeg_enc_subsampling
+#define LOAD_JPEG_FLAG_AUTOROTATE	1
+
+enum sfs_save_jpeg_subsampling
 {
     JE_Y_ONLY, //Y (grayscale) only
     JE_H1V1, //YCbCr, no subsampling (H1V1, YCbCr 1x1x1, 3 blocks per MCU)
@@ -232,13 +240,13 @@ enum sfs_jpeg_enc_subsampling
     JE_H2V2, //YCbCr, H2V2 subsampling (YCbCr 4x1x1, 6 blocks per MCU, very common)
 };
 
-class sfs_jpeg_enc_params : public smem_wrapper
+class sfs_save_jpeg_pars : public smem_base
 {
 public:
     int				quality; //1-100, higher is better
-    sfs_jpeg_enc_subsampling	subsampling;
+    sfs_save_jpeg_subsampling	subsampling;
     bool			two_pass_flag;
-    sfs_jpeg_enc_params()
+    sfs_save_jpeg_pars()
     {
 	quality = 85;
 	subsampling = JE_H2V2;
@@ -270,6 +278,7 @@ typedef int64_t (*sfs_sound_decoder_fmt_tell_t)( sfs_sound_decoder_data* );
 struct sfs_sound_decoder_data
 {
     uint32_t		flags; //SFS_SDEC_*
+    char*		filename; //cloned
     sfs_file 		f; //input stream
     bool		initialized;
     bool		f_close_req;
@@ -302,17 +311,18 @@ typedef void (*sfs_sound_encoder_fmt_deinit_t)( sfs_sound_encoder_data* );
 typedef size_t (*sfs_sound_encoder_fmt_write_t)( sfs_sound_encoder_data*, void* src_buf, size_t len );
 struct sfs_sound_encoder_data
 {
+    char*		filename; //cloned
     sfs_file 		f; //input stream
     bool		initialized;
     bool		f_close_req;
     sundog_engine*	sd;
-    sfs_file_fmt	file_format;
+    sfs_file_fmt	file_format; //SFS_FILE_FMT_UNKNOWN = RAW
     sfs_sample_format 	sample_format;
     int			sample_size; //in bytes
     int			frame_size; //in bytes
     int                 rate; //in Hz
     int                 channels;
-    size_t              len; //number of frames (frame = sample_size * channels)
+    size_t              len; //number of frames (frame = sample_size * channels); may be != final length
     uint8_t		loop_type; //0 - none; 1 - normal; 2 - bidirectional;
     size_t		loop_start; //in frames
     size_t		loop_len; //in frames; 0 - no loop;
@@ -323,8 +333,8 @@ struct sfs_sound_encoder_data
     void*		format_encoder_data;
 };
 
-int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img );
-int sfs_save_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, sfs_jpeg_enc_params* pars );
+int sfs_load_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, uint32_t flags );
+int sfs_save_jpeg( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img, sfs_save_jpeg_pars* pars );
 
 int sfs_load_png( sundog_engine* sd, const char* filename, sfs_file f, simage_desc* img );
 
@@ -342,7 +352,7 @@ int sfs_sound_encoder_init(
     sfs_sample_format sample_format,
     int rate, //Hz
     int channels,
-    size_t len, //number of frames
+    size_t len, //number of frames; final length may be different;
     uint32_t flags,
     sfs_sound_encoder_data* e );
 void sfs_sound_encoder_deinit( sfs_sound_encoder_data* e );
@@ -353,6 +363,6 @@ size_t sfs_sound_encoder_write( sfs_sound_encoder_data* e, void* src_buf, size_t
 //
 
 #if defined(OS_APPLE)
-int apple_sfs_global_init( void );
-int apple_sfs_global_deinit( void );
+int apple_sfs_global_init();
+int apple_sfs_global_deinit();
 #endif

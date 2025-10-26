@@ -1,7 +1,7 @@
 /*
     video.cpp
     This file is part of the SunDog engine.
-    Copyright (C) 2014 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2014 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -55,7 +55,7 @@ int svideo_open( svideo_struct* vid, sundog_engine* sd, const char* name, uint f
 	if( vid == 0 ) break;
 	smem_clear( vid, sizeof( svideo_struct ) );
 	vid->sd = sd;
-	vid->name = (char*)smem_strdup( name );
+	vid->name = (char*)SMEM_STRDUP( name );
 	vid->flags = flags;
 	vid->capture_callback = capture_callback;
 	vid->capture_user_data = capture_user_data;

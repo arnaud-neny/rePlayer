@@ -79,7 +79,7 @@ void* midi_client_thread( void* user_data )
     {
 	reset_request = 0;
 	npfd = snd_seq_poll_descriptors_count( d->handle, POLLIN );
-	pfd = (struct pollfd*)smem_new( ( npfd + 1 ) * sizeof( struct pollfd ) );
+	pfd = SMEM_ALLOC2( struct pollfd, npfd + 1 );
 	snd_seq_poll_descriptors( d->handle, pfd, npfd, POLLIN );
 	pfd[ npfd ].fd = d->thread_control_pipe[ 0 ];
 	pfd[ npfd ].events = POLLIN;
@@ -92,7 +92,7 @@ void* midi_client_thread( void* user_data )
 		rv = snd_seq_event_input( d->handle, &ev );
 		if( rv >= 0 && ev && ev->dest.client == snd_seq_client_id( d->handle ) )
 		{
-		    c->last_midi_in_activity = stime_ticks();
+		    c->midi_in_activity = true;
 		    device_midi_port* port = NULL;
 		    for( int i = 0; i < c->ports_cnt; i++ )
 		    {
@@ -171,9 +171,9 @@ void find_midi_client( sundog_midi_client* c, const char* dev_name, int* client_
 		*port_id = pid;
 		return;
 	    }
-	    char* port_name2 = (char*)smem_new( smem_strlen( port_name ) + 1 );
+	    char* port_name2 = SMEM_ALLOC2( char, smem_strlen( port_name ) + 1 );
 	    port_name2[ 0 ] = 0;
-	    smem_strcat_resize( port_name2, port_name );
+	    SMEM_STRCAT_D( port_name2, port_name );
 	    for( int i = smem_strlen( port_name2 ) - 1; i >= 0; i-- )
 	    {
 		if( port_name2[ i ] == ' ' ) 
@@ -203,9 +203,8 @@ int device_midi_client_open( sundog_midi_client* c, const char* name )
     //ALSA:
 
     int rv = 0;
-    c->device_specific = smem_new( sizeof( device_midi_client ) );
+    c->device_specific = SMEM_ZALLOC( sizeof( device_midi_client ) );
     device_midi_client* d = (device_midi_client*)c->device_specific;
-    smem_zero( d );
     
     while( 1 )
     {
@@ -355,7 +354,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 	    if( ignore == false )
 	    {
 		rv++;
-		char* port_name2 = smem_strdup( port_name );
+		char* port_name2 = SMEM_STRDUP( port_name );
 		for( int i = smem_strlen( port_name2 ) - 1; i >= 0; i-- )
 		{
 		    if( port_name2[ i ] == ' ' ) 
@@ -363,7 +362,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 		    else 
 			break;
 		}
-		smem_objarray_write_d( (void***)devices, port_name2, false, rv - 1 );
+		SMEM_OBJARRAY_WRITE_D( (void***)devices, port_name2, false, rv - 1 );
 	    }
 	}
     }
@@ -386,16 +385,16 @@ int device_midi_client_open_port( sundog_midi_client* c, int pnum, const char* p
     if( d->handle == 0 ) return -1;
     
     sundog_midi_port* sd_port = c->ports[ pnum ];
-    sd_port->device_specific = smem_znew( sizeof( device_midi_port ) );
+    sd_port->device_specific = SMEM_ZALLOC( sizeof( device_midi_port ) );
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
 #ifndef NOMIDI
     init_common_midiport_vars( port );
 #endif
-    char* port_name_long = (char*)smem_new( smem_get_size( c->name ) + 1 + smem_strlen( port_name ) + 1 );
+    char* port_name_long = SMEM_ALLOC2( char, smem_get_size( c->name ) + 1 + smem_strlen( port_name ) + 1 );
     port_name_long[ 0 ] = 0;
-    smem_strcat_resize( port_name_long, c->name );
-    smem_strcat_resize( port_name_long, " " );
-    smem_strcat_resize( port_name_long, port_name );
+    SMEM_STRCAT_D( port_name_long, c->name );
+    SMEM_STRCAT_D( port_name_long, " " );
+    SMEM_STRCAT_D( port_name_long, port_name );
     
     while( 1 )
     {
@@ -558,8 +557,6 @@ int device_midi_client_send_event( sundog_midi_client* c, int pnum, sundog_midi_
     sundog_midi_port* sd_port = c->ports[ pnum ];
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
     if( port == 0 ) return 0;
-
-    c->last_midi_out_activity = stime_ticks();
 
     snd_seq_event_t alsa_event;
     size_t data_size = evt->size;

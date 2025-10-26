@@ -1,7 +1,7 @@
 /*
     sound.cpp - sound and MIDI in/out
     This file is part of the SunDog engine.
-    Copyright (C) 2004 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2004 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -312,7 +312,7 @@ mutex_end:
 #endif
 }
 
-int sundog_sound_global_init( void )
+int sundog_sound_global_init()
 {
 #ifndef NOSOUND
     smutex_init( &g_sundog_sound_mutex, 0 );
@@ -320,7 +320,7 @@ int sundog_sound_global_init( void )
     return 0;
 }
 
-int sundog_sound_global_deinit( void )
+int sundog_sound_global_deinit()
 {
 #ifndef NOSOUND
     smutex_destroy( &g_sundog_sound_mutex );
@@ -419,7 +419,7 @@ int sundog_sound_init( sundog_sound* ss, sundog_engine* sd, sound_buffer_type ty
 
 	int frame = g_sample_size[ ss->out_type ] * ss->out_channels;
 	ss->slot_buffer_size = 1024 * 8;
-	ss->slot_buffer = smem_new( ss->slot_buffer_size * frame );
+	ss->slot_buffer = SMEM_ALLOC( ss->slot_buffer_size * frame );
 
 	if( sd )
 	{
@@ -890,7 +890,7 @@ const char* sundog_sound_get_driver_info( sundog_sound* ss )
 #endif
 }
 
-const char* sundog_sound_get_default_driver( void )
+const char* sundog_sound_get_default_driver()
 {
 #ifndef NOSOUND
     
@@ -908,16 +908,16 @@ int sundog_sound_get_drivers( char*** names, char*** infos )
 #ifndef NOSOUND
 
     if( NUMBER_OF_SDRIVERS <= 1 ) return 0;
-    char** n = (char**)smem_new( NUMBER_OF_SDRIVERS * sizeof( void* ) );
-    char** i = (char**)smem_new( NUMBER_OF_SDRIVERS * sizeof( void* ) );
+    char** n = SMEM_ALLOC2( char*, NUMBER_OF_SDRIVERS );
+    char** i = SMEM_ALLOC2( char*, NUMBER_OF_SDRIVERS );
     for( int d = 0; d < NUMBER_OF_SDRIVERS; d++ )
     {
-        n[ d ] = (char*)smem_new( smem_strlen( g_sdriver_names[ d ] ) + 1 );
+        n[ d ] = SMEM_ALLOC2( char, smem_strlen( g_sdriver_names[ d ] ) + 1 );
         n[ d ][ 0 ] = 0;
-        smem_strcat_resize( n[ d ], g_sdriver_names[ d ] );
-        i[ d ] = (char*)smem_new( smem_strlen( g_sdriver_infos[ d ] ) + 1 );
+        SMEM_STRCAT_D( n[ d ], g_sdriver_names[ d ] );
+        i[ d ] = SMEM_ALLOC2( char, smem_strlen( g_sdriver_infos[ d ] ) + 1 );
         i[ d ][ 0 ] = 0;
-        smem_strcat_resize( i[ d ], g_sdriver_infos[ d ] );
+        SMEM_STRCAT_D( i[ d ], g_sdriver_infos[ d ] );
     }
     *names = n;
     *infos = i;
@@ -1022,7 +1022,7 @@ int sundog_sound_capture_start( sundog_sound* ss, const char* filename, uint32_t
         sfs_write( &n, 1, 4, f ); //size
 
 	int frame_size = g_sample_size[ type ] * channels;
-        uint8_t* buf = (uint8_t*)smem_new( round_to_power_of_two( 2 * ss->freq * frame_size ) );
+        uint8_t* buf = SMEM_ALLOC2( uint8_t, round_to_power_of_two( 2 * ss->freq * frame_size ) );
         
 	sundog_sound_lock( ss );
 	ss->out_file = f;
@@ -1089,14 +1089,14 @@ void sundog_sound_capture_stop( sundog_sound* ss )
 // MIDI
 //
 
-int sundog_midi_global_init( void )
+int sundog_midi_global_init()
 {
 #ifndef NOMIDI
 #endif
     return 0;
 }
 
-int sundog_midi_global_deinit( void )
+int sundog_midi_global_deinit()
 {
 #ifndef NOMIDI
 #endif
@@ -1122,7 +1122,7 @@ int sundog_midi_client_open( sundog_midi_client* c, sundog_engine* sd, sundog_so
     c->sd = sd;
     c->ss = ss;
     c->flags = flags;
-    c->name = smem_strdup( name );
+    c->name = SMEM_STRDUP( name );
 
     if( c->flags & MIDI_CLIENT_FLAG_PORTS_MUTEX )
     {
@@ -1303,10 +1303,9 @@ int sundog_midi_client_open_port( sundog_midi_client* c, const char* port_name, 
 	    }
 	    else
 	    {
-		sundog_midi_port* port = (sundog_midi_port*)smem_new( sizeof( sundog_midi_port ) );
+		sundog_midi_port* port = SMEM_ZALLOC2( sundog_midi_port, 1 );
 		if( port )
 		{
-		    smem_zero( port );
 		    COMPILER_MEMORY_BARRIER(); //guarantee that the cleared (empty) port will be written below
 		    c->ports[ i ] = port;
 		    rv = i;
@@ -1335,10 +1334,10 @@ int sundog_midi_client_open_port( sundog_midi_client* c, const char* port_name, 
 	}
 	
 	smem_free( port->port_name );
-	port->port_name = smem_strdup( port_name );
+	port->port_name = SMEM_STRDUP( port_name );
 
 	smem_free( port->dev_name );
-	port->dev_name = smem_strdup( dev_name );
+	port->dev_name = SMEM_STRDUP( dev_name );
 	
 	COMPILER_MEMORY_BARRIER();
 	port->active = 1;
@@ -1547,6 +1546,10 @@ int sundog_midi_client_send_event( sundog_midi_client* c, int pnum, sundog_midi_
     sundog_midi_port* port = c->ports[ pnum ];
     if( port && port->active )
     {
+	c->midi_out_activity = true;
+#ifndef SUNDOG_MODULE
+	if( c->sd && c->sd ) c->sd->ss_idle_frame_counter = 0;
+#endif
 	rv = device_midi_client_send_event( c, pnum, evt );
     }
 

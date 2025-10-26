@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -322,13 +322,13 @@ static void pitch_detector_reinit_buffers( psynth_module* mod, int mod_num )
     size_t old_size = smem_get_size( data->buf );
     if( new_size > old_size )
     {
-	data->buf = (float*)smem_resize( data->buf, new_size );
-	data->energy_terms = (float*)smem_resize( data->energy_terms, new_size / 2 );
-	data->fft_i1 = (float*)smem_resize( data->fft_i1, new_size );
-	data->fft_r1 = (float*)smem_resize( data->fft_r1, new_size );
-	data->fft_i2 = (float*)smem_resize( data->fft_i2, new_size );
-	data->fft_r2 = (float*)smem_resize( data->fft_r2, new_size );
-	data->fft_win = (float*)smem_resize( data->fft_win, new_size );
+	data->buf = (float*)SMEM_RESIZE( data->buf, new_size );
+	data->energy_terms = (float*)SMEM_RESIZE( data->energy_terms, new_size / 2 );
+	data->fft_i1 = (float*)SMEM_RESIZE( data->fft_i1, new_size );
+	data->fft_r1 = (float*)SMEM_RESIZE( data->fft_r1, new_size );
+	data->fft_i2 = (float*)SMEM_RESIZE( data->fft_i2, new_size );
+	data->fft_r2 = (float*)SMEM_RESIZE( data->fft_r2, new_size );
+	data->fft_win = (float*)SMEM_RESIZE( data->fft_win, new_size );
     }
     if( data->buf_size != buf_size || data->fft_win_type != fft_win_type )
     {

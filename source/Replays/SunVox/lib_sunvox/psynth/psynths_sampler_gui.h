@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -269,7 +269,7 @@ int sampler_rec( psynth_net* pnet, int mod_num, uint32_t flags, int start )
 	    int rec_sample_size = sizeof( PS_STYPE );
 	    int rec_buf_size = REC_FRAMES * rec_sample_size * rec_channels;
 	    if( (int)smem_get_size( mdata->rec_buf ) < rec_buf_size )
-		mdata->rec_buf = smem_resize( mdata->rec_buf, rec_buf_size );
+		mdata->rec_buf = SMEM_RESIZE( mdata->rec_buf, rec_buf_size );
 	    if( ( flags & SMP_REC_SS_FLAG_SYNTH_THREAD ) == 0 )
 	    {
 	    	if( smutex_lock( psynth_get_mutex( mod_num, pnet ) ) == 0 )

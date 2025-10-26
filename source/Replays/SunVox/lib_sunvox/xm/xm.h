@@ -124,7 +124,7 @@ struct xm_song
 };
 
 void xm_remove_song( xm_song* song );
-xm_song* xm_new_song( void );
+xm_song* xm_new_song();
 xm_song* xm_load_song_from_fd( sfs_file f );
 xm_song* xm_load_song( const char* filename );
 

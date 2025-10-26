@@ -1,6 +1,6 @@
 /*
 This file is part of the SunVox library.
-Copyright (C) 2007 - 2024 Alexander Zolotov <nightradio@gmail.com>
+Copyright (C) 2007 - 2025 Alexander Zolotov <nightradio@gmail.com>
 WarmPlace.ru
 
 MINIFIED VERSION
@@ -138,7 +138,7 @@ PS_RETTYPE MODULE_HANDLER(
 	    data->max_grain_size = pnet->sampling_freq / 4;
 	    data->min_grain_size = pnet->sampling_freq / 5512;
 	    data->buf_size = round_to_power_of_two( data->max_grain_size * 2 );
-	    for( int i = 0; i < MODULE_OUTPUTS; i++ ) data->buf[ i ] = (PS_STYPE*)smem_znew( data->buf_size * sizeof( PS_STYPE ) );
+	    for( int i = 0; i < MODULE_OUTPUTS; i++ ) data->buf[ i ] = SMEM_ZALLOC2( PS_STYPE, data->buf_size );
 	    data->buf_ptr = 0;
 	    data->buf_clean = true;
 	    data->out_ptr = 0;

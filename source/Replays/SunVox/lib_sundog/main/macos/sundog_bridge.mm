@@ -1,7 +1,7 @@
 /*
     sundog_bridge.mm - SunDog<->System bridge
     This file is part of the SunDog engine.
-    Copyright (C) 2009 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2009 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
@@ -224,7 +224,7 @@ sundog_state* sundog_state_get( sundog_engine* s, int io ) //io: 0 - app input; 
     return state;
 }
 
-void macos_sundog_screen_redraw( void )
+void macos_sundog_screen_redraw()
 {
     CGLFlushDrawable( (CGLContextObj)g_gl_context_obj );
 }

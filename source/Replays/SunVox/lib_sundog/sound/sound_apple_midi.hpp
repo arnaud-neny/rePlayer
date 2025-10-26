@@ -82,7 +82,7 @@ static void midi_port_receive( device_midi_port* port, const MIDIPacketList* pac
 {
     if( !port ) return;
 
-    port->c->last_midi_in_activity = stime_ticks();
+    port->c->midi_in_activity = true;
 
     MIDIPacket* packet = (MIDIPacket*)packetList->packet;
     uint count = packetList->numPackets;
@@ -313,9 +313,8 @@ int device_midi_client_open( sundog_midi_client* c, const char* name )
     //CoreMIDI:
 
     int rv = 0;
-    c->device_specific = smem_new( sizeof( device_midi_client ) );
+    c->device_specific = SMEM_ZALLOC( sizeof( device_midi_client ) );
     device_midi_client* d = (device_midi_client*)c->device_specific;
-    smem_zero( d );
     
     int prev_cnt = g_midi_create_counter.fetch_add( 1 );
     if( prev_cnt == 0 )
@@ -431,7 +430,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 
     CFStringRef name;
     const uint name_size = 2048;
-    char* name_utf8 = (char*)smem_new( name_size );
+    char* name_utf8 = SMEM_ALLOC2( char, name_size );
     int sources = (int)MIDIGetNumberOfSources();
     int dests = (int)MIDIGetNumberOfDestinations();
     if( flags & MIDI_PORT_READ )
@@ -447,7 +446,7 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 		if( !name ) continue;
 		CFStringGetCString( name, name_utf8, name_size, kCFStringEncodingUTF8 );
 		CFRelease( name );
-		smem_objarray_write_d( (void***)devices, name_utf8, true, rv );
+		SMEM_OBJARRAY_WRITE_D( (void***)devices, name_utf8, true, rv );
 		rv++;
 	    }
 	}
@@ -465,14 +464,14 @@ int device_midi_client_get_devices( sundog_midi_client* c, char*** devices, uint
 		if( !name ) continue;
 		CFStringGetCString( name, name_utf8, name_size, kCFStringEncodingUTF8 );
 		CFRelease( name );
-		smem_objarray_write_d( (void***)devices, name_utf8, true, rv );
+		SMEM_OBJARRAY_WRITE_D( (void***)devices, name_utf8, true, rv );
 		rv++;
 	    }
 	}
 #ifdef AUDIOBUS_MIDI_OUT
 	for( int i = 0; i < AUDIOBUS_MIDI_OUT; i++ )
 	{
-	    smem_objarray_write_d( (void***)devices, (void*)g_ab_midi_out_names2[ i ], true, rv );
+	    SMEM_OBJARRAY_WRITE_D( (void***)devices, (void*)g_ab_midi_out_names2[ i ], true, rv );
 	    rv++;
 	}
 #endif
@@ -501,7 +500,7 @@ int device_midi_client_open_port( sundog_midi_client* c, int pnum, const char* p
     if( !d ) return -1;
 
     sundog_midi_port* sd_port = c->ports[ pnum ];
-    sd_port->device_specific = smem_znew( sizeof( device_midi_port ) );
+    sd_port->device_specific = SMEM_ZALLOC( sizeof( device_midi_port ) );
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
     port->c = c;
 #ifndef NOMIDI
@@ -523,7 +522,7 @@ int device_midi_client_open_port( sundog_midi_client* c, int pnum, const char* p
     if( smem_strcmp( dev_name, "public port" ) == 0 )
     {
         //Connect this port to the public port (visible to others):
-        char* ts = (char*)smem_new( smem_strlen( port_name ) + 128 );
+        char* ts = SMEM_ALLOC2( char, smem_strlen( port_name ) + 128 );
         if( flags & MIDI_PORT_READ )
         {
 #ifdef AUDIOBUS_MIDI_IN
@@ -757,8 +756,6 @@ int device_midi_client_send_event( sundog_midi_client* c, int pnum, sundog_midi_
     sundog_midi_port* sd_port = c->ports[ pnum ];
     device_midi_port* port = (device_midi_port*)sd_port->device_specific;
     if( !port ) return 0;
-
-    c->last_midi_out_activity = stime_ticks();
 
 #ifdef AUDIOBUS_MIDI_OUT
     if( port->audiobus_out <= 0 && g_ab_disable_coremidi_out ) return 0;

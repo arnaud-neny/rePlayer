@@ -7,7 +7,8 @@ extern uint8_t g_hsin_tab[ 256 ];
 
 void fft( uint32_t flags, float* fi, float* fr, int size );
 void fft( uint32_t flags, double* fi, double* fr, int size );
-float fft_test( void );
+float fft_test();
+void fft_speed_test();
 //frequency bins:
 //[ 0 ] = 0 (DC)
 //[ 1 ] = sample rate / 2 / size

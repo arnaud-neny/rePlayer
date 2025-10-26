@@ -17,8 +17,8 @@ struct midi_file
 };
 
 void midi_file_remove( midi_file* mf );
-midi_file* midi_file_new( void );
+midi_file* midi_file_new();
 void midi_track_remove( midi_track* mf );
-midi_track* midi_track_new( void );
+midi_track* midi_track_new();
 midi_file* midi_file_load_from_fd( sfs_file f );
 midi_file* midi_file_load( const char* filename );

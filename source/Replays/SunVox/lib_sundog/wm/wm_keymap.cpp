@@ -1,13 +1,130 @@
 /*
     keymap.cpp - key redefinition
     This file is part of the SunDog engine.
-    Copyright (C) 2014 - 2024 Alexander Zolotov <nightradio@gmail.com>
+    Copyright (C) 2014 - 2025 Alexander Zolotov <nightradio@gmail.com>
     WarmPlace.ru
 */
 
 #include "sundog.h"
 
 char g_ascii_names[ 128 * 2 ];
+
+uint8_t g_key_id_hashmap[ 101 ] = {
+    0,
+    0,
+    0,
+    0,
+    KEY_CAPS,
+    0,
+    0,
+    KEY_SPACE,
+    KEY_LEFT,
+    KEY_UP,
+    KEY_SHIFT,
+    KEY_F1,
+    KEY_F2,
+    KEY_F3,
+    KEY_F4,
+    KEY_F5,
+    KEY_F6,
+    KEY_F7,
+    KEY_F8,
+    KEY_F9,
+    0,
+    0,
+    KEY_PAGEDOWN,
+    KEY_DOWN,
+    0,
+    0,
+    KEY_BACKSPACE,
+    KEY_ENTER,
+    0,
+    0,
+    0,
+    0,
+    KEY_INSERT,
+    KEY_ALT,
+    KEY_F10,
+    KEY_F11,
+    KEY_F12,
+    0,
+    0,
+    KEY_CMD,
+    0,
+    0,
+    0,
+    0,
+    0,
+    KEY_PAGEDOWN,
+    KEY_PAGEUP,
+    0,
+    0,
+    0,
+    0,
+    0,
+    KEY_ESCAPE,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    KEY_END,
+    0,
+    0,
+    KEY_DELETE,
+    0,
+    0,
+    0,
+    0,
+    KEY_CAPS,
+    0,
+    0,
+    KEY_FN,
+    0,
+    0,
+    0,
+    KEY_HOME,
+    0,
+    KEY_DELETE,
+    0,
+    KEY_MENU,
+    0,
+    0,
+    0,
+    KEY_CTRL,
+    KEY_PAGEUP,
+    0,
+    KEY_CTRL,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    KEY_TAB,
+    KEY_INSERT,
+    0,
+    KEY_RIGHT,
+    0,
+    0,
+    0
+};
+
+//see generate_static_hashmap_of_key_names.pixi
+//if the name is not found, the function can return either 0 or the ID of some random key
+int get_key_id( const char* name )
+{
+    int hash = 0;
+    uint8_t* p = (uint8_t*)name;
+    for( ; *p != 0; p++ )
+        hash = 467 * hash + *p;
+    hash = ( hash & 0x7FFFFFFF ) % 101;
+
+    return g_key_id_hashmap[ hash ];
+}
 
 const char* get_key_name( int key )
 {
@@ -85,14 +202,13 @@ inline void keymap_make_codename( char* name, int key, uint flags, uint pars1, u
     {
 	name[ 0 ] = int_to_hchar( flags >> 4 );
 	name[ 1 ] = int_to_hchar( flags & 15 );
-	hex_int_to_string( key, &name[ 2 ] );
+	int_to_string_hex( key, &name[ 2 ] );
     }
 }
 
 sundog_keymap* keymap_new( window_manager* wm )
 {
-    sundog_keymap* km = (sundog_keymap*)smem_new( sizeof( sundog_keymap ) );
-    smem_zero( km );
+    sundog_keymap* km = SMEM_ZALLOC2( sundog_keymap, 1 );
     return km;
 }
 
@@ -113,7 +229,7 @@ void keymap_remove( sundog_keymap* km, window_manager* wm )
 		sundog_keymap_action* action = &section->actions[ i2 ];
 	    }
 	    smem_free( section->actions );
-	    ssymtab_remove( section->bindings );
+	    ssymtab_delete( section->bindings );
 	}
 	smem_free( km->sections );
     }
@@ -142,10 +258,9 @@ int keymap_add_section( sundog_keymap* km, const char* section_name, const char*
     {
 	if( km->sections == 0 )
 	{
-	    km->sections = (sundog_keymap_section*)smem_new( sizeof( sundog_keymap_section ) * ( section_num + 1 ) );
+	    km->sections = SMEM_ZALLOC2( sundog_keymap_section, section_num + 1 );
 	    if( km->sections )
 	    {
-		smem_zero( km->sections );
 		rv = 0;
 	    }
 	}
@@ -154,7 +269,7 @@ int keymap_add_section( sundog_keymap* km, const char* section_name, const char*
 	    int count = (int)( smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) );
 	    if( (unsigned)section_num >= (unsigned)count )
 	    {
-		km->sections = (sundog_keymap_section*)smem_resize2( km->sections, ( section_num + 1 ) * sizeof( sundog_keymap_section ) );
+		km->sections = SMEM_ZRESIZE2( km->sections, sundog_keymap_section, section_num + 1 );
 		rv = 0;
 	    }
 	}
@@ -165,7 +280,7 @@ int keymap_add_section( sundog_keymap* km, const char* section_name, const char*
 	    section->name = section_name;
 	    section->id = section_id;
 	    section->bindings = ssymtab_new( 5 ); //1543
-	    section->actions = (sundog_keymap_action*)smem_znew( sizeof( sundog_keymap_action ) * ( num_actions + 1 ) );
+	    section->actions = SMEM_ZALLOC2( sundog_keymap_action, num_actions + 1 );
 	}
 	break;
     }
@@ -187,10 +302,9 @@ int keymap_add_action( sundog_keymap* km, int section_num, const char* action_na
 	sundog_keymap_section* section = &km->sections[ section_num ];
 	if( section->actions == NULL )
 	{
-	    section->actions = (sundog_keymap_action*)smem_new( sizeof( sundog_keymap_action ) * ( action_num + 1 ) );
+	    section->actions = SMEM_ZALLOC2( sundog_keymap_action, action_num + 1 );
 	    if( section->actions )
 	    {
-		smem_zero( section->actions );
 		rv = 0;
 	    }
 	}
@@ -199,7 +313,7 @@ int keymap_add_action( sundog_keymap* km, int section_num, const char* action_na
 	    int count = (int)( smem_get_size( section->actions ) / sizeof( sundog_keymap_action ) );
 	    if( (unsigned)action_num >= (unsigned)count )
 	    {
-		section->actions = (sundog_keymap_action*)smem_resize2( section->actions, ( action_num + 1 ) * sizeof( sundog_keymap_action ) );
+		section->actions = SMEM_ZRESIZE2( section->actions, sundog_keymap_action, action_num + 1 );
 	    }
 	    rv = 0;
 	}
@@ -209,6 +323,7 @@ int keymap_add_action( sundog_keymap* km, int section_num, const char* action_na
 	    action->name = action_name;
 	    action->id = action_id;
 	    action->group = section->group;
+	    //printf( "main_%s - %s;\n", action_id, action_name );
 	    if( section->last_added_action >= 0 && action_num - section->last_added_action != 1 )
 		slog( "Wrong order for action %s\n", action_name );
 	    section->last_added_action = action_num;
@@ -232,6 +347,7 @@ int keymap_set_group( sundog_keymap* km, int section_num, const char* group, win
 	if( (unsigned)section_num >= smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) ) break;
 	sundog_keymap_section* section = &km->sections[ section_num ];
 	section->group = group;
+	//printf( "\n%s:\n\n", group );
 	rv = 0;
 	break;
     }
@@ -411,6 +527,58 @@ int keymap_bind( sundog_keymap* km, int section_num, int key, uint flags, int ac
     return keymap_bind2( km, section_num, key, flags, 0, 0, action_num, bind_num, bind_flags, wm );
 }
 
+int keymap_get_section( sundog_keymap* km, const char* section_id, window_manager* wm )
+{
+    if( !km )
+    {
+	if( wm ) km = wm->km;
+	if( !km ) return -1;
+    }
+    int rv = -1;
+    int num_sections = smem_get_size( km->sections ) / sizeof( sundog_keymap_section );
+    for( int s = 0; s < num_sections; s++ )
+    {
+	sundog_keymap_section* section = &km->sections[ s ];
+	if( smem_strcmp( section->id, section_id ) == 0 )
+	{
+	    rv = s;
+	    break;
+	}
+    }
+    return rv;
+}
+
+int keymap_get_action( sundog_keymap* km, int section_num, const char* action_id, window_manager* wm )
+{
+    if( !km )
+    {
+	if( wm ) km = wm->km;
+	if( !km ) return -1;
+    }
+    int rv = -1;
+    while( 1 )
+    {
+	if( section_num < 0 ) break;
+	if( (unsigned)section_num >= smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) ) break;
+	sundog_keymap_section* section = &km->sections[ section_num ];
+
+	int num_actions = smem_get_size( section->actions ) / sizeof( sundog_keymap_action );
+	for( int a = 0; a < num_actions; a++ )
+	{
+	    sundog_keymap_action* action = &section->actions[ a ];
+	    if( smem_strcmp( action->id, action_id ) == 0 )
+	    {
+		rv = a;
+		break;
+	    }
+	}
+
+	break;
+    }
+
+    return rv;
+}
+
 int keymap_get_action( sundog_keymap* km, int section_num, int key, uint flags, uint pars1, uint pars2, window_manager* wm )
 {
     if( !km )
@@ -424,6 +592,17 @@ int keymap_get_action( sundog_keymap* km, int section_num, int key, uint flags, 
 	if( section_num < 0 ) break;
 	if( (unsigned)section_num >= smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) ) break;
 	sundog_keymap_section* section = &km->sections[ section_num ];
+
+	if( key == KEY_SHORTCUT )
+	{
+	    int x = pars1 & 0xFFFF;
+	    int y = pars1 >> 16;
+	    if( x == section_num )
+	    {
+		rv = y;
+	    }
+	    break;
+	}
 
 	flags &= EVT_FLAG_MODS;
 
@@ -504,7 +683,7 @@ int keymap_save( sundog_keymap* km, sconfig_data* config, window_manager* wm )
     while( 1 )
     {
 	int sections_count = (int)( smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) );
-	char* keys = (char*)smem_new( 8 );
+	char* keys = SMEM_ALLOC2( char, 8 );
 	for( int snum = 0; snum < sections_count; snum++ )
 	{
 	    sundog_keymap_section* section = &km->sections[ snum ];
@@ -531,7 +710,7 @@ int keymap_save( sundog_keymap* km, sconfig_data* config, window_manager* wm )
 			{
 			    sprintf( key, "%x %x %x ", i, action->keys[ i ].key, action->keys[ i ].flags );
 			}
-			smem_strcat_resize( keys, key );
+			SMEM_STRCAT_D( keys, key );
 		    }
 		}
 		if( keys[ 0 ] == 0 )
@@ -578,7 +757,7 @@ int keymap_load( sundog_keymap* km, sconfig_data* config, window_manager* wm )
 		char* keys = sconfig_get_str_value( (const char*)action_name, 0, config );
 		if( keys )
 		{
-		    keys = smem_strdup( keys );
+		    keys = SMEM_STRDUP( keys );
 		    int nums[ 5 * KEYMAP_ACTION_KEYS ];
 		    int nums_count = 0;
 		    smem_clear( nums, sizeof( nums ) );
@@ -589,7 +768,7 @@ int keymap_load( sundog_keymap* km, sconfig_data* config, window_manager* wm )
 			if( keys[ i ] == ' ' )
 			{
 			    keys[ i ] = 0;
-			    nums[ nums_count ] = hex_string_to_int( num_ptr );
+			    nums[ nums_count ] = string_to_int_hex( num_ptr );
 			    num_ptr = &keys[ i + 1 ];
 			    nums_count++;
 			    if( nums_count >= 5 * KEYMAP_ACTION_KEYS ) break;
@@ -635,7 +814,7 @@ int keymap_print_available_keys( sundog_keymap* km, int section_num, int key_fla
 	if( (unsigned)section_num >= smem_get_size( km->sections ) / sizeof( sundog_keymap_section ) ) break;
 	sundog_keymap_section* section = &km->sections[ section_num ];
         int actions_count = (int)( smem_get_size( section->actions ) / sizeof( sundog_keymap_action ) );
-	keys = (bool*)smem_znew( sizeof( bool ) * 256 );
+	keys = SMEM_ZALLOC2( bool, 256 );
         for( int anum = 0; anum < actions_count; anum++ )
         {
     	    sundog_keymap_action* action = &section->actions[ anum ];
