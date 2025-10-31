@@ -15,6 +15,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/ReplayContexts.h>
+#include <UI/BusySpinner.h>
 
 #include <algorithm>
 #include <chrono>
@@ -53,9 +54,8 @@ namespace rePlayer
 
     void SongEditor::OnDisplay()
     {
-        m_busyColor = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
-        ImGui::BeginDisabled(m_isBusy);
-        ImGui::BeginBusy(m_isBusy);
+        ImGui::BeginDisabled(m_busySpinner.IsValid());
+        m_busySpinner->Begin();
 
         auto window = ImGui::GetCurrentWindow();
         window->AutoFitFramesX = 2;
@@ -218,16 +218,13 @@ namespace rePlayer
         }
         ImGui::EndDisabled();
 
-        ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+        m_busySpinner->End();
         ImGui::EndDisabled();
     }
 
     void SongEditor::OnEndUpdate()
     {
-        if (m_isBusy)
-            m_busyTime += ImGui::GetIO().DeltaTime;
-        else
-            m_busyTime = 0.0f;
+        m_busySpinner->Update();
     }
 
     void SongEditor::EditSubsongs()
@@ -469,13 +466,13 @@ namespace rePlayer
             ImGui::TableNextColumn();
             if (ImGui::Button("Scan") && m_playables[0] == eReplay::Unknown)
             {
-                m_isBusy = true;
+                m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
                 Core::AddJob([this, &replays, musicId = m_musicId]()
                 {
                     SmartPtr<core::io::Stream> stream = musicId.GetStream();
                     Core::FromJob([this, musicId, playables = stream.IsValid() ? replays.Enumerate(stream) : Replayables()]()
                     {
-                        m_isBusy = false;
+                        m_busySpinner.Reset();
                         if (m_musicId == musicId)
                             m_playables = playables;
                     });

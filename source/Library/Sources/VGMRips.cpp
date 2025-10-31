@@ -3,8 +3,10 @@
 #include <Core/Log.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
+#include <Thread/Thread.h>
 
 // rePlayer
+#include <UI/BusySpinner.h>
 #include "VGMRips.h"
 #include "WebHandler.h"
 
@@ -725,13 +727,17 @@ namespace rePlayer
     SourceVGMRips::~SourceVGMRips()
     {}
 
-    void SourceVGMRips::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceVGMRips::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
         // download artists database
         if (m_db.artists.IsEmpty())
         {
+            busySpinner.Info("downloading artists database");
+
             ArtistsCollector collector(m_db);
             collector.Fetch("https://vgmrips.net/packs/composers");
+            if (!collector.error.empty())
+                busySpinner.Error(collector.error);
         }
 
         // look for the artist
@@ -747,22 +753,27 @@ namespace rePlayer
         }
     }
 
-    void SourceVGMRips::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceVGMRips::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
-
-        // download artists database
-        if (m_db.artists.IsEmpty())
-        {
-            ArtistsCollector collector(m_db);
-            collector.Fetch("https://vgmrips.net/packs/composers");
-        }
 
         auto artistSourceIndex = m_artists.FindIf<uint32_t>([&](auto& item)
         {
             return item.id == importedArtistID.internalId;
         });
+        busySpinner.Info(m_artists[artistSourceIndex].url(m_data));
+
+        // download artists database
+        if (m_db.artists.IsEmpty())
+        {
+            busySpinner.Info("downloading artists database");
+
+            ArtistsCollector collector(m_db);
+            collector.Fetch("https://vgmrips.net/packs/composers");
+            if (!collector.error.empty())
+                busySpinner.Error(collector.error);
+        }
 
         // validation (has the artist been removed or renamed)
         {
@@ -779,18 +790,24 @@ namespace rePlayer
         }
 
         // collect all packs
+        auto* message = busySpinner.Info("downloading artist packs database at %u", 0);
         ArtistCollector collector(m_db);
         for (uint32_t i = 0; !collector.isDone; i++)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
             collector.state = ArtistCollector::kStateInit;
             if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", m_artists[artistSourceIndex].url(m_data), i) != Status::kOk)
                 collector.isDone = true;
         }
 
         // collect all songs
+        message = busySpinner.Info("downloading artist songs database from %s", "");
         for (auto packOffset : collector.packs)
         {
             auto* pack = collector.data.Items<Pack>(packOffset);
+
+            busySpinner.UpdateMessageParam(message, pack->url(collector.data));
 
             PackCollector packCollector;
             if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(collector.data)) != Status::kOk)
@@ -867,21 +884,29 @@ namespace rePlayer
         }
     }
 
-    void SourceVGMRips::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceVGMRips::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
         // download artists database
         if (m_db.artists.IsEmpty())
         {
+            busySpinner.Info("downloading artists database");
+
             ArtistsCollector collector(m_db);
             collector.Fetch("https://vgmrips.net/packs/composers");
+            if (!collector.error.empty())
+                busySpinner.Error(collector.error);
         }
 
         // download packs database
         if (m_db.packs.IsEmpty())
         {
+            auto* message = busySpinner.Info("downloading packs database at %u", 0);
+
             PacksCollector collector(m_db);
             for (uint32_t i = 0; !collector.isDone; i++)
             {
+                busySpinner.UpdateMessageParam(message, i);
+
                 collector.state = PacksCollector::kStateInit;
                 if (collector.Fetch("https://vgmrips.net/packs/latest?p=%u", i) != Status::kOk)
                     collector.isDone = true;
@@ -889,15 +914,25 @@ namespace rePlayer
         }
 
         // collect all songs
+        auto* message = busySpinner.Info("downloading songs database from %s", "");
         auto lName = ToLower(name);
-        for (auto packOffset : m_db.packs)
+        for (uint32_t packIdx = 0; packIdx < m_db.packs.NumItems(); packIdx++)
         {
+            auto packOffset = m_db.packs[packIdx];
             auto* pack = m_db.data.Items<Pack>(packOffset);
             if (strstr(ToLower(pack->name(m_db.data)).c_str(), lName.c_str()))
             {
+                char txt[1024];
+                sprintf(txt, "%s / %u%%", pack->url(m_db.data), uint32_t(((packIdx + 1) * 100ull) / m_db.packs.NumItems()));
+                busySpinner.UpdateMessageParam(message, txt);
+
                 PackCollector packCollector;
                 if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(m_db.data)) != Status::kOk)
                     break;
+
+                // throttle to avoid flooding website
+                if ((packIdx & 31) == 31)
+                    thread::Sleep(500);
 
                 // build pack
                 auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)

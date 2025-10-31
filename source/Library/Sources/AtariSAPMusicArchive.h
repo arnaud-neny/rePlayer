@@ -13,9 +13,9 @@ namespace rePlayer
     public:
         SourceAtariSAPMusicArchive();
 
-        void FindArtists(ArtistsCollection& artists, const char* name) final;
-        void ImportArtist(SourceID importedArtistID, SourceResults& results) final;
-        void FindSongs(const char* name, SourceResults& collectedSongs) final;
+        void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) final;
+        void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) final;
+        void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) final;
         Import ImportSong(SourceID sourceId, const std::string& path) final;
         void OnArtistUpdate(ArtistSheet* artist) final;
         void OnSongUpdate(const Song* const song) final;
@@ -128,7 +128,7 @@ namespace rePlayer
         uint32_t FindSong(const ASMASong& dbSong);
         std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
 
-        bool DownloadDatabase();
+        bool DownloadDatabase(BusySpinner& busySpinner);
         uint32_t FindDatabaseRoot(std::string& filePath);
         uint32_t FindDatabaseArtist(const std::string& author);
         void FindDatabaseArtists(std::string author, uint32_t songOffset);

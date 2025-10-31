@@ -29,6 +29,7 @@
 #include <Library/Sources/ZXArt.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 #include <UI/FileSelector.h>
 
 #include "Library.h"
@@ -349,8 +350,6 @@ namespace rePlayer
 
     void Library::OnDisplay()
     {
-        m_busyColor = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
-
         if (ImGui::BeginTabBar("LibraryBar", ImGuiTabBarFlags_None))
         {
             ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
@@ -383,10 +382,7 @@ namespace rePlayer
     {
         m_songs->OnEndUpdate();
         m_artists->OnEndUpdate();
-        if (m_isBusy)
-            m_busyTime += ImGui::GetIO().DeltaTime;
-        else
-            m_busyTime = 0.0f;
+        m_busySpinner->Update();
     }
 
     void Library::SourceSelection()
@@ -476,7 +472,7 @@ namespace rePlayer
         else if (isImportSongsOpened)
             ImGui::OpenPopup("Import Songs");
 
-        ImGui::BeginDisabled(m_isBusy);
+        ImGui::BeginDisabled(m_busySpinner.IsValid());
 
         UpdateImportArtists();
 
@@ -485,7 +481,7 @@ namespace rePlayer
         isImportSongsOpened = m_importSongs.isOpened;
         if (ImGui::BeginPopupModal("Import Songs", &m_importSongs.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
-            ImGui::BeginBusy(m_isBusy);
+            m_busySpinner->Begin();
 
             if (ImGui::BeginTable("Toolbar", 2, ImGuiTableFlags_SizingStretchProp))
             {
@@ -497,20 +493,30 @@ namespace rePlayer
                 if (ImGui::InputText("##Search", &m_importSongs.searchName, ImGuiInputTextFlags_EnterReturnsTrue))
                 {
                     m_imports = {};
-                    m_isBusy = true;
+                    m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+                    m_busySpinner->Info("Searching for songs with \"" + m_importSongs.searchName + "\"");
                     Core::AddJob([this]()
                     {
+                        m_busySpinner->Indent(1);
+
                         SourceResults sourceResults;
                         for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
                         {
                             if (m_selectedSources & (1ull << i))
-                                m_sources[i]->FindSongs(m_importSongs.searchName.c_str(), sourceResults);
+                            {
+                                m_busySpinner->Info(SourceID::sourceNames[i]);
+                                m_busySpinner->Indent(1);
+                                m_sources[i]->FindSongs(m_importSongs.searchName.c_str(), sourceResults, *m_busySpinner);
+                                m_busySpinner->Indent(-1);
+                            }
                         }
+
+                        m_busySpinner->Indent(-1);
                         Core::FromJob([this, sourceResults = std::move(sourceResults)]()
                         {
                             m_imports.isOpened = &m_importSongs.isOpened;
                             m_imports.sourceResults = std::move(sourceResults);
-                            m_isBusy = false;
+                            m_busySpinner.Reset();
                         });
                     });
                 }
@@ -521,7 +527,7 @@ namespace rePlayer
 
             ProcessImports();
 
-            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+            m_busySpinner->End();
 
             ImGui::EndPopup();
         }
@@ -533,7 +539,7 @@ namespace rePlayer
         isImportFilesOpened = FileSelector::IsOpened() || m_fileImport != nullptr;
         if (ImGui::BeginPopupModal("Import Files", &isImportFilesOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
-            ImGui::BeginBusy(m_isBusy);
+            m_busySpinner->Begin();
             if (m_fileImport)
                 m_fileImport = m_fileImport->Display();
             else if (auto files = FileSelector::Display())
@@ -543,7 +549,7 @@ namespace rePlayer
                 m_lastFileDialogPath = FileSelector::Close();
             }
 
-            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+            m_busySpinner->End();
             ImGui::EndPopup();
         }
         if (!isImportFilesOpened && (FileSelector::IsOpened() || m_fileImport != nullptr))
@@ -567,14 +573,14 @@ namespace rePlayer
         auto isImportArtistsOpened = m_importArtists.isOpened;
         if (ImGui::BeginPopupModal("Import Artists", &m_importArtists.isOpened, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
         {
-            ImGui::BeginBusy(m_isBusy);
+            m_busySpinner->Begin();
 
             if (m_imports.sourceResults.songs.IsEmpty())
                 FindArtists();
             else
                 ProcessImports();
 
-            ImGui::EndBusy(m_busyTime, 48.0f, 16.0f, 64, 0.7f, m_busyColor);
+            m_busySpinner->End();
 
             ImGui::EndPopup();
         }
@@ -593,14 +599,22 @@ namespace rePlayer
             ImGui::SetNextItemWidth(-1.0f);
             if (ImGui::InputText("##Search", &m_importArtists.searchName, ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                m_isBusy = true;
+                m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+                m_busySpinner->Info("Searching for artists with \"" + m_importArtists.searchName + "\"");
                 Core::AddJob([this]()
                 {
+                    m_busySpinner->Indent(1);
+
                     Source::ArtistsCollection collection;
                     for (uint32_t i = 0; i < SourceID::NumSourceIDs; i++)
                     {
                         if (m_selectedSources & (1ull << i))
-                            m_sources[i]->FindArtists(collection, m_importArtists.searchName.c_str());
+                        {
+                            m_busySpinner->Info(SourceID::sourceNames[i]);
+                            m_busySpinner->Indent(1);
+                            m_sources[i]->FindArtists(collection, m_importArtists.searchName.c_str(), *m_busySpinner);
+                            m_busySpinner->Indent(-1);
+                        }
                     }
                     std::sort(collection.matches.begin(), collection.matches.end(), [this](auto& l, auto& r)
                     {
@@ -610,6 +624,8 @@ namespace rePlayer
                     {
                         return _stricmp(l.name.c_str(), r.name.c_str()) < 0;
                     });
+
+                    m_busySpinner->Indent(-1);
                     Core::FromJob([this, collection = std::move(collection)]()
                     {
                         m_importArtists.artists = std::move(collection.matches);
@@ -642,7 +658,7 @@ namespace rePlayer
                                     break;
                             }
                         }
-                        m_isBusy = false;
+                        m_busySpinner.Reset();
                     });
                 });
             }
@@ -799,20 +815,25 @@ namespace rePlayer
             if (ImGui::Button("Import", ImVec2(-1.0f, 0.0f)))
             {
                 m_imports = {};
-                m_isBusy = true;
+                m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+                m_busySpinner->Info("Importing artists");
                 Core::AddJob([this]()
                 {
+                    m_busySpinner->Indent(1);
+
                     SourceResults sourceResults;
                     for (uint32_t i = 0; i < m_importArtists.artists.NumItems(); i++)
                     {
                         if (m_importArtists.states[i].isImported)
                             ImportArtist(m_importArtists.artists[i].id, sourceResults);
                     }
+
+                    m_busySpinner->Indent(-1);
                     Core::FromJob([this, sourceResults = std::move(sourceResults)]()
                     {
                         m_imports.isOpened = &m_importArtists.isOpened;
                         m_imports.sourceResults = std::move(sourceResults);
-                        m_isBusy = false;
+                        m_busySpinner.Reset();
                     });
                 });
             }
@@ -822,7 +843,10 @@ namespace rePlayer
 
     void Library::ImportArtist(SourceID artistId, SourceResults& sourceResults)
     {
-        m_sources[artistId.sourceId]->ImportArtist(artistId, sourceResults);
+        m_busySpinner->Info(SourceID::sourceNames[artistId.sourceId]);
+        m_busySpinner->Indent(1);
+        m_sources[artistId.sourceId]->ImportArtist(artistId, sourceResults, *m_busySpinner);
+        m_busySpinner->Indent(-1);
     }
 
     void Library::ProcessImports()
@@ -1300,7 +1324,7 @@ namespace rePlayer
 
     void Library::Save()
     {
-        if (m_isBusy)
+        if (m_busySpinner.IsValid())
             return;
 
         auto saveFlags = m_db.Fetch();

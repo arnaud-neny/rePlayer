@@ -7,6 +7,7 @@
 #include <Library/Sources/XmlHandler.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 #include "TheModArchive.h"
 #if __has_include("TheModArchiveKey.h")
 #include "TheModArchiveKey.h"
@@ -245,23 +246,35 @@ namespace rePlayer
     SourceTheModArchive::~SourceTheModArchive()
     {}
 
-    void SourceTheModArchive::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceTheModArchive::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
 #ifdef TheModArchiveKey
+        auto* message = busySpinner.Info("looking in roster at %u", 1);
         SearchArtist search;
         for (uint32_t i = 1;;)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
+            search.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=search_artist&query=%s&page=%u", search.Escape(name).c_str(), i);
             search.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=search_artist&query=%s&page=%u", search.Escape(name).c_str(), i);
+            if (!search.error.empty())
+                busySpinner.Error(search.error);
             i++;
             if (i > search.numPages)
                 break;
         }
 
+        message = busySpinner.Info("looking in guessed at %u", 1);
         {
             SearchGuessedArtist searchGuessed;
             for (uint32_t i = 1;;)
             {
+                busySpinner.UpdateMessageParam(message, i);
+
+                searchGuessed.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_guessed_artist&query=*%s*&page=%u", search.Escape(name).c_str(), i);
                 searchGuessed.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_guessed_artist&query=*%s*&page=%u", search.Escape(name).c_str(), i);
+                if (!searchGuessed.error.empty())
+                    busySpinner.Error(searchGuessed.error);
                 i++;
                 if (i > searchGuessed.numPages)
                     break;
@@ -292,7 +305,7 @@ namespace rePlayer
 #endif
     }
 
-    void SourceTheModArchive::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceTheModArchive::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
 #ifdef TheModArchiveKey
         assert(importedArtistID.sourceId == kID);
@@ -305,13 +318,19 @@ namespace rePlayer
         {
             auto& guessedArtist = m_guessedArtists[artistId & 0x7fFFff];
             guessedArtistName = m_strings.Items(guessedArtist.nameOffset);
+            auto* message = busySpinner.Info("importing guessed " + guessedArtistName + " at %u", 1);
             m_areStringsDirty |= guessedArtist.isNotRegistered;
             m_isDirty |= guessedArtist.isNotRegistered;
             guessedArtist.isNotRegistered = false;
             collector.name = guessedArtistName;
             for (uint32_t i = 1;;)
             {
+                busySpinner.UpdateMessageParam(message, i);
+
+                collector.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_guessed_artist&query=%s&page=%u", collector.Escape(guessedArtistName.c_str()).c_str(), i);
                 collector.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_guessed_artist&query=%s&page=%u", collector.Escape(guessedArtistName.c_str()).c_str(), i);
+                if (!collector.error.empty())
+                    busySpinner.Error(collector.error);
                 i++;
                 if (i > collector.numPages)
                     break;
@@ -319,10 +338,18 @@ namespace rePlayer
         }
         else
         {
+            char txt[128];
+            sprintf(txt, "importing roster %u at %%u", artistId);
+            auto* message = busySpinner.Info(txt, 1);
             collector.mainArtistId = artistId;
             for (uint32_t i = 1;;)
             {
+                busySpinner.UpdateMessageParam(message, i);
+
+                collector.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_artistid&query=%u&page=%u", artistId, i);
                 collector.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_artistid&query=%u&page=%u", artistId, i);
+                if (!collector.error.empty())
+                    busySpinner.Error(collector.error);
                 i++;
                 if (i > collector.numPages)
                     break;
@@ -418,13 +445,20 @@ namespace rePlayer
 #endif
     }
 
-    void SourceTheModArchive::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceTheModArchive::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
 #ifdef TheModArchiveKey
+        auto* message = busySpinner.Info("looking in filename or song title at %u", 1);
+
         SearchSong search(name);
         for (uint32_t i = 1;;)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
+            search.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=search&type=filename_or_songtitle&query=%s&page=%u", search.Escape(name).c_str(), i);
             search.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=search&type=filename_or_songtitle&query=%s&page=%u", search.Escape(name).c_str(), i);
+            if (!search.error.empty())
+                busySpinner.Error(search.error);
             i++;
             if (i > search.numPages)
                 break;

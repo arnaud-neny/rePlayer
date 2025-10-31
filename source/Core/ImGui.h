@@ -29,9 +29,5 @@ namespace ImGui
     {
         return DragScalar(label, ImGuiDataType_U32, v, v_speed, &v_min, &v_max, format, flags, text_align);
     }
-
-    void BeginBusy(bool isBusy);
-    void BeginBusy(const ImVec2& screenPos, const ImVec2& region, bool isBusy);
-    void EndBusy(float time, float radius, float thickness, int32_t numSegments, float speed, uint32_t color);
 }
 // namespace ImGui

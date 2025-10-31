@@ -60,6 +60,8 @@ namespace rePlayer
         template <typename... Arguments>
         Status Fetch(Arguments&&... args)
         {
+            error.clear();
+
             char url[1024];
             core::sprintf(url, std::forward<Arguments>(args)...);
 
@@ -100,6 +102,7 @@ namespace rePlayer
                 }
                 else
                 {
+                    error = "libxml: can't parse html";
                     Log::Error("libxml: can't parse html (%s)\n", url);
                     status = Status::kFail;
                 }
@@ -107,6 +110,8 @@ namespace rePlayer
             }
             else
             {
+                error = "Curl: ";
+                error += curl_easy_strerror(curlErr);
                 Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), url);
                 status = Status::kFail;
             }
@@ -159,6 +164,7 @@ namespace rePlayer
 
         CURL* curl;
         bool isInitialized = false;
+        std::string error;
     };
 }
 // namespace rePlayer

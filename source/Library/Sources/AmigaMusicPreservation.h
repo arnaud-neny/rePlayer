@@ -18,9 +18,9 @@ namespace rePlayer
         SourceAmigaMusicPreservation();
         ~SourceAmigaMusicPreservation() final;
 
-        void FindArtists(ArtistsCollection& artists, const char* name) final;
-        void ImportArtist(SourceID importedArtistID, SourceResults& results) final;
-        void FindSongs(const char* name, SourceResults& collectedSongs) final;
+        void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) final;
+        void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) final;
+        void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) final;
         Import ImportSong(SourceID sourceId, const std::string& path) final;
         void OnArtistUpdate(ArtistSheet* artist) final;
         void OnSongUpdate(const Song* const song) final;
@@ -52,7 +52,7 @@ namespace rePlayer
     private:
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;
-        Collector Collect(uint32_t artistID) const;
+        Collector Collect(uint32_t artistID, BusySpinner* busySpinner) const;
         bool IsInvalidIndex(const char* buffer, uint32_t size) const;
 
     private:

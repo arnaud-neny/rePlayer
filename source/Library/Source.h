@@ -15,6 +15,8 @@ namespace core::io
 
 namespace rePlayer
 {
+    class BusySpinner;
+
     struct SourceResults
     {
         enum StateType
@@ -93,9 +95,9 @@ namespace rePlayer
 
     public:
         virtual ~Source() {}
-        virtual void FindArtists(ArtistsCollection& artists, const char* name) = 0;
-        virtual void ImportArtist(SourceID importedArtistID, SourceResults& results) = 0;
-        virtual void FindSongs(const char* name, SourceResults& collectedSongs) = 0;
+        virtual void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) = 0;
+        virtual void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) = 0;
+        virtual void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) = 0;
         virtual Import ImportSong(SourceID sourceId, const std::string& path) = 0;
         virtual void OnArtistUpdate(ArtistSheet* artist) = 0;
         virtual void OnSongUpdate(const Song* const song) = 0;

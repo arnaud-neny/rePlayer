@@ -269,6 +269,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="RePlayer\CoreVersion.cpp" />
     <ClCompile Include="RePlayer\Replays.cpp" />
     <ClCompile Include="RePlayer\Settings.cpp" />
+    <ClCompile Include="UI\BusySpinner.cpp" />
     <ClCompile Include="UI\FileSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -348,6 +349,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="RePlayer\Settings.h" />
     <ClInclude Include="RePlayer\Version.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="UI\BusySpinner.h" />
     <ClInclude Include="UI\FileSelector.h" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 
 // rePlayer
 #include <RePlayer/Core.h>
+#include <UI/BusySpinner.h>
 #include "SNDH.h"
 #include "WebHandler.h"
 
@@ -236,10 +237,12 @@ namespace rePlayer
     SourceSNDH::~SourceSNDH()
     {}
 
-    void SourceSNDH::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceSNDH::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
         Search search;
         search.Fetch("https://sndh.atari.org/?p=searchdone&searchword=%s", search.Escape(name).c_str());
+        if (!search.error.empty())
+            busySpinner.Error(search.error);
 
         for (auto& searchedArtist : search.foundArtists)
         {
@@ -249,13 +252,17 @@ namespace rePlayer
         }
     }
 
-    void SourceSNDH::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceSNDH::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
+        busySpinner.Info(m_strings.Items(m_artists[importedArtistID.internalId].urlOffset));
+
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
         Collector collector;
         collector.Fetch("https://sndh.atari.org/?p=composer&name=%s", m_strings.Items(m_artists[importedArtistID.internalId].urlOffset));
+        if (!collector.error.empty())
+            busySpinner.Error(collector.error);
 
         auto artistIndex = results.GetArtistIndex(importedArtistID);
         if (artistIndex < 0)
@@ -301,10 +308,12 @@ namespace rePlayer
         }
     }
 
-    void SourceSNDH::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceSNDH::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
         Search search;
         search.Fetch("https://sndh.atari.org/?p=searchdone&searchword=%s", search.Escape(name).c_str());
+        if (!search.error.empty())
+            busySpinner.Error(search.error);
 
         for (auto& searchedSong : search.foundSongs)
         {

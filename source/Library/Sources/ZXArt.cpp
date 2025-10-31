@@ -9,6 +9,7 @@
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 #include "ZXArt.h"
 
 // curl
@@ -72,9 +73,9 @@ namespace rePlayer
     SourceZXArt::~SourceZXArt()
     {}
 
-    void SourceZXArt::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceZXArt::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(busySpinner))
             return;
 
         std::string lName = ToLower(name);
@@ -142,7 +143,7 @@ namespace rePlayer
         }
     }
 
-    void SourceZXArt::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceZXArt::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
@@ -165,9 +166,11 @@ namespace rePlayer
             }
         } buffer;
 
+        auto* message = busySpinner.Info("importing artist at %u", 0);
         CURLcode curlError = CURLE_OK;
         for (uint32_t start = 0; curlError == CURLE_OK;)
         {
+            busySpinner.UpdateMessageParam(message, start);
             buffer.Clear();
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
@@ -188,7 +191,7 @@ namespace rePlayer
         curl_easy_cleanup(curl);
     }
 
-    void SourceZXArt::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceZXArt::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
         CURL* curl = curl_easy_init();
 
@@ -210,9 +213,11 @@ namespace rePlayer
             }
         } buffer;
 
+        auto* message = busySpinner.Info("looking music title at %u", 0);
         CURLcode curlError = CURLE_OK;
         for (uint32_t start = 0; curlError == CURLE_OK;)
         {
+            busySpinner.UpdateMessageParam(message, start);
             buffer.Clear();
 
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
@@ -444,9 +449,13 @@ namespace rePlayer
                 song->name.String() += " / " + ConvertEntities(zxMusic["internalTitle"].get<std::string>());
             if (zxMusic.contains("year"))
             {
-                uint32_t year = 0;
-                sscanf_s(zxMusic["year"].get<std::string>().c_str(), "%u", &year);
-                song->releaseYear = uint16_t(year);
+                auto& zxYear = zxMusic["year"];
+                if (zxYear.is_string())
+                {
+                    uint32_t year = 0;
+                    sscanf_s(zxYear.get<std::string>().c_str(), "%u", &year);
+                    song->releaseYear = uint16_t(year);
+                }
             }
             if (zxMusic.contains("type"))
             {
@@ -563,7 +572,7 @@ namespace rePlayer
         return artist;
     }
 
-    bool SourceZXArt::DownloadDatabase()
+    bool SourceZXArt::DownloadDatabase(BusySpinner& busySpinner)
     {
         if (m_db.artists.IsEmpty())
         {
@@ -590,8 +599,11 @@ namespace rePlayer
 
             CURLcode curlError = CURLE_OK;
             Array<std::pair<uint32_t, std::string>> aliases;
+            auto* message = busySpinner.Info("downloading aliases database at %u", 0);
             for (uint32_t start = 0; curlError == CURLE_OK;)
             {
+                busySpinner.UpdateMessageParam(message, start);
+
                 buffer.Clear();
                 char url[1024];
                 sprintf(url, "https://zxart.ee/api/export:authorAlias/language:eng/start:%u/filter:authorAliasAll", start);
@@ -623,8 +635,11 @@ namespace rePlayer
             }
             if (curlError == CURLE_OK && aliases.IsNotEmpty())
             {
+                message = busySpinner.Info("downloading authors database at %u", 0);
                 for (uint32_t start = 0; curlError == CURLE_OK;)
                 {
+                    busySpinner.UpdateMessageParam(message, start);
+
                     buffer.Clear();
                     char url[1024];
                     sprintf(url, "https://zxart.ee/api/export:author/language:eng/start:%u/filter:authorAll", start);

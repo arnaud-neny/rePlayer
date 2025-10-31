@@ -7,6 +7,7 @@
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 #include "AmigaMusicPreservation.h"
 #include "WebHandler.h"
 
@@ -441,24 +442,34 @@ namespace rePlayer
     SourceAmigaMusicPreservation::~SourceAmigaMusicPreservation()
     {}
 
-    void SourceAmigaMusicPreservation::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceAmigaMusicPreservation::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
+        auto* message = busySpinner.Info("looking in handle category at %u", 0);
         SearchArtist search;
         for (uint32_t i = 0;; i += 50)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
             search.hasNextPage = false;
             search.Fetch("https://amp.dascene.net/newresult.php?request=handle&search=%s&position=%u", search.Escape(name).c_str(), i);
+            if (!search.error.empty())
+                busySpinner.Error(search.error);
             if (!search.hasNextPage)
                 break;
             search.state = SearchArtist::kStateInit;
         }
 
+        message = busySpinner.Info("looking in old handles category at %u", 0);
         auto newArtists = std::move(search.artists);
         search.hasNextPage = false;
         for (uint32_t i = 0;; i += 50)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
             search.hasNextPage = false;
             search.Fetch("https://amp.dascene.net/newresult.php?request=oldhandles&search=%s&position=%u", search.Escape(name).c_str(), i);
+            if (!search.error.empty())
+                busySpinner.Error(search.error);
             if (!search.hasNextPage)
                 break;
             search.state = SearchArtist::kStateInit;
@@ -475,12 +486,12 @@ namespace rePlayer
             artists.matches.Add(std::move(artist));
     }
 
-    void SourceAmigaMusicPreservation::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceAmigaMusicPreservation::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        Collector collector = Collect(importedArtistID.internalId);
+        Collector collector = Collect(importedArtistID.internalId, &busySpinner);
 
         for (auto& collectedSong : collector.songs)
         {
@@ -557,7 +568,7 @@ namespace rePlayer
                         return rplArtist;
                     };
 
-                    auto* rplArtist = createArtist(artistId == importedArtistID.internalId ? collector : Collect(artistId));
+                    auto* rplArtist = createArtist(artistId == importedArtistID.internalId ? collector : Collect(artistId, &busySpinner));
                     results.artists.Add(rplArtist);
                 }
                 if (artistId == importedArtistID.internalId)//main artist
@@ -571,13 +582,19 @@ namespace rePlayer
         }
     }
 
-    void SourceAmigaMusicPreservation::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceAmigaMusicPreservation::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
+        auto* message = busySpinner.Info("looking in module category at %u", 0);
         SearchSong search;
         for (uint32_t i = 0;; i += 50)
         {
+            busySpinner.UpdateMessageParam(message, i);
+
             search.hasNextPage = false;
             search.Fetch("https://amp.dascene.net/newresult.php?request=module&search=%s&position=%u", search.Escape(name).c_str(), i);
+            if (!search.error.empty())
+                busySpinner.Error(search.error);
+
             for (auto& searchSong : search.songs)
             {
                 auto song = new SongSheet();
@@ -754,7 +771,7 @@ namespace rePlayer
     {
         assert(artist->sources[0].id.sourceId == kID);
 
-        Collector collector = Collect(artist->sources[0].id.internalId);
+        Collector collector = Collect(artist->sources[0].id.internalId, nullptr);
         if (collector.artist.name != "n/a" && collector.artist.name != "currently not public")
             artist->realName = std::move(collector.artist.name);
         else
@@ -866,11 +883,20 @@ namespace rePlayer
         return song != m_songs.end() && song->id == id ? const_cast<SongSource*>(song) : nullptr;
     }
 
-    SourceAmigaMusicPreservation::Collector SourceAmigaMusicPreservation::Collect(uint32_t artistID) const
+    SourceAmigaMusicPreservation::Collector SourceAmigaMusicPreservation::Collect(uint32_t artistID, BusySpinner* busySpinner) const
     {
         Collector collector;
 
+        if (busySpinner)
+        {
+            char txt[128];
+            sprintf(txt, "importing artist %u", artistID);
+            busySpinner->Info(txt);
+        }
+
         collector.Fetch("https://amp.dascene.net/detail.php?detail=modules&view=%u", artistID);
+        if (busySpinner && !collector.error.empty())
+            busySpinner->Error(collector.error);
 
         return collector;
     }

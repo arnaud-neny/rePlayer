@@ -11,6 +11,7 @@
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 
 // zlib
 #include <zlib.h>
@@ -77,9 +78,9 @@ namespace rePlayer
         m_data.Add(uint8_t(0), alignof(SourceSong));
     }
 
-    void SourceAtariSAPMusicArchive::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceAtariSAPMusicArchive::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(busySpinner))
             return;
 
         std::string lName = ToLower(name);
@@ -126,20 +127,22 @@ namespace rePlayer
         }
     }
 
-    void SourceAtariSAPMusicArchive::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceAtariSAPMusicArchive::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        if (DownloadDatabase())
+        auto* artistName = m_artists[importedArtistID.internalId].name(m_strings);
+        busySpinner.Info(artistName);
+
+        if (DownloadDatabase(busySpinner))
             return;
 
         int32_t dbImportedArtistId = -1;
         {
-            auto* name = m_artists[importedArtistID.internalId].name(m_strings);
             for (auto& dbArtist : m_db.artists)
             {
-                if (GetArtistName(dbArtist) == name)
+                if (GetArtistName(dbArtist) == artistName)
                 {
                     dbImportedArtistId = int32_t(&dbArtist - m_db.artists.Items());
                     break;
@@ -148,7 +151,7 @@ namespace rePlayer
 
             assert(dbImportedArtistId >= 0); // has the artist disappeared from ASMA?
             if (dbImportedArtistId < 0)
-                Log::Error("Atari SAP Music Archive: can't find artist \"%s\"\n", name);
+                Log::Error("Atari SAP Music Archive: can't find artist \"%s\"\n", artistName);
         }
 
         for (auto dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId;)
@@ -211,9 +214,9 @@ namespace rePlayer
         m_isDirty |= results.songs.IsNotEmpty();
     }
 
-    void SourceAtariSAPMusicArchive::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceAtariSAPMusicArchive::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(busySpinner))
             return;
 
         std::string lName = ToLower(name);
@@ -723,10 +726,12 @@ namespace rePlayer
         return url;
     }
 
-    bool SourceAtariSAPMusicArchive::DownloadDatabase()
+    bool SourceAtariSAPMusicArchive::DownloadDatabase(BusySpinner& busySpinner)
     {
         if (m_db.songs.IsEmpty())
         {
+            busySpinner.Info("downloading database");
+
             // download database
             CURL* curl = curl_easy_init();
 
@@ -854,6 +859,11 @@ namespace rePlayer
                         }
                     }
                 }
+            }
+            if (m_db.songs.IsEmpty())
+            {
+                Log::Error("Atari SAP Music Archive: database failure\n");
+                busySpinner.Error("database failure");
             }
         }
         return m_db.songs.IsEmpty();

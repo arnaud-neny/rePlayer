@@ -9,6 +9,7 @@
 // rePlayer
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
+#include <UI/BusySpinner.h>
 
 // zlib
 #include <zlib.h>
@@ -407,11 +408,12 @@ namespace rePlayer
     SourceModland::~SourceModland()
     {}
 
-    void SourceModland::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceModland::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(&busySpinner))
             return;
 
+        busySpinner.Info("looking for artists");
         std::string lName = ToLower(name);
         for (auto& dbArtist : m_db.artists)
         {
@@ -429,23 +431,25 @@ namespace rePlayer
         }
     }
 
-    void SourceModland::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceModland::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
+        auto* artistName = m_artists[importedArtistID.internalId].name(m_strings);
+        busySpinner.Info(artistName);
+
         {
             thread::ScopedSpinLock lock(m_mutex);
-            if (DownloadDatabase())
+            if (DownloadDatabase(&busySpinner))
                 return;
         }
 
         uint16_t dbImportedArtistId = 0;
         {
-            auto* name = m_artists[importedArtistID.internalId].name(m_strings);
             for (auto& dbArtist : m_db.artists)
             {
-                if (dbArtist.name.IsSame(m_db.strings, name))
+                if (dbArtist.name.IsSame(m_db.strings, artistName))
                 {
                     dbImportedArtistId = uint16_t(&dbArtist - m_db.artists.Items());
                     break;
@@ -454,7 +458,7 @@ namespace rePlayer
 
             assert(dbImportedArtistId != 0); // has the artist disappeared from modland?
             if (dbImportedArtistId == 0)
-                Log::Error("Modland: can't find artist \"%s\"\n", name);
+                Log::Error("Modland: can't find artist \"%s\"\n", artistName);
         }
 
         for (uint32_t dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == dbImportedArtistId ? 0 : 1])
@@ -514,18 +518,21 @@ namespace rePlayer
         m_isDirty |= results.songs.IsNotEmpty();
     }
 
-    void SourceModland::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceModland::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
         {
             thread::ScopedSpinLock lock(m_mutex);
-            if (DownloadDatabase())
+            if (DownloadDatabase(&busySpinner))
                 return;
         }
 
         std::string lName = ToLower(name);
 
+        auto* message = busySpinner.Info("looking for songs: %u%%", 0);
         for (uint32_t i = 0, e = m_db.songs.NumItems(); i < e; i++)
         {
+            busySpinner.UpdateMessageParam(message, 100 - uint32_t(((1ull + i) * 100ull) / e));
+
             const auto& dbSong = m_db.songs[i];
             std::string dbSongName(dbSong.name(m_db.strings));
 
@@ -1152,7 +1159,7 @@ namespace rePlayer
 
     Source::Import SourceModland::ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path)
     {
-        if (replay->isKeepingLink && DownloadDatabase())
+        if (replay->isKeepingLink && DownloadDatabase(nullptr))
             return {};
 
         auto* songSource = GetSongSource(sourceId.internalId);
@@ -1296,7 +1303,7 @@ namespace rePlayer
 
     Source::Import SourceModland::ImportPkSong(SourceID sourceId, ModlandReplay::Type replayType, const std::string& path)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(nullptr))
             return {};
 
         auto* songSource = GetSongSource(sourceId.internalId);
@@ -1573,11 +1580,14 @@ namespace rePlayer
         return type;
     }
 
-    bool SourceModland::DownloadDatabase()
+    bool SourceModland::DownloadDatabase(BusySpinner* busySpinner)
     {
         if (m_db.songs.IsEmpty())
         {
             Array<char> unpackedData;
+
+            if (busySpinner)
+                busySpinner->Info("downloading database");
 
             CURL* curl = curl_easy_init();
 
@@ -1623,7 +1633,7 @@ namespace rePlayer
             curl_easy_cleanup(curl);
 
             if (unpackedData.IsNotEmpty())
-                DecodeDatabase(unpackedData.Items(), unpackedData.Items() + unpackedData.NumItems());
+                DecodeDatabase(unpackedData.Items(), unpackedData.Items() + unpackedData.NumItems(), busySpinner);
 
             // Check if discarded songs are still in the remote database
             if (m_db.songs.IsNotEmpty())
@@ -1641,14 +1651,22 @@ namespace rePlayer
                     }
                 }
             }
+            else
+            {
+                Log::Error("Modland: database failure\n");
+                if (busySpinner)
+                    busySpinner->Error("database failure");
+            }
         }
         return m_db.songs.IsEmpty();
     }
 
     #define BuildPathList(a) { a, sizeof(a) - 1 }
 
-    void SourceModland::DecodeDatabase(char* bufBegin, const char* bufEnd)
+    void SourceModland::DecodeDatabase(char* bufBegin, const char* bufEnd, BusySpinner* busySpinner)
     {
+        auto* message = busySpinner ? busySpinner->Info("decoding database: %u%%", 0) : nullptr;
+
         //first item is ignore as index 0 is null
         m_db.replays.Resize(1);
         m_db.artists.Resize(1);
@@ -1680,6 +1698,9 @@ namespace rePlayer
         char* lineEnd = nullptr;
         for (auto* line = buf; line < bufEnd; line = lineEnd + 1)
         {
+            if (busySpinner)
+                busySpinner->UpdateMessageParam(message, uint32_t(((line - bufBegin) * 100ull) / (bufEnd - bufBegin)));
+
             // skip to the next tabulation (ignore first field)
             while (line < bufEnd && *line != '\t' && *line != '\n' && *line != '\r')
                 line++;
@@ -1839,6 +1860,8 @@ namespace rePlayer
                 }
             }
         }
+        if (busySpinner)
+            busySpinner->UpdateMessageParam(message, 100);
     }
 
     uint16_t SourceModland::FindDatabaseReplay(const char* newReplay)

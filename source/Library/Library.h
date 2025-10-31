@@ -14,6 +14,7 @@ namespace core::io
 
 namespace rePlayer
 {
+    class BusySpinner;
     class LibraryDatabase;
     class Player;
     class SongEditor;
@@ -79,9 +80,7 @@ namespace rePlayer
         Serialized<bool> m_isSongTabEnabled = { "SongTab", true };
         Serialized<bool> m_isMergingOnDownload = { "AutoMerge", false };
 
-        bool m_isBusy = false;
-        float m_busyTime = 0.0f;
-        uint32_t m_busyColor;
+        SmartPtr<BusySpinner> m_busySpinner;
 
         struct ImportArtists
         {

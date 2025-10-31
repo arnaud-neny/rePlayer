@@ -14,9 +14,9 @@ namespace rePlayer
         SourceZXArt();
         ~SourceZXArt() final;
 
-        void FindArtists(ArtistsCollection& artists, const char* name) final;
-        void ImportArtist(SourceID importedArtistID, SourceResults& results) final;
-        void FindSongs(const char* name, SourceResults& collectedSongs) final;
+        void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) final;
+        void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) final;
+        void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) final;
         Import ImportSong(SourceID sourceId, const std::string& path) final;
         void OnArtistUpdate(ArtistSheet* artist) final;
         void OnSongUpdate(const Song* const song) final;
@@ -75,7 +75,7 @@ namespace rePlayer
         bool GetSongs(SourceResults& collectedSongs, const Array<uint8_t>& buffer, bool isCheckable, CURL* curl, uint32_t& start) const;
         ArtistSheet* GetArtist(uint32_t id, CURL* curl) const;
 
-        bool DownloadDatabase();
+        bool DownloadDatabase(BusySpinner& busySpinner);
 
     private:
         struct

@@ -2,12 +2,14 @@
 
 #include "Types/MusicID.h"
 
+#include <Containers/SmartPtr.h>
 #include <Core/Window.h>
 
 struct ImGuiTextFilter;
 
 namespace rePlayer
 {
+    class BusySpinner;
     class SongEndEditor;
 
     class SongEditor : public Window
@@ -50,9 +52,7 @@ namespace rePlayer
         ImGuiTextFilter* m_artistFilter = nullptr;
         float m_artistMaxWidth = 0.0f;
 
-        bool m_isBusy = false;
-        float m_busyTime = 0.0f;
-        uint32_t m_busyColor;
+        SmartPtr<BusySpinner> m_busySpinner;
     };
 }
 // namespace rePlayer

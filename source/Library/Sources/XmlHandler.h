@@ -58,10 +58,23 @@ namespace rePlayer
         }
 
         template <typename... Arguments>
-        void Fetch(Arguments&&... args)
+        void SetUrlLog(Arguments&&... args)
         {
             char url[1024];
             sprintf(url, std::forward<Arguments>(args)...);
+            urlLog = url;
+        }
+
+        template <typename... Arguments>
+        void Fetch(Arguments&&... args)
+        {
+            error.clear();
+
+            char url[1024];
+            sprintf(url, std::forward<Arguments>(args)...);
+
+            if (urlLog.empty())
+                urlLog = url;
 
             Array<char> buffer;
 
@@ -98,11 +111,18 @@ namespace rePlayer
                     xmlFreeDoc(doc);
                 }
                 else
-                    Log::Error("libxml: can't parse xml (%s)\n", url);
+                {
+                    error = "libxml: can't parse html";
+                    Log::Error("libxml: can't parse xml (%s)\n", urlLog.c_str());
+                }
                 xmlResetLastError();
             }
             else
-                Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), url);
+            {
+                error = "Curl: ";
+                error += curl_easy_strerror(curlErr);
+                Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), urlLog.c_str());
+            }
         }
 
         static xmlNode* FindNode(xmlNode* node, const char* name)
@@ -279,6 +299,8 @@ namespace rePlayer
 
         CURL* curl;
         bool isInitialized = false;
+        std::string urlLog;
+        std::string error;
     };
 }
 // namespace rePlayer

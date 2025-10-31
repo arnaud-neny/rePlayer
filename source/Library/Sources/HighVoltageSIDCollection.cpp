@@ -8,6 +8,7 @@
 
 // rePlayer
 #include <RePlayer/Core.h>
+#include <UI/BusySpinner.h>
 
 // zlib
 #include <zlib.h>
@@ -89,9 +90,9 @@ namespace rePlayer
     SourceHighVoltageSIDCollection::~SourceHighVoltageSIDCollection()
     {}
 
-    void SourceHighVoltageSIDCollection::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceHighVoltageSIDCollection::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(busySpinner))
             return;
 
         std::string lName = ToLower(name);
@@ -111,20 +112,22 @@ namespace rePlayer
         }
     }
 
-    void SourceHighVoltageSIDCollection::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceHighVoltageSIDCollection::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        if (DownloadDatabase())
+        auto* artistName = m_artists[importedArtistID.internalId].name(m_strings);
+        busySpinner.Info(artistName);
+
+        if (DownloadDatabase(busySpinner))
             return;
 
         uint16_t dbImportedArtistId = 0;
         {
-            auto* name = m_artists[importedArtistID.internalId].name(m_strings);
             for (auto& dbArtist : m_db.artists)
             {
-                if (dbArtist.name.IsSame(m_db.strings, name))
+                if (dbArtist.name.IsSame(m_db.strings, artistName))
                 {
                     dbImportedArtistId = uint16_t(&dbArtist - m_db.artists.Items());
                     break;
@@ -133,7 +136,7 @@ namespace rePlayer
 
             assert(dbImportedArtistId != 0); // has the artist disappeared?
             if (dbImportedArtistId == 0)
-                Log::Error("High Voltage SID Collection: can't find artist \"%s\"\n", name);
+                Log::Error("High Voltage SID Collection: can't find artist \"%s\"\n", artistName);
         }
 
         for (uint32_t dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
@@ -191,9 +194,9 @@ namespace rePlayer
         m_isDirty |= results.songs.IsNotEmpty();
     }
 
-    void SourceHighVoltageSIDCollection::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceHighVoltageSIDCollection::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
-        if (DownloadDatabase())
+        if (DownloadDatabase(busySpinner))
             return;
 
         std::string lName = ToLower(name);
@@ -679,7 +682,7 @@ namespace rePlayer
         return url;
     }
 
-    bool SourceHighVoltageSIDCollection::DownloadDatabase()
+    bool SourceHighVoltageSIDCollection::DownloadDatabase(BusySpinner& busySpinner)
     {
         if (m_db.songs.IsEmpty())
         {
@@ -705,10 +708,12 @@ namespace rePlayer
             for (uint32_t i = 0; i < NumItemsOf(ms_urls) && downloadStatus != 0; i++)
             {
                 auto url = std::string(ms_urls[m_currentUrl]) + "DOCUMENTS/Songlengths.md5";
+                busySpinner.Info("downloading database " + url);
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 downloadStatus = Download(curl);
                 if (downloadStatus != 0)
                 {
+                    busySpinner.Error("download failed");
                     buffer.Clear();
                     m_currentUrl = (m_currentUrl + 1) % NumItemsOf(ms_urls);
                 }
@@ -717,7 +722,7 @@ namespace rePlayer
             curl_easy_cleanup(curl);
 
             if (downloadStatus == 0)
-                DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems());
+                DecodeDatabase(buffer.Items<char>(), buffer.Items<char>() + buffer.NumItems(), busySpinner);
 
             // Check if discarded songs are still in the remote database
             if (m_db.songs.IsNotEmpty())
@@ -739,8 +744,10 @@ namespace rePlayer
         return m_db.songs.IsEmpty();
     }
 
-    void SourceHighVoltageSIDCollection::DecodeDatabase(char* bufBegin, const char* bufEnd)
+    void SourceHighVoltageSIDCollection::DecodeDatabase(char* bufBegin, const char* bufEnd, BusySpinner& busySpinner)
     {
+        auto* message = busySpinner.Info("decoding database: %u%%", 0);
+
         //first item is ignore as index 0 is null
         m_db.roots.Resize(1);
         m_db.artists.Resize(1);
@@ -751,6 +758,8 @@ namespace rePlayer
         char* lineEnd = nullptr;
         for (auto* line = buf; line < bufEnd; line = lineEnd + 1)
         {
+            busySpinner.UpdateMessageParam(message, uint32_t(((line - bufBegin) * 100ull) / (bufEnd - bufBegin)));
+
             // go to song entry
             while (line < bufEnd && *line != ';')
                 line++;
@@ -804,6 +813,7 @@ namespace rePlayer
                 }
             }
         }
+        busySpinner.UpdateMessageParam(message, 100);
     }
 
     uint16_t SourceHighVoltageSIDCollection::FindDatabaseRoot(const char* newRoot)

@@ -14,9 +14,9 @@ namespace rePlayer
         SourceModland();
         ~SourceModland() final;
 
-        void FindArtists(ArtistsCollection& artists, const char* name) final;
-        void ImportArtist(SourceID importedArtistID, SourceResults& results) final;
-        void FindSongs(const char* name, SourceResults& collectedSongs) final;
+        void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) final;
+        void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) final;
+        void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) final;
         Import ImportSong(SourceID sourceId, const std::string& path) final;
         void OnArtistUpdate(ArtistSheet* artist) final;
         void OnSongUpdate(const Song* const song) final;
@@ -187,8 +187,8 @@ namespace rePlayer
 
         MediaType UpdateMediaType(const ModlandSong& dbSong, std::string& dbSongName) const;
 
-        bool DownloadDatabase();
-        void DecodeDatabase(char* bufBegin, const char* bufEnd);
+        bool DownloadDatabase(BusySpinner* busySpinner);
+        void DecodeDatabase(char* bufBegin, const char* bufEnd, BusySpinner* busySpinner);
 
         uint16_t FindDatabaseReplay(const char* newReplay);
         uint16_t FindDatabaseArtist(const char* newArtist);

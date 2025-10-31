@@ -20,36 +20,36 @@ namespace rePlayer
     SourceURLImport::~SourceURLImport()
     {}
 
-    void SourceURLImport::FindArtists(ArtistsCollection& artists, const char* name)
+    void SourceURLImport::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        (void)artists; (void)name;
+        UnusedArg(artists, name, busySpinner);
     }
 
-    void SourceURLImport::ImportArtist(SourceID importedArtistID, SourceResults& results)
+    void SourceURLImport::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
     {
-        (void)importedArtistID; (void)results;
+        UnusedArg(importedArtistID, results, busySpinner);
     }
 
-    void SourceURLImport::FindSongs(const char* name, SourceResults& collectedSongs)
+    void SourceURLImport::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
-        (void)name; (void)collectedSongs;
+        UnusedArg(name, collectedSongs, busySpinner);
     }
 
     Source::Import SourceURLImport::ImportSong(SourceID sourceId, const std::string& path)
     {
-        (void)path;
+        UnusedArg(path);
         return { StreamUrl::Create(m_strings.Items(m_songs[sourceId.internalId].url)), false };
     }
 
     void SourceURLImport::OnArtistUpdate(ArtistSheet* artist)
     {
-        (void)artist;
+        UnusedArg(artist);
         assert(0 && "this should never be called");
     }
 
     void SourceURLImport::OnSongUpdate(const Song* const song)
     {
-        (void)song;
+        UnusedArg(song);
         assert(0 && "this should never be called");
     }
 

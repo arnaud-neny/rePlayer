@@ -12,6 +12,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/Replay.h>
+#include <UI/BusySpinner.h>
 #include <UI/FileSelector.h>
 
 #include "LibraryFileImport.h"
@@ -30,7 +31,7 @@ namespace rePlayer
 {
     void Library::FileImport::Scan(Array<std::filesystem::path>&& files)
     {
-        Core::GetLibrary().m_isBusy = true;
+        Core::GetLibrary().m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
         Core::AddJob([this, files = std::move(files)]()
         {
             auto& library = Core::GetLibrary();
@@ -108,7 +109,7 @@ namespace rePlayer
             }
             Core::FromJob([this]()
             {
-                Core::GetLibrary().m_isBusy = false;
+                Core::GetLibrary().m_busySpinner.Reset();
                 m_isScanning = false;
                 m_isImporting = true;
             });
@@ -336,7 +337,7 @@ namespace rePlayer
             if (ImGui::Button(txt, ImVec2(-1.0f, 0.0f)))
             {
                 Core::GetLibrary().m_db.Freeze();
-                Core::GetLibrary().m_isBusy = true;
+                Core::GetLibrary().m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
                 Core::AddJob([this]()
                 {
                     auto& library = Core::GetLibrary();
@@ -555,7 +556,7 @@ namespace rePlayer
                     Core::FromJob([this]()
                     {
                         Core::GetLibrary().m_db.UnFreeze();
-                        Core::GetLibrary().m_isBusy = false;
+                        Core::GetLibrary().m_busySpinner.Reset();
                         Core::Unlock();
                         m_isImporting = false;
                     });
