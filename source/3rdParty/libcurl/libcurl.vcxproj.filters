@@ -136,9 +136,6 @@
     <ClInclude Include="lib\curl_ctype.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_des.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_endian.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -155,9 +152,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\curl_hmac.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\curl_krb5.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\curl_ldap.h">
@@ -239,9 +233,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\fileinfo.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\fopen.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\formdata.h">
@@ -598,6 +589,21 @@
     <ClInclude Include="lib\curl_mem_undef.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\curlx\fopen.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\strerr.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vtls\apple.h">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curl_fopen.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\multi_ntfy.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\altsvc.c">
@@ -646,9 +652,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_addrinfo.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\curl_des.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_endian.c">
@@ -721,9 +724,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\fileinfo.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\fopen.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\formdata.c">
@@ -799,9 +799,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\imap.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\krb5.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\ldap.c">
@@ -1005,9 +1002,6 @@
     <ClCompile Include="lib\vssh\libssh2.c">
       <Filter>Source Files\lib\vssh</Filter>
     </ClCompile>
-    <ClCompile Include="lib\vssh\wolfssh.c">
-      <Filter>Source Files\lib\vssh</Filter>
-    </ClCompile>
     <ClCompile Include="lib\vtls\gtls.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
@@ -1129,6 +1123,21 @@
       <Filter>Source Files\lib\curlx</Filter>
     </ClCompile>
     <ClCompile Include="lib\cf-ip-happy.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\fopen.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\strerr.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vtls\apple.c">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curl_fopen.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\multi_ntfy.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
