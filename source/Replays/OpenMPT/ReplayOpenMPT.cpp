@@ -40,7 +40,8 @@ namespace rePlayer
         GlobalSettings("MultiTracker", "MultiTracker"),
         GlobalSettings("DigitalTracker", "Digital Tracker", false, true),
         GlobalSettings("DelusionDigital", "Delusion Digital Music", false, true),
-        GlobalSettings("DigiBoosterPro", "DigiBooster Pro", false, true)
+        GlobalSettings("DigiBoosterPro", "DigiBooster Pro", false, true),
+        GlobalSettings("PolyTracker", "PolyTracker", false, true)
     };
 
     bool ReplayOpenMPT::Init(SharedContexts* ctx, Window& window)
