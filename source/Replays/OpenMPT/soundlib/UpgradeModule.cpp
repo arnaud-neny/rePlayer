@@ -365,7 +365,6 @@ void CSoundFile::UpgradeModule()
 		}
 	}
 
-#ifndef NO_PLUGINS
 	if(m_dwLastSavedWithVersion < MPT_V("1.22.07.01") && hasAnyPlugins)
 	{
 		// Convert ANSI plugin path names to UTF-8 (irrelevant in probably 99% of all cases anyway, I think I've never seen a VST plugin with a non-ASCII file name)
@@ -379,7 +378,6 @@ void CSoundFile::UpgradeModule()
 			plugin.Info.szLibraryName = name;
 		}
 	}
-#endif // NO_PLUGINS
 
 	// Starting from OpenMPT 1.22.07.19, FT2-style panning was applied in compatible mix mode.
 	// Starting from OpenMPT 1.23.01.04, FT2-style panning has its own mix mode instead.
@@ -605,6 +603,7 @@ void CSoundFile::UpgradeModule()
 			{ kITCarryAfterNoteOff,           MPT_V("1.32.00.40") },
 			{ kITNoteCutWithPorta,            MPT_V("1.32.01.02") },
 			{ kITVolColNoSlidePropagation,    MPT_V("1.32.02.03") },
+			{ kITStoppedFilterEnvAtStart,     MPT_V("1.32.03.04") },
 		};
 
 		for(const auto &b : behaviours)
@@ -748,7 +747,6 @@ void CSoundFile::UpgradeModule()
 		}
 	}
 
-#ifndef NO_PLUGINS
 	if(m_dwLastSavedWithVersion >= MPT_V("1.27.00.42") && m_dwLastSavedWithVersion < MPT_V("1.30.00.46") && hasAnyPlugins)
 	{
 		// The Flanger DMO plugin is almost identical to the Chorus... but only almost.
@@ -821,7 +819,7 @@ void CSoundFile::UpgradeModule()
 			}
 		}
 	}
-#endif
+
 }
 
 OPENMPT_NAMESPACE_END

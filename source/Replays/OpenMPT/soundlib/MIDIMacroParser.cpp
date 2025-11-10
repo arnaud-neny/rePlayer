@@ -125,7 +125,6 @@ MIDIMacroParser::MIDIMacroParser(const CSoundFile &sndFile, PlayState *playState
 			// MIDI channel
 			isNibble = true;
 			data = 0xFF;
-#ifndef NO_PLUGINS
 			const PLUGINDEX plug = (plugin != 0 || !chn) ? plugin : sndFile.GetBestPlugin(*chn, nChn, PrioritiseChannel, EvenIfMuted);
 			if(plug > 0 && plug <= MAX_MIXPLUGINS)
 			{
@@ -133,7 +132,6 @@ MIDIMacroParser::MIDIMacroParser(const CSoundFile &sndFile, PlayState *playState
 				if(midiPlug && chn)
 					data = midiPlug->GetMidiChannel(*chn, nChn);
 			}
-#endif // NO_PLUGINS
 			if(data == 0xFF)
 			{
 				// Fallback if no plugin was found

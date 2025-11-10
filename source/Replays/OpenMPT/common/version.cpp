@@ -392,11 +392,6 @@ mpt::ustring GetBuildFeaturesString()
 		#if !(defined(MPT_WITH_OGG) && defined(MPT_WITH_VORBIS) && defined(MPT_WITH_VORBISFILE)) && !defined(MPT_WITH_STBVORBIS)
 			UL_(" -VORBIS")
 		#endif
-		#if !defined(NO_PLUGINS)
-			UL_(" +PLUGINS")
-		#else
-			UL_(" -PLUGINS")
-		#endif
 		#if defined(MPT_WITH_DMO)
 			UL_(" +DMO")
 		#endif
@@ -414,9 +409,6 @@ mpt::ustring GetBuildFeaturesString()
 		#endif
 		#ifndef MPT_WITH_DMO
 			UL_(" NO_DMO")
-		#endif
-		#ifdef NO_PLUGINS
-			UL_(" NO_PLUGINS")
 		#endif
 			;
 	#endif
@@ -624,7 +616,7 @@ mpt::ustring GetFullCreditsString()
 		"Thanks to:\n"
 		"\n"
 		"Konstanty for the XMMS-ModPlug resampling implementation\n"
-		"http://modplug-xmms.sourceforge.net/\n"
+		"https://modplug-xmms.sourceforge.net/\n"
 		"\n"
 #ifdef MODPLUG_TRACKER
 		"Geraint Luff for Signalsmith Stretch\n"
@@ -636,7 +628,7 @@ mpt::ustring GetFullCreditsString()
 #endif
 #ifdef MPT_WITH_VST
 		"Hermann Seib for his example VST Host implementation\n"
-		"http://www.hermannseib.com/english/vsthost.htm\n"
+		"https://www.hermannseib.com/english/vsthost.htm\n"
 		"\n"
 		"Benjamin \"BeRo\" Rosseaux for his independent VST header\n"
 		"https://blog.rosseaux.net/\n"
@@ -644,7 +636,7 @@ mpt::ustring GetFullCreditsString()
 #endif
 		"Storlek for all the IT compatibility hints and testcases\n"
 		"as well as the IMF, MDL, OKT and ULT loaders\n"
-		"http://schismtracker.org/\n"
+		"https://schismtracker.org/\n"
 		"\n"
 		"Sergei \"x0r\" Kolzun for various hints on Scream Tracker 2 compatibility\n"
 		"https://github.com/viiri/st2play\n"
@@ -691,7 +683,7 @@ mpt::ustring GetFullCreditsString()
 #endif
 #ifdef MPT_WITH_PORTAUDIO
 		"PortAudio contributors\n"
-		"http://www.portaudio.com/\n"
+		"https://www.portaudio.com/\n"
 		"\n"
 #endif
 #ifdef MPT_WITH_RTAUDIO
@@ -771,6 +763,9 @@ mpt::ustring GetFullCreditsString()
 		"\n"
 		"Nobuyuki for file icon\n"
 		"https://github.com/nobuyukinyuu/\n"
+		"\n"
+		"ESI Audiotechnik GmbH for testing hardware\n"
+		"https://www.esi-audio.com/\n"
 		"\n"
 #endif
 		"Daniel Collin (emoon/TBL) for providing test infrastructure\n"
