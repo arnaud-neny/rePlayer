@@ -94,7 +94,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libtfmxaudiodecoder\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libtfmxaudiodecoder\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -138,7 +138,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libtfmxaudiodecoder\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -167,7 +167,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libtfmxaudiodecoder\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -187,46 +187,72 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="libfc14audiodecoder\Analyze.h" />
-    <ClInclude Include="libfc14audiodecoder\Config.h" />
-    <ClInclude Include="libfc14audiodecoder\Debug.h" />
-    <ClInclude Include="libfc14audiodecoder\Dump.h" />
-    <ClInclude Include="libfc14audiodecoder\FC.h" />
-    <ClInclude Include="libfc14audiodecoder\fc14audiodecoder.h" />
-    <ClInclude Include="libfc14audiodecoder\LamePaulaMixer.h" />
-    <ClInclude Include="libfc14audiodecoder\LamePaulaVoice.h" />
-    <ClInclude Include="libfc14audiodecoder\LiveFix.h" />
-    <ClInclude Include="libfc14audiodecoder\MyEndian.h" />
-    <ClInclude Include="libfc14audiodecoder\MyTypes.h" />
-    <ClInclude Include="libfc14audiodecoder\Paula.h" />
-    <ClInclude Include="libfc14audiodecoder\SmartPtr.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Chris\TFMXDecoder.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Config.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\CRCLight.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Debug.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Decoder.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\DecoderProxy.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Dump.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Jochen\Analyze.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Jochen\HippelDecoder.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Jochen\LiveFix.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\LamePaulaMixer.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\LamePaulaVoice.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\MyEndian.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\MyTypes.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\PaulaVoice.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\SmartPtr.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\tfmxaudiodecoder.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ReplayFutureComposer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libfc14audiodecoder\Analyze.cpp" />
-    <ClCompile Include="libfc14audiodecoder\COSO.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Dump.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Envelope.cpp" />
-    <ClCompile Include="libfc14audiodecoder\FC.cpp" />
-    <ClCompile Include="libfc14audiodecoder\fc14audiodecoder.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Instrument.cpp" />
-    <ClCompile Include="libfc14audiodecoder\LamePaulaMixer.cpp" />
-    <ClCompile Include="libfc14audiodecoder\LamePaulaVoice.cpp" />
-    <ClCompile Include="libfc14audiodecoder\MCMD.cpp" />
-    <ClCompile Include="libfc14audiodecoder\ModPack.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Paula.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Player.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Portamento.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Probe.cpp" />
-    <ClCompile Include="libfc14audiodecoder\SMOD.cpp" />
-    <ClCompile Include="libfc14audiodecoder\TFMX.cpp" />
-    <ClCompile Include="libfc14audiodecoder\TFMX7V.cpp" />
-    <ClCompile Include="libfc14audiodecoder\TraitsByChecksum.cpp" />
-    <ClCompile Include="libfc14audiodecoder\Vibrato.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\ByChecksum.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\Macro.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\MergedFiles.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\Modulation.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\Pattern.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\SamplesFile.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\Sequencer.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\Songs.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\TFMXDecoder.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\CRCLight.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Decoder.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\DecoderProxy.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Dump.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Analyze.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\COSO.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Envelope.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\FC.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\HippelDecoder.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Instrument.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\MCMD.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\ModPack.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Portamento.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Probe.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\SMOD.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\TFMX.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\TFMX7V.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\TraitsByChecksum.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Vibrato.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\LamePaulaMixer.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\LamePaulaVoice.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\PaulaVoice.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\tfmxaudiodecoder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ReplayFutureComposer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libfc14audiodecoder\README.md" />
+    <None Include="libtfmxaudiodecoder\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,6 +3,11 @@
 #include <Replay.inl.h>
 #include <Audio/Surround.h>
 
+#include "libtfmxaudiodecoder/src/DecoderProxy.h"
+#include "libtfmxaudiodecoder/src/LamePaulaMixer.h"
+
+using namespace tfmxaudiodecoder;
+
 namespace rePlayer
 {
     class ReplayFutureComposer : public Replay
@@ -56,10 +61,12 @@ namespace rePlayer
         static constexpr uint32_t kSampleRate = 48000;
 
     private:
-        ReplayFutureComposer(void* decoder);
+        ReplayFutureComposer(io::Stream* stream, DecoderProxy* decoder);
 
     private:
-        void* m_decoder = nullptr;
+        SmartPtr<io::Stream> m_stream;
+        DecoderProxy* m_decoder = nullptr;
+        LamePaulaMixer m_mixer;
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
         static int32_t ms_stereoSeparation;
