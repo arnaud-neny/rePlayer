@@ -907,6 +907,10 @@ namespace rePlayer
             {
                 busySpinner.UpdateMessageParam(message, i);
 
+                // throttle to avoid flooding website
+                if ((i & 31) == 31)
+                    thread::Sleep(256 + (rand() & 0x1ff));
+
                 collector.state = PacksCollector::kStateInit;
                 if (collector.Fetch("https://vgmrips.net/packs/latest?p=%u", i) != Status::kOk)
                     collector.isDone = true;
@@ -932,7 +936,7 @@ namespace rePlayer
 
                 // throttle to avoid flooding website
                 if ((packIdx & 31) == 31)
-                    thread::Sleep(500);
+                    thread::Sleep(256 + (rand() & 0x1ff));
 
                 // build pack
                 auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
