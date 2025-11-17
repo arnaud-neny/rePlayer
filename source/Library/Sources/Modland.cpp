@@ -531,7 +531,7 @@ namespace rePlayer
         auto* message = busySpinner.Info("looking for songs: %u%%", 0);
         for (uint32_t i = 0, e = m_db.songs.NumItems(); i < e; i++)
         {
-            busySpinner.UpdateMessageParam(message, 100 - uint32_t(((1ull + i) * 100ull) / e));
+            busySpinner.UpdateMessageParam(message, uint32_t(((1ull + i) * 100ull) / e));
 
             const auto& dbSong = m_db.songs[i];
             std::string dbSongName(dbSong.name(m_db.strings));
