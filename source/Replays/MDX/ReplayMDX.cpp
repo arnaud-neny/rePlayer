@@ -9,6 +9,8 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+#include <filesystem>
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
@@ -44,6 +46,20 @@ namespace rePlayer
             stream->Read(*buf, size);
             return size_t(size);
         }
+
+        // try converting to ShiftJS
+        WCHAR toShiftJIS[256];
+        ::MultiByteToWideChar(932, 0, filename, -1, toShiftJIS, 256);
+        std::filesystem::path p(toShiftJIS);
+        stream = reinterpret_cast<io::Stream*>(user_data)->Open((const char *)p.generic_u8string().c_str());
+        if (stream.IsValid())
+        {
+            auto size = size_t(stream->GetSize());
+            *buf = malloc(size);
+            stream->Read(*buf, size);
+            return size_t(size);
+        }
+
         Log::Error("[MDX] can't open %s\n", filename);
         return 0;
     }
