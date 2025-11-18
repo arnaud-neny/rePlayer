@@ -661,8 +661,7 @@ namespace rePlayer
 
         CURL* curl = curl_easy_init();
 
-        char errorBuffer[CURL_ERROR_SIZE];
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         char url[128];
         sprintf(url, "https://amp.dascene.net/downmod.php?index=%u", sourceToDownload.internalId);
