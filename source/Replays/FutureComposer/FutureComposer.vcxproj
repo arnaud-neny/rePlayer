@@ -190,7 +190,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libtfmxaudiodecoder\src\Chris\TFMXDecoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Config.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\CRCLight.h" />
-    <ClInclude Include="libtfmxaudiodecoder\src\Debug.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Decoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\DecoderProxy.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Dump.h" />

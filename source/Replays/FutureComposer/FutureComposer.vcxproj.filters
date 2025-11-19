@@ -29,9 +29,6 @@
     <ClInclude Include="libtfmxaudiodecoder\src\CRCLight.h">
       <Filter>Source Files\libtfmxaudiodecoder</Filter>
     </ClInclude>
-    <ClInclude Include="libtfmxaudiodecoder\src\Debug.h">
-      <Filter>Source Files\libtfmxaudiodecoder</Filter>
-    </ClInclude>
     <ClInclude Include="libtfmxaudiodecoder\src\Decoder.h">
       <Filter>Source Files\libtfmxaudiodecoder</Filter>
     </ClInclude>

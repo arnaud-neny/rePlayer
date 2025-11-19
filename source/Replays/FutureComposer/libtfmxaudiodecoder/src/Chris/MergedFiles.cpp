@@ -46,6 +46,7 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
     input.versionHint = 0;
     input.startSongHint = -1;
 
+    // ----------------------------------------------------------------------
     // "TFMXPAK 012345 0123456 >>>" ASCII header from the early 90s.
     //  01234567890123456789012345
     const int tfmxPakParseSize = 31;  // large enough
@@ -66,6 +67,7 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         return true;
     }
     
+    // ----------------------------------------------------------------------
     // "TFHD" structure. Big-endian.
     const int tfmxTFHDParseSize = 0x12;
     if ( input.len > tfmxTFHDParseSize && !memcmp(input.buf,TAG_TFHD.c_str(),TAG_TFHD.length()) ) {
@@ -102,6 +104,7 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         return true;
     }
 
+    // ----------------------------------------------------------------------
     // TFMX-MOD header as another single-file format modification.
     // Little-endian!
     const int tfmxMODParseSize = 16;
@@ -130,8 +133,9 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         do {
             ubyte what = pBuf[offs++];
             uword len = makeWord(pBuf[offs+1],pBuf[offs]);
-            if (len == 0)
+            if (len == 0) {
                 break;
+            }
             offs += 2;
             // Need this, since there is crap at the end that
             // triggers definitions accidentally.
@@ -152,12 +156,28 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
                 }
                 break;
             case 2:
-                while (len-- > 0)
-                    game.push_back((char)pBuf[offs++]);
+                while (len-- > 0) {
+                    ubyte c = pBuf[offs++];
+                    if (c<128) {
+                        game.push_back((char)c);
+                    }
+                    else {
+                        game.push_back(0xc2+(c>0xbf));
+                        game.push_back((c&0x3f)+0x80);
+                    }
+                }
                 break;
             case 6:
-                while (len-- > 0)
-                    title.push_back((char)pBuf[offs++]);
+                while (len-- > 0) {
+                    ubyte c = pBuf[offs++];
+                    if (c<128) {
+                        title.push_back((char)c);
+                    }
+                    else {
+                        title.push_back(0xc2+(c>0xbf));
+                        title.push_back((c&0x3f)+0x80);
+                    }
+                }
                 break;
             case 0:
                 startSong = makeWord(pBuf[offs+3],pBuf[offs+2]);
@@ -173,11 +193,6 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
             };
         }
         while (offs < input.len);
-#if defined(DEBUG)
-        //cout << "MOD " << title << endl;
-        //cout << "MOD " << game << endl;
-        //cout << "MOD " << author << endl;
-#endif
         input.startSongHint = startSong;
         return true;
     }

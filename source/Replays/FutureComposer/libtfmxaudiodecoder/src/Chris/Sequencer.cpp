@@ -18,6 +18,9 @@
 // TFMX's sequencer is designed as a track table with N columns (= tracks).
 // Each track can assign patterns to any audio channel or execute a small
 // number of commands to affect either the track or song progression.
+//
+// Some modules use the LOOP command to escape from their initial start/end
+// range within the track table.
 
 namespace tfmxaudiodecoder {
 
