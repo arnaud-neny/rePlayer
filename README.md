@@ -200,8 +200,8 @@ Or add some comments (and likes) there:
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
 - [Ken](http://advsys.net/ken): in_ken plays all Ken Silverman's formats.
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
-- [libfc14audiodecoder](https://github.com/mschwendt/libfc14audiodecoder): Library for Future Composer & Hippel TFMX audio decoding.
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
+- [libtfmxaudiodecoder](https://github.com/mschwendt/libtfmxaudiodecoder): Library for TFMX & Future Composer audio decoding.
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
 - [MTPng](https://aminet.net/package/mus/play/mtpng_68k): MegaTracker Player (MTP or MTPng) is a program which will play most Apple IIgs SoundSmith and MegaTracker songs on your more modern computer.

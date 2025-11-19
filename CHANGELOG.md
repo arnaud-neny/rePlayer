@@ -1,10 +1,15 @@
-v0.21.2:
+v0.21.3:
 - Added SkaleTracker
-- Updated libfc14audiodecoder to 2.0.2
-- Updated libsidplay to 2.15.1
+- Updated libfc14audiodecoder to libtfmxaudiodecoder
+- Updated gbsplay to 0.0.101
+- Updated libsidplay to 2.15.2
+- Updated OpenMPT to 0.9.0-pre.9 r24409
+- Updated SunVox to 2.1.3
 - Updated vgmstream to r2055
-- Updated ImGui to 1.92.3
-- Updated libxml2 to 2.15.0
+- Updated ImGui to 1.92.4
+- Updated libarchive to 3.8.3
+- Updated libcurl to 8.17.0
+- Updated libxml2 to 2.15.1
 - Bug fixes
 
 v0.20.4:

@@ -39,9 +39,9 @@
   Fixed some memory leaks and made it x64 compliant.
 - Ken: http://advsys.net/ken/ & https://bitbucket.org/wothke/webken
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2, https://gitlab.com/kode54/lazyusf2 and https://bitbucket.org/losnoco/psflib
-- libfc14audiodecoder: https://github.com/mschwendt/libfc14audiodecoder
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
+- libtfmxaudiodecoder: https://github.com/mschwendt/libtfmxaudiodecoder
 - libvgm: https://github.com/ValleyBell/libvgm
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - MTPng: https://aminet.net/package/mus/play/mtpng_68k (and https://github.com/mrkite/soundsmith)
