@@ -48,6 +48,7 @@
 - sointu: https://github.com/vsariola/sointu annoying language
 - WaveSabre: https://github.com/logicomacorp/WaveSabre missing official file format
 - Full EdLib support (doh!): https://blog.chordian.net
+- Monotone: https://github.com/MobyGamer/MONOTONE (Virt: rickroll.mon)
 - single channel export
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
