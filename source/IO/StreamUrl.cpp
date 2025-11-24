@@ -459,11 +459,15 @@ namespace rePlayer
             m_isReadingChunk = true;
         }
 
-        Log::Warning("StreamUrl: %s\n", curl_easy_strerror(curlCode));
         if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
+        {
             std::atomic_ref(m_state).store(State::kEnd);
+        }
         else
+        {
             std::atomic_ref(m_state).store(State::kFailed);
+            Log::Warning("StreamUrl: %s\n", curl_easy_strerror(curlCode));
+        }
 
         std::atomic_ref(m_isJobDone).store(true);
     }
