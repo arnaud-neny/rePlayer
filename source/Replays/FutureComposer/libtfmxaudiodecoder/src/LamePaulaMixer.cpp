@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, see <https://www.gnu.org/licenses/>.
 
+#include <cmath>
+
 #include "LamePaulaMixer.h"
 #include "LamePaulaVoice.h"
 #include "Decoder.h"
@@ -27,6 +29,7 @@ LamePaulaMixer::LamePaulaMixer()
 {
     emptySample[0] = emptySample[1] = emptySample[2] = emptySample[3] = 0;
     panning = 50+25;
+    lowpass2 = false;
 
     // Fill clipping table needed for the four virtual voices.
     for (int i=0; i<0x180; i++) {
@@ -104,6 +107,10 @@ void LamePaulaMixer::setPanning(int p) {
     panning = p;
 }
 
+void LamePaulaMixer::setFiltering(int p) {
+    lowpass2 = (p == 1);
+}
+
 void LamePaulaMixer::init(Decoder *decoder) {
     if ( !decoder ) {
         return;
@@ -171,6 +178,14 @@ void LamePaulaMixer::init(udword freq, ubyte bits, ubyte chn, uword zero, ubyte 
     }
     setPanning(panLevel);
     initMixTables();
+
+    f1C = (3.14159265*2*4420.97)/pcmFreq;
+    f1Ci = 1.0-((3.14159265*2*4420.97)/pcmFreq);
+    f1LastLw = f1LastRw = 0;
+    f1LastLb = f1LastRb = 0;
+
+    f2L.setup(3275.0,pcmFreq);
+    f2R.setup(3275.0,pcmFreq);
 }
 
 void LamePaulaMixer::initMixTables() {
@@ -325,7 +340,7 @@ udword LamePaulaMixer::fillBuffer(void* buffer, udword bufferLen, Decoder *pDeco
 }
 
 void* LamePaulaMixer::fill8bitMono(void* buffer, udword numberOfSamples) {
-    ubyte* buffer8bit = static_cast<ubyte*>(buffer);
+    sbyte* buffer8bit = static_cast<sbyte*>(buffer);
     sbyte* mix = mix8mono;
     bool mode7V = false;
     int normalVoices = voices;
@@ -335,30 +350,50 @@ void* LamePaulaMixer::fill8bitMono(void* buffer, udword numberOfSamples) {
         mode7V = true;
     }
     for (ubyte v=0; v<normalVoices; v++) {
-        buffer8bit = static_cast<ubyte*>(buffer);
+        buffer8bit = static_cast<sbyte*>(buffer);
         LamePaulaVoice *pv = pVoice[v];
         uword vol = voiceVol[v] << 8;
         for (udword n = numberOfSamples; n>0; n--) {
             if (v == 0) {
-                *buffer8bit = zero8bit;
+                *buffer8bit = 0;
             }
-            *buffer8bit += mix[vol+pv->getSample()];
+            *buffer8bit++ += mix[vol+pv->getSample()];
+        }
+    }
+
+    if (!mode7V) {
+        goto fill8bitMonoPost;
+    }
+    buffer8bit = static_cast<sbyte*>(buffer);
+    for (udword n = numberOfSamples; n>0; n--) {
+        *buffer8bit++ += mix[0x4000+getSample_7V()];
+    }
+
+ fill8bitMonoPost:
+    buffer8bit = static_cast<sbyte*>(buffer);
+    if (lowpass2) {
+        for (udword n = numberOfSamples; n>0; n--) {
+            *buffer8bit = 0x7f * f2L.process( *buffer8bit/128.0 );
             buffer8bit++;
         }
     }
-    if (!mode7V)
-        return(buffer8bit);
-
-    buffer8bit = (static_cast<ubyte*>(buffer));
-    for (udword n = numberOfSamples; n>0; n--) {
-        *buffer8bit += mix[0x4000+getSample_7V()];
-        buffer8bit++;
+    else {
+        for (udword n = numberOfSamples; n>0; n--) {
+            f1LastLb = (f1C * *buffer8bit + f1Ci*f1LastLb);
+            *buffer8bit++ = f1LastLb;
+        }
     }
-    return(buffer8bit);
+    if (zero8bit != 0) {  // want unsigned samples?
+        ubyte *b = static_cast<ubyte*>(buffer);
+        for (udword n = numberOfSamples; n>0; n--) {
+            *b++ += zero8bit;
+        }
+    }
+    return buffer8bit;
 }
 
 void* LamePaulaMixer::fill8bitStereoPanning( void* buffer, udword numberOfSamples ) {
-    ubyte* buffer8bit = static_cast<ubyte*>(buffer);
+    sbyte* buffer8bit = static_cast<sbyte*>(buffer);
     sbyte *mixLeft, *mixRight;
     bool mode7V = false;
     int normalVoices = voices;
@@ -368,7 +403,7 @@ void* LamePaulaMixer::fill8bitStereoPanning( void* buffer, udword numberOfSample
         mode7V = true;
     }
     for (ubyte v=0; v<normalVoices; v++) {
-        buffer8bit = (static_cast<ubyte*>(buffer));
+        buffer8bit = static_cast<sbyte*>(buffer);
 
         if (panningPos[v] == RIGHT) {
             mixLeft = mix8left;
@@ -383,20 +418,20 @@ void* LamePaulaMixer::fill8bitStereoPanning( void* buffer, udword numberOfSample
         uword vol = voiceVol[v] << 8;
         for (udword n = numberOfSamples; n>0; n--) {
             if (v == 0) {
-                buffer8bit[0] = zero8bit;
-                buffer8bit[1] = zero8bit;
+                buffer8bit[0] = 0;
+                buffer8bit[1] = 0;
             }
             ubyte sam = pv->getSample();
-            buffer8bit[0] += mixLeft[vol+sam];
-            buffer8bit[1] += mixRight[vol+sam];
-            buffer8bit += 2;
+            *buffer8bit++ += mixLeft[vol+sam];
+            *buffer8bit++ += mixRight[vol+sam];
         }
     }
-    if (!mode7V)
-        return(buffer8bit);
 
-    buffer8bit = (static_cast<ubyte*>(buffer));
     int vph = 3;
+    if (!mode7V) {
+        goto fill8bitStereoPost;
+    }
+    buffer8bit = static_cast<sbyte*>(buffer);
     if (panningPos[vph] == RIGHT) {
         mixLeft = mix8left;
         mixRight = mix8right;
@@ -407,12 +442,36 @@ void* LamePaulaMixer::fill8bitStereoPanning( void* buffer, udword numberOfSample
     }
     for (udword n = numberOfSamples; n>0; n--) {
         ubyte sam = getSample_7V();
-        buffer8bit[0] += mixLeft[0x4000+sam];
-        buffer8bit[1] += mixRight[0x4000+sam];
-        buffer8bit += 2;
+        *buffer8bit++ += mixLeft[0x4000+sam];
+        *buffer8bit++ += mixRight[0x4000+sam];
     }
-    return(buffer8bit);
 
+ fill8bitStereoPost:
+    buffer8bit = static_cast<sbyte*>(buffer);
+    if (lowpass2) {
+        for (udword n = numberOfSamples; n>0; n--) {
+            *buffer8bit = 0x7f * f2L.process( *buffer8bit/128.0 );
+            buffer8bit++;
+            *buffer8bit = 0x7f * f2R.process( *buffer8bit/128.0 );
+            buffer8bit++;
+        }
+    }
+    else {
+        for (udword n = numberOfSamples; n>0; n--) {
+            f1LastLb = (f1C * *buffer8bit + f1Ci*f1LastLb);
+            *buffer8bit++ = f1LastLb;
+            f1LastRb = (f1C * *buffer8bit + f1Ci*f1LastRb);
+            *buffer8bit++ = f1LastRb;
+        }
+    }
+    if (zero8bit != 0) {  // want unsigned samples?
+        ubyte *b = static_cast<ubyte*>(buffer);
+        for (udword n = numberOfSamples; n>0; n--) {
+            *b++ += zero8bit;
+            *b++ += zero8bit;
+        }
+    }
+    return buffer8bit;
 }
 
 void* LamePaulaMixer::fill16bitMono( void* buffer, udword numberOfSamples ) {
@@ -425,27 +484,48 @@ void* LamePaulaMixer::fill16bitMono( void* buffer, udword numberOfSamples ) {
         normalVoices = 3;
         mode7V = true;
     }
+
     for (ubyte v=0; v<normalVoices; v++) {
         buffer16bit = static_cast<sword*>(buffer);
         LamePaulaVoice *pv = pVoice[v];
         uword vol = voiceVol[v] << 8;
         for (udword n = numberOfSamples; n>0; n--) {
             if (v == 0) {
-                *buffer16bit = zero16bit;
+                *buffer16bit = 0;
             }
-            *buffer16bit += mix[vol+pv->getSample()];
+            *buffer16bit++ += mix[vol+pv->getSample()];
+        }
+    }
+
+    if (!mode7V) {
+        goto fill16bitMonoPost;
+    }
+    buffer16bit = static_cast<sword*>(buffer);
+    for (udword n = numberOfSamples; n>0; n--) {
+        *buffer16bit++ += mix[0x4000+getSample_7V()];
+    }
+
+ fill16bitMonoPost:
+    buffer16bit = static_cast<sword*>(buffer);
+    if (lowpass2) {
+        for (udword n = numberOfSamples; n>0; n--) {
+            *buffer16bit = 0x7fff * f2L.process( *buffer16bit/32768.0 );
             buffer16bit++;
         }
     }
-    if (!mode7V)
-        return(buffer16bit);
-
-    buffer16bit = (static_cast<sword*>(buffer));
-    for (udword n = numberOfSamples; n>0; n--) {
-        *buffer16bit += mix[0x4000+getSample_7V()];
-        buffer16bit++;
+    else {
+        for (udword n = numberOfSamples; n>0; n--) {
+            f1LastLw = (f1C * *buffer16bit + f1Ci*f1LastLw);
+            *buffer16bit++ = f1LastLw;
+        }
     }
-    return(buffer16bit);
+    if (zero16bit != 0) {  // want unsigned samples?
+        uword *b = static_cast<uword*>(buffer);
+        for (udword n = numberOfSamples; n>0; n--) {
+            *b++ += zero16bit;
+        }
+    }
+    return buffer16bit;
 }
 
 void* LamePaulaMixer::fill16bitStereoPanning( void *buffer, udword numberOfSamples ) {
@@ -460,7 +540,7 @@ void* LamePaulaMixer::fill16bitStereoPanning( void *buffer, udword numberOfSampl
     }
     
     for (int v=0; v<normalVoices; v++ ) {
-        buffer16bit = (static_cast<sword*>(buffer));
+        buffer16bit = static_cast<sword*>(buffer);
 
         if (panningPos[v] == RIGHT) {
             mixLeft = mix16left;
@@ -475,20 +555,20 @@ void* LamePaulaMixer::fill16bitStereoPanning( void *buffer, udword numberOfSampl
         uword vol = voiceVol[v] << 8;
         for (udword n = numberOfSamples; n>0; n--) {
             if (v == 0) {
-                buffer16bit[0] = zero16bit;
-                buffer16bit[1] = zero16bit;
+                buffer16bit[0] = 0;
+                buffer16bit[1] = 0;
             }
             ubyte sam = pv->getSample();
-            buffer16bit[0] += mixLeft[vol+sam];
-            buffer16bit[1] += mixRight[vol+sam];
-            buffer16bit += 2;
+            *buffer16bit++ += mixLeft[vol+sam];
+            *buffer16bit++ += mixRight[vol+sam];
         }
     }
-    if (!mode7V)
-        return(buffer16bit);
 
-    buffer16bit = (static_cast<sword*>(buffer));
     int vph = 3;
+    if (!mode7V) {
+        goto fill16bitStereoPost;
+    }
+    buffer16bit = static_cast<sword*>(buffer);
     if (panningPos[vph] == RIGHT) {
         mixLeft = mix16left;
         mixRight = mix16right;
@@ -499,11 +579,36 @@ void* LamePaulaMixer::fill16bitStereoPanning( void *buffer, udword numberOfSampl
     }
     for (udword n = numberOfSamples; n>0; n--) {
         ubyte sam = getSample_7V();
-        buffer16bit[0] += mixLeft[0x4000+sam];
-        buffer16bit[1] += mixRight[0x4000+sam];
-        buffer16bit += 2;
+        *buffer16bit++ += mixLeft[0x4000+sam];
+        *buffer16bit++ += mixRight[0x4000+sam];
     }
-    return(buffer16bit);
+
+ fill16bitStereoPost:
+    buffer16bit = static_cast<sword*>(buffer);
+    if (lowpass2) {
+        for (udword n = numberOfSamples; n>0; n--) {
+            *buffer16bit = 0x7fff * f2L.process( *buffer16bit/32768.0 );
+            buffer16bit++;
+            *buffer16bit = 0x7fff * f2R.process( *buffer16bit/32768.0 );
+            buffer16bit++;
+        }
+    }
+    else {
+        for (udword n = numberOfSamples; n>0; n--) {
+            f1LastLw = (f1C * *buffer16bit + f1Ci*f1LastLw);
+            *buffer16bit++ = f1LastLw;
+            f1LastRw = (f1C * *buffer16bit + f1Ci*f1LastRw);
+            *buffer16bit++ = f1LastRw;
+        }
+    }
+    if (zero16bit != 0) {  // want unsigned samples?
+        uword *b = static_cast<uword*>(buffer);
+        for (udword n = numberOfSamples; n>0; n--) {
+            *b++ += zero16bit;
+            *b++ += zero16bit;
+        }
+    }
+    return buffer16bit;
 }
 
 }  // namespace

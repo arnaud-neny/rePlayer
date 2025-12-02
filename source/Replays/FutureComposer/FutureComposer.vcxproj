@@ -89,7 +89,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -110,7 +110,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -133,7 +133,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -162,7 +162,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -193,6 +193,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libtfmxaudiodecoder\src\Decoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\DecoderProxy.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Dump.h" />
+    <ClInclude Include="libtfmxaudiodecoder\src\Filter.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Jochen\Analyze.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Jochen\HippelDecoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Jochen\LiveFix.h" />
@@ -224,6 +225,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libtfmxaudiodecoder\src\Decoder.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\DecoderProxy.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Dump.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Filter.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Analyze.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\COSO.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Envelope.cpp" />

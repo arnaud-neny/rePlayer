@@ -16,6 +16,27 @@
 #ifndef TFMXAUDIODECODER_H
 #define TFMXAUDIODECODER_H
 
+/* If filtering input files by PC-style file name extension,
+ * the commonly used extensions are:
+ *
+ *     .tfx, .tfm, .mdat, .tfmx
+ *     .hip, .hipc, .hip7, .mcmd
+ *     .fc, .fc3, .fc4, .fc13, .fc14, .smod
+ *
+ * Some module collections have kept the original file naming style
+ * of TFMX files with AmigaDOS, which didn't use PC-style file name
+ * extensions (except for special icon files ending with ".info").
+ * Such files may start with
+ *
+ *     mdat.
+ *
+ * with the corresponding sample data file starting with "smpl.".
+ * Renaming such files is highly recommended, because many file explorers
+ * only support filtering/sorting by file name extension.
+ */
+
+#define TFMXAUDIODECODER_VERSION 010000
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -117,7 +138,14 @@ extern "C" {
 
     /* Returns: 0 to 100 */
     unsigned short int tfmxdec_get_voice_volume(void* decoder, unsigned int voice);
-    
+
+    /* Not recommended and ought not be on by default, because Paula's
+       external low-pass filter is applied to the whole output and creates
+       an overall muffled sound, which had most users of Amiga looking into
+       ways how to disable the filtering.
+       Default: off = 0, set flag to 1 = on. */
+    void tfmxdec_set_filtering(void* decoder, int flag);
+
 #ifdef __cplusplus
 }
 #endif

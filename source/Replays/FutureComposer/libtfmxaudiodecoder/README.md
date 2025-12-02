@@ -45,9 +45,9 @@ and consider adding a plug-in, if you like what you hear.
 Within music collections, the music data files recognized by this library
 usually use a file name extension from this list:
 
-    .tfmx, .tfx, .tfm, .mdat
+    .tfx, .tfm, .mdat, .tfmx
     .hip, .hipc, .hip7, .mcmd
-    .fc, .fc13, .fc14, .fc3, .fc4, .smod
+    .fc, .fc3, .fc4, .fc13, .fc14, .smod
 
 Some of the music comes as a pair of files (music data + separate samples file), if it has not been converted
 into a single-file format, e.g.:
@@ -78,6 +78,7 @@ collections either.
 * [Audacious](https://audacious-media-player.org/) with [this input plugin](https://github.com/mschwendt/audacious-plugins-fc)
 * [DeaDBeeF](https://deadbeef.sourceforge.io/) with [this input plugin](https://github.com/mschwendt/deadbeef-plugins-fc)
 * [Qmmp](https://qmmp.ylsoftware.com/) with [this input plugin](https://github.com/TTK-qmmp/qmmp-tfmx)
+* [rePlayer](https://github.com/arnaud-neny/rePlayer) includes a prebuilt plugin among a ton of others as to handle a high number of music file formats
 * ...
 
 ## Links

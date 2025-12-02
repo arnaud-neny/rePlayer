@@ -22,14 +22,16 @@
 #include "libtfmxaudiodecoder/src/Chris/TFMXDecoder.h"
 #include "libtfmxaudiodecoder/src/Jochen/HippelDecoder.h"
 
+#define VERSION "1.0.0"
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::FutureComposer,
         .name = "Future Composer",
         .extensions = "fc;fc13;fc14;fc3;fc4;smod;hip;hip7;hipc;mcmd;tfmx;tfx;tfm;mdat",
-        .about = "libtfmxaudiodecoder\nCopyright(c) Michael Schwendt",
-        .settings = "libtfmxaudiodecoder",
+        .about = "libtfmxaudiodecoder " VERSION "\nCopyright(c) Michael Schwendt",
+        .settings = "libtfmxaudiodecoder " VERSION,
         .init = ReplayFutureComposer::Init,
         .load = ReplayFutureComposer::Load,
         .displaySettings = ReplayFutureComposer::DisplaySettings,
@@ -43,6 +45,7 @@ namespace rePlayer
         window.RegisterSerializedData(ms_stereoSeparation, "ReplayFutureComposerStereoSeparation");
         window.RegisterSerializedData(ms_isNtsc, "ReplayFutureComposerNtsc");
         window.RegisterSerializedData(ms_surround, "ReplayFutureComposerSurround");
+        window.RegisterSerializedData(ms_filter, "ReplayFutureComposerFilter");
 
         return false;
     }
@@ -87,6 +90,8 @@ namespace rePlayer
         changed |= ImGui::SliderInt("Stereo", &ms_stereoSeparation, 0, 100, "%d%%", ImGuiSliderFlags_NoInput);
         const char* const surround[] = { "Stereo", "Surround" };
         changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
+        const char* const filter[] = { "Off", "On" };
+        changed |= ImGui::Combo("Lowpass Filter", &ms_filter, filter, NumItemsOf(filter));
         return changed;
     }
 
@@ -101,6 +106,8 @@ namespace rePlayer
             ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Stereo", "Output: Surround");
+        ComboOverride("LowpassFilter", GETSET(entry, overrideFilter), GETSET(entry, filter),
+            ms_filter, "No filter", "Lowpass filter");
 
         context.metadata.Update(entry, entry->value == 0);
     }
@@ -108,6 +115,7 @@ namespace rePlayer
     int32_t ReplayFutureComposer::ms_stereoSeparation = 100;
     int32_t ReplayFutureComposer::ms_isNtsc = 0;
     int32_t ReplayFutureComposer::ms_surround = 1;
+    int32_t ReplayFutureComposer::ms_filter = 0;
 
     ReplayFutureComposer::~ReplayFutureComposer()
     {
@@ -221,7 +229,7 @@ namespace rePlayer
 
         info += m_decoder->getFormatName() == HippelDecoder::TFMX_7V_FORMAT_NAME || m_decoder->getFormatName() == TFMXDecoder::FORMAT_NAME_7V ? "7 channels\n" : "4 channels\n";
         info += m_decoder->getFormatName();
-        info += "\nlibtfmxaudiodecoder";
+        info += "\nlibtfmxaudiodecoder " VERSION;
 
         return info;
     }

@@ -9,6 +9,7 @@
 #define LAMEPAULAMIXER_H
 
 #include "PaulaVoice.h"
+#include "Filter.h"
 
 namespace tfmxaudiodecoder {
 
@@ -27,6 +28,7 @@ class LamePaulaMixer
     void init(Decoder* decoder);
 
     void setPanning(int);
+    void setFiltering(int);
     
     void mute(ubyte voice, bool);
     bool isMuted(ubyte voice);
@@ -108,6 +110,13 @@ class LamePaulaMixer
     ubyte emptySample[4];
 
     float basePeriod;
+
+    float f1C, f1Ci;
+    sword f1LastLw, f1LastRw;
+    sbyte f1LastLb, f1LastRb;
+
+    bool lowpass2;
+    Filter f2L, f2R;
 };
 
 }  // namespace

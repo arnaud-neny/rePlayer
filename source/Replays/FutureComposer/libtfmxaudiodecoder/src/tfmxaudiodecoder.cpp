@@ -150,3 +150,8 @@ int tfmxdec_load(void* ptr, const char* path, int songNumber) {
     TFMX_DECLARE_DECODER;
     return p->dec.load( path, songNumber );
 }
+
+void tfmxdec_set_filtering(void* ptr, int flag) {
+    TFMX_DECLARE_DECODER;
+    p->mixer.setFiltering(flag);
+}

@@ -32,6 +32,8 @@ namespace rePlayer
                     uint32_t stereoSeparation : 7;
                     uint32_t isNtsc : 1;
                     uint32_t surround : 1;
+                    uint32_t overrideFilter : 1;
+                    uint32_t filter : 1;
                 };
             };
 
@@ -72,6 +74,7 @@ namespace rePlayer
         static int32_t ms_stereoSeparation;
         static int32_t ms_isNtsc;
         static int32_t ms_surround;
+        static int32_t ms_filter;
     };
 }
 // namespace rePlayer
