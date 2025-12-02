@@ -188,6 +188,7 @@ namespace rePlayer
     {
         auto settings = metadata.Find<Settings>();
         m_mixer.enableNtsc((settings && settings->overrideNtsc) ? settings->isNtsc : ms_isNtsc);
+        m_mixer.setFiltering((settings && settings->overrideFilter) ? settings->filter : ms_filter);
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
     }
