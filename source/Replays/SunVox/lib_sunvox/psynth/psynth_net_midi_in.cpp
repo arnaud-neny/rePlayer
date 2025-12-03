@@ -235,10 +235,10 @@ void psynth_handle_ctl_midi_in( psynth_midi_evt* evt, int offset, psynth_net* pn
 		    case psynth_midi_lin:
 			break;
 		    case psynth_midi_exp1:
-			val = dsp_curve( val, dsp_curve_type_exponential1 );
+			val = dsp_curve( val, dsp_curve_type_quadratic1 );
 			break;
 		    case psynth_midi_exp2:
-			val = dsp_curve( val, dsp_curve_type_exponential2 );
+			val = dsp_curve( val, dsp_curve_type_quadratic2 );
 			break;
 		    case psynth_midi_spline:
 			val = dsp_curve( val, dsp_curve_type_spline );

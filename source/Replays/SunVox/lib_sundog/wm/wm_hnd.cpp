@@ -2817,33 +2817,46 @@ static void scrollbar_get_strings( WINDOWPTR win )
     }
 }
 
+//to_display:
+// 0: in = slider position; out = value;
+// 1: in = value; out = slider position;
+//in,out = 0...1
 static float scrollbar_vconv( float val, uint32_t flags, bool to_display )
 {
-    if( flags & SCROLLBAR_FLAG_EXP2 )
+    //The formulas were changed on November 7, 2025
+    if( val < 0.0f ) val = 0;
+    if( val > 1.0f ) val = 1;
+    switch( flags & 15 )
     {
-        val = 1 - val;
-        if( to_display )
-        {
-            val = val * val;
-        }
-        else
-        {
-            if( val > 0 ) val = sqrt( val ); else val = 0;
-        }
-        return 1 - val;
-    }
-    if( flags & SCROLLBAR_FLAG_EXP3 )
-    {
-        val = 1 - val;
-        if( to_display )
-        {
-            val = val * val * val;
-        }
-        else
-        {
-            if( val > 0 ) val = pow( val, 1.0F / 3.0F ); else val = 0;
-        }
-        return 1 - val;
+	case SCROLLBAR_FLAG_EXP2:
+	{
+	    if( to_display )
+		val = sqrtf( val );
+	    else
+		val = val * val;
+    	    return val;
+    	}
+    	break;
+	case SCROLLBAR_FLAG_EXP3:
+	{
+	    if( to_display )
+		val = powf( val, 1.0f / 3.0f );
+	    else
+		val = val * val * val;
+    	    return val;
+    	}
+    	break;
+	case SCROLLBAR_FLAG_INVEXP3:
+	{
+	    float v = 1 - val;
+	    if( to_display )
+		val = 1 - powf( v, 1.0f / 3.0f );
+	    else
+		val = 1 - v * v * v;
+    	    return val;
+    	}
+    	break;
+    	default: break;
     }
     return val;
 }
@@ -3017,7 +3030,6 @@ int scrollbar_expanded_handler( sundog_event* evt, window_manager* wm )
                 if( cdata->max_value != 0 )
                 {
 		    xc = scrollbar_vconv( (float)cdata->cur / cdata->max_value, cdata->flags, true ) * ( win->xsize - wm->interelement_space * 2 );
-                    //xc = ( ( win->xsize - wm->interelement_space * 2 ) * ( ( cdata->cur << 10 ) / cdata->max_value ) ) >> 10;
                 }
 		draw_frect( wm->interelement_space, wm->interelement_space, xc, win->ysize - wm->interelement_space * 2, blend( wm->color2, win->color, 128 ), wm );
 
@@ -3635,7 +3647,6 @@ int scrollbar_handler( sundog_event* evt, window_manager* wm )
 		    if( data->max_value )
 		    {
 			xc = scrollbar_vconv( (float)data->cur / data->max_value, data->flags, true ) * data->working_area;
-			//xc = ( data->working_area * ( ( data->cur << 10 ) / data->max_value ) ) >> 10;
 		    }
 
 		    COLOR fgcolor = wm->color2;

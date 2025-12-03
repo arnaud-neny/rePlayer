@@ -137,6 +137,7 @@ int sunvox_save_module_to_fd( int mod_num, sfs_file f, uint save_flags, sunvox_e
     	    if( save_block( BID_VERS, 4, &version, st ) ) break;
 	}
         uint module_flags = mod->flags;
+        if( save_flags & SUNVOX_MODULE_SAVE_WITHOUT_SEL_FLAG ) module_flags &= ~PSYNTH_FLAG_SELECTED;
 	if( save_block( BID_SFFF, 4, &module_flags, st ) ) break;
         if( save_block( BID_SNAM, 32, &mod->name, st ) ) break;
 	psynth_event module_evt;

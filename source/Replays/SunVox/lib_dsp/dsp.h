@@ -21,8 +21,8 @@ void fft_speed_test();
 enum dsp_curve_type
 {
     dsp_curve_type_linear,
-    dsp_curve_type_exponential1, 
-    dsp_curve_type_exponential2, 
+    dsp_curve_type_quadratic1, //y = 1-(1-x)^2 = 2*x-x^2  	curve: /''
+    dsp_curve_type_quadratic2, //y = x^2			curve: ../
     dsp_curve_type_spline, 
     dsp_curve_type_rectangular,
     dsp_curve_types

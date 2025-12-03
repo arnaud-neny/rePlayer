@@ -11,6 +11,10 @@
 static int engine_init_display( android_sundog_engine* sd, uint32_t flags );
 static void engine_term_display( android_sundog_engine* sd, uint32_t flags );
 
+//retval:
+//  file not found - 0;
+//  file found - first byte of the file;
+//  file is empty - 1;
 static int android_sundog_option_exists( android_sundog_engine* sd, const char* name )
 {
     int rv = 0;
@@ -493,10 +497,29 @@ static int engine_init_display( android_sundog_engine* sd, uint32_t flags )
 #ifdef GLNORETAIN
     buf_preserved = false;
 #endif
-    if( android_sundog_option_exists( sd, "option_glnoretain" ) )
+    if( g_android_version_nums[ 0 ] >= 16 )
     {
-        LOGI( "option_glnoretain found. OpenGL Buffer Preserved = NO" );
-        buf_preserved = false;
+	//Android 16+
+	buf_preserved = false;
+	/*
+	Все чаще встречаются устройства, которые некорректно отрабатывают EGL_SWAP_BEHAVIOR_PRESERVED_BIT.
+	Будем считать, что после Android 16 все устройства уже достаточно мощные, чтобы работать без этой опции (с полной перерисовкой GUI в каждом кадре).
+	Хотя, возможно, будет логичнее смотреть не на версию системы, а на версию рендера glGetString( GL_RENDERER ) ?? Нужны тесты...
+	*/
+    }
+    int opt_glnoretain = android_sundog_option_exists( sd, "option_glnoretain" );
+    if( opt_glnoretain )
+    {
+        if( opt_glnoretain == 'r' )
+        {
+	    LOGI( "option_glnoretain: OpenGL Buffer Preserved = YES" );
+	    buf_preserved = true;
+        }
+        else
+        {
+    	    LOGI( "option_glnoretain: OpenGL Buffer Preserved = NO" );
+    	    buf_preserved = false;
+    	}
     }
     if( buf_preserved )
     {
@@ -1033,30 +1056,39 @@ static void engine_loop( android_sundog_engine* sd )
 {
     while( 1 ) 
     {
-        int ident;
         int events;
         struct android_poll_source* source;
 
-        while( ( ident = ALooper_pollAll( -1, NULL, &events, (void**)&source ) ) >= 0 ) 
+	while( 1 )
         {
-            // Process this event.
-            if( source != NULL ) 
+#if __ANDROID_MIN_SDK_VERSION__ > 21
+    	    int poll_res = ALooper_pollOnce( -1, NULL, &events, (void**)&source );
+	    if( poll_res >= 0 || poll_res == ALOOPER_POLL_CALLBACK )
+#else
+    	    int poll_res = ALooper_pollAll( -1, NULL, &events, (void**)&source ); //deprecated
+	    if( poll_res >= 0 )
+#endif
             {
-                source->process( sd->app, source );
+        	// Process this event
+        	if( source != NULL ) 
+        	{
+            	    source->process( sd->app, source );
+        	}
+        	// Check if we are exiting.
+        	if( sd->app->destroyRequested != 0 ) 
+        	{
+	    	    /*
+	    	    (after APP_CMD_DESTROY)
+	    	    From the Android docs:
+		    do not count on this method being called as a place for saving data!
+		    For example, if an activity is editing data in a content provider, those edits should be committed in either onPause() or onSaveInstanceState(Bundle), not here.
+	    	    */
+            	    android_sundog_deinit( sd, false );
+            	    return;
+            	}
+            	continue;
             }
-
-            // Check if we are exiting.
-            if( sd->app->destroyRequested != 0 ) 
-            {
-	        /*
-	        (after APP_CMD_DESTROY)
-	        From the Android docs:
-	        do not count on this method being called as a place for saving data!
-	        For example, if an activity is editing data in a content provider, those edits should be committed in either onPause() or onSaveInstanceState(Bundle), not here.
-	        */
-                android_sundog_deinit( sd, false );
-                return;
-            }
+            break;
         }
     }
 }

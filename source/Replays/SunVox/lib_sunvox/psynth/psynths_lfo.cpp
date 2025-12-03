@@ -32,7 +32,7 @@ IN THE SOFTWARE.
 #define MODULE_INPUTS	2
 #define MODULE_OUTPUTS	2
 #define MAX_DUTY_CYCLE 	256
-#define FREQ_UNIT_MAX  	6
+#define FREQ_UNIT_MAX  	8
 struct MODULE_DATA
 {
     PS_CTYPE   	ctl_volume;
@@ -48,6 +48,8 @@ struct MODULE_DATA
     PS_CTYPE    ctl_freq_scale;
     PS_CTYPE	ctl_smooth;
     PS_CTYPE	ctl_sin_quality;
+    PS_CTYPE	ctl_transpose;
+    PS_CTYPE	ctl_finetune;
     uint16_t*  	sin_tab;
     uint64_t    ptr;
     uint64_t	delta;
@@ -73,6 +75,7 @@ static void lfo_change_ctl_limits( int mod_num, psynth_net* pnet )
     {
         return;
     }
+    int min = 1;
     int max = 256;
     switch( data->ctl_freq_units )
     {
@@ -82,14 +85,22 @@ static void lfo_change_ctl_limits( int mod_num, psynth_net* pnet )
         case 2:
             max = 8192 * 2;
             break;
+        case 7:
+            min = 0;
+            max = 256;
+            break;
+        case 8:
+            min = 0;
+            max = 256*100;
+            break;
     }
     int cnum = 3;
-    if( mod->ctls[ cnum ].max != max )
+    if( mod->ctls[ cnum ].max != max || mod->ctls[ cnum ].min != min )
     {
         psynth_change_ctl_limits(
             mod_num,
             cnum,
-            -1,
+            min,
             max,
             max,
             pnet );
@@ -153,7 +164,7 @@ PS_RETTYPE MODULE_HANDLER(
 	case PS_CMD_GET_FLAGS: retval = PSYNTH_FLAG_EFFECT | PSYNTH_FLAG_GET_SPEED_CHANGES; break;
 	case PS_CMD_GET_FLAGS2: retval = PSYNTH_FLAG2_NOTE_RECEIVER; break;
 	case PS_CMD_INIT:
-	    psynth_resize_ctls_storage( mod_num, 13, pnet );
+	    psynth_resize_ctls_storage( mod_num, 15, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_VOLUME ), "", 0, 512, 256, 0, &data->ctl_volume, 256, 0, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_TYPE ), ps_get_string( STR_PS_LFO_TYPES ), 0, 1, 0, 1, &data->ctl_type, -1, 0, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_AMPLITUDE ), "", 0, 256, 256, 0, &data->ctl_amp, -1, 1, pnet );
@@ -167,6 +178,10 @@ PS_RETTYPE MODULE_HANDLER(
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_FREQ_SCALE ), "%", 0, 200, 100, 0, &data->ctl_freq_scale, 100, 1, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_SMOOTH_TRANSITIONS ), ps_get_string( STR_PS_LFO_SMOOTH_TRANSITIONS ), 0, 1, 1, 1, &data->ctl_smooth, -1, 2, pnet );
 	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_SIN_QUALITY ), ps_get_string( STR_PS_SIN_Q_MODES ), 0, 3, 0, 1, &data->ctl_sin_quality, -1, 1, pnet );
+	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_TRANSPOSE ), ps_get_string( STR_PS_SEMITONE ), 0, 256, 128, 1, &data->ctl_transpose, 128, 1, pnet );
+    	    psynth_set_ctl_show_offset( mod_num, 13, -128, pnet );
+    	    psynth_register_ctl( mod_num, ps_get_string( STR_PS_FINETUNE ), ps_get_string( STR_PS_SEMITONE256 ), 0, 512, 256, 0, &data->ctl_finetune, 256, 1, pnet );
+    	    psynth_set_ctl_show_offset( mod_num, 14, -256, pnet );
 	    data->ptr = 0;
 	    data->rand = 0;
 	    data->rand_prev = 0;
@@ -232,9 +247,43 @@ PS_RETTYPE MODULE_HANDLER(
 			case 6:
 			    data->delta = (uint64_t)( ( (uint64_t)64 << 36 ) * 256 ) / ( (uint64_t)data->ctl_freq * data->tick_size * data->ticks_per_line / ( data->ctl_freq_units - 3 ) );
 			    break;
+			case 7:
+			    {
+				float note = data->ctl_freq;
+				float freq = powf( 2.0f, note / 12.0f ) * 522.6875f / 32.0f;
+				if( freq > pnet->sampling_freq / 2 )
+				    data->delta = (uint64_t)1 << 41;
+				else
+				{
+				    freq *= (uint64_t)1<<42;
+				    data->delta = (uint64_t)( freq ) / pnet->sampling_freq;
+				}
+			    }
+			    break;
+			case 8:
+			    {
+				float note = data->ctl_freq;
+				float freq = powf( 2.0f, note / (100.0f*12.0f) ) * 522.6875f / 32.0f;
+				if( freq > pnet->sampling_freq / 2 )
+				    data->delta = (uint64_t)1 << 41;
+				else
+				{
+				    freq *= (uint64_t)1<<42;
+				    data->delta = (uint64_t)( freq ) / pnet->sampling_freq;
+				}
+			    }
+			    break;
 		    }
 		    int scale = data->ctl_freq_scale;
 		    if( scale != 100 ) data->delta = data->delta * scale / 100;
+		    int transpose = data->ctl_transpose - 128;
+		    int finetune = data->ctl_finetune - 256;
+		    if( transpose || finetune )
+		    {
+			double n = transpose + finetune / 256.0;
+			double s = pow( 2.0, n / 12.0 );
+			data->delta = data->delta * s;
+		    }
 		    if( data->delta < 1 ) data->delta = 1;
 		    if( !( data->ctl_shape == 5 || data->ctl_shape == 7 ) )
 		    {
@@ -648,6 +697,8 @@ PS_RETTYPE MODULE_HANDLER(
 		case 3: 
 		case 4: 
 		case 10: 
+		case 13: 
+		case 14: 
             	    data->recalc_delta = true;
 		    break;
 		case 5: 

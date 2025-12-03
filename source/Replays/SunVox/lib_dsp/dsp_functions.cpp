@@ -299,13 +299,13 @@ int dsp_curve( int x, dsp_curve_type type ) //Input: 0...32768; Output: 0...3276
     int y = x;
     switch( type )
     {
-        case dsp_curve_type_exponential1:
+        case dsp_curve_type_quadratic1:
             {
                 int y2 = 32768 - x;
                 y = 32768 - ( ( y2 * y2 ) >> 15 );
             }
             break;
-        case dsp_curve_type_exponential2:
+        case dsp_curve_type_quadratic2:
     	    y = ( x * x ) >> 15;
             break;
         case dsp_curve_type_spline:

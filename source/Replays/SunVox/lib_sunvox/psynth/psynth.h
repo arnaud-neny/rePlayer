@@ -272,8 +272,8 @@ enum psynth_midi_type
 enum psynth_midi_mode
 {
     psynth_midi_lin = 0,
-    psynth_midi_exp1,
-    psynth_midi_exp2,
+    psynth_midi_exp1, //exponential function approximation using exponentiation
+    psynth_midi_exp2, //exponential function approximation using exponentiation
     psynth_midi_spline,
     psynth_midi_trig,
     psynth_midi_toggle,
@@ -290,8 +290,14 @@ struct psynth_midi_evt
     uint8_t ch;
 };
 
-#define PSYNTH_CTL_FLAG_EXP2	( 1 << 0 ) //display exponential
-#define PSYNTH_CTL_FLAG_EXP3	( 1 << 1 ) //display exponential
+//Controller flags:
+//first 4 bit = GUI slider/knob response function f() for a controller;
+//f(x) will be used to remap the slider's normalized position to a normalized output;
+//x = normalized slider position; y = normalized output; final value = f(x)*(max-min)+min;
+#define PSYNTH_CTL_FLAG_LIN	0 //linear: y = x
+#define PSYNTH_CTL_FLAG_EXP2	1 //exponential fn approximation: y = x^2
+#define PSYNTH_CTL_FLAG_EXP3	2 //... y = x^3
+#define PSYNTH_CTL_FLAG_INVEXP3	3 //... (convex upwards) y = 1-x^3
 
 #define PSYNTH_CTL_MIDI_PARS1( type, ch, mode ) \
     ( ( ( type & 255 ) << 0 ) | ( ( ch & 255 ) << 8 ) | ( ( mode & 255 ) << 16 ) )

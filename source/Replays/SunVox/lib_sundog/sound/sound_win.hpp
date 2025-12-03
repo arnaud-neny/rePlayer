@@ -695,7 +695,7 @@ init_dsound_end:
 //
 // Waveform Audio (MMSYSTEM)
 //
-#if 0 // rePlayer beging
+#if 0 // rePlayer begin
 void WaveOutSendBuffer( sundog_sound* ss, WAVEHDR* waveHdr )
 {
     device_sound* d = (device_sound*)ss->device_specific;

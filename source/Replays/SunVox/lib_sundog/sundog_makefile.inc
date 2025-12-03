@@ -44,9 +44,11 @@
 ifneq (,$(findstring android16,$(TARGET_OS)))
     #Old NDK r23c with Android 4.1 (API level 16) support:
     ANDROID_NDK = /home/alex/soft/android-ndk-r23c
+    ANDROID_NDK_VER = old
 else
     #Newest NDK:
     ANDROID_NDK = /home/alex/soft/android-ndk-r28
+    ANDROID_NDK_VER = new
 endif
 ANDROID_GDK = /home/alex/soft/android-gdk
 MACOS_TOOLCHAIN_BIN = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
@@ -135,13 +137,15 @@ ifneq (,$(findstring android,$(TARGET_OS)))
 	-fno-exceptions \
 	-fno-rtti
     DEFAULT_LIBS = -llog -landroid -lOpenSLES -lm -ldl -lc++_static -lc++abi
-ifeq ($(SUNDOG_VER),)
-    CFLAGS2 += -DGL_GLEXT_PROTOTYPES=1
+ifeq ($(ANDROID_NDK_VER),new)
+    DEFAULT_LIBS += -laaudio
 endif
 ifeq ($(SUNDOG_VER),2)
     CFLAGS2 += \
 	-I$(ANDROID_GDK)/game-activity/prefab-src/modules/game-activity/include \
 	-I$(ANDROID_GDK)/src/common
+else
+    CFLAGS2 += -DGL_GLEXT_PROTOTYPES=1
 endif
     OBJDUMP = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-objdump
     AR = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
@@ -149,7 +153,7 @@ ifeq ($(TARGET_ARCH),x86)
     ifneq (,$(findstring android16,$(TARGET_OS)))
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android16-clang
     else
-	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android24-clang
+	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/i686-linux-android26-clang
     endif
     CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
@@ -160,7 +164,7 @@ ifeq ($(TARGET_ARCH),x86_64)
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang
 	LDFLAGS2 += -Wl,-z,max-page-size=16384
     else
-	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang
+	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android26-clang
     endif
     CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)
@@ -181,7 +185,7 @@ ifeq ($(TARGET_ARCH),arm64)
 	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
 	LDFLAGS2 += -Wl,-z,max-page-size=16384
     else
-	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
+	CC = $(ANDROID_NDK)/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android26-clang
     endif
     CXX = $(CC)++ $(CPPSTD)
     LD = $(CC)

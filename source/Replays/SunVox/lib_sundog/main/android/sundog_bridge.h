@@ -19,7 +19,7 @@ extern char* g_android_files_int_path;
 extern char* g_android_files_ext_path;
 #define ANDROID_NUM_EXT_STORAGE_DEVS 3 //Max number of shared/external storage devices (but not USB drives!), including the primary storage device
 extern char* g_android_version;
-extern char g_android_version_correct[ 16 ];
+extern char g_android_version_correct[ 16 ]; //"X.Y.Z"
 extern int g_android_version_nums[ 8 ];
 extern char* g_android_lang;
 extern char* g_android_requested_permissions;

@@ -59,7 +59,7 @@ const char* ps_get_string( ps_string str_id )
     		case STR_PS_KICKER_WAVE_TYPES: str = "треугольная;прямоугольная;sin"; break;
     		case STR_PS_LFO_TYPES: str = "амплитуда;панорама"; break;
     		case STR_PS_LFO_WAVEFORM_TYPES: str = "sin;прямоугольная;sin2;пила;пила2;случайная;треугольная;случайная плавная"; break;
-    		case STR_PS_LFO_FREQ_UNITS: str = "Гц/64;мс;Гц;тик;строка;строка/2;строка/3"; break;
+    		case STR_PS_LFO_FREQ_UNITS: str = "Гц/64;мс;Гц;тик;строка;строка/2;строка/3;полутон;полутон/100"; break;
     		case STR_PS_LFO_SMOOTH_TRANSITIONS: str = "выкл;внутри волны"; break;
     		case STR_PS_MODULATION_TYPES: str = "амплитудная (умножение);фазовая;фазовая (абсолютн.);сложение;вычитание;min;max;побитовое И (AND);побитовое искл.ИЛИ (XOR);min abs;max abs"; break;
     		case STR_PS_MODULATION_TYPES2: str = "фазовая;частотная;амплитудная (умножение);сложение;вычитание;min;max;побитовое И (AND);побитовое искл.ИЛИ (XOR);фазовая+;min abs;max abs"; break;
@@ -110,6 +110,7 @@ const char* ps_get_string( ps_string str_id )
 		case STR_PS_SEMITONE: str = "полутон"; break;
 		case STR_PS_SEMITONE10: str = "полутон/10"; break;
 		case STR_PS_SEMITONE64: str = "полутон/64"; break;
+		case STR_PS_SEMITONE256: str = "полутон/256"; break;
 		case STR_PS_SEC: str = "сек"; break;
 		case STR_PS_SEC256: str = "сек/256"; break;
 		case STR_PS_DELAY_OFFSET15: str = "задержка/32768"; break;
@@ -558,7 +559,7 @@ const char* ps_get_string( ps_string str_id )
     	    case STR_PS_KICKER_WAVE_TYPES: str = "triangle;square;sin"; break;
     	    case STR_PS_LFO_TYPES: str = "amplitude;panning"; break;
     	    case STR_PS_LFO_WAVEFORM_TYPES: str = "sin;square;sin2;saw;saw2;random;triangle;random interpolated"; break;
-    	    case STR_PS_LFO_FREQ_UNITS: str = "Hz/64;ms;Hz;tick;line;line/2;line/3"; break;
+    	    case STR_PS_LFO_FREQ_UNITS: str = "Hz/64;ms;Hz;tick;line;line/2;line/3;semitone;semitone/100"; break;
     	    case STR_PS_LFO_SMOOTH_TRANSITIONS: str = "off;waveform"; break;
     	    case STR_PS_MODULATION_TYPES: str = "amplitude (mul);phase;phase (absolute);add;sub;min;max;bitwise AND;bitwise XOR;min abs;max abs"; break;
     	    case STR_PS_MODULATION_TYPES2: str = "phase;frequency;amplitude (mul);add;sub;min;max;bitwise AND;bitwise XOR;phase+;min abs;max abs"; break;
@@ -609,6 +610,7 @@ const char* ps_get_string( ps_string str_id )
 	    case STR_PS_SEMITONE: str = "semitone"; break;
 	    case STR_PS_SEMITONE10: str = "semitone/10"; break;
 	    case STR_PS_SEMITONE64: str = "semitone/64"; break;
+	    case STR_PS_SEMITONE256: str = "semitone/256"; break;
 	    case STR_PS_SEC: str = "sec"; break;
 	    case STR_PS_SEC256: str = "sec/256"; break;
 	    case STR_PS_DELAY_OFFSET15: str = "delay/32768"; break;

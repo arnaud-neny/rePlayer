@@ -5,6 +5,23 @@
     WarmPlace.ru
 */
 
+/*
+pars: in/out buf type, in/out channels, sample rate;
+sundog_sound_init( pars ) //здесь pars обычно = default; т.е. sundog_sound_init() должен сам решать;
+  ss->pars = pars;
+  device_sound_init()
+    если требуется, уточняем ss->pars под конкретный драйвер - вместо default записываем конкретные значения;
+    sundog_sound_set_defaults()
+      в ss->pars все пустые (default) значения заменяем на реальные: int16, 44100, 2ch;
+    далее инициализация драйвера также может менять что-то в ss->pars...
+
+out_type / in_type - по умолчанию везде sound_buffer_int16;
+исключения с sound_buffer_float32:
+  jack, JS (sdl/webaudio), AU (iOS/macOS plugin & macOS standalone);
+
+В будущем нужно перевести все драйверы на float32 и/или добавить опцию для принудительного переключения между int16/float32.
+*/
+
 #include "sundog.h"
 
 int g_sample_size[ sound_buffer_max ] = 

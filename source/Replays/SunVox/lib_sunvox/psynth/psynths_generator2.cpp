@@ -304,9 +304,9 @@ void gen2_draw_line( int x1, int y1, int x2, int y2, int exp, COLOR color, windo
 	{
 	    int i2;
 	    if( exp == 1 )
-		i2 = dsp_curve( i * 32768 / steps, dsp_curve_type_exponential1 );
+		i2 = dsp_curve( i * 32768 / steps, dsp_curve_type_quadratic1 );
 	    else
-		i2 = dsp_curve( i * 32768 / steps, dsp_curve_type_exponential2 );
+		i2 = dsp_curve( i * 32768 / steps, dsp_curve_type_quadratic2 );
 	    int xx = x1 + ( xsize * i2 ) / 32768;
 	    int yy = y1 + ( ysize * i ) / steps;
 	    draw_line( x, y, xx, yy, color, wm );
@@ -2447,6 +2447,16 @@ PS_RETTYPE MODULE_HANDLER(
 		    {
 			data->search_ptr++;
 			if( data->search_ptr >= data->ctl_channels ) data->search_ptr = 0;
+			if( pnet->base_host_version >= 0x02010301 )
+			{
+			    for( c = 0; c < data->ctl_channels; c++ )
+			    {
+				gen2_channel* ch = &data->channels[ data->search_ptr ];
+				if( ch->sustain == 0 ) break;
+				data->search_ptr++;
+				if( data->search_ptr >= data->ctl_channels ) data->search_ptr = 0;
+			    }
+			}
 		    }
 		}
 		else 

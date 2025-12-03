@@ -48,10 +48,14 @@ struct app_parameter
     uint32_t flags;
 };
 #define MAX_APP_PARAMETERS 64
-#define APP_PAR_FLAG_INDEXED 	( 1 << 0 ) //0.0 = first item; 1.0 = second item; 2.0 ...
-#define APP_PAR_FLAG_BOOL	( 1 << 1 ) //option to convert MIDI IN value: 0.0 = 0; any other value = 1.0; can only be used in combination with APP_PAR_FLAG_INDEXED;
-#define APP_PAR_FLAG_EXP2 	( 1 << 2 ) //Display exponential: display_v = 1 - pow( 1 - v, 2 )
-#define APP_PAR_FLAG_EXP3 	( 1 << 3 ) //Display exponential: display_v = 1 - pow( 1 - v, 3 )
+//Parameter flags:
+//first 4 bit = GUI slider/knob response function f() for a parameter;
+//f(x) will be used to remap the slider's normalized position to a normalized output;
+//x = normalized slider position; y = normalized output; final value = f(x)*(max-min)+min;
+#define APP_PAR_FLAG_LIN 	0 //linear: y = x
+#define APP_PAR_FLAG_EXP 	1 //exponential: y = (exp(a*x)-1)/(exp(a)-1); a=5; OR approximation using x^3 or x^4
+#define APP_PAR_FLAG_INDEXED 	( 1 << 4 ) //0.0 = first item; 1.0 = second item; 2.0 ...
+#define APP_PAR_FLAG_BOOL	( 1 << 5 ) //for MIDI IN: 0.0 = 0; any other value = 1.0; can only be used in combination with APP_PAR_FLAG_INDEXED;
 #define APP_PAR( ID, IDSTR, NAME, UNIT, MIN, MAX, DEF, FLAGS ) \
     pars[ p ].id = ID; \
     pars[ p ].id_str = IDSTR; \

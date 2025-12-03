@@ -157,6 +157,8 @@ struct MODULE_DATA
     PS_CTYPE	ctl_tick_scale;
     PS_CTYPE	ctl_record;
     PS_CTYPE	ctl_reverse;
+    PS_CTYPE	ctl_attack;
+    PS_CTYPE	ctl_release;
     gen_channel	channels[ MAX_CHANNELS ];
     bool    	no_active_channels;
     bool	editor_play; 
@@ -196,6 +198,7 @@ struct MODULE_DATA
 #ifdef SUNVOX_GUI
     window_manager* 	wm;
     gen_channel		editor_player_channel;
+    smutex              gfx_mutex; 
 #endif
 };
 #define SAMPLE_TYPE_FLAG_LOOPRELEASE	( 1 << 2 )
@@ -252,7 +255,7 @@ struct instrument
     int32_t	editor_cursor;
     int32_t	editor_selected_size; 
 };
-static void reset_sampler_channel( gen_channel* ch );
+static void reset_sampler_channel( MODULE_DATA* module_data, gen_channel* ch );
 static void recalc_base_pitch( int smp_num, int mod_num, MODULE_DATA* module_data, psynth_net* net );
 static int get_base_note( int smp_num, int mod_num, MODULE_DATA* module_data, psynth_net* net, bool use_module_props );
 static void set_base_note( int base_note, int smp_num, int mod_num, MODULE_DATA* module_data, psynth_net* net );
@@ -308,7 +311,7 @@ static void remove_instrument_and_samples( int mod_num, psynth_net* pnet )
     }
     pnet->change_counter++;
 }
-static void reset_sampler_channel( gen_channel* ch )
+static void reset_sampler_channel( MODULE_DATA* module_data, gen_channel* ch )
 {
     memset( &ch->env_pos, 0, sizeof( ch->env_pos ) );
     for( int i = ENV_PAN; i < ENV_COUNT; i++ )
@@ -326,6 +329,9 @@ static void reset_sampler_channel( gen_channel* ch )
     }
     ch->flags |= GEN_CHANNEL_FLAG_SUSTAIN;
     ch->fadeout = 65536;
+    if( module_data->env[ ENV_VOL ]->h.flags & ENV_FLAG_ENABLED )
+	if( module_data->ctl_attack )
+	    ch->fadeout = 0;
     ch->vib_pos = 0;
     ch->vib_frame = 0;
     ch->flags |= GEN_CHANNEL_FLAG_ENV_START;
@@ -438,7 +444,7 @@ static void editor_play( psynth_net* net, int mod_num, int smp_num, bool play, S
 	ch->vel = 256;
 	ch->id = 0x12345678;
 	ch->local_pan = 128;
-	reset_sampler_channel( ch );
+	reset_sampler_channel( module_data, ch );
 	if( start_pos < 0 ) start_pos = 0;
 	if( start_pos >= (SMPPTR)smp->length ) start_pos = 0;
 	ch->ptr_h = start_pos;
@@ -2257,8 +2263,10 @@ static inline void sampler_tick(
     uint env_num = ENV_VOL;
     sampler_envelope* env = data->env[ env_num ];
     uint16_t* points = (uint16_t*)env->p;
+    bool vol_env_on = 0;
     if( ( env->h.flags & ENV_FLAG_ENABLED ) && data->env_buf[ env_num ] ) 
     {
+	vol_env_on = 1;
 	if( env->h.flags & ENV_FLAG_LOOP ) 
 	{ 
 	    if( chan->env_pos[ env_num ] >= points[ env->h.loop_end << 1 ] )  
@@ -2272,17 +2280,33 @@ static inline void sampler_tick(
 	}
 	r_vol = data->env_buf[ env_num ][ chan->env_pos[ env_num ] ];
 	if( !( env->h.flags & ENV_FLAG_LOOP ) ) 
-	{ 
+	{
 	    if( envelope_finished && r_vol == 0 )
 	    {
 		chan->flags &= ~GEN_CHANNEL_FLAG_PLAYING;
 		chan->id = ~0;
 	    }
 	}
-	if( ( chan->flags & GEN_CHANNEL_FLAG_SUSTAIN ) == 0 ) 
+	if( chan->flags & GEN_CHANNEL_FLAG_SUSTAIN )
+	{
+	    if( chan->fadeout < 65536 )
+	    {
+		if( data->ctl_attack > 0 )
+		{
+		    uint32_t add = ( ( 65536 - chan->fadeout ) * ( 32768 - data->ctl_attack ) ) / 32768;
+		    if( add == 0 ) add = 1;
+		    chan->fadeout = chan->fadeout + add;
+		}
+		else
+		    chan->fadeout = 65536; 
+	    }
+	}
+	else
 	{
 	    if( chan->fadeout > 0 )
 	    {
+		if( data->ctl_release < 32768 )
+		    chan->fadeout = ( (uint32_t)chan->fadeout * data->ctl_release ) / 32768; 
 		chan->fadeout -= ins->volume_fadeout << 1;
 		if( chan->fadeout < 0 ) chan->fadeout = 0;
 	    }
@@ -2319,9 +2343,9 @@ static inline void sampler_tick(
 	{
 	    chan->env_pos[ env_num ]++;
 	}
-    } 
-    else 
-    { 
+    }
+    else
+    {
 	r_vol = 32768;
 	if( ( chan->flags & GEN_CHANNEL_FLAG_SUSTAIN ) == 0 )
 	{
@@ -2447,6 +2471,11 @@ static inline void sampler_tick(
 	{
 	    chan->l_old = l_vol;
 	    chan->r_old = r_vol;
+	    if( vol_env_on && data->ctl_attack > 0 )
+	    {
+		chan->l_old = 0;
+		chan->r_old = 0;
+	    }
 	}
 	chan->vol_step = data->tick_size2 >> 8;
 	chan->l_delta = ( ( l_vol - chan->l_old ) << 12 ) / chan->vol_step; 
@@ -2592,7 +2621,7 @@ PS_RETTYPE MODULE_HANDLER(
 	case PS_CMD_GET_FLAGS: retval = PSYNTH_FLAG_GENERATOR | PSYNTH_FLAG_GET_SPEED_CHANGES | PSYNTH_FLAG_EFFECT | PSYNTH_FLAG_USE_MUTEX; break;
 	case PS_CMD_INIT:
 	    {
-		psynth_resize_ctls_storage( mod_num, 9, pnet );
+		psynth_resize_ctls_storage( mod_num, 11, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_VOLUME ), "", 0, 512, 256, 0, &data->ctl_volume, -1, 0, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_PANNING ), "", 0, 256, 128, 0, &data->ctl_pan, 128, 0, pnet );
 		psynth_set_ctl_show_offset( mod_num, 1, -128, pnet );
@@ -2604,7 +2633,11 @@ PS_RETTYPE MODULE_HANDLER(
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_TICK_LENGTH ), "", 0, 2048, 128, 0, &data->ctl_tick_scale, 128, 4, pnet );
 		psynth_set_ctl_flags( mod_num, 6, PSYNTH_CTL_FLAG_EXP3, pnet );
 		psynth_register_ctl( mod_num, ps_get_string( STR_PS_RECORD ), ps_get_string( STR_PS_SAMPLER_REC_MODES ), 0, 2, 0, 1, &data->ctl_record, -1, 3, pnet );
-		psynth_register_ctl( mod_num, ps_get_string( STR_PS_REVERSE ), ps_get_string( STR_PS_OFF_ON ), 0, 1, 0, 1, &data->ctl_reverse, -1, 4, pnet );
+		psynth_register_ctl( mod_num, ps_get_string( STR_PS_REVERSE ), ps_get_string( STR_PS_OFF_ON ), 0, 1, 0, 1, &data->ctl_reverse, -1, 5, pnet );
+		psynth_register_ctl( mod_num, ps_get_string( STR_PS_ATTACK ), "", 0, 32768, 0, 0, &data->ctl_attack, -1, 4, pnet );
+		psynth_register_ctl( mod_num, ps_get_string( STR_PS_RELEASE ), "", 0, 32768, 32768, 0, &data->ctl_release, -1, 4, pnet );
+		psynth_set_ctl_flags( mod_num, 9, PSYNTH_CTL_FLAG_INVEXP3, pnet );
+		psynth_set_ctl_flags( mod_num, 10, PSYNTH_CTL_FLAG_INVEXP3, pnet );
 		for( int c = 0; c < MAX_CHANNELS; c++ )
 		{
 		    smem_clear( &data->channels[ c ], sizeof( gen_channel ) );
@@ -2649,12 +2682,14 @@ PS_RETTYPE MODULE_HANDLER(
 #ifdef SUNVOX_GUI
 		data->wm = nullptr;
                 sunvox_engine* sv = (sunvox_engine*)pnet->host;
+                smutex_init( &data->gfx_mutex, 0 );
                 if( sv && sv->win )
                 {
                     window_manager* wm = sv->win->wm;
                     data->wm = wm;
 		    mod->visual = new_window( "Sampler GUI", 0, 0, 10, 10, wm->color1, 0, pnet, sampler_visual_handler, wm );
 		    sampler_visual_data* smp_data = (sampler_visual_data*)mod->visual->data;
+		    smp_data->gfx_mutex = &data->gfx_mutex;
 		    mod->visual_min_ysize = smp_data->min_ysize;
 		    smp_data->module_data = data;
 		    smp_data->mod_num = mod_num;
@@ -2663,24 +2698,29 @@ PS_RETTYPE MODULE_HANDLER(
 		    data2->module_data = data;
 		    data2->mod_num = mod_num;
 		    data2->pnet = pnet;
+		    data2->gfx_mutex = &data->gfx_mutex;
 		    sample_editor_data_l* data3 = (sample_editor_data_l*)data2->samples_l->data;
 		    data3->module_data = data;
 		    data3->mod_num = mod_num;
 		    data3->pnet = pnet;
+		    data3->gfx_mutex = &data->gfx_mutex;
 		    sample_editor_data_r* data4 = (sample_editor_data_r*)data2->samples_r->data;
 		    data4->module_data = data;
 		    data4->mod_num = mod_num;
 		    data4->pnet = pnet;
 		    data4->ldata = data3;
+		    data4->gfx_mutex = &data->gfx_mutex;
 		    envelope_editor_data_l* data5 = (envelope_editor_data_l*)data2->envelopes_l->data;
 		    data5->module_data = data;
 		    data5->mod_num = mod_num;
 		    data5->pnet = pnet;
+		    data5->gfx_mutex = &data->gfx_mutex;
 		    psynth_submod_change( data5->submod, mod_num, SUBMOD_MAX_CHANNELS, SUBMOD_SUNVOX_FLAGS, &data->ps );
 		    envelope_editor_data_r* data6 = (envelope_editor_data_r*)data2->envelopes_r->data;
 		    data6->module_data = data;
 		    data6->mod_num = mod_num;
 		    data6->pnet = pnet;
+		    data6->gfx_mutex = &data->gfx_mutex;
 		}
 #endif
 	    }
@@ -3167,19 +3207,21 @@ PS_RETTYPE MODULE_HANDLER(
 		{
 		    for( c = 0; c < MAX_CHANNELS; c++ )
 		    {
-			if( data->channels[ c ].id == event->id )
+			gen_channel* ch = &data->channels[ c ];
+			if( ch->id == event->id )
 			{
-			    if( data->channels[ c ].flags & GEN_CHANNEL_FLAG_SUSTAIN )
+			    if( ch->flags & GEN_CHANNEL_FLAG_SUSTAIN )
 			    {
-				release_sampler_channel( &data->channels[ c ], ins, data );
+				release_sampler_channel( ch, ins, data );
 			    }
-			    data->channels[ c ].id = ~0;
+			    ch->id = ~0;
 			    break;
 			}
 		    }
 		    for( c = 0; c < data->ctl_channels; c++ )
 		    {
-			if( ( data->channels[ data->search_ptr ].flags & GEN_CHANNEL_FLAG_PLAYING ) == 0 ) break;
+			gen_channel* ch = &data->channels[ data->search_ptr ];
+			if( ( ch->flags & GEN_CHANNEL_FLAG_PLAYING ) == 0 ) break;
 			data->search_ptr++;
 			if( data->search_ptr >= data->ctl_channels ) data->search_ptr = 0;
 		    }
@@ -3187,6 +3229,16 @@ PS_RETTYPE MODULE_HANDLER(
 		    {
 			data->search_ptr++;
 			if( data->search_ptr >= data->ctl_channels ) data->search_ptr = 0;
+			if( pnet->base_host_version >= 0x02010301 )
+			{
+			    for( c = 0; c < data->ctl_channels; c++ )
+			    {
+				gen_channel* ch = &data->channels[ data->search_ptr ];
+				if( ( ch->flags & GEN_CHANNEL_FLAG_SUSTAIN ) == 0 ) break;
+				data->search_ptr++;
+				if( data->search_ptr >= data->ctl_channels ) data->search_ptr = 0;
+			    }
+			}
 		    }
 		}
 		else 
@@ -3254,7 +3306,7 @@ PS_RETTYPE MODULE_HANDLER(
 		ch->id = event->id;
 		ch->local_pan = 128;
 		ch->local_reverse = 0;
-		reset_sampler_channel( ch );
+		reset_sampler_channel( data, ch );
 		ch->ptr_h = smp->start_pos;
 		init_reverse_flags( ch, smp, ch->local_reverse, data->ctl_reverse );
 		data->no_active_channels = false;
@@ -3495,6 +3547,9 @@ PS_RETTYPE MODULE_HANDLER(
 	    psynth_sunvox_remove( data->ps );
 	    smutex_destroy( &data->rec_btn_mutex );
 	    smem_free( data->rec_buf );
+#ifdef SUNVOX_GUI
+	    smutex_destroy( &data->gfx_mutex );
+#endif
 	    retval = 1;
 	    break;
 	default: break;

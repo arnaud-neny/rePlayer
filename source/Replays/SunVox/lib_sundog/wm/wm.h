@@ -884,11 +884,17 @@ enum scrollbar_hex
     scrollbar_hex_normal, //normal hex mode without show_offset;
     scrollbar_hex_normal_with_offset, //normal with show_offset;
 };
-#define SCROLLBAR_FLAG_INPUT	( 1 << 0 )
-#define SCROLLBAR_FLAG_COLORIZE	( 1 << 1 ) //color algorithm 2: colorize all elements
-#define SCROLLBAR_FLAG_EXP2	( 1 << 2 ) //display exponential
-#define SCROLLBAR_FLAG_EXP3	( 1 << 3 ) //display exponential
-#define SCROLLBAR_FLAGS_EXP	( SCROLLBAR_FLAG_EXP2 | SCROLLBAR_FLAG_EXP3 )
+//Scrollbar flags:
+//first 4 bit = response function f() type;
+//f(x) will be used to remap the slider's normalized position to a normalized output;
+//x = normalized slider position; y = normalized output; final value = f(x)*(max-min)+min;
+#define SCROLLBAR_FLAG_LIN	0 //linear: y = x
+#define SCROLLBAR_FLAG_EXP2	1 //exponential fn approximation: y = x^2
+#define SCROLLBAR_FLAG_EXP3	2 //... y = x^3
+#define SCROLLBAR_FLAG_INVEXP3	3 //... (convex upwards) y = 1-(1-x)^3
+#define SCROLLBAR_FLAGS_CURVE	15
+#define SCROLLBAR_FLAG_INPUT	( 1 << 4 )
+#define SCROLLBAR_FLAG_COLORIZE	( 1 << 5 ) //color algorithm 2: colorize all elements
 void draw_scrollbar_horizontal_selection( WINDOWPTR win, int x );
 int scrollbar_handler( sundog_event* evt, window_manager* wm );
 #define SCROLLBAR_DONT_CHANGE_VALUE (-1024*1024)

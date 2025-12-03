@@ -697,6 +697,10 @@ public class AndroidLib {
         int[] rv = null;
         try {
             rv = android.os.Process.getExclusiveCores();
+            if( rv == null )
+                Log.w( "GetExclusiveCores", "NULL :(" );
+            else
+                Log.i( "GetExclusiveCores", "num. of excl. cores = " + rv.length );
         } catch( RuntimeException e ) {
             Log.w( "GetExclusiveCores", "getExclusiveCores() is not supported on this device");
         }

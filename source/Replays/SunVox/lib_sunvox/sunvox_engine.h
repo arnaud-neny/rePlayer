@@ -2,8 +2,8 @@
 
 #include "psynth/psynth_net.h"
 
-#define SUNVOX_ENGINE_VERSION ( ( 2 << 24 ) | ( 1 << 16 ) | ( 3 << 8 ) | ( 0 << 0 ) )
-#define SUNVOX_ENGINE_VERSION_STR "2.1.3" // rePlayer
+#define SUNVOX_ENGINE_VERSION ( ( 2 << 24 ) | ( 1 << 16 ) | ( 4 << 8 ) | ( 0 << 0 ) )
+#define SUNVOX_ENGINE_VERSION_STR "2.1.4" // rePlayer
 
 //Main external defines:
 //SUNVOX_LIB - cropped version (portable library) with some limitations (no WAV export, no recording);
@@ -453,6 +453,26 @@ struct sunvox_midi
     volatile int	kbd_cap_cnt; //number of events captured
 };
 
+/*
+MIDI IN:
+
+Commands coming from all external MIDI devices are combined into a single stream, and modules decide which commands to accept from this stream.
+In the module properties, you can specify what to accept (all MIDI commands at once, or only commands from a selected MIDI channel)
+and when to accept them (always, never, or when a module is selected).
+
+Limitation:
+commands from external MIDI devices, commands from on-screen keyboards, and commands from a physical PC keyboard
+all work with a single set of 32 tracks. This means the total polyphony for all musical input devices is limited to 32.
+
+MIDI OUT:
+
+Each module can open one MIDI OUT port to send MIDI commands to the specified device. See MIDI OUT in the module properties.
+The polyphony for MIDI OUT per module is 16.
+
+Limitation for Android:
+the same MIDI device can't be opened twice; that is, only one module can send commands to a single MIDI device.
+*/
+
 //Visualization frames:
 //SUNVOX_VF_BUF_SRATE - frames per buffer (buffer length = 1 second)
 #if CPUMARK >= 10
@@ -896,7 +916,8 @@ int load_block( sunvox_load_state* state );
 #define SUNVOX_MODULE_SAVE_WITHOUT_VISUALIZER	( 1 << 1 )
 #define SUNVOX_MODULE_SAVE_WITHOUT_FILE_MARKERS	( 1 << 2 )
 #define SUNVOX_MODULE_SAVE_WITHOUT_OUT_LINKS	( 1 << 3 )
-#define SUNVOX_MODULE_SAVE_LINKS_SELECTED2	( 1 << 4 ) //Remove links without the *_SELECTED2 flag
+#define SUNVOX_MODULE_SAVE_WITHOUT_SEL_FLAG	( 1 << 4 ) //without PSYNTH_FLAG_SELECTED
+#define SUNVOX_MODULE_SAVE_LINKS_SELECTED2	( 1 << 5 ) //Remove links without the *_SELECTED2 flag
 #define SUNVOX_MODULE_LOAD_ADD_INFO		( 1 << 0 )
 #define SUNVOX_MODULE_LOAD_IGNORE_MSB_FLAGS	( 1 << 1 ) //Ignore Mute/Solo/Bypass
 
