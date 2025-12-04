@@ -163,12 +163,14 @@ static void sn76496_set_log_cb(void *info, DEVCB_LOG func, void* param);
 
 static UINT8 device_start_sn76496_mame(const SN76496_CFG* cfg, DEV_INFO* retDevInf);
 static void sn76496_w_mame(void *chip, UINT8 reg, UINT8 data);
+static void sn76496_set_pan(void* chip, const INT16* PanVals); // rePlayer
 
 
 static DEVDEF_RWFUNC devFunc[] =
 {
 	{RWF_REGISTER | RWF_WRITE, DEVRW_A8D8, 0, sn76496_w_mame},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, sn76496_set_mute_mask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, sn76496_set_pan}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 DEV_DEF devDef_SN76496_MAME =
@@ -207,6 +209,8 @@ struct _sn76496_state
 	UINT32 whitenoise_tap2; // mask for white noise tap 2 (lower one, usually bit 13)
 	UINT8 negate;           // output negate flag
 	UINT8 stereo;           // whether we're dealing with stereo or not
+	UINT8 stereo_df;		// rePlayer
+	UINT8 stereo_ov;		// rePlayer
 	UINT32 clock_divider;   // clock divider
 	UINT8 ncr_style_psg;    // flag to ignore writes to regs 1,3,5,6,7 with bit 7 low
 	UINT8 sega_style_psg;   // flag to make frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0; the initial register is pointing to 0x3 instead of 0x0; the volume reg is preloaded with 0xF instead of 0x0
@@ -218,6 +222,7 @@ struct _sn76496_state
 	UINT32 RNG;             // noise generator LFSR
 	//INT32 current_clock;
 	UINT8 stereo_mask;      // the stereo output mask
+	UINT8 stereo_mask_df;   // rePlayer
 	INT32 period[4];        // Length of 1/2 of waveform
 	INT32 count[4];         // Position within the waveform
 	UINT8 output[4];        // 1-bit output of each channel, pre-volume
@@ -241,7 +246,8 @@ static UINT8 sn76496_ready_r(void *chip, UINT8 offset)
 static void sn76496_stereo_w(void *chip, UINT8 offset, UINT8 data)
 {
 	sn76496_state *R = (sn76496_state*)chip;
-	if (R->stereo) R->stereo_mask = data;
+	if (R->stereo) R->stereo_mask_df = data; // rePlayer
+	if (R->stereo && R->stereo_ov == 0) R->stereo_mask = data; // rePlayer
 	else emu_logf(&R->logger, DEVLOG_WARN, "Call to stereo write with mono chip!\n");
 }
 
@@ -585,7 +591,7 @@ static void sn76496_reset(void *chip)
 	R->output[3] = R->RNG & 1;
 
 	R->cycles_to_ready = 1;          // assume ready is not active immediately on init. is this correct?
-	R->stereo_mask = 0xFF;           // all channels enabled
+	R->stereo_mask = R->stereo_mask_df = 0xFF; // all channels enabled // rePlayer
 	//R->current_clock = R->clock_divider-1;
 
 	R->ready_state = 1;
@@ -655,6 +661,7 @@ static UINT8 device_start_sn76496_mame(const SN76496_CFG* cfg, DEV_INFO* retDevI
 	chip->whitenoise_tap2 = ntap[1];        // mask for white noise tap 2
 	chip->negate = cfg->negate;             // channel negation
 	chip->stereo = cfg->stereo;             // GameGear stereo
+	chip->stereo_df = cfg->stereo;			// rePlayer
 	chip->ncr_style_psg = cfg->ncrPSG;      // NCR mode
 	chip->sega_style_psg = cfg->segaPSG;    // frequency set to 0 results in freq = 0x400 rather than 0
 	chip->NgpFlags = 0x00;
@@ -696,6 +703,25 @@ static void sn76496_w_mame(void *chip, UINT8 reg, UINT8 data)
 	}
 	return;
 }
+
+// rePlayer begin
+static void sn76496_set_pan(void* chip, const INT16* PanVals)
+{
+	sn76496_state* R = (sn76496_state*)chip;
+
+	if (PanVals[0] != 0)
+	{
+		R->stereo = R->stereo_ov = 1;
+		R->stereo_mask = 0b10100101;
+	}
+	else
+	{
+		R->stereo = R->stereo_df;
+		R->stereo_ov = 0;
+		R->stereo_mask = R->stereo_mask_df;
+	}
+}
+// rePlayer end
 
 // ---- MAME SN-settings ----
 /*

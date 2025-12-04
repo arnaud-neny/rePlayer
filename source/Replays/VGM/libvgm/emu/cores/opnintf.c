@@ -51,6 +51,7 @@ static DEVDEF_RWFUNC devFunc_MAME_2203[] =
 	{RWF_REGISTER | RWF_WRITE, DEVRW_A8D8, 0, ym2203_write},
 	{RWF_REGISTER | RWF_READ, DEVRW_A8D8, 0, ym2203_read},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, ym2203_set_mute_mask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, ym2203_set_pan}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 static DEV_DEF devDef_MAME_2203 =

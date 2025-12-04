@@ -27,4 +27,6 @@ void ADLIBEMU(set_mute_mask)(void *chip, UINT32 MuteMask);
 void ADLIBEMU(set_volume)(void *chip, INT32 volume);
 void ADLIBEMU(set_volume_lr)(void *chip, INT32 volL, INT32 volR);
 
+void ADLIBEMU(set_pan)(void* chip, const INT16* PanVals); // rePlayer
+
 #endif	// __ADLIBEMU_H__

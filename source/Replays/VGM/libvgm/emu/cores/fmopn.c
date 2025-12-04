@@ -2351,6 +2351,8 @@ typedef struct
 	UINT8 REGS[256];        /* registers         */
 	FM_OPN OPN;             /* OPN state         */
 	FM_CH CH[3];            /* channel state     */
+
+	UINT8		ForceStereo; // rePlayer
 } YM2203;
 
 /* Generate samples for one of the YM2203s */
@@ -2437,12 +2439,21 @@ void ym2203_update_one(void *chip, UINT32 length, DEV_SMPL **buffer)
 		/* buffering */
 		{
 			DEV_SMPL lt;
+			// rePlayer begin
+			if (F2203->ForceStereo)
+			{
+				bufL[i] = OPN->out_fm[0] + OPN->out_fm[2];
+				bufR[i] = OPN->out_fm[1];
+			}
+			else
+			{
+				lt = OPN->out_fm[0] + OPN->out_fm[1] + OPN->out_fm[2];
 
-			lt = OPN->out_fm[0] + OPN->out_fm[1] + OPN->out_fm[2];
-
-			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = lt;
+				/* buffering */
+				bufL[i] = lt;
+				bufR[i] = lt;
+			}
+			// rePlayer end
 		}
 
 		/* CSM mode: if CSM Key ON has occured, CSM Key OFF need to be sent       */
@@ -2670,6 +2681,15 @@ void ym2203_set_log_cb(void* chip, DEVCB_LOG func, void* param)
 	dev_logger_set(&F2203->OPN.logger, F2203, func, param);
 	return;
 }
+
+// rePlayer begin
+void ym2203_set_pan(void* chip, const INT16* PanVals)
+{
+	YM2203* F2203 = (YM2203*)chip;
+
+	F2203->ForceStereo = PanVals[0] != 0;
+}
+// rePlayer end
 #endif /* BUILD_YM2203 */
 
 
@@ -4354,6 +4374,7 @@ typedef struct
 	UINT8       dac_test;
 	INT32       dacout;
 	UINT8       MuteDAC;
+	UINT8		ForceStereo; // rePlayer
 	
 	UINT8       WaveOutMode;
 	INT32       WaveL;
@@ -4498,27 +4519,44 @@ void ym2612_update_one(void *chip, UINT32 length, DEV_SMPL **buffer)
 		else if (out_fm[5] < -8192) out_fm[5] = -8192;
 
 		/* 6-channels mixing  */
-		lt  = ((out_fm[0]>>0) & OPN->pan[0]);
-		rt  = ((out_fm[0]>>0) & OPN->pan[1]);
-		lt += ((out_fm[1]>>0) & OPN->pan[2]);
-		rt += ((out_fm[1]>>0) & OPN->pan[3]);
-		lt += ((out_fm[2]>>0) & OPN->pan[4]);
-		rt += ((out_fm[2]>>0) & OPN->pan[5]);
-		lt += ((out_fm[3]>>0) & OPN->pan[6]);
-		rt += ((out_fm[3]>>0) & OPN->pan[7]);
-		if (! F2612->dac_test)
+		// rePlayer begin
+		if (! F2612->ForceStereo)
 		{
-			lt += ((out_fm[4]>>0) & OPN->pan[8]);
-			rt += ((out_fm[4]>>0) & OPN->pan[9]);
+			lt = ((out_fm[0] >> 0) & OPN->pan[0]);
+			rt = ((out_fm[0] >> 0) & OPN->pan[1]);
+			lt += ((out_fm[1] >> 0) & OPN->pan[2]);
+			rt += ((out_fm[1] >> 0) & OPN->pan[3]);
+			lt += ((out_fm[2] >> 0) & OPN->pan[4]);
+			rt += ((out_fm[2] >> 0) & OPN->pan[5]);
+			lt += ((out_fm[3] >> 0) & OPN->pan[6]);
+			rt += ((out_fm[3] >> 0) & OPN->pan[7]);
+			if (!F2612->dac_test)
+			{
+				lt += ((out_fm[4] >> 0) & OPN->pan[8]);
+				rt += ((out_fm[4] >> 0) & OPN->pan[9]);
+			}
+			else
+			{
+				// DAC test mode ignores panning for channel 4
+				lt += dacout;
+				lt += dacout;
+			}
+			lt += ((out_fm[5] >> 0) & OPN->pan[10]);
+			rt += ((out_fm[5] >> 0) & OPN->pan[11]);
 		}
 		else
 		{
-			// DAC test mode ignores panning for channel 4
-			lt += dacout;
-			lt += dacout;
+			lt = out_fm[0];
+			rt = out_fm[1];
+			lt += out_fm[2];
+			rt += out_fm[3];
+			if (!F2612->dac_test)
+				lt += out_fm[4];
+			else
+				lt += dacout;
+			rt += out_fm[5];
 		}
-		lt += ((out_fm[5]>>0) & OPN->pan[10]);
-		rt += ((out_fm[5]>>0) & OPN->pan[11]);
+		// rePlayer end
 
 		/* buffering */
 		if (F2612->WaveOutMode)
@@ -4810,4 +4848,13 @@ void ym2612_set_log_cb(void* chip, DEVCB_LOG func, void* param)
 	dev_logger_set(&F2612->OPN.logger, F2612, func, param);
 	return;
 }
+
+// rePlayer begin
+void ym2612_set_pan(void* chip, const INT16* PanVals)
+{
+	YM2612* F2612 = (YM2612*)chip;
+
+	F2612->ForceStereo = PanVals[0] != 0;
+}
+// rePlayer end
 #endif /* (BUILD_YM2612) */

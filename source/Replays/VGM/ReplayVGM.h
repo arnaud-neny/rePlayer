@@ -32,6 +32,8 @@ namespace rePlayer
                     uint32_t vgmPlaybackHz : 2;
                     uint32_t overrideVgmHardStopOld : 1;
                     uint32_t vgmHardStopOld : 1;
+                    uint32_t overrideForceStereo : 1;
+                    uint32_t forceStereo : 1;
                 };
             };
             uint32_t duration = 0;
@@ -85,6 +87,7 @@ namespace rePlayer
         static int32_t ms_droV2Opl3;
         static int32_t ms_vgmPlaybackHz;
         static int32_t ms_vgmHardStopOld;
+        static int32_t ms_forceStereo;
     };
 }
 // namespace rePlayer

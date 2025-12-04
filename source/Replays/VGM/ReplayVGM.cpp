@@ -1,3 +1,14 @@
+// Some minor changes are done in libvgm:
+// - emu/cores/2612intf.c
+// - emu/adlibemu.h
+// - emu/adlibemu_opl_inc.c
+// - emu/adlibemu_opl_inc.h
+// - emu/cores/fmopn.c
+// - emu/cores/fmopn.h
+// - emu/cores/gb.c
+// - emu/cores/oplintf.c
+// - emu/cores/oplnintf.c
+// - emu/cores/sn76496.c
 #include "ReplayVGM.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -41,6 +52,7 @@ namespace rePlayer
         window.RegisterSerializedData(ms_droV2Opl3, "ReplayVGMDroV2Opl3");
         window.RegisterSerializedData(ms_vgmPlaybackHz, "ReplayVGMPlaybackHz");
         window.RegisterSerializedData(ms_vgmHardStopOld, "ReplayVGMHardStopOld");
+        window.RegisterSerializedData(ms_forceStereo, "ReplayVGMForceStereo");
 
         return false;
     }
@@ -138,6 +150,7 @@ namespace rePlayer
         changed |= ImGui::Combo("Hard stop on old VGM", &ms_vgmHardStopOld, stop, NumItemsOf(stop));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
+        changed |= ImGui::Combo("Force Stereo", &ms_forceStereo, stop, NumItemsOf(stop));
         return changed;
     }
 
@@ -168,6 +181,8 @@ namespace rePlayer
             ms_vgmHardStopOld, "Hard stop on old VGM: Off", "Hard stop on old VGM: On");
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
+        ComboOverride("ForceStereo", GETSET(entry, overrideForceStereo), GETSET(entry, forceStereo),
+            ms_forceStereo, "Default Panning", "Stereo Panning");
 
         const float buttonSize = ImGui::GetFrameHeight();
         bool isEnabled = entry->duration != 0;
@@ -222,6 +237,7 @@ namespace rePlayer
     int32_t ReplayVGM::ms_droV2Opl3 = DRO_V2OPL3_DETECT;
     int32_t ReplayVGM::ms_vgmPlaybackHz = 0;
     int32_t ReplayVGM::ms_vgmHardStopOld = 0;
+    int32_t ReplayVGM::ms_forceStereo = 1;
 
     ReplayVGM::~ReplayVGM()
     {
@@ -315,6 +331,20 @@ namespace rePlayer
         m_currentDuration = (settings
             && settings->numEntries == Settings().numEntries // check for older format as duration has been added after 0.6.0
             && settings->duration) ? (uint64_t(settings->duration) * kSampleRate) / 1000 : 0;
+
+        bool forceStereo = (settings && settings->overrideForceStereo) ? settings->forceStereo : ms_forceStereo;
+        std::vector<PLR_DEV_INFO> devInfos;
+        m_player->GetPlayer()->GetSongDeviceInfo(devInfos);
+        for (auto& devInfo : devInfos)
+        {
+            PLR_DEV_OPTS devOpts;
+            m_player->GetPlayer()->GetDeviceOptions(devInfo.id, devOpts);
+            if (forceStereo) for (uint32_t i = 0; i < NumItemsOf(devOpts.panOpts.chnPan[0]); ++i)
+                devOpts.panOpts.chnPan[1][i] = devOpts.panOpts.chnPan[0][i] = (i & 1) * 256 * 2 - 256;
+            else for (uint32_t i = 0; i < NumItemsOf(devOpts.panOpts.chnPan[0]); ++i)
+                devOpts.panOpts.chnPan[1][i] = devOpts.panOpts.chnPan[0][i] = 0;
+            m_player->GetPlayer()->SetDeviceOptions(devInfo.id, devOpts);
+        }
     }
 
     void ReplayVGM::SetSubsong(uint32_t /*subsongIndex*/)

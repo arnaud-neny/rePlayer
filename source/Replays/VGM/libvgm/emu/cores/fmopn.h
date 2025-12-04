@@ -139,6 +139,7 @@ UINT8 ym2203_timer_over(void *chip, UINT8 c);
 **  Channel Muting
 */
 void ym2203_set_mute_mask(void *chip, UINT32 MuteMask);
+void ym2203_set_pan(void* chip, const INT16* PanVals); // rePlayer
 
 /*
 **  logging function
@@ -205,6 +206,7 @@ UINT8 ym2612_timer_over(void *chip, UINT8 c );
 void ym2612_set_mute_mask(void *chip, UINT32 MuteMask);
 void ym2612_set_options(void *chip, UINT32 Flags);
 void ym2612_set_log_cb(void* chip, DEVCB_LOG func, void* param);
+void ym2612_set_pan(void* chip, const INT16* PanVals); // rePlayer
 #endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 #endif	// __FMOPN_H__

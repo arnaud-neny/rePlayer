@@ -79,6 +79,7 @@ static void device_reset_gameboy_sound(void *chip);
 static void gameboy_sound_set_mute_mask(void *chip, UINT32 MuteMask);
 static UINT32 gameboy_sound_get_mute_mask(void *chip);
 static void gameboy_sound_set_options(void *chip, UINT32 Flags);
+static void gameboy_sound_set_pan(void* chip, const INT16* PanVals); // rePlayer
 
 
 
@@ -87,6 +88,7 @@ static DEVDEF_RWFUNC devFunc[] =
 	{RWF_REGISTER | RWF_WRITE, DEVRW_A8D8, 0, gb_sound_w},
 	{RWF_REGISTER | RWF_READ, DEVRW_A8D8, 0, gb_sound_r},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, gameboy_sound_set_mute_mask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, gameboy_sound_set_pan}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 static DEV_DEF devDef =
@@ -277,6 +279,8 @@ struct _gb_sound_t
 	struct SOUNDC snd_control;
 
 	UINT8 snd_regs[0x30];
+
+	UINT8 forceStereo; // rePlayer
 
 	RATIO_CNTR cycleCntr;
 
@@ -1148,41 +1152,80 @@ static void gameboy_update(void *chip, UINT32 samples, DEV_SMPL **outputs)
 		if (gb->snd_1.on && !gb->snd_1.Muted)
 		{
 			sample = gb->snd_1.signal * gb->snd_1.envelope_value;
-
-			if (gb->snd_control.mode1_left)
-				left += sample;
-			if (gb->snd_control.mode1_right)
-				right += sample;
+			// rePlayer begin
+			if (gb->forceStereo)
+			{
+				if (gb->snd_control.mode1_left || gb->snd_control.mode1_right)
+					left += sample;
+			}
+			else
+			{
+				if (gb->snd_control.mode1_left)
+					left += sample;
+				if (gb->snd_control.mode1_right)
+					right += sample;
+			}
+			// rePlayer end
 		}
 
 		/* Mode 2 - Wave with Envelope */
 		if (gb->snd_2.on && !gb->snd_2.Muted)
 		{
 			sample = gb->snd_2.signal * gb->snd_2.envelope_value;
-			if (gb->snd_control.mode2_left)
-				left += sample;
-			if (gb->snd_control.mode2_right)
-				right += sample;
+			// rePlayer begin
+			if (gb->forceStereo)
+			{
+				if (gb->snd_control.mode2_left || gb->snd_control.mode2_right)
+					left += sample;
+			}
+			else
+			{
+				if (gb->snd_control.mode2_left)
+					left += sample;
+				if (gb->snd_control.mode2_right)
+					right += sample;
+			}
+			// rePlayer end
 		}
 
 		/* Mode 3 - Wave patterns from WaveRAM */
 		if (gb->snd_3.on && !gb->snd_3.Muted)
 		{
 			sample = gb->snd_3.signal;
-			if (gb->snd_control.mode3_left)
-				left += sample;
-			if (gb->snd_control.mode3_right)
-				right += sample;
+			// rePlayer begin
+			if (gb->forceStereo)
+			{
+				if (gb->snd_control.mode3_left || gb->snd_control.mode3_right)
+					right += sample;
+			}
+			else
+			{
+				if (gb->snd_control.mode3_left)
+					left += sample;
+				if (gb->snd_control.mode3_right)
+					right += sample;
+			}
+			// rePlayer end
 		}
 
 		/* Mode 4 - Noise with Envelope */
 		if (gb->snd_4.on && !gb->snd_4.Muted)
 		{
 			sample = gb->snd_4.signal * gb->snd_4.envelope_value;
-			if (gb->snd_control.mode4_left)
-				left += sample;
-			if (gb->snd_control.mode4_right)
-				right += sample;
+			// rePlayer begin
+			if (gb->forceStereo)
+			{
+				if (gb->snd_control.mode4_left || gb->snd_control.mode4_right)
+					right += sample;
+			}
+			else
+			{
+				if (gb->snd_control.mode4_left)
+					left += sample;
+				if (gb->snd_control.mode4_right)
+					right += sample;
+			}
+			// rePlayer end
 		}
 
 		/* Adjust for master volume */
@@ -1340,3 +1383,12 @@ static void gameboy_sound_set_options(void *chip, UINT32 Flags)
 	
 	return;
 }
+
+// rePlayer begin
+static void gameboy_sound_set_pan(void* chip, const INT16* PanVals)
+{
+	gb_sound_t* gb = (gb_sound_t*)chip;
+
+	gb->forceStereo = PanVals[0] != 0;
+}
+// rePlayer end

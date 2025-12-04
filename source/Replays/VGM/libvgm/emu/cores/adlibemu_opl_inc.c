@@ -1168,7 +1168,8 @@ UINT8 ADLIBEMU(reg_read)(void *chip, UINT8 port)
 //	- added parameter "chn" to fix panning for 4-op channels and the Rhythm Cymbal
 #undef CHANVAL_OUT
 #if defined(OPLTYPE_IS_OPL3)
-#define CHANVAL_OUT(chn)								\
+// rePlayer begin
+#define CHANVAL_OUT(chn, voice)								\
 	if (OPL->adlibreg[0x105]&1) {						\
 		outbufl[i] += chanval*cptr[chn].left_pan;		\
 		outbufr[i] += chanval*cptr[chn].right_pan;	\
@@ -1177,9 +1178,12 @@ UINT8 ADLIBEMU(reg_read)(void *chip, UINT8 port)
 		outbufr[i] += chanval;						\
 	}
 #else
-#define CHANVAL_OUT(chn)								\
+#define CHANVAL_OUT(chn, voice)								\
+	if ((OPL->force_stereo == 0) || (voice & 1)) \
 	outbufl[i] += chanval;							\
+	if ((OPL->force_stereo == 0) || ((voice & 1) ^ 1)) \
 	outbufr[i] += chanval;
+// rePlayer end
 #endif
 
 void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
@@ -1301,7 +1305,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 						operator_output(&cptr[9],0,tremval1[i]);
 						
 						chanval = cptr[9].cval*2;
-						CHANVAL_OUT(0)
+						CHANVAL_OUT(0,6) // rePlayer
 					}
 				}
 			}
@@ -1349,7 +1353,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 						operator_output(&cptr[9],cptr[0].cval*FIXEDPT,tremval2[i]);
 						
 						chanval = cptr[9].cval*2;
-						CHANVAL_OUT(0)
+						CHANVAL_OUT(0,6) // rePlayer
 					}
 				}
 			}
@@ -1382,7 +1386,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 					opfuncs[cptr[0].op_state](&cptr[0]);		//TomTom
 					operator_output(&cptr[0],0,tremval3[i]);
 					chanval = cptr[0].cval*2;
-					CHANVAL_OUT(0)
+					CHANVAL_OUT(0,8) // rePlayer
 				}
 			}
 
@@ -1466,9 +1470,9 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 					//CHANVAL_OUT(0)
 					// fix panning of the snare -Valley Bell
 					chanval = (OPL->op[7].cval + OPL->op[7+9].cval)*2;
-					CHANVAL_OUT(7)
+					CHANVAL_OUT(7,7) // rePlayer
 					chanval = OPL->op[8+9].cval*2;
-					CHANVAL_OUT(8)
+					CHANVAL_OUT(8,7) // rePlayer
 				}
 			}
 		}
@@ -1536,7 +1540,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[0],(cptr[0].lastcval+cptr[0].cval)*cptr[0].mfbi/2,tremval1[i]);
 
 								chanval = cptr[0].cval;
-								CHANVAL_OUT(3)	// Note: Op 1 of 4, so it needs to use the panning bits of Op 4 (Ch+3)
+								CHANVAL_OUT(3,cur_ch)	// Note: Op 1 of 4, so it needs to use the panning bits of Op 4 (Ch+3) // rePlayer
 							}
 						}
 
@@ -1573,7 +1577,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[3],cptr[9].cval*FIXEDPT,tremval2[i]);
 
 								chanval = cptr[3].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 
@@ -1594,7 +1598,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[3+9],0,tremval1[i]);
 
 								chanval = cptr[3+9].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 					}
@@ -1626,7 +1630,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[0],(cptr[0].lastcval+cptr[0].cval)*cptr[0].mfbi/2,tremval1[i]);
 
 								chanval = cptr[0].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 
@@ -1670,7 +1674,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[3+9],cptr[3].cval*FIXEDPT,tremval3[i]);
 
 								chanval = cptr[3+9].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 					}
@@ -1720,7 +1724,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 					operator_output(&cptr[9],0,tremval2[i]);
 
 					chanval = cptr[9].cval + cptr[0].cval;
-					CHANVAL_OUT(0)
+					CHANVAL_OUT(0,cur_ch) // rePlayer
 				}
 			}
 			else
@@ -1773,7 +1777,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[9],cptr[0].cval*FIXEDPT,tremval2[i]);
 
 								chanval = cptr[9].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 
@@ -1802,7 +1806,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[3+9],cptr[3].cval*FIXEDPT,tremval2[i]);
 
 								chanval = cptr[3+9].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 
@@ -1868,7 +1872,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 								operator_output(&cptr[3+9],cptr[3].cval*FIXEDPT,tremval4[i]);
 
 								chanval = cptr[3+9].cval;
-								CHANVAL_OUT(3)
+								CHANVAL_OUT(3,cur_ch) // rePlayer
 							}
 						}
 					}
@@ -1918,7 +1922,7 @@ void ADLIBEMU(getsample)(void *chip, UINT32 numsamples, DEV_SMPL** sndptr)
 					operator_output(&cptr[9],cptr[0].cval*FIXEDPT,tremval2[i]);
 
 					chanval = cptr[9].cval;
-					CHANVAL_OUT(0)
+					CHANVAL_OUT(0,cur_ch) // rePlayer
 				}
 			}
 		}
@@ -1969,3 +1973,12 @@ void ADLIBEMU(set_volume_lr)(void *chip, INT32 volLeft, INT32 volRight)
 
 	return;
 }
+
+// rePlayer begin
+void ADLIBEMU(set_pan)(void* chip, const INT16* PanVals)
+{
+	OPL_DATA* OPL = (OPL_DATA*)chip;
+
+	OPL->force_stereo = PanVals[0] != 0;
+}
+// rePlayer end
