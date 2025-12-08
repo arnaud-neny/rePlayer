@@ -54,6 +54,7 @@ namespace rePlayer
         uint32_t m_currentSample = 0;
         uint32_t m_currentFrameSample = 0;
         uint32_t m_numSamples = 0;
+        uint32_t m_silence = 0xffFFffFF;
         bool m_isPlaying = false;
         bool m_isRunning = true;
         bool m_isJobDone = false;

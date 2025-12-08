@@ -183,19 +183,32 @@ namespace rePlayer
         uint32_t preNumSamples = remainingSamples;
         auto* waveform = m_samples.Items(m_currentSample);
         auto replay = m_replay;
+        uint32_t sampleRate = replay->GetSampleRate();
+        uint32_t silence = m_silence != 0xffFFffFF ? (uint64_t(m_silence) * sampleRate / 1000ull) : 0;
+        int32_t lastSample = m_silence != 0xffFFffFF ? int32_t(((m_samples[silence].left + m_samples[silence].right) * 0.5f) * 128) : INT_MAX;
         while (remainingSamples && std::atomic_ref(m_isRunning).load())
         {
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
             if (numSamples == 0)
             {
-                Core::FromJob([this, current_duration = uint32_t((m_currentSample * 1000ull) / replay->GetSampleRate())]()
+                Core::FromJob([this, current_duration = uint32_t((m_currentSample * 1000ull) / sampleRate)]()
                 {
                     m_loops.Add(current_duration);
                 });
             }
+            for (uint32_t i = 0; i < numSamples; ++i)
+            {
+                auto monoSample = int32_t(((waveform[i].left + waveform[i].right) * 0.5f) * 128);
+                if (lastSample != monoSample)
+                {
+                    silence = m_currentSample + i;
+                    lastSample = monoSample;
+                    m_silence = uint32_t(((silence + sampleRate / 4) * 1000ull) / sampleRate);
+                }
+            }
             if ((numSamples | preNumSamples) == 0)
             {
-                m_duration = uint32_t((m_currentSample * 1000ull) / replay->GetSampleRate());
+                m_duration = uint32_t((m_currentSample * 1000ull) / sampleRate);
                 std::atomic_ref(m_currentSample) += remainingSamples;
                 remainingSamples = 0;
             }
@@ -207,6 +220,7 @@ namespace rePlayer
                 std::atomic_ref(m_currentSample) += numSamples;
             }
         }
+        m_silence = uint32_t((Min(silence + sampleRate / 4, m_currentSample) * 1000ull) / sampleRate);
     }
 
     inline uint32_t SongEndEditor::ReadCurrentSample()
@@ -332,6 +346,8 @@ namespace rePlayer
             drawList->Flags &= ~(ImDrawListFlags_AntiAliasedLines | ImDrawListFlags_AntiAliasedLinesUseTex | ImDrawListFlags_AntiAliasedFill);
             for (auto loopPos : m_loops)
                 drawList->AddLine(ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y + size.y), 0x8000ffff);
+            if (m_silence != 0xffFFffFF)
+                drawList->AddLine(ImVec2(pos.x - offset + m_silence / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + m_silence / numMillisecondsPerPixel, pos.y + size.y), 0x800000ff);
             drawList->AddTriangleFilled(ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel + 0.5f, pos.y + 6.5f)
                 , ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel - 4.0f, pos.y)
                 , ImVec2(pos.x - offset + m_duration / numMillisecondsPerPixel + 5.0f, pos.y)
@@ -471,6 +487,11 @@ namespace rePlayer
             if (m_isPlaying)
                 waveOutRestart(m_wave->outHandle);
         }
+        ImGui::SameLine();
+        if (ImGui::Button("S"))
+            m_duration = m_silence;
+        if (ImGui::IsItemHovered())
+            ImGui::Tooltip("Set duration\nSilence start at %u:%02u:%03u", m_silence / 60000, (m_silence / 1000) % 60, m_silence % 1000);
     }
 }
 // namespace rePlayer
