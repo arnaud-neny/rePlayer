@@ -499,6 +499,12 @@
     <ClCompile Include="src\extensions.c">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="celt\mini_kfft.c">
+      <Filter>Source Files\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qext_compare.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\opus.h">

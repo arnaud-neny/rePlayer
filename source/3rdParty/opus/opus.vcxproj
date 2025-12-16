@@ -32,6 +32,7 @@
     <ClCompile Include="celt\laplace.c" />
     <ClCompile Include="celt\mathops.c" />
     <ClCompile Include="celt\mdct.c" />
+    <ClCompile Include="celt\mini_kfft.c" />
     <ClCompile Include="celt\modes.c" />
     <ClCompile Include="celt\opus_custom_demo.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -188,6 +189,7 @@
     <ClCompile Include="src\opus_multistream_encoder.c" />
     <ClCompile Include="src\opus_projection_decoder.c" />
     <ClCompile Include="src\opus_projection_encoder.c" />
+    <ClCompile Include="src\qext_compare.c" />
     <ClCompile Include="src\repacketizer.c" />
     <ClCompile Include="src\repacketizer_demo.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

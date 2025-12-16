@@ -441,7 +441,7 @@ static void cwrsi3(int _k,celt_uint32 _i,int *_y){
   yj=_k;
   /*Finds the maximum _k such that ucwrs3(_k)<=_i (tested for all
      _i<2147418113=U(3,32768)).*/
-  _k=_i>0?isqrt32(2*_i-1)+1>>1:0;
+  _k=_i>0?vgmstream_isqrt32(2*_i-1)+1>>1:0;
   p=ucwrs3(_k);
   _i-=p;
   yj-=_k;

@@ -841,14 +841,14 @@ static unsigned quant_band(int encode, const CELTMode *m, int i, celt_norm *X, c
 
                if (fm < ((qn>>1)*((qn>>1) + 1)>>1))
                {
-                  itheta = (isqrt32(8*(celt_uint32)fm + 1) - 1)>>1;
+                  itheta = (vgmstream_isqrt32(8*(celt_uint32)fm + 1) - 1)>>1;
                   fs = itheta + 1;
                   fl = itheta*(itheta + 1)>>1;
                }
                else
                {
                   itheta = (2*(qn + 1)
-                   - isqrt32(8*(celt_uint32)(ft - fm - 1) + 1))>>1;
+                   - vgmstream_isqrt32(8*(celt_uint32)(ft - fm - 1) + 1))>>1;
                   fs = qn + 1 - itheta;
                   fl = ft - ((qn + 1 - itheta)*(qn + 2 - itheta)>>1);
                }
