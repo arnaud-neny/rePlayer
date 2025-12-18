@@ -187,18 +187,21 @@ namespace rePlayer
     void LibraryDatabase::DeleteInternal(Song* song, const char* logId) const
     {
         auto filename = GetFullpath(song);
-        if (!io::File::Delete(filename.c_str()))
+        if (io::File::IsExisting(filename.c_str()))
         {
-            Log::Warning("%s: Can't delete file \"%s\" to \"%s\"\n", logId, filename.c_str());
-            m_hasFailedDeletes = true;
+            if (!io::File::Delete(filename.c_str()))
+            {
+                Log::Warning("%s: Can't delete file \"%s\" to \"%s\"\n", logId, filename.c_str());
+                m_hasFailedDeletes = true;
+            }
+            else
+                Log::Message("%s: \"%s\" deleted\n", logId, filename.c_str());
         }
-        else
-            Log::Message("%s: \"%s\" deleted\n", logId, filename.c_str());
     }
 
     void LibraryDatabase::MoveInternal(const char* oldFilename, Song* song, const char* logId) const
     {
-        if (std::filesystem::exists(oldFilename))
+        if (io::File::IsExisting(oldFilename))
         {
             auto newFilename = GetFullpath(song);
             if (!io::File::Move(oldFilename, newFilename.c_str()))
