@@ -160,8 +160,9 @@ namespace rePlayer
         return nullptr;
     }
 
-    inline void Database::DeleteSubsong(SubsongID subsongId)
+    inline void Database::DeleteSubsong(SubsongID subsongId, bool isSilent)
     {
+        subsongId.external = isSilent;
         m_deletedSubsongs.AddOnce(subsongId);
     }
 

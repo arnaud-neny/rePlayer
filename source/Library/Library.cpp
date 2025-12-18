@@ -187,7 +187,7 @@ namespace rePlayer
                                 for (uint16_t j = 0; j <= otherSongSheet->lastSubsongIndex; j++)
                                 {
                                     if (!otherSongSheet->subsongs[j].isDiscarded)
-                                        m_db.DeleteSubsong(SubsongID(otherSongSheet->id, j));
+                                        m_db.DeleteSubsong(SubsongID(otherSongSheet->id, j), true);
                                 }
 
                                 break;

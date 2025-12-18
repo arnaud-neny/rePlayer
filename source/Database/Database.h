@@ -61,7 +61,7 @@ namespace rePlayer
         template <typename Predicate>
         Song* FindSong(Predicate&& predicate) const;
 
-        void DeleteSubsong(SubsongID subsongId);
+        void DeleteSubsong(SubsongID subsongId, bool isSilent = false);
         bool HasDeletedSubsongs(SongID songId) const;
 
         Artist* AddArtist(ArtistSheet* artist);
