@@ -997,3 +997,5 @@ EXTENSION(sre)          // VGMStream
 EXTENSION(ueba)         // VGMStream
 EXTENSION(wxv)          // VGMStream
 EXTENSION(xbw)          // VGMStream
+EXTENSION(md1)          // ASAP
+EXTENSION(md2)          // ASAP
