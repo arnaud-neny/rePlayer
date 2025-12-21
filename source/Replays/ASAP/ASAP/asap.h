@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+typedef struct ASAPFileLoader ASAPFileLoader;
 typedef struct ASAP ASAP;
 typedef struct ASAPInfo ASAPInfo;
 typedef struct ASAPWriter ASAPWriter;
@@ -64,6 +65,26 @@ void ASAP_DetectSilence(ASAP *self, int seconds);
  * @return <code>false</code> on error.
  */
 bool ASAP_Load(ASAP *self, const char *filename, uint8_t const *module, int moduleLen);
+
+/**
+ * Loads music data, possibly from several files.
+ * @param self This <code>ASAP</code>.
+ * @param filename Filename of the main file ("module").
+ * @param loader File loader.
+ * @return <code>false</code> on error.
+ */
+bool ASAP_LoadFiles(ASAP *self, const char *filename, const ASAPFileLoader *loader);
+
+/**
+ * Loads music data, possibly with extra files.
+ * @param self This <code>ASAP</code>.
+ * @param filename Filename, used to determine the format.
+ * @param module Contents of the main file.
+ * @param moduleLen Length of the main file.
+ * @param loader Loader for extra files, should they be needed.
+ * @return <code>false</code> on error.
+ */
+bool ASAP_LoadWithExtraFiles(ASAP *self, const char *filename, uint8_t const *module, int moduleLen, const ASAPFileLoader *loader);
 
 /**
  * Returns information about the loaded module.
@@ -148,7 +169,7 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - major part.
  */
-#define ASAPInfo_VERSION_MAJOR 6
+#define ASAPInfo_VERSION_MAJOR 7
 
 /**
  * ASAP version - minor part.
@@ -158,22 +179,22 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - micro part.
  */
-#define ASAPInfo_VERSION_MICRO 3
+#define ASAPInfo_VERSION_MICRO 0
 
 /**
  * ASAP version as a string.
  */
-#define ASAPInfo_VERSION "6.0.3"
+#define ASAPInfo_VERSION "7.0.0"
 
 /**
  * Years ASAP was created in.
  */
-#define ASAPInfo_YEARS "2005-2024"
+#define ASAPInfo_YEARS "2005-2025"
 
 /**
  * Short credits for ASAP.
  */
-#define ASAPInfo_CREDITS "Another Slight Atari Player (C) 2005-2024 Piotr Fusik\nCMC, MPT, TMC, TM2 players (C) 1994-2005 Marcin Lewandowski\nRMT player (C) 2002-2005 Radek Sterba\nDLT player (C) 2009 Marek Konopka\nCMS player (C) 1999 David Spilka\nFC player (C) 2011 Jerzy Kut\n"
+#define ASAPInfo_CREDITS "Another Slight Atari Player (C) 2005-2025 Piotr Fusik\nCMC, MPT, TMC, TM2 players (C) 1994-2005 Marcin Lewandowski\nRMT player (C) 2002-2005 Radek Sterba\nDLT player (C) 2009 Marek Konopka\nCMS player (C) 1999 David Spilka\nFC player (C) 2011 Jerzy Kut\n"
 
 /**
  * Short license notice.
@@ -273,7 +294,7 @@ const char *ASAPInfo_GetTitleOrFilename(const ASAPInfo *self);
 
 /**
  * Returns music creation date.
- * 
+ *
  * <p>Some of the possible formats are:
  * <ul>
  * <li>YYYY</li>
@@ -288,7 +309,7 @@ const char *ASAPInfo_GetDate(const ASAPInfo *self);
 
 /**
  * Sets music creation date.
- * 
+ *
  * <p>Some of the possible formats are:
  * <ul>
  * <li>YYYY</li>
@@ -371,7 +392,7 @@ bool ASAPInfo_SetDuration(ASAPInfo *self, int song, int duration);
 
 /**
  * Returns information whether the specified song loops.
- * 
+ *
  * <p>Returns:
  * <ul>
  * <li><code>true</code> if the song loops</li>
@@ -384,7 +405,7 @@ bool ASAPInfo_GetLoop(const ASAPInfo *self, int song);
 
 /**
  * Sets information whether the specified song loops.
- * 
+ *
  * <p>Use:
  * <ul>
  * <li><code>true</code> if the song loops</li>
@@ -498,10 +519,8 @@ const char *ASAPInfo_GetExtDescription(const char *ext);
  * For native modules it simply returns their extension.
  * For the SAP format it attempts to detect the original module format.
  * @param self This <code>ASAPInfo</code>.
- * @param module Contents of the file.
- * @param moduleLen Length of the file.
  */
-const char *ASAPInfo_GetOriginalModuleExt(const ASAPInfo *self, uint8_t const *module, int moduleLen);
+const char *ASAPInfo_GetOriginalModuleExt(const ASAPInfo *self);
 
 ASAPWriter *ASAPWriter_New(void);
 void ASAPWriter_Delete(ASAPWriter *self);
@@ -516,10 +535,8 @@ void ASAPWriter_Delete(ASAPWriter *self);
  * Returns the number of extensions written to <code>exts</code>.
  * @param exts Receives filename extensions without the leading dot.
  * @param info File information.
- * @param module Contents of the file.
- * @param moduleLen Length of the file.
  */
-int ASAPWriter_GetSaveExts(const char **exts, const ASAPInfo *info, uint8_t const *module, int moduleLen);
+int ASAPWriter_GetSaveExts(const char **exts, const ASAPInfo *info);
 
 /**
  * Maximum length of text representation of a duration.
@@ -536,13 +553,39 @@ int ASAPWriter_GetSaveExts(const char **exts, const ASAPInfo *info, uint8_t cons
 int ASAPWriter_DurationToString(uint8_t *result, int value);
 
 /**
- * Sets the destination array for <code>Write</code>.
+ * Sets the loader for extra input files, if they are needed.
+ * Conversion from MD1/MD2 to SAP/XEX needs an extra D15/D8 file.
  * @param self This <code>ASAPWriter</code>.
- * @param output The destination array.
- * @param startIndex The array offset to start writing at.
- * @param endIndex The array offset to finish writing before.
+ * @param sourceFilename Filename of the main input.
+ * @param loader Loader for extra files, if needed.
  */
-void ASAPWriter_SetOutput(ASAPWriter *self, uint8_t *output, int startIndex, int endIndex);
+void ASAPWriter_SetInput(ASAPWriter *self, const char *sourceFilename, const ASAPFileLoader *loader);
+
+/**
+ * Writes the a native module, possibly extracting it from a SAP file.
+ * @param self This <code>ASAPWriter</code>.
+ * @param info Source file information, optionally with the address changed.
+ * @param module Contents of the source file.
+ * @param moduleLen Length of the source file.
+ * @return <code>NULL</code> on error.
+ */
+uint8_t const *ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen);
+
+/**
+ * Writes the given module in the SAP format.
+ * @param self This <code>ASAPWriter</code>.
+ * @param info Source file information, with metadata updated for the output.
+ * @param module Contents of the source file.
+ * @param moduleLen Length of the source file.
+ * @return <code>NULL</code> on error.
+ */
+uint8_t const *ASAPWriter_WriteSap(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen);
+
+/**
+ * Returns the number of bytes written by <code>WriteNative</code> or <code>WriteSap</code>.
+ * @param self This <code>ASAPWriter</code>.
+ */
+int ASAPWriter_GetOutputLength(const ASAPWriter *self);
 
 /**
  * Writes the given module in a possibly different file format.
@@ -552,9 +595,9 @@ void ASAPWriter_SetOutput(ASAPWriter *self, uint8_t *output, int startIndex, int
  * @param module Contents of the source file.
  * @param moduleLen Length of the source file.
  * @param tag Display information (xex output only).
- * @return <code>-1</code> on error.
+ * @return <code>false</code> on error.
  */
-int ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPInfo *info, uint8_t const *module, int moduleLen, bool tag);
+bool ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPInfo *info, uint8_t const *module, int moduleLen, bool tag);
 
 const char* ASAPInfo_GetExt(const ASAPInfo* info); // rePlayer
 

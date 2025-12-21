@@ -7,13 +7,33 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+typedef struct {
+    int (*load)(const ASAPFileLoader* self, const char* filename, uint8_t* buffer, int length);
+} ASAPFileLoaderVtbl;
+struct ASAPFileLoader {
+    const ASAPFileLoaderVtbl* vtbl;
+    core::io::Stream* stream;
+
+    static int load(const ASAPFileLoader* self, const char* filename, uint8_t* buffer, int length)
+    {
+        auto s = self->stream->Open(filename);
+        if (s)
+        {
+            if (s->GetSize() == 0 || s->GetSize() > length)
+                return -1;
+            return int(s->Read(buffer, length));
+        }
+        return -1;
+    }
+};
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::ASAP,
         .name = "Another Slight Atari Player",
         .extensions = "sap;cmc;cm3;cmr;cms;dmc;dlt;fc;mpt;mpd;rmt;cm3;tmc;tm8;tm2",
-        .about = "Another Slight Atari Player " ASAPInfo_VERSION "\nCopyright (c) 2005-2023 Piotr Fusik\nCMC, MPT, TMC, TM2 players (c) 1994-2005 Marcin Lewandowski\nRMT player (c) 2002-2005 Radek Sterba\nDLT player (c) 2009 Marek Konopka\nCMS player (c) 1999 David Spilka\nFC player (c) 2011 Jerzy Kut",
+        .about = "Another Slight Atari Player " ASAPInfo_VERSION "\n" ASAPInfo_CREDITS,
         .settings = "Another Slight Atari Player " ASAPInfo_VERSION,
         .init = ReplayASAP::Init,
         .load = ReplayASAP::Load,
@@ -37,7 +57,14 @@ namespace rePlayer
             return nullptr;
         auto song = ASAP_New();
         auto data = stream->Read();
-        if (!ASAP_Load(song, stream->GetName().c_str(), data.Items(), static_cast<int>(data.Size())))
+
+        const ASAPFileLoaderVtbl ASAPFileLoader_vtbl = { ASAPFileLoader::load };
+        ASAPFileLoader loader = {
+            .vtbl = &ASAPFileLoader_vtbl,
+            .stream = stream
+        };
+
+        if (!ASAP_LoadFiles(song, stream->GetName().c_str(), &loader))
         {
             ASAP_Delete(song);
             return nullptr;
