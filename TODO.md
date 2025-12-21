@@ -1,6 +1,8 @@
 # rePlayer (another multi-formats music player)
 
 - sanitize songs and artists strings fields on import (remove "\n" "\r")
+- playlist rework: main contains current playlist by name and do not store list of playlists (just populate from disk), each playlist saves its own currently playing
+- song info: multi tab for samples/instruments/comments (see impulse tracker)
 - viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
 - seek: return the number of loops
