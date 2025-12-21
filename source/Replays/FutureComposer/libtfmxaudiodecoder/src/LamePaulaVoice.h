@@ -18,7 +18,7 @@ class LamePaulaVoice : public PaulaVoice
 {
  public:
     LamePaulaVoice();
-    ~LamePaulaVoice();
+    ~LamePaulaVoice() override;
 
     void on() override;
     void off() override;

@@ -53,8 +53,9 @@ bool HippelDecoder::COSO_isModPack(std::vector<udword>& vHeaders, bool& reject) 
         nextHeader += readBEudword(fcBuf,nextHeader+0x1c);
         offsets.sampleData = nextHeader;
     }
-    if (foundLink)
+    if (foundLink) {
         return true;
+    }
 
     // astaroth.hipc (size 28924)
     // 1st header: $09f4 "COSO" + offset in $18 = $20d2 (CORRECT)
@@ -105,7 +106,7 @@ bool HippelDecoder::COSO_isModPack(std::vector<udword>& vHeaders, bool& reject) 
         offsets.sampleData = offsets.sampleHeaders+stats.samples*traits.sampleStructSize;
     } while (true);
     
-    return foundLink;
+    return false;
 }
 
 }  // namespace

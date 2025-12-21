@@ -269,7 +269,7 @@ bool HippelDecoder::TFMX_COSO_findTags(const ubyte* buf, udword len) {
         if (r != (buf+len) ) {
             h = (udword)(r-buf);
             // Next require a "TFMX" header at +$20, else reject the module.
-            if ( ((h+0x40) < len) & !memcmp(buf+h+0x20,TFMX_TAG.c_str(),4) ) {
+            if ( ((h+0x40) < len) && !memcmp(buf+h+0x20,TFMX_TAG.c_str(),4) ) {
                 offsets.header = h;
                 return true;
             }

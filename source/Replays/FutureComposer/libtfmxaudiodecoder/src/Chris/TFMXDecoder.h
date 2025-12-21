@@ -471,9 +471,6 @@ class TFMXDecoder : public Decoder {
                                       &TFMXDecoder::macroFunc_SplitVolume
     };
 
-    //MacroDef macroDef_Signal = { "Signal      xx/xxxx  signalnumber/value",
-    //                             &TFMXDecoder::macroFunc_NOP };
-    
     void macroFunc_RandomMask(VoiceVars&);
     MacroDef macroDef_RandomMask = { "Random mask xx       mask",
                                     &TFMXDecoder::macroFunc_RandomMask

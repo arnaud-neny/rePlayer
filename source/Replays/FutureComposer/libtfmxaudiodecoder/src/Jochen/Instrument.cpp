@@ -50,7 +50,7 @@ void HippelDecoder::setInstrument(VoiceVars& voiceX, ubyte instr) {
     // COSO and newer TFMX players can modify it via note arg #2 bit 6.
     // TFMX 7V keeps the current sound sequence, if the new one is $80.
     if ( !traits.volSeqSnd80 ||  // FC and some TFMX players
-         (traits.volSeqSnd80 && (sound != 0x80)) ) {  // 7 voices players
+         (sound != 0x80) ) {     // 7 voices players
         // COSO and sometimes also TFMX.
         if ( traits.porta40SetSnd && (voiceX.pattVal2 & 0x40) != 0 ) {
             sound = voiceX.portaSpeed;

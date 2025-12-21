@@ -35,7 +35,7 @@ void Analyze::dump() {
 #if defined(DEBUG)
     cout << "Sound sequence commands used:" << endl;
     for ( SeqTraitsMap::iterator it = sndSeqCmdMap.begin();
-          it != sndSeqCmdMap.end(); it++ ) {
+          it != sndSeqCmdMap.end(); ++it ) {
         cout << hexB(it->first) << " : ";
         SeqTraits p = it->second;
         std::for_each(p.valuesUsed.begin(), p.valuesUsed.end(), [](ubyte c) {
@@ -47,7 +47,7 @@ void Analyze::dump() {
 
     cout << "Volume sequence commands used:" << endl;
     for ( SeqTraitsMap::iterator it = volSeqCmdMap.begin();
-          it != volSeqCmdMap.end(); it++ ) {
+          it != volSeqCmdMap.end(); ++it ) {
         cout << hexB(it->first) << " : ";
         SeqTraits p = it->second;
         std::for_each(p.valuesUsed.begin(), p.valuesUsed.end(), [](ubyte c) {
@@ -77,7 +77,7 @@ void Analyze::dump() {
 
     cout << "Sound sequence transpose/pitch values used:" << endl;
     for ( SeqTraitsMap::iterator it = seqTransMap.begin();
-          it != seqTransMap.end(); it++ ) {
+          it != seqTransMap.end(); ++it ) {
         cout << hexB(it->first) << " : ";
         SeqTraits p = it->second;
         std::for_each(p.valuesUsed.begin(), p.valuesUsed.end(), [](ubyte c) {
@@ -95,7 +95,7 @@ void Analyze::gatherVibrato(HippelDecoder::VoiceVars& voiceX) {
 
 bool Analyze::usesNegVibSpeed() {
     std::set<ubyte>::iterator it;
-    for (it = vibratoSpeedSet.begin(); it!=vibratoSpeedSet.end(); it++) {
+    for (it = vibratoSpeedSet.begin(); it!=vibratoSpeedSet.end(); ++it) {
         if (*it > 0x80) {
             return true;
         }
@@ -128,7 +128,7 @@ void Analyze::gatherSampleNum(ubyte num) {
 ubyte Analyze::maxSampleNum() {
     ubyte s = 0;
     std::set<ubyte>::iterator it;
-    for (it = samplesSet.begin(); it!=samplesSet.end(); it++) {
+    for (it = samplesSet.begin(); it!=samplesSet.end(); ++it) {
         if (*it > s) {
             s = *it;
         }
@@ -140,7 +140,7 @@ ubyte Analyze::maxSampleNum() {
 // Then it is unlikely to be old E7 SETSEQ command.
 bool Analyze::usesE7setDiffWave(HippelDecoder* decoder) {
     for ( SeqTraitsMap::iterator it = sndSeqCmdMap.begin();
-          it != sndSeqCmdMap.end(); it++ ) {
+          it != sndSeqCmdMap.end(); ++it ) {
         SeqTraits p = it->second;
         if ( p.valuesUsed.count(0xE7) == 1 ) {
             ubyte seq = it->first;

@@ -66,7 +66,7 @@ void tfmxaudiodecoder::TFMXDecoder::findSongs() {
         // Avoid duplicates.
         SongArgs a = std::make_tuple( s1, s2, s3 );
         bool skipSong = false;
-        for ( SongArgsSet::iterator it = setSongArgs.begin(); it != setSongArgs.end(); it++ ) {
+        for ( SongArgsSet::iterator it = setSongArgs.begin(); it != setSongArgs.end(); ++it ) {
             if ( std::get<0>(*it) == s1 && s2 == std::get<0>(*it) ) {
                 skipSong = true;
 #if defined(DEBUG)

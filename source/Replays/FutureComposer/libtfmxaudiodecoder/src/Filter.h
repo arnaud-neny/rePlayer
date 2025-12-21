@@ -30,7 +30,7 @@ class Filter {
 };
 
 inline float Filter::process(float in) {
-    float out = in*a[0] + x[0]*a[1] + x[1]*a[2] - y[0]*b[0] - y[1]*b[1];
+    float out = 0.75*in*a[0] + x[0]*a[1] + x[1]*a[2] - y[0]*b[0] - y[1]*b[1];
     x[1] = x[0];
     x[0] = in;
     y[1] = y[0];

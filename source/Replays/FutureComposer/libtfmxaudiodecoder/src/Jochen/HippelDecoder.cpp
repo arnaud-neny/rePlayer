@@ -200,8 +200,8 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
     // Ought to be read-only (const), but this implementation appends
     // a few values to the end of the buffer (see further below) and
     // may repair some data, too.
-    fcBufS.setBuffer((sbyte*)input.buf,input.bufLen);
-    fcBuf.setBuffer((ubyte*)input.buf,input.bufLen);
+    fcBufS.setBuffer(reinterpret_cast<sbyte*>(input.buf),input.bufLen);
+    fcBuf.setBuffer(input.buf,input.bufLen);
         
     // (NOTE) This next bit is just for convenience.
     //

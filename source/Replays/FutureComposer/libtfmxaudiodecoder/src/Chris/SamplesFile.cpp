@@ -41,7 +41,7 @@ bool tfmxaudiodecoder::TFMXDecoder::loadSamplesFile() {
         { "mdat.", "smpl." },
         { "MDAT.", "SMPL." }
     };
-    for ( std::vector<ExtPair>::iterator it = vExtPairs.begin(); it != vExtPairs.end(); it++ ) {
+    for ( std::vector<ExtPair>::iterator it = vExtPairs.begin(); it != vExtPairs.end(); ++it ) {
         std::string pathSmpl = input.path;
         std::size_t found = pathSmpl.rfind(it->first);
         if (found != std::string::npos) {
@@ -56,7 +56,7 @@ bool tfmxaudiodecoder::TFMXDecoder::loadSamplesFile() {
                 char* newInputBuf = new char[fLen+input.bufLen];
                 memcpy(newInputBuf,input.buf,input.bufLen);
                 delete[] input.buf;
-                input.buf = (ubyte*)newInputBuf;
+                input.buf = reinterpret_cast<ubyte*>(newInputBuf);
 
                 fIn.read(newInputBuf+input.len,fLen);
                 if (fIn.bad()) {
@@ -70,7 +70,7 @@ bool tfmxaudiodecoder::TFMXDecoder::loadSamplesFile() {
                 input.len += input.smplSize;
 
                 // Update smart pointers.
-                pBuf.setBuffer((ubyte*)input.buf,input.bufLen);
+                pBuf.setBuffer(input.buf,input.bufLen);
                 return true;
             }
 #else
@@ -80,7 +80,7 @@ bool tfmxaudiodecoder::TFMXDecoder::loadSamplesFile() {
                 char* newInputBuf = new char[res.second + input.bufLen];
                 memcpy(newInputBuf, input.buf, input.bufLen);
                 delete[] input.buf;
-                input.buf = (ubyte*)newInputBuf;
+                input.buf = reinterpret_cast<ubyte*>(newInputBuf);
 
                 memcpy(newInputBuf + input.len, res.first, res.second);
                 delete[] res.first;
@@ -92,7 +92,7 @@ bool tfmxaudiodecoder::TFMXDecoder::loadSamplesFile() {
                 input.len += input.smplSize;
 
                 // Update smart pointers.
-                pBuf.setBuffer((ubyte*)input.buf, input.bufLen);
+                pBuf.setBuffer(input.buf, input.bufLen);
                 return true;
             }
 #endif // rePlayer end
