@@ -42,6 +42,12 @@
 /* Define to 1 if you have libgcrypt (-lgcrypt). */
 #undef HAVE_LIBGCRYPT
 
+/* Define to 1 if you have libusb.h */
+#undef HAVE_LIBUSB
+
+/* Define to 1 if you have the <libusb-1.0/libusb.h> header file. */
+#undef HAVE_LIBUSB_1_0_LIBUSB_H
+
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
@@ -81,6 +87,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have libusb (-libusb-1.0). */
+#undef HAVE_USBSID
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
@@ -94,7 +103,7 @@
 #define PACKAGE_NAME "libsidplayfp"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsidplayfp 2.15.2"
+#define PACKAGE_STRING "libsidplayfp 2.16.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsidplayfp"
@@ -103,11 +112,14 @@
 #define PACKAGE_URL "https://github.com/libsidplayfp/libsidplayfp/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.15.2"
+#define PACKAGE_VERSION "2.16.0"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
 #undef PTHREAD_CREATE_JOINABLE
+
+/* Define to 1 to enable runtime SIMD dispatch. */
+#undef RUNTIME_DISPATCH
 
 /* Shared library extension */
 #undef SHLIBEXT
@@ -124,7 +136,7 @@
 #undef STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "2.15.2"
+#define VERSION "2.16.0"
 
 /* Path to VICE testsuite. */
 #undef VICE_TESTSUITE

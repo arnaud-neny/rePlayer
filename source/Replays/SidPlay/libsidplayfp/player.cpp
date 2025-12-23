@@ -49,10 +49,14 @@ const char TXT_NTSC_UNKNOWN[]   = "UNKNOWN (NTSC)";
 
 // Error Strings
 const char ERR_NA[]                   = "NA";
+const char ERR_NO_TUNE_LOADED[]       = "SIDPLAYER ERROR: No tune loaded";
 const char ERR_UNSUPPORTED_FREQ[]     = "SIDPLAYER ERROR: Unsupported sampling frequency.";
 const char ERR_UNSUPPORTED_SID_ADDR[] = "SIDPLAYER ERROR: Unsupported SID address.";
 const char ERR_UNSUPPORTED_SIZE[]     = "SIDPLAYER ERROR: Size of music data exceeds C64 memory.";
 const char ERR_INVALID_PERCENTAGE[]   = "SIDPLAYER ERROR: Percentage value out of range.";
+const char ERR_ILLEGAL_INSN[]         = "SIDPLAYER ERROR: Illegal instruction executed";
+const char ERR_BAD_BUF_SIZE[]         = "SIDPLAYER ERROR: Bad buffer size";
+const char ERR_INVALID_CONF[]         = "SIDPLAYER ERROR: Invalid configuration";
 
 /**
  * Configuration error exception.
@@ -176,8 +180,6 @@ void Player::initialise()
     }
 
     m_c64.resetCpu();
-
-    m_startTime = m_c64.getTimeMs();
 #if 0
     // Run for some cycles until the initialization routine is done
     for (int j = 0; j < 50; j++)
@@ -186,6 +188,8 @@ void Player::initialise()
     m_mixer.clockChips();
     m_mixer.resetBufs();
 #endif
+
+    m_startTime = m_c64.getTimeMs();
 }
 
 bool Player::load(SidTune *tune)
@@ -246,7 +250,7 @@ int Player::play(unsigned int cycles)
     // Make sure a tune is loaded
     if (m_tune == nullptr) UNLIKELY
     {
-        m_errorString = "No tune loaded";
+        m_errorString = ERR_NO_TUNE_LOADED;
         return -1;
     }
 
@@ -281,7 +285,7 @@ int Player::play(unsigned int cycles)
     }
     catch (MOS6510::haltInstruction const &)
     {
-        m_errorString = "Illegal instruction executed";
+        m_errorString = ERR_ILLEGAL_INSN;
         return -1;
     }
 }
@@ -368,12 +372,12 @@ uint_least32_t Player::play(short *buffer, uint_least32_t count)
         }
         catch (MOS6510::haltInstruction const &)
         {
-            m_errorString = "Illegal instruction executed";
+            m_errorString = ERR_ILLEGAL_INSN;
             m_isPlaying = state_t::STOPPING;
         }
         catch (Mixer::badBufferSize const &)
         {
-            m_errorString = "Bad buffer size";
+            m_errorString = ERR_BAD_BUF_SIZE;
             m_isPlaying = state_t::STOPPING;
         }
     }
@@ -466,7 +470,8 @@ bool Player::config(const SidConfig &cfg, bool force)
         catch (configError const &e)
         {
             sidRelease();
-            m_errorString = e.message();
+            //m_errorString = e.message(); // FIXME
+            m_errorString = ERR_INVALID_CONF;
             m_cfg.sidEmulation = nullptr;
             if (&m_cfg != &cfg)
             {
@@ -570,6 +575,19 @@ c64::model_t Player::c64model(SidConfig::c64_model_t defaultModel, bool forced)
     return model;
 }
 
+SidTuneInfo::model_t getSidModel(SidConfig::sid_model_t sidModel)
+{
+    switch (sidModel)
+    {
+    case SidConfig::MOS6581:
+        return SidTuneInfo::SIDMODEL_6581;
+    case SidConfig::MOS8580:
+        return SidTuneInfo::SIDMODEL_8580;
+    default:
+        return SidTuneInfo::SIDMODEL_UNKNOWN;
+    }
+}
+
 /**
  * Get the SID model.
  *
@@ -637,6 +655,7 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
 {
     if (builder != nullptr)
     {
+        m_info.m_sidModels.clear();
         const SidTuneInfo* tuneInfo = m_tune->getInfo();
 
         // Setup base SID
@@ -647,8 +666,10 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
             throw configError(builder->error());
         }
 
+
         m_c64.setBaseSid(s);
         m_mixer.addSid(s);
+        m_info.m_sidModels.push_back(getSidModel(userModel));
 
         // Setup extra SIDs if needed
         if (extraSidAddresses.size() != 0)
@@ -673,6 +694,7 @@ void Player::sidCreate(sidbuilder *builder, SidConfig::sid_model_t defaultModel,
                     throw configError(ERR_UNSUPPORTED_SID_ADDR);
 
                 m_mixer.addSid(s);
+                m_info.m_sidModels.push_back(getSidModel(userModel));
             }
         }
     }
