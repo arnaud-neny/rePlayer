@@ -448,13 +448,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;LIBXML_STATIC;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libxml2\include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -468,13 +468,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;_WIN32_WINNT=0x0600;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;LIBXML_STATIC;_WIN32_WINNT=0x0600;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libxml2\include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -490,13 +490,13 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;LIBXML_STATIC;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libxml2\include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -514,13 +514,13 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;_WIN32_WINNT=0x0600;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LIBARCHIVE_STATIC;HAVE_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;BZIP2_STATIC;LZMA_API_STATIC;HAVE__BOOL;LIBXML_STATIC;_WIN32_WINNT=0x0600;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)bzip2;$(ProjectDir)liblzma;$(ProjectDir)liblzma\api;$(ProjectDir)liblzma\check;$(ProjectDir)liblzma\common;$(ProjectDir)liblzma\delta;$(ProjectDir)liblzma\lz;$(ProjectDir)liblzma\lzma;$(ProjectDir)liblzma\rangecoder;$(ProjectDir)liblzma\simple;$(SolutionDir)3rdParty\zlib;$(SolutionDir)3rdParty\libxml2\include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
