@@ -163,9 +163,6 @@
     <ClInclude Include="lib\curl_md5.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_memory.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_memrchr.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -307,9 +304,6 @@
     <ClInclude Include="lib\macos.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\memdebug.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\mime.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -346,9 +340,6 @@
     <ClInclude Include="lib\rand.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\rename.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\request.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -373,9 +364,6 @@
     <ClInclude Include="lib\setup-win32.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\share.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\sigpipe.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -395,9 +383,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\socks.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\speedcheck.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\splay.h">
@@ -475,9 +460,6 @@
     <ClInclude Include="lib\vtls\mbedtls.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
-    <ClInclude Include="lib\vtls\mbedtls_threadlock.h">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClInclude>
     <ClInclude Include="lib\vtls\openssl.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
@@ -504,9 +486,6 @@
     </ClInclude>
     <ClInclude Include="lib\vtls\cipher_suite.h">
       <Filter>Source Files\lib\vtls</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vssh\curl_path.h">
-      <Filter>Source Files\lib\vssh</Filter>
     </ClInclude>
     <ClInclude Include="lib\vtls\vtls_scache.h">
       <Filter>Source Files\lib\vtls</Filter>
@@ -586,9 +565,6 @@
     <ClInclude Include="lib\cf-ip-happy.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_mem_undef.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curlx\fopen.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
@@ -602,6 +578,21 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\multi_ntfy.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\snprintf.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\strcopy.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vssh\vssh.h">
+      <Filter>Source Files\lib\vssh</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curl_share.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\ratelimit.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -858,9 +849,6 @@
     <ClCompile Include="lib\rand.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\rename.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\request.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -877,9 +865,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\sha256.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\share.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\slist.c">
@@ -901,9 +886,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\socks_sspi.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\speedcheck.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\splay.c">
@@ -1014,9 +996,6 @@
     <ClCompile Include="lib\vtls\mbedtls.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
-    <ClCompile Include="lib\vtls\mbedtls_threadlock.c">
-      <Filter>Source Files\lib\vtls</Filter>
-    </ClCompile>
     <ClCompile Include="lib\vtls\openssl.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
@@ -1040,9 +1019,6 @@
     </ClCompile>
     <ClCompile Include="lib\vtls\cipher_suite.c">
       <Filter>Source Files\lib\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vssh\curl_path.c">
-      <Filter>Source Files\lib\vssh</Filter>
     </ClCompile>
     <ClCompile Include="lib\vtls\vtls_scache.c">
       <Filter>Source Files\lib\vtls</Filter>
@@ -1138,6 +1114,18 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\multi_ntfy.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\strcopy.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vssh\vssh.c">
+      <Filter>Source Files\lib\vssh</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curl_share.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\ratelimit.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
