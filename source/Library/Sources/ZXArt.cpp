@@ -183,7 +183,7 @@ namespace rePlayer
             curlError = curl_easy_perform(curl);
             if (curlError == CURLE_OK)
             {
-                if (GetSongs(results, buffer, false, curl, start))
+                if (GetSongs(results, buffer, true, curl, start))
                     break;
             }
         }
