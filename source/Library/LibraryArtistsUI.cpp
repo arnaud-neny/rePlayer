@@ -79,6 +79,7 @@ namespace rePlayer
             moveToArtist->Edit()->sources.Add(selectedArtist->GetSource(moveToArtistSourceIndex));
             selectedArtist->Edit()->sources.RemoveAt(moveToArtistSourceIndex);
         }
+        auto busySpinnerColor = ImGui::GetColorU32(ImGuiCol_ButtonHovered);
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.7f, 0.8f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.8f, 1.0f));
@@ -86,7 +87,7 @@ namespace rePlayer
         {
             auto& library = GetLibrary();
             library.m_imports = {};
-            library.m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+            library.m_busySpinner.New(busySpinnerColor);
             library.m_busySpinner->Info("Importing artist");
             library.m_importArtists.isOpened = library.m_importArtists.isExternal = true;
             Core::AddJob([&library, artist = SmartPtr<ArtistSheet>(selectedArtist->Edit())]()
