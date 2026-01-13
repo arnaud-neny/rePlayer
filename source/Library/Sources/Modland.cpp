@@ -1682,9 +1682,7 @@ namespace rePlayer
             BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
             BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
             BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
-            BuildPathList("PlaySID/"),                              // deprecated, everything is in the HVSC folder
             BuildPathList("Pollytracker/"),                         // c64 player, available as sid
-            BuildPathList("RealSID/"),                              // deprecated, everything is in the HVSC folder
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
             BuildPathList("Stonetracker/"),                         // need to add to uade (multi-files & missing library support in uade)
