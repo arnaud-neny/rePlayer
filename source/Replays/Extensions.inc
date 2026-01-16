@@ -55,8 +55,8 @@ EXTENSION(stx)          // OpenMPT & XMP & VGMStream
 EXTENSION(symmod)
 EXTENSION(smod)
 EXTENSION(fc)
-EXTENSION(rsid)
-EXTENSION(psid)
+EXTENSION(rsid)         // Deprecated
+EXTENSION(psid)         // Deprecated
 EXTENSION(v2m)
 EXTENSION(sndh)
 EXTENSION(sc68)

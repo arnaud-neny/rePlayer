@@ -1558,6 +1558,8 @@ namespace rePlayer
             type = { eExtension::_med, eReplay::OpenMPT };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
             type = { eExtension::_eup, eReplay::Euphony };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidPlay)
+            type = { eExtension::_sid, eReplay::SidPlay };
         else if (dbSong.isExtensionOverriden)
         {
             auto extOffset = dbSongName.find_last_of('.');
@@ -1934,6 +1936,8 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kOktalyzer;
         else if (theReplay.starts_with("OctaMED"))
             m_db.replays.Last().type = ModlandReplay::kOctaMED;
+        else if (theReplay.starts_with("PlaySID") || theReplay.starts_with("RealSID"))
+            m_db.replays.Last().type = ModlandReplay::kSidPlay;
         else if (theReplay == "Delitracker Custom")
         {
             m_db.replays.Last().type = ModlandReplay::kDelitrackerCustom;

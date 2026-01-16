@@ -53,6 +53,7 @@ namespace rePlayer
         {
             enum Type : int32_t
             {
+                kSidPlay = -5,
                 kOktalyzer = -4,
                 kMusicEditor = -3,
                 kOctaMED = -2,
