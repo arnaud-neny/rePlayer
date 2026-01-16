@@ -74,6 +74,10 @@ namespace rePlayer
         ImGui::Bullet();
         ImGui::TextUnformatted("dllloader\n"
             "Copyright (c) 2012-2022 Scott Chacon and others");
+        ImGui::Bullet();
+        ImGui::TextUnformatted("FFTW 3.3.10\n"
+            "Copyright (c) 2003, 2007-14 Matteo Frigo\n"
+            "Copyright (c) 2003, 2007-14 Massachusetts Institute of Technology");
 
         ImGui::TextUnformatted("\nReplays 3rd parties:");
         Core::GetReplays().DisplayAbout();
