@@ -4,6 +4,7 @@
 #include <Database/Database.h>
 #include <Database/Types/Proxy.inl.h>
 #include <Imgui/imgui.h>
+#include <Replays/Replay.h>
 
 #include <stdlib.h>
 
@@ -335,6 +336,154 @@ namespace rePlayer
             };
             type = MediaType(reinterpret_cast<MediaType0&>(type).ext, reinterpret_cast<MediaType0&>(type).replay);
         }
+
+        // duration is deprecated and changed to loop info
+        static constexpr uint32_t kVersionLoop = (0 << 28) | (21 << 14) | 4;
+        if (version <= kVersionLoop && metadata.IsNotEmpty())
+        {
+            auto find = [](Span<CommandBuffer::Command> commands, eReplay replay)
+            {
+                for (uint32_t i = 0; i < commands.NumItems(); i += 1 + commands[i].numEntries)
+                {
+                    if (commands[i].commandId == uint16_t(replay))
+                        return &commands[i];
+                }
+                return (CommandBuffer::Command*)nullptr;
+            };
+
+            switch (type.replay)
+            {
+            case eReplay::Ayumi:
+            case eReplay::Quartet:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104Replays(command, 1, type.replay);
+                break;
+            case eReplay::GBSPlay:
+            case eReplay::GME:
+            case eReplay::HighlyAdvanced:
+            case eReplay::HighlyCompetitive:
+            case eReplay::HighlyExperimental:
+            case eReplay::HighlyTheoretical:
+            case eReplay::KSS:
+            case eReplay::LazyUSF:
+            case eReplay::NEZplug:
+            case eReplay::SNDHPlayer:
+            case eReplay::vio2sf:
+            case eReplay::ZXTune:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104Replays(command, 1, type.replay);
+                break;
+            case eReplay::SidPlay:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104Replays(command, 2, type.replay);
+                break;
+            case eReplay::WonderSwan:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104Replays(command, 1 + 8, type.replay);
+                break;
+            case eReplay::UADE:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104UADE(command);
+                break;
+            case eReplay::VGM:
+                if (auto* command = find(Metadatas(), type.replay))
+                    Edit()->Patch002104VGM(command);
+                break;
+            }
+        }
+    }
+
+    void SongSheet::Patch002104Replays(const CommandBuffer::Command* command, uint16_t numBaseEntries, eReplay replay)
+    {
+        if (metadata.Container().NumItems() != command->numEntries + 1u)
+        {
+            // bug fix
+            ((CommandBuffer::Command*)command)->numEntries = uint16_t(metadata.Container().NumItems() - 1);
+            metadata.Container()[0].numEntries = command->numEntries;
+        }
+
+        uint16_t numLoops = command->numEntries - numBaseEntries;
+        struct Settings : public Replay::Command<Settings, eReplay::Unknown>
+        {
+            uint32_t data[0];
+        };
+        auto* newSettings = reinterpret_cast<Settings*>(_alloca((numLoops * 2 + 1 + numBaseEntries) * sizeof(CommandBuffer::Command)));
+        newSettings->numEntries = numLoops * 2 + numBaseEntries;
+        newSettings->commandId = uint16_t(replay);
+
+        memcpy(newSettings->data, reinterpret_cast<const Settings*>(command)->data, numBaseEntries * sizeof(uint32_t));
+        auto* durations = reinterpret_cast<const uint32_t*>(reinterpret_cast<const Settings*>(command)->data + numBaseEntries);
+        auto* loops = reinterpret_cast<LoopInfo*>(newSettings->data + numBaseEntries);
+        for (uint16_t i = 0; i < numLoops; ++i)
+            loops[i] = { 0, durations[i] };
+        CommandBuffer(metadata.Container()).Add(newSettings);
+    }
+
+    void SongSheet::Patch002104UADE(const CommandBuffer::Command* command)
+    {
+        struct Settings : public Replay::Command<Settings, eReplay::UADE>
+        {
+            union
+            {
+                uint32_t value = 0;
+                struct
+                {
+                    uint32_t _deprecated1 : 8;
+                    uint32_t overrideStereoSeparation : 1;
+                    uint32_t stereoSeparation : 7;
+                    uint32_t overrideSurround : 1;
+                    uint32_t surround : 1;
+                    uint32_t _deprecated2 : 2;
+                    uint32_t overrideNtsc : 1;
+                    uint32_t ntsc : 1;
+                    uint32_t overrideFilter : 1;
+                    uint32_t filter : 2;
+                    uint32_t overridePlayer : 1;
+                };
+            };
+            uint32_t data[0];
+        };
+
+        auto* oldSettings = reinterpret_cast<const Settings*>(command);
+        if (metadata.Container().NumItems() != oldSettings->numEntries + 1u)
+        {
+            // bug fix
+            const_cast<Settings*>(oldSettings)->numEntries = uint16_t(metadata.Container().NumItems() - 1);
+            metadata.Container()[0].numEntries = oldSettings->numEntries;
+        }
+        uint32_t numSubsongs = oldSettings->numEntries - 1 - oldSettings->overridePlayer;
+        auto* newSettings = reinterpret_cast<Settings*>(_alloca((numSubsongs * 2 + 2 + oldSettings->overridePlayer) * sizeof(CommandBuffer::Command)));
+        newSettings->numEntries = uint16_t(numSubsongs * 2 + 1 + oldSettings->overridePlayer);
+        newSettings->commandId = uint16_t(eReplay::UADE);
+
+        newSettings->value = oldSettings->value;
+        newSettings->_deprecated1 = newSettings->_deprecated2 = 0;
+        bool isZero = true;
+        for (uint32_t i = 0; i < numSubsongs; ++i)
+        {
+            reinterpret_cast<LoopInfo*>(newSettings->data + oldSettings->overridePlayer)[i] = { 0, oldSettings->data[i + oldSettings->overridePlayer] };
+            isZero &= oldSettings->data[i + oldSettings->overridePlayer] == 0;
+        }
+        if (isZero)
+            newSettings->numEntries -= uint16_t(numSubsongs * 2);
+
+        CommandBuffer(metadata.Container()).Update(newSettings, newSettings->value == 0 && isZero);
+    }
+
+    void SongSheet::Patch002104VGM(const CommandBuffer::Command* command)
+    {
+        struct Settings : public Replay::Command<Settings, eReplay::VGM>
+        {
+            uint32_t value = 0;
+            LoopInfo loop = {};
+        } newSettings;
+        newSettings.value = ((Settings*)command)->value;
+        if (command->numEntries == 2) // check for older format as duration has been added after 0.6.0
+        {
+            newSettings.loop.start = 0;
+            newSettings.loop.length = ((Settings*)command)->loop.start;
+        }
+        CommandBuffer(metadata.Container()).Update(&newSettings, newSettings.value == 0 && newSettings.loop.length == 0);
     }
 }
 // namespace rePlayer

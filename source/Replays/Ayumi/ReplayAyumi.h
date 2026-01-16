@@ -32,7 +32,7 @@ namespace rePlayer
                     uint32_t surround : 1;
                 };
             };
-            uint32_t duration = 0;
+            LoopInfo loop = {};
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -70,7 +70,8 @@ namespace rePlayer
         const text_data m_textData;
         ayumi m_ay;
 
-        uint32_t m_currentDuration = 0;
+        LoopInfo m_loop = {};
+        uint64_t m_currentDuration = 0;
         uint64_t m_currentPosition = 0;
         uint64_t m_globalPosition = 0;
 

@@ -175,7 +175,7 @@ namespace rePlayer
             ms_combinedWaveforms, "Combined Waveforms: Average", "Combined Waveforms: Weak", "Combined Waveforms: Strong");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Default", "Output: Surround");
-        Durations(context, entry->GetDurations(), entry->numSongs, "Subsong #%d Duration");
+        Loops(context, entry->loops, entry->numSongs);
     }
 
     uint8_t ReplaySidPlay::ms_c64RomKernal[] = {
@@ -208,7 +208,7 @@ namespace rePlayer
 
     ReplaySidPlay::~ReplaySidPlay()
     {
-        delete[] m_durations;
+        delete[] m_loops;
         for (uint32_t i = 0; i < 2; i++)
         {
             delete m_sidplayfp[i];
@@ -223,9 +223,9 @@ namespace rePlayer
         , m_surround(kSampleRate)
     {
         auto numSongs = sidTune1->getInfo()->songs();
-        m_durations = new uint32_t[numSongs];
+        m_loops = new LoopInfo[numSongs];
         for (uint32_t i = 0; i < numSongs; i++)
-            m_durations[i] = kDefaultSongDuration;
+            m_loops[i] = { 0, kDefaultSongDuration };
 
         uint32_t numEmu = sidTune1->getInfo()->sidChips() == 1 ? 2 : 1;
         for (uint32_t i = 0; i < numEmu; i++)
@@ -278,6 +278,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -346,7 +347,7 @@ namespace rePlayer
         if (m_sidplayfp[1])
             m_sidplayfp[1]->stop();
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         m_sidplayfp[0]->play(nullptr, 0);
         if (m_sidplayfp[1])
             m_sidplayfp[1]->play(nullptr, 0);
@@ -358,10 +359,9 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         if (settings)
         {
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < settings->numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
 
         uint16_t powerOnDelay = uint16_t(settings && settings->overridePowerOnDelay ? settings->powerOnDelay : ms_powerOnDelay);
@@ -439,7 +439,7 @@ namespace rePlayer
 
     uint32_t ReplaySidPlay::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplaySidPlay::GetNumSubsongs() const
@@ -492,15 +492,14 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongs == numSongs)
         {
-            auto durations = settings->GetDurations();
             for (uint32_t i = 0; i < numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
         else
         {
             uint32_t value[2] = { settings ? settings->value[0] : 0, settings ? settings->value[1] : 0 };
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(uint32_t));
+            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(LoopInfo));
             settings->value[0] = value[0];
             settings->value[1] = value[1];
             settings->numSongs = numSongs;
@@ -525,8 +524,6 @@ namespace rePlayer
                 }
             }
 
-            auto* durations = settings->GetDurations();
-
             char md5[SidTune::MD5_LENGTH + 1];
             m_sidTune[0]->createMD5New(md5);
 
@@ -535,8 +532,7 @@ namespace rePlayer
                 auto duration = sidDatabase->lengthMs(md5, i + 1);
                 if (duration == -1)
                     duration = kDefaultSongDuration;
-                durations[i] = duration;
-                m_durations[i] = durations[i];
+                m_loops[i] = settings->loops[i] = { 0, uint32_t(duration) };
             }
         }
     }

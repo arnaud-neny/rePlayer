@@ -109,7 +109,7 @@ namespace rePlayer
             ms_stereoSeparation, 0, 100, "Stereo Separation %d%%");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Stereo", "Output: Surround");
-        Durations(context, entry->GetDurations(), entry->numSongs, "Subsong #%d Duration");
+        Loops(context, entry->loops, entry->numSongs);
     }
 
     int32_t ReplayGME::ms_stereoSeparation = 100;
@@ -119,7 +119,7 @@ namespace rePlayer
     {
         gme_delete(m_emu);
         delete[] m_tracks;
-        delete[] m_durations;
+        delete[] m_loops;
     }
 
     ReplayGME::ReplayGME(Music_Emu* emu, uint16_t* tracks, uint16_t numTracks, CommandBuffer metadata, const char* ext)
@@ -128,7 +128,7 @@ namespace rePlayer
         , m_surround(kSampleRate)
         , m_tracks(tracks)
         , m_numTracks(numTracks)
-        , m_durations(new uint32_t[numTracks])
+        , m_loops(new LoopInfo[numTracks])
     {
         SetupMetadata(metadata);
     }
@@ -146,7 +146,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
-                m_currentDuration = m_currentLoopDuration;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -173,12 +173,10 @@ namespace rePlayer
         gme_start_track(m_emu, m_tracks[m_subsongIndex]);
         m_surround.Reset();
         m_currentPosition = 0;
-        m_currentLoopDuration = m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
 
         gme_info_t* gmeInfo;
         gme_track_info(m_emu, &gmeInfo, m_tracks[m_subsongIndex]);
-        if (gmeInfo->loop_length > 0)
-            m_currentLoopDuration = (gmeInfo->loop_length * kSampleRate) / 1000;
         gme_free_info(gmeInfo);
         // disable fade, we handle it ourself
         gme_set_fade_msecs(m_emu, -1, 0);
@@ -192,10 +190,9 @@ namespace rePlayer
 
         if (settings)
         {
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < settings->numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         }
     }
 
@@ -207,7 +204,7 @@ namespace rePlayer
 
     uint32_t ReplayGME::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplayGME::GetNumSubsongs() const
@@ -263,28 +260,25 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongs == numSongs)
         {
-            auto durations = settings->GetDurations();
             for (uint32_t i = 0; i < numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
         }
         else
         {
             auto value = settings ? settings->value : 0;
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(uint32_t));
+            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(LoopInfo));
             settings->value = value;
             settings->numSongs = numSongs;
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < numSongs; i++)
             {
                 gme_info_t* gmeInfo;
                 gme_track_info(m_emu, &gmeInfo, i);
-                m_durations[i] = durations[i] = uint32_t(gmeInfo->play_length);
+                settings->loops[i] = { uint32_t(gmeInfo->play_length), uint32_t(gmeInfo->loop_length) };
+                m_loops[i] = settings->loops[i].GetFixed();
                 gme_free_info(gmeInfo);
             }
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
-            SetSubsong(0);
         }
+        m_currentDuration = (uint64_t(m_loops[0].GetDuration()) * kSampleRate) / 1000;
     }
 }
 // namespace rePlayer

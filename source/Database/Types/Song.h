@@ -53,6 +53,10 @@ namespace rePlayer
         // refcount
         void AddRef();
         void Release();
+
+        void Patch002104Replays(const CommandBuffer::Command* command, uint16_t numEntries, eReplay replay);
+        void Patch002104UADE(const CommandBuffer::Command* command);
+        void Patch002104VGM(const CommandBuffer::Command* command);
     };
 
     class Song : public Proxy<Song, SongSheet>, protected SongData<Blob::kIsStatic>
@@ -97,7 +101,7 @@ namespace rePlayer
 
         const Span<CommandBuffer::Command> Metadatas() const;
 
-        // modifer
+        // modifier
         void CopyTo(SongSheet* song) const;
         void CopySubsongsTo(SongSheet* song) const;
 

@@ -12,10 +12,10 @@ namespace rePlayer
 
         CommandBuffer metadata;
 
-        uint32_t duration = 0;
+        LoopInfo loop = {};
         uint16_t lastSubsongIndex;
-        uint16_t subsongIndex : 15 = 0;
-        uint16_t isSongEndEditorEnabled : 1 = false;
+        uint16_t subsongIndex = 0;
+        bool isSongEndEditorEnabled = false;
     };
 
     inline ReplayMetadataContext::ReplayMetadataContext(CommandBuffer commandBuffer, uint16_t _lastSubsongIndex)

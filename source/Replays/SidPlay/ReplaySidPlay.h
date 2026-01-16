@@ -49,7 +49,7 @@ namespace rePlayer
                     uint32_t combinedWaveforms : 2;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            LoopInfo loops[0];
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -94,7 +94,7 @@ namespace rePlayer
         bool m_isNtsc : 1 = ms_isNtsc;
         bool m_isResampling : 1 = ms_isResampling;
         uint16_t m_powerOnDelay = uint16_t(ms_powerOnDelay);
-        uint32_t* m_durations = nullptr;
+        LoopInfo* m_loops = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
 

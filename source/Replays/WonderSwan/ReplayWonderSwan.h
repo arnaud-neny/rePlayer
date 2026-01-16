@@ -36,16 +36,16 @@ namespace rePlayer
                 };
             };
             uint32_t subsongs[8] = { 0 }; // 256 / sizeof(uint32_t)
-            uint32_t durations[0];
+            LoopInfo loops[0];
 
             Settings() = default;
             Settings(uint32_t lastSubsong)
             {
-                numEntries += uint16_t(lastSubsong + 1);
+                numEntries += uint16_t(lastSubsong + 1) * 2;
                 for (uint32_t i = 0; i <= lastSubsong; i++)
-                    durations[i] = 0;
+                    loops[i] = {};
             }
-            uint32_t NumSubsongs() const { return numEntries - 1 - 8; }
+            uint32_t NumSubsongs() const { return (numEntries - 1 - 8) / 2; }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -91,7 +91,7 @@ namespace rePlayer
 
         Surround m_surround;
 
-        uint32_t m_durations[256] = {};
+        LoopInfo m_loops[256] = {};
         uint8_t m_subsongs[256] = {};
         uint32_t m_numSubsongs = 256;
 

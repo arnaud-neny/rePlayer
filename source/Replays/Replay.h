@@ -43,7 +43,7 @@ namespace rePlayer
             static void SliderOverride(const char* id, auto&& isEnabled, auto&& currentValue, float defaultValue, float min, float max, const char* format);
             template <typename... Items> // Items as const char* const
             static void ComboOverride(const char* id, auto&& isEnabled, auto&& currentValue, int32_t defaultValue, Items&&... items);
-            static void Durations(ReplayMetadataContext& context, uint32_t* durations, uint32_t numDurations, const char* format);
+            static bool Loops(ReplayMetadataContext& context, LoopInfo* loops, uint32_t numLoops, uint32_t defaultDuration = 0);
         };
 
         struct Patterns

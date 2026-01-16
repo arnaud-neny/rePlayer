@@ -36,7 +36,7 @@ namespace rePlayer
                     uint32_t forceStereo : 1;
                 };
             };
-            uint32_t duration = 0;
+            LoopInfo loop = {};
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -82,6 +82,7 @@ namespace rePlayer
         bool m_hasLooped = false;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
+        LoopInfo m_loop = {};
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
         static int32_t ms_droV2Opl3;

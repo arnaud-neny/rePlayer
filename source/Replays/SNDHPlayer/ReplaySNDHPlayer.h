@@ -27,16 +27,16 @@ namespace rePlayer
                     uint32_t surround : 1;
                 };
             };
-            uint32_t durations[0];
+            LoopInfo loops[0];
 
             Settings() = default;
             Settings(uint32_t lastSubsong)
             {
-                numEntries += uint16_t(lastSubsong + 1);
+                numEntries += uint16_t(lastSubsong + 1) * 2;
                 for (uint32_t i = 0; i <= lastSubsong; i++)
-                    durations[i] = 0;
+                    loops[i] = {};
             }
-            uint32_t NumSubsongs() const { return numEntries - 1; }
+            uint32_t NumSubsongs() const { return (numEntries - 1) / 2; }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -76,7 +76,7 @@ namespace rePlayer
 
         uint64_t m_currentDuration = 0;
         uint64_t m_currentPosition = 0;
-        uint32_t* m_durations;
+        LoopInfo* m_loops;
 
         Surround m_surround;
 

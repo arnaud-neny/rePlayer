@@ -121,5 +121,23 @@ namespace core
         surround.End(ctx);
         return output;
     }
+
+    inline bool LoopInfo::IsValid() const
+    {
+        return start != 0 || length != 0;
+    }
+
+    inline uint32_t LoopInfo::GetDuration() const
+    {
+        return start + length;
+    }
+
+    inline LoopInfo LoopInfo::GetFixed() const
+    {
+        LoopInfo loop = *this;
+        if (loop.length == 0)
+            std::swap(loop.start, loop.length);
+        return loop;
+    }
 }
 // namespace core

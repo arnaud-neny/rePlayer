@@ -141,7 +141,7 @@ namespace rePlayer
                     return nullptr;
                 }
                 titles.Resize(numSubsongs);
-                settings = metadata.Create<Settings>(sizeof(Settings) + numSubsongs * sizeof(uint32_t), numSubsongs);
+                settings = metadata.Create<Settings>(sizeof(Settings) + numSubsongs * sizeof(LoopInfo), numSubsongs);
                 settings->value = oldValue;
                 memcpy(settings->subsongs, subsongs, sizeof(subsongs));
 
@@ -197,7 +197,7 @@ namespace rePlayer
                         {
                             if (tracks[j] == uint32_t(exm3u[i].track))
                             {
-                                settings->durations[j] = exm3u[i].length;
+                                settings->loops[j] = { 0, uint32_t(exm3u[i].length) };
                                 titles[j] = exm3u[i].name;
                                 break;
                             }
@@ -225,7 +225,7 @@ namespace rePlayer
 
     void ReplayWonderSwan::Settings::Edit(ReplayMetadataContext& context)
     {
-        const auto settingsSize = sizeof(Settings) + (context.lastSubsongIndex + 1) * sizeof(uint32_t);
+        const auto settingsSize = sizeof(Settings) + (context.lastSubsongIndex + 1) * sizeof(LoopInfo);
         auto* dummy = new (_alloca(settingsSize)) Settings(context.lastSubsongIndex);
         auto* entry = context.metadata.Find<Settings>(dummy);
         if (!entry || entry->NumSubsongs() != context.lastSubsongIndex + 1u)
@@ -242,7 +242,7 @@ namespace rePlayer
             ms_globals.surround, "Output: Stereo", "Output: Surround");
         ComboOverride("Core", GETSET(entry, overrideCore), GETSET(entry, core),
             int32_t(ms_globals.core), "Core: mednafen", "Core: Oswan", "Core: in_wsr");
-        Durations(context, entry->durations, entry->NumSubsongs(), "Subsong #%d Duration");
+        Loops(context, entry->loops, entry->NumSubsongs());
 
         context.metadata.Update(entry, false);
     }
@@ -278,6 +278,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -320,7 +321,10 @@ namespace rePlayer
             {
                 numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
                 if (numSamples == 0)
+                {
                     m_currentPosition = 0;
+                    currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
+                }
             }
             m_currentPosition = currentPosition + numSamples;
             m_globalPosition += numSamples;
@@ -360,7 +364,8 @@ namespace rePlayer
 
         if (settings)
         {
-            memcpy(m_durations, settings->durations, sizeof(m_durations));
+            for (uint32_t i = 0; i < m_numSubsongs; ++i)
+                m_loops[i] = settings->loops[i].GetFixed();
             m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         }
     }
@@ -373,7 +378,7 @@ namespace rePlayer
 
     uint32_t ReplayWonderSwan::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplayWonderSwan::GetNumSubsongs() const
@@ -421,7 +426,8 @@ namespace rePlayer
             if (settings->subsongs[i / 32] & (1 << (i & 31)))
                 *subsongs++ = uint8_t(i);
         }
-        memcpy(m_durations, settings->durations, m_numSubsongs * sizeof(uint32_t));
+        for (uint32_t i = 0; i < m_numSubsongs; ++i)
+            m_loops[i] = settings->loops[i].GetFixed();
         m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
     }
 }

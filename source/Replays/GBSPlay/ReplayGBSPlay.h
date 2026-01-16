@@ -36,7 +36,7 @@ namespace rePlayer
                     uint32_t numSongs : 8;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            LoopInfo loops[0];
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -77,7 +77,7 @@ namespace rePlayer
         int16_t m_bufData[kMaxSamples * 2];
         int16_t m_bufDataCopy[kMaxSamples * 2];
         long m_bufPos = kMaxSamples;
-        uint32_t* m_durations = nullptr;
+        LoopInfo* m_loops = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
         Surround m_surround;

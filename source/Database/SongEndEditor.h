@@ -8,6 +8,7 @@
 namespace rePlayer
 {
     using namespace core;
+    class BusySpinner;
     class Replay;
     struct ReplayMetadataContext;
 
@@ -15,7 +16,7 @@ namespace rePlayer
     {
     public:
         static SongEndEditor* Create(ReplayMetadataContext& context, MusicID musicId);
-        SongEndEditor(MusicID musicId, Replay* replay, uint32_t duration);
+        SongEndEditor(MusicID musicId, Replay* replay, LoopInfo loop);
         ~SongEndEditor();
 
         bool Update(ReplayMetadataContext& context);
@@ -33,28 +34,33 @@ namespace rePlayer
 
     private:
         void Render();
-        uint32_t ReadCurrentSample();
+        uint32_t ReadCurrentSample() const;
         void OpenAudio();
+
+        bool IsBusy() const;
+
+        void FindLoop();
 
         uint32_t WaveformUI();
         void PlaybackUI();
         void ScaleUI(uint32_t width);
-        void DurationUI();
-        void RenderUI();
+        void LoopUI();
+        void ParamsUI();
 
     private:
         MusicID m_musicId;
         Replay* m_replay;
+        std::string m_title;
 
         Array<StereoSample> m_samples;
         Array<Frame> m_frames;
         Array<uint32_t> m_loops;
         uint64_t m_numMillisecondsPerPixel = 250;
-        uint32_t m_duration;
+        int64_t m_silence = -1;
+        LoopInfo m_loop;
         uint32_t m_currentSample = 0;
         uint32_t m_currentFrameSample = 0;
         uint32_t m_numSamples = 0;
-        uint32_t m_silence = 0xffFFffFF;
         bool m_isPlaying = false;
         bool m_isRunning = true;
         bool m_isJobDone = false;
@@ -63,6 +69,32 @@ namespace rePlayer
         uint32_t m_waveStartPosition = 0;
         Wave* m_wave = nullptr;
         thread::Semaphore m_semaphore;
+
+        // mouse & loop
+        float m_mousePosWithLoop = 0.0f;
+        LoopInfo m_mouseLoop;
+        enum class EditLoop
+        {
+            None,
+            Create,
+            Move,
+            ResizeLeft,
+            ResizeRight
+        } m_mouseMode = EditLoop::None;
+
+        struct
+        {
+            uint32_t loopMin = 10;
+            uint32_t loopMax = 180;
+            float peakThreshold = 0.58f; // 0.45-0.65
+            float consistencyThreshold = 0.45f;//0.35-0.55
+
+            int32_t frame = 1024;
+            int32_t hop = 128;
+            int32_t melFilters = 26;
+            int32_t mfccs = 13;
+        } m_loopDetection;
+        SmartPtr<BusySpinner> m_busySpinner;
     };
 }
 // namespace rePlayer

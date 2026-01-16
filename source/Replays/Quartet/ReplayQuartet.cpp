@@ -88,53 +88,9 @@ namespace rePlayer
             RATE_DEF, RATE_MIN, RATE_MAX, "Rate %d Hz");
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Applied only on reload :(");
+        Loops(context, &entry->loop, 1, kDefaultSongDuration);
 
-        const float buttonSize = ImGui::GetFrameHeight();
-        bool isEnabled = entry->duration != 0;
-        uint32_t duration = isEnabled ? entry->duration : kDefaultSongDuration;
-        auto pos = ImGui::GetCursorPosX();
-        if (ImGui::Checkbox("##Checkbox", &isEnabled))
-            duration = kDefaultSongDuration;
-        ImGui::SameLine();
-        ImGui::BeginDisabled(!isEnabled);
-        auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
-        ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
-        ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, "Duration", ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
-        int32_t milliseconds = duration % 1000;
-        int32_t seconds = (duration / 1000) % 60;
-        int32_t minutes = duration / 60000;
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
-        ImGui::SetNextItemWidth(width / 3.0f);
-        ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
-        ImGui::SetNextItemWidth(width / 2.0f);
-        ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
-        ImGui::SetNextItemWidth(width);
-        ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
-        {
-            context.duration = duration;
-            context.subsongIndex = 0;
-            context.isSongEndEditorEnabled = true;
-        }
-        else if (context.isSongEndEditorEnabled == false && context.duration != 0)
-        {
-            milliseconds = context.duration % 1000;
-            seconds = (context.duration / 1000) % 60;
-            minutes = context.duration / 60000;
-            context.duration = 0;
-        }
-        if (ImGui::IsItemHovered())
-            ImGui::Tooltip("Open Waveform Viewer");
-        ImGui::EndDisabled();
-        entry->duration = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
-
-        context.metadata.Update(entry, entry->value == 0 && entry->duration == 0);
+        context.metadata.Update(entry, entry->value == 0 && !entry->loop.IsValid());
     }
 
     ReplayQuartet::Globals ReplayQuartet::ms_globals = {
@@ -178,8 +134,8 @@ namespace rePlayer
             // reset the loop to continue playing
             m_player->done = 0;
             m_player->core.loop = 0;
-            if (m_duration)
-                m_player->ms_max += m_duration;
+            if (m_loop.IsValid())
+                m_player->ms_max += m_loop.length;
             else
                 m_player->ms_len += m_info.len.ms;
         }
@@ -208,7 +164,7 @@ namespace rePlayer
         zz_u8_t format;
         ms_driver.stream->Seek(0, io::Stream::kSeekBegin);
         zz_load(m_player, ms_driver.stream->GetName().c_str(), nullptr, &format);
-        zz_init(m_player, m_rate, m_duration == 0 ? ZZ_EOF : m_duration);
+        zz_init(m_player, m_rate, m_loop.IsValid() ? m_loop.GetDuration() : ZZ_EOF);
         zz_setup(m_player, ZZ_MIXER_DEF, kSampleRate);
         zz_info(m_player, &m_info);
     }
@@ -220,8 +176,8 @@ namespace rePlayer
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globals->stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globals->surround);
         m_rate = (settings && settings->overrideRate) ? uint16_t(settings->rate) : 0;
-        m_duration = settings ? settings->duration : 0;
-        m_player->ms_max = m_duration ? m_duration : ZZ_EOF;
+        m_loop = settings ? settings->loop.GetFixed() : LoopInfo{};
+        m_player->ms_max = m_loop.IsValid() ? m_loop.GetDuration() : ZZ_EOF;
     }
 
     void ReplayQuartet::SetSubsong(uint32_t subsongIndex)

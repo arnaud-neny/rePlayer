@@ -71,50 +71,90 @@ namespace rePlayer
     }
 
     template <typename CommandType, auto type>
-    inline void Replay::Command<CommandType, type>::Durations(ReplayMetadataContext& context, uint32_t* durations, uint32_t numDurations, const char* format)
+    inline bool Replay::Command<CommandType, type>::Loops(ReplayMetadataContext& context, LoopInfo* loops, uint32_t numLoops, uint32_t defaultDuration)
     {
+        bool isZero = true;
         const float buttonSize = ImGui::GetFrameHeight();
-        for (uint32_t i = 0; i < numDurations; i++)
+        char txt[64] = "Loop Start";
+        for (uint32_t i = 0; i < numLoops; i++)
         {
             ImGui::PushID(i);
-            auto& duration = durations[i];
-            char txt[64];
-            sprintf(txt, format, i + 1);
-            auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
-            ImGui::SetNextItemWidth(2.0f * width / 3.0f);
-            ImGui::DragUint("##Duration", durations + i, 1000.0f, 0, 0, txt, ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
-            int32_t milliseconds = duration % 1000;
-            int32_t seconds = (duration / 1000) % 60;
-            int32_t minutes = duration / 60000;
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
-            ImGui::SetNextItemWidth(width / 3.0f);
-            ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
-            ImGui::SetNextItemWidth(width / 2.0f);
-            ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
-            ImGui::SetNextItemWidth(width);
-            ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
-            duration = uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds);
-            ImGui::SameLine();
-            if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
+
+            auto spanWidth = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 8 - buttonSize;
+
+            // checkbox (only if we have a default duration
+            float deltaWidth = 0.0f; // so ##StartLoop get smaller
+            bool isEnabled = defaultDuration == 0 || loops[i].IsValid();
+            LoopInfo loop = isEnabled ? loops[i] : LoopInfo{ 0, defaultDuration };
+            if (defaultDuration)
             {
-                context.duration = duration;
+                deltaWidth = ImGui::GetCursorPosX();
+                if (ImGui::Checkbox("##Checkbox", &isEnabled))
+                    loop = { 0, defaultDuration };
+                ImGui::SameLine();
+                deltaWidth -= ImGui::GetCursorPosX();
+            }
+            ImGui::BeginDisabled(!isEnabled);
+
+            // loop start
+            if (numLoops > 1)
+                sprintf(txt, "Loop Start #%d", i + 1);
+            ImGui::SetNextItemWidth(0.33f * spanWidth + deltaWidth);
+            ImGui::DragUint("##StartLoop", &loop.start, 1000.0f, 0, 0, txt, ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
+            int32_t milliseconds = loop.start % 1000;
+            int32_t seconds = (loop.start / 1000) % 60;
+            int32_t minutes = loop.start / 60000;
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##StartMinutes", &minutes, 0.1f, 0, 65535, "%dm", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##StartSeconds", &seconds, 0.1f, 0, 59, "%ds", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##StartMilliseconds", &milliseconds, 1.0f, 0, 999, "%dms", ImGuiSliderFlags_AlwaysClamp);
+            loop.start = uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds);
+            ImGui::SameLine();
+
+            // loop length
+            ImGui::SetNextItemWidth(0.12f * spanWidth);
+            ImGui::DragUint("##LengthLoop", &loop.length, 1000.0f, 0, 0, "Length", ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
+            milliseconds = loop.length % 1000;
+            seconds = (loop.length / 1000) % 60;
+            minutes = loop.length / 60000;
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##LengthMinutes", &minutes, 0.1f, 0, 65535, "%dm", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##LengthSeconds", &seconds, 0.1f, 0, 59, "%ds", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(spanWidth * 0.55f / 6.0f);
+            ImGui::DragInt("##LengthMilliseconds", &milliseconds, 1.0f, 0, 999, "%dms", ImGuiSliderFlags_AlwaysClamp);
+            loop.length = uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds);
+            ImGui::SameLine();
+
+            if (ImGui::Button("E", ImVec2(-FLT_MIN, 0.0f)))
+            {
+                context.loop = loop;
                 context.subsongIndex = uint16_t(i);
                 context.isSongEndEditorEnabled = true;
             }
-            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && uint32_t(context.subsongIndex) == i)
+            else if (context.isSongEndEditorEnabled == false && context.loop.IsValid() && uint32_t(context.subsongIndex) == i)
             {
-                duration = context.duration;
-                context.duration = 0;
+                loop = context.loop;
+                context.loop = {};
             }
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Open Waveform Viewer");
+
+            loops[i] = isEnabled ? loop : LoopInfo{};
+            isZero &= !loop.IsValid();
+
+            ImGui::EndDisabled();
             ImGui::PopID();
         }
+        return isZero;
     }
 }
 // namespace rePlayer

@@ -31,7 +31,7 @@ namespace rePlayer
                     uint32_t rate : 10;
                 };
             };
-            uint32_t duration = 0;
+            LoopInfo loop = {};
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -91,7 +91,7 @@ namespace rePlayer
         zz_info_t m_info;
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
-        uint32_t m_duration = 0;
+        LoopInfo m_loop = {};
         uint16_t m_rate = 0;
 
         static Driver ms_driver;

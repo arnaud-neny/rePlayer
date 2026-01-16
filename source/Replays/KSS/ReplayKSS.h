@@ -29,7 +29,7 @@ namespace rePlayer
                     uint32_t devicePan : 8;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            LoopInfo loops[0];
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -68,7 +68,7 @@ namespace rePlayer
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
 
-        uint32_t m_durations[256] = { 0 };
+        LoopInfo m_loops[256] = { 0 };
 
         int32_t m_loopCount = 0;
 

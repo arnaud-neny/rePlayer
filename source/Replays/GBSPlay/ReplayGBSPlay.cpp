@@ -1,5 +1,6 @@
 #include "ReplayGBSPlay.h"
 
+#include <Audio/AudioTypes.inl.h>
 #include <Core/String.h>
 #include <Core/Window.inl.h>
 #include <Imgui.h>
@@ -83,7 +84,7 @@ namespace rePlayer
             ms_surround, "Output: Stereo", "Output: Surround");
         ComboOverride("Filter", GETSET(entry, overrideFilter), GETSET(entry, filter),
             ms_filter, "Filter: Off", "Filter: Game Boy Classic", "Filter: Game Boy Color");
-        Durations(context, entry->GetDurations(), entry->numSongs, "Subsong #%d Duration");
+        Loops(context, entry->loops, entry->numSongs);
     }
 
     int32_t ReplayGBSPlay::ms_filter = FILTER_DMG;
@@ -93,14 +94,14 @@ namespace rePlayer
     ReplayGBSPlay::~ReplayGBSPlay()
     {
         gbs_close(m_gbs);
-        delete[] m_durations;
+        delete[] m_loops;
     }
 
     ReplayGBSPlay::ReplayGBSPlay(gbs* gbs, CommandBuffer metadata)
         : Replay(GetExtension(gbs), eReplay::GBSPlay)
         , m_gbs(gbs)
         , m_surround(kSampleRate)
-        , m_durations(new uint32_t[gbs_get_status(gbs)->songs])
+        , m_loops(new LoopInfo[gbs_get_status(gbs)->songs])
     {
         m_buf.data = m_bufData;
         m_buf.bytes = sizeof(m_bufData);
@@ -130,6 +131,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -170,7 +172,7 @@ namespace rePlayer
         gbs_init(m_gbs, m_subsongIndex);
         m_surround.Reset();
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         m_bufPos = kMaxSamples;
     }
 
@@ -183,10 +185,9 @@ namespace rePlayer
 
         if (settings)
         {
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < settings->numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         }
     }
 
@@ -219,7 +220,7 @@ namespace rePlayer
 
     uint32_t ReplayGBSPlay::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplayGBSPlay::GetNumSubsongs() const
@@ -265,18 +266,16 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongs == numSongs)
         {
-            auto durations = settings->GetDurations();
             for (uint32_t i = 0; i < numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
         }
         else
         {
             auto value = settings ? settings->value : 0;
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(uint32_t));
+            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(LoopInfo));
             settings->value = value;
             settings->numSongs = numSongs;
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i < numSongs; i++)
             {
                 SetSubsong(i);
@@ -286,10 +285,8 @@ namespace rePlayer
                     len = kDefaultSongDuration;
                 else
                     len = (len * 1000) / 1024;
-                durations[i] = uint32_t(len);
-                m_durations[i] = uint32_t(len);
+                m_loops[i] = settings->loops[i] = { 0, uint32_t(len) };
             }
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
             SetSubsong(0);
         }
     }

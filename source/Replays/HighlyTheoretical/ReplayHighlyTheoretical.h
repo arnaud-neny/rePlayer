@@ -24,7 +24,7 @@ namespace rePlayer
                     uint32_t numSongsMinusOne : 8;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            LoopInfo loops[0];
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -67,7 +67,7 @@ namespace rePlayer
         {
             uint32_t index = 0;
             uint32_t duration = 0;
-            uint32_t overriddenDuration = 0;
+            LoopInfo loop = {};
         };
 
     private:

@@ -30,7 +30,7 @@ namespace rePlayer
                     uint32_t surround : 1;
                 };
             };
-            uint32_t* GetDurations() { return reinterpret_cast<uint32_t*>(this + 1); }
+            LoopInfo loops[0];
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -66,10 +66,9 @@ namespace rePlayer
         Music_Emu* m_emu;
         Surround m_surround;
         uint32_t m_stereoSeparation = 100;
-        uint32_t* m_durations = nullptr;
+        LoopInfo* m_loops = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
-        uint64_t m_currentLoopDuration = 0;
         uint16_t* m_tracks = nullptr;
         uint16_t m_numTracks;
         static int32_t ms_stereoSeparation;

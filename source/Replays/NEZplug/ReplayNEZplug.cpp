@@ -108,17 +108,15 @@ namespace rePlayer
         if (entry == nullptr)
         {
             // ok, we are here because we never played this song in this player
-            entry = context.metadata.Create<Settings>(sizeof(Settings) + sizeof(uint32_t));
-            entry->GetDurations()[0] = 0;
+            entry = context.metadata.Create<Settings>(sizeof(Settings) + sizeof(LoopInfo));
+            entry->loops[0] = {};
         }
 
         ComboOverride("Filter", GETSET(entry, overrideFilter), GETSET(entry, filter),
             ms_filter, "Filter: None", "Filter: LowPass", "Filter: Weighted", "Filter: LowPass Weighted");
         SliderOverride("Gain", GETSET(entry, overrideGain), GetSet([entry]() { return 1.0f + 7.0f * entry->gain / 255.0f; }, [entry](auto v) { entry->gain = uint32_t(255.0f * (v - 1.0f) / 7.0f); }),
             1.0f + 7.0f * ms_gain / 255.0f, 1.0f, 8.0f, "Gain x %1.3f");
-        Durations(context, entry->GetDurations(), entry->numSongsMinusOne + 1, "Subsong #%d Duration");
-
-        context.metadata.Update(entry, false);
+        Loops(context, entry->loops, entry->numSongsMinusOne + 1);
     }
 
     int32_t ReplayNEZplug::ms_gain = int32_t(255.0f * 2.0f / 7.0f);
@@ -154,6 +152,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -218,7 +217,7 @@ namespace rePlayer
         NEZReset(m_nezPlay);
 
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
     }
 
     void ReplayNEZplug::ApplySettings(const CommandBuffer metadata)
@@ -226,10 +225,9 @@ namespace rePlayer
         auto* settings = metadata.Find<Settings>();
         if (settings)
         {
-            auto durations = settings->GetDurations();
             for (uint16_t i = 0; i <= settings->numSongsMinusOne; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
 
         NEZSetFilter(m_nezPlay, (settings && settings->overrideFilter) ? settings->filter : ms_filter);
@@ -244,7 +242,7 @@ namespace rePlayer
 
     uint32_t ReplayNEZplug::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplayNEZplug::GetNumSubsongs() const
@@ -323,29 +321,27 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         if (settings && settings->numSongsMinusOne == numSongsMinusOne)
         {
-            auto durations = settings->GetDurations();
             for (uint32_t i = 0; i <= numSongsMinusOne; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = settings->loops[i].GetFixed();
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
         else
         {
             auto value = settings ? settings->value : 0;
-            settings = metadata.Create<Settings>(sizeof(Settings) + (numSongsMinusOne + 1) * sizeof(int32_t));
+            settings = metadata.Create<Settings>(sizeof(Settings) + (numSongsMinusOne + 1) * sizeof(LoopInfo));
             settings->value = value;
             settings->numSongsMinusOne = numSongsMinusOne;
-            auto durations = settings->GetDurations();
             if (m_subsongs.NumItems() > 1)
             {
                 for (uint32_t i = numSongsMinusOne; i <= numSongsMinusOne; i--)
                 {
                     SetSubsong(i);
-                    durations[i] = m_durations[i] = NEZGetTrackLength(m_nezPlay, 1);
+                    settings->loops[i] = m_loops[i] = { 0, NEZGetTrackLength(m_nezPlay, 1) };
                 }
             }
             else for (uint32_t i = 0; i <= numSongsMinusOne; i++)
-                durations[i] = m_durations[i] = NEZGetTrackLength(m_nezPlay, i + 1);
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                settings->loops[i] = m_loops[i] = { 0, NEZGetTrackLength(m_nezPlay, i + 1) };
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
     }
 }

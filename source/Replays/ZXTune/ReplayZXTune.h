@@ -31,16 +31,16 @@ namespace rePlayer
                     uint32_t surround : 1;
                 };
             };
-            uint32_t durations[0];
+            LoopInfo loops[0];
 
             Settings() = default;
             Settings(uint32_t lastSubsong)
             {
-                numEntries += uint16_t(lastSubsong + 1);
+                numEntries += uint16_t(lastSubsong + 1) * 2;
                 for (uint32_t i = 0; i <= lastSubsong; i++)
-                    durations[i] = 0;
+                    loops[i] = {};
             }
-            uint32_t NumSubsongs() const { return numEntries - 1; }
+            uint32_t NumSubsongs() const { return (numEntries - 1) / 2; }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -76,7 +76,7 @@ namespace rePlayer
             Binary::Data::Ptr data;
             Module::Holder::Ptr holder;
             MediaType type = { eExtension::Unknown, eReplay::ZXTune };
-            uint32_t duration = 0;
+            LoopInfo loop = {};
         };
 
     private:

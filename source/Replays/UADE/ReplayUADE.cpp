@@ -421,19 +421,16 @@ namespace rePlayer
     void ReplayUADE::Settings::Edit(ReplayMetadataContext& context)
     {
         uint32_t numSubsongs = context.lastSubsongIndex + 1;
-        const auto settingsSize = sizeof(Settings) + (numSubsongs + 1u) * sizeof(uint32_t);
+        const auto settingsSize = sizeof(Settings) + (numSubsongs + 1u) * sizeof(LoopInfo);
         auto* entry = new (_alloca(settingsSize)) Settings(numSubsongs);
-        auto* oldEntry = context.metadata.Find<Settings>();
-        if (oldEntry)
+        if (auto* oldEntry = context.metadata.Find<Settings>())
         {
-            if (oldEntry->NumSubsongs() && (oldEntry->NumSubsongs() != numSubsongs))
-                oldEntry = nullptr;
-            else
-            {
-                if (oldEntry->overridePlayer)
-                    entry->numEntries++;
+            if (oldEntry->overridePlayer)
+                entry->numEntries++;
+            if (entry->NumSubsongs() == numSubsongs)
                 memcpy(&entry->value, &oldEntry->value, oldEntry->numEntries * sizeof(uint32_t));
-            }
+            else
+                memcpy(&entry->value, &oldEntry->value, (oldEntry->overridePlayer + 1) * sizeof(uint32_t));
         }
 
         SliderOverride("StereoSeparation", GETSET(entry, overrideStereoSeparation), GETSET(entry, stereoSeparation),
@@ -484,7 +481,7 @@ namespace rePlayer
             ImGui::PopID();
             if (uint32_t(isPlayerOverridden) != entry->overridePlayer)
             {
-                memmove(entry->data + (isPlayerOverridden ? 1 : 0), entry->GetDurations(), numSubsongs * sizeof(uint32_t));
+                memmove(entry->data + (isPlayerOverridden ? 1 : 0), entry->GetLoops(), numSubsongs * sizeof(LoopInfo));
                 entry->numEntries += isPlayerOverridden ? 1 : -1;
                 entry->overridePlayer = isPlayerOverridden;
             }
@@ -492,66 +489,9 @@ namespace rePlayer
                 entry->data[0] = ms_globals.players[playerIndex].second;
         }
 
-        const float buttonSize = ImGui::GetFrameHeight();
-        auto* durations = entry->GetDurations();
-        bool isZero = true;
-        for (uint16_t i = 0; i < entry->NumSubsongs(); i++)
-        {
-            ImGui::PushID(i);
-            bool isEnabled = durations[i] != 0;
-            uint32_t duration = isEnabled ? durations[i] : kDefaultSongDuration;
-            auto pos = ImGui::GetCursorPosX();
-            if (ImGui::Checkbox("##Checkbox", &isEnabled))
-                duration = kDefaultSongDuration;
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!isEnabled);
-            char txt[64];
-            sprintf(txt, "Subsong #%d Duration", i + 1);
-            auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
-            ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
-            ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, txt, ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
-            int32_t milliseconds = duration % 1000;
-            int32_t seconds = (duration / 1000) % 60;
-            int32_t minutes = duration / 60000;
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
-            ImGui::SetNextItemWidth(width / 3.0f);
-            ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
-            ImGui::SetNextItemWidth(width / 2.0f);
-            ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::SameLine();
-            width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
-            ImGui::SetNextItemWidth(width);
-            ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::SameLine();
-            if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
-            {
-                context.duration = duration;
-                context.subsongIndex = i;
-                context.isSongEndEditorEnabled = true;
-            }
-            else if (context.isSongEndEditorEnabled == false && context.duration != 0 && context.subsongIndex == i)
-            {
-                milliseconds = context.duration % 1000;
-                seconds = (context.duration / 1000) % 60;
-                minutes = context.duration / 60000;
-                context.duration = 0;
-            }
-            if (ImGui::IsItemHovered())
-                ImGui::Tooltip("Open Waveform Viewer");
-            ImGui::EndDisabled();
-            durations[i] = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
-            ImGui::PopID();
-
-            isZero &= durations[i] == 0;
-        }
+        bool isZero = Loops(context, entry->GetLoops(), numSubsongs, kDefaultSongDuration);
         if (isZero)
-        {
-            entry->_deprecated1 = 0; // old num subsong entry
-            entry->numEntries -= uint16_t(numSubsongs);
-        }
+            entry->numEntries -= uint16_t(numSubsongs) * 2; // no need to save the loops
 
         context.metadata.Update(entry, isZero && entry->value == 0);
     }
@@ -566,7 +506,7 @@ namespace rePlayer
     ReplayUADE::~ReplayUADE()
     {
         uade_cleanup_state(m_uadeState);
-        delete[] m_durations;
+        delete[] m_loops;
     }
 
     ReplayUADE::ReplayUADE(io::Stream* stream, uade_state* uadeState, ReplayOverride* replayOverride)
@@ -593,6 +533,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
                 return 0;
             }
         }
@@ -640,7 +581,7 @@ namespace rePlayer
         }
         m_surround.Reset();
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
     }
 
     void ReplayUADE::ApplySettings(const CommandBuffer metadata)
@@ -664,16 +605,16 @@ namespace rePlayer
 
         if (settings && settings->NumSubsongs())
         {
-            auto durations = settings->GetDurations();
+            auto loops = settings->GetLoops();
             for (uint32_t i = 0, e = settings->NumSubsongs(); i < e; i++)
-                m_durations[i] = durations[i];
+                m_loops[i] = loops[i].GetFixed();
         }
         else
         {
             for (uint32_t i = 0, e = GetNumSubsongs(); i < e; i++)
-                m_durations[i] = 0;
+                m_loops[i] = {};
         }
-        m_currentDuration = (uint64_t(m_durations[m_subsongIndex]) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
     }
 
     void ReplayUADE::SetSubsong(uint32_t subsongIndex)
@@ -723,7 +664,7 @@ namespace rePlayer
 
     uint32_t ReplayUADE::GetDurationMs() const
     {
-        return m_durations[m_subsongIndex];
+        return m_loops[m_subsongIndex].GetDuration();
     }
 
     uint32_t ReplayUADE::GetNumSubsongs() const
@@ -767,19 +708,19 @@ namespace rePlayer
     {
         auto uadeInfo = uade_get_song_info(m_uadeState);
         auto numSongs = m_packagedSubsongNames.IsEmpty() ? uadeInfo->subsongs.max >= uadeInfo->subsongs.min ? uint32_t(uadeInfo->subsongs.max - uadeInfo->subsongs.min + 1) : 1 : m_packagedSubsongNames.NumItems();
-        m_durations = new uint32_t[numSongs];
+        m_loops = new LoopInfo[numSongs];
         auto settings = metadata.Find<Settings>();
         if (settings && settings->NumSubsongs() == numSongs)
         {
-            auto* durations = settings->GetDurations();
+            auto* loops = settings->GetLoops();
             for (uint32_t i = 0; i < numSongs; i++)
-                m_durations[i] = durations[i];
-            m_currentDuration = (uint64_t(durations[m_subsongIndex]) * kSampleRate) / 1000;
+                m_loops[i] = loops[i].GetFixed();
+            m_currentDuration = (uint64_t(loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
         }
         else
         {
             for (uint16_t i = 0; i < numSongs; i++)
-                m_durations[i] = 0;
+                m_loops[i] = {};
             m_currentDuration = 0;
         }
     }

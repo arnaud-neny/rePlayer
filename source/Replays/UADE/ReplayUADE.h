@@ -28,12 +28,12 @@ namespace rePlayer
                 uint32_t value = 0;
                 struct
                 {
-                    uint32_t _deprecated1 : 8;
+                    uint32_t unused1 : 8;
                     uint32_t overrideStereoSeparation : 1;
                     uint32_t stereoSeparation : 7;
                     uint32_t overrideSurround : 1;
                     uint32_t surround : 1;
-                    uint32_t _deprecated2 : 2;
+                    uint32_t unused2 : 2;
                     uint32_t overrideNtsc : 1;
                     uint32_t ntsc : 1;
                     uint32_t overrideFilter : 1;
@@ -46,13 +46,13 @@ namespace rePlayer
             Settings() = default;
             Settings(uint32_t numSubsongs)
             {
-                numEntries += uint8_t(numSubsongs);
-                for (uint32_t i = 0; i <= numSubsongs; i++)
+                numEntries += uint8_t(numSubsongs) * 2;
+                for (uint32_t i = 0; i < numSubsongs * 2; i++)
                     data[i] = 0;
             }
-            uint32_t NumSubsongs() const { return numEntries - (overridePlayer ? 2 : 1); }
+            uint32_t NumSubsongs() const { return (numEntries - 1 - overridePlayer) / 2; }
 
-            uint32_t* GetDurations() { return data + (overridePlayer ? 1 : 0); }
+            LoopInfo* GetLoops() { return reinterpret_cast<LoopInfo*>(data + overridePlayer); }
 
             static void Edit(ReplayMetadataContext& context);
         };
@@ -106,7 +106,7 @@ namespace rePlayer
         SmartPtr<io::Stream> m_stream;
         SmartPtr<io::Stream> m_tempStream;
         uade_state* m_uadeState;
-        uint32_t* m_durations = nullptr;
+        LoopInfo* m_loops = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
         Surround m_surround;

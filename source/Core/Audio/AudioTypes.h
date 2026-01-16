@@ -23,5 +23,15 @@ namespace core
 
         StereoSample operator*(float scale) const { return { left * scale, right * scale }; }
     };
+
+    struct LoopInfo
+    {
+        uint32_t start;
+        uint32_t length;
+
+        bool IsValid() const;
+        uint32_t GetDuration() const;
+        LoopInfo GetFixed() const;
+    };
 }
 // namespace core

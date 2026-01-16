@@ -98,9 +98,9 @@ namespace rePlayer
             ms_globals.stereoSeparation, 0, 100, "Stereo Separation %d%%");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_globals.surround, "Output: Stereo", "Output: Surround");
-        Durations(context, &entry->duration, 1, "Duration");
+        Loops(context, &entry->loop, 1);
 
-        context.metadata.Update(entry, entry->value == 0 && entry->duration == 0);
+        context.metadata.Update(entry, entry->value == 0 && !entry->loop.IsValid());
     }
 
     ReplayAyumi::Globals ReplayAyumi::ms_globals = {
@@ -121,7 +121,10 @@ namespace rePlayer
         , m_isrStep(textData.frame_rate / textData.sample_rate)
     {
         if (auto* settings = metadata.Find<Settings>())
-            m_currentDuration = (uint64_t(settings->duration) * GetSampleRate()) / 1000;
+        {
+            m_loop = settings->loop.GetFixed();
+            m_currentDuration = (uint64_t(m_loop.GetDuration()) * GetSampleRate()) / 1000;
+        }
     }
 
     uint32_t ReplayAyumi::Render(StereoSample* output, uint32_t numSamples)
@@ -134,6 +137,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loop.length) * GetSampleRate()) / 1000;
                 return 0;
             }
         }
@@ -209,6 +213,13 @@ namespace rePlayer
             seekSamples -= m_globalPosition;
         m_globalPosition = seekPosition;
 
+        m_currentPosition += seekSamples;
+        while (m_currentPosition >= m_currentDuration && m_currentDuration)
+        {
+            m_currentPosition -= m_currentDuration;
+            m_currentDuration = (uint64_t(m_loop.length) * GetSampleRate()) / 1000;
+        }
+
         while (seekSamples--)
         {
             m_isrCounter += m_isrStep;
@@ -270,6 +281,8 @@ namespace rePlayer
         m_currentPosition = 0;
         m_globalPosition = 0;
         m_isrCounter = 1.0;
+
+        m_currentDuration = (uint64_t(m_loop.GetDuration()) * GetSampleRate()) / 1000ull;
     }
 
     void ReplayAyumi::ApplySettings(const CommandBuffer metadata)
@@ -279,7 +292,10 @@ namespace rePlayer
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : globals->stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globals->surround);
         if (settings)
-            m_currentDuration = (uint64_t(settings->duration) * GetSampleRate()) / 1000;
+        {
+            m_loop = settings->loop.GetFixed();
+            m_currentDuration = (uint64_t(m_loop.GetDuration()) * GetSampleRate()) / 1000ull;
+        }
     }
 
     void ReplayAyumi::SetSubsong(uint32_t subsongIndex)
@@ -289,7 +305,7 @@ namespace rePlayer
 
     uint32_t ReplayAyumi::GetDurationMs() const
     {
-        return uint32_t(m_currentDuration * 1000ull / GetSampleRate());
+        return m_loop.GetDuration();
     }
 
     uint32_t ReplayAyumi::GetNumSubsongs() const

@@ -183,53 +183,9 @@ namespace rePlayer
             ImGui::Tooltip("Applied only on reload :(");
         ComboOverride("ForceStereo", GETSET(entry, overrideForceStereo), GETSET(entry, forceStereo),
             ms_forceStereo, "Default Panning", "Stereo Panning");
+        Loops(context, &entry->loop, 1, kDefaultSongDuration);
 
-        const float buttonSize = ImGui::GetFrameHeight();
-        bool isEnabled = entry->duration != 0;
-        uint32_t duration = isEnabled ? entry->duration : kDefaultSongDuration;
-        auto pos = ImGui::GetCursorPosX();
-        if (ImGui::Checkbox("##Checkbox", &isEnabled))
-            duration = kDefaultSongDuration;
-        ImGui::SameLine();
-        ImGui::BeginDisabled(!isEnabled);
-        auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 4 - buttonSize;
-        ImGui::SetNextItemWidth(2.0f * width / 3.0f - ImGui::GetCursorPosX() + pos);
-        ImGui::DragUint("##Duration", &duration, 1000.0f, 1, 0xffFFffFF, "Duration", ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
-        int32_t milliseconds = duration % 1000;
-        int32_t seconds = (duration / 1000) % 60;
-        int32_t minutes = duration / 60000;
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3 - buttonSize;
-        ImGui::SetNextItemWidth(width / 3.0f);
-        ImGui::DragInt("##Minutes", &minutes, 0.1f, 0, 65535, "%d m", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 2 - buttonSize;
-        ImGui::SetNextItemWidth(width / 2.0f);
-        ImGui::DragInt("##Seconds", &seconds, 0.1f, 0, 59, "%d s", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x - buttonSize;
-        ImGui::SetNextItemWidth(width);
-        ImGui::DragInt("##Milliseconds", &milliseconds, 1.0f, 0, 999, "%d ms", ImGuiSliderFlags_AlwaysClamp);
-        ImGui::SameLine();
-        if (ImGui::Button("E", ImVec2(buttonSize, 0.0f)))
-        {
-            context.duration = duration;
-            context.subsongIndex = 0;
-            context.isSongEndEditorEnabled = true;
-        }
-        else if (context.isSongEndEditorEnabled == false && context.duration != 0)
-        {
-            milliseconds = context.duration % 1000;
-            seconds = (context.duration / 1000) % 60;
-            minutes = context.duration / 60000;
-            context.duration = 0;
-        }
-        if (ImGui::IsItemHovered())
-            ImGui::Tooltip("Open Waveform Viewer");
-        ImGui::EndDisabled();
-        entry->duration = isEnabled ? uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds) : 0;
-
-        context.metadata.Update(entry, entry->value == 0 && entry->duration == 0);
+        context.metadata.Update(entry, entry->value == 0 && !entry->loop.IsValid());
     }
 
     int32_t ReplayVGM::ms_stereoSeparation = 100;
@@ -321,6 +277,7 @@ namespace rePlayer
         m_player->Reset();
         m_hasEnded = m_hasLooped = false;
         m_currentPosition = 0;
+        m_currentDuration = (uint64_t(m_loop.GetDuration()) * kSampleRate) / 1000;
     }
 
     void ReplayVGM::ApplySettings(const CommandBuffer metadata)
@@ -328,9 +285,8 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
-        m_currentDuration = (settings
-            && settings->numEntries == Settings().numEntries // check for older format as duration has been added after 0.6.0
-            && settings->duration) ? (uint64_t(settings->duration) * kSampleRate) / 1000 : 0;
+        m_loop = (settings && settings->loop.IsValid()) ? settings->loop : LoopInfo{};
+        m_currentDuration = (uint64_t(m_loop.GetDuration()) * kSampleRate) / 1000;
 
         bool forceStereo = (settings && settings->overrideForceStereo) ? settings->forceStereo : ms_forceStereo;
         std::vector<PLR_DEV_INFO> devInfos;
