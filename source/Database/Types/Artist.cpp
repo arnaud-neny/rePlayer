@@ -20,6 +20,7 @@ namespace rePlayer
     void ArtistData<storage>::Tooltip() const
     {
         ImGui::BeginTooltip();
+        ImGui::Text("Handle : %s", handles[0].Items());
         ImGui::Text("Songs  : %d", numSongs);
         if (!realName.IsEmpty())
             ImGui::Text("Name   : %s", realName.Items());
