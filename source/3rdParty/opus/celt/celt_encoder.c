@@ -595,6 +595,13 @@ void celt_preemphasis(const opus_res * OPUS_RESTRICT pcmp, celt_sig * OPUS_RESTR
       for (i=0;i<Nu;i++)
          inp[i*upsample] = MAX32(-65536.f, MIN32(65536.f,inp[i*upsample]));
    }
+#elif defined(ENABLE_RES24)
+   if (clip)
+   {
+      /* Clip input to avoid encoding non-portable files */
+      for (i=0;i<Nu;i++)
+         inp[i*upsample] = MAX32(-(65536<<SIG_SHIFT), MIN32(65536<<SIG_SHIFT,inp[i*upsample]));
+   }
 #else
    (void)clip; /* Avoids a warning about clip being unused. */
 #endif
@@ -1359,10 +1366,11 @@ static opus_val16 tone_detect(const celt_sig *in, int CC, int N, opus_val32 *ton
    opus_val32 lpc[2];
    opus_val16 freq;
    VARDECL(opus_val16, x);
+   SAVE_STACK;
    ALLOC(x, N, opus_val16);
    /* Shift by SIG_SHIFT+2 (+3 for stereo) to account for HF gain of the preemphasis filter. */
    if (CC==2) {
-      for (i=0;i<N;i++) x[i] = PSHR32(ADD32(in[i], in[i+N]), SIG_SHIFT+3);
+      for (i=0;i<N;i++) x[i] = PSHR32(ADD32(SHR32(in[i], 1), SHR32(in[i+N], 1)), SIG_SHIFT+2);
    } else {
       for (i=0;i<N;i++) x[i] = PSHR32(in[i], SIG_SHIFT+2);
    }
@@ -1389,6 +1397,7 @@ static opus_val16 tone_detect(const celt_sig *in, int CC, int N, opus_val32 *ton
       *toneishness=0;
    }
    /*printf("%f %f %f %f\n", freq, lpc[0], lpc[1], *toneishness);*/
+   RESTORE_STACK;
    return freq;
 }
 
@@ -1998,7 +2007,9 @@ int celt_encode_with_ec(CELTEncoder * OPUS_RESTRICT st, const opus_res * pcm, in
    }
    c=0; do {
       int need_clip=0;
-#ifndef FIXED_POINT
+#ifdef FIXED_POINT
+      need_clip = st->clip && sample_max>65536<<RES_SHIFT;
+#else
       need_clip = st->clip && sample_max>65536.f;
 #endif
       celt_preemphasis(pcm+c, in+c*(N+overlap)+overlap, N, CC, st->upsample,
