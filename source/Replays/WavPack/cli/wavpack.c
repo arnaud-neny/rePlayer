@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2025 David Bryant.                 //
+//                Copyright (c) 1998 - 2026 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,10 @@
 // wavpack.c
 
 // This is the main module for the WavPack command-line compressor.
+
+#ifndef ENABLE_LIBICONV
+#define LIBICONV_PLUG 1
+#endif
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -65,7 +69,7 @@
 
 static const char *sign_on = "\n"
 " WAVPACK  Hybrid Lossless Audio Compressor  %s Version %s\n"
-" Copyright (c) 1998 - 2025 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2026 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WAVPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -2465,7 +2469,7 @@ static int pack_file (char *infilename, char *outfilename, char *out2filename, c
         sum = WavpackGetEncodedNoise (wpc, &peak);
 
         error_line ("ave noise = %.2f dB, peak noise = %.2f dB",
-            log10 (sum / WavpackGetNumSamples64 (wpc) / full_scale_rms) * 10,
+            log10 (sum / WavpackGetSampleIndex64 (wpc) / full_scale_rms) * 10,
             log10 (peak / full_scale_rms) * 10);
     }
 
@@ -2810,8 +2814,10 @@ static int pack_dsd_audio (WavpackContext *wpc, FILE *infile, int qmode, unsigne
             if (md5_digest_source)
                 MD5_Update (&md5_context, input_buffer, bytes_read);
 
-            if (!sample_count)
+            if (!sample_count) {
+                samples_remaining = 0;
                 break;
+            }
 
             if (sample_count) {
                 if (qmode & QMODE_DSD_IN_BLOCKS) {
@@ -3520,7 +3526,7 @@ static int repack_file (char *infilename, char *outfilename, char *out2filename,
         sum = WavpackGetEncodedNoise (outfile, &peak);
 
         error_line ("ave noise = %.2f dB, peak noise = %.2f dB",
-            log10 (sum / WavpackGetNumSamples (outfile) / full_scale_rms) * 10,
+            log10 (sum / WavpackGetSampleIndex64 (outfile) / full_scale_rms) * 10,
             log10 (peak / full_scale_rms) * 10);
     }
 

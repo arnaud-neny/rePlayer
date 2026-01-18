@@ -184,9 +184,6 @@
     <ClCompile Include="cli\wvgain.c">
       <Filter>Source Files\cli</Filter>
     </ClCompile>
-    <ClCompile Include="cli\wvparser.c">
-      <Filter>Source Files\cli</Filter>
-    </ClCompile>
     <ClCompile Include="cli\wvtag.c">
       <Filter>Source Files\cli</Filter>
     </ClCompile>
@@ -210,5 +207,10 @@
     <MASM Include="src\unpack_x64.asm">
       <Filter>Source Files\src</Filter>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AUTHORS" />
+    <None Include="COPYING" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

@@ -404,12 +404,13 @@ uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t sa
         }
 #ifdef ENABLE_THREADS
         // This is where temporal multithreaded decoding occurs. If there's a worker thread available, and no errors
-        // have been encountered, and there are samples beyond this block to be decoded during this same call to
-        // WavpackUnpackSamples(), then we give this block to a worker thread to decode to completion. Because we
-        // are going to continue decoding the next block in this stream before this one completes, we must make a
-        // copy of the stream that can decode in isolation, and we instruct the worker thread to free everything
-        // associated with the stream context when it's done.
+        // have been encountered, and we are going to finish this block, and there are samples beyond this block to
+        // be decoded during this same call to WavpackUnpackSamples(), then we give this block to a worker thread to
+        // decode to completion. Because we are going to continue decoding the next block in this stream before this
+        // one completes, we must make a copy of the stream that can decode in isolation, and we instruct the worker
+        // thread to free everything associated with the stream context when it's done.
         else if (worker_available (wpc) && !wps->mute_error &&
+            wps->sample_index + samples_to_unpack == GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples &&
             wps->sample_index + samples > GET_BLOCK_INDEX (wps->wphdr) + wps->wphdr.block_samples) {
                 WavpackStream *wps_copy = malloc (sizeof (WavpackStream));
 
@@ -506,8 +507,10 @@ static void *unpack_samples_worker_thread (void *param)
         if (cxt->state == Quit)                     // break out if we're done
             break;
 
-        if (cxt->samcnt > temp_samples)             // reallocate temp buffer if not big enough
+        if (cxt->samcnt > temp_samples) {           // reallocate temp buffer if not big enough
             temp_buffer = (int32_t *) realloc (temp_buffer, (temp_samples = cxt->samcnt) * 8);
+            memset (temp_buffer, 0, temp_samples * 8);
+        }
 
         // this is where the work is done
         unpack_samples_interleave (cxt->wps, cxt->outbuf, cxt->offset, temp_buffer, cxt->samcnt);

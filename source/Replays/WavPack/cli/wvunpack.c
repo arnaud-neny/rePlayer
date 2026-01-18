@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //                           **** WAVPACK ****                            //
 //                  Hybrid Lossless Wavefile Compressor                   //
-//                Copyright (c) 1998 - 2025 David Bryant.                 //
+//                Copyright (c) 1998 - 2026 David Bryant.                 //
 //                          All Rights Reserved.                          //
 //      Distributed under the BSD Software License (see license.txt)      //
 ////////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,10 @@
 // wvunpack.c
 
 // This is the main module for the WavPack command-line decompressor.
+
+#ifndef ENABLE_LIBICONV
+#define LIBICONV_PLUG 1
+#endif
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -63,7 +67,7 @@
 
 static const char *sign_on = "\n"
 " WVUNPACK  Hybrid Lossless Audio Decompressor  %s Version %s\n"
-" Copyright (c) 1998 - 2025 David Bryant.  All Rights Reserved.\n\n";
+" Copyright (c) 1998 - 2026 David Bryant.  All Rights Reserved.\n\n";
 
 static const char *version_warning = "\n"
 " WARNING: WVUNPACK using libwavpack version %s, expected %s (see README)\n\n";
@@ -1522,9 +1526,9 @@ static int quick_verify_file (char *infilename, int verbose)
 
     if (total_samples != -1 && total_samples != block_index) {
         if (total_samples < block_index)
-            error_line ("quick verify: WavPack file contains %lld extra samples!", block_samples - total_samples);
+            error_line ("quick verify: WavPack file contains %lld extra samples!", block_index - total_samples);
         else
-            error_line ("quick verify: WavPack file is missing %lld samples!", total_samples - block_samples);
+            error_line ("quick verify: WavPack file is missing %lld samples!", total_samples - block_index);
 
         return WAVPACK_SOFT_ERROR;
     }
