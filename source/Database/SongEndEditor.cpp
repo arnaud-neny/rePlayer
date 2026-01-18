@@ -299,27 +299,20 @@ namespace rePlayer
         */
         // convert to mono
         m_busySpinner->Info("Converting to mono");
-#if !defined (WIN64) && !defined (_WIN64)
-        static constexpr int kDownsampleFactor = 8;
-        std::vector<float> mono(m_samples.NumItems() / kDownsampleFactor);
-        for (uint32_t i = 0, e = m_samples.NumItems() / kDownsampleFactor; i < e; i++)
+
+        auto downsampleFactor = m_loopDetection.downsampleFactor;
+        std::vector<float> mono(m_samples.NumItems() / downsampleFactor);
+        for (uint32_t i = 0, e = mono.size(); i < e; i++)
         {
-            float sample = m_samples[i * kDownsampleFactor].left + m_samples[i * kDownsampleFactor].right;
-            for (int j = 1; j < kDownsampleFactor; j++)
-                sample += m_samples[i * kDownsampleFactor + j].left + m_samples[i * kDownsampleFactor + j].right;
-            mono[i] = sample / kDownsampleFactor;
+            float sample = m_samples[i * downsampleFactor].left + m_samples[i * downsampleFactor].right;
+            for (uint32_t j = 1; j < downsampleFactor; j++)
+                sample += m_samples[i * downsampleFactor + j].left + m_samples[i * downsampleFactor + j].right;
+            mono[i] = sample / float(downsampleFactor);
         }
 
         // cache sample rate
-        auto sampleRate = m_replay->GetSampleRate() / kDownsampleFactor;
-#else
-        std::vector<float> mono(m_samples.NumItems());
-        for (uint32_t i = 0, e = m_samples.NumItems(); i < e; i++)
-            mono[i] = m_samples[i].left + m_samples[i].right;
+        auto sampleRate = m_replay->GetSampleRate() / downsampleFactor;
 
-        // cache sample rate
-        auto sampleRate = m_replay->GetSampleRate();
-#endif
         // compute autocorrelation using FFT convolution
         auto autocorrelate = [](const std::vector<float>& x)
         {
@@ -1015,6 +1008,7 @@ namespace rePlayer
             ImGui::EndDisabled();
             ImGui::BeginDisabled(m_silence >= 0 && m_silence < m_numSamples);
             ImGui::SeparatorText("Loop Length Params");
+            ImGui::DragUint("##downsampleFactor", &m_loopDetection.downsampleFactor, 0.05f, kMinDownsampleFactor, 16, "x%u downsample", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMin", &m_loopDetection.loopMin, 0.05f, 1, m_loopDetection.loopMax, "%us loop min", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMax", &m_loopDetection.loopMax, 0.05f, m_loopDetection.loopMin, m_numSamples / (5 * m_replay->GetSampleRate() / 2), "%us loop max", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragFloat("##peakThreshold", &m_loopDetection.peakThreshold, 0.001f, 0.45f, 0.65f, "%.2f peak threshold", ImGuiSliderFlags_AlwaysClamp);

@@ -82,8 +82,15 @@ namespace rePlayer
             ResizeRight
         } m_mouseMode = EditLoop::None;
 
+#if !defined (WIN64) && !defined (_WIN64)
+        static constexpr uint32_t kMinDownsampleFactor = 8; // memory issue on win32
+#else
+        static constexpr uint32_t kMinDownsampleFactor = 1;
+#endif
+
         struct
         {
+            uint32_t downsampleFactor = kMinDownsampleFactor;
             uint32_t loopMin = 10;
             uint32_t loopMax = 180;
             float peakThreshold = 0.58f; // 0.45-0.65
