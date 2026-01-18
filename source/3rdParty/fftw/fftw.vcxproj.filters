@@ -199,6 +199,9 @@
     <ClInclude Include="rdft\simd\hc2cfv.h">
       <Filter>Source Files\rdft\simd</Filter>
     </ClInclude>
+    <ClInclude Include="simd-support\x86-cpuid.h">
+      <Filter>Source Files\simd-support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="api\execute.c">

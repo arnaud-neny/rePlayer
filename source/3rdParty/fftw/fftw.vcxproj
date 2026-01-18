@@ -65,6 +65,7 @@
     <ClInclude Include="reodft\reodft.h" />
     <ClInclude Include="simd-support\simd-common.h" />
     <ClInclude Include="simd-support\simd-sse2.h" />
+    <ClInclude Include="simd-support\x86-cpuid.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="api\apiplan.c">
