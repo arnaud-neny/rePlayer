@@ -95,7 +95,7 @@ You can edit all the properties of a song there.
 - Settings: you can override here all the player parameters just for this song.
 - Source: list of sources where the song comes from. You can discard a source there.
 
-For some players, you can edit the song length. For that you can simply enter the length (click on the numbers or drag and drop like a slider), or use the wave editor (E) where a wave form of the song is generated. There you can left click to set your end of song marker; you can play the generated waveform and move its cursor with the right click.
+For some players, you can edit the song loop. For that you can simply enter the loop start and length (click on the numbers or drag and drop like a slider), or use the wave editor (E) where a wave form of the song is generated. There you can edit the loop range with left click; you can play the generated waveform and move its cursor with the right click. Silence is detected while the waveform is generated, or you can use the loop detector (it's working in most of the cases, but you might need to tweak it for some).
 
 ## The playlist
 
@@ -170,6 +170,7 @@ Or add some comments (and likes) there:
 - [Curl](https://curl.se): library for transferring data with URLs.
 - [Dear ImGui](https://github.com/ocornut/imgui/tree/docking): the docking version of Dear ImGui.
 - [dllloader](https://github.com/tapika/dllloader): a windows tool to be able to load multiple times the same dll as if it is a new one (very helpful to avoid refactoring old code with global variables everywhere).
+- [FFTW](https://www.fftw.org): library for computing the discrete Fourier transform.
 - [JSON](https://github.com/nlohmann/json): JSON for Modern C++.
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
 - [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.

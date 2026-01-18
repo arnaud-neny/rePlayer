@@ -1,19 +1,22 @@
-v0.21.4:
+v0.21.5:
 - Added SkaleTracker
 - Updated ASAP to 7.0.0
 - Updated libfc14audiodecoder to libtfmxaudiodecoder 1.0.1
 - Updated gbsplay to 0.0.101
-- Updated libsidplay to 2.15.2
+- Updated libsidplay to 2.16.0
 - Updated OpenMPT to 0.9.0-pre.9 r24409
-- Updated Opus to 1.6
+- Updated Opus to 1.6.1
 - Updated SunVox to 2.1.4
 - Updated vgmstream to r2055
-- Updated dr_flac to 0.13.2
-- Updated dr_mp3 to 0.7.2
-- Updated dr_wav to 0.14.3
+- Updated WavPack to 5.9.0
+- Updated Song End Editor to edit (and detect) loop instead of duration
+- Added FFTW 3.3.10
+- Updated dr_flac to 0.13.3
+- Updated dr_mp3 to 0.7.3
+- Updated dr_wav to 0.14.4
 - Updated ImGui to 1.92.5
-- Updated libarchive to 3.8.3
-- Updated libcurl to 8.17.0
+- Updated libarchive to 3.8.5
+- Updated libcurl to 8.18.0
 - Updated libxml2 to 2.15.1
 - Bug fixes
 

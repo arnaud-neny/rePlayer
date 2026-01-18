@@ -6,11 +6,12 @@
   To merge newer versions, replace imgui files in source\Core\ImGui and run batch DiffApplyImGui.bat (this will apply our changes to ImGui).  
   Then copy the imgui folder in rePlayer\external and run batch DiffMakeImGui.bat (this will create a patch file from the new version).
 - dllloader: https://github.com/tapika/dllloader
+- FFTW: https://www.fftw.org
 - JSON for Modern C++: https://github.com/nlohmann/json
-- stb (sprintf): https://github.com/nothings/stb
 - libarchive: https://github.com/libarchive/libarchive
 - libxml2: https://gitlab.gnome.org/GNOME/libxml2
 - TagLib: https://taglib.org
+- stb (sprintf): https://github.com/nothings/stb
 
 ## Replays Libraries:
 - adplug: https://github.com/adplug/adplug
