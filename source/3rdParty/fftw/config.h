@@ -331,10 +331,18 @@
 /* #undef SIZEOF_MPI_FINT */
 
 /* The size of `ptrdiff_t', as computed by sizeof. */
+#if (defined (WIN64) || defined (_WIN64))
 #define SIZEOF_PTRDIFF_T 8
+#else
+#define SIZEOF_PTRDIFF_T 4
+#endif
 
 /* The size of `size_t', as computed by sizeof. */
+#if (defined (WIN64) || defined (_WIN64))
 #define SIZEOF_SIZE_T 8
+#else
+#define SIZEOF_SIZE_T 4
+#endif
 
 /* The size of `unsigned int', as computed by sizeof. */
 #define SIZEOF_UNSIGNED_INT 4
@@ -346,7 +354,11 @@
 #define SIZEOF_UNSIGNED_LONG_LONG 8
 
 /* The size of `void *', as computed by sizeof. */
+#if (defined (WIN64) || defined (_WIN64))
 #define SIZEOF_VOID_P 8
+#else
+#define SIZEOF_VOID_P 4
+#endif
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
