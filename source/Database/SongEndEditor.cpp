@@ -299,17 +299,31 @@ namespace rePlayer
         */
         // convert to mono
         m_busySpinner->Info("Converting to mono");
+#if !defined (WIN64) && !defined (_WIN64)
+        static constexpr int kDownsampleFactor = 8;
+        std::vector<float> mono(m_samples.NumItems() / kDownsampleFactor);
+        for (uint32_t i = 0, e = m_samples.NumItems() / kDownsampleFactor; i < e; i++)
+        {
+            float sample = m_samples[i * kDownsampleFactor].left + m_samples[i * kDownsampleFactor].right;
+            for (int j = 1; j < kDownsampleFactor; j++)
+                sample += m_samples[i * kDownsampleFactor + j].left + m_samples[i * kDownsampleFactor + j].right;
+            mono[i] = sample / kDownsampleFactor;
+        }
+
+        // cache sample rate
+        auto sampleRate = m_replay->GetSampleRate() / kDownsampleFactor;
+#else
         std::vector<float> mono(m_samples.NumItems());
         for (uint32_t i = 0, e = m_samples.NumItems(); i < e; i++)
             mono[i] = m_samples[i].left + m_samples[i].right;
 
         // cache sample rate
         auto sampleRate = m_replay->GetSampleRate();
-
+#endif
         // compute autocorrelation using FFT convolution
         auto autocorrelate = [](const std::vector<float>& x)
         {
-            auto N = x.size();
+            auto N = int(x.size());
             int Nfft = 1;
             while (Nfft < 2 * N) Nfft <<= 1;
 
@@ -317,7 +331,7 @@ namespace rePlayer
             fftwf_complex* R = (fftwf_complex*)fftwf_malloc(sizeof(fftwf_complex) * (Nfft / 2 + 1));
             float* in = (float*)fftwf_malloc(sizeof(float) * Nfft);
             float* out = (float*)fftwf_malloc(sizeof(float) * Nfft);
-
+                                                                             
             std::fill(in + N, in + Nfft, 0.0f);
 
             float mean = std::accumulate(x.begin(), x.end(), 0.0f) / x.size();
@@ -718,7 +732,7 @@ namespace rePlayer
                 auto framePos = Clamp(offset + uint32_t(ImGui::GetMousePos().x - pos.x), 0u, m_frames.NumItems() - 1u);
                 auto cursorFrame = m_frames[framePos];
                 auto time = uint64_t(framePos) * numMillisecondsPerPixel;
-                ImGui::Tooltip("pos: %u:%02u:%03u\nmin: %d\nmax: %d\nrms: %u", time / 60000, (time / 1000) % 60, time % 1000
+                ImGui::Tooltip("pos: %u:%02u:%03u\nmin: %d\nmax: %d\nrms: %u", uint32_t(time / 60000), uint32_t(time / 1000) % 60, uint32_t(time % 1000)
                     , cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
             }
             if (ImGui::IsItemActive())
