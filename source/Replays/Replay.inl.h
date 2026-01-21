@@ -148,7 +148,9 @@ namespace rePlayer
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Open Waveform Viewer");
 
-            loops[i] = isEnabled ? loop : LoopInfo{};
+            if (!isEnabled)
+                loop = {};
+            loops[i] = loop;
             isZero &= !loop.IsValid();
 
             ImGui::EndDisabled();
