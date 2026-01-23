@@ -302,7 +302,7 @@ namespace rePlayer
 
         auto downsampleFactor = m_loopDetection.downsampleFactor;
         std::vector<float> mono(m_samples.NumItems() / downsampleFactor);
-        for (uint32_t i = 0, e = mono.size(); i < e; i++)
+        for (size_t i = 0, e = mono.size(); i < e; i++)
         {
             float sample = m_samples[i * downsampleFactor].left + m_samples[i * downsampleFactor].right;
             for (uint32_t j = 1; j < downsampleFactor; j++)
@@ -750,8 +750,8 @@ namespace rePlayer
                             m_mouseMode = EditLoop::Move; // move the loop by default
                             if (m_loop.length / numMillisecondsPerPixel >= kResizeWindow * 2)
                             {
-                                float delta_start = m_mousePosWithLoop - float(m_loop.start / numMillisecondsPerPixel - offset + pos.x);
-                                float delta_end = float(m_loop.GetDuration() / numMillisecondsPerPixel - offset + pos.x) - m_mousePosWithLoop;
+                                float delta_start = m_mousePosWithLoop - (float(m_loop.start / numMillisecondsPerPixel) - offset + pos.x);
+                                float delta_end = (float(m_loop.GetDuration() / numMillisecondsPerPixel) - offset + pos.x) - m_mousePosWithLoop;
                                 if (delta_start <= kResizeWindow)
                                     m_mouseMode = EditLoop::ResizeLeft; // resize the loop from the left
                                 else if (delta_end <= kResizeWindow)
