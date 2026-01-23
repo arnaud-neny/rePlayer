@@ -1006,7 +1006,6 @@ namespace rePlayer
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();
-            ImGui::BeginDisabled(m_silence >= 0 && m_silence < m_numSamples);
             ImGui::SeparatorText("Loop Length Params");
             ImGui::DragUint("##downsampleFactor", &m_loopDetection.downsampleFactor, 0.05f, kMinDownsampleFactor, 16, "x%u downsample", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMin", &m_loopDetection.loopMin, 0.05f, 1, m_loopDetection.loopMax, "%us loop min", ImGuiSliderFlags_AlwaysClamp);
@@ -1033,7 +1032,6 @@ namespace rePlayer
                 
                 ImGui::CloseCurrentPopup();
             }
-            ImGui::EndDisabled();
             ImGui::EndPopup();
         }
         else if (ImGui::IsItemHovered())
