@@ -74,7 +74,7 @@ namespace rePlayer
             ms_surround, "Output: Default", "Output: Surround");
         bool isZero = Loops(context, entry->loops, context.lastSubsongIndex + 1, kDefaultSongDuration);
 
-        context.metadata.Update(entry, isZero);
+        context.metadata.Update(entry, entry->value == 0 && isZero);
     }
 
     int32_t ReplaySNDHPlayer::ms_surround = 1;
