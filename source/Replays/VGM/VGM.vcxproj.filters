@@ -386,6 +386,15 @@
     <ClInclude Include="libvgm\emu\cores\msm5205.h">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\bsmt2000.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ics2115.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\msm5232.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGM.cpp">
@@ -689,6 +698,15 @@
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
     <ClCompile Include="libvgm\emu\cores\msm5205.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\bsmt2000.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\ics2115.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\msm5232.c">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
   </ItemGroup>

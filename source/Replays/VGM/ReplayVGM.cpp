@@ -1,8 +1,8 @@
 // Some minor changes are done in libvgm:
 // - emu/cores/2612intf.c
-// - emu/adlibemu.h
-// - emu/adlibemu_opl_inc.c
-// - emu/adlibemu_opl_inc.h
+// - emu/cores/adlibemu.h
+// - emu/cores/adlibemu_opl_inc.c
+// - emu/cores/adlibemu_opl_inc.h
 // - emu/cores/fmopn.c
 // - emu/cores/fmopn.h
 // - emu/cores/gb.c
@@ -27,7 +27,7 @@
 
 #include "yrw801.h"
 
-#define LIBVGM_VERSION "@e9f2b02"
+#define LIBVGM_VERSION "@57585ea"
 
 namespace rePlayer
 {

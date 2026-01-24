@@ -30,8 +30,8 @@
 #define SNDDEV_NES_APU
 #define SNDDEV_YMW258
 #define SNDDEV_UPD7759
-#define SNDDEV_OKIM6258
-#define SNDDEV_OKIM6295
+#define SNDDEV_MSM6258
+#define SNDDEV_MSM6295
 #define SNDDEV_K051649
 #define SNDDEV_K054539
 #define SNDDEV_C6280
@@ -53,6 +53,9 @@
 #define SNDDEV_K007232
 #define SNDDEV_K005289
 #define SNDDEV_MSM5205
+#define SNDDEV_MSM5232
+#define SNDDEV_BSMT2000
+#define SNDDEV_ICS2115
 #endif
 
 #ifdef SNDDEV_SN76496
@@ -109,10 +112,10 @@
 #ifdef SNDDEV_UPD7759
 #include "cores/upd7759.h"
 #endif
-#ifdef SNDDEV_OKIM6258
+#ifdef SNDDEV_MSM6258
 #include "cores/okim6258.h"
 #endif
-#ifdef SNDDEV_OKIM6295
+#ifdef SNDDEV_MSM6295
 #include "cores/okim6295.h"
 #endif
 #ifdef SNDDEV_K051649
@@ -177,6 +180,15 @@
 #endif
 #ifdef SNDDEV_MSM5205
 #include "cores/msm5205.h"
+#endif
+#ifdef SNDDEV_MSM5232
+#include "cores/msm5232.h"
+#endif
+#ifdef SNDDEV_BSMT2000
+#include "cores/bsmt2000.h"
+#endif
+#ifdef SNDDEV_ICS2115
+#include "cores/ics2115.h"
 #endif
 
 const DEV_DECL* sndEmu_Devices[] = {
@@ -246,11 +258,11 @@ const DEV_DECL* sndEmu_Devices[] = {
 #ifdef SNDDEV_UPD7759
 	&sndDev_uPD7759,
 #endif
-#ifdef SNDDEV_OKIM6258
-	&sndDev_OKIM6258,
+#ifdef SNDDEV_MSM6258
+	&sndDev_MSM6258,
 #endif
-#ifdef SNDDEV_OKIM6295
-	&sndDev_OKIM6295,
+#ifdef SNDDEV_MSM6295
+	&sndDev_MSM6295,
 #endif
 #ifdef SNDDEV_K051649
 	&sndDev_K051649,
@@ -314,6 +326,15 @@ const DEV_DECL* sndEmu_Devices[] = {
 #endif
 #ifdef SNDDEV_MSM5205
 	&sndDev_MSM5205,
+#endif
+#ifdef SNDDEV_MSM5232
+	&sndDev_MSM5232,
+#endif
+#ifdef SNDDEV_BSMT2000
+	&sndDev_BSMT2000,
+#endif
+#ifdef SNDDEV_ICS2115
+	&sndDev_ICS2115,
 #endif
 	NULL	// list end
 };

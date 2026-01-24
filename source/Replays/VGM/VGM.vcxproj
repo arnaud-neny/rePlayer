@@ -196,6 +196,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\adlibemu_opl_inc.h" />
     <ClInclude Include="libvgm\emu\cores\ay8910.h" />
     <ClInclude Include="libvgm\emu\cores\ayintf.h" />
+    <ClInclude Include="libvgm\emu\cores\bsmt2000.h" />
     <ClInclude Include="libvgm\emu\cores\c140.h" />
     <ClInclude Include="libvgm\emu\cores\c219.h" />
     <ClInclude Include="libvgm\emu\cores\c352.h" />
@@ -212,6 +213,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\fmopn.h" />
     <ClInclude Include="libvgm\emu\cores\fmopn_2608rom.h" />
     <ClInclude Include="libvgm\emu\cores\gb.h" />
+    <ClInclude Include="libvgm\emu\cores\ics2115.h" />
     <ClInclude Include="libvgm\emu\cores\iremga20.h" />
     <ClInclude Include="libvgm\emu\cores\k005289.h" />
     <ClInclude Include="libvgm\emu\cores\k007232.h" />
@@ -220,6 +222,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\k054539.h" />
     <ClInclude Include="libvgm\emu\cores\mikey.h" />
     <ClInclude Include="libvgm\emu\cores\msm5205.h" />
+    <ClInclude Include="libvgm\emu\cores\msm5232.h" />
     <ClInclude Include="libvgm\emu\cores\multipcm.h" />
     <ClInclude Include="libvgm\emu\cores\nesintf.h" />
     <ClInclude Include="libvgm\emu\cores\nes_apu.h" />
@@ -323,6 +326,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     </ClCompile>
     <ClCompile Include="libvgm\emu\cores\ay8910.c" />
     <ClCompile Include="libvgm\emu\cores\ayintf.c" />
+    <ClCompile Include="libvgm\emu\cores\bsmt2000.c" />
     <ClCompile Include="libvgm\emu\cores\c140.c" />
     <ClCompile Include="libvgm\emu\cores\c219.c" />
     <ClCompile Include="libvgm\emu\cores\c352.c" />
@@ -335,6 +339,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\fmopl.c" />
     <ClCompile Include="libvgm\emu\cores\fmopn.c" />
     <ClCompile Include="libvgm\emu\cores\gb.c" />
+    <ClCompile Include="libvgm\emu\cores\ics2115.c" />
     <ClCompile Include="libvgm\emu\cores\iremga20.c" />
     <ClCompile Include="libvgm\emu\cores\k005289.c" />
     <ClCompile Include="libvgm\emu\cores\k007232.c" />
@@ -343,6 +348,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\k054539.c" />
     <ClCompile Include="libvgm\emu\cores\mikey.c" />
     <ClCompile Include="libvgm\emu\cores\msm5205.c" />
+    <ClCompile Include="libvgm\emu\cores\msm5232.c" />
     <ClCompile Include="libvgm\emu\cores\multipcm.c" />
     <ClCompile Include="libvgm\emu\cores\nesintf.c" />
     <ClCompile Include="libvgm\emu\cores\nes_apu.c" />
