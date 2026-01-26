@@ -2,6 +2,7 @@
 #include "coding/coding.h"
 #include "layout/layout.h"
 #include "base/plugins.h"
+#include "base/info.h"
 
 
 /* Defines the list of accepted extensions. vgmstream doesn't use it internally so it's here
@@ -47,6 +48,7 @@ static const char* extension_list[] = {
     "ad", //txth/reserved [Xenosaga Freaks (PS2)]
     "adc", //txth/reserved [Tomb Raider The Last Revelation (DC), Tomb Raider Chronicles (DC)]
     "adm",
+    "adm2", //txth/reserved [Onmyou Taisenki: Byakko Enbu (PS2)]
     "adp",
     "adpcm",
     "adpcmx",
@@ -101,6 +103,7 @@ static const char* extension_list[] = {
     "b1s", //txth/reserved [7 Wonders of the Ancient World (PS2)]
     "baa",
     "baf",
+    "bao",
     "baka",
     "bank",
     "bar",
@@ -437,6 +440,7 @@ static const char* extension_list[] = {
     "opusx",
     "oto", //txth/reserved [Vampire Savior (SAT)]
     "ovb", //txth/semi [namCollection: Tekken (PS2), Tekken 5: Tekken 1-3 (PS2)]
+    "owp",
 
     "p04", //txth/reserved [Psychic Force 2012 (DC), Skies of Arcadia (DC)]
     "p08", //txth/reserved [SoulCalibur (DC)]
@@ -538,6 +542,7 @@ static const char* extension_list[] = {
     "seg",
     "sem", //txth/reserved [Oretachi Game Center Zoku: Sonic Wings (PS2)]
     "sf0",
+    "sfa",
     "sfl",
     "sfs",
     "sfx",
@@ -564,10 +569,12 @@ static const char* extension_list[] = {
     "snu",
     "snz", //txth/reserved [Killzone HD (PS3)]
     "sod",
+    "sounds",
     "son",
     "spc",
     "sph",
     "spt",
+    "spk",
     "spm",
     "sps",
     "spsd",
@@ -1305,8 +1312,8 @@ static const meta_info meta_info_list[] = {
         {meta_HCA,                  "CRI HCA header"},
         {meta_SVAG_SNK,             "SNK SVAG header"},
         {meta_VDS_VDM,              "Procyon Studio VDS/VDM header"},
-        {meta_FFMPEG,               "FFmpeg supported format"},
-        {meta_FFMPEG_faulty,        "FFmpeg supported format (check log)"},
+        {meta_FFMPEG,               "FFmpeg format"},
+        {meta_FFMPEG_faulty,        "FFmpeg format (check log)"},
         {meta_CXS,                  "tri-Crescendo CXS header"},
         {meta_AKB,                  "Square Enix AKB header"},
         {meta_PASX,                 "Premium Agency PASX header"},
@@ -1363,9 +1370,9 @@ static const meta_info meta_info_list[] = {
         {meta_SRE_PCM,              "Capcom .SRE+PCM header"},
         {meta_DSP_MCADPCM,          "Bethesda .mcadpcm header"},
         {meta_UBI_LYN,              "Ubisoft LyN RIFF header"},
-        {meta_MSB_MSH,              "Sony MultiStream MSH+MSB header"},
+        {meta_MSH_MSB,              "Sony MultiStream MSH+MSB header"},
         {meta_TXTP,                 "TXTP generic header"},
-        {meta_SMC_SMH,              "Genki SMC+SMH header"},
+        {meta_SMH_SMC,              "Genki SMH+SMC header"},
         {meta_PPST,                 "epics PPST header"},
         {meta_SPS_N1,               "Nippon Ichi .SPS header"},
         {meta_UBI_BAO,              "Ubisoft BAO header"},
@@ -1455,14 +1462,14 @@ static const meta_info meta_info_list[] = {
         {meta_DSP_CWAC,             "CRI CWAC header"},
         {meta_COMPRESSWAVE,         "CompressWave .cwav header"},
         {meta_KTAC,                 "Koei Tecmo KTAC header"},
-        {meta_MJB_MJH,              "Sony MultiStream MJH+MJB header"},
+        {meta_MJH_MJB,              "Sony MultiStream MJH+MJB header"},
         {meta_BSNF,                 "id Software BSNF header"},
         {meta_TAC,                  "tri-Ace Codec header"},
         {meta_IDSP_TOSE,            "TOSE .IDSP header"},
         {meta_DSP_KWA,              "Kuju London .KWA header"},
         {meta_OGV_3RDEYE,           "3rdEye .OGV header"},
         {meta_PIFF_TPCM,            "Tantalus PIFF TPCM header"},
-        {meta_WXD_WXH,              "Relic WXD+WXH header"},
+        {meta_WXH_WXD,              "Relic WXH+WXD header"},
         {meta_BNK_RELIC,            "Relic BNK header"},
         {meta_XSH_XSD_XSS,          "Treyarch XSH+XSD/XSS header"},
         {meta_PSB,                  "M2 PSB header"},
@@ -1511,6 +1518,9 @@ static const meta_info meta_info_list[] = {
         {meta_JAUDIO,               "Nintendo JAudio header"},
         {meta_BCF1,                 "RAD BCF1 header"},
         {meta_UEBA,                 "Epic Games UEBA header"},
+        {meta_WD,                   "Square WD header"},
+        {meta_BWAV_WARTHOG,         "Warthog .BWAV header"},
+        {meta_PS2P,                 "THQ Australia PS2P header"},
 };
 
 void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t out_size) {
@@ -1679,5 +1689,15 @@ void get_vgmstream_meta_description(VGMSTREAM* vgmstream, char* out, size_t out_
             description = meta_info_list[i].description;
     }
 
-    strncpy(out, description, out_size);
+#ifdef VGM_USE_FFMPEG
+    if (vgmstream->coding_type ==  coding_FFmpeg) {
+        const char* description_ffmpeg = ffmpeg_get_format_name(vgmstream->codec_data);
+        if (description_ffmpeg != NULL) {
+            snprintf(out, out_size, "%s (%s)", description, description_ffmpeg);
+            return;
+        }
+    }
+#endif
+
+    snprintf(out, out_size, "%s", description);
 }

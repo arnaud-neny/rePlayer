@@ -89,7 +89,7 @@ static inline int clamp_pcm24(int32_t val) {
 
 static inline int clamp_pcm32(int64_t val) {
     if (val > 2147483647) return 2147483647;
-    else if (val < -2147483648) return -2147483648;
+    else if (val < (-2147483647 - 1)) return (-2147483647 - 1);
     else return val;
 }
 
@@ -158,7 +158,7 @@ int sfmt_get_sample_size(sfmt_t fmt) {
         case SFMT_O24:
            return 0x03;
         default:
-            VGM_LOG("SBUF: undefined sample format %i found\n", fmt);
+            VGM_LOG_ONCE("SBUF: undefined sample format %i found\n", fmt);
             return 0; //TODO return 4 to avoid crashes?
     }
 }
@@ -429,7 +429,7 @@ void sbuf_copy_layers(sbuf_t* sdst, sbuf_t* ssrc, int dst_ch_start, int dst_max)
 
     sbuf_layer_t sbuf_layer_src_dst = layer_matrix[ssrc->fmt][sdst->fmt];
     if (!sbuf_layer_src_dst) {
-        VGM_LOG("SBUF: undefined layer function sfmt %i to %i\n", ssrc->fmt, sdst->fmt);
+        VGM_LOG_ONCE("SBUF: undefined layer function sfmt %i to %i\n", ssrc->fmt, sdst->fmt);
         return;
     }
 

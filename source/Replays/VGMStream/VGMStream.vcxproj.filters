@@ -101,9 +101,6 @@
     <ClInclude Include="vgmstream\version.h">
       <Filter>Source Files\vgmstream</Filter>
     </ClInclude>
-    <ClInclude Include="vgmstream\src\api.h">
-      <Filter>Source Files\vgmstream\src</Filter>
-    </ClInclude>
     <ClInclude Include="vgmstream\src\streamfile.h">
       <Filter>Source Files\vgmstream\src</Filter>
     </ClInclude>
@@ -1754,6 +1751,24 @@
     <ClInclude Include="vgmstream\src\meta\ubi_bao_config.h">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClInclude>
+    <ClInclude Include="vgmstream\src\base\info.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\minimp3_vgmstream.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\ubi_bao_parser.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\reader_helper.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\spu_utils.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\fsb_fev.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGMStream.cpp">
@@ -2551,9 +2566,6 @@
     <ClCompile Include="vgmstream\src\meta\mib_mih.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\mjb_mjh.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\mogg.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2567,9 +2579,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\msa.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\msb_msh.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\msf.c">
@@ -3067,9 +3076,6 @@
     <ClCompile Include="vgmstream\src\meta\wwise.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\wxd_wxh.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\xa.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -3185,9 +3191,6 @@
       <Filter>Source Files\vgmstream\src\util</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\util\paths.c">
-      <Filter>Source Files\vgmstream\src\util</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\util\reader.c">
       <Filter>Source Files\vgmstream\src\util</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\util\sf_utils.c">
@@ -4811,6 +4814,36 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\util\reader_put.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\minimp3_vgmstream.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\bwav_warthog.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\mjh_mjb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\msh_msb.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ps2p.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ubi_bao_parser.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wxh_wxd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\reader_text.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\spu_utils.c">
       <Filter>Source Files\vgmstream\src\util</Filter>
     </ClCompile>
   </ItemGroup>

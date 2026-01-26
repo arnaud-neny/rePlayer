@@ -48,6 +48,9 @@ VGMSTREAM* init_vgmstream_ffmpeg(STREAMFILE* sf) {
     if (id == get_id32be("1FCB"))
         return NULL;
 
+    if (check_extensions(sf, "sbao,bao"))
+        return NULL;
+
     if (target_subsong == 0) target_subsong = 1;
 
     /* init ffmpeg */
@@ -69,7 +72,8 @@ VGMSTREAM* init_vgmstream_ffmpeg(STREAMFILE* sf) {
 
     /* hack for AAC files (will return 0 samples if not an actual file) */
     if (!num_samples && check_extensions(sf, "aac,laac")) {
-        num_samples = aac_get_samples(sf, 0x00, get_streamfile_size(sf));
+        int frame_samples = ffmpeg_get_frame_samples(data);
+        num_samples = aac_get_samples_fs(sf, 0x00, get_streamfile_size(sf), frame_samples);
 
         if (num_samples > 0) {
             /* FFmpeg seeks to 0 eats first frame for whatever reason */

@@ -1,6 +1,5 @@
 // vgmstream customed files:
 // - base/render.c
-// - coding/coding.h
 // - coding/ffmpeg_decoder.c
 // - formats.c
 // - vgmstream.h
@@ -12,8 +11,9 @@
 
 extern "C" {
 #include "vgmstream/version.h"
-#include "vgmstream/src/api.h"
+#include "vgmstream/src/base/info.h"
 #include "vgmstream/src/base/mixing.h"
+#include "vgmstream/src/base/plugins.h"
 }
 
 namespace rePlayer
@@ -21,7 +21,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::VGMStream,
         .name = "vgmstream",
-        .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2025 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
+        .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2026 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
             "Thealexbarney, CyberBotX, et al\n"
             "Portions Copyright (c) 2004-2008, Marko Kreen\n"

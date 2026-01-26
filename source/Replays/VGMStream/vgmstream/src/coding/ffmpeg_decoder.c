@@ -958,6 +958,10 @@ void free_ffmpeg(void* priv_data) {
         data->header_block = NULL;
     }
 
+    if (data->sbuf) {
+        free(data->sbuf);
+    }
+
     close_streamfile(data->sf);
     free(data);
 }
@@ -1059,6 +1063,16 @@ const char* ffmpeg_get_codec_name(ffmpeg_codec_data* data) {
     return NULL;
 }
 
+const char* ffmpeg_get_format_name(ffmpeg_codec_data* data) {
+    if (!data || !data->formatCtx || !data->formatCtx->iformat)
+        return NULL;
+    if (data->formatCtx->iformat->long_name)
+        return data->formatCtx->iformat->long_name;
+    if (data->formatCtx->iformat->name)
+        return data->formatCtx->iformat->name;
+    return NULL;
+}
+
 void ffmpeg_set_force_seek(ffmpeg_codec_data* data) {
     if (!data)
         return;
@@ -1105,16 +1119,6 @@ const char* ffmpeg_get_metadata_value(ffmpeg_codec_data* data, const char* key) 
     return avde->value;
 }
 
-// rePlayer begin
-const char* ffmpeg_get_format_name(ffmpeg_codec_data* data)
-{
-    if (!data)
-        return NULL;
-
-    return data->formatCtx->iformat->long_name;
-}
-// rePlayer end
-
 int32_t ffmpeg_get_samples(ffmpeg_codec_data* data) {
     if (!data)
         return 0;
@@ -1125,6 +1129,12 @@ int ffmpeg_get_sample_rate(ffmpeg_codec_data* data) {
     if (!data || !data->codecCtx)
         return 0;
     return data->codecCtx->sample_rate;
+}
+
+int ffmpeg_get_frame_samples(ffmpeg_codec_data* data) {
+    if (!data || !data->codecCtx)
+        return 0;
+    return data->codecCtx->frame_size;
 }
 
 int ffmpeg_get_channels(ffmpeg_codec_data* data) {

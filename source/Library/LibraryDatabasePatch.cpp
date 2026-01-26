@@ -16,21 +16,22 @@ namespace rePlayer
     void LibraryDatabase::Patch()
     {
         static constexpr uint32_t kSongsVersionWithArchive = 2;
-        static constexpr eExtension kExtension_mdxPk = eExtension::_rk;
-        static constexpr eExtension kExtension_qsfPk = eExtension::_rar;
-        static constexpr eExtension kExtension_gsfPk = eExtension::_7z;
-        static constexpr eExtension kExtension_2sfPk = eExtension::_gz;
-        static constexpr eExtension kExtension_ssfPk = eExtension::_liq;
-        static constexpr eExtension kExtension_dsfPk = eExtension::_rtm;
-        static constexpr eExtension kExtension_psfPk = eExtension::_mgt;
-        static constexpr eExtension kExtension_psf2Pk = eExtension::_fnk;
-        static constexpr eExtension kExtension_usfPk = eExtension::_arch;
-        static constexpr eExtension kExtension_snsfPk = eExtension::_coco;
-        static constexpr eExtension kExtension_mbmPk = eExtension::_cba;
-        static constexpr eExtension kExtension_musPk = eExtension::_a2t;
-        static constexpr eExtension kExtension_eupPk = eExtension::_etx;
         if (SongsVersion() < kSongsVersionWithArchive)
         {
+            static constexpr eExtension kExtension_mdxPk = eExtension::_rk;
+            static constexpr eExtension kExtension_qsfPk = eExtension::_rar;
+            static constexpr eExtension kExtension_gsfPk = eExtension::_7z;
+            static constexpr eExtension kExtension_2sfPk = eExtension::_gz;
+            static constexpr eExtension kExtension_ssfPk = eExtension::_liq;
+            static constexpr eExtension kExtension_dsfPk = eExtension::_rtm;
+            static constexpr eExtension kExtension_psfPk = eExtension::_mgt;
+            static constexpr eExtension kExtension_psf2Pk = eExtension::_fnk;
+            static constexpr eExtension kExtension_usfPk = eExtension::_arch;
+            static constexpr eExtension kExtension_snsfPk = eExtension::_coco;
+            static constexpr eExtension kExtension_mbmPk = eExtension::_cba;
+            static constexpr eExtension kExtension_musPk = eExtension::_a2t;
+            static constexpr eExtension kExtension_eupPk = eExtension::_etx;
+
             for (auto* song : Songs())
             {
                 struct ArchiveBuffer : public Array<uint8_t>
@@ -358,6 +359,28 @@ namespace rePlayer
             }
             Raise(Database::Flag::kSaveSongs);
             m_hasFailedDeletes = true;
+        }
+        static constexpr uint32_t kVersionSid = (0 << 28) | (21 << 14) | 5; // psid and rsid are merged into sid
+        if (SongsVersion() <= kVersionSid)
+        {
+            static constexpr eExtension kExtension_rsid = eExtension::_bao;
+            static constexpr eExtension kExtension_psid = eExtension::_owp;
+            for (auto* song : Songs())
+            {
+                if (song->GetType().ext == kExtension_rsid || song->GetType().ext == kExtension_psid)
+                {
+                    auto oldFilename = GetFullpath(song);
+                    oldFilename.resize(oldFilename.size() - 3);
+                    if (song->GetType().ext == kExtension_rsid)
+                        oldFilename += "rsid";
+                    else
+                        oldFilename += "psid";
+                    auto songSheet = song->Edit();
+                    songSheet->type.ext = eExtension::_sid;
+                    Move(oldFilename, song, "Patch");
+                }
+            }
+            Raise(Database::Flag::kSaveSongs);
         }
     }
 }

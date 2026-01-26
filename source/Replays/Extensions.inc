@@ -55,8 +55,8 @@ EXTENSION(stx)          // OpenMPT & XMP & VGMStream
 EXTENSION(symmod)
 EXTENSION(smod)
 EXTENSION(fc)
-EXTENSION(rsid)         // Deprecated
-EXTENSION(psid)         // Deprecated
+EXTENSION(bao)          // VGMStream
+EXTENSION(owp)          // VGMStream
 EXTENSION(v2m)
 EXTENSION(sndh)
 EXTENSION(sc68)
@@ -999,3 +999,6 @@ EXTENSION(wxv)          // VGMStream
 EXTENSION(xbw)          // VGMStream
 EXTENSION(md1)          // ASAP
 EXTENSION(md2)          // ASAP
+EXTENSION(sfa)          // VGMStream
+EXTENSION(sounds)       // VGMStream
+EXTENSION(spk)          // VGMStream

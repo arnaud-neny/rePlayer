@@ -588,11 +588,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="speex\libspeex\vq_bfin.h" />
     <ClInclude Include="speex\libspeex\vq_sse.h" />
     <ClInclude Include="speex\libspeex\_kiss_fft_guts.h" />
-    <ClInclude Include="vgmstream\src\api.h" />
     <ClInclude Include="vgmstream\src\base\api_internal.h" />
     <ClInclude Include="vgmstream\src\base\codec_info.h" />
     <ClInclude Include="vgmstream\src\base\decode.h" />
     <ClInclude Include="vgmstream\src\base\decode_state.h" />
+    <ClInclude Include="vgmstream\src\base\info.h" />
     <ClInclude Include="vgmstream\src\base\mixer.h" />
     <ClInclude Include="vgmstream\src\base\mixer_priv.h" />
     <ClInclude Include="vgmstream\src\base\mixing.h" />
@@ -618,6 +618,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\coding\libs\ka1a_dec_data.h" />
     <ClInclude Include="vgmstream\src\coding\libs\libacm.h" />
     <ClInclude Include="vgmstream\src\coding\libs\minimp3.h" />
+    <ClInclude Include="vgmstream\src\coding\libs\minimp3_vgmstream.h" />
     <ClInclude Include="vgmstream\src\coding\libs\mio_erisacontext.h" />
     <ClInclude Include="vgmstream\src\coding\libs\mio_erisafile.h" />
     <ClInclude Include="vgmstream\src\coding\libs\mio_erisamatrix.h" />
@@ -660,6 +661,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\meta\encrypted_mc161_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\fsb5_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\fsb_encrypted_streamfile.h" />
+    <ClInclude Include="vgmstream\src\meta\fsb_fev.h" />
     <ClInclude Include="vgmstream\src\meta\fsb_interleave_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\fsb_keys.h" />
     <ClInclude Include="vgmstream\src\meta\hca_bf.h" />
@@ -690,6 +692,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\meta\txth_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\txtp.h" />
     <ClInclude Include="vgmstream\src\meta\ubi_bao_config.h" />
+    <ClInclude Include="vgmstream\src\meta\ubi_bao_parser.h" />
     <ClInclude Include="vgmstream\src\meta\ubi_bao_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\ubi_ckd_cwav_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\ubi_lyn_streamfile.h" />
@@ -726,10 +729,12 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\util\paths.h" />
     <ClInclude Include="vgmstream\src\util\reader_get.h" />
     <ClInclude Include="vgmstream\src\util\reader_get_nibbles.h" />
+    <ClInclude Include="vgmstream\src\util\reader_helper.h" />
     <ClInclude Include="vgmstream\src\util\reader_put.h" />
     <ClInclude Include="vgmstream\src\util\reader_sf.h" />
     <ClInclude Include="vgmstream\src\util\reader_text.h" />
     <ClInclude Include="vgmstream\src\util\sf_utils.h" />
+    <ClInclude Include="vgmstream\src\util\spu_utils.h" />
     <ClInclude Include="vgmstream\src\util\text_reader.h" />
     <ClInclude Include="vgmstream\src\util\vgmstream_limits.h" />
     <ClInclude Include="vgmstream\src\util\vorbis_codebooks.h" />
@@ -1541,6 +1546,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\coding\libs\ka1a_dec.c" />
     <ClCompile Include="vgmstream\src\coding\libs\libacm_decode.c" />
     <ClCompile Include="vgmstream\src\coding\libs\libacm_util.c" />
+    <ClCompile Include="vgmstream\src\coding\libs\minimp3_vgmstream.c" />
     <ClCompile Include="vgmstream\src\coding\libs\mio_erisacontext.c" />
     <ClCompile Include="vgmstream\src\coding\libs\mio_erisafile.c" />
     <ClCompile Include="vgmstream\src\coding\libs\mio_erisamatrix.c" />
@@ -1716,6 +1722,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\bsf.c" />
     <ClCompile Include="vgmstream\src\meta\btsnd.c" />
     <ClCompile Include="vgmstream\src\meta\bwav.c" />
+    <ClCompile Include="vgmstream\src\meta\bwav_warthog.c" />
     <ClCompile Include="vgmstream\src\meta\bw_mp3_riff.c" />
     <ClCompile Include="vgmstream\src\meta\caf.c" />
     <ClCompile Include="vgmstream\src\meta\cf_df.c" />
@@ -1838,7 +1845,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\mib_mih.c" />
     <ClCompile Include="vgmstream\src\meta\mic_koei.c" />
     <ClCompile Include="vgmstream\src\meta\mio.c" />
-    <ClCompile Include="vgmstream\src\meta\mjb_mjh.c" />
+    <ClCompile Include="vgmstream\src\meta\mjh_mjb.c" />
     <ClCompile Include="vgmstream\src\meta\mogg.c" />
     <ClCompile Include="vgmstream\src\meta\mp4.c" />
     <ClCompile Include="vgmstream\src\meta\mp4_faac.c" />
@@ -1846,11 +1853,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\mpds.c" />
     <ClCompile Include="vgmstream\src\meta\mpeg.c" />
     <ClCompile Include="vgmstream\src\meta\msa.c" />
-    <ClCompile Include="vgmstream\src\meta\msb_msh.c" />
     <ClCompile Include="vgmstream\src\meta\msf.c" />
     <ClCompile Include="vgmstream\src\meta\msf_banpresto.c" />
     <ClCompile Include="vgmstream\src\meta\msf_konami.c" />
     <ClCompile Include="vgmstream\src\meta\msf_tamasoft.c" />
+    <ClCompile Include="vgmstream\src\meta\msh_msb.c" />
     <ClCompile Include="vgmstream\src\meta\msv.c" />
     <ClCompile Include="vgmstream\src\meta\mta2.c" />
     <ClCompile Include="vgmstream\src\meta\mtaf.c" />
@@ -1901,6 +1908,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\pos.c" />
     <ClCompile Include="vgmstream\src\meta\pphd.c" />
     <ClCompile Include="vgmstream\src\meta\ppst.c" />
+    <ClCompile Include="vgmstream\src\meta\ps2p.c" />
     <ClCompile Include="vgmstream\src\meta\ps2_adm.c" />
     <ClCompile Include="vgmstream\src\meta\ps2_bmdx.c" />
     <ClCompile Include="vgmstream\src\meta\ps2_joe.c" />
@@ -2009,6 +2017,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\ubi_apm.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_bao.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_bao_config.c" />
+    <ClCompile Include="vgmstream\src\meta\ubi_bao_parser.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_ckd.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_ckd_cwav.c" />
     <ClCompile Include="vgmstream\src\meta\ubi_hx.c" />
@@ -2049,13 +2058,14 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\wave_segmented.c" />
     <ClCompile Include="vgmstream\src\meta\wb.c" />
     <ClCompile Include="vgmstream\src\meta\wbk.c" />
+    <ClCompile Include="vgmstream\src\meta\wd.c" />
     <ClCompile Include="vgmstream\src\meta\wpd.c" />
     <ClCompile Include="vgmstream\src\meta\wsi.c" />
     <ClCompile Include="vgmstream\src\meta\ws_aud.c" />
     <ClCompile Include="vgmstream\src\meta\wv6.c" />
     <ClCompile Include="vgmstream\src\meta\wvs.c" />
     <ClCompile Include="vgmstream\src\meta\wwise.c" />
-    <ClCompile Include="vgmstream\src\meta\wxd_wxh.c" />
+    <ClCompile Include="vgmstream\src\meta\wxh_wxd.c" />
     <ClCompile Include="vgmstream\src\meta\xa.c" />
     <ClCompile Include="vgmstream\src\meta\xa2_acclaim.c" />
     <ClCompile Include="vgmstream\src\meta\xabp.c" />
@@ -2102,9 +2112,10 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\util\meta_utils.c" />
     <ClCompile Include="vgmstream\src\util\miniz.c" />
     <ClCompile Include="vgmstream\src\util\paths.c" />
-    <ClCompile Include="vgmstream\src\util\reader.c" />
     <ClCompile Include="vgmstream\src\util\reader_put.c" />
+    <ClCompile Include="vgmstream\src\util\reader_text.c" />
     <ClCompile Include="vgmstream\src\util\sf_utils.c" />
+    <ClCompile Include="vgmstream\src\util\spu_utils.c" />
     <ClCompile Include="vgmstream\src\util\text_reader.c" />
     <ClCompile Include="vgmstream\src\util\vorbis_codebooks.c" />
     <ClCompile Include="vgmstream\src\vgmstream.c" />

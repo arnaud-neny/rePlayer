@@ -2,9 +2,10 @@
 #include "../coding/coding.h"
 #include "../layout/layout.h"
 #include "fsb_interleave_streamfile.h"
+#include "fsb_fev.h"
 
 
-typedef enum { MPEG, XBOX_IMA, FSB_IMA, PSX, XMA1, XMA2, DSP, CELT, PCM8, PCM8U, PCM16LE, PCM16BE, SILENCE } fsb_codec_t;
+typedef enum { NONE, MPEG, XBOX_IMA, FSB_IMA, PSX, XMA1, XMA2, DSP, CELT, PCM8, PCM8U, PCM16LE, PCM16BE, SILENCE } fsb_codec_t;
 typedef struct {
     /* main header */
     uint32_t id;
@@ -42,6 +43,7 @@ typedef struct {
 } fsb_header_t;
 
 static bool parse_fsb(fsb_header_t* fsb, STREAMFILE* sf);
+static void get_name(char* buf, size_t buf_size, fsb_header_t* fsb, STREAMFILE* sf_fsb);
 static layered_layout_data* build_layered_fsb_celt(STREAMFILE* sf, fsb_header_t* fsb, bool is_new_lib);
 
 /* FSB1~4 - from games using FMOD audio middleware */
@@ -51,7 +53,7 @@ VGMSTREAM* init_vgmstream_fsb(STREAMFILE* sf) {
 
 
     /* checks */
-    uint32_t id = read_u32be(0x00,sf);
+    uint32_t id = read_u32be(0x00, sf);
     if (id < get_id32be("FSB1") || id > get_id32be("FSB4"))
         return NULL;
 
@@ -78,8 +80,7 @@ VGMSTREAM* init_vgmstream_fsb(STREAMFILE* sf) {
     vgmstream->num_streams = fsb.total_subsongs;
     vgmstream->stream_size = fsb.stream_size;
     vgmstream->meta_type = fsb.meta_type;
-    if (fsb.name_offset)
-        read_string(vgmstream->stream_name, fsb.name_size + 1, fsb.name_offset, sf);
+    get_name(vgmstream->stream_name, STREAM_NAME_SIZE, &fsb, sf);
 
     switch(fsb.codec) {
 
@@ -386,6 +387,10 @@ static void fix_loops(fsb_header_t* fsb) {
 
 /* covert codec info incomprehensibly defined as bitflags into single codec */
 static void load_codec(fsb_header_t* fsb) {
+    // for rare cases were codec is preloaded while reading the header
+    if (fsb->codec)
+        return;
+
     if      (fsb->mode & FSOUND_MPEG)        fsb->codec = MPEG;
     else if (fsb->mode & FSOUND_IMAADPCM)    fsb->codec = XBOX_IMA;
     else if (fsb->mode & FSOUND_VAG)         fsb->codec = PSX;
@@ -523,12 +528,13 @@ static bool parse_fsb(fsb_header_t* fsb, STREAMFILE* sf) {
         /* sample header (N-stream) */
         {
             int i;
-            off_t header_offset = fsb->base_header_size;
-            off_t data_offset = fsb->base_header_size + fsb->sample_headers_size;
+            uint32_t header_offset = fsb->base_header_size;
+            uint32_t data_offset = fsb->base_header_size + fsb->sample_headers_size;
 
             /* find target_stream header (variable sized) */
             for (i = 0; i < fsb->total_subsongs; i++) {
                 uint32_t stream_header_size;
+                bool null_name = false;
 
                 if ((fsb->flags & FMOD_FSB_SOURCE_BASICHEADERS) && i > 0) {
                     /* miniheader, all subsongs reuse first header (rare) [Biker Mice from Mars (PS2)] */
@@ -537,6 +543,12 @@ static bool parse_fsb(fsb_header_t* fsb, STREAMFILE* sf) {
                     fsb->stream_size    = read_u32le(header_offset+0x04,sf);
                     fsb->loop_start     = 0;
                     fsb->loop_end       = 0;
+
+                    /* DSP extra data (coefs, init ps/hist etc.) [Manhunt 2 (Wii)] */
+                    if (fsb->mode & FSOUND_GCADPCM) {
+                        fsb->extradata_offset = header_offset + stream_header_size;
+                        stream_header_size += 0x2e * fsb->channels;
+                    }
 
                     /* XMA basic headers have extra data [Forza Motorsport 3 (X360)] */
                     if (fsb->mode & FSOUND_XMA) {
@@ -582,24 +594,38 @@ static bool parse_fsb(fsb_header_t* fsb, STREAMFILE* sf) {
                         if (fsb->first_extradata_offset == 0)
                             fsb->first_extradata_offset = fsb->extradata_offset;
                     }
+
+                    // Inversion (PC)-ru has some null names with garbage offsets from prev streams (not in X360/PS3)
+                    // seen in MPEG and CPM16
+                    if (fsb->version == FMOD_FSB_VERSION_4_0 && 
+                            ((fsb->mode & FSOUND_MPEG) || (fsb->mode & FSOUND_16BITS))) {
+                        null_name = read_u32le(fsb->name_offset, sf) == 0x00;
+                    }
                 }
 
-                if (i + 1 == target_subsong) /* final data_offset found */
+                // target found
+                if (i + 1 == target_subsong) {
+                    if (null_name) {
+                        fsb->codec = SILENCE;
+                        fsb->num_samples = fsb->sample_rate;
+                    }
                     break;
+                }
 
-                /* there are no offsets so add manually for next subsong */
+                // must calculate final offsets
                 header_offset += stream_header_size;
-                data_offset += fsb->stream_size;
+                if (!null_name)
+                    data_offset += fsb->stream_size;
 
-                /* some subsongs offsets need padding (most FSOUND_IMAADPCM, few MPEG too [Hard Reset (PC) subsong 5])
-                 * other codecs may set PADDED4 (ex. XMA) but don't seem to need it and work fine */
+                // some subsongs offsets need padding (most FSOUND_IMAADPCM, few MPEG too [Hard Reset (PC) subsong 5])
+                // other codecs may set PADDED4 (ex. XMA) but don't seem to need it and work fine
                 if (fsb->flags & FMOD_FSB_SOURCE_MPEG_PADDED4) {
                     if (data_offset % 0x20)
                         data_offset += 0x20 - (data_offset % 0x20);
                 }
             }
 
-            /* target not found */
+            // target not found
             if (i > fsb->total_subsongs)
                 goto fail;
 
@@ -649,4 +675,33 @@ static bool parse_fsb(fsb_header_t* fsb, STREAMFILE* sf) {
     return true;
 fail:
     return false;
+}
+
+static void get_name(char* buf, size_t buf_size, fsb_header_t* fsb, STREAMFILE* sf_fsb) {
+    STREAMFILE* sf_fev = NULL;
+    fev_header_t fev = {0};
+    bool fev_parsed = false;
+
+    sf_fev = open_fev_filename_pair(sf_fsb);
+    if (sf_fev) {
+        get_streamfile_basename(sf_fsb, fev.fsb_wavebank_name, STREAM_NAME_SIZE);
+
+        fev.target_subsong = sf_fsb->stream_index;
+        if (fev.target_subsong == 0) fev.target_subsong = 1;
+        fev.target_subsong--;
+        // usually FEV1, but RIFF FEV also seen rarely used with FSB4 (around 2011)
+        // [Marvel Super Hero Squad: Comic Combat (X360), Green Lantern: Rise of the Manhunters (PS3)]
+        fev_parsed = parse_fev(&fev, sf_fev);
+        if (!fev_parsed)
+            vgm_logi("FSB: Failed to parse FEV data\n");
+    }
+
+    // prioritise FEV stream names, usually the same as the FSB name just not truncated
+    // (benefits games where base names are all identical [Split/Second (PS3/X360/PC)])
+    if (fev_parsed && fev.stream_name[0])
+        snprintf(buf, buf_size, "%s", fev.stream_name);
+    else if (fsb->name_offset)
+        read_string(buf, fsb->name_size + 1, fsb->name_offset, sf_fsb);
+
+    close_streamfile(sf_fev);
 }
