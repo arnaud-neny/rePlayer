@@ -273,7 +273,7 @@ namespace rePlayer
             {
                 gme_info_t* gmeInfo;
                 gme_track_info(m_emu, &gmeInfo, i);
-                settings->loops[i] = { uint32_t(gmeInfo->play_length), uint32_t(gmeInfo->loop_length) };
+                settings->loops[i] = { uint32_t(gmeInfo->play_length >= 0 ? gmeInfo->play_length : 0), uint32_t(gmeInfo->loop_length >= 0 ? gmeInfo->loop_length : 0) };
                 m_loops[i] = settings->loops[i].GetFixed();
                 gme_free_info(gmeInfo);
             }
