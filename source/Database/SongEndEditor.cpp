@@ -217,8 +217,7 @@ namespace rePlayer
         auto* waveform = m_samples.Items(m_currentSample);
         auto replay = m_replay;
         uint32_t sampleRate = replay->GetSampleRate();
-        uint32_t silence = m_silence >= 0 ? uint32_t(m_silence) : 0;
-        int32_t lastSample = m_silence >= 0 ? int32_t(((m_samples[silence].left + m_samples[silence].right) * 0.5f) * 128) : INT_MAX;
+        uint32_t silence = m_silence;
         while (remainingSamples && std::atomic_ref(m_isRunning).load())
         {
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
@@ -231,11 +230,10 @@ namespace rePlayer
             }
             for (uint32_t i = 0; i < numSamples; ++i)
             {
-                auto monoSample = int32_t(((waveform[i].left + waveform[i].right) * 0.5f) * 128);
-                if (lastSample != monoSample)
+                if (fabs(m_lastSample.left - waveform[i].left) > 1.5f / 127.f || fabs(m_lastSample.right - waveform[i].right) > 1.5f / 127.f)
                 {
                     silence = m_currentSample + i;
-                    lastSample = monoSample;
+                    m_lastSample = waveform[i];
                     m_silence = silence + sampleRate / 4;
                 }
             }
@@ -835,12 +833,14 @@ namespace rePlayer
             drawList->Flags &= ~(ImDrawListFlags_AntiAliasedLines | ImDrawListFlags_AntiAliasedLinesUseTex | ImDrawListFlags_AntiAliasedFill);
             for (auto loopPos : m_loops)
                 drawList->AddLine(ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y + size.y), 0x8000ffff);
-            if (m_silence > 0 && m_silence < m_numSamples)
+            if (m_silence < m_numSamples)
             {
-                auto silence = (m_silence * 1000) / m_replay->GetSampleRate();
+                auto silence = uint32_t((m_silence * 1000ull) / m_replay->GetSampleRate());
                 drawList->AddLine(ImVec2(pos.x - offset + silence / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + silence / numMillisecondsPerPixel, pos.y + size.y), 0x800000ff);
             }
             drawList->AddRectFilled(ImVec2(pos.x - offset + m_loop.start / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + m_loop.GetDuration() / numMillisecondsPerPixel, pos.y + size.y), 0x3fFFffFF);
+            drawList->AddLine(ImVec2(pos.x - offset + m_loop.start / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + m_loop.start / numMillisecondsPerPixel, pos.y + size.y), 0x3fFFffFF);
+            drawList->AddLine(ImVec2(pos.x - offset + m_loop.GetDuration() / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + m_loop.GetDuration() / numMillisecondsPerPixel, pos.y + size.y), 0x3fFFffFF);
             drawList->Flags = drawListFlags;
 
             if (m_wave->outHandle && m_isPlaying)
@@ -987,25 +987,25 @@ namespace rePlayer
                 waveOutRestart(m_wave->outHandle);
         }
         ImGui::SameLine();
-        ImGui::BeginDisabled(IsBusy());
         if (ImGui::Button("A"))
             ImGui::OpenPopup("AutoLoop");
         if (ImGui::BeginPopup("AutoLoop"))
         {
-            ImGui::BeginDisabled(m_silence < 0 || m_silence >= m_numSamples);
+            ImGui::BeginDisabled(m_silence >= m_numSamples);
             ImGui::SeparatorText("Silence/End of Song");
             char txt[64] = "Not found###Silence";
-            if (m_silence >= 0 && m_silence < m_numSamples)
+            if (m_silence < m_numSamples)
             {
-                auto silence = (Max(m_silence, 0) * 1000) / m_replay->GetSampleRate();
+                uint32_t silence = uint32_t((m_silence * 1000ull) / m_replay->GetSampleRate());
                 sprintf(txt, "Start at %u:%02u:%03u###Silence", silence / 60000, (silence / 1000) % 60, silence % 1000);
             }
             if (ImGui::Button(txt, ImVec2(-FLT_MIN, 0.0f)))
             {
-                m_loop = { 0, uint32_t((m_silence * 1000) / m_replay->GetSampleRate()) };
+                m_loop = { 0, uint32_t((m_silence * 1000ull) / m_replay->GetSampleRate()) };
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();
+            ImGui::BeginDisabled(IsBusy());
             ImGui::SeparatorText("Loop Length Params");
             ImGui::DragUint("##downsampleFactor", &m_loopDetection.downsampleFactor, 0.05f, kMinDownsampleFactor, 16, "x%u downsample", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMin", &m_loopDetection.loopMin, 0.05f, 1, m_loopDetection.loopMax, "%us loop min", ImGuiSliderFlags_AlwaysClamp);
@@ -1032,11 +1032,11 @@ namespace rePlayer
                 
                 ImGui::CloseCurrentPopup();
             }
+            ImGui::EndDisabled();
             ImGui::EndPopup();
         }
         else if (ImGui::IsItemHovered())
             ImGui::Tooltip("Detect Loop\nOr Silence");
-        ImGui::EndDisabled();
     }
 }
 // namespace rePlayer
