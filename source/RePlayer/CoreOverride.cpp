@@ -21,6 +21,7 @@
 
 // stl
 #include <atomic>
+#include <csignal>
 
 #include "Core.h"
 
@@ -59,8 +60,20 @@ namespace rePlayer
                 }
                 return EXCEPTION_CONTINUE_SEARCH;
             }
+            static void OnAbort(int)
+            {
+                EXCEPTION_RECORD r = {
+                    .ExceptionCode = 0xBAADC0DE
+                };
+                EXCEPTION_POINTERS e = {
+                    .ExceptionRecord = &r
+                };
+                TopLevelExceptionFilter(&e);
+                _exit(1); // avoid recursion
+            }
         } cb;
         ::SetUnhandledExceptionFilter(&cb.TopLevelExceptionFilter);
+        std::signal(SIGABRT, &cb.OnAbort);
 
         return ms_instance;
     }
