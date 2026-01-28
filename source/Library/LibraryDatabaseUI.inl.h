@@ -47,7 +47,7 @@ namespace rePlayer
                 2,     // ModlandSourceID
                 65536, // FileImportID
                 0,     // HighVoltageSIDCollectionID
-                0,     // SNDHID
+                3,     // SNDHID (after Modland as content is too old on this site)
                 0,     // AtariSAPMusicArchiveID
                 0,     // ZXArtID
                 65537, // UrlImportID
