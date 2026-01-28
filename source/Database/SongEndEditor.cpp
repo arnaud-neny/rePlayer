@@ -1005,7 +1005,6 @@ namespace rePlayer
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();
-            ImGui::BeginDisabled(IsBusy());
             ImGui::SeparatorText("Loop Length Params");
             ImGui::DragUint("##downsampleFactor", &m_loopDetection.downsampleFactor, 0.05f, kMinDownsampleFactor, 16, "x%u downsample", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMin", &m_loopDetection.loopMin, 0.05f, 1, m_loopDetection.loopMax, "%us loop min", ImGuiSliderFlags_AlwaysClamp);
@@ -1018,6 +1017,7 @@ namespace rePlayer
             ImGui::DragInt("##MEL", &m_loopDetection.melFilters, 0.05f, 4, 64, "%u Mel Filters", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragInt("##MFCCS", &m_loopDetection.mfccs, 0.05f, 4, 32, "%u MFCC coefs", ImGuiSliderFlags_AlwaysClamp);
             ImGui::SeparatorText("Loop Detection");
+            ImGui::BeginDisabled(IsBusy());
             if (ImGui::Button("Find loop", ImVec2(-FLT_MIN, 0.0f)))
             {
                 m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
