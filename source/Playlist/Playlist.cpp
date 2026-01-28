@@ -1420,8 +1420,8 @@ namespace rePlayer
             ImGui::OpenPopup("SortPopup");
         if (ImGui::BeginPopup("SortPopup"))
         {
-            const char* sortModes[] = { "Title", "Artists", "Duration", "Type", "Rating", "Random", "Invert" };
-            for (int32_t i = 0; i < IM_ARRAYSIZE(sortModes); i++)
+            const char* sortModes[] = { "Title", "Artists", "Duration", "Type", "Rating", "Random", "Invert", "AutoMerge" };
+            for (int32_t i = 0; i < IM_ARRAYSIZE(sortModes) - (ImGui::GetIO().KeyShift ? 0 : 1); i++)
             {
                 if (ImGui::Selectable(sortModes[i]))
                 {
@@ -1437,6 +1437,37 @@ namespace rePlayer
                     {
                         for (int32_t n = ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, j = m_cue.entries.NumItems<int32_t>() - 1; n < j; n++, j--)
                             std::swap(m_cue.entries[n], m_cue.entries[j]);
+                    }
+                    else if (i == 7)
+                    {
+                        auto firstEntry = m_currentEntryIndex + 1;
+                        // sort by group
+                        std::sort(m_cue.entries.begin() + firstEntry, m_cue.entries.end(), [&](auto l, auto r)
+                        {
+                            return l.GetSong()->GetSourceId(0).AutoMerge() < r.GetSong()->GetSourceId(0).AutoMerge();
+                        });
+                        // build spans of entries per group
+                        Array<uint32_t> spans(1, SourceID::NumSourceIDs);
+                        spans[0] = firstEntry;
+                        int32_t group = m_cue.entries[firstEntry].GetSong()->GetSourceId(0).AutoMerge();
+                        for (uint32_t j = firstEntry + 1, e = m_cue.entries.NumItems(); j < e; ++j)
+                        {
+                            if (group != m_cue.entries[j].GetSong()->GetSourceId(0).AutoMerge())
+                            {
+                                group = m_cue.entries[j].GetSong()->GetSourceId(0).AutoMerge();
+                                spans.Add(j);
+                            }
+                        }
+                        spans.Add(m_cue.entries.NumItems());
+                        // randomize within each group and add to playlist
+                        for (int64_t j = 0, e = spans.NumItems() - 1; j < e; ++j)
+                        {
+                            for (int64_t begin = spans[j], end = spans[j + 1]; begin < end; ++begin)
+                            {
+                                auto index = rand() % (end - begin);
+                                std::swap(m_cue.entries[begin], m_cue.entries[begin + index]);
+                            }
+                        }
                     }
                     else
                     {
