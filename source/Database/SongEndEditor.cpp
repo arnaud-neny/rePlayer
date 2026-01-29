@@ -633,7 +633,7 @@ namespace rePlayer
         std::vector<std::vector<float>> features;
 
         auto* message = m_busySpinner->Info("MFCC %u%%", 0u);
-        for (size_t i = 0; i + FRAME < mono.size(); i += HOP)
+        for (size_t i = m_loopDetection.loopStart * sampleRate; i + FRAME < mono.size(); i += HOP)
         {
             features.emplace_back(MFCCS);
             mfcc.compute(&mono[i], features.back().data());
@@ -670,7 +670,7 @@ namespace rePlayer
             loopStart = 0;
         m_busySpinner->Indent(-1);
 
-        m_loop = { uint32_t((loopStart * HOP * 1000ull) / sampleRate), uint32_t((loopLength * 1000ull) / sampleRate) };
+        m_loop = { m_loopDetection.loopStart * 1000u + uint32_t((loopStart * HOP * 1000ull) / sampleRate), uint32_t((loopLength * 1000ull) / sampleRate) };
     }
 
     uint32_t SongEndEditor::WaveformUI()
@@ -1012,6 +1012,7 @@ namespace rePlayer
             ImGui::DragFloat("##peakThreshold", &m_loopDetection.peakThreshold, 0.001f, 0.45f, 0.65f, "%.2f peak threshold", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragFloat("##consistencyThreshold", &m_loopDetection.consistencyThreshold, 0.001f, 0.35f, 0.55f, "%.2f consistency threshold", ImGuiSliderFlags_AlwaysClamp);
             ImGui::SeparatorText("Loop Start Params");
+            ImGui::DragUint("##LoopStart", &m_loopDetection.loopStart, 0.05f, 0, m_numSamples / m_replay->GetSampleRate(), "%us loop start", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragInt("##FRAME", &m_loopDetection.frame, 10.0f, 256, 32768, "%u Frame size", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragInt("##HOP", &m_loopDetection.hop, 1.0f, 64, 4096, "%u HOP length", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragInt("##MEL", &m_loopDetection.melFilters, 0.05f, 4, 64, "%u Mel Filters", ImGuiSliderFlags_AlwaysClamp);

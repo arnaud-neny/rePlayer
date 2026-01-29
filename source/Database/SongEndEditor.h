@@ -97,6 +97,7 @@ namespace rePlayer
             float peakThreshold = 0.58f; // 0.45-0.65
             float consistencyThreshold = 0.45f;//0.35-0.55
 
+            uint32_t loopStart = 0;
             int32_t frame = 1024;
             int32_t hop = 128;
             int32_t melFilters = 26;
