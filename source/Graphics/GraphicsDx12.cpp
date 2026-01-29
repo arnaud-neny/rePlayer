@@ -423,12 +423,14 @@ namespace rePlayer
 
     SmartPtr<ID3D12CommandQueue> GraphicsDX12::CreateCommandQueue()
     {
-        D3D12_COMMAND_QUEUE_DESC desc = {};
-        desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        desc.NodeMask = 1;
+        static constexpr GUID kCommandQueueGUID = { 0x82936a26, 0xdc8d, 0x4891, { 0xad, 0x65, 0x63, 0x75, 0x2f, 0x6b, 0x6a, 0xc5 } };
+        D3D12_COMMAND_QUEUE_DESC desc = {
+            .Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
+            .Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
+            .NodeMask = 1
+        };
         SmartPtr<ID3D12CommandQueue> commandQueue;
-        if (m_device->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue)) < 0)
+        if (m_device->CreateCommandQueue1(&desc, kCommandQueueGUID, IID_PPV_ARGS(&commandQueue)) < 0)
             commandQueue.Reset();
         return commandQueue;
     }

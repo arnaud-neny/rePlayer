@@ -123,7 +123,7 @@ namespace rePlayer
         void ReleaseRenderTargetView(D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
     private:
-        SmartPtr<ID3D12Device> m_device;
+        SmartPtr<ID3D12Device9> m_device;
         SmartPtr<IDCompositionDevice> m_dcompDevice;
 
         SmartPtr<ID3D12DescriptorHeap> m_rtvDescriptorHeap;
