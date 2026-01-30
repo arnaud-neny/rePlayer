@@ -107,8 +107,12 @@ namespace rePlayer
 
     void DatabaseSongsUI::TrackSubsong(SubsongID subsongId, bool isTrackingArtist)
     {
-        m_isTrackingArtist |= isTrackingArtist;
-        m_trackedSubsongId = subsongId;
+        // don't track when renaming or it could be messy
+        if (!m_renamer.isEnabled)
+        {
+            m_isTrackingArtist |= isTrackingArtist;
+            m_trackedSubsongId = subsongId;
+        }
         if (!m_owner.IsVisible())
             m_subsongHighlights.RemoveAll();
         m_subsongHighlights[subsongId] = 1.0f;
@@ -241,23 +245,53 @@ namespace rePlayer
                         UpdateRowBackground(rowIdx, song, musicId.subsongId, currentPlayingSong);
                         UpdateSelection(rowIdx, musicId);
                         ImGui::SameLine(0.0f, 0.0f);//no spacing
-                        if (m_isRenaming && m_renamedEntry == musicId.subsongId)
+                        if (m_renamer.isEnabled && m_renamer.entry == musicId.subsongId)
                         {
                             ImGui::SetScrollHereY();
                             ImGui::SetKeyboardFocusHere();
                             ImGui::SetNextItemWidth(-FLT_MIN);
-                            if (ImGui::InputText("##edit", &m_renamedString, ImGuiInputTextFlags_EnterReturnsTrue))
+                            if (ImGui::InputText("##edit", &m_renamer.editedString, ImGuiInputTextFlags_EnterReturnsTrue))
                             {
-                                m_isRenaming = false;
+                                m_renamer.isEnabled = false;
 
-                                auto oldFileName = m_db.GetFullpath(song);
-                                song->Edit()->name = m_renamedString;
-                                if (io::File::IsExisting(oldFileName.c_str()))
-                                    m_db.Move(oldFileName, song, "Rename");
-                                m_db.Raise(Database::Flag::kSaveSongs);
+                                if (m_renamer.commonString.empty())
+                                {
+                                    // single rename
+                                    if (song->GetName() != m_renamer.editedString)
+                                    {
+                                        auto oldFileName = m_db.GetFullpath(song);
+                                        song->Edit()->name = m_renamer.editedString;
+                                        if (io::File::IsExisting(oldFileName.c_str()))
+                                            m_db.Move(oldFileName, song, "Rename");
+                                        m_db.Raise(Database::Flag::kSaveSongs);
+                                    }
+                                }
+                                else if (m_renamer.editedString != m_renamer.commonString)
+                                {
+                                    // multi rename
+                                    for (auto& entry : m_entries)
+                                    {
+                                        if (entry.IsSelected())
+                                        {
+                                            auto* curSong = m_db[entry];
+                                            // test if we didn't already renamed it (because subsongs share the same name)
+                                            if (strstr(curSong->GetName(), m_renamer.commonString.c_str()) == curSong->GetName())
+                                            {
+                                                auto oldFileName = m_db.GetFullpath(curSong);
+
+                                                auto& songName = curSong->Edit()->name.String();
+                                                songName = m_renamer.editedString + (songName.c_str() + m_renamer.commonString.size());
+
+                                                if (io::File::IsExisting(oldFileName.c_str()))
+                                                    m_db.Move(oldFileName, curSong, "Rename");
+                                            }
+                                        }
+                                    }
+                                    m_db.Raise(Database::Flag::kSaveSongs);
+                                }
                             }
                             else if (ImGui::IsItemDeactivated())
-                                m_isRenaming = false;
+                                m_renamer.isEnabled = false;
                         }
                         else
                             ImGui::TextUnformatted(m_db.GetTitle(musicId.subsongId).c_str());
@@ -359,20 +393,58 @@ namespace rePlayer
             }
 
             // Invalidate the renaming in case the song is gone (automerge...)
-            if (m_isRenaming && m_db[m_renamedEntry] == nullptr)
-                m_isRenaming = false;
+            if (m_renamer.isEnabled && m_db[m_renamer.entry] == nullptr)
+                m_renamer.isEnabled = false;
 
             // Handle global hot keys
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && m_isRenaming == false)
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && (m_renamer.isEnabled == false && trackingPos == FLT_MAX))
             {
-                // start renaming the song?
+                // start renaming the song(s)?
                 if (m_lastSelectedSubsong.IsValid() && ImGui::IsKeyPressed(ImGuiKey_F2))
                 {
                     if (auto* song = m_db[m_lastSelectedSubsong])
                     {
-                        m_isRenaming = true;
-                        m_renamedString = song->GetName();
-                        m_renamedEntry = m_lastSelectedSubsong;
+                        auto lastSelectedIndex = m_entries.FindIf<int32_t>([this](auto& entry)
+                        {
+                            return entry == m_lastSelectedSubsong;
+                        });
+                        if (lastSelectedIndex >= 0)
+                        {
+                            if (!m_entries[lastSelectedIndex].IsSelected())
+                            {
+                                m_entries[lastSelectedIndex].Select(true);
+                                m_numSelectedEntries++;
+                            }
+
+                            m_renamer.commonString = song->GetName();
+                            auto subStr = [this](const char* b, size_t maxLen)
+                            {
+                                size_t len = 0;
+                                while (m_renamer.commonString[0] && b[len])
+                                {
+                                    if (m_renamer.commonString[len] == b[len] && len < maxLen)
+                                        len++;
+                                    else
+                                        break;
+                                }
+                                return len;
+                            };
+
+                            size_t len = m_renamer.commonString.size();
+                            for (auto& entry : m_entries)
+                            {
+                                if (entry.IsSelected())
+                                {
+                                    len = subStr(m_db[entry]->GetName(), len);
+                                    m_renamer.commonString.resize(len);
+                                    if (len == 0)
+                                        break;
+                                }
+                            }
+                            m_renamer.editedString = m_renamer.commonString.empty() ? song->GetName() : m_renamer.commonString;
+                            m_renamer.isEnabled = true;
+                            m_renamer.entry = m_lastSelectedSubsong;
+                        }
                     }
                 }
                 // select all

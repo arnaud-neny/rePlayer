@@ -147,9 +147,13 @@ namespace rePlayer
         Export* m_export = nullptr;
 
         // renaming
-        bool m_isRenaming = false;
-        std::string m_renamedString;
-        SubsongID m_renamedEntry;
+        struct
+        {
+            bool isEnabled = false;
+            std::string editedString;
+            std::string commonString;
+            SubsongID entry;
+        } m_renamer;
     };
 }
 // namespace rePlayer
