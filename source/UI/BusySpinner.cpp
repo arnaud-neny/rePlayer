@@ -148,8 +148,8 @@ namespace rePlayer
             m_messages.stringCacheSize = sizeof(stringCache->buf);
         }
         char* str = m_messages.stringCache->buf + sizeof(m_messages.stringCache->buf) - m_messages.stringCacheSize;
-        m_messages.stringCacheSize -= uint32_t(param.size());
-        memcpy(str, param.c_str(), param.size());
+        m_messages.stringCacheSize -= uint32_t(param.size() + 1);
+        memcpy(str, param.c_str(), param.size() + 1);
 
         auto* message = new Message{
             .text = format,
@@ -172,7 +172,7 @@ namespace rePlayer
 
     void BusySpinner::UpdateMessageParam(Message* message, const std::string& param)
     {
-        if (m_messages.stringCacheSize < param.size())
+        if (m_messages.stringCacheSize < param.size() + 1)
         {
             auto* stringCache = new StringCache;
             stringCache->next = m_messages.stringCache;
@@ -180,8 +180,8 @@ namespace rePlayer
             m_messages.stringCacheSize = sizeof(stringCache->buf);
         }
         char* str = m_messages.stringCache->buf + sizeof(m_messages.stringCache->buf) - m_messages.stringCacheSize;
-        m_messages.stringCacheSize -= uint32_t(param.size());
-        memcpy(str, param.c_str(), param.size());
+        m_messages.stringCacheSize -= uint32_t(param.size() + 1);
+        memcpy(str, param.c_str(), param.size() + 1);
 
         message->str = str;
     }
