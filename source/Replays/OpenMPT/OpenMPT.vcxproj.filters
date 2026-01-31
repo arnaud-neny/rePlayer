@@ -27,6 +27,138 @@
     <Filter Include="Source Files\soundlib\plugins\dmo">
       <UniqueIdentifier>{1cbfa268-a2bf-45de-be35-528e79b0cf56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{968c9f8f-2269-4b5d-84cb-4e5114f0252c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt">
+      <UniqueIdentifier>{75c1bee4-1550-4aa4-ad0b-85aba3892352}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt">
+      <UniqueIdentifier>{f9c42d92-d13d-4b51-942f-e8c14400294b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\arch">
+      <UniqueIdentifier>{52efd52e-9ed4-40b0-b708-288844cb2880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\audio">
+      <UniqueIdentifier>{a8da7616-21b2-4b95-b2de-2f8c7e6d4277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\base">
+      <UniqueIdentifier>{0029f214-b231-40b9-9f7f-1031d40eacae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\binary">
+      <UniqueIdentifier>{5f3e649f-1d7c-408b-be0b-ee5e04ffa030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\check">
+      <UniqueIdentifier>{a6563960-c3cd-472b-b4bf-b754141da6be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\chrono">
+      <UniqueIdentifier>{916cba31-bfdd-4867-9db5-17ceb9b5b57a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\crc">
+      <UniqueIdentifier>{d67514cf-ad82-4eb7-a9ab-97c2d74e2ac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\crypto">
+      <UniqueIdentifier>{80eb62d7-d053-48bf-85fb-6d06f8bcd9ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\detect">
+      <UniqueIdentifier>{10ea3681-6a02-4ce7-b4e9-997059f8d4f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\endian">
+      <UniqueIdentifier>{fb76c91e-7377-4f0f-ab4d-356f0dbd0005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\environment">
+      <UniqueIdentifier>{ef107aa1-5f41-4f96-a068-f226929d54cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\exception">
+      <UniqueIdentifier>{0659851e-698e-4ab1-9584-e1f9d2cee8b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\format">
+      <UniqueIdentifier>{19ef8d5e-4173-4e47-8a5f-c48e1e3f5946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\fs">
+      <UniqueIdentifier>{7560affd-ae26-425f-b8c4-1ffa89e8d64a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io">
+      <UniqueIdentifier>{e56caae6-7f65-48e0-aeab-12ae714b53b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_file">
+      <UniqueIdentifier>{f15219e9-c1f4-4ca7-a130-fda682df1245}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_file_adapter">
+      <UniqueIdentifier>{c17b8ee6-a260-4a5a-a5d8-7ec351405cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_file_read">
+      <UniqueIdentifier>{fc3531d4-403f-4742-933f-ba9a2feb1f25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_file_unique">
+      <UniqueIdentifier>{0010dab3-2f8d-4edf-a797-713c499f8b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_read">
+      <UniqueIdentifier>{ef456865-887a-447a-86b2-d8030344e398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\io_write">
+      <UniqueIdentifier>{c203be99-6e2c-489b-8371-08efe5d6584b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\json">
+      <UniqueIdentifier>{23da4cf5-1a2c-40e5-a013-781a88805921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\library">
+      <UniqueIdentifier>{71ebccc8-c9d2-4121-893b-af73e0ba3c4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\mutex">
+      <UniqueIdentifier>{2e6a3a3d-4fc2-48d6-954b-6357f0602086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\osinfo">
+      <UniqueIdentifier>{eb8f31d6-2584-4143-8a12-401758513c9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\out_of_memory">
+      <UniqueIdentifier>{e7472c83-3368-4d8e-b7b3-e9d7e4fdd30a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\parse">
+      <UniqueIdentifier>{6f9072d1-1978-4631-a8b2-fa126cd9c4f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\path">
+      <UniqueIdentifier>{e41cf435-3ce7-4676-8c3b-45a2bc45076e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\random">
+      <UniqueIdentifier>{df2d9f06-7714-4ea6-90c1-ccf6f4bd26b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\string">
+      <UniqueIdentifier>{dc777080-cb1d-4311-8028-b43e294f44ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\string_transcode">
+      <UniqueIdentifier>{58f0e41e-8e56-4a66-b3a4-0c00ef043843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\system_error">
+      <UniqueIdentifier>{6dc00595-7fe1-431c-8714-7d6228cec974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\uuid">
+      <UniqueIdentifier>{61107838-f46d-4942-a43e-52f3d44437de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\mpt\uuid_namespace">
+      <UniqueIdentifier>{067129c0-ffc3-4657-ade2-dd07eb5e6f00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\all">
+      <UniqueIdentifier>{a14cbb7a-990f-4258-9a1f-94860a78e4f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\base">
+      <UniqueIdentifier>{9a456571-a11a-4954-b158-aeed3355e9e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\fileformat_base">
+      <UniqueIdentifier>{882a438d-bdf2-4495-a79f-8eb2473a4709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\logging">
+      <UniqueIdentifier>{3f949ddd-b942-454f-b981-3c73bc6fdbe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\random">
+      <UniqueIdentifier>{46bf9baf-26dc-4f11-a235-da86c199170a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\soundbase">
+      <UniqueIdentifier>{4c14d466-2f02-4647-be59-2d480d80a12e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\openmpt\soundfile_data">
+      <UniqueIdentifier>{31f74e03-6b1a-417c-955c-f9785ad4d1f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayOpenMPT.h">
@@ -397,6 +529,549 @@
     </ClInclude>
     <ClInclude Include="C:\Users\arnaud.neny\Downloads\openmpt-master\common\zlib_helper.h">
       <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\svn_version.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\arch\arch.hpp">
+      <Filter>Source Files\src\mpt\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\arch\feature_fence.hpp">
+      <Filter>Source Files\src\mpt\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\arch\feature_flags.hpp">
+      <Filter>Source Files\src\mpt\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\arch\x86_amd64.hpp">
+      <Filter>Source Files\src\mpt\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\audio\sample.hpp">
+      <Filter>Source Files\src\mpt\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\audio\span.hpp">
+      <Filter>Source Files\src\mpt\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\algorithm.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\aligned_array.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\alloc.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\arithmetic_shift.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\array.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\bit.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\check_platform.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\compiletime_warning.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\constexpr_throw.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\debugging.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_arch.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_compiler.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_libc.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_libcxx.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_os.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\detect_quirks.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\float.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\integer.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\macros.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\math.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\memory.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\namespace.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\numbers.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\numeric.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\pointer.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\preprocessor.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\saturate_cast.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\saturate_round.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\secure.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\semantic_version.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\size.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\source_location.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\span.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\type_traits.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\utility.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\version.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\base\wrapping_divide.hpp">
+      <Filter>Source Files\src\mpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\binary\base64.hpp">
+      <Filter>Source Files\src\mpt\binary</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\binary\base64url.hpp">
+      <Filter>Source Files\src\mpt\binary</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\binary\hex.hpp">
+      <Filter>Source Files\src\mpt\binary</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\check\compiler.hpp">
+      <Filter>Source Files\src\mpt\check</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\check\libc.hpp">
+      <Filter>Source Files\src\mpt\check</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\check\libcxx.hpp">
+      <Filter>Source Files\src\mpt\check</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\check\mfc.hpp">
+      <Filter>Source Files\src\mpt\check</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\check\windows.hpp">
+      <Filter>Source Files\src\mpt\check</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\chrono\system_clock.hpp">
+      <Filter>Source Files\src\mpt\chrono</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\chrono\unix_clock.hpp">
+      <Filter>Source Files\src\mpt\chrono</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\crc\crc.hpp">
+      <Filter>Source Files\src\mpt\crc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\crypto\config.hpp">
+      <Filter>Source Files\src\mpt\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\crypto\exception.hpp">
+      <Filter>Source Files\src\mpt\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\crypto\hash.hpp">
+      <Filter>Source Files\src\mpt\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\crypto\jwk.hpp">
+      <Filter>Source Files\src\mpt\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\detect\dl.hpp">
+      <Filter>Source Files\src\mpt\detect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\detect\ltdl.hpp">
+      <Filter>Source Files\src\mpt\detect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\detect\mfc.hpp">
+      <Filter>Source Files\src\mpt\detect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\detect\nlohmann_json.hpp">
+      <Filter>Source Files\src\mpt\detect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\endian\floatingpoint.hpp">
+      <Filter>Source Files\src\mpt\endian</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\endian\int24.hpp">
+      <Filter>Source Files\src\mpt\endian</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\endian\integer.hpp">
+      <Filter>Source Files\src\mpt\endian</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\endian\type_traits.hpp">
+      <Filter>Source Files\src\mpt\endian</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\environment\environment.hpp">
+      <Filter>Source Files\src\mpt\environment</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\concat.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\default_floatingpoint.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\default_formatter.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\default_integer.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\default_string.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\helpers.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\join.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\message.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\message_macros.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\simple.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\simple_floatingpoint.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\simple_integer.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\format\simple_spec.hpp">
+      <Filter>Source Files\src\mpt\format</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\fs\common_directories.hpp">
+      <Filter>Source Files\src\mpt\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\fs\fs.hpp">
+      <Filter>Source Files\src\mpt\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\exception\exception.hpp">
+      <Filter>Source Files\src\mpt\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\exception\exception_text.hpp">
+      <Filter>Source Files\src\mpt\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\exception\logic_error.hpp">
+      <Filter>Source Files\src\mpt\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\exception\runtime_error.hpp">
+      <Filter>Source Files\src\mpt\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io\base.hpp">
+      <Filter>Source Files\src\mpt\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io\io.hpp">
+      <Filter>Source Files\src\mpt\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io\io_span.hpp">
+      <Filter>Source Files\src\mpt\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io\io_stdstream.hpp">
+      <Filter>Source Files\src\mpt\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io\io_virtual_wrapper.hpp">
+      <Filter>Source Files\src\mpt\io</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file\fileref.hpp">
+      <Filter>Source Files\src\mpt\io_file</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file\fstream.hpp">
+      <Filter>Source Files\src\mpt\io_file</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file\inputfile.hpp">
+      <Filter>Source Files\src\mpt\io_file</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file\outputfile.hpp">
+      <Filter>Source Files\src\mpt\io_file</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file_adapter\fileadapter.hpp">
+      <Filter>Source Files\src\mpt\io_file_adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file_read\inputfile_filecursor.hpp">
+      <Filter>Source Files\src\mpt\io_file_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file_unique\unique_basename.hpp">
+      <Filter>Source Files\src\mpt\io_file_unique</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_file_unique\unique_tempfilename.hpp">
+      <Filter>Source Files\src\mpt\io_file_unique</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\callbackstream.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_callbackstream.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_filename_traits.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_memory.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_stdstream.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_traits_filedata.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filecursor_traits_memory.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_base.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_base_buffered.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_base_seekable.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_base_unseekable.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_base_unseekable_buffer.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_callbackstream.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_memory.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filedata_stdstream.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_read\filereader.hpp">
+      <Filter>Source Files\src\mpt\io_read</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\io_write\buffer.hpp">
+      <Filter>Source Files\src\mpt\io_write</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\json\json.hpp">
+      <Filter>Source Files\src\mpt\json</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\library\library.hpp">
+      <Filter>Source Files\src\mpt\library</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\mutex\mutex.hpp">
+      <Filter>Source Files\src\mpt\mutex</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\class.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\dos_memory.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\dos_version.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\windows_hx_version.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\windows_version.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\osinfo\windows_wine_version.hpp">
+      <Filter>Source Files\src\mpt\osinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\out_of_memory\out_of_memory.hpp">
+      <Filter>Source Files\src\mpt\out_of_memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\parse\parse.hpp">
+      <Filter>Source Files\src\mpt\parse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\parse\split.hpp">
+      <Filter>Source Files\src\mpt\parse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\path\basic_path.hpp">
+      <Filter>Source Files\src\mpt\path</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\path\native_path.hpp">
+      <Filter>Source Files\src\mpt\path</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\path\os_path.hpp">
+      <Filter>Source Files\src\mpt\path</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\path\os_path_long.hpp">
+      <Filter>Source Files\src\mpt\path</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\path\path.hpp">
+      <Filter>Source Files\src\mpt\path</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\any_engine.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\crand.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\default_engines.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\device.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\engine.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\engine_lcg.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\random.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\random\seed.hpp">
+      <Filter>Source Files\src\mpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\string\buffer.hpp">
+      <Filter>Source Files\src\mpt\string</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\string\types.hpp">
+      <Filter>Source Files\src\mpt\string</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\string\utility.hpp">
+      <Filter>Source Files\src\mpt\string</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\string_transcode\macros.hpp">
+      <Filter>Source Files\src\mpt\string_transcode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\string_transcode\transcode.hpp">
+      <Filter>Source Files\src\mpt\string_transcode</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\system_error\system_error.hpp">
+      <Filter>Source Files\src\mpt\system_error</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\uuid\guid.hpp">
+      <Filter>Source Files\src\mpt\uuid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\uuid\uuid.hpp">
+      <Filter>Source Files\src\mpt\uuid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpt\uuid_namespace\uuid_namespace.hpp">
+      <Filter>Source Files\src\mpt\uuid_namespace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\all\BuildSettings.hpp">
+      <Filter>Source Files\src\openmpt\all</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\all\BuildSettingsCompiler.hpp">
+      <Filter>Source Files\src\openmpt\all</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\all\PlatformFixes.hpp">
+      <Filter>Source Files\src\openmpt\all</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\base\Endian.hpp">
+      <Filter>Source Files\src\openmpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\base\FlagSet.hpp">
+      <Filter>Source Files\src\openmpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\base\Int24.hpp">
+      <Filter>Source Files\src\openmpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\base\Types.hpp">
+      <Filter>Source Files\src\openmpt\base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\fileformat_base\magic.hpp">
+      <Filter>Source Files\src\openmpt\fileformat_base</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\logging\Logger.hpp">
+      <Filter>Source Files\src\openmpt\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\random\ModPlug.hpp">
+      <Filter>Source Files\src\openmpt\random</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\Copy.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\CopyMix.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\Dither.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\DitherModPlug.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\DitherNone.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\DitherSimple.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\MixSample.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\MixSampleConvert.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleClip.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleClipFixedPoint.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleConvert.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleConvertFixedPoint.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleDecode.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleEncode.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundbase\SampleFormat.hpp">
+      <Filter>Source Files\src\openmpt\soundbase</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundfile_data\tags.hpp">
+      <Filter>Source Files\src\openmpt\soundfile_data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openmpt\soundfile_data\wav.hpp">
+      <Filter>Source Files\src\openmpt\soundfile_data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -850,5 +1525,9 @@
     <ClCompile Include="soundlib\PlaybackTest.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

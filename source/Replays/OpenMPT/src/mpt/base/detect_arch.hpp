@@ -252,6 +252,9 @@
 	#endif
 #endif
 #if defined(__AVX__)
+	#ifndef MPT_ARCH_X86_RDTSCP
+	#define MPT_ARCH_X86_RDTSCP  // assume AVX implies RDTSCP
+	#endif
 	#define MPT_ARCH_X86_3DNOWPREFETCH
 	#ifndef MPT_ARCH_X86_XSAVE
 	#define MPT_ARCH_X86_XSAVE
@@ -342,6 +345,9 @@
 	#define MPT_ARCH_X86_XSAVE
 #endif
 #ifdef __AVX__
+	#ifndef MPT_ARCH_X86_RDTSCP
+	#define MPT_ARCH_X86_RDTSCP  // assume AVX implies RDTSCP
+	#endif
 	#define MPT_ARCH_X86_AVX
 #endif
 #ifdef __AVX2__
@@ -413,6 +419,7 @@
 #define MPT_ARCH_INTRINSICS_X86_SSSE3
 #define MPT_ARCH_INTRINSICS_X86_SSE4_1
 #define MPT_ARCH_INTRINSICS_X86_SSE4_2
+#define MPT_ARCH_INTRINSICS_X86_RDTSCP
 #endif
 #if MPT_MSVC_AT_LEAST(2010, 1)
 #define MPT_ARCH_INTRINSICS_X86_XSAVE
@@ -488,6 +495,9 @@
 #endif
 #ifdef MPT_ARCH_X86_XSAVE
 #define MPT_ARCH_INTRINSICS_X86_XSAVE
+#endif
+#ifdef MPT_ARCH_X86_RDTSCP
+#define MPT_ARCH_INTRINSICS_X86_RDTSCP
 #endif
 #ifdef MPT_ARCH_X86_AVX
 #define MPT_ARCH_INTRINSICS_X86_AVX

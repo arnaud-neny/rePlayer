@@ -22,7 +22,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::OpenMPT,
         .name = "OpenMPT",
-        .about = "OpenMPT " OPENMPT_API_VERSION_STRING "\nCopyright (c) 2004-2024 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
+        .about = "OpenMPT " OPENMPT_API_VERSION_STRING "\nCopyright (c) 2004-2026 OpenMPT Project Developers and Contributors\nCopyright (c) 1997-2003 Olivier Lapicque",
         .settings = "OpenMPT " OPENMPT_API_VERSION_STRING,
         .init = ReplayOpenMPT::Init,
         .release = ReplayOpenMPT::Release,

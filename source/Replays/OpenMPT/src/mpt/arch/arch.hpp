@@ -87,6 +87,10 @@ inline constexpr mode_flags none = mode_flags{};
 
 struct cpu_info {
 public:
+	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE static cpu_info query() noexcept {
+		return cpu_info{};
+	}
+private:
 	cpu_info() = default;
 public:
 	MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr bool operator[](feature_flags) const noexcept {
@@ -131,15 +135,15 @@ namespace current = unknown;
 
 using cpu_info = mpt::arch::current::cpu_info;
 
-inline const cpu_info & get_cpu_info() {
-	static cpu_info info;
+MPT_ATTR_NOINLINE MPT_DECL_NOINLINE inline const cpu_info & get_cpu_info() {
+	static cpu_info info = cpu_info::query();
 	return info;
 }
 
 namespace detail {
 
 struct info_initializer {
-	inline info_initializer() noexcept {
+	MPT_ATTR_NOINLINE MPT_DECL_NOINLINE inline info_initializer() noexcept {
 		get_cpu_info();
 	}
 };
@@ -155,36 +159,6 @@ inline info_initializer g_info_initializer;
 
 
 } // namespace detail
-
-struct flags_cache {
-private:
-	const mpt::arch::current::feature_flags Features;
-	const mpt::arch::current::mode_flags Modes;
-public:
-	MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr flags_cache(const mpt::arch::cpu_info & info) noexcept
-		: Features(info.get_features())
-		, Modes(info.get_modes()) {
-		return;
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr bool operator[](mpt::arch::current::feature_flags query_features) const noexcept {
-		return ((Features & query_features) == query_features);
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr bool has_features(mpt::arch::current::feature_flags query_features) const noexcept {
-		return ((Features & query_features) == query_features);
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr mpt::arch::current::feature_flags get_features() const noexcept {
-		return Features;
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr bool operator[](mpt::arch::current::mode_flags query_modes) const noexcept {
-		return ((Modes & query_modes) == query_modes);
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr bool has_features(mpt::arch::current::mode_flags query_modes) const noexcept {
-		return ((Modes & query_modes) == query_modes);
-	}
-	[[nodiscard]] MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr mpt::arch::current::mode_flags get_modes() const noexcept {
-		return Modes;
-	}
-};
 
 
 

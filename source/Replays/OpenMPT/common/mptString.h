@@ -14,6 +14,7 @@
 
 #include "mpt/string/types.hpp"
 #include "mpt/string/utility.hpp"
+#include "mpt/string_transcode/macros.hpp"
 #include "mpt/string_transcode/transcode.hpp"
 
 #include <algorithm>
@@ -306,20 +307,6 @@ struct Charset
 
 
 
-// Checks if the std::string represents an UTF8 string.
-// This is currently implemented as converting to std::wstring and back assuming UTF8 both ways,
-// and comparing the result to the original string.
-// Caveats:
-//  - can give false negatives because of possible unicode normalization during conversion
-//  - can give false positives if the 8bit encoding contains high-ascii only in valid utf8 groups
-//  - slow because of double conversion
-inline bool IsUTF8(const std::string &str)
-{
-	return mpt::is_utf8(str);
-}
-
-
-
 template <typename Tsrc>
 inline mpt::ustring ToUnicode(Tsrc &&str)
 {
@@ -418,7 +405,7 @@ inline CString ToCString(Tencoding &&from, Tsrc &&str)
 // i.e. it is NOT generally available at compile time.
 // Use explicit UTF8 encoding,
 // i.e. U+00FC (LATIN SMALL LETTER U WITH DIAERESIS) would be written as "\xC3\xBC".
-#define MPT_UTF8(x) mpt::transcode<mpt::ustring>(mpt::common_encoding::utf8, x)
+#define MPT_UTF8(x) MPT_USTRING_UTF8(x)
 
 
 
@@ -457,34 +444,33 @@ inline mpt::ustring ToUnicode(uint16 codepage, Tencoding &&fallback, Tsrc &&str)
 
 
 
-inline char ToLowerCaseAscii(char c)
+template <typename Tstring>
+inline auto ToLowerCaseAscii(const Tstring &s_) -> typename mpt::make_string_type<Tstring>::type
 {
-	return mpt::to_lower_ascii(c);
+	using string_type = typename mpt::make_string_type<Tstring>::type;
+	using char_type = typename mpt::string_traits<typename mpt::make_string_type<Tstring>::type>::char_type;
+	string_type s{s_};
+	std::transform(s.begin(), s.end(), s.begin(), static_cast<char_type (*)(char_type)>(&mpt::to_lower_ascii));
+	return s;
 }
-
-inline char ToUpperCaseAscii(char c)
+template <typename Tstring>
+inline auto ToUpperCaseAscii(const Tstring &s_) -> typename mpt::make_string_type<Tstring>::type
 {
-	return mpt::to_upper_ascii(c);
-}
-
-inline std::string ToLowerCaseAscii(std::string s)
-{
-	std::transform(s.begin(), s.end(), s.begin(), static_cast<char(*)(char)>(&mpt::ToLowerCaseAscii));
+	using string_type = typename mpt::make_string_type<Tstring>::type;
+	using char_type = typename mpt::string_traits<typename mpt::make_string_type<Tstring>::type>::char_type;
+	string_type s{s_};
+	std::transform(s.begin(), s.end(), s.begin(), static_cast<char_type (*)(char_type)>(&mpt::to_upper_ascii));
 	return s;
 }
 
-inline std::string ToUpperCaseAscii(std::string s)
-{
-	std::transform(s.begin(), s.end(), s.begin(), static_cast<char(*)(char)>(&mpt::ToUpperCaseAscii));
-	return s;
-}
 
-inline int CompareNoCaseAscii(const char *a, const char *b, std::size_t n)
+template <typename Tchar>
+inline int CompareNoCaseAscii(const Tchar *a, const Tchar *b, std::size_t n)
 {
 	while(n--)
 	{
-		unsigned char ac = mpt::char_value(mpt::ToLowerCaseAscii(*a));
-		unsigned char bc = mpt::char_value(mpt::ToLowerCaseAscii(*b));
+		auto ac = mpt::char_value(mpt::to_lower_ascii(*a));
+		auto bc = mpt::char_value(mpt::to_lower_ascii(*b));
 		if(ac != bc)
 		{
 			return ac < bc ? -1 : 1;
@@ -498,12 +484,15 @@ inline int CompareNoCaseAscii(const char *a, const char *b, std::size_t n)
 	return 0;
 }
 
-inline int CompareNoCaseAscii(std::string_view a, std::string_view b)
+template <typename Ta, typename Tb>
+inline int CompareNoCaseAscii(const Ta &a_, const Tb &b_)
 {
+	typename mpt::make_string_view_type<Ta>::type a{a_};
+	typename mpt::make_string_view_type<Tb>::type b{b_};
 	for(std::size_t i = 0; i < std::min(a.length(), b.length()); ++i)
 	{
-		unsigned char ac = mpt::char_value(mpt::ToLowerCaseAscii(a[i]));
-		unsigned char bc = mpt::char_value(mpt::ToLowerCaseAscii(b[i]));
+		auto ac = mpt::char_value(mpt::to_lower_ascii(a[i]));
+		auto bc = mpt::char_value(mpt::to_lower_ascii(b[i]));
 		if(ac != bc)
 		{
 			return ac < bc ? -1 : 1;
@@ -519,15 +508,10 @@ inline int CompareNoCaseAscii(std::string_view a, std::string_view b)
 	return a.length() < b.length() ? -1 : 1;
 }
 
-inline int CompareNoCaseAscii(const std::string &a, const std::string &b)
-{
-	return CompareNoCaseAscii(std::string_view(a), std::string_view(b));
-}
-
 
 #if defined(MODPLUG_TRACKER)
 
-inline mpt::ustring ToLowerCase(const mpt::ustring &s)
+inline mpt::ustring ToLowerCaseLocale(mpt::ustring_view s)
 {
 	#if defined(MPT_WITH_MFC)
 		#if defined(UNICODE)
@@ -536,13 +520,21 @@ inline mpt::ustring ToLowerCase(const mpt::ustring &s)
 			return mpt::transcode<mpt::ustring>(mpt::transcode<CStringW>(s).MakeLower());
 		#endif // UNICODE
 	#else // !MPT_WITH_MFC
-		std::wstring ws = mpt::transcode<std::wstring>(s);
-		std::transform(ws.begin(), ws.end(), ws.begin(), &std::towlower);
-		return mpt::transcode<mpt::ustring>(ws);
+		if constexpr(std::is_same<mpt::ustring, std::wstring>::value)
+		{
+			mpt::ustring ws{s};
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towlower);
+			return ws;
+		} else
+		{
+			std::wstring ws = mpt::transcode<std::wstring>(s);
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towlower);
+			return mpt::transcode<mpt::ustring>(ws);
+		}
 	#endif // MPT_WITH_MFC
 }
 
-inline mpt::ustring ToUpperCase(const mpt::ustring &s)
+inline mpt::ustring ToUpperCaseLocale(mpt::ustring_view s)
 {
 	#if defined(MPT_WITH_MFC)
 		#if defined(UNICODE)
@@ -551,11 +543,77 @@ inline mpt::ustring ToUpperCase(const mpt::ustring &s)
 			return mpt::transcode<mpt::ustring>(mpt::transcode<CStringW>(s).MakeUpper());
 		#endif // UNICODE
 	#else // !MPT_WITH_MFC
-		std::wstring ws = mpt::transcode<std::wstring>(s);
-		std::transform(ws.begin(), ws.end(), ws.begin(), &std::towupper);
-		return mpt::transcode<mpt::ustring>(ws);
+		if constexpr(std::is_same<mpt::ustring, std::wstring>::value)
+		{
+			mpt::ustring ws{s};
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towupper);
+			return ws;
+		} else
+		{
+			std::wstring ws = mpt::transcode<std::wstring>(s);
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towupper);
+			return mpt::transcode<mpt::ustring>(ws);
+		}
 	#endif // MPT_WITH_MFC
 }
+
+inline mpt::ustring ToLowerCaseLocale(mpt::ustring s)
+{
+	#if defined(MPT_WITH_MFC)
+		#if defined(UNICODE)
+			return mpt::transcode<mpt::ustring>(mpt::transcode<CString>(std::move(s)).MakeLower());
+		#else // !UNICODE
+			return mpt::transcode<mpt::ustring>(mpt::transcode<CStringW>(std::move(s)).MakeLower());
+		#endif // UNICODE
+	#else // !MPT_WITH_MFC
+		if constexpr(std::is_same<mpt::ustring, std::wstring>::value)
+		{
+			std::transform(s.begin(), s.end(), s.begin(), &std::towlower);
+			return s;
+		} else
+		{
+			std::wstring ws = mpt::transcode<std::wstring>(std::move(s));
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towlower);
+			return mpt::transcode<mpt::ustring>(ws);
+		}
+	#endif // MPT_WITH_MFC
+}
+
+inline mpt::ustring ToUpperCaseLocale(mpt::ustring s)
+{
+	#if defined(MPT_WITH_MFC)
+		#if defined(UNICODE)
+			return mpt::transcode<mpt::ustring>(mpt::transcode<CString>(std::move(s)).MakeUpper());
+		#else // !UNICODE
+			return mpt::transcode<mpt::ustring>(mpt::transcode<CStringW>(std::move(s)).MakeUpper());
+		#endif // UNICODE
+	#else // !MPT_WITH_MFC
+		if constexpr(std::is_same<mpt::ustring, std::wstring>::value)
+		{
+			std::transform(s.begin(), s.end(), s.begin(), &std::towupper);
+			return s;
+		} else
+		{
+			std::wstring ws = mpt::transcode<std::wstring>(std::move(s));
+			std::transform(ws.begin(), ws.end(), ws.begin(), &std::towupper);
+			return mpt::transcode<mpt::ustring>(ws);
+		}
+	#endif // MPT_WITH_MFC
+}
+
+#if defined(MPT_WITH_MFC)
+
+inline CString ToLowerCaseLocale(CString s)
+{
+	return s.MakeLower();
+}
+
+inline CString ToUpperCaseLocale(CString s)
+{
+	return s.MakeUpper();
+}
+
+#endif // MPT_WITH_MFC
 
 #endif // MODPLUG_TRACKER
 

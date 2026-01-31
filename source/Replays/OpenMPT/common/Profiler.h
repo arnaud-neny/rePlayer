@@ -14,12 +14,17 @@
 
 
 #include "mpt/mutex/mutex.hpp"
+#if defined(MODPLUG_TRACKER)
+#include "mpt/profiler/profiler.hpp"
+#endif
 
-#include <string>
-#include <vector>
+#include "mptCPU.h"
+#include "mptTime.h"
+
 
 
 OPENMPT_NAMESPACE_BEGIN
+
 
 
 #if defined(MODPLUG_TRACKER)
@@ -27,6 +32,7 @@ OPENMPT_NAMESPACE_BEGIN
 //#define USE_PROFILER
 
 #endif
+
 
 #ifdef USE_PROFILER
 
@@ -104,7 +110,9 @@ public:
 #define OPENMPT_PROFILE_FUNCTION(cat) OPENMPT_PROFILE_SCOPE(cat, __func__)
 
 
+
 #else // !USE_PROFILER
+
 
 
 class Profiler
@@ -124,7 +132,9 @@ public:
 #define OPENMPT_PROFILE_FUNCTION(cat) do { } while(0)
 
 
+
 #endif // USE_PROFILER
+
 
 
 OPENMPT_NAMESPACE_END

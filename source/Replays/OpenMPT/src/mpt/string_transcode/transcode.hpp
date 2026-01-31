@@ -819,6 +819,8 @@ inline Tdststring encode_utf8(const mpt::widestring & str, typename Tdststring::
 		std::size_t charsleft = numchars;
 		while (charsleft > 0) {
 			if (charsleft == numchars) {
+				// cppcheck false-positive
+				// cppcheck-suppress arrayIndexOutOfBounds
 				out.push_back(static_cast<uint8>(utf8[charsleft - 1] | (((1 << numchars) - 1) << (8 - numchars))));
 			} else {
 				// cppcheck false-positive
@@ -1995,6 +1997,13 @@ inline auto decode(Ttranscoder transcoder, const Tsrcstring & src) -> decltype(t
 
 
 
+// Checks if the std::string represents an UTF8 string.
+// This is currently implemented as converting to std::wstring and back assuming UTF8 both ways,
+// and comparing the result to the original string.
+// Caveats:
+//  - can give false negatives because of possible unicode normalization during conversion
+//  - can give false positives if the 8bit encoding contains high-ascii only in valid utf8 groups
+//  - slow because of double conversion
 inline bool is_utf8(const std::string & str) {
 	return (str == encode<std::string>(common_encoding::utf8, decode<std::string>(common_encoding::utf8, str)));
 }

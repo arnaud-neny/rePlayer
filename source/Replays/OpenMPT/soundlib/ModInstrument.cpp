@@ -190,7 +190,7 @@ void ModInstrument::Convert(MODTYPE fromType, MODTYPE toType)
 		nGlobalVol = 64;
 		nPan = 128;
 
-		LimitMax(nFadeOut, 32767u);
+		LimitMax(nFadeOut, uint16(32767));
 	}
 
 	VolEnv.Convert(fromType, toType);
@@ -216,8 +216,8 @@ void ModInstrument::Convert(MODTYPE fromType, MODTYPE toType)
 	// Limit fadeout length and precision for IT
 	if(toType & MOD_TYPE_IT)
 	{
-		LimitMax(nFadeOut, 8192u);
-		nFadeOut = ((nFadeOut + 16) / 32) * 32;
+		LimitMax(nFadeOut, uint16(8192));
+		nFadeOut = static_cast<uint16>(((nFadeOut + 16) / 32) * 32);
 	}
 
 	// MPT-specific features - remove instrument tunings, Pitch/Tempo Lock, cutoff / resonance swing and filter mode for other formats
@@ -265,9 +265,9 @@ void ModInstrument::GetSamples(std::vector<bool> &referencedSamples) const
 
 void ModInstrument::Sanitize(MODTYPE modType)
 {
-	LimitMax(nFadeOut, 65536u);
-	LimitMax(nGlobalVol, 64u);
-	LimitMax(nPan, 256u);
+	LimitMax(nFadeOut, uint16(32768));
+	LimitMax(nGlobalVol, uint16(64));
+	LimitMax(nPan, uint16(256));
 
 	LimitMax(wMidiBank, uint16(16384));
 	LimitMax(nMidiProgram, uint8(128));
