@@ -1,4 +1,4 @@
-v0.21.6:
+v0.21.7:
 - Added SkaleTracker
 - Updated ASAP to 7.0.0
 - Updated libfc14audiodecoder to libtfmxaudiodecoder 1.0.1
