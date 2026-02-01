@@ -111,8 +111,13 @@ namespace rePlayer
                 if ((adapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0)
                 {
                     D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-                    if (FAILED(D3D12CreateDevice(dxgiAdapter, featureLevel, IID_PPV_ARGS(&m_device))))
-                        continue;
+                    if (FAILED(D3D12CreateDevice(dxgiAdapter, featureLevel, IID_PPV_ARGS(&m_newDevice))))
+                    {
+                        if (FAILED(D3D12CreateDevice(dxgiAdapter, featureLevel, IID_PPV_ARGS(&m_device))))
+                            continue;
+                    }
+                    else
+                        m_device = m_newDevice;
 
 //                     D3D12_FEATURE_DATA_SHADER_MODEL shaderModel{ D3D_SHADER_MODEL_6_5 };
 //                     if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel))) || shaderModel.HighestShaderModel < D3D_SHADER_MODEL_6_5)
@@ -262,6 +267,7 @@ namespace rePlayer
         m_rtvDescriptorHeap.Reset();
         m_dcompDevice.Reset();
         m_device.Reset();
+        m_newDevice.Reset();
 
 #if IS_DX12_DEBUG_ENABLED
         SmartPtr<IDXGIDebug1> dxgiDebug;
@@ -430,7 +436,9 @@ namespace rePlayer
             .NodeMask = 1
         };
         SmartPtr<ID3D12CommandQueue> commandQueue;
-        if (m_device->CreateCommandQueue1(&desc, kCommandQueueGUID, IID_PPV_ARGS(&commandQueue)) < 0)
+        if (m_newDevice && m_newDevice->CreateCommandQueue1(&desc, kCommandQueueGUID, IID_PPV_ARGS(&commandQueue)) < 0)
+            commandQueue.Reset();
+        else if (m_device->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue)) < 0)
             commandQueue.Reset();
         return commandQueue;
     }
