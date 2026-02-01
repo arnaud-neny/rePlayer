@@ -8,12 +8,6 @@
 #   undef Yield
 #endif
 
-namespace rePlayer
-{
-    extern ReplayPlugin g_replayPlugin;
-}
-// namespace rePlayer
-
 extern "C" __declspec(dllexport) rePlayer::ReplayPlugin* getReplayPlugin()
 {
     return &rePlayer::g_replayPlugin;

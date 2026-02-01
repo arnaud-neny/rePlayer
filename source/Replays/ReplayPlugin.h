@@ -62,5 +62,7 @@ namespace rePlayer
 
         void* globals = nullptr;
     };
+
+    extern ReplayPlugin g_replayPlugin;
 }
 // namespace rePlayer
