@@ -1,14 +1,16 @@
-v0.21.5:
+v0.21.6:
 - Added SkaleTracker
 - Updated ASAP to 7.0.0
 - Updated libfc14audiodecoder to libtfmxaudiodecoder 1.0.1
 - Updated gbsplay to 0.0.101
 - Updated libsidplay to 2.16.0
-- Updated OpenMPT to 0.9.0-pre.9 r24409
+- Updated libvgm to 57585ea
+- Updated OpenMPT to 0.9.0-pre.12 r24873
 - Updated Opus to 1.6.1
 - Updated SunVox to 2.1.4
-- Updated vgmstream to r2055
+- Updated vgmstream to r2083
 - Updated WavPack to 5.9.0
+- Updated file renaming allowing to rename a selection of songs
 - Updated Song End Editor to edit (and detect) loop instead of duration
 - Added FFTW 3.3.10
 - Updated dr_flac to 0.13.3

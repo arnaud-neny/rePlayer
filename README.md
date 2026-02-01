@@ -68,7 +68,7 @@ Right click on selected songs bring a menu:
       In this editor, songs are by default merged if there are identical.
       Then you can do some drag and drop to force some merge.
       Double-click on a song will cancel the merge, but Ctrl+Double click will play it.
-      Press F2 to rename the latest selected song.
+      Press F2 to rename the latest selected song and/or selection (using starting matching text).
       Press F7/F8 to focus on previous/next set of merged songs
 
 - ### The artist tab
