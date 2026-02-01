@@ -121,6 +121,8 @@ namespace rePlayer
             Array<char> strings;
             Array<std::pair<uint32_t, uint32_t>> players;
 
+            std::string dataPath;
+
             int32_t stereoSeparation;
             int32_t surround;
             int32_t filter;

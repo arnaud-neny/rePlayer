@@ -46,6 +46,7 @@ namespace rePlayer
 
         if (&window != nullptr)
         {
+            window.RegisterSerializedData(ms_globals.dataPath, "ReplayUADEDataPath");
             window.RegisterSerializedData(ms_globals.stereoSeparation, "ReplayUADEStereoSeparation");
             window.RegisterSerializedData(ms_globals.surround, "ReplayUADESurround");
             window.RegisterSerializedData(ms_globals.filter, "ReplayUADEFilter");
@@ -367,6 +368,9 @@ namespace rePlayer
         changed |= ImGui::Combo("Filter", &ms_globals.filter, filters, NumItemsOf(filters));
         const char* const region[] = { "PAL", "NTSC" };
         changed |= ImGui::Combo("Region", &ms_globals.isNtsc, region, NumItemsOf(region));
+        changed |= ImGui::InputText("UADE Path", &ms_globals.dataPath);
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+            ImGui::Tooltip("Set the path of your own UADE system files");
         return changed;
     }
 

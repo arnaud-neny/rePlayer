@@ -248,9 +248,6 @@
     <ClInclude Include="uade\src\include\uade_logging.h">
       <Filter>Source Files\uade\include</Filter>
     </ClInclude>
-    <ClInclude Include="data.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayUADE.cpp">
@@ -1284,10 +1281,8 @@
     <None Include="data\players\ENV\EaglePlayer\ems_v6.cfg.txt">
       <Filter>Resource Files\data\players\ENV\EaglePlayer</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="data\score">
+    <None Include="data\score">
       <Filter>Resource Files\data</Filter>
-    </CustomBuild>
+    </None>
   </ItemGroup>
 </Project>

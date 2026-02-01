@@ -154,7 +154,10 @@
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
-copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays\UADE &gt; nul 2&gt;&amp;1
+rmdir /S /Q $(SolutionDir)..\data\replays\UADE\*.* &gt; nul 2&gt;&amp;1
+xcopy /Y /R /E $(ProjectDir)data $(SolutionDir)..\data\replays\UADE &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -183,135 +186,16 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays-win32 &gt; nul 2&gt;&amp;1
-copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1
+mkdir $(SolutionDir)..\data\replays-win32\UADE &gt; nul 2&gt;&amp;1
+rmdir /S /Q $(SolutionDir)..\data\replays-win32\UADE\*.* &gt; nul 2&gt;&amp;1
+xcopy /Y /R /E $(ProjectDir)data $(SolutionDir)..\data\replays-win32\UADE &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bencode\include\bencodetools\bencode.h" />
     <ClInclude Include="compat\memmemrep.h" />
     <ClInclude Include="compat\strlrep.h" />
-    <ClInclude Include="data.h">
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(FullPath)</Outputs>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</BuildInParallel>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClInclude</OutputItemType>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ClInclude</OutputItemType>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClInclude</OutputItemType>
-      <OutputItemType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ClInclude</OutputItemType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
-echo Path=%TARGET_PATH_FOR_SOURCE%
-type nul &gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;%(FullPath)
-echo { &gt;&gt;%(FullPath)
-echo     size_t size;&gt;&gt; %(FullPath)
-echo     const unsigned int* data;&gt;&gt; %(FullPath)
-echo     const char* path;&gt;&gt; %(FullPath)
-echo } static s_files[] = {&gt;&gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=\\!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo };&gt;&gt; %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
-echo Path=%TARGET_PATH_FOR_SOURCE%
-type nul &gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;%(FullPath)
-echo { &gt;&gt;%(FullPath)
-echo     size_t size;&gt;&gt; %(FullPath)
-echo     const unsigned int* data;&gt;&gt; %(FullPath)
-echo     const char* path;&gt;&gt; %(FullPath)
-echo } static s_files[] = {&gt;&gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=\\!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo };&gt;&gt; %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
-echo Path=%TARGET_PATH_FOR_SOURCE%
-type nul &gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;%(FullPath)
-echo { &gt;&gt;%(FullPath)
-echo     size_t size;&gt;&gt; %(FullPath)
-echo     const unsigned int* data;&gt;&gt; %(FullPath)
-echo     const char* path;&gt;&gt; %(FullPath)
-echo } static s_files[] = {&gt;&gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=\\!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo };&gt;&gt; %(FullPath)
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=%(RootDir)%(Directory)data\
-echo Path=%TARGET_PATH_FOR_SOURCE%
-type nul &gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;%(FullPath)
-echo { &gt;&gt;%(FullPath)
-echo     size_t size;&gt;&gt; %(FullPath)
-echo     const unsigned int* data;&gt;&gt; %(FullPath)
-echo     const char* path;&gt;&gt; %(FullPath)
-echo } static s_files[] = {&gt;&gt; %(FullPath)
-set /A filenumber=0
-for /R data %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=\\!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; %(FullPath)
-  set /A filenumber+=1
-)
-echo };&gt;&gt; %(FullPath)
-</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)data\*.*;%(RootDir)%(Directory)data\extra\*.*;%(RootDir)%(Directory)data\extra\Samples\*.*;%(RootDir)%(Directory)data\players\*.*;%(RootDir)%(Directory)data\players\ENV\*.*;%(RootDir)%(Directory)data\players\ENV\EaglePlayer\*.*;%(RootDir)%(Directory)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-    </ClInclude>
     <ClInclude Include="ReplayUADE.h" />
     <ClInclude Include="ReplayUADE.inl.h" />
     <ClInclude Include="uade\src\cputbl.h" />
@@ -503,121 +387,7 @@ echo };&gt;&gt; %(FullPath)
   </ItemGroup>
   <ItemGroup>
     <None Include="data\eagleplayer.conf" />
-    <CustomBuild Include="data\score">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
-type nul &gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;$(ProjectDir)data.h
-echo { &gt;&gt;$(ProjectDir)data.h
-echo     size_t size;&gt;&gt; $(ProjectDir)data.h
-echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
-echo     const char* path;&gt;&gt; $(ProjectDir)data.h
-echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=/!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo };&gt;&gt; $(ProjectDir)data.h
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
-type nul &gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;$(ProjectDir)data.h
-echo { &gt;&gt;$(ProjectDir)data.h
-echo     size_t size;&gt;&gt; $(ProjectDir)data.h
-echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
-echo     const char* path;&gt;&gt; $(ProjectDir)data.h
-echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=/!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo };&gt;&gt; $(ProjectDir)data.h
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
-type nul &gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;$(ProjectDir)data.h
-echo { &gt;&gt;$(ProjectDir)data.h
-echo     size_t size;&gt;&gt; $(ProjectDir)data.h
-echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
-echo     const char* path;&gt;&gt; $(ProjectDir)data.h
-echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=/!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo };&gt;&gt; $(ProjectDir)data.h
-</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal EnableDelayedExpansion
-set TARGET_PATH_FOR_SOURCE=$(ProjectDir)data\
-type nul &gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  echo %%f
-  $(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress "%%f" s_file!filenumber!&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo struct &gt;&gt;$(ProjectDir)data.h
-echo { &gt;&gt;$(ProjectDir)data.h
-echo     size_t size;&gt;&gt; $(ProjectDir)data.h
-echo     const unsigned int* data;&gt;&gt; $(ProjectDir)data.h
-echo     const char* path;&gt;&gt; $(ProjectDir)data.h
-echo } static s_files[] = {&gt;&gt; $(ProjectDir)data.h
-set /A filenumber=0
-for /R "$(ProjectDir)data" %%f in (*.*) do (
-  set "file=%%f"
-  set result=!file:%TARGET_PATH_FOR_SOURCE%=!
-  set result=!result:\=/!
-  echo { s_file!filenumber!_size, s_file!filenumber!_data, "!result!" },&gt;&gt; $(ProjectDir)data.h
-  set /A filenumber+=1
-)
-echo };&gt;&gt; $(ProjectDir)data.h
-</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data.h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)data.h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data.h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)data.h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)data\*.*;$(ProjectDir)data\extra\*.*;$(ProjectDir)data\extra\Samples\*.*;$(ProjectDir)data\players\*.*;$(ProjectDir)data\players\ENV\*.*;$(ProjectDir)data\players\ENV\EaglePlayer\*.*;$(ProjectDir)data\players\S\*.*;%(AdditionalInputs)</AdditionalInputs>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
-      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</BuildInParallel>
-    </CustomBuild>
+    <None Include="data\score" />
     <None Include="data\extras\hippel_st.smp.set" />
     <None Include="data\extras\Samples\ackerbell" />
     <None Include="data\extras\Samples\analogstring" />

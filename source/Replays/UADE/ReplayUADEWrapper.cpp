@@ -1,6 +1,8 @@
 #include "ReplayUADE.h"
 
-#include <IO/StreamMemory.h>
+#include <IO/StreamFile.h>
+#include <RePlayer/Version.h>
+#include <ReplayPlugin.h>
 #include <Thread/Mutex.h>
 
 extern "C"
@@ -13,8 +15,6 @@ extern "C"
 #include <io.h>
 
 #include <filesystem>
-
-#include "data.h"
 
 extern "C" int uade_filesize(size_t * size, const char* pathname)
 {
@@ -158,21 +158,22 @@ extern "C" int uade_arch_spawn(struct uade_ipc *ipc, /*pid_t * uadepid*/void** u
 
 extern "C" FILE* stdioemu_fopen(const char* filename, const char*)
 {
-    FILE* stream = nullptr;
     auto fixedFilename = filename;
     while (*fixedFilename == '/')
         fixedFilename++;
 
-    for (auto& file : s_files)
+    auto* globals = static_cast<rePlayer::ReplayUADE::Globals*>(rePlayer::g_replayPlugin.globals);
+    if (!globals->dataPath.empty())
     {
-        if (stricmp(file.path, fixedFilename) == 0)
-        {
-            stream = reinterpret_cast<FILE*>(core::io::StreamMemory::Create(filename, reinterpret_cast<const uint8_t*>(file.data), file.size, true).Detach());
-            break;
-        }
+        auto p = std::filesystem::path(globals->dataPath) / fixedFilename;
+        
+        auto stream = reinterpret_cast<FILE*>(core::io::StreamFile::Create(reinterpret_cast<const char*>(p.u8string().c_str())).Detach());
+        if (stream)
+            return stream;
     }
 
-    return stream;
+    auto mainPath = std::filesystem::current_path() / "replays" REPLAYER_OS_STUB / "UADE" / fixedFilename;
+    return reinterpret_cast<FILE*>(core::io::StreamFile::Create(reinterpret_cast<const char*>(mainPath.u8string().c_str())).Detach());
 }
 
 extern "C" int stdioemu_fseek(FILE* stream, long offset, int origin)
