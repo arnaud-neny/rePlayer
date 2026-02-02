@@ -220,6 +220,7 @@ namespace rePlayer
                 viewport->RendererUserData = graphics->OnCreateWindow(viewport->PlatformHandleRaw ? (HWND)viewport->PlatformHandleRaw : (HWND)viewport->PlatformHandle
                     , static_cast<uint32_t>(viewport->Size.x)
                     , static_cast<uint32_t>(viewport->Size.y));
+                viewport->PlatformRequestClose = viewport->RendererUserData == nullptr;
             }
             static void OnDestroyWindow(ImGuiViewport* viewport)
             {
@@ -328,6 +329,8 @@ namespace rePlayer
                 continue;
 
             auto window = reinterpret_cast<GraphicsWindowDX12*>(viewport->RendererUserData);
+            if (window == nullptr)
+                continue;
 
             nextFrameIndex = window->m_frameIndex + 1;
             window->m_frameIndex = nextFrameIndex;
@@ -436,8 +439,11 @@ namespace rePlayer
             .NodeMask = 1
         };
         SmartPtr<ID3D12CommandQueue> commandQueue;
-        if (m_newDevice && m_newDevice->CreateCommandQueue1(&desc, kCommandQueueGUID, IID_PPV_ARGS(&commandQueue)) < 0)
-            commandQueue.Reset();
+        if (m_newDevice)
+        {
+            if (m_newDevice->CreateCommandQueue1(&desc, kCommandQueueGUID, IID_PPV_ARGS(&commandQueue)) < 0)
+                commandQueue.Reset();
+        }
         else if (m_device->CreateCommandQueue(&desc, IID_PPV_ARGS(&commandQueue)) < 0)
             commandQueue.Reset();
         return commandQueue;
