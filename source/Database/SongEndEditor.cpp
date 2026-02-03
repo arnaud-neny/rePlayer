@@ -63,6 +63,7 @@ namespace rePlayer
         m_numSamples = kDefaultSongLength * replay->GetSampleRate();
         m_samples.Resize(m_numSamples);
         memset(m_samples.Items(), 0, m_samples.Size<size_t>());
+        m_loopDetection.loopMax = GetMaxLoopDuration();
 
         Core::AddJob([this]()
         {
@@ -710,6 +711,26 @@ namespace rePlayer
                 if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && m_wave->outHandle && m_isPlaying)
                 {
                     m_waveStartPosition = Min(uint32_t((uint64_t(offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel * m_replay->GetSampleRate()) / 1000), m_samples.NumItems() - 1);
+                    if (ImGui::GetIO().KeyShift)
+                    {
+                        // snap playback to the closest loop point
+                        int64_t startPositionInMs = (m_waveStartPosition * 1000ull) / m_replay->GetSampleRate();
+                        int32_t loopIndex = -1;
+                        int64_t l = abs(startPositionInMs - m_loop.GetFixed().start); // insert the loop start
+                        for (uint32_t i = 0; i < m_loops.NumItems(); i++)
+                        {
+                            int64_t cl = abs(int64_t(m_loops[i]) - startPositionInMs);
+                            if (cl < l)
+                            {
+                                loopIndex = i;
+                                l = cl;
+                            }
+                        }
+                        if (loopIndex >= 0)
+                            m_waveStartPosition = uint32_t((uint64_t(m_loops[loopIndex]) * m_replay->GetSampleRate()) / 1000ull);
+                        else
+                            m_waveStartPosition = uint32_t((uint64_t(m_loop.GetFixed().start) * m_replay->GetSampleRate()) / 1000ull);
+                    }
                     waveOutReset(m_wave->outHandle);
                     waveOutUnprepareHeader(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
                     m_wave->header.dwFlags = 0;
@@ -1029,7 +1050,7 @@ namespace rePlayer
             ImGui::SeparatorText("Loop Length Params");
             ImGui::DragUint("##downsampleFactor", &m_loopDetection.downsampleFactor, 0.05f, kMinDownsampleFactor, 16, "x%u downsample", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragUint("##LoopMin", &m_loopDetection.loopMin, 0.05f, 1, m_loopDetection.loopMax, "%us loop min", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::DragUint("##LoopMax", &m_loopDetection.loopMax, 0.05f, m_loopDetection.loopMin, m_numSamples / (5 * m_replay->GetSampleRate() / 2), "%us loop max", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::DragUint("##LoopMax", &m_loopDetection.loopMax, 0.05f, m_loopDetection.loopMin, GetMaxLoopDuration(), "%us loop max", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragFloat("##peakThreshold", &m_loopDetection.peakThreshold, 0.001f, 0.45f, 0.65f, "%.2f peak threshold", ImGuiSliderFlags_AlwaysClamp);
             ImGui::DragFloat("##consistencyThreshold", &m_loopDetection.consistencyThreshold, 0.001f, 0.35f, 0.55f, "%.2f consistency threshold", ImGuiSliderFlags_AlwaysClamp);
             ImGui::SeparatorText("Loop Start Params");
@@ -1061,6 +1082,11 @@ namespace rePlayer
         }
         else if (ImGui::IsItemHovered())
             ImGui::Tooltip("Detect Loop\nOr Silence");
+    }
+
+    uint32_t SongEndEditor::GetMaxLoopDuration() const
+    {
+        return m_numSamples / (5 * m_replay->GetSampleRate() / 2);
     }
 }
 // namespace rePlayer

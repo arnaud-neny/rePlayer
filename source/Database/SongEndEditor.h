@@ -48,6 +48,8 @@ namespace rePlayer
         void LoopUI();
         void ParamsUI();
 
+        uint32_t GetMaxLoopDuration() const;
+
     private:
         MusicID m_musicId;
         Replay* m_replay;
@@ -94,7 +96,7 @@ namespace rePlayer
         {
             uint32_t downsampleFactor = kMinDownsampleFactor;
             uint32_t loopMin = 10;
-            uint32_t loopMax = 180;
+            uint32_t loopMax;
             float peakThreshold = 0.58f; // 0.45-0.65
             float consistencyThreshold = 0.45f;//0.35-0.55
 
