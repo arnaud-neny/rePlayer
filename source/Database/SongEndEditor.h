@@ -39,7 +39,8 @@ namespace rePlayer
 
         bool IsBusy() const;
 
-        void FindLoop();
+        LoopInfo FindLoop();
+        void BuildLoops();
 
         uint32_t WaveformUI();
         void PlaybackUI();

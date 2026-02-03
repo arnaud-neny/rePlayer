@@ -289,7 +289,7 @@ namespace rePlayer
         return ReadCurrentSample() != m_samples.NumItems();
     }
 
-    void SongEndEditor::FindLoop()
+    LoopInfo SongEndEditor::FindLoop()
     {
         /*
             Massive code build only with ChatGPT! (as I had no idea of what I was doing)
@@ -670,7 +670,20 @@ namespace rePlayer
             loopStart = 0;
         m_busySpinner->Indent(-1);
 
-        m_loop = { m_loopDetection.loopStart * 1000u + uint32_t((loopStart * HOP * 1000ull) / sampleRate), uint32_t((loopLength * 1000ull) / sampleRate) };
+        return { m_loopDetection.loopStart * 1000u + uint32_t((loopStart * HOP * 1000ull) / sampleRate), uint32_t((loopLength * 1000ull) / sampleRate) };
+    }
+
+    void SongEndEditor::BuildLoops()
+    {
+        auto loop = m_loop.GetFixed();
+        if (loop.IsValid())
+        {
+            uint32_t currentEnd = loop.GetDuration();
+            uint32_t end = uint32_t((m_numSamples * 1000ull) / m_replay->GetSampleRate());
+            m_loops.Clear();
+            for (; currentEnd < end; currentEnd += loop.GetFixed().length)
+                m_loops.Add(currentEnd);
+        }
     }
 
     uint32_t SongEndEditor::WaveformUI()
@@ -991,6 +1004,14 @@ namespace rePlayer
             ImGui::OpenPopup("AutoLoop");
         if (ImGui::BeginPopup("AutoLoop"))
         {
+            ImGui::SeparatorText("Loops");
+            ImGui::BeginDisabled(!m_loop.IsValid());
+            if (ImGui::Button("Plot end songs", ImVec2(-FLT_MIN, 0.0f)))
+            {
+                BuildLoops();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndDisabled();
             ImGui::BeginDisabled(m_silence >= m_numSamples);
             ImGui::SeparatorText("Silence/End of Song");
             char txt[64] = "Not found###Silence";
@@ -1024,9 +1045,11 @@ namespace rePlayer
                 m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
                 Core::AddJob([this]()
                 {
-                    FindLoop();
-                    Core::FromJob([this]()
+                    auto loop = FindLoop();
+                    Core::FromJob([this, loop]()
                     {
+                        m_loop = loop;
+                        BuildLoops();
                         m_busySpinner.Reset();
                     });
                 });
