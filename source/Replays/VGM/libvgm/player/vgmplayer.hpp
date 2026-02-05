@@ -187,7 +187,8 @@ public:
 	UINT8 Reset(void);
 	UINT8 Seek(UINT8 unit, UINT32 pos);
 	UINT32 Render(UINT32 smplCnt, WAVE_32BS* data);
-	
+	const std::vector<std::string>& GetDevNames() { return _devNames; } // rePlayer
+
 protected:
 	UINT8 ParseHeader(void);
 	void ParseXHdr_Data32(UINT32 fileOfs, std::vector<XHDR_DATA32>& xData);

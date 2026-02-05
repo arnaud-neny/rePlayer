@@ -66,6 +66,7 @@ static DEVDEF_RWFUNC devFunc[] =
 	{RWF_REGISTER | RWF_WRITE, DEVRW_A8D8, 0, OPSG_Write},
 	{RWF_REGISTER | RWF_READ, DEVRW_A8D8, 0, OPSG_Read},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, OPSG_SetMuteMask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, OPSG_SetPan}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 DEV_DEF devDef_C6280_Ootake =
@@ -284,6 +285,7 @@ typedef struct
 	Uint8		Port[16];				// for debug purpose
 
 	BOOL		bHoneyInTheSky; //はにいいんざすかいパッチ用。v2.60
+	BOOL		bForceStereo; // rePlayer
 } huc6280_state;
 
 static BOOL			_bTblInit = FALSE;
@@ -652,17 +654,23 @@ OPSG_Mix(
 		for (i=0; i<N_CHANNEL; i++)
 		{
 			PSGChn = &info->Psg[i];
-			
+			// rePlayer begin
 			if ((PSGChn->bOn)&&((i != 1)||(info->LfoCtrl == 0))&&(!info->bPsgMute[i])) //Kitao更新
 			{
 				if (PSGChn->bDDA)
 				{
-					smp = PSGChn->ddaSample * PSGChn->outVolumeL;
-					//smp = PSGChn->ddaSample * PSGChn->outVolumeL * (Sint32)OVERSAMPLE_RATE; //オーバーサンプリング用
-					sampleAllL += smp + (smp >> 3) + (smp >> 4) + (smp >> 5) + (smp >> 7) + (smp >> 12) + (smp >> 14) + (smp >> 15); //Kitao更新。サンプリング音の音量を実機並みに調整。v2.39,v2.40,v2.62,v2.65再調整した。
-					smp = PSGChn->ddaSample * PSGChn->outVolumeR;
-					//smp = PSGChn->ddaSample * PSGChn->outVolumeR * (Sint32)OVERSAMPLE_RATE; //オーバーサンプリング用
-					sampleAllR += smp + (smp >> 3) + (smp >> 4) + (smp >> 5) + (smp >> 7) + (smp >> 12) + (smp >> 14) + (smp >> 15); //Kitao更新。サンプリング音の音量を実機並みに調整。v2.39,v2.40,v2.62,v2.65再調整した。
+					if (!info->bForceStereo || (i & 1) == 0)
+					{
+						smp = PSGChn->ddaSample * PSGChn->outVolumeL;
+						//smp = PSGChn->ddaSample * PSGChn->outVolumeL * (Sint32)OVERSAMPLE_RATE; //オーバーサンプリング用
+						sampleAllL += smp + (smp >> 3) + (smp >> 4) + (smp >> 5) + (smp >> 7) + (smp >> 12) + (smp >> 14) + (smp >> 15); //Kitao更新。サンプリング音の音量を実機並みに調整。v2.39,v2.40,v2.62,v2.65再調整した。
+					}
+					if (!info->bForceStereo || (i & 1) != 0)
+					{
+						smp = PSGChn->ddaSample * PSGChn->outVolumeR;
+						//smp = PSGChn->ddaSample * PSGChn->outVolumeR * (Sint32)OVERSAMPLE_RATE; //オーバーサンプリング用
+						sampleAllR += smp + (smp >> 3) + (smp >> 4) + (smp >> 5) + (smp >> 7) + (smp >> 12) + (smp >> 14) + (smp >> 15); //Kitao更新。サンプリング音の音量を実機並みに調整。v2.39,v2.40,v2.62,v2.65再調整した。
+					}
 				}
 				else if (PSGChn->bNoiseOn)
 				{
@@ -678,17 +686,29 @@ OPSG_Mix(
 					
 					if (PSGChn->noiseFrq == 0) //Kitao追加。noiseFrq=0(dataに0x1Fが書き込まれた)のときは音量が通常の半分とした。（ファイヤープロレスリング３、パックランド、桃太郎活劇、がんばれゴルフボーイズなど）
 					{
-						smp = sample * PSGChn->outVolumeL;
-						sampleAllL += (smp >> 1) + (smp >> 12) + (smp >> 14); //(1/2 + 1/4096 + (1/32768 + 1/32768))
-						smp = sample * PSGChn->outVolumeR;
-						sampleAllR += (smp >> 1) + (smp >> 12) + (smp >> 14);
+						if (!info->bForceStereo || (i & 1) == 0)
+						{
+							smp = sample * PSGChn->outVolumeL;
+							sampleAllL += (smp >> 1) + (smp >> 12) + (smp >> 14); //(1/2 + 1/4096 + (1/32768 + 1/32768))
+						}
+						if (!info->bForceStereo || (i & 1) != 0)
+						{
+							smp = sample * PSGChn->outVolumeR;
+							sampleAllR += (smp >> 1) + (smp >> 12) + (smp >> 14);
+						}
 					}
 					else //通常
 					{
-						smp = sample * PSGChn->outVolumeL;
-						sampleAllL += smp + (smp >> 11) + (smp >> 14) + (smp >> 15); //Kitao更新。ノイズの音量を実機並みに調整(1 + 1/2048 + 1/16384 + 1/32768)。この"+1/32768"で絶妙(主観。大魔界村,ソルジャーブレイドなど)になる。v2.62更新
-						smp = sample * PSGChn->outVolumeR;
-						sampleAllR += smp + (smp >> 11) + (smp >> 14) + (smp >> 15); //Kitao更新。ノイズの音量を実機並みに調整
+						if (!info->bForceStereo || (i & 1) == 0)
+						{
+							smp = sample * PSGChn->outVolumeL;
+							sampleAllL += smp + (smp >> 11) + (smp >> 14) + (smp >> 15); //Kitao更新。ノイズの音量を実機並みに調整(1 + 1/2048 + 1/16384 + 1/32768)。この"+1/32768"で絶妙(主観。大魔界村,ソルジャーブレイドなど)になる。v2.62更新
+						}
+						if (!info->bForceStereo || (i & 1) != 0)
+						{
+							smp = sample * PSGChn->outVolumeR;
+							sampleAllR += smp + (smp >> 11) + (smp >> 14) + (smp >> 15); //Kitao更新。ノイズの音量を実機並みに調整
+						}
 					}
 				}
 				else if (PSGChn->deltaPhase)
@@ -706,8 +726,10 @@ OPSG_Mix(
 					if (PSGChn->frq < 128)
 						sample -= sample >> 2; //低周波域の音量を制限。ブラッドギアのスタート時などで実機と同様の音に。ソルジャーブレイドなども実機に近くなった。v2.03
 
-					sampleAllL += sample * PSGChn->outVolumeL; //Kitao更新
-					sampleAllR += sample * PSGChn->outVolumeR; //Kitao更新
+					if (!info->bForceStereo || (i & 1) == 0)
+						sampleAllL += sample * PSGChn->outVolumeL; //Kitao更新
+					if (!info->bForceStereo || (i & 1) != 0)
+						sampleAllR += sample * PSGChn->outVolumeR; //Kitao更新
 				}
 			}
 			//Kitao追加。DDA消音時はノイズ軽減のためフェードアウトで消音する。
@@ -720,10 +742,13 @@ OPSG_Mix(
 				--info->DdaFadeOutR[i];
 			else if (info->DdaFadeOutR[i] < 0)
 				++info->DdaFadeOutR[i];
-			sampleAllL += info->DdaFadeOutL[i];
+			if (!info->bForceStereo || (i & 1) == 0)
+				sampleAllL += info->DdaFadeOutL[i];
 			//sampleAllL += info->DdaFadeOutL[i] * OVERSAMPLE_RATE; //オーバーサンプリング用
-			sampleAllR += info->DdaFadeOutR[i];
+			if (!info->bForceStereo || (i & 1) != 0)
+				sampleAllR += info->DdaFadeOutR[i];
 			//sampleAllR += info->DdaFadeOutR[i] * OVERSAMPLE_RATE; //オーバーサンプリング用
+			// rePlayer end
 		}
 		//Kitao更新。6ch合わさったところで、ボリューム調整してバッファに書き込む。
 		bufL[j] = (DEV_SMPL)((double)sampleAllL * info->VOL);
@@ -830,6 +855,8 @@ OPSG_Init(
 
 	info->SAMPLE_RATE = sampleRate;
 	info->RESMPL_RATE = info->PSG_FRQ / OVERSAMPLE_RATE / info->SAMPLE_RATE;
+
+	info->bForceStereo = FALSE; // rePlayer
 
 	return info;
 }
@@ -964,3 +991,12 @@ OPSG_SetHoneyInTheSky(
 	
 	info->bHoneyInTheSky = bHoneyInTheSky;
 }
+
+// rePlayer begin
+static void OPSG_SetPan(void* chip, const INT16* PanVals)
+{
+	huc6280_state* info = (huc6280_state*)chip;
+
+	info->bForceStereo = PanVals[0] != 0;
+}
+// rePlayer end

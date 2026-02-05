@@ -64,6 +64,7 @@ OPSG_SetMutePsgChannel(
 	UINT8	bMute);
 
 static void OPSG_SetMuteMask(void* chip, UINT32 MuteMask);
+static void OPSG_SetPan(void* chip, const INT16* PanVals); // rePlayer
 
 //Kitao追加
 static UINT8

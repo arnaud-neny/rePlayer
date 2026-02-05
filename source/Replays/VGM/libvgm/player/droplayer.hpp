@@ -133,7 +133,8 @@ public:
 	UINT8 Reset(void);
 	UINT8 Seek(UINT8 unit, UINT32 pos);
 	UINT32 Render(UINT32 smplCnt, WAVE_32BS* data);
-	
+	const std::vector<std::string>& GetDevNames() { return _devNames; } // rePlayer
+
 private:
 	size_t DeviceID2OptionID(UINT32 id) const;
 	void RefreshMuting(DRO_CHIPDEV& chipDev, const PLR_MUTE_OPTS& muteOpts);

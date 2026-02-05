@@ -6,6 +6,7 @@
 #include "../emu/Resampler.h"	// for WAVE_32BS
 #include "../utils/DataLoader.h"
 #include <vector>
+#include <string> // rePlayer
 
 
 // GetState() bit masks
@@ -158,6 +159,8 @@ public:
 	virtual UINT8 Reset(void) = 0;
 	virtual UINT8 Seek(UINT8 unit, UINT32 pos) = 0; // seek to playback position
 	virtual UINT32 Render(UINT32 smplCnt, WAVE_32BS* data) = 0;
+
+	virtual const std::vector<std::string>& GetDevNames() = 0; // rePlayer
 	
 protected:
 	UINT32 _outSmplRate;

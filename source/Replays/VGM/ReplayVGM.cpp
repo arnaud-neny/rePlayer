@@ -6,9 +6,16 @@
 // - emu/cores/fmopn.c
 // - emu/cores/fmopn.h
 // - emu/cores/gb.c
+// - emu/cores/Ootake_PSG.c
+// - emu/cores/Ootake_PSG_private.h
 // - emu/cores/oplintf.c
 // - emu/cores/oplnintf.c
 // - emu/cores/sn76496.c
+// - player/droplayer.hpp
+// - player/gymplayer.hpp
+// - player/playerbase.hpp
+// - player/s98player.hpp
+// - player/vgmplayer.hpp
 #include "ReplayVGM.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -349,6 +356,21 @@ namespace rePlayer
             metadata += " : ";
             metadata += *tags++;
         }
+
+        auto& devs = m_player->GetPlayer()->GetDevNames();
+        if (!devs.empty())
+        {
+            if (!metadata.empty())
+                metadata += "\n";
+            metadata += "DEVICES : ";
+            metadata += devs[0];
+            for (size_t i = 1; i < devs.size(); ++i)
+            {
+                metadata += ";";
+                metadata += devs[i];
+            }
+        }
+
         return metadata;
     }
 
