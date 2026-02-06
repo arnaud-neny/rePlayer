@@ -18,7 +18,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::Hively,
         .name = "HivelyTracker",
-        .extensions = "ahx;hvl",
+        .extensions = "ahx;hvl;thx",
         .about = "HivelyTracker 1.9\nCopyright (c) 2006-2018 Pete Gordon",
         .settings = "HivelyTracker 1.9",
         .init = ReplayHively::Init,
