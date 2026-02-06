@@ -34,7 +34,7 @@ namespace rePlayer
             "TFMX",
             ModlandReplay::kTFMX,
             [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/mdat."); ext[1] = 's'; ext[2] = 'm'; ext[3] = 'p'; ext[4] = 'l'; name[0] = 's'; name[1] = 'm'; name[2] = 'p'; name[3] = 'l'; },
-            [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdat, eReplay::TFMX); },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_mdat, eReplay::FutureComposer); },
             [](const char* name) { return strstr(name, "smpl.") != nullptr; }
         },
         { // uade
