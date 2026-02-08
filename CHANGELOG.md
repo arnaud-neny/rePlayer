@@ -1,7 +1,7 @@
-v0.21.8:
+v0.21.9:
 - Added SkaleTracker
 - Updated ASAP to 7.0.0
-- Updated libfc14audiodecoder to libtfmxaudiodecoder 1.0.1
+- Updated libfc14audiodecoder to libtfmxaudiodecoder 1.0.2
 - Updated gbsplay to 0.0.101
 - Updated libsidplay to 2.16.0
 - Updated libvgm to 57585ea
