@@ -178,11 +178,8 @@ void TFMXDecoder::sid(VoiceVars& voice) {
         currSourceOffset += x;
         // target sample
         sword s = (sbyte)pBuf[voice.sid.sourceOffset + ((currSourceOffset>>16) & voice.sid.sourceLength)];
-        if ( d == 0 ) {  // direct sampling mode
-            *pTarget++ = s;
-        }
-        else if ( s == cur ) {  // target reached
-            cur = s;
+        if (( d == 0 ) ||    // direct sampling mode
+            ( s == cur )) {  // target reached
             *pTarget++ = s;
         }
         else if ( s > cur) {  // target higher

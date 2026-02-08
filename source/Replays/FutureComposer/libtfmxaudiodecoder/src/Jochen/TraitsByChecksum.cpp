@@ -38,6 +38,9 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
         if (r != pEnd) {
             udword silenceOffs = (r-sBuf.tellBegin());
             crc1 = crc.get(sBuf,0,silenceOffs);
+#if defined(DEBUG)
+            cout << "CRC = " << tohex(crc1) << endl;
+#endif
         }
             
         // Wings of Death  end, intro, outro, title
@@ -70,7 +73,72 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
             TFMX_sndModFuncs[5] = &HippelDecoder::TFMX_sndSeq_E5_repOffs;  // NB: but not used by those modules!
             TFMX_sndModFuncs[7] = &HippelDecoder::TFMX_sndSeq_E7_setDiffWave;
         }
-    }
+
+        // Grand Monster Slam (Atari ST to Amiga conversion)
+        // published on the Wanted Team examples website as:
+        // SOG.GrandSlamMonsterST
+        //
+        // It is prepended with the machine code player from
+        // Wings of Death (Amiga). Hence this player checksum.
+        if (crc1 == 0x3bcb814b) {
+            udword crc2;
+            crc2 = crc.get(sBuf,0x2950,0x2a04-0x2950);  // sample defs
+#if defined(DEBUG)
+            cout << "CRC (2) = " << tohex(crc2) << endl;
+#endif
+            if (crc2 == 0x9c2feb18) {
+                // By mistake, three samples are defined as looping,
+                // which causes audible side-effects e.g. for the PING sound.
+                // In the original Atari ST module, they have length 0
+                // and are played as one-shot samples.
+                // DIG-1:PING.DIK
+                fcBuf[0x2a02] = 0;
+                fcBuf[0x2a03] = 1;
+                // DIG-1:TUSCH.DIK
+                fcBuf[0x296c] = 0;
+                fcBuf[0x296d] = 1;
+                // DIG-1:BONGO.DIK
+                fcBuf[0x29e4] = 0;
+                fcBuf[0x29e5] = 1;
+            }
+        }
+
+        // Wings of Death (Atari ST to Amiga conversion)
+        // published on the Wanted Team examples website as:
+        // SOG.WingsOfDeathST intro
+        //
+        // It is prepended with the machine code player from
+        // Wings of Death (Amiga). Hence this player checksum.
+        // That player is not the right one to play that module.
+        if (crc1 == 0x4c0a6454) {
+            udword crc2, crc3, crc4;
+            crc2 = crc.get(sBuf,0x4a3c,0x4cb2-0x4a3c);  // sample defs
+            crc3 = crc.get(sBuf,0x2ef4,64);  // pattern $40
+            crc4 = crc.get(sBuf,0x43f4,0x4a18-0x43f4);  // track table
+#if defined(DEBUG)
+            cout << "CRC (2) = " << tohex(crc2) << endl;
+            cout << "CRC (3) = " << tohex(crc3) << endl;
+            cout << "CRC (4) = " << tohex(crc4) << endl;
+#endif
+            if (crc2 == 0xed03955b) {
+                // Accept only the examined file with high transpose from
+                // Atari ST and strong portamento parameters.
+                if (crc3 == 0x96681dec && crc4 == 0x43202c79) {
+                    traits.lowerPeriods = true;
+                    traits.periodMin = 0x002c;
+                    // TFMX-style portamento is too strong for the patterns
+                    // that are transposed by +3 octaves.
+                    traits.portaWeaker = true;
+                    // TFMX-style vibrato seems too strong.
+                    pVibratoFunc = &HippelDecoder::COSO_vibrato;
+                }
+                // Reject other/unknown releases.
+                else {
+                    traits.blacklisted = true;
+                }
+            }
+        }
+    }  // offsets.header != 0
 
     if (traits.compressed) {
         udword crc2 = crc.get(sBuf,offsets.trackTable,trackTabLen);

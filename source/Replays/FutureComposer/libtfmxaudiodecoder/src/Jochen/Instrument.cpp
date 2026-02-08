@@ -483,11 +483,24 @@ void HippelDecoder::TFMX_processPerVol(VoiceVars& voiceX) {
     }
     // else: lock note (i.e. transpose value from sequence is note to play)
     ubyte note = t&0x7f;
-    sword period = periods[note];
+    sword period;
+    if (traits.lowerPeriods) {
+        note = t&0x3f;
+        period = periodsLower[note];
+    }
+    else {
+        period = periods[note];
+    }
+    // Check it a first time here, so we can keep the non-standard
+    // double rate period values in the same array.
+    if (period < traits.periodMin) {
+        period = traits.periodMin;
+    }
 
     period = (this->*pVibratoFunc)(voiceX,period,note);
     period = (this->*pPortamentoFunc)(voiceX,period);
 
+    // Final range-check.
     if (period < traits.periodMin) {
         period = traits.periodMin;
     }

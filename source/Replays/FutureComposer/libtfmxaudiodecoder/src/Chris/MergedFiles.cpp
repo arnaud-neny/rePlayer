@@ -81,10 +81,6 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
 #endif
         offsets.header = readBEudword(pBuf,4);
        
-        char probeStr[tfmxTFHDParseSize+1];
-        memcpy(probeStr,input.buf,tfmxTFHDParseSize);
-        probeStr[tfmxTFHDParseSize] = 0;
-
         // 0 = unspecified / 1 = TFMX v1.5 / 2 = TFMX Pro / 3 = TFMX 7V
         // bit 7 = forced
         // Only few TFHD files specify the version.
@@ -114,10 +110,6 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         if ( pBuf[11] !=0 || pBuf[15] !=0 ) {
             return false;
         }
-        char probeStr[tfmxMODParseSize+1];
-        memcpy(probeStr,input.buf,tfmxMODParseSize);
-        probeStr[tfmxMODParseSize] = 0;
-
 #if defined(DEBUG)
         cout << TAG_TFMXMOD << endl;
 #endif

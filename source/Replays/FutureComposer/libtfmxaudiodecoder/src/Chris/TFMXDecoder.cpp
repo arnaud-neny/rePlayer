@@ -231,9 +231,22 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         o2 = 0x400;
         o3 = 0x600;
     }
+    // Check for out-of-bounds offsets. It may be the rare case of a TFMX PC
+    // module conversion like "Tony & Friends in Kellogg's Land", which uses
+    // little-endian offsets here.
+    if (o1 >= input.bufLen || o2 >= input.bufLen || o3 >= input.bufLen) {
+        // C++23 would have std::byteswap.
+        o1 = byteSwap(o1);
+        o2 = byteSwap(o2);
+        o3 = byteSwap(o3);
+    }
     offsets.trackTable = h+o1;
     offsets.patterns = h+o2;  // offset to array of offsets
     offsets.macros = h+o3;  // offset to array of offsets
+    // If they are out-of-bounds, reject the module.
+    if (offsets.trackTable >= input.bufLen || offsets.patterns >= input.bufLen || offsets.macros >= input.bufLen) {
+        return false;
+    }
     
     offsets.sampleData = h+input.mdatSize;
     // TFMX clears the first two words for one-shot samples.
@@ -757,7 +770,7 @@ uword TFMXDecoder::noteToPeriod(int note) {
 
 bool TFMXDecoder::detect(void* data, udword len) {
 #if defined(DEBUG)
-    cout << "TFMXlDecoder::detect()" << endl;
+    cout << "TFMXDecoder::detect()" << endl;
 #endif
     ubyte *d = static_cast<ubyte*>(data);
     bool maybe = false;

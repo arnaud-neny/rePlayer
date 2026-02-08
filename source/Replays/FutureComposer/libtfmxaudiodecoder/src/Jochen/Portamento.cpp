@@ -24,12 +24,22 @@ uword HippelDecoder::TFMX_portamento(VoiceVars& voiceX, uword period) {
         udword x;
         if (voiceX.portaSpeed < 0 ) {
             x = (-voiceX.portaSpeed);
-            voiceX.portaOffs += (x<<11);
+            if (traits.portaWeaker) {
+                voiceX.portaOffs += (x<<8);
+            }
+            else {
+                voiceX.portaOffs += (x<<11);
+            }
             period += (voiceX.portaOffs>>16);
         }
         else {
             x = voiceX.portaSpeed;
-            voiceX.portaOffs += (x<<11);
+            if (traits.portaWeaker) {
+                voiceX.portaOffs += (x<<8);
+            }
+            else {
+                voiceX.portaOffs += (x<<11);
+            }
             period -= (voiceX.portaOffs>>16);
         }
     }

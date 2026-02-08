@@ -46,6 +46,9 @@ bool HippelDecoder::TFMX_init(int songNumber) {
     traits.sndSeqGoto = true;
     traits.porta40SetSnd = true;   // harmless for modules that don't use it
     traitsByChecksum();
+    if (traits.blacklisted) {
+        return false;
+    }
 
     // For convenience, since we don't relocate the module to offset 0.
     udword h = offsets.header;

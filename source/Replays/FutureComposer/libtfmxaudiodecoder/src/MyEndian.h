@@ -52,6 +52,14 @@ inline udword makeDword(ubyte hihi, ubyte hilo, ubyte hi, ubyte lo) {
     return (makeWord(hihi,hilo)<<16)|makeWord(hi,lo);
 }
 
+inline udword byteSwap(udword someDword) {
+    return ( ((someDword&0xFF000000)>>24) |
+             ((someDword&0x00FF0000)>>8) |
+             ((someDword&0x0000FF00)<<8) |
+             ((someDword&0x000000FF)<<24)
+             );
+}
+
 }  // namespace
 
 #endif  // MYENDIAN_H

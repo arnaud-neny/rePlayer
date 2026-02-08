@@ -141,6 +141,7 @@ class HippelDecoder : public Decoder {
 
     // Index is AND 0x7f.
     static const uword periods[0x80];
+    static const uword periodsLower[0x40];
 
     static const uword SMOD_waveInfo[47*4];
     static const ubyte SMOD_waveforms[];
@@ -297,6 +298,9 @@ class HippelDecoder : public Decoder {
         int patternSize;  /* 0, if it's a compressed module */
         int sampleStructSize;
         uword periodMin, periodMax;
+        bool lowerPeriods;
+        bool portaWeaker;
+        bool blacklisted;
     } traits;
 
     void setTrackRange(int=-1,int=-1);

@@ -129,6 +129,8 @@ void TFMXDecoder::macroFunc_ExtraWait(VoiceVars& voice) {
         voice.macro.extraWait = true;
         macroEvalAgain = true;
     }
+    // Resetting the flag via DMAoff macro is extremely rare
+    // and potentially not needed with no hardware Paula.
 }
 
 void TFMXDecoder::macroFunc_NOP(VoiceVars& voice) {
@@ -378,6 +380,11 @@ void TFMXDecoder::macroFunc_StopSample_sub(VoiceVars& voice) {
     voice.ch->off();
     macroEvalAgain = true;
 
+    // Rare variants of TFMX implement it as a count value, but no module
+    // sets the value to anything above 1.
+    if (cmd.bb != 0) {
+        voice.macro.extraWait = false;
+    }
     // The variant that also does AddVolume/SetVolume.
     if (cmd.cd == 0) {
         if (cmd.ee == 0) {
