@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\pxtone">
+      <UniqueIdentifier>{5dd6fe08-4960-4d6d-a738-660496f4fd72}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayPxTone.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtn.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnData.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnDelay.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnError.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnEvelist.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnMaster.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnMax.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnMem.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnOverDrive.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_Frequency.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_Noise.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_NoiseBuilder.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_Oggv.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_Oscillator.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnPulse_PCM.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnService.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnText.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnUnit.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtnWoice.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+    <ClInclude Include="pxtone\pxtoneNoise.h">
+      <Filter>Source Files\pxtone</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayPxTone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnData.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnDelay.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnError.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnEvelist.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnMaster.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnMem.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnOverDrive.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_Frequency.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_Noise.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_NoiseBuilder.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_Oggv.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_Oscillator.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnPulse_PCM.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnService.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnService_moo.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnText.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnUnit.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnWoice.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnWoice_io.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtnWoicePTV.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+    <ClCompile Include="pxtone\pxtoneNoise.cpp">
+      <Filter>Source Files\pxtone</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

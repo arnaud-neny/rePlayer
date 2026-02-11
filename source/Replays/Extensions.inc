@@ -1002,3 +1002,5 @@ EXTENSION(md2)          // ASAP
 EXTENSION(sfa)          // VGMStream
 EXTENSION(sounds)       // VGMStream
 EXTENSION(spk)          // VGMStream
+EXTENSION(ptcop)        // PxTone
+EXTENSION(pttune)       // PxTone
