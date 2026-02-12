@@ -797,6 +797,7 @@ namespace rePlayer
                     float mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f).x;
                     auto oldPos = uint32_t(Clamp(offset + int64_t(m_mousePosWithLoop - pos.x), 0ll, m_frames.NumItems() - 1ll) * numMillisecondsPerPixel);
                     auto newPos = uint32_t(Clamp(offset + int64_t(m_mousePosWithLoop + mouseDelta - pos.x), 0ll, m_frames.NumItems() - 1ll) * numMillisecondsPerPixel);
+                    auto oldLoop = m_loop;
                     if (m_mouseMode == EditLoop::Move)
                     {
                         m_loop.start = uint32_t(Clamp(m_mouseLoop.start + mouseDelta * numMillisecondsPerPixel, 0ll, m_numSamples - 1ll));
@@ -837,6 +838,8 @@ namespace rePlayer
                             m_loop.length = newEnd - m_mouseLoop.start;
                         }
                     }
+                    if (oldLoop.start != m_loop.start || oldLoop.length != m_loop.length)
+                        BuildLoops();
                 }
             }
             else
@@ -946,6 +949,7 @@ namespace rePlayer
 
     void SongEndEditor::LoopUI()
     {
+        auto oldLoop = m_loop;
         auto width = ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 7;
         ImGui::SetNextItemWidth(0.33f * width);
         ImGui::DragUint("##StartLoop", &m_loop.start, 1000.0f, 0, 0, "Loop Start", ImGuiSliderFlags_NoInput, ImVec2(0.0f, 0.5f));
@@ -980,6 +984,8 @@ namespace rePlayer
         ImGui::SetNextItemWidth(width * 0.55f / 6.0f);
         ImGui::DragInt("##LengthMilliseconds", &milliseconds, 1.0f, 0, 999, "%dms", ImGuiSliderFlags_AlwaysClamp);
         m_loop.length = uint32_t(minutes) * 60000 + uint32_t(seconds) * 1000 + uint32_t(milliseconds);
+        if (oldLoop.start != m_loop.start || oldLoop.length != m_loop.length)
+            BuildLoops();
     }
 
     void SongEndEditor::ParamsUI()
@@ -1025,14 +1031,6 @@ namespace rePlayer
             ImGui::OpenPopup("AutoLoop");
         if (ImGui::BeginPopup("AutoLoop"))
         {
-            ImGui::SeparatorText("Loops");
-            ImGui::BeginDisabled(!m_loop.IsValid());
-            if (ImGui::Button("Plot end songs", ImVec2(-FLT_MIN, 0.0f)))
-            {
-                BuildLoops();
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndDisabled();
             ImGui::BeginDisabled(m_silence >= m_numSamples);
             ImGui::SeparatorText("Silence/End of Song");
             char txt[64] = "Not found###Silence";
@@ -1044,6 +1042,7 @@ namespace rePlayer
             if (ImGui::Button(txt, ImVec2(-FLT_MIN, 0.0f)))
             {
                 m_loop = { 0, uint32_t((m_silence * 1000ull) / m_replay->GetSampleRate()) };
+                BuildLoops();
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();
