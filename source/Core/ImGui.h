@@ -29,5 +29,10 @@ namespace ImGui
     {
         return DragScalar(label, ImGuiDataType_U32, v, v_speed, &v_min, &v_max, format, flags, text_align);
     }
+
+    inline void TextUnformatted(const std::string& str)
+    {
+        TextUnformatted(str.c_str(), str.c_str() + str.size());
+    }
 }
 // namespace ImGui
