@@ -1004,3 +1004,5 @@ EXTENSION(sounds)       // VGMStream
 EXTENSION(spk)          // VGMStream
 EXTENSION(ptcop)        // PxTone
 EXTENSION(pttune)       // PxTone
+EXTENSION(d8)           // ASAP
+EXTENSION(d15)          // ASAP

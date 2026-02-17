@@ -103,8 +103,15 @@ namespace rePlayer
         ASAP_Delete(m_song);
     }
 
+    static MediaType BuildMediaType(const char* ext)
+    {
+        if (ext)
+            return MediaType(ext, eReplay::ASAP);
+        return MediaType(eExtension::_sap, eReplay::ASAP);
+    }
+
     ReplayASAP::ReplayASAP(ASAP* song)
-        : Replay(ASAPInfo_GetExt(ASAP_GetInfo(song)), eReplay::ASAP)
+        : Replay(BuildMediaType(ASAPInfo_GetOriginalModuleExt(ASAP_GetInfo(song))))
         , m_song(song)
         , m_surround(ASAP_SAMPLE_RATE)
     {}
@@ -219,7 +226,7 @@ namespace rePlayer
         std::string info;
         auto songInfo = ASAP_GetInfo(m_song);
         info = ASAPInfo_GetChannels(songInfo) == 1 ? "1 channel\n" : "2 channels\n";
-        info += ASAPInfo_GetExtDescription(ASAPInfo_GetExt(songInfo));
+        info += ASAPInfo_GetExtDescription(GetMediaType().GetExtension());
         info += "\nASAP " ASAPInfo_VERSION;
         return info;
     }
