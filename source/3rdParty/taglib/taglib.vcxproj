@@ -50,6 +50,35 @@
     <ClInclude Include="taglib\flac\flacunknownmetadatablock.h" />
     <ClInclude Include="taglib\it\itfile.h" />
     <ClInclude Include="taglib\it\itproperties.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlbinaryelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlfloatelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmasterelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkattachments.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkchapters.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkcues.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkinfo.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkseekhead.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmksegment.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmktags.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlmktracks.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlstringelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmluintelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlutils.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmlvoidelement.h" />
+    <ClInclude Include="taglib\matroska\matroskaattachedfile.h" />
+    <ClInclude Include="taglib\matroska\matroskaattachments.h" />
+    <ClInclude Include="taglib\matroska\matroskachapter.h" />
+    <ClInclude Include="taglib\matroska\matroskachapteredition.h" />
+    <ClInclude Include="taglib\matroska\matroskachapters.h" />
+    <ClInclude Include="taglib\matroska\matroskacues.h" />
+    <ClInclude Include="taglib\matroska\matroskaelement.h" />
+    <ClInclude Include="taglib\matroska\matroskafile.h" />
+    <ClInclude Include="taglib\matroska\matroskaproperties.h" />
+    <ClInclude Include="taglib\matroska\matroskaseekhead.h" />
+    <ClInclude Include="taglib\matroska\matroskasegment.h" />
+    <ClInclude Include="taglib\matroska\matroskasimpletag.h" />
+    <ClInclude Include="taglib\matroska\matroskatag.h" />
     <ClInclude Include="taglib\mod\modfile.h" />
     <ClInclude Include="taglib\mod\modfilebase.h" />
     <ClInclude Include="taglib\mod\modfileprivate.h" />
@@ -61,6 +90,7 @@
     <ClInclude Include="taglib\mp4\mp4item.h" />
     <ClInclude Include="taglib\mp4\mp4itemfactory.h" />
     <ClInclude Include="taglib\mp4\mp4properties.h" />
+    <ClInclude Include="taglib\mp4\mp4stem.h" />
     <ClInclude Include="taglib\mp4\mp4tag.h" />
     <ClInclude Include="taglib\mpc\mpcfile.h" />
     <ClInclude Include="taglib\mpc\mpcproperties.h" />
@@ -176,6 +206,35 @@
     <ClCompile Include="taglib\flac\flacunknownmetadatablock.cpp" />
     <ClCompile Include="taglib\it\itfile.cpp" />
     <ClCompile Include="taglib\it\itproperties.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlbinaryelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlfloatelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmasterelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkattachments.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkchapters.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkcues.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkinfo.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkseekhead.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmksegment.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmktags.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlmktracks.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlstringelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmluintelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlutils.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmlvoidelement.cpp" />
+    <ClCompile Include="taglib\matroska\matroskaattachedfile.cpp" />
+    <ClCompile Include="taglib\matroska\matroskaattachments.cpp" />
+    <ClCompile Include="taglib\matroska\matroskachapter.cpp" />
+    <ClCompile Include="taglib\matroska\matroskachapteredition.cpp" />
+    <ClCompile Include="taglib\matroska\matroskachapters.cpp" />
+    <ClCompile Include="taglib\matroska\matroskacues.cpp" />
+    <ClCompile Include="taglib\matroska\matroskaelement.cpp" />
+    <ClCompile Include="taglib\matroska\matroskafile.cpp" />
+    <ClCompile Include="taglib\matroska\matroskaproperties.cpp" />
+    <ClCompile Include="taglib\matroska\matroskaseekhead.cpp" />
+    <ClCompile Include="taglib\matroska\matroskasegment.cpp" />
+    <ClCompile Include="taglib\matroska\matroskasimpletag.cpp" />
+    <ClCompile Include="taglib\matroska\matroskatag.cpp" />
     <ClCompile Include="taglib\mod\modfile.cpp" />
     <ClCompile Include="taglib\mod\modfilebase.cpp" />
     <ClCompile Include="taglib\mod\modproperties.cpp" />
@@ -186,6 +245,7 @@
     <ClCompile Include="taglib\mp4\mp4item.cpp" />
     <ClCompile Include="taglib\mp4\mp4itemfactory.cpp" />
     <ClCompile Include="taglib\mp4\mp4properties.cpp" />
+    <ClCompile Include="taglib\mp4\mp4stem.cpp" />
     <ClCompile Include="taglib\mp4\mp4tag.cpp" />
     <ClCompile Include="taglib\mpc\mpcfile.cpp" />
     <ClCompile Include="taglib\mpc\mpcproperties.cpp" />
@@ -348,7 +408,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\matroska;$(ProjectDir)taglib\matroska\ebml;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -368,7 +428,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\matroska;$(ProjectDir)taglib\matroska\ebml;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -390,7 +450,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\matroska;$(ProjectDir)taglib\matroska\ebml;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -414,7 +474,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3rdparty\utfcpp;$(ProjectDir)taglib;$(ProjectDir)taglib\toolkit;$(ProjectDir)taglib\ape;$(ProjectDir)taglib\asf;$(ProjectDir)taglib\dsdiff;$(ProjectDir)taglib\dsf;$(ProjectDir)taglib\flac;$(ProjectDir)taglib\it;$(ProjectDir)taglib\matroska;$(ProjectDir)taglib\matroska\ebml;$(ProjectDir)taglib\mod;$(ProjectDir)taglib\mp4;$(ProjectDir)taglib\mpc;$(ProjectDir)taglib\mpeg;$(ProjectDir)taglib\mpeg\id3v1;$(ProjectDir)taglib\mpeg\id3v2;$(ProjectDir)taglib\mpeg\id3v2\frames;$(ProjectDir)taglib\ogg;$(ProjectDir)taglib\ogg\flac;$(ProjectDir)taglib\ogg\opus;$(ProjectDir)taglib\ogg\speex;$(ProjectDir)taglib\ogg\vorbis;$(ProjectDir)taglib\riff;$(ProjectDir)taglib\riff\aiff;$(ProjectDir)taglib\riff\wav;$(ProjectDir)taglib\s3m;$(ProjectDir)taglib\shorten;$(ProjectDir)taglib\trueaudio;$(ProjectDir)taglib\wavpack;$(ProjectDir)taglib\xm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

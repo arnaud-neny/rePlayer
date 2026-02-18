@@ -37,7 +37,7 @@ namespace {
   constexpr std::array containers {
     "moov", "udta", "mdia", "meta", "ilst",
     "stbl", "minf", "moof", "traf", "trak",
-    "stsd"
+    "stsd", "stem"
   };
 } // namespace
 
@@ -74,17 +74,7 @@ MP4::Atom::Atom(File *file)
   }
   else if(d->length == 1) {
     // The atom has a 64-bit length.
-    if(const long long longLength = file->readBlock(8).toLongLong();
-       longLength <= LONG_MAX) {
-      // The actual length fits in long. That's always the case if long is 64-bit.
-      d->length = static_cast<long>(longLength);
-    }
-    else {
-      debug("MP4: 64-bit atoms are not supported");
-      d->length = 0;
-      file->seek(0, File::End);
-      return;
-    }
+    d->length = file->readBlock(8).toLongLong();
   }
 
   if(d->length < 8 || d->length > file->length() - d->offset) {
@@ -95,6 +85,11 @@ MP4::Atom::Atom(File *file)
   }
 
   d->name = header.mid(4, 4);
+
+  if(d->name == "stem") {
+    file->seek(d->length - 8, File::Current);
+    return;
+  }
 
   for(auto c : containers) {
     if(d->name == c) {

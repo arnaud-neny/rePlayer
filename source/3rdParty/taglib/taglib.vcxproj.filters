@@ -98,6 +98,12 @@
     <Filter Include="Source Files\taglib\shorten">
       <UniqueIdentifier>{e5c8ceaf-4e15-4f59-81b0-6f349813a0df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\taglib\matroska">
+      <UniqueIdentifier>{4bccb87b-50bb-4bb5-aab2-c79054445957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\taglib\matroska\ebml">
+      <UniqueIdentifier>{d507e742-4b67-4da3-afc2-8ed9c7453956}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="taglib\audioproperties.h">
@@ -493,6 +499,96 @@
     <ClInclude Include="taglib\shorten\shortenutils.h">
       <Filter>Source Files\taglib\shorten</Filter>
     </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskaattachedfile.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskaattachments.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskachapter.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskachapteredition.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskachapters.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskacues.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskaelement.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskafile.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskaproperties.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskaseekhead.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskasegment.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskasimpletag.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskatag.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlbinaryelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlfloatelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmasterelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkattachments.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkchapters.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkcues.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkinfo.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmkseekhead.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmksegment.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmktags.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlmktracks.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlstringelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmluintelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlutils.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmlvoidelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4stem.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="taglib\audioproperties.cpp">
@@ -833,6 +929,96 @@
     </ClCompile>
     <ClCompile Include="taglib\shorten\shortentag.cpp">
       <Filter>Source Files\taglib\shorten</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskaattachedfile.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskaattachments.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskachapter.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskachapteredition.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskachapters.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskacues.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskaelement.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskafile.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskaproperties.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskaseekhead.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskasegment.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskasimpletag.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\matroskatag.cpp">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlbinaryelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlfloatelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmasterelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkattachments.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkchapters.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkcues.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkinfo.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmkseekhead.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmksegment.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmktags.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlmktracks.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlstringelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmluintelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlutils.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmlvoidelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\mp4\mp4stem.cpp">
+      <Filter>Source Files\taglib\mp4</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

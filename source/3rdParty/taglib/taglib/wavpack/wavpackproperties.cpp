@@ -51,6 +51,7 @@ public:
   int version { 0 };
   int bitsPerSample { 0 };
   bool lossless { false };
+  bool dsd { false };
   unsigned int sampleFrames { 0 };
 };
 
@@ -100,6 +101,11 @@ int WavPack::Properties::bitsPerSample() const
 bool WavPack::Properties::isLossless() const
 {
   return d->lossless;
+}
+
+bool WavPack::Properties::isDsd() const
+{
+  return d->dsd;
 }
 
 unsigned int WavPack::Properties::sampleFrames() const
@@ -254,14 +260,14 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
     const unsigned int flags = data.toUInt(24, false);
     unsigned int smplRate = sampleRates[(flags & SRATE_MASK) >> SRATE_LSB];
 
-    if(!blockSamples) {        // ignore blocks with no samples
-      offset += blockSize + 8;
-      continue;
-    }
-
     if(blockSize < 24 || blockSize > 1048576) {
       debug("WavPack::Properties::read() -- Invalid block header found.");
       break;
+    }
+
+    if(!blockSamples) {        // ignore blocks with no samples
+      offset += blockSize + 8;
+      continue;
     }
 
     // For non-standard sample rates or DSD audio files, we must read and parse the block
@@ -291,6 +297,7 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
       d->bitsPerSample = static_cast<int>(((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB));
       d->sampleRate    = static_cast<int>(smplRate);
       d->lossless      = !(flags & HYBRID_FLAG);
+      d->dsd           = (flags & DSD_FLAG) != 0;
       d->sampleFrames  = smplFrames;
     }
 
