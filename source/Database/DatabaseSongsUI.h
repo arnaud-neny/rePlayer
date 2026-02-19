@@ -44,6 +44,7 @@ namespace rePlayer
 
     protected:
         virtual Array<SubsongEntry> GatherEntries() const;
+        virtual void OnArtistContext(int32_t entryIndex);
         virtual void OnSelectionContext();
         virtual bool AddToPlaylistUI();
 
@@ -64,7 +65,7 @@ namespace rePlayer
         // Used in UpdateSelection
         bool Select(int32_t rowIdx, MusicID musicId, bool isSelected);
         void DragSelection();
-        void UpdateSelectionContext(bool isSelected);
+        void UpdateSelectionContext(int32_t entryIndex, bool isSelected);
 
         // Used in UpdateSelectionContext
         void AddToArtist();
@@ -136,6 +137,7 @@ namespace rePlayer
         const bool m_isScrollingEnabled = true;
 
         bool m_isTrackingArtist = false;
+        uint8_t m_trackedRepeat = 0; // hack for ImGui when changing an artist and the selected song is not displayed because of scrolling not computed properly (as it is based on previous artist on change)
         SubsongID m_trackedSubsongId;
 
         // selection

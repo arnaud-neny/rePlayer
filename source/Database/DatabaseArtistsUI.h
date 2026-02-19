@@ -18,6 +18,7 @@ namespace rePlayer
 
     protected:
         Array<SubsongEntry> GatherEntries() const override;
+        void OnArtistContext(int32_t entryIndex) override;
 
         virtual void SourcesUI(Artist* selectedArtist);
         virtual void OnSavedChanges(Artist* selectedArtist);
@@ -52,6 +53,7 @@ namespace rePlayer
         ArtistSheet m_selectedArtistCopy;
 
         uint32_t m_dbArtistsRevision = 0;
+        SubsongID m_lastTrackedSubsongId;
 
         struct
         {

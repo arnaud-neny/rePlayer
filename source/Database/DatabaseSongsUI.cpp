@@ -112,6 +112,7 @@ namespace rePlayer
         {
             m_isTrackingArtist |= isTrackingArtist;
             m_trackedSubsongId = subsongId;
+            m_trackedRepeat = 2;
         }
         if (!m_owner.IsVisible())
             m_subsongHighlights.RemoveAll();
@@ -160,6 +161,11 @@ namespace rePlayer
             }
         }
         return entries;
+    }
+
+    void DatabaseSongsUI::OnArtistContext(int32_t entryIndex)
+    {
+        UnusedArg(entryIndex);
     }
 
     void DatabaseSongsUI::OnSelectionContext()
@@ -870,7 +876,7 @@ namespace rePlayer
                 m_entries[rowIdx].Select(isSelected = true);
                 m_numSelectedEntries++;
             }
-            UpdateSelectionContext(isSelected);
+            UpdateSelectionContext(rowIdx, isSelected);
             ImGui::EndPopup();
         }
     }
@@ -957,7 +963,7 @@ namespace rePlayer
         }
     }
 
-    void DatabaseSongsUI::UpdateSelectionContext(bool isSelected)
+    void DatabaseSongsUI::UpdateSelectionContext(int32_t entryIndex, bool isSelected)
     {
         if (ImGui::Selectable("Invert selection"))
         {
@@ -981,6 +987,7 @@ namespace rePlayer
             RemoveFromArtistUI();
             ImGui::EndMenu();
         }
+        OnArtistContext(entryIndex);
         ImGui::Separator();
         if (ImGui::BeginMenu("Tags"))
         {

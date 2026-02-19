@@ -46,6 +46,18 @@ namespace rePlayer
         if (m_selectedArtistCopy.handles.IsEmpty())
             m_selectedArtistCopy.handles.Push();
 
+        if (m_trackedSubsongId.IsValid())
+            m_lastTrackedSubsongId = m_trackedSubsongId;
+        else if (m_lastTrackedSubsongId.IsValid())
+        {
+            m_trackedSubsongId = m_lastTrackedSubsongId;
+            if (!(m_trackedRepeat--))
+            {
+                m_lastTrackedSubsongId = {};
+                m_isTrackingArtist = false;
+            }
+        }
+
         if (ImGui::BeginTable("Artists", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit, ImVec2(0.0f, -FLT_MIN)))
         {
             ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthFixed, 128.0f, 0);
@@ -167,8 +179,6 @@ namespace rePlayer
                             }
                         }
                     }
-
-                    m_isTrackingArtist = ImGui::IsWindowAppearing();
                 }
 
                 ImGui::EndTable();
@@ -347,6 +357,52 @@ namespace rePlayer
             }
         }
         return entries;
+    }
+
+    void DatabaseArtistsUI::OnArtistContext(int32_t entryIndex)
+    {
+        Array<ArtistID> artists;
+
+        auto* song = m_db[m_entries[entryIndex]];
+        for (uint16_t i = 0; i < song->NumArtistIds(); i++)
+        {
+            if (m_selectedArtistCopy.id != song->GetArtistId(i))
+                artists.Add(song->GetArtistId(i));
+        }
+
+        ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 16));
+        ImGui::BeginDisabled(artists.IsEmpty());
+        if (ImGui::BeginMenu("Jump to artist"))
+        {
+            // sort
+            std::sort(artists.begin(), artists.end(), [this](auto l, auto r)
+            {
+                return _stricmp(m_db[l]->GetHandle(), m_db[r]->GetHandle()) < 0;
+            });
+            // select
+            ImGuiListClipper clipper;
+            clipper.Begin(artists.NumItems<int32_t>());
+            while (clipper.Step())
+            {
+                for (int rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
+                {
+                    ImGui::PushID(static_cast<int>(artists[rowIdx]));
+                    auto* artist = m_db[artists[rowIdx]];
+                    if (ImGui::Selectable(artist->GetHandle(), false))
+                    {
+                        m_dbSongsRevision = m_db.SongsRevision() + 1;
+                        m_db[artists[rowIdx]]->CopyTo(&m_selectedArtistCopy);
+                        m_lastTrackedSubsongId = m_entries[entryIndex];
+                        m_isTrackingArtist = true;
+                        m_trackedRepeat = 2;
+                    }
+                    ImGui::PopID();
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndDisabled();
     }
 
     void DatabaseArtistsUI::SourcesUI(Artist* selectedArtist)
