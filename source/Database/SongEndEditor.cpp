@@ -700,8 +700,8 @@ namespace rePlayer
                 ImGui::SetScrollX(m_waveScroll);
                 m_isWaveScrolling = false;
             }
-            auto numMillisecondsPerPixel = m_numMillisecondsPerPixel;
             const auto size = ImGui::GetContentRegionAvail();
+            auto numMillisecondsPerPixel = m_numMillisecondsPerPixel = Clamp(m_numMillisecondsPerPixel, 1ull, 1 + (m_numSamples * 1000ull) / (m_replay->GetSampleRate() * uint64_t(size.x)));
             auto offset = uint32_t(ImGui::GetScrollX());
             auto maxFrames = Min(uint64_t(size.x), m_frames.NumItems<uint64_t>());
             if ((offset + maxFrames) > m_frames.NumItems<uint64_t>()) // prevent offset overflow
