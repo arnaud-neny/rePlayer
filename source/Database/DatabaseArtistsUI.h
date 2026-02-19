@@ -54,6 +54,7 @@ namespace rePlayer
 
         uint32_t m_dbArtistsRevision = 0;
         SubsongID m_lastTrackedSubsongId;
+        ArtistID m_trackedArtistId = ArtistID::Invalid;
 
         struct
         {

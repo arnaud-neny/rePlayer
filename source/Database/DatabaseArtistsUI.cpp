@@ -53,6 +53,7 @@ namespace rePlayer
             m_trackedSubsongId = m_lastTrackedSubsongId;
             if (!(m_trackedRepeat--))
             {
+                m_trackedArtistId = ArtistID::Invalid;
                 m_lastTrackedSubsongId = {};
                 m_isTrackingArtist = false;
             }
@@ -145,23 +146,29 @@ namespace rePlayer
                 }
 
                 // build the tracking position and set it if the scrolling is enabled for the table
-                if (m_isTrackingArtist && m_trackedSubsongId.IsValid())
+                if (m_isTrackingArtist && (m_trackedSubsongId.IsValid() || m_trackedArtistId != ArtistID::Invalid))
                 {
-                    if (auto* song = m_db[m_trackedSubsongId])
+                    ArtistID selectedArtistId = m_trackedArtistId;
+                    if (selectedArtistId == ArtistID::Invalid)
                     {
-                        ArtistID selectedArtistId = ArtistID::Invalid;
-                        for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
+                        if (auto* song = m_db[m_trackedSubsongId])
                         {
-                            if (song->GetArtistId(i) == m_selectedArtistCopy.id)
+                            for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
                             {
-                                // already tracking the current artist, just jump to the next
-                                selectedArtistId = song->GetArtistId((i + 1) % e);
-                                break;
+                                if (song->GetArtistId(i) == m_selectedArtistCopy.id)
+                                {
+                                    // already tracking the current artist, just jump to the next
+                                    selectedArtistId = song->GetArtistId((i + 1) % e);
+                                    break;
+                                }
+                                else if (i == 0)
+                                    selectedArtistId = song->GetArtistId(0);
                             }
-                            else if (i == 0)
-                                selectedArtistId = song->GetArtistId(0);
                         }
-
+                        m_trackedArtistId = selectedArtistId;
+                    }
+                    if (selectedArtistId != ArtistID::Invalid)
+                    {
                         auto trackedArtistIndex = m_artists.FindIf<int32_t>([this, selectedArtistId](auto& entry)
                         {
                             return entry == selectedArtistId;
@@ -392,6 +399,7 @@ namespace rePlayer
                     {
                         m_dbSongsRevision = m_db.SongsRevision() + 1;
                         m_db[artists[rowIdx]]->CopyTo(&m_selectedArtistCopy);
+                        m_trackedArtistId = artists[rowIdx];
                         m_lastTrackedSubsongId = m_entries[entryIndex];
                         m_isTrackingArtist = true;
                         m_trackedRepeat = 2;
