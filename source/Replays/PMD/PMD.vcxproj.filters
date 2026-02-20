@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\PMDWin">
+      <UniqueIdentifier>{d56f8ae5-4b5c-4ad5-b0c6-15209a24cd45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PMDWin\pmdwincore">
+      <UniqueIdentifier>{249e8d0c-8616-44e7-b8fc-b0e07c2a2ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PMDWin\ymfm">
+      <UniqueIdentifier>{af16d575-85fd-4472-924f-38779fc873f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayPMD.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\ipmdwin.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\pcmmusdriver.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\comsupport.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\portability_fmpmd.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\pmdwincore.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\opnaw.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\p86drv.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\ppsdrv.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\ppz8l.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\portability_fmpmdcore.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ifileio.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\portability_opna.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\table.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\util.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\opna.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\file_opna.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm_opn.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm_adpcm.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm_fm.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm_ssg.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\pmdwincore\ippz8.h">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\sjis2utf.h">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDWin\ymfm\ymfm_fm.ipp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayPMD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\pmdwincore.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\util.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\table.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\p86drv.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\ppsdrv.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\ppz8l.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\pmdwincore\opnaw.cpp">
+      <Filter>Source Files\PMDWin\pmdwincore</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\ymfm\file_opna.cpp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\ymfm\opna.cpp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\ymfm\ymfm_opn.cpp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\ymfm\ymfm_adpcm.cpp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDWin\ymfm\ymfm_ssg.cpp">
+      <Filter>Source Files\PMDWin\ymfm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="PMDWin\PMDWin.txt">
+      <Filter>Source Files\PMDWin</Filter>
+    </Text>
+    <Text Include="PMDWin\PMDWinS.txt">
+      <Filter>Source Files\PMDWin</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
