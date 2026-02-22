@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer">
+      <UniqueIdentifier>{2c350377-4714-42ed-bab8-af506a201750}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer\libopna">
+      <UniqueIdentifier>{97f2ad68-3346-411b-ba4b-2ec4024c0577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer\oscillo">
+      <UniqueIdentifier>{5831ee60-ce0d-4eed-bd42-d55c5d511147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer\common">
+      <UniqueIdentifier>{13cf2eee-6066-4e64-94b3-6b7c6fe40a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer\fmdriver">
+      <UniqueIdentifier>{1dc65426-8789-4917-b737-761da787d3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\98fmplayer\leveldata">
+      <UniqueIdentifier>{5993f9fb-eb73-49da-97ab-7d3ecc57d6e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayFMP.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\version.h">
+      <Filter>Source Files\98fmplayer</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opna.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnafm.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnassg.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnadrum.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnaadpcm.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnatimer.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\oscillo\oscillo.h">
+      <Filter>Source Files\98fmplayer\oscillo</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\libopna\opnatables.h">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\common\fmplayer_common.h">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\fmdriver.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\ppz8.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\leveldata\leveldata.h">
+      <Filter>Source Files\98fmplayer\leveldata</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\common\fmplayer_drumrom.h">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\fmdriver_common.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\common\fmplayer_file.h">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\fmdriver_pmd.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\fmdriver_fmp.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="98fmplayer\fmdriver\pmd_ssgeff.h">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayFMP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnatimer.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opna.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnafm.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnaadpcm.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnadrum.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnassg.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnassg-sinc-c.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\libopna\opnassg-sinc-sse2.c">
+      <Filter>Source Files\98fmplayer\libopna</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\common\fmplayer_work_opna.c">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\fmdriver\ppz8.c">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\common\fmplayer_file.c">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\fmdriver\fmdriver_fmp.c">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\fmdriver\fmdriver_pmd.c">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\fmdriver\fmdriver_common.c">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="98fmplayer\common\fmplayer_file_win.c">
+      <Filter>Source Files\98fmplayer\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="98fmplayer\LICENSE">
+      <Filter>Source Files\98fmplayer</Filter>
+    </None>
+    <None Include="98fmplayer\README.md">
+      <Filter>Source Files\98fmplayer</Filter>
+    </None>
+    <None Include="98fmplayer\README.ja.md">
+      <Filter>Source Files\98fmplayer</Filter>
+    </None>
+    <None Include="98fmplayer\fmdriver\ppz8-sinctable.inc">
+      <Filter>Source Files\98fmplayer\fmdriver</Filter>
+    </None>
+  </ItemGroup>
+</Project>

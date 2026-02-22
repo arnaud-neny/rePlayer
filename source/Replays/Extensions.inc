@@ -1006,3 +1006,6 @@ EXTENSION(ptcop)        // PxTone
 EXTENSION(pttune)       // PxTone
 EXTENSION(d8)           // ASAP
 EXTENSION(d15)          // ASAP
+EXTENSION(opi)          // FMP
+EXTENSION(ovi)          // FMP
+EXTENSION(ozi)          // FMP
