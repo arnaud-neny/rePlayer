@@ -10,7 +10,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::PMD,
         .name = "Professional Music Driver",
-        .extensions = "m",
+        .extensions = "m;m2;mz",
         .about = "Professional Music Driver (PMDWin 0.52)\nCopyright (c) 2023 C60",
         .settings = "PMDWin 0.52",
         .init = ReplayPMD::Init,
@@ -42,9 +42,19 @@ namespace rePlayer
             int al = 1;
             while (pmd->getmemo3(str, (uint8_t*)data.Items(), data.NumItems<int>(), al++) && str[0])
             {
+                int len = ::MultiByteToWideChar(932, 0, str, -1, nullptr, 0);
+                if (!len)
+                    continue;
+                auto* wc = reinterpret_cast<wchar_t*>(_alloca(len * sizeof(wchar_t)));
+                ::MultiByteToWideChar(932, 0, str, -1, wc, len);
+
+                len = ::WideCharToMultiByte(CP_UTF8, 0, wc, -1, nullptr, 0, nullptr, nullptr);
+                auto* c = reinterpret_cast<char*>(_alloca(len * sizeof(wchar_t)));
+                ::WideCharToMultiByte(CP_UTF8, 0, wc, -1, c, len, nullptr, nullptr);
+
                 if (!info.empty())
                     info += "\n";
-                info += str;
+                info += c;
             }
 
             return new ReplayPMD(pmd, std::move(info));
