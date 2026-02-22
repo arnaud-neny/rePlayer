@@ -624,6 +624,8 @@ namespace rePlayer
             return ImportPkSong(sourceId, ModlandReplay::kIFFSmus, path);
         if (strcmp(m_replays[songSource->replay].name(m_strings), "Euphony") == 0)
             return ImportPkSong(sourceId, ModlandReplay::kEuphony, path);
+        if (strcmp(m_replays[songSource->replay].name(m_strings), "FM sound driver (FMP)") == 0)
+            return ImportPkSong(sourceId, ModlandReplay::kFMP, path);
 
         CURL* curl = curl_easy_init();
 
@@ -792,11 +794,11 @@ namespace rePlayer
 
         if (songSource->artists[0])
         {
-            assert(m_artists[songSource->artists[0]].refcount >= 0);
+            assert(m_artists[songSource->artists[0]].refcount > 0);
             m_artists[songSource->artists[0]].refcount--;
             if (songSource->artists[1])
             {
-                assert(m_artists[songSource->artists[1]].refcount >= 0);
+                assert(m_artists[songSource->artists[1]].refcount > 0);
                 m_artists[songSource->artists[1]].refcount--;
             }
         }
@@ -1558,6 +1560,8 @@ namespace rePlayer
             type = { eExtension::_med, eReplay::OpenMPT };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kEuphony)
             type = { eExtension::_eup, eReplay::Euphony };
+        else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kFMP)
+            type = { eExtension::_ozi, eReplay::FMP };
         else if (m_db.replays[dbSong.replayId].type == ModlandReplay::kSidPlay)
             type = { eExtension::_sid, eReplay::SidPlay };
         else if (dbSong.isExtensionOverriden)
@@ -1790,7 +1794,7 @@ namespace rePlayer
                     if (currentReplayType == ModlandReplay::kMDX || currentReplayType == ModlandReplay::kQSF || currentReplayType == ModlandReplay::kGSF || currentReplayType == ModlandReplay::k2SF
                         || currentReplayType == ModlandReplay::kSSF || currentReplayType == ModlandReplay::kDSF || currentReplayType == ModlandReplay::kPSF || currentReplayType == ModlandReplay::kPSF2
                         || currentReplayType == ModlandReplay::kUSF || currentReplayType == ModlandReplay::kSNSF || currentReplayType == ModlandReplay::kMBM || currentReplayType == ModlandReplay::kMBMEdit
-                        || currentReplayType == ModlandReplay::kFACSoundTracker || currentReplayType == ModlandReplay::kEuphony || mergePackages > 0)
+                        || currentReplayType == ModlandReplay::kFACSoundTracker || currentReplayType == ModlandReplay::kEuphony || currentReplayType == ModlandReplay::kFMP || mergePackages > 0)
                     {
                         auto oldLine = line;
                         while (*line != '/' && *line != 0)
@@ -1950,6 +1954,8 @@ namespace rePlayer
         }
         else if (theReplay == "Euphony")
             m_db.replays.Last().type = ModlandReplay::kEuphony;
+        else if (theReplay == "FM sound driver (FMP)")
+            m_db.replays.Last().type = ModlandReplay::kFMP;
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
         if (m_db.replays.Last().type <= ModlandReplay::kDefault)
         {

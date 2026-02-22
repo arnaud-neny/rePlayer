@@ -102,7 +102,8 @@ namespace rePlayer
                 kDelitrackerCustom,
                 kIFFSmus,
                 kEuphony,
-                kSoundSmith
+                kSoundSmith,
+                kFMP
             };
 
             Chars name;
@@ -136,7 +137,7 @@ namespace rePlayer
             uint16_t isExtensionOverriden;
             uint16_t artists[2];
             uint32_t item;
-            uint32_t nextSong[2]; // next song from the each artist
+            uint32_t nextSong[2]; // next song from each artist
         };
 
         struct ModlandItem
