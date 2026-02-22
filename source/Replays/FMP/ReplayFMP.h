@@ -55,6 +55,7 @@ namespace rePlayer
 
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
+        std::string GetSubsongTitle() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
@@ -62,11 +63,12 @@ namespace rePlayer
         static constexpr uint32_t kSampleRate = 55467;
 
     private:
-        ReplayFMP(io::Stream* stream, fmplayer_file* fmfile);
+        ReplayFMP(io::Stream* stream, Array<uint32_t>&& subsongs, eExtension ext);
 
     private:
         Surround m_surround;
         SmartPtr<io::Stream> m_stream;
+        Array<uint32_t> m_subsongs;
         struct FMP
         {
             struct opna opna;
@@ -77,6 +79,8 @@ namespace rePlayer
             char adpcmram[OPNA_ADPCM_RAM_SIZE];
         } m_fmp;
         std::string m_info;
+        std::string m_title;
+        uint8_t m_oldLoopCnt;
 
         uint32_t m_stereoSeparation = 100;
         static int32_t ms_stereoSeparation;

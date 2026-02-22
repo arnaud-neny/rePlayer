@@ -73,7 +73,11 @@ void *fmplayer_fileread(const void *pathptr, const char *pcmname, const char *ex
   path = u8tou16(pathptr);
 #endif
   wchar_t *wpcmpath = 0, *wpcmname = 0, *wpcmextname = 0;
-  if (!pcmname) return fileread(path, maxsize, filesize, error);
+  if (!pcmname) {
+    void* buf = fileread(path, maxsize, filesize, error);
+    free(path);
+    return buf;
+  }
   int wpcmnamelen = MultiByteToWideChar(932, 0, pcmname, -1, 0, 0);
   if (!wpcmnamelen) goto err;
   if (extension) {
@@ -93,7 +97,8 @@ void *fmplayer_fileread(const void *pathptr, const char *pcmname, const char *ex
   if (!wpcmpath) goto err;
   wcscpy(wpcmpath, path);
   PathRemoveFileSpecW(wpcmpath);
-  wcscat(wpcmpath, L"\\");
+  if (wpcmpath[0])
+    wcscat(wpcmpath, L"\\");
   wcscat(wpcmpath, wpcmname);
   void *buf = fileread(wpcmpath, maxsize, filesize, error);
   free(wpcmextname);

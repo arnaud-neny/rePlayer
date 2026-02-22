@@ -81,9 +81,43 @@ namespace rePlayer
     Replay* ReplayFMP::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
         auto tl = Scope([&](){ tl_stream = stream; },[]() { tl_stream = nullptr; });
-        enum fmplayer_file_error error;
-        if (auto* fmfile = fmplayer_file_alloc(stream->GetName().c_str(), &error))
-            return new ReplayFMP(stream, fmfile);
+
+        Array<uint32_t> subsongs;
+        uint32_t fileIndex = 0;
+        uint8_t exts = 0;
+        for (SmartPtr<io::Stream> fmpStream = stream; fmpStream; fmpStream = fmpStream->Next())
+        {
+            enum fmplayer_file_error error;
+            if (auto* fmfile = fmplayer_file_alloc(fmpStream->GetName().c_str(), &error))
+            {
+                subsongs.Add(fileIndex);
+
+                if (fmfile->type == FMPLAYER_FILE_TYPE_FMP)
+                {
+                    auto* fmp = (driver_fmp*)&fmfile->driver.fmp;
+                    if (fmp->ppz_name[0])
+                        exts |= 1 << 0;
+                    else if (fmp->datainfo.partptr[FMP_DATA_FM_4] != 0xffFF
+                        || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF
+                        || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF)
+                        exts |= 1 << 1;
+                    else
+                        exts |= 1 << 2;
+                }
+                else
+                    exts |= 1 << 3;
+                ;
+
+                fmplayer_file_free(fmfile);
+            }
+            fileIndex++;
+        }
+        if (subsongs.IsNotEmpty())
+        {
+            return new ReplayFMP(stream, std::move(subsongs), exts == 1 << 1 ? eExtension::_ovi :
+                exts == 1 << 2 ? eExtension::_opi :
+                exts == 1 << 3 ? eExtension::_m : eExtension::_ozi);
+        }
         return nullptr;
     }
 
@@ -117,30 +151,65 @@ namespace rePlayer
         fmplayer_file_free(m_fmp.fmfile);
     }
 
-    ReplayFMP::ReplayFMP(io::Stream* stream, fmplayer_file* fmfile)
-        : Replay(eExtension::_opi, eReplay::FMP)
+    ReplayFMP::ReplayFMP(io::Stream* stream, Array<uint32_t>&& subsongs, eExtension ext)
+        : Replay(ext, eReplay::FMP)
         , m_surround(kSampleRate)
         , m_stream(stream)
+        , m_subsongs(std::move(subsongs))
     {
         memset(&m_fmp, 0, sizeof(m_fmp));
-        m_fmp.fmfile = fmfile;
+    }
 
-        fmplayer_init_work_opna(&m_fmp.work, &m_fmp.ppz8, &m_fmp.opna, &m_fmp.timer, m_fmp.adpcmram);
-        fmplayer_file_load(&m_fmp.work, fmfile, 1);
-
-        if (m_fmp.fmfile->type == FMPLAYER_FILE_TYPE_FMP)
+    uint32_t ReplayFMP::Render(core::StereoSample* output, uint32_t numSamples)
+    {
+        if (m_oldLoopCnt != m_fmp.work.loop_cnt || !m_fmp.work.playing)
         {
-            auto* fmp = (driver_fmp*)m_fmp.work.driver;
-            if (fmp->ppz_name[0])
-                m_mediaType.ext = eExtension::_ozi;
-            else if (fmp->datainfo.partptr[FMP_DATA_FM_4] != 0xffFF
-                || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF
-                || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF)
-                m_mediaType.ext = eExtension::_ovi;
+            m_oldLoopCnt = m_fmp.work.loop_cnt;
+            return 0;
         }
-        else
-            m_mediaType.ext = eExtension::_m;
 
+        auto* buffer = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
+        memset(buffer, 0, numSamples * sizeof(int16_t) * 2);
+        auto remainingSamples = numSamples;
+        do 
+        {
+            auto numRendered = opna_timer_mix_tick(&m_fmp.timer, buffer, remainingSamples);
+            buffer += numRendered * 2;
+            remainingSamples -= numRendered;
+            if (m_fmp.work.loop_cnt != m_oldLoopCnt)
+                break;
+        } while (m_fmp.work.playing && remainingSamples > 0);
+        numSamples -= remainingSamples;
+        buffer -= numSamples * 2;
+        output->Convert(m_surround, buffer, numSamples, m_stereoSeparation);
+        if (numSamples == 0)
+            m_oldLoopCnt = m_fmp.work.loop_cnt;
+
+        return numSamples;
+    }
+
+    void ReplayFMP::ResetPlayback()
+    {
+        auto stream = m_stream;
+        for (uint32_t fileIndex = 0; stream; fileIndex++)
+        {
+            if (fileIndex == m_subsongs[m_subsongIndex])
+                break;
+            stream = stream->Next();
+        }
+
+        fmplayer_file_free(m_fmp.fmfile);
+        memset(&m_fmp, 0, sizeof(m_fmp));
+
+        auto tl = Scope([&]() { tl_stream = m_stream; }, []() { tl_stream = nullptr; });
+        enum fmplayer_file_error error;
+        m_title = stream->GetName();
+        m_fmp.fmfile = fmplayer_file_alloc(stream->GetName().c_str(), &error);
+        fmplayer_init_work_opna(&m_fmp.work, &m_fmp.ppz8, &m_fmp.opna, &m_fmp.timer, m_fmp.adpcmram);
+        fmplayer_file_load(&m_fmp.work, m_fmp.fmfile, 1);
+        m_oldLoopCnt = m_fmp.work.loop_cnt;
+
+        m_info.clear();
         for (int i = 0;; ++i)
         {
             auto* comment = m_fmp.work.get_comment(&m_fmp.work, i);
@@ -161,44 +230,6 @@ namespace rePlayer
                 m_info += "\n";
             m_info += c;
         }
-
-    }
-
-    uint32_t ReplayFMP::Render(core::StereoSample* output, uint32_t numSamples)
-    {
-        if (m_fmp.work.loop_cnt || !m_fmp.work.playing)
-            m_fmp.work.loop_cnt = 0;
-
-        auto* buffer = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
-        memset(buffer, 0, numSamples * sizeof(int16_t) * 2);
-        auto remainingSamples = numSamples;
-        do 
-        {
-            auto numRendered = opna_timer_mix_tick(&m_fmp.timer, buffer, remainingSamples);
-            buffer += numRendered * 2;
-            remainingSamples -= numRendered;
-            if (m_fmp.work.loop_cnt)
-                break;
-        } while (m_fmp.work.playing && remainingSamples > 0);
-        numSamples -= remainingSamples;
-        buffer -= numSamples * 2;
-        output->Convert(m_surround, buffer, numSamples, m_stereoSeparation);
-        if (numSamples == 0)
-            m_fmp.work.loop_cnt = 0;
-
-        return numSamples;
-    }
-
-    void ReplayFMP::ResetPlayback()
-    {
-        fmplayer_file_free(m_fmp.fmfile);
-        memset(&m_fmp, 0, sizeof(m_fmp));
-
-        auto tl = Scope([&]() { tl_stream = m_stream; }, []() { tl_stream = nullptr; });
-        enum fmplayer_file_error error;
-        m_fmp.fmfile = fmplayer_file_alloc(m_stream->GetName().c_str(), &error);
-        fmplayer_init_work_opna(&m_fmp.work, &m_fmp.ppz8, &m_fmp.opna, &m_fmp.timer, m_fmp.adpcmram);
-        fmplayer_file_load(&m_fmp.work, m_fmp.fmfile, 1);
 
         m_surround.Reset();
     }
@@ -230,7 +261,12 @@ namespace rePlayer
 
     uint32_t ReplayFMP::GetNumSubsongs() const
     {
-        return 1;
+        return m_subsongs.NumItems();
+    }
+
+    std::string ReplayFMP::GetSubsongTitle() const
+    {
+        return m_title;
     }
 
     std::string ReplayFMP::GetExtraInfo() const
@@ -245,12 +281,16 @@ namespace rePlayer
         if (m_fmp.fmfile->type == FMPLAYER_FILE_TYPE_FMP)
         {
             info += "FMP ";
-            if (m_mediaType.ext == eExtension::_opi)
-                info += "OPN";
-            else if (m_mediaType.ext == eExtension::_ovi)
-                info += "OPNA";
-            else //if (m_mediaType.ext == eExtension::_ozi)
+
+            auto* fmp = (driver_fmp*)m_fmp.work.driver;
+            if (fmp->ppz_name[0])
                 info += "OPNA PPZ";
+            else if (fmp->datainfo.partptr[FMP_DATA_FM_4] != 0xffFF
+                || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF
+                || fmp->datainfo.partptr[FMP_DATA_FM_5] != 0xffFF)
+                info += "OPNA";
+            else
+                info += "OPN";
         }
         else
             info += "PMD";
