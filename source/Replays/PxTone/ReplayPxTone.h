@@ -68,7 +68,6 @@ namespace rePlayer
         {
             int32_t stereoSeparation;
             int32_t surround;
-            int32_t oldStyle;
         } static ms_globals;
     };
 }

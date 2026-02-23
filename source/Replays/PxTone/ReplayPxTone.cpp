@@ -15,7 +15,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::PxTone,
         .name = "PxTone",
-        .extensions = "",
+        .extensions = "ptcop;pttune",
         .about = "PxTone 22/09/10a\nCopyright (c) Daisuke \"Pixel\" Amaya",
         .settings = "PxTone 22/09/10a",
         .init = ReplayPxTone::Init,
