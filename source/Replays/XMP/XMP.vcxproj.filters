@@ -68,9 +68,6 @@
     <ClInclude Include="libxmp\src\lfo.h">
       <Filter>Source Files\libxmp\src</Filter>
     </ClInclude>
-    <ClInclude Include="libxmp\src\list.h">
-      <Filter>Source Files\libxmp\src</Filter>
-    </ClInclude>
     <ClInclude Include="libxmp\src\md5.h">
       <Filter>Source Files\libxmp\src</Filter>
     </ClInclude>
@@ -202,6 +199,15 @@
     </ClInclude>
     <ClInclude Include="wrap\stdio.h">
       <Filter>Source Files\wrap</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\mix_all.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\path.h">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libxmp\src\depackers\ice_unpack.h">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -732,6 +738,18 @@
     </ClCompile>
     <ClCompile Include="libxmp\src\flow.c">
       <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\path.c">
+      <Filter>Source Files\libxmp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\ice.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\ice_unpack.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
+    </ClCompile>
+    <ClCompile Include="libxmp\src\depackers\ice_unpack_fn.c">
+      <Filter>Source Files\libxmp\src\depackers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

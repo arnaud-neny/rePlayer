@@ -18,6 +18,7 @@ int replayer_fclose(FILE* stream);
 int replayer_ftell(FILE* stream);
 int replayer_fputc(unsigned char c, FILE* stream);
 int replayer_fprintf(void* const, char const* const, ...);
+int replayer_fgetc(FILE* stream);
 
 #define SEEK_SET (0)
 #define SEEK_CUR (1)
@@ -30,6 +31,10 @@ int replayer_fprintf(void* const, char const* const, ...);
 #define fclose(...) replayer_fclose(__VA_ARGS__)
 #define ftell(...) replayer_ftell(__VA_ARGS__)
 #define fputc(...) replayer_fputc(__VA_ARGS__)
+#define fgetc(...) replayer_fgetc(__VA_ARGS__)
+#define fflush(...)
+#define ferror(...) 0
+#define feof(...) 0
 
 #define fprintf(...) replayer_fprintf(__VA_ARGS__)
 #define snprintf(...) stbsp_snprintf(__VA_ARGS__)

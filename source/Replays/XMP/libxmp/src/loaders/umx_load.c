@@ -426,6 +426,6 @@ static int umx_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	}
 
 	m->mod.ext = kExtension_umx;
-	// rePlayer end
 	return type;
+	// rePlayer end
 }

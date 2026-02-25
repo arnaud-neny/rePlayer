@@ -1,3 +1,25 @@
+/* Extended Module Player
+ * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "common.h"
 
 #ifdef LIBXMP_PAULA_SIMULATOR
@@ -7,6 +29,7 @@
  */
 #include "virtual.h"
 #include "mixer.h"
+#include "mix_all.h"
 #include "paula.h"
 #include "precomp_blep.h"
 
@@ -161,5 +184,13 @@ MIXER(stereoout_mono_a500_filter)
 
 	LOOP { PAULA_SIMULATION(1); MIX_STEREO(); }
 }
+
+const MIXER_FP libxmp_a500_mixers[] = {
+	LIST_MIX_FUNCTIONS_PAULA(a500)
+};
+
+const MIXER_FP libxmp_a500led_mixers[] = {
+	LIST_MIX_FUNCTIONS_PAULA(a500_filter)
+};
 
 #endif /* LIBXMP_PAULA_SIMULATOR */

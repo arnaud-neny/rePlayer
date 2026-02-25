@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,7 +28,7 @@
 
 #if !(defined(LIBXMP_NO_PROWIZARD) && defined(LIBXMP_NO_DEPACKERS))
 
-#if defined(_WIN32) || defined(__WATCOMC__)
+#if defined(_WIN32) || defined(_DOS) || defined(__OS2__) || defined(__EMX__)
 #include <io.h>
 #else
 #include <unistd.h>
@@ -36,6 +36,14 @@
 #ifdef HAVE_UMASK
 #include <sys/types.h>
 #include <sys/stat.h>
+#endif
+
+#if defined(_MSC_VER) ||  defined(__WATCOMC__) || defined(__EMX__)
+#define XMP_MAXPATH _MAX_PATH
+#elif defined(PATH_MAX)
+#define XMP_MAXPATH  PATH_MAX
+#else
+#define XMP_MAXPATH  1024
 #endif
 
 #include "tempfile.h"
@@ -46,7 +54,6 @@
 #define close _close
 #define unlink _unlink
 #define umask _umask
-int mkstemp(char *);
 
 static int get_temp_dir(char *buf, size_t size)
 {

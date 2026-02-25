@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -68,6 +68,8 @@ static const struct depacker *const depacker_list[] = {
 	&libxmp_depacker_arc,
 	&libxmp_depacker_arcfs,
 	&libxmp_depacker_mmcmp,
+	&libxmp_depacker_ice1,
+	&libxmp_depacker_ice2,
 	&libxmp_depacker_lzx,
 	&libxmp_depacker_s404,
 	NULL
@@ -173,6 +175,17 @@ static int execute_command(const char * const cmd[], FILE *t)
 		exit(errno);
 	}
 	close(fds[1]);
+
+	if ((p = fdopen(fds[0], "rb")) == NULL) {
+		D_(D_CRIT "failed fdopen");
+		close(fds[0]);
+		return -1;
+	}
+
+	while ((n = fread(buf, 1, BUFLEN, p)) > 0) {
+		fwrite(buf, 1, n, t);
+	}
+
 	wait(&status);
 	if (!WIFEXITED(status)) {
 		D_(D_CRIT "process failed (wstatus = %d)", status);
@@ -183,15 +196,6 @@ static int execute_command(const char * const cmd[], FILE *t)
 		D_(D_CRIT "process exited with status %d", WEXITSTATUS(status));
 		close(fds[0]);
 		return -1;
-	}
-	if ((p = fdopen(fds[0], "rb")) == NULL) {
-		D_(D_CRIT "failed fdopen");
-		close(fds[0]);
-		return -1;
-	}
-
-	while ((n = fread(buf, 1, BUFLEN, p)) > 0) {
-		fwrite(buf, 1, n, t);
 	}
 
 	fclose(p);
@@ -274,7 +278,7 @@ int libxmp_decrunch(HIO_HANDLE *h, const char *filename, char **temp)
 	*temp = NULL;
 
 	headersize = hio_read(b, 1, 1024, h);
-	if (headersize < 100) {	/* minimum valid file size */
+	if (headersize < 64) {	/* minimum valid file size */
 		return 0;
 	}
 

@@ -76,6 +76,12 @@ extern "C" {
         return c;
     }
     int replayer_fprintf(void* const, char const* const, ...) { return 0; }
+    int replayer_fgetc(mem_out* stream)
+    {
+        int8_t c;
+        replayer_fread(&c, 1, 1, stream);
+        return c;
+    }
 }
 
 namespace rePlayer
@@ -85,7 +91,7 @@ namespace rePlayer
         .name = "Extended Module Player",
         .extensions = "669;abk;adsc;amf;arch;coco;dbm;digi;dsym;dtm;emod;far;fnk;gdm;imf;ims;it;j2b;kris;liq;mdl;med;mfp;mgt;mod;mtm;okt;psm;ptm;riff;rtm;s3m;sfx;stk;stm;stx;ult;umx;xm;xmf;" // xmp
             "gmc;ksm;ntp", // prowizard
-        .about = "libxmp " XMP_VERSION "\nCopyright (c) 1996-2024 Claudio Matsuoka & Hipolito Carraro Jr",
+        .about = "libxmp " XMP_VERSION "\nCopyright (c) 1996-2026 Claudio Matsuoka & Hipolito Carraro Jr",
         .settings = "Extended Module Player " XMP_VERSION,
         .init = ReplayXMP::Init,
         .load = ReplayXMP::Load,

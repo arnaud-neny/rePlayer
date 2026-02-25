@@ -193,6 +193,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libxmp\src\depackers\arc_unpack.h" />
     <ClInclude Include="libxmp\src\depackers\crc32.h" />
     <ClInclude Include="libxmp\src\depackers\depacker.h" />
+    <ClInclude Include="libxmp\src\depackers\ice_unpack.h" />
     <ClInclude Include="libxmp\src\depackers\lhasa\ext_header.h" />
     <ClInclude Include="libxmp\src\depackers\lhasa\lhasa.h" />
     <ClInclude Include="libxmp\src\depackers\lhasa\lha_basic_reader.h" />
@@ -216,7 +217,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libxmp\src\hio.h" />
     <ClInclude Include="libxmp\src\hmn_extras.h" />
     <ClInclude Include="libxmp\src\lfo.h" />
-    <ClInclude Include="libxmp\src\list.h" />
     <ClInclude Include="libxmp\src\loaders\iff.h" />
     <ClInclude Include="libxmp\src\loaders\it.h" />
     <ClInclude Include="libxmp\src\loaders\loader.h" />
@@ -233,6 +233,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libxmp\src\memio.h" />
     <ClInclude Include="libxmp\src\miniz.h" />
     <ClInclude Include="libxmp\src\mixer.h" />
+    <ClInclude Include="libxmp\src\mix_all.h" />
+    <ClInclude Include="libxmp\src\path.h" />
     <ClInclude Include="libxmp\src\paula.h" />
     <ClInclude Include="libxmp\src\period.h" />
     <ClInclude Include="libxmp\src\player.h" />
@@ -254,6 +256,14 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libxmp\src\depackers\crc32.c" />
     <ClCompile Include="libxmp\src\depackers\depacker.c" />
     <ClCompile Include="libxmp\src\depackers\gunzip.c" />
+    <ClCompile Include="libxmp\src\depackers\ice.c" />
+    <ClCompile Include="libxmp\src\depackers\ice_unpack.c" />
+    <ClCompile Include="libxmp\src\depackers\ice_unpack_fn.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="libxmp\src\depackers\lhasa\ext_header.c" />
     <ClCompile Include="libxmp\src\depackers\lhasa\lh1_decoder.c" />
     <ClCompile Include="libxmp\src\depackers\lhasa\lh5_decoder.c" />
@@ -411,6 +421,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libxmp\src\mix_all.c" />
     <ClCompile Include="libxmp\src\mix_paula.c" />
     <ClCompile Include="libxmp\src\mkstemp.c" />
+    <ClCompile Include="libxmp\src\path.c" />
     <ClCompile Include="libxmp\src\period.c" />
     <ClCompile Include="libxmp\src\player.c" />
     <ClCompile Include="libxmp\src\read_event.c" />

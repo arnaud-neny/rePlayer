@@ -1,6 +1,6 @@
 /* Extended Module Player
  * AMOS/STOS Music Bank Loader
- * Copyright (C) 2014 Stephen J Leary and Claudio Matsuoka
+ * Copyright (C) 2014-2026 Stephen J Leary and Claudio Matsuoka
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -565,7 +565,7 @@ static int abk_load(struct module_data *m, HIO_HANDLE *f, const int start)
 /*printf("%02x lps=%04x lpe=%04x\n", i,  mod->xxs[i].lps, mod->xxs[i].lpe);*/
 
         mod->xxi[i].sub[0].vol = ci[i].sample_volume;
-        mod->xxi[i].sub[0].pan = 0x80;
+        mod->xxi[i].sub[0].pan = XMP_INST_NO_DEFAULT_PAN;
         mod->xxi[i].sub[0].sid = i;
 
         libxmp_instrument_name(mod, i, (uint8*)ci[i].sample_name, 16);

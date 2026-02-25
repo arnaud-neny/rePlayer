@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2021 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,50 +20,29 @@
  * THE SOFTWARE.
  */
 
-/* _[v]snprintf() from msvcrt.dll might not nul terminate */
-/* OpenWatcom-provided versions seem to behave the same.. */
+#ifndef LIBXMP_PATH_H
+#define LIBXMP_PATH_H
 
 #include "common.h"
 
-#if defined(USE_LIBXMP_SNPRINTF)
-
-#undef snprintf
-#undef vsnprintf
-
-int libxmp_vsnprintf(char *str, size_t sz, const char *fmt, va_list ap)
+struct libxmp_path
 {
-	int rc = _vsnprintf(str, sz, fmt, ap);
-	if (sz != 0) {
-		if (rc < 0) rc = (int)sz;
-		if ((size_t)rc >= sz) str[sz - 1] = '\0';
-	}
-	return rc;
-}
+	char *path;
+	size_t length;
+	size_t alloc;
+};
 
-int libxmp_snprintf (char *str, size_t sz, const char *fmt, ...)
-{
-	va_list ap;
-	int rc;
+LIBXMP_BEGIN_DECLS
 
-	va_start (ap, fmt);
-	rc = _vsnprintf(str, sz, fmt, ap);
-	va_end (ap);
+void	libxmp_path_init	(struct libxmp_path *);
+void	libxmp_path_free	(struct libxmp_path *);
+void	libxmp_path_move	(struct libxmp_path *dest, struct libxmp_path *src);
+int	libxmp_path_set		(struct libxmp_path *, const char *);
+int	libxmp_path_truncate	(struct libxmp_path *, size_t);
+int	libxmp_path_suffix_at	(struct libxmp_path *, size_t, const char *);
+int	libxmp_path_append	(struct libxmp_path *, const char *);
+int	libxmp_path_join	(struct libxmp_path *, const char *, const char *);
 
-	return rc;
-}
+LIBXMP_END_DECLS
 
-#endif
-
-/* Win32 debug message helper by Mirko Buffoni */
-#if defined(_MSC_VER) && defined(DEBUG)
-void libxmp_msvc_dbgprint(const char *format, ...)
-{
-	va_list argptr;
-
-	/* do the output */
-	va_start(argptr, format);
-	vprintf(format, argptr);
-	printf("\n");
-	va_end(argptr);
-}
-#endif
+#endif /* LIBXMP_PATH_H */

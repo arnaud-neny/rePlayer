@@ -129,7 +129,7 @@ int pw_wizardry(HIO_HANDLE *file_in, FILE *file_out, const char **name)
 		return -1;
 	}
 
-	// fflush(file_out); // rePlayer
+	fflush(file_out);
 
 	if (name != NULL) {
 		*name = format->name;

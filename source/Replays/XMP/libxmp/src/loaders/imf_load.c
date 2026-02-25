@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2026 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -132,8 +132,6 @@ static int imf_test(HIO_HANDLE *f, char *t, const int start)
 }
 
 #define NONE 0xff
-#define FX_IMF_FPORTA_UP 0xfe
-#define FX_IMF_FPORTA_DN 0xfd
 
 
 /* Effect conversion table */
@@ -189,20 +187,6 @@ static void xlat_fx (int c, uint8 *fxt, uint8 *fxp)
     }
 
     switch (*fxt = fx[*fxt]) {
-    case FX_IMF_FPORTA_UP:
-	*fxt = FX_PORTA_UP;
-	if (*fxp < 0x30)
-	    *fxp = LSN (*fxp >> 2) | 0xe0;
-	else
-	    *fxp = LSN (*fxp >> 4) | 0xf0;
-	break;
-    case FX_IMF_FPORTA_DN:
-	*fxt = FX_PORTA_DN;
-	if (*fxp < 0x30)
-	    *fxp = LSN (*fxp >> 2) | 0xe0;
-	else
-	    *fxp = LSN (*fxp >> 4) | 0xf0;
-	break;
     case FX_EXTENDED:			/* Extended effects */
 	switch (h) {
 	case 0x1:			/* Set filter */
@@ -246,7 +230,7 @@ static int imf_load(struct module_data *m, HIO_HANDLE *f, const int start)
 {
     struct xmp_module *mod = &m->mod;
     int c, r, i, j;
-    struct xmp_event *event = 0, dummy;
+    struct xmp_event *event = NULL, dummy;
     struct imf_header ih;
     struct imf_instrument ii;
     struct imf_sample is;
@@ -377,10 +361,12 @@ static int imf_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	    if (b & IMF_NI_FOLLOW) {
 		n = hio_read8(f);
 		switch (n) {
-		case 255:
-		case 160:	/* ?! */
+		case 255:	/* No note */
+		    n = 0;
+		    break;
+		case 160:	/* Key off */
 		    n = XMP_KEY_OFF;
-		    break;	/* Key off */
+		    break;
 		default:
 		    n = 13 + 12 * MSN (n) + LSN (n);
 		}
@@ -515,7 +501,7 @@ static int imf_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	    sub->sid = smp_num;
 	    sub->vol = is.vol;
-	    sub->pan = (is.flg & IMF_SAMPLE_DEFPAN) ? is.pan : -1;
+	    sub->pan = (is.flg & IMF_SAMPLE_DEFPAN) ? is.pan : XMP_INST_NO_DEFAULT_PAN;
 	    xxs->len = is.len;
 	    xxs->lps = is.lps;
 	    xxs->lpe = is.lpe;
@@ -564,7 +550,7 @@ static int imf_load(struct module_data *m, HIO_HANDLE *f, const int start)
     }
 
     m->c4rate = C4_NTSC_RATE;
-    m->quirk |= QUIRK_FILTER | QUIRKS_ST3 | QUIRK_ARPMEM;
+    m->quirk |= QUIRK_FILTER | QUIRK_MARKER | QUIRK_RSTCHN | QUIRK_ARPMEM;
     m->flow_mode = FLOW_MODE_ORPHEUS;
     m->read_event_type = READ_EVENT_ST3;
 

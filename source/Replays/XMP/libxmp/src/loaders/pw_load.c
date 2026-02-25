@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2022 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2026 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,8 +28,6 @@
 
 #include "prowizard/prowiz.h"
 #include "../tempfile.h"
-
-extern struct list_head *checked_format;
 
 static int pw_test(HIO_HANDLE *, char *, const int);
 static int pw_load(struct module_data *, HIO_HANDLE *, const int);
@@ -71,11 +69,11 @@ static int pw_load(struct module_data *m, HIO_HANDLE *h, const int start)
 
 	// rePlayer begin
 	memset(&temp, 0, sizeof(temp));
-/*
-	if ((temp = make_temp_file(&temp_name)) == NULL) {
-		goto err;
-	}
-*/
+	/*
+		if ((temp = make_temp_file(&temp_name)) == NULL) {
+			goto err;
+		}
+	*/
 	// rePlayer end
 
 	if (pw_wizardry(h, &temp, &name) < 0) { // rePlayer
@@ -146,7 +144,7 @@ static int pw_load(struct module_data *m, HIO_HANDLE *h, const int start)
 		mod->xxs[i].flg = mh.ins[i].loop_size > 1 ? XMP_SAMPLE_LOOP : 0;
 		mod->xxi[i].sub[0].fin = (int8) (mh.ins[i].finetune << 4);
 		mod->xxi[i].sub[0].vol = mh.ins[i].volume;
-		mod->xxi[i].sub[0].pan = 0x80;
+		mod->xxi[i].sub[0].pan = XMP_INST_NO_DEFAULT_PAN;
 		mod->xxi[i].sub[0].sid = i;
 		mod->xxi[i].rls = 0xfff;
 

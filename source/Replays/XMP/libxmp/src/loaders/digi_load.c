@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2022 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2026 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,7 +36,6 @@
  */
 
 #include "loader.h"
-
 
 static int digi_test (HIO_HANDLE *, char *, const int);
 static int digi_load (struct module_data *, HIO_HANDLE *, const int);
@@ -86,11 +85,10 @@ struct digi_header {
     uint8 insname[31][30];	/* Instrument names */
 };
 
-
 static int digi_load(struct module_data *m, HIO_HANDLE *f, const int start)
 {
     struct xmp_module *mod = &m->mod;
-    struct xmp_event *event = 0;
+    struct xmp_event *event = NULL;
     struct digi_header dh;
     uint8 digi_event[4], chn_table[64];
     uint16 w;
@@ -170,7 +168,7 @@ static int digi_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	mod->xxs[i].flg = mod->xxs[i].lpe > 0 ? XMP_SAMPLE_LOOP : 0;
 	mod->xxi[i].sub[0].vol = dh.vol[i];
 	mod->xxi[i].sub[0].fin = dh.fin[i];
-	mod->xxi[i].sub[0].pan = 0x80;
+	mod->xxi[i].sub[0].pan = XMP_INST_NO_DEFAULT_PAN;
 	mod->xxi[i].sub[0].sid = i;
 
 	if (mod->xxs[i].len > 0)
