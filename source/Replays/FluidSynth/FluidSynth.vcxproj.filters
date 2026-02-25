@@ -1,0 +1,597 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth">
+      <UniqueIdentifier>{0f8638f2-9d73-4fe4-9275-4920982135a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\include">
+      <UniqueIdentifier>{cea0e7fa-5d2d-482d-b0fa-aec86be31e40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src">
+      <UniqueIdentifier>{249b9fc0-5dfa-4958-84f1-2d76985b643b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\include\fluidsynth">
+      <UniqueIdentifier>{2aabb266-01e9-4199-bec2-ed2e00d4a2b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\utils">
+      <UniqueIdentifier>{9a0500d5-81a1-484d-8fbd-834108c103f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\synth">
+      <UniqueIdentifier>{38b64b18-5f05-46ae-b834-1e3a67975170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\rvoice">
+      <UniqueIdentifier>{c81b9d13-3ec5-4b9f-8c63-b9104b10927b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\sfloader">
+      <UniqueIdentifier>{d0151a58-f209-4721-a7c4-a8de1280e79c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\bindings">
+      <UniqueIdentifier>{d0207e79-4448-44db-8758-e19cdcffc734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\midi">
+      <UniqueIdentifier>{a5cbfcd4-f825-43ff-bbfb-b9f412e69627}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\drivers">
+      <UniqueIdentifier>{efb15540-0d4d-46c5-8ddd-739b777544d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fluidsynth\src\gentables">
+      <UniqueIdentifier>{deff5a81-3a6f-4267-b99c-e13e5e42f615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gcem">
+      <UniqueIdentifier>{e818dcf6-d3b5-426c-bafd-3b741aa4d2c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gcem\gcem_incl">
+      <UniqueIdentifier>{9daa7fa6-d2ad-4012-9b50-3884fb7d6886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gcem\gcem_incl\quadrature">
+      <UniqueIdentifier>{26fa6e41-42df-41fa-af2f-4cb7102ad5ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayFluidSynth.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\config.h">
+      <Filter>Source Files\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth.h">
+      <Filter>Source Files\fluidsynth\include</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\audio.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\event.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\gen.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\ladspa.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\log.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\midi.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\misc.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\mod.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\seq.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\seqbind.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\settings.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\sfont.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\shell.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\synth.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\types.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\version.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\include\fluidsynth\voice.h">
+      <Filter>Source Files\fluidsynth\include\fluidsynth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_sys.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_hash.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluidsynth_priv.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_sys_embedded.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_stub_functions.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_file.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_list.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_synth.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_voice.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_phase.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_gen.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_mod.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_conv.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_conv_tables.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_iir_filter.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_adsr_env.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_lfo.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_sfont.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_event.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\bindings\fluid_ladspa.h">
+      <Filter>Source Files\fluidsynth\src\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_ringbuffer.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_chorus.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\midi\fluid_midi_router.h">
+      <Filter>Source Files\fluidsynth\src\midi</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\midi\fluid_midi.h">
+      <Filter>Source Files\fluidsynth\src\midi</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\bindings\fluid_cmd.h">
+      <Filter>Source Files\fluidsynth\src\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\drivers\fluid_adriver.h">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\drivers\fluid_mdriver.h">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\utils\fluid_settings.h">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_chan.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_tuning.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_defsfont.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_sffile.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_dls.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_instpatch.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\gentables\ConstExprArr.hpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem.hpp">
+      <Filter>Source Files\gcem</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\abs.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\acos.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\acosh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\asin.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\asinh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\atan.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\atan2.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\atanh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\beta.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\binomial_coef.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\ceil.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\copysign.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\cos.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\cosh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\erf.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\erf_inv.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\exp.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\expm1.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\fabs.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\fabsf.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\fabsl.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\factorial.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\find_exponent.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\find_fraction.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\find_whole.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\floor.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\fmod.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\gcd.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\gcem_options.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\hypot.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\incomplete_beta.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\incomplete_beta_inv.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\incomplete_gamma.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\incomplete_gamma_inv.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\inv_sqrt.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\is_even.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\is_finite.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\is_inf.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\is_nan.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\is_odd.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\lbeta.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\lcm.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\lgamma.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\lmgamma.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\log.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\log_binomial_coef.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\log1p.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\log2.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\log10.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\mantissa.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\max.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\min.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\neg_zero.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\pow.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\pow_integral.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\round.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\sgn.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\signbit.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\sin.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\sinh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\sqrt.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\tan.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\tanh.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\tgamma.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\trunc.hpp">
+      <Filter>Source Files\gcem\gcem_incl</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\quadrature\gauss_legendre_30.hpp">
+      <Filter>Source Files\gcem\gcem_incl\quadrature</Filter>
+    </ClInclude>
+    <ClInclude Include="gcem\include\gcem_incl\quadrature\gauss_legendre_50.hpp">
+      <Filter>Source Files\gcem\gcem_incl\quadrature</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\sfloader\fluid_samplecache.h">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_dsp_tables.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayFluidSynth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_settings.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\drivers\fluid_mdriver.c">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\bindings\fluid_filerenderer.c">
+      <Filter>Source Files\fluidsynth\src\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\drivers\fluid_adriver.c">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\bindings\fluid_cmd.c">
+      <Filter>Source Files\fluidsynth\src\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_synth.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\midi\fluid_midi.c">
+      <Filter>Source Files\fluidsynth\src\midi</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_hash.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_list.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_sys.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_sys_embedded.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_chan.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_tuning.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_voice.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_lfo.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_adsr_env.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_iir_filter.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_mod.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_conv.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_pan.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_convex.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_cb2amp.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_concave.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_ct2hz.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_gen.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_synth_monopoly.c">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\sfloader\fluid_defsfont.c">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_event.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_iir_filter_impl.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\sfloader\fluid_sfont.c">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\sfloader\fluid_samplecache.c">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\sfloader\fluid_sffile.c">
+      <Filter>Source Files\fluidsynth\src\sfloader</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_chorus.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\utils\fluid_ringbuffer.c">
+      <Filter>Source Files\fluidsynth\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_dsp.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_interp_coeff_sinc7.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_interp_coeff.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\gentables\fluid_interp_coeff_linear.cpp">
+      <Filter>Source Files\fluidsynth\src\gentables</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\midi\fluid_midi_router.c">
+      <Filter>Source Files\fluidsynth\src\midi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fluidsynth\AUTHORS">
+      <Filter>Source Files\fluidsynth</Filter>
+    </None>
+    <None Include="fluidsynth\LICENSE">
+      <Filter>Source Files\fluidsynth</Filter>
+    </None>
+    <None Include="fluidsynth\README.md">
+      <Filter>Source Files\fluidsynth</Filter>
+    </None>
+    <None Include="gcem\LICENSE">
+      <Filter>Source Files\gcem</Filter>
+    </None>
+    <None Include="gcem\README.md">
+      <Filter>Source Files\gcem</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="gcem\contributors.txt">
+      <Filter>Source Files\gcem</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
