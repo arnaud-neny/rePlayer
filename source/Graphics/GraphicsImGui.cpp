@@ -9,6 +9,7 @@
 // data
 #include "GraphicsFont3x5.h"
 #include "GraphicsFontLog.h"
+#include "JapaneseFont.h"
 #include "MediaIcons.h"
 
 namespace rePlayer
@@ -105,6 +106,10 @@ namespace rePlayer
         imFontConfig.FontLoader = &s_fontLoader;
 
         io.Fonts->AddFontDefault(&imFontConfig);
+
+        imFontConfig.MergeMode = true;
+        imFontConfig.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF((void*)sJapaneseFont_data, sJapaneseFont_size, 0.0f, &imFontConfig);
 
 /*
         {

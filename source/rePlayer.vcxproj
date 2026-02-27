@@ -308,6 +308,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="Graphics\GraphicsPremulDx12.h" />
     <ClInclude Include="Graphics\GraphicsPremulPS.h" />
     <ClInclude Include="Graphics\GraphicsPremulVS.h" />
+    <ClInclude Include="Graphics\JapaneseFont.h" />
     <ClInclude Include="Graphics\MediaIcons.h" />
     <ClInclude Include="IO\StreamArchive.h" />
     <ClInclude Include="IO\StreamArchiveRaw.h" />
@@ -375,6 +376,23 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="rePlayer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\assets\font\ume-tgc4.ttf">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">@$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) sJapaneseFont &gt; $(SolutionDir)Graphics\JapaneseFont.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Graphics\JapaneseFont.h</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">@$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) sJapaneseFont &gt; $(SolutionDir)Graphics\JapaneseFont.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Graphics\JapaneseFont.h</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) sJapaneseFont &gt; $(SolutionDir)Graphics\JapaneseFont.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Graphics\JapaneseFont.h</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@$(SolutionDir)..\tools\binary_to_compressed_c.exe -nocompress %(FullPath) sJapaneseFont &gt; $(SolutionDir)Graphics\JapaneseFont.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Graphics\JapaneseFont.h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Japanese Font</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Japanese Font</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Japanese Font</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Japanese Font</Message>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

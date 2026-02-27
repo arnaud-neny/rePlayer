@@ -39,6 +39,9 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{784d96b5-210a-46c7-8e89-05a87f7cf265}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\font">
+      <UniqueIdentifier>{91255c64-1eb6-4868-81c3-f31ba85a117e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -442,6 +445,9 @@
     <ClInclude Include="UI\BusySpinner.h">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\JapaneseFont.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphics\GraphicsDx12.inl">
@@ -488,5 +494,10 @@
     <ResourceCompile Include="rePlayer.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\assets\font\ume-tgc4.ttf">
+      <Filter>Resource Files\font</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
