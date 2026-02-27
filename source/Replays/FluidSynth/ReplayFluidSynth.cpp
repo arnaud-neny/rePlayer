@@ -4,12 +4,14 @@
 
 #include <Core/Window.inl.h>
 #include <Imgui.h>
+#include <IO/File.h>
 #include <IO/StreamFile.h>
-#include <IO/StreamMemory.h>
 #include <ReplayDll.h>
 
 #include <fluid_sys.h>
 #include <fluid_synth.h>
+
+#include <filesystem>
 
 namespace rePlayer
 {
@@ -59,13 +61,23 @@ namespace rePlayer
                 {
                     if (strcmp(filename, "::DefaultBank") == 0)
                     {
-                        if (ms_defaultSoundfont.IsEmpty())
-                        {
-                            ms_defaultSoundfont = g_replayPlugin.download("https://musical-artifacts.com/artifacts/1481/Phoenix_MT-32.sf2");
-                            if (ms_defaultSoundfont.IsEmpty())
-                                return nullptr;
-                        }
-                        return io::StreamMemory::Create(filename, ms_defaultSoundfont.Items(), ms_defaultSoundfont.NumItems(), true).Detach();
+                        // try to load from the cache
+                        auto mainPath = std::filesystem::current_path() / "cache" / "FluidSynth" / "Phoenix_MT-32.sf2";
+                        auto stream = io::StreamFile::Create(reinterpret_cast<const char*>(mainPath.u8string().c_str()));
+                        if (stream.IsValid())
+                            return stream.Detach();
+
+                        // not in the cache, so try to download it
+                        auto defaultSoundfont = g_replayPlugin.download("https://musical-artifacts.com/artifacts/1481/Phoenix_MT-32.sf2");
+                        if (defaultSoundfont.IsEmpty())
+                            return nullptr;
+
+                        // save to the cache
+                        auto file = io::File::OpenForWrite(reinterpret_cast<const char*>(mainPath.u8string().c_str()));
+                        file.Write(defaultSoundfont.Items(), defaultSoundfont.NumItems());
+
+                        // re-open it
+                        return io::StreamFile::Create(reinterpret_cast<const char*>(mainPath.u8string().c_str())).Detach();
                     }
                     return io::StreamFile::Create(filename).Detach();
                 }
@@ -196,7 +208,6 @@ namespace rePlayer
     float ReplayFluidSynth::ms_gain = 0.5f;
     int ReplayFluidSynth::ms_polyphony = 256;
     std::string ReplayFluidSynth::ms_soundfont;
-    Array<uint8_t> ReplayFluidSynth::ms_defaultSoundfont;
 
     ReplayFluidSynth::~ReplayFluidSynth()
     {

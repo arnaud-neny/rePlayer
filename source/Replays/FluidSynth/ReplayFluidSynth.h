@@ -65,8 +65,6 @@ namespace rePlayer
         static float ms_gain;
         static int32_t ms_polyphony;
         static std::string ms_soundfont;
-
-        static Array<uint8_t> ms_defaultSoundfont;
     };
 }
 // namespace rePlayer
