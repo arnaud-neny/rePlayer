@@ -67,6 +67,8 @@ namespace rePlayer
         static const char* const GetLabel();
         static constexpr uint16_t kReferenceDate = 19473; // std::chrono::year(2023) / 4 / 26;
 
+        static Array<uint8_t> Download(const char* logId, const char* url);
+
     private:
         template <typename ItemID>
         struct Stack

@@ -1,4 +1,5 @@
 // Core
+#include <Core/Log.h>
 #include <Core/Thread/Workers.h>
 
 // rePlayer
@@ -6,6 +7,8 @@
 #include <Playlist/Playlist.h>
 
 #include "Core.h"
+
+#include <curl/curl.h>
 
 // stl
 #include <atomic>
@@ -107,6 +110,40 @@ namespace rePlayer
     {
         m_songsStack.Reconcile();
         m_artistsStack.Reconcile();
+    }
+
+    Array<uint8_t> Core::Download(const char* logId, const char* url)
+    {
+        CURL* curl = curl_easy_init();
+
+        char errorBuffer[CURL_ERROR_SIZE];
+        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+
+        struct Buffer
+        {
+            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
+            {
+                auto oldSize = buffer->storage.NumItems();
+                buffer->storage.Resize(uint32_t(oldSize + size * nmemb));
+
+                memcpy(&buffer->storage[oldSize], data, size * nmemb);
+
+                return size * nmemb;
+            }
+            Array<uint8_t> storage;
+        } buffer;
+
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        if (curl_easy_perform(curl) != CURLE_OK)
+            Log::Error("%s: can't download \"%s\", curl error \"%s\"\n", logId, url, errorBuffer);
+        curl_easy_cleanup(curl);
+
+        return std::move(buffer.storage);
     }
 }
 // namespace rePlayer
