@@ -42,6 +42,7 @@ namespace rePlayer
             kStateEnd
         } state = kStateInit;
 
+        Collector() : WebHandler("UTF-8") {}
         void OnReadNode(xmlNode* node) final;
     };
 
@@ -127,23 +128,9 @@ namespace rePlayer
             kStateEnd
         } state = kStateInit;
 
-        static std::string FixUmlaut(std::string txt);
+        Search() : WebHandler("UTF-8") {}
         void OnReadNode(xmlNode* node) final;
     };
-
-    std::string SourceSNDH::Search::FixUmlaut(std::string txt)
-    {
-        // impossible to make tidy not converting this...
-        for (size_t pos = 0;;)
-        {
-            pos = txt.find("%C3%BC", pos, sizeof("%C3%BC") - 1);
-            if (pos == std::string::npos)
-                break;
-            txt.erase(pos, sizeof("%C3%BC") - 2);
-            txt[pos] = 'ü';
-        }
-        return txt;
-    }
 
     void SourceSNDH::Search::OnReadNode(xmlNode* node)
     {
@@ -160,7 +147,7 @@ namespace rePlayer
                         if (xmlStrstr(propChild->content, BAD_CAST"/?p=composer&name="))
                         {
                             foundArtists.Push();
-                            foundArtists.Last().first = FixUmlaut(Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1).c_str());//FixUmlaut((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
+                            foundArtists.Last().first = Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
                             state = kStateArtistName;
                         }
                     }
@@ -177,7 +164,7 @@ namespace rePlayer
                     {
                         if (xmlStrstr(propChild->content, BAD_CAST"/?p=composer&name="))
                         {
-                            foundSongs.Last().artist.first = FixUmlaut(Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1).c_str());//FixUmlaut((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
+                            foundSongs.Last().artist.first = Escape((const char*)propChild->content + sizeof("/?p=composer&name=") - 1);
                             state = kStateSongArtistName;
                         }
                     }

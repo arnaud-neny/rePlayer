@@ -20,16 +20,17 @@ namespace rePlayer
     public:
         virtual void OnReadNode(xmlNode* node) = 0;
 
-        WebHandler()
+        WebHandler(const char* encoding = nullptr)
             : curl(curl_easy_init())
+            , encoding(encoding)
         {}
         WebHandler(const WebHandler& other)
             : curl(curl_easy_init())
-        {
-            (void)other;
-        }
+            , encoding(other.encoding)
+        {}
         WebHandler(WebHandler&& other)
             : curl(other.curl)
+            , encoding(other.encoding)
             , isInitialized(other.isInitialized)
         {
             other.curl = curl_easy_init();
@@ -37,9 +38,9 @@ namespace rePlayer
         }
         WebHandler& operator=(const WebHandler& other)
         {
-            (void)other;
             curl_easy_cleanup(curl);
             curl = curl_easy_init();
+            encoding = other.encoding;
             isInitialized = false;
             return *this;
         }
@@ -47,6 +48,7 @@ namespace rePlayer
         {
             curl_easy_cleanup(curl);
             curl = other.curl;
+            encoding = other.encoding;
             isInitialized = other.isInitialized;
             other.curl = curl_easy_init();
             other.isInitialized = false;
@@ -94,7 +96,7 @@ namespace rePlayer
             auto curlErr = curl_easy_perform(curl);
             if (curlErr == CURLE_OK)
             {
-                if (auto* doc = htmlReadMemory(buffer.Items(), buffer.NumItems(), nullptr, nullptr, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING))
+                if (auto* doc = htmlReadMemory(buffer.Items(), buffer.NumItems(), nullptr, encoding, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING))
                 {
                     OnReadNode(xmlDocGetRootElement(doc));
 
@@ -163,6 +165,7 @@ namespace rePlayer
         }
 
         CURL* curl;
+        const char* encoding;
         bool isInitialized = false;
         std::string error;
     };
