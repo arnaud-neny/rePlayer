@@ -1525,6 +1525,12 @@
     <ClCompile Include="soundlib\PlaybackTest.cpp">
       <Filter>Source Files\soundlib</Filter>
     </ClCompile>
+    <ClCompile Include="soundlib\Load_nru.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
+    <ClCompile Include="soundlib\Load_ss.cpp">
+      <Filter>Source Files\soundlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
