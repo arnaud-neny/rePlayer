@@ -701,7 +701,7 @@ namespace rePlayer
                 m_isWaveScrolling = false;
             }
             const auto size = ImGui::GetContentRegionAvail();
-            auto numMillisecondsPerPixel = m_numMillisecondsPerPixel = Clamp(m_numMillisecondsPerPixel, 1ull, 1 + (m_numSamples * 1000ull) / (m_replay->GetSampleRate() * uint64_t(size.x)));
+            auto numMillisecondsPerPixel = m_numMillisecondsPerPixel = Clamp(m_numMillisecondsPerPixel, 1.0f, float((m_numSamples * 1000.0) / (m_replay->GetSampleRate() * Max(1.0, double(size.x)))));
             auto offset = uint32_t(ImGui::GetScrollX());
             auto maxFrames = Min(uint64_t(size.x), m_frames.NumItems<uint64_t>());
             if ((offset + maxFrames) > m_frames.NumItems<uint64_t>()) // prevent offset overflow
@@ -745,10 +745,10 @@ namespace rePlayer
                 if (ImGui::GetIO().MouseWheel != 0)
                 {
                     if (ImGui::GetIO().MouseWheel < 0)
-                        m_numMillisecondsPerPixel *= uint64_t(ImGui::GetIO().MouseWheel * -2);
+                        m_numMillisecondsPerPixel *= ImGui::GetIO().MouseWheel * -2.0f;
                     else
-                        m_numMillisecondsPerPixel /= uint64_t(ImGui::GetIO().MouseWheel * 2);
-                    m_numMillisecondsPerPixel = Clamp(m_numMillisecondsPerPixel, 1ull, 1 + (m_numSamples * 1000ull) / (m_replay->GetSampleRate() * uint64_t(size.x)));
+                        m_numMillisecondsPerPixel /= ImGui::GetIO().MouseWheel * 2.0f;
+                    m_numMillisecondsPerPixel = Clamp(m_numMillisecondsPerPixel, 1.0f, float((m_numSamples * 1000.0) / (m_replay->GetSampleRate() * Max(1.0, double(size.x)))));
                     ImGui::SetScrollX((offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel / m_numMillisecondsPerPixel - ImGui::GetMousePos().x + pos.x);
                     m_waveScroll = (offset + ImGui::GetMousePos().x - pos.x) * numMillisecondsPerPixel / m_numMillisecondsPerPixel - ImGui::GetMousePos().x + pos.x;
                     m_isWaveScrolling = true;
@@ -756,7 +756,7 @@ namespace rePlayer
 
                 auto framePos = Clamp(offset + uint32_t(ImGui::GetMousePos().x - pos.x), 0u, m_frames.NumItems() - 1u);
                 auto cursorFrame = m_frames[framePos];
-                auto time = uint64_t(framePos) * numMillisecondsPerPixel;
+                auto time = uint64_t(framePos * numMillisecondsPerPixel);
                 ImGui::Tooltip("pos: %u:%02u:%03u\nmin: %d\nmax: %d\nrms: %u", uint32_t(time / 60000), uint32_t(time / 1000) % 60, uint32_t(time % 1000)
                     , cursorFrame.min - 127, cursorFrame.max - 127, cursorFrame.rms);
             }
@@ -939,9 +939,9 @@ namespace rePlayer
 
     void SongEndEditor::ScaleUI(uint32_t width)
     {
-        auto numMillisecondsPerPixel = uint32_t(m_numMillisecondsPerPixel);
-        ImGui::SetNextItemWidth(120.0f);
-        ImGui::DragUint("##Scale", &numMillisecondsPerPixel, 1.0f, 1, 1 + (m_numSamples * 1000ull) / (m_replay->GetSampleRate() * uint64_t(width)), "%u ms per pixel", ImGuiSliderFlags_AlwaysClamp, ImVec2(0.0f, 0.5f));
+        auto numMillisecondsPerPixel = m_numMillisecondsPerPixel;
+        ImGui::SetNextItemWidth(150.0f);
+        ImGui::DragFloat("##Scale", &numMillisecondsPerPixel, 1.0f, 1.0f, float((m_numSamples * 1000.0) / (m_replay->GetSampleRate() * Max(1.0, double(width)))), "%.2f ms per pixel", ImGuiSliderFlags_AlwaysClamp, ImVec2(0.0f, 0.5f));
         if (ImGui::IsItemHovered())
             ImGui::Tooltip("Waveform display scale");
         m_numMillisecondsPerPixel = numMillisecondsPerPixel;

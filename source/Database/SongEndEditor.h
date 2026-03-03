@@ -58,7 +58,7 @@ namespace rePlayer
         Array<StereoSample> m_samples;
         Array<Frame> m_frames;
         Array<uint32_t> m_loops;
-        uint64_t m_numMillisecondsPerPixel = 250;
+        float m_numMillisecondsPerPixel = FLT_MAX;
         StereoSample m_lastSample = { 100000.f, 100000.f };
         uint32_t m_silence = 0;
         LoopInfo m_loop;
