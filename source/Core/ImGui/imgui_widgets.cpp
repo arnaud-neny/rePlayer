@@ -2829,9 +2829,9 @@ bool ImGui::DragScalarN(const char* label, ImGuiDataType data_type, void* p_data
     return value_changed;
 }
 
-bool ImGui::DragFloat(const char* label, float* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags)
+bool ImGui::DragFloat(const char* label, float* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags, const ImVec2& text_align) // rePlayer
 {
-    return DragScalar(label, ImGuiDataType_Float, v, v_speed, &v_min, &v_max, format, flags);
+    return DragScalar(label, ImGuiDataType_Float, v, v_speed, &v_min, &v_max, format, flags, text_align); // rePlayer
 }
 
 bool ImGui::DragFloat2(const char* label, float v[2], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags)
