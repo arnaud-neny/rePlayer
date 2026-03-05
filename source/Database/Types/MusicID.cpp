@@ -131,7 +131,7 @@ namespace rePlayer
         {
             ImGui::Separator();
             if (isTextWrapped)
-                ImGui::TextWrapped(metadata.c_str());
+                ImGui::TextWrapped("%s", metadata.c_str());
             else
                 ImGui::TextUnformatted(metadata.c_str());
         }
