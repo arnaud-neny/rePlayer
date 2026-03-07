@@ -86,6 +86,7 @@ namespace rePlayer
         void OnEndFrame() override;
         void OnApplySettings() override;
 
+        void PlaySubsong(bool isNext);
         void PlayPreviousSong();
         void PlayNextSong();
         void ValidateNextSong();

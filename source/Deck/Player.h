@@ -27,6 +27,7 @@ namespace rePlayer
         void Pause();
         void Stop();
         void Seek(uint32_t timeInMs);
+        void SetSubsong(uint16_t subsongIndex);
 
         void MarkSongAsNew(bool isNewSong);
         bool IsNewSong() const;

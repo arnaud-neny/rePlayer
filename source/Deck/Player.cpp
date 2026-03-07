@@ -152,6 +152,14 @@ namespace rePlayer
         }
     }
 
+    void Player::SetSubsong(uint16_t subsongIndex)
+    {
+        Stop();
+        m_id.subsongId.index = subsongIndex;
+        m_replay->SetSubsong(subsongIndex);
+        Play();
+    }
+
     Player::EndingState Player::IsEnding(uint32_t timeRangeInMs) const
     {
         if (m_status == Status::Playing)

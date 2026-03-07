@@ -561,9 +561,12 @@ namespace rePlayer
         }
 
         auto spacing = ImGui::GetStyle().ItemSpacing.x + 2.0f;
-        if (ImGui::Button(ImGuiIconMediaPrev))
+        if (ImGui::ButtonEx(ImGuiIconMediaPrev, ImVec2(0, 0), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight))
         {
-            PlayPreviousSong();
+            if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+                PlaySubsong(false);
+            else
+                PlayPreviousSong();
         }
         ImGui::SameLine(0.0f, spacing);
         if (ImGui::Button(ImGuiIconMediaStop) && isPlayerValid && !player->IsStopped())
@@ -589,9 +592,12 @@ namespace rePlayer
                 m_nextPlayer->Pause();
         }
         ImGui::SameLine(0.0f, spacing);
-        if (ImGui::Button(ImGuiIconMediaNext))
+        if (ImGui::ButtonEx(ImGuiIconMediaNext, ImVec2(0, 0), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight))
         {
-            PlayNextSong();
+            if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+                PlaySubsong(true);
+            else
+                PlayNextSong();
         }
         ImGui::SameLine(0.0f, spacing);
         if (ImGui::Button(m_loop == Loop::None ? ImGuiIconMediaLoopNone : m_loop == Loop::Playlist ? ImGuiIconMediaLoopPlaylist : ImGuiIconMediaLoopSingle))
@@ -729,6 +735,27 @@ namespace rePlayer
         {
             ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
             ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
+        }
+    }
+
+    void Deck::PlaySubsong(bool isNext)
+    {
+        if (m_mode != Mode::Solo || m_currentPlayer.IsInvalid())
+            return;
+        auto* song = m_currentPlayer->GetSong();
+        uint32_t currentSubsong = m_currentPlayer->GetId().subsongId.index;
+        uint32_t nextSubsong = currentSubsong;
+        for (;;)
+        {
+            nextSubsong = (nextSubsong + (isNext ? 1 : song->lastSubsongIndex)) % (song->lastSubsongIndex + 1);
+            if (nextSubsong == currentSubsong)
+                return;
+            if (song->subsongs[nextSubsong].isDiscarded)
+                continue;
+
+            m_currentPlayer->SetSubsong(uint16_t(nextSubsong));
+            if (!song->subsongs[nextSubsong].isInvalid)
+                break;
         }
     }
 
