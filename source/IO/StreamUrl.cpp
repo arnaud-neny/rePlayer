@@ -466,7 +466,7 @@ namespace rePlayer
         else
         {
             std::atomic_ref(m_state).store(State::kFailed);
-            Log::Warning("StreamUrl: %s\n", curl_easy_strerror(curlCode));
+            Log::Warning("StreamUrl: %s for \"%s\"\n", curl_easy_strerror(curlCode), m_url.c_str());
         }
 
         std::atomic_ref(m_isJobDone).store(true);
