@@ -296,6 +296,13 @@ namespace rePlayer
         ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x) * 3));
         ImGui::InputText("##Name", &subsong.name.String());
         ImGui::SameLine();
+        auto pos = ImGui::GetCursorPosX();
+        char txt[16];
+        sprintf(txt, "%u:%02u", subsong.durationCs / 6000, (subsong.durationCs / 100) % 60);
+        ImGui::SetCursorPosX(pos - ImGui::CalcTextSize(txt).x - style.ItemInnerSpacing.x);
+        ImGui::TextDisabled(txt);
+        ImGui::SetCursorPosX(pos);
+        ImGui::SameLine();
         static const char* const subsongStateLabels[] = { "U", "S", "F", "L" };
         static const char* const subsongStates[] = { "Undefined", "Stop", "Fade Out", "Loop Once" };
         if (ImGui::Button(subsongStateLabels[uint32_t(subsong.state)], ImVec2(buttonSize, 0.0f)))
