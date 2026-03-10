@@ -113,6 +113,8 @@ namespace rePlayer
                     m_song.original.subsongs[i].state = currentSong->GetSubsongState(i);
                     m_song.edited.subsongs[i].state = m_song.original.subsongs[i].state;
                 }
+                m_song.original.subsongs[i].durationCs = currentSong->GetSubsongDurationCs(i);
+                m_song.edited.subsongs[i].durationCs = m_song.original.subsongs[i].durationCs;
             }
             if (m_song.original.sourceIds != currentSong->SourceIds())
             {
