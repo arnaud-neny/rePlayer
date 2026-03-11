@@ -9,9 +9,9 @@
 #include "comsupport.h"
 
 //=============================================================================
-//	COM 風 interface class(File I/O interface)
+//	COM 風 pmd_interface class(File I/O pmd_interface)
 //=============================================================================
-interface IFILEIO : public IUnknown {
+pmd_interface IFILEIO : public pmd_IUnknown {
 public:
 	enum Flags
 	{
@@ -33,21 +33,21 @@ public:
 		error_unknown = -1
 	};
 	
-	virtual int64_t WINAPI GetFileSize(const TCHAR* filename) = 0;
-	virtual bool WINAPI Open(const TCHAR* filename, uint flg = 0) = 0;
-	virtual void WINAPI Close() = 0;
-	virtual int32_t WINAPI Read(void* dest, int32_t len) = 0;
-	virtual bool WINAPI Seek(int32_t fpos, SeekMethod method) = 0;
-	virtual int32_t WINAPI Tellp() = 0;
+	virtual int64_t GetFileSize(const TCHAR* filename) = 0;
+	virtual bool Open(const TCHAR* filename, uint flg = 0) = 0;
+	virtual void Close() = 0;
+	virtual int32_t Read(void* dest, int32_t len) = 0;
+	virtual bool Seek(int32_t fpos, SeekMethod method) = 0;
+	virtual int32_t Tellp() = 0;
 };
 
 
 //=============================================================================
-//	COM 風 interface class(IFILEIO 設定)
+//	COM 風 pmd_interface class(IFILEIO 設定)
 //=============================================================================
-interface ISETFILEIO : public IUnknown {
+pmd_interface ISETFILEIO : public pmd_IUnknown {
 public:
-	virtual void WINAPI setfileio(IFILEIO* pfileio) = 0;
+	virtual void setfileio(IFILEIO* pfileio) = 0;
 };
 
 

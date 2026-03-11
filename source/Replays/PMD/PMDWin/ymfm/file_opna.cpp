@@ -371,7 +371,7 @@ FileIO::~FileIO()
 //	ファイル名で示されたファイルのサイズを取得する
 // ---------------------------------------------------------------------------
 
-int64_t WINAPI FileIO::GetFileSize(const TCHAR* filename)
+int64_t FileIO::GetFileSize(const TCHAR* filename)
 {
 #if 0
 	HANDLE	handle;
@@ -406,7 +406,7 @@ int64_t WINAPI FileIO::GetFileSize(const TCHAR* filename)
 //	ファイルを開く
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Open(const TCHAR* filename, uint flg)
+bool FileIO::Open(const TCHAR* filename, uint flg)
 {
 #if 0
 	FilePath	filepath;
@@ -456,7 +456,7 @@ bool WINAPI FileIO::Open(const TCHAR* filename, uint flg)
 //	ファイルがない場合は作成
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::CreateNew(const TCHAR* filename)
+bool FileIO::CreateNew(const TCHAR* filename)
 {
 #if 0
 	FilePath	filepath;
@@ -484,7 +484,7 @@ bool WINAPI FileIO::CreateNew(const TCHAR* filename)
 //	ファイルを作り直す
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Reopen(uint flg)
+bool FileIO::Reopen(uint flg)
 {
 #if 0
 	if (!(flags & flags_open)) return false;
@@ -514,7 +514,7 @@ bool WINAPI FileIO::Reopen(uint flg)
 //	ファイルを閉じる
 // ---------------------------------------------------------------------------
 
-void WINAPI FileIO::Close()
+void FileIO::Close()
 {
 #if 0
 	if (GetFlags() & flags_open)
@@ -532,7 +532,7 @@ void WINAPI FileIO::Close()
 //	ファイルからの読み出し
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Read(void* dest, int32_t size)
+int32_t FileIO::Read(void* dest, int32_t size)
 {
 #if 0
 	if (!(GetFlags() & flags_open))
@@ -551,7 +551,7 @@ int32_t WINAPI FileIO::Read(void* dest, int32_t size)
 //	ファイルへの書き出し
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Write(const void* dest, int32_t size)
+int32_t FileIO::Write(const void* dest, int32_t size)
 {
 #if 0
 	if (!(GetFlags() & flags_open) || (GetFlags() & flags_readonly))
@@ -571,7 +571,7 @@ int32_t WINAPI FileIO::Write(const void* dest, int32_t size)
 //	ファイルをシーク
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Seek(int32_t pos, SeekMethod method)
+bool FileIO::Seek(int32_t pos, SeekMethod method)
 {
 	if (!(GetFlags() & flags_open))
 		return false;
@@ -618,7 +618,7 @@ bool WINAPI FileIO::Seek(int32_t pos, SeekMethod method)
 //	ファイルの位置を得る
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Tellp()
+int32_t FileIO::Tellp()
 {
 #if 0
 	if (!(GetFlags() & flags_open))
@@ -635,7 +635,7 @@ int32_t WINAPI FileIO::Tellp()
 //	現在の位置をファイルの終端とする
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::SetEndOfFile()
+bool FileIO::SetEndOfFile()
 {
 #if 0
 	if (!(GetFlags() & flags_open))
@@ -1035,7 +1035,7 @@ FileIO::~FileIO()
 //	ファイル名で示されたファイルのサイズを取得する
 // ---------------------------------------------------------------------------
 
-int64_t WINAPI FileIO::GetFileSize(const TCHAR* filename)
+int64_t FileIO::GetFileSize(const TCHAR* filename)
 {
 	int fd;
 	struct stat buf;
@@ -1057,7 +1057,7 @@ int64_t WINAPI FileIO::GetFileSize(const TCHAR* filename)
 //	ファイルを開く
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Open(const TCHAR* filename, uint flg)
+bool FileIO::Open(const TCHAR* filename, uint flg)
 {
 	FilePath	filepath;
 	
@@ -1092,7 +1092,7 @@ bool WINAPI FileIO::Open(const TCHAR* filename, uint flg)
 //	ファイルがない場合は作成
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::CreateNew(const TCHAR* filename)
+bool FileIO::CreateNew(const TCHAR* filename)
 {
 	FilePath	filepath;
 	Close();
@@ -1119,7 +1119,7 @@ bool WINAPI FileIO::CreateNew(const TCHAR* filename)
 //	ファイルを作り直す
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Reopen(uint flg)
+bool FileIO::Reopen(uint flg)
 {
 	if (!(flags & flags_open)) return false;
 	if ((flags & flags_readonly) && (flg & flags_create)) return false;
@@ -1151,7 +1151,7 @@ bool WINAPI FileIO::Reopen(uint flg)
 //	ファイルを閉じる
 // ---------------------------------------------------------------------------
 
-void WINAPI FileIO::Close()
+void FileIO::Close()
 {
 	if (GetFlags() & flags_open)
 	{
@@ -1165,7 +1165,7 @@ void WINAPI FileIO::Close()
 //	ファイルからの読み出し
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Read(void* dest, int32_t size)
+int32_t FileIO::Read(void* dest, int32_t size)
 {
 	if (!(GetFlags() & flags_open))
 		return -1;
@@ -1181,7 +1181,7 @@ int32_t WINAPI FileIO::Read(void* dest, int32_t size)
 //	ファイルへの書き出し
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Write(const void* dest, int32_t size)
+int32_t FileIO::Write(const void* dest, int32_t size)
 {
 	if (!(GetFlags() & flags_open) || (GetFlags() & flags_readonly))
 		return -1;
@@ -1197,7 +1197,7 @@ int32_t WINAPI FileIO::Write(const void* dest, int32_t size)
 //	ファイルをシーク
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::Seek(int32_t pos, SeekMethod method)
+bool FileIO::Seek(int32_t pos, SeekMethod method)
 {
 	if (!(GetFlags() & flags_open))
 		return false;
@@ -1225,7 +1225,7 @@ bool WINAPI FileIO::Seek(int32_t pos, SeekMethod method)
 //	ファイルの位置を得る
 // ---------------------------------------------------------------------------
 
-int32_t WINAPI FileIO::Tellp()
+int32_t FileIO::Tellp()
 {
 	if (!(GetFlags() & flags_open))
 		return 0;
@@ -1237,7 +1237,7 @@ int32_t WINAPI FileIO::Tellp()
 //	現在の位置をファイルの終端とする
 // ---------------------------------------------------------------------------
 
-bool WINAPI FileIO::SetEndOfFile()
+bool FileIO::SetEndOfFile()
 {
 	if (!(GetFlags() & flags_open))
 		return false;
@@ -1250,9 +1250,9 @@ bool WINAPI FileIO::SetEndOfFile()
 
 
 //=============================================================================
-//	IUnknown Interface(QueryInterface)
+//	pmd_IUnknown Interface(QueryInterface)
 //=============================================================================
-// HRESULT WINAPI FileIO::QueryInterface(
+// HRESULT FileIO::QueryInterface(
 // 		/* [in] */ REFIID riid,
 // 		/* [iid_is][out] */ void __RPC_FAR* __RPC_FAR* ppvObject)
 // {
@@ -1268,20 +1268,20 @@ bool WINAPI FileIO::SetEndOfFile()
 
 
 //=============================================================================
-//	IUnknown Interface(AddRef)
+//	pmd_IUnknown Interface(AddRef)
 //=============================================================================
-ULONG WINAPI FileIO::AddRef(void)
+int FileIO::AddRef(void)
 {
 	return ++uRefCount;
 }
 
 
 //=============================================================================
-//	IUnknown Interface(Release)
+//	pmd_IUnknown Interface(Release)
 //=============================================================================
-ULONG WINAPI FileIO::Release(void)
+int FileIO::Release(void)
 {
-	ULONG ref = --uRefCount;
+	int ref = --uRefCount;
 	if (ref == 0) {
 		delete this;
 	}

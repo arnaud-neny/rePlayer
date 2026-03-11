@@ -36,7 +36,7 @@ namespace FM {
 	public:
 		OPNAW(IFILEIO* pfileio);
 		virtual ~OPNAW();
-		void	WINAPI setfileio(IFILEIO* pfileio);
+		void	setfileio(IFILEIO* pfileio);
 		
 		bool	Init(uint c, uint r, bool ipflag, const TCHAR* path);
 		bool	SetRate(uint c, uint r, bool ipflag = false);

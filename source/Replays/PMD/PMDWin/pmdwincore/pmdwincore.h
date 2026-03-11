@@ -66,87 +66,87 @@ public:
 	PMDWIN(core::io::Stream* stream);
 	virtual ~PMDWIN();
 	
-	// IUnknown
-// 	HRESULT WINAPI QueryInterface(
+	// pmd_IUnknown
+// 	HRESULT QueryInterface(
 // 			/* [in] */ REFIID riid,
 // 			/* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
-	ULONG WINAPI AddRef(void);
-	ULONG WINAPI Release(void);
+	int AddRef(void);
+	int Release(void);
 	
 	// IPCMMUSICDRIVER
-	bool WINAPI init(TCHAR *path);
-	int WINAPI music_load(TCHAR *filename);
-	int WINAPI music_load2(uint8_t *musdata, int size);
-	TCHAR* WINAPI getmusicfilename(TCHAR *dest);
-	void WINAPI music_start(void);
-	void WINAPI music_stop(void);
-	int WINAPI getloopcount(void);
-	bool WINAPI getlength(TCHAR *filename, int *length, int *loop);
-	int WINAPI getpos(void);
-	void WINAPI setpos(int pos);
-	int WINAPI getpcmdata(int16_t *buf, int nsamples);
+	bool init(TCHAR *path);
+	int music_load(TCHAR *filename);
+	int music_load2(uint8_t *musdata, int size);
+	TCHAR* getmusicfilename(TCHAR *dest);
+	void music_start(void);
+	void music_stop(void);
+	int getloopcount(void);
+	bool getlength(TCHAR *filename, int *length, int *loop);
+	int getpos(void);
+	void setpos(int pos);
+	int getpcmdata(int16_t *buf, int nsamples);
 	
 	// IFMPMD
-	bool WINAPI loadrhythmsample(TCHAR *path);
-	bool WINAPI setpcmdir(TCHAR **path);
-	void WINAPI setpcmrate(int rate);
-	void WINAPI setppzrate(int rate);
-	void WINAPI setfmcalc55k(bool flag);
-	void WINAPI setppzinterpolation(bool ip);
-	void WINAPI setfmwait(int nsec);
-	void WINAPI setssgwait(int nsec);
-	void WINAPI setrhythmwait(int nsec);
-	void WINAPI setadpcmwait(int nsec);
-	void WINAPI fadeout(int speed);
-	void WINAPI fadeout2(int speed);
-	void WINAPI setpos2(int pos);
-	int WINAPI getpos2(void);
-	TCHAR* WINAPI getpcmfilename(TCHAR *dest);
-	TCHAR* WINAPI getppzfilename(TCHAR *dest, int bufnum);
-	bool WINAPI getlength2(TCHAR *filename, int *length, int *loop);
+	bool loadrhythmsample(TCHAR *path);
+	bool setpcmdir(TCHAR **path);
+	void setpcmrate(int rate);
+	void setppzrate(int rate);
+	void setfmcalc55k(bool flag);
+	void setppzinterpolation(bool ip);
+	void setfmwait(int nsec);
+	void setssgwait(int nsec);
+	void setrhythmwait(int nsec);
+	void setadpcmwait(int nsec);
+	void fadeout(int speed);
+	void fadeout2(int speed);
+	void setpos2(int pos);
+	int getpos2(void);
+	TCHAR* getpcmfilename(TCHAR *dest);
+	TCHAR* getppzfilename(TCHAR *dest, int bufnum);
+	bool getlength2(TCHAR *filename, int *length, int *loop);
 	
 	// IPMDWIN
-	void WINAPI setppsuse(bool value);
-	void WINAPI setrhythmwithssgeffect(bool value);
-	void WINAPI setpmd86pcmmode(bool value);
-	bool WINAPI getpmd86pcmmode(void);
-	void WINAPI setppsinterpolation(bool ip);
-	void WINAPI setp86interpolation(bool ip);
-	int WINAPI maskon(int ch);
-	int WINAPI maskoff(int ch);
-	void WINAPI setfmvoldown(int voldown);
-	void WINAPI setssgvoldown(int voldown);
-	void WINAPI setrhythmvoldown(int voldown);
-	void WINAPI setadpcmvoldown(int voldown);
-	void WINAPI setppzvoldown(int voldown);
-	int WINAPI getfmvoldown(void);
-	int WINAPI getfmvoldown2(void);
-	int WINAPI getssgvoldown(void);
-	int WINAPI getssgvoldown2(void);
-	int WINAPI getrhythmvoldown(void);
-	int WINAPI getrhythmvoldown2(void);
-	int WINAPI getadpcmvoldown(void);
-	int WINAPI getadpcmvoldown2(void);
-	int WINAPI getppzvoldown(void);
-	int WINAPI getppzvoldown2(void);
-	char* WINAPI getmemo(char *dest, uint8_t *musdata, int size, int al);
-	char* WINAPI getmemo2(char *dest, uint8_t *musdata, int size, int al);
-	char* WINAPI getmemo3(char *dest, uint8_t *musdata, int size, int al);
-	int	WINAPI fgetmemo(char *dest, TCHAR *filename, int al);
-	int	WINAPI fgetmemo2(char *dest, TCHAR *filename, int al);
-	int	WINAPI fgetmemo3(char *dest, TCHAR *filename, int al);
-	TCHAR* WINAPI getppcfilename(TCHAR *dest);
-	TCHAR* WINAPI getppsfilename(TCHAR *dest);
-	TCHAR* WINAPI getp86filename(TCHAR *dest);
-	int WINAPI ppc_load(TCHAR *filename);
-	int WINAPI pps_load(TCHAR *filename);
-	int WINAPI p86_load(TCHAR *filename);
-	int WINAPI ppz_load(TCHAR *filename, int bufnum);
-	OPEN_WORK* WINAPI getopenwork(void);
-	QQ* WINAPI getpartwork(int ch);
+	void setppsuse(bool value);
+	void setrhythmwithssgeffect(bool value);
+	void setpmd86pcmmode(bool value);
+	bool getpmd86pcmmode(void);
+	void setppsinterpolation(bool ip);
+	void setp86interpolation(bool ip);
+	int maskon(int ch);
+	int maskoff(int ch);
+	void setfmvoldown(int voldown);
+	void setssgvoldown(int voldown);
+	void setrhythmvoldown(int voldown);
+	void setadpcmvoldown(int voldown);
+	void setppzvoldown(int voldown);
+	int getfmvoldown(void);
+	int getfmvoldown2(void);
+	int getssgvoldown(void);
+	int getssgvoldown2(void);
+	int getrhythmvoldown(void);
+	int getrhythmvoldown2(void);
+	int getadpcmvoldown(void);
+	int getadpcmvoldown2(void);
+	int getppzvoldown(void);
+	int getppzvoldown2(void);
+	char* getmemo(char *dest, uint8_t *musdata, int size, int al);
+	char* getmemo2(char *dest, uint8_t *musdata, int size, int al);
+	char* getmemo3(char *dest, uint8_t *musdata, int size, int al);
+	int	fgetmemo(char *dest, TCHAR *filename, int al);
+	int	fgetmemo2(char *dest, TCHAR *filename, int al);
+	int	fgetmemo3(char *dest, TCHAR *filename, int al);
+	TCHAR* getppcfilename(TCHAR *dest);
+	TCHAR* getppsfilename(TCHAR *dest);
+	TCHAR* getp86filename(TCHAR *dest);
+	int ppc_load(TCHAR *filename);
+	int pps_load(TCHAR *filename);
+	int p86_load(TCHAR *filename);
+	int ppz_load(TCHAR *filename, int bufnum);
+	OPEN_WORK* getopenwork(void);
+	QQ* getpartwork(int ch);
 	
 	// IFILESTREAM
-	void WINAPI setfileio(IFILEIO* pfileio);
+	void setfileio(IFILEIO* pfileio);
 	
 private:
 	FM::OPNAW*	opna;
@@ -215,12 +215,12 @@ protected:
 	void effend(void);
 	void effsweep(void);
 	uint8_t *pdrswitch(QQ *qq, uint8_t *si);
-	char* WINAPI _getmemo(char *dest, uint8_t *musdata, int size, int al);
-	char* WINAPI _getmemo2(char *dest, uint8_t *musdata, int size, int al);
-	char* WINAPI _getmemo3(char *dest, uint8_t *musdata, int size, int al);
-	int	WINAPI _fgetmemo(char *dest, TCHAR *filename, int al);
-	int	WINAPI _fgetmemo2(char *dest, TCHAR *filename, int al);
-	int	WINAPI _fgetmemo3(char *dest, TCHAR *filename, int al);
+	char* _getmemo(char *dest, uint8_t *musdata, int size, int al);
+	char* _getmemo2(char *dest, uint8_t *musdata, int size, int al);
+	char* _getmemo3(char *dest, uint8_t *musdata, int size, int al);
+	int	_fgetmemo(char *dest, TCHAR *filename, int al);
+	int	_fgetmemo2(char *dest, TCHAR *filename, int al);
+	int	_fgetmemo3(char *dest, TCHAR *filename, int al);
 	
 	int silence_fmpart(QQ *qq);
 	void keyoff(QQ *qq);

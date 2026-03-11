@@ -312,45 +312,45 @@ typedef struct OpenWorktag {
 //=============================================================================
 //	COM 風 interface class
 //=============================================================================
-interface IPMDWIN : public IFMPMD {
-	virtual void WINAPI setppsuse(bool value) = 0;
-	virtual void WINAPI setrhythmwithssgeffect(bool value) = 0;
-	virtual void WINAPI setpmd86pcmmode(bool value) = 0;
-	virtual bool WINAPI getpmd86pcmmode(void) = 0;
-	virtual void WINAPI setppsinterpolation(bool ip) = 0;
-	virtual void WINAPI setp86interpolation(bool ip) = 0;
-	virtual int WINAPI maskon(int ch) = 0;
-	virtual int WINAPI maskoff(int ch) = 0;
-	virtual void WINAPI setfmvoldown(int voldown) = 0;
-	virtual void WINAPI setssgvoldown(int voldown) = 0;
-	virtual void WINAPI setrhythmvoldown(int voldown) = 0;
-	virtual void WINAPI setadpcmvoldown(int voldown) = 0;
-	virtual void WINAPI setppzvoldown(int voldown) = 0;
-	virtual int WINAPI getfmvoldown(void) = 0;
-	virtual int WINAPI getfmvoldown2(void) = 0;
-	virtual int WINAPI getssgvoldown(void) = 0;
-	virtual int WINAPI getssgvoldown2(void) = 0;
-	virtual int WINAPI getrhythmvoldown(void) = 0;
-	virtual int WINAPI getrhythmvoldown2(void) = 0;
-	virtual int WINAPI getadpcmvoldown(void) = 0;
-	virtual int WINAPI getadpcmvoldown2(void) = 0;
-	virtual int WINAPI getppzvoldown(void) = 0;
-	virtual int WINAPI getppzvoldown2(void) = 0;
-	virtual char* WINAPI getmemo(char *dest, uint8_t *musdata, int size, int al) = 0;
-	virtual char* WINAPI getmemo2(char *dest, uint8_t *musdata, int size, int al) = 0;
-	virtual char* WINAPI getmemo3(char *dest, uint8_t *musdata, int size, int al) = 0;
-	virtual int	WINAPI fgetmemo(char *dest, TCHAR *filename, int al) = 0;
-	virtual int	WINAPI fgetmemo2(char *dest, TCHAR *filename, int al) = 0;
-	virtual int	WINAPI fgetmemo3(char *dest, TCHAR *filename, int al) = 0;
-	virtual TCHAR* WINAPI getppcfilename(TCHAR *dest) = 0;
-	virtual TCHAR* WINAPI getppsfilename(TCHAR *dest) = 0;
-	virtual TCHAR* WINAPI getp86filename(TCHAR *dest) = 0;
-	virtual int WINAPI ppc_load(TCHAR *filename) = 0;
-	virtual int WINAPI pps_load(TCHAR *filename) = 0;
-	virtual int WINAPI p86_load(TCHAR *filename) = 0;
-	virtual int WINAPI ppz_load(TCHAR *filename, int bufnum) = 0;
-	virtual OPEN_WORK* WINAPI getopenwork(void) = 0;
-	virtual QQ* WINAPI getpartwork(int ch) = 0;
+pmd_interface IPMDWIN : public IFMPMD {
+	virtual void setppsuse(bool value) = 0;
+	virtual void setrhythmwithssgeffect(bool value) = 0;
+	virtual void setpmd86pcmmode(bool value) = 0;
+	virtual bool getpmd86pcmmode(void) = 0;
+	virtual void setppsinterpolation(bool ip) = 0;
+	virtual void setp86interpolation(bool ip) = 0;
+	virtual int maskon(int ch) = 0;
+	virtual int maskoff(int ch) = 0;
+	virtual void setfmvoldown(int voldown) = 0;
+	virtual void setssgvoldown(int voldown) = 0;
+	virtual void setrhythmvoldown(int voldown) = 0;
+	virtual void setadpcmvoldown(int voldown) = 0;
+	virtual void setppzvoldown(int voldown) = 0;
+	virtual int getfmvoldown(void) = 0;
+	virtual int getfmvoldown2(void) = 0;
+	virtual int getssgvoldown(void) = 0;
+	virtual int getssgvoldown2(void) = 0;
+	virtual int getrhythmvoldown(void) = 0;
+	virtual int getrhythmvoldown2(void) = 0;
+	virtual int getadpcmvoldown(void) = 0;
+	virtual int getadpcmvoldown2(void) = 0;
+	virtual int getppzvoldown(void) = 0;
+	virtual int getppzvoldown2(void) = 0;
+	virtual char* getmemo(char *dest, uint8_t *musdata, int size, int al) = 0;
+	virtual char* getmemo2(char *dest, uint8_t *musdata, int size, int al) = 0;
+	virtual char* getmemo3(char *dest, uint8_t *musdata, int size, int al) = 0;
+	virtual int fgetmemo(char *dest, TCHAR *filename, int al) = 0;
+	virtual int fgetmemo2(char *dest, TCHAR *filename, int al) = 0;
+	virtual int fgetmemo3(char *dest, TCHAR *filename, int al) = 0;
+	virtual TCHAR* getppcfilename(TCHAR *dest) = 0;
+	virtual TCHAR* getppsfilename(TCHAR *dest) = 0;
+	virtual TCHAR* getp86filename(TCHAR *dest) = 0;
+	virtual int ppc_load(TCHAR *filename) = 0;
+	virtual int pps_load(TCHAR *filename) = 0;
+	virtual int p86_load(TCHAR *filename) = 0;
+	virtual int ppz_load(TCHAR *filename, int bufnum) = 0;
+	virtual OPEN_WORK* getopenwork(void) = 0;
+	virtual QQ* getpartwork(int ch) = 0;
 };
 
 #endif	// IPMDWIN_H

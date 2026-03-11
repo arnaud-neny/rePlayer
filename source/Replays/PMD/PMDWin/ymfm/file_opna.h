@@ -68,28 +68,28 @@ public:
 	FileIO(core::io::Stream* stream);
 	virtual ~FileIO();
 	
-	// IUnknown
-// 	HRESULT WINAPI QueryInterface(
+	// pmd_IUnknown
+// 	HRESULT QueryInterface(
 // 		/* [in] */ REFIID riid,
 // 		/* [iid_is][out] */ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG WINAPI AddRef(void);
-	ULONG WINAPI Release(void);
+	int AddRef(void);
+	int Release(void);
 	
-	int64_t WINAPI GetFileSize(const TCHAR* filename);	
-	bool WINAPI Open(const TCHAR* filename, uint flg);
-	bool WINAPI CreateNew(const TCHAR* filename);
-	bool WINAPI Reopen(uint flg = 0);
-	void WINAPI Close();
-	Error WINAPI GetError() { return error; }
+	int64_t GetFileSize(const TCHAR* filename);	
+	bool Open(const TCHAR* filename, uint flg);
+	bool CreateNew(const TCHAR* filename);
+	bool Reopen(uint flg = 0);
+	void Close();
+	Error GetError() { return error; }
 	
-	int32_t WINAPI Read(void* dest, int32_t len);
-	int32_t WINAPI Write(const void* src, int32_t len);
-	bool WINAPI Seek(int32_t fpos, SeekMethod method);
-	int32_t WINAPI Tellp();
-	bool WINAPI SetEndOfFile();
+	int32_t Read(void* dest, int32_t len);
+	int32_t Write(const void* src, int32_t len);
+	bool Seek(int32_t fpos, SeekMethod method);
+	int32_t Tellp();
+	bool SetEndOfFile();
 	
-	uint WINAPI GetFlags() { return flags; }
-	void WINAPI SetLogicalOrigin(int32_t origin) { lorigin = origin; }
+	uint GetFlags() { return flags; }
+	void SetLogicalOrigin(int32_t origin) { lorigin = origin; }
 	
 private:
 	int uRefCount;		// 参照カウンタ

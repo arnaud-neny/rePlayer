@@ -4,7 +4,6 @@
 #include <Audio/Surround.h>
 #include <Containers/Array.h>
 
-#define PMD_REPLAYER
 #include <pmdwincore.h>
 
 namespace rePlayer

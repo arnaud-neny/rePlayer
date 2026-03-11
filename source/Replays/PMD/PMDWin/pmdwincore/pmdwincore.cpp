@@ -7306,7 +7306,7 @@ void PMDWIN::fout(void)
 //=============================================================================
 //	初期化
 //=============================================================================
-bool WINAPI PMDWIN::init(TCHAR *path)
+bool PMDWIN::init(TCHAR *path)
 {
 	int		i;
 	TCHAR	path2[_MAX_PATH];
@@ -7536,7 +7536,7 @@ void PMDWIN::_init(void)
 //=============================================================================
 //	リズム音の再読み込み
 //=============================================================================
-bool WINAPI PMDWIN::loadrhythmsample(TCHAR *path)
+bool PMDWIN::loadrhythmsample(TCHAR *path)
 {
 	TCHAR	path2[_MAX_PATH];
 	
@@ -7551,7 +7551,7 @@ bool WINAPI PMDWIN::loadrhythmsample(TCHAR *path)
 //=============================================================================
 //	PCM 検索ディレクトリの設定
 //=============================================================================
-bool WINAPI PMDWIN::setpcmdir(TCHAR **path)
+bool PMDWIN::setpcmdir(TCHAR **path)
 {
 	int		i = 0;
 	
@@ -7574,7 +7574,7 @@ bool WINAPI PMDWIN::setpcmdir(TCHAR **path)
 //=============================================================================
 //	合成周波数の設定
 //=============================================================================
-void WINAPI PMDWIN::setpcmrate(int rate)
+void PMDWIN::setpcmrate(int rate)
 {
 	if(rate == SOUND_55K || rate == SOUND_55K_2) {
 		open_work.rate = open_work.ppzrate = SOUND_44K;
@@ -7594,7 +7594,7 @@ void WINAPI PMDWIN::setpcmrate(int rate)
 //=============================================================================
 //	PPZ 合成周波数の設定
 //=============================================================================
-void WINAPI PMDWIN::setppzrate(int rate)
+void PMDWIN::setppzrate(int rate)
 {
 	open_work.ppzrate = rate;
 	ppz8->SetRate(rate, open_work.ppz8ip);
@@ -7604,7 +7604,7 @@ void WINAPI PMDWIN::setppzrate(int rate)
 //=============================================================================
 //	PPS を鳴らすか？
 //=============================================================================
-void WINAPI PMDWIN::setppsuse(bool value)
+void PMDWIN::setppsuse(bool value)
 {
 	pmdwork.ppsdrv_flag = value;
 }
@@ -7613,7 +7613,7 @@ void WINAPI PMDWIN::setppsuse(bool value)
 //=============================================================================
 //	SSG 効果音で OPNA Rhythm も鳴らすか？
 //=============================================================================
-void WINAPI PMDWIN::setrhythmwithssgeffect(bool value)
+void PMDWIN::setrhythmwithssgeffect(bool value)
 {
 	open_work.kp_rhythm_flag = value;
 }
@@ -7622,7 +7622,7 @@ void WINAPI PMDWIN::setrhythmwithssgeffect(bool value)
 //=============================================================================
 //	PMD86 の PCM を PMDB2 互換にするか？
 //=============================================================================
-void WINAPI PMDWIN::setpmd86pcmmode(bool value)
+void PMDWIN::setpmd86pcmmode(bool value)
 {
 	if(value) {
 		open_work.pcm86_vol = open_work._pcm86_vol = 1;
@@ -7635,7 +7635,7 @@ void WINAPI PMDWIN::setpmd86pcmmode(bool value)
 //=============================================================================
 //	PMD86 の PCM が PMDB2 互換かどうかを取得する
 //=============================================================================
-bool WINAPI PMDWIN::getpmd86pcmmode(void)
+bool PMDWIN::getpmd86pcmmode(void)
 {
 	if(open_work.pcm86_vol) return true;
 	return false;
@@ -7645,7 +7645,7 @@ bool WINAPI PMDWIN::getpmd86pcmmode(void)
 //=============================================================================
 //	曲の読み込みその１（ファイルから）
 //=============================================================================
-int WINAPI PMDWIN::music_load(TCHAR *filename)
+int PMDWIN::music_load(TCHAR *filename)
 {
 	int		size, result;
 	TCHAR	current_dir[_MAX_PATH];
@@ -7695,7 +7695,7 @@ int WINAPI PMDWIN::music_load(TCHAR *filename)
 //=============================================================================
 //	曲の読み込みその２（メモリから）
 //=============================================================================
-int WINAPI PMDWIN::music_load2(uint8_t *musdata, int size)
+int PMDWIN::music_load2(uint8_t *musdata, int size)
 {
 	return music_load3(musdata, size, NULL);
 }
@@ -7704,7 +7704,7 @@ int WINAPI PMDWIN::music_load2(uint8_t *musdata, int size)
 //=============================================================================
 //	演奏開始
 //=============================================================================
-void WINAPI PMDWIN::music_start(void)
+void PMDWIN::music_start(void)
 {
 	mstart_f();
 }
@@ -7713,7 +7713,7 @@ void WINAPI PMDWIN::music_start(void)
 //=============================================================================
 //	演奏停止
 //=============================================================================
-void WINAPI PMDWIN::music_stop(void)
+void PMDWIN::music_stop(void)
 {
 	mstop_f();
 }
@@ -7722,7 +7722,7 @@ void WINAPI PMDWIN::music_stop(void)
 //=============================================================================
 //	フェードアウト(PMD互換)
 //=============================================================================
-void WINAPI PMDWIN::fadeout(int speed)
+void PMDWIN::fadeout(int speed)
 {
 	open_work.fadeout_speed = speed;
 }
@@ -7731,7 +7731,7 @@ void WINAPI PMDWIN::fadeout(int speed)
 //=============================================================================
 //	フェードアウト(高音質)
 //=============================================================================
-void WINAPI PMDWIN::fadeout2(int speed)
+void PMDWIN::fadeout2(int speed)
 {
 	if(speed > 0) {
 		if(open_work.fadeout2_speed == 0) {
@@ -7747,7 +7747,7 @@ void WINAPI PMDWIN::fadeout2(int speed)
 //=============================================================================
 //	PCM データ（wave データ）の取得
 //=============================================================================
-int WINAPI PMDWIN::getpcmdata(int16_t *buf, int nsamples)
+int PMDWIN::getpcmdata(int16_t *buf, int nsamples)
 {
 	int	copysamples = 0;				// コピー済みのサンプル数
 	int	i, us, ftemp;
@@ -7857,7 +7857,7 @@ int WINAPI PMDWIN::getpcmdata(int16_t *buf, int nsamples)
 //=============================================================================
 //	FM で 55kHz合成、一次補完するかどうかの設定
 //=============================================================================
-void WINAPI PMDWIN::setfmcalc55k(bool flag)
+void PMDWIN::setfmcalc55k(bool flag)
 {
 	open_work.fmcalc55k = flag;
 	opna->SetRate(OPNAClock, open_work.rate, open_work.fmcalc55k);
@@ -7867,7 +7867,7 @@ void WINAPI PMDWIN::setfmcalc55k(bool flag)
 //=============================================================================
 //	PPS で一次補完するかどうかの設定
 //=============================================================================
-void WINAPI PMDWIN::setppsinterpolation(bool ip)
+void PMDWIN::setppsinterpolation(bool ip)
 {
 	open_work.ppsip = ip;
 	ppsdrv->SetRate(open_work.rate, ip);
@@ -7877,7 +7877,7 @@ void WINAPI PMDWIN::setppsinterpolation(bool ip)
 //=============================================================================
 //	P86 で一次補完するかどうかの設定
 //=============================================================================
-void WINAPI PMDWIN::setp86interpolation(bool ip)
+void PMDWIN::setp86interpolation(bool ip)
 {
 	open_work.p86ip = ip;
 	p86drv->SetRate(open_work.rate, ip);
@@ -7887,7 +7887,7 @@ void WINAPI PMDWIN::setp86interpolation(bool ip)
 //=============================================================================
 //	PPZ8 で一次補完するかどうかの設定
 //=============================================================================
-void WINAPI PMDWIN::setppzinterpolation(bool ip)
+void PMDWIN::setppzinterpolation(bool ip)
 {
 	open_work.ppz8ip = ip;
 	ppz8->SetRate(open_work.ppzrate, ip);
@@ -7897,7 +7897,7 @@ void WINAPI PMDWIN::setppzinterpolation(bool ip)
 //=============================================================================
 //	メモの取得（内部動作）
 //=============================================================================
-char* WINAPI PMDWIN::_getmemo(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::_getmemo(char *dest, uint8_t *musdata, int size, int al)
 {
 	uint8_t	*si, *mmlbuf;
 	int		i, dx;
@@ -7996,7 +7996,7 @@ char* WINAPI PMDWIN::_getmemo(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（内部動作、２バイト半角→半角文字に変換）
 //=============================================================================
-char* WINAPI PMDWIN::_getmemo2(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::_getmemo2(char *dest, uint8_t *musdata, int size, int al)
 {
 	char	*buf;
 	char	*rslt;
@@ -8015,7 +8015,7 @@ char* WINAPI PMDWIN::_getmemo2(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（内部動作、２バイト半角→半角文字に変換＋ESCシーケンスの除去）
 //=============================================================================
-char* WINAPI PMDWIN::_getmemo3(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::_getmemo3(char *dest, uint8_t *musdata, int size, int al)
 {
 	char	*buf;
 	char	*rslt;
@@ -8034,7 +8034,7 @@ char* WINAPI PMDWIN::_getmemo3(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（内部動作、ファイル名から）
 //=============================================================================
-int WINAPI PMDWIN::_fgetmemo(char *dest, TCHAR *filename, int al)
+int PMDWIN::_fgetmemo(char *dest, TCHAR *filename, int al)
 {
 	uint8_t	*mmlbuf;
 	int		size;
@@ -8069,7 +8069,7 @@ int WINAPI PMDWIN::_fgetmemo(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	メモの取得（内部動作、ファイル名から／２バイト半角→半角文字に変換）
 //=============================================================================
-int WINAPI PMDWIN::_fgetmemo2(char *dest, TCHAR *filename, int al)
+int PMDWIN::_fgetmemo2(char *dest, TCHAR *filename, int al)
 {
 	char	*buf;
 	int		rslt;
@@ -8091,7 +8091,7 @@ int WINAPI PMDWIN::_fgetmemo2(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	メモの取得（ファイル名から／半角文字に変換＋ESCシーケンスの除去）
 //=============================================================================
-int WINAPI PMDWIN::_fgetmemo3(char *dest, TCHAR *filename, int al)
+int PMDWIN::_fgetmemo3(char *dest, TCHAR *filename, int al)
 {
 	char	*buf;
 	int		rslt;
@@ -8113,7 +8113,7 @@ int WINAPI PMDWIN::_fgetmemo3(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	メモの取得
 //=============================================================================
-char* WINAPI PMDWIN::getmemo(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::getmemo(char *dest, uint8_t *musdata, int size, int al)
 {
 	char	*buf;
 	
@@ -8141,7 +8141,7 @@ char* WINAPI PMDWIN::getmemo(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（２バイト半角→半角文字に変換）
 //=============================================================================
-char* WINAPI PMDWIN::getmemo2(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::getmemo2(char *dest, uint8_t *musdata, int size, int al)
 {
 	char	*buf;
 	
@@ -8168,7 +8168,7 @@ char* WINAPI PMDWIN::getmemo2(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（２バイト半角→半角文字に変換＋ESCシーケンスの除去）
 //=============================================================================
-char* WINAPI PMDWIN::getmemo3(char *dest, uint8_t *musdata, int size, int al)
+char* PMDWIN::getmemo3(char *dest, uint8_t *musdata, int size, int al)
 {
 	char	*buf;
 	
@@ -8195,7 +8195,7 @@ char* WINAPI PMDWIN::getmemo3(char *dest, uint8_t *musdata, int size, int al)
 //=============================================================================
 //	メモの取得（ファイル名から）
 //=============================================================================
-int	WINAPI PMDWIN::fgetmemo(char *dest, TCHAR *filename, int al)
+int PMDWIN::fgetmemo(char *dest, TCHAR *filename, int al)
 {
 	char	*buf;
 	int		rslt;
@@ -8222,7 +8222,7 @@ int	WINAPI PMDWIN::fgetmemo(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	メモの取得（ファイル名から／２バイト半角→半角文字に変換）
 //=============================================================================
-int	WINAPI PMDWIN::fgetmemo2(char *dest, TCHAR *filename, int al)
+int PMDWIN::fgetmemo2(char *dest, TCHAR *filename, int al)
 {
 	char	*buf;
 	int		rslt;
@@ -8249,7 +8249,7 @@ int	WINAPI PMDWIN::fgetmemo2(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	メモの取得（ファイル名から／半角文字に変換＋ESCシーケンスの除去）
 //=============================================================================
-int	WINAPI PMDWIN::fgetmemo3(char *dest, TCHAR *filename, int al)
+int PMDWIN::fgetmemo3(char *dest, TCHAR *filename, int al)
 {
 	char	*buf;
 	int		rslt;
@@ -8276,7 +8276,7 @@ int	WINAPI PMDWIN::fgetmemo3(char *dest, TCHAR *filename, int al)
 //=============================================================================
 //	曲の filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getmusicfilename(TCHAR *dest)
+TCHAR* PMDWIN::getmusicfilename(TCHAR *dest)
 {
 	filepath.Strcpy(dest, open_work.mus_filename);
 	return dest;
@@ -8286,7 +8286,7 @@ TCHAR* WINAPI PMDWIN::getmusicfilename(TCHAR *dest)
 //=============================================================================
 //	PPC / P86 filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getpcmfilename(TCHAR *dest)
+TCHAR* PMDWIN::getpcmfilename(TCHAR *dest)
 {
 	if(open_work.use_p86) {
 		filepath.Strcpy(dest, p86drv->p86_file);
@@ -8300,7 +8300,7 @@ TCHAR* WINAPI PMDWIN::getpcmfilename(TCHAR *dest)
 //=============================================================================
 //	PPC filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getppcfilename(TCHAR *dest)
+TCHAR* PMDWIN::getppcfilename(TCHAR *dest)
 {
 	filepath.Strcpy(dest, open_work.ppcfilename);
 	return dest;
@@ -8310,7 +8310,7 @@ TCHAR* WINAPI PMDWIN::getppcfilename(TCHAR *dest)
 //=============================================================================
 //	PPS filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getppsfilename(TCHAR *dest)
+TCHAR* PMDWIN::getppsfilename(TCHAR *dest)
 {
 	filepath.Strcpy(dest, ppsdrv->pps_file);
 	return dest;
@@ -8320,7 +8320,7 @@ TCHAR* WINAPI PMDWIN::getppsfilename(TCHAR *dest)
 //=============================================================================
 //	P86 filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getp86filename(TCHAR *dest)
+TCHAR* PMDWIN::getp86filename(TCHAR *dest)
 {
 	filepath.Strcpy(dest, p86drv->p86_file);
 	return dest;
@@ -8330,7 +8330,7 @@ TCHAR* WINAPI PMDWIN::getp86filename(TCHAR *dest)
 //=============================================================================
 //	PPZ filename の取得
 //=============================================================================
-TCHAR* WINAPI PMDWIN::getppzfilename(TCHAR *dest, int bufnum)
+TCHAR* PMDWIN::getppzfilename(TCHAR *dest, int bufnum)
 {
 	filepath.Strcpy(dest, ppz8->PVI_FILE[bufnum]);
 	return dest;
@@ -8340,7 +8340,7 @@ TCHAR* WINAPI PMDWIN::getppzfilename(TCHAR *dest, int bufnum)
 //=============================================================================
 //	.PPC の読み込み（ファイルから）
 //=============================================================================
-int WINAPI PMDWIN::ppc_load(TCHAR *filename)
+int PMDWIN::ppc_load(TCHAR *filename)
 {
 	int		resultppc;
 	
@@ -8357,7 +8357,7 @@ int WINAPI PMDWIN::ppc_load(TCHAR *filename)
 //=============================================================================
 //	.PPS の読み込み（ファイルから）
 //=============================================================================
-int WINAPI PMDWIN::pps_load(TCHAR *filename)
+int PMDWIN::pps_load(TCHAR *filename)
 {
 	int		result;
 	
@@ -8377,7 +8377,7 @@ int WINAPI PMDWIN::pps_load(TCHAR *filename)
 //=============================================================================
 //	.P86 の読み込み（ファイルから）
 //=============================================================================
-int WINAPI PMDWIN::p86_load(TCHAR *filename)
+int PMDWIN::p86_load(TCHAR *filename)
 {
 	int		result;
 	
@@ -8403,7 +8403,7 @@ int WINAPI PMDWIN::p86_load(TCHAR *filename)
 //=============================================================================
 //	.PZI, .PVI の読み込み（ファイルから）
 //=============================================================================
-int WINAPI PMDWIN::ppz_load(TCHAR *filename, int bufnum)
+int PMDWIN::ppz_load(TCHAR *filename, int bufnum)
 {
 	int		result;
 	
@@ -8424,7 +8424,7 @@ int WINAPI PMDWIN::ppz_load(TCHAR *filename, int bufnum)
 //=============================================================================
 //	パートのマスク
 //=============================================================================
-int WINAPI PMDWIN::maskon(int ch)
+int PMDWIN::maskon(int ch)
 {
 	int		ah, fmseltmp;
 	
@@ -8474,7 +8474,7 @@ int WINAPI PMDWIN::maskon(int ch)
 //=============================================================================
 //	パートのマスク解除
 //=============================================================================
-int WINAPI PMDWIN::maskoff(int ch)
+int PMDWIN::maskoff(int ch)
 {
 	int		fmseltmp;
 	
@@ -8513,7 +8513,7 @@ int WINAPI PMDWIN::maskoff(int ch)
 //=============================================================================
 //	FM Volume Down の設定
 //=============================================================================
-void WINAPI PMDWIN::setfmvoldown(int voldown)
+void PMDWIN::setfmvoldown(int voldown)
 {
 	open_work.fm_voldown = open_work._fm_voldown = voldown;
 }
@@ -8522,7 +8522,7 @@ void WINAPI PMDWIN::setfmvoldown(int voldown)
 //=============================================================================
 //	SSG Volume Down の設定
 //=============================================================================
-void WINAPI PMDWIN::setssgvoldown(int voldown)
+void PMDWIN::setssgvoldown(int voldown)
 {
 	open_work.ssg_voldown = open_work._ssg_voldown = voldown;
 }
@@ -8531,7 +8531,7 @@ void WINAPI PMDWIN::setssgvoldown(int voldown)
 //=============================================================================
 //	Rhythm Volume Down の設定
 //=============================================================================
-void WINAPI PMDWIN::setrhythmvoldown(int voldown)
+void PMDWIN::setrhythmvoldown(int voldown)
 {
 	open_work.rhythm_voldown = open_work._rhythm_voldown = voldown;
 	open_work.rhyvol = 48*4*(256-open_work.rhythm_voldown)/1024;
@@ -8542,7 +8542,7 @@ void WINAPI PMDWIN::setrhythmvoldown(int voldown)
 //=============================================================================
 //	ADPCM Volume Down の設定
 //=============================================================================
-void WINAPI PMDWIN::setadpcmvoldown(int voldown)
+void PMDWIN::setadpcmvoldown(int voldown)
 {
 	open_work.pcm_voldown = open_work._pcm_voldown = voldown;
 }
@@ -8551,7 +8551,7 @@ void WINAPI PMDWIN::setadpcmvoldown(int voldown)
 //=============================================================================
 //	PPZ8 Volume Down の設定
 //=============================================================================
-void WINAPI PMDWIN::setppzvoldown(int voldown)
+void PMDWIN::setppzvoldown(int voldown)
 {
 	open_work.ppz_voldown = open_work._ppz_voldown = voldown;
 }
@@ -8560,7 +8560,7 @@ void WINAPI PMDWIN::setppzvoldown(int voldown)
 //=============================================================================
 //	FM Volume Down の取得
 //=============================================================================
-int WINAPI PMDWIN::getfmvoldown(void)
+int PMDWIN::getfmvoldown(void)
 {
 	return open_work.fm_voldown;
 }
@@ -8569,7 +8569,7 @@ int WINAPI PMDWIN::getfmvoldown(void)
 //=============================================================================
 //	FM Volume Down の取得（その２）
 //=============================================================================
-int WINAPI PMDWIN::getfmvoldown2(void)
+int PMDWIN::getfmvoldown2(void)
 {
 	return open_work._fm_voldown;
 }
@@ -8578,7 +8578,7 @@ int WINAPI PMDWIN::getfmvoldown2(void)
 //=============================================================================
 //	SSG Volume Down の取得
 //=============================================================================
-int WINAPI PMDWIN::getssgvoldown(void)
+int PMDWIN::getssgvoldown(void)
 {
 	return open_work.ssg_voldown;
 }
@@ -8587,7 +8587,7 @@ int WINAPI PMDWIN::getssgvoldown(void)
 //=============================================================================
 //	SSG Volume Down の取得（その２）
 //=============================================================================
-int WINAPI PMDWIN::getssgvoldown2(void)
+int PMDWIN::getssgvoldown2(void)
 {
 	return open_work._ssg_voldown;
 }
@@ -8596,7 +8596,7 @@ int WINAPI PMDWIN::getssgvoldown2(void)
 //=============================================================================
 //	Rhythm Volume Down の取得
 //=============================================================================
-int WINAPI PMDWIN::getrhythmvoldown(void)
+int PMDWIN::getrhythmvoldown(void)
 {
 	return open_work.rhythm_voldown;
 }
@@ -8605,7 +8605,7 @@ int WINAPI PMDWIN::getrhythmvoldown(void)
 //=============================================================================
 //	Rhythm Volume Down の取得（その２）
 //=============================================================================
-int WINAPI PMDWIN::getrhythmvoldown2(void)
+int PMDWIN::getrhythmvoldown2(void)
 {
 	return open_work._rhythm_voldown;
 }
@@ -8614,7 +8614,7 @@ int WINAPI PMDWIN::getrhythmvoldown2(void)
 //=============================================================================
 //	ADPCM Volume Down の取得
 //=============================================================================
-int WINAPI PMDWIN::getadpcmvoldown(void)
+int PMDWIN::getadpcmvoldown(void)
 {
 	return open_work.pcm_voldown;
 }
@@ -8623,7 +8623,7 @@ int WINAPI PMDWIN::getadpcmvoldown(void)
 //=============================================================================
 //	ADPCM Volume Down の取得（その２）
 //=============================================================================
-int WINAPI PMDWIN::getadpcmvoldown2(void)
+int PMDWIN::getadpcmvoldown2(void)
 {
 	return open_work._pcm_voldown;
 }
@@ -8632,7 +8632,7 @@ int WINAPI PMDWIN::getadpcmvoldown2(void)
 //=============================================================================
 //	PPZ8 Volume Down の取得
 //=============================================================================
-int WINAPI PMDWIN::getppzvoldown(void)
+int PMDWIN::getppzvoldown(void)
 {
 	return open_work.ppz_voldown;
 }
@@ -8641,7 +8641,7 @@ int WINAPI PMDWIN::getppzvoldown(void)
 //=============================================================================
 //	PPZ8 Volume Down の取得（その２）
 //=============================================================================
-int WINAPI PMDWIN::getppzvoldown2(void)
+int PMDWIN::getppzvoldown2(void)
 {
 	return open_work._ppz_voldown;
 }
@@ -8650,7 +8650,7 @@ int WINAPI PMDWIN::getppzvoldown2(void)
 //=============================================================================
 //	再生位置の移動(pos : ms)
 //=============================================================================
-void WINAPI PMDWIN::setpos(int pos)
+void PMDWIN::setpos(int pos)
 {
 	int64_t	_pos;
 	int		us;
@@ -8690,7 +8690,7 @@ void WINAPI PMDWIN::setpos(int pos)
 //=============================================================================
 //	再生位置の移動(pos : count 単位)
 //=============================================================================
-void WINAPI PMDWIN::setpos2(int pos)
+void PMDWIN::setpos2(int pos)
 {
 	int		us;
 	
@@ -8725,7 +8725,7 @@ void WINAPI PMDWIN::setpos2(int pos)
 //=============================================================================
 //	再生位置の取得(pos : ms)
 //=============================================================================
-int WINAPI PMDWIN::getpos(void)
+int PMDWIN::getpos(void)
 {
 	return (int)(upos / 1000);
 }
@@ -8734,7 +8734,7 @@ int WINAPI PMDWIN::getpos(void)
 //=============================================================================
 //	再生位置の取得(pos : count 単位)
 //=============================================================================
-int WINAPI PMDWIN::getpos2(void)
+int PMDWIN::getpos2(void)
 {
 	return open_work.syousetu_lng * open_work.syousetu + open_work.opncount;
 }
@@ -8743,7 +8743,7 @@ int WINAPI PMDWIN::getpos2(void)
 //=============================================================================
 //	曲の長さの取得(pos : ms)
 //=============================================================================
-bool WINAPI PMDWIN::getlength(TCHAR *filename, int *length, int *loop)
+bool PMDWIN::getlength(TCHAR *filename, int *length, int *loop)
 {
 	int		us;
 	int		result;
@@ -8818,7 +8818,7 @@ bool WINAPI PMDWIN::getlength(TCHAR *filename, int *length, int *loop)
 //=============================================================================
 //	曲の長さの取得(pos : count 単位)
 //=============================================================================
-bool WINAPI PMDWIN::getlength2(TCHAR *filename, int *length, int *loop)
+bool PMDWIN::getlength2(TCHAR *filename, int *length, int *loop)
 {
 	int		us;
 	int		result;
@@ -8893,7 +8893,7 @@ bool WINAPI PMDWIN::getlength2(TCHAR *filename, int *length, int *loop)
 //=============================================================================
 //	ループ回数の取得
 //=============================================================================
-int WINAPI PMDWIN::getloopcount(void)
+int PMDWIN::getloopcount(void)
 {
 	return open_work.status2;
 }
@@ -8902,7 +8902,7 @@ int WINAPI PMDWIN::getloopcount(void)
 //=============================================================================
 //	FM の Register 出力後の wait 設定
 //=============================================================================
-void WINAPI PMDWIN::setfmwait(int nsec)
+void PMDWIN::setfmwait(int nsec)
 {
 	opna->SetFMWait(nsec);
 }
@@ -8911,7 +8911,7 @@ void WINAPI PMDWIN::setfmwait(int nsec)
 //=============================================================================
 //	SSG の Register 出力後の wait 設定
 //=============================================================================
-void WINAPI PMDWIN::setssgwait(int nsec)
+void PMDWIN::setssgwait(int nsec)
 {
 	opna->SetSSGWait(nsec);
 }
@@ -8920,7 +8920,7 @@ void WINAPI PMDWIN::setssgwait(int nsec)
 //=============================================================================
 //	rhythm の Register 出力後の wait 設定
 //=============================================================================
-void WINAPI PMDWIN::setrhythmwait(int nsec)
+void PMDWIN::setrhythmwait(int nsec)
 {
 	opna->SetRhythmWait(nsec);
 }
@@ -8929,7 +8929,7 @@ void WINAPI PMDWIN::setrhythmwait(int nsec)
 //=============================================================================
 //	ADPCM の Register 出力後の wait 設定
 //=============================================================================
-void WINAPI PMDWIN::setadpcmwait(int nsec)
+void PMDWIN::setadpcmwait(int nsec)
 {
 	opna->SetADPCMWait(nsec);
 }
@@ -8938,7 +8938,7 @@ void WINAPI PMDWIN::setadpcmwait(int nsec)
 //=============================================================================
 //	OPEN_WORKのポインタの取得
 //=============================================================================
-OPEN_WORK* WINAPI PMDWIN::getopenwork(void)
+OPEN_WORK* PMDWIN::getopenwork(void)
 {
 	return &open_work;
 }
@@ -8947,7 +8947,7 @@ OPEN_WORK* WINAPI PMDWIN::getopenwork(void)
 //=============================================================================
 //	パートワークのポインタの取得
 //=============================================================================
-QQ* WINAPI PMDWIN::getpartwork(int ch)
+QQ* PMDWIN::getpartwork(int ch)
 {
 	if(ch >= sizeof(open_work.MusPart) / sizeof(QQ *)) {
 		return NULL;
@@ -8957,9 +8957,9 @@ QQ* WINAPI PMDWIN::getpartwork(int ch)
 
 
 //=============================================================================
-//	IUnknown Interface(QueryInterface)
+//	pmd_IUnknown Interface(QueryInterface)
 //=============================================================================
-// HRESULT WINAPI PMDWIN::QueryInterface(
+// HRESULT  PMDWIN::QueryInterface(
 // 			/* [in] */ REFIID riid,
 // 			/* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
 // {
@@ -8981,20 +8981,20 @@ QQ* WINAPI PMDWIN::getpartwork(int ch)
 
 
 //=============================================================================
-//	IUnknown Interface(AddRef)
+//	pmd_IUnknown Interface(AddRef)
 //=============================================================================
-ULONG WINAPI PMDWIN::AddRef(void)
+int PMDWIN::AddRef(void)
 {
 	return ++uRefCount;
 }
 
 
 //=============================================================================
-//	IUnknown Interface(Release)
+//	pmd_IUnknown Interface(Release)
 //=============================================================================
-ULONG WINAPI PMDWIN::Release(void)
+int PMDWIN::Release(void)
 {
-	ULONG ref = --uRefCount;
+	int ref = --uRefCount;
 	if(ref == 0) {
 		delete this;
 	}
@@ -9005,7 +9005,7 @@ ULONG WINAPI PMDWIN::Release(void)
 //=============================================================================
 //	File Stream 設定
 //=============================================================================
-void WINAPI PMDWIN::setfileio(IFILEIO* pfileio)
+void PMDWIN::setfileio(IFILEIO* pfileio)
 {
 	if (pfileio == NULL) {
 		pfileio = fileio;
