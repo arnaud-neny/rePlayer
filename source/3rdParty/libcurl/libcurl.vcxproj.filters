@@ -109,9 +109,6 @@
     <ClInclude Include="lib\config-os400.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\config-plan9.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\config-riscos.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -182,9 +179,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\curl_setup.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\curl_setup_once.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\curl_sha256.h">
@@ -391,9 +385,6 @@
     <ClInclude Include="lib\strcase.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\strdup.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\strerror.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -428,9 +419,6 @@
       <Filter>Source Files\lib\vauth</Filter>
     </ClInclude>
     <ClInclude Include="lib\vquic\curl_ngtcp2.h">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vquic\curl_osslq.h">
       <Filter>Source Files\lib\vquic</Filter>
     </ClInclude>
     <ClInclude Include="lib\vquic\curl_quiche.h">
@@ -553,9 +541,6 @@
     <ClInclude Include="lib\uint-table.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curlx\binmode.h">
-      <Filter>Source Files\lib\curlx</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curlx\inet_ntop.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
@@ -594,6 +579,12 @@
     </ClInclude>
     <ClInclude Include="lib\ratelimit.h">
       <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\basename.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\strdup.h">
+      <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -894,9 +885,6 @@
     <ClCompile Include="lib\strcase.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\strdup.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\strerror.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -964,9 +952,6 @@
       <Filter>Source Files\lib\vauth</Filter>
     </ClCompile>
     <ClCompile Include="lib\vquic\curl_ngtcp2.c">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vquic\curl_osslq.c">
       <Filter>Source Files\lib\vquic</Filter>
     </ClCompile>
     <ClCompile Include="lib\vquic\curl_quiche.c">
@@ -1127,6 +1112,15 @@
     </ClCompile>
     <ClCompile Include="lib\ratelimit.c">
       <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\basename.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\snprintf.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curlx\strdup.c">
+      <Filter>Source Files\lib\curlx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
