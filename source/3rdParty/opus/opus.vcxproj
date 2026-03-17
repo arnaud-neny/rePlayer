@@ -32,7 +32,12 @@
     <ClCompile Include="celt\laplace.c" />
     <ClCompile Include="celt\mathops.c" />
     <ClCompile Include="celt\mdct.c" />
-    <ClCompile Include="celt\mini_kfft.c" />
+    <ClCompile Include="celt\mini_kfft.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="celt\modes.c" />
     <ClCompile Include="celt\opus_custom_demo.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
