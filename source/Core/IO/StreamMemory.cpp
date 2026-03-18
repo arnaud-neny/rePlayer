@@ -70,9 +70,14 @@ namespace core::io
 
     SmartPtr<Stream> StreamMemory::OnOpen(const std::string& filename)
     {
+        if (filename == m_name)
+            return OnClone();
         std::filesystem::path path(m_name);
         path.replace_filename(filename);
-        return StreamFile::Create(path.string(), GetRoot());
+        auto stream = StreamFile::Create(path.string(), GetRoot());
+        if (stream.IsInvalid())
+            stream = StreamFile::Create(filename, GetRoot());
+        return stream;
     }
 
     SmartPtr<Stream> StreamMemory::OnClone()
