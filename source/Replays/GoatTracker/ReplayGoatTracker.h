@@ -105,8 +105,6 @@ namespace rePlayer
         bool m_hasFailed = false;
         mutable bool m_hasNoticedFailure = false;
 
-        Array<struct Sequence> m_sequence;
-
     public:
         static Globals ms_globals;
 

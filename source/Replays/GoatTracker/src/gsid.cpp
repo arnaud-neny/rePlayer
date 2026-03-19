@@ -140,7 +140,7 @@ void sid_init(int speed, unsigned m, unsigned ntsc, unsigned interpolate, unsign
   if (sidfp) sidfp->reset();
   for (c = 0; c < NUMSIDREGS; c++)
   {
-    sidreg[c] = 0x00;
+    sidreg[c] = sidreg2[c] = 0x00; // rePlayer
   }
   if (m == 1)
   {

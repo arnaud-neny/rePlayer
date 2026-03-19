@@ -394,18 +394,14 @@ namespace rePlayer
         {
             if (!m_remainingSamples)
             {
-                auto getPatBreak = []()
+                uint8_t allLoop = 0;
+                for (int i = 0; i < numchannels; ++i)
                 {
-                    for (uint32_t i = 0; i < MAX_CHN; ++i)
-                    {
-                        if (chn[i].repeat != 0)
-                            return false;
-                        if (chn[i].pattptr == 0x7fFFffFF)
-                            return true;
-                    }
-                    return false;
-                };
-                bool hasPatBreak = getPatBreak();
+                    if (chn[i].tick != 1)
+                        break;
+                    if (chn[i].pattptr == 0x7fFFffFF && chn[i].advance && songorder[m_subsongIndex][i][chn[i].songptr] == LOOPSONG)
+                        allLoop |= 1 << i;
+                }
 
                 playroutine();
 
@@ -414,39 +410,11 @@ namespace rePlayer
                 else
                     m_remainingSamples = ((kSampleRate * 5) >> 1) * 2 / m_tempo;
 
-                if ((hasPatBreak && !getPatBreak()) || songinit == PLAY_STOP)
+                if (songinit != PLAY_PLAYING || allLoop == (1u << numchannels) - 1)
                 {
                     m_hasFailed = songinit == PLAY_STOP;
-                    uint32_t songsPtr = 0;
-                    for (uint32_t i = 0; i < MAX_CHN; ++i)
-                        songsPtr |= uint32_t(chn[i].songptr) << (i * 8);
-                    if (songinit == PLAY_STOP || m_sequence.FindIf([songsPtr](auto& entry)
-                    {
-                        if (entry.songsPtr == songsPtr)
-                        {
-                            for (uint32_t i = 0; i < MAX_CHN; ++i)
-                            {
-                                if (entry.pattPtr[i] != chn[i].pattptr)
-                                    return false;
-                            }
-                            return true;
-                        }
-                        return false;
-                    }))
-                    {
-                        m_sequence.Clear();
-                        auto* sequence = m_sequence.Push();
-                        sequence->songsPtr = songsPtr;
-                        for (uint32_t i = 0; i < MAX_CHN; ++i)
-                            sequence->pattPtr[i] = chn[i].pattptr;
-                        m_hasLooped = numSamples != mixSamples;
-                        return numSamples - mixSamples;
-                    }
-
-                    auto* sequence = m_sequence.Push();
-                    sequence->songsPtr = songsPtr;
-                    for (uint32_t i = 0; i < MAX_CHN; ++i)
-                        sequence->pattPtr[i] = chn[i].pattptr;
+                    m_hasLooped = numSamples != mixSamples;
+                    return numSamples - mixSamples;
                 }
             }
 
@@ -488,7 +456,15 @@ namespace rePlayer
         playroutine();
         m_remainingSamples = 0;
         m_hasLooped = false;
-        m_sequence.Clear();
+
+        // Silence the startup glitch
+        playroutine();
+        int16_t buf[1024 * 2];
+        sid_fillbuffer(buf, 1024);
+        sid_fillbuffer(buf, 1024);
+        sid_fillbuffer(buf, 1024);
+        initsong(subsongIndex, PLAY_BEGINNING);
+        playroutine();
 
         m_surround.Reset();
     }
