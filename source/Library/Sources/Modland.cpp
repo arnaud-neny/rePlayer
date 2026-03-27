@@ -127,6 +127,20 @@ namespace rePlayer
             [](const char* name) { return strstr(name, "mco.") == nullptr; }
         },
         { // uade
+            "Maximum Effect",
+            ModlandReplay::kMaximumEffect,
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/MAX."); ext[1] = 'S'; ext[2] = 'M'; ext[3] = 'P'; name[0] = 'S'; name[1] = 'M'; name[2] = 'P'; },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 4); return MediaType(eExtension::_max, eReplay::UADE); },
+            [](const char* name) { return strstr(name, "SMP.") != nullptr; }
+        },
+        { // uade
+            "MIDI-Loriciel",
+            ModlandReplay::kMIDILoriciel,
+            [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto ext = strstr(url.data(), "/MIDI."); ext[1] = 'S'; ext[2] = 'M'; ext[3] = 'P'; ext[4] = 'L'; name[0] = 'S'; name[1] = 'M'; name[2] = 'P'; name[3] = 'L'; },
+            [](std::string& name) { name.erase(name.begin(), name.begin() + 5); return MediaType(eExtension::_midi, eReplay::UADE); },
+            [](const char* name) { return strstr(name, "SMPL.") != nullptr; }
+        },
+        { // uade
             "Pierre Adane Packer",
             ModlandReplay::kPierreAdanePacker,
             [](CURL*, const ModlandReplayOverride* const, const SourceModland&, std::string& url, std::string& name) { auto pos = url.find_last_of('/'); url.resize(pos + 1); url += "smp.set"; name = "smp.set"; },
@@ -1686,18 +1700,19 @@ namespace rePlayer
             const char* const path;
             size_t size;
         } static ignoreList[] = {
-            BuildPathList("Ad Lib/EdLib D01/"),                     // adlib multi-files - unplayable
-            BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),  // simply ignore this
-            BuildPathList("HVSC"),                                  // just a mirror, conflict with actual modland structure
-            BuildPathList("MusicMaker V8 Old/"),                    // uade issue?
-            BuildPathList("Pollytracker/"),                         // c64 player, available as sid
+            BuildPathList("Ad Lib/EdLib D01/"),                         // adlib multi-files - unplayable
+            BuildPathList("Hippel ST COSO/Jochen Hippel/smp.set"),      // simply ignore this
+            BuildPathList("HVSC"),                                      // just a mirror, conflict with actual modland structure
+            BuildPathList("MusicMaker V8 Old/"),                        // uade issue?
+            BuildPathList("Noise Tracker GS 1/Noise Tracker GS 1.txt"),
+            BuildPathList("Pollytracker/"),                             // c64 player, available as sid
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
-            BuildPathList("Stonetracker/"),                         // need to add to uade (multi-files & missing library support in uade)
-            BuildPathList("TSS/"),                                  // T'Sound System?
+            BuildPathList("Stonetracker/"),                             // need to add to uade (multi-files & missing library support in uade)
+            BuildPathList("TSS/"),                                      // T'Sound System?
             BuildPathList("Tunefish/"),
-            BuildPathList("Zoundmonitor/Samples/"),                 // simply ignore this
-            BuildPathList("Zoundmonitor/readme.txt")                // simply ignore this
+            BuildPathList("Zoundmonitor/Samples/"),                     // simply ignore this
+            BuildPathList("Zoundmonitor/readme.txt")                    // simply ignore this
         };
 
         auto buf = bufBegin;
@@ -1835,17 +1850,20 @@ namespace rePlayer
                             else
                                 ++line;
                         }
-                        if (ext == nullptr)
+                        if (m_db.replays[replayIndex].ext(m_db.strings)[0])
                         {
-                            Log::Warning("Modland: missing extension \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
+                            if (ext == nullptr)
+                            {
+                                Log::Warning("Modland: missing extension \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
+                            }
+                            else if (!m_db.replays[replayIndex].ext.IsSame<false>(m_db.strings, ext))
+                            {
+                                Log::Warning("Modland: extension mismatch \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
+                                ext = nullptr;
+                            }
+                            else
+                                ext[-1] = 0;
                         }
-                        else if (!m_db.replays[replayIndex].ext.IsSame<false>(m_db.strings, ext))
-                        {
-                            Log::Warning("Modland: extension mismatch \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
-                            ext = nullptr;
-                        }
-                        else
-                            ext[-1] = 0;
                     }
 
                     auto songIndex = m_db.songs.NumItems();
@@ -1902,7 +1920,16 @@ namespace rePlayer
             auto& replay = m_db.replays[i];
 
             if (theReplay == replay.name(m_db.strings))
+            {
+                if (replay.type == ModlandReplay::kSGC)
+                {
+                    // skip m3u files
+                    offset = theReplay.find_last_of('.');
+                    if (offset != theReplay.npos && _stricmp(theReplay.c_str() + offset + 1, "m3u") == 0)
+                        return 0;
+                }
                 return uint16_t(i);
+            }
         }
 
         m_db.replays.Push();
@@ -1958,6 +1985,11 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kEuphony;
         else if (theReplay == "FM sound driver (FMP)")
             m_db.replays.Last().type = ModlandReplay::kFMP;
+        else if (theReplay == "SGC")
+        {
+            m_db.replays.Last().type = ModlandReplay::kSGC;
+            m_db.replays.Last().ext.Set(m_db.strings, "sgc");
+        }
         m_db.replays.Last().name.Set(m_db.strings, theReplay);
         if (m_db.replays.Last().type <= ModlandReplay::kDefault)
         {

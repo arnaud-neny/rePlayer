@@ -69,6 +69,8 @@ namespace rePlayer
                 kKrisHatlelid,
                 kMagneticFieldsPacker,
                 kMarkCookseyOld,
+                kMaximumEffect,
+                kMIDILoriciel,
                 kPierreAdanePacker,
                 kPokeyNoise,
                 kQuartetST,
@@ -103,7 +105,8 @@ namespace rePlayer
                 kIFFSmus,
                 kEuphony,
                 kSoundSmith,
-                kFMP
+                kFMP,
+                kSGC                
             };
 
             Chars name;
