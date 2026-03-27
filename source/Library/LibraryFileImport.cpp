@@ -496,8 +496,9 @@ namespace rePlayer
 
                             struct ArchiveBuffer : public Array<uint8_t>
                             {
-                                static int ArchiveOpen(struct archive*, void*)
+                                static int ArchiveOpen(struct archive* a, void*)
                                 {
+                                    archive_write_set_bytes_in_last_block(a, 1);
                                     return ARCHIVE_OK;
                                 }
 
