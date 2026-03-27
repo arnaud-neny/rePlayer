@@ -34,14 +34,33 @@ namespace rePlayer
         WAVEHDR header = {};
     };
 
-    SongEndEditor* SongEndEditor::Create(ReplayMetadataContext& context, MusicID musicId)
+    SmartPtr<SongEndEditor> SongEndEditor::Create(ReplayMetadataContext& context, MusicID musicId)
     {
         musicId.subsongId.index = context.subsongIndex;
         auto currentSong = musicId.GetSong();
         if (auto replay = Core::GetReplays().Load(musicId.GetStream(), currentSong->Edit()->metadata.Container(), currentSong->Edit()->type))
-            return new SongEndEditor(musicId, replay, context.loop);
+            return SmartPtr<SongEndEditor>(kAllocate, musicId, replay, context.loop);
         context.isSongEndEditorEnabled = false;
         return nullptr;
+    }
+
+    void SongEndEditor::Close()
+    {
+        while (m_busySpinner.IsValid())
+            thread::Sleep(1);
+
+        std::atomic_ref(m_isRunning).store(false);
+        m_semaphore.Signal();
+
+        if (m_wave->outHandle)
+        {
+            waveOutPause(m_wave->outHandle);
+            waveOutReset(m_wave->outHandle);
+            waveOutClose(m_wave->outHandle);
+        }
+
+        while (!std::atomic_ref(m_isJobDone).load())
+            thread::Sleep(0);
     }
 
     SongEndEditor::SongEndEditor(MusicID musicId, Replay* replay, LoopInfo loop)
@@ -65,6 +84,7 @@ namespace rePlayer
         memset(m_samples.Items(), 0, m_samples.Size<size_t>());
         m_loopDetection.loopMax = GetMaxLoopDuration();
 
+        AddRef();
         Core::AddJob([this]()
         {
             while (std::atomic_ref(m_isRunning).load())
@@ -73,6 +93,7 @@ namespace rePlayer
                 m_semaphore.Wait();
             }
             std::atomic_ref(m_isJobDone).store(true);
+            Release();
         });
 
         OpenAudio();
@@ -82,22 +103,6 @@ namespace rePlayer
 
     SongEndEditor::~SongEndEditor()
     {
-        while (m_busySpinner.IsValid())
-            thread::Sleep(1);
-
-        std::atomic_ref(m_isRunning).store(false);
-        m_semaphore.Signal();
-
-        if (m_wave->outHandle)
-        {
-            waveOutPause(m_wave->outHandle);
-            waveOutReset(m_wave->outHandle);
-            waveOutClose(m_wave->outHandle);
-        }
-
-        while (!std::atomic_ref(m_isJobDone).load())
-            thread::Sleep(0);
-
         delete m_replay;
         delete m_wave;
     }
@@ -224,9 +229,11 @@ namespace rePlayer
             auto numSamples = replay->Render(waveform, Min(32768ul, remainingSamples));
             if (numSamples == 0)
             {
+                AddRef();
                 Core::FromJob([this, current_duration = uint32_t((m_currentSample * 1000ull) / sampleRate)]()
                 {
                     m_loops.Add(current_duration);
+                    Release();
                 });
             }
             for (uint32_t i = 0; i < numSamples; ++i)

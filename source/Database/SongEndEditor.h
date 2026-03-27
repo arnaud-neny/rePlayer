@@ -2,6 +2,8 @@
 
 #include <Audio/AudioTypes.h>
 #include <Containers/Array.h>
+#include <Containers/SmartPtr.h>
+#include <Core/RefCounted.h>
 #include <Thread/Semaphore.h>
 #include <Database/Types/MusicID.h>
 
@@ -12,13 +14,13 @@ namespace rePlayer
     class Replay;
     struct ReplayMetadataContext;
 
-    class SongEndEditor
+    class SongEndEditor : public RefCounted
     {
     public:
-        static SongEndEditor* Create(ReplayMetadataContext& context, MusicID musicId);
+        static SmartPtr<SongEndEditor> Create(ReplayMetadataContext& context, MusicID musicId);
         SongEndEditor(MusicID musicId, Replay* replay, LoopInfo loop);
-        ~SongEndEditor();
 
+        void Close();
         bool Update(ReplayMetadataContext& context);
 
     private:
@@ -33,6 +35,8 @@ namespace rePlayer
         struct Wave;
 
     private:
+        ~SongEndEditor() override;
+
         void Render();
         uint32_t ReadCurrentSample() const;
         void OpenAudio();

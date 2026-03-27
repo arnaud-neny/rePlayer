@@ -46,7 +46,7 @@ namespace rePlayer
         uint16_t m_selectedSubsong = 0;
         Replayables m_playables;
 
-        SongEndEditor* m_songEndEditor = nullptr;
+        SmartPtr<SongEndEditor> m_songEndEditor;
 
         ArtistID m_selectedArtistID = ArtistID::Invalid;
         ImGuiTextFilter* m_artistFilter = nullptr;
