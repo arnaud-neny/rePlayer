@@ -289,12 +289,21 @@ namespace rePlayer
         }
 
         // special cases
-        if (strstr(name, "smp.set") && strstr(state->song.info.playername, "(soc)"))
+        std::string lcName = ToLower(name);
+        if (strstr(lcName.c_str(), "smp.set"))
         {
-            if (auto f = loadFile("extra/hippel_st.smp.set", name))
-                return f;
+            if (strstr(state->song.info.playername, "(soc)"))
+            {
+                if (auto f = loadFile("extras/hippel_st.smp.set", name))
+                    return f;
+            }
+            else if (state->song.info.detectioninfo.ep && strstr(state->song.info.detectioninfo.ep->playername, "Maximum_Effect"))
+            {
+                if (auto f = loadFile("extras/max.smp.set", name))
+                    return f;
+            }
         }
-        else if (strstr(name, "smpl.mdst.") == name)
+        else if (strstr(lcName.c_str(), "smpl.mdst.") == lcName.c_str())
         {
             filename = "smpl";
             filename += name + 9;
