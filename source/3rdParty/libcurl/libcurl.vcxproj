@@ -461,7 +461,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_THREADS_WIN32=0;DEBUGBUILD;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_SYNC_DNS;DEBUGBUILD;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -481,7 +481,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_THREADS_WIN32=0;DEBUGBUILD;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_SYNC_DNS;DEBUGBUILD;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -503,7 +503,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_THREADS_WIN32=0;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_SYNC_DNS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -527,7 +527,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_THREADS_WIN32=0;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;BUILDING_LIBCURL;CURL_DISABLE_FILE;CURL_DISABLE_GOPHER;CURL_DISABLE_IMAP;CURL_DISABLE_LDAP;CURL_DISABLE_MQTT;CURL_DISABLE_POP3;CURL_DISABLE_SMTP;CURL_DISABLE_TELNET;USE_SCHANNEL;USE_WINDOWS_SSPI;USE_IPV6;USE_SYNC_DNS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
