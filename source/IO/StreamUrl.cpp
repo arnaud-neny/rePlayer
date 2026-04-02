@@ -149,6 +149,7 @@ namespace rePlayer
                     m_chunkSize = 0;
                     m_isReadingChunk = true;
                     m_isJobDone = false;
+                    m_infos.Clear();
                     Core::AddJob([this]()
                     {
                         Update();
@@ -242,9 +243,34 @@ namespace rePlayer
         if (m_type == Type::kStreaming)
         {
             thread::ScopedSpinLock lock(m_spinLock);
-            title = m_title;
+            for (int64_t i = m_infos.NumItems<int64_t>() - 1; i >= 0; --i)
+            {
+                if (m_infos[i].pos < m_tail)
+                {
+                    title = m_infos[i].title;
+                    break;
+                }
+            }
         }
         return title;
+    }
+
+    std::string StreamUrl::GetArtist() const
+    {
+        std::string artist;
+        if (m_type == Type::kStreaming)
+        {
+            thread::ScopedSpinLock lock(m_spinLock);
+            for (int64_t i = m_infos.NumItems<int64_t>() - 1; i >= 0; --i)
+            {
+                if (m_infos[i].pos < m_tail)
+                {
+                    artist = m_infos[i].artist;
+                    break;
+                }
+            }
+        }
+        return artist;
     }
 
     const Span<const uint8_t> StreamUrl::Read()
@@ -457,6 +483,7 @@ namespace rePlayer
             m_metadataSize = 0;
             m_chunkSize = 0;
             m_isReadingChunk = true;
+            m_infos.Clear();
         }
 
         if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
@@ -648,6 +675,7 @@ namespace rePlayer
     void StreamUrl::ExtractMetadata()
     {
         std::string title;
+        std::string artist;
         auto first = m_metadata.find("StreamTitle='");
         if (first != m_metadata.npos)
         {
@@ -661,10 +689,84 @@ namespace rePlayer
                 if (last != m_metadata.npos)
                     title.append(m_metadata.c_str() + first, m_metadata.c_str() + last);
             }
+
+            // Some title are badly encoded (double UTF-8), so revert it
+            // Decode one layer of UTF-8 encoding
+            auto decode = [](std::string& input)
+            {
+                auto* str = (unsigned char*)input.data();
+                auto oldSize = input.size() + 1; // including nul char
+                auto newSize = 0;
+                for (size_t i = 0; i < oldSize; i++, newSize++)
+                {
+                    unsigned char c = str[i];
+
+                    if (c < 0x80)
+                    {
+                        // ASCII
+                        str[newSize] = c;
+        }
+                    else if ((c >> 5) == 0x6 && str[i + 1])
+                    {
+                        // 2-byte UTF-8
+                        unsigned char c1 = str[i];
+                        unsigned char c2 = str[++i];
+
+                        unsigned char decoded =
+                            ((c1 & 0x1F) << 6) |
+                            (c2 & 0x3F);
+
+                        str[newSize] = decoded;
+                    }
+//                     else if ((c >> 4) == 0xE)
+//                     {
+//                         // 3-byte UTF-8 - not reversible to single byte safely
+//                         // copy as-is
+//                         str[newSize] = c;
+//                     }
+                    else
+                    {
+                        str[newSize] = c;
+                    }
+                }
+                input.resize(newSize - 1);
+                return oldSize != newSize;
+            };
+            while (decode(title));
+
+            // most radios do "artist - title"
+            auto pos = title.find(" - ");
+            if (pos != title.npos)
+            {
+                artist = title.substr(0, pos);
+                title = title.substr(pos + 3);
+            }
+            else
+            {
+                // some do "title by artist"
+                pos = title.rfind(" by ");
+                if (pos != title.npos)
+                {
+                    artist = title.substr(pos + 4);
+                    title = title.substr(0, pos);
+                }
+            }
         }
 
         thread::ScopedSpinLock lock(m_spinLock);
-        m_title = title;
+        auto minPos = m_head - kCacheSize;
+        for (int64_t i = m_infos.NumItems<int64_t>() - 1; i > 0; --i)
+        {
+            if (m_infos[i].pos < minPos)
+            {
+                m_infos.RemoveAt(0, uint32_t(i));
+                break;
+            }
+        }
+        auto* info = m_infos.Push();
+        info->pos = m_head;
+        info->title = title;
+        info->artist = artist;
     }
 }
 // namespace rePlayer

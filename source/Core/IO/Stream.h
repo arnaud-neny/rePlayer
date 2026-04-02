@@ -33,6 +33,7 @@ namespace core::io
         virtual [[nodiscard]] std::string GetComments() const { return {}; }
         virtual [[nodiscard]] std::string GetInfo() const { return {}; }
         virtual [[nodiscard]] std::string GetTitle() const { return {}; }
+        virtual [[nodiscard]] std::string GetArtist() const { return {}; }
 
         [[nodiscard]] SmartPtr<Stream> Clone();
 

@@ -266,6 +266,13 @@ namespace rePlayer
         return title;
     }
 
+    std::string ReplayAAC::GetStreamingArtist() const
+    {
+        std::string artist;
+        artist = m_stream->GetArtist();
+        return artist;
+    }
+
     std::string ReplayAAC::GetExtraInfo() const
     {
         std::string metadata;

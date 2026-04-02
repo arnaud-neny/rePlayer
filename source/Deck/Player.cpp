@@ -227,8 +227,16 @@ namespace rePlayer
         {
             if (!info.empty())
                 info += "\n";
-            info += "Streaming Title: ";
+            info += "Streaming Title : ";
             info += streamingTitle;
+        }
+        auto streamingArtist = m_replay->GetStreamingArtist();
+        if (!streamingArtist.empty())
+        {
+            if (!info.empty())
+                info += "\n";
+            info += "Streaming Artist: ";
+            info += streamingArtist;
         }
         return info;
     }

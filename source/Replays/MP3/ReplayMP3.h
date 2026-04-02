@@ -35,6 +35,7 @@ namespace rePlayer
         uint32_t GetDurationMs() const override;
         uint32_t GetNumSubsongs() const override;
         std::string GetStreamingTitle() const override;
+        std::string GetStreamingArtist() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 

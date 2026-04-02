@@ -30,6 +30,7 @@ namespace rePlayer
 
         std::string GetInfo() const final;
         std::string GetTitle() const final;
+        std::string GetArtist() const final;
 
         const Span<const uint8_t> Read() final;
 
@@ -69,7 +70,13 @@ namespace rePlayer
         std::string m_icyUrl;
         std::string m_metadata;
 
-        std::string m_title;
+        struct Info
+        {
+            int64_t pos;
+            std::string title;
+            std::string artist;
+        };
+        Array<Info> m_infos;
 
         int64_t m_tail = 0;
         int64_t m_head = 0;

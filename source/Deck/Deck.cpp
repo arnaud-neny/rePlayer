@@ -1011,8 +1011,8 @@ namespace rePlayer
                 ImGui::TextUnformatted("Title  :");
                 ImGui::SameLine();
                 ImGui::TextUnformatted(title.c_str());
-                std::string artists = musicId.GetArtists();
-                ImGui::TextUnformatted( player->GetSong()->artistIds.NumItems() > 1 ? "Artists:" : "Artist :");
+                std::string artists = player->GetArtists();
+                ImGui::TextUnformatted(player->GetSong()->artistIds.NumItems() > 1 ? "Artists:" : "Artist :");
                 ImGui::SameLine();
                 ImGui::TextUnformatted(artists.c_str());
                 ImGui::TextUnformatted(player->IsPlaying() ? "Playing:" : player->IsStopped() ? "Stopped:" : "Paused :");

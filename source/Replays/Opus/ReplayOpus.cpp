@@ -200,6 +200,8 @@ namespace rePlayer
                     title += '-';
                 title += tag;
             }
+            if (title.empty())
+                title = m_stream->GetTitle();
         }
         return title;
     }
@@ -217,6 +219,8 @@ namespace rePlayer
                     artist += " & ";
                 artist += tag;
             }
+            if (artist.empty())
+                artist = m_stream->GetArtist();
         }
         return artist;
     }

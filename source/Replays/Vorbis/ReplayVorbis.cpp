@@ -163,6 +163,8 @@ namespace rePlayer
                     title += '-';
                 title += comment;
             }
+            if (title.empty())
+                title = m_stream->GetTitle();
         }
         return title;
     }
@@ -180,6 +182,8 @@ namespace rePlayer
                     artist += " & ";
                 artist += comment;
             }
+            if (artist.empty())
+                artist = m_stream->GetArtist();
         }
         return artist;
     }
