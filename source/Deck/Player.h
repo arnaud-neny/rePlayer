@@ -98,7 +98,6 @@ namespace rePlayer
         uint32_t m_waveFillPos = 0;
         mutable uint32_t m_patternsPos = 0;
         const uint32_t m_numSamples;
-        const uint32_t m_numCachedSamples;
 
         int32_t m_numLoops = 0;
         uint32_t m_remainingFadeOut;

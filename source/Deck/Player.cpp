@@ -68,7 +68,7 @@ namespace rePlayer
             m_songPos = 0;
             m_songEnd = ~0ull;
             m_wavePlayPos = 0;
-            m_waveFillPos = m_numCachedSamples;
+            m_waveFillPos = m_numSamples;
             m_patternsPos = 0;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
@@ -79,8 +79,7 @@ namespace rePlayer
             m_replay->ResetPlayback();
             m_replay->ApplySettings(m_song->metadata.Container());
 
-            Render(m_numCachedSamples, 0);
-            memset(m_waveData + m_numCachedSamples, 0, (m_numSamples - m_numCachedSamples) * sizeof(StereoSample));
+            Render(m_numSamples, 0);
 
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
             ResumeThread();
@@ -129,7 +128,7 @@ namespace rePlayer
             m_songPos = 0;
             m_songEnd = ~0ull;
             m_wavePlayPos = 0;
-            m_waveFillPos = m_numCachedSamples;
+            m_waveFillPos = m_numSamples;
             m_patternsPos = 0;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
@@ -137,8 +136,7 @@ namespace rePlayer
             m_fadeOutSilence = 0;
 
             timeInMs = m_replay->Seek(timeInMs);
-            Render(m_numCachedSamples, 0);
-            memset(m_waveData + m_numCachedSamples, 0, (m_numSamples - m_numCachedSamples) * sizeof(StereoSample));
+            Render(m_numSamples, 0);
 
             if (m_status == Status::Paused)
                 waveOutPause(m_wave->outHandle);
@@ -468,7 +466,6 @@ namespace rePlayer
         , m_replay(replay)
         , m_wave(new Wave())
         , m_numSamples(1 << (32 - std::countl_zero(replay->GetSampleRate())))
-        , m_numCachedSamples(m_numSamples / 2)
     {}
 
     Player::~Player()
@@ -524,10 +521,9 @@ namespace rePlayer
 
         if (!isExport)
         {
-            Render(m_numCachedSamples, 0);
+            Render(m_numSamples, 0);
             m_wavePlayPos = 0;
-            m_waveFillPos = m_numCachedSamples;
-            memset(m_waveData + m_waveFillPos, 0, (numSamples - m_numCachedSamples) * sizeof(StereoSample));
+            m_waveFillPos = m_numSamples;
 
             waveOutPause(m_wave->outHandle);
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
@@ -608,9 +604,8 @@ namespace rePlayer
 
     void Player::ThreadUpdate()
     {
-        auto numSamples = m_numSamples;
-        auto numCachedSamples = m_numCachedSamples;
-        auto numSamplesMask = numSamples - 1;
+        const auto numSamples = m_numSamples;
+        const auto numSamplesMask = numSamples - 1;
         while (std::atomic_ref(m_isRunning).load())
         {
             auto startTime = std::chrono::high_resolution_clock::now();
@@ -625,11 +620,11 @@ namespace rePlayer
             {
                 m_songSeek += m_wavePlayPos; // simulate a seek to keep track of current time
                 waveFillPos = (waveFillPos & numSamplesMask) | (wavePlayPos & ~numSamplesMask);
-                waveFillPos += numCachedSamples;
+                waveFillPos += numSamples;
             }
             m_wavePlayPos = wavePlayPos;
 
-            wavePlayPos = wavePlayPos + numCachedSamples;
+            wavePlayPos = wavePlayPos + numSamples;
             while (waveFillPos < wavePlayPos)
             {
                 auto count = Min(numSamples - (waveFillPos & numSamplesMask), wavePlayPos - waveFillPos);
@@ -658,27 +653,30 @@ namespace rePlayer
         {
             if (m_numLoops < 0 && subsongState == SubsongState::Standard)
             {
-                //fix duration
-                auto duration = static_cast<uint32_t>((m_songPos * 100ull) / m_replay->GetSampleRate());
-                bool isDirty = false;
-                auto& subsong = m_song->subsongs[m_id.subsongId.index];
-                if (!m_hasSeeked && duration != subsong.durationCs)
+                if (!m_replay->IsStreaming())
                 {
-                    subsong.durationCs = duration;
-                    isDirty = true;
+                    //fix duration
+                    auto duration = static_cast<uint32_t>((m_songPos * 100ull) / m_replay->GetSampleRate());
+                    bool isDirty = false;
+                    auto& subsong = m_song->subsongs[m_id.subsongId.index];
+                    if (!m_hasSeeked && duration != subsong.durationCs)
+                    {
+                        subsong.durationCs = duration;
+                        isDirty = true;
+                    }
+                    if (!m_hasSeeked && !subsong.isPlayed)
+                    {
+                        subsong.isPlayed = true;
+                        isDirty = true;
+                    }
+                    if (subsong.state != subsongState)
+                    {
+                        subsong.state = subsongState;
+                        isDirty = true;
+                    }
+                    if (isDirty)
+                        m_id.MarkForSave();
                 }
-                if (!m_hasSeeked && !subsong.isPlayed)
-                {
-                    subsong.isPlayed = true;
-                    isDirty = true;
-                }
-                if (subsong.state != subsongState)
-                {
-                    subsong.state = subsongState;
-                    isDirty = true;
-                }
-                if (isDirty)
-                    m_id.MarkForSave();
 
                 m_songEnd = m_songPos;
                 memset(waveData + waveFillPos, 0, numSamples * sizeof(StereoSample));
@@ -759,22 +757,25 @@ namespace rePlayer
 
                     if (fadeOutSize < count)
                     {
-                        //fix duration
-                        auto duration = static_cast<uint32_t>(((m_songPos + fadeOutSize) * 100ull) / m_replay->GetSampleRate());
-                        bool isDirty = false;
-                        auto& subsong = m_song->subsongs[m_id.subsongId.index];
-                        if (!m_hasSeeked && duration != subsong.durationCs)
+                        if (!m_replay->IsStreaming())
                         {
-                            subsong.durationCs = duration;
-                            isDirty = true;
+                            //fix duration
+                            auto duration = static_cast<uint32_t>(((m_songPos + fadeOutSize) * 100ull) / m_replay->GetSampleRate());
+                            bool isDirty = false;
+                            auto& subsong = m_song->subsongs[m_id.subsongId.index];
+                            if (!m_hasSeeked && duration != subsong.durationCs)
+                            {
+                                subsong.durationCs = duration;
+                                isDirty = true;
+                            }
+                            if (!m_hasSeeked && !subsong.isPlayed)
+                            {
+                                subsong.isPlayed = true;
+                                isDirty = true;
+                            }
+                            if (isDirty)
+                                m_id.MarkForSave();
                         }
-                        if (!m_hasSeeked && !subsong.isPlayed)
-                        {
-                            subsong.isPlayed = true;
-                            isDirty = true;
-                        }
-                        if (isDirty)
-                            m_id.MarkForSave();
 
                         m_songEnd = m_songPos;
                         memset(waveData + waveFillPos, 0, (count - fadeOutSize) * sizeof(StereoSample));
