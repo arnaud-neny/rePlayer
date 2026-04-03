@@ -39,7 +39,7 @@ namespace core
     template <typename T>
     inline T* Realloc(void* ptr, size_t size)
     {
-        return reinterpret_cast<T*>(ReAlloc(ptr, size, alignof(T)));
+        return reinterpret_cast<T*>(Realloc(ptr, size, alignof(T)));
     }
 
     inline void Free(const void* ptr)
