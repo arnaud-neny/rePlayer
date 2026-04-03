@@ -75,6 +75,9 @@ namespace rePlayer
 
     uint32_t ReplayOpus::Render(StereoSample* output, uint32_t numSamples)
     {
+        if (!m_opus)
+            return 0;
+
         auto remainingSamples = numSamples;
         while (remainingSamples)
         {
@@ -158,10 +161,13 @@ namespace rePlayer
 
     void ReplayOpus::ResetPlayback()
     {
-        if (op_seekable(m_opus))
-            op_raw_seek(m_opus, 0);
-        m_stream->Seek(0, io::Stream::kSeekBegin);
-        op_free(m_opus);
+        if (m_opus)
+        {
+            if (op_seekable(m_opus))
+                op_raw_seek(m_opus, 0);
+            m_stream->Seek(0, io::Stream::kSeekBegin);
+            op_free(m_opus);
+        }
         OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
         m_stream->EnableLatency(true);
         m_opus = op_open_callbacks(m_stream.Get(), &cb, nullptr, 0, nullptr);
