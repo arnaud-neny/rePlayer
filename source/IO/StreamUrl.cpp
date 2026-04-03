@@ -326,6 +326,9 @@ namespace rePlayer
         curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, OnCurlWrite);
         curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, this);
 
+        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_LIMIT, 30L); // 30 bytes per sec
+        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_TIME, 5L); // 5 seconds check
+
         Core::AddJob([this]()
         {
             Update();
@@ -468,12 +471,11 @@ namespace rePlayer
         for (;;)
         {
             curlCode = curl_easy_perform(m_curl);
-            assert(curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR || curlCode == CURLE_HTTP_RETURNED_ERROR || curlCode == CURLE_OPERATION_TIMEDOUT || curlCode == CURLE_COULDNT_CONNECT || curlCode == CURLE_COULDNT_RESOLVE_HOST || curlCode == CURLE_URL_MALFORMAT || curlCode == CURLE_RECV_ERROR);
             if (m_type == Type::kStreaming)
             {
                 if (curlCode == CURLE_WRITE_ERROR || std::atomic_ref(m_state).load() == State::kCancel)
                     break;
-                else if (curlCode != CURLE_OK && curlCode != CURLE_RECV_ERROR)
+                if (curlCode != CURLE_OK && curlCode != CURLE_RECV_ERROR && curlCode != CURLE_OPERATION_TIMEDOUT && curlCode != CURLE_PARTIAL_FILE)
                     break;
             }
             else

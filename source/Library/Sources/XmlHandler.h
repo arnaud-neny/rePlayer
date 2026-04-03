@@ -92,6 +92,9 @@ namespace rePlayer
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
                 curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
+
+                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 30L); // 30 bytes per sec
+                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 5L); // 5 seconds check
             }
             else
             {
