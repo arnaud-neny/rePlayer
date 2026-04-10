@@ -103,7 +103,7 @@ void TFMXDecoder::reset() {
         voice.macro.step = 0;
         voice.macro.skip = true;
         voice.macro.loop = 0xff;
-        voice.macro.extraWait = false;
+        voice.macro.extraWait = true;
         
         voice.sid.targetOffset = 0x100*v + 4;
         voice.sid.targetLength = 0;
@@ -305,6 +305,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     variant.portaOverride = false;
     variant.noNoteDetune = false;
     variant.bpmSpeed5 = false;
+    variant.noAddBeginCount = false;
     
     PattCmdFuncs[0] = &TFMXDecoder::pattCmd_End;
     PattCmdFuncs[1] = &TFMXDecoder::pattCmd_Loop;
@@ -471,6 +472,7 @@ void TFMXDecoder::restart() {
 
 void TFMXDecoder::setTFMXv1() {
     formatName = FORMAT_NAME;
+    variant.noAddBeginCount = true;
     variant.vibratoUnscaled = true;
     variant.finetuneUnscaled = true;
     variant.portaUnscaled = false;

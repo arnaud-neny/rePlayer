@@ -26,6 +26,19 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
         variant.noNoteDetune = true;
         variant.portaUnscaled = false;
     }
+    // Hard'n'Heavy (1989) is a TFMX v1 variant with an AddBegin macro
+    // that is missing the effect updates. The game soundtrack sounds wrong
+    // in many videos.
+    else if (crc1 == 0x27f8998c || crc1 == 0x26447707 ||
+             // somebody compressed these files, they are not the originals!
+             crc1 == 0xd404651b || crc1 == 0xb5348633 ) {
+        setTFMXv1();
+        variant.portaUnscaled = true;
+    }
+    // R-Type (1989).
+    else if (crc1 == 0x8ac70fc8) {
+        setTFMXv1();
+    }
     // Ooops Up by Peter Thierolf. First two sub-songs specify a BPM customization
     // that isn't compatible with the speed count value of default TFMX.
     else if (crc1 == 0x76f8aa6e) {

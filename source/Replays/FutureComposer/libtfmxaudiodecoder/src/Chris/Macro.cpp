@@ -107,7 +107,7 @@ void TFMXDecoder::processMacroMain(VoiceVars& voice) {
              << tohex(voice.macro.offset) << '/'
              << hexW(voice.macro.step) << ' '
              << hexB(command) << ' '
-             << std::setw(6) << (int)(0x00ffffff&makeDword(0,cmd.bb,cmd.cd,cmd.ee));
+             << std::setw(6) << std::setfill('_') << (int)(0x00ffffff&makeDword(0,cmd.bb,cmd.cd,cmd.ee));
 #endif
         macroCmdUsed[command&0x3f] = true;
         MacroDef* pM = MacroDefs[command&0x3f];

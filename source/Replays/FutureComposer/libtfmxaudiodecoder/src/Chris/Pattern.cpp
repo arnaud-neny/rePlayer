@@ -24,6 +24,7 @@ udword TFMXDecoder::getPattOffset(ubyte pt) {
 
 void TFMXDecoder::processPattern(Track& tr) {
 #if defined(DEBUG_RUN)
+    dumpTimestamp(songPosCurrent);
     cout << "  processPattern() at 0x" << tohex(tr.pattern.offset) << endl;
 #endif
     int evalMaxLoops = RECURSE_LIMIT;  // NB! Around 8 would suffice.

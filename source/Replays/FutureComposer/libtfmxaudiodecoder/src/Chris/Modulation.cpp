@@ -35,11 +35,13 @@ void TFMXDecoder::processModulation(VoiceVars& voice) {
 // ----------------------------------------------------------------------
 
 void TFMXDecoder::addBegin(VoiceVars& voice) {
-    if (voice.addBeginCount == 0) {
+    if (variant.noAddBeginCount || (voice.addBeginCount == 0) ) {
         return;
     }
     voice.sample.start += voice.addBeginOffset;
     if (voice.sample.start < offsets.sampleData) {
+        // Found only a single file that underflows by 0x10.
+        voice.sample.start = offsets.sampleData;
     }
     if (voice.sid.targetLength != 0) {
         voice.sid.sourceOffset = voice.sample.start;
