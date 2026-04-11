@@ -46,6 +46,7 @@ class TFMXDecoder : public Decoder {
     void setPaulaVoice(ubyte,PaulaVoice*) override;
 
  public:// rePlayer
+    void softRestart();
     void reset();
     void adjustTraitsPost();
     void dumpMacros();
@@ -72,7 +73,7 @@ class TFMXDecoder : public Decoder {
     std::vector<ubyte> vSongs;
     udword songPosCurrent;
     int voices;
-    bool /*loopMode, */triggerRestart; // rePlayer
+    bool triggerRestart;
 
     struct ModuleOffsets {
         udword header;

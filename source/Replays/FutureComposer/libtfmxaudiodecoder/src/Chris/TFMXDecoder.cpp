@@ -52,31 +52,7 @@ TFMXDecoder::~TFMXDecoder() {
 
 // Assign default values to essential runtime variables.
 void TFMXDecoder::reset() {
-    songEnd = false;
-    songPosCurrent = 0;
-    tickFPadd = 0;
-    triggerRestart = false;
-
-    sequencer.step.next = false;
-    sequencer.loops = -1;
-    for (int step = 0; step < TRACK_STEPS_MAX; step++ ) {
-        sequencer.stepSeenBefore[step] = false;
-    }
-
-    fade.active = false;
-    fade.volume = fade.target = 64;
-    fade.delta = 0;
-
     cmd.aa = cmd.bb = cmd.cd = cmd.ee = 0;
-
-    for (ubyte t=0; t<sequencer.tracks; t++) {
-        Track& tr = track[t];
-        tr.on = getTrackMute(t);
-        tr.PT = 0xff; tr.TR = 0;
-        tr.pattern.offset = tr.pattern.step = 0;
-        tr.pattern.wait = 0;
-        tr.pattern.loops = -1;
-    }
 
     for (ubyte v=0; v<voices; v++) {
         VoiceVars& voice = voiceVars[v];
@@ -448,7 +424,33 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
 // With an initialized decoder, calling this should (re)start the
 // decoder currently chosen song.
 void TFMXDecoder::restart() {
-    reset();  // state variables
+    reset();
+    softRestart();
+}
+
+void TFMXDecoder::softRestart() {
+    songEnd = false;
+    songPosCurrent = 0;
+    tickFPadd = 0;
+    triggerRestart = false;
+
+    sequencer.step.next = false;
+    sequencer.loops = -1;
+    for (int step = 0; step < TRACK_STEPS_MAX; step++ ) {
+        sequencer.stepSeenBefore[step] = false;
+    }
+    for (ubyte t=0; t<sequencer.tracks; t++) {
+        Track& tr = track[t];
+        tr.on = getTrackMute(t);
+        tr.PT = 0xff; tr.TR = 0;
+        tr.pattern.offset = tr.pattern.step = 0;
+        tr.pattern.wait = 0;
+        tr.pattern.loops = -1;
+    }
+
+    fade.active = false;
+    fade.volume = fade.target = 64;
+    fade.delta = 0;
 
     uword so = vSongs[admin.startSong]<<1;
     sequencer.step.first = sequencer.step.current = readBEuword(pBuf,offsets.header+0x100+so);
@@ -689,8 +691,7 @@ int TFMXDecoder::run() {
     if (songEnd && loopMode) {
         songEnd = false;
         if (triggerRestart) {
-            restart();
-            triggerRestart = false;
+            softRestart();
         }
         songEnd = true;// rePlayer
     }
