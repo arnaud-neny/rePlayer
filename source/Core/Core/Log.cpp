@@ -78,6 +78,8 @@ namespace core
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
+        thread::ScopedSpinLock lock(m_spinLock);
+
         uint32_t numLines = m_isLineInProgress ? m_currentLine.size + 1 : m_currentLine.size;
         uint32_t color = 0xffFFff;
         ImGui::PushStyleColor(ImGuiCol_Text, 0xffFFffFF);
@@ -176,6 +178,8 @@ namespace core
     {
         if (m_mode == Mode::kDisabled)
             return;
+
+        thread::ScopedSpinLock lock(m_spinLock);
 
         // get text buffer
         char* buf;

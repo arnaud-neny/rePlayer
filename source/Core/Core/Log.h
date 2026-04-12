@@ -4,6 +4,7 @@
 #include <Containers/Array.h>
 #include <Core/SharedContext.h>
 #include <Core/Window.h>
+#include <Thread/SpinLock.h>
 #include <string>
 
 namespace core
@@ -160,6 +161,8 @@ namespace core
 
         uint64_t m_timeRef;
         wchar_t* m_filename;
+
+        thread::SpinLock m_spinLock;
 
         static char ms_callbackBuf[];
         static Log* ms_instance;
