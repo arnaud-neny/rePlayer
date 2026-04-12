@@ -18,8 +18,8 @@
 #include <shellapi.h>
 #include <winternl.h>
 
-#if _DEBUG
-//#include <crtdbg.h>
+#ifdef _DEBUG
+#include <crtdbg.h>
 #endif
 
 #include "resource.h"
@@ -218,6 +218,7 @@ void ImGuiRelease()
     ImGui::DestroyContext();
 }
 
+#ifdef _DEBUG
 static _CRT_ALLOC_HOOK oldHook;
 static int MyHook(int allocType, void* userData, size_t size,
     int blockType, long requestNumber,
@@ -227,13 +228,13 @@ static int MyHook(int allocType, void* userData, size_t size,
         printf("toto");
     return oldHook(allocType, userData, size, blockType, requestNumber, filename, lineNumber);
 }
-
+#endif
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
 {
     core::thread::SetCurrentId(core::thread::ID::kMain);
 
-#if _DEBUG
+#ifdef _DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     //_CrtSetBreakAlloc(146143);
     //oldHook =_CrtGetAllocHook();
@@ -350,7 +351,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int /*nCmdShow*/)
                     break;
                 }
 
-#if _DEBUG
+#ifdef _DEBUG
                 static bool show_demo_window = false;
                 if (ImGui::IsKeyPressed(ImGuiKey_F11))
                     show_demo_window = !show_demo_window;
