@@ -31,6 +31,14 @@ namespace rePlayer
         void Load() final;
         void Save() const final;
 
+        void BrowserInit(BrowserContext& context) final;
+        void BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter) final;
+        int64_t BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const final;
+        void BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const final;
+        void BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs) final;
+        std::string BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const final;
+        Array<BrowserSong> BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry);
+
         static constexpr SourceID::eSourceID kID = SourceID::VGMRipsID;
 
     private:
@@ -48,12 +56,35 @@ namespace rePlayer
             bool IsSame(const Array<char>& blob, const char* otherString) const;
         };
 
-        struct Pack
+        struct VgmRipsArtist
         {
             Chars url;
             Chars name;
-            uint32_t numArtists;
-            uint32_t artists[0];
+            uint32_t packs : 31;
+            uint32_t isComplete : 1;
+        };
+
+        struct VgmRipsPack
+        {
+            Chars url;
+            Chars name;
+            Chars songsUrl;
+            uint32_t songs;
+            uint16_t year;
+            uint16_t numArtists;
+            struct
+            {
+                uint16_t index;
+                uint16_t remap;
+                uint32_t nextPack;
+            } artists[0];
+        };
+
+        struct VgmRipsSong
+        {
+            Chars url;
+            Chars name;
+            uint32_t nextSong;
         };
 
         struct PackSource
@@ -82,16 +113,26 @@ namespace rePlayer
             Chars url;
         };
 
+        static constexpr BrowserColumn kColumnArtist = BrowserColumn(1);
+        static constexpr BrowserColumn kColumnYear = BrowserColumn(2);
+        static constexpr BrowserColumn kColumnId = BrowserColumn(3);
+        static constexpr BrowserStage kStageArtists = { BrowserStageId(1), BrowserStageType::Folder };
+        static constexpr BrowserStage kStagePacks = { BrowserStageId(2), BrowserStageType::Folder };
+        static constexpr BrowserStage kStageSongs = { BrowserStageId(3), BrowserStageType::Song };  
+
     private:
         SongSource* FindSong(uint32_t pack, const std::string& titleUrl);
         ArtistSource* FindArtist(const std::string& url);
 
+        bool DownloadArtists(BusySpinner& busySpinner);
+
     private:
         struct DB
         {
-            Array<std::pair<Chars, Chars>> artists; // url/name
+            Array<VgmRipsArtist> artists;
             Array<uint32_t> packs;
             Array<char> data;
+            bool IsFullPacks = false;
         } m_db;
 
         Array<SongSource> m_songs;

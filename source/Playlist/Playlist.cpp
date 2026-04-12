@@ -682,6 +682,70 @@ namespace rePlayer
         player = newPlayer;
     }
 
+    void Playlist::ProcessBrowserSong(const BrowserSong& browserSong, ProcessMode mode)
+    {
+        MusicID musicId;
+        musicId.databaseId = DatabaseID::kPlaylist;
+        for (auto* song : m_cue.db.Songs())
+        {
+            if (m_cue.db.GetPath(song->GetSourceId(0)) == browserSong.url)
+            {
+                musicId.subsongId.songId = song->GetId();
+                if (mode == kPlay)
+                    Core::GetDeck().PlaySolo(musicId);
+                else
+                    Enqueue(musicId);
+                return;
+            }
+        }
+
+        auto* songSheet = new SongSheet();
+        songSheet->sourceIds.Add(m_cue.db.AddPath(SourceID::URLImportID, browserSong.url));
+        songSheet->name = browserSong.name;
+        songSheet->type = browserSong.type;
+
+        for (uint32_t i = 0; i < browserSong.artists.NumItems(); ++i)
+        {
+            for (auto* artist : m_cue.db.Artists())
+            {
+                for (uint32_t j = 0; j < artist->NumSources(); ++j)
+                {
+                    auto& source = artist->GetSource(j);
+                    if (source.id.sourceId == SourceID::URLImportID)
+                    {
+                        if (m_cue.db.GetPath(source.id) == browserSong.artists[i])
+                        {
+                            songSheet->artistIds.Add(artist->GetId());
+                            artist->Edit()->numSongs++;
+                            break;
+                        }
+                    }
+                }
+                if (songSheet->artistIds.NumItems() != i)
+                    break;
+            }
+            if (songSheet->artistIds.NumItems() == i)
+            {
+                auto* artistSheet = new ArtistSheet();
+                artistSheet->handles.Add(browserSong.artists[i].c_str());
+                auto* source = artistSheet->sources.Push();
+                source->id = m_cue.db.AddPath(SourceID::URLImportID, browserSong.artists[i]);
+                artistSheet->numSongs++;
+                m_cue.db.AddArtist(artistSheet);
+                songSheet->artistIds.Add(artistSheet->id);
+            }
+        }
+
+        m_cue.db.AddSong(songSheet);
+
+        musicId.subsongId.songId = songSheet->id;
+        if (mode == kPlay)
+            Core::GetDeck().PlaySolo(musicId);
+        else
+            Enqueue(musicId);
+        m_cue.db.Raise(Database::Flag::kSaveSongs);
+    }
+
     MusicID Playlist::GetCurrentEntry() const
     {
         if (m_currentEntryIndex >= 0)

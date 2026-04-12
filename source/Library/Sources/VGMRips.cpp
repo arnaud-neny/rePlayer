@@ -1,11 +1,13 @@
 // Core
 #include <Containers/HashMap.h>
 #include <Core/Log.h>
+#include <ImGui.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
 #include <Thread/Thread.h>
 
 // rePlayer
+#include <Database/Database.h>
 #include <UI/BusySpinner.h>
 #include "VGMRips.h"
 #include "WebHandler.h"
@@ -117,7 +119,9 @@ namespace rePlayer
                             auto dataOffset = db.data.NumItems();
                             artistUrl += sizeof("https://vgmrips.net/packs/composer");
                             auto* artist = db.artists.Push();
-                            artist->first.offset = artist->second.offset = dataOffset;
+                            artist->url.offset = artist->name.offset = dataOffset;
+                            artist->packs = 0;
+                            artist->isComplete = 0;
                             db.data.Add(reinterpret_cast<const char*>(artistUrl), xmlStrlen(artistUrl) + 1);
 
                             for (node = node->children; node; node = node->next)
@@ -133,7 +137,7 @@ namespace rePlayer
                                         nameEnd++;
                                     if (name != nameEnd)
                                     {
-                                        artist->second.offset = db.data.NumItems();
+                                        artist->name.offset = db.data.NumItems();
                                         db.data.Add(name, uint32_t(nameEnd - name));
                                         db.data.Add(0);
                                     }
@@ -150,13 +154,10 @@ namespace rePlayer
 
     struct SourceVGMRips::ArtistCollector : public WebHandler
     {
-        Array<uint32_t> packs; // url/name
-        Array<char> data;
+        SourceVGMRips::DB& db;
 
         std::string name;
         std::string url;
-
-        const SourceVGMRips::DB& db;
 
         enum
         {
@@ -167,9 +168,10 @@ namespace rePlayer
             kStateArtists,
             kStateEnd
         } state = kStateInit;
+        bool isSkipped = false;
         bool isDone = false;
 
-        ArtistCollector(const SourceVGMRips::DB& other);
+        ArtistCollector(SourceVGMRips::DB& other);
         void OnReadNode(xmlNode* node) final;
         void ReadPack(xmlNode* node);
         void ReadChips(xmlNode* node);
@@ -177,7 +179,7 @@ namespace rePlayer
         void ReadArtists(xmlNode* node);
     };
 
-    SourceVGMRips::ArtistCollector::ArtistCollector(const SourceVGMRips::DB& other)
+    SourceVGMRips::ArtistCollector::ArtistCollector(SourceVGMRips::DB& other)
         : db(other)
     {}
 
@@ -214,7 +216,8 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"chips") == 0)
                     {
-                        ReadChips(node->children);
+                        if (!isSkipped)
+                            ReadChips(node->children);
                         state = kStateSystems;
                         break;
                     }
@@ -226,18 +229,24 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"systems") == 0)
                     {
-                        ReadSystems(node->children);
+                        if (!isSkipped)
+                        {
+                            ReadSystems(node->children);
 
-                        auto urlOffset = data.NumItems();
-                        data.Add(url.c_str(), uint32_t(url.size() + 1));
-                        auto nameOffset = data.NumItems();
-                        data.Add(name.c_str(), uint32_t(name.size() + 1));
-                        data.Resize(AlignUp(data.NumItems(), sizeof(uint32_t)));
-                        packs.Add(data.NumItems());
-                        auto* pack = data.Push<Pack*>(sizeof(Pack));
-                        pack->url.offset = urlOffset;
-                        pack->name.offset = nameOffset;
-                        pack->numArtists = 0;
+                            auto urlOffset = db.data.NumItems();
+                            db.data.Add(url.c_str(), uint32_t(url.size() + 1));
+                            auto nameOffset = db.data.NumItems();
+                            db.data.Add(name.c_str(), uint32_t(name.size() + 1));
+                            db.data.Resize(AlignUp(db.data.NumItems(), alignof(VgmRipsPack)));
+                            db.packs.Add(db.data.NumItems());
+                            auto* pack = db.data.Push<VgmRipsPack*>(sizeof(VgmRipsPack));
+                            pack->url.offset = urlOffset;
+                            pack->name.offset = nameOffset;
+                            pack->songsUrl.offset = 0;
+                            pack->songs = 0;
+                            pack->year = 0;
+                            pack->numArtists = 0;
+                        }
 
                         state = kStateArtists;
                         break;
@@ -250,7 +259,8 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"composers") == 0)
                     {
-                        ReadArtists(node->children);
+                        if (!isSkipped)
+                            ReadArtists(node->children);
                         state = kStatePack;
                         break;
                     }
@@ -283,6 +293,17 @@ namespace rePlayer
                                     break;
                                 }
                             }
+                            isSkipped = false;
+                            for (auto packOffset : db.packs)
+                            {
+                                auto* pack = db.data.Items<VgmRipsPack>(packOffset);
+                                if (url == pack->url(db.data))
+                                {
+                                    isSkipped = true;
+                                    break;
+                                }
+                            }
+
                             state = kStateChips;
                             return;
                         }
@@ -371,15 +392,22 @@ namespace rePlayer
                             if (auto* artistUrl = xmlStrstr(propChild->content, BAD_CAST"https://vgmrips.net/packs/composer/"))
                             {
                                 artistUrl += sizeof("https://vgmrips.net/packs/composer");
+                                bool isFound = false;
                                 for (uint32_t i = 0, e = db.artists.NumItems(); i < e; i++)
                                 {
-                                    if (_stricmp(db.artists[i].first(db.data), reinterpret_cast<const char*>(artistUrl)) == 0)
+                                    if (_stricmp(db.artists[i].url(db.data), pcCast<char>(artistUrl)) == 0)
                                     {
-                                        data.Push<uint32_t&>(sizeof(uint32_t)) = i;
-                                        data.Items<Pack>(packs.Last())->numArtists++;
+                                        auto& packArtist = db.data.Push<decltype(VgmRipsPack::artists[0])&>(sizeof(VgmRipsPack::artists[0]));
+                                        packArtist.index = uint16_t(i);
+                                        db.data.Items<VgmRipsPack>(db.packs.Last())->numArtists++;
+                                        packArtist.nextPack = db.artists[i].packs;
+                                        db.artists[i].packs = db.packs.Last();
+                                        isFound = true;
                                         break;
                                     }
                                 }
+                                if (!isFound)
+                                    Log::Warning("VGMRips: artist \"%s\" is missing from database\n", artistUrl);
                             }
                         }
                     }
@@ -405,6 +433,7 @@ namespace rePlayer
             kStateArtists,
             kStateEnd
         } state = kStateInit;
+        bool isSkipped = false;
         bool isDone = false;
 
         PacksCollector(SourceVGMRips::DB& other);
@@ -452,7 +481,8 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"chips") == 0)
                     {
-                        ReadChips(node->children);
+                        if (!isSkipped)
+                            ReadChips(node->children);
                         state = kStateSystems;
                         break;
                     }
@@ -464,18 +494,24 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"systems") == 0)
                     {
-                        ReadSystems(node->children);
+                        if (!isSkipped)
+                        {
+                            ReadSystems(node->children);
 
-                        auto urlOffset = db.data.NumItems();
-                        db.data.Add(url.c_str(), uint32_t(url.size() + 1));
-                        auto nameOffset = db.data.NumItems();
-                        db.data.Add(name.c_str(), uint32_t(name.size() + 1));
-                        db.data.Resize(AlignUp(db.data.NumItems(), alignof(Pack)));
-                        db.packs.Add(db.data.NumItems());
-                        auto* pack = db.data.Push<Pack*>(sizeof(Pack));
-                        pack->url.offset = urlOffset;
-                        pack->name.offset = nameOffset;
-                        pack->numArtists = 0;
+                            auto urlOffset = db.data.NumItems();
+                            db.data.Add(url.c_str(), uint32_t(url.size() + 1));
+                            auto nameOffset = db.data.NumItems();
+                            db.data.Add(name.c_str(), uint32_t(name.size() + 1));
+                            db.data.Resize(AlignUp(db.data.NumItems(), alignof(VgmRipsPack)));
+                            db.packs.Add(db.data.NumItems());
+                            auto* pack = db.data.Push<VgmRipsPack*>(sizeof(VgmRipsPack));
+                            pack->url.offset = urlOffset;
+                            pack->name.offset = nameOffset;
+                            pack->songsUrl.offset = 0;
+                            pack->songs = 0;
+                            pack->year = 0;
+                            pack->numArtists = 0;
+                        }
 
                         state = kStateArtists;
                         break;
@@ -488,7 +524,8 @@ namespace rePlayer
                 {
                     if (xmlStrcmp(propChild->content, BAD_CAST"composers") == 0)
                     {
-                        ReadArtists(node->children);
+                        if (!isSkipped)
+                            ReadArtists(node->children);
                         state = kStatePack;
                         break;
                     }
@@ -518,6 +555,16 @@ namespace rePlayer
                                 if (node->type == XML_TEXT_NODE)
                                 {
                                     name = reinterpret_cast<const char*>(node->content);
+                                    break;
+                                }
+                            }
+                            isSkipped = false;
+                            for (auto packOffset : db.packs)
+                            {
+                                auto* pack = db.data.Items<VgmRipsPack>(packOffset);
+                                if (url == pack->url(db.data))
+                                {
+                                    isSkipped = true;
                                     break;
                                 }
                             }
@@ -609,15 +656,23 @@ namespace rePlayer
                             if (auto* artistUrl = xmlStrstr(propChild->content, BAD_CAST"https://vgmrips.net/packs/composer/"))
                             {
                                 artistUrl += sizeof("https://vgmrips.net/packs/composer");
+                                bool isFound = false;
                                 for (uint32_t i = 0, e = db.artists.NumItems(); i < e; i++)
                                 {
-                                    if (_stricmp(db.artists[i].first(db.data), reinterpret_cast<const char*>(artistUrl)) == 0)
+                                    if (_stricmp(db.artists[i].url(db.data), pcCast<char>(artistUrl)) == 0)
                                     {
-                                        db.data.Push<uint32_t&>(sizeof(uint32_t)) = i;
-                                        db.data.Items<Pack>(db.packs.Last())->numArtists++;
+                                        auto& packArtist = db.data.Push<decltype(VgmRipsPack::artists[0])&>(sizeof(VgmRipsPack::artists[0]));
+                                        packArtist.index = uint16_t(i);
+                                        db.data.Items<VgmRipsPack>(db.packs.Last())->numArtists++;
+                                        packArtist.nextPack = db.artists[i].packs;
+                                        db.artists[i].packs = db.packs.Last();
+                                        db.artists[i].isComplete = true;
+                                        isFound = true;
                                         break;
                                     }
                                 }
+                                if (!isFound)
+                                    Log::Warning("VGMRips: artist \"%s\" is missing from database\n", artistUrl);
                             }
                         }
                     }
@@ -629,9 +684,10 @@ namespace rePlayer
 
     struct SourceVGMRips::PackCollector : public WebHandler
     {
-        Array<std::pair<Chars, Chars>> songs; // url/name
-        Array<char> data;
-        uint32_t year = 0;
+        SourceVGMRips::DB& db;
+
+        const uint32_t packOffset;
+        uint32_t songOffset;
 
         enum
         {
@@ -641,8 +697,14 @@ namespace rePlayer
             kStateEnd
         } state = kStateInit;
 
+        PackCollector(SourceVGMRips::DB& other, uint32_t packOffset);
         void OnReadNode(xmlNode* node) final;
     };
+
+    SourceVGMRips::PackCollector::PackCollector(SourceVGMRips::DB& other, uint32_t packOffset)
+        : db(other)
+        , packOffset(packOffset)
+    {}
 
     void SourceVGMRips::PackCollector::OnReadNode(xmlNode* node)
     {
@@ -659,7 +721,9 @@ namespace rePlayer
             }
             else if (state == kStateYear && node->type == XML_TEXT_NODE)
             {
+                uint32_t year = 0;
                 sscanf_s(reinterpret_cast<const char*>(node->content), "%u", &year);
+                db.data.Items<VgmRipsPack>(packOffset)->year = uint16_t(year);
                 state = kStateSongs;
                 skipChildren = true;
             }
@@ -678,12 +742,18 @@ namespace rePlayer
                                 if (*c == '/')
                                     songUrl = c + 1;
                             }
-                            if (data.IsEmpty())
+                            if (db.data.Items<VgmRipsPack>(packOffset)->songsUrl.offset == 0)
                             {
-                                data.Add(reinterpret_cast<const char*>(packUrl), uint32_t(songUrl - packUrl));
-                                data.Last() = 0;
+                                db.data.Items<VgmRipsPack>(packOffset)->songsUrl.offset = db.data.NumItems();
+                                db.data.Add(pcCast<char>(packUrl), uint32_t(songUrl - packUrl));
+                                db.data.Last() = 0;
                             }
-                            songs.Push()->first.Set(data, reinterpret_cast<const char*>(songUrl));
+                            db.data.Resize(AlignUp(db.data.NumItems(), alignof(VgmRipsSong)));
+                            songOffset = db.data.NumItems();
+                            db.data.Push(sizeof(VgmRipsSong));
+                            db.data.Items<VgmRipsSong>(songOffset)->url.Set(db.data, pcCast<char>(songUrl));
+                            db.data.Items<VgmRipsSong>(songOffset)->nextSong = db.data.Items<VgmRipsPack>(packOffset)->songs;
+                            db.data.Items<VgmRipsPack>(packOffset)->songs = songOffset;
                         }
                     }
                 }
@@ -696,8 +766,8 @@ namespace rePlayer
                             auto* child = node->children;
                             while (child->children)
                                 child = child->children;
-                            songs.Last().second.Set(data, reinterpret_cast<const char*>(child->content));
-                            data.Pop();
+                            db.data.Items<VgmRipsSong>(songOffset)->name.Set(db.data, pcCast<char>(child->content));
+                            db.data.Pop();
                         }
                     }
                 }
@@ -710,7 +780,7 @@ namespace rePlayer
                             auto* child = node->children;
                             while (child->children)
                                 child = child->children;
-                            data.Add(reinterpret_cast<const char*>(child->content), xmlStrlen(child->content) + 1);
+                            db.data.Add(pcCast<char>(child->content), xmlStrlen(child->content) + 1);
                             skipChildren = true;
                         }
                     }
@@ -722,6 +792,7 @@ namespace rePlayer
     }
 
     SourceVGMRips::SourceVGMRips()
+        : Source(true)
     {}
 
     SourceVGMRips::~SourceVGMRips()
@@ -729,26 +800,18 @@ namespace rePlayer
 
     void SourceVGMRips::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        // download artists database
-        if (m_db.artists.IsEmpty())
-        {
-            busySpinner.Info("downloading artists database");
-
-            ArtistsCollector collector(m_db);
-            collector.Fetch("https://vgmrips.net/packs/composers");
-            if (!collector.error.empty())
-                busySpinner.Error(collector.error);
-        }
+        if (DownloadArtists(busySpinner))
+            return;
 
         // look for the artist
         auto lName = ToLower(name);
         for (auto& artist : m_db.artists)
         {
-            if (strstr(ToLower(artist.second(m_db.data)).c_str(), lName.c_str()))
+            if (strstr(ToLower(artist.name(m_db.data)).c_str(), lName.c_str()))
             {
                 auto* newArtist = artists.matches.Push();
-                newArtist->name = artist.second(m_db.data);
-                newArtist->id = SourceID(kID, FindArtist(artist.first(m_db.data))->id);
+                newArtist->name = artist.name(m_db.data);
+                newArtist->id = SourceID(kID, FindArtist(artist.url(m_db.data))->id);
             }
         }
     }
@@ -764,76 +827,73 @@ namespace rePlayer
         });
         busySpinner.Info(m_artists[artistSourceIndex].url(m_data));
 
-        // download artists database
-        if (m_db.artists.IsEmpty())
-        {
-            busySpinner.Info("downloading artists database");
-
-            ArtistsCollector collector(m_db);
-            collector.Fetch("https://vgmrips.net/packs/composers");
-            if (!collector.error.empty())
-                busySpinner.Error(collector.error);
-        }
+        if (DownloadArtists(busySpinner))
+            return;
 
         // validation (has the artist been removed or renamed)
+        auto* dbArtist = m_db.artists.FindIf([&](auto& item)
         {
-            auto* dbArtist = m_db.artists.FindIf([&](auto& item)
-            {
-                return item.first.IsSame(m_db.data, m_artists[artistSourceIndex].url(m_data));
-            });
-            if (dbArtist == nullptr)
-            {
-                // has the artist disappeared from VGMRips?
-                Log::Error("VGMRips: can't find artist \"%s\"\n", m_artists[artistSourceIndex].url(m_data));
-                return;
-            }
+            return item.url.IsSame(m_db.data, m_artists[artistSourceIndex].url(m_data));
+        });
+        if (dbArtist == nullptr)
+        {
+            // has the artist disappeared from VGMRips?
+            Log::Error("VGMRips: can't find artist \"%s\"\n", m_artists[artistSourceIndex].url(m_data));
+            return;
         }
 
         // collect all packs
-        auto* message = busySpinner.Info("downloading artist packs database at %u", 0);
-        ArtistCollector collector(m_db);
-        for (uint32_t i = 0; !collector.isDone; i++)
+        if (dbArtist->isComplete == false)
         {
-            busySpinner.UpdateMessageParam(message, i);
+            auto* message = busySpinner.Info("downloading artist packs database at %u", 0);
+            ArtistCollector collector(m_db);
+            for (uint32_t i = 0; !collector.isDone; i++)
+            {
+                busySpinner.UpdateMessageParam(message, i);
 
-            collector.state = ArtistCollector::kStateInit;
-            if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", m_artists[artistSourceIndex].url(m_data), i) != Status::kOk)
-                collector.isDone = true;
+                collector.state = ArtistCollector::kStateInit;
+                if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", m_artists[artistSourceIndex].url(m_data), i) != Status::kOk)
+                    collector.isDone = true;
+            }
+            dbArtist->isComplete = true;
         }
 
         // collect all songs
-        message = busySpinner.Info("downloading artist songs database from %s", "");
-        for (auto packOffset : collector.packs)
+        auto* message = busySpinner.Info("downloading artist songs database from %s", "");
+        for (auto packOffset = dbArtist->packs, nextOffset = 0u; packOffset; packOffset = nextOffset)
         {
-            auto* pack = collector.data.Items<Pack>(packOffset);
+            auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(packOffset); };
 
-            busySpinner.UpdateMessageParam(message, pack->url(collector.data));
+            if (getPack()->songs == 0)
+            {
+                busySpinner.UpdateMessageParam(message, getPack()->url(m_db.data));
 
-            PackCollector packCollector;
-            if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(collector.data)) != Status::kOk)
-                break;
+                PackCollector packCollector(m_db, packOffset);
+                if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data)) != Status::kOk)
+                    break;
+            }
 
             // build pack
             auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
             {
                 auto* packSource = m_data.Items<PackSource>(song.pack);
-                return song.pack && packSource->url.IsSame(m_data, packCollector.data.Items());
+                return song.pack && packSource->url.IsSame(m_data, getPack()->songsUrl(m_db.data));
             });
             if (sourcePackOffset < 0)
             {
                 m_data.Resize(AlignUp(m_data.NumItems(), alignof(PackSource)));
                 sourcePackOffset = m_data.NumItems();
-                m_data.Push(sizeof(PackSource) + pack->numArtists * sizeof(uint32_t));
-                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, packCollector.data.Items());
-                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = pack->numArtists;
+                m_data.Push(sizeof(PackSource) + getPack()->numArtists * sizeof(uint32_t));
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, getPack()->songsUrl(m_db.data));
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = getPack()->numArtists;
             }
             else
                 sourcePackOffset = m_songs[sourcePackOffset].pack;
 
             // remap artists
-            for (uint32_t i = 0; i < pack->numArtists; i++)
+            for (uint32_t i = 0; i < getPack()->numArtists; i++)
             {
-                auto* newArtistSource = FindArtist(m_db.artists[pack->artists[i]].first(m_db.data));
+                auto* newArtistSource = FindArtist(m_db.artists[getPack()->artists[i].index].url(m_db.data));
                 m_data.Items<PackSource>(uint32_t(sourcePackOffset))->artists[i] = newArtistSource->id;
                 SourceID artistId(kID, newArtistSource->id);
                 auto* artistIt = results.artists.FindIf([&](auto& entry)
@@ -843,19 +903,23 @@ namespace rePlayer
                 if (artistIt == nullptr)
                 {
                     auto artist = new ArtistSheet();
-                    artist->handles.Add(m_db.artists[pack->artists[i]].second(m_db.data));
+                    artist->handles.Add(m_db.artists[getPack()->artists[i].index].name(m_db.data));
                     artist->sources.Add(artistId);
-                    pack->artists[i] = results.artists.NumItems();
+                    getPack()->artists[i].remap = results.artists.NumItems<uint16_t>();
                     results.artists.Add(artist);
                 }
                 else
-                    pack->artists[i] = artistIt - results.artists;
+                    getPack()->artists[i].remap = uint16_t(artistIt - results.artists);
+
+                // find also next pack
+                if (getPack()->artists[i].index == uint32_t(dbArtist - m_db.artists))
+                    nextOffset = getPack()->artists[i].nextPack;
             }
 
             // collect all songs from the pack
-            for (auto& collectedSong : packCollector.songs)
+            for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
             {
-                auto* songSource = FindSong(uint32_t(sourcePackOffset), collectedSong.first(packCollector.data));
+                auto* songSource = FindSong(uint32_t(sourcePackOffset), m_db.data.Items<VgmRipsSong>(songOffset)->url(m_db.data));
                 SourceID songSourceId(kID, songSource->id);
                 if (results.IsSongAvailable(songSourceId))
                     continue;
@@ -869,14 +933,14 @@ namespace rePlayer
                 else
                     song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
 
-                song->name = pack->name(collector.data);
+                song->name = getPack()->name(m_db.data);
                 song->name.String() += '/';
-                song->name.String() += collectedSong.second(packCollector.data);
+                song->name.String() += m_db.data.Items<VgmRipsSong>(songOffset)->name(m_db.data);
                 song->type = { eExtension::_vgz, eReplay::VGM };
-                song->releaseYear = uint16_t(packCollector.year);
+                song->releaseYear = getPack()->year;
                 song->sourceIds.Add(songSourceId);
-                for (uint32_t i = 0; i < pack->numArtists; i++)
-                    song->artistIds.Add(ArtistID(pack->artists[i]));
+                for (uint32_t i = 0; i < getPack()->numArtists; i++)
+                    song->artistIds.Add(ArtistID(getPack()->artists[i].remap));
 
                 results.songs.Add(song);
                 results.states.Add(state);
@@ -886,19 +950,11 @@ namespace rePlayer
 
     void SourceVGMRips::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
-        // download artists database
-        if (m_db.artists.IsEmpty())
-        {
-            busySpinner.Info("downloading artists database");
-
-            ArtistsCollector collector(m_db);
-            collector.Fetch("https://vgmrips.net/packs/composers");
-            if (!collector.error.empty())
-                busySpinner.Error(collector.error);
-        }
+        if (DownloadArtists(busySpinner))
+            return;
 
         // download packs database
-        if (m_db.packs.IsEmpty())
+        if (!m_db.IsFullPacks)
         {
             auto* message = busySpinner.Info("downloading packs database at %u", 0);
 
@@ -908,12 +964,14 @@ namespace rePlayer
                 busySpinner.UpdateMessageParam(message, i);
 
                 // throttle to avoid flooding website
-                if ((i & 31) == 31)
+                if ((i & 15) == 15)
                     thread::Sleep(256 + (rand() & 0x1ff));
 
                 collector.state = PacksCollector::kStateInit;
                 if (collector.Fetch("https://vgmrips.net/packs/latest?p=%u", i) != Status::kOk)
                     collector.isDone = true;
+                else
+                    m_db.IsFullPacks = true;
             }
         }
 
@@ -923,16 +981,19 @@ namespace rePlayer
         for (uint32_t packIdx = 0; packIdx < m_db.packs.NumItems(); packIdx++)
         {
             auto packOffset = m_db.packs[packIdx];
-            auto* pack = m_db.data.Items<Pack>(packOffset);
-            if (strstr(ToLower(pack->name(m_db.data)).c_str(), lName.c_str()))
+            auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(packOffset); };
+            if (strstr(ToLower(getPack()->name(m_db.data)).c_str(), lName.c_str()))
             {
                 char txt[1024];
-                sprintf(txt, "%s / %u%%", pack->url(m_db.data), uint32_t(((packIdx + 1) * 100ull) / m_db.packs.NumItems()));
+                sprintf(txt, "%s / %u%%", getPack()->url(m_db.data), uint32_t(((packIdx + 1) * 100ull) / m_db.packs.NumItems()));
                 busySpinner.UpdateMessageParam(message, txt);
 
-                PackCollector packCollector;
-                if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", pack->url(m_db.data)) != Status::kOk)
-                    break;
+                if (getPack()->songs == 0)
+                {
+                    PackCollector packCollector(m_db, packOffset);
+                    if (packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data)) != Status::kOk)
+                        break;
+                }
 
                 // throttle to avoid flooding website
                 if ((packIdx & 31) == 31)
@@ -942,23 +1003,23 @@ namespace rePlayer
                 auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
                 {
                     auto* packSource = m_data.Items<PackSource>(song.pack);
-                    return song.pack && packSource->url.IsSame(m_data, packCollector.data.Items());
+                    return song.pack && packSource->url.IsSame(m_data, getPack()->songsUrl(m_db.data));
                 });
                 if (sourcePackOffset < 0)
                 {
                     m_data.Resize(AlignUp(m_data.NumItems(), alignof(PackSource)));
                     sourcePackOffset = m_data.NumItems();
-                    m_data.Push(sizeof(PackSource) + pack->numArtists * sizeof(uint32_t));
-                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, packCollector.data.Items());
-                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = pack->numArtists;
+                    m_data.Push(sizeof(PackSource) + getPack()->numArtists * sizeof(uint32_t));
+                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, getPack()->songsUrl(m_db.data));
+                    m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = getPack()->numArtists;
                 }
                 else
                     sourcePackOffset = m_songs[sourcePackOffset].pack;
 
                 // remap artists
-                for (uint32_t i = 0; i < pack->numArtists; i++)
+                for (uint32_t i = 0; i < getPack()->numArtists; i++)
                 {
-                    auto* newArtistSource = FindArtist(m_db.artists[pack->artists[i]].first(m_db.data));
+                    auto* newArtistSource = FindArtist(m_db.artists[getPack()->artists[i].index].url(m_db.data));
                     m_data.Items<PackSource>(uint32_t(sourcePackOffset))->artists[i] = newArtistSource->id;
                     SourceID artistId(kID, newArtistSource->id);
                     auto* artistIt = collectedSongs.artists.FindIf([&](auto& entry)
@@ -968,19 +1029,19 @@ namespace rePlayer
                     if (artistIt == nullptr)
                     {
                         auto artist = new ArtistSheet();
-                        artist->handles.Add(m_db.artists[pack->artists[i]].second(m_db.data));
+                        artist->handles.Add(m_db.artists[getPack()->artists[i].index].name(m_db.data));
                         artist->sources.Add(artistId);
-                        pack->artists[i] = collectedSongs.artists.NumItems();
+                        getPack()->artists[i].remap = collectedSongs.artists.NumItems<uint16_t>();
                         collectedSongs.artists.Add(artist);
                     }
                     else
-                        pack->artists[i] = artistIt - collectedSongs.artists;
+                        getPack()->artists[i].remap = uint16_t(artistIt - collectedSongs.artists);
                 }
 
                 // collect all songs from the pack
-                for (auto& collectedSong : packCollector.songs)
+                for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
                 {
-                    auto* songSource = FindSong(uint32_t(sourcePackOffset), collectedSong.first(packCollector.data));
+                    auto* songSource = FindSong(uint32_t(sourcePackOffset), m_db.data.Items<VgmRipsSong>(songOffset)->url(m_db.data));
                     SourceID songSourceId(kID, songSource->id);
                     if (collectedSongs.IsSongAvailable(songSourceId))
                         continue;
@@ -992,16 +1053,16 @@ namespace rePlayer
                     if (songSource->isDiscarded)
                         state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
                     else
-                        song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
+                        song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew) : state.SetSongStatus(SourceResults::kOwned);
 
-                    song->name = pack->name(m_db.data);
+                    song->name = getPack()->name(m_db.data);
                     song->name.String() += '/';
-                    song->name.String() += collectedSong.second(packCollector.data);
+                    song->name.String() += m_db.data.Items<VgmRipsSong>(songOffset)->name(m_db.data);
                     song->type = { eExtension::_vgz, eReplay::VGM };
-                    song->releaseYear = uint16_t(packCollector.year);
+                    song->releaseYear = getPack()->year;
                     song->sourceIds.Add(songSourceId);
-                    for (uint32_t i = 0; i < pack->numArtists; i++)
-                        song->artistIds.Add(ArtistID(pack->artists[i]));
+                    for (uint32_t i = 0; i < getPack()->numArtists; i++)
+                        song->artistIds.Add(ArtistID(getPack()->artists[i].remap));
 
                     collectedSongs.songs.Add(song);
                     collectedSongs.states.Add(state);
@@ -1024,8 +1085,6 @@ namespace rePlayer
 
         CURL* curl = curl_easy_init();
 
-        char errorBuffer[CURL_ERROR_SIZE];
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         std::string url = "https://vgmrips.net/packs/vgm/";
@@ -1292,6 +1351,528 @@ namespace rePlayer
         }
     }
 
+    void SourceVGMRips::BrowserInit(BrowserContext& context)
+    {
+        if (m_db.artists.IsEmpty())
+        {
+            context.busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+            Core::AddJob([this, &context]()
+            {
+                DownloadArtists(*context.busySpinner);
+
+                Core::FromJob([this, &context]()
+                {
+                    context.busySpinner.Reset();
+                    if (m_db.artists.IsEmpty())
+                        context.Invalidate();
+                });
+            });
+        }
+        static const char* columnNames[] = { "Name", "Artist", "Year", "ID" };
+        context.numColumns = NumItemsOf(columnNames);
+        context.columnNames = columnNames;
+    }
+
+    void SourceVGMRips::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
+    {
+        Array<BrowserEntry> entries;
+        if (context.stage.id == kStageArtists.id)
+        {
+            // disable artist/year columns
+            context.disabledColumns = 3 << 1;
+            context.stage = kStageArtists;
+            for (uint32_t i = 0, e = m_db.artists.NumItems(); i < e; i++)
+            {
+                auto* artistName = m_db.artists[i].name(m_db.data);
+                if (filter.PassFilter(artistName))
+                {
+                    bool isSelected = false;
+                    if (auto* entry = context.entries.Find(i))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    ArtistID artistId = ArtistID::Invalid;
+                    auto* artistUrl = m_db.artists[i].url(m_db.data);
+                    if (auto* sourceArtist = m_artists.FindIf([&](auto& entry)
+                    {
+                        if (entry.url.offset == 0)
+                            return false;
+                        return strcmp(artistUrl, entry.url(m_data)) == 0;
+                    }))
+                    {
+                        auto sourceId = SourceID(kID, sourceArtist->id);
+                        for (auto* rplArtist : Core::GetDatabase(DatabaseID::kLibrary).Artists())
+                        {
+                            for (uint16_t j = 0, n = rplArtist->NumSources(); j < n; j++)
+                            {
+                                if (rplArtist->GetSource(j).id == sourceId)
+                                {
+                                    artistId = rplArtist->GetId();
+                                    break;
+                                }
+                            }
+                            if (artistId != ArtistID::Invalid)
+                                break;
+                        }
+                    }
+                    entries.Add({
+                        .dbIndex = i,
+                        .isSong = false,
+                        .isSelected = isSelected,
+                        .artistId = artistId
+                        });
+                }
+            }
+        }
+        else if (context.stage.id == kStagePacks.id)
+        {
+            // disable id column
+            context.disabledColumns = 1 << 3;
+            context.stage = kStagePacks;
+
+            // collect all packs
+            auto& dbArtist = m_db.artists[context.stageDbIndex];
+            if (dbArtist.isComplete == false)
+            {
+                ArtistCollector collector(m_db);
+                for (uint32_t i = 0; !collector.isDone; i++)
+                {
+                    collector.state = ArtistCollector::kStateInit;
+                    if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", dbArtist.url(m_db.data), i) != Status::kOk)
+                        collector.isDone = true;
+                }
+                dbArtist.isComplete = true;
+            }
+
+            for (uint32_t packOffset = dbArtist.packs; packOffset;)
+            {
+                const auto* dbPack = m_db.data.Items<VgmRipsPack>(packOffset);
+                if (filter.PassFilter(dbPack->name(m_db.data)))
+                {
+                    bool isSelected = false;
+                    if (auto* entry = context.entries.Find(packOffset))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    entries.Add({
+                        .dbIndex = packOffset,
+                        .isSong = false,
+                        .isSelected = isSelected,
+                        .isDiscarded = false,
+                        .artistId = ArtistID::Invalid
+                        });
+                }
+                for (uint16_t i = 0; i < dbPack->numArtists; i++)
+                {
+                    if (dbPack->artists[i].index == context.stageDbIndex)
+                    {
+                        packOffset = dbPack->artists[i].nextPack;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // no column disabled
+            context.disabledColumns = 0;
+            context.stage = kStagePacks;
+
+            auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(context.stageDbIndex); };
+            if (getPack()->songs == 0)
+            {
+                PackCollector packCollector(m_db, context.stageDbIndex);
+                packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data));
+            }
+
+            auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
+            {
+                auto* packSource = m_data.Items<PackSource>(song.pack);
+                return song.pack && packSource->url.IsSame(m_data, getPack()->songsUrl(m_db.data));
+            });
+
+            for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+            {
+                const auto& dbSong = *m_db.data.Items<VgmRipsSong>(songOffset);
+                if (filter.PassFilter(dbSong.name(m_db.data)))
+                {
+                    bool isSelected = false;
+                    bool isDiscarded = false;
+                    if (auto* entry = context.entries.Find(songOffset))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    SongID songId = SongID::Invalid;
+                    if (sourcePackOffset >= 0)
+                    {
+                        if (auto* songSource = m_songs.FindIf([&](auto& song)
+                        {
+                            if (song.url.offset == 0)
+                                return false;
+                            return m_songs[sourcePackOffset].pack == song.pack && strcmp(dbSong.url(m_db.data), song.url(m_data)) == 0;
+                        }))
+                        {
+                            songId = songSource->songId;
+                            isDiscarded = songSource->isDiscarded;
+                        }
+                    }
+                    entries.Add({
+                        .dbIndex = songOffset,
+                        .isSong = true,
+                        .isSelected = isSelected,
+                        .isDiscarded = isDiscarded,
+                        .songId = songId
+                        });
+                }
+            }
+        }
+        context.entries = std::move(entries);
+    }
+
+    int64_t SourceVGMRips::BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        int64_t delta = 0;
+        if (lEntry.isSong)
+        {
+            auto& lDbEntry = *m_db.data.Items<VgmRipsSong>(lEntry.dbIndex);
+            auto& rDbEntry = *m_db.data.Items<VgmRipsSong>(rEntry.dbIndex);
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.data), rDbEntry.name(m_db.data));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.songId]->GetName() : dName;
+                auto* rName = rEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.songId]->GetName() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                {
+                    delta = ((int64_t(rEntry.isDiscarded) - int64_t(lEntry.isDiscarded)) << 32)
+                        + int64_t(lEntry.songId) - int64_t(rEntry.songId);
+                }
+            }
+        }
+        else if (context.stage == kStagePacks)
+        {
+            auto& lDbEntry = *m_db.data.Items<VgmRipsPack>(lEntry.dbIndex);
+            auto& rDbEntry = *m_db.data.Items<VgmRipsPack>(rEntry.dbIndex);
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.data), rDbEntry.name(m_db.data));
+            else if (column == kColumnArtist)
+            {
+                std::string lArtist, rArtist;
+                for (uint16_t i = 0; i < lDbEntry.numArtists; ++i)
+                    lArtist += m_db.artists[lDbEntry.artists[i].index].name(m_db.data);
+                for (uint16_t i = 0; i < rDbEntry.numArtists; ++i)
+                    rArtist += m_db.artists[rDbEntry.artists[i].index].name(m_db.data);
+                delta = CompareStringMixed(lArtist.c_str(), rArtist.c_str());
+            }
+            else if (column == kColumnYear)
+                delta = int64_t(lDbEntry.year) - int64_t(rDbEntry.year);
+        }
+        else
+        {
+            auto& lDbEntry = m_db.artists[lEntry.dbIndex];
+            auto& rDbEntry = m_db.artists[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.data), rDbEntry.name(m_db.data));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
+                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+            }
+        }
+        return delta;
+    }
+
+    void SourceVGMRips::BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        if (column == kColumnName)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = *m_db.data.Items<VgmRipsSong>(entry.dbIndex);
+                ImGui::Text(ImGuiIconFile "%s.vgz", dbSong.name(m_db.data));
+            }
+            else if (context.stage == kStagePacks)
+            {
+                ImGui::Text(ImGuiIconFolder "%s", m_db.data.Items<VgmRipsPack>(entry.dbIndex)->name(m_db.data));
+            }
+            else
+            {
+                ImGui::Text(ImGuiIconFolder "%s", m_db.artists[entry.dbIndex].name(m_db.data));
+            }
+        }
+        else if (column == kColumnArtist)
+        {
+            if (context.stage != kStageArtists)
+            {
+                auto& dbPack = entry.isSong ? *m_db.data.Items<VgmRipsPack>(context.stageDbIndex) : *m_db.data.Items<VgmRipsPack>(entry.dbIndex);
+                if (dbPack.numArtists)
+                {
+                    ImGui::TextUnformatted(m_db.artists[dbPack.artists[0].index].name(m_db.data));
+                    for (uint16_t i = 1; i < dbPack.numArtists; ++i)
+                    {
+                        ImGui::SameLine(0.0f, 0.0f);
+                        ImGui::Text(" & %s", m_db.artists[dbPack.artists[i].index].name(m_db.data));
+                    }
+                }
+            }
+        }
+        else if (column == kColumnYear)
+        {
+            if (context.stage != kStageArtists)
+            {
+                auto& dbPack = entry.isSong ? *m_db.data.Items<VgmRipsPack>(context.stageDbIndex) : *m_db.data.Items<VgmRipsPack>(entry.dbIndex);
+                if (dbPack.year)
+                    ImGui::Text("%04d", dbPack.year);
+                else
+                    ImGui::TextUnformatted("n/a");
+            }
+        }
+        else if (column == kColumnId)
+        {
+            if (entry.isSong)
+            {
+                if (entry.songId != SongID::Invalid)
+                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
+                else if (entry.isDiscarded)
+                    ImGui::TextUnformatted("-------- DISCARDED");
+            }
+            else
+            {
+                if (entry.artistId != ArtistID::Invalid)
+                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
+            }
+        }
+    }
+
+    void SourceVGMRips::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)
+    {
+        UnusedArg(context);
+
+        auto addPack = [&](VgmRipsPack& dbPack)
+        {
+            // build pack
+            auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
+            {
+                auto* packSource = m_data.Items<PackSource>(song.pack);
+                return song.pack && packSource->url.IsSame(m_data, dbPack.songsUrl(m_db.data));
+            });
+            if (sourcePackOffset < 0)
+            {
+                m_data.Resize(AlignUp(m_data.NumItems(), alignof(PackSource)));
+                sourcePackOffset = m_data.NumItems();
+                m_data.Push(sizeof(PackSource) + dbPack.numArtists * sizeof(uint32_t));
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->url.Set(m_data, dbPack.songsUrl(m_db.data));
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->numArtists = dbPack.numArtists;
+            }
+            else
+                sourcePackOffset = m_songs[sourcePackOffset].pack;
+
+            // remap artists
+            for (uint32_t i = 0; i < dbPack.numArtists; i++)
+            {
+                auto* newArtistSource = FindArtist(m_db.artists[dbPack.artists[i].index].url(m_db.data));
+                m_data.Items<PackSource>(uint32_t(sourcePackOffset))->artists[i] = newArtistSource->id;
+                SourceID artistId(kID, newArtistSource->id);
+                auto* artistIt = collectedSongs.artists.FindIf([&](auto& entry)
+                {
+                    return entry->sources[0].id == artistId;
+                });
+                if (artistIt == nullptr)
+                {
+                    auto artist = new ArtistSheet();
+                    artist->handles.Add(m_db.artists[dbPack.artists[i].index].name(m_db.data));
+                    artist->sources.Add(artistId);
+                    dbPack.artists[i].remap = collectedSongs.artists.NumItems<uint16_t>();
+                    collectedSongs.artists.Add(artist);
+                }
+                else
+                    dbPack.artists[i].remap = uint16_t(artistIt - collectedSongs.artists);
+            }
+            return uint32_t(sourcePackOffset);
+        };
+        auto addSong = [&](uint32_t sourcePackOffset, const VgmRipsPack& dbPack, const VgmRipsSong& dbSong)
+        {
+            auto* songSource = FindSong(sourcePackOffset, dbSong.url(m_db.data));
+            SourceID songSourceId(kID, songSource->id);
+            if (collectedSongs.IsSongAvailable(songSourceId))
+                return;
+
+            auto* song = new SongSheet();
+
+            SourceResults::State state;
+            song->id = songSource->songId;
+            if (songSource->isDiscarded)
+                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+            else
+                song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
+
+            song->name = dbPack.name(m_db.data);
+            song->name.String() += '/';
+            song->name.String() += dbSong.name(m_db.data);
+            song->type = { eExtension::_vgz, eReplay::VGM };
+            song->releaseYear = dbPack.year;
+            song->sourceIds.Add(songSourceId);
+            for (uint32_t i = 0; i < dbPack.numArtists; i++)
+                song->artistIds.Add(ArtistID(dbPack.artists[i].remap));
+
+            collectedSongs.songs.Add(song);
+            collectedSongs.states.Add(state);
+        };
+
+        if (entry.isSong)
+        {
+            auto& dbPack = *m_db.data.Items<VgmRipsPack>(context.stageDbIndex);
+            auto& dbSong = *m_db.data.Items<VgmRipsSong>(entry.dbIndex);
+
+            auto sourcePackOffset = addPack(dbPack);
+            addSong(sourcePackOffset, dbPack, dbSong);
+        }
+        else if (context.stage == kStagePacks)
+        {
+            auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(entry.dbIndex); };
+            if (getPack()->songs == 0)
+            {
+                PackCollector packCollector(m_db, entry.dbIndex);
+                packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data));
+            }
+
+            auto sourcePackOffset = addPack(*getPack());
+            for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+                addSong(sourcePackOffset, *getPack(), *m_db.data.Items<VgmRipsSong>(songOffset));
+        }
+        else
+        {
+            // collect all packs
+            auto& dbArtist = m_db.artists[entry.dbIndex];
+            if (dbArtist.isComplete == false)
+            {
+                ArtistCollector collector(m_db);
+                for (uint32_t i = 0; !collector.isDone; i++)
+                {
+                    collector.state = ArtistCollector::kStateInit;
+                    if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", dbArtist.url(m_db.data), i) != Status::kOk)
+                        collector.isDone = true;
+                }
+                dbArtist.isComplete = true;
+            }
+
+            for (uint32_t packOffset = dbArtist.packs; packOffset;)
+            {
+                auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(packOffset); };
+                if (getPack()->songs == 0)
+                {
+                    PackCollector packCollector(m_db, packOffset);
+                    packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data));
+                }
+
+                auto sourcePackOffset = addPack(*getPack());
+                for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+                    addSong(sourcePackOffset, *getPack(), *m_db.data.Items<VgmRipsSong>(songOffset));
+
+                for (uint16_t i = 0; i < getPack()->numArtists; i++)
+                {
+                    if (getPack()->artists[i].index == entry.dbIndex)
+                    {
+                        packOffset = getPack()->artists[i].nextPack;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    std::string SourceVGMRips::BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const
+    {
+        if (stage == kStageArtists)
+            return m_db.artists[entry.dbIndex].name(m_db.data);
+        return m_db.data.Items<VgmRipsPack>(entry.dbIndex)->name(m_db.data);
+    }
+
+    core::Array<rePlayer::BrowserSong> SourceVGMRips::BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry)
+    {
+        Array<BrowserSong> songs;
+        auto addSong = [&](const VgmRipsPack& dbPack, const VgmRipsSong& dbSong)
+        {
+            auto* song = songs.Push();
+            song->url = "https://vgmrips.net/packs/vgm/";
+            song->url += dbPack.songsUrl(m_db.data);
+            song->url += '/';
+            song->url += dbSong.url(m_db.data);
+            song->name = dbPack.name(m_db.data);
+            song->name += '/';
+            song->name += dbSong.name(m_db.data);
+            song->type = { eExtension::_vgz, eReplay::VGM };
+            for (uint16_t i = 0; i < dbPack.numArtists; ++i)
+                song->artists.Add(m_db.artists[dbPack.artists[i].index].name(m_db.data));
+        };
+        if (entry.isSong)
+        {
+            addSong(*m_db.data.Items<VgmRipsPack>(context.stageDbIndex), *m_db.data.Items<VgmRipsSong>(entry.dbIndex));
+        }
+        else if (context.stage == kStagePacks)
+        {
+            auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(entry.dbIndex); };
+            if (getPack()->songs == 0)
+            {
+                PackCollector packCollector(m_db, entry.dbIndex);
+                packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data));
+            }
+
+            for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+                addSong(*getPack(), *m_db.data.Items<VgmRipsSong>(songOffset));
+        }
+        else
+        {
+            // collect all packs
+            auto& dbArtist = m_db.artists[entry.dbIndex];
+            if (dbArtist.isComplete == false)
+            {
+                ArtistCollector collector(m_db);
+                for (uint32_t i = 0; !collector.isDone; i++)
+                {
+                    collector.state = ArtistCollector::kStateInit;
+                    if (collector.Fetch("https://vgmrips.net/packs/composer/%s?p=%u", dbArtist.url(m_db.data), i) != Status::kOk)
+                        collector.isDone = true;
+                }
+                dbArtist.isComplete = true;
+            }
+
+            for (uint32_t packOffset = dbArtist.packs; packOffset;)
+            {
+                auto getPack = [&]() { return m_db.data.Items<VgmRipsPack>(packOffset); };
+                if (getPack()->songs == 0)
+                {
+                    PackCollector packCollector(m_db, packOffset);
+                    packCollector.Fetch("https://vgmrips.net/packs/pack/%s", getPack()->url(m_db.data));
+                }
+
+                for (auto songOffset = getPack()->songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+                    addSong(*getPack(), *m_db.data.Items<VgmRipsSong>(songOffset));
+
+                for (uint16_t i = 0; i < getPack()->numArtists; i++)
+                {
+                    if (getPack()->artists[i].index == entry.dbIndex)
+                    {
+                        packOffset = getPack()->artists[i].nextPack;
+                        break;
+                    }
+                }
+            }
+        }
+        return songs;
+    }
+
     SourceVGMRips::SongSource* SourceVGMRips::FindSong(uint32_t pack, const std::string& titleUrl)
     {
         auto* song = m_songs.FindIf([&](auto& song)
@@ -1343,6 +1924,20 @@ namespace rePlayer
             m_areDataDirty = true;
         }
         return artist;
+    }
+
+    bool SourceVGMRips::DownloadArtists(BusySpinner& busySpinner)
+    {
+        if (m_db.artists.IsEmpty())
+        {
+            busySpinner.Info("downloading artists database");
+
+            ArtistsCollector collector(m_db);
+            collector.Fetch("https://vgmrips.net/packs/composers");
+            if (!collector.error.empty())
+                busySpinner.Error(collector.error);
+        }
+        return m_db.artists.IsEmpty();
     }
 }
 // namespace rePlayer

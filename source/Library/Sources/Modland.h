@@ -32,6 +32,14 @@ namespace rePlayer
         void Load() final;
         void Save() const final;
 
+        void BrowserInit(BrowserContext& context) final;
+        void BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter) final;
+        int64_t BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const final;
+        void BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const final;
+        void BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs) final;
+        std::string BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const final;
+        Array<BrowserSong> BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry);
+
         static constexpr SourceID::eSourceID kID = SourceID::ModlandSourceID;
 
     private:
@@ -106,7 +114,7 @@ namespace rePlayer
                 kEuphony,
                 kSoundSmith,
                 kFMP,
-                kSGC                
+                kSGC
             };
 
             Chars name;
@@ -149,6 +157,12 @@ namespace rePlayer
             uint32_t next;
         };
 
+        struct ModlandPk
+        {
+            const char* name;
+            ModlandReplay::Type type;
+        };
+
         struct SourceReplay
         {
             Chars name;
@@ -176,11 +190,21 @@ namespace rePlayer
             bool IsValid() const { return songId != SongID::Invalid || isDiscarded == true; }
         };
 
+        static constexpr BrowserColumn kColumnArtist = BrowserColumn(1);
+        static constexpr BrowserColumn kColumnReplay = BrowserColumn(2);
+        static constexpr BrowserColumn kColumnId = BrowserColumn(3);
+        static constexpr BrowserStage kStageArtists = { BrowserStageId(1), BrowserStageType::Folder };
+        static constexpr BrowserStage kStageSongs = { BrowserStageId(2), BrowserStageType::Song };
+        static constexpr BrowserStage kStageMultiSong = { BrowserStageId(3), BrowserStageType::Song };
+
     private:
         SourceSong* GetSongSource(uint32_t index) const;
 
+        void AddSong(const ModlandSong& dbSong, SourceResults& collectedSongs, bool isNewChecked);
+
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const ModlandSong& dbSong);
+        std::string BuildUrl(const ModlandSong& dbSong, uint32_t dbItem) const;
         std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
         static std::string CleanUrl(CURL* curl, const char* url);
         Import ImportMultiSong(SourceID sourceId, const ModlandReplayOverride* const replay, const std::string& path);
@@ -191,6 +215,8 @@ namespace rePlayer
         const ModlandReplayOverride* const GetReplayOverride(SourceSong* songSource) const;
 
         MediaType UpdateMediaType(const ModlandSong& dbSong, std::string& dbSongName) const;
+
+        std::string GetBrowserArtists(const ModlandSong& dbSong) const;
 
         bool DownloadDatabase(BusySpinner* busySpinner);
         void DecodeDatabase(char* bufBegin, const char* bufEnd, BusySpinner* busySpinner);
@@ -227,6 +253,7 @@ namespace rePlayer
 
         static const char* const ms_filename;
         static ModlandReplayOverride ms_replayOverrides[];
+        static const ModlandPk ms_pkReplays[];
     };
 }
 // namespace rePlayer

@@ -69,7 +69,6 @@ namespace rePlayer
 
             Array<char> buffer;
 
-            char errorBuffer[CURL_ERROR_SIZE];
             if (!isInitialized)
             {
                 isInitialized = true;
@@ -78,8 +77,8 @@ namespace rePlayer
                 curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
                 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
                 curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+                curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
-                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
                 curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
@@ -89,7 +88,6 @@ namespace rePlayer
             }
             else
             {
-                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
                 curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
             }
 
@@ -125,9 +123,17 @@ namespace rePlayer
 
         std::string Escape(const char* buf)
         {
-            auto escapeBuf = curl_easy_escape(curl, buf, static_cast<int>(strlen(buf)));
+            auto escapeBuf = curl_easy_escape(curl, buf, 0);
             std::string newBuf = escapeBuf;
             curl_free(escapeBuf);
+            return newBuf;
+        }
+
+        std::string Unescape(const char* buf)
+        {
+            auto unescapeBuf = curl_easy_unescape(curl, buf, 0, nullptr);
+            std::string newBuf = unescapeBuf;
+            curl_free(unescapeBuf);
             return newBuf;
         }
 

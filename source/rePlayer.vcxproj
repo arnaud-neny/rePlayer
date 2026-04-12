@@ -242,6 +242,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="IO\StreamUrl.cpp" />
     <ClCompile Include="Library\Library.cpp" />
     <ClCompile Include="Library\LibraryArtistsUI.cpp" />
+    <ClCompile Include="Library\LibraryBrowserUI.cpp" />
     <ClCompile Include="Library\LibraryDatabase.cpp" />
     <ClCompile Include="Library\LibraryFileImport.cpp" />
     <ClCompile Include="Library\LibraryDatabasePatch.cpp" />
@@ -315,6 +316,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="IO\StreamUrl.h" />
     <ClInclude Include="Library\Library.h" />
     <ClInclude Include="Library\LibraryArtistsUI.h" />
+    <ClInclude Include="Library\LibraryBrowserUI.h" />
     <ClInclude Include="Library\LibraryDatabase.h" />
     <ClInclude Include="Library\LibraryDatabaseUI.h" />
     <ClInclude Include="Library\LibraryDatabaseUI.inl.h" />

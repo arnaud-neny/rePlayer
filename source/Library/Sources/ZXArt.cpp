@@ -1,11 +1,13 @@
 // Core
 #include <Core/Log.h>
 #include <Core/String.h>
+#include <ImGui.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
 #include <JSON/json.hpp>
 
 // rePlayer
+#include <Database/Database.h>
 #include <Database/Types/Countries.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
@@ -68,6 +70,7 @@ namespace rePlayer
     }
 
     SourceZXArt::SourceZXArt()
+        : Source(true)
     {}
 
     SourceZXArt::~SourceZXArt()
@@ -399,6 +402,283 @@ namespace rePlayer
         }
     }
 
+    void SourceZXArt::BrowserInit(BrowserContext& context)
+    {
+        if (m_db.artists.IsEmpty())
+        {
+            context.busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+            Core::AddJob([this, &context]()
+            {
+                DownloadDatabase(*context.busySpinner);
+
+                Core::FromJob([this, &context]()
+                {
+                    context.busySpinner.Reset();
+                    if (m_db.artists.IsEmpty())
+                        context.Invalidate();
+                });
+            });
+        }
+        static const char* columnNames[] = { "Name", "Artist", "Year", "ID" };
+        context.numColumns = NumItemsOf(columnNames);
+        context.columnNames = columnNames;
+    }
+
+    void SourceZXArt::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
+    {
+        Array<BrowserEntry> entries;
+        if (context.stage.id == kStageArtists.id)
+        {
+            // disable artist column
+            context.disabledColumns = 3 << 1;
+            context.stage = kStageArtists;
+            for (uint32_t i = 0, e = m_db.artists.NumItems(); i < e; i++)
+            {
+                auto* artistName = m_db.artists[i].handles(m_db.strings);
+                if (filter.PassFilter(artistName))
+                {
+                    bool isSelected = false;
+                    if (auto* entry = context.entries.Find(i))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    ArtistID artistId = ArtistID::Invalid;
+                    auto sourceId = SourceID(kID, m_db.artists[i].id);
+                    for (auto* rplArtist : Core::GetDatabase(DatabaseID::kLibrary).Artists())
+                    {
+                        for (uint16_t j = 0, n = rplArtist->NumSources(); j < n; j++)
+                        {
+                            if (rplArtist->GetSource(j).id == sourceId)
+                            {
+                                artistId = rplArtist->GetId();
+                                break;
+                            }
+                        }
+                        if (artistId != ArtistID::Invalid)
+                            break;
+                    }
+                    entries.Add({
+                        .dbIndex = i,
+                        .isSong = false,
+                        .isSelected = isSelected,
+                        .artistId = artistId
+                        });
+                }
+            }
+        }
+        else
+        {
+            // no column disabled
+            context.disabledColumns = 0;
+            context.stage = kStageSongs;
+
+            auto& dbArtist = m_db.artists[context.stageDbIndex];
+            DownloadArtist(dbArtist);
+
+            for (uint32_t i = 0, songOffset = dbArtist.songs; i < dbArtist.numSongs; ++i)
+            {
+                const auto* dbSong = m_db.songs.Items<ZxArtSong>(songOffset);
+                if (filter.PassFilter(dbSong->name(m_db.strings)))
+                {
+                    bool isSelected = false;
+                    bool isDiscarded = false;
+                    if (auto* entry = context.entries.Find(songOffset))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    SongID songId = SongID::Invalid;
+                    if (auto* songSource = FindSong(dbSong->id))
+                    {
+                        songId = songSource->songId;
+                        isDiscarded = songSource->isDiscarded;
+                    }
+                    entries.Add({
+                        .dbIndex = songOffset,
+                        .isSong = true,
+                        .isSelected = isSelected,
+                        .isDiscarded = isDiscarded,
+                        .songId = songId
+                        });
+                }
+                songOffset += AlignUp(uint32_t(ZxArtSong::Size() + dbSong->numArtists * sizeof(uint16_t)), alignof(uint32_t));
+            }
+        }
+        context.entries = std::move(entries);
+    }
+
+    int64_t SourceZXArt::BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        int64_t delta = 0;
+        if (lEntry.isSong)
+        {
+            auto& lDbEntry = *m_db.songs.Items<ZxArtSong>(lEntry.dbIndex);
+            auto& rDbEntry = *m_db.songs.Items<ZxArtSong>(rEntry.dbIndex);
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+            else if (column == kColumnArtist)
+            {
+                std::string lArtist, rArtist;
+                for (uint16_t i = 0; i < lDbEntry.numArtists; ++i)
+                    lArtist += m_db.artists[lDbEntry.artists[i]].handles(m_db.strings);
+                for (uint16_t i = 0; i < rDbEntry.numArtists; ++i)
+                    rArtist += m_db.artists[rDbEntry.artists[i]].handles(m_db.strings);
+                delta = CompareStringMixed(lArtist.c_str(), rArtist.c_str());
+            }
+            else if (column == kColumnYear)
+                delta = int64_t(lDbEntry.year) - int64_t(rDbEntry.year);
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.songId]->GetName() : dName;
+                auto* rName = rEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.songId]->GetName() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                {
+                    delta = ((int64_t(rEntry.isDiscarded) - int64_t(lEntry.isDiscarded)) << 32)
+                        + int64_t(lEntry.songId) - int64_t(rEntry.songId);
+                }
+            }
+        }
+        else
+        {
+            auto& lDbEntry = m_db.artists[lEntry.dbIndex];
+            auto& rDbEntry = m_db.artists[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.handles(m_db.strings), rDbEntry.handles(m_db.strings));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
+                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+            }
+        }
+        return delta;
+    }
+
+    void SourceZXArt::BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        if (column == kColumnName)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = *m_db.songs.Items<ZxArtSong>(entry.dbIndex);
+                if (dbSong.type.ext != eExtension::Unknown)
+                    ImGui::Text(ImGuiIconFile "%s.%s", dbSong.name(m_db.strings), MediaType::extensionNames[int(dbSong.type.ext)]);
+                else
+                    ImGui::Text(ImGuiIconFile "%s", dbSong.name(m_db.strings));
+            }
+            else
+            {
+                ImGui::Text(ImGuiIconFolder "%s", m_db.artists[entry.dbIndex].handles(m_db.strings));
+            }
+        }
+        else if (column == kColumnArtist)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = *m_db.songs.Items<ZxArtSong>(entry.dbIndex);
+                ImGui::TextUnformatted(m_db.artists[dbSong.artists[0]].handles(m_db.strings));
+                for (uint16_t i = 1; i < dbSong.numArtists; ++i)
+                {
+                    ImGui::SameLine(0.0f, 0.0f);
+                    ImGui::Text(" & %s", m_db.artists[dbSong.artists[i]].handles(m_db.strings));
+                }
+            }
+        }
+        else if (column == kColumnYear)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = *m_db.songs.Items<ZxArtSong>(entry.dbIndex);
+                if (dbSong.year)
+                    ImGui::Text("%04d", dbSong.year);
+                else
+                    ImGui::TextUnformatted("n/a");
+            }
+        }
+        else if (column == kColumnId)
+        {
+            if (entry.isSong)
+            {
+                if (entry.songId != SongID::Invalid)
+                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
+                else if (entry.isDiscarded)
+                    ImGui::TextUnformatted("-------- DISCARDED");
+            }
+            else
+            {
+                if (entry.artistId != ArtistID::Invalid)
+                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
+            }
+        }
+    }
+
+    void SourceZXArt::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)
+    {
+        UnusedArg(context);
+        if (entry.isSong)
+        {
+            AddSong(*m_db.songs.Items<ZxArtSong>(entry.dbIndex), collectedSongs);
+        }
+        else
+        {
+            auto& dbArtist = m_db.artists[entry.dbIndex];
+            DownloadArtist(dbArtist);
+            for (uint32_t i = 0, songOffset = dbArtist.songs; i < dbArtist.numSongs; ++i)
+            {
+                auto& dbSong = *m_db.songs.Items<ZxArtSong>(songOffset);
+                AddSong(dbSong, collectedSongs);
+                songOffset += AlignUp(uint32_t(ZxArtSong::Size() + dbSong.numArtists * sizeof(uint16_t)), alignof(uint32_t));
+            }
+        }
+    }
+
+    std::string SourceZXArt::BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const
+    {
+        UnusedArg(stage);
+        return m_db.artists[entry.dbIndex].handles(m_db.strings);
+    }
+
+    core::Array<rePlayer::BrowserSong> SourceZXArt::BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry)
+    {
+        UnusedArg(context);
+        Array<BrowserSong> songs;
+        auto addSong = [&](const ZxArtSong& dbSong)
+        {
+            auto* song = songs.Push();
+            char url[128];
+            sprintf(url, "https://zxart.ee/file/id:%u/", dbSong.id);
+            song->url = url;
+            song->name = dbSong.name(m_db.strings);
+            song->type = dbSong.type;
+            for (uint16_t i = 0; i < dbSong.numArtists; ++i)
+                song->artists.Add(m_db.artists[dbSong.artists[i]].handles(m_db.strings));
+        };
+        if (entry.isSong)
+        {
+            addSong(*m_db.songs.Items<ZxArtSong>(entry.dbIndex));
+        }
+        else
+        {
+            auto& dbArtist = m_db.artists[entry.dbIndex];
+            DownloadArtist(dbArtist);
+            for (uint32_t i = 0, songOffset = dbArtist.songs; i < dbArtist.numSongs; ++i)
+            {
+                auto& dbSong = *m_db.songs.Items<ZxArtSong>(songOffset);
+                addSong(dbSong);
+                songOffset += AlignUp(uint32_t(ZxArtSong::Size() + dbSong.numArtists * sizeof(uint16_t)), alignof(uint32_t));
+            }
+        }
+        return songs;
+    }
+
     SourceZXArt::SongSource* SourceZXArt::AddSong(uint32_t id)
     {
         auto* song = std::lower_bound(m_songs.begin(), m_songs.end(), id, [](auto& song, auto id)
@@ -456,6 +736,8 @@ namespace rePlayer
                     sscanf_s(zxYear.get<std::string>().c_str(), "%u", &year);
                     song->releaseYear = uint16_t(year);
                 }
+                else if (zxYear.is_number())
+                    song->releaseYear = uint16_t(zxYear.get<uint32_t>());
             }
             if (zxMusic.contains("type"))
             {
@@ -576,6 +858,9 @@ namespace rePlayer
     {
         if (m_db.artists.IsEmpty())
         {
+            if (m_db.songs.IsEmpty())
+                m_db.songs.Add(uint8_t(0), 4);
+
             CURL* curl = curl_easy_init();
 
             char errorBuffer[CURL_ERROR_SIZE];
@@ -718,6 +1003,174 @@ namespace rePlayer
             curl_easy_cleanup(curl);
         }
         return m_db.artists.IsEmpty();
+    }
+
+    void SourceZXArt::DownloadArtist(ZxArtArtist& artist)
+    {
+        if (artist.songs != 0)
+            return;
+
+        CURL* curl = curl_easy_init();
+
+        char errorBuffer[CURL_ERROR_SIZE];
+        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
+
+        struct Buffer : public Array<uint8_t>
+        {
+            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
+            {
+                buffer->Add(data, uint32_t(size * nmemb));
+                return size * nmemb;
+            }
+        } buffer;
+
+        artist.songs = m_db.songs.NumItems();
+        CURLcode curlError = CURLE_OK;
+        artist.numSongs = 0;
+        for (; curlError == CURLE_OK;)
+        {
+            buffer.Clear();
+
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+
+            char url[1024];
+            sprintf(url, "https://zxart.ee/api/export:zxMusic/language:eng/start:%u/filter:authorId=%u", artist.numSongs, artist.id);
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            Log::Message("ZXArt: fetching author %u at %u\n", artist.id, artist.numSongs);
+            curlError = curl_easy_perform(curl);
+            if (curlError == CURLE_OK)
+            {
+                if (GetDbSongs(buffer, artist.numSongs))
+                    break;
+            }
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    bool SourceZXArt::GetDbSongs(const Array<uint8_t>& buffer, uint32_t& start)
+    {
+        auto json = nlohmann::json::parse(buffer.begin(), buffer.end());
+        uint32_t totalAmount = json.contains("totalAmount") ? json["totalAmount"].get<uint32_t>() : 0;
+        auto& jsonEntries = json["responseData"]["zxMusic"];
+        for (auto& zxMusic : jsonEntries)
+        {
+            auto* song = m_db.songs.Push<ZxArtSong*>(ZxArtSong::Size());
+
+            song->id = zxMusic["id"].get<uint32_t>();
+
+            auto name = ConvertEntities(zxMusic["title"].get<std::string>());
+            if (zxMusic.contains("internalTitle"))
+                name += " / " + ConvertEntities(zxMusic["internalTitle"].get<std::string>());
+            song->name.Set(m_db.strings, name);
+
+            uint32_t year = 0;
+            if (zxMusic.contains("year"))
+            {
+                auto& zxYear = zxMusic["year"];
+                if (zxYear.is_string())
+                    sscanf_s(zxYear.get<std::string>().c_str(), "%u", &year);
+                else if (zxYear.is_number())
+                    year = zxYear.get<uint32_t>();
+            }
+            song->year = uint16_t(year);
+
+            song->type = {};
+            if (zxMusic.contains("type"))
+            {
+                song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
+                if (song->type.ext == eExtension::Unknown)
+                {
+                    m_db.strings.Last() = '.';
+                    auto type = zxMusic["type"].get<std::string>();
+                    m_db.strings.Add(type.c_str(), uint32_t(type.size() + 1));
+                }
+            }
+            else if (zxMusic.contains("originalFileName"))
+            {
+                auto filename = zxMusic["originalFileName"].get<std::string>();
+                auto pos = filename.rfind('.');
+                if (pos != filename.npos)
+                {
+                    song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
+                    if (song->type.ext == eExtension::Unknown)
+                        m_db.strings.Add(filename.c_str() + pos, uint32_t(filename.size() - pos + 1));
+                }
+            }
+
+            song->numArtists = uint16_t(zxMusic["authorIds"].size());
+            for (auto& author : zxMusic["authorIds"])
+            {
+                auto authorId = author.get<uint32_t>();
+                auto it = m_db.artists.FindIf([authorId](auto& entry)
+                {
+                    return entry.id == authorId;
+                });
+                auto newArtistId = uint16_t(it - m_db.artists.begin());
+                m_db.songs.Add(pcCast<uint8_t>(&newArtistId), sizeof(uint16_t));
+            }
+            m_db.songs.Resize(AlignUp(m_db.songs.NumItems(), alignof(uint32_t)));
+        }
+        start += uint32_t(jsonEntries.size());
+        return start >= totalAmount;
+    }
+
+    void SourceZXArt::AddSong(const ZxArtSong& dbSong, SourceResults& collectedSongs)
+    {
+        auto song = new SongSheet();
+
+        song->sourceIds.Add(SourceID(kID, dbSong.id));
+
+        SourceResults::State state;
+        if (auto sourceSong = FindSong(dbSong.id))
+        {
+            song->id = sourceSong->songId;
+            if (sourceSong->isDiscarded)
+                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+            else
+                song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
+        }
+        else
+        {
+            state.SetSongStatus(SourceResults::kNew).SetChecked(true);
+        }
+
+        song->name = dbSong.name(m_db.strings);
+        song->releaseYear = dbSong.year;
+        song->type = dbSong.type;
+        for (uint16_t i = 0; i < dbSong.numArtists; ++i)
+        {
+            auto& dbArtist = m_db.artists[dbSong.artists[i]];
+            auto it = std::find_if(collectedSongs.artists.begin(), collectedSongs.artists.end(), [&](auto entry)
+            {
+                return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == dbArtist.id;
+            });
+            auto newArtistId = static_cast<ArtistID>(it - collectedSongs.artists.begin());
+            if (it == collectedSongs.artists.end())
+            {
+                auto* newArtist = new ArtistSheet();
+                newArtist->sources.Add(SourceID(kID, dbArtist.id));
+                for (uint32_t j = 0, ofs = dbArtist.handles.offset; j < dbArtist.numHandles; ++j)
+                {
+                    newArtist->handles.Add(m_db.strings.Items(ofs));
+                    ofs += uint32_t(newArtist->handles[j].String().size() + 1);
+                }
+
+                newArtist->realName = dbArtist.realName(m_db.strings);
+                if (dbArtist.country)
+                    newArtist->countries.Add(dbArtist.country);
+
+                collectedSongs.artists.Add(newArtist);
+            }
+            song->artistIds.Add(newArtistId);
+        }
+        collectedSongs.songs.Add(song);
+        collectedSongs.states.Add(state);
     }
 }
 // namespace rePlayer

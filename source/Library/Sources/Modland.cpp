@@ -3,10 +3,12 @@
 // Core
 #include <Core/Log.h>
 #include <Core/String.h>
+#include <ImGui.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
 
 // rePlayer
+#include <Database/Database.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <UI/BusySpinner.h>
@@ -358,6 +360,25 @@ namespace rePlayer
         },
     };
 
+    const SourceModland::ModlandPk SourceModland::ms_pkReplays[] = {
+        { "MDX", ModlandReplay::kMDX },
+        { "Capcom Q-Sound Format", ModlandReplay::kQSF },
+        { "Gameboy Sound Format", ModlandReplay::kGSF },
+        { "Nintendo DS Sound Format", ModlandReplay::k2SF },
+        { "Saturn Sound Format", ModlandReplay::kSSF },
+        { "Dreamcast Sound Format", ModlandReplay::kDSF },
+        { "Playstation Sound Format", ModlandReplay::kPSF },
+        { "Playstation 2 Sound Format", ModlandReplay::kPSF2 },
+        { "Ultra64 Sound Format", ModlandReplay::kUSF },
+        { "Super Nintendo Sound Format", ModlandReplay::kSNSF },
+        { "MoonBlaster", ModlandReplay::kMBM },
+        { "MoonBlaster (edit mode)", ModlandReplay::kMBMEdit },
+        { "FAC SoundTracker", ModlandReplay::kFACSoundTracker },
+        { "IFF-SMUS", ModlandReplay::kIFFSmus },
+        { "Euphony", ModlandReplay::kEuphony },
+        { "FM sound driver (FMP)", ModlandReplay::kFMP }
+    };
+
     inline const char* SourceModland::Chars::operator()(const Array<char>& blob) const
     {
         return blob.Items() + offset;
@@ -409,6 +430,7 @@ namespace rePlayer
     }
 
     SourceModland::SourceModland()
+        : Source(true)
     {
         m_db.items.Push(); // add first item because it will be used as an invalid index
 
@@ -429,8 +451,9 @@ namespace rePlayer
 
         busySpinner.Info("looking for artists");
         std::string lName = ToLower(name);
-        for (auto& dbArtist : m_db.artists)
+        for (uint32_t i = 1, e = m_db.artists.NumItems(); i < e; ++i)
         {
+            auto& dbArtist = m_db.artists[i];
             std::string lArtist = ToLower(dbArtist.name(m_db.strings));
             if (strstr(lArtist.c_str(), lName.c_str()))
             {
@@ -461,11 +484,12 @@ namespace rePlayer
 
         uint16_t dbImportedArtistId = 0;
         {
-            for (auto& dbArtist : m_db.artists)
+            for (uint32_t i = 1, e = m_db.artists.NumItems(); i < e; ++i)
             {
+                auto& dbArtist = m_db.artists[i];
                 if (dbArtist.name.IsSame(m_db.strings, artistName))
                 {
-                    dbImportedArtistId = uint16_t(&dbArtist - m_db.artists.Items());
+                    dbImportedArtistId = uint16_t(i);
                     break;
                 }
             }
@@ -476,58 +500,7 @@ namespace rePlayer
         }
 
         for (uint32_t dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == dbImportedArtistId ? 0 : 1])
-        {
-            const auto& dbSong = m_db.songs[dbSongId];
-            std::string dbSongName(dbSong.name(m_db.strings));
-            auto songSourceId = FindSong(dbSong);
-            if (results.IsSongAvailable(SourceID(kID, songSourceId)))
-                continue;
-
-            auto* song = new SongSheet();
-            auto* songSource = GetSongSource(songSourceId);
-
-            SourceResults::State state;
-            song->id = songSource->songId;
-            if (songSource->isDiscarded)
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-            else
-                song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
-
-            uint32_t artistIds[2] = { 0, 0 };
-            for (uint32_t i = 0; i < 2; i++)
-            {
-                if (songSource->artists[i])
-                {
-                    SourceID artistId(kID, songSource->artists[i]);
-                    auto* artistIt = results.artists.FindIf([artistId](auto entry)
-                    {
-                        return entry->sources[0].id == artistId;
-                    });
-                    if (artistIt == nullptr)
-                    {
-                        artistIds[i] = results.artists.NumItems();
-                        auto artist = new ArtistSheet();
-                        artist->handles.Add(m_db.artists[dbSong.artists[i]].name(m_db.strings));
-                        artist->sources.Add(artistId);
-                        results.artists.Add(artist);
-                    }
-                    else
-                        artistIds[i] = artistIt - results.artists;
-                }
-            }
-
-            song->type = UpdateMediaType(dbSong, dbSongName);
-            song->name = dbSongName;
-            if (dbSong.artists[0])
-            {
-                song->artistIds.Add(static_cast<ArtistID>(artistIds[0]));
-                if (dbSong.artists[1])
-                    song->artistIds.Add(static_cast<ArtistID>(artistIds[1]));
-            }
-            song->sourceIds.Add(SourceID(kID, songSourceId));
-            results.songs.Add(song);
-            results.states.Add(state);
-        }
+            AddSong(m_db.songs[dbSongId], results, true);
 
         m_isDirty |= results.songs.IsNotEmpty();
     }
@@ -554,51 +527,7 @@ namespace rePlayer
             if (strstr(rName.c_str(), lName.c_str()) == nullptr)
                 continue;
 
-            auto songSourceId = FindSong(dbSong);
-            auto* song = new SongSheet();
-            auto* songSource = GetSongSource(songSourceId);
-
-            SourceResults::State state;
-            song->id = songSource->songId;
-            if (songSource->isDiscarded)
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-            else
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kNew : SourceResults::kOwned);
-
-            uint32_t artistIds[2] = { 0, 0 };
-            for (uint32_t artistIdx = 0; artistIdx < 2; artistIdx++)
-            {
-                if (songSource->artists[artistIdx])
-                {
-                    SourceID artistId(kID, songSource->artists[artistIdx]);
-                    auto artistIt = collectedSongs.artists.FindIf([artistId](auto entry)
-                    {
-                        return entry->sources[0].id == artistId;
-                    });
-                    if (artistIt == nullptr)
-                    {
-                        artistIds[artistIdx] = collectedSongs.artists.NumItems();
-                        auto artist = new ArtistSheet();
-                        artist->handles.Add(m_db.artists[dbSong.artists[artistIdx]].name(m_db.strings));
-                        artist->sources.Add(artistId);
-                        collectedSongs.artists.Add(artist);
-                    }
-                    else
-                        artistIds[artistIdx] = artistIt - collectedSongs.artists;
-                }
-            }
-
-            song->type = UpdateMediaType(dbSong, dbSongName);
-            song->name = dbSongName;
-            if (dbSong.artists[0])
-            {
-                song->artistIds.Add(static_cast<ArtistID>(artistIds[0]));
-                if (dbSong.artists[1])
-                    song->artistIds.Add(static_cast<ArtistID>(artistIds[1]));
-            }
-            song->sourceIds.Add(SourceID(kID, songSourceId));
-            collectedSongs.songs.Add(song);
-            collectedSongs.states.Add(state);
+            AddSong(dbSong, collectedSongs, false);
         }
     }
 
@@ -610,36 +539,11 @@ namespace rePlayer
 
         if (auto* replay = GetReplayOverride(songSource))
             return ImportMultiSong(sourceId, replay, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "MDX") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kMDX, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Capcom Q-Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kQSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Gameboy Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kGSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Nintendo DS Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::k2SF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Saturn Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kSSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Dreamcast Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kDSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kPSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Playstation 2 Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kPSF2, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Ultra64 Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kUSF, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Super Nintendo Sound Format") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kSNSF, path);
-        if (strstr(m_replays[songSource->replay].name(m_strings), "MoonBlaster") == m_replays[songSource->replay].name(m_strings))
-            return ImportPkSong(sourceId, strstr(m_replays[songSource->replay].name(m_strings), "edit") ? ModlandReplay::kMBMEdit : ModlandReplay::kMBM, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "FAC SoundTracker") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kFACSoundTracker, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "IFF-SMUS") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kIFFSmus, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "Euphony") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kEuphony, path);
-        if (strcmp(m_replays[songSource->replay].name(m_strings), "FM sound driver (FMP)") == 0)
-            return ImportPkSong(sourceId, ModlandReplay::kFMP, path);
+        for (auto& replay : ms_pkReplays)
+        {
+            if (strcmp(m_replays[songSource->replay].name(m_strings), replay.name) == 0)
+                return ImportPkSong(sourceId, replay.type, path);
+        }
 
         CURL* curl = curl_easy_init();
 
@@ -997,9 +901,405 @@ namespace rePlayer
         }
     }
 
+    void SourceModland::BrowserInit(BrowserContext& context)
+    {
+        if (m_db.songs.IsEmpty())
+        {
+            context.busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+            Core::AddJob([this, &context]()
+            {
+                thread::ScopedSpinLock lock(m_mutex);
+                DownloadDatabase(context.busySpinner);
+
+                Core::FromJob([this, &context]()
+                {
+                    context.busySpinner.Reset();
+                    if (m_db.songs.IsEmpty())
+                        context.Invalidate();
+
+                });
+            });
+        }
+        static const char* columnNames[] = { "Name", "Artist", "replay", "ID" };
+        context.numColumns = NumItemsOf(columnNames);
+        context.columnNames = columnNames;
+    }
+
+    void SourceModland::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
+    {
+        Array<BrowserEntry> entries;
+        if (context.stage.id == kStageArtists.id)
+        {
+            // disable artist column
+            context.disabledColumns = 3 << 1;
+            context.stage = kStageArtists;
+            // include artist 0 to browse songs without artist
+            for (uint32_t i = 0, e = m_db.artists.NumItems(); i < e; i++)
+            {
+                if (filter.PassFilter(m_db.artists[i].name(m_db.strings)))
+                {
+                    bool isSelected = false;
+                    if (auto* entry = context.entries.Find(i))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    ArtistID artistId = ArtistID::Invalid;
+                    if (auto* sourceArtist = m_artists.FindIf([&](auto& entry) { return entry.name.IsSame(m_strings, m_db.artists[i].name(m_db.strings)); }))
+                    {
+                        auto sourceId = SourceID(kID, uint32_t(sourceArtist - m_artists.Items()));
+                        for (auto* rplArtist : Core::GetDatabase(DatabaseID::kLibrary).Artists())
+                        {
+                            for (uint16_t j = 0, n = rplArtist->NumSources(); j < n; j++)
+                            {
+                                if (rplArtist->GetSource(j).id == sourceId)
+                                {
+                                    artistId = rplArtist->GetId();
+                                    break;
+                                }
+                            }
+                            if (artistId != ArtistID::Invalid)
+                                break;
+                        }
+                    }
+                    entries.Add({
+                        .dbIndex = i,
+                        .isSong = false,
+                        .isSelected = isSelected,
+                        .artistId = artistId
+                        });
+                }
+            }
+        }
+        else
+        {
+            // no column disabled
+            context.disabledColumns = 0;
+            auto findSong = [this](const ModlandSong& dbSong)
+            {
+                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                {
+                    if (m_songs[i] == 0)
+                        continue;
+                    auto* song = GetSongSource(i);
+                    if (dbSong.name.IsSame(m_db.strings, song->name))
+                    {
+                        if (!m_db.replays[dbSong.replayId].name.IsSame(m_db.strings, m_replays[song->replay].name(m_strings)))
+                            continue;
+                        if (song->artists[0])
+                        {
+                            if (!dbSong.artists[0])
+                                continue;
+                            if (!m_db.artists[dbSong.artists[0]].name.IsSame(m_db.strings, m_artists[song->artists[0]].name(m_strings)))
+                                continue;
+                            if (song->artists[1])
+                            {
+                                if (!dbSong.artists[1])
+                                    continue;
+                                if (!m_db.artists[dbSong.artists[1]].name.IsSame(m_db.strings, m_artists[song->artists[1]].name(m_strings)))
+                                    continue;
+                            }
+                            else if (dbSong.artists[1])
+                                continue;
+                        }
+                        else if (dbSong.artists[0])
+                            continue;
+
+                        return song;
+                    }
+                }
+                return (SourceSong*)nullptr;
+            };
+            if (context.stage.id == kStageMultiSong.id)
+            {
+                context.stage = kStageMultiSong;
+                const auto& dbSong = m_db.songs[context.stageDbIndex];
+                SongID songId = SongID::Invalid;
+                bool isDiscarded = false;
+                if (auto* songSource = findSong(dbSong))
+                {
+                    songId = songSource->songId;
+                    isDiscarded = songSource->isDiscarded;
+                }
+                for (auto item = dbSong.item; item; item = m_db.items[item].next)
+                {
+                    if (filter.PassFilter(m_db.items[item].name(m_db.strings)))
+                    {
+                        bool isSelected = false;
+                        if (auto* entry = context.entries.Find(item))
+                        {
+                            isSelected = entry->isSelected;
+                            context.entries.RemoveAtFast(entry - context.entries.Items());
+                        }
+                        entries.Add({
+                            .dbIndex = item,
+                            .isSong = true,
+                            .isSelected = isSelected,
+                            .isDiscarded = isDiscarded,
+                            .songId = songId
+                            });
+                    }
+                }
+            }
+            else
+            {
+                auto stage = kStageSongs;
+                for (uint32_t dbSongId = m_db.artists[context.stageDbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == context.stageDbIndex ? 0 : 1])
+                {
+                    const auto& dbSong = m_db.songs[dbSongId];
+                    if (filter.PassFilter(dbSong.name(m_db.strings)))
+                    {
+                        bool isSelected = false;
+                        bool isDiscarded = false;
+                        if (auto* entry = context.entries.Find(dbSongId))
+                        {
+                            isSelected = entry->isSelected;
+                            context.entries.RemoveAtFast(entry - context.entries.Items());
+                        }
+                        SongID songId = SongID::Invalid;
+                        if (auto* songSource = findSong(dbSong))
+                        {
+                            songId = songSource->songId;
+                            isDiscarded = songSource->isDiscarded;
+                        }
+                        auto isSong = dbSong.item == 0 || GetReplayOverride(m_db.replays[dbSong.replayId].type);
+                        entries.Add({
+                            .dbIndex = dbSongId,
+                            .isSong = isSong,
+                            .isSelected = isSelected,
+                            .isDiscarded = isDiscarded,
+                            .songId = songId
+                            });
+                        context.stage.EnableArtist(!isSong);
+                    }
+                }
+                context.stage = stage;
+            }
+        }
+        context.entries = std::move(entries);
+    }
+
+    int64_t SourceModland::BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const
+    {
+        int64_t delta = 0;
+        if (context.stage.id == kStageSongs.id)
+        {
+            auto& lDbEntry = m_db.songs[lEntry.dbIndex];
+            auto& rDbEntry = m_db.songs[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+            else if (column == kColumnArtist)
+                delta = CompareStringMixed(GetBrowserArtists(lDbEntry).c_str(), GetBrowserArtists(rDbEntry).c_str());
+            else if (column == kColumnReplay)
+                delta = CompareStringMixed(m_db.replays[lDbEntry.replayId].name(m_db.strings), m_db.replays[rDbEntry.replayId].name(m_db.strings));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.songId]->GetName() : dName;
+                auto* rName = rEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.songId]->GetName() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                {
+                    delta = ((int64_t(rEntry.isDiscarded) - int64_t(lEntry.isDiscarded)) << 32)
+                        + int64_t(lEntry.songId) - int64_t(rEntry.songId);
+                }
+            }
+        }
+        else if (context.stage == kStageMultiSong)
+        {
+            auto& lDbEntry = m_db.items[lEntry.dbIndex];
+            auto& rDbEntry = m_db.items[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+        }
+        else
+        {
+            auto& lDbEntry = m_db.artists[lEntry.dbIndex];
+            auto& rDbEntry = m_db.artists[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
+                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+            }
+        }
+        return delta;
+    }
+
+    void SourceModland::BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const
+    {
+        if (column == kColumnName)
+        {
+            if (context.stage.id == kStageSongs.id)
+            {
+                if (m_db.songs[entry.dbIndex].isExtensionOverriden || !m_db.replays[m_db.songs[entry.dbIndex].replayId].ext.offset)
+                    ImGui::Text("%s%s", entry.isSong ? ImGuiIconFile : ImGuiIconFolder, m_db.songs[entry.dbIndex].name(m_db.strings));
+                else
+                    ImGui::Text("%s%s.%s", entry.isSong ? ImGuiIconFile : ImGuiIconFolder, m_db.songs[entry.dbIndex].name(m_db.strings), m_db.replays[m_db.songs[entry.dbIndex].replayId].ext(m_db.strings));
+            }
+            else if (context.stage == kStageMultiSong)
+            {
+                ImGui::Text(ImGuiIconFile "%s", m_db.items[entry.dbIndex].name(m_db.strings));
+            }
+            else
+            {
+                ImGui::Text(ImGuiIconFolder "%s", m_db.artists[entry.dbIndex].name(m_db.strings));
+            }
+        }
+        else if (column == kColumnArtist)
+        {
+            if (context.stage != kStageArtists)
+            {
+                auto artists = GetBrowserArtists(m_db.songs[context.stage == kStageMultiSong ? context.stageDbIndex : entry.dbIndex]);
+                ImGui::TextUnformatted(artists.c_str(), artists.c_str() + artists.size());
+            }
+        }
+        else if (column == kColumnReplay)
+        {
+            if (context.stage != kStageArtists)
+            {
+                ImGui::TextUnformatted(m_db.replays[m_db.songs[context.stage == kStageMultiSong ? context.stageDbIndex : entry.dbIndex].replayId].name(m_db.strings));
+            }
+        }
+        else if (column == kColumnId)
+        {
+            if (context.stage != kStageArtists)
+            {
+                if (entry.songId != SongID::Invalid)
+                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
+                else if (entry.isDiscarded)
+                    ImGui::TextUnformatted("-------- DISCARDED");
+            }
+            else
+            {
+                if (entry.artistId != ArtistID::Invalid)
+                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
+            }
+        }
+    }
+
+    void SourceModland::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)
+    {
+        if (context.stage != kStageArtists)
+        {
+            AddSong(m_db.songs[context.stage == kStageMultiSong ? context.stageDbIndex : entry.dbIndex], collectedSongs, true);
+        }
+        else
+        {
+            for (uint32_t dbSongId = m_db.artists[entry.dbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == entry.dbIndex ? 0 : 1])
+                AddSong(m_db.songs[dbSongId], collectedSongs, true);
+        }
+    }
+
+    std::string SourceModland::BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const
+    {
+        return stage == kStageArtists ? m_db.artists[entry.dbIndex].name(m_db.strings) : m_db.songs[entry.dbIndex].name(m_db.strings);
+    }
+
+    core::Array<rePlayer::BrowserSong> SourceModland::BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry)
+    {
+        Array<BrowserSong> songs;
+        auto addSong = [&](const ModlandSong& dbSong, uint32_t dbItem)
+        {
+            auto* song = songs.Push();
+            song->url = BuildUrl(dbSong, dbItem);
+            song->name = dbSong.name(m_db.strings);
+            if (dbItem)
+            {
+                song->name += '/';
+                song->name += m_db.items[dbItem].name(m_db.strings);
+            }
+            if (dbSong.artists[0])
+            {
+                song->artists.Add(m_db.artists[dbSong.artists[0]].name(m_db.strings));
+                if (dbSong.artists[1])
+                    song->artists.Add(m_db.artists[dbSong.artists[1]].name(m_db.strings));
+            }
+            song->type = UpdateMediaType(dbSong, song->name);
+        };
+        if (context.stage != kStageArtists)
+        {
+            if (context.stage == kStageMultiSong)
+                addSong(m_db.songs[context.stageDbIndex], entry.dbIndex);
+            else
+                addSong(m_db.songs[entry.dbIndex], 0);
+        }
+        else
+        {
+            for (uint32_t dbSongId = m_db.artists[entry.dbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == entry.dbIndex ? 0 : 1])
+            {
+                const auto& dbSong = m_db.songs[dbSongId];
+                auto dbItem = dbSong.item;
+                do
+                {
+                    addSong(dbSong, dbItem);
+                    dbItem = m_db.items[dbItem].next;
+                } while (dbItem);
+            }
+        }
+        return songs;
+    }
+
     SourceModland::SourceSong* SourceModland::GetSongSource(uint32_t index) const
     {
         return m_data.Items<SourceSong>(m_songs[index]);
+    }
+
+    void SourceModland::AddSong(const ModlandSong& dbSong, SourceResults& collectedSongs, bool isNewChecked)
+    {
+        auto songSourceId = FindSong(dbSong);
+        if (collectedSongs.IsSongAvailable(SourceID(kID, songSourceId)))
+            return;
+
+        auto* song = new SongSheet();
+        auto* songSource = GetSongSource(songSourceId);
+
+        SourceResults::State state;
+        song->id = songSource->songId;
+        if (songSource->isDiscarded)
+            state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+        else
+            song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(isNewChecked) : state.SetSongStatus(SourceResults::kOwned);
+
+        uint32_t artistIds[2] = { 0, 0 };
+        for (uint32_t artistIdx = 0; artistIdx < 2; artistIdx++)
+        {
+            if (songSource->artists[artistIdx])
+            {
+                SourceID artistId(kID, songSource->artists[artistIdx]);
+                auto artistIt = collectedSongs.artists.FindIf([artistId](auto entry)
+                {
+                    return entry->sources[0].id == artistId;
+                });
+                if (artistIt == nullptr)
+                {
+                    artistIds[artistIdx] = collectedSongs.artists.NumItems();
+                    auto artist = new ArtistSheet();
+                    artist->handles.Add(m_db.artists[dbSong.artists[artistIdx]].name(m_db.strings));
+                    artist->sources.Add(artistId);
+                    collectedSongs.artists.Add(artist);
+                }
+                else
+                    artistIds[artistIdx] = artistIt - collectedSongs.artists;
+            }
+        }
+
+        song->name = dbSong.name(m_db.strings);
+        song->type = UpdateMediaType(dbSong, song->name.String());
+        if (dbSong.artists[0])
+        {
+            song->artistIds.Add(static_cast<ArtistID>(artistIds[0]));
+            if (dbSong.artists[1])
+                song->artistIds.Add(static_cast<ArtistID>(artistIds[1]));
+        }
+        song->sourceIds.Add(SourceID(kID, songSourceId));
+        collectedSongs.songs.Add(song);
+        collectedSongs.states.Add(state);
     }
 
     uint16_t SourceModland::FindArtist(const char* const name)
@@ -1101,6 +1401,60 @@ namespace rePlayer
         m_areDataDirty = true;
 
         return id;
+    }
+
+    std::string SourceModland::BuildUrl(const ModlandSong& dbSong, uint32_t dbItem) const
+    {
+        std::string url("https://modland.com/pub/modules/");
+        CURL* curl = curl_easy_init();
+        auto unescape = [&url, curl](const char* str)
+        {
+            for (;;)
+            {
+                auto start = str;
+                while (*str != 0 && *str != '/')
+                    ++str;
+
+                auto e = curl_easy_escape(curl, start, static_cast<int>(str - start));
+                url += e;
+                curl_free(e);
+                if (*str++)
+                    url += '/';
+                else
+                    break;
+            }
+        };
+
+        unescape(m_db.replays[dbSong.replayId].name(m_db.strings));
+        if (dbSong.artists[0] == 0)
+            url += "/-%20unknown/";
+        else
+        {
+            url += "/";
+            unescape(m_db.artists[dbSong.artists[0]].name(m_db.strings));
+            if (dbSong.artists[1] != 0)
+            {
+                url += "/coop-";
+                unescape(m_db.artists[dbSong.artists[1]].name(m_db.strings));
+            }
+            url += "/";
+        }
+        unescape(dbSong.name(m_db.strings));
+        if (!dbSong.isExtensionOverriden && m_db.replays[dbSong.replayId].ext.offset)
+        {
+            url += '.';
+            unescape(m_db.replays[dbSong.replayId].ext(m_db.strings));
+        }
+
+        if (dbItem)
+        {
+            url += "/";
+            unescape(m_db.items[dbItem].name(m_db.strings));
+        }
+
+        curl_easy_cleanup(curl);
+
+        return url;
     }
 
     std::string SourceModland::SetupUrl(CURL* curl, SourceSong* songSource) const
@@ -1602,6 +1956,24 @@ namespace rePlayer
         return type;
     }
 
+    std::string SourceModland::GetBrowserArtists(const ModlandSong& dbSong) const
+    {
+        std::string artists;
+        if (dbSong.artists[0])
+        {
+            artists = m_db.artists[dbSong.artists[0]].name(m_db.strings);
+            if (dbSong.artists[1])
+            {
+                artists += " & ";
+                artists += m_db.artists[dbSong.artists[1]].name(m_db.strings);
+
+            }
+        }
+        else if (dbSong.artists[1])
+            artists = m_db.artists[dbSong.artists[1]].name(m_db.strings);
+        return artists;
+    }
+
     bool SourceModland::DownloadDatabase(BusySpinner* busySpinner)
     {
         if (m_db.songs.IsEmpty())
@@ -1873,7 +2245,8 @@ namespace rePlayer
                     m_db.songs.Last().isExtensionOverriden = ext == nullptr;
                     for (uint32_t i = 0; i < 2; i++)
                     {
-                        if (m_db.songs.Last().artists[i] = artists[i])
+                        m_db.songs.Last().artists[i] = artists[i];
+                        if (artists[i] || i == 0)
                         {
                             m_db.songs.Last().nextSong[i] = m_db.artists[artists[i]].songs;
                             m_db.artists[artists[i]].songs = songIndex;
@@ -1932,35 +2305,27 @@ namespace rePlayer
             }
         }
 
+        auto getPkReplay = [&]()
+        {
+            for (auto& pkReplay : ms_pkReplays)
+            {
+                if (theReplay == pkReplay.name)
+                {
+                    m_db.replays.Last().type = pkReplay.type;
+                    return true;
+                }
+            }
+            return false;
+        };
+
         m_db.replays.Push();
         if (auto* replay = GetReplayOverride(theReplay.c_str()))
             m_db.replays.Last().type = replay->type;
-        else if (theReplay == "MDX")
-            m_db.replays.Last().type = ModlandReplay::kMDX;
-        else if (theReplay == "Capcom Q-Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kQSF;
-        else if (theReplay == "Gameboy Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kGSF;
-        else if (theReplay == "Nintendo DS Sound Format")
-            m_db.replays.Last().type = ModlandReplay::k2SF;
-        else if (theReplay == "Saturn Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kSSF;
-        else if (theReplay == "Dreamcast Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kDSF;
-        else if (theReplay == "Playstation Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kPSF;
-        else if (theReplay == "Playstation 2 Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kPSF2;
-        else if (theReplay == "Ultra64 Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kUSF;
-        else if (theReplay == "Super Nintendo Sound Format")
-            m_db.replays.Last().type = ModlandReplay::kSNSF;
-        else if (theReplay == "MoonBlaster")
-            m_db.replays.Last().type = ModlandReplay::kMBM;
-        else if (theReplay == "MoonBlaster (edit mode)")
-            m_db.replays.Last().type = ModlandReplay::kMBMEdit;
-        else if (theReplay == "FAC SoundTracker")
-            m_db.replays.Last().type = ModlandReplay::kFACSoundTracker;
+        else if (getPkReplay())
+        {
+            if (m_db.replays.Last().type == ModlandReplay::kIFFSmus)
+                m_db.replays.Last().ext.Set(m_db.strings, "smus");
+        }
         else if (theReplay == "SidMon 1")
             m_db.replays.Last().type = ModlandReplay::kSidMon1;
         else if (theReplay == "Music Editor")
@@ -1969,22 +2334,13 @@ namespace rePlayer
             m_db.replays.Last().type = ModlandReplay::kOktalyzer;
         else if (theReplay.starts_with("OctaMED"))
             m_db.replays.Last().type = ModlandReplay::kOctaMED;
-        else if (theReplay.starts_with("PlaySID") || theReplay.starts_with("RealSID"))
+        else if (theReplay.starts_with("RealSID"))
             m_db.replays.Last().type = ModlandReplay::kSidPlay;
         else if (theReplay == "Delitracker Custom")
         {
             m_db.replays.Last().type = ModlandReplay::kDelitrackerCustom;
             m_db.replays.Last().ext.Set(m_db.strings, "cus");
         }
-        else if (theReplay == "IFF-SMUS")
-        {
-            m_db.replays.Last().type = ModlandReplay::kIFFSmus;
-            m_db.replays.Last().ext.Set(m_db.strings, "smus");
-        }
-        else if (theReplay == "Euphony")
-            m_db.replays.Last().type = ModlandReplay::kEuphony;
-        else if (theReplay == "FM sound driver (FMP)")
-            m_db.replays.Last().type = ModlandReplay::kFMP;
         else if (theReplay == "SGC")
         {
             m_db.replays.Last().type = ModlandReplay::kSGC;

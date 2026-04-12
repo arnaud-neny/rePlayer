@@ -437,6 +437,7 @@ namespace rePlayer
     }
 
     SourceAmigaMusicPreservation::SourceAmigaMusicPreservation()
+        : Source(false)
     {}
 
     SourceAmigaMusicPreservation::~SourceAmigaMusicPreservation()

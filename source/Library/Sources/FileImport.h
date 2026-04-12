@@ -7,6 +7,7 @@ namespace rePlayer
     class SourceFileImport : public Source
     {
     public:
+        SourceFileImport();
         void FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner) final;
         void ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner) final;
         void FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner) final;

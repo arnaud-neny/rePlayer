@@ -5,6 +5,10 @@
 
 namespace rePlayer
 {
+    SourceFileImport::SourceFileImport()
+        : Source(false)
+    {}
+
     void SourceFileImport::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
         UnusedArg(artists, name, busySpinner);

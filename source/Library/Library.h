@@ -41,13 +41,23 @@ namespace rePlayer
         class DatabaseUI;
         class ArtistsUI;
         class SongsUI;
+        class BrowserUI;
 
         class FileImport;
+
+        enum class Tab : int8_t
+        {
+            None = -1,
+            Songs = 0,
+            Artists,
+            Browser
+        };
 
     private:
         std::string OnGetWindowTitle() override;
         void OnDisplay() override;
         void OnEndUpdate() override;
+        void OnApplySettings() override;
 
         void SourceSelection();
 
@@ -68,6 +78,7 @@ namespace rePlayer
         LibraryDatabase& m_db;
         ArtistsUI* m_artists = nullptr;
         SongsUI* m_songs = nullptr;
+        BrowserUI* m_browser = nullptr;
 
         Source* m_sources[SourceID::NumSourceIDs];
         static constexpr uint64_t kSelectableSources = ((1ull << SourceID::NumSourceIDs) - 1ull) & ~((1ull << SourceID::FileImportID) | (1ull << SourceID::URLImportID));
@@ -76,9 +87,10 @@ namespace rePlayer
         bool m_hasSongsBackup = false;
         bool m_hasArtistsBackup = false;
 
-        bool m_isSongTabFirstCall = true; // Too many bugs with ImGuiTabItemFlags_SetSelected...
-        Serialized<bool> m_isSongTabEnabled = { "SongTab", true };
         Serialized<bool> m_isMergingOnDownload = { "AutoMerge", false };
+
+        Serialized<Tab> m_currentTab = { "Tab", Tab::Songs };
+        Tab m_selectedTab = Tab::None;
 
         SmartPtr<BusySpinner> m_busySpinner;
 

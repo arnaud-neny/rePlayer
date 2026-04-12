@@ -31,6 +31,14 @@ namespace rePlayer
         void Load() final;
         void Save() const final;
 
+        void BrowserInit(BrowserContext& context) final;
+        void BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter) final;
+        int64_t BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const final;
+        void BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const final;
+        void BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs) final;
+        std::string BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const final;
+        Array<BrowserSong> BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry);
+
         static constexpr SourceID::eSourceID kID = SourceID::AtariSAPMusicArchiveID;
 
     private:
@@ -74,6 +82,7 @@ namespace rePlayer
             uint32_t numHandles = 0;
             uint32_t songs = 0;
             uint32_t numSongs = 0;
+            uint32_t root = 0;
         };
         struct ASMASong
         {
@@ -118,22 +127,33 @@ namespace rePlayer
             bool IsValid() const { return songId != SongID::Invalid || isDiscarded == true; }
         };
 
+        static constexpr BrowserColumn kColumnArtist = BrowserColumn(1);
+        static constexpr BrowserColumn kColumnId = BrowserColumn(2);
+        static constexpr BrowserStage kStageArtists = { BrowserStageId(1), BrowserStageType::Folder };
+        static constexpr BrowserStage kStageSongs = { BrowserStageId(2), BrowserStageType::Song };
+
     private:
         template <typename T = uint32_t>
         SourceSong* GetSongSource(T index) const { return m_data.Items<SourceSong>(m_songs[index]); }
+
+        void AddSong(const ASMASong& dbSong, SourceResults& collectedSongs, bool isNewChecked);
 
         std::string GetArtistName(const ASMAArtist& dbArtist) const;
 
         uint16_t FindArtist(const ASMAArtist& dbArtist);
         uint32_t FindSong(const ASMASong& dbSong);
+        std::string BuildUrl(const ASMASong& dbSong) const;
         std::string SetupUrl(CURL* curl, SourceSong* songSource) const;
+
+        std::string GetBrowserArtistName(const ASMAArtist& dbArtist) const;
+        std::string GetBrowserArtists(const ASMASong& dbSong) const;
 
         bool DownloadDatabase(BusySpinner& busySpinner);
         uint32_t FindDatabaseRoot(std::string& filePath);
         uint32_t FindDatabaseArtist(const std::string& author);
         void FindDatabaseArtists(std::string author, uint32_t songOffset);
 
-        ASMASong& DbSong(uint32_t offset) { return *m_db.data.Items<ASMASong>(offset); }
+        ASMASong& DbSong(uint32_t offset) const { return *m_db.data.Items<ASMASong>(offset); }
         SourceSong& SrcSong(uint32_t offset) { return *m_data.Items<SourceSong>(offset); }
 
     private:

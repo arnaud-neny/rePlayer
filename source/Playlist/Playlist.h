@@ -22,9 +22,17 @@ namespace rePlayer
     class DatabaseSongsUI;
     class Player;
     class PlaylistDatabase;
+    struct BrowserSong;
 
     class Playlist : public Window
     {
+    public:
+        enum ProcessMode
+        {
+            kPlay,
+            kEnqueue
+        };
+
     public:
         Playlist();
         ~Playlist();
@@ -42,6 +50,8 @@ namespace rePlayer
         SmartPtr<Player> LoadCurrentSong();
         SmartPtr<Player> LoadNextSong(bool isAdvancing);
         void ValidateNextSong(SmartPtr<Player>& player);
+
+        void ProcessBrowserSong(const BrowserSong& browserSong, ProcessMode mode);
 
         void Eject() { m_currentEntryIndex = -1; }
 

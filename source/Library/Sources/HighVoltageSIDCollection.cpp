@@ -3,10 +3,12 @@
 // Core
 #include <Core/Log.h>
 #include <Core/String.h>
+#include <ImGui.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
 
 // rePlayer
+#include <Database/Database.h>
 #include <RePlayer/Core.h>
 #include <UI/BusySpinner.h>
 
@@ -79,6 +81,7 @@ namespace rePlayer
     }
 
     SourceHighVoltageSIDCollection::SourceHighVoltageSIDCollection()
+        : Source(true)
     {
         m_artists.Push();
         m_roots.Push();
@@ -96,8 +99,9 @@ namespace rePlayer
             return;
 
         std::string lName = ToLower(name);
-        for (auto& dbArtist : m_db.artists)
+        for (uint32_t i = 1, e = m_db.artists.NumItems(); i < e; ++i)
         {
+            auto& dbArtist = m_db.artists[i];
             std::string lArtist = ToLower(dbArtist.name(m_db.strings));
             if (strstr(lArtist.c_str(), lName.c_str()))
             {
@@ -125,8 +129,9 @@ namespace rePlayer
 
         uint16_t dbImportedArtistId = 0;
         {
-            for (auto& dbArtist : m_db.artists)
+            for (uint32_t i = 1, e = m_db.artists.NumItems(); i < e; ++i)
             {
+                auto& dbArtist = m_db.artists[i];
                 if (dbArtist.name.IsSame(m_db.strings, artistName))
                 {
                     dbImportedArtistId = uint16_t(&dbArtist - m_db.artists.Items());
@@ -140,56 +145,7 @@ namespace rePlayer
         }
 
         for (uint32_t dbSongId = m_db.artists[dbImportedArtistId].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
-        {
-            const auto& dbSong = m_db.songs[dbSongId];
-            auto songSourceId = FindSong(dbSong);
-            if (results.IsSongAvailable(SourceID(kID, songSourceId)))
-                continue;
-
-            std::string dbSongName(dbSong.name(m_db.strings));
-            for (auto* c = dbSongName.data(); c = strchr(c, '_');)
-                *c = ' ';
-
-            auto song = new SongSheet();
-            auto songSource = GetSongSource(songSourceId);
-
-            SourceResults::State state;
-            song->id = songSource->songId;
-            if (songSource->isDiscarded)
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-            else
-                song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(true) : state.SetSongStatus(SourceResults::kOwned);
-
-            uint32_t artistId = 0;
-            if (songSource->artist)
-            {
-                SourceID artistSourceId(kID, songSource->artist);
-                auto* artistIt = results.artists.FindIf([artistSourceId](auto entry)
-                {
-                    return entry->sources[0].id == artistSourceId;
-                });
-                if (artistIt == nullptr)
-                {
-                    artistId = results.artists.NumItems();
-                    auto artist = new ArtistSheet();
-                    artist->handles.Add(m_db.artists[dbSong.artist].name(m_db.strings));
-                    for (auto* c = artist->handles[0].String().data(); c = strchr(c, '_');)
-                        *c = ' ';
-                    artist->sources.Add(artistSourceId);
-                    results.artists.Add(artist);
-                }
-                else
-                    artistId = artistIt - results.artists;
-            }
-
-            song->type = { eExtension::_sid, eReplay::SidPlay };
-            song->name = dbSongName;
-            if (dbSong.artist)
-                song->artistIds.Add(static_cast<ArtistID>(artistId));
-            song->sourceIds.Add(SourceID(kID, songSourceId));
-            results.songs.Add(song);
-            results.states.Add(state);
-        }
+            AddSong(m_db.songs[dbSongId], results, true);
 
         m_isDirty |= results.songs.IsNotEmpty();
     }
@@ -212,46 +168,7 @@ namespace rePlayer
             if (strstr(rName.c_str(), lName.c_str()) == nullptr)
                 continue;
 
-            auto songSourceId = FindSong(dbSong);
-            auto song = new SongSheet();
-            auto songSource = GetSongSource(songSourceId);
-
-            SourceResults::State state;
-            song->id = songSource->songId;
-            if (songSource->isDiscarded)
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-            else
-                state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kNew : SourceResults::kOwned);
-
-            uint32_t artistId = 0;
-            if (songSource->artist)
-            {
-                SourceID artistSourceId(kID, songSource->artist);
-                auto artistIt = collectedSongs.artists.FindIf([artistSourceId](auto entry)
-                {
-                    return entry->sources[0].id == artistSourceId;
-                });
-                if (artistIt == nullptr)
-                {
-                    artistId = collectedSongs.artists.NumItems();
-                    auto artist = new ArtistSheet();
-                    artist->handles.Add(m_db.artists[dbSong.artist].name(m_db.strings));
-                    for (auto* c = artist->handles[0].String().data(); c = strchr(c, '_');)
-                        *c = ' ';
-                    artist->sources.Add(artistSourceId);
-                    collectedSongs.artists.Add(artist);
-                }
-                else
-                    artistId = artistIt - collectedSongs.artists;
-            }
-
-            song->type = { eExtension::_sid, eReplay::SidPlay };
-            song->name = dbSongName;
-            if (dbSong.artist)
-                song->artistIds.Add(static_cast<ArtistID>(artistId));
-            song->sourceIds.Add(SourceID(kID, songSourceId));
-            collectedSongs.songs.Add(song);
-            collectedSongs.states.Add(state);
+            AddSong(dbSong, collectedSongs, false);
         }
     }
 
@@ -334,7 +251,7 @@ namespace rePlayer
     void SourceHighVoltageSIDCollection::OnSongUpdate(const Song* const song)
     {
         assert(song->GetSourceId(0).sourceId == kID);
-        auto songSource = GetSongSource(song->GetSourceId(0).internalId);
+        auto* songSource = GetSongSource(song->GetSourceId(0).internalId);
         if (!songSource->IsValid())
         {
             if (songSource->artist)
@@ -349,7 +266,7 @@ namespace rePlayer
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID);
-        auto songSource = GetSongSource(sourceId.internalId);
+        auto* songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
         songSource->isDiscarded = true;
         m_isDirty = true;
@@ -359,7 +276,7 @@ namespace rePlayer
     {
         thread::ScopedSpinLock lock(m_mutex);
         assert(sourceId.sourceId == kID && newSongId != SongID::Invalid);
-        auto songSource = GetSongSource(sourceId.internalId);
+        auto* songSource = GetSongSource(sourceId.internalId);
         songSource->songId = newSongId;
         songSource->isDiscarded = false;
         m_isDirty = true;
@@ -561,9 +478,339 @@ namespace rePlayer
         }
     }
 
+    void SourceHighVoltageSIDCollection::BrowserInit(BrowserContext& context)
+    {
+        if (m_db.songs.IsEmpty())
+        {
+            context.busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
+            Core::AddJob([this, &context]()
+            {
+                thread::ScopedSpinLock lock(m_mutex);
+                DownloadDatabase(*context.busySpinner);
+
+                Core::FromJob([this, &context]()
+                {
+                    context.busySpinner.Reset();
+                    if (m_db.songs.IsEmpty())
+                        context.Invalidate();
+                });
+            });
+        }
+        static const char* columnNames[] = { "Name", "Artist", "Root", "ID" };
+        context.numColumns = NumItemsOf(columnNames);
+        context.columnNames = columnNames;
+    }
+
+    void SourceHighVoltageSIDCollection::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
+    {
+        Array<BrowserEntry> entries;
+        if (context.stage.id == kStageArtists.id)
+        {
+            // disable artist column
+            context.disabledColumns = 3 << 1;
+            context.stage = kStageArtists;
+            // include artist 0 to browse songs without artist
+            for (uint32_t i = 0, e = m_db.artists.NumItems(); i < e; i++)
+            {
+                if (filter.PassFilter(m_db.artists[i].name(m_db.strings)))
+                {
+                    bool isSelected = false;
+                    if (auto* entry = context.entries.Find(i))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    ArtistID artistId = ArtistID::Invalid;
+                    auto* artistName = m_db.artists[i].name(m_db.strings);
+                    if (auto* sourceArtist = m_artists.FindIf([&](auto& entry) { return entry.name.IsSame(m_strings, artistName); }))
+                    {
+                        auto sourceId = SourceID(kID, uint32_t(sourceArtist - m_artists.Items()));
+                        for (auto* rplArtist : Core::GetDatabase(DatabaseID::kLibrary).Artists())
+                        {
+                            for (uint16_t j = 0, n = rplArtist->NumSources(); j < n; j++)
+                            {
+                                if (rplArtist->GetSource(j).id == sourceId)
+                                {
+                                    artistId = rplArtist->GetId();
+                                    break;
+                                }
+                            }
+                            if (artistId != ArtistID::Invalid)
+                                break;
+                        }
+                    }
+                    entries.Add({
+                        .dbIndex = i,
+                        .isSong = false,
+                        .isSelected = isSelected,
+                        .artistId = artistId
+                        });
+                }
+            }
+        }
+        else
+        {
+            // no column disabled
+            context.disabledColumns = 0;
+            context.stage = kStageSongs;
+            auto findSong = [this](const HvscSong& dbSong)
+            {
+                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+                {
+                    if (m_songs[i] == 0)
+                        continue;
+                    auto* song = GetSongSource(i);
+                    if (dbSong.name.IsSame(m_db.strings, song->name))
+                    {
+                        if (!m_db.roots[dbSong.root].name.IsSame(m_db.strings, m_roots[song->root].name(m_strings)))
+                            continue;
+                        if (song->artist)
+                        {
+                            if (!dbSong.artist)
+                                continue;
+                            if (!m_db.artists[dbSong.artist].name.IsSame(m_db.strings, m_artists[song->artist].name(m_strings)))
+                                continue;
+                        }
+                        else if (dbSong.artist)
+                            continue;
+
+                        return song;
+                    }
+                }
+                return (SourceSong*)nullptr;
+            };
+
+            for (auto dbSongId = m_db.artists[context.stageDbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
+            {
+                const auto& dbSong = m_db.songs[dbSongId];
+                if (filter.PassFilter(dbSong.name(m_db.strings)))
+                {
+                    bool isSelected = false;
+                    bool isDiscarded = false;
+                    if (auto* entry = context.entries.Find(dbSongId))
+                    {
+                        isSelected = entry->isSelected;
+                        context.entries.RemoveAtFast(entry - context.entries.Items());
+                    }
+                    SongID songId = SongID::Invalid;
+                    if (auto* songSource = findSong(dbSong))
+                    {
+                        songId = songSource->songId;
+                        isDiscarded = songSource->isDiscarded;
+                    }
+                    entries.Add({
+                        .dbIndex = dbSongId,
+                        .isSong = true,
+                        .isSelected = isSelected,
+                        .isDiscarded = isDiscarded,
+                        .songId = songId
+                        });
+                }
+            }
+        }
+        context.entries = std::move(entries);
+    }
+
+    int64_t SourceHighVoltageSIDCollection::BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        int64_t delta = 0;
+        if (lEntry.isSong)
+        {
+            auto& lDbEntry = m_db.songs[lEntry.dbIndex];
+            auto& rDbEntry = m_db.songs[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+            else if (column == kColumnArtist)
+                delta = CompareStringMixed(m_db.artists[lDbEntry.artist].name(m_db.strings), m_db.artists[rDbEntry.artist].name(m_db.strings));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.songId]->GetName() : dName;
+                auto* rName = rEntry.songId != SongID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.songId]->GetName() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                {
+                    delta = ((int64_t(rEntry.isDiscarded) - int64_t(lEntry.isDiscarded)) << 32)
+                        + int64_t(lEntry.songId) - int64_t(rEntry.songId);
+                }
+            }
+        }
+        else
+        {
+            auto& lDbEntry = m_db.artists[lEntry.dbIndex];
+            auto& rDbEntry = m_db.artists[rEntry.dbIndex];
+            if (column == kColumnName)
+                delta = CompareStringMixed(lDbEntry.name(m_db.strings), rDbEntry.name(m_db.strings));
+            else if (column == kColumnId)
+            {
+                auto* dName = "\xff";
+                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
+                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                delta = CompareStringMixed(lName, rName);
+                if (delta == 0)
+                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+            }
+        }
+        return delta;
+    }
+
+    void SourceHighVoltageSIDCollection::BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const
+    {
+        UnusedArg(context);
+        if (column == kColumnName)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = m_db.songs[entry.dbIndex];
+                ImGui::Text(ImGuiIconFile "%s.sid", dbSong.name(m_db.strings));
+            }
+            else
+            {
+                ImGui::Text(ImGuiIconFolder "%s", m_db.artists[entry.dbIndex].name(m_db.strings));
+            }
+        }
+        else if (column == kColumnArtist)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = m_db.songs[entry.dbIndex];
+                ImGui::TextUnformatted(m_db.artists[dbSong.artist].name(m_db.strings));
+            }
+        }
+        else if (column == kColumnRoot)
+        {
+            if (entry.isSong)
+            {
+                auto& dbSong = m_db.songs[entry.dbIndex];
+                ImGui::TextUnformatted(m_db.roots[dbSong.root].name(m_db.strings));
+            }
+        }
+        else if (column == kColumnId)
+        {
+            if (entry.isSong)
+            {
+                if (entry.songId != SongID::Invalid)
+                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
+                else if (entry.isDiscarded)
+                    ImGui::TextUnformatted("-------- DISCARDED");
+            }
+            else
+            {
+                if (entry.artistId != ArtistID::Invalid)
+                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
+            }
+        }
+    }
+
+    void SourceHighVoltageSIDCollection::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)
+    {
+        UnusedArg(context);
+        if (entry.isSong)
+        {
+            AddSong(m_db.songs[entry.dbIndex], collectedSongs, true);
+        }
+        else
+        {
+            for (auto dbSongId = m_db.artists[entry.dbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
+            {
+                const auto& dbSong = m_db.songs[dbSongId];
+                AddSong(dbSong, collectedSongs, true);
+            }
+        }
+    }
+
+    std::string SourceHighVoltageSIDCollection::BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const
+    {
+        UnusedArg(stage);
+        return m_db.artists[entry.dbIndex].name(m_db.strings);
+    }
+
+    core::Array<rePlayer::BrowserSong> SourceHighVoltageSIDCollection::BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry)
+    {
+        UnusedArg(context);
+        Array<BrowserSong> songs;
+        auto addSong = [&](const HvscSong& dbSong)
+        {
+            auto* song = songs.Push();
+            song->url = BuildUrl(dbSong);
+            song->name = dbSong.name(m_db.strings);
+            if (dbSong.artist)
+            {
+                auto& dbArtist = m_db.artists[dbSong.artist];
+                song->artists.Add(dbArtist.name(m_db.strings));
+            }
+            song->type = { eExtension::_sid, eReplay::SidPlay };
+        };
+        if (entry.isSong)
+        {
+            addSong(m_db.songs[entry.dbIndex]);
+        }
+        else
+        {
+            for (auto dbSongId = m_db.artists[entry.dbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
+            {
+                const auto& dbSong = m_db.songs[dbSongId];
+                addSong(dbSong);
+            }
+        }
+        return songs;
+    }
+
     SourceHighVoltageSIDCollection::SourceSong* SourceHighVoltageSIDCollection::GetSongSource(uint32_t index) const
     {
         return m_data.Items<SourceSong>(m_songs[index]);
+    }
+
+    void SourceHighVoltageSIDCollection::AddSong(const HvscSong& dbSong, SourceResults& collectedSongs, bool isNewChecked)
+    {
+        auto songSourceId = FindSong(dbSong);
+        if (collectedSongs.IsSongAvailable(SourceID(kID, songSourceId)))
+            return;
+
+        std::string dbSongName(dbSong.name(m_db.strings));
+        for (auto* c = dbSongName.data(); c = strchr(c, '_');)
+            *c = ' ';
+
+        auto* song = new SongSheet();
+        auto* songSource = GetSongSource(songSourceId);
+
+        SourceResults::State state;
+        song->id = songSource->songId;
+        if (songSource->isDiscarded)
+            state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+        else
+            song->id == SongID::Invalid ? state.SetSongStatus(SourceResults::kNew).SetChecked(isNewChecked) : state.SetSongStatus(SourceResults::kOwned);
+
+        uint32_t artistId = 0;
+        if (songSource->artist)
+        {
+            SourceID artistSourceId(kID, songSource->artist);
+            auto* artistIt = collectedSongs.artists.FindIf([artistSourceId](auto entry)
+            {
+                return entry->sources[0].id == artistSourceId;
+            });
+            if (artistIt == nullptr)
+            {
+                artistId = collectedSongs.artists.NumItems();
+                auto artist = new ArtistSheet();
+                artist->handles.Add(m_db.artists[dbSong.artist].name(m_db.strings));
+                for (auto* c = artist->handles[0].String().data(); c = strchr(c, '_');)
+                    *c = ' ';
+                artist->sources.Add(artistSourceId);
+                collectedSongs.artists.Add(artist);
+            }
+            else
+                artistId = artistIt - collectedSongs.artists;
+        }
+
+        song->name = dbSongName;
+        song->type = { eExtension::_sid, eReplay::SidPlay };
+        if (dbSong.artist)
+            song->artistIds.Add(static_cast<ArtistID>(artistId));
+        song->sourceIds.Add(SourceID(kID, songSourceId));
+        collectedSongs.songs.Add(song);
+        collectedSongs.states.Add(state);
     }
 
     uint16_t SourceHighVoltageSIDCollection::FindArtist(const char* const name)
@@ -594,7 +841,7 @@ namespace rePlayer
         {
             if (m_songs[i] == 0)
                 continue;
-            auto song = GetSongSource(i);
+            auto* song = GetSongSource(i);
             if (dbSong.name.IsSame(m_db.strings, song->name))
             {
                 if (!m_db.roots[dbSong.root].name.IsSame(m_db.strings, m_roots[song->root].name(m_strings)))
@@ -643,6 +890,43 @@ namespace rePlayer
         m_areDataDirty = true;
 
         return id;
+    }
+
+    std::string SourceHighVoltageSIDCollection::BuildUrl(const HvscSong& dbSong) const
+    {
+        std::string url(ms_urls[m_currentUrl]);
+        CURL* curl = curl_easy_init();
+        auto unescape = [&url, curl](const char* str)
+        {
+            for (;;)
+            {
+                auto start = str;
+                while (*str != 0 && *str != '/')
+                    ++str;
+
+                auto e = curl_easy_escape(curl, start, static_cast<int>(str - start));
+                url += e;
+                curl_free(e);
+                if (*str++)
+                    url += '/';
+                else
+                    break;
+            }
+        };
+
+        unescape(m_db.roots[dbSong.root].name(m_db.strings));
+        url += '/';
+        if (dbSong.artist != 0)
+        {
+            unescape(m_db.artists[dbSong.artist].name(m_db.strings));
+            url += '/';
+        }
+        unescape(dbSong.name(m_db.strings));
+        url += ".sid";
+
+        curl_easy_cleanup(curl);
+
+        return url;
     }
 
     std::string SourceHighVoltageSIDCollection::SetupUrl(CURL* curl, SourceSong* songSource, std::string url) const
@@ -804,12 +1088,10 @@ namespace rePlayer
                     m_db.songs.Push();
                     m_db.songs.Last().name.Set(m_db.strings, newSong);
                     m_db.songs.Last().root = rootIndex;
-                    if (m_db.songs.Last().artist = artist)
-                    {
-                        m_db.songs.Last().nextSong = m_db.artists[artist].songs;
-                        m_db.artists[artist].songs = songIndex;
-                        m_db.artists[artist].numSongs++;
-                    }
+                    m_db.songs.Last().artist = artist;
+                    m_db.songs.Last().nextSong = m_db.artists[artist].songs;
+                    m_db.artists[artist].songs = songIndex;
+                    m_db.artists[artist].numSongs++;
                 }
             }
         }

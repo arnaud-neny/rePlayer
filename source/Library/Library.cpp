@@ -14,6 +14,7 @@
 #include <Deck/Player.h>
 #include <IO/StreamArchive.h>
 #include <Library/LibraryArtistsUI.h>
+#include <Library/LibraryBrowserUI.h>
 #include <Library/LibraryDatabase.h>
 #include <Library/LibraryFileImport.h>
 #include <Library/LibrarySongsUI.h>
@@ -54,6 +55,7 @@ namespace rePlayer
         , m_db(Core::GetLibraryDatabase())
         , m_artists(new ArtistsUI(*this))
         , m_songs(new SongsUI(*this))
+        , m_browser(new BrowserUI(*this))
     {
         m_sources[SourceID::AmigaMusicPreservationSourceID] = new SourceAmigaMusicPreservation();
         m_sources[SourceID::TheModArchiveSourceID] = new SourceTheModArchive();
@@ -76,6 +78,7 @@ namespace rePlayer
         for (auto source : m_sources)
             delete source;
 
+        delete m_browser;
         delete m_artists;
         delete m_songs;
     }
@@ -339,8 +342,15 @@ namespace rePlayer
     std::string Library::OnGetWindowTitle()
     {
         char title[128];
-        DatabaseSongsUI* ui = m_isSongTabEnabled ? static_cast<DatabaseSongsUI*>(m_songs) : static_cast<DatabaseSongsUI*>(m_artists);
-        sprintf(title, "Library: %u/%u subsongs (%u songs & %u artists)###Library", ui->NumSelectedSubsongs(), ui->NumSubsongs(), m_db.NumSongs(), m_db.NumArtists());
+        if (m_currentTab == Tab::Browser)
+        {
+            sprintf(title, "Library: %s###Library", m_browser->GetTitle());
+        }
+        else
+        {
+            DatabaseSongsUI* ui = m_currentTab == Tab::Songs ? static_cast<DatabaseSongsUI*>(m_songs) : static_cast<DatabaseSongsUI*>(m_artists);
+            sprintf(title, "Library: %u/%u subsongs (%u songs & %u artists)###Library", ui->NumSelectedSubsongs(), ui->NumSubsongs(), m_db.NumSongs(), m_db.NumArtists());
+        }
 
         ImGui::SetNextWindowPos(ImVec2(480.0f, 16.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(624.0f, 660.0f), ImGuiCond_FirstUseEver);
@@ -352,6 +362,8 @@ namespace rePlayer
     {
         if (ImGui::BeginTabBar("LibraryBar", ImGuiTabBarFlags_None))
         {
+            ImGui::BeginDisabled(m_busySpinner.IsValid());
+
             ImGui::PushStyleColor(ImGuiCol_Tab, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.6f, 0.5f));
             ImGui::PushStyleColor(ImGuiCol_TabHovered, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.7f, 0.8f));
             ImGui::PushStyleColor(ImGuiCol_TabSelected, (ImVec4)ImColor::HSV(5.0f / 7.0f, 0.8f, 1.0f));
@@ -360,20 +372,27 @@ namespace rePlayer
             ImGui::PopStyleColor(3);
             UpdateImports();
 
-            auto isSongTabEnabled = m_isSongTabEnabled;
-            if (ImGui::BeginTabItem("Songs", nullptr, (m_isSongTabFirstCall && isSongTabEnabled) ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
+            if (ImGui::BeginTabItem("Songs", nullptr, m_selectedTab == Tab::Songs ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
             {
-                m_isSongTabEnabled = true;
+                m_currentTab = Tab::Songs;
                 m_songs->OnDisplay();
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Artists", nullptr, (m_isSongTabFirstCall && !isSongTabEnabled) ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
+            if (ImGui::BeginTabItem("Artists", nullptr, m_selectedTab == Tab::Artists ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
             {
-                m_isSongTabEnabled = false;
+                m_currentTab = Tab::Artists;
                 m_artists->OnDisplay();
                 ImGui::EndTabItem();
             }
-            m_isSongTabFirstCall = false;
+            if (ImGui::BeginTabItem("Browser", nullptr, m_selectedTab == Tab::Browser ? ImGuiTabItemFlags_SetSelected : ImGuiTabItemFlags_None))
+            {
+                m_currentTab = Tab::Browser;
+                m_browser->OnDisplay();
+                ImGui::EndTabItem();
+            }
+            m_selectedTab = Tab::None;
+
+            ImGui::EndDisabled();
             ImGui::EndTabBar();
         }
     }
@@ -383,6 +402,11 @@ namespace rePlayer
         m_songs->OnEndUpdate();
         m_artists->OnEndUpdate();
         m_busySpinner->Update();
+    }
+
+    void Library::OnApplySettings()
+    {
+        m_selectedTab = m_currentTab;
     }
 
     void Library::SourceSelection()
@@ -471,8 +495,6 @@ namespace rePlayer
         }
         else if (isImportSongsOpened)
             ImGui::OpenPopup("Import Songs");
-
-        ImGui::BeginDisabled(m_busySpinner.IsValid());
 
         UpdateImportArtists();
 
@@ -563,7 +585,6 @@ namespace rePlayer
             }
             Core::Unlock();
         }
-        ImGui::EndDisabled();
     }
 
     void Library::UpdateImportArtists()

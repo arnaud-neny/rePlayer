@@ -43,6 +43,7 @@ namespace rePlayer
         static const char* const sourceNames[];
         static const int32_t sourceProrities[];
         static const int32_t playlistProrities[];
+        static const eSourceID sortedSources[];
     };
 
     static constexpr SourceID kInvalidSourceID = { SourceID::AmigaMusicPreservationSourceID, 0 };

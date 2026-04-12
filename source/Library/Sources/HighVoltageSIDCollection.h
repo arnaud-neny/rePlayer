@@ -32,6 +32,14 @@ namespace rePlayer
         void Load() final;
         void Save() const final;
 
+        void BrowserInit(BrowserContext& context) final;
+        void BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter) final;
+        int64_t BrowserCompare(const BrowserContext& context, const BrowserEntry& lEntry, const BrowserEntry& rEntry, BrowserColumn column) const final;
+        void BrowserDisplay(const BrowserContext& context, const BrowserEntry& entry, BrowserColumn column) const final;
+        void BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs) final;
+        std::string BrowserGetStageName(const BrowserEntry& entry, BrowserStage stage) const final;
+        Array<BrowserSong> BrowserFetchSongs(const BrowserContext& context, const BrowserEntry& entry);
+
         static constexpr SourceID::eSourceID kID = SourceID::HighVoltageSIDCollectionID;
 
     private:
@@ -94,11 +102,20 @@ namespace rePlayer
             bool IsValid() const { return songId != SongID::Invalid || isDiscarded == true; }
         };
 
+        static constexpr BrowserColumn kColumnArtist = BrowserColumn(1);
+        static constexpr BrowserColumn kColumnRoot = BrowserColumn(2);
+        static constexpr BrowserColumn kColumnId = BrowserColumn(3);
+        static constexpr BrowserStage kStageArtists = { BrowserStageId(1), BrowserStageType::Folder };
+        static constexpr BrowserStage kStageSongs = { BrowserStageId(2), BrowserStageType::Song };
+
     private:
         SourceSong* GetSongSource(uint32_t index) const;
 
+        void AddSong(const HvscSong& dbSong, SourceResults& collectedSongs, bool isNewChecked);
+
         uint16_t FindArtist(const char* const name);
         uint32_t FindSong(const HvscSong& dbSong);
+        std::string BuildUrl(const HvscSong& dbSong) const;
         std::string SetupUrl(CURL* curl, SourceSong* songSource, std::string url) const;
 
         bool DownloadDatabase(BusySpinner& busySpinner);

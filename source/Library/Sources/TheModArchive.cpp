@@ -241,6 +241,7 @@ namespace rePlayer
     }
 
     SourceTheModArchive::SourceTheModArchive()
+        : Source(false)
     {}
 
     SourceTheModArchive::~SourceTheModArchive()

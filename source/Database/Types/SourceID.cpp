@@ -41,12 +41,26 @@ namespace rePlayer
         2,          // ModlandSourceID
         65536,      // FileImportID
         0,          // HighVoltageSIDCollectionID
-        3,          // SNDHID (after Modland as content is too old on this site)
+        0,          // SNDHID
         0,          // AtariSAPMusicArchiveID
         0,          // ZXArtID
         65537,      // UrlImportID
         0           // VGMRips
     };
     static_assert(NumItemsOf(SourceID::playlistProrities) == SourceID::NumSourceIDs);
+
+    const SourceID::eSourceID SourceID::sortedSources[] = {
+        AmigaMusicPreservationSourceID,
+        AtariSAPMusicArchiveID,
+        FileImportID,
+        HighVoltageSIDCollectionID,
+        ModlandSourceID,
+        SNDHID,
+        TheModArchiveSourceID,
+        URLImportID,
+        VGMRipsID,
+        ZXArtID
+    };
+    static_assert(NumItemsOf(SourceID::sortedSources) == SourceID::NumSourceIDs);
 }
 // namespace rePlayer

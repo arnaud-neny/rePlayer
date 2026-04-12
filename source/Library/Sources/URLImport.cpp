@@ -12,6 +12,7 @@ namespace rePlayer
     const char* const SourceURLImport::ms_filename = MusicPath "URL" MusicExt;
 
     SourceURLImport::SourceURLImport()
+        : Source(false)
     {
         m_songs.Add({});
         m_strings.Add('\0');
