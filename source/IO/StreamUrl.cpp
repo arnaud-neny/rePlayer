@@ -3,6 +3,7 @@
 // Core
 #include <Core/Log.h>
 #include <Core/String.h>
+#include <IO/StreamMemory.h>
 #include <Thread/Thread.h>
 
 // rePlayer
@@ -127,7 +128,7 @@ namespace rePlayer
 
     Status StreamUrl::Seek(int64_t offset, SeekWhence whence)
     {
-        if (m_type != Type::kDownload)
+        if (m_type == Type::kStreaming)
         {
             if (whence == SeekWhence::kSeekBegin && offset == 0)
             {
@@ -416,17 +417,7 @@ namespace rePlayer
         while (std::atomic_ref(m_state) < State::kEnd)
             thread::Sleep(1);
 
-        SmartPtr<StreamUrl> stream(kAllocate, m_url, true, GetRoot());
-        stream->m_url = m_url;
-        stream->m_icyName = m_icyName;
-        stream->m_icyDescription = m_icyDescription;
-        stream->m_icyGenre = m_icyGenre;
-        stream->m_icyUrl = m_icyUrl;
-        stream->m_metadata = m_metadata;
-        stream->m_head = m_head;
-        stream->m_state = m_state;
-        stream->m_type = m_type;
-        stream->m_data = m_data;
+        auto stream = io::StreamMemory::Create(m_url, m_data.Items(), m_data.Size(), true, this);
         return stream;
     }
 
