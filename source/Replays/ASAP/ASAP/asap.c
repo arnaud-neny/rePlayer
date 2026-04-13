@@ -8016,3 +8016,38 @@ static bool PokeyPair_IsSilent(const PokeyPair *self)
 {
 	return Pokey_IsSilent(&self->basePokey) && Pokey_IsSilent(&self->extraPokey);
 }
+// rePlayer begin
+const char* ASAPInfo_GetModuleExt(const ASAPInfo* self)
+{
+	switch (self->type) {
+	case ASAPModuleType_CMC:
+		return self->fastplay == 156 ? "dmc" : "cmc";
+	case ASAPModuleType_CM3:
+		return "cm3";
+	case ASAPModuleType_CMR:
+		return "cmr";
+	case ASAPModuleType_CMS:
+		return "cms";
+	case ASAPModuleType_DLT:
+		return "dlt";
+	case ASAPModuleType_MPT:
+		return self->fastplay == 156 ? "mpd" : "mpt";
+	case ASAPModuleType_MD1:
+		return "md1";
+	case ASAPModuleType_MD2:
+		return "md2";
+	case ASAPModuleType_RMT:
+		return "rmt";
+	case ASAPModuleType_TMC:
+		return "tmc";
+	case ASAPModuleType_TM2:
+		return "tm2";
+	case ASAPModuleType_FC:
+		return "fc";
+	case ASAPModuleType_D15:
+		return self->fastplay == 1 ? "d15" : "d8";
+	default:
+		return NULL;
+	}
+}
+// rePlayer end

@@ -7,6 +7,11 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+extern "C"
+{
+    const char* ASAPInfo_GetModuleExt(const ASAPInfo* self);
+}
+
 typedef struct {
     int (*load)(const ASAPFileLoader* self, const char* filename, uint8_t* buffer, int length);
 } ASAPFileLoaderVtbl;
@@ -111,7 +116,7 @@ namespace rePlayer
     }
 
     ReplayASAP::ReplayASAP(ASAP* song)
-        : Replay(BuildMediaType(ASAPInfo_GetOriginalModuleExt(ASAP_GetInfo(song))))
+        : Replay(BuildMediaType(ASAPInfo_GetModuleExt(ASAP_GetInfo(song))))
         , m_song(song)
         , m_surround(ASAP_SAMPLE_RATE)
     {}
