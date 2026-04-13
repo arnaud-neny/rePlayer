@@ -53,7 +53,7 @@ namespace rePlayer
             {
                 auto stub = GetLibrary().m_sources[source.id.sourceId]->GetArtistStub(source.id);
                 if (!stub.empty())
-                    ImGui::Tooltip(stub.c_str(), stub.c_str() + stub.size());
+                    ImGui::Tooltip(stub.c_str());
             }
             if (ImGui::BeginPopupContextItem("Source popup"))
             {
