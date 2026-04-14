@@ -832,7 +832,7 @@ namespace rePlayer
                 if (m_isTrackingSongInPlaylist && m_mode == Mode::Playlist)
                     Core::GetPlaylist().FocusCurrentSong();
                 if (m_isTrackingSongInDatabase && m_currentPlayer.IsValid())
-                    m_currentPlayer->GetId().Track();
+                    m_currentPlayer->GetId().Track(TrackMode::SongAndCurrentArtist);
             }
         }
     }

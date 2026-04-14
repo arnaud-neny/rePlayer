@@ -101,7 +101,7 @@ namespace rePlayer
         void Raise(Flag flags);
         Flag Fetch();
 
-        void TrackSubsong(SubsongID subsongId, bool isTrackingArtist);
+        void TrackSubsong(SubsongID subsongId, TrackMode trackMode);
 
         template <typename ItemID, typename ItemType>
         void Reconcile(ItemID id, ItemType* item);

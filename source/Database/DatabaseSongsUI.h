@@ -27,7 +27,7 @@ namespace rePlayer
         DatabaseSongsUI(DatabaseID databaseId, Window& owner, bool isScrollingEnabled = true, uint16_t defaultHiddenColumns = (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay), const char* header = "Songs");
         virtual ~DatabaseSongsUI();
 
-        void TrackSubsong(SubsongID subsongId, bool isTrackingArtist);
+        void TrackSubsong(SubsongID subsongId, TrackMode trackMode);
 
         uint32_t NumSubsongs() const;
         uint32_t NumSelectedSubsongs() const;
@@ -136,7 +136,7 @@ namespace rePlayer
 
         const bool m_isScrollingEnabled = true;
 
-        bool m_isTrackingArtist = false;
+        TrackMode m_trackMode = TrackMode::None;
         uint8_t m_trackedRepeat = 0; // hack for ImGui when changing an artist and the selected song is not displayed because of scrolling not computed properly (as it is based on previous artist on change)
         SubsongID m_trackedSubsongId;
 

@@ -31,6 +31,19 @@ namespace rePlayer
         kCount
     };
 
+    enum class TrackMode : uint8_t
+    {
+        None= 0,
+        Song = 1 << 7,
+        CurrentArtist = 1 << 0,
+        NextArtist = 1 << 1,
+        SongAndCurrentArtist = Song | CurrentArtist,
+        SongAndNextArtist = Song | NextArtist,
+        ArtistMask = CurrentArtist | NextArtist
+    };
+    inline constexpr TrackMode& operator|=(TrackMode& a, TrackMode b) { a = TrackMode(uint8_t(a) | uint8_t(b)); return a; }
+    inline constexpr bool operator<=>(TrackMode a, TrackMode b) { return uint8_t(a) & uint8_t(b); }
+
     struct MusicID
     {
         SubsongID subsongId;
@@ -61,7 +74,7 @@ namespace rePlayer
         std::string GetFullpath() const;
 
         void MarkForSave();
-        void Track(bool isTrackingArtist = false) const;
+        void Track(TrackMode trackMode) const;
 
         // Helpers
         SmartPtr<core::io::Stream> GetStream() const;

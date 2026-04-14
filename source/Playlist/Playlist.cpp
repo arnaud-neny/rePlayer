@@ -147,7 +147,7 @@ namespace rePlayer
 
                 auto status = LoadPlaylist(file, m_cue, version);
                 if (status == Status::kOk && m_currentEntryIndex >= 0)
-                    m_cue.entries[m_currentEntryIndex].Track(true);
+                    m_cue.entries[m_currentEntryIndex].Track(TrackMode::SongAndCurrentArtist);
             }
             else
             {
@@ -1000,7 +1000,7 @@ namespace rePlayer
                             char label[16];
                             sprintf(label, indexFormat, rowIdx + 1);
                             if (ImGui::Button(label, ImVec2(ImGui::GetColumnWidth(), 0.f)))
-                                curEntry.Track(ImGui::GetIO().KeyShift);
+                                curEntry.Track(ImGui::GetIO().KeyShift ? TrackMode::SongAndNextArtist : TrackMode::Song);
                         }
                         ImGui::TableNextColumn();
                         ImGui::TextUnformatted(curEntry.GetTitle().data());

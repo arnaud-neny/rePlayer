@@ -105,12 +105,12 @@ namespace rePlayer
             delete filter.ui;
     }
 
-    void DatabaseSongsUI::TrackSubsong(SubsongID subsongId, bool isTrackingArtist)
+    void DatabaseSongsUI::TrackSubsong(SubsongID subsongId, TrackMode trackMode)
     {
         // don't track when renaming or it could be messy
         if (!m_renamer.isEnabled)
         {
-            m_isTrackingArtist |= isTrackingArtist;
+            m_trackMode |= trackMode;
             m_trackedSubsongId = subsongId;
             m_trackedRepeat = 2;
         }
