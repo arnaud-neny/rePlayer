@@ -542,6 +542,7 @@ class TFMXDecoder : public Decoder {
         bool noNoteDetune;
         bool bpmSpeed5;
         bool noAddBeginCount;
+        bool noTrackMute;
     } variant;
 
     struct {

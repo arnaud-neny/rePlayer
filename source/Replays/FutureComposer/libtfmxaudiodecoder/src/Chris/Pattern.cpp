@@ -89,13 +89,13 @@ void TFMXDecoder::pattCmd_End(Track& tr) {
     cout << "End >>>>>>>>--Next track  step--" << endl;
 #endif
     tr.PT = 0xff;
+    if (sequencer.step.current != sequencer.step.last) {
+        sequencer.step.current++;
+    }
     if (sequencer.step.current == sequencer.step.last) {
         songEnd = true;
         triggerRestart = true;
         return;
-    }
-    else {
-        sequencer.step.current++;
     }
     processTrackStep();
     sequencer.step.next = true;

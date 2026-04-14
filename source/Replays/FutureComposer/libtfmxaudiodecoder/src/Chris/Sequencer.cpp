@@ -21,6 +21,12 @@
 //
 // Some modules use the LOOP command to escape from their initial start/end
 // range within the track table.
+//
+// The size of the track table (and thus the number of lines/steps within it)
+// cannot be determined reliably, unfortunately. In some files there are data
+// within track table range, which look like pattern data before the actual
+// beginning of the patterns. As such, not much can be done about figuring out
+// whether a song definition's track step number is valid.
 
 namespace tfmxaudiodecoder {
 
@@ -32,7 +38,14 @@ const std::string TFMXDecoder::TrackCmdInfo[TRACK_CMD_MAX+1] = {
     "Track Cmd FADE    "
 };
 
+// Track Mute is a feature of the TFMX file format and editor, but isn't
+// used much outside the editor itself. For the majority of files all tracks
+// are set to ON. In only 7 files, some tracks are set to OFF and lead to
+// missing voices in two cases.
 bool TFMXDecoder::getTrackMute(ubyte t) {
+    if (variant.noTrackMute) {
+        return true;
+    }
     return (0==readBEuword(pBuf,offsets.header+0x1c0+(t<<1)));
 }
 

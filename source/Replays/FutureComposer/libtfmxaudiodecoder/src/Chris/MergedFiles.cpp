@@ -125,13 +125,11 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         do {
             ubyte what = pBuf[offs++];
             uword len = makeWord(pBuf[offs+1],pBuf[offs]);
-            if (len == 0) {
-                break;
-            }
             offs += 2;
-            // Need this, since there is crap at the end that
-            // triggers definitions accidentally.
-            if ((offs+len) > input.len) {
+            if (len == 0 || offs>=input.len ||
+                // Need this, since there is crap at the end that
+                // triggers definitions accidentally.
+                ((offs+len) > input.len) ) {
                 break;
             }
             switch (what) {

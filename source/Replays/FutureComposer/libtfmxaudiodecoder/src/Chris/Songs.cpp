@@ -38,10 +38,17 @@ void tfmxaudiodecoder::TFMXDecoder::findSongs() {
         int s1 = readBEuword(pBuf,offsets.header+0x100+(so<<1));
         int s2 = readBEuword(pBuf,offsets.header+0x140+(so<<1));
         int s3 = readBEuword(pBuf,offsets.header+0x180+(so<<1));
+        int s1next = s1;
         // Skip invalid defs.
-        if (s1>s2 || s1>=0x1ff || s2>=0x1ff) {
+        // Largest track number $1ff is not invalid per se,
+        // but (1ff,1ff,0) was the dummy placeholder entry for song 32,
+        // and some files have changed it to (0,1ff,5).
+        // Yet we cannot reject (0,1ff,SPEED) entirely, since e.g.
+        // the composer Erno used that in the first song definition.
+        if (s1>s2 || s1>0x1ff || s2>0x1ff ||
+            (so>1 && (s1==0x1ff || s2==0x1ff)) ) {
 #if defined(DEBUG)
-            cout << "WARNING: Skipping song " << so << ": " << s1 << " to " << s2 << " speed " << s3 << "  for " << input.path << endl;
+            cout << "WARNING: Skipping invalid song " << hexB(so) << ": " << hexW(s1) << " to " << hexW(s2) << " speed " << hexW(s3) << "  for " << input.path << endl;
 #endif
             continue;
         }
@@ -61,16 +68,26 @@ void tfmxaudiodecoder::TFMXDecoder::findSongs() {
             if (countInactive == sequencer.tracks) {
                 continue;
             }
+            if (s1 != sequencer.step.current) {
+                s1next = sequencer.step.current;
+            }
         }
         
-        // Avoid duplicates.
+        // Avoid two types of duplicates.
+        //
+        // 1: All like (0,0,5) and basically (X,X,SPEED) where
+        //    a previously accepted song had the same start step X already.
+        // 2: Exact dupes of (X,Y,SPEED) will be skipped, too.
         SongArgs a = std::make_tuple( s1, s2, s3 );
         bool skipSong = false;
         for ( SongArgsSet::iterator it = setSongArgs.begin(); it != setSongArgs.end(); ++it ) {
-            if ( std::get<0>(*it) == s1 && s2 == std::get<0>(*it) ) {
+            if ( (std::get<0>(*it) == s1 && s2 == std::get<0>(*it)) ||
+                 // Also ignore songs which immediately advance to
+                 // the start step of a previously seen song def.
+                 (s1next!=s1 && (std::get<0>(*it) == s1next)) ) {
                 skipSong = true;
 #if defined(DEBUG)
-                cout << "WARNING: Skipping song fragment " << so << " (" << s1 << ',' << s2 << ',' << s3 << ')' << endl;
+                cout << "WARNING: Skipping song fragment " << hexB(so) << " (" << hexW(s1) << ',' << hexW(s2) << ',' << hexW(s3) << ')' << endl;
 #endif
                 break;
             }
@@ -79,7 +96,7 @@ void tfmxaudiodecoder::TFMXDecoder::findSongs() {
             vSongs.push_back(so);
             setSongArgs.insert(a);
 #if defined(DEBUG)
-            cout << "Song " << so << ": " << s1 << " to " << s2 << " speed " << s3 << endl;
+            cout << "Song " << hexB(so) << ": " << hexW(s1) << " to " << hexW(s2) << " speed " << hexW(s3) << endl;
 #endif
         }
     }

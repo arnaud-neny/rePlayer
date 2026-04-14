@@ -54,6 +54,14 @@ TFMXDecoder::~TFMXDecoder() {
 void TFMXDecoder::reset() {
     cmd.aa = cmd.bb = cmd.cd = cmd.ee = 0;
 
+    for (ubyte t=0; t<sequencer.tracks; t++) {
+        Track& tr = track[t];
+        tr.on = getTrackMute(t);
+        tr.PT = 0xff; tr.TR = 0;
+        tr.pattern.offset = tr.pattern.step = 0;
+        tr.pattern.wait = 0;
+        tr.pattern.loops = -1;
+    }
     for (ubyte v=0; v<voices; v++) {
         VoiceVars& voice = voiceVars[v];
         
@@ -282,6 +290,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     variant.noNoteDetune = false;
     variant.bpmSpeed5 = false;
     variant.noAddBeginCount = false;
+    variant.noTrackMute = false;
     
     PattCmdFuncs[0] = &TFMXDecoder::pattCmd_End;
     PattCmdFuncs[1] = &TFMXDecoder::pattCmd_Loop;
@@ -439,15 +448,13 @@ void TFMXDecoder::softRestart() {
     for (int step = 0; step < TRACK_STEPS_MAX; step++ ) {
         sequencer.stepSeenBefore[step] = false;
     }
-    for (ubyte t=0; t<sequencer.tracks; t++) {
-        Track& tr = track[t];
-        tr.on = getTrackMute(t);
-        tr.PT = 0xff; tr.TR = 0;
-        tr.pattern.offset = tr.pattern.step = 0;
-        tr.pattern.wait = 0;
-        tr.pattern.loops = -1;
-    }
 
+    // Not all songs are designed for looping cleanly, so aid them.
+    for (ubyte v=0; v<voices; v++) {
+        VoiceVars& voice = voiceVars[v];
+        voice.keyUp = true;
+        voice.volume = voice.outputVolume = 0;
+    }
     fade.active = false;
     fade.volume = fade.target = 64;
     fade.delta = 0;
@@ -590,6 +597,10 @@ void TFMXDecoder::processPTTR(Track& tr) {
     // PT >= 0x80 < 0x90 : continue pattern from previous step
     // PT >= 0x90 : track not used
     if (tr.PT < 0x90) {
+        if (tr.pattern.offset == 0) {  // track didn't set valid PT before
+            tr.PT = 0xff;
+            return;
+        }
         if (tr.pattern.wait == 0) {
             processPattern(tr);
         }
@@ -648,7 +659,8 @@ int TFMXDecoder::run() {
 
         }
     }
-    
+
+    bool hasEnded = false;//rePlayer
     if ( !songEnd || loopMode ) {
         if (--admin.count < 0) {
             admin.count = admin.speed;  // reload
@@ -676,25 +688,26 @@ int TFMXDecoder::run() {
                         break;
                     }
                 }  // next track
-                // This is a state where track sequencer cannot advance.
-                if ( !sequencer.step.next && countInactive == sequencer.tracks) {
-                    songEnd = true;
-                    triggerRestart = true;
+                // These are states where track sequencer cannot advance.
+                if ( !sequencer.step.next ) {
+                    if ( (countInactive == sequencer.tracks) ||
+                         (countInactive+countInfinite) == sequencer.tracks ) {
+                        songEnd = true;
+                        triggerRestart = true;
+                    }
                 }
-                if ( !sequencer.step.next && (countInactive+countInfinite) == sequencer.tracks) {
-                    songEnd = true;
-                    triggerRestart = true;
+                // Loop on end?
+                if (songEnd && loopMode) {
+                    songEnd = false;
+                    if (triggerRestart) {
+                        softRestart();
+                    }
+                    hasEnded = true;// rePlayer
                 }
             } while (sequencer.step.next);
         }
     }
-    if (songEnd && loopMode) {
-        songEnd = false;
-        if (triggerRestart) {
-            softRestart();
-        }
-        songEnd = true;// rePlayer
-    }
+    songEnd |= hasEnded;//rePlayer
     
     tickFPadd += tickFP;
     int tick = tickFPadd>>8;
