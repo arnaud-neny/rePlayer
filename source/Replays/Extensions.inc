@@ -1009,3 +1009,4 @@ EXTENSION(d15)          // ASAP
 EXTENSION(opi)          // FMP
 EXTENSION(ovi)          // FMP
 EXTENSION(ozi)          // FMP
+EXTENSION(mvm)          // MVX
