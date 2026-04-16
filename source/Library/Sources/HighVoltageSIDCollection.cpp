@@ -503,6 +503,33 @@ namespace rePlayer
 
     void SourceHighVoltageSIDCollection::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
     {
+        auto findSong = [this](const HvscSong& dbSong)
+        {
+            for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+            {
+                if (m_songs[i] == 0)
+                    continue;
+                auto* song = GetSongSource(i);
+                if (dbSong.name.IsSame(m_db.strings, song->name))
+                {
+                    if (!m_db.roots[dbSong.root].name.IsSame(m_db.strings, m_roots[song->root].name(m_strings)))
+                        continue;
+                    if (song->artist)
+                    {
+                        if (!dbSong.artist)
+                            continue;
+                        if (!m_db.artists[dbSong.artist].name.IsSame(m_db.strings, m_artists[song->artist].name(m_strings)))
+                            continue;
+                    }
+                    else if (dbSong.artist)
+                        continue;
+
+                    return song;
+                }
+            }
+            return (SourceSong*)nullptr;
+        };
+
         Array<BrowserEntry> entries;
         if (context.stage.id == kStageArtists.id)
         {
@@ -521,6 +548,7 @@ namespace rePlayer
                         context.entries.RemoveAtFast(entry - context.entries.Items());
                     }
                     ArtistID artistId = ArtistID::Invalid;
+                    bool hasNewEntries = false;
                     auto* artistName = m_db.artists[i].name(m_db.strings);
                     if (auto* sourceArtist = m_artists.FindIf([&](auto& entry) { return entry.name.IsSame(m_strings, artistName); }))
                     {
@@ -532,6 +560,15 @@ namespace rePlayer
                                 if (rplArtist->GetSource(j).id == sourceId)
                                 {
                                     artistId = rplArtist->GetId();
+
+                                    for (auto dbSongId = m_db.artists[i].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
+                                    {
+                                        if (!findSong(m_db.songs[dbSongId]))
+                                        {
+                                            hasNewEntries = true;
+                                            break;
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -543,8 +580,11 @@ namespace rePlayer
                         .dbIndex = i,
                         .isSong = false,
                         .isSelected = isSelected,
-                        .artistId = artistId
-                        });
+                        .artist = {
+                            .id = artistId,
+                            .isFetched = !hasNewEntries
+                        }
+                    });
                 }
             }
         }
@@ -553,33 +593,6 @@ namespace rePlayer
             // no column disabled
             context.disabledColumns = 0;
             context.stage = kStageSongs;
-            auto findSong = [this](const HvscSong& dbSong)
-            {
-                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
-                {
-                    if (m_songs[i] == 0)
-                        continue;
-                    auto* song = GetSongSource(i);
-                    if (dbSong.name.IsSame(m_db.strings, song->name))
-                    {
-                        if (!m_db.roots[dbSong.root].name.IsSame(m_db.strings, m_roots[song->root].name(m_strings)))
-                            continue;
-                        if (song->artist)
-                        {
-                            if (!dbSong.artist)
-                                continue;
-                            if (!m_db.artists[dbSong.artist].name.IsSame(m_db.strings, m_artists[song->artist].name(m_strings)))
-                                continue;
-                        }
-                        else if (dbSong.artist)
-                            continue;
-
-                        return song;
-                    }
-                }
-                return (SourceSong*)nullptr;
-            };
-
             for (auto dbSongId = m_db.artists[context.stageDbIndex].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong)
             {
                 const auto& dbSong = m_db.songs[dbSongId];
@@ -604,7 +617,7 @@ namespace rePlayer
                         .isSelected = isSelected,
                         .isDiscarded = isDiscarded,
                         .songId = songId
-                        });
+                    });
                 }
             }
         }
@@ -645,11 +658,11 @@ namespace rePlayer
             else if (column == kColumnId)
             {
                 auto* dName = "\xff";
-                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
-                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                auto* lName = lEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artist.id]->GetHandle() : dName;
+                auto* rName = rEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artist.id]->GetHandle() : dName;
                 delta = CompareStringMixed(lName, rName);
                 if (delta == 0)
-                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+                    delta = int32_t(lEntry.artist.id) - int32_t(rEntry.artist.id);
             }
         }
         return delta;
@@ -687,20 +700,7 @@ namespace rePlayer
             }
         }
         else if (column == kColumnId)
-        {
-            if (entry.isSong)
-            {
-                if (entry.songId != SongID::Invalid)
-                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
-                else if (entry.isDiscarded)
-                    ImGui::TextUnformatted("-------- DISCARDED");
-            }
-            else
-            {
-                if (entry.artistId != ArtistID::Invalid)
-                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
-            }
-        }
+            BrowserDisplayLibraryId(entry, entry.isSong);
     }
 
     void SourceHighVoltageSIDCollection::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)

@@ -247,6 +247,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="Library\LibraryFileImport.cpp" />
     <ClCompile Include="Library\LibraryDatabasePatch.cpp" />
     <ClCompile Include="Library\LibrarySongsUI.cpp" />
+    <ClCompile Include="Library\Source.cpp" />
     <ClCompile Include="Library\Sources\AmigaMusicPreservation.cpp" />
     <ClCompile Include="Library\Sources\AtariSAPMusicArchive.cpp" />
     <ClCompile Include="Library\Sources\FileImport.cpp" />

@@ -544,6 +544,34 @@ namespace rePlayer
 
     void SourceAtariSAPMusicArchive::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
     {
+        auto findSong = [this](const ASMASong& dbSong)
+        {
+            for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+            {
+                if (m_songs[i] == 0)
+                    continue;
+                auto* song = GetSongSource(i);
+                if (dbSong.path.IsSame(m_db.strings, song->name()))
+                {
+                    if (!m_db.roots[dbSong.root].IsSame(m_db.strings, m_roots[song->root].id, m_roots[song->root].label(m_strings)))
+                        continue;
+                    if (dbSong.numArtists != song->numArtists)
+                        continue;
+                    uint16_t artistIndex = 0;
+                    for (; artistIndex < dbSong.numArtists; artistIndex++)
+                    {
+                        if (!m_artists[song->artists[artistIndex]].name.IsSame(m_strings, GetArtistName(m_db.artists[dbSong.artists[artistIndex].id])))
+                            break;
+                    }
+                    if (artistIndex != dbSong.numArtists)
+                        continue;
+
+                    return song;
+                }
+            }
+            return (SourceSong*)nullptr;
+        };
+
         Array<BrowserEntry> entries;
         if (context.stage.id == kStageArtists.id)
         {
@@ -562,6 +590,7 @@ namespace rePlayer
                         context.entries.RemoveAtFast(entry - context.entries.Items());
                     }
                     ArtistID artistId = ArtistID::Invalid;
+                    bool hasNewEntries = false;
                     auto artistName = GetArtistName(m_db.artists[i]);
                     if (auto* sourceArtist = m_artists.FindIf([&](auto& entry) { return entry.name.IsSame(m_strings, artistName); }))
                     {
@@ -573,6 +602,25 @@ namespace rePlayer
                                 if (rplArtist->GetSource(j).id == sourceId)
                                 {
                                     artistId = rplArtist->GetId();
+
+                                    for (auto dbSongId = m_db.artists[i].songs; dbSongId;)
+                                    {
+                                        const auto& dbSong = DbSong(dbSongId);
+                                        if (!findSong(dbSong))
+                                        {
+                                            hasNewEntries = true;
+                                            break;
+                                        }
+                                        // Max 1 to handle when there is no artist
+                                        for (uint16_t k = 0; k < Max(dbSong.numArtists, 1); k++)
+                                        {
+                                            if (dbSong.artists[k].id == uint16_t(i))
+                                            {
+                                                dbSongId = dbSong.artists[k].nextSong;
+                                                break;
+                                            }
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -584,8 +632,11 @@ namespace rePlayer
                         .dbIndex = i,
                         .isSong = false,
                         .isSelected = isSelected,
-                        .artistId = artistId
-                        });
+                        .artist = {
+                            .id = artistId,
+                            .isFetched = !hasNewEntries
+                        }
+                    });
                 }
             }
         }
@@ -594,34 +645,6 @@ namespace rePlayer
             // no column disabled
             context.disabledColumns = 0;
             context.stage = kStageSongs;
-            auto findSong = [this](const ASMASong& dbSong)
-            {
-                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
-                {
-                    if (m_songs[i] == 0)
-                        continue;
-                    auto* song = GetSongSource(i);
-                    if (dbSong.path.IsSame(m_db.strings, song->name()))
-                    {
-                        if (!m_db.roots[dbSong.root].IsSame(m_db.strings, m_roots[song->root].id, m_roots[song->root].label(m_strings)))
-                            continue;
-                        if (dbSong.numArtists != song->numArtists)
-                            continue;
-                        uint16_t artistIndex = 0;
-                        for (; artistIndex < dbSong.numArtists; artistIndex++)
-                        {
-                            if (!m_artists[song->artists[artistIndex]].name.IsSame(m_strings, GetArtistName(m_db.artists[dbSong.artists[artistIndex].id])))
-                                break;
-                        }
-                        if (artistIndex != dbSong.numArtists)
-                            continue;
-
-                        return song;
-                    }
-                }
-                return (SourceSong*)nullptr;
-            };
-
             for (auto dbSongId = m_db.artists[context.stageDbIndex].songs; dbSongId;)
             {
                 const auto& dbSong = DbSong(dbSongId);
@@ -646,7 +669,7 @@ namespace rePlayer
                         .isSelected = isSelected,
                         .isDiscarded = isDiscarded,
                         .songId = songId
-                        });
+                    });
                 }
                 // Max 1 to handle when there is no artist
                 for (uint16_t i = 0; i < Max(dbSong.numArtists, 1); i++)
@@ -696,11 +719,11 @@ namespace rePlayer
             else if (column == kColumnId)
             {
                 auto* dName = "\xff";
-                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
-                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                auto* lName = lEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artist.id]->GetHandle() : dName;
+                auto* rName = rEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artist.id]->GetHandle() : dName;
                 delta = CompareStringMixed(lName, rName);
                 if (delta == 0)
-                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+                    delta = int32_t(lEntry.artist.id) - int32_t(rEntry.artist.id);
             }
         }
         return delta;
@@ -730,20 +753,7 @@ namespace rePlayer
             }
         }
         else if (column == kColumnId)
-        {
-            if (entry.isSong)
-            {
-                if (entry.songId != SongID::Invalid)
-                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
-                else if (entry.isDiscarded)
-                    ImGui::TextUnformatted("-------- DISCARDED");
-            }
-            else
-            {
-                if (entry.artistId != ArtistID::Invalid)
-                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
-            }
-        }
+            BrowserDisplayLibraryId(entry, entry.isSong);
     }
 
     void SourceAtariSAPMusicArchive::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)

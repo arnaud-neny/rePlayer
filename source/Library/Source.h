@@ -113,7 +113,11 @@ namespace rePlayer
             union
             {
                 SongID songId;
-                ArtistID artistId;
+                struct
+                {
+                    ArtistID id;
+                    bool isFetched;
+                } artist;
             };
 
             bool operator==(uint32_t i) const { return dbIndex == i; }
@@ -200,6 +204,9 @@ namespace rePlayer
 
         static constexpr BrowserColumn kColumnName = BrowserColumn::Name;
         static constexpr BrowserStage kStageRoot = {};
+
+    protected:
+        void BrowserDisplayLibraryId(const BrowserEntry& entry, bool isSong) const;
     };
 }
 // namespace rePlayer

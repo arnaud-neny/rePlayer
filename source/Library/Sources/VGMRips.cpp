@@ -1393,6 +1393,7 @@ namespace rePlayer
                         context.entries.RemoveAtFast(entry - context.entries.Items());
                     }
                     ArtistID artistId = ArtistID::Invalid;
+                    bool hasNewEntries = !m_db.artists[i].isComplete;
                     auto* artistUrl = m_db.artists[i].url(m_db.data);
                     if (auto* sourceArtist = m_artists.FindIf([&](auto& entry)
                     {
@@ -1409,6 +1410,45 @@ namespace rePlayer
                                 if (rplArtist->GetSource(j).id == sourceId)
                                 {
                                     artistId = rplArtist->GetId();
+
+                                    if (!hasNewEntries) for (uint32_t packOffset = m_db.artists[i].packs; packOffset;)
+                                    {
+                                        const auto& dbPack = *m_db.data.Items<VgmRipsPack>(packOffset);
+
+                                        auto sourcePackOffset = m_songs.FindIf<int64_t>([&](auto& song)
+                                        {
+                                            auto* packSource = m_data.Items<PackSource>(song.pack);
+                                            return song.pack && packSource->url.IsSame(m_data, dbPack.songsUrl(m_db.data));
+                                        });
+                                        if (sourcePackOffset < 0)
+                                        {
+                                            hasNewEntries = true;
+                                            break;
+                                        }
+                                        for (auto songOffset = dbPack.songs; songOffset; songOffset = m_db.data.Items<VgmRipsSong>(songOffset)->nextSong)
+                                        {
+                                            const auto& dbSong = *m_db.data.Items<VgmRipsSong>(songOffset);
+                                            if (!m_songs.FindIf([&](auto& song)
+                                            {
+                                                if (song.url.offset == 0)
+                                                    return false;
+                                                return m_songs[sourcePackOffset].pack == song.pack && strcmp(dbSong.url(m_db.data), song.url(m_data)) == 0;
+                                            }))
+                                            {
+                                                hasNewEntries = true;
+                                                break;
+                                            }
+                                        }
+
+                                        for (uint16_t k = 0; k < dbPack.numArtists; k++)
+                                        {
+                                            if (dbPack.artists[k].index == i)
+                                            {
+                                                packOffset = dbPack.artists[k].nextPack;
+                                                break;
+                                            }
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -1420,8 +1460,11 @@ namespace rePlayer
                         .dbIndex = i,
                         .isSong = false,
                         .isSelected = isSelected,
-                        .artistId = artistId
-                        });
+                        .artist = {
+                            .id = artistId,
+                            .isFetched = !hasNewEntries
+                        }
+                    });
                 }
             }
         }
@@ -1461,8 +1504,8 @@ namespace rePlayer
                         .isSong = false,
                         .isSelected = isSelected,
                         .isDiscarded = false,
-                        .artistId = ArtistID::Invalid
-                        });
+                        .artist = { .id = ArtistID::Invalid }
+                    });
                 }
                 for (uint16_t i = 0; i < dbPack->numArtists; i++)
                 {
@@ -1525,7 +1568,7 @@ namespace rePlayer
                         .isSelected = isSelected,
                         .isDiscarded = isDiscarded,
                         .songId = songId
-                        });
+                    });
                 }
             }
         }
@@ -1582,11 +1625,11 @@ namespace rePlayer
             else if (column == kColumnId)
             {
                 auto* dName = "\xff";
-                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
-                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                auto* lName = lEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artist.id]->GetHandle() : dName;
+                auto* rName = rEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artist.id]->GetHandle() : dName;
                 delta = CompareStringMixed(lName, rName);
                 if (delta == 0)
-                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+                    delta = int32_t(lEntry.artist.id) - int32_t(rEntry.artist.id);
             }
         }
         return delta;
@@ -1639,20 +1682,7 @@ namespace rePlayer
             }
         }
         else if (column == kColumnId)
-        {
-            if (entry.isSong)
-            {
-                if (entry.songId != SongID::Invalid)
-                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
-                else if (entry.isDiscarded)
-                    ImGui::TextUnformatted("-------- DISCARDED");
-            }
-            else
-            {
-                if (entry.artistId != ArtistID::Invalid)
-                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
-            }
-        }
+            BrowserDisplayLibraryId(entry, entry.isSong);
     }
 
     void SourceVGMRips::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)

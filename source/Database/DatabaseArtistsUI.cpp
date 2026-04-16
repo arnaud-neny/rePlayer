@@ -135,7 +135,7 @@ namespace rePlayer
                             selectedArtist = artist;
                             if (m_selectedArtistCopy.id != artistId)
                             {
-                                m_dbSongsRevision = m_db.SongsRevision() + 1;
+                                m_dbSongsRevision = m_db.SongsRevision() - 1;
                                 selectedArtist->CopyTo(&m_selectedArtistCopy);
                             }
                         }
@@ -183,7 +183,7 @@ namespace rePlayer
                             selectedArtist = m_db[selectedArtistId];
                             if (m_selectedArtistCopy.id != selectedArtistId)
                             {
-                                m_dbSongsRevision = m_db.SongsRevision() + 1;
+                                m_dbSongsRevision = m_db.SongsRevision() - 1;
                                 selectedArtist->CopyTo(&m_selectedArtistCopy);
                             }
                         }
@@ -399,7 +399,7 @@ namespace rePlayer
                     auto* artist = m_db[artists[rowIdx]];
                     if (ImGui::Selectable(artist->GetHandle(), false))
                     {
-                        m_dbSongsRevision = m_db.SongsRevision() + 1;
+                        m_dbSongsRevision = m_db.SongsRevision() - 1;
                         m_db[artists[rowIdx]]->CopyTo(&m_selectedArtistCopy);
                         m_trackedArtistId = artists[rowIdx];
                         m_lastTrackedSubsongId = m_entries[entryIndex];

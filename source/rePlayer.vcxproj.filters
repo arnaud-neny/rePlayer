@@ -212,6 +212,9 @@
     <ClCompile Include="Library\LibraryBrowserUI.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Source.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">

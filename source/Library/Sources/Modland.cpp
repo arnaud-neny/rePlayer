@@ -927,6 +927,42 @@ namespace rePlayer
 
     void SourceModland::BrowserPopulate(BrowserContext& context, const ImGuiTextFilter& filter)
     {
+        auto findSong = [this](const ModlandSong& dbSong)
+        {
+            for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
+            {
+                if (m_songs[i] == 0)
+                    continue;
+                auto* song = GetSongSource(i);
+                if (dbSong.name.IsSame(m_db.strings, song->name))
+                {
+                    if (!m_db.replays[dbSong.replayId].name.IsSame(m_db.strings, m_replays[song->replay].name(m_strings)))
+                        continue;
+                    if (song->artists[0])
+                    {
+                        if (!dbSong.artists[0])
+                            continue;
+                        if (!m_db.artists[dbSong.artists[0]].name.IsSame(m_db.strings, m_artists[song->artists[0]].name(m_strings)))
+                            continue;
+                        if (song->artists[1])
+                        {
+                            if (!dbSong.artists[1])
+                                continue;
+                            if (!m_db.artists[dbSong.artists[1]].name.IsSame(m_db.strings, m_artists[song->artists[1]].name(m_strings)))
+                                continue;
+                        }
+                        else if (dbSong.artists[1])
+                            continue;
+                    }
+                    else if (dbSong.artists[0])
+                        continue;
+
+                    return song;
+                }
+            }
+            return (SourceSong*)nullptr;
+        };
+
         Array<BrowserEntry> entries;
         if (context.stage.id == kStageArtists.id)
         {
@@ -945,6 +981,7 @@ namespace rePlayer
                         context.entries.RemoveAtFast(entry - context.entries.Items());
                     }
                     ArtistID artistId = ArtistID::Invalid;
+                    bool hasNewEntries = false;
                     if (auto* sourceArtist = m_artists.FindIf([&](auto& entry) { return entry.name.IsSame(m_strings, m_db.artists[i].name(m_db.strings)); }))
                     {
                         auto sourceId = SourceID(kID, uint32_t(sourceArtist - m_artists.Items()));
@@ -955,6 +992,15 @@ namespace rePlayer
                                 if (rplArtist->GetSource(j).id == sourceId)
                                 {
                                     artistId = rplArtist->GetId();
+
+                                    for (uint32_t dbSongId = m_db.artists[i].songs; dbSongId; dbSongId = m_db.songs[dbSongId].nextSong[m_db.songs[dbSongId].artists[0] == i ? 0 : 1])
+                                    {
+                                        if (!findSong(m_db.songs[dbSongId]))
+                                        {
+                                            hasNewEntries = true;
+                                            break;
+                                        }
+                                    }
                                     break;
                                 }
                             }
@@ -966,8 +1012,11 @@ namespace rePlayer
                         .dbIndex = i,
                         .isSong = false,
                         .isSelected = isSelected,
-                        .artistId = artistId
-                        });
+                        .artist = {
+                            .id = artistId,
+                            .isFetched = !hasNewEntries
+                        }
+                    });
                 }
             }
         }
@@ -975,41 +1024,6 @@ namespace rePlayer
         {
             // no column disabled
             context.disabledColumns = 0;
-            auto findSong = [this](const ModlandSong& dbSong)
-            {
-                for (uint32_t i = 1, e = m_songs.NumItems(); i < e; i++)
-                {
-                    if (m_songs[i] == 0)
-                        continue;
-                    auto* song = GetSongSource(i);
-                    if (dbSong.name.IsSame(m_db.strings, song->name))
-                    {
-                        if (!m_db.replays[dbSong.replayId].name.IsSame(m_db.strings, m_replays[song->replay].name(m_strings)))
-                            continue;
-                        if (song->artists[0])
-                        {
-                            if (!dbSong.artists[0])
-                                continue;
-                            if (!m_db.artists[dbSong.artists[0]].name.IsSame(m_db.strings, m_artists[song->artists[0]].name(m_strings)))
-                                continue;
-                            if (song->artists[1])
-                            {
-                                if (!dbSong.artists[1])
-                                    continue;
-                                if (!m_db.artists[dbSong.artists[1]].name.IsSame(m_db.strings, m_artists[song->artists[1]].name(m_strings)))
-                                    continue;
-                            }
-                            else if (dbSong.artists[1])
-                                continue;
-                        }
-                        else if (dbSong.artists[0])
-                            continue;
-
-                        return song;
-                    }
-                }
-                return (SourceSong*)nullptr;
-            };
             if (context.stage.id == kStageMultiSong.id)
             {
                 context.stage = kStageMultiSong;
@@ -1037,7 +1051,7 @@ namespace rePlayer
                             .isSelected = isSelected,
                             .isDiscarded = isDiscarded,
                             .songId = songId
-                            });
+                        });
                     }
                 }
             }
@@ -1121,11 +1135,11 @@ namespace rePlayer
             else if (column == kColumnId)
             {
                 auto* dName = "\xff";
-                auto* lName = lEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artistId]->GetHandle() : dName;
-                auto* rName = rEntry.artistId != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artistId]->GetHandle() : dName;
+                auto* lName = lEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[lEntry.artist.id]->GetHandle() : dName;
+                auto* rName = rEntry.artist.id != ArtistID::Invalid ? Core::GetDatabase(DatabaseID::kLibrary)[rEntry.artist.id]->GetHandle() : dName;
                 delta = CompareStringMixed(lName, rName);
                 if (delta == 0)
-                    delta = int32_t(lEntry.artistId) - int32_t(rEntry.artistId);
+                    delta = int32_t(lEntry.artist.id) - int32_t(rEntry.artist.id);
             }
         }
         return delta;
@@ -1167,20 +1181,7 @@ namespace rePlayer
             }
         }
         else if (column == kColumnId)
-        {
-            if (context.stage != kStageArtists)
-            {
-                if (entry.songId != SongID::Invalid)
-                    ImGui::Text("%08X %s", uint32_t(entry.songId), Core::GetDatabase(DatabaseID::kLibrary)[entry.songId]->GetName());
-                else if (entry.isDiscarded)
-                    ImGui::TextUnformatted("-------- DISCARDED");
-            }
-            else
-            {
-                if (entry.artistId != ArtistID::Invalid)
-                    ImGui::Text("%04X %s", uint32_t(entry.artistId), Core::GetDatabase(DatabaseID::kLibrary)[entry.artistId]->GetHandle());
-            }
-        }
+            BrowserDisplayLibraryId(entry, context.stage != kStageArtists);
     }
 
     void SourceModland::BrowserImport(const BrowserContext& context, const BrowserEntry& entry, SourceResults& collectedSongs)
