@@ -25,6 +25,8 @@
 - FAAD2: https://github.com/knik0/faad2
 - Farbrausch ViruZ II: https://github.com/farbrausch/fr_public  
   Made the x86 version available as "emulation" as it renders closer to the original than the C version.
+- FluidSynth: https://github.com/FluidSynth/fluidsynth
+- FMPlayer: https://github.com/myon98/98fmplayer
 - Furnace: https://github.com/tildearrow/furnace
 - game-music-emu: https://github.com/libgme/game-music-emu
 - gbsplay: https://github.com/mmitch/gbsplay
@@ -46,12 +48,15 @@
 - libvgm: https://github.com/ValleyBell/libvgm
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - MTPng: https://aminet.net/package/mus/play/mtpng_68k (and https://github.com/mrkite/soundsmith)
+- MVX: https://github.com/ConspiracyHu/apEx-public`
 - OpenMPT: https://source.openmpt.org
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org
 - Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
+- PMDWin: https://c60.la.coocan.jp & https://github.com/gzaffin/pmdmini
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - Psycle: https://sourceforge.net/projects/psycle
+- PxTone: https://pxtone.org/developer & https://github.com/yuxshao/ptweb
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp
 - SkaleTracker: https://www.pouet.net/prod.php?which=20929

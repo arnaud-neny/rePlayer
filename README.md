@@ -22,7 +22,7 @@ The player works only on PC with Windows 10 (x64) and later versions, and Window
 
 ## The deck
 
-![rePlayer's Deck](/doc/deck.png)
+![rePlayer's Deck](doc/deck.png)
 
 The main panel where you can see your playing song, and interact with the playback:
 1. VU meter (just a fancy visualizer).
@@ -37,22 +37,24 @@ The main panel where you can see your playing song, and interact with the playba
 
 ## The library
 
-This where you manage all your songs and artists you've imported (or going to import), so you have there two tabs, one for songs and the other for the artists
+This where you manage all your songs and artists you've imported (or going to import), so you have there two tabs, one for songs and the other for the artists.
+With the third tab, you can browse the online repositories where the song are imported from.
 
 - ### The song tab (main library view)
 
-![rePlayer's Library Songs](/doc/libsongs.png)
+![rePlayer's Library Songs](doc/libsongs.png)
 
 1. Title bar, displaying the number of filtered songs (and selected) and some extra informations of our current state of the database.
 2. Import button: click it to import files from you disk drives or artists or songs from online websites/databases.
 3. Song tab button: the current tab button for the songs
 4. Artists tab button (see next paragraph).
-5. Combo to select the behavior of the search filter (6).
-6. Search filter: type text their and it will filter your songs list.
-7. Filter buttons: you can add (remove or move) more filter bars to help you refine you research with different criteria.
-8. Song list.
-9. Rating button: the rating you set to your song, from N/A (not available aka not set) and 0 to 100%.
-10. End of playback button: to define the type end you want in your song. U means undefined (the player will detect it when it will reach the end of the song); F to fade out at the end, L to loop the song once.
+5. Browser button.
+6. Combo to select the behavior of the search filter (7).
+7. Search filter: type text their and it will filter your songs list.
+8. Filter buttons: you can add (remove or move) more filter bars to help you refine you research with different criteria.
+9. Song list.
+10. Rating button: the rating you set to your song, from N/A (not available aka not set) and 0 to 100%.
+11. End of playback button: to define the type end you want in your song. U means undefined (the player will detect it when it will reach the end of the song); F to fade out at the end, L to loop the song once.
 
 Double click on a song will try to play it. If you already have a song playing from the playlist, you are not going to loose its tracking: this song is "shelved" and will resume at the end of the other song or if you go to the next one.  
 Middle click on a song will open the song editor with this song as editable  
@@ -73,7 +75,7 @@ Right click on selected songs bring a menu:
 
 - ### The artist tab
 
-![rePlayer's Library Artists](/doc/libartists.png)
+![rePlayer's Library Artists](doc/libartists.png)
 
 1. Search filter: type text their and it will filter your artists list.
 2. Artist list.
@@ -81,9 +83,17 @@ Right click on selected songs bring a menu:
 4. Source list where the artist has been imported from; each time you click the import button, it will automatically fetch all songs from this sources (The main purpose of this player for me).
 5. Merge With Another Artist button: when importing from a website, it will create an artist from there. So you can have the same artist duplicated in the database. This is the way to combine these artists.
 
+- ### The browser tab
+
+![rePlayer's Repositories Browser](doc/libbrowser.png)
+
+1. Folder (as a path) selection.
+2. Filter the content of the current folder.
+3. All items available in the current folder (more folders or/and songs). Double click to enter the folder or play the song. Right click to bring a popup menu to import to the library or add to playlist as casual entries.
+
 ## The song editor
 
-![rePlayer's Song Editor](/doc/songed.png)
+![rePlayer's Song Editor](doc/songed.png)
 
 You can edit all the properties of a song there.
 - Info: database id (with L for library and P for playlist), file size, date when the file was added to the database and release year.
@@ -99,7 +109,7 @@ For some players, you can edit the song loop. For that you can simply enter the 
 
 ## The playlist
 
-![rePlayer's Playlist](/doc/playlist.png)
+![rePlayer's Playlist](doc/playlist.png)
 
 Add songs from the library here (from the library context menu, or drag and drop a selection from the library there).  
 Or add songs from you disk drive (drag and drop).  
@@ -113,7 +123,7 @@ Note 3: you can drag and drop url. On load, it will download the song or stream 
 
 ## The settings
 
-![rePlayer's Settings](/doc/settings.png)
+![rePlayer's Settings](doc/settings.png)
 
 Enable/disable the songs focus there (when a song start to play, it is focused in the playlist and/or database).  
 Enable/disable the auto merge when a song is download from the library.  
@@ -188,6 +198,8 @@ Or add some comments (and likes) there:
 - [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
 - [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
 - [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
+- [FluidSynth](`https://www.fluidsynth.org/`): a real-time software synthesizer based on the SoundFont 2 specifications.
+- [FMPlayer](`https://github.com/myon98/98fmplayer`): PC-98 FM driver emulation.
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
 - [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
@@ -206,12 +218,15 @@ Or add some comments (and likes) there:
 - [libvgm](https://github.com/ValleyBell/libvgm): to play vgm files (consoles).
 - [mdxmini](https://github.com/mistydemeo/mdxmini): play back MDX chiptunes from the X68000 home computer.
 - [MTPng](https://aminet.net/package/mus/play/mtpng_68k): MegaTracker Player (MTP or MTPng) is a program which will play most Apple IIgs SoundSmith and MegaTracker songs on your more modern computer.
+- [MVX](https://github.com/ConspiracyHu/apEx-public): Conspiracy's MVX Synth.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
 - [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
+- [PMDWin](`https://c60.la.coocan.jp`): PC-98 PMD chiptunes.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
+- [PxTone](https://pxtone.org): PxTone Collage is a free but powerful music editor made by Pixel, the creator of Cave Story and Kero Blaster.
 - [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [SkaleTracker](https://www.pouet.net/prod.php?which=20929): Skale Tracker is a music tracker developed by Ruben Ramos Salvador (baktery) in the year 1998.
