@@ -19,8 +19,8 @@ namespace rePlayer
         .replayId = eReplay::FluidSynth,
         .name = "FluidSynth",
         .extensions = "mid",
-        .about = "FluidSynth 2.5.3\nCopyright (c) 2003-2026 Peter Hanappe and others",
-        .settings = "FluidSynth 2.5.3",
+        .about = "FluidSynth " FLUIDSYNTH_VERSION "\nCopyright (c) 2003-2026 Peter Hanappe and others",
+        .settings = "FluidSynth " FLUIDSYNTH_VERSION,
         .init = ReplayFluidSynth::Init,
         .load = ReplayFluidSynth::Load,
         .displaySettings = ReplayFluidSynth::DisplaySettings,
@@ -169,7 +169,7 @@ namespace rePlayer
             , GetSet([&]() { return entry->polyphony != 0 ? entry->polyphony : ms_polyphony; }, [&](auto v) {  entry->polyphony = v; })
             , ms_polyphony, 1, 65535, "Polyphony voices %d");
 
-        struct  
+        struct
         {
             static int InputTextCallback(ImGuiInputTextCallbackData* data)
             {
@@ -315,7 +315,7 @@ namespace rePlayer
         char buf[16];
         sprintf(buf, "%d channel%c", m_fs.player->ntracks, m_fs.player->ntracks > 1 ? 's' : ' ');
         info = buf;
-        info += "\nMIDI\nFluidSynth 2.5.3";
+        info += "\nMIDI\nFluidSynth " FLUIDSYNTH_VERSION;
         return info;
     }
 }
