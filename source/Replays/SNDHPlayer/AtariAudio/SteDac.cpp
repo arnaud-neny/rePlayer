@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library
+	Atari Audio Library v1.00
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder

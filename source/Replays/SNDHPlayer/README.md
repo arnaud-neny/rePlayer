@@ -1,10 +1,11 @@
-# SNDH-Archive-Player
+# SNDH-Archive-Player v1.00
 ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twitter.com/leonard_coder)
 
 ![image info](./thumbnail.png)
 
 # Versions
 
+- v1.00 : sndh2.2 song len support and official AtariAudio v1.00
 - v0.80 : fix minizip library when dealing with weird zip path name
 - v0.79 : minor STE DAC potential fix
 - v0.78 : fix oscilloscope scale issue in v0.77
@@ -23,7 +24,9 @@ ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twit
 - v0.20 : SNDH music are time seekable! enjoy!
 - v0.10 : first version
 
+# Simple AtariAudio library
 
+if you need to add SNDH music in your own code just use the simple [AtariAudio library](https://github.com/arnaud-carre/sndh-player/tree/main/AtariAudio). It doesn't need any external lib, and should compile on tiny plaform (doesn't even need float support). 
 
 # Why?
 While having fun writing a YM7 format player on embeded device, I started to re-write my 30 years old ym2149 emulation (StSound). The new emulation is more accurate and source code is really simple.

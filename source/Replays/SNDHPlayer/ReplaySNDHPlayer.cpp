@@ -8,13 +8,13 @@
 
 namespace rePlayer
 {
-    #define SndhPlayerVersion "0.80"
+    #define SndhPlayerVersion "1.00"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,
         .name = "SNDH-Player",
         .extensions = "sndh",
-        .about = "SNDH-Player " SndhPlayerVersion "\nCopyright (c) 2023-2025 Arnaud Carré",
+        .about = "SNDH-Player " SndhPlayerVersion "\nCopyright (c) 2023-2026 Arnaud CarrÃ©",
         .settings = "SNDH-Player " SndhPlayerVersion,
         .init = ReplaySNDHPlayer::Init,
         .load = ReplaySNDHPlayer::Load,
