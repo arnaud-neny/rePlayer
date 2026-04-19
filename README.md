@@ -198,8 +198,8 @@ Or add some comments (and likes) there:
 - [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
 - [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
 - [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
-- [FluidSynth](`https://www.fluidsynth.org/`): a real-time software synthesizer based on the SoundFont 2 specifications.
-- [FMPlayer](`https://github.com/myon98/98fmplayer`): PC-98 FM driver emulation.
+- [FluidSynth](https://www.fluidsynth.org): a real-time software synthesizer based on the SoundFont 2 specifications.
+- [FMPlayer](https://github.com/myon98/98fmplayer): PC-98 FM driver emulation.
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
 - [game-music-emu](https://github.com/libgme/game-music-emu): collection of audio emulators for assorted video game console hardware (NES, Megadrive, Gameboy...).
 - [gbsplay](https://github.com/mmitch/gbsplay): Gameboy sound player.
@@ -223,7 +223,7 @@ Or add some comments (and likes) there:
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
 - [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
-- [PMDWin](`https://c60.la.coocan.jp`): PC-98 PMD chiptunes.
+- [PMDWin](https://c60.la.coocan.jp): PC-98 PMD chiptunes.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
 - [PxTone](https://pxtone.org): PxTone Collage is a free but powerful music editor made by Pixel, the creator of Cave Story and Kero Blaster.
