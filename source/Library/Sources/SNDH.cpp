@@ -882,8 +882,8 @@ namespace rePlayer
             sprintf(url, "https://sndh.atari.org/dl.php?ID=%u", dbSong.id);
             song->url = url;
             song->name = m_db.strings.Items(dbSong.name);
-            if (strcmp(m_db.strings.Items(artistId), "Unknown Composer"))
-                song->artists.Add(m_db.strings.Items(artistId));
+            if (strcmp(m_db.strings.Items(m_db.composers[artistId].name), "Unknown Composer"))
+                song->artists.Add(m_db.strings.Items(m_db.composers[artistId].name));
             song->type = { eExtension::_sndh, eReplay::SNDHPlayer };
         };
         if (entry.isSong)
