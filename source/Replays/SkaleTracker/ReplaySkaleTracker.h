@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Replay.h>
+#include <Replay.inl.h>
 #include <Audio/AudioTypes.h>
 
 #include "Bridge/BridgeShared.h"
@@ -11,6 +11,15 @@ namespace rePlayer
     {
     public:
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
+
+        struct Settings : public Command<Settings, eReplay::SkaleTracker>
+        {
+            LoopInfo loop = {};
+
+            Settings() = default;
+
+            static void Edit(ReplayMetadataContext& context);
+        };
 
     public:
         ~ReplaySkaleTracker() override;
@@ -42,6 +51,10 @@ namespace rePlayer
         SharedMemory* m_sharedMemory;
 
         uint32_t mNumSamples = 0;
+
+        LoopInfo m_loop = {};
+        uint64_t m_currentDuration = 0;
+        uint64_t m_currentPosition = 0;
     };
 }
 // namespace rePlayer

@@ -1,5 +1,6 @@
 #include "ReplaySkaleTracker.h"
 
+#include <Audio/AudioTypes.inl.h>
 #include <Core/String.h>
 #include <Thread/Thread.h>
 #include <ReplayDll.h>
@@ -16,7 +17,8 @@ namespace rePlayer
         .name = "Skale Tracker",
         .extensions = "skm",
         .about = "Skale Tracker 0.81\nCopyright (c) 2005 Ruben Ramos Salvador aka Baktery/Chanka",
-        .load = ReplaySkaleTracker::Load
+        .load = ReplaySkaleTracker::Load,
+        .editMetadata = ReplaySkaleTracker::Settings::Edit
     };
 
     Replay* ReplaySkaleTracker::Load(io::Stream* stream, CommandBuffer /*metadata*/)
@@ -119,6 +121,16 @@ namespace rePlayer
         return nullptr;
     }
 
+    void ReplaySkaleTracker::Settings::Edit(ReplayMetadataContext& context)
+    {
+        Settings dummy;
+        auto* entry = context.metadata.Find(&dummy);
+
+        Loops(context, &entry->loop, 1);
+
+        context.metadata.Update(entry, !entry->loop.IsValid());
+    }
+
     ReplaySkaleTracker::~ReplaySkaleTracker()
     {
         m_sharedMemory->isQuitRequested = true;
@@ -147,6 +159,20 @@ namespace rePlayer
 
     uint32_t ReplaySkaleTracker::Render(StereoSample* output, uint32_t numSamples)
     {
+        auto currentPosition = m_currentPosition;
+        auto currentDuration = m_currentDuration;
+        if (currentDuration != 0 && (currentPosition + numSamples) >= currentDuration)
+        {
+            numSamples = currentPosition < currentDuration ? uint32_t(currentDuration - currentPosition) : 0;
+            if (numSamples == 0)
+            {
+                m_currentPosition = 0;
+                m_currentDuration = (uint64_t(m_loop.length) * GetSampleRate()) / 1000;
+                return 0;
+            }
+        }
+        m_currentPosition = currentPosition + numSamples;
+
         auto remainingSamples = numSamples;
         while (remainingSamples)
         {
@@ -156,7 +182,8 @@ namespace rePlayer
                 {
                     if (remainingSamples == numSamples)
                         m_sharedMemory->bank[m_sharedMemory->bankIndex ^ 1].hasLooped = false;
-                    break;
+                    if (m_currentDuration == 0)
+                        break;
                 }
 
                 WaitForSingleObject(m_hResponseEvent, INFINITE);
@@ -184,11 +211,26 @@ namespace rePlayer
         m_sharedMemory->bankIndex = 0;
         mNumSamples = 0;
 
+        m_currentPosition = 0;
+        m_currentDuration = (uint64_t(m_loop.GetDuration()) * GetSampleRate()) / 1000;
+
         SetEvent(m_hRequestEvent);
     }
 
-    void ReplaySkaleTracker::ApplySettings(const CommandBuffer /*metadata*/)
-    {}
+    void ReplaySkaleTracker::ApplySettings(const CommandBuffer metadata)
+    {
+        auto settings = metadata.Find<Settings>();
+        if (settings)
+        {
+            m_loop = settings->loop.GetFixed();
+            m_currentDuration = (uint64_t(m_loop.GetDuration()) * GetSampleRate()) / 1000;
+        }
+        else
+        {
+            m_loop = {};
+            m_currentDuration = 0;
+        }
+    }
 
     void ReplaySkaleTracker::SetSubsong(uint32_t)
     {}
