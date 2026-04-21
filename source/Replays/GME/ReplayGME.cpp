@@ -11,8 +11,8 @@
 
 namespace rePlayer
 {
-    static_assert(GME_VERSION == 0x000604);
-    #define GME_VERSION_STRING "0.6.4"
+    static_assert(GME_VERSION == 0x000605);
+    #define GME_VERSION_STRING "0.6.5"
 
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::GME,

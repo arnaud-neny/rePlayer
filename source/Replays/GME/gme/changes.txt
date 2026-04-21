@@ -1,5 +1,35 @@
-Game_Music_Emu Change Log
--------------------------
+# Game_Music_Emu Change Log
 
-Please see the git version history (e.g. git shortlog tags/0.6.0..tags/0.6.1)
-for the accurate change log.
+# 0.6.5:
+## Most importand changes
+* Removed CPP demo as it uses private API.
+* Reworked demos so they no longer use private API.
+* Implemented some undocumented OPcodes for NES CPU (Thanks to @drfliemost for the contribution) (#86)
+* Fixed several compile warnings.
+* The fade length is now passed to the track info for SPC files. (Thanks to @myQwill for the contribution)
+* The C++ runtime library is now properly exported. (Thanks to @robUx4 for the contribution)
+* Fixed several crashes and security vulnerabilities reported by people.
+* The YM2413 chip emulator has been updated to the version v1.5.9. (Thanks to @drfliemost for the contribution)
+* Added ADPCM support for the HES emulator, backported from Kode54's fork. (Thanks to @drfliemost for the contribution)
+
+**Full Changelog**: https://github.com/libgme/game-music-emu/compare/0.6.4...0.6.5
+
+
+# 0.6.4:
+## Most importand changes
+* Extended the support of fade length in gme_info_t.
+* Added an ability to change fade duration by the new `gme_set_fade_msecs()` function.
+* Added Android.mk to support build via ndk-build.
+* Implemented RSN support via the gme_player (requires non-free unrar, however, gme itself doesn't need that).
+* Fixed several bugs at the GBS support (Thanks to @drfiemost).
+* Added an API to disable SPC echo completely (`gme_disable_echo(Music_Emu*, int disable)`) that can be used to avoid conflicts with external effects processors.
+* Implemented support for all known NSF chips (Thanks to @kode54!)
+* Added support for more track info at M3U support (Thanks to @kode54).
+* **The logic of the multi-channel output was changed to resolve the problem of the incorrect work** (Thanks to @myQwil) Details: https://github.com/libgme/game-music-emu/pull/54
+* Shared library now built with the exported symbols list and proper versioning enabled (Thanks to @sezero).
+* Added ability to build both static and shared libraries via CMake in the same build.
+
+**Full Changelog**: https://github.com/libgme/game-music-emu/compare/0.6.3...0.6.4
+
+# Older releases:
+Please see the git version history (e.g. git shortlog tags/0.6.0..tags/0.6.1) for the accurate change log.

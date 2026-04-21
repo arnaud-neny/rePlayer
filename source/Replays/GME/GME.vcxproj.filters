@@ -206,20 +206,11 @@
     <ClInclude Include="gme\gme\Ym2612_Nuked.h">
       <Filter>Source Files\gme</Filter>
     </ClInclude>
-    <ClInclude Include="gme\gme\ext\2413tone.h">
-      <Filter>Source Files\gme\ext</Filter>
-    </ClInclude>
     <ClInclude Include="gme\gme\ext\emu2413.h">
       <Filter>Source Files\gme\ext</Filter>
     </ClInclude>
-    <ClInclude Include="gme\gme\ext\emutypes.h">
-      <Filter>Source Files\gme\ext</Filter>
-    </ClInclude>
-    <ClInclude Include="gme\gme\ext\panning.h">
-      <Filter>Source Files\gme\ext</Filter>
-    </ClInclude>
-    <ClInclude Include="gme\gme\ext\vrc7tone.h">
-      <Filter>Source Files\gme\ext</Filter>
+    <ClInclude Include="gme\gme\Hes_Apu_Adpcm.h">
+      <Filter>Source Files\gme</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -379,8 +370,19 @@
     <ClCompile Include="gme\gme\ext\emu2413.c">
       <Filter>Source Files\gme\ext</Filter>
     </ClCompile>
-    <ClCompile Include="gme\gme\ext\panning.c">
-      <Filter>Source Files\gme\ext</Filter>
+    <ClCompile Include="gme\gme\Hes_Apu_Adpcm.cpp">
+      <Filter>Source Files\gme</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gme\gme\ext\CHANGELOG.md">
+      <Filter>Source Files\gme\ext</Filter>
+    </None>
+    <None Include="gme\gme\ext\LICENSE">
+      <Filter>Source Files\gme\ext</Filter>
+    </None>
+    <None Include="gme\gme\ext\README.md">
+      <Filter>Source Files\gme\ext</Filter>
+    </None>
   </ItemGroup>
 </Project>

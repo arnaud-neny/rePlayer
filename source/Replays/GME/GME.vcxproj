@@ -199,11 +199,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="gme\gme\Data_Reader.h" />
     <ClInclude Include="gme\gme\Dual_Resampler.h" />
     <ClInclude Include="gme\gme\Effects_Buffer.h" />
-    <ClInclude Include="gme\gme\ext\2413tone.h" />
     <ClInclude Include="gme\gme\ext\emu2413.h" />
-    <ClInclude Include="gme\gme\ext\emutypes.h" />
-    <ClInclude Include="gme\gme\ext\panning.h" />
-    <ClInclude Include="gme\gme\ext\vrc7tone.h" />
     <ClInclude Include="gme\gme\Fir_Resampler.h" />
     <ClInclude Include="gme\gme\Gbs_Emu.h" />
     <ClInclude Include="gme\gme\Gb_Apu.h" />
@@ -215,6 +211,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="gme\gme\gme_types.h" />
     <ClInclude Include="gme\gme\Gym_Emu.h" />
     <ClInclude Include="gme\gme\Hes_Apu.h" />
+    <ClInclude Include="gme\gme\Hes_Apu_Adpcm.h" />
     <ClInclude Include="gme\gme\Hes_Cpu.h" />
     <ClInclude Include="gme\gme\hes_cpu_io.h" />
     <ClInclude Include="gme\gme\Hes_Emu.h" />
@@ -266,7 +263,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="gme\gme\Dual_Resampler.cpp" />
     <ClCompile Include="gme\gme\Effects_Buffer.cpp" />
     <ClCompile Include="gme\gme\ext\emu2413.c" />
-    <ClCompile Include="gme\gme\ext\panning.c" />
     <ClCompile Include="gme\gme\Fir_Resampler.cpp" />
     <ClCompile Include="gme\gme\Gbs_Emu.cpp" />
     <ClCompile Include="gme\gme\Gb_Apu.cpp" />
@@ -276,6 +272,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="gme\gme\Gme_File.cpp" />
     <ClCompile Include="gme\gme\Gym_Emu.cpp" />
     <ClCompile Include="gme\gme\Hes_Apu.cpp" />
+    <ClCompile Include="gme\gme\Hes_Apu_Adpcm.cpp" />
     <ClCompile Include="gme\gme\Hes_Cpu.cpp" />
     <ClCompile Include="gme\gme\Hes_Emu.cpp" />
     <ClCompile Include="gme\gme\Kss_Cpu.cpp" />
@@ -310,6 +307,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="gme\gme\Ym2612_MAME.cpp" />
     <ClCompile Include="gme\gme\Ym2612_Nuked.cpp" />
     <ClCompile Include="ReplayGME.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gme\gme\ext\CHANGELOG.md" />
+    <None Include="gme\gme\ext\LICENSE" />
+    <None Include="gme\gme\ext\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

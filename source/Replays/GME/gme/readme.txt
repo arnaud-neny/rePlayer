@@ -1,4 +1,4 @@
-Game_Music_Emu 0.6.4: Game Music Emulators
+Game_Music_Emu 0.6.5: Game Music Emulators
 ------------------------------------------
 Game_Music_Emu is a collection of video game music file emulators that
 support the following formats and systems:
@@ -128,6 +128,8 @@ gme/
   Hes_Emu.h           TurboGrafx-16/PC Engine HES emulator
   Hes_Apu.cpp
   Hes_Apu.h
+  Hes_Apu_Adpcm.cpp
+  Hes_Apu_Adpcm.h
   Hes_Cpu.cpp
   Hes_Cpu.h
   hes_cpu_io.h

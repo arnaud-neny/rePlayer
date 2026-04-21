@@ -89,7 +89,7 @@ private:
 	Scc_Apu scc;
 	Sms_Apu* sn;
 	byte unmapped_read  [0x100];
-	byte unmapped_write [page_size];
+	byte unmapped_write [page_size + 1];
 };
 
 #endif
