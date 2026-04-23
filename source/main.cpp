@@ -116,6 +116,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case APPCOMMAND_VOLUME_DOWN:
             s_rePlayer->DecreaseVolume();
             break;
+        case APPCOMMAND_VOLUME_MUTE:
+            s_rePlayer->MuteVolume();
+            break;
         }
         break;
     case WM_USER:

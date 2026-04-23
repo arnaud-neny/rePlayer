@@ -39,6 +39,7 @@ namespace rePlayer
         void Stop();
         void IncreaseVolume();
         void DecreaseVolume();
+        void MuteVolume();
 
         bool IsLooping() const { return m_loop == Loop::Playlist; }
         bool IsEndless() const { return m_loop == Loop::Single; }
@@ -130,6 +131,7 @@ namespace rePlayer
         bool m_isSystrayMenuEnabled = false;
         bool m_isSystrayBalloonEnabled = false;
         bool m_isOpened = true;
+        bool m_isMuted = false;
 
         enum class VolumeCurve : uint8_t
         {
@@ -138,6 +140,7 @@ namespace rePlayer
         };
         Serialized<VolumeCurve> m_volumeCurve = { "VolumeCurve", VolumeCurve::Linear };
         Serialized<int32_t> m_volume = { "Volume", 0xffFF };
+        int32_t m_mutedVolume = 0;
         float m_VuMeterHeight = 100.f;
 
         Serialized<float> m_blendingFactor = { "Blending", 0.8f };

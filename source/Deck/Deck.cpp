@@ -42,6 +42,7 @@ namespace rePlayer
         ::RegisterHotKey(hWnd, APPCOMMAND_MEDIA_PLAY_PAUSE, MOD_NOREPEAT, VK_MEDIA_PLAY_PAUSE);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
+        ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE, MOD_NOREPEAT, VK_VOLUME_MUTE);
     }
 
     Deck::~Deck()
@@ -118,13 +119,30 @@ namespace rePlayer
 
     void Deck::IncreaseVolume()
     {
-        m_volume = Clamp(m_volume + 256, 0, 65535);
+        m_volume = m_isMuted ? m_mutedVolume : Clamp(m_volume + 256, 0, 65535);
         Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
+        m_isMuted = false;
     }
 
     void Deck::DecreaseVolume()
     {
-        m_volume = Clamp(m_volume - 256, 0, 65535);
+        m_volume = m_isMuted ? m_mutedVolume : Clamp(m_volume - 256, 0, 65535);
+        Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
+        m_isMuted = false;
+    }
+
+    void Deck::MuteVolume()
+    {
+        if (m_isMuted)
+        {
+            m_volume = m_mutedVolume;
+        }
+        else
+        {
+            m_mutedVolume = m_volume;
+            m_volume = 0;
+        }
+        m_isMuted = !m_isMuted;
         Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
     }
 
@@ -241,11 +259,13 @@ namespace rePlayer
                 {
                     ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
                     ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
+                    ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE, MOD_NOREPEAT, VK_VOLUME_MUTE);
                 }
                 else
                 {
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
+                    ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE);
                 }
             }
             const char* const volumeCurves[] = { "Linear", "Logarithmic" };
