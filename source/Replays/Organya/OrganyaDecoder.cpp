@@ -88,7 +88,7 @@ namespace Organya
                 auto& c = carrier, &f = frequency, &a = amplitude;
                 double mainpos = c.offset, maindelta = 256*c.pitch/nsamples;
                 for(size_t i=0; i<result.size(); ++i) {
-                    auto s = [=](double p=1) { return 256*p*i/nsamples; };
+                    auto s = [&](double p=1) { return 256*p*i/nsamples; };
                     // Take sample from each of the three signal generators:
                     int freqval = f.wave[0xFF & int(f.offset + s(f.pitch))] * f.level;
                     int ampval  = a.wave[0xFF & int(a.offset + s(a.pitch))] * a.level;
