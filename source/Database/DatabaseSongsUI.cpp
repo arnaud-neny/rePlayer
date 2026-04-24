@@ -802,10 +802,10 @@ namespace rePlayer
                         delta = int64_t(lSong->GetDatabaseDay()) - int64_t(rSong->GetDatabaseDay());
                         break;
                     case kSource:
-                        delta = strcmp(SourceID::sourceNames[lSong->GetSourceId(0).sourceId], SourceID::sourceNames[rSong->GetSourceId(0).sourceId]);
+                        delta = _stricmp(SourceID::sourceNames[lSong->GetSourceId(0).sourceId], SourceID::sourceNames[rSong->GetSourceId(0).sourceId]);
                         break;
                     case kReplay:
-                        delta = strcmp(lSong->GetType().GetReplay(), rSong->GetType().GetReplay());
+                        delta = _stricmp(lSong->GetType().GetReplay(), rSong->GetType().GetReplay());
                         break;
                     }
 
