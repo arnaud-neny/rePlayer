@@ -107,6 +107,7 @@ namespace rePlayer
         void Stop() override;
         void IncreaseVolume() override;
         void DecreaseVolume() override;
+        void MuteVolume() override;
 
         // Systray
         void SystrayMouseLeft(int32_t x, int32_t y) override;

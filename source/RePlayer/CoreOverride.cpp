@@ -200,6 +200,11 @@ namespace rePlayer
         m_deck->DecreaseVolume();
     }
 
+    void Core::MuteVolume()
+    {
+        m_deck->MuteVolume();
+    }
+
     void Core::SystrayMouseLeft(int32_t x, int32_t y)
     {
         m_deck->OnSystray(x, y, Deck::SystrayState::kMouseButtonLeft);
