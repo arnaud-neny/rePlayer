@@ -231,7 +231,8 @@ namespace rePlayer
         std::string info;
         auto songInfo = ASAP_GetInfo(m_song);
         info = ASAPInfo_GetChannels(songInfo) == 1 ? "1 channel\n" : "2 channels\n";
-        info += ASAPInfo_GetExtDescription(ASAPInfo_GetOriginalModuleExt(songInfo));
+        auto* ext = ASAPInfo_GetOriginalModuleExt(songInfo);
+        info += ASAPInfo_GetExtDescription(ext ? ext : "sap");
         info += "\nASAP " ASAPInfo_VERSION;
         return info;
     }
