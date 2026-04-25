@@ -58,6 +58,7 @@ namespace rePlayer
         uint32_t GetNumSubsongs() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
+        const Properties& BuildProperties() override;
 
         Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags) override;
 
@@ -107,6 +108,8 @@ namespace rePlayer
         bool m_isSilenceDetectionRunning = false;
         bool m_isSilenceDetectionCancelled = false;
         int32_t m_vblank = -1;
+
+        Properties m_properties;
 
         static GlobalSettings ms_settings[];
     };

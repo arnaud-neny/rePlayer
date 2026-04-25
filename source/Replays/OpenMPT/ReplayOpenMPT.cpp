@@ -14,6 +14,8 @@
 #include <ReplayDll.h>
 
 #include "libopenmpt/libopenmpt_version.h"
+#include "common/stdafx.h"
+#include "soundlib/Sndfile.h"
 
 #include <atomic>
 
@@ -338,6 +340,136 @@ namespace rePlayer
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();
+        // clear properties
+        m_properties.Clear();
+        // push empty property info
+        auto* property = m_properties.Push();
+        property->label = "Info";
+        property->numColumns = 2;
+        // push property message if any
+        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message_raw"))
+        {
+            if (str[0])
+            {
+                property = m_properties.Push();
+                property->label = "Message";
+                property->data.Add(pcCast<uint8_t>(str), uint32_t(strlen(str) + 1));
+            }
+            openmpt_free_string(str);
+        }
+        // push property samples if any
+        if (auto count = openmpt_module_get_num_samples(m_modulePlayback))
+        {
+            property = m_properties.Push();
+            property->label = "Samples";
+            auto* sndfile = pcCast<OpenMPT::CSoundFile>(openmpt_module_get_sndfile(m_modulePlayback));
+            uint32_t columns = 0;
+            for (int i = 0; i < count; ++i)
+            {
+                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i));
+
+                if (sample.uFlags & OpenMPT::CHN_ADLIB)
+                {
+                    columns |= 1 << 0;
+                }
+                else if (auto sampleSize = sample.GetSampleSizeInBytes())
+                {
+                    columns |= 1 << 0;
+                    columns |= 1 << 2;
+
+                    if (auto sampleFreq = sample.GetSampleRate(sndfile->GetType()))
+                        columns |= 1 << 1;
+                }
+            }
+            property->numColumns = std::popcount(columns) + 1;
+            for (int i = 0; i < count; ++i)
+            {
+                auto str = openmpt_module_get_sample_name(m_modulePlayback, i);
+
+                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i));
+
+                std::string flags;
+                char sampleSizeBuf[16];
+                char sampleFreqBuf[16];
+                sampleSizeBuf[0] = 0;
+                sampleFreqBuf[0] = 0;
+
+                if (sample.uFlags & OpenMPT::CHN_ADLIB)
+                {
+                    flags += "opl ";
+                }
+                else if (auto sampleSize = sample.GetSampleSizeInBytes())
+                {
+                    sprintf(sampleSizeBuf, "%uBytes", sampleSize);
+                    if (sample.uFlags & OpenMPT::CHN_16BIT)
+                        flags += "16bit ";
+                    else
+                        flags += "8bit ";
+                    if (sample.uFlags & OpenMPT::CHN_STEREO)
+                        flags += "stereo ";
+
+                    if (auto sampleFreq = sample.GetSampleRate(sndfile->GetType()))
+                        sprintf(sampleFreqBuf, "%uHz", sampleFreq);
+                }
+
+                property->Add(str, Property::kIsEditable);
+                if (columns & (1 << 0))
+                {
+                    if (!flags.empty())
+                        flags.resize(flags.size() - 1);
+                    property->Add(flags.c_str(), Property::kIsNotEditable);
+                }
+                if (columns & (1 << 1))
+                    property->Add(sampleFreqBuf, Property::kIsNotEditable);
+                if (columns & (1 << 2))
+                    property->Add(sampleSizeBuf, Property::kIsNotEditable);
+                if (str)
+                    openmpt_free_string(str);
+            }
+        }
+        // push property instruments if any
+        if (auto count = openmpt_module_get_num_instruments(m_modulePlayback))
+        {
+            property = m_properties.Push();
+            property->label = "Instruments";
+            auto* sndfile = pcCast<OpenMPT::CSoundFile>(openmpt_module_get_sndfile(m_modulePlayback));
+            property->numColumns = 1;
+            for (int i = 0; i < count; ++i)
+            {
+                auto* instrument = sndfile->Instruments[i];
+                if (instrument && (instrument->PitchEnv.dwFlags & OpenMPT::ENV_ENABLED
+                    || instrument->VolEnv.dwFlags & OpenMPT::ENV_ENABLED
+                    || instrument->PanEnv.dwFlags & OpenMPT::ENV_ENABLED))
+                {
+                    property->numColumns = 2;
+                    break;
+                }
+            }
+            for (int i = 0; i < count; ++i)
+            {
+                auto str = openmpt_module_get_instrument_name(m_modulePlayback, i);
+                property->Add(str, Property::kIsEditable);
+                if (str)
+                    openmpt_free_string(str);
+
+                if (property->numColumns == 2)
+                {
+                    std::string envs;
+                    if (auto* instrument = sndfile->Instruments[i])
+                    {
+                        if (instrument->PitchEnv.dwFlags & OpenMPT::ENV_ENABLED)
+                            envs += "pitch,";
+                        if (instrument->VolEnv.dwFlags & OpenMPT::ENV_ENABLED)
+                            envs += "vol,";
+                        if (instrument->PanEnv.dwFlags & OpenMPT::ENV_ENABLED)
+                            envs += "pan,";
+                        if (!envs.empty())
+                            envs.resize(envs.size() - 1);
+                    }
+                    property->Add(envs.c_str(), Property::kIsNotEditable);
+                }
+            }
+        }
     }
 
     MediaType ReplayOpenMPT::BuildMediaType(openmpt_module* module)
@@ -412,6 +544,49 @@ namespace rePlayer
         }
         info += "\nOpenMPT " OPENMPT_API_VERSION_STRING;
         return info;
+    }
+
+    const Replay::Properties& ReplayOpenMPT::BuildProperties()
+    {
+        // build realtime basic info
+        auto& property = m_properties[0];
+        property.numEntries = 0;
+        property.data.Clear();
+
+        auto str = openmpt_module_get_metadata(m_modulePlayback, "artist");
+        if (str)
+        {
+            if (str[0])
+                property.Add("Artist", Property::kIsNotEditable, str, Property::kIsEditable);
+            openmpt_free_string(str);
+        }
+
+        str = openmpt_module_get_metadata(m_modulePlayback, "title");
+        property.Add("Title", Property::kIsNotEditable, str, Property::kIsEditable);
+        if (str)
+            openmpt_free_string(str);
+
+        str = openmpt_module_get_subsong_name(m_modulePlayback, m_subsongIndex);
+        if (str)
+        {
+            if (str[0])
+                property.Add("Subsong Name", Property::kIsNotEditable, str, Property::kIsEditable);
+            openmpt_free_string(str);
+        }
+
+        char buf[16];
+        sprintf(buf, "%d", (int)openmpt_module_get_current_tempo2(m_moduleVisuals));
+        property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", openmpt_module_get_current_speed(m_moduleVisuals));
+        property.Add("Speed", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", openmpt_module_get_current_order(m_moduleVisuals));
+        property.Add("Order", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", openmpt_module_get_current_row(m_moduleVisuals));
+        property.Add("Row", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", openmpt_module_get_current_pattern(m_moduleVisuals));
+        property.Add("Pattern", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+
+        return m_properties;
     }
 
     Replay::Patterns ReplayOpenMPT::UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags)

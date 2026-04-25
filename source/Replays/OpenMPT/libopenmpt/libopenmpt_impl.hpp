@@ -204,7 +204,7 @@ public:
 public:
 	void select_subsong( std::int32_t subsong );
 	std::int32_t get_selected_subsong() const;
-	
+
 	std::int32_t get_restart_order( std::int32_t subsong ) const;
 	std::int32_t get_restart_row( std::int32_t subsong ) const;
 
@@ -281,6 +281,7 @@ public:
 	void ctl_set_floatingpoint( std::string_view ctl, double value, bool throw_if_unknown = true );
 	void ctl_set_text( std::string_view ctl, std::string_view value, bool throw_if_unknown = true );
 	std::size_t read_one_tick(std::int32_t samplerate); // rePlayer
+	void* get_sndfile() const; // rePlayer
 }; // class module_impl
 
 namespace helper {

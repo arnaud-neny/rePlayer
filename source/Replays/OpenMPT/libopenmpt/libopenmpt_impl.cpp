@@ -2267,6 +2267,10 @@ std::size_t module_impl::read_one_tick(std::int32_t samplerate) {
 	m_currentPositionSeconds += static_cast<double>(count) / static_cast<double>(samplerate);
 	return count;
 }
+
+void* module_impl::get_sndfile() const {
+	return m_sndFile.get();
+}
 // rePlayer end
 
 } // namespace openmpt
