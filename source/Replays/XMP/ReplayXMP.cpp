@@ -6,6 +6,8 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+#include <bit>
+
 extern "C" {
 #   include "libxmp/src/common.h"
     struct HIO_HANDLE* hio_open_callbacks(void*, struct xmp_callbacks);
@@ -385,6 +387,111 @@ namespace rePlayer
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();
+        // clear properties
+        m_properties.Clear();
+        // push empty property info
+        auto* property = m_properties.Push();
+        property->label = "Info";
+        property->numColumns = 2;
+        // push property message if any
+        if (m_moduleInfo.comment && m_moduleInfo.comment[0])
+        {
+            property = m_properties.Push();
+            property->label = "Message";
+            property->data.Add(pcCast<uint8_t>(m_moduleInfo.comment), uint32_t(strlen(m_moduleInfo.comment) + 1));
+        }
+        // push property samples if any
+        if (auto count = m_moduleInfo.mod->smp)
+        {
+            property = m_properties.Push();
+            property->label = "Samples";
+            uint32_t columns = 0;
+            for (int i = 0; i < count; ++i)
+            {
+                auto& sample = m_moduleInfo.mod->xxs[i];
+
+                if (sample.flg & XMP_SAMPLE_SYNTH)
+                {
+                    columns |= 1 << 0;
+                }
+                else if (auto sampleSize = sample.len)
+                {
+                    columns |= 1 << 0;
+                    columns |= 1 << 1;
+                }
+            }
+            property->numColumns = std::popcount(columns) + 1;
+            for (int i = 0; i < count; ++i)
+            {
+                auto& sample = m_moduleInfo.mod->xxs[i];
+
+                std::string flags;
+                char sampleSizeBuf[16];
+                sampleSizeBuf[0] = 0;
+
+                if (sample.flg & XMP_SAMPLE_SYNTH)
+                {
+                    flags += "synth ";
+                }
+                else if (auto sampleSize = sample.len)
+                {
+                    sprintf(sampleSizeBuf, "%uBytes", sampleSize);
+                    if (sample.flg & XMP_SAMPLE_16BIT)
+                        flags += "16bit ";
+                    else
+                        flags += "8bit ";
+                    if (sample.flg & XMP_SAMPLE_STEREO)
+                        flags += "stereo ";
+                }
+
+                property->Add(sample.name, Property::kIsEditable);
+                if (columns & (1 << 0))
+                {
+                    if (!flags.empty())
+                        flags.resize(flags.size() - 1);
+                    property->Add(flags.c_str(), Property::kIsNotEditable);
+                }
+                if (columns & (1 << 1))
+                    property->Add(sampleSizeBuf, Property::kIsNotEditable);
+            }
+        }
+        // push property instruments if any
+        if (auto count = m_moduleInfo.mod->ins)
+        {
+            property = m_properties.Push();
+            property->label = "Instruments";
+            property->numColumns = 1;
+            for (int i = 0; i < count; ++i)
+            {
+                auto& instrument = m_moduleInfo.mod->xxi[i];
+                if (/*instrument.nsm && */(instrument.fei.flg & XMP_ENVELOPE_ON
+                    || instrument.aei.flg & XMP_ENVELOPE_ON
+                    || instrument.pei.flg & XMP_ENVELOPE_ON))
+                {
+                    property->numColumns = 2;
+                    break;
+                }
+            }
+            for (int i = 0; i < count; ++i)
+            {
+                auto& instrument = m_moduleInfo.mod->xxi[i];
+                property->Add(instrument.name, Property::kIsEditable);
+
+                if (property->numColumns == 2)
+                {
+                    std::string envs;
+                    if (instrument.fei.flg & XMP_ENVELOPE_ON)
+                        envs += "pitch,";
+                    if (instrument.aei.flg & XMP_ENVELOPE_ON)
+                        envs += "vol,";
+                    if (instrument.pei.flg & XMP_ENVELOPE_ON)
+                        envs += "pan,";
+                    if (!envs.empty())
+                        envs.resize(envs.size() - 1);
+                    property->Add(envs.c_str(), Property::kIsNotEditable);
+                }
+            }
+        }
     }
 
     uint32_t ReplayXMP::GetDurationMs() const
@@ -412,51 +519,21 @@ namespace rePlayer
             metadata += "Name: ";
             metadata += m_moduleInfo.mod->name;
         }
-        char fmtInstrument[] = "Instrument %00d: ";
-        if (m_moduleInfo.mod->ins < 10)
-        {
-            fmtInstrument[12] = 'd';
-            fmtInstrument[13] = ':';
-            fmtInstrument[14] = ' ';
-            fmtInstrument[15] = 0;
-        }
-        else if(m_moduleInfo.mod->ins < 100)
-            fmtInstrument[13] = '2';
-        else
-            fmtInstrument[13] = '3';
         for (int i = 0, e = m_moduleInfo.mod->ins; i < e; i++)
         {
             if (m_moduleInfo.mod->xxi[i].name[0])
             {
                 if (!metadata.empty())
                     metadata += "\n";
-                char buf[64];
-                sprintf(buf, fmtInstrument, i);
-                metadata += buf;
                 metadata += m_moduleInfo.mod->xxi[i].name;
             }
         }
-        char fmtSample[] = "Sample %00d: ";
-        if (m_moduleInfo.mod->smp < 10)
-        {
-            fmtSample[8] = 'd';
-            fmtSample[9] = ':';
-            fmtSample[10] = ' ';
-            fmtSample[11] = 0;
-        }
-        else if (m_moduleInfo.mod->smp < 100)
-            fmtSample[9] = '2';
-        else
-            fmtSample[9] = '3';
         for (int i = 0, e = m_moduleInfo.mod->smp; i < e; i++)
         {
             if (m_moduleInfo.mod->xxs[i].name[0])
             {
                 if (!metadata.empty())
                     metadata += "\n";
-                char buf[64];
-                sprintf(buf, fmtSample, i);
-                metadata += buf;
                 metadata += m_moduleInfo.mod->xxs[i].name;
             }
         }
@@ -473,6 +550,33 @@ namespace rePlayer
         info += m_moduleInfo.mod->type;
         info += "\nlibxmp " XMP_VERSION;
         return info;
+    }
+
+    const Replay::Properties& ReplayXMP::BuildProperties()
+    {
+        // build realtime basic info
+        auto& property = m_properties[0];
+        property.numEntries = 0;
+        property.data.Clear();
+
+        property.Add("Title", Property::kIsNotEditable, m_moduleInfo.mod->name, Property::kIsEditable);
+
+        xmp_frame_info frameInfo;
+        xmp_get_frame_info(m_contextVisuals, &frameInfo);
+
+        char buf[16];
+        sprintf(buf, "%d", frameInfo.bpm);
+        property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", frameInfo.speed);
+        property.Add("Speed", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", frameInfo.pos);
+        property.Add("Order", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", frameInfo.row);
+        property.Add("Row", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", frameInfo.pattern);
+        property.Add("Pattern", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+
+        return m_properties;
     }
 
     Replay::Patterns ReplayXMP::UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags)
