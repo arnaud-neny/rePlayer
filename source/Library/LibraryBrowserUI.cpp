@@ -168,7 +168,7 @@ namespace rePlayer
         auto& context = *m_context;
         assert(context.stage != Source::kStageRoot);
 
-        if (ImGui::BeginTable(SourceID::sourceNames[0], context.numColumns, ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+        if (ImGui::BeginTable(SourceID::sourceNames[0], context.numColumns, ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg))
         {
             for (int32_t i = 0; i < context.numColumns; ++i)
                 ImGui::TableSetupColumn(context.columnNames[i], ImGuiTableColumnFlags_WidthStretch | (context.disabledColumns & (1 << i) ? ImGuiTableColumnFlags_Disabled : ImGuiTableColumnFlags_None), 0.0f, i);
