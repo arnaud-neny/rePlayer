@@ -51,6 +51,7 @@ namespace rePlayer
         MediaType GetMediaType() const;
 
         Replay::Patterns GetPatterns(uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Replay::Patterns::Flags flags) const;
+        const Replay::Properties& GetProperties() const;
 
         StereoSample GetVuMeter() const;
         void DrawVisuals(float xMin, float yMin, float xMax, float yMax) const;
@@ -117,6 +118,7 @@ namespace rePlayer
         } m_status;
 
         std::string m_extraInfo;
+        Replay::Properties m_properties;
     };
 }
 // namespace rePlayer

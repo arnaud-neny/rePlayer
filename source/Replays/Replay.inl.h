@@ -158,5 +158,31 @@ namespace rePlayer
         }
         return isZero;
     }
+
+    inline void Replay::Property::Add(const char* entry, IsEditable isEditable)
+    {
+        if (entry)
+        {
+            auto len = uint32_t(strlen(entry) + uint32_t(isEditable));
+            if (len > 32767)
+                len = 32767;
+            uint16_t u = uint16_t(len) | (uint16_t(isEditable) << 15);
+            data.Add(pcCast<uint8_t>(&u), sizeof(u));
+            data.Add(pcCast<uint8_t>(entry), len);
+        }
+        else
+        {
+            data.Add(0);
+            data.Add(0);
+        }
+        numEntries++;
+    }
+
+    template<typename... Args>
+    inline void Replay::Property::Add(const char* entry, IsEditable isEditable, Args&&... others)
+    {
+        Add(entry, isEditable);
+        Add(std::forward<Args>(others)...);
+    }
 }
 // namespace rePlayer

@@ -53,5 +53,13 @@ namespace rePlayer
     {
         return m_replay->GetMediaType();
     }
+
+    inline const Replay::Properties& Player::GetProperties() const
+    {
+        auto& p = m_replay->BuildProperties();
+        if (p.IsEmpty())
+            return m_properties;
+        return p;
+    }
 }
 // namespace rePlayer

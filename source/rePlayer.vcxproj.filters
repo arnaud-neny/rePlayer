@@ -215,6 +215,9 @@
     <ClCompile Include="Library\Source.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
+    <ClCompile Include="Deck\Properties.cpp">
+      <Filter>Source Files\Deck</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -456,6 +459,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\JapaneseFont.h">
       <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck\Properties.h">
+      <Filter>Source Files\Deck</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

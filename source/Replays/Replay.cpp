@@ -67,5 +67,11 @@ namespace rePlayer
     {
         g_replayPlugin.onDelete(this);
     }
+
+    const Replay::Properties& Replay::BuildProperties()
+    {
+        static Properties properties;
+        return properties;
+    }
 }
 // namespace rePlayer

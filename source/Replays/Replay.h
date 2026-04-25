@@ -83,6 +83,37 @@ namespace rePlayer
             static const uint32_t colors[kNumColors];
         };
 
+        struct Property
+        {
+            enum class IsEditable : uint8_t {};
+            static constexpr IsEditable kIsNotEditable = IsEditable(0);
+            static constexpr IsEditable kIsEditable = IsEditable(1);
+            struct Entry
+            {
+                uint8_t sizeLow;
+                uint8_t sizeHigh : 7;
+                uint8_t isEditable : 1;
+                char txt[0];
+
+                uint16_t Size() const { return sizeLow + (sizeHigh << 8);  }
+                const Entry* Next() const { return pcCast<Entry>(&txt[Size()]); }
+            };
+
+            const char* label = nullptr;
+            uint32_t numColumns = 0;
+            uint32_t numEntries = 0;
+            Array<uint8_t> data;
+
+            void Add(const char* entry, IsEditable isEditable);
+            template<typename... Args>
+            void Add(const char* entry, IsEditable isEditable, Args&&... others);
+
+            const Entry* First() const { return pcCast<Entry>(data.Items()); }
+        };
+
+        struct Properties : public Array<Property>
+        {};
+
     public:
         virtual ~Replay();
 
@@ -106,6 +137,7 @@ namespace rePlayer
         virtual std::string GetStreamingArtist() const { return {}; }
         virtual std::string GetExtraInfo() const = 0;
         virtual std::string GetInfo() const = 0;
+        virtual const Properties& BuildProperties();
 
         virtual bool CanLoop() const { return true; }
 

@@ -9,6 +9,7 @@
 #include <Database/SongEditor.h>
 #include <Deck/Patterns.h>
 #include <Deck/Player.h>
+#include <Deck/Properties.h>
 #include <Library/Library.h>
 #include <Playlist/Playlist.h>
 #include <Replayer/About.h>
@@ -30,6 +31,7 @@ namespace rePlayer
     Deck::Deck()
         : Window("System", ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking, true)
         , m_patterns(new Patterns)
+        , m_properties(new Properties)
     {
         Enable(true);
         m_volume = Player::GetVolume(m_volumeCurve == VolumeCurve::Logarithmic);
@@ -48,6 +50,7 @@ namespace rePlayer
     Deck::~Deck()
     {
         delete m_patterns;
+        delete m_properties;
     }
 
     void Deck::PlaySolo(MusicID musicId)
@@ -431,6 +434,7 @@ namespace rePlayer
         }
 
         m_patterns->Update(m_currentPlayer);
+        m_properties->Update(m_currentPlayer);
     }
 
     std::string Deck::OnGetWindowTitle()
@@ -659,6 +663,9 @@ namespace rePlayer
             isEnabled = Core::GetSongEditor().IsEnabled();
             if (ImGui::MenuItem("Song Editor", "", &isEnabled))
                 Core::GetSongEditor().Enable(isEnabled);
+            isEnabled = m_properties->IsEnabled();
+            if (ImGui::MenuItem("Song Properties", "", &isEnabled))
+                m_properties->Enable(isEnabled);
             isEnabled = m_patterns->IsEnabled();
             if (ImGui::MenuItem("Patterns Display", "", &isEnabled))
                 m_patterns->Enable(isEnabled);

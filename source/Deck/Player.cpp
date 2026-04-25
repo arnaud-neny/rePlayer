@@ -8,12 +8,14 @@
 #include <Deck/Deck.h>
 #include <Graphics/Graphics.h>
 #include <RePlayer/Core.h>
+#include <Replays/Replay.inl.h>
 
 #include "Player.h"
 
 // TagLib
 #include <fileref.h>
 #include <tag.h>
+#include <toolkit/tpropertymap.h>
 #include "TagLibStream.h"
 
 // Windows
@@ -590,9 +592,22 @@ namespace rePlayer
                             extraInfo += "\n\n";
                         extraInfo += tag->comment().to8Bit();
                     }
-                    Core::FromJob([This, extraInfo = std::move(extraInfo)]
+                    Replay::Properties properties;
+                    auto* property = properties.Push();
+                    property->label = "Tags";
+                    property->numColumns = 2;
+                    auto pmap = tag->properties();
+                    for (auto it = pmap.begin(); it != pmap.end(); ++it)
                     {
-                        This->m_extraInfo = extraInfo;
+                        property->Add(it->first.toCString(), Replay::Property::kIsNotEditable
+                            , it->second.toString().toCString(), Replay::Property::kIsEditable);
+                    }
+                    if (property->numEntries == 0)
+                        properties.Clear();
+                    Core::FromJob([This, extraInfo = std::move(extraInfo), properties = std::move(properties)]
+                    {
+                        This->m_extraInfo = std::move(extraInfo);
+                        This->m_properties = std::move(properties);
                     });
                 }
             });
