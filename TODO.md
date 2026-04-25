@@ -1,22 +1,21 @@
 # rePlayer (another multi-formats music player)
 
 - adplug kill surround et fais du stereo dans l'opl; song loop (possibilité de ne pas boucler mais de continuer de générer de l'opl, à tester sur adl klepacki)
+- add radios database: https://de1.api.radio-browser.info/#List_of_all_radio_stations
 - sidplay: stereo resid (to remove dual sid in replayer for stereo...)
-- multi-tab song info (samples, instruments, comment pour les IT)
 - move surround from replays to player 
 - ASAP full stereo + song length edit
 - player: command buffer (play, stop...) to handle everything in the thread (no more extra thread management)
 - check vgmrips: all packs https://vgmrips.net/packs/sitemap.php
 - sanitize songs and artists strings fields on import (remove "\n" "\r")
 - playlist rework: main contains current playlist by name and do not store list of playlists (just populate from disk), each playlist saves its own currently playing
-- song info: multi tab for samples/instruments/comments (see impulse tracker)
 - viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
 - seek: return the number of loops
 - playlist add files: rework for faster add
 - replace replays "displaySettings" with a generic settings system without UI (ui is in replayer instead), to remove dependencies to imgui
 - add a project to make rePlayer as a lib/dll (so people can use the replays too): rePlayback (stripped from database and ui)
-- improve the seemless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
+- improve the seamless playback (re-use the sample player with multiple replays? as soon as they are compatible: same sample rate)
 - mp3: sync info (bitrate) with playback
 - database: add album database
 - mod archive: source validation (some song ids are redirected to other ids: "emax are you stupid" 92256 to 67566)

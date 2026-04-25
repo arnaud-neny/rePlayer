@@ -1,7 +1,7 @@
 # rePlayer (another multi-formats music player)
 
-| [Getting started](#get-started) - [The deck](#the-deck) - [The library](#the-library) - [The song editor](#the-song-editor) - [The playlist](#the-playlist) - [The settings](#the-settings) - [The tray icon](#the-tray-icon) |
-:----------------------------------------------------------: |
+| [Getting started](#get-started) - [The deck](#the-deck) - [The library](#the-library) - [The song editor](#the-song-editor) - [The playlist](#the-playlist) - [The settings](#the-settings) - [The tray icon](#the-tray-icon) - [The patterns](#the-patterns) - [The properties](#the-properties) |
+| :-------------------------------------------------------: |
 | [Web sites](#web-sites) - [Third Parties](#third-parties) |
 
 With this piece of software, you can play a lot of oldschool music format from the old times, such as the <b>Amiga</b> (which was the original purpose of this player), Atari, C64, Nintendo, Sega...  
@@ -152,6 +152,11 @@ Middle click will turn on/off the invert States flag.
 
 Realtime display of the current played pattern.
 Options are available to show or hide some parts of the patterns. (Usefull if you want to watch the [Wrecklamation](https://modland.com/pub/modules/Fasttracker%202/Hoffman/wrecklamation.xm) from Hoffman with only the colors enabled).
+
+## The properties
+
+Display the properties of the current playing song. Some properties are realtime (such as openMPT and its patterns row, colums, order...)
+Some data can be copied to the clipboard (such as instrument names, comments, tags...).
 
 ## Web Sites
 

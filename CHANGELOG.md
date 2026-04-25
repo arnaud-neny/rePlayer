@@ -5,6 +5,13 @@
 
 ## Current version
 
+v0.22.1:
+- Updated FluidSynth to 2.5.4
+- Updated libgme to 0.6.5
+- Updated SNDH-Player to 1.00
+- Added Properties to display current song details
+- Bug fixes
+
 v0.22.0:
 - Added Conspiracy's MVX Synth
 - Added FluidSynth
