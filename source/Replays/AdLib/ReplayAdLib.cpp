@@ -12,6 +12,7 @@
 #include "adplug/emuopl.h"
 #include "adplug/kemuopl.h"
 #include "adplug/nemuopl.h"
+#include "adplug/silentopl.h"
 #include "adplug/surroundopl.h"
 #include "adplug/version.h"
 #include "adplug/wemuopl.h"
@@ -31,25 +32,26 @@ namespace rePlayer
         .getFileFilter = ReplayAdLib::GetFileFilters
     };
 
-    COPLprops* ReplayAdLib::CreateCore(bool isStereo)
+    COPLprops ReplayAdLib::CreateCore(bool isStereo)
     {
-        COPLprops* core = new COPLprops;
-        core->stereo = isStereo;
-        core->use16bit = true;
+        COPLprops core = {
+            .use16bit = true,
+            .stereo = isStereo
+        };
         switch (ms_opl)
         {
         case Opl::kDOSBoxOPL3Emulator:
-            core->opl = new CWemuopl(kSampleRate, true, isStereo);
+            core.opl = new CWemuopl(kSampleRate, true, isStereo);
             break;
         case Opl::kNukedOPL3Emulator:
-            core->opl = new CNemuopl(kSampleRate);
-            core->stereo = true;
+            core.opl = new CNemuopl(kSampleRate);
+            core.stereo = true;
             break;
         case Opl::kKenSilvermanEmulator:
-            core->opl = new CKemuopl(kSampleRate, true, isStereo);
+            core.opl = new CKemuopl(kSampleRate, true, isStereo);
             break;
         case Opl::kMameEmulator:
-            core->opl = new CEmuopl(kSampleRate, true, isStereo);
+            core.opl = new CEmuopl(kSampleRate, true, isStereo);
             break;
         }
         return core;
@@ -60,7 +62,8 @@ namespace rePlayer
     public:
         RawFileProvider(io::Stream* stream)
             : m_stream(stream)
-        {}
+        {
+        }
 
         ~RawFileProvider()
         {
@@ -116,34 +119,34 @@ namespace rePlayer
         if (stream->GetSize() < 8 || stream->GetSize() > 1024 * 1024)
             return nullptr;
 
-        COPLprops* core;
+        Copl* opl;
         if (ms_surround)
         {
-            core = new COPLprops;
-            core->stereo = true;
-            core->use16bit = true;
-            core->opl = new CSurroundopl(CreateCore(false), CreateCore(false), true);
+            auto a = CreateCore(false), b = CreateCore(false);
+            opl = new CSurroundopl(&a, &b, true);
         }
         else
-            core = CreateCore(true);
+            opl = CreateCore(true).opl;
 
         RawFileProvider file(stream);
-        auto player = CAdPlug::factory(stream->GetName(), core->opl, CAdPlug::players, file);
+        auto player = CAdPlug::factory(stream->GetName(), opl, CAdPlug::players, file);
         if (!player)
         {
-            delete core->opl;
-            delete core;
+            delete opl;
             return nullptr;
         }
 
-        return new ReplayAdLib(stream->GetName(), core, player);
+        stream->Seek(0, io::Stream::kSeekBegin);
+        auto* silentOpl = new CSilentopl;
+        RawFileProvider silentFile(stream);
+        return new ReplayAdLib(stream->GetName(), opl, player, silentOpl, CAdPlug::factory(stream->GetName(), silentOpl, CAdPlug::players, silentFile));
     }
 
     bool ReplayAdLib::DisplaySettings()
     {
         bool changed = false;
         {
-            const char* const opls[] = { "DOSBox OPL3", "Nuked OPL3", "Ken Silverman", "Tatsuyuki Satoh MAME OPL2"};
+            const char* const opls[] = { "DOSBox OPL3", "Nuked OPL3", "Ken Silverman", "Tatsuyuki Satoh MAME OPL2" };
             changed |= ImGui::Combo("OPL Emulator", reinterpret_cast<int32_t*>(&ms_opl), opls, NumItemsOf(opls));
             if (ImGui::IsItemHovered())
                 ImGui::Tooltip("Applied only on reload :(");
@@ -175,7 +178,7 @@ namespace rePlayer
     }
 
     int32_t ReplayAdLib::ms_surround{ 0 };
-    ReplayAdLib::Opl ReplayAdLib::ms_opl{ Opl::kDOSBoxOPL3Emulator };
+    ReplayAdLib::Opl ReplayAdLib::ms_opl{ Opl::kNukedOPL3Emulator };
 
     bool ReplayAdLib::Init(SharedContexts* ctx, Window& window)
     {
@@ -220,17 +223,23 @@ namespace rePlayer
 
     ReplayAdLib::~ReplayAdLib()
     {
+        delete m_silent.player;
+        delete m_silent.opl;
         delete m_player;
-        delete m_core->opl;
-        delete m_core;
+        delete m_opl;
     }
 
-    ReplayAdLib::ReplayAdLib(const std::string& filename, COPLprops* core, CPlayer* player)
+    ReplayAdLib::ReplayAdLib(const std::string& filename, Copl* opl, CPlayer* player, Copl* silentOpl, CPlayer* silentPlayer)
         : Replay(GetExtension(filename, player), eReplay::AdLib)
         , m_filename(filename)
-        , m_core(core)
+        , m_opl(opl)
         , m_player(player)
-    {}
+        , m_silent{
+            .opl = silentOpl,
+            .player = silentPlayer
+        }
+    {
+    }
 
     uint32_t ReplayAdLib::Render(StereoSample* output, uint32_t numSamples)
     {
@@ -250,7 +259,7 @@ namespace rePlayer
                 auto samplesToAdd = Min(numSamples, remainingSamples);
 
                 auto buf = reinterpret_cast<int16_t*>(output + samplesToAdd) - samplesToAdd * 2;
-                m_core->opl->update(buf, samplesToAdd);
+                m_opl->update(buf, samplesToAdd);
 
                 remainingSamples -= samplesToAdd;
                 numSamples -= samplesToAdd;
@@ -282,11 +291,13 @@ namespace rePlayer
     uint32_t ReplayAdLib::Seek(uint32_t timeInMs)
     {
         m_player->rewind(m_subsongIndex);
+        m_silent.player->rewind(m_subsongIndex);
 
         uint32_t pos = 0;
         while (pos < timeInMs)
         {
             m_player->update();
+            m_silent.player->update();
             pos += uint32_t(1000 / m_player->getrefresh());
         }
         return pos;
@@ -308,6 +319,29 @@ namespace rePlayer
     {
         m_subsongIndex = subsongIndex;
         m_player->rewind(subsongIndex);
+
+        m_silent.player->rewind(subsongIndex);
+        // clear properties
+        m_silent.properties.Clear();
+        // push empty property info
+        auto* property = m_silent.properties.Push();
+        property->label = "Info";
+        property->numColumns = 2;
+        if (auto numInstruments = m_player->getinstruments())
+        {
+            property = m_silent.properties.Push();
+            property->label = "Instruments";
+            property->numColumns = 1;
+            bool isEmpty = true;
+            for (uint32_t i = 0; i < numInstruments; i++)
+            {
+                auto str = m_player->getinstrument(i);
+                isEmpty &= str.empty() || str[0] == 0;
+                property->Add(str.c_str(), Property::kIsEditable);
+            }
+            if (isEmpty)
+                m_silent.properties.Pop();
+        }
     }
 
     const char* ReplayAdLib::GetExtension(const std::string& filename, CPlayer* player)
@@ -379,6 +413,78 @@ namespace rePlayer
         info += "\nAdPlug ";
         info += CAdPlug::get_version();
         return info;
+    }
+
+    Replay::Patterns ReplayAdLib::UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags)
+    {
+        UnusedArg(numLines, charWidth, spaceWidth, flags);
+        if (numSamples > 0)
+        {
+            auto remainingSamples = m_silent.remainingSamples;
+            while (numSamples > 0)
+            {
+                if (remainingSamples > 0)
+                {
+                    auto samplesToAdd = Min(numSamples, remainingSamples);
+                    remainingSamples -= samplesToAdd;
+                    numSamples -= samplesToAdd;
+                }
+                else if (m_silent.player->update())
+                {
+                    remainingSamples = static_cast<uint32_t>(kSampleRate / m_silent.player->getrefresh());
+                    m_silent.isStuck = 0;
+                }
+                else
+                {
+                    if (m_silent.isStuck == 1)
+                        m_silent.player->rewind(m_subsongIndex);
+                    m_silent.isStuck++;
+                }
+            }
+            m_silent.remainingSamples = remainingSamples;
+        }
+        return {};
+    }
+
+    const Replay::Properties& ReplayAdLib::BuildProperties()
+    {
+        // build realtime basic info
+        auto& property = m_silent.properties[0];
+        property.numEntries = 0;
+        property.data.Clear();
+
+        auto str = m_silent.player->getauthor();
+        if (!str.empty())
+            property.Add("Artist", Property::kIsNotEditable, str.c_str(), Property::kIsEditable);
+        str = m_silent.player->gettitle();
+        if (!str.empty())
+            property.Add("Title", Property::kIsNotEditable, str.c_str(), Property::kIsEditable);
+        str = m_silent.player->getdesc();
+        if (!str.empty())
+            property.Add("Description", Property::kIsNotEditable, str.c_str(), Property::kIsEditable);
+
+        char buf[16];
+        sprintf(buf, "%.2fHz", m_silent.player->getrefresh());
+        property.Add("Refresh", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        if (m_silent.player->getspeed())
+        {
+            sprintf(buf, "%u", m_silent.player->getspeed());
+            property.Add("Speed", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        }
+        if (m_silent.player->getorders())
+        {
+            sprintf(buf, "%d", m_silent.player->getorder());
+            property.Add("Order", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+            sprintf(buf, "%d", m_silent.player->getrow());
+            property.Add("Row", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        }
+        if (m_silent.player->getpatterns())
+        {
+            sprintf(buf, "%d", m_silent.player->getpattern());
+            property.Add("Pattern", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        }
+
+        return m_silent.properties;
     }
 }
 // namespace rePlayer

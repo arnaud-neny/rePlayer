@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Replay.h>
+#include <Replay.inl.h>
 
 struct COPLprops;
+class Copl;
 class CPlayer;
 
 namespace rePlayer
@@ -37,6 +38,9 @@ namespace rePlayer
         uint32_t GetNumSubsongs() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
+        const Properties& BuildProperties() override;
+
+        Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags) override;
 
     private:
         static constexpr uint32_t kSampleRate = 48000;
@@ -50,18 +54,27 @@ namespace rePlayer
         };
 
     private:
-        ReplayAdLib(const std::string& filename, COPLprops* core, CPlayer* player);
+        ReplayAdLib(const std::string& filename, Copl* opl, CPlayer* player, Copl* silentOpl, CPlayer* silentPlayer);
 
-        static COPLprops* CreateCore(bool isStereo);
+        static COPLprops CreateCore(bool isStereo);
         static const char* GetExtension(const std::string& filename, CPlayer* player);
 
     private:
         std::string m_filename;
-        struct COPLprops* m_core;
+        Copl* m_opl;
         CPlayer* m_player;
         uint32_t m_remainingSamples = 0;
         bool m_hasEnded = false;
         uint8_t m_isStuck = 0;
+
+        struct
+        {
+            Copl* opl;
+            CPlayer* player;
+            uint32_t remainingSamples = 0;
+            uint8_t isStuck = 0;
+            Properties properties;
+        } m_silent;
 
         static int32_t ms_surround;
         static Opl ms_opl;
