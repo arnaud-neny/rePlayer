@@ -189,10 +189,22 @@ namespace rePlayer
     void ReplayHively::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
-        hvl_InitSubsong(m_modulePlayback, subsongIndex);
-        hvl_InitSubsong(m_moduleVisuals, subsongIndex);
-        m_numPlaybackAvailableSamples = 0;
-        m_numVisualsAvailableSamples = 0;
+        ResetPlayback();
+        // clear properties
+        m_properties.Clear();
+        // push empty property info
+        auto* property = m_properties.Push();
+        property->label = "Info";
+        property->numColumns = 2;
+        // push property instruments
+        property = m_properties.Push();
+        property->label = "Instruments";
+        property->numColumns = 1;
+        for (int i = 0; i < m_modulePlayback->ht_InstrumentNr; ++i)
+        {
+            auto& instrument = m_modulePlayback->ht_Instruments[i];
+            property->Add(instrument.ins_Name, Property::kIsEditable);
+        }
     }
 
     uint32_t ReplayHively::GetDurationMs() const
@@ -238,6 +250,36 @@ namespace rePlayer
         info += "\nHivelyTracker 1.9";
 
         return info;
+    }
+
+    const Replay::Properties& ReplayHively::BuildProperties()
+    {
+        // build realtime basic info
+        auto& property = m_properties[0];
+        property.numEntries = 0;
+        property.data.Clear();
+
+        property.Add("Title", Property::kIsNotEditable, m_moduleVisuals->ht_Name, Property::kIsEditable);
+
+        char buf[16];
+        sprintf(buf, "%d", m_moduleVisuals->ht_Tempo);
+        property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", m_moduleVisuals->ht_SpeedMultiplier);
+        property.Add("Speed", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", m_moduleVisuals->ht_PosNr);
+        property.Add("Order", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        sprintf(buf, "%d", m_moduleVisuals->ht_NoteNr);
+        property.Add("Row", Property::kIsNotEditable, buf, Property::kIsNotEditable);
+        std::string patterns;
+        for (uint16_t i = 0; i < m_moduleVisuals->ht_Channels; ++i)
+        {
+            sprintf(buf, "%d,", m_moduleVisuals->ht_Positions[m_moduleVisuals->ht_PosNr].pos_Track[i]);
+            patterns += buf;
+        }
+        patterns.pop_back();
+        property.Add("Patterns", Property::kIsNotEditable, patterns.c_str(), Property::kIsNotEditable);
+
+        return m_properties;
     }
 
     Replay::Patterns ReplayHively::UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags)

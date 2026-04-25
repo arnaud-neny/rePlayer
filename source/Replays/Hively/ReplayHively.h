@@ -52,6 +52,7 @@ namespace rePlayer
         uint32_t GetNumSubsongs() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
+        const Properties& BuildProperties() override;
 
         Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags) override;
 
@@ -69,6 +70,9 @@ namespace rePlayer
         uint32_t m_numPlaybackAvailableSamples = 0;
         uint32_t m_numVisualsAvailableSamples = 0;
         bool m_arePatternsDisplayed = true;
+
+        Properties m_properties;
+
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
         static int32_t ms_patterns;
