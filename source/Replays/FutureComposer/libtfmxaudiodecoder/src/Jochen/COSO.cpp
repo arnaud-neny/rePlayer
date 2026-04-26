@@ -166,7 +166,10 @@ bool HippelDecoder::COSO_init(int songNumber) {
 void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
     if ( --voiceX.pattCompressCount >= 0 ) {
 #if defined(DEBUG_RUN)
-        cout << "-- -- -- | ";
+        cout << "-- -- --";
+        if (voiceX.voiceNum < (stats.voices-1)) {
+            cout << " | ";
+        }
 #endif
         return;
     }
@@ -201,13 +204,22 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
             cout << endl;
             dumpTimestamp(songPosCurrent);
             cout << "  Step = " << hexW((trackOffs-offsets.trackTable)/trackStepLen) << endl;
+            for (ubyte v = 0; v < stats.voices; ++v) {
+                cout << "PT TR ST";
+                if (stats.voices == 7) {
+                    cout << " CV";
+                }
+                cout << "   ";
+            }
+            cout << endl;
             udword tmp = trackOffs;
             for (ubyte v = 0; v<stats.voices; ++v) {
                 for (int t = 0; t < trackColumnSize; ++t) {
                     cout << hexB(fcBuf[tmp++]) << ' ';
                 }
-                if (v < (stats.voices-1))
+                if (v < (stats.voices-1)) {
                     cout << "| ";
+                }
             }
             cout << endl;
             cout << endl;
@@ -243,7 +255,10 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
             voiceX.pattCompress = voiceX.pattCompressCount = fcBuf[pattOffs++];
             voiceX.pattPos++;
 #if defined(DEBUG_RUN)
-            cout << "-- -- -- | ";
+            cout << "-- -- --";
+            if (voiceX.voiceNum < (stats.voices-1)) {
+                cout << " | ";
+            }
 #endif
             return;
         }
@@ -287,7 +302,9 @@ void HippelDecoder::COSO_processPattern(VoiceVars& voiceX) {
         setInstrument(voiceX,instr);
     }
 #if defined(DEBUG_RUN)
-    cout << "| ";
+    if (voiceX.voiceNum < (stats.voices-1)) {
+        cout << "| ";
+    }
     cout << std::flush;
 #endif
 }

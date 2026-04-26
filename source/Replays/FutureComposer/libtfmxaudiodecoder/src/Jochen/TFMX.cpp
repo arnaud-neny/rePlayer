@@ -166,13 +166,22 @@ void HippelDecoder::TFMX_nextNote(VoiceVars& voiceX) {
             cout << endl;
             dumpTimestamp(songPosCurrent);
             cout << "  Step = " << hexW((trackOffs-offsets.trackTable)/trackStepLen) << endl;
+            for (ubyte v = 0; v < stats.voices; ++v) {
+                cout << "PT TR ST";
+                if (stats.voices == 7) {
+                    cout << " CV";
+                }
+                cout << "   ";
+            }
+            cout << endl;
             udword tmp = trackOffs;
             for (ubyte v = 0; v < stats.voices; ++v) {
                 for (int t = 0; t < trackColumnSize; ++t) {
                     cout << hexB(fcBuf[tmp++]) << ' ';
                 }
-                if (v < (stats.voices-1))
+                if (v < (stats.voices-1)) {
                     cout << "| ";
+                }
             }
             cout << endl;
             cout << endl;
@@ -205,7 +214,9 @@ void HippelDecoder::TFMX_processPattern(VoiceVars& voiceX) {
 #if defined(DEBUG_RUN)
     dumpByte(note);
     dumpByte(fcBuf[pattOffs]);
-    cout << "| ";
+    if (voiceX.voiceNum < (stats.voices-1)) {
+        cout << "| ";
+    }
 #endif
     if ( (note & 0x7f) != 0 ) {  // 0 = nothing more to do here
         

@@ -82,6 +82,7 @@ class TFMXDecoder : public Decoder {
         udword macros;
         udword sampleData;
         udword silence;
+        udword trackTableEnd;
     } offsets;
 
     struct Admin {
@@ -154,6 +155,7 @@ class TFMXDecoder : public Decoder {
             sword wait;
             ubyte loop;
             bool skip, extraWait;
+            bool delayedOff;
         } macro;
         
         sword waitOnDMACount;

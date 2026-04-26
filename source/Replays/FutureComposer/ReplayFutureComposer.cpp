@@ -22,7 +22,7 @@
 #include "libtfmxaudiodecoder/src/Chris/TFMXDecoder.h"
 #include "libtfmxaudiodecoder/src/Jochen/HippelDecoder.h"
 
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 
 namespace rePlayer
 {

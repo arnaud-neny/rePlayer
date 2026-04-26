@@ -88,6 +88,7 @@ void TFMXDecoder::reset() {
         voice.macro.skip = true;
         voice.macro.loop = 0xff;
         voice.macro.extraWait = true;
+        voice.macro.delayedOff = false;
         
         voice.sid.targetOffset = 0x100*v + 4;
         voice.sid.targetLength = 0;
@@ -268,6 +269,20 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     offsets.silence = offsets.sampleData;
     // TFMX clears the first dword here for one shot samples e.g.
     pBuf[offsets.silence] = pBuf[offsets.silence+1] = pBuf[offsets.silence+2] = pBuf[offsets.silence+3] = 0;
+
+    // Evaluate the compress identification fields at $0A and $0C.
+    // In rare cases that part of the header has been overwritten
+    // and is invalid.
+    udword compressHint = readBEudword(pBuf,h+0x0c);
+    if (compressHint!=0 && readBEuword(pBuf,h+0x0a)==1) {
+        offsets.trackTableEnd = offsets.trackTable + compressHint - (0x800-0x10);
+        if (offsets.trackTableEnd>getPattOffset(0)) {
+            offsets.trackTableEnd = getPattOffset(0);
+        }
+    }
+    else {
+        offsets.trackTableEnd = getPattOffset(0);
+    }
 
 // ----------
 
@@ -521,7 +536,9 @@ void TFMXDecoder::dumpModule() {
     cout << getFormatName() << endl;
     cout << "Header at 0x" << tohex(offsets.header) << endl;
     cout << "Macro offsets at 0x" << tohex(offsets.macros) << endl;
+    cout << "1st macro at 0x" << tohex(getMacroOffset(0)) << endl;
     cout << "Pattern offsets at 0x" << tohex(offsets.patterns) << endl;
+    cout << "1st pattern at 0x" << tohex(getPattOffset(0)) << endl;
     cout << "Track table (sequencer) at 0x" << tohex(offsets.trackTable) << endl;
     cout << "Sample data at 0x" << tohex(offsets.sampleData) << endl;
     cout << "Songs: " << dec << getSongs() << endl;

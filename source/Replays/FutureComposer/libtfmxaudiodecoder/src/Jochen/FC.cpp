@@ -262,9 +262,19 @@ void HippelDecoder::FC_nextNote(VoiceVars& voiceX) {
         dumpTimestamp(songPosCurrent);
         cout << "  Step = " << hexW(voiceX.trackPos/ trackStepLen);
         cout << " | " << hexW(voiceX.trackStart+voiceX.trackPos) << " of " << hexW(voiceX.trackStart) << " to " << hexW(voiceX.trackEnd) << endl;
+        for (ubyte v = 0; v < stats.voices; ++v) {
+            cout << "PT TR ST   ";
+        }
+        cout << endl;
         udword tmp = voiceX.trackStart+voiceX.trackPos;
-        for (int t = 0; t < trackStepLen; ++t)
-            cout << hexB(fcBuf[tmp++]) << ' ';
+            for (ubyte v = 0; v < stats.voices; ++v) {
+                for (int t = 0; t < trackColumnSize; ++t) {
+                    cout << hexB(fcBuf[tmp++]) << ' ';
+                }
+                if (v < (stats.voices-1)) {
+                    cout << "| ";
+                }
+            }
         cout << endl;
         cout << endl;
     }
@@ -312,7 +322,9 @@ void HippelDecoder::FC_nextNote(VoiceVars& voiceX) {
 #if defined(DEBUG_RUN)
     dumpByte(note);
     dumpByte(info);
-    cout << "| ";
+    if (voiceX.voiceNum < (stats.voices-1)) {
+        cout << "| ";
+    }
 #endif
     
     if (note != 0) {

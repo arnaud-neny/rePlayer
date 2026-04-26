@@ -1,3 +1,8 @@
+// Since the TFMX header and data don't tell which specific version or
+// variant of TFMX are required, this function comes as a last resort.
+// It tries to recognize specific files via a checksum of a small portion
+// of the pattern data and then adjusts player traits.
+
 #include "TFMXDecoder.h"
 #include "CRCLight.h"
 
@@ -19,6 +24,8 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     // 0123456789abcdef0123456789abcdef0123456789abcdef
     // XXXXX XXXX  XX X    X   XXX       XXXXXXXX      
 
+    // Rock'n'Roll (1989). No checksum based adjustments required, because
+    // it uses the unique header tag that was specific to TFMX before v1.
 
     // Danger Freak (1989) seems to be a special TFMX v1 variant.
     if (crc1 == 0x48960d8c || crc1 == 0x5dcd624f || crc1 == 0x3f0b151f) {
