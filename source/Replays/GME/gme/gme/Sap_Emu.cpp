@@ -101,7 +101,59 @@ static void parse_string( byte const* in, byte const* end, int len, char* out )
 	out [len] = 0;
 	memcpy( out, start, len );
 }
+// rePlayer begin
+static int parse_int(byte const* io[], byte const* end)
+{
+	byte const* in = *io;
+	int n = 0;
+	while (in < end)
+	{
+		int dig = *in - '0';
+		if ((unsigned)dig > 9)
+			break;
+		++in;
+		n = n * 10 + dig;
+	}
+	if (in == *io)
+		n = -1; // no numeric characters
+	*io = in;
+	return n;
+}
 
+static int parse_time(byte const in[], byte const* end)
+{
+	int minutes = parse_int(&in, end);
+	if (minutes < 0 || *in != ':')
+		return 0;
+
+	++in;
+	int seconds = parse_int(&in, end);
+	if (seconds < 0)
+		return 0;
+
+	int time = minutes * 60000 + seconds * 1000;
+	if (*in == '.')
+	{
+		byte const* start = ++in;
+		int msec = parse_int(&in, end);
+		if (msec >= 0)
+		{
+			// allow 1-3 digits
+			for (int n = int(in - start); n < 3; n++)
+				msec *= 10;
+			time += msec;
+		}
+	}
+
+	while (in < end && *in <= ' ')
+		++in;
+
+	if (end - in >= 4 && !memcmp(in, "LOOP", 4))
+		time = -time;
+
+	return time;
+}
+// rePlayer end
 static blargg_err_t parse_info( byte const* in, long size, Sap_Emu::info_t* out )
 {
 	out->track_count   = 1;
@@ -111,6 +163,9 @@ static blargg_err_t parse_info( byte const* in, long size, Sap_Emu::info_t* out 
 
 	if ( size < 16 || memcmp( in, "SAP\x0D\x0A", 5 ) )
 		return gme_wrong_file_type;
+
+	memset(out->track_times, 0, sizeof(out->track_times)); // rePlayer
+	int time_count = 0; // rePlayer
 
 	byte const* file_end = in + size - 5;
 	in += 5;
@@ -123,13 +178,17 @@ static blargg_err_t parse_info( byte const* in, long size, Sap_Emu::info_t* out 
 		char const* tag = (char const*) in;
 		while ( in < line_end && *in > ' ' )
 			in++;
-		int tag_len = (char const*) in - tag;
+		int tag_len = int((char const*) in - tag);
 
 		while ( in < line_end && *in <= ' ' ) in++;
 
 		if ( tag_len <= 0 )
 		{
 			// skip line
+		}
+		else if ( !strncmp( "TIME", tag, tag_len ) && time_count < sizeof(out->track_times) / sizeof(out->track_times[0]) )
+		{
+			out->track_times [time_count++] = parse_time( in, line_end );
 		}
 		else if ( !strncmp( "INIT", tag, tag_len ) )
 		{
@@ -210,9 +269,22 @@ static void copy_sap_fields( Sap_Emu::info_t const& in, track_info_t* out )
 	Gme_File::copy_field_( out->copyright, in.copyright );
 }
 
-blargg_err_t Sap_Emu::track_info_( track_info_t* out, int ) const
+blargg_err_t Sap_Emu::track_info_( track_info_t* out, int track) const
 {
 	copy_sap_fields( info, out );
+// rePlayer begin
+	if ( track < sizeof(info.track_times) / sizeof(info.track_times[0]) )
+	{
+		int time = info.track_times [track];
+		if ( time )
+		{
+			if ( time > 0 )
+				out->length = time;
+			else
+				out->loop_length = -time;
+		}
+	}
+// rePlayer end
 	return 0;
 }
 
@@ -229,9 +301,22 @@ struct Sap_File : Gme_Info_
 		return 0;
 	}
 
-	blargg_err_t track_info_( track_info_t* out, int ) const
+	blargg_err_t track_info_( track_info_t* out, int track) const
 	{
 		copy_sap_fields( info, out );
+// rePlayer begin
+		if ( track < sizeof(info.track_times) / sizeof(info.track_times[0]) )
+		{
+			int time = info.track_times[track];
+			if (time)
+			{
+				if (time > 0)
+					out->length = time;
+				else
+					out->loop_length = -time;
+			}
+		}
+// rePlayer end
 		return 0;
 	}
 };

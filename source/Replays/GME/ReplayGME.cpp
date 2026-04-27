@@ -1,3 +1,6 @@
+// Some minor changes are done in GME:
+// - Sap_Emu.cpp
+// - Sap_Emu.h
 #include "ReplayGME.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -273,7 +276,19 @@ namespace rePlayer
             {
                 gme_info_t* gmeInfo;
                 gme_track_info(m_emu, &gmeInfo, i);
-                settings->loops[i] = { uint32_t(gmeInfo->play_length >= 0 ? gmeInfo->play_length : 0), uint32_t(gmeInfo->loop_length >= 0 ? gmeInfo->loop_length : 0) };
+                // don't use play_length, it's crap
+                if (gmeInfo->length > 0)
+                {
+                    settings->loops[i] = { uint32_t(gmeInfo->length), 0 };
+                }
+                else
+                {
+                    settings->loops[i] = {};
+                    if (gmeInfo->intro_length > 0)
+                        settings->loops[i].start = uint32_t(gmeInfo->intro_length);
+                    if (gmeInfo->loop_length > 0)
+                        settings->loops[i].length = uint32_t(gmeInfo->loop_length);
+                }
                 m_loops[i] = settings->loops[i].GetFixed();
                 gme_free_info(gmeInfo);
             }
