@@ -153,7 +153,7 @@ namespace rePlayer
                     {
                         if (auto* song = m_db[m_trackedSubsongId])
                         {
-                            if (m_trackMode <=> TrackMode::SongAndCurrentArtist)
+                            if (m_trackMode <=> TrackMode::CurrentArtist)
                                 selectedArtistId = song->NumArtistIds() ? song->GetArtistId(0) : ArtistID::Invalid;
                             else for (uint32_t i = 0, e = song->NumArtistIds(); i < e; ++i)
                             {
