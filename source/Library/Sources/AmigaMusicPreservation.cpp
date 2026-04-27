@@ -684,19 +684,11 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
         auto curlError = curl_easy_perform(curl);
         SmartPtr<io::Stream> stream;
-        bool isEntryMissing = false;
         if (curlError == CURLE_OK && buffer.IsNotEmpty())
         {
             if (memcmp(buffer.begin(), "<!DOCTYPE html", sizeof("<!DOCTYPE html") - 1) == 0)
             {
-                if (IsInvalidIndex(buffer.Items<char>(), buffer.NumItems()))
-                {
-                    isEntryMissing = true;
-                    auto* song = FindSong(sourceToDownload.internalId);
-                    m_songs.RemoveAt(song - m_songs);
-                    m_isDirty = true;
-                }
-
+                // AMP server is buggy, it can say the index is invalid because it can't access its database, so we can't rely on that anymore to discard the entry :(
                 Log::Error("Amiga Music Preservation: file \"%s\" not found\n", url);
             }
             else
@@ -764,7 +756,7 @@ namespace rePlayer
 
         curl_easy_cleanup(curl);
 
-        return { stream, isEntryMissing };
+        return { stream, false };
     }
 
     void SourceAmigaMusicPreservation::OnArtistUpdate(ArtistSheet* artist)
@@ -899,13 +891,6 @@ namespace rePlayer
             busySpinner->Error(collector.error);
 
         return collector;
-    }
-
-    bool SourceAmigaMusicPreservation::IsInvalidIndex(const char* buffer, uint32_t size) const
-    {
-        if (size > (sizeof("<!DOCTYPE ") + sizeof("lalala<BR/>invalid index !<BR/>")))
-            return strstr(buffer + sizeof("<!DOCTYPE "), "lalala<BR/>invalid index !<BR/>");
-        return false;
     }
 }
 // namespace rePlayer
