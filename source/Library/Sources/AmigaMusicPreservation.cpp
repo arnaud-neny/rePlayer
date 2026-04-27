@@ -521,9 +521,9 @@ namespace rePlayer
             if (song->type.ext == eExtension::Unknown)
             {
                 if (collectedSong.ext == "FST")
-                    song->type = { eExtension::_mod, eReplay::OpenMPT };
+                    song->type = Core::GetReplays().Find("mod");
                 else if (collectedSong.ext == "OSS")
-                    song->type = { eExtension::_med, eReplay::OpenMPT };
+                    song->type = Core::GetReplays().Find("med");
                 else
                 {
                     song->name.String() += ".";
@@ -619,9 +619,9 @@ namespace rePlayer
                 if (song->type.ext == eExtension::Unknown)
                 {
                     if (searchSong.ext == "FST")
-                        song->type = { eExtension::_mod, eReplay::OpenMPT };
+                        song->type = Core::GetReplays().Find("mod");
                     else if (searchSong.ext == "OSS")
-                        song->type = { eExtension::_med, eReplay::OpenMPT };
+                        song->type = Core::GetReplays().Find("med");
                     else
                     {
                         song->name.String() += ".";

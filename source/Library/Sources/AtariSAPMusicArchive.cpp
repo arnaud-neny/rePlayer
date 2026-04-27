@@ -803,7 +803,7 @@ namespace rePlayer
                 auto& dbArtist = m_db.artists[dbSong.artists[i].id];
                 song->artists[i] = GetBrowserArtistName(dbArtist);
             }
-            song->type = { eExtension::_sap, eReplay::ASAP };
+            song->type = Core::GetReplays().Find("sap");
         };
         if (entry.isSong)
         {
