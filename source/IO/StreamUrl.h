@@ -34,12 +34,10 @@ namespace rePlayer
 
         const Span<const uint8_t> Read() final;
 
-        bool EnableLatency(bool isEnabled) override;
-
     private:
         static constexpr uint32_t kCacheSize = 1024 * 1024;
         static constexpr uint32_t kCacheMask = kCacheSize - 1;
-        static constexpr uint32_t kCacheWindow = kCacheSize - 65536;
+        static constexpr uint32_t kCacheWindow = 7 * kCacheSize / 8;
 
     private:
         StreamUrl(const std::string& filename, bool isClone, io::Stream* root);
@@ -47,6 +45,8 @@ namespace rePlayer
 
         SmartPtr<Stream> OnOpen(const std::string& filename) final;
         SmartPtr<Stream> OnClone() final;
+
+        void Commit();
 
         std::string Escape(const std::string& url, size_t startPos);
 
@@ -84,7 +84,6 @@ namespace rePlayer
         uint32_t m_metadataSize = 0;
         uint32_t m_chunkSize = 0;
         bool m_isReadingChunk = true;
-        bool m_isLatencyEnabled = true;
 
         enum class State : uint8_t
         {

@@ -299,10 +299,6 @@ namespace rePlayer
     Status ReplayAAC::Init()
     {
         m_stream->Seek(0, io::Stream::kSeekBegin);
-        core::Scope scope = {
-            [stream = m_stream.Get()]() { stream->EnableLatency(true); },
-            [stream = m_stream.Get()]() { stream->EnableLatency(false); },
-        };
 
         auto bytesRead = m_stream->Read(m_buffer, sizeof(m_buffer));
         m_bytesIntoBuffer = uint32_t(bytesRead);

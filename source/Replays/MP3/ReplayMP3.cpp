@@ -24,10 +24,6 @@ namespace rePlayer
             .isSeekable = stream->GetSize() != 0,
             .isInit = true
         };
-        core::Scope scope = {
-            [stream]() { stream->EnableLatency(true); },
-            [stream]() { stream->EnableLatency(false); },
-        };
         if (!drmp3_init(mp3, OnRead, OnSeek, OnTell, nullptr, streamData, nullptr))
         {
             delete mp3;
@@ -119,19 +115,9 @@ namespace rePlayer
     void ReplayMP3::ResetPlayback()
     {
         if (m_streamData->isSeekable)
-        {
             drmp3_seek_to_start_of_stream(m_mp3);
-        }
         else
-        {
-            drmp3_uninit(m_mp3);
-            m_streamData->isInit = true;
             m_streamData->stream->Seek(0, io::Stream::kSeekBegin);
-            m_streamData->stream->EnableLatency(true);
-            drmp3_init(m_mp3, OnRead, OnSeek, OnTell, nullptr, m_streamData, nullptr);
-            m_streamData->stream->EnableLatency(false);
-            m_streamData->isInit = false;
-        }
     }
 
     void ReplayMP3::ApplySettings(const CommandBuffer /*metadata*/)

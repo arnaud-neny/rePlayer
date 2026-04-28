@@ -24,12 +24,7 @@ namespace rePlayer
 
     Replay* ReplayVorbis::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        core::Scope scope = {
-            [stream]() { stream->EnableLatency(true); },
-            [stream]() { stream->EnableLatency(false); },
-        };
-
-        auto* vorbis = new OggVorbis_File;;
+        auto* vorbis = new OggVorbis_File;
         if (ov_open_callbacks(stream, vorbis, nullptr, 0, { OnRead, OnSeek, nullptr, OnTell }) || vorbis->vi->channels > 2)
         {
             delete vorbis;
@@ -95,8 +90,8 @@ namespace rePlayer
         {
             for (uint32_t i = 0; i < numSamples; i++)
             {
-                output->left = *pcm[0]++;
-                output->right = *pcm[1]++;
+                output->left = pcm[0][i];
+                output->right = pcm[1][i];
                 output++;
             }
         }
@@ -104,10 +99,10 @@ namespace rePlayer
         {
             for (uint32_t i = 0; i < numSamples; i++)
             {
-                output->left = output->right = *pcm[0]++;
+                output->left = output->right = pcm[0][i];
                 output++;
             }
-        }
+        }		
         return numSamples;
     }
 
@@ -124,11 +119,8 @@ namespace rePlayer
     {
         if (ov_seekable(m_vorbis))
             ov_raw_seek(m_vorbis, 0);
-        m_stream->Seek(0, io::Stream::kSeekBegin);
-        ov_clear(m_vorbis);
-        m_stream->EnableLatency(true);
-        ov_open_callbacks(m_stream.Get(), m_vorbis, nullptr, 0, { OnRead, OnSeek, nullptr, OnTell });
-        m_stream->EnableLatency(false);
+        else
+            m_stream->Seek(0, io::Stream::kSeekBegin);
     }
 
     void ReplayVorbis::ApplySettings(const CommandBuffer /*metadata*/)
@@ -194,6 +186,8 @@ namespace rePlayer
         auto comments = ov_comment(m_vorbis, -1);
         for (int32_t i = 0; i < comments->comments; i++)
         {
+            if (strncmp(comments->user_comments[i], "METADATA_BLOCK_PICTURE", sizeof("METADATA_BLOCK_PICTURE") - 1) == 0)
+                continue;
             if (!info.empty())
                 info += "\n";
             info.append(comments->user_comments[i], comments->comment_lengths[i]);

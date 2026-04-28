@@ -35,7 +35,6 @@ namespace rePlayer
         auto* output = reinterpret_cast<uint8_t*>(buffer);
         auto remainingSize = size;
         auto tail = m_tail;
-        bool isStarving = false;
         if (m_type == Type::kStreaming)
         {
             while (remainingSize > 0)
@@ -43,11 +42,11 @@ namespace rePlayer
                 auto head = atomicHead.load();
                 auto chunkSize = head - tail;
                 // too far behind or connection reset ?
-                if (head < tail || chunkSize > kCacheWindow)
+                if (chunkSize < 0 || chunkSize > kCacheWindow)
                 {
-                    tail = Max(0, head - kCacheSize + kCacheWindow - size);
+                    tail = Max(0, head - kCacheWindow / 2);
+                    chunkSize = head - tail;
                     Log::Warning("StreamUrl: skip (overflow)\n");
-                    continue;
                 }
 
                 // cancel or something wrong (slow connection)?
@@ -58,22 +57,9 @@ namespace rePlayer
                         m_tail = head;
                         return size - remainingSize;
                     }
-                    // slow connection? to early reads?
-                    if (m_isLatencyEnabled)
-                    {
-                        // wait
-                        thread::Sleep(1);
-                        if (!isStarving)
-                            Log::Warning("StreamUrl: wait (starving)\n");
-                    }
-                    else
-                    {
-                        // rewind
-                        tail = Max(0, head - kCacheSize + kCacheWindow - size);
-                        if (!isStarving)
-                            Log::Warning("StreamUrl: skip (starving)\n");
-                    }
-                    isStarving = true;
+
+                    // slow connection? to early reads? wait
+                    thread::Sleep(1);
                     continue;
                 }
                 chunkSize = uint32_t(Min(remainingSize, uint64_t(chunkSize)));
@@ -133,9 +119,8 @@ namespace rePlayer
             if (whence == SeekWhence::kSeekBegin && offset == 0)
             {
                 std::atomic_ref atomicHead(m_head);
-                if (m_tail != 0 && atomicHead < kCacheSize / 2)
+                if (atomicHead < kCacheWindow)
                 {
-                    Log::Warning("StreamUrl: Seek reset\n");
                     m_tail = 0;
                 }
                 else
@@ -151,12 +136,7 @@ namespace rePlayer
                     m_isReadingChunk = true;
                     m_isJobDone = false;
                     m_infos.Clear();
-                    Core::AddJob([this]()
-                    {
-                        Update();
-                    });
-                    while (std::atomic_ref(m_state) < State::kDownload)
-                        thread::Sleep(1);
+                    Commit();
                 }
                 return Status::kOk;
             }
@@ -284,12 +264,6 @@ namespace rePlayer
         return { m_data.Items(), uint32_t(m_head) };
     }
 
-    bool StreamUrl::EnableLatency(bool isEnabled)
-    {
-        std::swap(m_isLatencyEnabled, isEnabled);
-        return isEnabled;
-    }
-
     StreamUrl::StreamUrl(const std::string& url, bool isClone, io::Stream* root)
         : io::Stream(root)
         , m_url(url)
@@ -317,9 +291,7 @@ namespace rePlayer
         curl_easy_setopt(m_curl, CURLOPT_HTTP200ALIASES, m_http200Aliases);
 
         curl_easy_setopt(m_curl, CURLOPT_REFERER, url.c_str());
-        char buf[128];
-        sprintf(buf, "rePlayer %u.%u.%u", Core::GetVersion() >> 28, (Core::GetVersion() >> 14) & ((1 << 14) - 1), Core::GetVersion() & ((1 << 14) - 1));
-        curl_easy_setopt(m_curl, CURLOPT_USERAGENT, buf);
+        curl_easy_setopt(m_curl, CURLOPT_USERAGENT, Core::GetLabel());
 
         curl_easy_setopt(m_curl, CURLOPT_HEADERFUNCTION, OnCurlHeader);
         curl_easy_setopt(m_curl, CURLOPT_HEADERDATA, this);
@@ -330,12 +302,10 @@ namespace rePlayer
         curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_LIMIT, 30L); // 30 bytes per sec
         curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_TIME, 5L); // 5 seconds check
 
-        Core::AddJob([this]()
-        {
-            Update();
-        });
-        while (std::atomic_ref(m_state) < State::kDownload)
-            thread::Sleep(1);
+        curl_easy_setopt(m_curl, CURLOPT_TCP_KEEPALIVE, 1L);
+        curl_easy_setopt(m_curl, CURLOPT_TCP_KEEPIDLE, 60L); // Idle time before sending probes
+
+        Commit();
     }
 
     StreamUrl::~StreamUrl()
@@ -421,6 +391,23 @@ namespace rePlayer
         return stream;
     }
 
+    void StreamUrl::Commit()
+    {
+        Core::AddJob([this]()
+        {
+            Update();
+        });
+        while (std::atomic_ref(m_state) < State::kDownload)
+            thread::Sleep(1);
+
+        if (std::atomic_ref(m_type) == Type::kStreaming)
+        {
+            // wait for some data to be preloaded
+            while (std::atomic_ref(m_state) == State::kDownload && std::atomic_ref(m_head) < 65536)
+                thread::Sleep(1);
+        }
+    }
+
     std::string StreamUrl::Escape(const std::string& url, size_t startPos)
     {
         auto pos = url.find_first_not_of('/', startPos);
@@ -458,28 +445,8 @@ namespace rePlayer
 
     void StreamUrl::Update()
     {
-        CURLcode curlCode;
-        for (;;)
-        {
-            curlCode = curl_easy_perform(m_curl);
-            if (m_type == Type::kStreaming)
-            {
-                if (curlCode == CURLE_WRITE_ERROR || std::atomic_ref(m_state).load() == State::kCancel)
-                    break;
-                if (curlCode != CURLE_OK && curlCode != CURLE_RECV_ERROR && curlCode != CURLE_OPERATION_TIMEDOUT && curlCode != CURLE_PARTIAL_FILE)
-                    break;
-            }
-            else
-                break;
-            Log::Warning("StreamUrl: connection reset \"%s\"\n", curl_easy_strerror(curlCode));
-            m_tail = 0;
-            m_metadataSize = 0;
-            m_chunkSize = 0;
-            m_isReadingChunk = true;
-            m_infos.Clear();
-        }
-
-        if (curlCode == CURLE_OK || curlCode == CURLE_WRITE_ERROR)
+        CURLcode curlCode = curl_easy_perform(m_curl);
+        if (curlCode == CURLE_OK || (curlCode == CURLE_WRITE_ERROR && std::atomic_ref(m_state) == State::kCancel))
         {
             std::atomic_ref(m_state).store(State::kEnd);
         }
@@ -698,7 +665,7 @@ namespace rePlayer
                     {
                         // ASCII
                         str[newSize] = c;
-        }
+                    }
                     else if ((c >> 5) == 0x6 && str[i + 1])
                     {
                         // 2-byte UTF-8

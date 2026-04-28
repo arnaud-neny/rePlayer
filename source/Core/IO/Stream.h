@@ -49,9 +49,6 @@ namespace core::io
 
         [[nodiscard]] Array<std::string> GetFilenames() const;
 
-        // for streaming, read can wait for data
-        virtual bool EnableLatency(bool isEnabled) { UnusedArg(isEnabled); return false; }
-
     protected:
         Stream(Stream* root);
         virtual ~Stream();

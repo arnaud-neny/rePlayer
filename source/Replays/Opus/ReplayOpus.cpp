@@ -22,11 +22,6 @@ namespace rePlayer
 
     Replay* ReplayOpus::Load(io::Stream* stream, CommandBuffer /*metadata*/)
     {
-        core::Scope scope = {
-            [stream]() { stream->EnableLatency(true); },
-            [stream]() { stream->EnableLatency(false); },
-        };
-
         OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
         auto* opus = op_open_callbacks(stream, &cb, nullptr, 0, nullptr);
         if (opus)
@@ -75,9 +70,6 @@ namespace rePlayer
 
     uint32_t ReplayOpus::Render(StereoSample* output, uint32_t numSamples)
     {
-        if (!m_opus)
-            return 0;
-
         auto remainingSamples = numSamples;
         while (remainingSamples)
         {
@@ -161,17 +153,10 @@ namespace rePlayer
 
     void ReplayOpus::ResetPlayback()
     {
-        if (m_opus)
-        {
-            if (op_seekable(m_opus))
-                op_raw_seek(m_opus, 0);
+        if (op_seekable(m_opus))
+            op_raw_seek(m_opus, 0);
+        else
             m_stream->Seek(0, io::Stream::kSeekBegin);
-            op_free(m_opus);
-        }
-        OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
-        m_stream->EnableLatency(true);
-        m_opus = op_open_callbacks(m_stream.Get(), &cb, nullptr, 0, nullptr);
-        m_stream->EnableLatency(false);
     }
 
     void ReplayOpus::ApplySettings(const CommandBuffer /*metadata*/)

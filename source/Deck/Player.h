@@ -69,7 +69,8 @@ namespace rePlayer
 
         void ThreadUpdate();
 
-        void Render(uint32_t numSamples, uint32_t waveFillPos);
+        void FillCache();
+        bool Render(uint32_t numSamples, uint32_t waveFillPos);
         void ResumeThread();
         void SuspendThread();
 
@@ -81,6 +82,7 @@ namespace rePlayer
 
         static constexpr uint32_t kCharWidth = 3;
         static constexpr uint32_t kCharHeight = 5;
+        static constexpr int kNumRetries = 4;
 
     private:
         MusicID m_id;
@@ -105,6 +107,7 @@ namespace rePlayer
         uint32_t m_fadeOutSilence = 0;
         float m_fadeOutRatio;
         uint32_t m_waitTime = 0;
+        int m_numRetries = kNumRetries;
         bool m_isWaiting = true;
         bool m_isRunning = true;
         bool m_isJobDone = false;
