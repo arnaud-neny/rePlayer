@@ -2298,8 +2298,9 @@ namespace rePlayer
                 if (replay.type == ModlandReplay::kSGC)
                 {
                     // skip m3u files
-                    offset = theReplay.find_last_of('.');
-                    if (offset != theReplay.npos && _stricmp(theReplay.c_str() + offset + 1, "m3u") == 0)
+                    std::string_view s(newReplay);
+                    offset = s.find_last_of('.');
+                    if (offset != s.npos && _stricmp(newReplay + offset + 1, "m3u") == 0)
                         return 0;
                 }
                 return uint16_t(i);
