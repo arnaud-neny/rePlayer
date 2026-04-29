@@ -149,7 +149,7 @@ namespace rePlayer
             if (numSamples == 0)
             {
                 m_currentPosition = 0;
-                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000;
+                m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000ull;
                 return 0;
             }
         }
@@ -168,6 +168,19 @@ namespace rePlayer
         m_surround.Reset();
         if (gme_seek(m_emu, timeInMs))
             return 0;
+
+        if (timeInMs < m_loops[m_subsongIndex].start)
+        {
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000ull;
+        }
+        else
+        {
+            timeInMs -= m_loops[m_subsongIndex].start;
+            timeInMs %= m_loops[m_subsongIndex].length;
+            m_currentDuration = (uint64_t(m_loops[m_subsongIndex].length) * kSampleRate) / 1000ull;
+        }
+        m_currentPosition = (uint64_t(timeInMs) * kSampleRate) / 1000ull;
+
         return timeInMs;
     }
 
@@ -176,7 +189,7 @@ namespace rePlayer
         gme_start_track(m_emu, m_tracks[m_subsongIndex]);
         m_surround.Reset();
         m_currentPosition = 0;
-        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000ull;
 
         gme_info_t* gmeInfo;
         gme_track_info(m_emu, &gmeInfo, m_tracks[m_subsongIndex]);
@@ -195,7 +208,7 @@ namespace rePlayer
         {
             for (uint16_t i = 0; i < settings->numSongs; i++)
                 m_loops[i] = settings->loops[i].GetFixed();
-            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
+            m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000ull;
         }
     }
 
@@ -293,7 +306,7 @@ namespace rePlayer
                 gme_free_info(gmeInfo);
             }
         }
-        m_currentDuration = (uint64_t(m_loops[0].GetDuration()) * kSampleRate) / 1000;
+        m_currentDuration = (uint64_t(m_loops[0].GetDuration()) * kSampleRate) / 1000ull;
     }
 }
 // namespace rePlayer
