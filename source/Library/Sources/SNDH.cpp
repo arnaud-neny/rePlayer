@@ -981,6 +981,7 @@ namespace rePlayer
             song->name = dbSong.name;
         song->type = { eExtension::_sndh, eReplay::SNDHPlayer };
         song->releaseYear = uint16_t(dbSong.year);
+        song->tags.Raise(Tag::kAtari).Raise(Tag::kST).Raise(Tag::k16bit);
         song->sourceIds.Add(songSourceId);
 
         if (strcmp(artistName, "Unknown Composer"))

@@ -708,6 +708,7 @@ namespace rePlayer
         for (auto& zxMusic : jsonEntries)
         {
             auto song = new SongSheet();
+            song->tags.Raise(Tag::kZX).Raise(Tag::k8bit);
 
             auto searchSongId = zxMusic["id"].get<uint32_t>();
             song->sourceIds.Add(SourceID(kID, searchSongId));
@@ -1145,6 +1146,7 @@ namespace rePlayer
         song->name = dbSong.name(m_db.strings);
         song->releaseYear = dbSong.year;
         song->type = dbSong.type;
+        song->tags.Raise(Tag::kZX).Raise(Tag::k8bit);
         for (uint16_t i = 0; i < dbSong.numArtists; ++i)
         {
             auto& dbArtist = m_db.artists[dbSong.artists[i]];

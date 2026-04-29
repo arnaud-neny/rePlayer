@@ -808,6 +808,7 @@ namespace rePlayer
         song->type = { eExtension::_sid, eReplay::SidPlay };
         if (dbSong.artist)
             song->artistIds.Add(static_cast<ArtistID>(artistId));
+        song->tags.Raise(Tag::kC64).Raise(Tag::k8bit);
         song->sourceIds.Add(SourceID(kID, songSourceId));
         collectedSongs.songs.Add(song);
         collectedSongs.states.Add(state);
