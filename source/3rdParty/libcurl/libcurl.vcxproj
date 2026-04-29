@@ -37,6 +37,7 @@
     <ClInclude Include="lib\asyn.h" />
     <ClInclude Include="lib\bufq.h" />
     <ClInclude Include="lib\bufref.h" />
+    <ClInclude Include="lib\cf-dns.h" />
     <ClInclude Include="lib\cf-h1-proxy.h" />
     <ClInclude Include="lib\cf-h2-proxy.h" />
     <ClInclude Include="lib\cf-haproxy.h" />
@@ -55,7 +56,6 @@
     <ClInclude Include="lib\cshutdn.h" />
     <ClInclude Include="lib\curlx\base64.h" />
     <ClInclude Include="lib\curlx\basename.h" />
-    <ClInclude Include="lib\curlx\curlx.h" />
     <ClInclude Include="lib\curlx\dynbuf.h" />
     <ClInclude Include="lib\curlx\fopen.h" />
     <ClInclude Include="lib\curlx\inet_ntop.h" />
@@ -89,7 +89,6 @@
     <ClInclude Include="lib\curl_ntlm_core.h" />
     <ClInclude Include="lib\curl_printf.h" />
     <ClInclude Include="lib\curl_range.h" />
-    <ClInclude Include="lib\curl_rtmp.h" />
     <ClInclude Include="lib\curl_sasl.h" />
     <ClInclude Include="lib\curl_setup.h" />
     <ClInclude Include="lib\curl_sha256.h" />
@@ -101,6 +100,7 @@
     <ClInclude Include="lib\cw-out.h" />
     <ClInclude Include="lib\cw-pause.h" />
     <ClInclude Include="lib\dict.h" />
+    <ClInclude Include="lib\dnscache.h" />
     <ClInclude Include="lib\doh.h" />
     <ClInclude Include="lib\dynhds.h" />
     <ClInclude Include="lib\easyif.h" />
@@ -110,6 +110,7 @@
     <ClInclude Include="lib\file.h" />
     <ClInclude Include="lib\fileinfo.h" />
     <ClInclude Include="lib\formdata.h" />
+    <ClInclude Include="lib\ftp-int.h" />
     <ClInclude Include="lib\ftp.h" />
     <ClInclude Include="lib\ftplistparser.h" />
     <ClInclude Include="lib\functypes.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="lib\pingpong.h" />
     <ClInclude Include="lib\pop3.h" />
     <ClInclude Include="lib\progress.h" />
+    <ClInclude Include="lib\protocol.h" />
     <ClInclude Include="lib\psl.h" />
     <ClInclude Include="lib\rand.h" />
     <ClInclude Include="lib\ratelimit.h" />
@@ -170,6 +172,8 @@
     <ClInclude Include="lib\system_win32.h" />
     <ClInclude Include="lib\telnet.h" />
     <ClInclude Include="lib\tftp.h" />
+    <ClInclude Include="lib\thrdpool.h" />
+    <ClInclude Include="lib\thrdqueue.h" />
     <ClInclude Include="lib\transfer.h" />
     <ClInclude Include="lib\uint-bset.h" />
     <ClInclude Include="lib\uint-hash.h" />
@@ -213,6 +217,7 @@
     <ClCompile Include="lib\asyn-thrdd.c" />
     <ClCompile Include="lib\bufq.c" />
     <ClCompile Include="lib\bufref.c" />
+    <ClCompile Include="lib\cf-dns.c" />
     <ClCompile Include="lib\cf-h1-proxy.c" />
     <ClCompile Include="lib\cf-h2-proxy.c" />
     <ClCompile Include="lib\cf-haproxy.c" />
@@ -254,7 +259,6 @@
     <ClCompile Include="lib\curl_memrchr.c" />
     <ClCompile Include="lib\curl_ntlm_core.c" />
     <ClCompile Include="lib\curl_range.c" />
-    <ClCompile Include="lib\curl_rtmp.c" />
     <ClCompile Include="lib\curl_sasl.c" />
     <ClCompile Include="lib\curl_sha512_256.c" />
     <ClCompile Include="lib\curl_share.c" />
@@ -264,6 +268,7 @@
     <ClCompile Include="lib\cw-out.c" />
     <ClCompile Include="lib\cw-pause.c" />
     <ClCompile Include="lib\dict.c" />
+    <ClCompile Include="lib\dnscache.c" />
     <ClCompile Include="lib\doh.c" />
     <ClCompile Include="lib\dynhds.c" />
     <ClCompile Include="lib\easy.c" />
@@ -317,6 +322,7 @@
     <ClCompile Include="lib\pingpong.c" />
     <ClCompile Include="lib\pop3.c" />
     <ClCompile Include="lib\progress.c" />
+    <ClCompile Include="lib\protocol.c" />
     <ClCompile Include="lib\psl.c" />
     <ClCompile Include="lib\rand.c" />
     <ClCompile Include="lib\ratelimit.c" />
@@ -340,6 +346,8 @@
     <ClCompile Include="lib\system_win32.c" />
     <ClCompile Include="lib\telnet.c" />
     <ClCompile Include="lib\tftp.c" />
+    <ClCompile Include="lib\thrdpool.c" />
+    <ClCompile Include="lib\thrdqueue.c" />
     <ClCompile Include="lib\transfer.c" />
     <ClCompile Include="lib\uint-bset.c" />
     <ClCompile Include="lib\uint-hash.c" />

@@ -172,9 +172,6 @@
     <ClInclude Include="lib\curl_range.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curl_rtmp.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curl_sasl.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -496,9 +493,6 @@
     <ClInclude Include="lib\curlx\base64.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
-    <ClInclude Include="lib\curlx\curlx.h">
-      <Filter>Source Files\lib\curlx</Filter>
-    </ClInclude>
     <ClInclude Include="lib\curlx\dynbuf.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
@@ -586,6 +580,24 @@
     <ClInclude Include="lib\curlx\strdup.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
+    <ClInclude Include="lib\cf-dns.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\dnscache.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\ftp-int.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\protocol.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\thrdpool.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\thrdqueue.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\altsvc.c">
@@ -658,9 +670,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_range.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\curl_rtmp.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\curl_sasl.c">
@@ -1121,6 +1130,21 @@
     </ClCompile>
     <ClCompile Include="lib\curlx\strdup.c">
       <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cf-dns.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\dnscache.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\protocol.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\thrdpool.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\thrdqueue.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
