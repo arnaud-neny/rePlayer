@@ -45,7 +45,7 @@ namespace rePlayer
         void Discard(MusicID musicId);
         SmartPtr<core::io::Stream> GetStream(Song* song);
         SmartPtr<core::io::Stream> GetStream(const MusicID musicId);
-        SmartPtr<Player> LoadSong(const MusicID musicId);
+        SmartPtr<Player> LoadSong(const MusicID musicId, bool isExport = false);
         void LoadPreviousSong(SmartPtr<Player>& currentPlayer, SmartPtr<Player>& nextPlayer);
         SmartPtr<Player> LoadCurrentSong();
         SmartPtr<Player> LoadNextSong(bool isAdvancing);

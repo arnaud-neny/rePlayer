@@ -218,6 +218,9 @@
     <ClCompile Include="Deck\Properties.cpp">
       <Filter>Source Files\Deck</Filter>
     </ClCompile>
+    <ClCompile Include="RePlayer\ReplayGainScanner.cpp">
+      <Filter>Source Files\RePlayer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -462,6 +465,9 @@
     </ClInclude>
     <ClInclude Include="Deck\Properties.h">
       <Filter>Source Files\Deck</Filter>
+    </ClInclude>
+    <ClInclude Include="RePlayer\ReplayGainScanner.h">
+      <Filter>Source Files\RePlayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

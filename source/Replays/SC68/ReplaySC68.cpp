@@ -188,7 +188,7 @@ namespace rePlayer
                 src += 2;
                 dst += 2;
             }
-            output->Convert(m_surround, buf, numSamples, 100, 1.333f);
+            output->Convert(m_surround, buf, numSamples, 100);
         }
         else
             output->Convert(m_surround, buf, numSamples, 100);

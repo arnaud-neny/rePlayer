@@ -17,7 +17,7 @@
 namespace rePlayer
 {
     DatabaseArtistsUI::DatabaseArtistsUI(DatabaseID databaseId, Window& owner)
-        : DatabaseSongsUI(databaseId, owner, false, (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kState) + (1 << kRating) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay),"Artists")
+        : DatabaseSongsUI(databaseId, owner, false, (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kState) + (1 << kRating) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay) + (1 << kRG), "Artists")
         , m_artistFilter(new ImGuiTextFilter())
         , m_artistPicker{ new ImGuiTextFilter() }
     {

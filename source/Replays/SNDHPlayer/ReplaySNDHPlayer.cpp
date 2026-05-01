@@ -120,7 +120,7 @@ namespace rePlayer
             for (uint32_t i = 0; i < numSamples; i++)
                 activeChannels |= reinterpret_cast<uint32_t*>(output)[i];
             m_activeChannels = activeChannels;
-            output->Convert(m_surround, samples, numSamples, 100, 1.333f);
+            output->Convert(m_surround, samples, numSamples, 100);
         }
         else
         {

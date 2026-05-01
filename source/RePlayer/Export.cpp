@@ -127,7 +127,7 @@ namespace rePlayer
                 for(; !IsCancelled();)
                 {
                     auto currentPos = player->m_songPos;
-                    player->Render(player->m_numSamples, 0);
+                    player->Generate(player->m_numSamples, 0);
                     if (player->m_songEnd != ~0ull)
                     {
                         drwav_write_pcm_frames(&wav, currentPos - player->m_songEnd, player->m_waveData);

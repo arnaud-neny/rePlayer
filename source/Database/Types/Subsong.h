@@ -18,10 +18,20 @@ namespace rePlayer
     };
     static constexpr uint32_t kNumSubsongStates = 4;
 
+    struct ReplayGain
+    {
+        float gain;
+        float peak;
+
+        ReplayGain& Invalidate() { rCast<uint32_t>(gain) = 0xffFFffFF; peak = 0.0f; return *this; }
+        bool IsValid() const { return rcCast<uint32_t>(gain) != 0xffFFffFF; }
+    };
+
     template <Blob::Storage storage = Blob::kIsStatic>
     struct SubsongData
     {
         uint32_t durationCs = 0; // seconds * 100
+        ReplayGain replayGain = ReplayGain().Invalidate();
         union
         {
             uint16_t initializer = 1 << 11; // isDirty
@@ -57,6 +67,7 @@ namespace rePlayer
     template <Blob::Storage storage>
     inline SubsongData<storage>::SubsongData(const SubsongData<Blob::kIsStatic>& otherSubsongData) requires (storage == Blob::kIsDynamic)
         : durationCs(otherSubsongData.durationCs)
+        , replayGain(otherSubsongData.replayGain)
         , initializer(otherSubsongData.initializer)
         , name(otherSubsongData.name)
     {}
@@ -64,6 +75,7 @@ namespace rePlayer
     template <Blob::Storage storage>
     inline SubsongData<storage>::SubsongData(const SubsongData<Blob::kIsDynamic>& otherSubsongData) requires (storage == Blob::kIsDynamic)
         : durationCs(otherSubsongData.durationCs)
+        , replayGain(otherSubsongData.replayGain)
         , initializer(otherSubsongData.initializer)
         , name(otherSubsongData.name)
     {}
@@ -72,6 +84,7 @@ namespace rePlayer
     inline SubsongData<storage>& SubsongData<storage>::operator=(const SubsongData<Blob::kIsStatic>& otherSubsongData) requires (storage == Blob::kIsDynamic)
     {
         durationCs = otherSubsongData.durationCs;
+        replayGain = otherSubsongData.replayGain;
         initializer = otherSubsongData.initializer;
         name = otherSubsongData.name;
         return *this;
@@ -81,6 +94,7 @@ namespace rePlayer
     inline SubsongData<storage>& SubsongData<storage>::operator=(const SubsongData<Blob::kIsDynamic>& otherSubsongData) requires (storage == Blob::kIsDynamic)
     {
         durationCs = otherSubsongData.durationCs;
+        replayGain = otherSubsongData.replayGain;
         initializer = otherSubsongData.initializer;
         name = otherSubsongData.name;
         return *this;
@@ -100,6 +114,8 @@ namespace rePlayer
     void SubsongData<storage>::Store(BlobSerializer& s) const requires (storage == Blob::kIsDynamic)
     {
         s.Store(durationCs);
+        s.Store(replayGain.gain);
+        s.Store(replayGain.peak);
         s.Store(initializer);
         s.Store(name);
     }
@@ -108,6 +124,8 @@ namespace rePlayer
     void SubsongData<storage>::Load(io::File& file) requires (storage == Blob::kIsDynamic)
     {
         file.Read(durationCs);
+        file.Read(replayGain.gain);
+        file.Read(replayGain.peak);
         file.Read(initializer);
         name.Load(file);
     }
@@ -116,6 +134,8 @@ namespace rePlayer
     void SubsongData<storage>::Save(io::File& file) const requires (storage == Blob::kIsDynamic)
     {
         file.Write(durationCs);
+        file.Write(replayGain.gain);
+        file.Write(replayGain.peak);
         file.Write(initializer);
         name.Save(file);
     }

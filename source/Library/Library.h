@@ -34,7 +34,7 @@ namespace rePlayer
         void Save();
 
         SmartPtr<core::io::Stream> GetStream(Song* song);
-        SmartPtr<Player> LoadSong(const MusicID musicId);
+        SmartPtr<Player> LoadSong(const MusicID musicId, bool isExport = false);
 
     private:
         template <typename ParentDatabaseUI>

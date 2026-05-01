@@ -88,7 +88,7 @@ namespace rePlayer
             }
             m_items.Add(item);
         }
-        if (version != Core::GetVersion())
+        if (version < ItemType::kVersion)
         {
             for (uint32_t i = 0, n = m_items.NumItems(); i < n; i++)
             {

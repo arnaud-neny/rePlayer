@@ -9,6 +9,7 @@
 #include <Deck/Deck.h>
 #include <Graphics/Graphics.h>
 #include <RePlayer/Core.h>
+#include <RePlayer/ReplayGainScanner.h>
 #include <Replays/Replay.inl.h>
 
 #include "Player.h"
@@ -32,6 +33,9 @@
 
 namespace rePlayer
 {
+    bool Player::ms_isReplayGainEnabled = true;
+    bool Player::ms_isReplayGainChecked = false;
+
     struct Player::Wave
     {
         HWAVEOUT outHandle{ nullptr };
@@ -169,15 +173,12 @@ namespace rePlayer
         if (m_status == Status::Playing)
         {
             auto songEnd = m_songEnd;
-            MMTIME mmt{};
-            mmt.wType = TIME_BYTES;
-            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
 
-            mmt.u.cb /= sizeof(StereoSample);
-            if (mmt.u.cb >= songEnd)
+            auto playingPos = GetPlayingPosition();
+            if (playingPos >= songEnd)
                 return EndingState::kEnded;
-            mmt.u.cb += (uint64_t(timeRangeInMs) * m_replay->GetSampleRate()) / 1000;
-            if (mmt.u.cb >= songEnd)
+            playingPos += (uint64_t(timeRangeInMs) * m_replay->GetSampleRate()) / 1000;
+            if (playingPos >= songEnd)
                 return EndingState::kEnding;
         }
         return EndingState::kNotEnding;
@@ -187,13 +188,9 @@ namespace rePlayer
     {
         if (m_wave->outHandle)
         {
-            MMTIME mmt{};
-            mmt.wType = TIME_BYTES;
-            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-
-            mmt.u.cb /= sizeof(StereoSample);
-            if (mmt.u.cb < m_songEnd)
-                return uint32_t((1000ull * (mmt.u.cb + m_songSeek)) / m_replay->GetSampleRate());
+            auto playingPos = GetPlayingPosition();
+            if (playingPos < m_songEnd)
+                return uint32_t((1000ull * (playingPos + m_songSeek)) / m_replay->GetSampleRate());
             return uint32_t((1000ull * (m_songEnd + m_songSeek)) / m_replay->GetSampleRate());
         }
         return 0;
@@ -255,13 +252,9 @@ namespace rePlayer
         Replay::Patterns patterns;
         if (m_status != Status::Stopped)
         {
-            MMTIME mmt{};
-            mmt.wType = TIME_BYTES;
-            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-
-            mmt.u.cb /= sizeof(StereoSample);
-            patterns = m_replay->UpdatePatterns(mmt.u.cb - m_patternsPos, numLines, charWidth, spaceWidth, flags);
-            m_patternsPos = mmt.u.cb;
+            auto playingPos = GetPlayingPosition();
+            patterns = m_replay->UpdatePatterns(playingPos - m_patternsPos, numLines, charWidth, spaceWidth, flags);
+            m_patternsPos = playingPos;
         }
         return patterns;
     }
@@ -273,11 +266,7 @@ namespace rePlayer
 
         uint32_t numVuMeterSamples = 2 * m_replay->GetSampleRate() / 60;
 
-        MMTIME mmt{};
-        mmt.wType = TIME_BYTES;
-        waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-        mmt.u.cb >>= 3;// / 2 channels / 4 bytes (32bit samples)
-        auto wavePlayPos = mmt.u.cb;
+        auto wavePlayPos = GetPlayingPosition();
         wavePlayPos += m_replay->GetSampleRate() / 15; // display a little bit in the future
         wavePlayPos -= numVuMeterSamples / 2;
 
@@ -294,7 +283,14 @@ namespace rePlayer
             sum.left += v1 * v1;
             sum.right += v2 * v2;
         }
-        return { sqrtf(sum.left / numVuMeterSamples), sqrtf(sum.right / numVuMeterSamples) };
+        auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
+        float scale = 1.0f;
+        if (ms_isReplayGainEnabled && rg.IsValid())
+            scale = powf(1.0f / (powf(10.0f, rg.gain / 20.0f) * rg.peak), 2);
+        else if (rg.IsValid())
+            scale = powf(1.0f / rg.peak, 2);
+        scale /= numVuMeterSamples;
+        return { sqrtf(sum.left * scale), sqrtf(sum.right * scale) };
     }
 
     void Player::DrawVisuals(float xMin, float yMin, float xMax, float yMax) const
@@ -310,11 +306,7 @@ namespace rePlayer
             ImDrawList* drawList = ImGui::GetWindowDrawList();
             auto color = 0x98D9B27A; // ImGui::GetColorU32(ImGuiCol_FrameBgActive);
 
-            MMTIME mmt{};
-            mmt.wType = TIME_BYTES;
-            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-            mmt.u.cb >>= 3;// / 2 channels / 4 bytes (32bit samples)
-            auto wavePlayPos = mmt.u.cb;
+            auto wavePlayPos = GetPlayingPosition();
             wavePlayPos += m_replay->GetSampleRate() / 15; // display a little bit in the future
 
             uint32_t numOscilloscopeSamples = m_replay->GetSampleRate() / 100; // 10ms oscilloscope
@@ -324,8 +316,15 @@ namespace rePlayer
 
             drawList->PushClipRect({ xMin, yMin }, { xMax, yMax });
 
+            auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
+            float scale = 1.0f;
+            if (ms_isReplayGainEnabled && rg.IsValid())
+                scale = powf(1.0f / (powf(10.0f, rg.gain / 20.0f) * rg.peak), 2);
+            else if (rg.IsValid())
+                scale = powf(1.0f / rg.peak, 2);
+
             auto yCenter = (yMin + yMax) * 0.5f;
-            auto yScale = (yMax - yMin) * 0.5f;
+            auto yScale = (yMax - yMin) * 0.5f * scale;
 
             for (uint32_t i = 0; i < numOscilloscopeSamples; i++)
             {
@@ -596,11 +595,30 @@ namespace rePlayer
                             extraInfo += "\n\n";
                         extraInfo += tag->comment().to8Bit();
                     }
+
+                    auto pmap = tag->properties();
+                    if (!This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid())
+                    {
+                        auto itGain = pmap.find("REPLAYGAIN_TRACK_GAIN");
+                        auto itPeak = pmap.find("REPLAYGAIN_TRACK_PEAK");
+                        if (itGain != pmap.end() && itPeak != pmap.end())
+                        {
+                            double gain, peak;
+                            if (sscanf_s(itGain->second.toString().toCString(), "%lf", &gain) == 1)
+                            {
+                                if (sscanf_s(itPeak->second.toString().toCString(), "%lf", &peak) == 1)
+                                {
+                                    This->m_song->subsongs[This->m_id.subsongId.index].replayGain.gain = float(gain);
+                                    This->m_song->subsongs[This->m_id.subsongId.index].replayGain.peak = float(peak);
+                                }
+                            }
+                        }
+                    }
+
                     Replay::Properties properties;
                     auto* property = properties.Push();
                     property->label = "Tags";
                     property->numColumns = 2;
-                    auto pmap = tag->properties();
                     for (auto it = pmap.begin(); it != pmap.end(); ++it)
                     {
                         property->Add(it->first.toCString(), Replay::Property::kIsNotEditable
@@ -614,11 +632,30 @@ namespace rePlayer
                         This->m_properties = std::move(properties);
                     });
                 }
+
+                auto isValid = This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid();
+                if (ms_isReplayGainChecked || (ms_isReplayGainEnabled && !isValid))
+                {
+                    ReplayGainScanner rg;
+                    rg.Enqueue(This->m_id);
+                    rg.Update();
+                    if (This->m_status != Status::Playing && !isValid)
+                        This->Scale(This->m_numSamples, 0);
+                }
             });
         }
         else
             m_isJobDone = true;
         return false;
+    }
+
+    uint32_t Player::GetPlayingPosition() const
+    {
+        MMTIME mmt{};
+        mmt.wType = TIME_BYTES;
+        waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
+        mmt.u.cb /= sizeof(StereoSample);
+        return mmt.u.cb;
     }
 
     void Player::ThreadUpdate()
@@ -629,11 +666,7 @@ namespace rePlayer
         {
             auto startTime = std::chrono::high_resolution_clock::now();
 
-            MMTIME mmt{};
-            mmt.wType = TIME_BYTES;
-            waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-            mmt.u.cb /= sizeof(StereoSample);
-            auto wavePlayPos = mmt.u.cb;
+            auto wavePlayPos = GetPlayingPosition() & ~1u; // align for SSE (or ~3u for AVX)
             auto waveFillPos = m_waveFillPos;
             if (m_wavePlayPos > wavePlayPos) // loop or something wrong happened; need to detect when waveOut had a failure
             {
@@ -655,10 +688,9 @@ namespace rePlayer
                         m_replay->ResetPlayback();
 
                         // reinit the fill/playback position to make stream buffering happy
-                        waveOutGetPosition(m_wave->outHandle, &mmt, sizeof(MMTIME));
-                        mmt.u.cb /= sizeof(StereoSample);
-                        m_wavePlayPos = mmt.u.cb;
-                        waveFillPos = mmt.u.cb + numSamples;
+                        wavePlayPos = GetPlayingPosition() & ~1u; // align for SSE (or ~3u for AVX)
+                        m_wavePlayPos = wavePlayPos;
+                        waveFillPos = wavePlayPos + numSamples;
                     }
                     else
                     {
@@ -694,6 +726,13 @@ namespace rePlayer
 
     bool Player::Render(uint32_t numSamples, uint32_t waveFillPos)
     {
+        auto remaining = Generate(numSamples, waveFillPos);
+        Scale(numSamples - (remaining & ~1u), waveFillPos); // align for SSE (or ~3u for AVX)
+        return remaining != 0;
+    }
+
+    uint32_t Player::Generate(uint32_t numSamples, uint32_t waveFillPos)
+    {
         auto waveData = m_waveData;
         if (m_replay->IsStreaming())
         {
@@ -701,12 +740,12 @@ namespace rePlayer
             {
                 auto count = m_replay->Render(waveData + waveFillPos, numSamples);
                 if (count == 0)
-                    return true;
+                    break;
                 numSamples -= count;
                 waveFillPos += count;
                 m_songPos += count;
             }
-            return false;
+            return numSamples;
         }
 
         auto subsongState = m_replay->CanLoop() ? GetSubsong().state : SubsongState::Standard;
@@ -739,7 +778,7 @@ namespace rePlayer
 
                 m_songEnd = m_songPos;
                 memset(waveData + waveFillPos, 0, numSamples * sizeof(StereoSample));
-                return false;
+                return 0;
             }
 
             auto count = m_replay->Render(waveData + waveFillPos, numSamples);
@@ -851,7 +890,35 @@ namespace rePlayer
             }
             previousCount = count;
         }
-        return false;
+        return 0;
+    }
+
+    void Player::Scale(uint32_t numSamples, uint32_t waveFillPos)
+    {
+        if (ms_isReplayGainEnabled == false)
+            return;
+
+        auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
+        if (!rg.IsValid())
+            return;
+
+        auto scale = powf(10.0f, rg.gain / 20.0f);
+        auto* waveData = m_waveData + waveFillPos;
+        assert(((waveFillPos | numSamples) & 1) == 0);
+
+/*
+        // clipping
+        if (clipping && rg.peak > 0)
+            scale = Min(scale, 1.0 / rg.peak);
+*/
+
+        __m128 vScale = _mm_set1_ps(scale);
+        for (uint32_t i = 0; i < numSamples; i += 2)
+        {
+            __m128 vData = _mm_load_ps(pCast<float>(waveData + i));
+            __m128 vResult = _mm_mul_ps(vData, vScale);
+            _mm_storeu_ps(pCast<float>(waveData + i), vResult);
+        }
     }
 
     void Player::ResumeThread()

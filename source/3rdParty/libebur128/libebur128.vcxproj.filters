@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\ebur128">
+      <UniqueIdentifier>{a480b10c-ecb3-4477-b15a-200986054690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ebur128\queue">
+      <UniqueIdentifier>{b31b9bd8-5280-49c4-a435-4f6847e01e56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ebur128\queue\sys">
+      <UniqueIdentifier>{614f9cb4-003f-4559-af10-6f1ffa072435}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="COPYING" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ebur128\ebur128.c">
+      <Filter>Source Files\ebur128</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ebur128\ebur128.h">
+      <Filter>Source Files\ebur128</Filter>
+    </ClInclude>
+    <ClInclude Include="ebur128\queue\sys\queue.h">
+      <Filter>Source Files\ebur128\queue\sys</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

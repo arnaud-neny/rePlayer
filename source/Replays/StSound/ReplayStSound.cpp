@@ -108,7 +108,7 @@ namespace rePlayer
             auto numSamplesToUpdate = Min(bufferSize, numSamplesLeft);
             auto samples = reinterpret_cast<ymsample*>(output + numSamplesToUpdate) - numSamplesToUpdate * 2;
             m_module->update(samples, numSamplesToUpdate, isStereo);
-            output = output->Convert(m_surround, samples, numSamplesToUpdate, 100, isStereo ? 1.333f : 1.0f);
+            output = output->Convert(m_surround, samples, numSamplesToUpdate, 100);
             numSamplesLeft -= numSamplesToUpdate;
             loop = m_module->getLoop();
             if (m_loop != loop)

@@ -12,6 +12,7 @@ namespace rePlayer
     {
         friend class SmartPtr<Player>;
         friend class Export;
+        friend class ReplayGainScanner;
     public:
         enum EndingState
         {
@@ -67,10 +68,14 @@ namespace rePlayer
 
         bool Init(io::Stream* stream, bool isExport);
 
+        uint32_t GetPlayingPosition() const;
+
         void ThreadUpdate();
 
         void FillCache();
         bool Render(uint32_t numSamples, uint32_t waveFillPos);
+        uint32_t Generate(uint32_t numSamples, uint32_t waveFillPos);
+        void Scale(uint32_t numSamples, uint32_t waveFillPos);
         void ResumeThread();
         void SuspendThread();
 
@@ -118,10 +123,14 @@ namespace rePlayer
             Stopped,
             Paused,
             Playing
-        } m_status;
+        } m_status = Status::Stopped;
 
         std::string m_extraInfo;
         Replay::Properties m_properties;
+
+    public:
+        static bool ms_isReplayGainEnabled;
+        static bool ms_isReplayGainChecked;
     };
 }
 // namespace rePlayer

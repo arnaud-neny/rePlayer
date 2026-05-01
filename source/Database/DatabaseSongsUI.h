@@ -19,12 +19,13 @@ namespace rePlayer
 
     class Database;
     class Export;
+    class ReplayGainScanner;
     class Song;
 
     class DatabaseSongsUI
     {
     public:
-        DatabaseSongsUI(DatabaseID databaseId, Window& owner, bool isScrollingEnabled = true, uint16_t defaultHiddenColumns = (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay), const char* header = "Songs");
+        DatabaseSongsUI(DatabaseID databaseId, Window& owner, bool isScrollingEnabled = true, uint16_t defaultHiddenColumns = (1 << kSize) + (1 << kYear) + (1 << kCRC) + (1 << kDatabaseDate) + (1 << kSource) + (1 << kReplay) + (1 << kRG), const char* header = "Songs");
         virtual ~DatabaseSongsUI();
 
         void TrackSubsong(SubsongID subsongId, TrackMode trackMode);
@@ -52,6 +53,7 @@ namespace rePlayer
         void DisplaySongsFilter(bool& isDirty);
         void DisplaySongsTable(bool& isDirty);
         void DisplayExportAsWav();
+        void DisplayReplayGain();
 
         // Used in DisplaySongsFilter
         void DisplaySongsFilterUI(bool& isDirty);
@@ -122,7 +124,7 @@ namespace rePlayer
 
         enum TabIDs
         {
-            kTitle, kArtist, kType, kSize, kDuration, kYear, kCRC, kState, kRating, kDatabaseDate, kSource, kReplay,
+            kTitle, kArtist, kType, kSize, kDuration, kYear, kCRC, kState, kRating, kDatabaseDate, kSource, kReplay, kRG,
             kNumIDs
         };
 
@@ -147,6 +149,10 @@ namespace rePlayer
         // WAV export
         bool m_isExportAsWavTriggered = false;
         Export* m_export = nullptr;
+
+        // ReplayGain
+        bool m_isReplayGainScannerTriggered = false;
+        ReplayGainScanner* m_replayGainScanner = nullptr;
 
         // renaming
         struct

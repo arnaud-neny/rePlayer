@@ -93,6 +93,7 @@ namespace rePlayer
 
         const uint16_t GetLastSubsongIndex() const;
         const uint32_t GetSubsongDurationCs(uint32_t index) const;
+        const ReplayGain GetSubsongReplayGain(uint32_t index) const;
         const uint8_t GetSubsongRating(uint32_t index) const;
         const SubsongState GetSubsongState(uint32_t index) const;
         const bool IsSubsongDiscarded(uint32_t index) const;
@@ -105,6 +106,7 @@ namespace rePlayer
         void CopyTo(SongSheet* song) const;
         void CopySubsongsTo(SongSheet* song) const;
 
+        static constexpr uint32_t kVersion = (0 << 28) | (22 << 14) | 2;
         void Patch(uint32_t version);
 
     private:

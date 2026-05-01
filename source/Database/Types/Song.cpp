@@ -240,6 +240,13 @@ namespace rePlayer
         return Dynamic()->subsongs[index].durationCs;
     }
 
+    const ReplayGain Song::GetSubsongReplayGain(uint32_t index) const
+    {
+        if (dataSize != 0)
+            return subsongs[index].replayGain;
+        return Dynamic()->subsongs[index].replayGain;
+    }
+
     const uint8_t Song::GetSubsongRating(uint32_t index) const
     {
         if (dataSize != 0)
@@ -325,6 +332,10 @@ namespace rePlayer
 
     void Song::Patch(uint32_t version)
     {
+        // !!!!                                       !!!!
+        // !!!! never forget to update Song::kVersion !!!!
+        // !!!!                                       !!!!
+
         // version 1: updated type storage
         // version 2: converted internal packages to archive
         if (version == 0)
@@ -335,6 +346,40 @@ namespace rePlayer
                 eReplay replay : 7{ eReplay::Unknown };
             };
             type = MediaType(reinterpret_cast<MediaType0&>(type).ext, reinterpret_cast<MediaType0&>(type).replay);
+        }
+
+        // replay gain added a field to subsongdata
+        static constexpr uint32_t kVersionReplayGain = (0 << 28) | (22 << 14) | 1;
+        if (version <= kVersionReplayGain)
+        {
+            struct OldSubsongData
+            {
+                uint32_t durationCs;
+                uint16_t initializer;
+                BlobString<Blob::kIsStatic> name;
+            };
+
+            auto* song = new SongSheet();
+            song->id = id;
+            song->fileSize = fileSize;
+            song->fileCrc = fileCrc;
+            song->tags = tags;
+            song->lastSubsongIndex = lastSubsongIndex;
+            song->releaseYear = releaseYear;
+            song->databaseDay = databaseDay;
+            song->type = type;
+            song->name = name;
+            song->artistIds.Add(artistIds.Items(), artistIds.NumItems());
+            song->sourceIds.Add(sourceIds.Items(), sourceIds.NumItems());
+            song->metadata.Add(metadata.Items(), metadata.NumItems());
+            song->subsongs.Resize(lastSubsongIndex + 1);
+            for (uint16_t i = 0; i <= lastSubsongIndex; ++i)
+            {
+                song->subsongs[i].durationCs = pcCast<OldSubsongData>(subsongs)[i].durationCs;
+                song->subsongs[i].initializer = pcCast<OldSubsongData>(subsongs)[i].initializer;
+                song->subsongs[i].name = pcCast<OldSubsongData>(subsongs)[i].name;
+            }
+            ToProxy(song);
         }
 
         // duration is deprecated and changed to loop info

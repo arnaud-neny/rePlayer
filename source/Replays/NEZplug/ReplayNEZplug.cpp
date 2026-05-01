@@ -27,7 +27,6 @@ namespace rePlayer
     {
         ctx->Init();
 
-        window.RegisterSerializedData(ms_gain, "ReplayNEZplugGain");
         window.RegisterSerializedData(ms_filter, "ReplayNEZplugFilter");
 
         return false;
@@ -96,9 +95,6 @@ namespace rePlayer
         bool changed = false;
         const char* const filter[] = { "None", "LowPass", "Weighted", "LowPass Weighted" };
         changed |= ImGui::Combo("Filter", &ms_filter, filter, NumItemsOf(filter));
-        float gain = 1.0f + 7.0f * ms_gain / 255.0f;
-        changed |= ImGui::SliderFloat("Gain", &gain, 1.0f, 8.0f, "x%1.3f", ImGuiSliderFlags_NoInput);
-        ms_gain = int32_t(255.0f * (gain - 1.0f) / 7.0f);
         return changed;
     }
 
@@ -114,12 +110,9 @@ namespace rePlayer
 
         ComboOverride("Filter", GETSET(entry, overrideFilter), GETSET(entry, filter),
             ms_filter, "Filter: None", "Filter: LowPass", "Filter: Weighted", "Filter: LowPass Weighted");
-        SliderOverride("Gain", GETSET(entry, overrideGain), GetSet([entry]() { return 1.0f + 7.0f * entry->gain / 255.0f; }, [entry](auto v) { entry->gain = uint32_t(255.0f * (v - 1.0f) / 7.0f); }),
-            1.0f + 7.0f * ms_gain / 255.0f, 1.0f, 8.0f, "Gain x %1.3f");
         Loops(context, entry->loops, entry->numSongsMinusOne + 1);
     }
 
-    int32_t ReplayNEZplug::ms_gain = int32_t(255.0f * 2.0f / 7.0f);
     int32_t ReplayNEZplug::ms_filter = 0;
 
     ReplayNEZplug::~ReplayNEZplug()
@@ -231,7 +224,6 @@ namespace rePlayer
         }
 
         NEZSetFilter(m_nezPlay, (settings && settings->overrideFilter) ? settings->filter : ms_filter);
-        NEZGain(m_nezPlay, (settings && settings->overrideGain) ? settings->gain : ms_gain);
     }
 
     void ReplayNEZplug::SetSubsong(uint32_t subsongIndex)

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <Core.h>
+#include <Core/String.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <ImGui/imgui.h>
-#include <string>
 
 namespace ImGui
 {
@@ -33,6 +33,23 @@ namespace ImGui
     inline void TextUnformatted(const std::string& str)
     {
         TextUnformatted(str.c_str(), str.c_str() + str.size());
+    }
+
+    template <typename... Arguments>
+    inline void TextColumnRight(Arguments&&... args)
+    {
+        if constexpr ((sizeof...(Arguments)) == 1)
+        {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - ImGui::CalcTextSize(args).x);
+            ImGui::TextUnformatted(args);
+        }
+        else
+        {
+            char txt[256];
+            auto len = core::sprintf(txt, std::forward<Arguments>(args)...);
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - ImGui::CalcTextSize(txt, txt + len).x);
+            ImGui::TextUnformatted(txt, txt + len);
+        }
     }
 }
 // namespace ImGui

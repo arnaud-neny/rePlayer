@@ -427,7 +427,7 @@ namespace rePlayer
             m_remainingSamples -= samplesToRender;
             mixSamples -= samplesToRender;
         }
-        output->Convert(m_surround, buffer, numSamples, 100, m_surround.IsEnabled() ? 1.33f : 1.0f);
+        output->Convert(m_surround, buffer, numSamples, 100);
         return numSamples;
     }
 

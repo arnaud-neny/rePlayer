@@ -301,7 +301,7 @@ namespace rePlayer
         return GetStream(song);
     }
 
-    SmartPtr<Player> Playlist::LoadSong(const MusicID musicId)
+    SmartPtr<Player> Playlist::LoadSong(const MusicID musicId, bool isExport)
     {
         SmartPtr<Player> player;
         if (musicId.databaseId == DatabaseID::kPlaylist)
@@ -391,7 +391,7 @@ namespace rePlayer
                     }
                     if (musicId.subsongId.index < numSubsongs)
                     {
-                        player = Player::Create(musicId, song, replay, stream);
+                        player = Player::Create(musicId, song, replay, stream, isExport);
                         player->MarkSongAsNew(hasChanged);
                         Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
                     }
@@ -425,7 +425,7 @@ namespace rePlayer
             }
         }
         else
-            player = Core::GetLibrary().LoadSong(musicId);
+            player = Core::GetLibrary().LoadSong(musicId, isExport);
         return player;
     }
 
@@ -1847,6 +1847,22 @@ namespace rePlayer
                                         {
                                             auto artistTag = tag->artist();
                                             artist = artistTag.toCString(true);
+                                        }
+
+                                        auto pmap = tag->properties();
+                                        auto itGain = pmap.find("REPLAYGAIN_TRACK_GAIN");
+                                        auto itPeak = pmap.find("REPLAYGAIN_TRACK_PEAK");
+                                        if (itGain != pmap.end() && itPeak != pmap.end())
+                                        {
+                                            double gain = -HUGE_VAL;
+                                            sscanf_s(itGain->second.toString().toCString(), "%lf", &gain);
+                                            double peak = 0.0;
+                                            sscanf_s(itPeak->second.toString().toCString(), "%lf", &peak);
+                                            if (gain != -HUGE_VAL && peak != 0.0) for (uint16_t i = 0; i <= songSheet->lastSubsongIndex; ++i)
+                                            {
+                                                songSheet->subsongs[i].replayGain.gain = float(gain);
+                                                songSheet->subsongs[i].replayGain.peak = float(peak);
+                                            }
                                         }
                                     }
                                 }

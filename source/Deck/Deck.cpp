@@ -45,6 +45,9 @@ namespace rePlayer
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE, MOD_NOREPEAT, VK_VOLUME_MUTE);
+
+        RegisterSerializedData(Player::ms_isReplayGainEnabled, "ReplayGainEnabled");
+        RegisterSerializedData(Player::ms_isReplayGainChecked, "ReplayGainChecked");
     }
 
     Deck::~Deck()
@@ -81,6 +84,8 @@ namespace rePlayer
         if (player1.IsValid())
         {
             m_shelvedPlayer.Reset();
+            if (m_currentPlayer)
+                m_currentPlayer->Stop();
             m_currentPlayer = player1;
             m_nextPlayer = player2;
             m_mode = Mode::Playlist;
@@ -237,6 +242,7 @@ namespace rePlayer
             uint32_t saveMax = 24 * 60;
             if (ImGui::SliderScalar("AutoSave", ImGuiDataType_U32, &saveFrequency, &saveMin, &saveMax, "Every %u minutes", ImGuiSliderFlags_AlwaysClamp))
                 m_saveFrequency = saveFrequency * 60;
+            ImGui::Separator();
             if (ImGui::Checkbox("Playback media hot keys", &m_arePlaybackMediaHotKeysEnabled))
             {
                 auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
@@ -271,6 +277,7 @@ namespace rePlayer
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE);
                 }
             }
+            ImGui::Separator();
             const char* const volumeCurves[] = { "Linear", "Logarithmic" };
             auto volumeCurve = m_volumeCurve.As<int32_t>();
             if (ImGui::Combo("Volume curve", &volumeCurve, volumeCurves, NumItemsOf(volumeCurves)) && volumeCurve != m_volumeCurve.As<int32_t>())
@@ -279,6 +286,13 @@ namespace rePlayer
                 m_volumeCurve = VolumeCurve(volumeCurve);
                 m_volume = int32_t(volume);
             }
+            ImGui::Checkbox("ReplayGain", &Player::ms_isReplayGainEnabled);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                ImGui::Tooltip("ReplayGain will be built on load if it is not already setup\nIf you change the song or replay settings, try to rebuild it\nor enable the rebuild");
+            ImGui::Checkbox("ReplayGain Rebuild", &Player::ms_isReplayGainChecked);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                ImGui::Tooltip("ReplayGain will be always built on load\nBut for extra CPU and memory usage");
+            ImGui::Separator();
             if (Window::ms_isPassthroughAvailable == Window::Passthrough::IsAvailable)
                 ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
             ImGui::SliderFloat("Scale", &m_scale, 1.0f, 4.0f, "%1.2f", ImGuiSliderFlags_AlwaysClamp);
@@ -377,6 +391,7 @@ namespace rePlayer
             {
                 if (m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type)
                 {
+                    m_currentPlayer->Stop();
                     m_currentPlayer = playlist.LoadSong(m_currentPlayer->GetId());
                     hasChanged = true;
                 }
@@ -385,6 +400,8 @@ namespace rePlayer
                     if (m_shelvedPlayer.IsValid())
                     {
                         m_mode = Mode::Playlist;
+                        if (m_currentPlayer)
+                            m_currentPlayer->Stop();
                         m_currentPlayer = std::move(m_shelvedPlayer);
                         if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->type))
                             m_nextPlayer = playlist.LoadNextSong(false);
@@ -396,6 +413,8 @@ namespace rePlayer
             }
             else if (m_currentPlayer->GetSubsong().isDiscarded || m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type || m_currentPlayer->GetId() != playlist.GetCurrentEntry())
             {
+                if (m_currentPlayer)
+                    m_currentPlayer->Stop();
                 m_currentPlayer = playlist.LoadCurrentSong();
                 m_nextPlayer = playlist.LoadNextSong(false);
                 hasChanged = true;

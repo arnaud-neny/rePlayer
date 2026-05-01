@@ -304,7 +304,7 @@ namespace rePlayer
                     auto samplesLeft = m_samples + kNumSamples - numCachedSamples;
                     auto samplesRight = samplesLeft + (m_surround.IsEnabled() ? kNumSamples : 0);
                     auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
-                    samples = samples->Convert(m_surround, samplesLeft, samplesRight, numSamplesToCopy, 100, m_surround.IsEnabled() ? 3.0f : 2.0f);
+                    samples = samples->Convert(m_surround, samplesLeft, samplesRight, numSamplesToCopy, 100);
                     numRemainingSamples -= numSamplesToCopy;
                     numCachedSamples -= numSamplesToCopy;
                 }
@@ -329,7 +329,7 @@ namespace rePlayer
                 {
                     auto samplesStereo = m_samples + (kNumSamples - numCachedSamples) * 2;
                     auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
-                    samples = samples->Convert(m_surround, samplesStereo, numSamplesToCopy, 100, m_surround.IsEnabled() ? 2.6f : 2.0f);
+                    samples = samples->Convert(m_surround, samplesStereo, numSamplesToCopy, 100);
                     numRemainingSamples -= numSamplesToCopy;
                     numCachedSamples -= numSamplesToCopy;
                 }

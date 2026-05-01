@@ -25,8 +25,8 @@ namespace rePlayer
                     uint32_t numSongsMinusOne : 8;
                     uint32_t overrideFilter : 1;
                     uint32_t filter : 2;
-                    uint32_t overrideGain : 1;
-                    uint32_t gain : 8;
+                    uint32_t deprecated_overrideGain : 1;
+                    uint32_t deprecated_gain : 8;
                 };
             };
             LoopInfo loops[0];
@@ -78,7 +78,6 @@ namespace rePlayer
         std::string m_title;
         uint32_t m_currentSubsongIndex = 0;
 
-        static int32_t ms_gain;
         static int32_t ms_filter;
     };
 }

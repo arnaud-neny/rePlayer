@@ -115,6 +115,8 @@ namespace rePlayer
                 }
                 m_song.original.subsongs[i].durationCs = currentSong->GetSubsongDurationCs(i);
                 m_song.edited.subsongs[i].durationCs = m_song.original.subsongs[i].durationCs;
+                m_song.original.subsongs[i].replayGain = currentSong->GetSubsongReplayGain(i);
+                m_song.edited.subsongs[i].replayGain = m_song.original.subsongs[i].replayGain;
             }
             if (m_song.original.sourceIds != currentSong->SourceIds())
             {
@@ -297,12 +299,36 @@ namespace rePlayer
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x) * 3));
         ImGui::InputText("##Name", &subsong.name.String());
+        char duration[16];
+        sprintf(duration, "%u:%02u", subsong.durationCs / 6000, (subsong.durationCs / 100) % 60);
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+        {
+            std::string str = "Duration  : ";
+            str += duration;
+            str += "\nReplayGain: ";
+            if (subsong.replayGain.IsValid())
+            {
+                char txt[16];
+                sprintf(txt, "%.2f dB", subsong.replayGain.gain);
+                str += txt;
+            }
+            else
+                str += "Undefined";
+            str += "\nPeak      : ";
+            if (subsong.replayGain.peak != 0.0f)
+            {
+                char txt[16];
+                sprintf(txt, "%.5f", subsong.replayGain.peak);
+                str += txt;
+            }
+            else
+                str += "Undefined";
+            ImGui::Tooltip(str.c_str());
+        }
         ImGui::SameLine();
         auto pos = ImGui::GetCursorPosX();
-        char txt[16];
-        sprintf(txt, "%u:%02u", subsong.durationCs / 6000, (subsong.durationCs / 100) % 60);
-        ImGui::SetCursorPosX(pos - ImGui::CalcTextSize(txt).x - style.ItemInnerSpacing.x);
-        ImGui::TextDisabled(txt);
+        ImGui::SetCursorPosX(pos - ImGui::CalcTextSize(duration).x - style.ItemInnerSpacing.x);
+        ImGui::TextDisabled(duration);
         ImGui::SetCursorPosX(pos);
         ImGui::SameLine();
         static const char* const subsongStateLabels[] = { "U", "S", "F", "L" };
@@ -736,6 +762,7 @@ namespace rePlayer
                         m_song.edited.lastSubsongIndex = 0;
 
                         currentSongEdit->subsongs[0].durationCs = 0;
+                        currentSongEdit->subsongs[0].replayGain.Invalidate();
                     }
 
                     currentSongEdit->subsongs[0].isInvalid = m_song.edited.subsongs[0].isInvalid;
@@ -765,14 +792,13 @@ namespace rePlayer
 
             if (isTypeUpdated)
             {
-                for (uint16_t i = 1; i <= currentSongEdit->lastSubsongIndex; i++)
+                for (; currentSongEdit->lastSubsongIndex; --currentSongEdit->lastSubsongIndex)
                 {
-                    SubsongID subsongIdToRemove(currentSongEdit->id, i);
+                    SubsongID subsongIdToRemove(currentSongEdit->id, currentSongEdit->lastSubsongIndex);
 
                     // todo: remove System::Discard to do only Playlist::Discard
                     Core::Discard(MusicID(subsongIdToRemove, m_musicId.databaseId));
                 }
-                currentSongEdit->lastSubsongIndex = 0;
                 currentSongEdit->subsongs[0].Clear();
                 CommandBuffer(currentSongEdit->metadata.Container()).Remove(uint16_t(m_song.original.type.replay));
             }

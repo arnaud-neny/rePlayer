@@ -13,6 +13,7 @@
 #include <Deck/Deck.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Export.h>
+#include <RePlayer/ReplayGainScanner.h>
 
 #include "DatabaseSongsUI.h"
 
@@ -101,6 +102,13 @@ namespace rePlayer
                 thread::Sleep(1);
             delete m_export;
         }
+        if (m_replayGainScanner)
+        {
+            m_replayGainScanner->Cancel();
+            while (!m_replayGainScanner->IsDone())
+                thread::Sleep(1);
+            delete m_replayGainScanner;
+        }
         for (auto& filter : m_filters)
             delete filter.ui;
     }
@@ -127,6 +135,7 @@ namespace rePlayer
         DisplaySongsFilter(isDirty);
         DisplaySongsTable(isDirty);
         DisplayExportAsWav();
+        DisplayReplayGain();
     }
 
     void DatabaseSongsUI::OnEndUpdate()
@@ -226,6 +235,7 @@ namespace rePlayer
                 ImGui::TableSetupColumn("Added", ImGuiTableColumnFlags_WidthFixed | getHiddenFlag(kDatabaseDate), 0.0f, kDatabaseDate);
                 ImGui::TableSetupColumn("Source", ImGuiTableColumnFlags_WidthStretch | getHiddenFlag(kSource), 0.0f, kSource);
                 ImGui::TableSetupColumn("Replay", ImGuiTableColumnFlags_WidthStretch | getHiddenFlag(kReplay), 0.0f, kReplay);
+                ImGui::TableSetupColumn("ReplayGain", ImGuiTableColumnFlags_WidthFixed | getHiddenFlag(kRG), 0.0f, kRG);
                 ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
                 ImGui::TableHeadersRow();
 
@@ -303,76 +313,90 @@ namespace rePlayer
                             ImGui::TextUnformatted(m_db.GetTitle(musicId.subsongId).c_str());
                         if (ImGui::IsItemHovered())
                             musicId.SongTooltip();
-                        ImGui::TableNextColumn();
-                        musicId.DisplayArtists();
-                        ImGui::TableNextColumn();
-                        ImGui::TextUnformatted(song->GetType().GetExtension());
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%u", song->GetFileSize());
-                        ImGui::TableNextColumn();
+                        if (ImGui::TableNextColumn())
+                            musicId.DisplayArtists();
+                        if (ImGui::TableNextColumn())
+                            ImGui::TextUnformatted(song->GetType().GetExtension());
+                        if (ImGui::TableNextColumn())
+                            ImGui::TextColumnRight("%u", song->GetFileSize());
+                        if (ImGui::TableNextColumn())
                         {
                             auto subsongDurationCs = song->GetSubsongDurationCs(musicId.subsongId.index);
-                            ImGui::Text("%u:%02u", subsongDurationCs / 6000, (subsongDurationCs / 100) % 60);
+                            ImGui::TextColumnRight("%u:%02u", subsongDurationCs / 6000, (subsongDurationCs / 100) % 60);
                         }
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%04u", song->GetReleaseYear());
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%08X", song->GetFileCrc());
-                        ImGui::TableNextColumn();
-
-                        static const char* const subsongStateLabels[] = { "U", "S", "F", "L" };
-                        static const char* const subsongStates[] = { "Undefined", "Stop", "Fade Out", "Loop Once" };
-                        auto subsongState = song->GetSubsongState(musicId.subsongId.index);
-                        if (ImGui::Button(subsongStateLabels[static_cast<uint32_t>(subsongState)]))
-                            ImGui::OpenPopup("StatePopup");
-                        if (ImGui::BeginPopup("StatePopup"))
+                        if (ImGui::TableNextColumn())
+                            ImGui::Text("%04u", song->GetReleaseYear());
+                        if (ImGui::TableNextColumn())
+                            ImGui::Text("%08X", song->GetFileCrc());
+                        if (ImGui::TableNextColumn())
                         {
-                            for (uint32_t i = 0; i < kNumSubsongStates; i++)
+                            static const char* const subsongStateLabels[] = { "U", "S", "F", "L" };
+                            static const char* const subsongStates[] = { "Undefined", "Stop", "Fade Out", "Loop Once" };
+                            auto subsongState = song->GetSubsongState(musicId.subsongId.index);
+                            if (ImGui::Button(subsongStateLabels[static_cast<uint32_t>(subsongState)]))
+                                ImGui::OpenPopup("StatePopup");
+                            if (ImGui::BeginPopup("StatePopup"))
                             {
-                                auto state = static_cast<SubsongState>(i);
-
-                                if (ImGui::Selectable(subsongStates[i], subsongState == state))
+                                for (uint32_t i = 0; i < kNumSubsongStates; i++)
                                 {
-                                    if (state != subsongState)
+                                    auto state = static_cast<SubsongState>(i);
+
+                                    if (ImGui::Selectable(subsongStates[i], subsongState == state))
                                     {
-                                        song->Edit()->subsongs[musicId.subsongId.index].state = state;
+                                        if (state != subsongState)
+                                        {
+                                            song->Edit()->subsongs[musicId.subsongId.index].state = state;
+                                            m_db.Raise(Database::Flag::kSaveSongs);
+                                        }
+                                    }
+                                }
+                                ImGui::EndPopup();
+                            }
+                            else if (ImGui::IsItemHovered())
+                                ImGui::Tooltip(subsongStates[static_cast<uint32_t>(subsongState)]);
+                        }
+                        if (ImGui::TableNextColumn())
+                        {
+                            int32_t subsongRating = song->GetSubsongRating(musicId.subsongId.index);
+                            if (subsongRating == 0)
+                                ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
+                            else
+                                ImGui::ProgressBar((subsongRating - 1) * 0.01f);
+                            if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
+                            {
+                                char label[8] = "N/A";
+                                if (subsongRating > 0)
+                                    sprintf(label, "%u%%%%", subsongRating - 1);
+                                if (ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput))
+                                {
+                                    if (song->GetSubsongRating(musicId.subsongId.index) != subsongRating)
+                                    {
+                                        song->Edit()->subsongs[musicId.subsongId.index].rating = subsongRating;
                                         m_db.Raise(Database::Flag::kSaveSongs);
                                     }
                                 }
+                                ImGui::EndPopup();
                             }
-                            ImGui::EndPopup();
                         }
-                        else if (ImGui::IsItemHovered())
-                            ImGui::Tooltip(subsongStates[static_cast<uint32_t>(subsongState)]);
-
-                        ImGui::TableNextColumn();
-                        int32_t subsongRating = song->GetSubsongRating(musicId.subsongId.index);
-                        if (subsongRating == 0)
-                            ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
-                        else
-                            ImGui::ProgressBar((subsongRating - 1) * 0.01f);
-                        if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
+                        if (ImGui::TableNextColumn())
                         {
-                            char label[8] = "N/A";
-                            if (subsongRating > 0)
-                                sprintf(label, "%u%%%%", subsongRating - 1);
-                            if (ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput))
-                            {
-                                if (song->GetSubsongRating(musicId.subsongId.index) != subsongRating)
-                                {
-                                    song->Edit()->subsongs[musicId.subsongId.index].rating = subsongRating;
-                                    m_db.Raise(Database::Flag::kSaveSongs);
-                                }
-                            }
-                            ImGui::EndPopup();
+                            auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(song->GetDatabaseDay() + Core::kReferenceDate)));
+                            ImGui::Text("%04d/%02u/%02u", int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
                         }
-                        ImGui::TableNextColumn();
-                        auto added = std::chrono::year_month_day(std::chrono::sys_days(std::chrono::days(song->GetDatabaseDay() + Core::kReferenceDate)));
-                        ImGui::Text("%04d/%02u/%02u", int32_t(added.year()), uint32_t(added.month()), uint32_t(added.day()));
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%s", SourceID::sourceNames[song->GetSourceId(0).sourceId]);
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%s", song->GetType().GetReplay());
+                        if (ImGui::TableNextColumn())
+                            ImGui::Text("%s", SourceID::sourceNames[song->GetSourceId(0).sourceId]);
+                        if (ImGui::TableNextColumn())
+                            ImGui::Text("%s", song->GetType().GetReplay());
+                        if (ImGui::TableNextColumn())
+                        {
+                            auto rg = song->GetSubsongReplayGain(musicId.subsongId.index);
+                            if (rg.IsValid())
+                            {
+                                ImGui::TextColumnRight("%.2fdB", rg.gain);
+                                if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                                    ImGui::Tooltip("Peak: %.5f", rg.peak);
+                            }
+                        }
                         ImGui::PopID();
                     }
                 }
@@ -671,6 +695,73 @@ namespace rePlayer
         }
     }
 
+    void DatabaseSongsUI::DisplayReplayGain()
+    {
+        if (m_isReplayGainScannerTriggered)
+        {
+            m_isReplayGainScannerTriggered = false;
+            m_replayGainScanner = new ReplayGainScanner();
+            for (auto& entry : m_entries)
+            {
+                if (entry.IsSelected())
+                    m_replayGainScanner->Enqueue({ entry, m_databaseId });
+            }
+            if (m_replayGainScanner->Start())
+            {
+                ImGui::OpenPopup("ReplayGain");
+                // lock the rePlayer to avoid opening the systray menu
+                Core::Lock();
+            }
+            else
+            {
+                delete m_replayGainScanner;
+                m_replayGainScanner = nullptr;
+            }
+        }
+        ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+        if (ImGui::BeginPopupModal("ReplayGain", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
+        {
+            float progress;
+            uint32_t duration;
+            auto songIndex = m_replayGainScanner->GetStatus(progress, duration);
+            MusicID musicId = m_replayGainScanner->GetMusicId(songIndex);
+
+            ImGui::BeginChild("Labels", ImVec2(320.0f, ImGui::GetFrameHeight() * 3 + ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None, ImGuiWindowFlags_NoSavedSettings);
+            ImGui::Text("ID     : %016llX%c", musicId.subsongId.Value(), musicId.databaseId == DatabaseID::kPlaylist ? 'p' : 'l');
+            ImGui::Text("Title  : %s", musicId.GetTitle().c_str());
+            ImGui::Text(musicId.GetSong()->NumArtistIds() > 1 ? "Artists: %s" : "Artist : %s", musicId.GetArtists().c_str());
+            ImGui::Text("Replay : %s", musicId.GetSong()->GetType().GetReplay());
+            ImGui::EndChild();
+            {
+                auto numSongs = m_replayGainScanner->NumSongs();
+                char buf[32];
+                sprintf(buf, "Song %u/%u", songIndex + 1, numSongs);
+                ImGui::ProgressBar((songIndex + 1.0f) / numSongs, ImVec2(-FLT_MIN, 0), buf);
+            }
+            if (duration != 0xffFFffFF)
+            {
+                char buf[32];
+                sprintf(buf, "%u:%02u", uint32_t(duration / 60), uint32_t(duration % 60));
+                ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), buf);
+            }
+            else
+                ImGui::ProgressBar(1.0f, ImVec2(-FLT_MIN, 0), "ReplayGain");
+
+            if (ImGui::Button("Cancel", ImVec2(-FLT_MIN, 0.0f)))
+                m_replayGainScanner->Cancel();
+
+            if (m_replayGainScanner->IsDone())
+            {
+                delete m_replayGainScanner;
+                m_replayGainScanner = nullptr;
+                ImGui::CloseCurrentPopup();
+                Core::Unlock();
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
     void DatabaseSongsUI::FilterSongs()
     {
         // prepare selection
@@ -806,6 +897,20 @@ namespace rePlayer
                         break;
                     case kReplay:
                         delta = _stricmp(lSong->GetType().GetReplay(), rSong->GetType().GetReplay());
+                        break;
+                    case kRG:
+                        {
+                            auto lRG = lSong->GetSubsongReplayGain(l.index);
+                            auto rRG = rSong->GetSubsongReplayGain(r.index);
+                            if (lRG.gain == rRG.gain)
+                                delta = 0;
+                            else if (!lRG.IsValid())
+                                delta = sortSpec.SortDirection == ImGuiSortDirection_Ascending ? 1 : -1;
+                            else if (!rRG.IsValid())
+                                delta = sortSpec.SortDirection == ImGuiSortDirection_Ascending ? -1 : 1;
+                            else
+                                delta = int64_t(65536 * 256 * double(lRG.gain - rRG.gain));
+                        }
                         break;
                     }
 
@@ -1004,6 +1109,11 @@ namespace rePlayer
         if (ImGui::Selectable("Export as WAV"))
         {
             m_isExportAsWavTriggered = true;
+            ImGui::CloseCurrentPopup();
+        }
+        if (ImGui::Selectable("Build ReplayGain"))
+        {
+            m_isReplayGainScannerTriggered = true;
             ImGui::CloseCurrentPopup();
         }
         OnSelectionContext();
@@ -1225,14 +1335,24 @@ namespace rePlayer
                     {
                         if (entry.IsSelected())
                         {
-                            auto* song = m_db[entry]->Edit();
+                            auto* s = m_db[entry];
+                            if (!s)
+                                continue;
+                            auto* song = s->Edit();
                             if (song->type.replay != eReplay(i))
                             {
+                                CommandBuffer(song->metadata.Container()).Remove(uint16_t(song->type.replay));
                                 song->type.replay = eReplay(i);
-                                for (auto& subsong : song->subsongs)
-                                    subsong.isPlayed = false;
+
+                                for (; song->lastSubsongIndex; --song->lastSubsongIndex)
+                                {
+                                    SubsongID subsongIdToRemove(song->id, song->lastSubsongIndex);
+                                    Core::Discard(MusicID(subsongIdToRemove, m_databaseId));
+                                }
+                                song->subsongs[0].Clear();
                             }
-                            song->subsongs[0].isInvalid = false;
+                            else
+                                song->subsongs[0].isInvalid = false;
                         }
                     }
                     m_db.Raise(Database::Flag::kSaveSongs);

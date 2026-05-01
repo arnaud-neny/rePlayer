@@ -243,7 +243,7 @@ namespace rePlayer
         return stream;
     }
 
-    SmartPtr<Player> Library::LoadSong(const MusicID musicId)
+    SmartPtr<Player> Library::LoadSong(const MusicID musicId, bool  isExport)
     {
         assert(musicId.databaseId == DatabaseID::kLibrary);
         SmartPtr<Player> player;
@@ -314,7 +314,7 @@ namespace rePlayer
             }
             if (musicId.subsongId.index < numSubsongs)
             {
-                player = Player::Create(musicId, song, replay, stream);
+                player = Player::Create(musicId, song, replay, stream, isExport);
                 player->MarkSongAsNew(hasChanged);
                 Log::Message("%s: loaded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->type.GetExtension());
             }
