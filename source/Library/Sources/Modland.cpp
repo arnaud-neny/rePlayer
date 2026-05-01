@@ -2079,6 +2079,7 @@ namespace rePlayer
             BuildPathList("MusicMaker V8 Old/"),                        // uade issue?
             BuildPathList("Noise Tracker GS 1/Noise Tracker GS 1.txt"),
             BuildPathList("Pollytracker/"),                             // c64 player, available as sid
+            BuildPathList("RealSID/"),                                  // deprecated (they forgot to remove it from their db)
             BuildPathList("Renoise/"),
             BuildPathList("Renoise Old/"),
             BuildPathList("Stonetracker/"),                             // need to add to uade (multi-files & missing library support in uade)
