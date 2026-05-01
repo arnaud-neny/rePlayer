@@ -462,6 +462,9 @@ namespace rePlayer
         str = m_silent.player->getdesc();
         if (!str.empty())
             property.Add("Description", Property::kIsNotEditable, str.c_str(), Property::kIsEditable);
+        str = m_silent.player->gettype();
+        if (!str.empty())
+            property.Add("Type", Property::kIsNotEditable, str.c_str(), Property::kIsEditable);
 
         char buf[16];
         sprintf(buf, "%.2fHz", m_silent.player->getrefresh());
