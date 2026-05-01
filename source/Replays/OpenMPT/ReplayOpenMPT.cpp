@@ -366,7 +366,7 @@ namespace rePlayer
             uint32_t columns = 0;
             for (int i = 0; i < count; ++i)
             {
-                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i));
+                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i + 1));
 
                 if (sample.uFlags & OpenMPT::CHN_ADLIB)
                 {
@@ -386,7 +386,7 @@ namespace rePlayer
             {
                 auto str = openmpt_module_get_sample_name(m_modulePlayback, i);
 
-                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i));
+                auto& sample = sndfile->GetSample(OpenMPT::SAMPLEINDEX(i + 1));
 
                 std::string flags;
                 char sampleSizeBuf[16];
@@ -436,7 +436,7 @@ namespace rePlayer
             property->numColumns = 1;
             for (int i = 0; i < count; ++i)
             {
-                auto* instrument = sndfile->Instruments[i];
+                auto* instrument = sndfile->Instruments[i + 1];
                 if (instrument && (instrument->PitchEnv.dwFlags & OpenMPT::ENV_ENABLED
                     || instrument->VolEnv.dwFlags & OpenMPT::ENV_ENABLED
                     || instrument->PanEnv.dwFlags & OpenMPT::ENV_ENABLED))
@@ -455,7 +455,7 @@ namespace rePlayer
                 if (property->numColumns == 2)
                 {
                     std::string envs;
-                    if (auto* instrument = sndfile->Instruments[i])
+                    if (auto* instrument = sndfile->Instruments[i + 1])
                     {
                         if (instrument->PitchEnv.dwFlags & OpenMPT::ENV_ENABLED)
                             envs += "pitch,";
@@ -574,7 +574,15 @@ namespace rePlayer
             openmpt_free_string(str);
         }
 
+        if (auto type = openmpt_module_get_metadata(m_modulePlayback, "type_long"))
+        {
+            property.Add("Type", Property::kIsNotEditable, type, Property::kIsEditable);
+            openmpt_free_string(type);
+        }
+
         char buf[16];
+        sprintf(buf, "%d", (int)openmpt_module_get_num_channels(m_moduleVisuals));
+        property.Add("Channels", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", (int)openmpt_module_get_current_tempo2(m_moduleVisuals));
         property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", openmpt_module_get_current_speed(m_moduleVisuals));
