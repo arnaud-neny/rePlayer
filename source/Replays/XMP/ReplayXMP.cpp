@@ -561,10 +561,15 @@ namespace rePlayer
 
         property.Add("Title", Property::kIsNotEditable, m_moduleInfo.mod->name, Property::kIsEditable);
 
+        if (m_moduleInfo.mod->type[0])
+            property.Add("Type", Property::kIsNotEditable, m_moduleInfo.mod->type, Property::kIsEditable);
+
         xmp_frame_info frameInfo;
         xmp_get_frame_info(m_contextVisuals, &frameInfo);
 
         char buf[16];
+        sprintf(buf, "%d", m_moduleInfo.mod->chn);
+        property.Add("Channels", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", frameInfo.bpm);
         property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", frameInfo.speed);
