@@ -262,6 +262,8 @@ namespace rePlayer
         property.Add("Title", Property::kIsNotEditable, m_moduleVisuals->ht_Name, Property::kIsEditable);
 
         char buf[16];
+        sprintf(buf, "%d", int(m_modulePlayback->ht_Channels));
+        property.Add("Channels", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", m_moduleVisuals->ht_Tempo);
         property.Add("Tempo", Property::kIsNotEditable, buf, Property::kIsNotEditable);
         sprintf(buf, "%d", m_moduleVisuals->ht_SpeedMultiplier);
