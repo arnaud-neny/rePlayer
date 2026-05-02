@@ -755,9 +755,9 @@ namespace rePlayer
 
     void ReplayOpenMPT::SilenceDetection(ReplayOpenMPT* replay)
     {
-        replay->m_stream->Rewind();
+        auto stream = replay->m_stream->Clone();
         openmpt_module_initial_ctl ctrls[] = { { "play.at_end", "continue" }, { nullptr, nullptr } };
-        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, replay->m_stream, openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, ctrls);
+        auto* module = openmpt_module_create2({ OnRead, OnSeek, OnTell }, stream, openmpt_log_func_silent, nullptr, nullptr, nullptr, nullptr, nullptr, ctrls);
         openmpt_module_select_subsong(module, replay->m_subsongIndex);
         openmpt_module_ctl_set_integer(module, "vblank", replay->m_vblank);
 
