@@ -11,6 +11,9 @@
 // curl
 #include <curl/curl.h>
 
+// libebur128
+#include <ebur128/ebur128.h>
+
 // libarchive
 #include <libarchive/archive.h>
 
@@ -79,7 +82,7 @@ namespace rePlayer
             "Copyright (c) 2003, 2007-14 Matteo Frigo\n"
             "Copyright (c) 2003, 2007-14 Massachusetts Institute of Technology");
         ImGui::Bullet();
-        ImGui::TextUnformatted("libebur128 1.2.6\n"
+        ImGui::TextUnformatted("libebur128 " TOSTRING(EBUR128_VERSION_MAJOR) "." TOSTRING(EBUR128_VERSION_MINOR) "." TOSTRING(EBUR128_VERSION_PATCH) "\n"
             "Copyright (c) 2011 Jan Kokemüller");
 
         ImGui::TextUnformatted("\nReplays 3rd parties:");
