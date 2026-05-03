@@ -48,6 +48,7 @@ namespace rePlayer
 
         RegisterSerializedData(Player::ms_isReplayGainEnabled, "ReplayGainEnabled");
         RegisterSerializedData(Player::ms_isReplayGainChecked, "ReplayGainChecked");
+        RegisterSerializedData(Player::ms_crossFadeLengthInMs, "CrossFadeLength");
     }
 
     Deck::~Deck()
@@ -68,9 +69,10 @@ namespace rePlayer
         {
             if (m_mode != Mode::Solo)
             {
-                //push current player stack
                 if (m_currentPlayer.IsValid())
                     m_currentPlayer->Pause();
+                if (m_nextPlayer.IsValid())
+                    m_nextPlayer->Pause();
                 m_shelvedPlayer = std::move(m_currentPlayer);
                 m_mode = Mode::Solo;
             }
@@ -167,9 +169,16 @@ namespace rePlayer
             m_currentPlayer.Reset();
     }
 
-    void Deck::DisplayProgressBarInTable(float backgroundRatio)
+    bool Deck::DisplayProgressBarInTable(MusicID id, float backgroundRatio)
     {
-        if (Player* player = m_currentPlayer)
+        Player* player = nullptr;
+        if (id.playlistId == PlaylistID::kInvalid)
+            player = (m_currentPlayer.IsValid() && m_currentPlayer->GetId().IsSameSong(id)) ? m_currentPlayer :
+            (m_nextPlayer.IsValid() && m_nextPlayer->IsPlaying() && m_nextPlayer->GetId().IsSameSong(id)) ? m_nextPlayer : nullptr;
+        else
+            player = (m_currentPlayer.IsValid() && m_currentPlayer->GetId() == id) ? m_currentPlayer :
+            (m_nextPlayer.IsValid() && m_nextPlayer->IsPlaying() && m_nextPlayer->GetId() == id) ? m_nextPlayer : nullptr;
+        if (player)
         {
             auto table = ImGui::GetCurrentTable();
             auto tableInstanceData = ImGui::TableGetInstanceData(table, table->InstanceCurrent);
@@ -195,8 +204,7 @@ namespace rePlayer
 
             ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32_DISABLE);
         }
-        else
-            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(ImVec4(0.15f, 0.25f, 0.15f, 1.0f)));
+        return player == nullptr;
     }
 
     MusicID Deck::GetCurrentPlayerId() const
@@ -292,6 +300,11 @@ namespace rePlayer
             ImGui::Checkbox("ReplayGain Rebuild", &Player::ms_isReplayGainChecked);
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
                 ImGui::Tooltip("ReplayGain will be always built on load\nBut for extra CPU and memory usage");
+            uint32_t crossFadeMin = Player::kMinCrossFadeLengthInMs;
+            uint32_t crossFadeMax = Player::kMaxCrossFadeLengthInMs;
+            ImGui::SliderScalar("CrossFade", ImGuiDataType_U32, &Player::ms_crossFadeLengthInMs, &crossFadeMin, &crossFadeMax, "%u milliseconds", ImGuiSliderFlags_AlwaysClamp);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                ImGui::Tooltip("Not applied to songs smaller\nthan 3 times the crossfade length");
             ImGui::Separator();
             if (Window::ms_isPassthroughAvailable == Window::Passthrough::IsAvailable)
                 ImGui::SliderFloat("Transparency", &m_blendingFactor, 0.25f, 1.0f, "", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
@@ -437,23 +450,33 @@ namespace rePlayer
                     else
                         m_currentPlayer->Pause();
                 }
-                else if (auto endState = m_currentPlayer->IsEnding(75))
+                else if (auto endState = m_currentPlayer->IsEnding())
                 {
                     if (endState == Player::kEnded)
                         PlayNextSong();
-                    else if (isPlaying && m_shelvedPlayer.IsInvalid() && m_nextPlayer.IsValid() && !m_nextPlayer->IsPlaying())
+                    else if (isPlaying && m_shelvedPlayer.IsInvalid() && (m_nextPlayer.IsInvalid() || !m_nextPlayer->IsPlaying()))
                     {
                         // start the next song without stopping the current one, to have a seamless playback
                         ValidateNextSong();
                         if (m_nextPlayer.IsValid())
-                            m_nextPlayer->Play();
+                        {
+                            m_nextPlayer->Play(Core::GetPlaylist().IsCrossFadeEnabled() ? Player::CrossFadeState::kCrossFadeInOut : Player::CrossFadeState::kNone);
+                            if (m_isTrackingSongInPlaylist)
+                                Core::GetPlaylist().FocusSong(true);
+                            if (m_isTrackingSongInDatabase)
+                                m_nextPlayer->GetId().Track(TrackMode::SongAndCurrentArtist);
+                        }
                     }
                 }
             }
         }
 
-        m_patterns->Update(m_currentPlayer);
-        m_properties->Update(m_currentPlayer);
+        auto* player = m_currentPlayer.Get();
+        if (player && m_nextPlayer.IsValid() && m_nextPlayer->IsPlaying())
+            player = m_nextPlayer;
+
+        m_patterns->Update(player);
+        m_properties->Update(player);
     }
 
     std::string Deck::OnGetWindowTitle()
@@ -478,7 +501,7 @@ namespace rePlayer
         Core::GetPlaylist().UpdateDragDropSource(1);
 
         SongSheet* song = nullptr;
-        auto player = m_currentPlayer;
+        auto player = (m_mode == Mode::Solo || m_nextPlayer.IsInvalid() || !m_nextPlayer->IsPlaying()) ? m_currentPlayer : m_nextPlayer;
         auto isPlayerValid = player.IsValid();
 
         // VuMeter
@@ -849,7 +872,8 @@ namespace rePlayer
         else if (m_nextPlayer.IsValid())//m_mode == Mode::Playlist;
         {
             std::swap(m_currentPlayer, m_nextPlayer);
-            Play();
+            if (!m_currentPlayer->IsPlaying())
+                Play();
             m_nextPlayer = Core::GetPlaylist().LoadNextSong(true);
         }
         else
@@ -872,11 +896,11 @@ namespace rePlayer
     {
         if (m_currentPlayer.IsValid())
         {
-            m_currentPlayer->Play();
+            m_currentPlayer->Play((m_mode == Mode::Playlist && Core::GetPlaylist().IsCrossFadeEnabled()) ? Player::CrossFadeState::kCrossFadeOut : Player::CrossFadeState::kNone);
             if (isTrackingEnabled == Tracking::IsEnabled)
             {
                 if (m_isTrackingSongInPlaylist && m_mode == Mode::Playlist)
-                    Core::GetPlaylist().FocusCurrentSong();
+                    Core::GetPlaylist().FocusSong();
                 if (m_isTrackingSongInDatabase && m_currentPlayer.IsValid())
                     m_currentPlayer->GetId().Track(TrackMode::SongAndCurrentArtist);
             }

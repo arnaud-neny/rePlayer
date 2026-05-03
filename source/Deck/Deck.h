@@ -44,11 +44,10 @@ namespace rePlayer
 
         bool IsLooping() const { return m_loop == Loop::Playlist; }
         bool IsEndless() const { return m_loop == Loop::Single; }
-        bool IsSolo() const { return m_mode == Mode::Solo; }
 
         void OnNewPlaylist();
 
-        void DisplayProgressBarInTable(float backgroundRatio = 0.0f);
+        bool DisplayProgressBarInTable(MusicID id, float backgroundRatio = 0.0f);
 
         MusicID GetCurrentPlayerId() const;
         std::string GetMetadata(const MusicID musicId) const;

@@ -753,9 +753,9 @@ namespace rePlayer
         return {};
     }
 
-    void Playlist::FocusCurrentSong()
+    void Playlist::FocusSong(bool isNextSong)
     {
-        m_isCurrentEntryFocus = true;
+        m_focus = isNextSong ? Focus::kNext : Focus::kCurrent;
     }
 
     void Playlist::UpdateDragDropSource(uint8_t dropId)
@@ -801,6 +801,8 @@ namespace rePlayer
         ButtonClear();
         ImGui::SameLine();
         ButtonSort();
+        ImGui::SameLine();
+        ImGui::Checkbox("CrossFade", &m_isCrossFadeEnabled);
 
         int32_t draggedIndex = -1;
         MusicID currentRatingId;
@@ -862,14 +864,15 @@ namespace rePlayer
 
                         ImGui::TableNextColumn();
 
-                        if (rowIdx == m_currentEntryIndex && !deck.IsSolo())
-                            deck.DisplayProgressBarInTable();
-                        else if (song->IsInvalid())
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.10f, 0.10f, 1.0f) : ImVec4(0.20f, 0.10f, 0.10f, 0.93f)));
-                        else if (song->IsUnavailable())
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.20f, 0.00f, 1.0f) : ImVec4(0.20f, 0.20f, 0.00f, 0.93f)));
-                        else if (!song->IsSubsongPlayed(subsongId.index))
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.25f, 0.25f, 0.25f, 1.0f) : ImVec4(0.25f, 0.25f, 0.25f, 0.93f)));
+                        if (deck.DisplayProgressBarInTable(curEntry))
+                        {
+                            if (song->IsInvalid())
+                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.10f, 0.10f, 1.0f) : ImVec4(0.20f, 0.10f, 0.10f, 0.93f)));
+                            else if (song->IsUnavailable())
+                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.20f, 0.00f, 1.0f) : ImVec4(0.20f, 0.20f, 0.00f, 0.93f)));
+                            else if (!song->IsSubsongPlayed(subsongId.index))
+                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.25f, 0.25f, 0.25f, 1.0f) : ImVec4(0.25f, 0.25f, 0.25f, 0.93f)));
+                        }
 
                         ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick;
                         if (ImGui::Selectable("##select", curEntry.isSelected, selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//TBD: using imgui_internal for row height
@@ -1038,14 +1041,14 @@ namespace rePlayer
                     }
                 }
 
-                if (m_isCurrentEntryFocus)
+                if (m_focus != Focus::kNone)
                 {
                     if (m_currentEntryIndex >= 0)
                     {
-                        float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex);
+                        float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex + int(m_focus));
                         ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
                     }
-                    m_isCurrentEntryFocus = false;
+                    m_focus = Focus::kNone;
                 }
 
                 ImGui::EndTable();

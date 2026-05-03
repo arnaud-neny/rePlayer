@@ -21,10 +21,18 @@ namespace rePlayer
             kEnding = 1
         };
 
+        enum class CrossFadeState
+        {
+            kNone = 0,
+            kCrossFadeIn = 1 << 0,
+            kCrossFadeOut = 1 << 1,
+            kCrossFadeInOut = kCrossFadeIn | kCrossFadeOut
+        };
+
     public:
         static SmartPtr<Player> Create(MusicID id, SongSheet* song, Replay* replay, io::Stream* stream, bool isExport = false);
 
-        void Play();
+        void Play(CrossFadeState crossFadeState);
         void Pause();
         void Stop();
         void Seek(uint32_t timeInMs);
@@ -37,7 +45,7 @@ namespace rePlayer
 
         bool IsStopped() const;
         bool IsPlaying() const;
-        EndingState IsEnding(uint32_t timeRangeInMs) const;
+        EndingState IsEnding() const;
 
         bool IsSeekable() const;
 
@@ -76,11 +84,14 @@ namespace rePlayer
         bool Render(uint32_t numSamples, uint32_t waveFillPos);
         uint32_t Generate(uint32_t numSamples, uint32_t waveFillPos);
         void Scale(uint32_t numSamples, uint32_t waveFillPos);
+        void Crossfade(uint32_t numSamples, uint32_t waveFillPos);
         void ResumeThread();
         void SuspendThread();
 
         void DrawOscilloscope(float xMin, float yMin, float xMax, float yMax) const;
         void DrawPatterns(float xMin, float yMin, float xMax, float yMax) const;
+
+        void SetupCrossFade(CrossFadeState crossFadeState);
 
     private:
         struct Wave;
@@ -107,6 +118,11 @@ namespace rePlayer
         mutable uint32_t m_patternsPos = 0;
         const uint32_t m_numSamples;
 
+        uint32_t m_crossFadePosition = 0;
+        uint32_t m_crossFadeOut = 0;
+        uint32_t m_crossFadeInLength = 0;
+        uint32_t m_crossFadeOutLength = 0;
+
         int32_t m_numLoops = 0;
         uint32_t m_remainingFadeOut;
         uint32_t m_fadeOutSilence = 0;
@@ -131,6 +147,9 @@ namespace rePlayer
     public:
         static bool ms_isReplayGainEnabled;
         static bool ms_isReplayGainChecked;
+        static constexpr uint32_t kMinCrossFadeLengthInMs = 4000;
+        static constexpr uint32_t kMaxCrossFadeLengthInMs = 15000;
+        static uint32_t ms_crossFadeLengthInMs;
     };
 }
 // namespace rePlayer

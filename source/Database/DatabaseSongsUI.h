@@ -61,7 +61,7 @@ namespace rePlayer
 
         // Used in DisplaySongsTable
         void SortSubsongs(bool isDirty);
-        void UpdateRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId, MusicID currentPlayingSong);
+        void UpdateRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId);
         void UpdateSelection(int32_t rowIdx, MusicID musicId);
 
         // Used in UpdateSelection

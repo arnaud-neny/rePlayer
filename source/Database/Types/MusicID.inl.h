@@ -12,6 +12,7 @@ namespace rePlayer
 
     inline MusicID::MusicID(SubsongID otherSubsongId, DatabaseID otherDatabaseId)
         : subsongId(otherSubsongId)
+        , playlistId(PlaylistID::kInvalid)
         , databaseId(otherDatabaseId)
     {}
 
@@ -23,6 +24,11 @@ namespace rePlayer
     inline constexpr bool MusicID::operator<(MusicID other) const
     {
         return playlistId < other.playlistId;
+    }
+
+    inline bool MusicID::IsSameSong(MusicID id) const
+    {
+        return databaseId == id.databaseId && subsongId == id.subsongId;
     }
 }
 // namespace rePlayer

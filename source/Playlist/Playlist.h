@@ -60,9 +60,11 @@ namespace rePlayer
 
         MusicID GetCurrentEntry() const;
 
-        void FocusCurrentSong();
+        void FocusSong(bool isNextSong = false);
 
         void UpdateDragDropSource(uint8_t dropId);
+
+        bool IsCrossFadeEnabled() const { return m_isCrossFadeEnabled; }
 
     private:
         struct Cue
@@ -138,7 +140,12 @@ namespace rePlayer
 
         int32_t m_oldCurrentEntryIndex = -1;
         int32_t m_currentEntryIndex = -1;
-        bool m_isCurrentEntryFocus = true;
+        enum class Focus : int8_t
+        {
+            kNone = -1,
+            kCurrent,
+            kNext
+        } m_focus = Focus::kNone;
 
         std::string m_inputUrls;
         Array<std::string> m_urls;
@@ -150,6 +157,7 @@ namespace rePlayer
             kSongs
         };
         Serialized<OpenedTab> m_openedTab = { "OpenedTab", OpenedTab::kNone };
+        Serialized<bool> m_isCrossFadeEnabled = { "CrossFade", false };
 
         DatabaseArtistsUI* m_artists = nullptr;
         SongsUI* m_songs = nullptr;

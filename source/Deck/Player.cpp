@@ -42,6 +42,8 @@ namespace rePlayer
         WAVEHDR header{};
     };
 
+    uint32_t Player::ms_crossFadeLengthInMs = 8000;
+
     SmartPtr<Player> Player::Create(MusicID id, SongSheet* song, Replay* replay, io::Stream* stream, bool isExport)
     {
         if (replay)
@@ -54,7 +56,7 @@ namespace rePlayer
         return nullptr;
     }
 
-    void Player::Play()
+    void Player::Play(CrossFadeState crossFadeState)
     {
         if (m_replay->IsStreaming() && (!m_song->subsongs[m_id.subsongId.index].isPlayed || m_song->subsongs[m_id.subsongId.index].durationCs != 0))
         {
@@ -64,6 +66,8 @@ namespace rePlayer
         }
         if (m_status == Status::Paused)
         {
+            SetupCrossFade(crossFadeState);
+
             m_numRetries = kNumRetries;
             m_status = Status::Playing;
             waveOutRestart(m_wave->outHandle);
@@ -80,11 +84,14 @@ namespace rePlayer
             m_waveFillPos = m_numSamples;
             m_patternsPos = 0;
             m_numRetries = kNumRetries;
+            m_crossFadePosition = 0;
 
             m_numLoops = m_replay->CanLoop() ? Core::GetDeck().IsEndless() ? INT_MAX : GetSubsong().state == SubsongState::Loop ? 1 : 0 : 0;
             m_hasSeeked = m_replay->CanLoop() && Core::GetDeck().IsEndless();
             m_remainingFadeOut = m_replay->GetSampleRate() * 4;
             m_fadeOutSilence = 0;
+
+            SetupCrossFade(crossFadeState);
 
             m_replay->ResetPlayback();
             m_replay->ApplySettings(m_song->metadata.Container());
@@ -146,6 +153,14 @@ namespace rePlayer
             m_fadeOutSilence = 0;
 
             timeInMs = m_replay->Seek(timeInMs);
+
+            int64_t seekPos = m_replay->GetSampleRate();
+            seekPos *= timeInMs;
+            m_songSeek = uint32_t(seekPos / 1000);
+            m_crossFadePosition = uint32_t(m_songSeek);
+
+            m_crossFadeInLength = 0;
+
             Render(m_numSamples, 0);
 
             if (m_status == Status::Paused)
@@ -153,10 +168,6 @@ namespace rePlayer
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
             if (m_status == Status::Playing)
                 ResumeThread();
-
-            int64_t seekPos = m_replay->GetSampleRate();
-            seekPos *= timeInMs;
-            m_songSeek = uint32_t(seekPos / 1000);
         }
     }
 
@@ -165,10 +176,10 @@ namespace rePlayer
         Stop();
         m_id.subsongId.index = subsongIndex;
         m_replay->SetSubsong(subsongIndex);
-        Play();
+        Play(CrossFadeState::kNone);
     }
 
-    Player::EndingState Player::IsEnding(uint32_t timeRangeInMs) const
+    Player::EndingState Player::IsEnding() const
     {
         if (m_status == Status::Playing)
         {
@@ -177,7 +188,10 @@ namespace rePlayer
             auto playingPos = GetPlayingPosition();
             if (playingPos >= songEnd)
                 return EndingState::kEnded;
-            playingPos += (uint64_t(timeRangeInMs) * m_replay->GetSampleRate()) / 1000;
+            if (m_crossFadeOutLength)
+                songEnd = m_crossFadeOut - m_songSeek;
+            static constexpr uint64_t kTimeRangeInMs = 75;
+            playingPos += (kTimeRangeInMs * m_replay->GetSampleRate()) / 1000;
             if (playingPos >= songEnd)
                 return EndingState::kEnding;
         }
@@ -529,6 +543,7 @@ namespace rePlayer
             FillCache();
             m_wavePlayPos = 0;
             m_waveFillPos = m_numSamples;
+            m_crossFadePosition = 0;
 
             waveOutPause(m_wave->outHandle);
             waveOutWrite(m_wave->outHandle, &m_wave->header, sizeof(m_wave->header));
@@ -545,104 +560,107 @@ namespace rePlayer
                 ::SetThreadPriority(threadHandle, threadPriority);
             });
 
-            Core::AddJob([This = SmartPtr<Player>(this), clonedStream = stream->Clone()]()
+            if (!m_replay->IsStreaming())
             {
-                // read stream tags if there is any
-                TagLibStream tagLibStream(clonedStream);
-                TagLib::FileRef f(&tagLibStream);
-                if (auto tag = f.tag())
+                Core::AddJob([This = SmartPtr<Player>(this), clonedStream = stream->Clone()]()
                 {
-                    std::string extraInfo;
-                    if (!tag->artist().isEmpty())
+                    // read stream tags if there is any
+                    TagLibStream tagLibStream(clonedStream);
+                    TagLib::FileRef f(&tagLibStream);
+                    if (auto tag = f.tag())
                     {
-                        extraInfo = "Artist: ";
-                        extraInfo += tag->artist().to8Bit();
-                    }
-                    if (!tag->title().isEmpty())
-                    {
-                        if (!extraInfo.empty())
-                            extraInfo += "\n";
-                        extraInfo += "Title : ";
-                        extraInfo += tag->title().to8Bit();
-                    }
-                    if (!tag->album().isEmpty())
-                    {
-                        if (!extraInfo.empty())
-                            extraInfo += "\n";
-                        extraInfo += "Album : ";
-                        extraInfo += tag->album().to8Bit();
-                    }
-                    if (!tag->genre().isEmpty())
-                    {
-                        if (!extraInfo.empty())
-                            extraInfo += "\n";
-                        extraInfo += "Genre : ";
-                        extraInfo += tag->genre().to8Bit();
-                    }
-                    if (tag->year())
-                    {
-                        if (!extraInfo.empty())
-                            extraInfo += "\n";
-                        extraInfo += "Year  : ";
-                        char buf[64];
-                        core::sprintf(buf, "%d", tag->year());
-                        extraInfo += buf;
-                    }
-
-                    if (!tag->comment().isEmpty())
-                    {
-                        if (!extraInfo.empty())
-                            extraInfo += "\n\n";
-                        extraInfo += tag->comment().to8Bit();
-                    }
-
-                    auto pmap = tag->properties();
-                    if (!This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid())
-                    {
-                        auto itGain = pmap.find("REPLAYGAIN_TRACK_GAIN");
-                        auto itPeak = pmap.find("REPLAYGAIN_TRACK_PEAK");
-                        if (itGain != pmap.end() && itPeak != pmap.end())
+                        std::string extraInfo;
+                        if (!tag->artist().isEmpty())
                         {
-                            double gain, peak;
-                            if (sscanf_s(itGain->second.toString().toCString(), "%lf", &gain) == 1)
+                            extraInfo = "Artist: ";
+                            extraInfo += tag->artist().to8Bit();
+                        }
+                        if (!tag->title().isEmpty())
+                        {
+                            if (!extraInfo.empty())
+                                extraInfo += "\n";
+                            extraInfo += "Title : ";
+                            extraInfo += tag->title().to8Bit();
+                        }
+                        if (!tag->album().isEmpty())
+                        {
+                            if (!extraInfo.empty())
+                                extraInfo += "\n";
+                            extraInfo += "Album : ";
+                            extraInfo += tag->album().to8Bit();
+                        }
+                        if (!tag->genre().isEmpty())
+                        {
+                            if (!extraInfo.empty())
+                                extraInfo += "\n";
+                            extraInfo += "Genre : ";
+                            extraInfo += tag->genre().to8Bit();
+                        }
+                        if (tag->year())
+                        {
+                            if (!extraInfo.empty())
+                                extraInfo += "\n";
+                            extraInfo += "Year  : ";
+                            char buf[64];
+                            core::sprintf(buf, "%d", tag->year());
+                            extraInfo += buf;
+                        }
+
+                        if (!tag->comment().isEmpty())
+                        {
+                            if (!extraInfo.empty())
+                                extraInfo += "\n\n";
+                            extraInfo += tag->comment().to8Bit();
+                        }
+
+                        auto pmap = tag->properties();
+                        if (!This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid())
+                        {
+                            auto itGain = pmap.find("REPLAYGAIN_TRACK_GAIN");
+                            auto itPeak = pmap.find("REPLAYGAIN_TRACK_PEAK");
+                            if (itGain != pmap.end() && itPeak != pmap.end())
                             {
-                                if (sscanf_s(itPeak->second.toString().toCString(), "%lf", &peak) == 1)
+                                double gain, peak;
+                                if (sscanf_s(itGain->second.toString().toCString(), "%lf", &gain) == 1)
                                 {
-                                    This->m_song->subsongs[This->m_id.subsongId.index].replayGain.gain = float(gain);
-                                    This->m_song->subsongs[This->m_id.subsongId.index].replayGain.peak = float(peak);
+                                    if (sscanf_s(itPeak->second.toString().toCString(), "%lf", &peak) == 1)
+                                    {
+                                        This->m_song->subsongs[This->m_id.subsongId.index].replayGain.gain = float(gain);
+                                        This->m_song->subsongs[This->m_id.subsongId.index].replayGain.peak = float(peak);
+                                    }
                                 }
                             }
                         }
+
+                        Replay::Properties properties;
+                        auto* property = properties.Push();
+                        property->label = "Tags";
+                        property->numColumns = 2;
+                        for (auto it = pmap.begin(); it != pmap.end(); ++it)
+                        {
+                            property->Add(it->first.toCString(), Replay::Property::kIsNotEditable
+                                , it->second.toString().toCString(), Replay::Property::kIsEditable);
+                        }
+                        if (property->numEntries == 0)
+                            properties.Clear();
+                        Core::FromJob([This, extraInfo = std::move(extraInfo), properties = std::move(properties)]
+                        {
+                            This->m_extraInfo = std::move(extraInfo);
+                            This->m_properties = std::move(properties);
+                        });
                     }
 
-                    Replay::Properties properties;
-                    auto* property = properties.Push();
-                    property->label = "Tags";
-                    property->numColumns = 2;
-                    for (auto it = pmap.begin(); it != pmap.end(); ++it)
+                    auto isValid = This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid();
+                    if (ms_isReplayGainChecked || (ms_isReplayGainEnabled && !isValid))
                     {
-                        property->Add(it->first.toCString(), Replay::Property::kIsNotEditable
-                            , it->second.toString().toCString(), Replay::Property::kIsEditable);
+                        ReplayGainScanner rg;
+                        rg.Enqueue(This->m_id);
+                        rg.Update();
+                        if (This->m_status != Status::Playing && !isValid)
+                            This->Scale(This->m_numSamples, 0);
                     }
-                    if (property->numEntries == 0)
-                        properties.Clear();
-                    Core::FromJob([This, extraInfo = std::move(extraInfo), properties = std::move(properties)]
-                    {
-                        This->m_extraInfo = std::move(extraInfo);
-                        This->m_properties = std::move(properties);
-                    });
-                }
-
-                auto isValid = This->m_song->subsongs[This->m_id.subsongId.index].replayGain.IsValid();
-                if (ms_isReplayGainChecked || (ms_isReplayGainEnabled && !isValid))
-                {
-                    ReplayGainScanner rg;
-                    rg.Enqueue(This->m_id);
-                    rg.Update();
-                    if (This->m_status != Status::Playing && !isValid)
-                        This->Scale(This->m_numSamples, 0);
-                }
-            });
+                });
+            }
         }
         else
             m_isJobDone = true;
@@ -701,6 +719,7 @@ namespace rePlayer
                 }
                 m_numRetries = kNumRetries;
                 waveFillPos += count;
+                m_crossFadePosition += count;
             }
 
             m_waveFillPos = waveFillPos;
@@ -727,7 +746,8 @@ namespace rePlayer
     bool Player::Render(uint32_t numSamples, uint32_t waveFillPos)
     {
         auto remaining = Generate(numSamples, waveFillPos);
-        Scale(numSamples - (remaining & ~1u), waveFillPos); // align for SSE (or ~3u for AVX)
+        Scale(numSamples - ((remaining + 1) & ~1u), waveFillPos); // align for SSE (or ~3u for AVX)
+        Crossfade(numSamples - remaining, waveFillPos);
         return remaining != 0;
     }
 
@@ -824,13 +844,17 @@ namespace rePlayer
                     float fadeOut = m_remainingFadeOut * m_fadeOutRatio;
                     uint32_t silenceRate = m_replay->GetSampleRate() / 2;
                     auto fadeOutSilence = m_fadeOutSilence;
+                    auto isCrossFadeEnabled = m_crossFadeOutLength |= 0;
                     for (uint32_t i = 0; i < fadeOutSize; i++)
                     {
                         auto left = waveData[waveFillPos].left * fadeOut;
                         auto right = waveData[waveFillPos].right * fadeOut;
 
-                        waveData[waveFillPos].left = left;
-                        waveData[waveFillPos].right = right;
+                        if (!isCrossFadeEnabled)
+                        {
+                            waveData[waveFillPos].left = left;
+                            waveData[waveFillPos].right = right;
+                        }
 
                         waveFillPos++;
                         fadeOut += fadeOutRatio;
@@ -873,7 +897,8 @@ namespace rePlayer
                             m_id.MarkForSave();
 
                         m_songEnd = m_songPos;
-                        memset(waveData + waveFillPos, 0, (count - fadeOutSize) * sizeof(StereoSample));
+                        if (!isCrossFadeEnabled)
+                            memset(waveData + waveFillPos, 0, (count - fadeOutSize) * sizeof(StereoSample));
                         waveFillPos += count - fadeOutSize;
                     }
 
@@ -921,6 +946,46 @@ namespace rePlayer
         }
     }
 
+    void Player::Crossfade(uint32_t numSamples, uint32_t waveFillPos)
+    {
+        auto time = m_crossFadePosition;
+        auto crossFadeLength = m_crossFadeInLength;
+        if (time < crossFadeLength)
+        {
+            numSamples = Min(numSamples, crossFadeLength - time);
+            auto* waveData = m_waveData + waveFillPos;
+            for (uint32_t i = 0; i < numSamples; ++i)
+            {
+                float c = sinf(((time + i) * 3.14159265359f * 0.5f) / crossFadeLength);
+                waveData[i] = waveData[i] * c;
+            }
+        }
+        else
+        {
+            crossFadeLength = m_crossFadeOutLength;
+            auto crossFadeOut = m_crossFadeOut;
+            if (crossFadeLength && time + numSamples > crossFadeOut)
+            {
+                if (time < crossFadeOut)
+                {
+                    auto n = crossFadeOut - time;
+                    numSamples -= n;
+                    time += n;
+                    waveFillPos += n;
+                }
+                time -= crossFadeOut;
+                auto* waveData = m_waveData + waveFillPos;
+                if (time >= crossFadeLength)
+                    memset(waveData, 0, sizeof(waveData[0]) * numSamples);
+                else for (uint32_t i = 0; i < numSamples; ++i)
+                {
+                    float c = cosf((Min(int64_t(time + i), crossFadeLength) * 3.14159265359f * 0.5f) / crossFadeLength);
+                    waveData[i] = waveData[i] * c;
+                }
+            }
+        }
+    }
+
     void Player::ResumeThread()
     {
         std::atomic_ref(m_isWaiting).store(false);
@@ -932,6 +997,35 @@ namespace rePlayer
         std::atomic_ref(m_isWaiting).store(true);
         while (std::atomic_ref(m_waitTime).load() != INFINITE)
             thread::Sleep(0);
+    }
+
+    void Player::SetupCrossFade(CrossFadeState crossFadeState)
+    {
+        bool hasFadeIn = m_crossFadeInLength != 0;
+        auto crossFadeLengthInMs = Clamp(ms_crossFadeLengthInMs, kMinCrossFadeLengthInMs, kMaxCrossFadeLengthInMs);
+
+        auto isCrossFadeEnabled = crossFadeLengthInMs > 0 && m_song->subsongs[m_id.subsongId.index].durationCs >= (3 * crossFadeLengthInMs / 10);
+        if (isCrossFadeEnabled && int(crossFadeState) & int(CrossFadeState::kCrossFadeIn))
+            m_crossFadeInLength = uint32_t((crossFadeLengthInMs * uint64_t(m_replay->GetSampleRate())) / 1000ull);
+        else
+            m_crossFadeInLength = 0;
+        if (isCrossFadeEnabled && int(crossFadeState) & int(CrossFadeState::kCrossFadeOut))
+        {
+            m_crossFadeOutLength = uint32_t((crossFadeLengthInMs * uint64_t(m_replay->GetSampleRate())) / 1000ull);
+            m_crossFadeOut = uint32_t((m_song->subsongs[m_id.subsongId.index].durationCs * uint64_t(m_replay->GetSampleRate())) / 100ull) - m_crossFadeOutLength;
+        }
+        else
+        {
+            m_crossFadeOutLength = 0;
+            m_crossFadeOut = 0;
+        }
+
+        if (m_crossFadePosition == 0)
+        {
+            if (!hasFadeIn && m_crossFadeInLength != 0)
+                Crossfade(m_numSamples, 0);
+            m_crossFadePosition = m_numSamples;
+        }
     }
 }
 // namespace rePlayer

@@ -64,6 +64,7 @@ namespace rePlayer
         constexpr bool operator<(MusicID other) const;
 
         bool IsValid() const;
+        bool IsSameSong(MusicID id) const;
 
         Song* GetSong() const;
         Artist* GetArtist(ArtistID artistId) const;

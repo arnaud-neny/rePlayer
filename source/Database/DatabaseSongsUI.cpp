@@ -243,8 +243,6 @@ namespace rePlayer
 
                 SubsongID currentRatingSubsong;
 
-                MusicID currentPlayingSong = Core::GetDeck().GetCurrentPlayerId();
-
                 ImGuiListClipper clipper;
                 clipper.Begin(m_entries.NumItems<int>());
 
@@ -258,7 +256,7 @@ namespace rePlayer
                         ImGui::TableNextColumn();
                         ImGui::PushID(&musicId.subsongId, &musicId.subsongId.external);
 
-                        UpdateRowBackground(rowIdx, song, musicId.subsongId, currentPlayingSong);
+                        UpdateRowBackground(rowIdx, song, musicId.subsongId);
                         UpdateSelection(rowIdx, musicId);
                         ImGui::SameLine(0.0f, 0.0f);//no spacing
                         if (m_renamer.isEnabled && m_renamer.entry == musicId.subsongId)
@@ -924,12 +922,10 @@ namespace rePlayer
         }
     }
 
-    void DatabaseSongsUI::UpdateRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId, MusicID currentPlayingSong)
+    void DatabaseSongsUI::UpdateRowBackground(int32_t rowIdx, Song* song, SubsongID subsongId)
     {
         float backgroundRatio = m_subsongHighlights.Get(subsongId, 0.0f);
-        if (currentPlayingSong.databaseId == m_databaseId && subsongId == currentPlayingSong.subsongId)
-            Core::GetDeck().DisplayProgressBarInTable(backgroundRatio);
-        else
+        if (Core::GetDeck().DisplayProgressBarInTable({ subsongId, m_databaseId }, backgroundRatio))
         {
             if (song->IsInvalid())
                 ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.10f, 0.10f, 1.0f) : ImVec4(0.20f, 0.10f, 0.10f, 0.93f)));
