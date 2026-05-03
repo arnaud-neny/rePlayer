@@ -22,7 +22,7 @@
 
 #include "Dac.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -77,7 +77,7 @@ void Dac::kinkedDac(ChipModel chipModel)
     const double _2R_div_R = chipModel == MOS6581 ? 2.20 : 2.00;
 
     // 6581 DACs are not terminated by a 2R resistor
-    const bool term = chipModel == MOS8580;
+    const bool term = chipModel == CSG8580;
 
     leakage = chipModel == MOS6581 ? MOSFET_LEAKAGE_6581 : MOSFET_LEAKAGE_8580;
 

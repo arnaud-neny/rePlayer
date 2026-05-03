@@ -24,7 +24,6 @@
 
 #ifdef SLOPE_FACTOR
 #  include <cmath>
-#  include "sidcxx11.h"
 #endif
 
 namespace reSIDfp

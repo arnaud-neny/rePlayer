@@ -25,16 +25,12 @@
 #include "Integrator8580.h"
 #include "OpAmp.h"
 
-#include "sidcxx11.h"
-
 #include <mutex>
 #include <thread>
 
-// rePlayer begin: to get rid of msvcpxxx_atomic_wait.dll
-#if defined(__cpp_lib_jthread)
-#undef __cpp_lib_jthread
+#if defined(HAVE_CXX20) && defined(__cpp_lib_jthread)
+ // rePlayer #  define HAVE_JTHREADS
 #endif
-// rePlayer end
 
 namespace reSIDfp
 {
@@ -120,16 +116,11 @@ constexpr Spline::Point opamp_voltage[OPAMP_SIZE] =
 
 std::unique_ptr<FilterModelConfig8580> FilterModelConfig8580::instance(nullptr);
 
-std::mutex Instance8580_Lock;
+std::once_flag flag8580;
 
 FilterModelConfig8580* FilterModelConfig8580::getInstance()
 {
-    std::lock_guard<std::mutex> lock(Instance8580_Lock);
-
-    if (!instance.get())
-    {
-        instance.reset(new FilterModelConfig8580());
-    }
+    std::call_once(flag8580, [](){ instance.reset(new FilterModelConfig8580()); });
 
     return instance.get();
 }
@@ -202,7 +193,7 @@ FilterModelConfig8580::FilterModelConfig8580() :
         buildResonanceTable(opampModel, resGain);
     };
 
-#if defined(HAVE_CXX20) && defined(__cpp_lib_jthread)
+#ifdef HAVE_JTHREADS
     using sidThread = std::jthread;
 #else
     using sidThread = std::thread;
@@ -213,7 +204,7 @@ FilterModelConfig8580::FilterModelConfig8580() :
     sidThread thdGain(filterGain);
     sidThread thdResonance(filterResonance);
 
-#if !defined(HAVE_CXX20) || !defined(__cpp_lib_jthread)
+#ifndef HAVE_JTHREADS
     thdSummer.join();
     thdMixer.join();
     thdGain.join();

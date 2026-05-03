@@ -389,7 +389,7 @@ private:
      *      - false - if nothing was put into 'result'
      *      - true  - 'result' has the resulting field
      */
-    bool getField(std::string &result, const char *buffer, int tuneNo = 0, STILField field = all);
+    bool getField(std::string &result, const char *buffer, int tuneNo = 0, STILField field = all) const;
 
     /**
      * @param result - where to put the resulting string to (if any)
@@ -403,7 +403,7 @@ private:
      *      - false - if nothing was put into 'result'
      *      - true  - 'result' has the resulting field
      */
-    bool getOneField(std::string &result, const char *start, const char *end, STILField field);
+    bool getOneField(std::string &result, const char *start, const char *end, STILField field) const;
 
     /**
      * Extracts one line from 'infile' to 'line[]'. The end of

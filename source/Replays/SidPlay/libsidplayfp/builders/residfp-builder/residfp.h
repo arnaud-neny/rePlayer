@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2013 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2001 Simon White
  *
@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef RESIDFP_H
-#define RESIDFP_H
+#ifndef RESIDFP_BUILDER_H
+#define RESIDFP_BUILDER_H
 
 #include "sidplayfp/sidbuilder.h"
 #include "sidplayfp/siddefs.h"
@@ -31,64 +31,62 @@
  */
 class SID_EXTERN ReSIDfpBuilder: public sidbuilder
 {
-public:
-    ReSIDfpBuilder(const char * const name) :
-        sidbuilder(name) {}
-    ~ReSIDfpBuilder();
-
-    /**
-     * Available sids.
-     *
-     * @return the number of available sids, 0 = endless.
-     */
-    unsigned int availDevices() const { return 0; }
-
+protected:
     /**
      * Create the sid emu.
-     *
-     * @param sids the number of required sid emu
      */
-    unsigned int create(unsigned int sids);
+    libsidplayfp::sidemu* create();
 
-    const char *credits() const;
+public:
+    ReSIDfpBuilder(const char * const name);
+    ~ReSIDfpBuilder();
+
+
+    const char *getCredits() const;
 
     /// @name global settings
     /// Settings that affect all SIDs.
     //@{
     /**
-     * enable/disable filter.
-     */
-    void filter(bool enable);
-
-    /**
-     * Set 6581 filter curve.
+     * Set 6581 filter curve type.
      *
-     * @param filterCurve from 0.0 (light) to 1.0 (dark) (default 0.5)
+     * @param filterCurve sets center frequency from 0.0 (dark) to 1.0 (bright). (default 0.5)
      */
     void filter6581Curve(double filterCurve);
 
     /**
-     * Set 6581 filter curve.
+     * Set 6581 filter offset and range.
      *
-     * @param filterCurve from 0.0 (dark) to 1.0 (light) (default 0.5)
+     * @param filterRange sets center frequency from 0.0 (dark) to 1.0 (bright).
+     *                    This also affects the range. (default 0.5)
      */
     void filter6581Range(double filterRange);
 
     /**
-     * Set 8580 filter curve.
+     * Set 8580 filter curve type.
      *
-     * @param filterCurve curve center frequency (default 12500)
+     * @param filterCurve sets center frequency from 0.0 (dark) to 1.0 (bright). (default 0.5)
      */
     void filter8580Curve(double filterCurve);
 
     /**
+     * Enable/disable old caps for 6581 model.
+     *
+     * @param enable true to enable old 2200pF caps used on ASSY 326298
+     *               false to use the standard 470pF caps.
+     */
+    void enableOld6581caps(bool enable);
+
+    /**
      * Set combined waveforms strength.
      *
-     * @param cws 
+     * @param cws
      */
     void combinedWaveformsStrength(SidConfig::sid_cw_t cws);
-
     //@}
+private:
+    struct config;
+    config *m_config;
 };
 
-#endif // RESIDFP_H
+#endif // RESIDFP_BUILDER_H

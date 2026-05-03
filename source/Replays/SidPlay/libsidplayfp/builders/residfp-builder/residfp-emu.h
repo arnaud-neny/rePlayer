@@ -23,9 +23,9 @@
 #ifndef RESIDFP_EMU_H
 #define RESIDFP_EMU_H
 
-#include <stdint.h>
+#include <cstdint>
 
-#include "residfp/SID.h"
+#include "residfp/residfp.h"
 #include "sidplayfp/SidConfig.h"
 #include "sidemu.h"
 #include "Event.h"
@@ -38,17 +38,17 @@ class sidbuilder;
 namespace libsidplayfp
 {
 
-class ReSIDfp final : public sidemu
+class reSIDfpEmu final : public sidemu
 {
 private:
-    reSIDfp::SID &m_sid;
+    reSIDfp::residfp &m_sid;
 
 public:
     static const char* getCredits();
 
 public:
-    ReSIDfp(sidbuilder *builder);
-    ~ReSIDfp() override;
+    explicit reSIDfpEmu(sidbuilder *builder);
+    ~reSIDfpEmu() override;
 
     bool getStatus() const { return m_status; }
 
@@ -62,15 +62,21 @@ public:
     void clock() override;
 
     void sampling(float systemclock, float freq,
-        SidConfig::sampling_method_t method, bool) override;
+        SidConfig::sampling_method_t method) override;
 
     void model(SidConfig::sid_model_t model, bool digiboost) override;
 
     // Specific to residfp
-    void filter(bool enable);
-    void filter6581Curve(double filterCurve);
-    void filter6581Range(double adjustment);
-    void filter8580Curve(double filterCurve);
+    void enableFilter(bool enable) { m_sid.enableFilter(enable); }
+
+    void filter6581Curve(double filterCurve) { m_sid.setFilter6581Curve(filterCurve); }
+
+    void filter6581Range(double adjustment) { m_sid.setFilter6581Range(adjustment); }
+
+    void filter8580Curve(double filterCurve) { m_sid.setFilter8580Curve(filterCurve); }
+
+    void enableOld6581caps(bool enable) { m_sid.enableOld6581caps(enable); }
+
     void combinedWaveforms(SidConfig::sid_cw_t cws);
 };
 

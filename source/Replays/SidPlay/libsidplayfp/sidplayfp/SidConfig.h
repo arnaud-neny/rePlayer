@@ -23,7 +23,7 @@
 #ifndef SIDCONFIG_H
 #define SIDCONFIG_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "sidplayfp/siddefs.h"
 
@@ -39,13 +39,6 @@ class sidbuilder;
 class SID_EXTERN SidConfig
 {
 public:
-    /// Playback mode
-    typedef enum
-    {
-        MONO = 1,      ///< One channel mono playback
-        STEREO         ///< Two channels stereo playback
-    } playback_t;
-
     /// SID chip model
     typedef enum
     {
@@ -95,7 +88,7 @@ public:
     static const uint_least16_t MAX_POWER_ON_DELAY = 0x1FFF;
     static const uint_least16_t DEFAULT_POWER_ON_DELAY = MAX_POWER_ON_DELAY + 1;
 
-    static const uint_least32_t DEFAULT_SAMPLING_FREQ  = 44100;
+    static const uint_least32_t DEFAULT_SAMPLING_FREQ  = 48000;
 
 public:
     /**
@@ -129,11 +122,6 @@ public:
     cia_model_t ciaModel;
 
     /**
-     * Playbak mode.
-     */
-    playback_t playback;
-
-    /**
      * Sampling frequency.
      */
     uint_least32_t frequency;
@@ -153,16 +141,6 @@ public:
     sidbuilder *sidEmulation;
 
     /**
-     * Left channel volume.
-     */
-    uint_least32_t leftVolume;
-
-    /**
-     * Right channel volume.
-     */
-    uint_least32_t rightVolume;
-
-    /**
      * Power on delay cycles.
      */
     uint_least16_t powerOnDelay;
@@ -173,17 +151,11 @@ public:
     sampling_method_t samplingMethod;
 
     /**
-     * Faster low-quality emulation,
-     * available only for reSID.
-     */
-    bool fastSampling;
-
-    /**
      * Compare two config objects.
      *
      * @return true if different
      */
-    bool compare(const SidConfig &config);
+    bool compare(const SidConfig &config) const;
 
 public:
     SidConfig();

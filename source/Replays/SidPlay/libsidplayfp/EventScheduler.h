@@ -123,7 +123,7 @@ public:
      *
      * @param event the event to cancel
      */
-    void cancel(Event &event);
+    void cancel(const Event &event);
 
     /**
      * Cancel all pending events and reset time.
@@ -147,7 +147,7 @@ public:
      * @param event the event
      * @return true when pending
      */
-    bool isPending(Event &event) const;
+    bool isPending(const Event &event) const;
 
     /**
      * Get time with respect to a specific clock phase.
@@ -167,7 +167,7 @@ public:
      */
     event_phase_t phase() const { return static_cast<event_phase_t>(currentTime & 1); }
 
-    event_clock_t remaining(Event &event) const { return event.triggerTime - currentTime; }
+    event_clock_t remaining(const Event &event) const { return event.triggerTime - currentTime; }
 };
 
 }

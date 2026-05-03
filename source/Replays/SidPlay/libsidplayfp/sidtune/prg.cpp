@@ -35,7 +35,7 @@ namespace libsidplayfp
 // Format strings
 const char TXT_FORMAT_PRG[] = "Tape image file (PRG)";
 
-SidTuneBase* prg::load(const char *fileName, buffer_t& dataBuf)
+SidTuneBase* prg::load(const char *fileName, const buffer_t& dataBuf)
 {
     const char *ext = SidTuneTools::fileExtOfPath(fileName);
     if ((!stringutils::equal(ext, ".prg"))

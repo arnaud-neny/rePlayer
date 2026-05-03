@@ -75,7 +75,7 @@ const char *parseTime(const char *str, int_least32_t &result)
 
     if (*end == '.')
     {
-        char *start = end + 1;
+        const char *start = end + 1;
         long milliseconds = strtol(start, &end, 10);
         switch (end - start)
         {

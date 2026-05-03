@@ -61,7 +61,7 @@ public:
      *
      * @return the voice analog output
      */
-    RESID_INLINE
+    RESIDFP_INLINE
     float output()
     {
         unsigned int const wav = waveformGenerator.output();

@@ -38,7 +38,7 @@ public:
      *
      * @param seed
      */
-    sidrandom(unsigned int seed) :
+    explicit sidrandom(unsigned int seed) :
         m_seed(seed * 1103515245 + 12345) {}
 
     /**

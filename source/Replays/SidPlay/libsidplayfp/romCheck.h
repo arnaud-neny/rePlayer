@@ -21,7 +21,7 @@
 #ifndef ROMCHECK_H
 #define ROMCHECK_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -48,7 +48,7 @@ private:
 
     /**
      * Pointer to the ROM buffer
-     */ 
+     */
     const uint8_t* m_rom;
 
     /**
@@ -64,18 +64,10 @@ private:
      */
     std::string checksum() const
     {
-        try
-        {
-            sidmd5 md5;
-            md5.append(m_rom, m_size);
-            md5.finish();
+        sidmd5 md5;
+        md5.append(m_rom, m_size);
 
-            return md5.getDigest();
-        }
-        catch (md5Error const &)
-        {
-            return std::string();
-        }
+        return md5.getDigest();
     }
 
 protected:

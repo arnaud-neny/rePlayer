@@ -23,8 +23,8 @@
 #ifndef SIDPLAYFP_H
 #define SIDPLAYFP_H
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
 
 #include "sidplayfp/siddefs.h"
 #include "sidplayfp/sidversion.h"
@@ -83,15 +83,6 @@ public:
     const char *error() const;
 
     /**
-     * Set the fast-forward factor.
-     *
-     * @param percent
-     * @deprecated
-     */
-    SID_DEPRECATED
-    bool fastForward(unsigned int percent);
-
-    /**
      * Load a tune.
      * Check #error for detailed message if something goes wrong.
      *
@@ -99,20 +90,6 @@ public:
      * @return true on sucess, false otherwise.
      */
     bool load(SidTune *tune);
-
-    /**
-     * Run the emulation and produce samples to play if a buffer is given.
-     *
-     * @param buffer pointer to the buffer to fill with samples.
-     * @param count the size of the buffer measured in 16 bit samples
-     *              or 0 if no output is needed (e.g. Hardsid)
-     * @return the number of produced samples. If less than requested
-     *         or #isPlaying() is false an error occurred, use #error()
-     *         to get a detailed message.
-     * @deprecated use #play(unsigned int)
-     */
-    SID_DEPRECATED
-    uint_least32_t play(short *buffer, uint_least32_t count);
 
     /**
      * Get the buffer pointers for each of the installed SID chip.
@@ -153,7 +130,7 @@ public:
     unsigned int installedSIDs() const;
 
     /**
-     * Init mixer.
+     * Initialize the mixer.
      *
      * @param stereo whether to mix in stereo or mono
      * @since 2.15
@@ -171,25 +148,8 @@ public:
     unsigned int mix(short *buffer, unsigned int samples);
 
     /**
-     * Check if the engine is playing or stopped.
-     *
-     * @return true if playing, false otherwise.
-     * @deprecated
-     */
-    SID_DEPRECATED
-    bool isPlaying() const;
-
-    /**
-     * Stop the engine.
-     * @deprecated
-     */
-    SID_DEPRECATED
-    void stop();
-
-    /**
-     * Control debugging.
-     * Only has effect if library have been compiled
-     * with the --enable-debug option.
+     * Control CPU tracing.
+     * @note: Must be called before #reset
      *
      * @param enable enable/disable debugging.
      * @param out the file where to redirect the debug info.
@@ -207,7 +167,7 @@ public:
 
     /**
      * Enable/disable SID filter.
-     * Must be called after #config or it has no effect.
+     * @note: Must be called after #config or it has no effect.
      *
      * @param sidNum the SID chip, 0 for the first one, 1 for the second or 2 for the third.
      * @param enable true enable the filter, false disable it.
@@ -265,6 +225,17 @@ public:
      * @since 2.2
      */
     bool getSidStatus(unsigned int sidNum, uint8_t regs[32]);
+
+    /**
+     * Get the required size of the buffer for the number of cycles to run,
+     * approximate value by excess.
+     * The mixer must have been initialized before with #initMixer
+     *
+     * @param cycles the number of cycles.
+     * @return size of buffer in bytes or zero if the mixer has not been initialized.
+     * @since 3.0
+     */
+    int getBufSize(unsigned int cycles);
 };
 
 #endif // SIDPLAYFP_H

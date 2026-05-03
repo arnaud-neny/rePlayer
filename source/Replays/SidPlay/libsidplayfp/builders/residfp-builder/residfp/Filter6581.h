@@ -27,7 +27,7 @@
 #include "FilterModelConfig6581.h"
 #include "Integrator6581.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -69,7 +69,7 @@ class Integrator6581;
  * Tommi Lempinen has done an impressive work on re-vectorizing and annotating
  * the die photographs, substantially simplifying further analysis of the
  * filter circuit.
- * 
+ *
  * The filter schematics below are reverse engineered from these re-vectorized
  * and annotated die photographs. While the filter first depicted in reSID 0.9
  * is a correct model of the basic filter, the schematics are now completed
@@ -232,8 +232,8 @@ class Integrator6581;
  * which varies with the input signals to the VCRs. This can be seen from the
  * VCR figure above.
  *
- * 
- * 
+ *
+ *
  * "Op-amp" (self-biased NMOS inverter)
  * ------------------------------------
  * ~~~
@@ -252,7 +252,7 @@ class Integrator6581;
  * vi -----||              o---o----- vo
  *         ||--+           |   |
  *             |       ||--+   |
- *             |-------||      |
+ *             o-------||      |
  *             |       ||--+   |
  *         ||--+           |   |
  *      +--||              |   |
@@ -288,7 +288,7 @@ class Integrator6581;
  * ~~~
  *
  *            12V
- * 
+ *
  *             |
  *             |
  *         ||--+
@@ -300,7 +300,7 @@ class Integrator6581;
  *            Rext    OUT)
  *             |
  *             |
- * 
+ *
  *            GND
  *
  * vi   - input
@@ -349,7 +349,7 @@ public:
     /**
      * Set filter curve type based on single parameter.
      *
-     * @param curvePosition 0 .. 1, where 0 sets center frequency high ("bright") and 1 sets it low ("dark").
+     * @param curvePosition 0 .. 1, where 0 sets center frequency low ("dark") and 1 sets it high ("bright").
      *                      Default is 0.5
      */
     void setFilterCurve(double curvePosition);
@@ -360,7 +360,20 @@ public:
      * @param adjustment 0 .. 1, where 0 sets center frequency low ("dark"), 1 sets it high ("bright").
      *                   This also affects the range. Default is 0.5
      */
-    void setFilterRange(double adjustment);
+    static void setFilterRange(double adjustment)
+    {
+        FilterModelConfig6581::getInstance()->setFilterRange(adjustment);
+    }
+
+    /**
+     * Enable/disable old caps for 6581 model.
+     *
+     * @param enable true to enable old 2200pF caps, false to use new 470pF caps.
+     */
+    static void enableOldCaps(bool enable)
+    {
+        FilterModelConfig6581::getInstance()->enableOldCaps(enable);
+    }
 };
 
 } // namespace reSIDfp

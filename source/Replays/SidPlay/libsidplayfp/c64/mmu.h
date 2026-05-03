@@ -23,8 +23,6 @@
 #ifndef MMU_H
 #define MMU_H
 
-#include <stdint.h>
-
 #include "sidendian.h"
 #include "sidmemory.h"
 #include "EventScheduler.h"
@@ -36,6 +34,7 @@
 
 #include "sidcxx11.h"
 
+#include <cstdint>
 #include <cstring>
 
 namespace libsidplayfp
@@ -97,7 +96,7 @@ private:
     void updateMappingPHI2();
 
 public:
-    MMU(EventScheduler &eventScheduler, IOBank* ioBank);
+    MMU(EventScheduler &scheduler, IOBank* ioBank);
 
     void reset();
 

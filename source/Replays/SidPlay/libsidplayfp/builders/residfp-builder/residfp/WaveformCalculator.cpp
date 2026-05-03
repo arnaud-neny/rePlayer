@@ -21,7 +21,7 @@
 
 #include "WaveformCalculator.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 #include <map>
 #include <mutex>

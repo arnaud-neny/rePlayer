@@ -37,14 +37,12 @@
 
 #include "siddefs-fp.h"
 
-#include "sidcxx11.h"
-
 #ifdef __cpp_lib_math_constants
 #  include <numbers>
 #endif
 
 
-#if __cpp_lib_constexpr_cmath >= 202306L
+#if __cplusplus >= 202306L
 #  define CONSTEXPR_FUNC  constexpr
 #  define CONSTEXPR_VAR   constexpr
 #else
@@ -92,23 +90,27 @@ double I0(double x)
 
 // https://godbolt.org/z/hz51cTT8s
 
-#if defined(__has_cpp_attribute) && __has_cpp_attribute( assume )
-#define CONVOLVE_SIMD(simd, name) \
-    __attribute__ ((__target__ (#simd))) \
-    int convolve_ ## name(const int* a, const short* b, int bLength)  \
-    { \
-        [[assume( bLength > 0 )]]; \
-        int out = std::inner_product(a, a+bLength, b, out); \
-        return (out + (1 << 14)) >> 15; \
-    }
-#else
-#define CONVOLVE_SIMD(simd, name) \
-    __attribute__ ((__target__ (#simd))) \
-    int convolve_ ## name(const int* a, const short* b, int bLength)  \
-    { \
-        int out = std::inner_product(a, a+bLength, b, out); \
-        return (out + (1 << 14)) >> 15; \
-    }
+#if defined(__has_cpp_attribute)
+#  if __has_cpp_attribute( assume )
+#    define CONVOLVE_SIMD(simd, name) \
+        __attribute__ ((__target__ (#simd))) \
+        int convolve_ ## name(const int* a, const short* b, int bLength)  \
+        { \
+            [[assume( bLength > 0 )]]; \
+            int out = std::inner_product(a, a+bLength, b, out); \
+            return (out + (1 << 14)) >> 15; \
+        }
+#  endif
+#endif
+
+#ifndef CONVOLVE_SIMD
+#  define CONVOLVE_SIMD(simd, name) \
+        __attribute__ ((__target__ (#simd))) \
+        int convolve_ ## name(const int* a, const short* b, int bLength)  \
+        { \
+            int out = std::inner_product(a, a+bLength, b, out); \
+            return (out + (1 << 14)) >> 15; \
+        }
 #endif
 
 CONVOLVE_SIMD(mmx, mmx)

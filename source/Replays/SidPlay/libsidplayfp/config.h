@@ -27,6 +27,9 @@
 /* Define to 1 if you have libexsid (-lexsid). */
 #undef HAVE_EXSID
 
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
 /* Define to 1 if you have ftd2xx.h */
 #undef HAVE_FTD2XX
 
@@ -36,11 +39,17 @@
 /* Define to 1 if you have ftdi.h */
 #undef HAVE_FTDI
 
+/* Define to 1 if the system has the type `int16_t'. */
+#define HAVE_INT16_T 1
+
+/* Define to 1 if the system has the type `int32_t'. */
+#define HAVE_INT32_T 1
+
+/* Define to 1 if the system has the type `int8_t'. */
+#define HAVE_INT8_T 1
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have libgcrypt (-lgcrypt). */
-#undef HAVE_LIBGCRYPT
 
 /* Define to 1 if you have libusb.h */
 #undef HAVE_LIBUSB
@@ -56,6 +65,9 @@
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if you have libresidfp (-lresidfp). */
+#define HAVE_RESIDFP 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H
@@ -78,11 +90,26 @@
 /* Define to 1 if you have the `strncasecmp' function. */
 #undef HAVE_STRNCASECMP
 
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/soundcard.h> header file. */
+#undef HAVE_SYS_SOUNDCARD_H
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if the system has the type `uint16_t'. */
+#define HAVE_UINT16_T 1
+
+/* Define to 1 if the system has the type `uint32_t'. */
+#define HAVE_UINT32_T 1
+
+/* Define to 1 if the system has the type `uint8_t'. */
+#define HAVE_UINT8_T 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
@@ -94,32 +121,29 @@
 #undef LT_OBJDIR
 
 /* Name of package */
-#define PACKAGE "libsidplayfp"
+#define PACKAGE ""
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT ""
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "libsidplayfp"
+#define PACKAGE_NAME ""
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsidplayfp 2.16.0"
+#define PACKAGE_STRING "libsidplayfp 3.0.0"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "libsidplayfp"
+#define PACKAGE_TARNAME ""
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "https://github.com/libsidplayfp/libsidplayfp/"
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.16.0"
+#define PACKAGE_VERSION "3.0.0"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
 #undef PTHREAD_CREATE_JOINABLE
-
-/* Define to 1 to enable runtime SIMD dispatch. */
-#undef RUNTIME_DISPATCH
 
 /* Shared library extension */
 #undef SHLIBEXT
@@ -136,7 +160,7 @@
 #undef STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "2.16.0"
+#define VERSION "3.0.0"
 
 /* Path to VICE testsuite. */
 #undef VICE_TESTSUITE

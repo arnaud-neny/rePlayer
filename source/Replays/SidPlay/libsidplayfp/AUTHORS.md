@@ -5,7 +5,7 @@ of the C64 system and the SID chips.
 
 Copyright (c) 2000 Simon White
 Copyright (c) 2007-2010 Antti Lankila
-Copyright (c) 2010-2025 Leandro Nini
+Copyright (c) 2010-2026 Leandro Nini
 
 This version of the freely available libsidplayfp emulator engine source code
 contains the following contributed or derived work. In the order they first
@@ -25,10 +25,13 @@ supplied contributions or code was derived from their work:
     Jarno Paananen    - HardSID UNIX builder
     Thibaut VARENE    - exSID driver and builder
     LouD              - USBSID-Pico driver and builder
+    Mihály Horváth    - crSID, base of the sidlite engine
 
 VIC II, CIA and cpu-port emulation is based on VICE code.
 CIA SDR and interrupt handling are based on Denise emulator
 implementation.
+
+COMPUTE!'s Sidplayer by Craig Chamberlain and Harry Bratt.
 
 Credit where credit is due, so if I missed anyone please let me know.
 

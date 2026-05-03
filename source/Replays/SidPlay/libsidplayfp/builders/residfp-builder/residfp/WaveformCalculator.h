@@ -24,7 +24,7 @@
 
 #include "array.h"
 
-#include "siddefs-fp.h"
+#include "residfp/residfp_defs.h"
 
 
 namespace reSIDfp
@@ -111,7 +111,7 @@ public:
      * @param cws strength of combined waveforms
      * @return Pulldown table
      */
-    matrix_t* buildPulldownTable(ChipModel model, CombinedWaveforms cws);
+    static matrix_t* buildPulldownTable(ChipModel model, CombinedWaveforms cws);
 };
 
 } // namespace reSIDfp

@@ -27,7 +27,7 @@
 #include "FilterModelConfig8580.h"
 #include "Integrator8580.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -307,7 +307,8 @@ public:
     /**
      * Set filter curve type based on single parameter.
      *
-     * @param curvePosition 0 .. 1, where 0 sets center frequency high ("light") and 1 sets it low ("dark"), default is 0.5
+     * @param curvePosition 0 .. 1, where 0 sets center frequency low ("dark") and 1 sets it high ("bright").
+     *                      Default is 0.5
      */
     void setFilterCurve(double curvePosition);
 };

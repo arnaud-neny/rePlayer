@@ -123,8 +123,8 @@ void c64::reset()
     colorRAMBank.reset();
     mmu.reset();
 
-    for (auto sidBank: extraSidBanks)
-        sidBank.second->reset();
+    for (auto extraSidBank: extraSidBanks)
+        extraSidBank.second->reset();
 
     irqCount = 0;
     oldBAState = true;
@@ -180,14 +180,6 @@ bool c64::addExtraSid(c64sid *s, int address)
     }
 
     return true;
-}
-
-unsigned int c64::installedSIDs() const
-{
-    unsigned int sids = 1;
-    for (auto sidBank: extraSidBanks)
-        sids += sidBank.second->installedSIDs();
-    return sids;
 }
 
 void c64::deleteSids(sidBankMap_t &extraSidBanks)

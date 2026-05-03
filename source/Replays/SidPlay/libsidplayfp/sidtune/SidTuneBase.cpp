@@ -108,10 +108,10 @@ SidTuneBase* SidTuneBase::load(LoaderFunc loader, void* loaderData, const char* 
     return getFromFiles(loader, loaderData, fileName, fileNameExt, separatorIsSlash);
 }
 
-unsigned int SidTuneBase::selectSong(unsigned int selectedSong)
+unsigned int SidTuneBase::selectSong(unsigned int songNum)
 {
     // Check whether selected song is valid, use start song if not
-    const unsigned int song = (selectedSong == 0 || selectedSong > info->m_songs) ? info->m_startSong : selectedSong;
+    const unsigned int song = (songNum == 0 || songNum > info->m_songs) ? info->m_startSong : songNum;
 
     // Copy any song-specific variable information
     // such a speed/clock setting to the info structure.

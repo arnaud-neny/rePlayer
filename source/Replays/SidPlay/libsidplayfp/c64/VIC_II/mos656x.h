@@ -24,8 +24,7 @@
 #ifndef MOS656X_H
 #define MOS656X_H
 
-#include <stdint.h>
-
+#include <cstdint>
 
 #include "lightpen.h"
 #include "sprites.h"
@@ -192,7 +191,7 @@ private:
      *
      * @return raster line when to trigger an IRQ
      */
-    unsigned int readRasterLineIRQ() const
+    inline unsigned int readRasterLineIRQ() const
     {
         return regs[0x12] + ((regs[0x11] & 0x80) << 1);
     }
@@ -202,9 +201,9 @@ private:
      *
      * @return true if DEN is set, otherwise false
      */
-    bool readDEN() const { return (regs[0x11] & 0x10) != 0; }
+    inline bool readDEN() const { return (regs[0x11] & 0x10) != 0; }
 
-    bool evaluateIsBadLine() const
+    inline bool evaluateIsBadLine() const
     {
         return areBadLinesEnabled
             && rasterY >= FIRST_DMA_LINE

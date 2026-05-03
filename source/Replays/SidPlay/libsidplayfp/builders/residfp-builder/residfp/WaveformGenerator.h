@@ -26,8 +26,6 @@
 #include "siddefs-fp.h"
 #include "array.h"
 
-#include "sidcxx11.h"
-
 // print SR debugging info
 //#define TRACE 1
 
@@ -278,12 +276,12 @@ public:
 
 } // namespace reSIDfp
 
-#if RESID_INLINING || defined(WAVEFORMGENERATOR_CPP)
+#if RESIDFP_INLINING || defined(WAVEFORMGENERATOR_CPP)
 
 namespace reSIDfp
 {
 
-RESID_INLINE
+RESIDFP_INLINE
 void WaveformGenerator::clock()
 {
     if (unlikely(test))
@@ -348,7 +346,7 @@ void WaveformGenerator::clock()
     }
 }
 
-RESID_INLINE
+RESIDFP_INLINE
 unsigned int WaveformGenerator::output()
 {
     // Set output value.

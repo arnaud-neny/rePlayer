@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2014 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2025 Leandro Nini <drfiemost@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +18,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef IMD5_H
-#define IMD5_H
+#ifndef PROPERTIES_H
+#define PROPERTIES_H
 
-namespace libsidplayfp
-{
+#include "sidcxx11.h"
 
-class iMd5
+#ifdef HAVE_CXX17
+
+#include <optional>
+
+template <typename T>
+using Property = std::optional<T>;
+
+#else
+
+#include <type_traits>
+
+template <typename T>
+class Property
 {
+    static_assert(std::is_scalar<T>(), "T must be a scalar type");
+
+private:
+    T m_val;
+    bool m_isSet;
+
 public:
-    virtual void append(const void* data, int nbytes) =0;
-    virtual void finish() =0;
-    virtual void reset() =0;
-    virtual const unsigned char* getDigest() =0;
-    virtual ~iMd5() = default;
+    Property() :
+        m_isSet(false) {}
+
+    inline bool has_value() const { return m_isSet; }
+    inline T value() const { return m_val; }
+    inline Property<T>& operator =(const T& val) { m_val = val; m_isSet = true;  return *this; }
 };
 
-class md5Error {};
+#endif // HAVE_CXX17
 
-}
-
-#endif // IMD5_H
+#endif // PROPERTIES_H

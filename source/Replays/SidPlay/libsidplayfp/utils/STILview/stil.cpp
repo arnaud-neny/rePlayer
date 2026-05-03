@@ -848,7 +848,7 @@ STIL::readEntry(ifstream &inFile, string &buffer)
 }
 
 bool
-STIL::getField(string &result, const char *buffer, int tuneNo, STILField field)
+STIL::getField(string &result, const char *buffer, int tuneNo, STILField field) const
 {
     CERR_STIL_DEBUG << "getField() called, buffer=" << buffer << ", rest=" << tuneNo << "," << field << endl;
 
@@ -1067,7 +1067,7 @@ STIL::getField(string &result, const char *buffer, int tuneNo, STILField field)
 }
 
 bool
-STIL::getOneField(string &result, const char *start, const char *end, STILField field)
+STIL::getOneField(string &result, const char *start, const char *end, STILField field) const
 {
     // Sanity checking
 

@@ -168,12 +168,12 @@ public:
 
 } // namespace reSIDfp
 
-#if RESID_INLINING || defined(ENVELOPEGENERATOR_CPP)
+#if RESIDFP_INLINING || defined(ENVELOPEGENERATOR_CPP)
 
 namespace reSIDfp
 {
 
-RESID_INLINE
+RESIDFP_INLINE
 void EnvelopeGenerator::clock()
 {
     env3 = envelope_counter;
@@ -312,7 +312,7 @@ void EnvelopeGenerator::clock()
  *  1 - Nothing
  *  2 - Counter is disabled
  */
-RESID_INLINE
+RESIDFP_INLINE
 void EnvelopeGenerator::state_change()
 {
     state_pipeline--;
@@ -351,7 +351,7 @@ void EnvelopeGenerator::state_change()
     }
 }
 
-RESID_INLINE
+RESIDFP_INLINE
 void EnvelopeGenerator::set_exponential_counter()
 {
     // Check for change of exponential counter period.

@@ -41,6 +41,7 @@ FilterModelConfig::FilterModelConfig(
     Vdd(vdd),
     Vth(vth),
     Vddt(Vdd - Vth),
+    uCox(ucox),
     vmin(opamp_voltage[0].x),
     vmax(std::max(Vddt, opamp_voltage[0].y)),
     denorm(vmax - vmin),
@@ -52,7 +53,7 @@ FilterModelConfig::FilterModelConfig(
     volume(new unsigned short[16 * (1 << 16)]),
     resonance(new unsigned short[16 * (1 << 16)])
 {
-    setUCox(ucox);
+    calcCurrFactorCoeff();
 
     // Convert op-amp voltage transfer to 16 bit values.
 
@@ -87,9 +88,8 @@ FilterModelConfig::~FilterModelConfig()
     delete [] resonance;
 }
 
-void FilterModelConfig::setUCox(double new_uCox)
+void FilterModelConfig::calcCurrFactorCoeff()
 {
-    uCox = new_uCox;
     currFactorCoeff = denorm * (uCox / 2. * 1.0e-6 / C);
 }
 

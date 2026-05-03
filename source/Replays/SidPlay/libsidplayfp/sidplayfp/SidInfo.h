@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- *  Copyright 2011-2019 Leandro Nini
+ *  Copyright 2011-2025 Leandro Nini
  *  Copyright 2007-2010 Antti Lankila
  *  Copyright 2000 Simon White
  *
@@ -23,7 +23,7 @@
 #ifndef SIDINFO_H
 #define SIDINFO_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "sidplayfp/siddefs.h"
 #include "sidplayfp/SidTuneInfo.h"
@@ -45,12 +45,6 @@ public:
     unsigned int numberOfCredits() const;
     const char *credits(unsigned int i) const;
     //@}
-
-    /// Number of SIDs supported by this library
-    unsigned int maxsids() const;
-
-    /// Number of output channels (1-mono, 2-stereo)
-    unsigned int channels() const;
 
     /// Address of the driver
     uint_least16_t driverAddr() const;
@@ -85,10 +79,6 @@ private:
 
     virtual unsigned int getNumberOfCredits() const =0;
     virtual const char *getCredits(unsigned int i) const =0;
-
-    virtual unsigned int getMaxsids() const =0;
-
-    virtual unsigned int getChannels() const =0;
 
     virtual uint_least16_t getDriverAddr() const =0;
 

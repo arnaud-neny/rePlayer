@@ -24,7 +24,7 @@
 #ifndef SPRITES_H
 #define SPRITES_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <algorithm>
 #include <iterator>
@@ -48,7 +48,7 @@ private:
     uint8_t mc[SPRITES];
 
 public:
-    Sprites(uint8_t regs[0x40]) :
+    explicit Sprites(uint8_t regs[0x40]) :
         enable(regs[0x15]),
         y_expansion(regs[0x17]) {}
 
@@ -117,7 +117,7 @@ public:
      * @rasterY y raster position
      * @regs the VIC registers
      */
-    void checkDma(unsigned int rasterY, uint8_t regs[0x40])
+    void checkDma(unsigned int rasterY, const uint8_t regs[0x40])
     {
         const uint8_t y = rasterY & 0xff;
         uint8_t mask = 1;

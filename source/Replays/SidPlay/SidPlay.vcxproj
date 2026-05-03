@@ -89,13 +89,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -110,13 +110,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -133,13 +133,13 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -162,13 +162,13 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\curl;$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)libsidplayfp;$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -203,17 +203,32 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator6581.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator8580.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.h" />
-    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Potentiometer.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Limiter.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\PassThrough.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Resampler.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\SincResampler.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\TwoPassSincResampler.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\ZeroOrderResampler.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp_defs.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\sidversion.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\SID.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\siddefs-fp.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Spline.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Voice.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformCalculator.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformGenerator.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite-emu.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\ADSR.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\cw_tables.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\Filter.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\filt_tables.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\SID.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_constants.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_defs.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_settings.h" />
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\WavGen.h" />
     <ClInclude Include="libsidplayfp\c64\Banks\Bank.h" />
     <ClInclude Include="libsidplayfp\c64\Banks\ColorRAMBank.h" />
     <ClInclude Include="libsidplayfp\c64\Banks\DisconnectedBusBank.h" />
@@ -248,8 +263,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\Event.h" />
     <ClInclude Include="libsidplayfp\EventCallback.h" />
     <ClInclude Include="libsidplayfp\EventScheduler.h" />
-    <ClInclude Include="libsidplayfp\mixer.h" />
+    <ClInclude Include="libsidplayfp\libs\hashlib\config.hpp" />
+    <ClInclude Include="libsidplayfp\libs\hashlib\core.hpp" />
+    <ClInclude Include="libsidplayfp\libs\hashlib\md5.hpp" />
     <ClInclude Include="libsidplayfp\player.h" />
+    <ClInclude Include="libsidplayfp\properties.h" />
     <ClInclude Include="libsidplayfp\psiddrv.h" />
     <ClInclude Include="libsidplayfp\reloc65.h" />
     <ClInclude Include="libsidplayfp\romCheck.h" />
@@ -279,13 +297,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\sidtune\SmartPtr.h" />
     <ClInclude Include="libsidplayfp\simpleMixer.h" />
     <ClInclude Include="libsidplayfp\stringutils.h" />
-    <ClInclude Include="libsidplayfp\utils\iMd5.h" />
     <ClInclude Include="libsidplayfp\utils\iniParser.h" />
-    <ClInclude Include="libsidplayfp\utils\md5Factory.h" />
-    <ClInclude Include="libsidplayfp\utils\md5Gcrypt.h" />
-    <ClInclude Include="libsidplayfp\utils\md5Internal.h" />
-    <ClInclude Include="libsidplayfp\utils\MD5\MD5.h" />
-    <ClInclude Include="libsidplayfp\utils\MD5\MD5_Defs.h" />
     <ClInclude Include="libsidplayfp\utils\SidDatabase.h" />
     <ClInclude Include="libsidplayfp\utils\STILview\stil.h" />
     <ClInclude Include="libsidplayfp\utils\STILview\stildefs.h" />
@@ -442,6 +454,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp\builders\residfp-builder\residfp;$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.cpp" />
     <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\SID.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -492,6 +505,12 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite-builder.cpp" />
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite-emu.cpp" />
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\ADSR.cpp" />
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\Filter.cpp" />
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\SID.cpp" />
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\WavGen.cpp" />
     <ClCompile Include="libsidplayfp\c64\c64.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -593,12 +612,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="libsidplayfp\EventScheduler.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="libsidplayfp\mixer.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -764,26 +777,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="libsidplayfp\utils\md5Factory.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="libsidplayfp\utils\MD5\MD5.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HAVE_CONFIG_H;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="libsidplayfp\utils\SidDatabase.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -807,6 +800,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="ReplaySidPlay.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="libsidplayfp\builders\sidlite-builder\sidlite\README" />
     <None Include="ReplaySidPlayBasic.inl" />
     <None Include="ReplaySidPlayKernal.inl" />
   </ItemGroup>

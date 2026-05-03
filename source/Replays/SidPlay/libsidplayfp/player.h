@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2022 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2000-2001 Simon White
  *
@@ -24,7 +24,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 
 #include "sidplayfp/siddefs.h"
@@ -33,7 +33,6 @@
 
 #include "SidInfoImpl.h"
 #include "sidrandom.h"
-#include "mixer.h"
 #include "simpleMixer.h"
 #include "c64/c64.h"
 
@@ -53,22 +52,13 @@ class sidbuilder;
 namespace libsidplayfp
 {
 
+class sidemu;
+
 class Player
 {
 private:
-    enum class state_t
-    {
-        STOPPED,
-        PLAYING,
-        STOPPING
-    };
-
-private:
     /// Commodore 64 emulator
     c64 m_c64;
-
-    /// Mixer
-    Mixer m_mixer;
 
     /// Emulator info
     SidTune *m_tune;
@@ -80,16 +70,16 @@ private:
     SidConfig m_cfg;
 
     /// Error message
-    const char *m_errorString;
-
-    std::atomic<state_t> m_isPlaying;
+    std::string m_errorString;
 
     sidrandom m_rand;
 
     uint_least32_t m_startTime = 0;
 
     /// PAL/NTSC switch value
-    uint8_t videoSwitch;
+    uint8_t m_videoSwitch;
+
+    std::vector<sidemu*> m_chips;
 
     std::unique_ptr<SimpleMixer> m_simpleMixer;
 
@@ -128,10 +118,9 @@ private:
      * @param cpuFreq the CPU clock frequency
      * @param frequency the output sampling frequency
      * @param sampling the sampling method to use
-     * @param fastSampling true to enable fast low quality resampling (only for reSID)
      */
     void sidParams(double cpuFreq, int frequency,
-                    SidConfig::sampling_method_t sampling, bool fastSampling);
+                    SidConfig::sampling_method_t sampling);
 
     inline void run(unsigned int events);
 
@@ -145,19 +134,11 @@ public:
 
     bool config(const SidConfig &cfg, bool force=false);
 
-    bool fastForward(unsigned int percent);
-
     bool load(SidTune *tune);
-
-    uint_least32_t play(short *buffer, uint_least32_t samples);
 
     void buffers(short** buffers) const;
 
     int play(unsigned int cycles);
-
-    bool isPlaying() const { return m_isPlaying != state_t::STOPPED; }
-
-    void stop();
 
     uint_least32_t timeMs() const { return m_c64.getTimeMs() - m_startTime; }
 
@@ -167,7 +148,7 @@ public:
 
     void filter(unsigned int sidNum, bool enable);
 
-    const char *error() const { return m_errorString; }
+    const char *error() const { return m_errorString.c_str(); }
 
     void setKernal(const uint8_t* rom);
     void setBasic(const uint8_t* rom);
@@ -177,13 +158,15 @@ public:
 
     bool getSidStatus(unsigned int sidNum, uint8_t regs[32]);
 
-    unsigned int installedSIDs() const { return m_c64.installedSIDs(); }
+    unsigned int installedSIDs() const { return m_chips.size(); }
 
     void initMixer(bool stereo);
 
     unsigned int mix(short *buffer, unsigned int samples);
 
     bool reset();
+
+    int getBufSize(unsigned int cycles);
 };
 
 }

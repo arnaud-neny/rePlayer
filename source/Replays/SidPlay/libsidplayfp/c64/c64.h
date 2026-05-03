@@ -23,7 +23,7 @@
 #ifndef C64_H
 #define C64_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 
 #include <map>
@@ -260,8 +260,6 @@ public:
     sidmemory& getMemInterface() { return mmu; }
 
     uint_least16_t getCia1TimerA() const { return cia1.getTimerA(); }
-
-    unsigned int installedSIDs() const;
 };
 
 void c64::interruptIRQ(bool state)

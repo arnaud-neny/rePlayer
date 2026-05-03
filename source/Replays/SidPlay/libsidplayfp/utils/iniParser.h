@@ -39,9 +39,9 @@ private:
     sections_t::const_iterator curSection;
 
 private:
-    std::string parseSection(const std::string &buffer);
+    static std::string parseSection(const std::string &buffer);
 
-    keys_t::value_type parseKey(const std::string &buffer);
+    static keys_t::value_type parseKey(const std::string &buffer);
 
     bool open_internal(std::ifstream& iniFile);
 

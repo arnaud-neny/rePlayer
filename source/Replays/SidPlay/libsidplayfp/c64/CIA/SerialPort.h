@@ -71,7 +71,7 @@ private:
     void syncCntHistory();
 
 public:
-    explicit SerialPort(EventScheduler &scheduler, MOS652X &parent) :
+    SerialPort(EventScheduler &scheduler, MOS652X &parent) :
         Event("Serial Port interrupt"),
         parent(parent),
         eventScheduler(scheduler),

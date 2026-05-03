@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2014-2015 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2026 Leandro Nini <drfiemost@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +18,42 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "md5Factory.h"
+#ifndef PASSTHROUGH_H
+#define PASSTHROUGH_H
 
-#include "iMd5.h"
+#include "Resampler.h"
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-#ifdef HAVE_LIBGCRYPT
-#  include "md5Gcrypt.h"
-#else
-#  include "md5Internal.h"
-#endif
-
-namespace libsidplayfp
+namespace reSIDfp
 {
 
-std::unique_ptr<iMd5> md5Factory::get()
+/**
+ * Pass through with no resampling.
+ */
+class PassThrough final : public Resampler
 {
-    return std::unique_ptr<iMd5>(
-#ifdef HAVE_LIBGCRYPT
-        new md5Gcrypt()
-#else
-        new md5Internal()
-#endif
-    );
-}
+private:
+    /// Last sample
+    int outputValue;
 
-}
+public:
+    PassThrough() :
+        outputValue(0) {}
+
+    bool input(int sample) override
+    {
+        outputValue = sample;
+
+        return true;
+    }
+
+    int output() const override { return outputValue; }
+
+    void reset() override
+    {
+        outputValue = 0;
+    }
+};
+
+} // namespace reSIDfp
+
+#endif

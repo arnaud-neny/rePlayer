@@ -58,7 +58,7 @@ protected:
     }
 
 public:
-    c64vic(c64env &env) :
+    explicit c64vic(c64env &env) :
         MOS656X(env.scheduler()),
         m_env(env) {}
 

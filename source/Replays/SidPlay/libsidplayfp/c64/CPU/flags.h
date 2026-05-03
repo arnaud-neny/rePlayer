@@ -23,7 +23,7 @@
 #ifndef FLAGS_H
 #define FLAGS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace libsidplayfp
 {
@@ -61,7 +61,7 @@ public:
     /**
      * Get status register value.
      */
-    inline uint8_t get()
+    inline uint8_t get() const
     {
         uint8_t sr = 0;
 

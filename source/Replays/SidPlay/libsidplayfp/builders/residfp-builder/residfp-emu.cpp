@@ -22,12 +22,9 @@
 
 #include "residfp-emu.h"
 
-#include <sstream>
-#include <string>
-#include <algorithm>
 #include <cmath>
 
-#include "residfp/siddefs-fp.h"
+#include "residfp/residfp.h"
 #include "sidplayfp/siddefs.h"
 
 #ifdef HAVE_CONFIG_H
@@ -39,79 +36,59 @@ namespace libsidplayfp
 
 const char ERR_INVALID_CW[]     = "Invalid combined waveforms strength.";
 
-const char* ReSIDfp::getCredits()
+const char* reSIDfpEmu::getCredits()
 {
     return
-        "ReSIDfp V" VERSION " Engine:\n"
+        "reSIDfpEmu V" VERSION " Engine:\n"
         "\t(C) 1999-2002 Simon White\n"
         "MOS6581/CSG8580 (SID) Emulation:\n"
         "\t(C) 1999-2002 Dag Lem\n"
         "\t(C) 2005-2011 Antti S. Lankila\n"
-        "\t(C) 2010-2024 Leandro Nini\n";
+        "\t(C) 2010-2026 Leandro Nini\n";
 }
 
-ReSIDfp::ReSIDfp(sidbuilder *builder) :
+reSIDfpEmu::reSIDfpEmu(sidbuilder *builder) :
     sidemu(builder),
-    m_sid(*(new reSIDfp::SID))
+    m_sid(*(new reSIDfp::residfp))
 {
     reset(0);
 }
 
-ReSIDfp::~ReSIDfp()
+reSIDfpEmu::~reSIDfpEmu()
 {
     delete &m_sid;
     delete[] m_buffer;
 }
 
-void ReSIDfp::filter6581Curve(double filterCurve)
-{
-   m_sid.setFilter6581Curve(filterCurve);
-}
-
-void ReSIDfp::filter6581Range(double adjustment)
-{
-   m_sid.setFilter6581Range(adjustment);
-}
-
-void ReSIDfp::filter8580Curve(double filterCurve)
-{
-   m_sid.setFilter8580Curve(filterCurve);
-}
-
 // Standard component options
-void ReSIDfp::reset(uint8_t volume)
+void reSIDfpEmu::reset(uint8_t volume)
 {
     m_accessClk = 0;
     m_sid.reset();
     m_sid.write(0x18, volume);
 }
 
-uint8_t ReSIDfp::read(uint_least8_t addr)
+uint8_t reSIDfpEmu::read(uint_least8_t addr)
 {
     clock();
     return m_sid.read(addr);
 }
 
-void ReSIDfp::write(uint_least8_t addr, uint8_t data)
+void reSIDfpEmu::write(uint_least8_t addr, uint8_t data)
 {
     clock();
     m_sid.write(addr, data);
 }
 
-void ReSIDfp::clock()
+void reSIDfpEmu::clock()
 {
     const event_clock_t cycles = eventScheduler->getTime(EVENT_CLOCK_PHI1) - m_accessClk;
     m_accessClk += cycles;
     m_bufferpos += m_sid.clock(cycles, m_buffer+m_bufferpos);
 }
 
-void ReSIDfp::filter(bool enable)
-{
-      m_sid.enableFilter(enable);
-}
-
-void ReSIDfp::sampling(float systemclock, float freq,
-        SidConfig::sampling_method_t method, bool)
+void reSIDfpEmu::sampling(float systemclock, float freq,
+        SidConfig::sampling_method_t method)
 {
     reSIDfp::SamplingMethod sampleMethod;
     switch (method)
@@ -128,11 +105,8 @@ void ReSIDfp::sampling(float systemclock, float freq,
         return;
     }
 
-    try
-    {
-        m_sid.setSamplingParameters(systemclock, sampleMethod, freq);
-    }
-    catch (reSIDfp::SIDError const &)
+    bool res = m_sid.setSamplingParameters(systemclock, sampleMethod, freq);
+    if  (!res)
     {
         m_status = false;
         m_error = ERR_UNSUPPORTED_FREQ;
@@ -149,7 +123,7 @@ void ReSIDfp::sampling(float systemclock, float freq,
 }
 
 // Set the emulated SID model
-void ReSIDfp::model(SidConfig::sid_model_t model, bool digiboost)
+void reSIDfpEmu::model(SidConfig::sid_model_t model, bool digiboost)
 {
     reSIDfp::ChipModel chipModel;
     switch (model)
@@ -159,7 +133,7 @@ void ReSIDfp::model(SidConfig::sid_model_t model, bool digiboost)
             m_sid.input(0);
             break;
         case SidConfig::MOS8580:
-            chipModel = reSIDfp::MOS8580;
+            chipModel = reSIDfp::CSG8580;
             m_sid.input(digiboost ? -32768 : 0);
             break;
         default:
@@ -173,7 +147,7 @@ void ReSIDfp::model(SidConfig::sid_model_t model, bool digiboost)
 }
 
 // Set the emulated SID combined waveforms
-void ReSIDfp::combinedWaveforms(SidConfig::sid_cw_t cws)
+void reSIDfpEmu::combinedWaveforms(SidConfig::sid_cw_t cws)
 {
     reSIDfp::CombinedWaveforms combinedWaveforms;
     switch (cws)

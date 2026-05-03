@@ -4,6 +4,7 @@
 #include <Audio/Surround.h>
 
 class ReSIDfpBuilder;
+class SIDLiteBuilder;
 class SidDatabase;
 class sidplayfp;
 class SidTune;
@@ -47,6 +48,8 @@ namespace rePlayer
                     uint32_t powerOnDelay : 13;
                     uint32_t overrideCombinedWaveforms : 1;
                     uint32_t combinedWaveforms : 2;
+                    uint32_t overrideEnableFastSid : 1;
+                    uint32_t fastSidEnabled : 1;
                 };
             };
             LoopInfo loops[0];
@@ -73,7 +76,6 @@ namespace rePlayer
 
     private:
         static constexpr uint32_t kSampleRate = 48000;
-        static constexpr uint32_t kNumSamples = 4096;
 
         static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
@@ -84,7 +86,11 @@ namespace rePlayer
         void SetupMetadata(CommandBuffer metadata);
 
     private:
-        ReSIDfpBuilder* m_residfpBuilder[2] = { nullptr };
+        union
+        {
+            ReSIDfpBuilder* m_residfpBuilder[2] = { nullptr };
+            SIDLiteBuilder* m_sidliteBuilder[2];
+        };
         sidplayfp* m_sidplayfp[2] = { nullptr };
         SidTune* m_sidTune[2] = { nullptr };
         Surround m_surround;
@@ -93,18 +99,20 @@ namespace rePlayer
         bool m_isClockForced : 1 = false;
         bool m_isNtsc : 1 = ms_isNtsc;
         bool m_isResampling : 1 = ms_isResampling;
+        bool m_isFastSid : 1 = ms_isFastSidEnabled;
         uint16_t m_powerOnDelay = uint16_t(ms_powerOnDelay);
         LoopInfo* m_loops = nullptr;
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
 
-        int16_t m_samples[kNumSamples * 2];
         uint32_t m_numSamples = 0;
+        short* m_samples[3];
 
         static uint8_t ms_c64RomKernal[];
         static uint8_t ms_c64RomBasic[];
         static SidDatabase* ms_sidDatabase;
 
+        static bool ms_isFastSidEnabled;
         static bool ms_isFilterEnabled;
         static int32_t ms_filter6581;
         static int32_t ms_filter8580;

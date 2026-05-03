@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004 Dag Lem <resid@nimrod.no>
  *
@@ -26,8 +26,6 @@
 
 #include <limits>
 
-#include "sidcxx11.h"
-
 #include "array.h"
 #include "Dac.h"
 #include "Filter6581.h"
@@ -35,6 +33,7 @@
 #include "WaveformCalculator.h"
 #include "resample/TwoPassSincResampler.h"
 #include "resample/ZeroOrderResampler.h"
+#include "resample/PassThrough.h"
 
 namespace reSIDfp
 {
@@ -149,7 +148,7 @@ SID::SID() :
     voice[1].setOtherVoices(voice[0], voice[2]);
     voice[2].setOtherVoices(voice[1], voice[0]);
 
-    setChipModel(MOS8580);
+    setChipModel(CSG8580);
     reset();
 }
 
@@ -178,6 +177,11 @@ void SID::enableFilter(bool enable)
 {
     filter6581->enable(enable);
     filter8580->enable(enable);
+}
+
+void SID::enableOld6581caps(bool enable)
+{
+    filter6581->enableOldCaps(enable);
 }
 
 void SID::voiceSync(bool sync)
@@ -224,7 +228,7 @@ void SID::setChipModel(ChipModel model)
         modelTTL = BUS_TTL_6581;
         break;
 
-    case MOS8580:
+    case CSG8580:
         filter = filter8580;
         scaleFactor = 5;
         modelTTL = BUS_TTL_8580;
@@ -335,12 +339,12 @@ unsigned char SID::read(int offset)
     switch (offset)
     {
     case 0x19: // X value of paddle
-        busValue = potX.readPOT();
+        busValue = 0xff;
         busValueTtl = modelTTL;
         break;
 
     case 0x1a: // Y value of paddle
-        busValue = potY.readPOT();
+        busValue = 0xff;
         busValueTtl = modelTTL;
         break;
 
@@ -498,6 +502,10 @@ void SID::setSamplingParameters(double clockFrequency, SamplingMethod method, do
         resampler.reset(TwoPassSincResampler::create(clockFrequency, samplingFrequency));
         break;
 
+    case NONE:
+        resampler.reset(new PassThrough());
+        break;
+
     default:
         throw SIDError("Unknown sampling method");
     }
@@ -516,9 +524,7 @@ void SID::clockSilent(unsigned int cycles)
             for (int i = 0; i < delta_t; i++)
             {
                 // clock waveform generators (can affect OSC3)
-                voice[0].wave()->clock();
-                voice[1].wave()->clock();
-                voice[2].wave()->clock();
+                clockWaveGen();
 
                 voice[0].wave()->output();
                 voice[1].wave()->output();

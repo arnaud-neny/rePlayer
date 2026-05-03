@@ -109,7 +109,7 @@ private:
     }
 
     // If voice 3 is off we still need to clock the waveform generator
-    inline int getSilentVoice(Voice& v) const
+    inline static int getSilentVoice(Voice& v)
     {
         v.wave()->output();
         return 0;
@@ -148,12 +148,12 @@ public:
     /**
      * SID clocking - 1 cycle
      *
-     * @param v1 voice 1 in
-     * @param v2 voice 2 in
-     * @param v3 voice 3 in
+     * @param voice1 voice 1 in
+     * @param voice2 voice 2 in
+     * @param voice3 voice 3 in
      * @return filtered output, unsigned 16 bit
      */
-    unsigned short clock(Voice& v1, Voice& v2, Voice& v3);
+    unsigned short clock(Voice& voice1, Voice& voice2, Voice& voice3);
 
     /**
      * Enable filter.
@@ -205,12 +205,12 @@ public:
 
 } // namespace reSIDfp
 
-#if RESID_INLINING || defined(FILTER_CPP)
+#if RESIDFP_INLINING || defined(FILTER_CPP)
 
 namespace reSIDfp
 {
 
-RESID_INLINE
+RESIDFP_INLINE
 unsigned short Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
 {
     const int V1 = getNormalizedVoice(voice1);

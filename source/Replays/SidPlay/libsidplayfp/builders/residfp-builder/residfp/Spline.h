@@ -65,7 +65,7 @@ private:
     mutable ParamVector::const_pointer c;
 
 public:
-    Spline(const std::vector<Point> &input);
+    explicit Spline(const std::vector<Point> &input);
 
     /**
      * Evaluate y and its derivative at given point x.

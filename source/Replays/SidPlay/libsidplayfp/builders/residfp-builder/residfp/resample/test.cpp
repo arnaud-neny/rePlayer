@@ -31,10 +31,6 @@
 #include "Resampler.h"
 #include "TwoPassSincResampler.h"
 
-#if __cplusplus < 201103L
-#  define unique_ptr auto_ptr
-#endif
-
 #ifndef M_PI
 #  define M_PI    3.14159265358979323846
 #endif
@@ -45,8 +41,8 @@
  */
 int main(int, const char*[])
 {
-    const double RATE = 985248.4;
-    const int RINGSIZE = 2048;
+    constexpr double RATE = 985248.4;
+    constexpr int RINGSIZE = 2048;
 
     std::unique_ptr<reSIDfp::TwoPassSincResampler> r(reSIDfp::TwoPassSincResampler::create(RATE, 48000.0));
 
@@ -61,7 +57,7 @@ int main(int, const char*[])
 
         for (int j = 0; j < RINGSIZE; j ++)
         {
-            int signal = static_cast<int>(32768.0 * std::sin(k++ * omega) * std::sqrt(2.));
+            int signal = static_cast<int>(32768.0 * std::sin(k++ * omega) * sqrt(2));
             r->input(signal);
         }
 

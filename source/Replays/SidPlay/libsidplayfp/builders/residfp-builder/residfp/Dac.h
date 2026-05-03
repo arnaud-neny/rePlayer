@@ -23,7 +23,7 @@
 #ifndef DAC_H
 #define DAC_H
 
-#include "siddefs-fp.h"
+#include "residfp/residfp_defs.h"
 
 namespace reSIDfp
 {
@@ -90,13 +90,17 @@ private:
     /// the dac array length
     const unsigned int dacLength;
 
+private:
+    Dac(const Dac&) = delete;
+    Dac& operator=(const Dac&) = delete;
+
 public:
     /**
      * Initialize DAC model.
      *
      * @param bits the number of input bits
      */
-    Dac(unsigned int bits);
+    explicit Dac(unsigned int bits);
     ~Dac();
 
     /**

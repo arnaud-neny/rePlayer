@@ -34,6 +34,11 @@ namespace reSIDfp
  * acts as a high-pass filter with a cutoff dependent on the attached audio
  * equipment impedance. Here we suppose an impedance of 10kOhm resulting
  * in a 3 dB attenuation at 1.6Hz.
+ * The STC networks are connected with a [BJT] based [common collector]
+ * used as a voltage follower (featuring a 2SC1815 NPN transistor).
+ *
+ * To operate properly the 6581 audio output needs a pull-down resistor,
+ * 1KOhm is the recommended value.
  *
  * ~~~
  *                                 9/12V
@@ -42,7 +47,7 @@ namespace reSIDfp
  *      +---o----R---o--------o-----(K)          +-----
  *  out |   |        |        |      |           |audio
  * -----+   R 1k     C 1000   |      |    10 uF  |
- *          |        |  pF    +-C----o-----C-----+ 10k
+ *          |        |  pF    +-C----o-----C-----+ ~10k
  *                             470   |           |
  *         GND      GND         pF   R 1K        | amp
  *          *                   **   |           +-----
@@ -50,13 +55,27 @@ namespace reSIDfp
  *                                  GND
  * ~~~
  *
- * The STC networks are connected with a [BJT] based [common collector]
- * used as a voltage follower (featuring a 2SC1815 NPN transistor).
- *
- * * To operate properly the 6581 audio output needs a pull-down resistor
- *   (1KOhm recommended, not needed on 8580)
- * ** The C64c board additionally includes a [bootstrap] condenser to increase
+ * * Only for the 6581.
+ * ** The C64c board additionally includes a [bootstrap] capacitor to increase
  *    the input impedance of the common collector.
+ *
+ * The C128 boards include an additional capacitor and a resistor
+ * to the ouptput stage.
+ *
+ * ~~~
+ *                                 9/12V
+ * -----+
+ * audio|       10k                  |
+ *      +---o----R---o--------o-----(K)                    +-----
+ *  out |   |        |        |      |                     |audio
+ * -----+   R 1k     C 1000   |      |        10 uF        |
+ *          |        |  pF    +-C----o-----o----C---o------+ ~10k
+ *                             470   |     |        |      |
+ *         GND      GND         pF   R 1K  C 220pF  R 47K  | amp
+ *          *                        |     |        |      +-----
+ *
+ *                                  GND   GND      GND
+ * ~~~
  *
  * [BJT]: https://en.wikipedia.org/wiki/Bipolar_junction_transistor
  * [common collector]: https://en.wikipedia.org/wiki/Common_collector
@@ -104,12 +123,12 @@ public:
 
 } // namespace reSIDfp
 
-#if RESID_INLINING || defined(EXTERNALFILTER_CPP)
+#if RESIDFP_INLINING || defined(EXTERNALFILTER_CPP)
 
 namespace reSIDfp
 {
 
-RESID_INLINE
+RESIDFP_INLINE
 int ExternalFilter::clock(int input)
 {
     const int Vi = input << 11;

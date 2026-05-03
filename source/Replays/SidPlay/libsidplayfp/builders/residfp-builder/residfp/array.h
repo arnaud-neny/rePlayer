@@ -22,10 +22,6 @@
 #define ARRAY_H
 
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 #include <atomic>
 
 /**
@@ -52,6 +48,9 @@ private:
     T* data;
     counter* count;
     const unsigned int x, y;
+
+private:
+    matrix& operator=(const matrix&) = delete;
 
 public:
     matrix(unsigned int x, unsigned int y) :

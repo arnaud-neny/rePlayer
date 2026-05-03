@@ -23,7 +23,7 @@
 #ifndef SIDTUNEBASE_H
 #define SIDTUNEBASE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
@@ -50,7 +50,7 @@ class loadError
 private:
     const char* m_msg;
 public:
-    loadError(const char* msg) : m_msg(msg) {}
+    explicit loadError(const char* msg) : m_msg(msg) {}
     const char* message() const { return m_msg; }
 };
 
@@ -262,7 +262,7 @@ protected:
     /**
      * Petscii to Ascii converter.
      */
-    std::string petsciiToAscii(SmartPtr_sidtt<const uint8_t>& spPet);
+    static std::string petsciiToAscii(SmartPtr_sidtt<const uint8_t>& spPet);
 
 private:  // ---------------------------------------------------------------
 
@@ -275,7 +275,7 @@ private:  // ---------------------------------------------------------------
     }
 
     // rePlayer begin
-    static SidTuneBase* getFromFiles(LoaderFunc loader, void* loaderData, const char* name, const char **fileNameExtensions, bool separatorIsSlash);
+    static SidTuneBase* getFromFiles(LoaderFunc loader, void* loaderData, const char* fileName, const char **fileNameExtensions, bool separatorIsSlash);
     // rePlayer end
 
     /**

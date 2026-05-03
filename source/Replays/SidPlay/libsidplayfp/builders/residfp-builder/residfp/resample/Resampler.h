@@ -22,12 +22,7 @@
 #ifndef RESAMPLER_H
 #define RESAMPLER_H
 
-#include <cmath>
-#include <cassert>
-
-#include "sidcxx11.h"
-
-#include "siddefs-fp.h"
+#include "Limiter.h"
 
 namespace reSIDfp
 {
@@ -38,39 +33,7 @@ namespace reSIDfp
  */
 class Resampler
 {
-private:
-    template<int m>
-    static inline int clipper(int x)
-    {
-        assert(x >= 0);
-        constexpr int threshold = 28000;
-        if (likely(x < threshold))
-            return x;
-
-        constexpr double max_val = static_cast<double>(m);
-        constexpr double t = threshold / max_val;
-        constexpr double a = 1. - t;
-        constexpr double b = 1. / a;
-
-        double value = static_cast<double>(x - threshold) / max_val;
-        value = t + a * std::tanh(b * value);
-        return static_cast<int>(value * max_val);
-    }
-
-    /*
-     * Soft Clipping implementation, splitted for test.
-     */
-    static inline int softClipImpl(int x)
-    {
-        return x < 0 ? -clipper<32768>(-x) : clipper<32767>(x);
-    }
-
 protected:
-    /*
-     * Soft Clipping into 16 bit range [-32768,32767]
-     */
-    static inline short softClip(int x) { return static_cast<short>(softClipImpl(x)); }
-
     virtual int output() const = 0;
 
     Resampler() {}
@@ -94,7 +57,7 @@ public:
     inline short getOutput(int scaleFactor) const
     {
         const int out = (scaleFactor * output()) / 2;
-        return softClip(out);
+        return Limiter::softClip(out);
     }
 
     virtual void reset() = 0;

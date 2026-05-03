@@ -1,7 +1,9 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2014 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2007-2010 Antti Lankila
+ * Copyright 2001 Simon White
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,33 +20,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef MD5_INTERNAL_H
-#define MD5_INTERNAL_H
+#ifndef SIDLITE_H
+#define SIDLITE_H
 
-#include "iMd5.h"
+#include "sidplayfp/sidbuilder.h"
+#include "sidplayfp/siddefs.h"
 
-#include "MD5/MD5.h"
-
-#include "sidcxx11.h"
-
-namespace libsidplayfp
+/**
+ * SIDLite Builder Class
+ */
+class SID_EXTERN SIDLiteBuilder: public sidbuilder
 {
-
-class md5Internal final : public iMd5
-{
-private:
-    MD5 hd;
+protected:
+    /**
+     * Create the sid emu.
+     */
+    libsidplayfp::sidemu* create();
 
 public:
-    void append(const void* data, int nbytes) override { hd.append(data, nbytes); }
+    SIDLiteBuilder(const char * const name);
+    ~SIDLiteBuilder();
 
-    void finish() override { hd.finish(); }
 
-    const unsigned char* getDigest() override { return hd.getDigest(); }
+    const char *getCredits() const;
 
-    void reset() override { hd.reset(); }
+private:
+    struct config;
+    config *m_config;
 };
 
-}
-
-#endif
+#endif // SIDLITE_H

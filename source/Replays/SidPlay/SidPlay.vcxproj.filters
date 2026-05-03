@@ -42,9 +42,6 @@
     <Filter Include="Source Files\libsidplayfp\utils">
       <UniqueIdentifier>{56750c06-9fd5-47b1-a23a-cc14b3eaf3d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\libsidplayfp\utils\MD5">
-      <UniqueIdentifier>{fced5531-28d9-4b45-8f74-2e2dbcce9ca9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\libsidplayfp\utils\STILview">
       <UniqueIdentifier>{1f0836f5-54c9-42a8-8ff5-0fd94384c564}</UniqueIdentifier>
     </Filter>
@@ -53,6 +50,21 @@
     </Filter>
     <Filter Include="Source Files\libsidplayfp\builders\residfp-builder\residfp\resample">
       <UniqueIdentifier>{5da7fd9b-5df5-48e6-a2ea-12edcdbeabbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\sidlite-builder">
+      <UniqueIdentifier>{fa7277b0-2fce-4429-8220-fcbdb31ac449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\sidlite-builder\sidlite">
+      <UniqueIdentifier>{b0ca6756-3def-49b1-a9bc-cfe48315e6a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp">
+      <UniqueIdentifier>{da82533a-c54d-49bf-b0bd-a1eb6ae21653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\libs">
+      <UniqueIdentifier>{c626cca1-94b9-4da6-aa42-84bb7b2aac29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsidplayfp\libs\hashlib">
+      <UniqueIdentifier>{7f11817c-93cd-4612-ae54-0ae637e42107}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,9 +78,6 @@
       <Filter>Source Files\libsidplayfp</Filter>
     </ClInclude>
     <ClInclude Include="libsidplayfp\EventScheduler.h">
-      <Filter>Source Files\libsidplayfp</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\mixer.h">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClInclude>
     <ClInclude Include="libsidplayfp\player.h">
@@ -257,29 +266,11 @@
     <ClInclude Include="libsidplayfp\sidplayfp\sidversion.h">
       <Filter>Source Files\libsidplayfp\sidplayfp</Filter>
     </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\iMd5.h">
-      <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClInclude>
     <ClInclude Include="libsidplayfp\utils\iniParser.h">
-      <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\md5Factory.h">
-      <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\md5Gcrypt.h">
-      <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\md5Internal.h">
       <Filter>Source Files\libsidplayfp\utils</Filter>
     </ClInclude>
     <ClInclude Include="libsidplayfp\utils\SidDatabase.h">
       <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\MD5\MD5.h">
-      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
-    </ClInclude>
-    <ClInclude Include="libsidplayfp\utils\MD5\MD5_Defs.h">
-      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
     </ClInclude>
     <ClInclude Include="libsidplayfp\utils\STILview\stil.h">
       <Filter>Source Files\libsidplayfp\utils\STILview</Filter>
@@ -323,9 +314,6 @@
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.h">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
     </ClInclude>
-    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Potentiometer.h">
-      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
-    </ClInclude>
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\SID.h">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
     </ClInclude>
@@ -365,12 +353,69 @@
     <ClInclude Include="libsidplayfp\simpleMixer.h">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite-emu.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\ADSR.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\cw_tables.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\filt_tables.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\Filter.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\SID.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_constants.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_defs.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\sl_settings.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\WavGen.h">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Limiter.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\PassThrough.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp_defs.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\sidversion.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\properties.h">
+      <Filter>Source Files\libsidplayfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\libs\hashlib\config.hpp">
+      <Filter>Source Files\libsidplayfp\libs\hashlib</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\libs\hashlib\core.hpp">
+      <Filter>Source Files\libsidplayfp\libs\hashlib</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\libs\hashlib\md5.hpp">
+      <Filter>Source Files\libsidplayfp\libs\hashlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libsidplayfp\EventScheduler.cpp">
-      <Filter>Source Files\libsidplayfp</Filter>
-    </ClCompile>
-    <ClCompile Include="libsidplayfp\mixer.cpp">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClCompile>
     <ClCompile Include="libsidplayfp\player.cpp">
@@ -460,14 +505,8 @@
     <ClCompile Include="libsidplayfp\utils\iniParser.cpp">
       <Filter>Source Files\libsidplayfp\utils</Filter>
     </ClCompile>
-    <ClCompile Include="libsidplayfp\utils\md5Factory.cpp">
-      <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClCompile>
     <ClCompile Include="libsidplayfp\utils\SidDatabase.cpp">
       <Filter>Source Files\libsidplayfp\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="libsidplayfp\utils\MD5\MD5.cpp">
-      <Filter>Source Files\libsidplayfp\utils\MD5</Filter>
     </ClCompile>
     <ClCompile Include="libsidplayfp\utils\STILview\stil.cpp">
       <Filter>Source Files\libsidplayfp\utils\STILview</Filter>
@@ -532,6 +571,27 @@
     <ClCompile Include="libsidplayfp\simpleMixer.cpp">
       <Filter>Source Files\libsidplayfp</Filter>
     </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite-builder.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite-emu.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\ADSR.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\Filter.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\SID.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\sidlite-builder\sidlite\WavGen.cpp">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReplaySidPlayBasic.inl">
@@ -539,6 +599,9 @@
     </None>
     <None Include="ReplaySidPlayKernal.inl">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="libsidplayfp\builders\sidlite-builder\sidlite\README">
+      <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
     </None>
   </ItemGroup>
 </Project>

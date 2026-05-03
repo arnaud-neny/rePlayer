@@ -105,11 +105,11 @@ private:
 
     int_least32_t stereo_ch1_TwoChips() const
     {
-        return (m_iSamples[0] + 0.5*m_iSamples[1]) * SCALE[1] / SCALE_FACTOR;
-    }
-    int_least32_t stereo_ch2_TwoChips() const
-    {
-        return (0.5*m_iSamples[0] + m_iSamples[1]) * SCALE[1] / SCALE_FACTOR;
+            return (m_iSamples[0] + 0.5*m_iSamples[1]) * SCALE[1] / SCALE_FACTOR;
+        }
+        int_least32_t stereo_ch2_TwoChips() const
+        {
+            return (0.5*m_iSamples[0] + m_iSamples[1]) * SCALE[1] / SCALE_FACTOR;
     }
 
     int_least32_t stereo_ch1_ThreeChips() const
@@ -135,6 +135,8 @@ public:
      * Do the mixing.
      */
     unsigned int doMix(short *buffer, unsigned int samples);
+
+    unsigned int channels() const { return m_mix.size(); }
 };
 
 }

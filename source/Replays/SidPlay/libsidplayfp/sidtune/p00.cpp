@@ -80,7 +80,7 @@ const char TXT_FORMAT_REL[] = "Unsupported tape image file (REL)";
 const char P00_ID[] = "C64File";
 
 
-SidTuneBase* p00::load(const char *fileName, buffer_t& dataBuf)
+SidTuneBase* p00::load(const char *fileName, const buffer_t& dataBuf)
 {
     const char *ext = SidTuneTools::fileExtOfPath(fileName);
 

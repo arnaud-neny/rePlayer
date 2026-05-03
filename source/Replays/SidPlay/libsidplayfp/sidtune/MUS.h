@@ -21,7 +21,7 @@
 #ifndef MUS_H
 #define MUS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "SidTuneBase.h"
 
@@ -37,10 +37,10 @@ private:
     uint_least16_t musDataLen;
 
 private:
-    bool mergeParts(buffer_t& musBuf, buffer_t& strBuf);
+    bool mergeParts(buffer_t& musBuf, buffer_t& strBuf) const;
 
-    void tryLoad(buffer_t& musBuf,
-                    buffer_t& strBuf,
+    void tryLoad(const buffer_t& musBuf,
+                    const buffer_t& strBuf,
                     uint_least32_t fileOffset,
                     uint_least32_t voice3Index,
                     bool init);
@@ -48,7 +48,7 @@ private:
 protected:
     MUS() {}
 
-    void installPlayer(sidmemory& mem);
+    void installPlayer(sidmemory& mem) const;
 
     void setPlayerAddress();
 

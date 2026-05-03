@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004,2010 Dag Lem
  *
@@ -29,7 +29,7 @@
 
 #include "Dac.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -75,11 +75,16 @@ private:
     double vcr_n_Ids_term[1 << 16];
     //@}
 
+    double vcr_mult;
+    bool m_oldCaps;
+
     // Voice DC offset LUT
     double voiceDC[256];
 
 private:
-    double getDacZero(double adjustment) const { return dac_zero + (1. - adjustment); }
+    double getDacZero(double adjustment) const { return dac_zero + 3. * adjustment - 1.; }
+
+    void updateParams();
 
     FilterModelConfig6581();
     ~FilterModelConfig6581() = default;
@@ -99,6 +104,8 @@ public:
 
     void setFilterRange(double adjustment);
 
+    void enableOldCaps(bool enable);
+
     /**
      * Construct an 11 bit cutoff frequency DAC output voltage table.
      * Ownership is transferred to the requester which becomes responsible
@@ -114,7 +121,7 @@ public:
     inline unsigned short getVcr_nVg(int i) const { return vcr_nVg[i]; }
     inline unsigned short getVcr_n_Ids_term(int i) const
     {
-        return to_ushort(vcr_n_Ids_term[i] * uCox);
+        return to_ushort(vcr_n_Ids_term[i] * vcr_mult);
     }
     // only used if SLOPE_FACTOR is defined
     static inline constexpr double getUt() { return Ut; }

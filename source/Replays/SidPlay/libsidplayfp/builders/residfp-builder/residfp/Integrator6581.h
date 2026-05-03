@@ -26,7 +26,7 @@
 #include "Integrator.h"
 #include "FilterModelConfig6581.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <cassert>
 
 // uncomment to enable use of the slope factor
@@ -182,7 +182,7 @@ private:
     FilterModelConfig6581& fmc;
 
 public:
-    Integrator6581(FilterModelConfig6581& fmc) :
+    explicit Integrator6581(FilterModelConfig6581& fmc) :
         wlSnake(fmc.getWL_snake()),
 #ifdef SLOPE_FACTOR
         n(1.4),

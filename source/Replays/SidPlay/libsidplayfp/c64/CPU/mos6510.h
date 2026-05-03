@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2019 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2000 Simon White
  *
@@ -23,7 +23,9 @@
 #ifndef MOS6510_H
 #define MOS6510_H
 
-#include <stdint.h>
+#include <memory>
+#include <string>
+#include <cstdint>
 #include <cstdio>
 
 #include "flags.h"
@@ -39,14 +41,12 @@ class EventContext;
 namespace libsidplayfp
 {
 
-#ifdef DEBUG
 class MOS6510;
 
 namespace MOS6510Debug
 {
     void DumpState(event_clock_t time, MOS6510 &cpu);
 }
-#endif
 
 class CPUDataBus
 {
@@ -56,6 +56,16 @@ public:
   virtual uint8_t cpuRead(uint_least16_t addr) =0;
 
   virtual void cpuWrite(uint_least16_t addr, uint8_t data) =0;
+};
+
+struct CPUDebug
+{
+    int_least32_t instrStartPC;
+    uint_least16_t instrOperand;
+
+    FILE *m_fdbg;
+
+    bool dodump;
 };
 
 /**
@@ -69,12 +79,19 @@ public:
  */
 class MOS6510
 {
-#ifdef DEBUG
     friend void MOS6510Debug::DumpState(event_clock_t time, MOS6510 &cpu);
-#endif
 
 public:
-    class haltInstruction {};
+    class haltInstruction {
+private:
+    const std::string m_msg;
+
+public:
+    explicit haltInstruction(const std::string &msg) :
+        m_msg(msg) {}
+
+    std::string message() const { return m_msg; }
+};
 
 private:
     /**
@@ -148,18 +165,11 @@ private:
     uint8_t Register_X;
     uint8_t Register_Y;
 
-#ifdef DEBUG
-    // Debug info
-    int_least32_t instrStartPC;
-    uint_least16_t instrOperand;
-
-    FILE *m_fdbg;
-
-    bool dodump;
-#endif
-
     /// Table of CPU opcode implementations
     struct ProcessorCycle instrTable[0x101 << 3];
+
+    // Debug info
+    std::unique_ptr<CPUDebug> cpu_debug;
 
 private:
     void eventWithoutSteals();

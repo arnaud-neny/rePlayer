@@ -43,7 +43,7 @@ public:
      * @return pointer to a SidTune or 0 if not a PC64 file
      * @throw loadError if PC64 file is corrupt
      */
-    static SidTuneBase* load(const char *fileName, buffer_t& dataBuf);
+    static SidTuneBase* load(const char *fileName, const buffer_t& dataBuf);
 
     ~p00() override = default;
 

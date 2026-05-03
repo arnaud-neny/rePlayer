@@ -1,3 +1,8 @@
+// - builder/residfp-builder/residfp/FilterModelConfig6581.cpp
+// - builder/residfp-builder/residfp/FilterModelConfig8580.cpp
+// - sidplayfp/SidTune.cpp
+// - sidplayfp/SidTune.h
+// - sidplayfp/SidTuneBase.h
 #include "ReplaySidPlay.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -9,6 +14,7 @@
 
 #include "libsidplayfp/config.h"
 #include "libsidplayfp/builders/residfp-builder/residfp.h"
+#include "libsidplayfp/builders/sidlite-builder/sidlite.h"
 #include "libsidplayfp/sidplayfp/SidInfo.h"
 #include "libsidplayfp/sidplayfp/SidTune.h"
 #include "libsidplayfp/sidplayfp/SidTuneInfo.h"
@@ -36,7 +42,7 @@ namespace rePlayer
         .replayId = eReplay::SidPlay,
         .name = "SidPlay",
         .extensions = "psid;rsid;sid;mus",
-        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2025 Leandro Nini",
+        .about = PACKAGE_STRING "\nCopyright (c) 2000 Simon White\nCopyright (c) 2007-2010 Antti Lankila\nCopyright (c) 2010-2026 Leandro Nini",
         .settings = "SidPlay " PACKAGE_VERSION,
         .init = ReplaySidPlay::Init,
         .release = ReplaySidPlay::Release,
@@ -49,6 +55,7 @@ namespace rePlayer
     {
         ctx->Init();
 
+        window.RegisterSerializedData(ms_isFastSidEnabled, "ReplaySidPlayFastSid");
         window.RegisterSerializedData(ms_isFilterEnabled, "ReplaySidPlayFilter");
         window.RegisterSerializedData(ms_filter6581, "ReplaySidPlayFilter6581");
         window.RegisterSerializedData(ms_filter8580, "ReplaySidPlayFilter8580");
@@ -135,11 +142,22 @@ namespace rePlayer
             changed |= ImGui::Combo("Filter###SidFilter", &index, samplings, NumItemsOf(samplings));
             ms_isFilterEnabled = index != 0;
         }
-        changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
-        changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
         {
-            const char* const combinedWaveforms[] = { "Average", "Weak", "Strong" };
-            changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, NumItemsOf(combinedWaveforms));
+            const char* const builder[] = { "ReSIDfp", "SIDLite" };
+            auto index = ms_isFastSidEnabled ? 1 : 0;
+            changed |= ImGui::Combo("Builder###FastSid", &index, builder, NumItemsOf(builder));
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                ImGui::Tooltip("Need song reload to be effective");
+            ms_isFastSidEnabled = index != 0;
+        }
+        if (!ms_isFastSidEnabled)
+        {
+            changed |= ImGui::SliderInt("Filter 6581###SidFilter6581", &ms_filter6581, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+            changed |= ImGui::SliderInt("Filter 8580###SidFilter8580", &ms_filter8580, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+            {
+                const char* const combinedWaveforms[] = { "Average", "Weak", "Strong" };
+                changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, NumItemsOf(combinedWaveforms));
+            }
         }
         {
             const char* const surround[] = { "Default", "Surround" };
@@ -161,16 +179,18 @@ namespace rePlayer
             ms_powerOnDelay, 0, SidConfig::MAX_POWER_ON_DELAY, "Power On Delay: %d cycles");
         ComboOverride("SidFilter", GETSET(entry, overrideEnableFilter), GETSET(entry, filterEnabled),
             ms_isFilterEnabled, "Filter: Disable", "Filter: Enable");
-        SliderOverride("Filter6581", GETSET(entry, overrideFilter6581), GETSET(entry, filter6581),
-            ms_filter6581, 0, 100, "Filter 6581: %d%%");
-        SliderOverride("Filter8580", GETSET(entry, overrideFilter8580), GETSET(entry, filter8580),
-            ms_filter8580, 0, 100, "Filter 8580: %d%%");
         ComboOverride("SidModel", GETSET(entry, overrideSidModel), GETSET(entry, sidModel),
             ms_isSidModel8580, "Sid Model: 6581", "Sid Model: 8580");
         ComboOverride("SidClock", GETSET(entry, overrideClock), GETSET(entry, clock),
             ms_isNtsc, "Clock Speed: PAL", "Clock Speed: NTSC");
         ComboOverride("SidSampling", GETSET(entry, overrideResampling), GETSET(entry, resampling),
             ms_isResampling, "Sampling: Interpolate", "Sampling: Resample");
+        ComboOverride("Builder", GETSET(entry, overrideEnableFastSid), GETSET(entry, fastSidEnabled),
+            ms_isFastSidEnabled, "Builder: ReSIDfp", "Builder: SIDLite");
+        SliderOverride("Filter6581", GETSET(entry, overrideFilter6581), GETSET(entry, filter6581),
+            ms_filter6581, 0, 100, "Filter 6581: %d%%");
+        SliderOverride("Filter8580", GETSET(entry, overrideFilter8580), GETSET(entry, filter8580),
+            ms_filter8580, 0, 100, "Filter 8580: %d%%");
         ComboOverride("SidCW", GETSET(entry, overrideCombinedWaveforms), GETSET(entry, combinedWaveforms),
             ms_combinedWaveforms, "Combined Waveforms: Average", "Combined Waveforms: Weak", "Combined Waveforms: Strong");
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
@@ -187,9 +207,10 @@ namespace rePlayer
 
     SidDatabase* ReplaySidPlay::ms_sidDatabase = nullptr;
 
+    bool ReplaySidPlay::ms_isFastSidEnabled = false;
     bool ReplaySidPlay::ms_isFilterEnabled = true;
     int32_t ReplaySidPlay::ms_filter6581 = 50;
-    int32_t ReplaySidPlay::ms_filter8580 = 25;
+    int32_t ReplaySidPlay::ms_filter8580 = 50;
     bool ReplaySidPlay::ms_isSidModel8580 = false;
     bool ReplaySidPlay::ms_isNtsc = false;
     bool ReplaySidPlay::ms_isResampling = false;
@@ -213,7 +234,10 @@ namespace rePlayer
         {
             delete m_sidplayfp[i];
             delete m_sidTune[i];
-            delete m_residfpBuilder[i];
+            if (m_isFastSid)
+                delete m_sidliteBuilder[i];
+            else
+                delete m_residfpBuilder[i];
         }
     }
 
@@ -227,6 +251,9 @@ namespace rePlayer
         for (uint32_t i = 0; i < numSongs; i++)
             m_loops[i] = { 0, kDefaultSongDuration };
 
+        auto settings = metadata.Find<Settings>();
+        m_isFastSid = settings && settings->overrideEnableFastSid ? settings->fastSidEnabled : ms_isFastSidEnabled;
+
         uint32_t numEmu = sidTune1->getInfo()->sidChips() == 1 ? 2 : 1;
         for (uint32_t i = 0; i < numEmu; i++)
         {
@@ -234,21 +261,15 @@ namespace rePlayer
             m_sidplayfp[i] = new sidplayfp();
             m_sidplayfp[i]->setRoms(ms_c64RomKernal, ms_c64RomBasic, nullptr);
 
-            m_residfpBuilder[i] = new ReSIDfpBuilder("rePlayer");
-
-            // Create SID emulators
-            m_residfpBuilder[i]->create(m_sidTune[i]->getInfo()->sidChips());
-            if (!m_residfpBuilder[i]->getStatus())
-            {
-                //printf("%s", m_residfpBuilder->error());
-            }
+            if (m_isFastSid)
+                m_sidliteBuilder[i] = new SIDLiteBuilder("rePlayer");
+            else
+                m_residfpBuilder[i] = new ReSIDfpBuilder("rePlayer");
 
             // Configure the engine
             SidConfig cfg;
             cfg.frequency = kSampleRate;
             cfg.samplingMethod = ms_isResampling ? SidConfig::RESAMPLE_INTERPOLATE : SidConfig::INTERPOLATE;
-            cfg.fastSampling = false;
-            cfg.playback = numEmu == 2 ? SidConfig::MONO : SidConfig::STEREO;
             cfg.sidEmulation = m_residfpBuilder[i];
             cfg.defaultSidModel = ms_isSidModel8580 ? SidConfig::MOS8580 : SidConfig::MOS6581;
             cfg.defaultC64Model = ms_isNtsc ? SidConfig::NTSC : SidConfig::PAL;
@@ -284,58 +305,100 @@ namespace rePlayer
         }
         m_currentPosition = currentPosition + numSamples;
 
+        static constexpr uint32_t kCycles = 10000;
+        auto numRemainingSamples = numSamples;
+        auto numCachedSamples = m_numSamples;
         if (m_sidplayfp[1] != nullptr)
         {
-            auto numRemainingSamples = numSamples;
-            auto numCachedSamples = m_numSamples;
             auto* samples = output;
             while (numRemainingSamples)
             {
                 if (numCachedSamples == 0)
                 {
-                    auto numSamplesLeft = m_sidplayfp[0]->play(m_samples, kNumSamples);
-                    auto numSamplesRight = m_sidplayfp[1]->play(m_samples + kNumSamples, kNumSamples);
-                    if (numSamplesLeft != numSamplesRight || numSamplesLeft == 0 || !m_sidplayfp[0]->isPlaying() || !m_sidplayfp[1]->isPlaying()) // todo error reporting?
+                    auto numSamplesLeft = m_sidplayfp[0]->play(kCycles);
+                    auto numSamplesRight = m_sidplayfp[1]->play(kCycles);
+                    if (numSamplesLeft != numSamplesRight || numSamplesLeft <= 0) // todo error reporting?
+                    {
+                        m_numSamples = 0;
                         return 0;
-                    numCachedSamples = kNumSamples;
+                    }
+                    numCachedSamples = uint32_t(numSamplesLeft);
+                    m_sidplayfp[0]->buffers(&m_samples[0]);
+                    m_sidplayfp[1]->buffers(&m_samples[1]);
                 }
                 else
                 {
-                    auto samplesLeft = m_samples + kNumSamples - numCachedSamples;
-                    auto samplesRight = samplesLeft + (m_surround.IsEnabled() ? kNumSamples : 0);
+                    auto* samplesLeft = m_samples[0];
+                    auto* samplesRight = m_samples[m_surround.IsEnabled() ? 1 : 0];
                     auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
                     samples = samples->Convert(m_surround, samplesLeft, samplesRight, numSamplesToCopy, 100);
                     numRemainingSamples -= numSamplesToCopy;
                     numCachedSamples -= numSamplesToCopy;
+                    m_samples[0] += numSamplesToCopy;
+                    m_samples[1] += numSamplesToCopy;
                 }
             }
-            m_numSamples = numCachedSamples;
         }
         else
         {
-            auto numRemainingSamples = numSamples;
-            auto numCachedSamples = m_numSamples;
-            auto* samples = output;
+            auto surround = m_surround.Begin();
             while (numRemainingSamples)
             {
                 if (numCachedSamples == 0)
                 {
-                    auto numSamplesStereo = m_sidplayfp[0]->play(m_samples, kNumSamples * 2);
-                    if (numSamplesStereo == 0 || !m_sidplayfp[0]->isPlaying()) // todo error reporting?
+                    auto numSamplesStereo = m_sidplayfp[0]->play(kCycles);
+                    if (numSamplesStereo <= 0) // todo error reporting?
+                    {
+                        m_surround.End(surround);
+                        m_numSamples = 0;
                         return 0;
-                    numCachedSamples = kNumSamples;
+                    }
+                    numCachedSamples = uint32_t(numSamplesStereo);
+                    m_sidplayfp[0]->buffers(&m_samples[0]);
                 }
                 else
                 {
-                    auto samplesStereo = m_samples + (kNumSamples - numCachedSamples) * 2;
                     auto numSamplesToCopy = Min(numRemainingSamples, numCachedSamples);
-                    samples = samples->Convert(m_surround, samplesStereo, numSamplesToCopy, 100);
+                    if (m_sidplayfp[0]->installedSIDs() == 2)
+                    {
+                        for (uint32_t i = 0; i < numSamplesToCopy; ++i)
+                        {
+                            auto s0 = int(m_samples[0][i]);
+                            auto s1 = int(m_samples[1][i]);
+
+                            StereoSample s;
+                            s.left = (s0 + (s1 >> 1)) / (32767 * 1.41421356237f);
+                            s.right = (s1 + (s0 >> 1)) / (32767 * 1.41421356237f);
+
+                            output[i] = surround(s);
+                        }
+                    }
+                    else
+                    {
+                        for (uint32_t i = 0; i < numSamplesToCopy; ++i)
+                        {
+                            auto s0 = int(m_samples[0][i]);
+                            auto s1 = int(m_samples[1][i]);
+                            auto s2 = int(m_samples[2][i]);
+
+                            StereoSample s;
+                            s.left = (s0 + s1 + (s2 >> 1)) / (32767 * 1.73205080757f);
+                            s.right = (s1 + s2 + (s0 >> 1)) / (32767 * 1.73205080757f);
+
+                            output[i] = surround(s);
+                        };
+                        m_samples[2] += numSamplesToCopy;
+                    }
+                    m_samples[0] += numSamplesToCopy;
+                    m_samples[1] += numSamplesToCopy;
                     numRemainingSamples -= numSamplesToCopy;
                     numCachedSamples -= numSamplesToCopy;
+                    output += numSamplesToCopy;
                 }
             }
-            m_numSamples = numCachedSamples;
+            m_surround.End(surround);
         }
+        m_numSamples = numCachedSamples;
 
         return numSamples;
     }
@@ -343,14 +406,12 @@ namespace rePlayer
     void ReplaySidPlay::ResetPlayback()
     {
         m_surround.Reset();
-        m_sidplayfp[0]->stop();
-        if (m_sidplayfp[1])
-            m_sidplayfp[1]->stop();
         m_currentPosition = 0;
         m_currentDuration = (uint64_t(m_loops[m_subsongIndex].GetDuration()) * kSampleRate) / 1000;
-        m_sidplayfp[0]->play(nullptr, 0);
+        m_sidplayfp[0]->reset();
         if (m_sidplayfp[1])
-            m_sidplayfp[1]->play(nullptr, 0);
+            m_sidplayfp[1]->reset();
+
         m_numSamples = 0;
     }
 
@@ -372,10 +433,14 @@ namespace rePlayer
         bool isResampling = settings && settings->overrideResampling ? settings->resampling : ms_isResampling;
         for (uint32_t sidIndex = 0; sidIndex < 2 && m_sidTune[sidIndex] != nullptr; sidIndex++)
         {
-            m_residfpBuilder[sidIndex]->filter((settings && settings->overrideEnableFilter) ? settings->filterEnabled : ms_isFilterEnabled);
-            m_residfpBuilder[sidIndex]->filter6581Curve(((settings && settings->overrideFilter6581) ? settings->filter6581 : ms_filter6581) / 100.0f);
-            m_residfpBuilder[sidIndex]->filter8580Curve(((settings && settings->overrideFilter8580) ? settings->filter8580 : ms_filter8580) / 100.0f);
-            m_residfpBuilder[sidIndex]->combinedWaveformsStrength(SidConfig::sid_cw_t((settings && settings->overrideCombinedWaveforms) ? settings->combinedWaveforms : ms_combinedWaveforms));
+            for (uint32_t i = 0; i < m_sidplayfp[sidIndex]->installedSIDs(); ++i)
+                m_sidplayfp[sidIndex]->filter(i, (settings && settings->overrideEnableFilter) ? settings->filterEnabled : ms_isFilterEnabled);
+            if (!m_isFastSid)
+            {
+                m_residfpBuilder[sidIndex]->filter6581Curve(((settings && settings->overrideFilter6581) ? settings->filter6581 : ms_filter6581) / 100.0f);
+                m_residfpBuilder[sidIndex]->filter8580Curve(((settings && settings->overrideFilter8580) ? settings->filter8580 : ms_filter8580) / 100.0f);
+                m_residfpBuilder[sidIndex]->combinedWaveformsStrength(SidConfig::sid_cw_t((settings && settings->overrideCombinedWaveforms) ? settings->combinedWaveforms : ms_combinedWaveforms));
+            }
 
             if (m_currentPosition == 0 && (m_isSidModelForced != isSidModelForced || m_isSidModel8580 != isSidModel8580 || m_isClockForced != isClockForced || m_isNtsc != isNtsc || m_powerOnDelay != powerOnDelay))
             {
@@ -390,7 +455,7 @@ namespace rePlayer
                 {
                     //printf("%s", m_sidplayfp[sidIndex]->error());
                 }
-                m_sidplayfp[sidIndex]->play(nullptr, 0);
+                m_sidplayfp[sidIndex]->reset();
             }
         }
         m_isSidModelForced = isSidModelForced;

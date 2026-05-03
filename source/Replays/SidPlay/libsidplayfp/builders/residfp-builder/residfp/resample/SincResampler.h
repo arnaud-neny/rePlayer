@@ -81,6 +81,10 @@ private:
 private:
     int fir(int subcycle);
 
+private:
+    SincResampler(const SincResampler&) = delete;
+    SincResampler& operator=(const SincResampler&) = delete;
+
 public:
     /**
      * Use a clock freqency of 985248Hz for PAL C64, 1022730Hz for NTSC C64.

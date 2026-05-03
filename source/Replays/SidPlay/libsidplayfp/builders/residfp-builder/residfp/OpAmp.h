@@ -27,7 +27,7 @@
 
 #include "Spline.h"
 
-#include "sidcxx11.h"
+#include "siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -49,7 +49,7 @@ namespace reSIDfp
  * for the currents, we get:
  *
  *     n*((Vddt - vx)^2 - (Vddt - vi)^2) + (Vddt - vx)^2 - (Vddt - vo)^2 = 0
- * 
+ *
  * where n is the ratio between R1 and R2.
  *
  * Our root function f can thus be written as:
