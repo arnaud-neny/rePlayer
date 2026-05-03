@@ -142,21 +142,28 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
 
     if (traits.compressed) {
         udword crc2 = crc.get(sBuf,offsets.trackTable,trackTabLen);
+#if defined(DEBUG)
+            cout << "CRC2 = " << tohex(crc2) << endl;
+#endif
 
         // Astaroth
         // Chambers of Shaolin
         // Dragonflight (musf)
         if (crc2 == 0x5495cc19 || crc2 == 0x7866963a ||
-            crc2 == 0xc04a79a7 ||
+            crc2 == 0xc04a79a7 || crc2 == 0xc5ec120d ||
             crc2 == 0x2158d5fc || crc2 == 0x2518e0aa || crc2 == 0x3e8f7323 ) {
             pPortamentoFunc = &HippelDecoder::TFMX_portamento;
         }
         // Wings of Death level 1-7
+        // Original soundtrack is in COSO format but still requires
+        // a player variant with TFMX-style vib/porta.
         if (crc2 == 0x6084ae9f || crc2 == 0x8ec439c || crc2 == 0x664a0708 ||
             crc2 == 0x5cbcc3e9 || crc2 == 0x58514e2 || crc2 == 0x9beab3a4 ||
             crc2 == 0xb6185651 ) {
             traits.skipToWaveMod = true;  // default for COSO, though
+            traits.vibScaling = false;
             pPortamentoFunc = &HippelDecoder::TFMX_portamento;
+            pVibratoFunc = &HippelDecoder::TFMX_vibrato;
         }
     }
 }

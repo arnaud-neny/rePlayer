@@ -82,6 +82,7 @@ collections either.
 * [DeaDBeeF](https://deadbeef.sourceforge.io/) with [this input plugin](https://github.com/mschwendt/deadbeef-plugins-fc)
 * [Qmmp](https://qmmp.ylsoftware.com/) with [this input plugin](https://github.com/TTK-qmmp/qmmp-tfmx)
 * [rePlayer](https://github.com/arnaud-neny/rePlayer) includes a prebuilt plugin among a ton of others as to handle a high number of music file formats
+* [TTKMusicPlayer](https://github.com/Greedysky/TTKMusicPlayer) with [this input plugin](https://github.com/TTK-qmmp/qmmp-tfmx)
 * ...
 
 ## Links

@@ -130,6 +130,10 @@ bool HippelDecoder::COSO_init(int songNumber) {
     }
     
     trackTabLen = stats.trackSteps*trackStepLen;
+    traitsByChecksum();
+    if (traits.blacklisted) {
+        return false;
+    }
     
     // Reject Atari ST TFMX COSO modules. As it seems to use different sound
     // sequence commands, a command like $E2 $E5 with less than $E5 samples

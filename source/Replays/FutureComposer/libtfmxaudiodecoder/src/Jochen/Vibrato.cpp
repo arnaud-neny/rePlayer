@@ -65,14 +65,14 @@ uword HippelDecoder::TFMX_vibrato(VoiceVars& voiceX, uword period, ubyte note) {
 
         // vibFlag bit 5: 0 => vibrato down, 1 => vibrato up
         if ((voiceX.vibFlag&(1<<5))==0) {  // vibrato down
-            offs -= voiceX.vibSpeed;
+            offs -= speed;
             if (offs < 0) {  // lowest value reached?
                 offs = 0;
                 voiceX.vibFlag |= (1<<5);   // switch to vibrato up
             }
         }
         else {  // vibrato up
-            offs += voiceX.vibSpeed;
+            offs += speed;
             if (offs > vibDelta) {  // highest value reached?
                 offs = vibDelta;
                 voiceX.vibFlag &= ~(1<<5);  // switch to vibrato down

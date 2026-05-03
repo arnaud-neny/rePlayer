@@ -35,7 +35,7 @@
  * only support filtering/sorting by file name extension.
  */
 
-#define TFMXAUDIODECODER_VERSION 010005
+#define TFMXAUDIODECODER_VERSION 010007
 
 #ifdef __cplusplus
 extern "C" {
