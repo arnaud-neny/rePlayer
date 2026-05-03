@@ -117,6 +117,7 @@ You can select the songs and reorder these. Click on the numbered button to trac
 An Url button to add a list of links to the playlist.  
 Buttons to load, save or clear the playlist.  
 And a button to sort (by type, artists, duration, type or random/shuffle). If you press Ctrl, the sort will happen only for entries after the current playing one.  
+A checkbox to enable or disable the crossfade between songs.  
 Note 1: if you drag and drop files in there, the playlist will have a sidebar with buttons which open a database like the library managing all these files and urls. It's almost working the same way as the library.  
 Note 2: while drag and dropping files, keep Ctrl pressed to force all files in the playlist (by default, they are filtered by their extension or prefix). Keep Shift pressed and the current playlist is cleared. You can also drop on the deck.  
 Note 3: you can drag and drop url. On load, it will download the song or stream the online radio.
@@ -129,7 +130,11 @@ Enable/disable the songs focus there (when a song start to play, it is focused i
 Enable/disable the auto merge when a song is download from the library.  
 AutoSave frequency of the rePlayer. (it will save on quit anyway).  
 Enable/disable the media hot keys (for playback and volume).  
+Change the curve for the volume.  
+Enable the ReplayGain and/or the check for it on every load.  
+Crossfade duration.  
 Transparency of the windows (not available on the win32 release).  
+Scale the UI if it's too small for you eyes.  
 Live log can be enabled/disabled as well as its save on the disk. The logs retention can be changed too (older log files than the retention days limit are deleted).  
 Extension can be associated with a replay or let the scanner choose the first available one.  
 You can change the global settings of each players. I will not enter into the details here, I'm too lazy (I've just enabled by default my simple surround filter because I like it).
@@ -188,6 +193,7 @@ Or add some comments (and likes) there:
 - [FFTW](https://www.fftw.org): library for computing the discrete Fourier transform.
 - [JSON](https://github.com/nlohmann/json): JSON for Modern C++.
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
+- [libebur128](https://github.com/jiixyj/libebur128): a library implementing the EBU R128 loudness standard.
 - [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.
 - [stb](https://github.com/nothings/stb): for the optimized sprintf.
 - [TagLib](https://taglib.org): to read tag from music formats.
@@ -196,7 +202,7 @@ Or add some comments (and likes) there:
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
-- [Ayumi](http://sovietov.com/app/ayumi/ayumi.html): Highly precise emulation of AY-3-8910 and YM2149 sound chips. webAyumi for amad & fxm backend.
+- [Ayumi](https://github.com/true-grue/ayumi): Highly precise emulation of AY-3-8910 and YM2149 sound chips. webAyumi for amad & fxm backend.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
 - [Direct Stream Digital](https://github.com/Sound-Linux-More/sacd): Plays Philips DSDIFF and Sony DSF files, heavily inspired by SACD Decoder from Robert Tari.
 - [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.

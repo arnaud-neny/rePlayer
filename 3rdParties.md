@@ -9,6 +9,7 @@
 - FFTW: https://www.fftw.org
 - JSON for Modern C++: https://github.com/nlohmann/json
 - libarchive: https://github.com/libarchive/libarchive
+- libebur128: https://github.com/jiixyj/libebur128
 - libxml2: https://gitlab.gnome.org/GNOME/libxml2
 - TagLib: https://taglib.org
 - stb (sprintf): https://github.com/nothings/stb
@@ -58,7 +59,7 @@
 - Psycle: https://sourceforge.net/projects/psycle
 - PxTone: https://pxtone.org/developer & https://github.com/yuxshao/ptweb
 - sc68: https://sourceforge.net/projects/sc68
-- SidPlay: https://github.com/libsidplayfp/libsidplayfp
+- SidPlay: https://github.com/libsidplayfp/libsidplayfp & https://github.com/libsidplayfp/libresidfp
 - SkaleTracker: https://www.pouet.net/prod.php?which=20929
 - SNDH-Player: https://github.com/arnaud-carre/sndh-player
 - SoundMon: Brian Postma website is gone.  
@@ -81,4 +82,3 @@
 
 ## External tools:
 - DXC: https://github.com/microsoft/DirectXShaderCompiler
-- UPX: https://github.com/upx/upx

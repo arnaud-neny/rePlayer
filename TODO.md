@@ -4,11 +4,12 @@
 - add radios database: https://de1.api.radio-browser.info/#List_of_all_radio_stations
 - sidplay: stereo resid (to remove dual sid in replayer for stereo...)
 - move surround from replays to player 
-- ASAP full stereo + song length edit
 - player: command buffer (play, stop...) to handle everything in the thread (no more extra thread management)
+- player: refactor position (get rid of m_seekPos, use a m_playingPosition to simplify everything)
 - check vgmrips: all packs https://vgmrips.net/packs/sitemap.php
 - sanitize songs and artists strings fields on import (remove "\n" "\r")
 - playlist rework: main contains current playlist by name and do not store list of playlists (just populate from disk), each playlist saves its own currently playing
+- maybe think about multiple libraries (keep the defaut one as import library, and other libraries such as playlist to avoid cache the song)
 - viewport validation (check if the windows are outside the screen because of some windows shit)
 - array: change ReturnType (is_pointer, is_reference,...) with a trait enum type (enum return type value, index, pointer, ref)
 - seek: return the number of loops
@@ -23,8 +24,6 @@
 - support for .cue, .m3u, .pls
 - pure database random play (System::Mode::Random)
 - duplicates finder (https://github.com/jmacd/xdelta https://github.com/ilanschnell/bsdiff4 https://github.com/sisong/HDiffPatch)
-- audio normalization/replaygain (https://github.com/jiixyj/libebur128)
-- crossfader
 - editable countries (to prevent missing ones)
 - remove std::string
 - memory allocator profiler
