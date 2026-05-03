@@ -67,10 +67,10 @@ namespace rePlayer
     {
         if (player.IsValid())
         {
+            if (m_currentPlayer.IsValid())
+                m_currentPlayer->Pause();
             if (m_mode != Mode::Solo)
             {
-                if (m_currentPlayer.IsValid())
-                    m_currentPlayer->Pause();
                 if (m_nextPlayer.IsValid())
                     m_nextPlayer->Pause();
                 m_shelvedPlayer = std::move(m_currentPlayer);
