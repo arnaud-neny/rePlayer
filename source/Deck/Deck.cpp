@@ -450,11 +450,11 @@ namespace rePlayer
                     else
                         m_currentPlayer->Pause();
                 }
-                else if (auto endState = m_currentPlayer->IsEnding())
+                else if (isPlaying) if (auto endState = m_currentPlayer->IsEnding())
                 {
                     if (endState == Player::kEnded)
                         PlayNextSong();
-                    else if (isPlaying && m_shelvedPlayer.IsInvalid() && (m_nextPlayer.IsInvalid() || !m_nextPlayer->IsPlaying()))
+                    else if (m_shelvedPlayer.IsInvalid() && (m_nextPlayer.IsInvalid() || !m_nextPlayer->IsPlaying()))
                     {
                         // start the next song without stopping the current one, to have a seamless playback
                         ValidateNextSong();
