@@ -589,6 +589,24 @@
     <ClInclude Include="taglib\mp4\mp4stem.h">
       <Filter>Source Files\taglib\mp4</Filter>
     </ClInclude>
+    <ClInclude Include="3rdparty\utfcpp\utf8\cpp20.h">
+      <Filter>Source Files\3rdparty\utfcpp\utf8</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\matroska\matroskawritestyle.h">
+      <Filter>Source Files\taglib\matroska</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4chapter.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4chapterholder.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4nerochapterlist.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
+    <ClInclude Include="taglib\mp4\mp4qtchapterlist.h">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="taglib\audioproperties.cpp">
@@ -1018,6 +1036,15 @@
       <Filter>Source Files\taglib\matroska\ebml</Filter>
     </ClCompile>
     <ClCompile Include="taglib\mp4\mp4stem.cpp">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\mp4\mp4chapter.cpp">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\mp4\mp4nerochapterlist.cpp">
+      <Filter>Source Files\taglib\mp4</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\mp4\mp4qtchapterlist.cpp">
       <Filter>Source Files\taglib\mp4</Filter>
     </ClCompile>
   </ItemGroup>

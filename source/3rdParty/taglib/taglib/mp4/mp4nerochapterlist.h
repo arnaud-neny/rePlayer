@@ -1,3 +1,7 @@
+/**************************************************************************
+    copyright            : (C) 2026 by Ryan Francesconi
+ **************************************************************************/
+
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
@@ -18,53 +22,45 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMASTERELEMENT_H
-#define TAGLIB_EBMLMASTERELEMENT_H
-#ifndef DO_NOT_DOCUMENT
+#ifndef TAGLIB_MP4CHAPTERLIST_H
+#define TAGLIB_MP4CHAPTERLIST_H
 
-#include <list>
+#include "mp4chapterholder.h"
 
-#include "ebmlelement.h"
-#include "taglib.h"
+namespace TagLib {
+  class File;
+  namespace MP4 {
 
-namespace TagLib
-{
-  class ByteVector;
-
-  namespace EBML {
-    class MasterElement : public Element
+    /*!
+     * Reads, writes, and removes Nero-style chapter markers (chpl atom)
+     * from MP4 files.  Operates independently of MP4::Tag -- the chpl atom
+     * lives at moov/udta/chpl, a sibling of the metadata ilst path.
+     */
+    class NeroChapterList : public ChapterHolder
     {
     public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset);
-      explicit MasterElement(Id id);
-      ~MasterElement() override;
+      /*!
+       * Reads chapter markers from the already-opened \a file.
+       * Returns \c false if the file has no chpl atom.
+       */
+      bool read(TagLib::File *file);
 
-      offset_t getOffset() const;
-      bool read(File &file) override;
-      ByteVector render() override;
-      void appendElement(std::unique_ptr<Element> &&element);
-      std::list<std::unique_ptr<Element>>::iterator begin();
-      std::list<std::unique_ptr<Element>>::iterator end();
-      std::list<std::unique_ptr<Element>>::const_iterator begin() const;
-      std::list<std::unique_ptr<Element>>::const_iterator end() const;
-      std::list<std::unique_ptr<Element>>::const_iterator cbegin() const;
-      std::list<std::unique_ptr<Element>>::const_iterator cend() const;
-      offset_t getPadding() const;
-      void setPadding(offset_t numBytes);
-      offset_t getMinRenderSize() const;
-      void setMinRenderSize(offset_t minimumSize);
+      /*!
+       * Writes chapter markers to the already-opened \a file,
+       * replacing any existing chpl atom.
+       * The chapter count is capped at 255 (Nero format limit).
+       * Returns \c true on success.
+       */
+      bool write(TagLib::File *file);
 
-    protected:
-      bool read(File &file, int depth);
-
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      std::list<std::unique_ptr<Element>> elements;
+      /*!
+       * Removes the chpl atom from the already-opened \a file.
+       * Returns \c true on success, or if no chpl atom exists.
+       */
+      bool remove(TagLib::File *file);
     };
 
-  }
-}
+  }  // namespace MP4
+}  // namespace TagLib
 
-#endif
 #endif
