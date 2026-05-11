@@ -23,6 +23,10 @@
 #ifndef SIDLITE_FILTER_H
 #define SIDLITE_FILTER_H
 
+#include <map>
+
+struct SampleI32;
+
 namespace SIDLite
 {
 
@@ -33,9 +37,9 @@ class Filter
 public:
     Filter(settings *s, unsigned char *regs);
     void reset();
-    int clock(int FilterInput, int NonFiltered);
+    SampleI32 clock(SampleI32 FilterInput, SampleI32 NonFiltered);
 
-    inline int getLevel() const { return Level; }
+    inline int getLevel(int i) const { return Level[i]; }
 
     void rebuildCutoffTables(unsigned short samplerate);
 
@@ -46,11 +50,19 @@ private:
     unsigned short *CutoffMul8580;
     unsigned short *CutoffMul6581;
 
-    signed int     PrevVolume; // lowpass-filtered version of Volume-band register
-    int            PrevLowPass;
-    int            PrevBandPass;
-    int            Level;      // filtered version, good for VU-meter display
-    unsigned char  VUmeterUpdateCounter;
+    signed int     PrevVolume[2]; // lowpass-filtered version of Volume-band register
+    int            PrevLowPass[2];
+    int            PrevBandPass[2];
+    int            Level[2];      // filtered version, good for VU-meter display
+    unsigned char  VUmeterUpdateCounter[2];
+
+    static constexpr int CF_LEN = 0x800;
+
+    using co_tab_t = std::array<unsigned short, CF_LEN>;
+    using co_cache_t = std::map<unsigned short, co_tab_t>;
+
+    co_cache_t CUTOFF_CACHE_8580;
+    co_cache_t CUTOFF_CACHE_6581;
 };
 
 }

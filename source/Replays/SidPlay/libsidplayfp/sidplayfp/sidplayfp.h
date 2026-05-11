@@ -97,7 +97,7 @@ public:
      * @param buffers pointer to the array of buffer pointers.
      * @since 2.14
      */
-    void buffers(short** buffers) const;
+    void buffers(SampleI16** buffers) const;
 
     /**
      * Run the emulation for selected number of cycles.
@@ -145,7 +145,7 @@ public:
      * @return number of samples generated (samples for mono, samples*2 for stereo)
      * @since 2.15
      */
-    unsigned int mix(short *buffer, unsigned int samples);
+    unsigned int mix(SampleI16 *buffer, unsigned int samples);
 
     /**
      * Control CPU tracing.
@@ -236,6 +236,8 @@ public:
      * @since 3.0
      */
     int getBufSize(unsigned int cycles);
+
+    void panning(unsigned int sidNum, unsigned int voice, char pan);
 };
 
 #endif // SIDPLAYFP_H

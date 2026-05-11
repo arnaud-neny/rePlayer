@@ -30,6 +30,8 @@
 
 #include <array>
 
+struct SampleI16;
+
 namespace SIDLite
 {
 
@@ -47,13 +49,15 @@ public:
     void reset();
     void write(int addr, int value);
     int read(int addr) const;
-    int clock(unsigned int cycles, short* buf);
+    int clock(unsigned int cycles, SampleI16* buf);
 
     void setChipModel(model_t model);
     void setRealSIDmode(bool mode);
     bool setSamplingParameters(unsigned int clockFrequency, unsigned short samplingFrequency);
 
-    int getLevel() const { return filter.getLevel(); }
+    int getLevel(int i) const { return filter.getLevel(i); }
+
+    void panning(unsigned int voice, char pan) { wavgen.Panning[voice] = pan; }
 
 private:
     unsigned char regs[0x20] = {0};
@@ -66,7 +70,7 @@ private:
     short             SampleCycleCnt;
 
 private:
-    inline bool generateSample(unsigned int &cycles, short &output);
+    inline bool generateSample(unsigned int &cycles, SampleI16 &output);
 };
 
 }

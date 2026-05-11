@@ -34,12 +34,12 @@
 namespace SIDLite
 {
 
-int SID::clock(unsigned int cycles, short* buf)
+int SID::clock(unsigned int cycles, SampleI16* buf)
 {
     int i = 0;
     while (cycles > 0)
     {
-        short output;
+        SampleI16 output;
         if (generateSample(cycles, output))
         {
             buf[i] = output;
@@ -49,7 +49,7 @@ int SID::clock(unsigned int cycles, short* buf)
     return i;
 }
 
-inline bool SID::generateSample(unsigned int &cycles, short &output)
+inline bool SID::generateSample(unsigned int &cycles, SampleI16 &output)
 {
     // Cycle-based part of emulations:
 
@@ -71,14 +71,18 @@ inline bool SID::generateSample(unsigned int &cycles, short &output)
     // Samplerate-based part of emulations:
 
     wg_output_t wg_out = wavgen.clock(&adsr);
-    int sample = filter.clock(wg_out.first, wg_out.second);
+    SampleI32 sample = filter.clock(wg_out.first, wg_out.second);
 
     // saturation logic on overflow
-    if (sample > INT16_MAX)
-        sample = INT16_MAX;
-    else if (sample < INT16_MIN)
-        sample = INT16_MIN;
-    output = static_cast<short>(sample);
+    if (sample.left > INT16_MAX)
+        sample.left = INT16_MAX;
+    else if (sample.left < INT16_MIN)
+        sample.left = INT16_MIN;
+    if (sample.right > INT16_MAX)
+        sample.right = INT16_MAX;
+    else if (sample.right < INT16_MIN)
+        sample.right = INT16_MIN;
+    output = { static_cast<short>(sample.left), static_cast<short>(sample.right) };
 
     return true;
 }

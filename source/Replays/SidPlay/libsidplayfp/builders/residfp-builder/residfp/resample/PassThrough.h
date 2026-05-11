@@ -33,24 +33,24 @@ class PassThrough final : public Resampler
 {
 private:
     /// Last sample
-    int outputValue;
+    SampleI32 outputValue;
 
 public:
     PassThrough() :
         outputValue(0) {}
 
-    bool input(int sample) override
+    bool input(SampleI32 sample) override
     {
         outputValue = sample;
 
         return true;
     }
 
-    int output() const override { return outputValue; }
+    SampleI32 output() const override { return outputValue; }
 
     void reset() override
     {
-        outputValue = 0;
+        outputValue = {0};
     }
 };
 

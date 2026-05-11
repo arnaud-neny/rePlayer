@@ -118,7 +118,7 @@ void reSIDfpEmu::sampling(float systemclock, float freq,
 
     // 20ms buffer
     const int buffersize = std::ceil((freq / 1000.f) * 20.f);
-    m_buffer = new short[buffersize];
+    m_buffer = new SampleI16[buffersize];
     m_status = true;
 }
 
@@ -169,6 +169,11 @@ void reSIDfpEmu::combinedWaveforms(SidConfig::sid_cw_t cws)
 
     m_sid.setCombinedWaveforms(combinedWaveforms);
     m_status = true;
+}
+
+void reSIDfpEmu::panning(unsigned int voice, char pan)
+{
+    m_sid.panning(voice, pan);
 }
 
 }

@@ -321,10 +321,10 @@ class Filter6581 final : public Filter
 {
 private:
     /// VCR + associated capacitor connected to highpass output.
-    Integrator6581 hpIntegrator;
+    Integrator6581 hpIntegrator[2];
 
     /// VCR + associated capacitor connected to bandpass output.
-    Integrator6581 bpIntegrator;
+    Integrator6581 bpIntegrator[2];
 
     const unsigned short* f0_dac;
 
@@ -334,13 +334,13 @@ protected:
      */
     void updateCenterFrequency() override;
 
-    int solveIntegrators() override;
+    int solveIntegrators(int i) override;
 
 public:
     Filter6581() :
         Filter(*FilterModelConfig6581::getInstance()),
-        hpIntegrator(*FilterModelConfig6581::getInstance()),
-        bpIntegrator(*FilterModelConfig6581::getInstance()),
+        hpIntegrator{ Integrator6581(*FilterModelConfig6581::getInstance()), Integrator6581(*FilterModelConfig6581::getInstance()) },
+        bpIntegrator{ Integrator6581(*FilterModelConfig6581::getInstance()), Integrator6581(*FilterModelConfig6581::getInstance()) },
         f0_dac(FilterModelConfig6581::getInstance()->getDAC(0.5))
     {}
 

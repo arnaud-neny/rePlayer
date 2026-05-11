@@ -220,17 +220,19 @@ void Player::filter(unsigned int sidNum, bool enable)
 
 void Player::initMixer(bool stereo)
 {
-    std::unique_ptr<short*[]> bufs(new short*[m_chips.size()]);
+/*
+    std::unique_ptr<SampleI16*[]> bufs(new SampleI16 *[m_chips.size()]);
     buffers(bufs.get());
     m_simpleMixer.reset(new SimpleMixer(stereo, bufs.get(), installedSIDs()));
+*/
 }
 
-unsigned int Player::mix(short *buffer, unsigned int samples)
+unsigned int Player::mix(SampleI16 *buffer, unsigned int samples)
 {
-    return m_simpleMixer->doMix(buffer, samples);
+    return 0;// m_simpleMixer->doMix(buffer, samples);
 }
 
-void Player::buffers(short** buffers) const
+void Player::buffers(SampleI16** buffers) const
 {
     for (size_t i = 0; i < m_chips.size(); i++)
     {
@@ -602,4 +604,10 @@ int Player::getBufSize(unsigned int cycles)
     return  static_cast<int>(std::ceil(size)) * m_simpleMixer->channels();
 }
 
+
+void Player::panning(unsigned int sidNum, unsigned int voice, char pan)
+{
+    if (sidemu* s = (sidNum < m_chips.size()) ? m_chips[sidNum] : nullptr)
+        s->panning(voice, pan);
+}
 }

@@ -136,7 +136,7 @@ public:
 
     bool load(SidTune *tune);
 
-    void buffers(short** buffers) const;
+    void buffers(SampleI16** buffers) const;
 
     int play(unsigned int cycles);
 
@@ -162,11 +162,13 @@ public:
 
     void initMixer(bool stereo);
 
-    unsigned int mix(short *buffer, unsigned int samples);
+    unsigned int mix(SampleI16 *buffer, unsigned int samples);
 
     bool reset();
 
     int getBufSize(unsigned int cycles);
+
+    void panning(unsigned int sidNum, unsigned int voice, char pan);
 };
 
 }

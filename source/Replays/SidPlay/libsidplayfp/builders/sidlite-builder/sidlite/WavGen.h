@@ -25,13 +25,15 @@
 
 #include <utility>
 
+struct SampleI32;
+
 namespace SIDLite
 {
 
 class ADSR;
 class settings;
 
-using wg_output_t = std::pair<int, int>;
+using wg_output_t = std::pair<SampleI32, SampleI32>;
 
 class WavGen
 {
@@ -58,6 +60,8 @@ private:
 
     unsigned char oscReg;
     unsigned char envReg;
+public:
+    char          Panning[3] = { 0 };
 };
 
 }

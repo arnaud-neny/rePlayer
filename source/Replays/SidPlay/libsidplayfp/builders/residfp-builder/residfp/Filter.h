@@ -58,13 +58,13 @@ private:
 
 protected:
     /// Filter highpass state.
-    int Vhp = 0;
+    int Vhp[2] = { 0 };
 
     /// Filter bandpass state.
-    int Vbp = 0;
+    int Vbp[2] = { 0 };
 
     /// Filter lowpass state.
-    int Vlp = 0;
+    int Vlp[2] = { 0 };
 
 private:
     /// Filter external input.
@@ -138,7 +138,7 @@ protected:
      */
     inline unsigned int getFC() const { return fc; }
 
-    virtual int solveIntegrators() = 0;
+    virtual int solveIntegrators(int i) = 0;
 
 public:
     Filter(FilterModelConfig& fmc);
@@ -153,7 +153,7 @@ public:
      * @param voice3 voice 3 in
      * @return filtered output, unsigned 16 bit
      */
-    unsigned short clock(Voice& voice1, Voice& voice2, Voice& voice3);
+    SampleU16 clock(Voice& voice1, Voice& voice2, Voice& voice3);
 
     /**
      * Enable filter.
@@ -211,26 +211,38 @@ namespace reSIDfp
 {
 
 RESIDFP_INLINE
-unsigned short Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
+SampleU16 Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
 {
     const int V1 = getNormalizedVoice(voice1);
     const int V2 = getNormalizedVoice(voice2);
     // Voice 3 is silenced by voice3off if it is not routed through the filter.
     const int V3 = (filt3 || !voice3off) ? getNormalizedVoice(voice3) : getSilentVoice(voice3);
 
-    int Vsum = 0;
-    int Vmix = 0;
+    int Vsum[2] = { 0 };
+    int Vmix[2] = { 0 };
 
-    (filt1 ? Vsum : Vmix) += V1;
-    (filt2 ? Vsum : Vmix) += V2;
-    (filt3 ? Vsum : Vmix) += V3;
-    (filtE ? Vsum : Vmix) += Ve;
+    if (voice1.panning <= 0)
+        (filt1 ? Vsum[0] : Vmix[0]) += V1;
+    if (voice2.panning <= 0)
+        (filt2 ? Vsum[0] : Vmix[0]) += V2;
+    if (voice3.panning <= 0)
+        (filt3 ? Vsum[0] : Vmix[0]) += V3;
+    (filtE ? Vsum[0] : Vmix[0]) += Ve;
+    if (voice1.panning >= 0)
+        (filt1 ? Vsum[1] : Vmix[1]) += V1;
+    if (voice1.panning >= 0)
+        (filt2 ? Vsum[1] : Vmix[1]) += V2;
+    if (voice1.panning >= 0)
+        (filt3 ? Vsum[1] : Vmix[1]) += V3;
+    (filtE ? Vsum[1] : Vmix[1]) += Ve;
 
-    Vhp = currentSummer[currentResonance[Vbp] + Vlp + Vsum];
+    Vhp[0] = currentSummer[currentResonance[Vbp[0]] + Vlp[0] + Vsum[0]];
+    Vhp[1] = currentSummer[currentResonance[Vbp[1]] + Vlp[1] + Vsum[1]];
 
-    Vmix += solveIntegrators();
+    Vmix[0] += solveIntegrators(0);
+    Vmix[1] += solveIntegrators(1);
 
-    return currentVolume[currentMixer[Vmix]];
+    return { currentVolume[currentMixer[Vmix[0]]], currentVolume[currentMixer[Vmix[1]]] };
 }
 
 } // namespace reSIDfp

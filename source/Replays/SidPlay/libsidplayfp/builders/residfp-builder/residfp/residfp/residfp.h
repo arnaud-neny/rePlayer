@@ -26,6 +26,8 @@
 #include "residfp/residfp_defs.h"
 #include "residfp/sidversion.h"
 
+struct SampleI16;
+
 /**
  * \file residfp.h
  *
@@ -160,7 +162,7 @@ public:
      * @param buf audio output buffer
      * @return number of samples produced
      */
-    int clock(unsigned int cycles, short* buf);
+    int clock(unsigned int cycles, SampleI16* buf);
 
     /**
      * Clock SID forward producing audio
@@ -170,7 +172,7 @@ public:
      * @param bufSize the buffer size
      * @return number of c64 clocks run
      */
-    int clock(short* buf, int bufSize);
+    int clock(SampleI16* buf, int bufSize);
 
     /**
      * Clock SID forward with no audio production.
@@ -219,6 +221,8 @@ public:
      *               false to use the standard 470pF caps.
      */
     void enableOld6581caps(bool enable);
+
+    void panning(unsigned int voice, char pan);
 };
 
 }

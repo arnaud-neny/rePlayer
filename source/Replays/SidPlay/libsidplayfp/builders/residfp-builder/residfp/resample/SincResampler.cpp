@@ -151,7 +151,7 @@ int convolve(const int* a, const short* b, int bLength)
     return (out + (1 << 14)) >> 15;
 }
 
-int SincResampler::fir(int subcycle)
+SampleI32 SincResampler::fir(int subcycle)
 {
     // Find the first of the nearest fir tables close to the phase
     int firTableFirst = (subcycle * firRES >> 10);
@@ -161,9 +161,9 @@ int SincResampler::fir(int subcycle)
     int sampleStart = sampleIndex - firN + RINGSIZE - 1;
 
 #ifdef RUNTIME_DISPATCH
-    const int v1 = simd_convolve(sample + sampleStart, (*firTable)[firTableFirst], firN);
+    const SampleI32 v1 = { simd_convolve(sample[0] + sampleStart, (*firTable)[firTableFirst], firN), simd_convolve(sample[1] + sampleStart, (*firTable)[firTableFirst], firN) };
 #else
-    const int v1 = convolve(sample + sampleStart, (*firTable)[firTableFirst], firN);
+    const SampleI32 v1 = { convolve(sample[0] + sampleStart, (*firTable)[firTableFirst], firN), convolve(sample[1] + sampleStart, (*firTable)[firTableFirst], firN)};
 #endif
 
     // Use next FIR table, wrap around to first FIR table using
@@ -175,14 +175,15 @@ int SincResampler::fir(int subcycle)
     }
 
 #ifdef RUNTIME_DISPATCH
-    const int v2 = simd_convolve(sample + sampleStart, (*firTable)[firTableFirst], firN);
+    const SampleI32 v2 = { simd_convolve(sample[0] + sampleStart, (*firTable)[firTableFirst], firN), simd_convolve(sample[1] + sampleStart, (*firTable)[firTableFirst], firN)};
 #else
-    const int v2 = convolve(sample + sampleStart, (*firTable)[firTableFirst], firN);
+    const SampleI32 v2 = { convolve(sample[0] + sampleStart, (*firTable)[firTableFirst], firN), convolve(sample[1] + sampleStart, (*firTable)[firTableFirst], firN)};
 #endif
 
     // Linear interpolation between the sinc tables yields good
     // approximation for the exact value.
-    return v1 + (firTableOffset * (v2 - v1) >> 10);
+    return { v1.left + (firTableOffset * (v2.left - v1.left) >> 10)
+        , v1.right + (firTableOffset * (v2.right - v1.right) >> 10) };
 }
 
 SincResampler::SincResampler(
@@ -299,11 +300,12 @@ SincResampler::~SincResampler()
     delete firTable;
 }
 
-bool SincResampler::input(int input)
+bool SincResampler::input(SampleI32 input)
 {
     bool ready = false;
 
-    sample[sampleIndex] = sample[sampleIndex + RINGSIZE] = input;
+    sample[0][sampleIndex] = sample[0][sampleIndex + RINGSIZE] = input.left;
+    sample[1][sampleIndex] = sample[1][sampleIndex + RINGSIZE] = input.right;
     sampleIndex = (sampleIndex + 1) & (RINGSIZE - 1);
 
     if (sampleOffset < 1024)
@@ -320,7 +322,8 @@ bool SincResampler::input(int input)
 
 void SincResampler::reset()
 {
-    std::fill(std::begin(sample), std::end(sample), 0);
+    std::fill(std::begin(sample[0]), std::end(sample[0]), 0);
+    std::fill(std::begin(sample[1]), std::end(sample[1]), 0);
     sampleOffset = 0;
 }
 

@@ -96,4 +96,8 @@ const char* residfp_version_string = "1.0.1";
 #define RESIDFP_INLINING 1
 #define RESIDFP_INLINE inline
 
+struct SampleI16 { short left, right; };
+struct SampleU16 { unsigned short left, right; };
+struct SampleI32 { int left, right; };
+
 #endif // SIDDEFS_FP_H

@@ -3,11 +3,11 @@
 #include <Replay.inl.h>
 #include <Audio/Surround.h>
 
-class ReSIDfpBuilder;
-class SIDLiteBuilder;
+class sidbuilder;
 class SidDatabase;
 class sidplayfp;
 class SidTune;
+struct SampleI16;
 
 namespace rePlayer
 {
@@ -80,19 +80,15 @@ namespace rePlayer
         static constexpr uint32_t kDefaultSongDuration = 150 * 1000;
 
     private:
-        ReplaySidPlay(SidTune* sidTune1, SidTune* sidTune2, CommandBuffer metadata);
+        ReplaySidPlay(SidTune* sidTune, CommandBuffer metadata);
 
         static eExtension GetExtension(SidTune* sidTune);
         void SetupMetadata(CommandBuffer metadata);
 
     private:
-        union
-        {
-            ReSIDfpBuilder* m_residfpBuilder[2] = { nullptr };
-            SIDLiteBuilder* m_sidliteBuilder[2];
-        };
-        sidplayfp* m_sidplayfp[2] = { nullptr };
-        SidTune* m_sidTune[2] = { nullptr };
+        sidbuilder* m_sidBuilder = nullptr;
+        sidplayfp* m_sidplayfp = nullptr;
+        SidTune* m_sidTune = nullptr;
         Surround m_surround;
         bool m_isSidModelForced : 1 = false;
         bool m_isSidModel8580 : 1 = ms_isSidModel8580;
@@ -106,7 +102,7 @@ namespace rePlayer
         uint64_t m_currentDuration = 0;
 
         uint32_t m_numSamples = 0;
-        short* m_samples[3];
+        SampleI16* m_samples[3];
 
         static uint8_t ms_c64RomKernal[];
         static uint8_t ms_c64RomBasic[];

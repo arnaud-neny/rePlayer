@@ -151,8 +151,8 @@ wg_output_t WavGen::clock(const ADSR *adsr)
 
     unsigned int WavGenOut = 0;
     unsigned char EnvOut = 0;
-    int FilterInput = 0;
-    int NonFiltered = 0;
+    SampleI32 FilterInput = { 0 };
+    SampleI32 NonFiltered = { 0 };
     const unsigned char FilterSwitchReso = regs[0x17];
     const unsigned char VolumeBand = regs[0x18];
 
@@ -364,11 +364,19 @@ wg_output_t WavGen::clock(const ADSR *adsr)
         int swave = static_cast<int>(WavGenOut) - CRSID_WAVE_MID;
         if (UNLIKELY(FilterSwitchReso & (1 << Channel)))
         {
-            FilterInput += (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
+            int v = (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
+            if (Panning[Channel] <= 0)
+                FilterInput.left += v;
+            if (Panning[Channel] >= 0)
+                FilterInput.right += v;
         }
         else if (LIKELY(Channel!=2 || !(VolumeBand & OFF3_BITVAL)))
         {
-            NonFiltered += (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
+            int v = (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
+            if (Panning[Channel] <= 0)
+                NonFiltered.left += v;
+            if (Panning[Channel] >= 0)
+                NonFiltered.right += v;
         }
     }
     // update readable SID1-registers (some SID tunes might use 3rd channel ENV3/OSC3 value as control)

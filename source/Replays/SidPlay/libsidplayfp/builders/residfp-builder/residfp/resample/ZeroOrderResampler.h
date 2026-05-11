@@ -39,7 +39,7 @@ class ZeroOrderResampler final : public Resampler
 
 private:
     /// Last sample
-    int cachedSample;
+    SampleI32 cachedSample;
 
     /// Number of cycles per sample
     const int cyclesPerSample;
@@ -47,22 +47,23 @@ private:
     int sampleOffset;
 
     /// Calculated sample
-    int outputValue;
+    SampleI32 outputValue;
 
 public:
     ZeroOrderResampler(double clockFrequency, double samplingFrequency) :
-        cachedSample(0),
+        cachedSample{0},
         cyclesPerSample(static_cast<int>(clockFrequency / samplingFrequency * 1024.)),
         sampleOffset(0),
-        outputValue(0) {}
+        outputValue{0} {}
 
-    bool input(int sample) override
+    bool input(SampleI32 sample) override
     {
         bool ready = false;
 
         if (sampleOffset < 1024)
         {
-            outputValue = cachedSample + (sampleOffset * (sample - cachedSample) >> 10);
+            outputValue.left = cachedSample.left + (sampleOffset * (sample.left - cachedSample.left) >> 10);
+            outputValue.right = cachedSample.right + (sampleOffset * (sample.right - cachedSample.right) >> 10);
             ready = true;
             sampleOffset += cyclesPerSample;
         }
@@ -74,12 +75,12 @@ public:
         return ready;
     }
 
-    int output() const override { return outputValue; }
+    SampleI32 output() const override { return outputValue; }
 
     void reset() override
     {
         sampleOffset = 0;
-        cachedSample = 0;
+        cachedSample = { 0 };
     }
 };
 

@@ -29,15 +29,15 @@
 namespace reSIDfp
 {
 
-int Filter6581::solveIntegrators()
+int Filter6581::solveIntegrators(int i)
 {
-    Vbp = hpIntegrator.solve(Vhp);
-    Vlp = bpIntegrator.solve(Vbp);
+    Vbp[i] = hpIntegrator[i].solve(Vhp[i]);
+    Vlp[i] = bpIntegrator[i].solve(Vbp[i]);
 
     int Vfilt = 0;
-    if (lp) Vfilt += Vlp;
-    if (bp) Vfilt += Vbp;
-    if (hp) Vfilt += Vhp;
+    if (lp) Vfilt += Vlp[i];
+    if (bp) Vfilt += Vbp[i];
+    if (hp) Vfilt += Vhp[i];
 
     // The filter input resistors are slightly bigger than the voice ones
     // Scale the values accordingly
@@ -56,8 +56,10 @@ Filter6581::~Filter6581()
 void Filter6581::updateCenterFrequency()
 {
     const unsigned short Vw = f0_dac[getFC()];
-    hpIntegrator.setVw(Vw);
-    bpIntegrator.setVw(Vw);
+    hpIntegrator[0].setVw(Vw);
+    hpIntegrator[1].setVw(Vw);
+    bpIntegrator[0].setVw(Vw);
+    bpIntegrator[1].setVw(Vw);
 }
 
 void Filter6581::setFilterCurve(double curvePosition)

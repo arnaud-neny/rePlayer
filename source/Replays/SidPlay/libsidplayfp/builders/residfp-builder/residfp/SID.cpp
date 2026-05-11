@@ -545,4 +545,9 @@ void SID::clockSilent(unsigned int cycles)
     }
 }
 
+void SID::panning(unsigned int v, char pan)
+{
+    voice[v].panning = pan;
+}
+
 } // namespace reSIDfp

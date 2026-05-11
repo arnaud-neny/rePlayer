@@ -59,7 +59,7 @@ protected:
     event_clock_t m_accessClk = 0;
 
     /// The sample buffer
-    short *m_buffer = nullptr;
+    SampleI16 *m_buffer = nullptr;
 
     /// Current position in buffer
     int m_bufferpos = 0;
@@ -153,7 +153,9 @@ public:
     /**
      * Get the buffer.
      */
-    short *buffer() const { return m_buffer; }
+    SampleI16 *buffer() const { return m_buffer; }
+
+    virtual void panning(unsigned int voice, char pan) = 0;
 };
 
 }

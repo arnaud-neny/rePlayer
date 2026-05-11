@@ -74,12 +74,12 @@ private:
 
     int sampleOffset = 0;
 
-    int outputValue = 0;
+    SampleI32 outputValue = { 0, 0 };
 
-    int sample[RINGSIZE * 2];
+    int sample[2][RINGSIZE * 2];
 
 private:
-    int fir(int subcycle);
+    SampleI32 fir(int subcycle);
 
 private:
     SincResampler(const SincResampler&) = delete;
@@ -108,9 +108,9 @@ public:
         double highestAccurateFrequency);
     ~SincResampler() override;
 
-    bool input(int input) override;
+    bool input(SampleI32 input) override;
 
-    int output() const override { return outputValue; }
+    SampleI32 output() const override { return outputValue; }
 
     void reset() override;
 };

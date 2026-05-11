@@ -60,4 +60,6 @@
 #  define SID_UNUSED
 #endif
 
+struct SampleI16 { short left; short right; };
+
 #endif /* SIDDEFS_H */

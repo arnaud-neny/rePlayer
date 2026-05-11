@@ -66,7 +66,9 @@ public:
 
     void model(SidConfig::sid_model_t model, bool digiboost) override;
 
-    int getLevel() const;
+    int getLevel(int i) const;
+
+    void panning(unsigned int voice, char pan);
 };
 
 }

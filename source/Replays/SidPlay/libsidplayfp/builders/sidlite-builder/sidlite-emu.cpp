@@ -84,9 +84,9 @@ void SIDLiteEmu::clock()
     m_bufferpos += m_sid.clock(cycles, m_buffer+m_bufferpos);
 }
 
-int SIDLiteEmu::getLevel() const
+int SIDLiteEmu::getLevel(int i) const
 {
-    return m_sid.getLevel();
+    return m_sid.getLevel(i);
 }
 
 /*
@@ -124,7 +124,7 @@ void SIDLiteEmu::sampling(float systemclock, float freq,
 
     // 20ms buffer
     const int buffersize = std::ceil((freq / 1000.f) * 20.f);
-    m_buffer = new short[buffersize];
+    m_buffer = new SampleI16[buffersize];
     m_status = true;
 }
 
@@ -152,4 +152,8 @@ void SIDLiteEmu::model(SidConfig::sid_model_t model, bool /*digiboost*/)
     m_status = true;
 }
 
+void SIDLiteEmu::panning(unsigned int voice, char pan)
+{
+    m_sid.panning(voice, pan);
+}
 }
