@@ -32,8 +32,13 @@ namespace rePlayer
         g_imguiWindowDefaultStyle = WS_EX_NOREDIRECTIONBITMAP;
     }
 
+    static void ImGui_ImplDX12_DrawCallback_ResetRenderState(const ImDrawList*, const ImDrawCmd*) {} // Intentionally empty. Used as an identifier for rendering loop to call its code. Simpler to implement this way.
+
     bool GraphicsImGuiDX12::OnInit()
     {
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+        platform_io.DrawCallback_ResetRenderState = ImGui_ImplDX12_DrawCallback_ResetRenderState;
+
         bool isSuccessFull = CreateRootSignature()
             && CreatePipelineState()
             && CreateTextureFont();
@@ -373,7 +378,7 @@ namespace rePlayer
                 {
                     // User callback, registered via ImDrawList::AddCallback()
                     // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
-                    if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
+                    if (pcmd->UserCallback == ImGui_ImplDX12_DrawCallback_ResetRenderState)
                         SetupRenderStates(window, drawData, frameResources);
                     else
                         pcmd->UserCallback(cmd_list, pcmd);

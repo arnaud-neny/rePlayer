@@ -74,7 +74,7 @@ namespace rePlayer
                 const float a = a_min + (float(i) / float(m_numSegments)) * (a_max - a_min);
                 drawList->PathLineTo({ centre.x + ImCos(a + scaledTime * 8) * clampedRadius, centre.y + ImSin(a + scaledTime * 8) * clampedRadius });
             }
-            drawList->PathStroke(m_color, false, thickness);
+            drawList->PathStroke(m_color, thickness);
 
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1], ImGui::GetIO().Fonts->Fonts[1]->LegacySize);
 

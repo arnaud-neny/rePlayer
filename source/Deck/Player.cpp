@@ -349,7 +349,7 @@ namespace rePlayer
                 auto p = ImVec2(x, yCenter + yScale * waveData[pos].left);
                 drawList->PathLineTo(p);
             }
-            drawList->PathStroke(color, 0, 1);
+            drawList->PathStroke(color, 1.0f);
             for (uint32_t i = 0; i < numOscilloscopeSamples; i++)
             {
                 float x = xMin + i * (xMax - xMin) / (numOscilloscopeSamples - 1.0f);
@@ -359,7 +359,7 @@ namespace rePlayer
                 auto p = ImVec2(x, yCenter + yScale * waveData[pos].right);
                 drawList->PathLineTo(p);
             }
-            drawList->PathStroke(color, 0, 1);
+            drawList->PathStroke(color, 1.0f);
 
             drawList->PopClipRect();
         }
