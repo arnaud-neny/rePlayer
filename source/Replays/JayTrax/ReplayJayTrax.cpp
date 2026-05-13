@@ -23,7 +23,7 @@ namespace rePlayer
             [](auto* data) { if (data) { data->FreeSong(); delete data; } });
         soundEngine->Allocate();
         auto data = stream->Read();
-        if (soundEngine->LoadSongFromMemory(pCast<unsigned char>(data.Items())))
+        if (soundEngine->LoadSongFromMemory(pCast<unsigned char>(data.Items()), data.NumItems<int>()))
             return nullptr;
 
         return new ReplayJayTrax(soundEngine.Detach(), stream);
@@ -42,7 +42,7 @@ namespace rePlayer
     {
         auto data = stream->Read();
         m_displayEngine.Allocate();
-        m_displayEngine.LoadSongFromMemory(pCast<unsigned char>(data.Items()));
+        m_displayEngine.LoadSongFromMemory(pCast<unsigned char>(data.Items()), data.NumItems<int>());
     }
 
     uint32_t ReplayJayTrax::Render(StereoSample* output, uint32_t numSamples)

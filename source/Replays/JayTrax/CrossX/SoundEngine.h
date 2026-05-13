@@ -277,7 +277,7 @@ public:
 
 	//Song management
 	void	CreateEmptySong(void);
-	int		LoadSongFromMemory(unsigned  char *Module);
+	int		LoadSongFromMemory(unsigned  char *Module, int ModuleSize);
 	void	FreeSong(void);
 
 	//Playback controls

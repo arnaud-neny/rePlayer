@@ -59,6 +59,14 @@
 //CODE
 //////////////////////////
 
+inline void* Malloc(size_t s)
+{
+	void* m = malloc(s);
+	if (m)
+		memset(m, 0, s);
+	return m;
+}
+
 SoundEngine::SoundEngine()
 {
 	int i;
@@ -2015,8 +2023,8 @@ void SoundEngine::CreateEmptySong(void)
 
 	m_SongPack.nrofsongs=1;
 	m_SongPack.mugiversion=3457;
-	m_Songs = (subsong **)malloc(1*sizeof(subsong*));
-	m_Songs[0] = (subsong *) malloc(sizeof(subsong));
+	m_Songs = (subsong **)Malloc(1*sizeof(subsong*));
+	m_Songs[0] = (subsong *) Malloc(sizeof(subsong));
 	m_Songs[0]->songspd=120;
 	m_Songs[0]->groove=0;
 	m_Songs[0]->songpos=0;
@@ -2035,7 +2043,7 @@ void SoundEngine::CreateEmptySong(void)
 	for(i=0;i<SE_MAXCHANS;i++)
 	{
 		m_Songs[0]->mute[i]=0;
-		m_Songs[0]->songchans[i] = (songitem *) malloc(256*sizeof(songitem));
+		m_Songs[0]->songchans[i] = (songitem *) Malloc(256*sizeof(songitem));
 
 		songpart = m_Songs[0]->songchans[i];
 		for (j=0;j<256;j++)
@@ -2047,18 +2055,18 @@ void SoundEngine::CreateEmptySong(void)
 
 //patterns maken
 	m_SongPack.nrofpats = 2; // aantal patterns beschikbaar
-	m_Patterns = (patitem *) malloc(64*m_SongPack.nrofpats*sizeof(patitem));
+	m_Patterns = (patitem *) Malloc(64*m_SongPack.nrofpats*sizeof(patitem));
 	memset(m_Patterns,0,128*sizeof(patitem));
-	m_PatternNames = (char **) malloc(8);
-	m_PatternNames[0] = (char *) malloc(10);
+	m_PatternNames = (char **) Malloc(sizeof(char*)*2);
+	m_PatternNames[0] = (char *) Malloc(10);
 	strcpy(m_PatternNames[0], "Empty");
-	m_PatternNames[1] = (char *) malloc(5);
+	m_PatternNames[1] = (char *) Malloc(5);
 	strcpy(m_PatternNames[1], "Pat1");
 
 // instrument maken
 	m_SongPack.nrofinst = 1;
-	m_Instruments = (inst **) malloc(4);
-	m_Instruments[0] = (inst *) malloc(sizeof(inst));
+	m_Instruments = (inst **) Malloc(sizeof(inst**));
+	m_Instruments[0] = (inst *) Malloc(sizeof(inst));
 	memcpy(m_Instruments[0], m_DefaultInst,sizeof(inst));
 
 //zero1
@@ -2192,10 +2200,10 @@ void SoundEngine::FreeSong(void)
 //				 7: The archive doesn't contain a mugician song
 
 
-#define FILEREAD(dest, size) {memcpy((dest), file+ReadIndex, (size)); ReadIndex +=(size);}
+#define FILEREAD(dest, size) {if(ReadIndex+(size)<ModuleSize) {memcpy((dest), file+ReadIndex, (size)); ReadIndex +=(size);}else{memset((dest),0,(size));}}
 static inline auto Align(auto s) { return (s + 3) & ~3; }
 
-int SoundEngine::LoadSongFromMemory(unsigned char *file)
+int SoundEngine::LoadSongFromMemory(unsigned char *file, int ModuleSize)
 {
 	int ReadIndex;
 	bool curdirflg;
@@ -2219,13 +2227,13 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 	{
 		// Now let's read all the subsongs
 		version = m_SongPack.mugiversion;
-		m_Songs = (subsong **)malloc(m_SongPack.nrofsongs*sizeof(subsong*));
-		if(m_Songs)//did the malloc fail?
+		m_Songs = (subsong **)Malloc(m_SongPack.nrofsongs*sizeof(subsong*));
+		if(m_Songs)//did the Malloc fail?
 		{
 
 			for(i=0;i<m_SongPack.nrofsongs;i++)
 			{
-				m_Songs[i] = (subsong *) malloc(sizeof(subsong));
+				m_Songs[i] = (subsong *) Malloc(sizeof(subsong));
 				if(m_Songs[i])
 				{
 					//subsongheader
@@ -2234,12 +2242,12 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 					//subsong channeldata
 					for(j=0;j<SE_MAXCHANS;j++)
 					{
-						m_Songs[i]->songchans[j] = (songitem *) malloc(256*sizeof(songitem));
+						m_Songs[i]->songchans[j] = (songitem *) Malloc(256*sizeof(songitem));
 						if(m_Songs[i]->songchans[j])
 						{
 							FILEREAD(m_Songs[i]->songchans[j], 256*sizeof(songitem));
 						}
-						else //malloc of channeldata failed
+						else //Malloc of channeldata failed
 						{
 							error = 1;
 							failed=true;
@@ -2247,7 +2255,7 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 						}
 					}
 				}
-				else//malloc of subsong failed
+				else//Malloc of subsong failed
 				{
 					error = 1;
 					failed=true;
@@ -2256,12 +2264,12 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 			}
 
 		// now let's load the pattern data
-			m_Patterns = (patitem *) malloc(64*m_SongPack.nrofpats*sizeof(patitem));
+			m_Patterns = (patitem *) Malloc(64*m_SongPack.nrofpats*sizeof(patitem));
 			if(m_Patterns)
 			{
 				FILEREAD(m_Patterns, m_SongPack.nrofpats*64*sizeof(patitem));
 			}
-			else // malloc of patterndata failed
+			else // Malloc of patterndata failed
 			{
 				error = 1;
 				failed=true;
@@ -2269,18 +2277,18 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 			}
 
 			// And all the patterns names (first we load 1 long for the length(With the added zero which is saved too))
-			m_PatternNames = (char **)malloc(m_SongPack.nrofpats * sizeof(char *));
+			m_PatternNames = (char **)Malloc(m_SongPack.nrofpats * sizeof(char *));
 			if(m_PatternNames)
 			{
 				for(i=0;i<m_SongPack.nrofpats;i++)
 				{
 					FILEREAD(&length[0], 4);
-					m_PatternNames[i] = (char *) malloc(length[0]);
+					m_PatternNames[i] = (char *) Malloc(length[0]);
 					if(m_PatternNames[i])
 					{
 						FILEREAD(m_PatternNames[i],length[0]);
 					}
-					else//malloc of patname failed
+					else//Malloc of patname failed
 					{
 						error = 1;
 						failed=true;
@@ -2288,7 +2296,7 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 					}
 				}
 			}
-			else //malloc of m_PatternNames failed
+			else //Malloc of m_PatternNames failed
 			{
 				error = 1;
 				failed=true;
@@ -2297,12 +2305,12 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 
 		// And finally we load the instrumentdata with the occasional sample
 
-			m_Instruments = (inst **) malloc(m_SongPack.nrofinst*sizeof(inst *));
+			m_Instruments = (inst **) Malloc(m_SongPack.nrofinst*sizeof(inst *));
 			if(m_Instruments)
 			{
 				for(i=0;i<m_SongPack.nrofinst;i++)
 				{
-					m_Instruments[i] = (inst *)malloc(sizeof(inst));
+					m_Instruments[i] = (inst *)Malloc(sizeof(inst));
 					if(m_Instruments[i])
 					{
 // 						FILEREAD(m_Instruments[i], sizeof(inst));
@@ -2326,12 +2334,12 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 
 						if(m_Instruments[i]->sampledata != 0) // there's a sample attached to it?
 						{
-							m_Instruments[i]->sampledata = (unsigned char *) malloc(m_Instruments[i]->samplelength);
+							m_Instruments[i]->sampledata = (unsigned char *) Malloc(m_Instruments[i]->samplelength);
 							if(m_Instruments[i]->sampledata)
 							{
 								FILEREAD(m_Instruments[i]->sampledata,m_Instruments[i]->samplelength);
 							}
-							else //malloc of wavedata failed
+							else //Malloc of wavedata failed
 							{
 								error = 1;
 								failed=true;
@@ -2339,7 +2347,7 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 							}
 						}
 					}
-					else //malloc of instrument failed
+					else //Malloc of instrument failed
 					{
 						error = 1;
 						failed=true;
@@ -2348,7 +2356,7 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 
 				}
 			}
-			else //malloc of instruments tabel failed
+			else //Malloc of instruments tabel failed
 			{
 				error = 1;
 				failed=true;
@@ -2369,7 +2377,7 @@ int SoundEngine::LoadSongFromMemory(unsigned char *file)
 			// YES!!!! Ready...all is saved.. Let's close the file
 
 		}
-		else//malloc of 'songs' failed
+		else//Malloc of 'songs' failed
 		{
 			error = 1;
 			failed=true;
