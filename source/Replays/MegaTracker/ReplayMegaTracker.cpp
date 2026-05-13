@@ -38,10 +38,10 @@ extern "C"
                 return 0;
         }
         else
-		{
-			s_file = s_mainFile;
+        {
+            s_file = s_mainFile;
             s_file->Seek(0, core::io::Stream::kSeekBegin);
-		}
+        }
 
         return 1;
     }
@@ -239,14 +239,14 @@ namespace rePlayer
         while (remainingSamples > 0)
         {
             if (m_numSamples == 0)
-			{
+            {
                 if (!m_plugin->GetSongStat())
                     break;
 
-				GUS_Update();
+                GUS_Update();
 
                 m_numSamples = SPT;
-			}
+            }
 
             auto samplesToRender = Min(m_numSamples, remainingSamples);
             output = output->Convert(m_surround, GUS_GetSamples() + (SPT - m_numSamples) * 2, samplesToRender, m_stereoSeparation);
