@@ -5148,7 +5148,7 @@ static void pmd_part_proc_fm(
   if (!part->proc_masked) {
     part->lfof.portamento = false;
   }
-  for (;;) {
+  for (int cnt=0;cnt<65536;++cnt) { //rePlayer:hack for endless loop (bad file/wrong file)
     // 137f / 151b
     uint8_t cmd = pmd_part_cmdload(pmd, part);
     if (cmd & 0x80) {
