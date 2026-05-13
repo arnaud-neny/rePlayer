@@ -1207,8 +1207,8 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
     // Select style and parent window
     // rePlayer begin
     ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &vd->DwStyle, &vd->DwExStyle, viewport->ParentViewportId != ImGui::GetMainViewport()->ID);
-    vd->HwndParent = viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon ? ImGui_ImplWin32_GetHwndFromViewport(viewport->ParentViewport) : nullptr; // ignore parent to create the window with a taskbar and re-assigned it later with other fix
     // rePlayer end
+    vd->HwndParent = ImGui_ImplWin32_GetHwndFromViewport(viewport->ParentViewport);
 
     // Create window
     RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
@@ -1281,14 +1281,8 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
         // Calling ::SetParent() here would be incorrect: it will create a full child relation, alter coordinate system and clipping.
         // Calling ::SetWindowLongPtr() with GWLP_HWNDPARENT seems correct although poorly documented.
         // https://devblogs.microsoft.com/oldnewthing/20100315-00/?p=14613
-        // rePlayer begin : taskbar icon fix attempt
-        if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon || ::GetFocus() == vd->Hwnd)
-        {
-            vd->HwndParent = new_parent;
-            ::SetWindowLongPtr(vd->Hwnd, GWLP_HWNDPARENT, (LONG_PTR)vd->HwndParent);
-            vd->DwStyle = 0xffFFffFF; // rePlayer: force style to show window
-        }
-        // rePlayer end
+        vd->HwndParent = new_parent;
+        ::SetWindowLongPtr(vd->Hwnd, GWLP_HWNDPARENT, (LONG_PTR)vd->HwndParent);
     }
 
     // (Optional) Update Win32 style if it changed _after_ creation.

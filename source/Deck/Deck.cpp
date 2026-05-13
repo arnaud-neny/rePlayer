@@ -21,6 +21,7 @@
 
 // system :(
 #include <windows.h>
+#include <shobjidl.h> // taskbar hack
 
 // stl
 #include <cmath>
@@ -496,6 +497,19 @@ namespace rePlayer
         // We want this to be the "main" window
         auto viewport = ImGui::GetWindowViewport();
         viewport->Flags &= ~ImGuiViewportFlags_NoTaskBarIcon;
+        // Taskbar hack to bring the icon back
+        static bool needSetup = true;
+        if (needSetup && viewport->PlatformHandleRaw)
+        {
+            ITaskbarList* pTaskbar = nullptr;
+            if (CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER, IID_ITaskbarList, pCast<void*>(&pTaskbar)) >= 0)
+            {
+                pTaskbar->HrInit();
+                pTaskbar->ActivateTab(HWND(viewport->PlatformHandleRaw));
+                pTaskbar->Release();
+                needSetup = false;
+            }
+        }
         // Hack end
 
         Core::GetPlaylist().UpdateDragDropSource(1);

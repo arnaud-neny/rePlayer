@@ -189,7 +189,7 @@ index c255b5d6..4d632722 100644
  
  bool ImGui::DragFloat2(const char* label, float v[2], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags)
 diff --git a/external/imgui-docking/backends/imgui_impl_win32.cpp b/source/Core/ImGui/imgui_impl_win32.cpp
-index eb38c31d..990ef2b5 100644
+index eb38c31d..78728fdf 100644
 --- a/external/imgui-docking/backends/imgui_impl_win32.cpp
 +++ b/source/Core/ImGui/imgui_impl_win32.cpp
 @@ -1156,21 +1156,29 @@ struct ImGui_ImplWin32_ViewportData
@@ -226,36 +226,18 @@ index eb38c31d..990ef2b5 100644
  
  static HWND ImGui_ImplWin32_GetHwndFromViewport(ImGuiViewport* viewport)
  {
-@@ -1197,8 +1205,10 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+@@ -1197,7 +1205,9 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
      viewport->PlatformUserData = vd;
  
      // Select style and parent window
 -    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &vd->DwStyle, &vd->DwExStyle);
--    vd->HwndParent = ImGui_ImplWin32_GetHwndFromViewport(viewport->ParentViewport);
 +    // rePlayer begin
 +    ImGui_ImplWin32_GetWin32StyleFromViewportFlags(viewport->Flags, &vd->DwStyle, &vd->DwExStyle, viewport->ParentViewportId != ImGui::GetMainViewport()->ID);
-+    vd->HwndParent = viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon ? ImGui_ImplWin32_GetHwndFromViewport(viewport->ParentViewport) : nullptr; // ignore parent to create the window with a taskbar and re-assigned it later with other fix
 +    // rePlayer end
+     vd->HwndParent = ImGui_ImplWin32_GetHwndFromViewport(viewport->ParentViewport);
  
      // Create window
-     RECT rect = { (LONG)viewport->Pos.x, (LONG)viewport->Pos.y, (LONG)(viewport->Pos.x + viewport->Size.x), (LONG)(viewport->Pos.y + viewport->Size.y) };
-@@ -1271,15 +1281,23 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
-         // Calling ::SetParent() here would be incorrect: it will create a full child relation, alter coordinate system and clipping.
-         // Calling ::SetWindowLongPtr() with GWLP_HWNDPARENT seems correct although poorly documented.
-         // https://devblogs.microsoft.com/oldnewthing/20100315-00/?p=14613
--        vd->HwndParent = new_parent;
--        ::SetWindowLongPtr(vd->Hwnd, GWLP_HWNDPARENT, (LONG_PTR)vd->HwndParent);
-+        // rePlayer begin : taskbar icon fix attempt
-+        if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon || ::GetFocus() == vd->Hwnd)
-+        {
-+            vd->HwndParent = new_parent;
-+            ::SetWindowLongPtr(vd->Hwnd, GWLP_HWNDPARENT, (LONG_PTR)vd->HwndParent);
-+            vd->DwStyle = 0xffFFffFF; // rePlayer: force style to show window
-+        }
-+        // rePlayer end
-     }
- 
-     // (Optional) Update Win32 style if it changed _after_ creation.
+@@ -1279,7 +1289,9 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
      // Generally they won't change unless configuration flags are changed, but advanced uses (such as manually rewriting viewport flags) make this useful.
      DWORD new_style;
      DWORD new_ex_style;
@@ -266,7 +248,7 @@ index eb38c31d..990ef2b5 100644
  
      // Only reapply the flags that have been changed from our point of view (as other flags are being modified by Windows)
      if (vd->DwStyle != new_style || vd->DwExStyle != new_ex_style)
-@@ -1432,6 +1450,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+@@ -1432,6 +1444,10 @@ static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
  
  namespace ImGui { extern ImGuiIO& GetIO(ImGuiContext*); extern ImGuiPlatformIO& GetPlatformIO(ImGuiContext*); }
  
@@ -277,7 +259,7 @@ index eb38c31d..990ef2b5 100644
  static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
  {
      // Allow secondary viewport WndProc to be called regardless of current context
-@@ -1448,6 +1470,14 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1448,6 +1464,14 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
      {
          switch (msg)
          {
@@ -292,7 +274,7 @@ index eb38c31d..990ef2b5 100644
          case WM_CLOSE:
              viewport->PlatformRequestClose = true;
              return 0; // 0 = Operating system will ignore the message and not destroy the window. We close ourselves.
-@@ -1478,6 +1508,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
+@@ -1478,6 +1502,7 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
  
  static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
  {
@@ -300,7 +282,7 @@ index eb38c31d..990ef2b5 100644
      WNDCLASSEXW wcex;
      wcex.cbSize = sizeof(WNDCLASSEXW);
      wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0);
-@@ -1485,13 +1516,14 @@ static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
+@@ -1485,13 +1510,14 @@ static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
      wcex.cbClsExtra = 0;
      wcex.cbWndExtra = 0;
      wcex.hInstance = ::GetModuleHandle(nullptr);
