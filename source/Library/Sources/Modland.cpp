@@ -410,18 +410,12 @@ namespace rePlayer
         otherblob.Copy(src, strlen(src) + 1);
     }
 
-    template <bool isCaseSensitive>
     inline bool SourceModland::Chars::IsSame(const Array<char>& blob, const char* otherString) const
     {
         auto src = blob.Items() + offset;
         while (*src && *otherString)
         {
-            if constexpr (isCaseSensitive)
-            {
-                if (*src != *otherString)
-                    return false;
-            }
-            else if (::tolower(*src) != ::tolower(*otherString))
+            if (*src != *otherString)
                 return false;
             src++;
             otherString++;
@@ -2230,7 +2224,7 @@ namespace rePlayer
                             {
                                 Log::Warning("Modland: missing extension \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
                             }
-                            else if (!m_db.replays[replayIndex].ext.IsSame<false>(m_db.strings, ext))
+                            else if (!m_db.replays[replayIndex].ext.IsSame(m_db.strings, ext))
                             {
                                 Log::Warning("Modland: extension mismatch \"%s\" for \"%s\"\n", m_db.replays[replayIndex].ext(m_db.strings), link.c_str());
                                 ext = nullptr;

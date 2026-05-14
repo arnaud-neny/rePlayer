@@ -53,7 +53,6 @@ namespace rePlayer
             void Set(Array<char>& blob, const std::string& otherString);
             template <typename T>
             void Copy(const Array<char>& blob, Array<T>& otherblob) const;
-            template <bool isCaseSensitive = true>
             bool IsSame(const Array<char>& blob, const char* otherString) const;
         };
 
