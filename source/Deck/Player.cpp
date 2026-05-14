@@ -297,14 +297,7 @@ namespace rePlayer
             sum.left += v1 * v1;
             sum.right += v2 * v2;
         }
-        auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
-        float scale = 1.0f;
-        if (ms_isReplayGainEnabled && rg.IsValid())
-            scale = powf(1.0f / (powf(10.0f, rg.gain / 20.0f) * rg.peak), 2);
-        else if (rg.IsValid())
-            scale = powf(1.0f / rg.peak, 2);
-        scale /= numVuMeterSamples;
-        return { sqrtf(sum.left * scale), sqrtf(sum.right * scale) };
+        return { sqrtf(sum.left / numVuMeterSamples), sqrtf(sum.right / numVuMeterSamples) };
     }
 
     void Player::DrawVisuals(float xMin, float yMin, float xMax, float yMax) const
@@ -330,15 +323,8 @@ namespace rePlayer
 
             drawList->PushClipRect({ xMin, yMin }, { xMax, yMax });
 
-            auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
-            float scale = 1.0f;
-            if (ms_isReplayGainEnabled && rg.IsValid())
-                scale = powf(1.0f / (powf(10.0f, rg.gain / 20.0f) * rg.peak), 2);
-            else if (rg.IsValid())
-                scale = powf(1.0f / rg.peak, 2);
-
             auto yCenter = (yMin + yMax) * 0.5f;
-            auto yScale = (yMax - yMin) * 0.5f * scale;
+            auto yScale = (yMax - yMin) * 0.5f;
 
             for (uint32_t i = 0; i < numOscilloscopeSamples; i++)
             {
