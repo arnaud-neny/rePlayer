@@ -160,7 +160,7 @@ public:
      *
      * @param cycles c64 clocks to run
      * @param buf audio output buffer
-     * @return number of samples produced
+     * @return number of 16bit samples produced
      */
     int clock(unsigned int cycles, SampleI16* buf);
 
@@ -169,7 +169,7 @@ public:
      * using chosen output resampling algorithm.
      *
      * @param buf audio output buffer
-     * @param bufSize the buffer size
+     * @param bufSize the buffer size as number of 16bit samples
      * @return number of c64 clocks run
      */
     int clock(SampleI16* buf, int bufSize);
@@ -216,6 +216,7 @@ public:
 
     /**
      * Enable/disable old caps for 6581 model.
+     * When enabled the filter cutoff is lower.
      *
      * @param enable true to enable old 2200pF caps used on ASSY 326298
      *               false to use the standard 470pF caps.

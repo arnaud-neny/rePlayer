@@ -49,7 +49,7 @@ namespace reSIDfp
  * for the currents, we get:
  *
  *     n*((Vddt - vx)^2 - (Vddt - vi)^2) + (Vddt - vx)^2 - (Vddt - vo)^2 = 0
- *
+ * 
  * where n is the ratio between R1 and R2.
  *
  * Our root function f can thus be written as:
@@ -88,12 +88,12 @@ public:
      * @param vmin
      * @param vmax
      */
-    OpAmp(const std::vector<Spline::Point> &opamp_voltages, double Vddt,
-            double vmin, double vmax
+    OpAmp(const std::vector<Spline::Point> &opamp_voltages, double new_Vddt,
+            double new_vmin, double new_vmax
     ) :
-        Vddt(Vddt),
-        vmin(vmin),
-        vmax(vmax),
+        Vddt(new_Vddt),
+        vmin(new_vmin),
+        vmax(new_vmax),
         opamp(opamp_voltages) {}
 
     /**

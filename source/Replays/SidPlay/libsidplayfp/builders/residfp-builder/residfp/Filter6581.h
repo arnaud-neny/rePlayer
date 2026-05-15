@@ -69,7 +69,7 @@ class Integrator6581;
  * Tommi Lempinen has done an impressive work on re-vectorizing and annotating
  * the die photographs, substantially simplifying further analysis of the
  * filter circuit.
- *
+ * 
  * The filter schematics below are reverse engineered from these re-vectorized
  * and annotated die photographs. While the filter first depicted in reSID 0.9
  * is a correct model of the basic filter, the schematics are now completed
@@ -232,8 +232,8 @@ class Integrator6581;
  * which varies with the input signals to the VCRs. This can be seen from the
  * VCR figure above.
  *
- *
- *
+ * 
+ * 
  * "Op-amp" (self-biased NMOS inverter)
  * ------------------------------------
  * ~~~
@@ -288,7 +288,7 @@ class Integrator6581;
  * ~~~
  *
  *            12V
- *
+ * 
  *             |
  *             |
  *         ||--+
@@ -300,7 +300,7 @@ class Integrator6581;
  *            Rext    OUT)
  *             |
  *             |
- *
+ * 
  *            GND
  *
  * vi   - input
