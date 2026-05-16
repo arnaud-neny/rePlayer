@@ -46,8 +46,6 @@ namespace rePlayer
         KSND_GetSongInfo(m_song, &m_info);
         KSND_SetPlayerQuality(m_player, 4);
 
-        // clear properties
-        m_properties.Clear();
         // push empty property info
         auto* property = m_properties.Push();
         property->label = "Info";

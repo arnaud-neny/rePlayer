@@ -14,8 +14,6 @@ namespace rePlayer
     class ReplayKlystrack : public Replay
     {
     public:
-        static bool Init(SharedContexts* ctx, Window& window);
-
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
     public:
