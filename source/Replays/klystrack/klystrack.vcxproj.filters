@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\klystron">
+      <UniqueIdentifier>{eb1f2901-7757-4c96-ab93-4e1110ae3cd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\klystron\snd">
+      <UniqueIdentifier>{6edaa869-20e5-49b4-bdca-300addb6c66c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\klystron\lib">
+      <UniqueIdentifier>{19d74bd6-fa19-496a-82ca-f8369d3b00a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayKlystrack.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cyd.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydtypes.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\music.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydflt.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydfx.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydrvb.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydchr.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydcrush.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydentry.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cyddefs.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydadsr.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydfm.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydwave.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\lib\ksnd.h">
+      <Filter>Source Files\klystron\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\macros.h">
+      <Filter>Source Files\klystron</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL_endian.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\freqs.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\pack.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+    <ClInclude Include="klystron\src\snd\cydosc.h">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayKlystrack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\lib\ksnd.c">
+      <Filter>Source Files\klystron\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\music.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\freqs.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\pack.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cyd.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydfm.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydfx.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydcrush.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydchr.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydrvb.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydosc.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydwave.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydentry.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+    <ClCompile Include="klystron\src\snd\cydflt.c">
+      <Filter>Source Files\klystron\snd</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

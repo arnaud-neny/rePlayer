@@ -1011,3 +1011,4 @@ EXTENSION(ovi)          // FMP
 EXTENSION(ozi)          // FMP
 EXTENSION(mvm)          // MVX
 EXTENSION(jxs)          // JayTrax
+EXTENSION(kt)           // klystrack
