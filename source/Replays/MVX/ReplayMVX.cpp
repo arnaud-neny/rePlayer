@@ -9,6 +9,8 @@
 #include <filesystem>
 #endif
 
+#include <chrono>
+
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
@@ -30,9 +32,8 @@ namespace rePlayer
         stream->Seek(0, io::Stream::kSeekBegin);
 
         // prepare bridge
-        static uint32_t s_id = 0;
         char id[9];
-        sprintf(id, "%08X", s_id++);
+        sprintf(id, "%08X", uint32_t(std::chrono::system_clock::now().time_since_epoch().count()));
 
         auto hFileMapping = core::Scope([&]()
         {
