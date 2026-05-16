@@ -1,0 +1,14 @@
+libpac
+
+A library written in ANSI C to decode SBStudio PAC music modules into
+a stream of integer PCM audio data.  SBStudio is a tracker for MS-DOS
+written by Henning Hellstroem in the early 1990s.
+
+This package contain the source code for the libpac library and two
+plugins; one for XMMS (the X MultiMedia System) and one for Winamp
+(consider this one a quick hack).  There's also a command-line player
+included.
+
+See the file INSTALL for compilation and installation instructions.
+
+The libpac homepage is located at http://libpac.sourceforge.net/

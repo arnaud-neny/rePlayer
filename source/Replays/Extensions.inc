@@ -1012,3 +1012,4 @@ EXTENSION(ozi)          // FMP
 EXTENSION(mvm)          // MVX
 EXTENSION(jxs)          // JayTrax
 EXTENSION(kt)           // klystrack
+EXTENSION(pac)          // SBStudio
