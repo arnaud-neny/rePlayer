@@ -5,6 +5,15 @@
 
 ## Current version
 
+v0.22.3:
+- Added JayTrax
+- Added Klystrack
+- Added SBStudio
+- Updated residfp to 1.0.2
+- Updated ImGui to 1.92.8
+- Updated TagLib to 2.3
+- Bug fixes
+
 v0.22.2:
 - Updated libfc14audiodecoder to 1.0.7
 - Updated libsidplay to 3.0.0

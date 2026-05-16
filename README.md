@@ -222,7 +222,9 @@ Or add some comments (and likes) there:
 - [Highly Theoretical](https://bitbucket.org/losnoco/highly_theoretical): Saturn and Dreamcast music player.
 - [HivelyTracker](https://github.com/pete-gordon/hivelytracker): ahx-thx-hvl formats.
 - [iXalance](https://bitbucket.org/wothke/webixs): IXS player (Impulse Tracker modules with procedural samples).
+- [JayTrax](https://proofofconcept.nl/portfolio/jaytrax): Jaytrax synth.
 - [Ken](http://advsys.net/ken): in_ken plays all Ken Silverman's formats.
+- [Klystrack](https://kometbomb.github.io/klystrack): klystrack is a tracker for making C64/NES/Amiga-style chiptunes on a modern platform.
 - [LazyUSF](https://bitbucket.org/losnoco/lazyusf2): Nintendo 64 music player.
 - [LIBKSS](https://github.com/digital-sound-antiques/libkss): LIBKSS is a music player library for MSX music formats, forked from MSXplug. Supported formats are .kss, .mgs, .bgm, .opx, .mpk, .mbm.
 - [libtfmxaudiodecoder](https://github.com/mschwendt/libtfmxaudiodecoder): Library for TFMX & Future Composer audio decoding.
@@ -238,6 +240,7 @@ Or add some comments (and likes) there:
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
 - [PxTone](https://pxtone.org): PxTone Collage is a free but powerful music editor made by Pixel, the creator of Cave Story and Kero Blaster.
+- [SBStudio](https://libpac.sourceforge.net): SBStudio is a tracker for MS-DOS written by Henning Hellstroem in the early 1990s.
 - [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [SkaleTracker](https://www.pouet.net/prod.php?which=20929): Skale Tracker is a music tracker developed by Ruben Ramos Salvador (baktery) in the year 1998.

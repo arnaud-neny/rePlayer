@@ -41,7 +41,9 @@
   With minor changes.
 - iXalance: https://bitbucket.org/wothke/webixs  
   Fixed some memory leaks and made it x64 compliant.
+- JayTrax: https://bitbucket.org/rhinoid/crossx
 - Ken: http://advsys.net/ken/ & https://bitbucket.org/wothke/webken
+- Klystrack: https://github.com/kometbomb/klystron & https://github.com/kometbomb/klystrack
 - LazyUSF: https://bitbucket.org/losnoco/lazyusf2, https://gitlab.com/kode54/lazyusf2 and https://bitbucket.org/losnoco/psflib
 - LIBKSS: https://github.com/digital-sound-antiques/libkss
 - libnezplug: https://github.com/jprjr/libnezplug
@@ -58,6 +60,7 @@
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - Psycle: https://sourceforge.net/projects/psycle
 - PxTone: https://pxtone.org/developer & https://github.com/yuxshao/ptweb
+- SBStudio: https://libpac.sourceforge.net
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp & https://github.com/libsidplayfp/libresidfp
 - SkaleTracker: https://www.pouet.net/prod.php?which=20929
