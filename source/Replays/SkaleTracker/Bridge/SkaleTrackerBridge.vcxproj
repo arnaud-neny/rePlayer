@@ -53,11 +53,11 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(SolutionDir)Core</AdditionalIncludeDirectories>
     </ClCompile>
@@ -72,19 +72,16 @@
 copy /Y $(ProjectDir)..\SkalePlayer\Bin\Win32\SkalePlayer.dll $(TargetDir) &gt; nul 2&gt;&amp;1
 copy /Y $(TargetDir) $(TargetDir)..\..\..\x64_Debug\replays\SkaleTracker\ &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>@MSBuild.exe $(SolutionPath) /target:rePlayer\Core /p:configuration=$(Configuration) /p:platform=$(Platform) /v:m</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/w44266 /wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(SolutionDir)Core</AdditionalIncludeDirectories>
     </ClCompile>
@@ -105,9 +102,6 @@ copy /Y $(ProjectDir)..\SkalePlayer\Bin\Win32\SkalePlayer.dll $(SolutionDir)..\d
 copy /Y $(ProjectDir)..\SkalePlayer\Bin\Win32\SkalePlayer.dll $(TargetDir) &gt; nul 2&gt;&amp;1
 copy /Y $(TargetDir) $(TargetDir)..\..\..\x64_Release\replays\SkaleTracker\ &gt; nul 2&gt;&amp;1</Command>
     </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>@MSBuild.exe $(SolutionPath) /target:rePlayer\Core /p:configuration=$(Configuration) /p:platform=$(Platform) /v:m</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\SkalePlayer\Include\SkalePlayer.h" />
