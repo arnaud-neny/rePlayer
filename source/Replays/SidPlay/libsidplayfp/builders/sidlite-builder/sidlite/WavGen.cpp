@@ -365,17 +365,17 @@ wg_output_t WavGen::clock(const ADSR *adsr)
         if (UNLIKELY(FilterSwitchReso & (1 << Channel)))
         {
             int v = (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
-            if (Panning[Channel] <= 0)
+            if (!isSurroundEnabled || Channel != 1)
                 FilterInput.left += v;
-            if (Panning[Channel] >= 0)
+            if (!isSurroundEnabled || Channel == 1)
                 FilterInput.right += v;
         }
         else if (LIKELY(Channel!=2 || !(VolumeBand & OFF3_BITVAL)))
         {
             int v = (swave * Envelope) / ENVELOPE_MAGNITUDE_DIV;
-            if (Panning[Channel] <= 0)
+            if (!isSurroundEnabled || Channel != 1)
                 NonFiltered.left += v;
-            if (Panning[Channel] >= 0)
+            if (!isSurroundEnabled || Channel == 1)
                 NonFiltered.right += v;
         }
     }

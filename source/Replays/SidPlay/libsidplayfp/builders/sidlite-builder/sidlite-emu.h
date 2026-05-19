@@ -68,7 +68,7 @@ public:
 
     int getLevel(int i) const;
 
-    void panning(unsigned int voice, char pan);
+    void surround(bool enabled);
 };
 
 }

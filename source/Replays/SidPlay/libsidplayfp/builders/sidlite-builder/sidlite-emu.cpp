@@ -152,8 +152,8 @@ void SIDLiteEmu::model(SidConfig::sid_model_t model, bool /*digiboost*/)
     m_status = true;
 }
 
-void SIDLiteEmu::panning(unsigned int voice, char pan)
+void SIDLiteEmu::surround(bool enabled)
 {
-    m_sid.panning(voice, pan);
+    m_sid.surround(enabled);
 }
 }

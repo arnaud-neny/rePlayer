@@ -121,8 +121,6 @@ public:
         waveformGenerator.reset();
         envelopeGenerator.reset();
     }
-
-    char panning = 0;
 };
 
 } // namespace reSIDfp

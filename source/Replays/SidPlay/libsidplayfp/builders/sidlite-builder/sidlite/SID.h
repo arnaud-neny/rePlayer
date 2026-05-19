@@ -57,8 +57,7 @@ public:
 
     int getLevel(int i) const { return filter.getLevel(i); }
 
-    void panning(unsigned int voice, char pan) { wavgen.Panning[voice] = pan; }
-
+    void surround(bool enabled) { wavgen.isSurroundEnabled = enabled; }
 private:
     unsigned char regs[0x20] = {0};
 

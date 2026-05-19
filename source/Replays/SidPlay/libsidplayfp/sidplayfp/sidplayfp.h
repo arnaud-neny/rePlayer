@@ -145,7 +145,7 @@ public:
      * @return number of samples generated (samples for mono, samples*2 for stereo)
      * @since 2.15
      */
-    unsigned int mix(SampleI16 *buffer, unsigned int samples);
+    unsigned int mix(short *buffer, unsigned int samples);
 
     /**
      * Control CPU tracing.
@@ -237,7 +237,7 @@ public:
      */
     int getBufSize(unsigned int cycles);
 
-    void panning(unsigned int sidNum, unsigned int voice, char pan);
+    void surround(bool enabled);
 };
 
 #endif // SIDPLAYFP_H

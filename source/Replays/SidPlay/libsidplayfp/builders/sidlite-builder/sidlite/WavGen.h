@@ -61,7 +61,7 @@ private:
     unsigned char oscReg;
     unsigned char envReg;
 public:
-    char          Panning[3] = { 0 };
+    char          isSurroundEnabled = false;
 };
 
 }

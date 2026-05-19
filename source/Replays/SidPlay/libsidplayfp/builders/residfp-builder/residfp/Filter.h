@@ -45,10 +45,10 @@ private:
     FilterModelConfig& fmc;
 
     /// Current filter/voice mixer setting.
-    unsigned short* currentMixer = nullptr;
+    unsigned short* currentMixer[2] = { nullptr };
 
     /// Filter input summer setting.
-    unsigned short* currentSummer = nullptr;
+    unsigned short* currentSummer[2] = { nullptr };
 
     /// Filter resonance value.
     unsigned short* currentResonance = nullptr;
@@ -98,6 +98,8 @@ private:
 
     /// Filter enabled.
     bool enabled = true;
+
+    bool isSurroundEnabled = false;
 
     /// Selects which inputs to route through filter.
     unsigned char filt = 0;
@@ -201,6 +203,8 @@ public:
      * @param input a signed 16 bit sample
      */
     void input(short input) { Ve = fmc.getNormalizedVoice(input/32768.f, 0); }
+
+    void surround(bool surroundEnabled);
 };
 
 } // namespace reSIDfp
@@ -221,28 +225,26 @@ SampleU16 Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
     int Vsum[2] = { 0 };
     int Vmix[2] = { 0 };
 
-    if (voice1.panning <= 0)
-        (filt1 ? Vsum[0] : Vmix[0]) += V1;
-    if (voice2.panning <= 0)
+    (filt1 ? Vsum[0] : Vmix[0]) += V1;
+    if (!isSurroundEnabled)
         (filt2 ? Vsum[0] : Vmix[0]) += V2;
-    if (voice3.panning <= 0)
-        (filt3 ? Vsum[0] : Vmix[0]) += V3;
+    (filt3 ? Vsum[0] : Vmix[0]) += V3;
     (filtE ? Vsum[0] : Vmix[0]) += Ve;
-    if (voice1.panning >= 0)
+
+    if (!isSurroundEnabled)
         (filt1 ? Vsum[1] : Vmix[1]) += V1;
-    if (voice1.panning >= 0)
-        (filt2 ? Vsum[1] : Vmix[1]) += V2;
-    if (voice1.panning >= 0)
+    (filt2 ? Vsum[1] : Vmix[1]) += V2;
+    if (!isSurroundEnabled)
         (filt3 ? Vsum[1] : Vmix[1]) += V3;
     (filtE ? Vsum[1] : Vmix[1]) += Ve;
 
-    Vhp[0] = currentSummer[currentResonance[Vbp[0]] + Vlp[0] + Vsum[0]];
-    Vhp[1] = currentSummer[currentResonance[Vbp[1]] + Vlp[1] + Vsum[1]];
+    Vhp[0] = currentSummer[0][currentResonance[Vbp[0]] + Vlp[0] + Vsum[0]];
+    Vhp[1] = currentSummer[1][currentResonance[Vbp[1]] + Vlp[1] + Vsum[1]];
 
     Vmix[0] += solveIntegrators(0);
     Vmix[1] += solveIntegrators(1);
 
-    return { currentVolume[currentMixer[Vmix[0]]], currentVolume[currentMixer[Vmix[1]]] };
+    return { currentVolume[currentMixer[0][Vmix[0]]], currentVolume[currentMixer[1][Vmix[1]]] };
 }
 
 } // namespace reSIDfp

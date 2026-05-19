@@ -155,7 +155,7 @@ public:
      */
     SampleI16 *buffer() const { return m_buffer; }
 
-    virtual void panning(unsigned int voice, char pan) = 0;
+    virtual void surround(bool enabled) = 0;
 };
 
 }

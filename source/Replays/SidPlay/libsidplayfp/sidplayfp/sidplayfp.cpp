@@ -137,7 +137,7 @@ void sidplayfp::initMixer(bool stereo)
     return sidplayer.initMixer(stereo);
 }
 
-unsigned int sidplayfp::mix(SampleI16 *buffer, unsigned int samples)
+unsigned int sidplayfp::mix(short *buffer, unsigned int samples)
 {
     return sidplayer.mix(buffer, samples);
 }
@@ -147,7 +147,7 @@ int sidplayfp::getBufSize(unsigned int cycles)
     return sidplayer.getBufSize(cycles);
 }
 
-void sidplayfp::panning(unsigned int sidNum, unsigned int voice, char pan)
+void sidplayfp::surround(bool enabled)
 {
-    sidplayer.panning(sidNum, voice, pan);
+    sidplayer.surround(enabled);
 }

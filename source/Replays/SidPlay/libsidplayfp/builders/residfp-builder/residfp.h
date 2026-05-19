@@ -80,7 +80,7 @@ public:
     /**
      * Set combined waveforms strength.
      *
-     * @param cws
+     * @param cws 
      */
     void combinedWaveformsStrength(SidConfig::sid_cw_t cws);
     //@}

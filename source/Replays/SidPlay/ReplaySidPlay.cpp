@@ -250,7 +250,6 @@ namespace rePlayer
 
         auto settings = metadata.Find<Settings>();
         m_isFastSid = settings && settings->overrideEnableFastSid ? settings->fastSidEnabled : ms_isFastSidEnabled;
-        m_isFastSid &= strstr(sidTune->getInfo()->formatString(), "RSID") == 0; // SIDLite doesn't work properly with Real SID
 
         m_sidTune->selectSong(m_subsongIndex + 1);
         m_sidplayfp = new sidplayfp();
@@ -442,11 +441,7 @@ namespace rePlayer
         bool isSurroundEnable = (settings && settings->overrideSurround) ? settings->surround : ms_surround;
         m_surround.Enable(isSurroundEnable);
         if (m_sidplayfp->installedSIDs() == 1)
-        {
-            m_sidplayfp->panning(0, 0, isSurroundEnable ? -1 : 0);
-            m_sidplayfp->panning(0, 1, isSurroundEnable ?  1 : 0);
-            m_sidplayfp->panning(0, 2, isSurroundEnable ? -1 : 0);
-        }
+            m_sidplayfp->surround(isSurroundEnable);
     }
 
     void ReplaySidPlay::SetSubsong(uint32_t subsongIndex)

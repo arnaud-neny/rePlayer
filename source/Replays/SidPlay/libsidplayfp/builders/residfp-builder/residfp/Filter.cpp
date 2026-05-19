@@ -52,24 +52,32 @@ void Filter::updateMixing()
 {
     currentVolume = volume + (vol * (1<<16));
 
-    unsigned int Nsum = 0;
-    unsigned int Nmix = 0;
+    for (int i = 0; i < 2; ++i)
+    {
+        unsigned int Nsum = 0;
+        unsigned int Nmix = 0;
 
-    (filt1 ? Nsum : Nmix)++;
-    (filt2 ? Nsum : Nmix)++;
+        if (i == 0 || !isSurroundEnabled)
+            (filt1 ? Nsum : Nmix)++;
+        if (i == 1 || !isSurroundEnabled)
+            (filt2 ? Nsum : Nmix)++;
 
-    if (filt3) Nsum++;
-    else if (!voice3off) Nmix++;
+        if (i == 0 || !isSurroundEnabled)
+        {
+            if (filt3) Nsum++;
+            else if (!voice3off) Nmix++;
+        }
 
-    (filtE ? Nsum : Nmix)++;
+        (filtE ? Nsum : Nmix)++;
 
-    currentSummer = summer + summerIdx[Nsum];
+        currentSummer[i] = summer + summerIdx[Nsum];
 
-    if (lp) Nmix++;
-    if (bp) Nmix++;
-    if (hp) Nmix++;
+        if (lp) Nmix++;
+        if (bp) Nmix++;
+        if (hp) Nmix++;
 
-    currentMixer = mixer + mixerIdx[Nmix];
+        currentMixer[i] = mixer + mixerIdx[Nmix];
+    }
 }
 
 void Filter::writeFC_LO(unsigned char fc_lo)
@@ -142,6 +150,12 @@ void Filter::reset()
     writeFC_HI(0);
     writeMODE_VOL(0);
     writeRES_FILT(0);
+}
+
+void Filter::surround(bool surroundEnabled)
+{
+    isSurroundEnabled = surroundEnabled;
+    updateMixing();
 }
 
 } // namespace reSIDfp

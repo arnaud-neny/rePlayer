@@ -48,7 +48,7 @@ private:
 
     /**
      * Pointer to the ROM buffer
-     */
+     */ 
     const uint8_t* m_rom;
 
     /**

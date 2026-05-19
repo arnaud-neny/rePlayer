@@ -142,7 +142,7 @@ void residfp::enableOld6581caps(bool enable)
     sid.enableOld6581caps(enable);
 }
 
-void residfp::panning(unsigned int voice, char pan)
+void residfp::surround(bool enabled)
 {
-    sid.panning(voice, pan);
+    sid.surround(enabled);
 }

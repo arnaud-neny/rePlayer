@@ -156,14 +156,14 @@ public:
 
     /**
      * Trigger an interrupt.
-     *
+     * 
      * @param interruptMask Interrupt flag number
      */
     virtual void trigger(uint8_t interruptMask) =0;
 
     /**
      * Clear interrupt state.
-     *
+     * 
      * @return old interrupt state
      */
     virtual uint8_t clear();

@@ -171,9 +171,9 @@ void reSIDfpEmu::combinedWaveforms(SidConfig::sid_cw_t cws)
     m_status = true;
 }
 
-void reSIDfpEmu::panning(unsigned int voice, char pan)
+void reSIDfpEmu::surround(bool enabled)
 {
-    m_sid.panning(voice, pan);
+    m_sid.surround(enabled);
 }
 
 }

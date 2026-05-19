@@ -545,9 +545,10 @@ void SID::clockSilent(unsigned int cycles)
     }
 }
 
-void SID::panning(unsigned int v, char pan)
+
+void SID::surround(bool enabled)
 {
-    voice[v].panning = pan;
+    filter->surround(enabled);
 }
 
 } // namespace reSIDfp
