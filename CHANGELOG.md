@@ -5,6 +5,9 @@
 
 ## Current version
 
+v0.22.4:
+- Bug fixes
+
 v0.22.3:
 - Added JayTrax
 - Added Klystrack
