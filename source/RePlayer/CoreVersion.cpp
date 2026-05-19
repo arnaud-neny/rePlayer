@@ -43,7 +43,7 @@ namespace rePlayer
             return Status::kOk;
 
         // Allow only one instance
-        for (int numRetries = 4;;)
+        for (int numRetries = 16;;)
         {
             ::CreateMutex(0, false, "Local\\$rePlayer$");
             if (GetLastError() == ERROR_ALREADY_EXISTS)
@@ -77,6 +77,7 @@ namespace rePlayer
 
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_easy_setopt(curl, CURLOPT_URL, "https://github.com/arnaud-neny/rePlayer/releases/latest");
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
         if (curl_easy_perform(curl) == CURLE_OK)
         {
@@ -116,18 +117,10 @@ namespace rePlayer
                     {
                         // rename
                         std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".exe", std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".old");
-                        for (const std::filesystem::directory_entry& dirEntry : std::filesystem::directory_iterator(mainPath))
-                        {
-                            if (dirEntry.is_regular_file() && _stricmp(dirEntry.path().extension().generic_string().c_str(), ".dll") == 0)
-                            {
-                                auto newpath = dirEntry.path();
-                                newpath.replace_extension("old");
-                                std::filesystem::rename(dirEntry.path(), newpath);
-                            }
-                        }
+                        std::filesystem::rename(mainPath / "replays" REPLAYER_OS_STUB "/", mainPath / "replays" REPLAYER_OS_STUB ".old/");
 
                         // unzip
-                        std::string errors;
+                        bool hasFailed = false;
                         auto archive = archive_read_new();
                         archive_read_support_format_all(archive);
                         archive_read_open_memory(archive, downloadBuffer.Items(), downloadBuffer.Size<size_t>());
@@ -156,21 +149,31 @@ namespace rePlayer
                                     file.Write(unpackedData.Items(), fileSize);
                                 else
                                 {
-                                    if (errors.empty())
-                                        errors = "Can't write:";
-                                    char txt[256];
-                                    sprintf(txt, "\n- \"%s\"", archive_entry_pathname(entry));
-                                    errors += txt;
+                                    hasFailed = true;
+                                    break;
                                 }
                             }
                         }
                         archive_read_free(archive);
 
-                        if (!errors.empty())
-                            MessageBox(nullptr, errors.c_str(), "rePlayer", MB_OK);
-                    }
+                        if (hasFailed)
+                        {
+                            if (std::filesystem::exists(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".old"))
+                            {
+                                std::filesystem::remove(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".exe");
+                                std::filesystem::rename(std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".old", std::filesystem::path(mainPath) / "rePlayer" REPLAYER_OS_STUB ".exe");
+                            }
+                            if (std::filesystem::exists(mainPath / "replays" REPLAYER_OS_STUB ".old/"))
+                            {
+                                std::filesystem::remove_all(mainPath / "replays" REPLAYER_OS_STUB "/");
+                                std::filesystem::rename(mainPath / "replays" REPLAYER_OS_STUB ".old/", mainPath / "replays" REPLAYER_OS_STUB "/");
+                            }
 
-                    isReloadNeeded = true;
+                            ::MessageBoxA(nullptr, "Failed to unpack update", "rePlayer", MB_OK | MB_ICONERROR);
+                        }
+                        else
+                            isReloadNeeded = true;
+                    }
                 }
             }
         }
