@@ -12,6 +12,7 @@ namespace rePlayer
 #undef REPLAY
         Count
     };
+    static_assert(uint16_t(eReplay::Count) <= 64);
 
     struct Replayables
     {
@@ -61,7 +62,7 @@ namespace rePlayer
         static const char* const extensionNames[];
         static const size_t extensionLengths[];
         static const char* const replayNames[];
-    
+
         static const char* sortedExtensionNames[];
         static eExtension sortedExtensions[];
         static int32_t mapSortedExtensions[];

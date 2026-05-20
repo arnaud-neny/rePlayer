@@ -1,5 +1,4 @@
 // vgmstream customed files:
-// - base/render.c
 // - coding/ffmpeg_decoder.c
 // - formats.c
 // - vgmstream.h
@@ -13,7 +12,10 @@ extern "C" {
 #include "vgmstream/version.h"
 #include "vgmstream/src/base/info.h"
 #include "vgmstream/src/base/mixing.h"
+#include "vgmstream/src/base/play_config.h"
+#include "vgmstream/src/base/play_state.h"
 #include "vgmstream/src/base/plugins.h"
+#include "vgmstream/src/base/render.h"
 }
 
 namespace rePlayer
@@ -23,7 +25,7 @@ namespace rePlayer
         .name = "vgmstream",
         .about = "vgmstream " VGMSTREAM_VERSION "\nCopyright (c) 2008-2026 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm\n"
             "Christopher Snowhill, NicknineTheEagle, bxaimc\n"
-            "Thealexbarney, CyberBotX, et al\n"
+            "Thealexbarney, CyberBotX, EdnessP, et al\n"
             "Portions Copyright (c) 2004-2008, Marko Kreen\n"
             "Portions Copyright (c) 2001-2007  jagarl/Kazunori Ueno <jagarl@creator.club.ne.jp>\n"
             "Portions Copyright (c) 1998, Justin Frankel/Nullsoft Inc.\n"
@@ -299,11 +301,20 @@ namespace rePlayer
             return 0;
         }
 
+        // pfff.... TODO: check next update when play_adjust_totals is properly fixed
+        if (m_vgmstream->pstate.play_position == m_vgmstream->pstate.play_duration)
+            return 0;
+
         bool isMono = m_vgmstream->channels == 1;
         auto* buf = reinterpret_cast<sample_t*>(output);
         if (isMono)
             buf = reinterpret_cast<sample_t*>(reinterpret_cast<float*>(output + numSamples) - numSamples);
-        auto numRendered = render_vgmstream2(buf, int32_t(numSamples), m_vgmstream);
+
+        sbuf_t sbuf = { 0 };
+        sfmt_t sfmt = mixing_get_input_sample_type(m_vgmstream);
+        sbuf_init(&sbuf, sfmt, buf, int(numSamples), m_vgmstream->channels);
+
+        auto numRendered = render_main(&sbuf, m_vgmstream);
         if (isMono)
             output->ConvertMono(reinterpret_cast<float*>(buf), numRendered);
 

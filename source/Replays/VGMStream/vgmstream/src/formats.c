@@ -110,6 +110,7 @@ static const char* extension_list[] = {
     "bcstm",
     "bcwav",
     "bcv", //txth/reserved [The Bigs (PSP)]
+    "bdm", //txth/reserved [Ore to Imouto no Kounai Play (BD-J)]
     "bfstm",
     "bfwav",
     "bg00",
@@ -258,6 +259,7 @@ static const char* extension_list[] = {
 
     "iab",
     "iadp",
+    "iap",
     "idmsf",
     "idsp",
     "idvi", //fake extension/header id for .pcm (renamed, to be removed)
@@ -381,7 +383,8 @@ static const char* extension_list[] = {
     "mps", //txth/reserved [Scandal (PS2)]
     "ms",
     "msa",
-    "msb",
+    "msb", // unrelated to .msh, EA Redwood Shores MPF+MUS variant
+    "msh",
     "msd",
     "mse",
     "msf",
@@ -389,6 +392,7 @@ static const char* extension_list[] = {
     "msv",
     "msvp", //fake extension/header id for .msv
     "msx",
+    "mta",
     "mta2",
     "mtaf",
     "mtt", //txth/reserved [Splinter Cell: Pandora Tomorrow (PS2)]
@@ -484,6 +488,8 @@ static const char* extension_list[] = {
     "rsf",
     "rsm",
     "rsnd", //txth/reserved [Birushana: Ichijuu no Kaze (Switch)]
+    "rsoundast",
+    "rsoundsnd",
     "rsp",
     "rstm", //fake extension/header id for .rstm (in bigfiles)
     "rvw", //txth/reserved [Half-Minute Hero (PC)]
@@ -535,6 +541,7 @@ static const char* extension_list[] = {
     "sdp", //txth/reserved [Metal Gear Arcade (AC)]
     "sdf",
     "sdt",
+    "sdx", //txth/reserved [Anarchy Reigns (multi)]
     "se",
     "se3", //txth/reserved (.nub container) [Tales of Vesperia (X360/PS3), Tales of Graces f (PS3)]
     "seb",
@@ -634,9 +641,11 @@ static const char* extension_list[] = {
 
     "u0",
     "ue4opus",
+    "ueopus",
     "ueba",
     "ulw", //txth/raw [Burnout (GC)]
     "um3",
+    "usm",
     "utk",
     "uv",
 
@@ -700,6 +709,7 @@ static const char* extension_list[] = {
     "wic", //txth/reserved [Road Rash (SAT)-videos]
     "wip", //txth/reserved [Colin McRae DiRT (PC)]
     "wlv", //txth/reserved [ToeJam & Earl III: Mission to Earth (DC)]
+    "wmw",
     "wp2",
     "wpd",
     "wsd",
@@ -710,6 +720,7 @@ static const char* extension_list[] = {
     "wv6",
     "wvd", //txth/reserved [Donkey Kong Barrel Blast (Wii)]
     "wve",
+    "wvp", //txth/semi [Virtua Cop 2 (PC)]
     "wvs",
     "wvx",
     "wxd",
@@ -829,6 +840,7 @@ static const coding_info coding_info_list[] = {
         {coding_SILENCE,            "Silence"},
 
         {coding_PCM16LE,            "16-bit Little Endian PCM"},
+        {coding_PCM16LE_U,          "16-bit Little Endian unsigned PCM"},
         {coding_PCM16BE,            "16-bit Big Endian PCM"},
         {coding_PCM16_int,          "16-bit PCM (block)"},
         {coding_PCM8,               "8-bit signed PCM"},
@@ -857,6 +869,7 @@ static const coding_info coding_info_list[] = {
         {coding_NGC_DTK,            "Nintendo DTK 4-bit ADPCM"},
         {coding_AFC,                "Nintendo AFC 4-bit ADPCM"},
         {coding_AFC_2bit,           "Nintendo AFC 2-bit ADPCM"},
+        {coding_AFC_4X,             "Nintendo AFC 4X 4-bit ADPCM"},
         {coding_VADPCM,             "Silicon Graphics VADPCM 4-bit ADPCM"},
 
         {coding_G721,               "CCITT G.721 4-bit ADPCM"},
@@ -906,7 +919,7 @@ static const coding_info coding_info_list[] = {
         {coding_AWC_IMA,            "Rockstar AWC 4-bit IMA ADPCM"},
         {coding_UBI_IMA,            "Ubisoft 4-bit IMA ADPCM"},
         {coding_UBI_SCE_IMA,        "Ubisoft 4-bit SCE IMA ADPCM"},
-        {coding_H4M_IMA,            "Hudson HVQM4 4-bit IMA ADPCM"},
+        {coding_HVQM4_IMA,          "Hudson HVQM4 4-bit IMA ADPCM"},
         {coding_CD_IMA,             "Crystal Dynamics 4-bit IMA ADPCM"},
         {coding_CRANKCASE_IMA,      "CrankcaseAudio REV 4-bit IMA ADPCM"},
 
@@ -1039,7 +1052,7 @@ static const layout_info layout_info_list[] = {
         {layout_blocked_ea_wve_au00,    "blocked (EA WVE au00)"},
         {layout_blocked_ea_wve_ad10,    "blocked (EA WVE Ad10)"},
         {layout_blocked_sthd,           "blocked (STHD)"},
-        {layout_blocked_h4m,            "blocked (H4M)"},
+        {layout_blocked_hvqm4,          "blocked (HVQM4)"},
         {layout_blocked_xa_aiff,        "blocked (XA AIFF)"},
         {layout_blocked_vs_square,      "blocked (Square VS)"},
         {layout_blocked_vid1,           "blocked (VID1)"},
@@ -1318,7 +1331,8 @@ static const meta_info meta_info_list[] = {
         {meta_AKB,                  "Square Enix AKB header"},
         {meta_PASX,                 "Premium Agency PASX header"},
         {meta_XMA_RIFF,             "Microsoft XMA RIFF header"},
-        {meta_ASTB,                 "Capcom ASTB header"},
+        {meta_AST_MTF,              "Capcom AST header"},
+        {meta_SND_MTF,              "Capcom SND header"},
         {meta_WWISE_RIFF,           "Audiokinetic Wwise RIFF header"},
         {meta_UBI_RAKI,             "Ubisoft RAKI header"},
         {meta_SNDX,                 "Sony SNDX header"},
@@ -1339,7 +1353,6 @@ static const meta_info meta_info_list[] = {
         {meta_EA_SNU,               "Electronic Arts SNU header"},
         {meta_AWC,                  "Rockstar AWC header"},
         {meta_OPUS,                 "Nintendo Switch OPUS header"},
-        {meta_ASTL,                 "Capcom ASTL header"},
         {meta_UBI_SB,               "Ubisoft SBx header"},
         {meta_UBI_APM,              "Ubisoft APM header"},
         {meta_NAAC,                 "Namco NAAC header"},
@@ -1378,7 +1391,7 @@ static const meta_info meta_info_list[] = {
         {meta_UBI_BAO,              "Ubisoft BAO header"},
         {meta_DSP_SWITCH_AUDIO,     "UE4 Switch Audio header"},
         {meta_SADF,                 "Procyon Studio SADF header"},
-        {meta_H4M,                  "Hudson HVQM4 header"},
+        {meta_HVQM4,                "Hudson HVQM4 header"},
         {meta_ASF,                  "Argonaut ASF header"},
         {meta_XMD,                  "Konami XMD header"},
         {meta_CKS,                  "Cricket Audio CKS header"},
@@ -1521,6 +1534,9 @@ static const meta_info meta_info_list[] = {
         {meta_WD,                   "Square WD header"},
         {meta_BWAV_WARTHOG,         "Warthog .BWAV header"},
         {meta_PS2P,                 "THQ Australia PS2P header"},
+        {meta_GCSP,                 "THQ Australia GCSP header"},
+        {meta_UEOPUS,               "Epic Games UEOPUS header"},
+        {meta_WMW,                  "Artoon WMW header"},
 };
 
 void get_vgmstream_coding_description(VGMSTREAM* vgmstream, char* out, size_t out_size) {
@@ -1690,7 +1706,8 @@ void get_vgmstream_meta_description(VGMSTREAM* vgmstream, char* out, size_t out_
     }
 
 #ifdef VGM_USE_FFMPEG
-    if (vgmstream->coding_type ==  coding_FFmpeg) {
+    // include FFmpeg's format description for the generic ffmpeg.c parser
+    if (vgmstream->coding_type == coding_FFmpeg && vgmstream->meta_type == meta_FFMPEG) {
         const char* description_ffmpeg = ffmpeg_get_format_name(vgmstream->codec_data);
         if (description_ffmpeg != NULL) {
             snprintf(out, out_size, "%s (%s)", description, description_ffmpeg);

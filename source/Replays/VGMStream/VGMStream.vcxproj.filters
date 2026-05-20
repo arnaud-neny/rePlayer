@@ -1769,6 +1769,24 @@
     <ClInclude Include="vgmstream\src\meta\fsb_fev.h">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClInclude>
+    <ClInclude Include="vgmstream\src\base\play_config.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\play_state.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\resampler.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\tags.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\crid_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\hvqm4_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGMStream.cpp">
@@ -2050,9 +2068,6 @@
     <ClCompile Include="vgmstream\src\layout\blocked_filp.c">
       <Filter>Source Files\vgmstream\src\layout</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\layout\blocked_h4m.c">
-      <Filter>Source Files\vgmstream\src\layout</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\layout\blocked_halpst.c">
       <Filter>Source Files\vgmstream\src\layout</Filter>
     </ClCompile>
@@ -2231,9 +2246,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ast_mv.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\astb.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\atsl.c">
@@ -2456,9 +2468,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\gsnd.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\h4m.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\halpst.c">
@@ -4618,9 +4627,6 @@
     <ClCompile Include="vgmstream\src\meta\2dx.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\astl.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\audiopkg.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -4845,6 +4851,36 @@
     </ClCompile>
     <ClCompile Include="vgmstream\src\util\spu_utils.c">
       <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\base\resampler.c">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_hvqm4.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ast_mtf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\crid.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\gcsp.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hvqm4.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\plug.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\snd_mtf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ueopus.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wmw.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -84,7 +84,8 @@ VGMSTREAM* init_vgmstream_fsb5(STREAMFILE* sf) {
     }
 
     if ((fsb5.sample_header_size + fsb5.name_table_size + fsb5.sample_data_size + fsb5.base_header_size) != get_streamfile_size(sf)) {
-        vgm_logi("FSB5: wrong size, expected %x + %x + %x + %x vs %x (re-rip)\n", fsb5.sample_header_size, fsb5.name_table_size, fsb5.sample_data_size, fsb5.base_header_size, (uint32_t)get_streamfile_size(sf));
+        uint32_t expected_size = fsb5.sample_header_size + fsb5.name_table_size + fsb5.sample_data_size + fsb5.base_header_size;
+        vgm_logi("FSB5: wrong size, expected %x + %x + %x + %x = %x vs %x (re-rip)\n", fsb5.sample_header_size, fsb5.name_table_size, fsb5.sample_data_size, fsb5.base_header_size, expected_size, (uint32_t)get_streamfile_size(sf));
         return NULL;
     }
 
@@ -680,7 +681,7 @@ static void get_name(char* buf, size_t buf_size, int target_subsong, fsb5_header
         fev.target_subsong = target_subsong - 1;
         fev_parsed = parse_fev(&fev, sf_fev);
         // should be just RIFF FEV, which contain a LGCY chunk with FEV1 data
-        // (does not include newer joined RIFF FEV .bank files)
+        // (not counting the newer RIFF FEV .bank files with an embedded FSB)
         if (!fev_parsed)
             VGM_LOG("FSB: Failed to parse FEV data\n");
     }
@@ -689,7 +690,7 @@ static void get_name(char* buf, size_t buf_size, int target_subsong, fsb5_header
     // full names not trimmed to the base name, and some streams have multiple names
     // which the FSB only stores the last one [Tearaway (PSV) - sports_t02_l03.fsb#1
     // Superbrothers: Sword & Sworcery (Android) - SSSpeoplecombat.fsb#3]
-    if (fev_parsed && fev.stream_name[0])
+    if (fev_parsed && fev.stream_name_size)
         snprintf(buf, buf_size, "%s", fev.stream_name);
     else if (fsb5->name_offset)
         read_string(buf, buf_size, fsb5->name_offset, sf_fsb);

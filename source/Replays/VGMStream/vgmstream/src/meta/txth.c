@@ -48,6 +48,7 @@ typedef enum {
     OKI4S = 32,         /* OKI ADPCM with 16-bit output (unlike OKI/VOX/Dialogic ADPCM's 12-bit) */
     PCM24LE = 33,       /* 24-bit Little Endian PCM */
     PCM24BE = 34,       /* 24-bit Big Endian PCM */
+    PCM16LE_U = 35,     /* 16-bit little endian unsigned PCM */
     XA,
     XA_EA,
     CP_YM,
@@ -240,6 +241,7 @@ VGMSTREAM* init_vgmstream_txth(STREAMFILE* sf) {
             case PCM24LE:       interleave = 0x03; break;
             case PCM24BE:       interleave = 0x03; break;
             case PCM16LE:
+            case PCM16LE_U:
             case PCM16BE:       interleave = 0x02; break;
             case PCM8:
             case PCM8_U:
@@ -263,6 +265,7 @@ VGMSTREAM* init_vgmstream_txth(STREAMFILE* sf) {
         case PCM24LE:       coding = coding_PCM24LE; break;
         case PCM24BE:       coding = coding_PCM24BE; break;
         case PCM16LE:       coding = coding_PCM16LE; break;
+        case PCM16LE_U:     coding = coding_PCM16LE_U; break;
         case PCM16BE:       coding = coding_PCM16BE; break;
         case PCM8:          coding = coding_PCM8; break;
         case PCM8_U:        coding = coding_PCM8_U; break;
@@ -340,6 +343,7 @@ VGMSTREAM* init_vgmstream_txth(STREAMFILE* sf) {
         case coding_PCM24LE:
         case coding_PCM24BE:
         case coding_PCM16LE:
+        case coding_PCM16LE_U:
         case coding_PCM16BE:
         case coding_PCM8:
         case coding_PCM8_U:
@@ -1022,6 +1026,7 @@ static txth_codec_t parse_codec(txth_header* txth, const char* val) {
     else if (is_string(val,"PCM24LE"))      return PCM24LE;
     else if (is_string(val,"PCM16BE"))      return PCM16BE;
     else if (is_string(val,"PCM16LE"))      return PCM16LE;
+    else if (is_string(val,"PCM16LE_U"))    return PCM16LE_U;
     else if (is_string(val,"PCM8"))         return PCM8;
     else if (is_string(val,"PCM8_U"))       return PCM8_U;
     else if (is_string(val,"PCM8_SB"))      return PCM8_SB;
@@ -1265,6 +1270,10 @@ static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, cha
                 txth->num_samples = get_bytes_to_samples(txth, txth->num_samples * (txth->interleave*txth->channels));
         }
     }
+    else if (is_string(key,"num_samples_bytes")) {
+        if (!parse_num(txth->sf_head,txth,val, &txth->num_samples)) goto fail;
+        txth->num_samples = get_bytes_to_samples(txth, txth->num_samples);
+    }
     else if (is_string(key,"loop_start_sample") || is_string(key,"loop_start")) {
         if (!parse_num(txth->sf_head,txth,val, &txth->loop_start_sample)) goto fail;
         if (txth->sample_type==1)
@@ -1273,6 +1282,10 @@ static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, cha
             txth->loop_start_sample = get_bytes_to_samples(txth, txth->loop_start_sample * (txth->interleave*txth->channels));
         if (txth->loop_adjust)
             txth->loop_start_sample += txth->loop_adjust;
+    }
+    else if (is_string(key,"loop_start_bytes")) {
+        if (!parse_num(txth->sf_head,txth,val, &txth->loop_start_sample)) goto fail;
+        txth->loop_start_sample = get_bytes_to_samples(txth, txth->loop_start_sample);
     }
     else if (is_string(key,"loop_end_sample") || is_string(key,"loop_end")) {
         if (is_string(val,"data_size")) {
@@ -1287,6 +1300,10 @@ static int parse_keyval(STREAMFILE* sf_, txth_header* txth, const char* key, cha
         }
         if (txth->loop_adjust)
             txth->loop_end_sample += txth->loop_adjust;
+    }
+    else if (is_string(key,"loop_end_bytes")) {
+        if (!parse_num(txth->sf_head,txth,val, &txth->loop_end_sample)) goto fail;
+        txth->loop_end_sample = get_bytes_to_samples(txth, txth->loop_end_sample);
     }
     else if (is_string(key,"skip_samples")) {
         if (!parse_num(txth->sf_head,txth,val, &txth->skip_samples)) goto fail;
@@ -2239,6 +2256,7 @@ static int get_bytes_to_samples(txth_header* txth, uint32_t bytes) {
             return pcm24_bytes_to_samples(bytes, txth->channels);
         case PCM16BE:
         case PCM16LE:
+        case PCM16LE_U:
             return pcm16_bytes_to_samples(bytes, txth->channels);
         case PCM8:
         case PCM8_U:

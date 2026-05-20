@@ -122,7 +122,6 @@ bool prepare_vgmstream(VGMSTREAM* vgmstream, STREAMFILE* sf) {
         vgmstream->loop_end_sample = 0;
     }
 
-
     setup_vgmstream(vgmstream); /* final setup */
 
     return true;
@@ -155,6 +154,11 @@ void setup_vgmstream(VGMSTREAM* vgmstream) {
     }
 #endif
 
+    // TODO: check that this isn't called when active, as resets become unrealiable
+    if (vgmstream->current_sample > 0) {
+        VGM_LOG("VGMSTREAM: called setup_vgmstream when decoder is active\n");
+    }
+
     /* save start things so we can restart when seeking */
     memcpy(vgmstream->start_ch, vgmstream->ch, sizeof(VGMSTREAMCHANNEL)*vgmstream->channels);
     memcpy(vgmstream->start_vgmstream, vgmstream, sizeof(VGMSTREAM));
@@ -177,6 +181,8 @@ void reset_vgmstream(VGMSTREAM* vgmstream) {
     decode_reset(vgmstream);
 
     render_reset(vgmstream);
+
+    mixer_reset(vgmstream->mixer);
 
     /* note that this does not reset the constituent STREAMFILES
      * (vgmstream->ch[N].streamfiles' internal state, like internal offset, though shouldn't matter) */
@@ -358,7 +364,7 @@ void vgmstream_set_loop_target(VGMSTREAM* vgmstream, int loop_target) {
             vgmstream_set_loop_target(data->layers[i], loop_target);
         }
     }
-
+VGM_LOG("set vgmstream_set_loop_target\n");
     /* notify of new initial state */
     setup_vgmstream(vgmstream);
 }

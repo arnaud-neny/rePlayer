@@ -8,6 +8,7 @@ typedef enum {
 
     /* PCM */
     coding_PCM16LE,         /* little endian 16-bit PCM */
+    coding_PCM16LE_U,       /* little endian 16-bit PCM, unsigned */
     coding_PCM16BE,         /* big endian 16-bit PCM */
     coding_PCM16_int,       /* 16-bit PCM with sample-level interleave (for blocks) */
 
@@ -40,6 +41,7 @@ typedef enum {
     coding_NGC_DTK,         /* Nintendo DTK ADPCM (hardware disc), also called TRK or ADP */
     coding_AFC,             /* Nintendo AFC ADPCM */
     coding_AFC_2bit,        /* Nintendo AFC ADPCM (2-bit) */
+    coding_AFC_4X,          /* Nintendo AFC 4X ADPCM */
     coding_VADPCM,          /* Silicon Graphics VADPCM */
 
     coding_G721,            /* CCITT G.721 */
@@ -88,7 +90,7 @@ typedef enum {
     coding_AWC_IMA,         /* Rockstar AWC IMA ADPCM */
     coding_UBI_IMA,         /* Ubisoft IMA ADPCM */
     coding_UBI_SCE_IMA,     /* Ubisoft SCE IMA ADPCM */
-    coding_H4M_IMA,         /* H4M IMA ADPCM (stereo or mono, high nibble first) */
+    coding_HVQM4_IMA,       /* HVQM4 IMA ADPCM (stereo or mono, high nibble first) */
     coding_MTF_IMA,         /* Capcom MT Framework IMA ADPCM */
     coding_CD_IMA,          /* Crystal Dynamics IMA ADPCM */
     coding_CRANKCASE_IMA,   /* CrankcaseAudio REV IMA ADPCM */
@@ -238,7 +240,7 @@ typedef enum {
     layout_blocked_ea_wve_au00, /* EA WVE au00 blocks */
     layout_blocked_ea_wve_ad10, /* EA WVE Ad10 blocks */
     layout_blocked_sthd,        /* Dream Factory STHD */
-    layout_blocked_h4m,         /* H4M video */
+    layout_blocked_hvqm4,
     layout_blocked_xa_aiff,     /* XA in AIFF files [Crusader: No Remorse (SAT), Road Rash (3DO)] */
     layout_blocked_vs_square,
     layout_blocked_vid1,
@@ -530,7 +532,8 @@ typedef enum {
     meta_AKB,
     meta_PASX,
     meta_XMA_RIFF,
-    meta_ASTB,
+    meta_AST_MTF,
+    meta_SND_MTF,
     meta_WWISE_RIFF,        /* Audiokinetic Wwise RIFF/RIFX */
     meta_UBI_RAKI,          /* Ubisoft RAKI header (Rayman Legends, Just Dance 2017) */
     meta_SNDX,
@@ -549,7 +552,6 @@ typedef enum {
     meta_EA_SNU,            /* Electronic Arts SNU (Dead Space) */
     meta_AWC,               /* Rockstar AWC (GTA5, RDR) */
     meta_OPUS,              /* Nintendo Opus [Lego City Undercover (Switch)] */
-    meta_ASTL,
     meta_NAAC,
     meta_UBI_SB,
     meta_UBI_APM,
@@ -589,7 +591,7 @@ typedef enum {
     meta_SPS_N1,
     meta_UBI_BAO,
     meta_DSP_SWITCH_AUDIO,  /* Gal Gun 2 (Switch) */
-    meta_H4M,               /* Hudson HVQM4 video [Resident Evil 0 (GC), Tales of Symphonia (GC)] */
+    meta_HVQM4,
     meta_ASF,               /* Argonaut ASF [Croc 2 (PC)] */
     meta_XMD,               /* Konami XMD [Silent Hill 4 (Xbox), Castlevania: Curse of Darkness (Xbox)] */
     meta_CKS,               /* Cricket Audio stream [Part Time UFO (Android), Mega Man 1-6 (Android)] */
@@ -733,6 +735,9 @@ typedef enum {
     meta_WD,
     meta_BWAV_WARTHOG,
     meta_PS2P,
+    meta_GCSP,
+    meta_UEOPUS,
+    meta_WMW,
 } meta_t;
 
 #endif

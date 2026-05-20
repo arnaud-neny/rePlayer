@@ -596,10 +596,14 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\base\mixer.h" />
     <ClInclude Include="vgmstream\src\base\mixer_priv.h" />
     <ClInclude Include="vgmstream\src\base\mixing.h" />
+    <ClInclude Include="vgmstream\src\base\play_config.h" />
+    <ClInclude Include="vgmstream\src\base\play_state.h" />
     <ClInclude Include="vgmstream\src\base\plugins.h" />
     <ClInclude Include="vgmstream\src\base\render.h" />
+    <ClInclude Include="vgmstream\src\base\resampler.h" />
     <ClInclude Include="vgmstream\src\base\sbuf.h" />
     <ClInclude Include="vgmstream\src\base\seek_table.h" />
+    <ClInclude Include="vgmstream\src\base\tags.h" />
     <ClInclude Include="vgmstream\src\coding\coding.h" />
     <ClInclude Include="vgmstream\src\coding\g72x_state.h" />
     <ClInclude Include="vgmstream\src\coding\libs\binka_data.h" />
@@ -653,6 +657,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\meta\bar_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\bgw_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\bnsf_keys.h" />
+    <ClInclude Include="vgmstream\src\meta\crid_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\deblock_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\ea_eaac_opus_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\ea_eaac_streamfile.h" />
@@ -667,6 +672,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="vgmstream\src\meta\hca_bf.h" />
     <ClInclude Include="vgmstream\src\meta\hca_keys.h" />
     <ClInclude Include="vgmstream\src\meta\hca_keys_awb.h" />
+    <ClInclude Include="vgmstream\src\meta\hvqm4_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\idtech_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\ivb_streamfile.h" />
     <ClInclude Include="vgmstream\src\meta\jstm_streamfile.h" />
@@ -1492,6 +1498,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\base\play_state.c" />
     <ClCompile Include="vgmstream\src\base\plugins.c" />
     <ClCompile Include="vgmstream\src\base\render.c" />
+    <ClCompile Include="vgmstream\src\base\resampler.c" />
     <ClCompile Include="vgmstream\src\base\sbuf.c" />
     <ClCompile Include="vgmstream\src\base\seek.c" />
     <ClCompile Include="vgmstream\src\base\seek_table.c" />
@@ -1623,8 +1630,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\layout\blocked_ea_wve_au00.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_filp.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_gsnd.c" />
-    <ClCompile Include="vgmstream\src\layout\blocked_h4m.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_halpst.c" />
+    <ClCompile Include="vgmstream\src\layout\blocked_hvqm4.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_hwas.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_mul.c" />
     <ClCompile Include="vgmstream\src\layout\blocked_mxch.c" />
@@ -1690,9 +1697,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\asd_naxat.c" />
     <ClCompile Include="vgmstream\src\meta\asf.c" />
     <ClCompile Include="vgmstream\src\meta\ast.c" />
-    <ClCompile Include="vgmstream\src\meta\astb.c" />
-    <ClCompile Include="vgmstream\src\meta\astl.c" />
     <ClCompile Include="vgmstream\src\meta\ast_mmv.c" />
+    <ClCompile Include="vgmstream\src\meta\ast_mtf.c" />
     <ClCompile Include="vgmstream\src\meta\ast_mv.c" />
     <ClCompile Include="vgmstream\src\meta\atsl.c" />
     <ClCompile Include="vgmstream\src\meta\audiopkg.c" />
@@ -1731,6 +1737,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\compresswave.c" />
     <ClCompile Include="vgmstream\src\meta\cpk.c" />
     <ClCompile Include="vgmstream\src\meta\cps.c" />
+    <ClCompile Include="vgmstream\src\meta\crid.c" />
     <ClCompile Include="vgmstream\src\meta\csb.c" />
     <ClCompile Include="vgmstream\src\meta\csmp.c" />
     <ClCompile Include="vgmstream\src\meta\cstr.c" />
@@ -1784,6 +1791,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\g1l.c" />
     <ClCompile Include="vgmstream\src\meta\gbts.c" />
     <ClCompile Include="vgmstream\src\meta\gca.c" />
+    <ClCompile Include="vgmstream\src\meta\gcsp.c" />
     <ClCompile Include="vgmstream\src\meta\gcsw.c" />
     <ClCompile Include="vgmstream\src\meta\gcub.c" />
     <ClCompile Include="vgmstream\src\meta\genh.c" />
@@ -1791,7 +1799,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\gin.c" />
     <ClCompile Include="vgmstream\src\meta\gsnd.c" />
     <ClCompile Include="vgmstream\src\meta\gwb_gwd.c" />
-    <ClCompile Include="vgmstream\src\meta\h4m.c" />
     <ClCompile Include="vgmstream\src\meta\halpst.c" />
     <ClCompile Include="vgmstream\src\meta\hca.c" />
     <ClCompile Include="vgmstream\src\meta\hd3_bd3.c" />
@@ -1799,6 +1806,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\hgc1.c" />
     <ClCompile Include="vgmstream\src\meta\his.c" />
     <ClCompile Include="vgmstream\src\meta\hsf.c" />
+    <ClCompile Include="vgmstream\src\meta\hvqm4.c" />
     <ClCompile Include="vgmstream\src\meta\hxd.c" />
     <ClCompile Include="vgmstream\src\meta\i3ds.c" />
     <ClCompile Include="vgmstream\src\meta\iab.c" />
@@ -1904,6 +1912,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\pc_mxst.c" />
     <ClCompile Include="vgmstream\src\meta\pdt.c" />
     <ClCompile Include="vgmstream\src\meta\piff_tpcm.c" />
+    <ClCompile Include="vgmstream\src\meta\plug.c" />
     <ClCompile Include="vgmstream\src\meta\pona.c" />
     <ClCompile Include="vgmstream\src\meta\pos.c" />
     <ClCompile Include="vgmstream\src\meta\pphd.c" />
@@ -1975,6 +1984,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\snds.c" />
     <ClCompile Include="vgmstream\src\meta\sndx.c" />
     <ClCompile Include="vgmstream\src\meta\sndz.c" />
+    <ClCompile Include="vgmstream\src\meta\snd_mtf.c" />
     <ClCompile Include="vgmstream\src\meta\song_monster.c" />
     <ClCompile Include="vgmstream\src\meta\spm.c" />
     <ClCompile Include="vgmstream\src\meta\spsd.c" />
@@ -2027,6 +2037,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\ubi_sb.c" />
     <ClCompile Include="vgmstream\src\meta\ue4opus.c" />
     <ClCompile Include="vgmstream\src\meta\ueba.c" />
+    <ClCompile Include="vgmstream\src\meta\ueopus.c" />
     <ClCompile Include="vgmstream\src\meta\undefind.c" />
     <ClCompile Include="vgmstream\src\meta\utk.c" />
     <ClCompile Include="vgmstream\src\meta\va3.c" />
@@ -2059,6 +2070,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="vgmstream\src\meta\wb.c" />
     <ClCompile Include="vgmstream\src\meta\wbk.c" />
     <ClCompile Include="vgmstream\src\meta\wd.c" />
+    <ClCompile Include="vgmstream\src\meta\wmw.c" />
     <ClCompile Include="vgmstream\src\meta\wpd.c" />
     <ClCompile Include="vgmstream\src\meta\wsi.c" />
     <ClCompile Include="vgmstream\src\meta\ws_aud.c" />

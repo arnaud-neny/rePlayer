@@ -1013,3 +1013,11 @@ EXTENSION(mvm)          // MVX
 EXTENSION(jxs)          // JayTrax
 EXTENSION(kt)           // klystrack
 EXTENSION(pac)          // SBStudio
+EXTENSION(iap)          // VGMStream
+EXTENSION(msh)          // VGMStream
+EXTENSION(mta)          // VGMStream
+EXTENSION(rsoundast)    // VGMStream
+EXTENSION(rsoundsnd)    // VGMStream
+EXTENSION(ueopus)       // VGMStream
+EXTENSION(usm)          // VGMStream
+EXTENSION(wmw)          // VGMStream
