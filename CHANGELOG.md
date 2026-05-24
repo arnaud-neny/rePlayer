@@ -5,7 +5,11 @@
 
 ## Current version
 
-v0.22.4:
+v0.22.5:
+- Updated adplug to 2.4 r923
+- Updated libtfmxaudiodecoder to 1.0.9
+- Updated OpenMPT to 0.9.0-pre.12 r25345
+- Updated vgmstream to r2117
 - Bug fixes
 
 v0.22.3:
@@ -15,20 +19,16 @@ v0.22.3:
 - Updated residfp to 1.0.2
 - Updated ImGui to 1.92.8
 - Updated TagLib to 2.3
-- Bug fixes
 
 v0.22.2:
-- Updated libfc14audiodecoder to 1.0.7
 - Updated libsidplay to 3.0.0
 - Added CrossFade
 - Added ReplayGain
 - Updated libcurl to 8.20.0
-- Bug fixes
 
 v0.22.1:
 - Updated FluidSynth to 2.5.4
 - Added Properties to display current song details
-- Bug fixes
 
 v0.22.0:
 - Added Conspiracy's MVX Synth
@@ -37,7 +37,6 @@ v0.22.0:
 - Added Professional Music Driver
 - Added PxTone
 - Added Browser Tab to look into online repositories
-- Bug fixes
 
 ## Older updates
 
@@ -45,7 +44,7 @@ v0.22.0:
 - [0.22.0] ASAP to 8.0.0
 - [0.17.3] FAAD2 to 2.11.2
 - [0.19.4] Furnace to 0.6.8.3
-- [0.22.0] libfc14audiodecoder to 1.0.4
+- [0.22.2] libtfmxaudiodecoder to 1.0.7
 - [0.21.9] gbsplay to 0.0.101
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
