@@ -27,29 +27,30 @@ class LamePaulaVoice : public PaulaVoice
     uword getLoopCount() override;
 
     void drain();
-    
+
     friend class LamePaulaMixer;
 
  protected:
     bool isOn;
     bool looping;  // whether to loop sample buffer continously (PAULA emu)
-    
+
     const ubyte* start;
     const ubyte* end;
     udword length;
-    
+
     const ubyte* repeatStart;
     const ubyte* repeatEnd;
     udword repeatLength;
-    
+
     uword curPeriod;
     udword stepSpeed;
     udword stepSpeedPnt;
     udword stepSpeedAddPnt;
 
     uword loopCount;
-    
+
     sbyte lastSample;
+    // unused post 1.0.7, but kept here to not affect ABI
     bool smoothUp;
     int smoothCount;
 };

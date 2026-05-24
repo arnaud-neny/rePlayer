@@ -25,7 +25,7 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
     smartPtr<const ubyte> sBuf(fcBuf.tellBegin(),fcBuf.tellLength());
     const ubyte* pEnd;
     const ubyte* r;
-    
+
     // If there's player machine code before the TFMX header, checksum it.
     if ( offsets.header != 0 ) {
         udword crc1 = 0;
@@ -42,7 +42,7 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
             cout << "CRC = " << tohex(crc1) << endl;
 #endif
         }
-            
+
         // Wings of Death  end, intro, outro, title
         // skip from sndmod sustain to volmod seq processing
         // the others skip to to wave modulation
@@ -134,7 +134,7 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
                 }
                 // Reject other/unknown releases.
                 else {
-                    traits.blacklisted = true;
+                    blacklisted = true;
                 }
             }
         }

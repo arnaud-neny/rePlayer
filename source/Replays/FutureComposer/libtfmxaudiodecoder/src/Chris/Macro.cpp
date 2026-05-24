@@ -83,17 +83,33 @@ void TFMXDecoder::dumpMacros() {
 
 // ----------------------------------------------------------------------
 
+void TFMXDecoder::initMacro(VoiceVars& voice) {
+    voice.macro.step = 0;
+    voice.macro.wait = 0;
+    voice.macro.loop = 0xff;
+    voice.macro.state = -1;
+    voice.waitOnDMACount = 0;
+    if (variant.execOrder == MAC_MOD_SEQ) {
+        voice.effectsMode = 0;
+    }
+    else {
+        voice.effectsMode = 1;
+    }
+    voice.macro.extraWait = true;
+}
+
 void TFMXDecoder::processMacroMain(VoiceVars& voice) {
-    if (voice.macro.delayedOff) {
-        voice.ch->off();
-        voice.macro.delayedOff = false;
-    }
-    if (voice.macro.skip) {
+    if (voice.macro.state == 0) {
         return;
     }
-    if (voice.macro.wait>0 ) {
-        voice.macro.wait--;
-        return;
+    else if (voice.macro.state == 1) {
+        initMacro(voice);
+    }
+    else {
+        if (voice.macro.wait>0 ) {
+            voice.macro.wait--;
+            return;
+        }
     }
 
     int macroLen = 0;
@@ -127,14 +143,22 @@ void TFMXDecoder::processMacroMain(VoiceVars& voice) {
 
 // ----------------------------------------------------------------------
 
+// In the official TFMX v1.5 and v2.2 releases, an extra wait is
+// hardcoded in specific locations as an undocumented implementation
+// detail.
+//
+// Only variants of the player could set it to ON/OFF via the DMAoff
+// macro commands $00 and $13 in conjunction with delayed DMACON write.
+// By default, it is set to $ff (ON, true). Else >= 0 (OFF, false).
+// Only a very few TFMX files use customized DMAoff.
 void TFMXDecoder::macroFunc_ExtraWait(VoiceVars& voice) {
     voice.macro.step++;
-    if ( !voice.macro.extraWait ) {
-        voice.macro.extraWait = true;
-        macroEvalAgain = true;
+    if (voice.macro.extraWait || variant.extraWaitV1) {
+        return;
     }
-    // Resetting the flag via DMAoff macro is extremely rare
-    // and potentially not needed with no hardware Paula.
+    // No extra wait, but reset it to enabled.
+    voice.macro.extraWait = true;
+    macroEvalAgain = true;
 }
 
 void TFMXDecoder::macroFunc_NOP(VoiceVars& voice) {
@@ -156,8 +180,34 @@ void TFMXDecoder::macroFunc_StartSample(VoiceVars& voice) {
     // There are variants of the "DMAon" macro command, which
     // are not needed because we don't emulate access to Amiga
     // custom chip registers like DMACON, INTENA and INTREQ.
-    voice.ch->on();
-    voice.effectsMode = (sbyte)cmd.bb;
+    if ( variant.noDelayedDMAon ) {
+        voice.ch->on();
+    }
+    else {
+        voice.macro.delayedOn = true;
+    }
+
+    // Variants of the player can set the macro wait value here.
+    // The high byte (in cmd.aa) is set to zero early, so only the
+    // low byte (in cmd.bb) would matter. However, as the low byte
+    // is 0 for all but a very few TFMX files, the resulting wait
+    // value would stay at 0, which would be pointless.
+    //
+    // Furthermore, of the existing files that run a subsequent Wait
+    // command, that wait value would take precedence. It can be
+    // assumed that setting the wait value here is not the real goal.
+    //
+    // Instead, of the few remaining files that set the first parameter
+    // to 1, they want the player to run sound synthesis via the effects
+    // processor a first time before turning on the audio channel.
+    if (cmd.bb != 0) {
+        voice.effectsMode = 1;
+        if (variant.execOrder == MOD_MAC_SEQ) {
+            processModulation(voice);
+            return;
+        }
+    }
+
     voice.macro.step++;
     macroEvalAgain = true;
 }
@@ -202,6 +252,11 @@ void TFMXDecoder::macroFunc_Loop(VoiceVars& voice) {
     if (voice.macro.loop == 0) {
         voice.macro.loop = 0xff;
         voice.macro.step++;
+        // Possibly unique to R-Type, which does an extra wait here
+        // unlike TFMX v1 and later.
+        if (variant.macroLoopExtraWait) {
+            return;
+        }
     }
     else {
         if (voice.macro.loop == 0xff) {
@@ -223,18 +278,18 @@ void TFMXDecoder::macroFunc_Cont(VoiceVars& voice) {
 }
 
 void TFMXDecoder::macroFunc_Stop(VoiceVars& voice) {
-    voice.macro.skip = true;
+    voice.macro.state = 0;
 }
 
 void TFMXDecoder::macroFunc_AddNote(VoiceVars& voice) {
-    macroFunc_AddNote_sub(voice,voice.note);
+    macroFunc_AddNote_sub(voice,voice.note,voice.detune);
     macroFunc_ExtraWait(voice);
 }
 
-void TFMXDecoder::macroFunc_AddNote_sub(VoiceVars& voice, ubyte noteAdd) {
+void TFMXDecoder::macroFunc_AddNote_sub(VoiceVars& voice, ubyte noteAdd, sword detuneAdd) {
     sbyte n = noteAdd+(sbyte)cmd.bb;
     uword p = noteToPeriod(n);
-    sword finetune = voice.detune + (sword)makeWord(cmd.cd,cmd.ee);
+    sword finetune = detuneAdd + (sword)makeWord(cmd.cd,cmd.ee);
     if (variant.finetuneUnscaled) {
         p += finetune;
     }
@@ -248,7 +303,12 @@ void TFMXDecoder::macroFunc_AddNote_sub(VoiceVars& voice, ubyte noteAdd) {
 }
 
 void TFMXDecoder::macroFunc_SetNote(VoiceVars& voice) {
-    macroFunc_AddNote_sub(voice,0);
+    sword detune = voice.detune;
+    // TFMX v1 SetNote ignores voice detune.
+    if (variant.setNoteV1) {
+        detune = 0;
+    }
+    macroFunc_AddNote_sub(voice,0,detune);
     macroFunc_ExtraWait(voice);
 }
 
@@ -274,6 +334,12 @@ void TFMXDecoder::macroFunc_Portamento(VoiceVars& voice) {
 
 void TFMXDecoder::macroFunc_Vibrato(VoiceVars& voice) {
     voice.vibrato.time = cmd.bb;
+    // Original v1 and v2 apply this bit mask here.
+    // Since a composer may have entered an uneven vibrato parameter,
+    // the masked value can affect vibrato amplitude.
+    if (variant.vibratoTimeMask) {
+        voice.vibrato.time &= 0xfe;
+    }
     voice.vibrato.count = cmd.bb>>1;
     voice.vibrato.intensity = cmd.ee;
     if (voice.portamento.speed == 0) {
@@ -293,10 +359,14 @@ void TFMXDecoder::macroFunc_AddVolume(VoiceVars& voice) {
 }
 
 void TFMXDecoder::macroFunc_AddVolNote(VoiceVars& voice) {
+    // Replaces AddVolume by default. Potentially harmless,
+    // since 'bb' arg must be set to 0xfe in order to activate the
+    // extra behaviour, and AddVolume doesn't use 'bb' arg, so
+    // it's set to 0 in macro scripts.
     if (cmd.cd == 0xfe) {
         ubyte ee = cmd.ee;
         cmd.cd = cmd.ee = 0;
-        macroFunc_AddNote_sub(voice,voice.note);
+        macroFunc_AddNote_sub(voice,voice.note,voice.detune);
         cmd.ee = ee;
     }
     ubyte vol = voice.noteVolume + voice.noteVolume + voice.noteVolume;
@@ -310,7 +380,7 @@ void TFMXDecoder::macroFunc_SetVolume(VoiceVars& voice) {
     if (cmd.cd == 0xfe) {  // +AddNote variant
         ubyte ee = cmd.ee;
         cmd.cd = cmd.ee = 0;
-        macroFunc_AddNote_sub(voice,voice.note);
+        macroFunc_AddNote_sub(voice,voice.note,voice.detune);
         cmd.ee = ee;
     }
     voice.volume = cmd.ee;
@@ -390,6 +460,7 @@ void TFMXDecoder::macroFunc_StopSample_sub(VoiceVars& voice) {
     }
     else {
         voice.ch->off();
+        voice.macro.extraWait = true;
         macroEvalAgain = true;
     }
     // The variant that also does AddVolume/SetVolume.
@@ -481,7 +552,7 @@ void TFMXDecoder::macroFunc_OneShot(VoiceVars& voice) {
 void TFMXDecoder::macroFunc_WaitOnDMA(VoiceVars& voice) {
     // The rarely used variant where 'cdee' arg is the number of waits.
     voice.waitOnDMACount = makeWord(cmd.cd,cmd.ee);
-    voice.macro.skip = true;
+    voice.macro.state = 0;
     voice.waitOnDMAPrevLoops = voice.ch->getLoopCount();
     macroFunc_ExtraWait(voice);
 }
@@ -492,8 +563,8 @@ void TFMXDecoder::macroFunc_RandomPlay(VoiceVars& voice) {
     voice.rnd.mode = cmd.ee;
     voice.rnd.count = 1;
     voice.rnd.flag = 1;
-    voice.rnd.blockWait = true;
     randomPlay(voice);
+    voice.rnd.blockWait = true;
     voice.macro.step++;
     macroEvalAgain = true;
 }
@@ -525,7 +596,8 @@ void TFMXDecoder::macroFunc_RandomMask(VoiceVars& voice) {
 }
 
 void TFMXDecoder::macroFunc_SetPrevNote(VoiceVars& voice) {
-    macroFunc_AddNote_sub(voice,voice.notePrevious);
+    // Non-existant in TFMX v1, so add voice detune by default.
+    macroFunc_AddNote_sub(voice,voice.notePrevious,voice.detune);
     macroFunc_ExtraWait(voice);
 }
 

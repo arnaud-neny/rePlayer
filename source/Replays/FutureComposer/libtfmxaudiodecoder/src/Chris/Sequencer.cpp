@@ -49,6 +49,30 @@ bool TFMXDecoder::getTrackMute(ubyte t) {
     return (0==readBEuword(pBuf,offsets.header+0x1c0+(t<<1)));
 }
 
+void TFMXDecoder::resetSequencer() {
+    sequencer.step.current = sequencer.step.first;
+    sequencer.step.next = false;
+    sequencer.loops = -1;
+    for (int step = 0; step < TRACK_STEPS_MAX; step++ ) {
+        sequencer.stepSeenBefore[step] = false;
+    }
+}
+
+void TFMXDecoder::nextTrackStep() {
+    // This is a normal song end condition, but comparison must be '=='
+    // because the track loop command can jump beyond last track.
+    if (sequencer.step.current == sequencer.step.last) {
+        // Default behaviour is to return to beginning.
+        sequencer.step.current = sequencer.step.first;
+        songEnd = true;
+    }
+    else {
+        sequencer.step.current++;
+    }
+    processTrackStep();
+    sequencer.step.next = true;
+}
+
 void TFMXDecoder::processTrackStep() {
     int evalMaxLoops = RECURSE_LIMIT;  // NB! Around 5 would suffice.
     do {

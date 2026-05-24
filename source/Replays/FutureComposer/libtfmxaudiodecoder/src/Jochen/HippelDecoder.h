@@ -125,7 +125,7 @@ class HippelDecoder : public Decoder {
 
     static const int VOICES_MAX = 8;
     PaulaVoice dummyVoices[VOICES_MAX];  // TODO use ptrs?
-    
+
     static const int RECURSE_LIMIT = 16;  // way more than needed
 
     smartPtr<ubyte> fcBuf;   // for safe unsigned access
@@ -163,7 +163,7 @@ class HippelDecoder : public Decoder {
         sword speed, count;  // speed and speed count
         int startSpeed;
         int startSong;
-        
+
         bool initialized;  // true => restartable
         int readModRecurse;
     } admin;
@@ -179,7 +179,7 @@ class HippelDecoder : public Decoder {
     } stats;
 
     uword randomWord;
-        
+
     std::vector<ubyte> vSongNumbers;
 
     ubyte trackStepLen, trackColumnSize;
@@ -204,10 +204,10 @@ class HippelDecoder : public Decoder {
 
     struct VoiceVars {
         PaulaVoice *ch;  // paula and mixer interface
-    
+
         ubyte voiceNum;  // 0 = first
         bool trigger;
-        
+
         ubyte pattVal1, pattVal2;
 
         ubyte currentVolSeq;  // the number, not the offset
@@ -226,10 +226,10 @@ class HippelDecoder : public Decoder {
 
         sbyte pitchBendSpeed;
         ubyte pitchBendTime, pitchBendDelayFlag;
-    
+
         sbyte portaSpeed, portaDelayFlag;
         sdword portaOffs;
-    
+
         ubyte vibFlag, vibDelay, vibSpeed,
             vibAmpl, vibCurOffs;
 
@@ -240,19 +240,19 @@ class HippelDecoder : public Decoder {
 
         udword pattStart;
         uword pattPos;
-    
+
         sbyte transpose;       // TR
         sbyte soundTranspose;  // ST
         sbyte seqTranspose;    // from sndModSeq
-    
+
         ubyte currentSndSeq;  // the number, not the offset
         udword sndSeq;
         uword sndSeqPos;
-    
+
         ubyte sndModSustainTime;
-    
+
         uword outputPeriod, outputVolume;
-    
+
         const ubyte* pSampleStart;
         uword repeatOffset;
         uword repeatLength;
@@ -273,7 +273,7 @@ class HippelDecoder : public Decoder {
 
         uword lastPeriod;
         sdword portaDiffOld;
-        
+
     };
     struct VoiceVars voiceVars[VOICES_MAX];
 
@@ -293,14 +293,13 @@ class HippelDecoder : public Decoder {
         bool portaIsBit6;
         bool porta40SetSnd;  // handle portamento.counts bit 6 can set SndSeq
         bool porta80SetSnd;  // handle portamento.counts bit 7 can set SndSeq
-        
+
         bool isSMOD;         // Future Composer 1.0 to 1.3, NOT 1.4
         int patternSize;  /* 0, if it's a compressed module */
         int sampleStructSize;
         uword periodMin, periodMax;
         bool lowerPeriods;
         bool portaWeaker;
-        bool blacklisted;
     } traits;
 
     void setTrackRange(int=-1,int=-1);
@@ -330,7 +329,7 @@ class HippelDecoder : public Decoder {
         udword bufLen;  // the allocated amount
         udword len;     // length of the data we copy
     } input;
-    
+
     uword FC_portamento_pitchbend(VoiceVars&, uword period);
     void FC_volSlide(VoiceVars&);
 
@@ -386,7 +385,7 @@ class HippelDecoder : public Decoder {
     typedef void (HippelDecoder::*ModFuncPtr)(VoiceVars&);
     ModFuncPtr TFMX_sndModFuncs[(0xea-0xe0)+1] = { };
     std::vector<ModFuncPtr> vModFunc;
-    
+
     bool TFMX_COSO_findTags(const ubyte*, udword);
     bool COSO_detect(ubyte*,udword);
     bool COSO_findPlayer(const ubyte*, udword);

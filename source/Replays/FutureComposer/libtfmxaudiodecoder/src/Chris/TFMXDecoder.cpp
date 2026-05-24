@@ -64,7 +64,7 @@ void TFMXDecoder::reset() {
     }
     for (ubyte v=0; v<voices; v++) {
         VoiceVars& voice = voiceVars[v];
-        
+
         voice.voiceNum = v;
         voice.envelope.flag = 0;
         voice.portamento.speed = 0;
@@ -85,16 +85,16 @@ void TFMXDecoder::reset() {
 
         voice.macro.wait = 1;
         voice.macro.step = 0;
-        voice.macro.skip = true;
+        voice.macro.state = 0;
         voice.macro.loop = 0xff;
         voice.macro.extraWait = true;
-        voice.macro.delayedOff = false;
-        
+        voice.macro.delayedOff = voice.macro.delayedOn = false;
+
         voice.sid.targetOffset = 0x100*v + 4;
         voice.sid.targetLength = 0;
         voice.sid.lastSample = 0;
         voice.sid.op1.interDelta = 0;
-        
+
         voice.rnd.flag = 0;
 
         voice.ch->off();
@@ -118,7 +118,7 @@ void TFMXDecoder::reset() {
 ubyte TFMXDecoder::getVoices() {
     return voices;
 }
-    
+
 void TFMXDecoder::setPaulaVoice(ubyte v, PaulaVoice* p) {
     voiceVars[v].ch = p;
 }
@@ -178,7 +178,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         memcpy(input.buf,data,length);
         input.bufLen = newLen;
         input.len = length;
-        
+
         // Set up smart pointer for unsigned input buffer access.
         pBuf.setBuffer(input.buf,input.bufLen);
 
@@ -201,7 +201,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     }
 
 // --------
-    
+
     // For convenience, since we don't relocate the module to offset 0.
     udword h = offsets.header;
 
@@ -232,8 +232,9 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     if (offsets.trackTable >= input.bufLen || offsets.patterns >= input.bufLen || offsets.macros >= input.bufLen) {
         return false;
     }
-    
+
     offsets.sampleData = h+input.mdatSize;
+    offsets.silence = offsets.sampleData;
     // TFMX clears the first two words for one-shot samples.
     udword o = offsets.sampleData;
     pBuf[o] = pBuf[o+1] = pBuf[o+2] = pBuf[o+3] = 0;
@@ -263,12 +264,8 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
             cout << "WARNING: Rejecting Atari ST TFMX file!  " << input.path << endl;
 #endif
             return false;
-        }            
+        }
     }
-
-    offsets.silence = offsets.sampleData;
-    // TFMX clears the first dword here for one shot samples e.g.
-    pBuf[offsets.silence] = pBuf[offsets.silence+1] = pBuf[offsets.silence+2] = pBuf[offsets.silence+3] = 0;
 
     // Evaluate the compress identification fields at $0A and $0C.
     // In rare cases that part of the header has been overwritten
@@ -300,13 +297,19 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     variant.compressed = false;
     variant.finetuneUnscaled = false;
     variant.vibratoUnscaled = false;
+    variant.vibratoTimeMask = false;
     variant.portaUnscaled = false;
     variant.portaOverride = false;
     variant.noNoteDetune = false;
+    variant.setNoteV1 = false;
+    variant.extraWaitV1 = false;
+    variant.macroLoopExtraWait = false;
     variant.bpmSpeed5 = false;
     variant.noAddBeginCount = false;
+    variant.noDelayedDMAon = false;
     variant.noTrackMute = false;
-    
+    variant.execOrder = MAC_MOD_SEQ;
+
     PattCmdFuncs[0] = &TFMXDecoder::pattCmd_End;
     PattCmdFuncs[1] = &TFMXDecoder::pattCmd_Loop;
     PattCmdFuncs[2] = &TFMXDecoder::pattCmd_Goto;
@@ -363,7 +366,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     MacroDefs[0x15] = &macroDef_Goto;
     MacroDefs[0x16] = &macroDef_Return;
     MacroDefs[0x17] = &macroDef_SetPeriod;
-    
+
     MacroDefs[0x18] = &macroDef_SampleLoop;
     MacroDefs[0x19] = &macroDef_OneShot;
     MacroDefs[0x1a] = &macroDef_WaitOnDMA;
@@ -381,7 +384,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     // Macro command $20 Signal and its external write-only registers
     // as added by some TFMX variants is not needed either.
     MacroDefs[0x20] = &macroDef_UNDEF;
-    
+
     MacroDefs[0x21] = &macroDef_PlayMacro;
     MacroDefs[0x22] = &macroDef_22;
     MacroDefs[0x23] = &macroDef_23;
@@ -407,6 +410,9 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
 
     // Last the rare checksum adjustments.
     traitsByChecksum();
+    if (blacklisted) {
+        return false;
+    }
 
 // ----------
 
@@ -422,7 +428,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         vSongs.clear();
         vSongs.push_back(input.startSongHint);
     }
-    
+
     admin.startSong = (songNumber < 0) ? 0 : songNumber;
     if (admin.startSong > static_cast<int>(vSongs.size()-1)) {
         admin.startSong = 0;
@@ -438,6 +444,11 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         duration += run();
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
+#if defined(DEBUG)
+    cout << "Duration of " << input.path << "  #" << admin.startSong << "  ";
+    dumpTimestamp(duration);
+    cout << endl;
+#endif
 
     adjustTraitsPost();
     dumpModule();
@@ -449,30 +460,6 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
 // decoder currently chosen song.
 void TFMXDecoder::restart() {
     reset();
-    softRestart();
-}
-
-void TFMXDecoder::softRestart() {
-    songEnd = false;
-    songPosCurrent = 0;
-    tickFPadd = 0;
-    triggerRestart = false;
-
-    sequencer.step.next = false;
-    sequencer.loops = -1;
-    for (int step = 0; step < TRACK_STEPS_MAX; step++ ) {
-        sequencer.stepSeenBefore[step] = false;
-    }
-
-    // Not all songs are designed for looping cleanly, so aid them.
-    for (ubyte v=0; v<voices; v++) {
-        VoiceVars& voice = voiceVars[v];
-        voice.keyUp = true;
-        voice.volume = voice.outputVolume = 0;
-    }
-    fade.active = false;
-    fade.volume = fade.target = 64;
-    fade.delta = 0;
 
     uword so = vSongs[admin.startSong]<<1;
     sequencer.step.first = sequencer.step.current = readBEuword(pBuf,offsets.header+0x100+so);
@@ -491,6 +478,28 @@ void TFMXDecoder::softRestart() {
          << " to " << (int)sequencer.step.last
          << " / speed " << (int)admin.speed << endl;
 #endif
+    softRestart();
+}
+
+// The bits that also are needed when restarting songs that end
+// without looping.
+void TFMXDecoder::softRestart() {
+    songEnd = false;
+    songPosCurrent = 0;
+    tickFPadd = 0;
+    triggerRestart = false;
+
+    // Not all songs are designed for looping cleanly, so aid them.
+    for (ubyte v=0; v<voices; v++) {
+        VoiceVars& voice = voiceVars[v];
+        voice.keyUp = true;
+        voice.volume = voice.outputVolume = 0;
+    }
+    fade.active = false;
+    fade.volume = fade.target = 64;
+    fade.delta = 0;
+
+    resetSequencer();
     processTrackStep();
 }
 
@@ -498,9 +507,14 @@ void TFMXDecoder::setTFMXv1() {
     formatName = FORMAT_NAME;
     variant.noAddBeginCount = true;
     variant.vibratoUnscaled = true;
+    variant.vibratoTimeMask = true;
     variant.finetuneUnscaled = true;
-    variant.portaUnscaled = false;
+    variant.portaUnscaled = true;
     variant.portaOverride = true;
+    variant.setNoteV1 = true;
+    variant.extraWaitV1 = true;
+    variant.noDelayedDMAon = true;
+    variant.execOrder = SEQ_MOD_MAC;
     MacroDefs[0xd] = &macroDef_AddVolume;
     // max. macro cmd = $19
     for (ubyte m = 0x1a; m<0x40; m++) {
@@ -609,6 +623,105 @@ ubyte* TFMXDecoder::makeSamplePtr(udword offset) {
     return(pBuf.tellBegin() + offset);
 }
 
+void TFMXDecoder::handleWaitOnPaulaDone() {
+    // Pretend we have an interrupt handler that has evaluated
+    // Paula "audio channel 0-3 block finished" interrupts meanwhile.
+    for (ubyte v=0; v<voices; v++) {
+        VoiceVars& voice = voiceVars[v];
+        if (voice.waitOnDMACount >= 0) {  // 0 = wait once
+            uword x = voice.ch->getLoopCount();
+            uword y = voice.waitOnDMAPrevLoops;
+            int d;
+            if (x >= y) {
+                d = x-y;
+            }
+            else {
+                d = x+(0x10000-y);
+            }
+            if ( d > voice.waitOnDMACount ) {
+                voice.waitOnDMACount = -1;
+                if (voice.macro.state == 0) {
+                    voice.macro.state = -1;
+                }
+            }
+            else {
+                voice.waitOnDMACount -= d;
+                voice.waitOnDMAPrevLoops = voice.ch->getLoopCount();
+            }
+        }
+    }  // voices
+}
+
+void TFMXDecoder::handleDelayedDMAoff() {
+    for (ubyte v=0; v<voices; v++) {
+        VoiceVars& voice = voiceVars[v];
+        if (voice.macro.delayedOff) {
+            voice.macro.delayedOff = false;
+            voice.ch->off();
+        }
+    }
+}
+
+void TFMXDecoder::handleDelayedDMAon() {
+    for (ubyte v=0; v<voices; v++) {
+        VoiceVars& voice = voiceVars[v];
+        if (voice.macro.delayedOn) {
+            voice.macro.delayedOn = false;
+            voice.ch->on();
+        }
+    }
+}
+
+void TFMXDecoder::runMain() {
+    if (--admin.count < 0) {
+        bool hasEnded = false;//rePlayer
+        admin.count = admin.speed;  // reload
+        do {
+            sequencer.step.next = false;
+            int countInactive = 0;
+            int countInfinite = 0;
+            for (ubyte t=0; t<sequencer.tracks; t++) {
+                Track& tr = track[t];
+                tr.on = getTrackMute(t);
+                if (tr.PT >= 0x90) {
+                    countInactive++;
+                }
+                else if (tr.pattern.infiniteLoop) {
+                    countInfinite++;
+                }
+#if defined(DEBUG_RUN)
+                cout << '[' << (int)t << "] ";
+#endif
+                processPTTR(tr);
+#if defined(DEBUG_RUN)
+                cout << endl;
+#endif
+                if (sequencer.step.next) {
+                    break;
+                }
+            }  // next track
+            // These are states where track sequencer cannot advance.
+            if ( !sequencer.step.next ) {
+                if ( (countInactive == sequencer.tracks) ||
+                     (countInactive+countInfinite) == sequencer.tracks ) {
+                    songEnd = true;
+                    triggerRestart = true;
+                }
+            }
+            // Loop on end?
+            if (songEnd && loopMode) {
+                songEnd = false;
+                if (triggerRestart) {
+                    softRestart();
+                    processTrackStep();
+                }
+                hasEnded = true;// rePlayer
+            }
+        } while (sequencer.step.next);
+        songEnd |= hasEnded;//rePlayer
+    }
+}
+
 void TFMXDecoder::processPTTR(Track& tr) {
     // PT < 0x80 : current pattern
     // PT >= 0x80 < 0x90 : continue pattern from previous step
@@ -633,7 +746,7 @@ void TFMXDecoder::processPTTR(Track& tr) {
             tr.PT = 0xff;
             ubyte vNum = channelToVoiceMap[tr.TR & (sizeof(channelToVoiceMap)-1)];
             VoiceVars& v = voiceVars[vNum];
-            v.macro.skip = true;
+            v.macro.state = 0;
             v.ch->off();
         }
     }
@@ -643,94 +756,55 @@ int TFMXDecoder::run() {
     if (!admin.initialized) {
         return 0;
     }
-    for (ubyte v=0; v<voices; v++) {
-        if ( !songEnd || loopMode ) {
-            VoiceVars& voice = voiceVars[v];
-
-            // Pretend we have an interrupt handler that has evaluated
-            // Paula "audio channel 0-3 block finished" interrupts meanwhile.
-            if (voice.waitOnDMACount >= 0) {  // 0 = wait once
-                uword x = voice.ch->getLoopCount();
-                uword y = voice.waitOnDMAPrevLoops;
-                int d;
-                if (x >= y) {
-                    d = x-y;
-                }
-                else {
-                    d = x+(0x10000-y);
-                }
-                if ( d > voice.waitOnDMACount ) {
-                    voice.macro.skip = false;
-                    voice.waitOnDMACount = -1;
-                }
-                else {
-                    voice.waitOnDMACount -= d;
-                    voice.waitOnDMAPrevLoops = voice.ch->getLoopCount();
-                }
-            }
-
-            processMacroMain( voice );
-            processModulation( voice );
-
-            voice.ch->paula.period = voice.outputPeriod;
-
-        }
-    }
-
-    bool hasEnded = false;//rePlayer
-    if ( !songEnd || loopMode ) {
-        if (--admin.count < 0) {
-            admin.count = admin.speed;  // reload
-            do {
-                sequencer.step.next = false;
-                int countInactive = 0;
-                int countInfinite = 0;
-                for (ubyte t=0; t<sequencer.tracks; t++) {
-                    Track& tr = track[t];
-                    tr.on = getTrackMute(t);
-                    if (tr.PT >= 0x90) {
-                        countInactive++;
-                    }
-                    else if (tr.pattern.infiniteLoop) {
-                        countInfinite++;
-                    }
 #if defined(DEBUG_RUN)
-                    cout << '[' << (int)t << "] ";
+    dumpTimestamp(songPosCurrent);
 #endif
-                    processPTTR(tr);
-#if defined(DEBUG_RUN)
-                    cout << endl;
-#endif
-                    if (sequencer.step.next) {
-                        break;
-                    }
-                }  // next track
-                // These are states where track sequencer cannot advance.
-                if ( !sequencer.step.next ) {
-                    if ( (countInactive == sequencer.tracks) ||
-                         (countInactive+countInfinite) == sequencer.tracks ) {
-                        songEnd = true;
-                        triggerRestart = true;
-                    }
-                }
-                // Loop on end?
-                if (songEnd && loopMode) {
-                    songEnd = false;
-                    if (triggerRestart) {
-                        softRestart();
-                    }
-                    hasEnded = true;// rePlayer
-                }
-            } while (sequencer.step.next);
-        }
-    }
-    songEnd |= hasEnded;//rePlayer
-    
+    playerCommon();
     tickFPadd += tickFP;
     int tick = tickFPadd>>8;
     tickFPadd &= 0xff;
     songPosCurrent += tick;
     return tick;
+}
+
+void TFMXDecoder::playerCommon() {
+#if defined(DEBUG_RUN)
+    cout << "  playerCommon()" << endl;
+#endif
+    if ( !songEnd || loopMode ) {
+        handleWaitOnPaulaDone();
+        handleDelayedDMAoff();
+
+        if (variant.execOrder == MOD_MAC_SEQ) {
+            for (ubyte v=0; v<voices; v++) {
+                VoiceVars& voice = voiceVars[v];
+                processModulation( voice );
+                processMacroMain( voice );
+                voice.ch->paula.period = voice.outputPeriod;
+            }
+            runMain();
+        }
+        else if (variant.execOrder == SEQ_MOD_MAC) {
+            runMain();
+            for (ubyte v=0; v<voices; v++) {
+                VoiceVars& voice = voiceVars[v];
+                processModulation( voice );
+                processMacroMain( voice );
+                voice.ch->paula.period = voice.outputPeriod;
+            }
+        }
+        else {  // if (variant.execOrder == MAC_MOD_SEQ) {
+            for (ubyte v=0; v<voices; v++) {
+                VoiceVars& voice = voiceVars[v];
+                processMacroMain( voice );
+                processModulation( voice );
+                voice.ch->paula.period = voice.outputPeriod;
+            }
+            runMain();
+        }
+
+        handleDelayedDMAon();
+    }
 }
 
 void TFMXDecoder::noteCmd() {
@@ -749,6 +823,8 @@ void TFMXDecoder::noteCmd() {
         v.envelope.target = cmd.ee;
     }
     else if (cmd.aa == 0xf6) {  // vibrato
+        // Unlike the variants of the vibrato macro command,
+        // here the bitmask has never been dropped.
         ubyte tmp = cmd.bb&0xfe;
         v.vibrato.time = tmp;
         v.vibrato.count = tmp>>1;
@@ -770,12 +846,7 @@ void TFMXDecoder::noteCmd() {
         v.note = cmd.aa;
         v.keyUp = false;
         v.macro.offset = getMacroOffset(cmd.bb & 0x7f);
-        v.macro.step = 0;
-        v.macro.wait = 0;
-        v.macro.loop = 0xff;
-        v.macro.skip = false;
-        v.effectsMode = 0;
-        v.waitOnDMACount = 0;
+        v.macro.state = 1;
     }
     else {  // cmd.aa >= $c0   portamento note
         v.portamento.count = cmd.bb;
@@ -843,13 +914,13 @@ const uword TFMXDecoder::periods[0xd+0x40] = {
     0x08ea, 0x086a, 0x07f2, 0x0780, 0x0718,
     // +0 standard octaves
     0x06ae, 0x064e, 0x05f4, 0x059e, 0x054d, 0x0501, 0x04b9, 0x0475,
-    0x0435, 0x03f9, 0x03c0, 0x038c, 
+    0x0435, 0x03f9, 0x03c0, 0x038c,
     // +0x0c
-    0x0358, 0x032a, 0x02fc, 0x02d0, 0x02a8, 0x0282, 0x025e, 0x023b, 
+    0x0358, 0x032a, 0x02fc, 0x02d0, 0x02a8, 0x0282, 0x025e, 0x023b,
     0x021b, 0x01fd, 0x01e0, 0x01c6,
     // +0x18
     0x01ac, 0x0194, 0x017d, 0x0168, 0x0154, 0x0140, 0x012f, 0x011e,
-    0x010e, 0x00fe, 0x00f0, 0x00e3, 
+    0x010e, 0x00fe, 0x00f0, 0x00e3,
     // +0x24
     0x00d6, 0x00ca, 0x00bf, 0x00b4, 0x00aa, 0x00a0, 0x0097, 0x008f,
     0x0087, 0x007f, 0x0078, 0x0071,

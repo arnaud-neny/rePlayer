@@ -6,6 +6,8 @@
 #include "TFMXDecoder.h"
 #include "CRCLight.h"
 
+#include <set>
+
 using namespace tfmxaudiodecoder;
 
 void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
@@ -24,26 +26,71 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     // 0123456789abcdef0123456789abcdef0123456789abcdef
     // XXXXX XXXX  XX X    X   XXX       XXXXXXXX      
 
-    // Rock'n'Roll (1989). No checksum based adjustments required, because
-    // it uses the unique header tag that was specific to TFMX before v1.
-
+    // Turrican
+    std::set<udword> T1_checksums = {
+        0x73868fda,  // title, credits, highscore
+        0x93730029,  // title
+        0x6e799869,  // world 1
+        0x3d00fc52,  // world 2
+        0xd76d33ed,  // world 3
+        0xb989d570,  // world 4
+        0x8fa80b4e,  // world 5
+        0x88f7c34b,  // loader
+        0xb762f2dc   // bonus
+    };
+    // Turrican II
+    std::set<udword> T2_checksums = {
+        0xe2d6b5e0,  // world 1
+        0x0bf41b64,  // world 2
+        0x19ac72c3,  // world 3
+        0x03854473,  // world 4
+        0x9430d9de,  // world 5
+        0xc1ac5e1c,  // loader
+        0xcbb842b0,  // loading
+        0x78cd70f9   // demo
+    };
+    // Turrican II (1991) ingame music requires a special player variant
+    // with different execution order of macros and effects.
+    if (T2_checksums.count(crc1) >= 1) {
+        variant.execOrder = MOD_MAC_SEQ;
+    }
+    // Turrican (1990) is a TFMXv1 variant and strictly requires old
+    // features such as non-scaled vibrato/portamento.
+    else if (T1_checksums.count(crc1) >= 1) {
+        setTFMXv1();
+        variant.vibratoTimeMask = false;
+        MacroDefs[0x0d] = &macroDef_AddVolNote;
+        MacroDefs[0x1a] = &macroDef_WaitOnDMA;
+        MacroDefs[0x1c] = &macroDef_SplitKey;
+        MacroDefs[0x1d] = &macroDef_SplitVolume;
+    }
     // Danger Freak (1989) seems to be a special TFMX v1 variant.
-    if (crc1 == 0x48960d8c || crc1 == 0x5dcd624f || crc1 == 0x3f0b151f) {
+    else if (crc1 == 0x48960d8c || crc1 == 0x5dcd624f || crc1 == 0x3f0b151f) {
         setTFMXv1();
         variant.noNoteDetune = true;
-        variant.portaUnscaled = false;
     }
-    // Hard'n'Heavy (1989) is a TFMX v1 variant with an AddBegin macro
-    // that is missing the effect updates. The game soundtrack sounds wrong
-    // in many videos.
+    // Hard'n'Heavy (1989) is a TFMX v1 variant. In particular, it strictly
+    // requires the old AddBegin macro that is missing the effect updates.
+    // Alternatively, the AddBegin count parameter must be ignored.
+    // The game's title soundtrack sounds wrong in many videos.
     else if (crc1 == 0x27f8998c || crc1 == 0x26447707 ||
              // somebody compressed these files, they are not the originals!
              crc1 == 0xd404651b || crc1 == 0xb5348633 ) {
         setTFMXv1();
-        variant.portaUnscaled = true;
-    }
+     }
     // R-Type (1989).
     else if (crc1 == 0x8ac70fc8) {
+        setTFMXv1();
+        variant.macroLoopExtraWait = true;
+    }
+    // The Adventures of Quik & Silva.
+    else if (crc1 == 0x04f469a6 || crc1 == 0xd37c9008 ) {
+        variant.execOrder = MAC_MOD_SEQ;
+    }
+    // Rock'n'Roll (1989). No checksum based adjustments required, because
+    // it uses the unique header tag that was specific to TFMX before v1.
+    // Except for the intro.
+    else if (crc1 == 0xda279570) {  // intro
         setTFMXv1();
     }
     // Software Manager - Titel 2
@@ -58,5 +105,29 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     // that isn't compatible with the speed count value of default TFMX.
     else if (crc1 == 0x76f8aa6e) {
         variant.bpmSpeed5 = true;
+    }
+    // TFMX music by ern0 in the music demo "Musication Vol. 1" are
+    // replayed with a TFMX v1 player.
+    else if (crc1 == 0x0eed9c91 ||  // Danubius Replay (aka Gitar)
+             crc1 == 0x1a5d2b53 ||  // Flying World
+             crc1 == 0x22a92c26 ||  // Armageddon
+             crc1 == 0xe60babf2     // Magnetic Fields IV (aka Oxygen)
+             ) {
+        setTFMXv1();
+    }
+    else if (crc1 == 0x5fb2f54e) {  // Puzzy
+        setTFMXv1();
+        // Fix second song's track end.
+        pBuf[offsets.header+0x143] = 0x6f;
+    }
+    else if (crc1 == 0xcb3c7113) {  // Sledge Hammer One (aka Hammer One)
+        setTFMXv1();
+        // Fix song start/end. Song table is wrecked.
+        pBuf[offsets.header+0x101] = 0x04;
+        pBuf[offsets.header+0x141] = 0x6b;
+    }
+    // File "mdat.blade of destiny - titel (7ch)" is bad/corrupted.
+    else if (crc1 == 0xc83b701b) {
+        blacklisted = true;
     }
 }

@@ -26,19 +26,15 @@ some modules.
 
 ## Compatibility
 
-Tell me! 
-https://github.com/mschwendt/libtfmxaudiodecoder/issues
-
-I've mostly listened to the ``Logical`` soundtrack by
-[Rudolf Stember](http://www.stember.com/) in a looping playlist (since
-it's among my favourite TFMX modules), and heard ``Monster Time`` and
-``Rest In Peace`` by Jan Krolzig for the first time. Whoah!
-
-The library has been tested with a large number of files from old
+The library is tested with a large number of files from old
 and current major collections like [Modland](https://modland.com/) and
 [ExoticA](https://www.exotica.org.uk/wiki/Category:Amiga_Music_Formats).
 During pre-release testing, multiple issues reported in bug trackers of
 other music players have been reviewed, too.
+
+Some [bad music files](README_BAD.md) have been found. If you find them in
+your own collection, consider deleting them if repaired copies are not
+available.
 
 If you are an author of a music player, please give this library a try,
 and consider adding a plug-in, if you like what you hear.
@@ -51,6 +47,7 @@ usually use a file name extension from this list:
     .tfx, .tfm, .mdat, .tfmx
     .hip, .hipc, .hip7, .mcmd
     .fc, .fc3, .fc4, .fc13, .fc14, .smod
+    .sog, .soc
 
 Some of the music comes as a pair of files (music data + separate samples file), if it has not been converted
 into a single-file format, e.g.:
@@ -89,7 +86,7 @@ collections either.
 
 * https://www.exotica.org.uk/wiki/TFMX
 * https://de.wikipedia.org/wiki/TFMX
-* https://modland.com/ and https://www.exotica.org.uk/wiki/Category:Amiga_Music_Formats
+* https://modland.com/ and https://www.exotica.org.uk/wiki/Category:Amiga_Music_Formats and http://wt.exotica.org.uk/
 * https://chrishuelsbeck.bandcamp.com/
 * http://thethalionsource.w4f.eu/Hippel/hippelm.htm
 * https://remix64.com/ as a hub for the C64 and Amiga remix community.

@@ -42,7 +42,7 @@ class TFMXDecoder : public Decoder {
 
     int getSongs() override;
     ubyte getVoices() override;
-    
+
     void setPaulaVoice(ubyte,PaulaVoice*) override;
 
  public:// rePlayer
@@ -51,7 +51,7 @@ class TFMXDecoder : public Decoder {
     void adjustTraitsPost();
     void dumpMacros();
     void dumpModule();
-    
+
     static const std::string FORMAT_NAME;
     static const std::string FORMAT_NAME_PRO;
     static const std::string FORMAT_NAME_7V;
@@ -60,12 +60,12 @@ class TFMXDecoder : public Decoder {
 
     static const int TRACKS_MAX = 8;
     static const int TRACK_STEPS_MAX = 512;
-    
+
     static const uword periods[0x40+0xd];
 
     static const int VOICES_MAX = 8;
     PaulaVoice dummyVoices[VOICES_MAX];
-    
+
     static const int RECURSE_LIMIT = 16;  // way more than needed
 
     smartPtr<ubyte> pBuf;   // for safe unsigned access
@@ -85,10 +85,19 @@ class TFMXDecoder : public Decoder {
         udword trackTableEnd;
     } offsets;
 
+    enum ExecOrder {
+        // SEQ : sequencer
+        // MAC : macro processing
+        // MOD : modulation/effects processing
+        SEQ_MOD_MAC,
+        MOD_MAC_SEQ,
+        MAC_MOD_SEQ
+    };
+
     struct Admin {
         sword speed, count;  // speed and speed count
         int startSpeed, startSong;
-        
+
         bool initialized;  // true => restartable
         uword randomWord;
     } admin;
@@ -137,10 +146,10 @@ class TFMXDecoder : public Decoder {
     struct VoiceVars {
         PaulaVoice *ch;  // paula and mixer interface
         uword outputPeriod, outputVolume;
-    
+
         ubyte voiceNum;  // 0 = first
         sbyte effectsMode;
-        
+
         sbyte volume;
 
         ubyte note, notePrevious;
@@ -148,22 +157,24 @@ class TFMXDecoder : public Decoder {
         uword period;
         sword detune;
         bool keyUp;
-        
+
         struct {
             udword offset, offsetSaved;
             udword step, stepSaved;
             sword wait;
             ubyte loop;
-            bool skip, extraWait;
-            bool delayedOff;
+            // deliberately not using enum/const yet
+            sbyte state;  // -1 = enabled, 0 = skip, 1 = init
+            bool extraWait;
+            bool delayedOff, delayedOn;
         } macro;
-        
+
         sword waitOnDMACount;
         uword waitOnDMAPrevLoops;
-        
+
         ubyte addBeginCount, addBeginArg;
         sdword addBeginOffset;
-        
+
         struct {
             ubyte time, count;
             sbyte intensity;
@@ -240,9 +251,14 @@ class TFMXDecoder : public Decoder {
     void toPaulaStart(VoiceVars&,udword);
     void toPaulaLength(VoiceVars&,uword);
     void takeNextBufChecked(VoiceVars&);
+    void handleWaitOnPaulaDone();
+    void handleDelayedDMAoff();
+    void handleDelayedDMAon();
     void noteCmd();
     uword noteToPeriod(int);
+    void runMain();
     void processPTTR(Track&);
+    void playerCommon();
 
     void processModulation(VoiceVars&);
     void addBegin(VoiceVars&);
@@ -273,8 +289,10 @@ class TFMXDecoder : public Decoder {
 
     typedef void (TFMXDecoder::*PattCmdFuncPtr)(Track&);
     PattCmdFuncPtr PattCmdFuncs[(0xff-0xf0)+1] = { };
-    
+
     bool getTrackMute(ubyte);
+    void resetSequencer();
+    void nextTrackStep();
     void processTrackStep();
     void trackCmd_Stop(udword);
     void trackCmd_Loop(udword);
@@ -286,8 +304,9 @@ class TFMXDecoder : public Decoder {
     typedef void (TFMXDecoder::*TrackCmdFuncPtr)(udword);
     TrackCmdFuncPtr TrackCmdFuncs[TRACK_CMD_MAX+1] = { };
     static const std::string TrackCmdInfo[TRACK_CMD_MAX+1];
-    
+
     udword getMacroOffset(ubyte);
+    void initMacro(VoiceVars&);
     void processMacroMain(VoiceVars&);
 
     typedef void (TFMXDecoder::*MacroFuncPtr)(VoiceVars&);
@@ -309,17 +328,17 @@ class TFMXDecoder : public Decoder {
     MacroDef macroDef_UNDEF = { "Undefined - - - - - - - - - - - - -",
                                 &TFMXDecoder::macroFunc_NOP
     };
-    
+
     void macroFunc_StopSound(VoiceVars&);
     MacroDef macroDef_StopSound = { "DMAoff+Reset (stop sample & reset all)",
                                     &TFMXDecoder::macroFunc_StopSound
     };
-    
+
     void macroFunc_StartSample(VoiceVars&);
     MacroDef macroDef_StartSample = { "DMAon (start sample at selected begin)",
                                       &TFMXDecoder::macroFunc_StartSample
     };
-    
+
     void macroFunc_SetBegin(VoiceVars&);
     void macroFunc_SetBegin_sub(VoiceVars&, udword);
     MacroDef macroDef_SetBegin = { "SetBegin    xxxxxx   sample-startadress",
@@ -330,7 +349,7 @@ class TFMXDecoder : public Decoder {
     MacroDef macroDef_SetLen = { "SetLen      ..xxxx   sample-length",
                                  &TFMXDecoder::macroFunc_SetLen
     };
-    
+
     void macroFunc_Wait(VoiceVars&);
     MacroDef macroDef_Wait = { "Wait        ..xxxx   count (VBI's)",
                                &TFMXDecoder::macroFunc_Wait
@@ -345,14 +364,14 @@ class TFMXDecoder : public Decoder {
     MacroDef macroDef_Cont = { "Cont        xx/xxxx  macro-number/step",
                                &TFMXDecoder::macroFunc_Cont
     };
-    
+
     void macroFunc_Stop(VoiceVars&);
     MacroDef macroDef_Stop = { "-------------STOP----------------------",
                                &TFMXDecoder::macroFunc_Stop
     };
-    
+
     void macroFunc_AddNote(VoiceVars&);
-    void macroFunc_AddNote_sub(VoiceVars&,ubyte);
+    void macroFunc_AddNote_sub(VoiceVars&,ubyte,sword);
     MacroDef macroDef_AddNote = { "AddNote     xx/xxxx  note/detune",
                                   &TFMXDecoder::macroFunc_AddNote
     };
@@ -384,9 +403,6 @@ class TFMXDecoder : public Decoder {
 
     void macroFunc_AddVolNote(VoiceVars&);  // actually $00-$40
     // +AddNote variant
-    // Replaces AddVolume by default. Potentially harmless,
-    // since 'bb' arg must be set to 0xfe in order to activate the
-    // extra behaviour, and AddVolume doesn't use 'bb' arg.
     MacroDef macroDef_AddVolNote = { "Addvol+note xx/fe/xx note/CONST./volume",
                                     &TFMXDecoder::macroFunc_AddVolNote
     };
@@ -528,7 +544,7 @@ class TFMXDecoder : public Decoder {
                              &TFMXDecoder::macroFunc_29
     };
 
-    
+
     bool trackCmdUsed[TRACK_CMD_MAX+1];
     bool patternCmdUsed[16];
     bool macroCmdUsed[0x40];
@@ -537,14 +553,23 @@ class TFMXDecoder : public Decoder {
         // format
         bool compressed;
         // player variants
+        // Track individual differences for now.
+        // Eventually, some may be grouped together and eliminated.
         bool finetuneUnscaled;
         bool vibratoUnscaled;
+        bool vibratoTimeMask;
         bool portaUnscaled;
         bool portaOverride;
         bool noNoteDetune;
+        bool setNoteV1;
+        bool extraWaitV1;
+        bool macroLoopExtraWait;
         bool bpmSpeed5;
         bool noAddBeginCount;
+        bool noDelayedDMAon;
         bool noTrackMute;
+        // Main player order of execution.
+        ExecOrder execOrder;
     } variant;
 
     struct {

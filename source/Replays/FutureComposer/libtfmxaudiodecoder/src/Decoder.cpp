@@ -25,6 +25,7 @@ Decoder::Decoder() {
     songEnd = true;
     loopMode = false;
     rate = 50<<8;
+    blacklisted = false;
 }
 
 void Decoder::seek(sdword ms) {

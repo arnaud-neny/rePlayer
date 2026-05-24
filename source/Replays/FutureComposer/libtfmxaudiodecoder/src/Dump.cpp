@@ -92,7 +92,7 @@ void dumpTimestamp(udword ms) {
     udword mins = secs / 60;
     secs %= 60;
     cout << dec << setw(2) << setfill('0') << mins << ':'
-         << setw(2) << setfill('0') << secs;
+         << setw(2) << secs << '.' << setw(3) << ms;
 }
 
 }  // namespace tfmxaudiodecoder
