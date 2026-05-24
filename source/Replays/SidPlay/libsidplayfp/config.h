@@ -57,9 +57,6 @@
 /* Define to 1 if you have the <libusb-1.0/libusb.h> header file. */
 #undef HAVE_LIBUSB_1_0_LIBUSB_H
 
-/* Define if you have POSIX threads libraries and header files. */
-#undef HAVE_PTHREAD
-
 /* Define to 1 if you have pthread.h */
 #undef HAVE_PTHREAD_H
 
@@ -130,7 +127,7 @@
 #define PACKAGE_NAME ""
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsidplayfp 3.0.0"
+#define PACKAGE_STRING "libsidplayfp 3.0.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME ""
@@ -139,7 +136,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.0.0"
+#define PACKAGE_VERSION "3.0.1"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -160,7 +157,7 @@
 #undef STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "3.0.0"
+#define VERSION "3.0.1"
 
 /* Path to VICE testsuite. */
 #undef VICE_TESTSUITE
