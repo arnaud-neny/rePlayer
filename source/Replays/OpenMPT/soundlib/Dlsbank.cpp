@@ -2237,9 +2237,9 @@ bool CDLSBank::ExtractInstrument(CSoundFile &sndFile, INSTRUMENTINDEX nInstr, ui
 				// First copy over original channel
 				auto pDest = sampleCopy.sample16() + offsetOrig;
 				if(sample.uFlags[CHN_16BIT])
-					CopySample<SC::ConversionChain<SC::Convert<int16, int16>, SC::DecodeIdentity<int16>>>(pDest, sample.nLength, 2, sample.sample16(), sample.GetSampleSizeInBytes(), 1);
+					CopySample<SC::CopyNative16>(pDest, sample.nLength, 2, sample.sample16(), sample.GetSampleSizeInBytes(), 1);
 				else
-					CopySample<SC::ConversionChain<SC::Convert<int16, int8>, SC::DecodeIdentity<int8>>>(pDest, sample.nLength, 2, sample.sample8(), sample.GetSampleSizeInBytes(), 1);
+					CopySample<SC::Convert<int16, int8>>(pDest, sample.nLength, 2, sample.sample8(), sample.GetSampleSizeInBytes(), 1);
 				sample.FreeSample();
 
 				// Now read the other channel
@@ -2251,16 +2251,16 @@ bool CDLSBank::ExtractInstrument(CSoundFile &sndFile, INSTRUMENTINDEX nInstr, ui
 						pDest = sampleCopy.sample16() + offsetNew;
 						const SmpLength copyLength = std::min(sample.nLength, sampleCopy.nLength);
 						if(sample.uFlags[CHN_16BIT])
-							CopySample<SC::ConversionChain<SC::Convert<int16, int16>, SC::DecodeIdentity<int16>>>(pDest, copyLength, 2, sample.sample16(), sample.GetSampleSizeInBytes(), sample.GetNumChannels());
+							CopySample<SC::CopyNative16>(pDest, copyLength, 2, sample.sample16(), sample.GetSampleSizeInBytes(), sample.GetNumChannels());
 						else
-							CopySample<SC::ConversionChain<SC::Convert<int16, int8>, SC::DecodeIdentity<int8>>>(pDest, copyLength, 2, sample.sample8(), sample.GetSampleSizeInBytes(), sample.GetNumChannels());
+							CopySample<SC::Convert<int16, int8>>(pDest, copyLength, 2, sample.sample8(), sample.GetSampleSizeInBytes(), sample.GetNumChannels());
 					}
 				} else
 				{
 					SmpLength len = std::min(mpt::saturate_cast<SmpLength>(waveData.size() / 2u), sampleCopy.nLength);
 					const std::byte *src = mpt::byte_cast<const std::byte *>(waveData.data());
 					int16 *dst = sampleCopy.sample16() + offsetNew;
-					CopySample<SC::ConversionChain<SC::Convert<int16, int16>, SC::DecodeInt16<0, littleEndian16>>>(dst, len, 2, src, waveData.size(), 1);
+					DecodeSample<SC::DecodeChain<SC::Convert<int16, int16>, SC::DecodeInt16<0, littleEndian16>>>(dst, len, 2, src, waveData.size(), 1);
 				}
 				sample.FreeSample();
 				sample = sampleCopy;

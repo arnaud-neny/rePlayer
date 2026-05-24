@@ -1094,7 +1094,7 @@ bool CSoundFile::ReadMID(FileReader &file, ModLoadingFlags loadFlags)
 				midiChnStatus[midiCh].SetPitchbend(data1 | (track.ReadUint8() << 7));
 				break;
 			case 0xF0: // General / Immediate
-				switch(command & 0x0F)
+				switch(command)
 				{
 				case MIDIEvents::sysExStart: // SysEx
 				case MIDIEvents::sysExEnd: // SysEx (continued)
@@ -1102,7 +1102,7 @@ bool CSoundFile::ReadMID(FileReader &file, ModLoadingFlags loadFlags)
 						uint32 len;
 						track.ReadVarInt(len);
 						FileReader sysex = track.ReadChunk(len);
-						if(midiCh == MIDIEvents::sysExEnd)
+						if(command == MIDIEvents::sysExEnd)
 							break;
 
 						if(sysex.ReadMagic("\x7F\x7F\x04\x01"))

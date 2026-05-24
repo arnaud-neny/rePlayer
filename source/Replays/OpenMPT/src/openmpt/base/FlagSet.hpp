@@ -433,8 +433,117 @@ public:
 };
 
 
+
+#define MPT_FLAGSET_IMPL_UB_CHECKS 0
+#define MPT_FLAGSET_IMPL_ADL       1
+#define MPT_FLAGSET_IMPL_MACROS    0
+
+
+
+// clang-format off
+
+
+
+#if MPT_FLAGSET_IMPL_UB_CHECKS
+
+
+
+template <typename T> constexpr auto declare_enum_bitops(const T &) noexcept -> std::false_type { return {}; }
+
+template <typename T> struct has_enum_bitops : public decltype(declare_enum_bitops(std::declval<T>())) { };
+
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && has_enum_bitops<enum_t>::value, bool>::type = true>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator~(enum_t a) noexcept
+{
+	return ~enum_value_type<enum_t>(a);
+}
+
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && has_enum_bitops<enum_t>::value, bool>::type = true>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator|(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) | enum_value_type<enum_t>(b);
+}
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && has_enum_bitops<enum_t>::value, bool>::type = true>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator&(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) & enum_value_type<enum_t>(b);
+}
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && has_enum_bitops<enum_t>::value, bool>::type = true>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator^(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) ^ enum_value_type<enum_t>(b);
+}
+
+
+
+// backwards compatibility
+
+#define MPT_DECLARE_ENUM_BITOPS(enum_t) \
+	constexpr auto declare_enum_bitops(const enum_t &) noexcept -> std::true_type { return {}; } \
+	static_assert(has_enum_bitops<enum_t>::value); \
+	static_assert(std::is_same<decltype(~std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() | std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() & std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() ^ std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+/**/
+
+
+
+#elif MPT_FLAGSET_IMPL_ADL
+
+
+
+template <typename T>
+constexpr auto declare_enum_bitops(const T &) noexcept -> std::false_type
+{
+	return {};
+}
+
+// When using these operators inside the enum definition itself, declare_enum_bitops() can return false unless the enum was forward-declared and declared as a bitop enum before its definition.
+// In order to avoid ODR violations, we also encode the result of declare_enum_bitops() into the defaulted template argument that enables the function.
+
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && decltype(declare_enum_bitops(std::declval<enum_t>()))::value, bool>::type = decltype(declare_enum_bitops(std::declval<enum_t>()))::value>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator~(enum_t a) noexcept
+{
+	return ~enum_value_type<enum_t>(a);
+}
+
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && decltype(declare_enum_bitops(std::declval<enum_t>()))::value, bool>::type = decltype(declare_enum_bitops(std::declval<enum_t>()))::value>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator|(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) | enum_value_type<enum_t>(b);
+}
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && decltype(declare_enum_bitops(std::declval<enum_t>()))::value, bool>::type = decltype(declare_enum_bitops(std::declval<enum_t>()))::value>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator&(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) & enum_value_type<enum_t>(b);
+}
+template <typename enum_t, typename std::enable_if<std::is_enum<enum_t>::value && decltype(declare_enum_bitops(std::declval<enum_t>()))::value, bool>::type = decltype(declare_enum_bitops(std::declval<enum_t>()))::value>
+MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator^(enum_t a, enum_t b) noexcept
+{
+	return enum_value_type<enum_t>(a) ^ enum_value_type<enum_t>(b);
+}
+
+
+
+// backwards compatibility
+
+#define MPT_DECLARE_ENUM_BITOPS(enum_t) \
+	constexpr auto declare_enum_bitops(const enum_t &) noexcept -> std::true_type { return {}; } \
+	static_assert(std::is_same<decltype(~std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() | std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() & std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+	static_assert(std::is_same<decltype(std::declval<enum_t>() ^ std::declval<enum_t>()), enum_value_type<enum_t>>::value); \
+/**/
+
+
+
+#elif MPT_FLAGSET_IMPL_MACROS
+
+
+
 // Declare typesafe logical operators for enum_t
-#define MPT_DECLARE_ENUM(enum_t) \
+#define MPT_DECLARE_ENUM_BITOPS(enum_t) \
 	MPT_ATTR_ALWAYSINLINE MPT_INLINE_FORCE constexpr enum_value_type<enum_t> operator|(enum_t a, enum_t b) noexcept \
 	{ \
 		return enum_value_type<enum_t>(a) | enum_value_type<enum_t>(b); \
@@ -453,8 +562,22 @@ public:
 	} \
 /**/
 
+
+
+#endif
+
+
+
+// clang-format on
+
+
+
 // backwards compatibility
-#define DECLARE_FLAGSET MPT_DECLARE_ENUM
+
+#define MPT_DECLARE_ENUM MPT_DECLARE_ENUM_BITOPS
+
+#define DECLARE_FLAGSET MPT_DECLARE_ENUM_BITOPS
+
 
 
 OPENMPT_NAMESPACE_END

@@ -24,10 +24,10 @@ namespace ctrlSmp
 {
 
 // Reverse sample data
-bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile);
+bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile, uint8 channelMask = uint8_max);
 
 // Invert sample data (flip by 180 degrees)
-bool InvertSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile);
+bool InvertSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile, uint8 channelMask = uint8_max);
 
 // Crossfade sample data to create smooth loops
 bool XFadeSample(ModSample &smp, SmpLength fadeLength, int fadeLaw, bool afterloopFade, bool useSustainLoop, CSoundFile &sndFile);
@@ -59,9 +59,7 @@ namespace ctrlChn
 void ReplaceSample( CSoundFile &sndFile,
 					const ModSample &sample,
 					const void * const pNewSample,
-					const SmpLength newLength,
-					FlagSet<ChannelFlags> setFlags,
-					FlagSet<ChannelFlags> resetFlags);
+					const SmpLength newLength);
 
 } // namespace ctrlChn
 

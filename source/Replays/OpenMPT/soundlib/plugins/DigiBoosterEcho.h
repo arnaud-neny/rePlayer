@@ -118,4 +118,6 @@ protected:
 	void RecalculateEchoParams();
 };
 
+MPT_BINARY_STRUCT(DigiBoosterEcho::PluginChunk, 8)
+
 OPENMPT_NAMESPACE_END

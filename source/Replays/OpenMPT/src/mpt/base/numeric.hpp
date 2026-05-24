@@ -5,7 +5,7 @@
 
 
 
-#include "mpt/base/detect_compiler.hpp"
+#include "mpt/base/detect.hpp"
 #include "mpt/base/namespace.hpp"
 
 #include "mpt/base/bit.hpp"
@@ -13,12 +13,18 @@
 
 #include <algorithm>
 #include <limits>
+#include <numeric>
 #include <type_traits>
+
+#if MPT_CXX_BEFORE(20)
+#include <cmath>
+#endif
 
 
 
 namespace mpt {
 inline namespace MPT_INLINE_NS {
+
 
 
 template <typename Tmod, Tmod m>
@@ -94,6 +100,54 @@ template <class T>
 constexpr int signum(T value) {
 	return (value > T(0)) - (value < T(0));
 }
+
+
+
+#if MPT_CXX_AT_LEAST(20)
+
+using std::midpoint;
+
+#else
+
+template <typename T, typename std::enable_if<std::is_arithmetic<T>::value, bool>::type = true>
+[[nodiscard]] constexpr T midpoint(const T v1, const T v2) noexcept {
+	if constexpr (std::is_floating_point<T>::value) {
+		if (std::isnan(v1) || std::isnan(v2)) {
+			return (v1 + v2) / static_cast<T>(2);
+		}
+		if ((std::fabs(v1) <= (std::numeric_limits<T>::max() / static_cast<T>(2))) && (std::fabs(v2) <= (std::numeric_limits<T>::max() / static_cast<T>(2)))) {
+			return (v1 + v2) / static_cast<T>(2);
+		}
+		if (std::fabs(v1) < (std::numeric_limits<T>::min() * static_cast<T>(2))) {
+			return v1 + (v2 / static_cast<T>(2));
+		}
+		if (std::fabs(v2) < (std::numeric_limits<T>::min() * static_cast<T>(2))) {
+			return (v1 / static_cast<T>(2)) + v2;
+		}
+		return v1 / static_cast<T>(2) + v2 / static_cast<T>(2);
+	} else {
+		using Tu = typename std::make_unsigned<T>::type;
+		const Tu v1u = static_cast<Tu>(v1);
+		const Tu v2u = static_cast<Tu>(v2);
+		if (v1 > v2) {
+			return static_cast<T>(v1 - static_cast<T>(static_cast<Tu>(v1u - v2u) / static_cast<Tu>(2)));
+		} else {
+			return static_cast<T>(v1 + static_cast<T>(static_cast<Tu>(v2u - v1u) / static_cast<Tu>(2)));
+		}
+	}
+}
+
+template <class T>
+[[nodiscard]] constexpr T * midpoint(T * const v1, T * const v2) noexcept {
+	if (v1 > v2) {
+		return v1 - ((v1 - v2) / 2);
+	} else {
+		return v1 + ((v2 - v1) / 2);
+	}
+}
+
+#endif
+
 
 
 } // namespace MPT_INLINE_NS

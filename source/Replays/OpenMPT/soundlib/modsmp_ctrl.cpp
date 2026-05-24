@@ -19,19 +19,19 @@ namespace ctrlSmp
 {
 
 template <class T>
-static void ReverseSampleImpl(T *pStart, const SmpLength length)
+static void ReverseSampleImpl(T *p, const SmpLength length, const int stride)
 {
-	for(SmpLength i = 0; i < length / 2; i++)
+	for(T *pEnd = p + (length - 1) * stride; p < pEnd; p += stride, pEnd -= stride)
 	{
-		std::swap(pStart[i], pStart[length - 1 - i]);
+		std::swap(*p, *pEnd);
 	}
 }
 
 // Reverse sample data
-bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile)
+bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile, uint8 channelMask)
 {
 	if(!smp.HasSampleData()) return false;
-	if(end == 0 || start > smp.nLength || end > smp.nLength)
+	if(end <= start || end > smp.nLength)
 	{
 		start = 0;
 		end   = smp.nLength;
@@ -39,15 +39,31 @@ bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &s
 
 	if(end - start < 2) return false;
 
-	static_assert(MaxSamplingPointSize <= 4);
-	if(smp.GetBytesPerSample() == 4)  // 16 bit stereo
-		ReverseSampleImpl(static_cast<int32 *>(smp.samplev()) + start, end - start);
-	else if(smp.GetBytesPerSample() == 2)  // 16 bit mono / 8 bit stereo
-		ReverseSampleImpl(static_cast<int16 *>(smp.samplev()) + start, end - start);
-	else if(smp.GetBytesPerSample() == 1)  // 8 bit mono
-		ReverseSampleImpl(static_cast<int8 *>(smp.samplev()) + start, end - start);
-	else
-		return false;
+	const uint8 numChannels = smp.GetNumChannels();
+	const uint8 allChannelsMask = static_cast<uint8>((1 << numChannels) - 1);
+	if(numChannels < 2 || !channelMask || (channelMask & allChannelsMask) == allChannelsMask)
+	{
+		static_assert(MaxSamplingPointSize <= 4);
+		const uint8 bps = smp.GetBytesPerSample();
+		if(bps == 4)  // 16 bit stereo
+			ReverseSampleImpl(static_cast<int32 *>(smp.samplev()) + start, end - start, 1);
+		else if(bps == 2)  // 16 bit mono / 8 bit stereo
+			ReverseSampleImpl(static_cast<int16 *>(smp.samplev()) + start, end - start, 1);
+		else if(bps == 1)  // 8 bit mono
+			ReverseSampleImpl(static_cast<int8 *>(smp.samplev()) + start, end - start, 1);
+		else
+			return false;
+	} else
+	{
+		const int chn = mpt::bit_width(channelMask) - 1;
+		const uint8 bps = smp.GetElementarySampleSize();
+		if(bps == 2)
+			ReverseSampleImpl(smp.sample16() + start * numChannels + chn, end - start, numChannels);
+		else if(bps == 1)
+			ReverseSampleImpl(smp.sample8() + start * numChannels + chn, end - start, numChannels);
+		else
+			return false;
+	}
 
 	smp.PrecomputeLoops(sndFile, false);
 	return true;
@@ -55,29 +71,37 @@ bool ReverseSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &s
 
 
 template <class T>
-static void InvertSampleImpl(T *pStart, const SmpLength length)
+static void InvertSampleImpl(T *p, const SmpLength length, const int stride)
 {
-	for(SmpLength i = 0; i < length; i++)
+	for(const T *pEnd = p + length; p != pEnd; p += stride)
 	{
-		pStart[i] = ~pStart[i];
+		*p = ~(*p);
 	}
 }
 
+
 // Invert sample data (flip by 180 degrees)
-bool InvertSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile)
+bool InvertSample(ModSample &smp, SmpLength start, SmpLength end, CSoundFile &sndFile, uint8 channelMask)
 {
 	if(!smp.HasSampleData()) return false;
-	if(end == 0 || start > smp.nLength || end > smp.nLength)
+	if(end <= start || end > smp.nLength)
 	{
 		start = 0;
 		end = smp.nLength;
 	}
-	start *= smp.GetNumChannels();
-	end *= smp.GetNumChannels();
+
+	const uint8 numChannels = smp.GetNumChannels();
+	const uint8 allChannelsMask = static_cast<uint8>((1 << numChannels) - 1);
+	const bool singleChannel = numChannels >= 2 && channelMask != 0 && (channelMask & allChannelsMask) != allChannelsMask;
+	const int chn = singleChannel ? mpt::bit_width(channelMask) - 1 : 0;
+	const int stride = singleChannel ? numChannels : 1;
+	start *= numChannels;
+	end *= numChannels;
+
 	if(smp.GetElementarySampleSize() == 2)
-		InvertSampleImpl(smp.sample16() + start, end - start);
+		InvertSampleImpl(smp.sample16() + start + chn, end - start, stride);
 	else if(smp.GetElementarySampleSize() == 1)
-		InvertSampleImpl(smp.sample8() + start, end - start);
+		InvertSampleImpl(smp.sample8() + start + chn, end - start, stride);
 	else
 		return false;
 
@@ -110,12 +134,13 @@ bool XFadeSample(ModSample &smp, SmpLength fadeLength, int fadeLaw, bool afterlo
 	if(loopEnd <= loopStart || loopEnd > smp.nLength) return false;
 	if(loopStart < fadeLength) return false;
 
-	const SmpLength start = (loopStart - fadeLength) * smp.GetNumChannels();
-	const SmpLength end = (loopEnd - fadeLength) * smp.GetNumChannels();
-	const SmpLength afterloopStart = loopStart * smp.GetNumChannels();
-	const SmpLength afterloopEnd = loopEnd * smp.GetNumChannels();
-	const SmpLength afterLoopLength = std::min(smp.nLength - loopEnd, fadeLength) * smp.GetNumChannels();
-	fadeLength *= smp.GetNumChannels();
+	const uint8 numChannels = smp.GetNumChannels();
+	const SmpLength start = (loopStart - fadeLength) * numChannels;
+	const SmpLength end = (loopEnd - fadeLength) * numChannels;
+	const SmpLength afterloopStart = loopStart * numChannels;
+	const SmpLength afterloopEnd = loopEnd * numChannels;
+	const SmpLength afterLoopLength = std::min(smp.nLength - loopEnd, fadeLength) * numChannels;
+	fadeLength *= numChannels;
 
 	// e=0.5: constant power crossfade (for uncorrelated samples), e=1.0: constant volume crossfade (for perfectly correlated samples)
 	const double e = 1.0 - fadeLaw / 200000.0;
@@ -288,9 +313,9 @@ bool ConvertToStereo(ModSample &smp, CSoundFile &sndFile)
 	}
 
 	if(smp.GetElementarySampleSize() == 2)
-		ConvertMonoToStereoImpl(smp.sample16(), (int16 *)newSample, smp.nLength);
+		ConvertMonoToStereoImpl(smp.sample16(), static_cast<int16 *>(newSample), smp.nLength);
 	else if(smp.GetElementarySampleSize() == 1)
-		ConvertMonoToStereoImpl(smp.sample8(), (int8 *)newSample, smp.nLength);
+		ConvertMonoToStereoImpl(smp.sample8(), static_cast<int8 *>(newSample), smp.nLength);
 	else
 		return false;
 
@@ -313,10 +338,14 @@ namespace ctrlChn
 void ReplaceSample( CSoundFile &sndFile,
 					const ModSample &sample,
 					const void * const pNewSample,
-					const SmpLength newLength,
-					FlagSet<ChannelFlags> setFlags,
-					FlagSet<ChannelFlags> resetFlags)
+					const SmpLength newLength)
 {
+	FlagSet<ChannelFlags> setFlags, resetFlags;
+	setFlags.set(CHN_16BIT, sample.uFlags[CHN_16BIT]);
+	resetFlags.set(CHN_16BIT, !sample.uFlags[CHN_16BIT]);
+	setFlags.set(CHN_STEREO, sample.uFlags[CHN_STEREO]);
+	resetFlags.set(CHN_STEREO, !sample.uFlags[CHN_STEREO]);
+
 	const bool periodIsFreq = sndFile.PeriodsAreFrequencies();
 	for(auto &chn : sndFile.m_PlayState.Chn)
 	{

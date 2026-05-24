@@ -21,38 +21,38 @@ namespace MIDIEvents
 {
 
 	// MIDI Event Types
-	enum EventType
+	enum EventType : uint8
 	{
-		evNoteOff			= 0x8,	// Note Off event
-		evNoteOn			= 0x9,	// Note On event
-		evPolyAftertouch	= 0xA,	// Poly Aftertouch / Poly Pressure event
-		evControllerChange	= 0xB,	// Controller Change (see MidiCC enum)
-		evProgramChange		= 0xC,	// Program Change
-		evChannelAftertouch	= 0xD,	// Channel Aftertouch
-		evPitchBend			= 0xE,	// Pitchbend event (see PitchBend enum)
-		evSystem			= 0xF,	// System event (see SystemEvent enum)
+		evNoteOff           = 0x80,  // Note Off event
+		evNoteOn            = 0x90,  // Note On event
+		evPolyAftertouch    = 0xA0,  // Poly Aftertouch / Poly Pressure event
+		evControllerChange  = 0xB0,  // Controller Change (see MidiCC enum)
+		evProgramChange     = 0xC0,  // Program Change
+		evChannelAftertouch = 0xD0,  // Channel Aftertouch
+		evPitchBend         = 0xE0,  // Pitchbend event (see PitchBend enum)
+		evSystem            = 0xF0,  // System event (see SystemEvent enum)
 	};
 
 	// System Events (Fx ...)
-	enum SystemEvent
+	enum SystemEvent : uint8
 	{
-		sysExStart			= 0x0,	// Begin of System Exclusive message
-		sysQuarterFrame		= 0x1,	// Quarter Frame Message
-		sysPositionPointer	= 0x2,	// Song Position Pointer
-		sysSongSelect		= 0x3,	// Song Select
-		sysTuneRequest		= 0x6,	// Tune Request
-		sysExEnd			= 0x7,	// End of System Exclusive message
-		sysMIDIClock		= 0x8,	// MIDI Clock event
-		sysMIDITick			= 0x9,	// MIDI Tick event
-		sysStart			= 0xA,	// Start Song
-		sysContinue			= 0xB,	// Continue Song
-		sysStop				= 0xC,	// Stop Song
-		sysActiveSense		= 0xE,	// Active Sense Message
-		sysReset			= 0xF,	// Reset Device
+		sysExStart         = 0xF0,  // Begin of System Exclusive message
+		sysQuarterFrame    = 0xF1,  // Quarter Frame Message
+		sysPositionPointer = 0xF2,  // Song Position Pointer
+		sysSongSelect      = 0xF3,  // Song Select
+		sysTuneRequest     = 0xF6,  // Tune Request
+		sysExEnd           = 0xF7,  // End of System Exclusive message
+		sysMIDIClock       = 0xF8,  // MIDI Clock event
+		sysMIDITick        = 0xF9,  // MIDI Tick event
+		sysStart           = 0xFA,  // Start Song
+		sysContinue        = 0xFB,  // Continue Song
+		sysStop            = 0xFC,  // Stop Song
+		sysActiveSense     = 0xFE,  // Active Sense Message
+		sysReset           = 0xFF,  // Reset Device
 	};
 
 	// MIDI Pitchbend Constants
-	enum PitchBend
+	enum PitchBend : uint16
 	{
 		pitchBendMin     = 0x00,
 		pitchBendCentre  = 0x2000,
@@ -61,7 +61,7 @@ namespace MIDIEvents
 
 	// MIDI Continuous Controller Codes
 	// http://home.roadrunner.com/~jgglatt/tech/midispec/ctllist.htm
-	enum MidiCC
+	enum MidiCC : uint8
 	{
 		MIDICC_start = 0,
 		MIDICC_BankSelect_Coarse = MIDICC_start,

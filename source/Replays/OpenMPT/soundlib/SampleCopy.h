@@ -14,6 +14,15 @@
 
 #include "openmpt/soundbase/SampleConvert.hpp"
 #include "openmpt/soundbase/SampleDecode.hpp"
+#include "openmpt/soundbase/SampleEncode.hpp"
+
+#include "mpt/base/bit.hpp"
+#include "mpt/base/memory.hpp"
+
+#include <algorithm>
+#include <array>
+
+#include <cstddef>
 
 
 OPENMPT_NAMESPACE_BEGIN
@@ -30,12 +39,28 @@ OPENMPT_NAMESPACE_BEGIN
 // Template arguments:
 // SampleConversion: Functor of type SampleConversionFunctor to apply sample conversion (see above for existing functors).
 template <typename SampleConversion>
-size_t CopySample(typename SampleConversion::output_t *MPT_RESTRICT outBuf, size_t numSamples, size_t incTarget, const typename SampleConversion::input_t *MPT_RESTRICT inBuf, size_t sourceSize, size_t incSource, SampleConversion conv = SampleConversion())
+std::size_t CopySample(typename SampleConversion::output_t *MPT_RESTRICT outBuf, std::size_t numSamples, std::size_t incTarget, const typename SampleConversion::input_t *MPT_RESTRICT inBuf, std::size_t sourceSize, std::size_t incSource, SampleConversion conv = SampleConversion())
 {
-	const size_t sampleSize = incSource * SampleConversion::input_inc * sizeof(typename SampleConversion::input_t);
+	const std::size_t sampleSize = incSource * sizeof(typename SampleConversion::input_t);
 	LimitMax(numSamples, sourceSize / sampleSize);
-	const size_t copySize = numSamples * sampleSize;
+	const std::size_t copySize = numSamples * sampleSize;
+	SampleConversion sampleConv(conv);
+	while(numSamples--)
+	{
+		*outBuf = sampleConv(*inBuf);
+		outBuf += incTarget;
+		inBuf += incSource;
+	}
+	return copySize;
+}
 
+
+template <typename SampleConversion>
+std::size_t DecodeSample(typename SampleConversion::output_t *MPT_RESTRICT outBuf, std::size_t numSamples, std::size_t incTarget, const typename SampleConversion::input_t *MPT_RESTRICT inBuf, std::size_t sourceSize, std::size_t incSource, SampleConversion conv = SampleConversion())
+{
+	const std::size_t sampleSize = incSource * SampleConversion::input_inc * sizeof(typename SampleConversion::input_t);
+	LimitMax(numSamples, sourceSize / sampleSize);
+	const std::size_t copySize = numSamples * sampleSize;
 	SampleConversion sampleConv(conv);
 	while(numSamples--)
 	{
@@ -43,8 +68,36 @@ size_t CopySample(typename SampleConversion::output_t *MPT_RESTRICT outBuf, size
 		outBuf += incTarget;
 		inBuf += incSource * SampleConversion::input_inc;
 	}
-
 	return copySize;
+}
+
+
+template <typename SampleConversion>
+std::size_t EncodeSample(typename SampleConversion::encoded_t *MPT_RESTRICT outBuf, std::size_t numSamples, std::size_t incTarget, const typename SampleConversion::input_t *MPT_RESTRICT inBuf, std::size_t sourceSize, std::size_t incSource, SampleConversion conv = SampleConversion())
+{
+	const std::size_t sampleSize = incSource * sizeof(typename SampleConversion::input_t);
+	LimitMax(numSamples, sourceSize / sampleSize);
+	const std::size_t copySize = numSamples * sampleSize;
+	static_assert(mpt::is_binary_safe<typename SampleConversion::output_t>::value);
+	static_assert((sizeof(typename SampleConversion::output_t) % sizeof(typename SampleConversion::encoded_t)) == 0);
+	using Tbuf = std::array<typename SampleConversion::encoded_t, sizeof(typename SampleConversion::output_t) / sizeof(typename SampleConversion::encoded_t)>;
+	SampleConversion sampleConv(conv);
+	while(numSamples--)
+	{
+		Tbuf buf = mpt::bit_cast<Tbuf>(sampleConv(*inBuf));
+		std::copy(buf.data(), buf.data() + buf.size(), outBuf);
+		outBuf += incTarget * SampleConversion::encoded_inc;
+		inBuf += incSource;
+	}
+	return copySize;
+}
+
+
+// SampleConversion template parameter shortcuts for pure copying of native sample data
+namespace SC
+{  // SC = _S_ample_C_onversion
+	using CopyNative8 = Convert<int8, int8>;
+	using CopyNative16 = Convert<int16, int16>;
 }
 
 

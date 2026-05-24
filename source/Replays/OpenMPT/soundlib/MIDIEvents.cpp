@@ -19,7 +19,9 @@ namespace MIDIEvents
 // Build a generic MIDI event
 uint32 Event(EventType eventType, uint8 midiChannel, uint8 dataByte1, uint8 dataByte2)
 {
-	return (eventType << 4) | (midiChannel & 0x0F) | (dataByte1 << 8) | (dataByte2 << 16);
+	MPT_ASSERT(!(dataByte1 & 0x80));
+	MPT_ASSERT(!(dataByte2 & 0x80));
+	return (eventType & 0xF0) | (midiChannel & 0x0F) | (dataByte1 << 8) | (dataByte2 << 16);
 }
 
 
@@ -33,7 +35,8 @@ uint32 CC(MidiCC midiCC, uint8 midiChannel, uint8 param)
 // Build a MIDI Pitchbend event
 uint32 PitchBend(uint8 midiChannel, uint16 bendAmount)
 {
-	return Event(evPitchBend, midiChannel, static_cast<uint8>(bendAmount & 0x7F), static_cast<uint8>(bendAmount >> 7));
+	MPT_ASSERT(!(bendAmount & 0xC000));
+	return Event(evPitchBend, midiChannel, static_cast<uint8>(bendAmount & 0x7F), static_cast<uint8>((bendAmount >> 7) & 0x7F));
 }
 
 
@@ -61,13 +64,14 @@ uint32 NoteOn(uint8 midiChannel, uint8 note, uint8 velocity)
 // Build a MIDI System Event
 uint8 System(SystemEvent eventType)
 {
-	return static_cast<uint8>((evSystem << 4) | eventType);
+	return static_cast<uint8>(eventType);
 }
 
 
 // Build a MIDI Song Position Event
 uint32 SongPosition(uint16 quarterNotes)
 {
+	MPT_ASSERT(!(quarterNotes & 0xC000));
 	return Event(evSystem, sysPositionPointer, static_cast<uint8>(quarterNotes & 0x7F), static_cast<uint8>((quarterNotes >> 7) & 0x7F));
 }
 
@@ -82,7 +86,7 @@ uint8 GetChannelFromEvent(uint32 midiMsg)
 // Get MIDI Event type from a MIDI event
 EventType GetTypeFromEvent(uint32 midiMsg)
 {
-	return static_cast<EventType>(((midiMsg >> 4) & 0xF));
+	return static_cast<EventType>(midiMsg & 0xF0);
 }
 
 
@@ -104,26 +108,28 @@ uint8 GetDataByte2FromEvent(uint32 midiMsg)
 uint8 GetEventLength(uint8 firstByte)
 {
 	uint8 msgSize = 3;
-	switch(firstByte & 0xF0)
+	switch(GetTypeFromEvent(firstByte))
 	{
-	case 0xC0:
-	case 0xD0:
+	case evProgramChange:
+	case evChannelAftertouch:
 		msgSize = 2;
 		break;
-	case 0xF0:
-		switch(firstByte)
+	case evSystem:
+		switch(static_cast<SystemEvent>(firstByte))
 		{
-		case 0xF1:
-		case 0xF3:
+		case sysQuarterFrame:
+		case sysSongSelect:
 			msgSize = 2;
 			break;
-		case 0xF2:
+		case sysPositionPointer:
 			msgSize = 3;
 			break;
 		default:
 			msgSize = 1;
 			break;
 		}
+		break;
+	default:
 		break;
 	}
 	return msgSize;
