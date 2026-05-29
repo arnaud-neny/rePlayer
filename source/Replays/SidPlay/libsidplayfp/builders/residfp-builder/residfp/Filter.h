@@ -229,7 +229,8 @@ SampleU16 Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
     if (!isSurroundEnabled)
         (filt2 ? Vsum[0] : Vmix[0]) += V2;
     (filt3 ? Vsum[0] : Vmix[0]) += V3;
-    (filtE ? Vsum[0] : Vmix[0]) += Ve;
+    if (!isSurroundEnabled)
+        (filtE ? Vsum[0] : Vmix[0]) += Ve;
 
     if (!isSurroundEnabled)
         (filt1 ? Vsum[1] : Vmix[1]) += V1;

@@ -68,7 +68,8 @@ void Filter::updateMixing()
             else if (!voice3off) Nmix++;
         }
 
-        (filtE ? Nsum : Nmix)++;
+        if (i == 1 || !isSurroundEnabled)
+            (filtE ? Nsum : Nmix)++;
 
         currentSummer[i] = summer + summerIdx[Nsum];
 
