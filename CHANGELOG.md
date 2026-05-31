@@ -5,23 +5,25 @@
 
 ## Current version
 
+v0.22.6:
+- Updated adplug to 2.4 r927
+- Updated libsidplay to 3.0.1
+- Bug fixes
+
 v0.22.5:
-- Updated adplug to 2.4 r923
 - Updated libtfmxaudiodecoder to 1.0.9
 - Updated OpenMPT to 0.9.0-pre.12 r25345
 - Updated vgmstream to r2117
-- Bug fixes
 
 v0.22.3:
 - Added JayTrax
 - Added Klystrack
 - Added SBStudio
-- Updated residfp to 1.0.2
+- Updated libresidfp to 1.0.2
 - Updated ImGui to 1.92.8
 - Updated TagLib to 2.3
 
 v0.22.2:
-- Updated libsidplay to 3.0.0
 - Added CrossFade
 - Added ReplayGain
 - Updated libcurl to 8.20.0
@@ -40,7 +42,7 @@ v0.22.0:
 
 ## Older updates
 
-- [0.19.4] adplug to 2.4 r916
+- [0.22.5] adplug to 2.4 r923
 - [0.22.0] ASAP to 8.0.0
 - [0.17.3] FAAD2 to 2.11.2
 - [0.19.4] Furnace to 0.6.8.3
@@ -49,8 +51,9 @@ v0.22.0:
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
+- [0.22.2] libresidfp to 1.0.1
 - [0.16.15] libsc68 to 3.0.0a r706
-- [0.21.9] libsidplay to 2.16.0
+- [0.22.2] libsidplay to 3.0.0
 - [0.21.9] libvgm to 57585ea
 - [0.22.0] libxmp to 4.7.0
 - [0.22.0] OpenMPT to 0.9.0-pre.12 r24999
