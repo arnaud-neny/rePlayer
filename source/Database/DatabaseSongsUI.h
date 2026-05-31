@@ -138,6 +138,7 @@ namespace rePlayer
 
         const bool m_isScrollingEnabled = true;
 
+        bool m_resetCrolling = false;
         TrackMode m_trackMode = TrackMode::None;
         uint8_t m_trackedRepeat = 0; // hack for ImGui when changing an artist and the selected song is not displayed because of scrolling not computed properly (as it is based on previous artist on change)
         SubsongID m_trackedSubsongId;

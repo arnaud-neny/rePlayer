@@ -137,6 +137,7 @@ namespace rePlayer
                             {
                                 m_dbSongsRevision = m_db.SongsRevision() - 1;
                                 selectedArtist->CopyTo(&m_selectedArtistCopy);
+                                m_resetCrolling = true;
                             }
                         }
                         ImGui::SameLine(0.0f, 0.0f);//no spacing

@@ -240,6 +240,15 @@ namespace rePlayer
                 ImGui::TableHeadersRow();
 
                 SortSubsongs(isDirty);
+                if (m_resetCrolling)
+                {
+                    if (m_entries.IsNotEmpty())
+                    {
+                        m_trackedSubsongId = m_entries[0];
+                        m_trackMode = TrackMode::Song;
+                    }
+                    m_resetCrolling = false;
+                }
 
                 SubsongID currentRatingSubsong;
 
@@ -402,13 +411,13 @@ namespace rePlayer
                 // build the tracking position and set it if the scrolling is enabled for the table
                 if (m_trackedSubsongId.IsValid())
                 {
-                    auto trackedSubsongIndex = m_entries.FindIf<int32_t>([this](auto& entry)
+                    if (m_entries.IsNotEmpty())
                     {
-                        return entry == m_trackedSubsongId;
-                    });
-                    if (trackedSubsongIndex >= 0)
-                    {
-                        trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedSubsongIndex);
+                        auto trackedSubsongIndex = m_entries.FindIf<int32_t>([this](auto& entry)
+                        {
+                            return entry == m_trackedSubsongId;
+                        });
+                        trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * Max(trackedSubsongIndex, 0));
                         if (m_isScrollingEnabled)
                             ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
                     }
