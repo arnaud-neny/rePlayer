@@ -290,6 +290,9 @@
     <ClInclude Include="adplug\plx.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
+    <ClInclude Include="adplug\ungzip.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayAdLib.cpp">
@@ -539,6 +542,9 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\plx.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\ungzip.c">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
   </ItemGroup>

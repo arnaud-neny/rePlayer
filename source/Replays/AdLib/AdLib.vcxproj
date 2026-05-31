@@ -268,6 +268,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="adplug\surroundopl.h" />
     <ClInclude Include="adplug\temuopl.h" />
     <ClInclude Include="adplug\u6m.h" />
+    <ClInclude Include="adplug\ungzip.h" />
     <ClInclude Include="adplug\unlzh.h" />
     <ClInclude Include="adplug\unlzss.h" />
     <ClInclude Include="adplug\unlzw.h" />
@@ -355,6 +356,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="adplug\surroundopl.cpp" />
     <ClCompile Include="adplug\temuopl.cpp" />
     <ClCompile Include="adplug\u6m.cpp" />
+    <ClCompile Include="adplug\ungzip.c" />
     <ClCompile Include="adplug\unlzh.c" />
     <ClCompile Include="adplug\unlzss.c" />
     <ClCompile Include="adplug\unlzw.c" />
