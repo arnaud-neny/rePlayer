@@ -411,13 +411,13 @@ namespace rePlayer
                 // build the tracking position and set it if the scrolling is enabled for the table
                 if (m_trackedSubsongId.IsValid())
                 {
-                    if (m_entries.IsNotEmpty())
+                    auto trackedSubsongIndex = m_entries.FindIf<int32_t>([this](auto& entry)
                     {
-                        auto trackedSubsongIndex = m_entries.FindIf<int32_t>([this](auto& entry)
-                        {
-                            return entry == m_trackedSubsongId;
-                        });
-                        trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * Max(trackedSubsongIndex, 0));
+                        return entry == m_trackedSubsongId;
+                    });
+                    if (trackedSubsongIndex >= 0)
+                    {
+                        trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedSubsongIndex);
                         if (m_isScrollingEnabled)
                             ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
                     }
