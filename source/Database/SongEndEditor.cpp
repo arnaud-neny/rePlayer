@@ -7,6 +7,7 @@
 #include <Thread/Thread.h>
 
 // rePlayer
+#include <Deck/Player.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/Replay.h>
@@ -84,6 +85,14 @@ namespace rePlayer
         memset(m_samples.Items(), 0, m_samples.Size<size_t>());
         m_loopDetection.loopMax = GetMaxLoopDuration();
 
+        auto rg = m_musicId.GetSong()->GetSubsongReplayGain(m_musicId.subsongId.index);
+        if (rg.IsValid())
+        {
+            if (Player::ms_isReplayGainEnabled)
+                m_rgScale = powf(10.0f, rg.gain / 20.0f);
+            m_rgPeak = rg.peak;
+        }
+
         AddRef();
         Core::AddJob([this]()
         {
@@ -138,6 +147,11 @@ namespace rePlayer
             }
             if (m_currentFrameSample != numSamples)
             {
+                float scale = m_rgScale;
+                if (m_rgPeak != FLT_MAX)
+                    scale = 1.0f / (scale * m_rgPeak);
+                scale *= 0.5f;
+
                 uint32_t currentSample = ReadCurrentSample();
                 uint32_t startFrame = uint32_t((1000ull * m_currentFrameSample) / (sampleRate * numMillisecondsPerPixel));
                 uint32_t endFrame = currentSample == numSamples ? m_frames.NumItems() : uint32_t((1000ull * currentSample) / (sampleRate * numMillisecondsPerPixel));
@@ -148,13 +162,13 @@ namespace rePlayer
                     {
                         auto x0 = uint32_t(i * numMillisecondsPerPixel * sampleRate / 1000);
                         auto x1 = uint32_t((i + 1) * numMillisecondsPerPixel * sampleRate / 1000);
-                        float s = (samples[x0].left + samples[x0].right) * 0.5f;
+                        float s = (samples[x0].left + samples[x0].right) * scale;
                         float rms = s * s;
                         float min = s;
                         float max = s;
                         for (auto x = x0 + 1; x < x1; x++)
                         {
-                            s = (samples[x].left + samples[x].right) * 0.5f;
+                            s = (samples[x].left + samples[x].right) * scale;
                             rms += s * s;
                             if (s < min)
                                 min = s;
@@ -244,6 +258,8 @@ namespace rePlayer
                     m_lastSample = waveform[i];
                     m_silence = silence + sampleRate / 4;
                 }
+                waveform[i].left *= m_rgScale;
+                waveform[i].right *= m_rgScale;
             }
             if ((numSamples | preNumSamples) == 0)
             {

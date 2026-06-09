@@ -78,6 +78,9 @@ namespace rePlayer
         Wave* m_wave = nullptr;
         thread::Semaphore m_semaphore;
 
+        float m_rgScale = 1.0f;
+        float m_rgPeak = FLT_MAX;
+
         // mouse & loop
         float m_mousePosWithLoop = 0.0f;
         LoopInfo m_mouseLoop;
