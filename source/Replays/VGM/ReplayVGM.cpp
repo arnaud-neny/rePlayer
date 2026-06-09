@@ -3,6 +3,7 @@
 // - emu/cores/adlibemu.h
 // - emu/cores/adlibemu_opl_inc.c
 // - emu/cores/adlibemu_opl_inc.h
+// - emu/cores/es5503.c
 // - emu/cores/fmopn.c
 // - emu/cores/fmopn.h
 // - emu/cores/gb.c
@@ -135,6 +136,34 @@ namespace rePlayer
         player->SetEventCallback(OnEvent, replay);
 
         replay->m_mediaType.ext = GetExtension(stream, player, replay->m_loader);
+
+        auto* property = replay->m_properties.Push();
+        property->label = "Info";
+        property->numColumns = 2;
+        auto* tags = player->GetPlayer()->GetTags();
+        while (*tags)
+        {
+            if (tags[1] == nullptr || *tags[1] == 0)
+            {
+                tags += 2;
+            }
+            else
+            {
+                property->Add(*tags++, Property::kIsNotEditable);
+                property->Add(*tags++, Property::kIsEditable);
+            }
+        }
+
+        auto& devs = player->GetPlayer()->GetDevNames();
+        if (!devs.empty())
+        {
+            property = replay->m_properties.Push();
+            property->label = "Devices";
+            property->numColumns = 1;
+
+            for (auto& dev : devs)
+                property->Add(dev.c_str(), Property::kIsNotEditable);
+        }
 
         return replay;
     }
@@ -411,6 +440,11 @@ namespace rePlayer
         }
         info += "\nlibvgm " LIBVGM_VERSION;
         return info;
+    }
+
+    const Replay::Properties& ReplayVGM::BuildProperties()
+    {
+        return m_properties;
     }
 }
 // namespace rePlayer

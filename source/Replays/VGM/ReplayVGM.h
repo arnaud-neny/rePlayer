@@ -59,6 +59,7 @@ namespace rePlayer
         uint32_t GetNumSubsongs() const override;
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
+        const Properties& BuildProperties() override;
 
     private:
         static constexpr uint32_t kSampleRate = 48000;
@@ -83,6 +84,7 @@ namespace rePlayer
         uint64_t m_currentPosition = 0;
         uint64_t m_currentDuration = 0;
         LoopInfo m_loop = {};
+        Properties m_properties;
         static int32_t ms_stereoSeparation;
         static int32_t ms_surround;
         static int32_t ms_droV2Opl3;

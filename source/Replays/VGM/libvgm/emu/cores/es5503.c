@@ -63,6 +63,7 @@ static void es5503_write_ram(void *info, UINT32 offset, UINT32 length, const UIN
 
 static void es5503_set_mute_mask(void *info, UINT32 MuteMask);
 static void es5503_set_srchg_cb(void *info, DEVCB_SRATE_CHG CallbackFunc, void* DataPtr);
+static void es5503_set_pan(void *info, const INT16* PanVals);
 
 
 static DEVDEF_RWFUNC devFunc[] =
@@ -71,6 +72,7 @@ static DEVDEF_RWFUNC devFunc[] =
 	{RWF_REGISTER | RWF_READ, DEVRW_A8D8, 0, es5503_r},
 	{RWF_MEMORY | RWF_WRITE, DEVRW_BLOCK, 0, es5503_write_ram},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, es5503_set_mute_mask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, es5503_set_pan}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 static DEV_DEF devDef =
@@ -174,6 +176,7 @@ typedef struct
 	UINT32 clock;
 	UINT8 output_channels;
 	UINT8 outchn_mask;
+	UINT8 force_stereo;    // rePlayer
 	UINT32 output_rate;
 	
 	DEVCB_SRATE_CHG SmpRateFunc;
@@ -264,7 +267,7 @@ static void es5503_pcm_update(void *param, UINT32 samples, DEV_SMPL **outputs)
 	UINT32 snum;
 	UINT32 ramptr;
 	ES5503Chip *chip = (ES5503Chip *)param;
-	UINT8 chnsStereo, chan;
+	UINT8 chnsStereo, chan, forceStereo; // rePlayer
 
 	memset(outputs[0], 0, samples * sizeof(DEV_SMPL));
 	memset(outputs[1], 0, samples * sizeof(DEV_SMPL));
@@ -272,6 +275,7 @@ static void es5503_pcm_update(void *param, UINT32 samples, DEV_SMPL **outputs)
 		return;
 
 	chnsStereo = chip->output_channels & ~1;
+	forceStereo = chip->force_stereo; // rePlayer
 	for (snum = 0; snum < samples; snum++)
 	{
 		for (osc = 0; osc < chip->oscsenabled; osc++)
@@ -342,8 +346,12 @@ static void es5503_pcm_update(void *param, UINT32 samples, DEV_SMPL **outputs)
 					{
 						if (chan == chnMask)
 						{
-							outputs[0][snum] += outData;
-							outputs[1][snum] += outData;
+							// rePlayer begin
+							if (!forceStereo || (chan & 1) == 0)
+								outputs[0][snum] += outData;
+							if (!forceStereo || (chan & 1))
+								outputs[1][snum] += outData;
+							// rePlayer end
 						}
 					}
 
@@ -645,3 +653,12 @@ static void es5503_set_srchg_cb(void *info, DEVCB_SRATE_CHG CallbackFunc, void* 
 	
 	return;
 }
+
+// rePlayer begin
+static void es5503_set_pan(void* info, const INT16* PanVals)
+{
+	ES5503Chip* chip = (ES5503Chip*)info;
+
+	chip->force_stereo = PanVals[0] != 0;
+}
+// rePlayer end
