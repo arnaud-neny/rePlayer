@@ -45,15 +45,14 @@ namespace rePlayer
                 if (ImGui::BeginTabItem("Metadata"))
                 {
                     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetColorU32(ImGuiCol_ChildBg));
-                    ImGui::InputTextMultiline("##", metadata.data(), metadata.size() + 1, ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_WordWrap);
+                    ImGui::InputTextMultiline("##", metadata.data(), metadata.size() + 1, ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_ReadOnly);
                     ImGui::PopStyleColor();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
             }
         }
-
-        if (ImGui::BeginTabBar("Properties", ImGuiTabBarFlags_None))
+        else if (ImGui::BeginTabBar("Properties", ImGuiTabBarFlags_None))
         {
             // padding taken from the frame_size of InputTextEx
             auto textPadding = ImGui::GetStyle().FramePadding.y * 2.0f;
@@ -65,7 +64,7 @@ namespace rePlayer
                     {
                         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImGui::GetColorU32(ImGuiCol_ChildBg));
                         // read only editable to be able to copy the text in the clipboard
-                        ImGui::InputTextMultiline("##", property.data.Items<char>(), property.data.NumItems(), ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_WordWrap);
+                        ImGui::InputTextMultiline("##", property.data.Items<char>(), property.data.NumItems(), ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_ReadOnly);
                         ImGui::PopStyleColor();
                     }
                     else
