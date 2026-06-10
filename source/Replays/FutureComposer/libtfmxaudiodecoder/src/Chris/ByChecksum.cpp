@@ -29,7 +29,7 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     // Turrican
     std::set<udword> T1_checksums = {
         0x73868fda,  // title, credits, highscore
-        0x93730029,  // title
+        0x93730029,  // title (old rips from 1990)
         0x6e799869,  // world 1
         0x3d00fc52,  // world 2
         0xd76d33ed,  // world 3
@@ -54,7 +54,7 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     if (T2_checksums.count(crc1) >= 1) {
         variant.execOrder = MOD_MAC_SEQ;
     }
-    // Turrican (1990) is a TFMXv1 variant and strictly requires old
+    // Turrican (1990) is a TFMX v1/v2 variant and strictly requires old
     // features such as non-scaled vibrato/portamento.
     else if (T1_checksums.count(crc1) >= 1) {
         setTFMXv1();
@@ -82,6 +82,13 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     else if (crc1 == 0x8ac70fc8) {
         setTFMXv1();
         variant.macroLoopExtraWait = true;
+        // If it's the bad rip where the first 192 samples are missing,
+        // blacklist it. See README_BAD.md file. Checking for minimum
+        // sample file size 116160 would work, too.
+        if (0xe8ff20f9 != readBEudword(sBuf,offsets.sampleData+4) ||
+            0xe8f700fd != readBEudword(sBuf,offsets.sampleData+0xbc) ) {
+            blacklisted = true;
+        }
     }
     // The Adventures of Quik & Silva.
     else if (crc1 == 0x04f469a6 || crc1 == 0xd37c9008 ) {
@@ -92,6 +99,57 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     // Except for the intro.
     else if (crc1 == 0xda279570) {  // intro
         setTFMXv1();
+    }
+    // Particularly non-scaled vibrato is required by these old TFMX v1
+    // modules. There may be a few more that could be set to v1, e.g.
+    // Wanted Team's EP_TFMX.lha mentions a list, but whether it would
+    // be audible remains to be investigated.
+    //
+    // Grand Monster Slam
+    else if (crc1 == 0xb54457fc || crc1 == 0x97707404 ||
+             // Circus Attractions
+             crc1 == 0x5f04d9af || crc1 == 0x72ef7307 ||
+             // Gordian Tomb
+             crc1 == 0xf2292eae ||
+             // Oxxonian
+             crc1 == 0x0629665d ||
+             // X-Out
+             crc1 == 0x9264f036 ||  // title
+             crc1 == 0x22a86efb ||  // level 1
+             crc1 == 0x711d8520 ||  // level 2
+             crc1 == 0x2f525ee0 ||  // level 3
+             crc1 == 0x8412d8d5 ||  // level 4
+             crc1 == 0xc0376a19 ||  // level 5
+             crc1 == 0xade39424 ||  // end
+             crc1 == 0x2adbf5f9 ||  // high-scores
+             crc1 == 0x236d305d ||  // load
+             crc1 == 0x14adce8c) {  // shop (?)
+        setTFMXv1();
+    }
+    // Z-Out uses an unusual player variant newer than TFMX v2.2, which
+    // uses scaled vibrato/portamento already but not delayed channel on yet.
+    // The macro scripts of some instruments strictly require immediate
+    // channel on, or else sounds will stay silent.
+    //
+    // Alternative versions of the Z-Out soundtrack are not affected,
+    // and their checksums differ.
+    //
+    // This also fixes an uneven sample start address, which isn't illegal,
+    // but an accident that causes audible side-effects. Also is the proper
+    // fix for the Wanted Team's rip "Z-Out 5" where the sample file would be
+    // one byte too short for the sample parameters in this macro.
+    else if (crc1 == 0x8648904b ||  // title
+             crc1 == 0xb7f700b2 || crc1 == 0x0eabbc61 ||  // ingame
+             crc1 == 0x999c8c6b || crc1 == 0xdb5e4afc ||  // ingame
+             crc1 == 0x9d652521 || crc1 == 0xa1dc3139) {  // ingame
+        variant.noDelayedDMAon = true;  // strictly required!
+        // Repair one instrument. The preceding sample area (in macro 2)
+        // is from 0x789a to 0x884e, and there's no indication that it's
+        // not an off-by-one bug in macro 10.
+        udword mo = getMacroOffset(0x10);
+        if (readBEudword(pBuf,mo+4) == 0x0200884f) {
+            pBuf[mo+4+3] = 0x4e;  // set begin to 0x884e
+        }
     }
     // Software Manager - Titel 2
     else if (crc1 == 0xa8566760) {
@@ -114,6 +172,19 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
              crc1 == 0xe60babf2     // Magnetic Fields IV (aka Oxygen)
              ) {
         setTFMXv1();
+        // Without summing up the findings in ticket #16 (like questionable
+        // start/end points), the three main guitar samples are shifted
+        // into only the positive side of value range of signed samples.
+        // That causes clicks also because it leads to three defective,
+        // negative peak values sticking out in each of them. It could be
+        // that with real Amiga hardware, those samples are less of an issue.
+        // The following centers the samples properly around zero,
+        // which reduces the primary problem with them.
+        if (crc1 == 0x0eed9c91) {  // Danubius Replay (aka Gitar)
+            for (int i=4; i<0x303e4; ++i) {
+                pBuf[offsets.sampleData+i] -= 0x38;
+            }
+        }
     }
     else if (crc1 == 0x5fb2f54e) {  // Puzzy
         setTFMXv1();

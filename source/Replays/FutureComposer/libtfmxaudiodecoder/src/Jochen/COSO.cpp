@@ -27,10 +27,10 @@ const std::string HippelDecoder::COSO_TAG = "COSO";
 
 bool HippelDecoder::COSO_init(int songNumber) {
     admin.startSong = (songNumber < 0) ? 0 : songNumber;
-
+    
     setRate(50<<8);
     stats.voices = 4;
-
+    
     trackColumnSize = TFMX_TRACKTAB_COLUMN_SIZE;
     trackStepLen = TFMX_TRACKTAB_STEP_SIZE;
     traits.sampleStructSize = COSO_SAMPLE_STRUCT_SIZE;
@@ -73,7 +73,7 @@ bool HippelDecoder::COSO_init(int songNumber) {
          readBEudword(fcBuf,h+0x18)>=input.len ) {
         return false;
     }
-
+    
     // As to support module packs, we maintain a list of headers.
     std::vector<udword> vHeaders;
     vHeaders.push_back(h);
@@ -128,13 +128,13 @@ bool HippelDecoder::COSO_init(int songNumber) {
         cout << "WARNING: mismatch between offset sample data 0x" << hex << offsets.sampleData << " and calculated via number of samples 0x" << (offsets.sampleHeaders+stats.samples*traits.sampleStructSize) << endl;
 #endif
     }
-
+    
     trackTabLen = stats.trackSteps*trackStepLen;
     traitsByChecksum();
     if (blacklisted) {
         return false;
     }
-
+    
     // Reject Atari ST TFMX COSO modules. As it seems to use different sound
     // sequence commands, a command like $E2 $E5 with less than $E5 samples
     // would be invalid for TFMX on Amiga.
@@ -160,7 +160,7 @@ bool HippelDecoder::COSO_init(int songNumber) {
         }
         sh += traits.sampleStructSize;
     }
-
+    
     (this->*pStartSongFunc)();
     return true;
 }
@@ -181,7 +181,7 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
 
     udword pattOffs;
     ubyte pattVal;
-
+    
     int maxLoops = RECURSE_LIMIT;
     while ( --maxLoops >= 0 ) {
 
@@ -193,7 +193,7 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
         voiceX.pattPos++;
 
         if ( pattVal == 0xff ) {  // end pattern?
-
+            
             // This points at the new _current_ position.
             udword trackOffs = voiceX.trackStart+voiceX.trackPos;
 
@@ -232,7 +232,7 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
 #endif
         // Prepare position of _next_ step in track table.
         voiceX.trackPos += trackStepLen;
-
+            
         uword pattern = fcBuf[trackOffs++];  // PT
         voiceX.pattStart = offsets.header+readBEuword(fcBuf,offsets.patterns+(pattern<<1));
         voiceX.pattPos = 0;
@@ -247,7 +247,7 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
         }
         else {
             voiceX.soundTranspose = fcBufS[trackOffs];  // ST
-        }
+        }            
         // continue while loop
         }
         else if ( pattVal == 0xfe ) {  // change pattern speed + next note
@@ -283,7 +283,7 @@ void HippelDecoder::COSO_processPattern(VoiceVars& voiceX) {
     dumpByte(voiceX.pattVal1);
     dumpByte(voiceX.pattVal2);
 #endif
-
+    
     if ( (voiceX.pattVal2 & 0xe0) != 0 ) {
         voiceX.portaSpeed = fcBufS[pattOffs++];
         voiceX.pattPos++;
@@ -298,7 +298,7 @@ void HippelDecoder::COSO_processPattern(VoiceVars& voiceX) {
     }
 
     voiceX.portaOffs = 0;   // reset portamento offset
-
+    
     if ( (voiceX.pattVal1 & 0x80) == 0 ) {  // if note is not negative
         // Get instrument/volModSeq number from pattern arg2
         // and add sound transpose value from track table.

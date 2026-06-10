@@ -37,7 +37,7 @@ public:
     virtual void setPaulaVoice(ubyte,PaulaVoice*) { }
     virtual int run() { return 20; }
     virtual void seek(sdword);
-
+    
     virtual ubyte getVoices() { return 0; }
     virtual int getSongs() { return 0; }
 
@@ -55,7 +55,7 @@ protected:
     void setBPM(uword);
 
     static const std::string UNKNOWN_FORMAT_ID;
-
+        
     std::string formatID;
     std::string formatName;
     std::string author, title, game, name;

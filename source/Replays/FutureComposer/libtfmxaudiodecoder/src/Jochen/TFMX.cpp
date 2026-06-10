@@ -30,17 +30,17 @@ bool HippelDecoder::TFMX_init(int songNumber) {
 
     setRate(50<<8);
     stats.voices = 4;
-
+    
     trackColumnSize = TFMX_TRACKTAB_COLUMN_SIZE;
     trackStepLen = TFMX_TRACKTAB_STEP_SIZE;
     traits.sampleStructSize = TFMX_SAMPLE_STRUCT_SIZE;
-
+    
     pStartSongFunc = &HippelDecoder::TFMX_startSong;
     pNextNoteFunc = &HippelDecoder::TFMX_nextNote;
     pSoundFunc = &HippelDecoder::TFMX_soundModulation;
     pVibratoFunc = &HippelDecoder::TFMX_vibrato;
     pPortamentoFunc = &HippelDecoder::TFMX_portamento;
-
+    
     traits.vibScaling = true;
     traits.vibSpeedFlag = true;
     traits.sndSeqGoto = true;
@@ -65,29 +65,29 @@ bool HippelDecoder::TFMX_init(int songNumber) {
     stats.samples = readBEuword(fcBuf,h+0x12);
     if (stats.samples > SAMPLES_MAX)
         stats.samples = SAMPLES_MAX;
-
+    
     udword offs = h+0x20;  // this is constant
     offsets.sndModSeqs = offs;
-
+    
     offs += stats.sndSeqs*64;
     offsets.volModSeqs = offs;
-
+    
     offs += stats.volSeqs*64;
     offsets.patterns = offs;
-
+    
     offs += stats.patterns*traits.patternSize;
     offsets.trackTable = offs;
 
     trackTabLen = stats.trackSteps*trackStepLen;
     offs += trackTabLen;
     offsets.subSongTab = offs;
-
+    
     offs += (stats.songs+1)*TFMX_SONGTAB_ENTRY_SIZE;  // subsong definitions, one is undefined
     if ( offs >= input.len ) {  // something is fubar then
         return false;
     }
     offsets.sampleHeaders = offs;
-
+    
     offs += (stats.samples)*traits.sampleStructSize;  // skip sample headers
     offsets.sampleData = offs;
 
@@ -107,7 +107,7 @@ bool HippelDecoder::TFMX_init(int songNumber) {
     if ( !maybe4V && maybe7V ) {
         TFMX_7V_subInit();
      }
-
+        
     udword sh = offsets.sampleHeaders;
     sh += 0x12;  // skip file name
     for (int sam = 0; sam < stats.samples; sam++) {
@@ -154,13 +154,13 @@ void HippelDecoder::TFMX_nextNote(VoiceVars& voiceX) {
 
         // This points at the new _current_ position.
         udword trackOffs = voiceX.trackStart+voiceX.trackPos;
-
+        
         if ( trackOffs >= voiceX.trackEnd ) {  // pattern table end?
             voiceX.trackPos = 0;     // restart by default
             trackOffs = voiceX.trackStart;
             songEnd = true;
         }
-
+        
 #if defined(DEBUG_RUN)
         if (voiceX.voiceNum==0) {
             cout << endl;
@@ -190,7 +190,7 @@ void HippelDecoder::TFMX_nextNote(VoiceVars& voiceX) {
 #endif
         // Prepare position of _next_ step in track table.
         voiceX.trackPos += trackStepLen;
-
+        
         uword pattern = fcBuf[trackOffs++];  // PT
         voiceX.pattStart = offsets.patterns+(pattern<<6);
         voiceX.transpose = fcBufS[trackOffs++];  // TR
@@ -219,7 +219,7 @@ void HippelDecoder::TFMX_processPattern(VoiceVars& voiceX) {
     }
 #endif
     if ( (note & 0x7f) != 0 ) {  // 0 = nothing more to do here
-
+        
         voiceX.pattVal1 = note&0x7f;
         voiceX.pattVal2 = fcBuf[pattOffs];
         voiceX.portaOffs = 0;   // reset portamento offset

@@ -18,6 +18,9 @@
     <Filter Include="Source Files\libtfmxaudiodecoder\Jochen">
       <UniqueIdentifier>{ff4f11e0-c5d2-4455-b4c1-6816f96d4931}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\libtfmxaudiodecoder\Chris\DNS">
+      <UniqueIdentifier>{c8427ef7-b8e1-4f15-beeb-3a6e68a3bba6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayFutureComposer.h">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="libtfmxaudiodecoder\src\Filter.h">
       <Filter>Source Files\libtfmxaudiodecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="libtfmxaudiodecoder\src\Chris\DNS\DNSDecoder.h">
+      <Filter>Source Files\libtfmxaudiodecoder\Chris\DNS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,8 +184,14 @@
     <ClCompile Include="libtfmxaudiodecoder\src\Filter.cpp">
       <Filter>Source Files\libtfmxaudiodecoder</Filter>
     </ClCompile>
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\DNS\DNSDecoder.cpp">
+      <Filter>Source Files\libtfmxaudiodecoder\Chris\DNS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="libtfmxaudiodecoder\README.md" />
+    <None Include="libtfmxaudiodecoder\src\Chris\DNS\README.md">
+      <Filter>Source Files\libtfmxaudiodecoder\Chris\DNS</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,12 +22,12 @@ namespace tfmxaudiodecoder {
 
 HippelDecoder::HippelDecoder() {
     analyze = new Analyze;
-
+    
     input.buf = 0;
     input.bufLen = input.len = 0;
 
     admin.initialized = false;
-
+    
     // Set up some dummy voices to decouple the decoder from the mixer.
     for (ubyte v=0; v<VOICES_MAX; v++) {
         voiceVars[v].ch = &dummyVoices[v];
@@ -48,7 +48,7 @@ void HippelDecoder::reset() {
     songEnd = false;
     songPosCurrent = 0;
     tickFPadd = 0;
-
+    
     for (ubyte v=0; v<stats.voices; v++) {
         voiceVars[v].voiceNum = v;
         voiceVars[v].trackPos =
@@ -62,7 +62,7 @@ void HippelDecoder::reset() {
             voiceVars[v].vibAmpl =
             voiceVars[v].vibCurOffs =
             voiceVars[v].vibFlag = 0;
-        voiceVars[v].pitchBendSpeed =
+        voiceVars[v].pitchBendSpeed = 
             voiceVars[v].pitchBendTime =
             voiceVars[v].pitchBendDelayFlag = 0;
         voiceVars[v].transpose =
@@ -80,8 +80,8 @@ void HippelDecoder::reset() {
         voiceVars[v].sndModSustainTime = 0;
         voiceVars[v].pattVal1 =
             voiceVars[v].pattVal2 = 0;
-        voiceVars[v].outputPeriod =
-            voiceVars[v].outputVolume =
+        voiceVars[v].outputPeriod = 
+            voiceVars[v].outputVolume = 
             voiceVars[v].volume = 0;
         voiceVars[v].voiceVol = 100;
         voiceVars[v].volRandomThreshold =
@@ -114,14 +114,14 @@ void HippelDecoder::reset() {
 
 void HippelDecoder::clearFormat() {
     memset(&stats,0,sizeof(stats));
-
+    
     songEnd = false;
     songPosCurrent = 0;
     duration = 0;
     blacklisted = false;
 
     pInitFunc = 0;
-
+    
     formatID.clear();
     formatName.clear();
 
@@ -177,7 +177,7 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
     cout << "HippelDecoder::init()" << endl;
 #endif
     udword newLen;
-
+    
     if (data==0 || length==0 ) {  // re-init mode
         goto mainInit;
     }
@@ -198,14 +198,14 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
     }
     memcpy(input.buf,data,length);
     input.len = length;
-
+        
     // Set up smart pointers for signed and unsigned input buffer access.
     // Ought to be read-only (const), but this implementation appends
     // a few values to the end of the buffer (see further below) and
     // may repair some data, too.
     fcBufS.setBuffer(reinterpret_cast<sbyte*>(input.buf),input.bufLen);
     fcBuf.setBuffer(input.buf,input.bufLen);
-
+        
     // (NOTE) This next bit is just for convenience.
     //
     // Copy ``silent'' modulation sequence to end of FC module buffer so it
@@ -221,11 +221,11 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
     silentSample.pStart = fcBuf.tellBegin()+offsets.silence+1;
     silentSample.startOffs = silentSample.repOffs = 0;
     silentSample.len = silentSample.repLen = 1;
-
+        
     for (int s=0; s<SAMPLES_MAX; s++) {
         samples[s] = silentSample;
     }
-
+    
     // (NOTE) Instead of addresses (pointers) use 32-bit offsets everywhere.
     // This is just for added safety and convenience. One could range-check
     // each pointer/offset where appropriate to avoid segmentation faults
@@ -249,7 +249,7 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
     if (!admin.initialized) {
         return false;
     }
-
+    
     // Determine duration with a dry-run till song-end.
     duration = 0;
     bool loopModeBak = loopMode;
@@ -258,7 +258,7 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
         duration += run();
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
-
+    
     if (analyze->usesE7setDiffWave(this) ) {
         TFMX_sndModFuncs[7] = &HippelDecoder::TFMX_sndSeq_E7_setDiffWave;
     }
@@ -272,7 +272,7 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
 #ifdef DEBUG
     analyze->dump();
 #endif
-
+    
     restart();
     return admin.initialized;
 }
@@ -381,13 +381,13 @@ int HippelDecoder::run() {
         if ( !songEnd || loopMode ) {
             // Next function will will decide whether to turn audio channel on.
             voiceVars[v].trigger = false;
-
+            
             // Start or update instrument.
             (this->*pSoundFunc)(voiceVars[v]);
 
             voiceVars[v].ch->paula.period = voiceVars[v].outputPeriod;
             voiceVars[v].ch->paula.volume = voiceVars[v].outputVolume;
-
+        
             if (voiceVars[v].repeatDelay != 0) {
                 if (--voiceVars[v].repeatDelay == 1) {
                     voiceVars[v].repeatDelay = 0;
@@ -411,7 +411,7 @@ int HippelDecoder::run() {
     }
 
     // If all modules ran at 50 Hz, we could simply return 20 ms,
-    // but the rate for some modules is different.
+    // but the rate for some modules is different. 
     tickFPadd += tickFP;
     int tick = tickFPadd>>8;
     tickFPadd &= 0xff;
@@ -604,20 +604,20 @@ const ubyte HippelDecoder::silenceData[8] = {
 
 const uword HippelDecoder::periods[0x80] = {
     0x06b0, 0x0650, 0x05f4, 0x05a0, 0x054c, 0x0500, 0x04b8, 0x0474,
-    0x0434, 0x03f8, 0x03c0, 0x038a,
+    0x0434, 0x03f8, 0x03c0, 0x038a, 
     // +0x0c (*2 = byte-offset)
-    0x0358, 0x0328, 0x02fa, 0x02d0, 0x02a6, 0x0280, 0x025c, 0x023a,
+    0x0358, 0x0328, 0x02fa, 0x02d0, 0x02a6, 0x0280, 0x025c, 0x023a, 
     0x021a, 0x01fc, 0x01e0, 0x01c5,
     // +0x18 (*2 = byte-offset)
     0x01ac, 0x0194, 0x017d, 0x0168, 0x0153, 0x0140, 0x012e, 0x011d,
-    0x010d, 0x00fe, 0x00f0, 0x00e2,
+    0x010d, 0x00fe, 0x00f0, 0x00e2, 
     // +0x24 (*2 = byte-offset)
     0x00d6, 0x00ca, 0x00be, 0x00b4, 0x00aa, 0x00a0, 0x0097, 0x008f,
     0x0087, 0x007f, 0x0078, 0x0071,
     // +0x30 (*2 = byte-offset)
     // Standard rate player sets this octave to lowest period.
     0x0071, 0x0071, 0x0071, 0x0071, 0x0071, 0x0071, 0x0071, 0x0071,
-    0x0071, 0x0071, 0x0071, 0x0071,
+    0x0071, 0x0071, 0x0071, 0x0071, 
     // +0x3c (*2 = byte-offset)
     0x0d60, 0x0ca0, 0x0be8, 0x0b40, 0x0a98, 0x0a00, 0x0970, 0x08e8,
     0x0868, 0x07f0, 0x0780, 0x0714,
@@ -632,7 +632,7 @@ const uword HippelDecoder::periods[0x80] = {
     // transpose, the useless octave cause breakage.
     // 0x1ac0, 0x1940, 0x17d0, 0x1680, 0x1530, 0x1400, 0x12e0, 0x11d0,
     // 0x10d0, 0x0fe0, 0x0f00, 0x0e28,
-    //
+    //    
     // End of Future Composer 1.0 - 1.3 period table.
     //
     // End of TFMX/COSO period table. There may be some more 0x0071

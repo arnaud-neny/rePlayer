@@ -1,4 +1,6 @@
 // some "minor" changes to make it compatible (tag scan and precise loop detection):
+// - Chris/DNS/DNSDecoder.cpp
+// - Chris/DNS/DNSDecoder.h
 // - Chris/SamplesFile.cpp
 // - Chris/TFMXDecoder.cpp
 // - Chris/TFMXDecoder.h
@@ -19,17 +21,18 @@
 #include <Imgui.h>
 #include <ReplayDll.h>
 
+#include "libtfmxaudiodecoder/src/Chris/DNS/DNSDecoder.h"
 #include "libtfmxaudiodecoder/src/Chris/TFMXDecoder.h"
 #include "libtfmxaudiodecoder/src/Jochen/HippelDecoder.h"
 
-#define VERSION "1.0.9"
+#define VERSION "1.0.10"
 
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::FutureComposer,
         .name = "Future Composer",
-        .extensions = "fc;fc13;fc14;fc3;fc4;smod;hip;hip7;hipc;mcmd;tfmx;tfx;tfm;mdat",
+        .extensions = "fc;fc13;fc14;fc3;fc4;smod;hip;hip7;hipc;mcmd;tfmx;tfx;tfm;mdat;dns",
         .about = "libtfmxaudiodecoder " VERSION "\nCopyright(c) Michael Schwendt",
         .settings = "libtfmxaudiodecoder " VERSION,
         .init = ReplayFutureComposer::Init,
@@ -145,6 +148,8 @@ namespace rePlayer
             || tag == TFMXDecoder::TAG_TFHD
             || tag == TFMXDecoder::TAG_TFMXMOD)
             return eExtension::_tfm;
+        else if (tag == DNSDecoder::TAG)
+            return eExtension::_dns;
         return eExtension::Unknown;
     }
 

@@ -187,6 +187,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="libtfmxaudiodecoder\src\Chris\DNS\DNSDecoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Chris\TFMXDecoder.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\Config.h" />
     <ClInclude Include="libtfmxaudiodecoder\src\CRCLight.h" />
@@ -213,6 +214,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libtfmxaudiodecoder\src\Chris\ByChecksum.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Chris\DNS\DNSDecoder.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Chris\Macro.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Chris\MergedFiles.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Chris\Modulation.cpp" />
@@ -254,6 +256,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
   </ItemGroup>
   <ItemGroup>
     <None Include="libtfmxaudiodecoder\README.md" />
+    <None Include="libtfmxaudiodecoder\src\Chris\DNS\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -64,7 +64,7 @@ void TFMXDecoder::reset() {
     }
     for (ubyte v=0; v<voices; v++) {
         VoiceVars& voice = voiceVars[v];
-
+        
         voice.voiceNum = v;
         voice.envelope.flag = 0;
         voice.portamento.speed = 0;
@@ -89,12 +89,12 @@ void TFMXDecoder::reset() {
         voice.macro.loop = 0xff;
         voice.macro.extraWait = true;
         voice.macro.delayedOff = voice.macro.delayedOn = false;
-
+        
         voice.sid.targetOffset = 0x100*v + 4;
         voice.sid.targetLength = 0;
         voice.sid.lastSample = 0;
         voice.sid.op1.interDelta = 0;
-
+        
         voice.rnd.flag = 0;
 
         voice.ch->off();
@@ -118,7 +118,7 @@ void TFMXDecoder::reset() {
 ubyte TFMXDecoder::getVoices() {
     return voices;
 }
-
+    
 void TFMXDecoder::setPaulaVoice(ubyte v, PaulaVoice* p) {
     voiceVars[v].ch = p;
 }
@@ -178,7 +178,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         memcpy(input.buf,data,length);
         input.bufLen = newLen;
         input.len = length;
-
+        
         // Set up smart pointer for unsigned input buffer access.
         pBuf.setBuffer(input.buf,input.bufLen);
 
@@ -201,7 +201,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     }
 
 // --------
-
+    
     // For convenience, since we don't relocate the module to offset 0.
     udword h = offsets.header;
 
@@ -232,7 +232,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     if (offsets.trackTable >= input.bufLen || offsets.patterns >= input.bufLen || offsets.macros >= input.bufLen) {
         return false;
     }
-
+    
     offsets.sampleData = h+input.mdatSize;
     offsets.silence = offsets.sampleData;
     // TFMX clears the first two words for one-shot samples.
@@ -264,7 +264,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
             cout << "WARNING: Rejecting Atari ST TFMX file!  " << input.path << endl;
 #endif
             return false;
-        }
+        }            
     }
 
     // Evaluate the compress identification fields at $0A and $0C.
@@ -309,7 +309,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     variant.noDelayedDMAon = false;
     variant.noTrackMute = false;
     variant.execOrder = MAC_MOD_SEQ;
-
+    
     PattCmdFuncs[0] = &TFMXDecoder::pattCmd_End;
     PattCmdFuncs[1] = &TFMXDecoder::pattCmd_Loop;
     PattCmdFuncs[2] = &TFMXDecoder::pattCmd_Goto;
@@ -366,7 +366,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     MacroDefs[0x15] = &macroDef_Goto;
     MacroDefs[0x16] = &macroDef_Return;
     MacroDefs[0x17] = &macroDef_SetPeriod;
-
+    
     MacroDefs[0x18] = &macroDef_SampleLoop;
     MacroDefs[0x19] = &macroDef_OneShot;
     MacroDefs[0x1a] = &macroDef_WaitOnDMA;
@@ -384,7 +384,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     // Macro command $20 Signal and its external write-only registers
     // as added by some TFMX variants is not needed either.
     MacroDefs[0x20] = &macroDef_UNDEF;
-
+    
     MacroDefs[0x21] = &macroDef_PlayMacro;
     MacroDefs[0x22] = &macroDef_22;
     MacroDefs[0x23] = &macroDef_23;
@@ -396,13 +396,21 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     MacroDefs[0x28] = &macroDef_28;
     MacroDefs[0x29] = &macroDef_29;
 
+    // TFMX v1.x up to and including v2.2 cannot be distinguished from
+    // the later TFMX and/or variants. Unless the very rarely used old
+    // header tag is used. And since the old-style effects (particularly
+    // non-scaled vibrato and portamento) may be strictly required by
+    // music created with v1/v2, a checksum based detection of specific
+    // modules may be the only way. And the differences between v1 and v2
+    // are of little use when detecting file contents.
+
     // TFMX v1.x
     if ( ((readBEudword(pBuf,offsets.header) == TFMX_HEX) &&  // old header
           (pBuf[offsets.header+4] == 0x20))
          || (input.versionHint == 1) ) {  // from TFHD
         setTFMXv1();
     }
-    // TFMX v2.x / TFMX Professional
+    // aka TFMX Professional
     else {  // also  input.versionHint == 2   // from TFHD
         formatName = FORMAT_NAME_PRO;
     }
@@ -428,7 +436,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         vSongs.clear();
         vSongs.push_back(input.startSongHint);
     }
-
+    
     admin.startSong = (songNumber < 0) ? 0 : songNumber;
     if (admin.startSong > static_cast<int>(vSongs.size()-1)) {
         admin.startSong = 0;
@@ -502,6 +510,10 @@ void TFMXDecoder::softRestart() {
     resetSequencer();
     processTrackStep();
 }
+
+// TFMX v2.2 is mostly like TFMX v1.x, but it adds macros 0x1a to 0x1e
+// and enhances a few (like Addvol -> Addvol+note). There is no setTFMXv2()
+// method, because it can be treated as a variant of v1.
 
 void TFMXDecoder::setTFMXv1() {
     formatName = FORMAT_NAME;
@@ -914,13 +926,13 @@ const uword TFMXDecoder::periods[0xd+0x40] = {
     0x08ea, 0x086a, 0x07f2, 0x0780, 0x0718,
     // +0 standard octaves
     0x06ae, 0x064e, 0x05f4, 0x059e, 0x054d, 0x0501, 0x04b9, 0x0475,
-    0x0435, 0x03f9, 0x03c0, 0x038c,
+    0x0435, 0x03f9, 0x03c0, 0x038c, 
     // +0x0c
-    0x0358, 0x032a, 0x02fc, 0x02d0, 0x02a8, 0x0282, 0x025e, 0x023b,
+    0x0358, 0x032a, 0x02fc, 0x02d0, 0x02a8, 0x0282, 0x025e, 0x023b, 
     0x021b, 0x01fd, 0x01e0, 0x01c6,
     // +0x18
     0x01ac, 0x0194, 0x017d, 0x0168, 0x0154, 0x0140, 0x012f, 0x011e,
-    0x010e, 0x00fe, 0x00f0, 0x00e3,
+    0x010e, 0x00fe, 0x00f0, 0x00e3, 
     // +0x24
     0x00d6, 0x00ca, 0x00bf, 0x00b4, 0x00aa, 0x00a0, 0x0097, 0x008f,
     0x0087, 0x007f, 0x0078, 0x0071,

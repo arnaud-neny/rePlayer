@@ -18,7 +18,7 @@
 namespace tfmxaudiodecoder {
 
 void TFMXDecoder::processModulation(VoiceVars& voice) {
-    if (voice.effectsMode > 0) {
+    if (voice.effectsMode > 0) { 
         addBegin(voice);
         sid(voice);
         vibrato(voice);
@@ -118,7 +118,7 @@ void TFMXDecoder::portamento(VoiceVars& voice) {
 
     uword current = voice.portamento.period;
     uword target = voice.period;  // target period
-
+    
     if (current == target) {
         goto end;
     }
@@ -193,7 +193,7 @@ void TFMXDecoder::sid(VoiceVars& voice) {
                 cur = s;
                 *pTarget++ = s;
             }
-            else {  // s > cur
+            else {  // s > cur 
                 *pTarget++ = cur;
             }
         }
@@ -242,7 +242,7 @@ void TFMXDecoder::fadeInit(ubyte target, ubyte speed) {
     fade.active = true;
     fade.target = target;
     fade.count = fade.speed = speed;
-    // With speed=0 target volume can be set directly.
+    // With speed=0 target volume can be set directly. 
     if ( (fade.speed==0) || (fade.volume==fade.target) ) {
         fade.volume = fade.target;
         fade.delta = 0;
@@ -349,7 +349,7 @@ void TFMXDecoder::randomPlay(VoiceVars& voice) {
         }
     }
     voice.rnd.arp.pos++;
-
+                
     if ( (cmd.aa&0x40) == 0) {
         return;
     }
