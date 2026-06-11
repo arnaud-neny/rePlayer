@@ -146,6 +146,7 @@ namespace rePlayer
         // selection
         SubsongID m_lastSelectedSubsong;
         ArtistID m_artistToRemove = ArtistID::Invalid;
+        MusicID m_toPlaySolo = {};
 
         // WAV export
         bool m_isExportAsWavTriggered = false;

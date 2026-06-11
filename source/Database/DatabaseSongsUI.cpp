@@ -136,6 +136,12 @@ namespace rePlayer
         DisplaySongsTable(isDirty);
         DisplayExportAsWav();
         DisplayReplayGain();
+
+        if (m_toPlaySolo.IsValid())
+        {
+            Core::GetDeck().PlaySolo(m_toPlaySolo);
+            m_toPlaySolo = {};
+        }
     }
 
     void DatabaseSongsUI::OnEndUpdate()
@@ -1042,9 +1048,7 @@ namespace rePlayer
         }
 
         if (ImGui::IsMouseDoubleClicked(0))
-        {
-            Core::GetDeck().PlaySolo(musicId);
-        }
+            m_toPlaySolo = musicId;
         return isSelected;
     }
 
