@@ -243,6 +243,7 @@ class TFMXDecoder : public Decoder {
 
     bool isMerged();
     bool loadSamplesFile();
+    bool loadSamplesFile(const std::string &path);
     void setTFMXv1();
     void traitsByChecksum();  // final step after successful initialization
     void findSongs();

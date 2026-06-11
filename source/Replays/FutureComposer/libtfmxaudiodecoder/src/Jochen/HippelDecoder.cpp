@@ -178,7 +178,7 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
 #endif
     udword newLen;
     
-    if (data==0 || length==0 ) {  // re-init mode
+    if ( (data==0 || length==0) && admin.initialized) {  // re-init mode
         goto mainInit;
     }
 

@@ -852,8 +852,8 @@ void DNSDecoder::setPath(std::string path, LoaderCallback loaderArg, void* loade
     input.path = path;
     input.loader = loaderArg;
     input.loaderData = loaderDataArg;
-    // rePlayer end
-        // Since most modules in these formats don't store a title/name internally,
+// rePlayer end
+    // Since most modules in these formats don't store a title/name internally,
     // this helper function contructs a name from the filename.
     name.clear();
     std::size_t found = path.find_last_of("/\\");

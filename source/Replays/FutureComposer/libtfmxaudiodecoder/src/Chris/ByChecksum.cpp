@@ -196,9 +196,20 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
         // Fix song start/end. Song table is wrecked.
         pBuf[offsets.header+0x101] = 0x04;
         pBuf[offsets.header+0x141] = 0x6b;
+        // Invalidate track 0 of step 0 as to avoid subsongs starting at 0.
+        pBuf[offsets.trackTable] = 0xff;
     }
     // File "mdat.blade of destiny - titel (7ch)" is bad/corrupted.
     else if (crc1 == 0xc83b701b) {
         blacklisted = true;
+    }
+    // Bundesliga Manager HATTRICK features only a single title theme
+    // using 7V mode. The second song is a fragment of the title theme
+    // but without proper track commands to initialize 7V mode.
+    else if (crc1 == 0x3c2eb450) {
+        int song = 1;
+        // Set start step to 0x1ff to make song invalid.
+        pBuf[offsets.header+0x100+(song<<1)] = 0x01;
+        pBuf[offsets.header+0x100+(song<<1)+1] = 0xff;
     }
 }
