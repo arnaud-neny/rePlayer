@@ -31,9 +31,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "usf/usf.h"
+#include "../usf.h"
 
-#include "usf/usf_internal.h"
+#include "../usf_internal.h"
 
 #undef JUMP
 
