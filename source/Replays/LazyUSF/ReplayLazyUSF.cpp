@@ -202,14 +202,8 @@ namespace rePlayer
                 auto extPos = stream->GetName().find_last_of('.');
                 if (extPos == std::string::npos || _stricmp(stream->GetName().c_str() + extPos + 1, "usflib") != 0)
                 {
-                    if (m_lazyState == nullptr)
-                        m_lazyState = new uint8_t[usf_get_state_size()];
-                    usf_clear(m_lazyState);
-                    if (psf_load(stream->GetName().c_str(), &m_psfFileSystem, 0x21, UsfLoad, this, nullptr, nullptr, 0, nullptr, nullptr) >= 0)
-                    {
-                        m_mediaType.ext = m_hasLib ? eExtension::_miniusf : eExtension::_usf;
-                        m_subsongs.Add({ fileIndex, uint32_t(m_length) });
-                    }
+                    m_mediaType.ext = m_hasLib ? eExtension::_miniusf : eExtension::_usf;
+                    m_subsongs.Add({ fileIndex, uint32_t(m_length) });
                 }
             }
             m_tags.Clear();
@@ -222,6 +216,9 @@ namespace rePlayer
             delete this;
             return nullptr;
         }
+
+        m_lazyState = new uint8_t[usf_get_state_size()];
+        usf_clear(m_lazyState);
 
         SetupMetadata(metadata);
 
