@@ -2,6 +2,8 @@
 
 #include "SoundMonTypes.h"
 
+#include <Containers/Array.h>
+
 namespace SoundMon
 {
     class Module;
@@ -91,7 +93,17 @@ namespace SoundMon
         bool m_loop{ false };
         uint8_t m_numsubsongs{ 0 };
         uint8_t m_subsongptr{ 0 };
+        union Key
+        {
+            struct
+            {
+                uint16_t pat;
+                uint16_t step;
+            };
+            int32_t val;
+        };
         uint16_t* m_subsongs{ nullptr };
+        core::Array<int32_t> m_steps;
 
         static int16_t		ms_bpper[256];
         static int16_t		ms_vibtable[8];

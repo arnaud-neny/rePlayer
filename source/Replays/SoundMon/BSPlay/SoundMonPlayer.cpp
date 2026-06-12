@@ -2,8 +2,6 @@
 #include "SoundMonModule.h"
 #include "SoundMonPlayer.h"
 
-#include <Containers/Array.h>
-
 #include <algorithm>
 
 using namespace core;
@@ -42,7 +40,7 @@ namespace SoundMon
     void Player::Stop()
     {
         m_patptr = 0;
-        m_stepptr = m_subsongs[m_subsongptr * 2];
+        m_stepptr = m_subsongs[m_subsongptr];
         m_speed = 6;
         m_count = 0;
         m_arpptr = 0;
@@ -51,6 +49,7 @@ namespace SoundMon
             bpcurrent = {};
         m_mixer->Stop();
         m_loop = false;
+        m_steps.Clear();
     }
 
     void Player::SetStep(int step)
@@ -98,14 +97,19 @@ namespace SoundMon
         int16_t count{ 0 };
         int16_t speed{ 6 };
         int32_t patptr{ 0 };
-        int32_t stepptr = m_subsongs[m_subsongptr * 2];
+        int32_t stepptr = m_subsongs[m_subsongptr];
         int32_t nextstep{ -1 };
+        Array<int32_t> steps;
         while (1)
         {
             ticks++;
             count++;
             if (count >= speed)
             {
+                Key k = { .pat = uint16_t(patptr), .step = uint16_t(stepptr) };
+                if (!steps.AddOnce(k.val).second)
+                    break;
+
                 for (int16_t voice = 0; voice < kVoices; voice++)
                 {
                     auto pattern = m_modptr->GetPattern(stepptr, voice);
@@ -116,22 +120,25 @@ namespace SoundMon
                         nextstep = m_modptr->GetFXByte(pattern, patptr);
                 }
 
+                if (nextstep >= 0)
+				{
+                    stepptr = nextstep;
+                    nextstep = -1;
+                    if (m_modptr->GetVersion() == 3)
+                        patptr = 0;
+                    else if (patptr != 0)
+                        patptr++;
+                }
+                else
+                    patptr++;
                 count = 0;
-                patptr++;
-                if (patptr == kNotesPerPattern || nextstep != -1)
+                if (patptr == kNotesPerPattern)
                 {
                     patptr = 0;
-                    if (stepptr == m_subsongs[m_subsongptr * 2 + 1])
-                        break;
-
-                    if (nextstep != -1)
-                    {
-                        stepptr = nextstep;
-                        nextstep = -1;
-                    }
-                    else
-                        stepptr++;
+                    stepptr++;
                 }
+                if (stepptr >= m_modptr->GetNumSteps())
+                    stepptr = m_subsongs[m_subsongptr];
             }
         }
         return static_cast<uint32_t>(1000 * ticks / 50);
@@ -184,28 +191,36 @@ namespace SoundMon
         m_count++;
         if (m_count >= m_speed)
         {
+            Key k = { .pat = uint16_t(m_patptr), .step = uint16_t(m_stepptr) };
+            if (!m_steps.AddOnce(k.val).second)
+			{
+				m_loop = true;
+				m_steps.Clear();
+				m_steps.Add(k.val);
+			}
+
             //ShowPos(m_stepptr, m_patptr);
             BpNext();
             BpProcess();
             m_count = 0;
-            m_patptr++;
-            if (m_patptr == kNotesPerPattern || m_nextstep != -1)
+            if (m_nextstep >= 0)
+			{
+                m_stepptr = m_nextstep;
+                m_nextstep = -1;
+                if (m_modptr->GetVersion() == 3)
+                    m_patptr = 0;
+                else if (m_patptr != 0)
+                    m_patptr++;
+            }
+            else
+                m_patptr++;
+            if (m_patptr == kNotesPerPattern)
             {
                 m_patptr = 0;
-                m_loop = m_stepptr == m_subsongs[m_subsongptr * 2 + 1];
-
-                if (m_nextstep != -1)
-                {
-                    if (m_nextstep >= m_modptr->GetNumSteps())
-                        m_nextstep = m_subsongs[m_subsongptr * 2];
-                    m_stepptr = m_nextstep;
-                    m_nextstep = -1;
-                }
-                else if (m_loop)
-                    m_stepptr = m_subsongs[m_subsongptr * 2];
-                else
-                    m_stepptr++;
+                m_stepptr++;
             }
+            if (m_stepptr >= m_modptr->GetNumSteps())
+                m_stepptr = m_subsongs[m_subsongptr];
         }
     }
 
@@ -614,75 +629,84 @@ namespace SoundMon
 
     void Player::BuildSubsongs()
     {
-        int32_t stepptr = 0;
-        Array<int32_t> steps;
-        Array<uint16_t> subsong;
+        Key key = { .pat = 0, .step = 0 };
+        Array<int32_t> vals;
+        Array<Key> subsong;
         Array<uint16_t> subsongs;
 
-        while (stepptr != m_modptr->GetNumSteps())
+        int blank = 0;
+        while (key.step != m_modptr->GetNumSteps())
         {
-            if (!!steps.AddOnce(stepptr).second)
+            if (vals.AddOnce(key.val).second)
             {
-                std::sort(steps.begin(), steps.end());
-                subsong.Add(uint16_t(stepptr));
+                std::sort(vals.begin(), vals.end());
+                subsong.Add(key);
                 int32_t newstepptr = -1;
-                bool isblank = true;
-                for (uint32_t patptr = 0; patptr < kNotesPerPattern && newstepptr == -1; ++patptr)
+                for (int16_t voice = 0; voice < kVoices; voice++)
                 {
-                    for (int16_t voice = 0; voice < kVoices; voice++)
-                    {
-                        auto pattern = m_modptr->GetPattern(stepptr, voice);
-                        auto transpose = m_modptr->GetTR(stepptr, voice);
-                        auto soundtranspose = m_modptr->GetST(stepptr, voice);
-                        auto note = m_modptr->GetNote(pattern, patptr);
-                        auto option = m_modptr->GetFX(pattern, patptr);
-                        auto optiondata = m_modptr->GetFXByte(pattern, patptr);
-                        auto instrument = m_modptr->GetInstrument(pattern, patptr);
-                        isblank &= transpose == 0 && soundtranspose == 0 && note == 0 && option == 0 && optiondata == 0 && instrument == 0;
-                        if (option == 0x7)
-                            newstepptr = m_modptr->GetFXByte(pattern, patptr);
-                    }
+                    auto pattern = m_modptr->GetPattern(key.step, voice);
+                    auto transpose = m_modptr->GetTR(key.step, voice);
+                    auto soundtranspose = m_modptr->GetST(key.step, voice);
+                    auto note = m_modptr->GetNote(pattern, key.pat);
+                    auto option = m_modptr->GetFX(pattern, key.pat);
+                    auto optiondata = m_modptr->GetFXByte(pattern, key.pat);
+                    auto instrument = m_modptr->GetInstrument(pattern, key.pat);
+                    if (option == 0x7)
+                        newstepptr = m_modptr->GetFXByte(pattern, key.pat);
+                    else if (transpose == 0 && soundtranspose == 0 && note == 0 && option == 0 && optiondata == 0 && instrument == 0)
+                        blank++;
                 }
-                if (isblank && subsong.NumItems() == 1)
+                if (blank == kNotesPerPattern * kVoices && subsong.NumItems() == kNotesPerPattern)
                 {
-                    subsong.Pop();
-                    stepptr = 0;
-                }
-                else if (newstepptr >= 0)
-                {
-                    if (newstepptr >= m_modptr->GetNumSteps())
-                        newstepptr = subsong[0];
-                    stepptr = newstepptr;
+                    subsong.Clear();
+                    key.val = 0;
                 }
                 else
-                    stepptr++;
+				{
+					if (newstepptr >= 0)
+					{
+                        key.step = newstepptr;
+                        if (m_modptr->GetVersion() == 3)
+                            key.pat = 0;
+                        else if (key.pat != 0)
+							key.pat++;
+                    }
+                    else
+					    key.pat++;
+					if (key.pat == kNotesPerPattern)
+					{
+						blank = 0;
+						key.step++;
+						key.pat = 0;
+					}
+                    if (key.step >= m_modptr->GetNumSteps())
+                        key.step = subsong[0].step;
+                }
             }
             else
             {
+                blank = 0;
                 if (subsong.IsNotEmpty())
                 {
-                    subsongs.Add(subsong[0]);
-                    subsongs.Add(subsong.Last());
+                    subsongs.Add(subsong[0].step);
                     subsong.Clear();
                 }
 
-                stepptr = 0;
-                for (auto step : steps)
+                key.val = 0;
+                for (auto val : vals)
                 {
-                    if (step == stepptr)
-                        stepptr++;
-                    else
+                    Key k = { .val = val };
+                    if (k.step == key.step)
+                        key.step++;
+                    else if (k.step > key.step)
                         break;
                 }
             }
         }
         if (subsong.IsNotEmpty())
-        {
-            subsongs.Add(subsong[0]);
-            subsongs.Add(subsong.Last());
-        }
+            subsongs.Add(subsong[0].step);
 
-        m_numsubsongs = static_cast<uint8_t>(subsongs.NumItems() / 2);
+        m_numsubsongs = static_cast<uint8_t>(subsongs.NumItems());
         m_subsongs = new uint16_t[subsongs.NumItems()];
         memcpy(m_subsongs, subsongs.Items(), subsongs.Size());
     }
