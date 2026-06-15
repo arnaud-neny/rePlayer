@@ -20,8 +20,14 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
 #endif
 
     // Gem'X. No checksum based adjustments required, but the soundtrack
-    // strictly requires a special variant of $00 DMAoff as well as the
-    // set of macro commands $22 to $29. Macro commands used:
+    // strictly requires a special variant of $00 DMAoff and $01 DMAon
+    // as well as the set of macro commands $22 to $29. The original machine
+    // code player seems to be unique and does funky (most likely experimental)
+    // things with its combination of variants of the macros $00 and $01.
+    // Such as optionally controlling delayed channel on after waiting for
+    // several vertical raster lines or setting Paula period 4 on channel off
+    // (with the result being hardware dependent and uncertain).
+    // Macro commands used:
     // 000000000000000011111111111111112222222222222222
     // 0123456789abcdef0123456789abcdef0123456789abcdef
     // XXXXX XXXX  XX X    X   XXX       XXXXXXXX      
@@ -38,15 +44,14 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
         0x88f7c34b,  // loader
         0xb762f2dc   // bonus
     };
-    // Turrican II
+    // Turrican II (excl. loader jingle!)
     std::set<udword> T2_checksums = {
         0xe2d6b5e0,  // world 1
         0x0bf41b64,  // world 2
         0x19ac72c3,  // world 3
         0x03854473,  // world 4
         0x9430d9de,  // world 5
-        0xc1ac5e1c,  // loader
-        0xcbb842b0,  // loading
+        0xcbb842b0,  // loader (original "unfixed", not "fixed" version!)
         0x78cd70f9   // demo
     };
     // Turrican II (1991) ingame music requires a special player variant
@@ -209,7 +214,6 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     else if (crc1 == 0x3c2eb450) {
         int song = 1;
         // Set start step to 0x1ff to make song invalid.
-        pBuf[offsets.header+0x100+(song<<1)] = 0x01;
-        pBuf[offsets.header+0x100+(song<<1)+1] = 0xff;
+        writeBEword(pBuf,offsets.header+0x100+(song<<1),0x1ff);
     }
 }

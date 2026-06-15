@@ -186,6 +186,7 @@ void TFMXDecoder::macroFunc_StartSample(VoiceVars& voice) {
     else {
         voice.macro.delayedOn = true;
     }
+    voice.macro.step++;
 
     // Variants of the player can set the macro wait value here.
     // The high byte (in cmd.aa) is set to zero early, so only the
@@ -204,11 +205,8 @@ void TFMXDecoder::macroFunc_StartSample(VoiceVars& voice) {
         voice.effectsMode = 1;
         if (variant.execOrder == MOD_MAC_SEQ) {
             processModulation(voice);
-            return;
         }
     }
-
-    voice.macro.step++;
     macroEvalAgain = true;
 }
 

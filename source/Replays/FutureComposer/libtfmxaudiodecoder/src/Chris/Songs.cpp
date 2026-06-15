@@ -69,6 +69,7 @@ void tfmxaudiodecoder::TFMXDecoder::findSongs() {
         // First step == last step isn't invalid per se,
         // but in corner-cases the tracks don't advance either.
         if (s1==s2) {
+            resetSequencer();
             sequencer.step.current = sequencer.step.first = s1;
             sequencer.step.last = s2;
             // Reset some sequencer values we rely on.

@@ -17,6 +17,7 @@
 // with this program; if not, see <https://www.gnu.org/licenses/>.
 
 #include <vector>
+#include <cstdlib>
 
 #include "HippelDecoder.h"
 
@@ -236,7 +237,33 @@ void HippelDecoder::COSO_nextNote(VoiceVars& voiceX) {
         uword pattern = fcBuf[trackOffs++];  // PT
         voiceX.pattStart = offsets.header+readBEuword(fcBuf,offsets.patterns+(pattern<<1));
         voiceX.pattPos = 0;
-        voiceX.transpose = fcBufS[trackOffs++];  // TR
+        sbyte oldTrans = voiceX.transpose;
+        voiceX.transposeNew = fcBufS[trackOffs++];  // TR
+
+        bool setTR = true;  // default behaviour
+        // Optional fix for a limitation of the original player system,
+        // which causes undesired audible side-effects. A new track step
+        // activates TR immediately, which in turn affects all currently
+        // playing sounds since the period is updated frequently during
+        // processing of effects/modulation. If TR changes much before
+        // a new note is played, sometimes that is intentional transposition
+        // of a long-lasting sound. In other cases, it transposes the
+        // currently playing sound too early.
+        // NB! The hardcoded constants may be replaced in the future,
+        // if more glitches are found.
+        if (traits.avoidTRglitch) {
+            // Look for TR of 12 semitones, at least.
+            if (std::abs(oldTrans-voiceX.transposeNew) >= 12) {
+                int c = COSO_countPatternWait(voiceX);
+                if (c!=0 && c <= 4) {
+                    setTR = false;
+                }
+            }
+        }
+        if (setTR) {
+            voiceX.transpose = voiceX.transposeNew;
+        }
+
         ubyte st = fcBuf[trackOffs];  // ST
         if (trackColumnSize == 4) {
             voiceX.soundTranspose = fcBufS[trackOffs++];  // ST
@@ -300,6 +327,7 @@ void HippelDecoder::COSO_processPattern(VoiceVars& voiceX) {
     voiceX.portaOffs = 0;   // reset portamento offset
     
     if ( (voiceX.pattVal1 & 0x80) == 0 ) {  // if note is not negative
+        voiceX.transpose = voiceX.transposeNew;
         // Get instrument/volModSeq number from pattern arg2
         // and add sound transpose value from track table.
         uword instr = (voiceX.pattVal2&0x1f)+voiceX.soundTranspose;
@@ -311,6 +339,52 @@ void HippelDecoder::COSO_processPattern(VoiceVars& voiceX) {
     }
     cout << std::flush;
 #endif
+}
+
+// Helper function only used for traits.avoidTRglitch so far.
+// Count the number of pattern steps that don't play a note.
+// Currently stop after 8 steps at most.
+int HippelDecoder::COSO_countPatternWait(VoiceVars& voiceX) {
+    int comprCount = 0, compress = 0;
+    int c = 0;
+    udword po = getPattOffs(voiceX);
+
+    for (int i=0; i<8; ++i) {  // look at 8 steps max
+        if (--comprCount >= 0) {
+            c++;
+            continue;
+        }
+        comprCount = compress;
+
+        int maxLoops = RECURSE_LIMIT;
+        while ( --maxLoops >= 0 ) {
+            ubyte pattVal = fcBuf[po++];
+            if (pattVal == 0xff) {
+                return c;
+            }
+            else if (pattVal == 0xfe) {
+                compress = comprCount = fcBuf[po++];
+            }
+            else if (pattVal == 0xfd) {
+                compress = comprCount = fcBuf[po++];
+                c++;
+                break;
+            }
+            else {
+                ubyte pattVal2 = fcBuf[po++];
+                if ( (pattVal2 & 0xe0) != 0 ) {
+                    po++;
+                }
+                if (pattVal == 0) {
+                    c++;
+                }
+                else {
+                    return c;
+                }
+            }
+        }  // next pattern value
+    }  // next step
+    return c;
 }
 
 }  // namespace

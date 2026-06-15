@@ -129,7 +129,7 @@ void TFMXDecoder::setPath(std::string path, LoaderCallback loaderArg, void* load
     input.loaderData = loaderDataArg;
 // rePlayer end
     // Since most modules in these formats don't store a title/name internally,
-    // this helper function contructs a name from the filename.
+    // this helper function constructs a name from the filename.
     name.clear();
     std::size_t found = path.find_last_of("/\\");
     if (found != std::string::npos) {
@@ -159,13 +159,14 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         if (!admin.initialized) {
             return false;
         }
-        data = input.buf;
-        length = input.len;
     }
     else {  // invalidate what has been found out before
         input.smplLoaded = false;
         input.mdatSize = input.smplSize = 0;
 
+        if ( !detect(data,length) ) {
+            return false;
+        }
         // If we still have a sufficiently large buffer, reuse it.
         udword newLen = length;
         if (newLen > input.bufLen) {
@@ -181,10 +182,6 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         
         // Set up smart pointer for unsigned input buffer access.
         pBuf.setBuffer(input.buf,input.bufLen);
-
-        if ( !detect(input.buf,input.bufLen) ) {
-            return false;
-        }
     }
 
     // Check whether it's a single-file format.
@@ -482,8 +479,8 @@ void TFMXDecoder::restart() {
     admin.startSpeed = admin.speed;
     admin.count = 0;  // quick start
 #if defined(DEBUG)
-    cout << "Sequencer: " << dec << (int)sequencer.step.first
-         << " to " << (int)sequencer.step.last
+    cout << "Sequencer: " << tohex((uword)sequencer.step.first)
+         << " to " << tohex((uword)sequencer.step.last)
          << " / speed " << (int)admin.speed << endl;
 #endif
     softRestart();
@@ -628,12 +625,16 @@ void TFMXDecoder::takeNextBufChecked(VoiceVars& v) {
         v.ch->paula.length = (input.len - v.paulaOrig.offset)>>1;
         v.ch->paula.start = makeSamplePtr( v.paulaOrig.offset );
     }
+    // an "else" case here (see DNSDecoder.cpp) is not needed by players
+    // that always set start before length
     v.ch->takeNextBuf();
 }
 
 ubyte* TFMXDecoder::makeSamplePtr(udword offset) {
     return(pBuf.tellBegin() + offset);
 }
+
+// ----------------------------------------------------------------------
 
 void TFMXDecoder::handleWaitOnPaulaDone() {
     // Pretend we have an interrupt handler that has evaluated

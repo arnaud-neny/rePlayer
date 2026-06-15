@@ -157,13 +157,21 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
         // Wings of Death level 1-7
         // Original soundtrack is in COSO format but still requires
         // a player variant with TFMX-style vib/porta.
-        if (crc2 == 0x6084ae9f || crc2 == 0x8ec439c || crc2 == 0x664a0708 ||
+        else if (crc2 == 0x6084ae9f || crc2 == 0x8ec439c || crc2 == 0x664a0708 ||
             crc2 == 0x5cbcc3e9 || crc2 == 0x58514e2 || crc2 == 0x9beab3a4 ||
             crc2 == 0xb6185651 ) {
             traits.skipToWaveMod = true;  // default for COSO, though
             traits.vibScaling = false;
             pPortamentoFunc = &HippelDecoder::TFMX_portamento;
             pVibratoFunc = &HippelDecoder::TFMX_vibrato;
+        }
+        // A Prehistoric Tale (music4). The original music in TFMX COSO
+        // format glitches at 0:53 and 1:11 because pattern transpose is
+        // to be applied immediately, and since it affects a currently
+        // playing sound, in corner-cases the resulting transposition is
+        // undesired. This enables a fix at runtime.
+        else if (crc2 == 0x5cf7578f) {
+            traits.avoidTRglitch = true;
         }
     }
 }
