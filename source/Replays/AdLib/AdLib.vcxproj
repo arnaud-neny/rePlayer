@@ -277,6 +277,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="adplug\wemuopl.h" />
     <ClInclude Include="adplug\woodyopl.h" />
     <ClInclude Include="adplug\xad.h" />
+    <ClInclude Include="adplug\xmi.h" />
+    <ClInclude Include="adplug\xmi_timbres.h" />
     <ClInclude Include="adplug\xsm.h" />
     <ClInclude Include="ReplayAdLib.h" />
   </ItemGroup>
@@ -363,6 +365,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="adplug\vgm.cpp" />
     <ClCompile Include="adplug\woodyopl.cpp" />
     <ClCompile Include="adplug\xad.cpp" />
+    <ClCompile Include="adplug\xmi.cpp" />
     <ClCompile Include="adplug\xsm.cpp" />
     <ClCompile Include="ReplayAdLib.cpp" />
   </ItemGroup>

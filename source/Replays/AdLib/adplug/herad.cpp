@@ -83,7 +83,7 @@ bool isHSQ(uint8_t * data, int size)
 	// data[3] - word CompSize
 	// data[4]
 	// data[5] - byte Checksum
-	if ( data[2] != 0 )
+	if (data[2] != 0)
 	{
 		AdPlug_LogWrite("HERAD: Is not HSQ, wrong check byte.\n");
 		return false;
@@ -91,7 +91,7 @@ bool isHSQ(uint8_t * data, int size)
 
 	const uint16_t temp_size = u16_unaligned(data + 3);
 
-	if ( temp_size != size )
+	if (temp_size != size)
 	{
 		AdPlug_LogWrite("HERAD: Is not HSQ, wrong compressed size.\n");
 		return false;
@@ -101,7 +101,7 @@ bool isHSQ(uint8_t * data, int size)
 	{
 		checksum += data[i];
 	}
-	if ( checksum != 0xAB )
+	if (checksum != 0xAB)
 	{
 		AdPlug_LogWrite("HERAD: Is not HSQ, wrong checksum.\n");
 		return false;
@@ -117,12 +117,12 @@ bool isSQX(uint8_t * data)
 	// data[3] - byte SQX flag #2
 	// data[4] - byte SQX flag #3
 	// data[5] - byte CntOffPart
-	if ( data[2] > 2 || data[3] > 2 || data[4] > 2 )
+	if (data[2] > 2 || data[3] > 2 || data[4] > 2)
 	{
 		AdPlug_LogWrite("HERAD: Is not SQX, wrong flags.\n");
 		return false;
 	}
-	if ( data[5] == 0 || data[5] > 15 )
+	if (data[5] == 0 || data[5] > 15)
 	{
 		AdPlug_LogWrite("HERAD: Is not SQX, wrong bit count.\n");
 		return false;
@@ -650,19 +650,19 @@ bool CheradPlayer::load(const std::string &filename, const CFileProvider &fp)
 		AdPlug_LogWrite("HERAD: File size is too small.\n");
 		goto failure;
 	}
-	if ( size < u16_unaligned(data))
+	if (size < u16_unaligned(data))
 	{
 		AdPlug_LogWrite("HERAD: Incorrect offset / file size.\n");
 		goto failure;
 	}
 	nInsts = (size - u16_unaligned(data)) / HERAD_INST_SIZE;
-	if ( nInsts == 0 )
+	if (nInsts == 0)
 	{
 		AdPlug_LogWrite("HERAD: M32 files are not supported.\n");
 		goto failure;
 	}
 	offset = u16_unaligned(data + 2);
-	if ( offset != 0x32 && offset != 0x52 )
+	if (offset != 0x32 && offset != 0x52)
 	{
 		AdPlug_LogWrite("HERAD: Wrong first track offset.\n");
 		goto failure;
@@ -680,7 +680,7 @@ bool CheradPlayer::load(const std::string &filename, const CFileProvider &fp)
 	nTracks = 0;
 	for (int i = 0; i < HERAD_MAX_TRACKS; i++)
 	{
-		if ( u16_unaligned(data + 2 + i * 2) == 0 )
+		if (u16_unaligned(data + 2 + i * 2) == 0)
 			break;
 		nTracks++;
 	}

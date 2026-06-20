@@ -1021,3 +1021,4 @@ EXTENSION(rsoundsnd)    // VGMStream
 EXTENSION(ueopus)       // VGMStream
 EXTENSION(usm)          // VGMStream
 EXTENSION(wmw)          // VGMStream
+EXTENSION(xmi)          // Adlib: Miles Design eXtended MIDI

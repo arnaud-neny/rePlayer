@@ -293,6 +293,12 @@
     <ClInclude Include="adplug\ungzip.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
+    <ClInclude Include="adplug\xmi.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
+    <ClInclude Include="adplug\xmi_timbres.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayAdLib.cpp">
@@ -545,6 +551,9 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\ungzip.c">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\xmi.cpp">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
   </ItemGroup>
