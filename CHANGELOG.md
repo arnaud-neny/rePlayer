@@ -5,13 +5,16 @@
 
 ## Current version
 
-v0.22.6:
-- Updated adplug to 2.4 r927
-- Updated libsidplay to 3.0.1
+v0.22.7:
+- Updated adplug to 2.4 r929
+- Updated FluidSynth to 2.5.5
+- Updated libtfmxaudiodecoder to 1.0.13
 - Bug fixes
 
+v0.22.6:
+- Updated libsidplay to 3.0.1
+
 v0.22.5:
-- Updated libtfmxaudiodecoder to 1.0.9
 - Updated OpenMPT to 0.9.0-pre.12 r25345
 - Updated vgmstream to r2117
 
@@ -29,7 +32,6 @@ v0.22.2:
 - Updated libcurl to 8.20.0
 
 v0.22.1:
-- Updated FluidSynth to 2.5.4
 - Added Properties to display current song details
 
 v0.22.0:
@@ -42,11 +44,12 @@ v0.22.0:
 
 ## Older updates
 
-- [0.22.5] adplug to 2.4 r923
+- [0.22.6] adplug to 2.4 r927
 - [0.22.0] ASAP to 8.0.0
 - [0.17.3] FAAD2 to 2.11.2
+- [0.22.1] FluidSynth to 2.5.4
 - [0.19.4] Furnace to 0.6.8.3
-- [0.22.2] libtfmxaudiodecoder to 1.0.7
+- [0.22.5] libtfmxaudiodecoder to 1.0.9
 - [0.21.9] gbsplay to 0.0.101
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
