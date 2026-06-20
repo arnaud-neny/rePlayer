@@ -397,7 +397,7 @@ namespace rePlayer
             }
 
             song->name = collectedSong.name;
-            song->type = collectedSong.type;
+            song->SetType(collectedSong.type);
             song->sourceIds.Add(SourceID(kID, collectedSong.id));
 
             for (auto& artist : collectedSong.artists)
@@ -484,7 +484,7 @@ namespace rePlayer
             }
 
             song->name = searchSong.name;
-            song->type = searchSong.type;
+            song->SetType(searchSong.type);
             song->sourceIds.Add(SourceID(kID, searchSong.id));
             for (auto& searchArtist : searchSong.artists)
             {

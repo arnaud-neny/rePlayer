@@ -23,13 +23,21 @@ namespace rePlayer
         uint32_t fileCrc = 0;                                   // offset : 12
         Tag tags;                                               // offset : 16
         uint16_t lastSubsongIndex = 0;                          // offset : 24
-        MediaType type;                                         // offset : 26
+        uint16_t releaseYear = 0;                               // offset : 26
         BlobString<storage> name;                               // offset : 28
         BlobArray<ArtistID, storage> artistIds;                 // offset : 30
         BlobArray<SourceID, storage> sourceIds;                 // offset : 32
         BlobArray<CommandBuffer::Command, storage> metadata;    // offset : 34
-        uint16_t releaseYear = 0;                               // offset : 36
-        uint16_t databaseDay = 0;                               // offset : 38
+        union
+        {
+            uint32_t dataType = 0;                              // offset : 36
+            struct 
+            {
+                eExtension ext : 11;
+                eReplay replay : 6;
+                uint32_t databaseDay : 15;
+            };
+        };
         Subsongs subsongs;                                      // offset : 40
 
         SongData();
@@ -54,9 +62,12 @@ namespace rePlayer
         void AddRef();
         void Release();
 
-        void Patch002104Replays(const CommandBuffer::Command* command, uint16_t numEntries, eReplay replay);
+        void Patch002104Replays(const CommandBuffer::Command* command, uint16_t numEntries, eReplay patchedReplay);
         void Patch002104UADE(const CommandBuffer::Command* command);
         void Patch002104VGM(const CommandBuffer::Command* command);
+
+        const MediaType GetType() const { return { ext, replay }; }
+        SongSheet& SetType(MediaType type) { ext = type.ext; replay = type.replay; return *this; }
     };
 
     class Song : public Proxy<Song, SongSheet>, protected SongData<Blob::kIsStatic>
@@ -106,7 +117,7 @@ namespace rePlayer
         void CopyTo(SongSheet* song) const;
         void CopySubsongsTo(SongSheet* song) const;
 
-        static constexpr uint32_t kVersion = (0 << 28) | (22 << 14) | 2;
+        static constexpr uint32_t kVersion = (0 << 28) | (22 << 14) | 7;
         void Patch(uint32_t version);
 
     private:

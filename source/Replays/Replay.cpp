@@ -33,8 +33,9 @@ namespace rePlayer
     int32_t MediaType::mapSortedExtensions[int32_t(eExtension::Count)];
 
     MediaType::MediaType(const char* const otherExt, eReplay otherReplay)
-        : replay{ otherReplay }
-        , ext{ eExtension::Unknown }
+        : replay(otherReplay)
+        , ext(eExtension::Unknown)
+        , dummy(0)
     {
         for (auto& extensionName : extensionNames)
         {

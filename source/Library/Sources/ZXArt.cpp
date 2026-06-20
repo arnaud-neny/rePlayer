@@ -584,8 +584,8 @@ namespace rePlayer
             if (entry.isSong)
             {
                 auto& dbSong = *m_db.songs.Items<ZxArtSong>(entry.dbIndex);
-                if (dbSong.type.ext != eExtension::Unknown)
-                    ImGui::Text(ImGuiIconFile "%s.%s", dbSong.name(m_db.strings), MediaType::extensionNames[int(dbSong.type.ext)]);
+                if (dbSong.ext != eExtension::Unknown)
+                    ImGui::Text(ImGuiIconFile "%s.%s", dbSong.name(m_db.strings), MediaType::extensionNames[int(dbSong.ext)]);
                 else
                     ImGui::Text(ImGuiIconFile "%s", dbSong.name(m_db.strings));
             }
@@ -659,7 +659,7 @@ namespace rePlayer
             sprintf(url, "https://zxart.ee/file/id:%u/", dbSong.id);
             song->url = url;
             song->name = dbSong.name(m_db.strings);
-            song->type = dbSong.type;
+            song->type = { dbSong.ext, dbSong.replay };
             for (uint16_t i = 0; i < dbSong.numArtists; ++i)
                 song->artists.Add(m_db.artists[dbSong.artists[i]].handles(m_db.strings));
         };
@@ -744,8 +744,8 @@ namespace rePlayer
             }
             if (zxMusic.contains("type"))
             {
-                song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
-                if (song->type.ext == eExtension::Unknown)
+                song->SetType(Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str()));
+                if (song->ext == eExtension::Unknown)
                     song->name.String() += std::string(".") + zxMusic["type"].get<std::string>();
             }
             else if (zxMusic.contains("originalFileName"))
@@ -754,8 +754,8 @@ namespace rePlayer
                 auto pos = filename.rfind('.');
                 if (pos != filename.npos)
                 {
-                    song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
-                    if (song->type.ext == eExtension::Unknown)
+                    song->SetType(Core::GetReplays().Find(filename.c_str() + pos + 1));
+                    if (song->ext == eExtension::Unknown)
                         song->name.String() += filename.c_str() + pos;
                 }
             }
@@ -1083,11 +1083,11 @@ namespace rePlayer
             }
             song->year = uint16_t(year);
 
-            song->type = {};
+            MediaType mediaType = {};
             if (zxMusic.contains("type"))
             {
-                song->type = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
-                if (song->type.ext == eExtension::Unknown)
+                mediaType = Core::GetReplays().Find(zxMusic["type"].get<std::string>().c_str());
+                if (mediaType.ext == eExtension::Unknown)
                 {
                     m_db.strings.Last() = '.';
                     auto type = zxMusic["type"].get<std::string>();
@@ -1100,11 +1100,13 @@ namespace rePlayer
                 auto pos = filename.rfind('.');
                 if (pos != filename.npos)
                 {
-                    song->type = Core::GetReplays().Find(filename.c_str() + pos + 1);
-                    if (song->type.ext == eExtension::Unknown)
+                    mediaType = Core::GetReplays().Find(filename.c_str() + pos + 1);
+                    if (mediaType.ext == eExtension::Unknown)
                         m_db.strings.Add(filename.c_str() + pos, uint32_t(filename.size() - pos + 1));
                 }
             }
+            song->ext = mediaType.ext;
+            song->replay = mediaType.replay;
 
             song->numArtists = uint16_t(zxMusic["authorIds"].size());
             for (auto& author : zxMusic["authorIds"])
@@ -1145,7 +1147,8 @@ namespace rePlayer
 
         song->name = dbSong.name(m_db.strings);
         song->releaseYear = dbSong.year;
-        song->type = dbSong.type;
+        song->ext = dbSong.ext;
+        song->replay = dbSong.replay;
         song->tags.Raise(Tag::kZX).Raise(Tag::k8bit);
         for (uint16_t i = 0; i < dbSong.numArtists; ++i)
         {

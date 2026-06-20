@@ -39,7 +39,7 @@ namespace rePlayer
     {
         musicId.subsongId.index = context.subsongIndex;
         auto currentSong = musicId.GetSong();
-        if (auto replay = Core::GetReplays().Load(musicId.GetStream(), currentSong->Edit()->metadata.Container(), currentSong->Edit()->type))
+        if (auto replay = Core::GetReplays().Load(musicId.GetStream(), currentSong->Edit()->metadata.Container(), currentSong->Edit()->GetType()))
             return SmartPtr<SongEndEditor>(kAllocate, musicId, replay, context.loop);
         context.isSongEndEditorEnabled = false;
         return nullptr;

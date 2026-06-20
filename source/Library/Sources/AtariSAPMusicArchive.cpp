@@ -867,7 +867,7 @@ namespace rePlayer
             song->artistIds.Add(static_cast<ArtistID>(artistIdx));
         }
 
-        song->type = Core::GetReplays().Find(std::filesystem::path(dbSong.path(m_db.strings)).extension().generic_string().c_str() + 1);
+        song->SetType(Core::GetReplays().Find(std::filesystem::path(dbSong.path(m_db.strings)).extension().generic_string().c_str() + 1));
         song->name = dbSong.name(m_db.strings);
         song->releaseYear = dbSong.date;
         song->tags.Raise(Tag::kAtari).Raise(Tag::k8bit);

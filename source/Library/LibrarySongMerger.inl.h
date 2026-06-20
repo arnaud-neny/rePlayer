@@ -496,8 +496,8 @@ namespace rePlayer
                     auto* song = m_entries[i].song->Edit();
                     songs.m_db.Delete(m_entries[i].song, "Merge");
 
-                    Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(song->id), song->type.GetExtension(), songs.m_db.GetTitleAndArtists(song->id).c_str()
-                        , uint32_t(primarySong->id), primarySong->type.GetExtension(), songs.m_db.GetTitleAndArtists(primarySong->id).c_str());
+                    Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(song->id), song->GetType().GetExtension(), songs.m_db.GetTitleAndArtists(song->id).c_str()
+                        , uint32_t(primarySong->id), primarySong->GetType().GetExtension(), songs.m_db.GetTitleAndArtists(primarySong->id).c_str());
 
                     for (auto sourceId : song->sourceIds)
                     {

@@ -4,7 +4,7 @@
 
 namespace rePlayer
 {
-    enum class eReplay : uint16_t
+    enum class eReplay : uint32_t
     {
         Unknown,
 #define REPLAY(a, b) a,
@@ -21,7 +21,7 @@ namespace rePlayer
         eReplay operator[](size_t index) const { return replays[index]; }
     };
 
-    enum class eExtension : uint16_t
+    enum class eExtension : uint32_t
     {
         Unknown,
 #define EXTENSION(a) _##a,
@@ -31,24 +31,26 @@ namespace rePlayer
 #undef EXTENSION
         Count
     };
-    static_assert(uint16_t(eExtension::Count) <= 1024);
+    static_assert(uint16_t(eExtension::Count) <= 2048);
 
     struct MediaType
     {
         union
         {
-            uint16_t value = 0;
+            uint32_t value = 0;
             struct
             {
-                eExtension ext : 10;
+                eExtension ext : 11;
                 eReplay replay : 6;
+                uint32_t dummy : 15;
             };
         };
 
         MediaType() = default;
         MediaType(eExtension otherExt, eReplay otherReplay)
-            : ext{ otherExt }
-            , replay{ otherReplay }
+            : ext(otherExt)
+            , replay(otherReplay)
+            , dummy(0)
         {}
         MediaType(const char* const otherExt, eReplay otherReplay);
 
@@ -71,7 +73,7 @@ namespace rePlayer
     template <typename T>
     inline const T* const MediaType::GetExtension() const
     {
-        return reinterpret_cast<const T*>(extensionNames[static_cast<size_t>(ext)]);
+        return reinterpret_cast<const T*>(extensionNames[int(ext)]);
     }
 }
 // namespace rePlayer

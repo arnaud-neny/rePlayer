@@ -979,7 +979,8 @@ namespace rePlayer
             song->name = m_db.strings.Items(dbSong.name);
         else
             song->name = dbSong.name;
-        song->type = { eExtension::_sndh, eReplay::SNDHPlayer };
+        song->ext = eExtension::_sndh;
+        song->replay = eReplay::SNDHPlayer;
         song->releaseYear = uint16_t(dbSong.year);
         song->tags.Raise(Tag::kAtari).Raise(Tag::kST).Raise(Tag::k16bit);
         song->sourceIds.Add(songSourceId);

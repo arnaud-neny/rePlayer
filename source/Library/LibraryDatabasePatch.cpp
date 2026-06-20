@@ -74,7 +74,7 @@ namespace rePlayer
                 {
                     auto oldFilename = GetFullpath(song);
                     auto songSheet = song->Edit();
-                    songSheet->type.ext = ext == kExtension_mdxPk ? eExtension::_mdx
+                    songSheet->ext = ext == kExtension_mdxPk ? eExtension::_mdx
                         : ext == kExtension_qsfPk ? eExtension::_miniqsf
                         : ext == kExtension_gsfPk ? eExtension::_minigsf
                         : ext == kExtension_2sfPk ? eExtension::_mini2sf
@@ -95,7 +95,7 @@ namespace rePlayer
                 {
                     auto oldFilename = GetFullpath(song);
                     auto songSheet = song->Edit();
-                    songSheet->type.ext = ext == kExtension_mbmPk ? eExtension::_mbm
+                    songSheet->ext = ext == kExtension_mbmPk ? eExtension::_mbm
                         : ext == kExtension_musPk ? eExtension::_mus
                         : eExtension::_eup;
                     songSheet->subsongs[0].isPackage = false;
@@ -205,9 +205,9 @@ namespace rePlayer
 
                             auto songSheet = song->Edit();
                             if (ext == eExtension::_tfm)
-                                songSheet->type.ext = eExtension::_mdat;
+                                songSheet->ext = eExtension::_mdat;
                             else if (ext == eExtension::_qts)
-                                songSheet->type.ext = eExtension::_4v;
+                                songSheet->ext = eExtension::_4v;
                             songSheet->subsongs[0].isPackage = true;
                             songSheet->subsongs[0].isArchive = true;
 
@@ -377,7 +377,7 @@ namespace rePlayer
                     else
                         oldFilename += "psid";
                     auto songSheet = song->Edit();
-                    songSheet->type.ext = eExtension::_sid;
+                    songSheet->ext = eExtension::_sid;
                     Move(oldFilename, song, "Patch");
                 }
             }

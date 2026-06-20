@@ -66,10 +66,10 @@ namespace rePlayer
         {
             currentSong = m_musicId.GetSong();
             // we don't want to loose everything we edited, so just update the changes
-            if (m_song.original.type != currentSong->GetType())
+            if (m_song.original.GetType() != currentSong->GetType())
             {
-                m_song.original.type = currentSong->GetType();
-                m_song.edited.type = m_song.original.type;
+                m_song.original.SetType(currentSong->GetType());
+                m_song.edited.SetType(m_song.original.GetType());
             }
             if (m_song.original.name != currentSong->GetName())
             {
@@ -519,15 +519,15 @@ namespace rePlayer
 
             ImGui::SetNextItemWidth(-FLT_MIN);
 
-            if (ImGui::BeginCombo("##ReplayCB", replays.GetName(m_song.edited.type.replay), ImGuiComboFlags_None))
+            if (ImGui::BeginCombo("##ReplayCB", replays.GetName(m_song.edited.replay), ImGuiComboFlags_None))
             {
                 uint32_t numReplayables = 0;
                 for (uint32_t i = 0; i < uint32_t(eReplay::Count) && m_playables[i] != eReplay::Unknown; i++, numReplayables++)
                 {
                     ImGui::PushID(int(m_playables[i]));
-                    const bool isItemSelected = m_playables[i] == m_song.edited.type.replay;
+                    const bool isItemSelected = m_playables[i] == m_song.edited.replay;
                     if (ImGui::Selectable(replays.GetName(m_playables[i]), isItemSelected))
-                        m_song.edited.type.replay = m_playables[i];
+                        m_song.edited.replay = m_playables[i];
                     ImGui::PopID();
                 }
 
@@ -541,9 +541,9 @@ namespace rePlayer
                     if (!isReplayable)
                     {
                         ImGui::PushID(i);
-                        const bool isItemSelected = i == uint32_t(m_song.edited.type.replay);
+                        const bool isItemSelected = i == uint32_t(m_song.edited.replay);
                         if (ImGui::Selectable(replays.GetName(eReplay(i)), isItemSelected))
-                            m_song.edited.type.replay = eReplay(i);
+                            m_song.edited.replay = eReplay(i);
                         ImGui::PopID();
                     }
                 }
@@ -553,10 +553,10 @@ namespace rePlayer
 
             ImGui::TableNextColumn();
             ImGui::BeginDisabled(m_song.edited.subsongs[0].isArchive);
-            auto extIndex = MediaType::mapSortedExtensions[int32_t(m_song.edited.type.ext)];
+            auto extIndex = MediaType::mapSortedExtensions[int32_t(m_song.edited.ext)];
             ImGui::SetNextItemWidth(ImGui::GetFontSize() * 5);
             ImGui::Combo("##Extension", &extIndex, MediaType::sortedExtensionNames, int32_t(eExtension::Count));
-            m_song.edited.type.ext = MediaType::sortedExtensions[extIndex];
+            m_song.edited.ext = MediaType::sortedExtensions[extIndex];
             ImGui::EndDisabled();
 
             ImGui::EndTable();
@@ -578,7 +578,7 @@ namespace rePlayer
             m_songEndEditor = nullptr;
         }
 
-        Core::GetReplays().EditMetadata(m_song.edited.type.replay, context);
+        Core::GetReplays().EditMetadata(m_song.edited.replay, context);
 
         if (context.isSongEndEditorEnabled)
             m_songEndEditor = SongEndEditor::Create(context, m_musicId);
@@ -673,8 +673,8 @@ namespace rePlayer
         auto areTagsUpdated = isEnabled && (currentSong->GetTags() != m_song.edited.tags);
         auto areMetadataUpdated = isEnabled && (currentSong->Metadatas() != m_song.edited.metadata);
         auto areSourcesUpdated = isEnabled && (currentSong->SourceIds() != m_song.edited.sourceIds);
-        auto isExtensionUpdated = isEnabled && (currentSong->GetType().ext != m_song.edited.type.ext);
-        auto isReplayUpdated = isEnabled && (currentSong->GetType().replay != m_song.edited.type.replay);
+        auto isExtensionUpdated = isEnabled && (currentSong->GetType().ext != m_song.edited.ext);
+        auto isReplayUpdated = isEnabled && (currentSong->GetType().replay != m_song.edited.replay);
         auto isTypeUpdated = isEnabled && (isExtensionUpdated || isReplayUpdated);
         auto isYearUpdated = isEnabled && (currentSong->GetReleaseYear() != m_song.edited.releaseYear);
         auto isUpdated = isTitleUpdated || areSubsongsUpdated || areArtistsUpdated || areTagsUpdated || areMetadataUpdated || areSourcesUpdated || isTypeUpdated || isYearUpdated;
@@ -723,7 +723,7 @@ namespace rePlayer
                         auto newSong = new SongSheet();
                         newSong->tags = m_song.edited.tags;
                         newSong->releaseYear = currentSongEdit->releaseYear;
-                        newSong->type = currentSongEdit->type;
+                        newSong->dataType = currentSongEdit->dataType;
                         newSong->name = m_song.edited.name;
                         newSong->artistIds = m_song.edited.artistIds;
                         newSong->sourceIds.Add(sourceId);
@@ -740,7 +740,7 @@ namespace rePlayer
             }
 
             currentSongEdit->releaseYear = m_song.edited.releaseYear;
-            currentSongEdit->type = m_song.edited.type;
+            currentSongEdit->dataType = m_song.edited.dataType;
             currentSongEdit->name = m_song.edited.name;
             currentSongEdit->artistIds = m_song.edited.artistIds;
             currentSongEdit->tags = m_song.edited.tags;
@@ -800,7 +800,7 @@ namespace rePlayer
                     Core::Discard(MusicID(subsongIdToRemove, m_musicId.databaseId));
                 }
                 currentSongEdit->subsongs[0].Clear();
-                CommandBuffer(currentSongEdit->metadata.Container()).Remove(uint16_t(m_song.original.type.replay));
+                CommandBuffer(currentSongEdit->metadata.Container()).Remove(uint16_t(m_song.original.replay));
             }
 
             m_musicId.MarkForSave();

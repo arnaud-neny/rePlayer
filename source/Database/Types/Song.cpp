@@ -18,13 +18,12 @@ namespace rePlayer
         s.Store(fileCrc);
         s.Store(tags);
         s.Store(lastSubsongIndex);
-        s.Store(type);
+        s.Store(releaseYear);
         s.Store(name);
         s.Store(artistIds);
         s.Store(sourceIds);
         s.Store(metadata);
-        s.Store(releaseYear);
-        s.Store(databaseDay);
+        s.Store(dataType);
         for (uint16_t i = 0; i <= lastSubsongIndex; i++)
             s.Store(subsongs[i]);
         return s;
@@ -37,13 +36,12 @@ namespace rePlayer
         file.Read(fileCrc);
         file.Read(tags);
         file.Read(lastSubsongIndex);
-        file.Read(type);
+        file.Read(releaseYear);
         name.Load(file);
         artistIds.Load(file);
         sourceIds.Load(file);
         metadata.Load(file);
-        file.Read(releaseYear);
-        file.Read(databaseDay);
+        file.Read(dataType);
         subsongs.Resize(lastSubsongIndex + 1);
         for (uint16_t i = 0; i <= lastSubsongIndex; i++)
             subsongs[i].Load(file);
@@ -56,13 +54,12 @@ namespace rePlayer
         file.Write(fileCrc);
         file.Write(tags);
         file.Write(lastSubsongIndex);
-        file.Write(type);
+        file.Write(releaseYear);
         name.Save(file);
         artistIds.Save(file);
         sourceIds.Save(file);
         metadata.Save(file);
-        file.Write(releaseYear);
-        file.Write(databaseDay);
+        file.Write(dataType);
         for (uint16_t i = 0; i <= lastSubsongIndex; i++)
             subsongs[i].Save(file);
     }
@@ -124,8 +121,8 @@ namespace rePlayer
     const MediaType Song::GetType() const
     {
         if (dataSize != 0)
-            return type;
-        return Dynamic()->type;
+            return { ext, replay };
+        return Dynamic()->GetType();
     }
 
     const bool Song::IsInvalid() const
@@ -298,8 +295,7 @@ namespace rePlayer
             song->fileCrc = fileCrc;
             song->tags = tags;
             song->releaseYear = releaseYear;
-            song->databaseDay = databaseDay;
-            song->type = type;
+            song->dataType = dataType;
             song->name = name;
             song->artistIds.Clear();
             song->artistIds.Add(artistIds.Items(), artistIds.NumItems());
@@ -335,6 +331,7 @@ namespace rePlayer
         // !!!!                                       !!!!
         // !!!! never forget to update Song::kVersion !!!!
         // !!!!                                       !!!!
+        auto* data = pCast<uint8_t>(this);
 
         // version 1: updated type storage
         // version 2: converted internal packages to archive
@@ -342,10 +339,36 @@ namespace rePlayer
         {
             struct MediaType0
             {
-                eExtension ext : 9{ eExtension::Unknown };
-                eReplay replay : 7{ eReplay::Unknown };
+                uint16_t ext : 9;
+                uint16_t replay : 7;
             };
-            type = MediaType(reinterpret_cast<MediaType0&>(type).ext, reinterpret_cast<MediaType0&>(type).replay);
+            struct MediaType16
+            {
+                uint16_t ext : 10;
+                uint16_t replay : 6;
+            };
+            auto oldType = rCast<MediaType0>(data[26]);
+            rCast<MediaType16>(data[26]).ext = oldType.ext;
+            rCast<MediaType16>(data[26]).replay = oldType.replay;
+        }
+
+        // Media type size increase and moved member
+        static constexpr uint32_t kVersionMediaType17 = (0 << 28) | (22 << 14) | 6;
+        if (version <= kVersionMediaType17)
+        {
+            struct MediaType16
+            {
+                uint16_t ext : 10;
+                uint16_t replay : 6;
+            };
+            auto oldType = rCast<MediaType16>(data[26]);
+            auto oldReleaseYear = rCast<uint16_t>(data[36]);
+            auto oldDatabaseDay = rCast<uint16_t>(data[38]);
+
+            releaseYear = oldReleaseYear;
+            ext = eExtension(oldType.ext);
+            replay = eReplay(oldType.replay);
+            databaseDay = oldDatabaseDay;
         }
 
         // replay gain added a field to subsongdata
@@ -366,8 +389,7 @@ namespace rePlayer
             song->tags = tags;
             song->lastSubsongIndex = lastSubsongIndex;
             song->releaseYear = releaseYear;
-            song->databaseDay = databaseDay;
-            song->type = type;
+            song->dataType = dataType;
             song->name = name;
             song->artistIds.Add(artistIds.Items(), artistIds.NumItems());
             song->sourceIds.Add(sourceIds.Items(), sourceIds.NumItems());
@@ -386,22 +408,22 @@ namespace rePlayer
         static constexpr uint32_t kVersionLoop = (0 << 28) | (21 << 14) | 4;
         if (version <= kVersionLoop && metadata.IsNotEmpty())
         {
-            auto find = [](Span<CommandBuffer::Command> commands, eReplay replay)
+            auto find = [](Span<CommandBuffer::Command> commands, eReplay replayToFind)
             {
                 for (uint32_t i = 0; i < commands.NumItems(); i += 1 + commands[i].numEntries)
                 {
-                    if (commands[i].commandId == uint16_t(replay))
+                    if (commands[i].commandId == uint16_t(replayToFind))
                         return &commands[i];
                 }
                 return (CommandBuffer::Command*)nullptr;
             };
 
-            switch (type.replay)
+            switch (replay)
             {
             case eReplay::Ayumi:
             case eReplay::Quartet:
-                if (auto* command = find(Metadatas(), type.replay))
-                    Edit()->Patch002104Replays(command, 1, type.replay);
+                if (auto* command = find(Metadatas(), replay))
+                    Edit()->Patch002104Replays(command, 1, replay);
                 break;
             case eReplay::GBSPlay:
             case eReplay::GME:
@@ -415,30 +437,30 @@ namespace rePlayer
             case eReplay::SNDHPlayer:
             case eReplay::vio2sf:
             case eReplay::ZXTune:
-                if (auto* command = find(Metadatas(), type.replay))
-                    Edit()->Patch002104Replays(command, 1, type.replay);
+                if (auto* command = find(Metadatas(), replay))
+                    Edit()->Patch002104Replays(command, 1, replay);
                 break;
             case eReplay::SidPlay:
-                if (auto* command = find(Metadatas(), type.replay))
-                    Edit()->Patch002104Replays(command, 2, type.replay);
+                if (auto* command = find(Metadatas(), replay))
+                    Edit()->Patch002104Replays(command, 2, replay);
                 break;
             case eReplay::WonderSwan:
-                if (auto* command = find(Metadatas(), type.replay))
-                    Edit()->Patch002104Replays(command, 1 + 8, type.replay);
+                if (auto* command = find(Metadatas(), replay))
+                    Edit()->Patch002104Replays(command, 1 + 8, replay);
                 break;
             case eReplay::UADE:
-                if (auto* command = find(Metadatas(), type.replay))
+                if (auto* command = find(Metadatas(), replay))
                     Edit()->Patch002104UADE(command);
                 break;
             case eReplay::VGM:
-                if (auto* command = find(Metadatas(), type.replay))
+                if (auto* command = find(Metadatas(), replay))
                     Edit()->Patch002104VGM(command);
                 break;
             }
         }
     }
 
-    void SongSheet::Patch002104Replays(const CommandBuffer::Command* command, uint16_t numBaseEntries, eReplay replay)
+    void SongSheet::Patch002104Replays(const CommandBuffer::Command* command, uint16_t numBaseEntries, eReplay patchedReplay)
     {
         if (metadata.Container().NumItems() != command->numEntries + 1u)
         {
@@ -454,7 +476,7 @@ namespace rePlayer
         };
         auto* newSettings = reinterpret_cast<Settings*>(_alloca((numLoops * 2 + 1 + numBaseEntries) * sizeof(CommandBuffer::Command)));
         newSettings->numEntries = numLoops * 2 + numBaseEntries;
-        newSettings->commandId = uint16_t(replay);
+        newSettings->commandId = uint16_t(patchedReplay);
 
         memcpy(newSettings->data, reinterpret_cast<const Settings*>(command)->data, numBaseEntries * sizeof(uint32_t));
         auto* durations = reinterpret_cast<const uint32_t*>(reinterpret_cast<const Settings*>(command)->data + numBaseEntries);

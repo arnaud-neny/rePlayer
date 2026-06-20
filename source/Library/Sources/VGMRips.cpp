@@ -936,7 +936,8 @@ namespace rePlayer
                 song->name = getPack()->name(m_db.data);
                 song->name.String() += '/';
                 song->name.String() += m_db.data.Items<VgmRipsSong>(songOffset)->name(m_db.data);
-                song->type = { eExtension::_vgz, eReplay::VGM };
+                song->ext = eExtension::_vgz;
+                song->replay = eReplay::VGM;
                 song->releaseYear = getPack()->year;
                 song->sourceIds.Add(songSourceId);
                 for (uint32_t i = 0; i < getPack()->numArtists; i++)
@@ -1058,7 +1059,8 @@ namespace rePlayer
                     song->name = getPack()->name(m_db.data);
                     song->name.String() += '/';
                     song->name.String() += m_db.data.Items<VgmRipsSong>(songOffset)->name(m_db.data);
-                    song->type = { eExtension::_vgz, eReplay::VGM };
+                    song->ext = eExtension::_vgz;
+                    song->replay = eReplay::VGM;
                     song->releaseYear = getPack()->year;
                     song->sourceIds.Add(songSourceId);
                     for (uint32_t i = 0; i < getPack()->numArtists; i++)
@@ -1750,7 +1752,8 @@ namespace rePlayer
             song->name = dbPack.name(m_db.data);
             song->name.String() += '/';
             song->name.String() += dbSong.name(m_db.data);
-            song->type = { eExtension::_vgz, eReplay::VGM };
+            song->ext = eExtension::_vgz;
+            song->replay = eReplay::VGM;
             song->releaseYear = dbPack.year;
             song->sourceIds.Add(songSourceId);
             for (uint32_t i = 0; i < dbPack.numArtists; i++)

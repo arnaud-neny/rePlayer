@@ -85,7 +85,7 @@ namespace rePlayer
                 stream = Core::GetPlaylist().GetStream(entry.song);
             else
                 stream = Core::GetLibrary().GetStream(entry.song);
-            if (auto replay = Core::GetReplays().Load(stream, entry.songSheet->metadata.Container(), entry.songSheet->type))
+            if (auto replay = Core::GetReplays().Load(stream, entry.songSheet->metadata.Container(), entry.songSheet->GetType()))
             {
                 if (replay->IsStreaming())
                 {

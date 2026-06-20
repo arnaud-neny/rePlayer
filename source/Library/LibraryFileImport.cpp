@@ -446,11 +446,11 @@ namespace rePlayer
                             break;
                         }
 
-                        song->type = GetMediaType(stream->GetName());
-                        song->type.replay = eReplay(entry.currentReplay);
-                        if (auto* replay = replays.Load(stream, song->metadata.Container(), song->type))
+                        song->SetType(GetMediaType(stream->GetName()));
+                        song->replay = eReplay(entry.currentReplay);
+                        if (auto* replay = replays.Load(stream, song->metadata.Container(), song->GetType()))
                         {
-                            song->type = replay->GetMediaType();
+                            song->SetType(replay->GetMediaType());
                             auto numSubsongs = replay->GetNumSubsongs();
                             song->lastSubsongIndex = uint16_t(numSubsongs - 1);
                             song->subsongs.Resize(numSubsongs);

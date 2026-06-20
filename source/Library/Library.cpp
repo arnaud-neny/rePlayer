@@ -115,10 +115,10 @@ namespace rePlayer
                         songSheet->subsongs[0].isInvalid = true;
                         m_db.Raise(Database::Flag::kSaveSongs);
                     }
-                    Log::Warning("Imported file is missing for ID_%06X \"[%s]%s\"\n", uint32_t(songSheet->id), songSheet->type.GetExtension(), m_db.GetTitleAndArtists(songSheet->id).c_str());
+                    Log::Warning("Imported file is missing for ID_%06X \"[%s]%s\"\n", uint32_t(songSheet->id), songSheet->GetType().GetExtension(), m_db.GetTitleAndArtists(songSheet->id).c_str());
                     return {};
                 }
-                Log::Warning("Discarding imported file for ID_%06X \"[%s]%s\"\n", uint32_t(songSheet->id), songSheet->type.GetExtension(), m_db.GetTitleAndArtists(songSheet->id).c_str());
+                Log::Warning("Discarding imported file for ID_%06X \"[%s]%s\"\n", uint32_t(songSheet->id), songSheet->GetType().GetExtension(), m_db.GetTitleAndArtists(songSheet->id).c_str());
                 songSheet->sourceIds.RemoveAt(0);
                 m_db.Raise(Database::Flag::kSaveSongs);
             }
@@ -171,8 +171,8 @@ namespace rePlayer
                                     stream.Reset();
                                 }
 
-                                Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(otherSongSheet->id), otherSongSheet->type.GetExtension(), m_db.GetTitleAndArtists(otherSongSheet->id).c_str()
-                                    , uint32_t(primarySong->id), primarySong->type.GetExtension(), m_db.GetTitleAndArtists(primarySong->id).c_str());
+                                Log::Message("Merge: ID_%06X \"[%s]%s\" with ID_%06X \"[%s]%s\"\n", uint32_t(otherSongSheet->id), otherSongSheet->GetType().GetExtension(), m_db.GetTitleAndArtists(otherSongSheet->id).c_str()
+                                    , uint32_t(primarySong->id), primarySong->GetType().GetExtension(), m_db.GetTitleAndArtists(primarySong->id).c_str());
 
                                 for (auto oldSourceId : otherSongSheet->sourceIds)
                                 {
@@ -209,13 +209,13 @@ namespace rePlayer
                             filename = path.string();
                             stream = StreamArchive::Create(stream, song->IsPackage());
                         }
-                        else if (importedSong.extension != eExtension::Unknown && songSheet->type.ext != importedSong.extension)
+                        else if (importedSong.extension != eExtension::Unknown && songSheet->ext != importedSong.extension)
                         {
                             // corrective in case it has been edited
                             std::filesystem::path path(filename);
                             path.replace_extension(MediaType::extensionNames[int(importedSong.extension)]);
                             filename = path.string();
-                            songSheet->type.ext = importedSong.extension;
+                            songSheet->ext = importedSong.extension;
                             stream->SetName(filename);
                         }
 
@@ -266,12 +266,12 @@ namespace rePlayer
 
         // song is available, try to play it
         auto metadata(song->metadata);
-        if (auto replay = Core::GetReplays().Load(stream, song->metadata.Container(), song->type))
+        if (auto replay = Core::GetReplays().Load(stream, song->metadata.Container(), song->GetType()))
         {
-            auto oldType = song->type;
+            auto oldType = song->GetType();
             auto type = replay->GetMediaType();
             bool hasChanged = oldType != type || metadata != song->metadata;
-            song->type = type;
+            song->SetType(type);
             if (oldType.ext != type.ext && !song->subsongs[0].isArchive)
                 m_db.Move(stream->GetName(), dbSong, "LoadSong");
             uint32_t oldNumSubsongs = song->lastSubsongIndex + 1ul;
@@ -316,12 +316,12 @@ namespace rePlayer
             {
                 player = Player::Create(musicId, song, replay, stream, isExport);
                 player->MarkSongAsNew(hasChanged);
-                Log::Message("%s: loaded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->type.GetExtension());
+                Log::Message("%s: loaded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->GetType().GetExtension());
             }
             else
             {
                 delete replay;
-                Log::Message("%s: discarded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->type.GetExtension());
+                Log::Message("%s: discarded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->GetType().GetExtension());
             }
             if (hasChanged)
                 m_db.Raise(Database::Flag::kSaveSongs);
@@ -334,7 +334,7 @@ namespace rePlayer
                 song->subsongs[0].isInvalid = true;
                 m_db.Raise(Database::Flag::kSaveSongs);
             }
-            Log::Warning("Can't find a suitable replay for ID_%06X \"[%s]%s\"\n", uint32_t(song->id), song->type.GetExtension(), m_db.GetTitleAndArtists(musicId.subsongId).c_str());
+            Log::Warning("Can't find a suitable replay for ID_%06X \"[%s]%s\"\n", uint32_t(song->id), song->GetType().GetExtension(), m_db.GetTitleAndArtists(musicId.subsongId).c_str());
         }
         return player;
     }
@@ -941,7 +941,7 @@ namespace rePlayer
                             }
                             break;
                             case kType:
-                                delta = strcmp(lSong->type.GetExtension(), rSong->type.GetExtension());
+                                delta = strcmp(lSong->GetType().GetExtension(), rSong->GetType().GetExtension());
                                 break;
                             case kSource:
                                 delta = strcmp(SourceID::sourceNames[lSong->sourceIds[0].sourceId], SourceID::sourceNames[rSong->sourceIds[0].sourceId]);
@@ -1095,7 +1095,7 @@ namespace rePlayer
                         }
                     }
                     ImGui::TableNextColumn();
-                    ImGui::TextUnformatted(song->type.GetExtension());
+                    ImGui::TextUnformatted(song->GetType().GetExtension());
                     ImGui::TableNextColumn();
                     ImGui::TextUnformatted(SourceID::sourceNames[song->sourceIds[0].sourceId]);
                     if (ImGui::IsItemHovered())

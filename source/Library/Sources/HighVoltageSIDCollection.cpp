@@ -805,7 +805,8 @@ namespace rePlayer
         }
 
         song->name = dbSongName;
-        song->type = { eExtension::_sid, eReplay::SidPlay };
+        song->ext = eExtension::_sid;
+        song->replay = eReplay::SidPlay;
         if (dbSong.artist)
             song->artistIds.Add(static_cast<ArtistID>(artistId));
         song->tags.Raise(Tag::kC64).Raise(Tag::k8bit);

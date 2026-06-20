@@ -66,13 +66,15 @@ namespace rePlayer
         {
             uint32_t id;
             Chars name;
-            MediaType type;
-            uint16_t year;
+            eExtension ext : 11;
+            eReplay replay : 6;
+            uint32_t year : 15;
             uint16_t numArtists;
             uint16_t artists[0];
 
             static uint32_t Size() { return offsetof(ZxArtSong, artists); }
         };
+        static_assert(uint16_t(eReplay::Count) <= 64 && uint16_t(eExtension::Count) <= 2048);
 
         struct SongSource
         {

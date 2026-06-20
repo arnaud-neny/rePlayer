@@ -1285,7 +1285,7 @@ namespace rePlayer
         }
 
         song->name = dbSong.name(m_db.strings);
-        song->type = UpdateMediaType(dbSong, song->name.String());
+        song->SetType(UpdateMediaType(dbSong, song->name.String()));
         if (dbSong.artists[0])
         {
             song->artistIds.Add(static_cast<ArtistID>(artistIds[0]));

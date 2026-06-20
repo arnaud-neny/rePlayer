@@ -329,12 +329,12 @@ namespace rePlayer
                 }
 
                 auto metadata(song->metadata);
-                if (auto* replay = Core::GetReplays().Load(stream, song->metadata.Container(), song->type))
+                if (auto* replay = Core::GetReplays().Load(stream, song->metadata.Container(), song->GetType()))
                 {
-                    auto oldType = song->type;
+                    auto oldType = song->GetType();
                     auto type = replay->GetMediaType();
                     bool hasChanged = oldType != type || metadata != song->metadata;
-                    song->type = type;
+                    song->SetType(type);
                     uint32_t oldNumSubsongs = song->lastSubsongIndex + 1;
                     auto numSubsongs = replay->GetNumSubsongs();
                     if (numSubsongs != oldNumSubsongs || song->subsongs[0].isDirty || song->subsongs[0].isInvalid || oldType.replay != type.replay)
@@ -393,12 +393,12 @@ namespace rePlayer
                     {
                         player = Player::Create(musicId, song, replay, stream, isExport);
                         player->MarkSongAsNew(hasChanged);
-                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
+                        Log::Message("%s: loaded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
                     }
                     else
                     {
                         delete replay;
-                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->type.replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
+                        Log::Message("%s: discarded %06X%02X \"%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_cue.db.GetPath(sourceId));
                     }
 
                     if (hasChanged)
@@ -702,7 +702,7 @@ namespace rePlayer
         auto* songSheet = new SongSheet();
         songSheet->sourceIds.Add(m_cue.db.AddPath(SourceID::URLImportID, browserSong.url));
         songSheet->name = browserSong.name;
-        songSheet->type = browserSong.type;
+        songSheet->SetType(browserSong.type);
 
         for (uint32_t i = 0; i < browserSong.artists.NumItems(); ++i)
         {
@@ -1639,7 +1639,7 @@ namespace rePlayer
                     addFilesContext->numEntries++;
 
                     auto* songSheet = new SongSheet;
-                    songSheet->type = type;
+                    songSheet->SetType(type);
                     if (type.ext == eExtension::Unknown)
                         songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
                     else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), type.GetExtension()) == 0)
@@ -1744,7 +1744,7 @@ namespace rePlayer
                                 isAdded = true;
 
                                 auto* songSheet = new SongSheet;
-                                songSheet->type = replay->GetMediaType();
+                                songSheet->SetType(replay->GetMediaType());
                                 auto streamSize = stream->GetSize();
                                 songSheet->fileSize = uint32_t(streamSize);
                                 if (IS_FILECRC_ENABLED)
@@ -1993,7 +1993,7 @@ namespace rePlayer
                     m_cue.db.Raise(Database::Flag::kSaveSongs);
 
                     addFilesContext->Lock();
-                    addFilesContext->entriesToScan.Add({ filename, musicId.playlistId, songSheet->type });
+                    addFilesContext->entriesToScan.Add({ filename, musicId.playlistId, songSheet->GetType()});
                     addFilesContext->Unlock();
                 }
             }
@@ -2094,7 +2094,7 @@ namespace rePlayer
                             songSheet->fileSize = entryToUpdate.song->fileSize;
                             songSheet->fileCrc = entryToUpdate.song->fileCrc;
                             songSheet->lastSubsongIndex = entryToUpdate.song->lastSubsongIndex;
-                            songSheet->type = entryToUpdate.song->type;
+                            songSheet->SetType(entryToUpdate.song->GetType());
                             if (entryToUpdate.song->name.IsNotEmpty())
                                 songSheet->name = entryToUpdate.song->name;
                             songSheet->metadata = entryToUpdate.song->metadata;

@@ -1348,10 +1348,10 @@ namespace rePlayer
                             if (!s)
                                 continue;
                             auto* song = s->Edit();
-                            if (song->type.replay != eReplay(i))
+                            if (song->replay != eReplay(i))
                             {
-                                CommandBuffer(song->metadata.Container()).Remove(uint16_t(song->type.replay));
-                                song->type.replay = eReplay(i);
+                                CommandBuffer(song->metadata.Container()).Remove(uint16_t(song->replay));
+                                song->replay = eReplay(i);
 
                                 for (; song->lastSubsongIndex; --song->lastSubsongIndex)
                                 {

@@ -394,7 +394,7 @@ namespace rePlayer
             auto& playlist = Core::GetPlaylist();
 
             // 1 - check for the playlist file in shelved mode (m_mode should be Mode::Solo)
-            if (m_shelvedPlayer.IsValid() && (m_shelvedPlayer->GetSubsong().isDiscarded || m_shelvedPlayer->GetMediaType() != m_shelvedPlayer->GetSong()->type || m_shelvedPlayer->GetId() != playlist.GetCurrentEntry()))
+            if (m_shelvedPlayer.IsValid() && (m_shelvedPlayer->GetSubsong().isDiscarded || m_shelvedPlayer->GetMediaType() != m_shelvedPlayer->GetSong()->GetType() || m_shelvedPlayer->GetId() != playlist.GetCurrentEntry()))
             {
                 m_shelvedPlayer = playlist.LoadCurrentSong();
                 m_nextPlayer = playlist.LoadNextSong(false);
@@ -403,7 +403,7 @@ namespace rePlayer
             // 2 - check solo vs playlist
             if (m_mode == Mode::Solo)
             {
-                if (m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type)
+                if (m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->GetType())
                 {
                     m_currentPlayer->Stop();
                     m_currentPlayer = playlist.LoadSong(m_currentPlayer->GetId());
@@ -417,7 +417,7 @@ namespace rePlayer
                         if (m_currentPlayer)
                             m_currentPlayer->Stop();
                         m_currentPlayer = std::move(m_shelvedPlayer);
-                        if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->type))
+                        if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->GetType()))
                             m_nextPlayer = playlist.LoadNextSong(false);
                         hasChanged = true;
                     }
@@ -425,7 +425,7 @@ namespace rePlayer
                         m_currentPlayer.Reset();
                 }
             }
-            else if (m_currentPlayer->GetSubsong().isDiscarded || m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->type || m_currentPlayer->GetId() != playlist.GetCurrentEntry())
+            else if (m_currentPlayer->GetSubsong().isDiscarded || m_currentPlayer->GetMediaType() != m_currentPlayer->GetSong()->GetType() || m_currentPlayer->GetId() != playlist.GetCurrentEntry())
             {
                 if (m_currentPlayer)
                     m_currentPlayer->Stop();
@@ -433,7 +433,7 @@ namespace rePlayer
                 m_nextPlayer = playlist.LoadNextSong(false);
                 hasChanged = true;
             }
-            else if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->type))
+            else if (m_nextPlayer.IsValid() && (m_nextPlayer->GetSubsong().isDiscarded || m_nextPlayer->GetMediaType() != m_nextPlayer->GetSong()->GetType()))
                 m_nextPlayer = playlist.LoadNextSong(false);
             // we could validate here, but we might spam the servers if we move entries in the playlist
             //else

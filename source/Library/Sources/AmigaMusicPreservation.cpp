@@ -517,13 +517,13 @@ namespace rePlayer
             }
 
             song->name = collectedSong.name;
-            song->type = Core::GetReplays().Find(collectedSong.ext.c_str());
-            if (song->type.ext == eExtension::Unknown)
+            song->SetType(Core::GetReplays().Find(collectedSong.ext.c_str()));
+            if (song->ext == eExtension::Unknown)
             {
                 if (collectedSong.ext == "FST")
-                    song->type = Core::GetReplays().Find("mod");
+                    song->SetType(Core::GetReplays().Find("mod"));
                 else if (collectedSong.ext == "OSS")
-                    song->type = Core::GetReplays().Find("med");
+                    song->SetType(Core::GetReplays().Find("med"));
                 else
                 {
                     song->name.String() += ".";
@@ -615,13 +615,13 @@ namespace rePlayer
                 }
 
                 song->name = searchSong.name;
-                song->type = Core::GetReplays().Find(searchSong.ext.c_str());
-                if (song->type.ext == eExtension::Unknown)
+                song->SetType(Core::GetReplays().Find(searchSong.ext.c_str()));
+                if (song->ext == eExtension::Unknown)
                 {
                     if (searchSong.ext == "FST")
-                        song->type = Core::GetReplays().Find("mod");
+                        song->SetType(Core::GetReplays().Find("mod"));
                     else if (searchSong.ext == "OSS")
-                        song->type = Core::GetReplays().Find("med");
+                        song->SetType(Core::GetReplays().Find("med"));
                     else
                     {
                         song->name.String() += ".";

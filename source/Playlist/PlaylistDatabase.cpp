@@ -29,7 +29,7 @@ namespace rePlayer
             {
                 SmartPtr<Song> holdSong = (*this)[subsongIdToRemove.songId];
                 auto song = holdSong->Edit();
-                Log::Message("Discard: ID_%06X_%02XP \"[%s]%s\"\n", uint32_t(subsongIdToRemove.songId), uint32_t(subsongIdToRemove.index), song->type.GetExtension(), GetTitleAndArtists(subsongIdToRemove).c_str());
+                Log::Message("Discard: ID_%06X_%02XP \"[%s]%s\"\n", uint32_t(subsongIdToRemove.songId), uint32_t(subsongIdToRemove.index), song->GetType().GetExtension(), GetTitleAndArtists(subsongIdToRemove).c_str());
 
                 uint32_t numSubsongs = song->lastSubsongIndex + 1ul;
                 song->subsongs[subsongIdToRemove.index].isDiscarded = true;
