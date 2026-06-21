@@ -215,6 +215,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\SID.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\siddefs-fp.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Spline.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\State.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Voice.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformCalculator.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\WaveformGenerator.h" />
@@ -475,6 +476,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\State.cpp" />
     <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\version.cc">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)libsidplayfp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

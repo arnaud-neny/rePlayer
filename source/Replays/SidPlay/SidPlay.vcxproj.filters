@@ -413,6 +413,9 @@
     <ClInclude Include="libsidplayfp\libs\hashlib\md5.hpp">
       <Filter>Source Files\libsidplayfp\libs\hashlib</Filter>
     </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\State.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libsidplayfp\EventScheduler.cpp">
@@ -591,6 +594,9 @@
     </ClCompile>
     <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.cpp">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\residfp</Filter>
+    </ClCompile>
+    <ClCompile Include="libsidplayfp\builders\residfp-builder\residfp\State.cpp">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

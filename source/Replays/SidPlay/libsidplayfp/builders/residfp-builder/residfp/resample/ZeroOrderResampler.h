@@ -36,6 +36,7 @@ namespace reSIDfp
  */
 class ZeroOrderResampler final : public Resampler
 {
+    friend class State;
 
 private:
     /// Last sample

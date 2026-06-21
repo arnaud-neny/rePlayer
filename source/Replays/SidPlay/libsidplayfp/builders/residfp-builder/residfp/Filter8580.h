@@ -276,6 +276,8 @@ class Integrator8580;
  */
 class Filter8580 final : public Filter
 {
+    friend class State;
+
 private:
     /// VCR + associated capacitor connected to highpass output.
     Integrator8580 hpIntegrator[2];
@@ -291,7 +293,9 @@ protected:
      */
     void updateCenterFrequency() override;
 
-    int solveIntegrators(int i) override;
+    int32_t solveIntegrators(int i) override;
+
+    void restartIntegrators() override { hpIntegrator[0].restart(); bpIntegrator[0].restart(); hpIntegrator[1].restart(); bpIntegrator[1].restart(); }
 
 public:
     Filter8580() :

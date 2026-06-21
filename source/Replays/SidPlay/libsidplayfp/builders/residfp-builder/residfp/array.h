@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- *  Copyright (C) 2011-2014 Leandro Nini
+ *  Copyright (C) 2011-2026 Leandro Nini
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,32 +21,16 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+#include <cstdint>
 
 #include <atomic>
+#include <memory>
 
-/**
- * Counter.
- */
-class counter
-{
-private:
-    std::atomic<unsigned int> c;
-
-public:
-    counter() : c(1) {}
-    void increase() { ++c; }
-    unsigned int decrease() { return --c; }
-};
-
-/**
- * Reference counted pointer to matrix wrapper, for use with standard containers.
- */
 template<typename T>
 class matrix
 {
 private:
     T* data;
-    counter* count;
     const unsigned int x, y;
 
 private:
@@ -55,17 +39,15 @@ private:
 public:
     matrix(unsigned int new_x, unsigned int new_y) :
         data(new T[new_x * new_y]),
-        count(new counter()),
         x(new_x),
         y(new_y) {}
 
     matrix(const matrix& p) :
         data(p.data),
-        count(p.count),
         x(p.x),
-        y(p.y) { count->increase(); }
+        y(p.y) {}
 
-    ~matrix() { if (count->decrease() == 0) { delete count; delete [] data; } }
+    ~matrix() { delete [] data; }
 
     unsigned int length() const { return x * y; }
 
@@ -74,6 +56,7 @@ public:
     T const* operator[](unsigned int a) const { return &data[a * y]; }
 };
 
-using matrix_t = matrix<short>;
+using matrix_t = matrix<int16_t>;
+using rc_matrix_t = std::shared_ptr<matrix_t>;
 
 #endif

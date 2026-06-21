@@ -33,6 +33,7 @@
 #include "ExternalFilter.h"
 #include "Filter.h"
 #include "Voice.h"
+#include "State.h"
 
 namespace reSIDfp
 {
@@ -61,6 +62,8 @@ public:
  */
 class SID
 {
+    friend class State;
+
 private:
     /// Currently active filter
     Filter* filter;
@@ -102,7 +105,13 @@ private:
     CombinedWaveforms cws;
 
     /// Last written value
-    unsigned char busValue;
+    uint8_t busValue;
+
+    /// Paddle coordinates.
+    //@{
+    uint8_t paddleX = 0xff;
+    uint8_t paddleY = 0xff;
+    //@}
 
     /**
      * Emulated nonlinearity of the envelope DAC.
@@ -118,13 +127,16 @@ private:
      */
     float oscDAC[4096];
 
+    /// Parameters for save state
+    Params* p;
+
 private:
     /**
      * Age the bus value and zero it if it's TTL has expired.
      *
      * @param n the number of cycles
      */
-    void ageBusValue(unsigned int n);
+    void ageBusValue(int n);
 
     /**
      * Calculate the numebr of cycles according to current parameters
@@ -154,7 +166,7 @@ private:
     inline SampleI32 clockFilt()
     {
         SampleU16 filtOutput = filter->clock(voice[0], voice[1], voice[2]);
-        SampleI32 exFiltInput = { static_cast<int>(filtOutput.left) + INT16_MIN, static_cast<int>(filtOutput.right) + INT16_MIN };
+        SampleI32 exFiltInput = { static_cast<int32_t>(filtOutput.left) + INT16_MIN, static_cast<int32_t>(filtOutput.right) + INT16_MIN };
         return externalFilter.clock(exFiltInput);
     }
 
@@ -203,6 +215,14 @@ public:
     void input(int value);
 
     /**
+     * Read registers without altering state.
+     *
+     * @param offset SID register to read
+     * @return value read from chip
+     */
+    uint8_t peek(int offset) const;
+
+    /**
      * Read registers.
      *
      * Reading a write only register returns the last char written to any SID register.
@@ -222,7 +242,7 @@ public:
      * @param offset SID register to read
      * @return value read from chip
      */
-    unsigned char read(int offset);
+    uint8_t read(int offset);
 
     /**
      * Write registers.
@@ -230,7 +250,7 @@ public:
      * @param offset chip register to write
      * @param value value to write
      */
-    void write(int offset, unsigned char value);
+    void write(int offset, uint8_t value);
 
     /**
      * Setting of SID sampling parameters.
@@ -282,6 +302,15 @@ public:
 
     /**
      * Clock SID forward with no audio production.
+     * Only the digital parts are emulated,
+     * the analog stage is ignored.
+     *
+     * @param cycles c64 clocks to clock.
+     */
+    void clockDigital(unsigned int cycles);
+
+    /**
+     * Clock SID forward with no audio production.
      *
      * @note:
      * You can't mix this method of clocking with the audio-producing
@@ -325,6 +354,11 @@ public:
      */
     void enableOld6581caps(bool enable);
 
+    /**
+     * Set paddle coordinates.
+     */
+    void setPaddle(uint8_t x, uint8_t y);
+
     void surround(bool enabled);
 };
 
@@ -340,7 +374,7 @@ namespace reSIDfp
 {
 
 RESIDFP_INLINE
-void SID::ageBusValue(unsigned int n)
+void SID::ageBusValue(int n)
 {
     if (likely(busValueTtl != 0))
     {

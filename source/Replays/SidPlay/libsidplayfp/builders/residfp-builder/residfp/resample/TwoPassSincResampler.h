@@ -39,6 +39,8 @@ namespace reSIDfp
  */
 class TwoPassSincResampler final : public Resampler
 {
+    friend class State;
+
 private:
     std::unique_ptr<SincResampler> const s1;
     std::unique_ptr<SincResampler> const s2;

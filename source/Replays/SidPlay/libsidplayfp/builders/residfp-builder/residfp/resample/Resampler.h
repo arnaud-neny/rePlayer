@@ -24,6 +24,8 @@
 
 #include "Limiter.h"
 
+#include <cstdint>
+
 namespace reSIDfp
 {
 

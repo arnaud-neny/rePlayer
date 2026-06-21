@@ -34,16 +34,16 @@ int Filter6581::solveIntegrators(int i)
     Vbp[i] = hpIntegrator[i].solve(Vhp[i]);
     Vlp[i] = bpIntegrator[i].solve(Vbp[i]);
 
-    int Vfilt = 0;
+    int32_t Vfilt = 0;
     if (lp) Vfilt += Vlp[i];
     if (bp) Vfilt += Vbp[i];
     if (hp) Vfilt += Vhp[i];
 
     // The filter input resistors are slightly bigger than the voice ones
     // Scale the values accordingly
-    constexpr int filterGain = static_cast<int>(0.93 * (1 << 12));
+    constexpr int32_t filterGain = static_cast<int32_t>(0.93 * (1 << 12));
     // Scaling unsigned values adds a DC offset
-    constexpr int offset = 32767 * ((1 << 12) - filterGain);
+    constexpr int32_t offset = 32767 * ((1 << 12) - filterGain);
     assert(Vfilt >= 0);
     return (Vfilt * filterGain + offset) >> 12;
 }
@@ -55,7 +55,7 @@ Filter6581::~Filter6581()
 
 void Filter6581::updateCenterFrequency()
 {
-    const unsigned short Vw = f0_dac[getFC()];
+    const uint16_t Vw = f0_dac[getFC()];
     hpIntegrator[0].setVw(Vw);
     hpIntegrator[1].setVw(Vw);
     bpIntegrator[0].setVw(Vw);

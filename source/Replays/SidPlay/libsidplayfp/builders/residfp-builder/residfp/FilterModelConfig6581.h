@@ -71,7 +71,7 @@ private:
 
     /// Voltage Controlled Resistors
     //@{
-    unsigned short vcr_nVg[1 << 16];
+    uint16_t vcr_nVg[1 << 16];
     double vcr_n_Ids_term[1 << 16];
     //@}
 
@@ -82,7 +82,7 @@ private:
     double voiceDC[256];
 
 private:
-    double getDacZero(double adjustment) const { return dac_zero + 3. * adjustment - 1.; }
+    double getDacZero(double adjustment) const { return dac_zero + 2. * adjustment - 1.; }
 
     void updateParams();
 
@@ -94,7 +94,7 @@ protected:
      * On 6581 the DC offset varies between ~5.0V and ~5.214V depending on
      * the envelope value.
      */
-    inline double getVoiceDC(unsigned int env) const override
+    inline double getVoiceDC(uint8_t env) const override
     {
         return voiceDC[env];
     }
@@ -114,14 +114,14 @@ public:
      * @param adjustment
      * @return the DAC table
      */
-    unsigned short* getDAC(double adjustment) const;
+    uint16_t* getDAC(double adjustment) const;
 
     inline double getWL_snake() const { return WL_snake; }
 
-    inline unsigned short getVcr_nVg(int i) const { return vcr_nVg[i]; }
-    inline unsigned short getVcr_n_Ids_term(int i) const
+    inline uint16_t getVcr_nVg(int i) const { return vcr_nVg[i]; }
+    inline uint16_t getVcr_n_Ids_term(int i) const
     {
-        return to_ushort(vcr_n_Ids_term[i] * vcr_mult);
+        return to_uint16(vcr_n_Ids_term[i] * vcr_mult);
     }
     // only used if SLOPE_FACTOR is defined
     static inline constexpr double getUt() { return Ut; }

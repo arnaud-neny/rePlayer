@@ -47,13 +47,15 @@ namespace reSIDfp
  */
 class SincResampler final : public Resampler
 {
+    friend class State;
+
 private:
     /// Size of the ring buffer, must be a power of 2
     static constexpr int RINGSIZE = 2048;
 
 #ifdef RUNTIME_DISPATCH
 private:
-    using convolve_func_t = auto (*)(const int*, const short*, int) -> int;
+    using convolve_func_t = auto (*)(const int32_t*, const int16_t*, int) -> int32_t;
 
     convolve_func_t simd_convolve;
 #endif
@@ -76,7 +78,7 @@ private:
 
     SampleI32 outputValue = { 0, 0 };
 
-    int sample[2][RINGSIZE * 2];
+    int32_t sample[2][RINGSIZE * 2];
 
 private:
     SampleI32 fir(int subcycle);

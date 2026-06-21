@@ -319,6 +319,8 @@ class Integrator6581;
  */
 class Filter6581 final : public Filter
 {
+    friend class State;
+
 private:
     /// VCR + associated capacitor connected to highpass output.
     Integrator6581 hpIntegrator[2];
@@ -326,7 +328,7 @@ private:
     /// VCR + associated capacitor connected to bandpass output.
     Integrator6581 bpIntegrator[2];
 
-    const unsigned short* f0_dac;
+    const uint16_t* f0_dac;
 
 protected:
     /**
@@ -334,7 +336,9 @@ protected:
      */
     void updateCenterFrequency() override;
 
-    int solveIntegrators(int i) override;
+    int32_t solveIntegrators(int i) override;
+
+    void restartIntegrators() override { hpIntegrator[0].restart(); bpIntegrator[0].restart(); hpIntegrator[1].restart(); bpIntegrator[1].restart(); }
 
 public:
     Filter6581() :

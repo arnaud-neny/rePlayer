@@ -27,12 +27,12 @@
 namespace reSIDfp
 {
 
-int Filter8580::solveIntegrators(int i)
+int32_t Filter8580::solveIntegrators(int i)
 {
     Vbp[i] = hpIntegrator[i].solve(Vhp[i]);
     Vlp[i] = bpIntegrator[i].solve(Vbp[i]);
 
-    int Vfilt = 0;
+    int32_t Vfilt = 0;
     if (lp) Vfilt += Vlp[i];
     if (bp) Vfilt += Vbp[i];
     if (hp) Vfilt += Vhp[i];
@@ -46,7 +46,7 @@ int Filter8580::solveIntegrators(int i)
  * When no bit are selected a resistance with half
  * W/L ratio is selected.
  */
-const double DAC_WL0 = 0.00615;
+constexpr double DAC_WL0 = 0.00615;
 
 Filter8580::~Filter8580() = default;
 
