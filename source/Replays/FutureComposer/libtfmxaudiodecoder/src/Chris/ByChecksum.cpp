@@ -69,6 +69,12 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
         MacroDefs[0x1c] = &macroDef_SplitKey;
         MacroDefs[0x1d] = &macroDef_SplitVolume;
     }
+    // Turrican 3 level 5 / world 5
+    else if (crc1 == 0xc7ae8de6) {
+        if ( readBEudword(pBuf,4+getMacroOffset(0x4c)) != 0x02008c0e ) {
+            blacklisted = true;
+        }
+    }
     // Danger Freak (1989) seems to be a special TFMX v1 variant.
     else if (crc1 == 0x48960d8c || crc1 == 0x5dcd624f || crc1 == 0x3f0b151f) {
         setTFMXv1();

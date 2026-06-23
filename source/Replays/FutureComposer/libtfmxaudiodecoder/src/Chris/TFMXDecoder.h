@@ -167,6 +167,7 @@ class TFMXDecoder : public Decoder {
             sbyte state;  // -1 = enabled, 0 = skip, 1 = init
             bool extraWait;
             bool delayedOff, delayedOn;
+            bool branchIfSame;
         } macro;
         
         sword waitOnDMACount;
@@ -543,6 +544,20 @@ class TFMXDecoder : public Decoder {
     void macroFunc_29(VoiceVars&);
     MacroDef macroDef_29 = { "SID stop    xx....   flag (1=clear all)",
                              &TFMXDecoder::macroFunc_29
+    };
+
+    // NB! This macro command is not named anywhere. It's used extremely rarely,
+    // but is a NOP except in some of the Gem'Z soundtrack.
+    void macroFunc_BranchIfSame(VoiceVars&);
+    MacroDef macroDef_BranchIfSame = { "BranchIfSame   xxxx        step",
+                                       &TFMXDecoder::macroFunc_BranchIfSame
+    };
+
+    // NB! This macro command is not named anywhere. It's used only by
+    // Turrican III title.
+    void macroFunc_KeyUp(VoiceVars&);
+    MacroDef macroDef_KeyUp = { "Key up      ../.x/.. channel",
+                                &TFMXDecoder::macroFunc_KeyUp
     };
 
     

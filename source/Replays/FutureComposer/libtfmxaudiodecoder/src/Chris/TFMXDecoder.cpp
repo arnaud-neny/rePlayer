@@ -54,15 +54,15 @@ TFMXDecoder::~TFMXDecoder() {
 void TFMXDecoder::reset() {
     cmd.aa = cmd.bb = cmd.cd = cmd.ee = 0;
 
-    for (ubyte t=0; t<sequencer.tracks; t++) {
+    for (ubyte t=0; t<TRACKS_MAX; t++) {
         Track& tr = track[t];
-        tr.on = getTrackMute(t);
+        tr.on = false;
         tr.PT = 0xff; tr.TR = 0;
         tr.pattern.offset = tr.pattern.step = 0;
         tr.pattern.wait = 0;
         tr.pattern.loops = -1;
     }
-    for (ubyte v=0; v<voices; v++) {
+    for (ubyte v=0; v<VOICES_MAX; v++) {
         VoiceVars& voice = voiceVars[v];
         
         voice.voiceNum = v;
@@ -89,6 +89,8 @@ void TFMXDecoder::reset() {
         voice.macro.loop = 0xff;
         voice.macro.extraWait = true;
         voice.macro.delayedOff = voice.macro.delayedOn = false;
+        voice.macro.offset = 0;
+        voice.macro.branchIfSame = false;
         
         voice.sid.targetOffset = 0x100*v + 4;
         voice.sid.targetLength = 0;
@@ -284,6 +286,8 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     setRate(50<<8);
     voices = 4;
 
+    // Move these, if ever encapsulating sequencer.
+    // So far, they have been constant, btw.
     sequencer.tracks = 8;
     sequencer.step.size = 16;
 
@@ -393,6 +397,9 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     MacroDefs[0x28] = &macroDef_28;
     MacroDefs[0x29] = &macroDef_29;
 
+    MacroDefs[0x30] = &macroDef_BranchIfSame;
+    MacroDefs[0x31] = &macroDef_KeyUp;
+
     // TFMX v1.x up to and including v2.2 cannot be distinguished from
     // the later TFMX and/or variants. Unless the very rarely used old
     // header tag is used. And since the old-style effects (particularly
@@ -450,7 +457,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
 #if defined(DEBUG)
-    cout << "Duration of " << input.path << "  #" << admin.startSong << "  ";
+    cout << "Duration of " << input.path << "  #" << dec << admin.startSong << "  ";
     dumpTimestamp(duration);
     cout << endl;
 #endif
@@ -822,12 +829,11 @@ void TFMXDecoder::playerCommon() {
 }
 
 void TFMXDecoder::noteCmd() {
-#if defined(DEBUG_RUN)
-    cout << "  ::noteCmd()" << endl;
-#endif
     ubyte vNum = channelToVoiceMap[cmd.cd & (sizeof(channelToVoiceMap)-1)];
     VoiceVars& v = voiceVars[vNum];
-
+#if defined(DEBUG_RUN)
+    cout << "  ::noteCmd()  v" << tohex(v.voiceNum) << endl;
+#endif
     if (cmd.aa == 0xfc) {  // lock note
     }
     else if (cmd.aa == 0xf7) {  // envelope
@@ -859,8 +865,12 @@ void TFMXDecoder::noteCmd() {
         v.notePrevious = v.note;
         v.note = cmd.aa;
         v.keyUp = false;
-        v.macro.offset = getMacroOffset(cmd.bb & 0x7f);
-        v.macro.state = 1;
+        udword mo = getMacroOffset(cmd.bb & 0x7f);
+        if (mo != v.macro.offset) {
+            v.macro.branchIfSame = false;
+        }
+        v.macro.offset = mo;
+        v.macro.state = 1;  // delayed macro init
     }
     else {  // cmd.aa >= $c0   portamento note
         v.portamento.count = cmd.bb;
