@@ -35,6 +35,7 @@
     <ClInclude Include="libarchive\archive_entry_locale.h" />
     <ClInclude Include="libarchive\archive_entry_private.h" />
     <ClInclude Include="libarchive\archive_hmac_private.h" />
+    <ClInclude Include="libarchive\archive_integer.h" />
     <ClInclude Include="libarchive\archive_openssl_evp_private.h" />
     <ClInclude Include="libarchive\archive_openssl_hmac_private.h" />
     <ClInclude Include="libarchive\archive_options_private.h" />
