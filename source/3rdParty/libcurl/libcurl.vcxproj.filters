@@ -310,9 +310,6 @@
     <ClInclude Include="lib\netrc.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\noproxy.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\parsedate.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -414,12 +411,6 @@
     </ClInclude>
     <ClInclude Include="lib\vauth\vauth.h">
       <Filter>Source Files\lib\vauth</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vquic\curl_ngtcp2.h">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\vquic\curl_quiche.h">
-      <Filter>Source Files\lib\vquic</Filter>
     </ClInclude>
     <ClInclude Include="lib\vquic\vquic.h">
       <Filter>Source Files\lib\vquic</Filter>
@@ -596,6 +587,42 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\thrdqueue.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\capsule.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\cf-capsule.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\cf-ngtcp2.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\cf-ngtcp2-cmn.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\cf-ngtcp2-proxy.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vquic\cf-quiche.h">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vtls\vtls_config.h">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cf-recvbuf.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cf-setup.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\creds.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\peer.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\proxy.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -825,9 +852,6 @@
     <ClCompile Include="lib\netrc.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\noproxy.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\openldap.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -959,12 +983,6 @@
     </ClCompile>
     <ClCompile Include="lib\vauth\vauth.c">
       <Filter>Source Files\lib\vauth</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vquic\curl_ngtcp2.c">
-      <Filter>Source Files\lib\vquic</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vquic\curl_quiche.c">
-      <Filter>Source Files\lib\vquic</Filter>
     </ClCompile>
     <ClCompile Include="lib\vquic\vquic.c">
       <Filter>Source Files\lib\vquic</Filter>
@@ -1144,6 +1162,42 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\thrdqueue.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\capsule.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\cf-capsule.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\cf-ngtcp2.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\cf-ngtcp2-cmn.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\cf-ngtcp2-proxy.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vquic\cf-quiche.c">
+      <Filter>Source Files\lib\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vtls\vtls_config.c">
+      <Filter>Source Files\lib\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cf-recvbuf.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\cf-setup.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\creds.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\peer.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\proxy.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
