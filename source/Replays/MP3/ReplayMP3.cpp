@@ -114,10 +114,7 @@ namespace rePlayer
 
     void ReplayMP3::ResetPlayback()
     {
-        if (m_streamData->isSeekable)
-            drmp3_seek_to_start_of_stream(m_mp3);
-        else
-            m_streamData->stream->Seek(0, io::Stream::kSeekBegin);
+        drmp3_seek_to_start_of_stream(m_mp3);
     }
 
     void ReplayMP3::ApplySettings(const CommandBuffer /*metadata*/)
