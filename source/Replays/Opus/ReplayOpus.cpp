@@ -38,6 +38,7 @@ namespace rePlayer
         : Replay(eExtension::_opus, eReplay::Opus)
         , m_opus(opus)
         , m_stream(stream)
+        , m_isStreaming(op_seekable(m_opus) == 0)
     {}
 
     int32_t ReplayOpus::OnRead(io::Stream* stream, uint8_t* ptr, int32_t nbytes)
@@ -60,12 +61,12 @@ namespace rePlayer
 
     bool ReplayOpus::IsSeekable() const
     {
-        return op_seekable(m_opus) != 0;
+        return !m_isStreaming;
     }
 
     bool ReplayOpus::IsStreaming() const
     {
-        return op_seekable(m_opus) == 0;
+        return m_isStreaming;
     }
 
     uint32_t ReplayOpus::Render(StereoSample* output, uint32_t numSamples)
@@ -115,6 +116,7 @@ namespace rePlayer
                             metadata += comments;
                         }
                     }
+                    thread::ScopedSpinLock lock(m_mutex);
                     m_metadata = std::move(metadata);
                     m_artists = std::move(artists);
                     m_title = std::move(title);
@@ -154,9 +156,20 @@ namespace rePlayer
     void ReplayOpus::ResetPlayback()
     {
         if (op_seekable(m_opus))
+        {
             op_raw_seek(m_opus, 0);
+        }
         else
+        {
             m_stream->Seek(0, io::Stream::kSeekBegin);
+            OpusFileCallbacks cb = { op_read_func(OnRead), op_seek_func(OnSeek), op_tell_func(OnTell), nullptr };
+            auto* opus = op_open_callbacks(m_stream, &cb, nullptr, 0, nullptr);
+            if (opus)
+            {
+                std::swap(m_opus, opus);
+                op_free(opus);
+            }
+        }
     }
 
     void ReplayOpus::ApplySettings(const CommandBuffer /*metadata*/)
@@ -183,16 +196,11 @@ namespace rePlayer
         std::string title;
         if (IsStreaming())
         {
-            auto tags = op_tags(m_opus, -1);
-            int index = 0;
-            for (auto* tag = opus_tags_query(tags, "title", index); tag; tag = opus_tags_query(tags, "title", ++index))
-            {
-                if (index)
-                    title += '-';
-                title += tag;
-            }
-            if (title.empty())
+            thread::ScopedSpinLock lock(m_mutex);
+            if (m_title.empty())
                 title = m_stream->GetTitle();
+            else
+                title = m_title;
         }
         return title;
     }
@@ -202,16 +210,11 @@ namespace rePlayer
         std::string artist;
         if (IsStreaming())
         {
-            auto tags = op_tags(m_opus, -1);
-            int index = 0;
-            for (auto* tag = opus_tags_query(tags, "artist", index); tag; tag = opus_tags_query(tags, "artist", ++index))
-            {
-                if (index)
-                    artist += " & ";
-                artist += tag;
-            }
-            if (artist.empty())
+            thread::ScopedSpinLock lock(m_mutex);
+            if (m_artists.empty())
                 artist = m_stream->GetArtist();
+            else
+                artist = m_artists;
         }
         return artist;
     }
@@ -219,12 +222,9 @@ namespace rePlayer
     std::string ReplayOpus::GetExtraInfo() const
     {
         std::string info;
-        auto tags = op_tags(m_opus, -1);
-        for (int32_t i = 0; i < tags->comments; i++)
         {
-            if (!info.empty())
-                info += "\n";
-            info.append(tags->user_comments[i], tags->comment_lengths[i]);
+            thread::ScopedSpinLock lock(m_mutex);
+            info = m_metadata;
         }
         auto streamInfo = m_stream->GetInfo();
         if (!streamInfo.empty())

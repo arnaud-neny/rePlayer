@@ -2,6 +2,7 @@
 
 #include <Replay.h>
 #include <Audio/AudioTypes.h>
+#include <Thread/SpinLock.h>
 
 #include <opusfile.h>
 
@@ -56,8 +57,11 @@ namespace rePlayer
 
         int32_t m_previousLink = -1;
         uint8_t m_numChannels = 0;
+        bool m_isStreaming = false;
         uint32_t m_originalSampleRate = 0;
         uint32_t m_bitRate = 0;
+
+        mutable thread::SpinLock m_mutex;
 
         std::string m_metadata;
         std::string m_artists;
