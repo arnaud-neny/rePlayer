@@ -101,6 +101,9 @@ namespace rePlayer
 
         void DisplayInfoAndOscilloscope(Player* player);
 
+        template <size_t Length>
+        void PrintSongTime(char(&buf)[Length], uint32_t playbackTime, uint32_t durationCs);
+
         void UpdateSystray();
         void InvertWindowStates();
 

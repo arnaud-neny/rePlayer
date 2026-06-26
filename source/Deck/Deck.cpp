@@ -574,28 +574,9 @@ namespace rePlayer
 
             auto playbackTime = player->GetPlaybackTimeInMs();
             auto durationCs = song->subsongs[subsongId.index].durationCs;
-            auto duration = Max(1u, durationCs * 10, playbackTime);
 
-            char buf[32];
-            if (m_mode == Mode::Solo)
-            {
-                if (m_seekPos >= 0)
-                    sprintf(buf, "%u:%02u/%u:%02u", uint32_t(m_seekPos / 60000), uint32_t((m_seekPos / 1000) % 60), duration / 60000, (duration / 1000) % 60);
-                else if (durationCs > 0)
-                    sprintf(buf, "%u:%02u/%u:%02u", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60);
-                else
-                    sprintf(buf, "%u:%02u", playbackTime / 60000, (playbackTime / 1000) % 60);
-            }
-            else
-            {
-                auto& playlist = Core::GetPlaylist();
-                if (m_seekPos >= 0)
-                    sprintf(buf, "%u:%02u/%u:%02u [%u/%u]", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
-                else if (durationCs > 0)
-                    sprintf(buf, "%u:%02u/%u:%02u [%u/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
-                else
-                    sprintf(buf, "%u:%02u [%u/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
-            }
+            char buf[64];
+            PrintSongTime(buf, playbackTime, durationCs);
             ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 4);
             ImGui::PushStyleVar(ImGuiStyleVar_DisabledAlpha, 1.0f);
             auto col = ImGui::GetStyleColorVec4(ImGuiCol_SliderGrab);
@@ -605,7 +586,7 @@ namespace rePlayer
             ImGui::PushStyleColor(ImGuiCol_SliderGrab, col);
             ImGui::SetNextItemWidth(-1.0f);
             uint32_t minPlaybackTime = 0;
-            uint32_t maxPlaybackTime = duration;
+            uint32_t maxPlaybackTime = Max(1u, durationCs * 10, playbackTime);
             ImGui::BeginDisabled(isSeekDisabled);
             if (ImGui::SliderScalar("###progress", ImGuiDataType_U32 , &playbackTime, &minPlaybackTime, &maxPlaybackTime, buf, ImGuiSliderFlags_AlwaysClamp))
             {
@@ -1103,26 +1084,9 @@ namespace rePlayer
                 ImGui::SameLine();
                 auto playbackTime = player->GetPlaybackTimeInMs();
                 auto durationCs = player->GetSong()->subsongs[musicId.subsongId.index].durationCs;
-                auto duration = Max(1u, durationCs * 10, playbackTime);
-                if (m_mode == Mode::Solo)
-                {
-                    if (m_seekPos >= 0)
-                        ImGui::Text("%d:%02d/%d:%02d", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60);
-                    else if (durationCs > 0)
-                        ImGui::Text("%d:%02d/%d:%02d", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60);
-                    else
-                        ImGui::Text("%d:%02d", playbackTime / 60000, (playbackTime / 1000) % 60);
-                }
-                else
-                {
-                    auto& playlist = Core::GetPlaylist();
-                    if (m_seekPos >= 0)
-                        ImGui::Text("%d:%02d/%d:%02d [%d/%u]", m_seekPos / 60000, (m_seekPos / 1000) % 60, duration / 60000, (duration / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
-                    else if (durationCs > 0)
-                        ImGui::Text("%d:%02d/%d:%02d [%d/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, duration / 60000, (duration / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
-                    else
-                        ImGui::Text("%d:%02d [%d/%u]", playbackTime / 60000, (playbackTime / 1000) % 60, playlist.GetCurrentEntryIndex() + 1, playlist.NumEntries());
-                }
+                char buf[64];
+                PrintSongTime(buf, playbackTime, durationCs);
+                ImGui::TextUnformatted(buf);
             }
 
             ImGui::End();
@@ -1167,6 +1131,36 @@ namespace rePlayer
         }
         else
             m_isSystrayMenuEnabled = false;
+    }
+
+    template <size_t Length>
+    void Deck::PrintSongTime(char(&buf)[Length], uint32_t playbackTime, uint32_t durationCs)
+    {
+        if (m_seekPos >= 0)
+            playbackTime = uint32_t(m_seekPos);
+        playbackTime /= 1000;
+        auto duration = Max(1u, durationCs / 100, playbackTime);
+
+        int offset = 0;
+        auto printTime = [&](uint32_t time)
+        {
+            if (time < 60 * 60)
+                offset += sprintf(buf + offset, Length - offset, "%u:%02u", time / 60, time % 60);
+            else
+                offset += sprintf(buf + offset, Length - offset, "%u:%02u:%02u", time / 3600, (time / 60) % 60, time % 60);
+        };
+        printTime(playbackTime);
+        if (durationCs > 0)
+        {
+            buf[offset++] = '/';
+            printTime(duration);
+        }
+
+        if (m_mode != Mode::Solo)
+        {
+            auto& playlist = Core::GetPlaylist();
+            sprintf(buf + offset, Length - offset, " [%u/%u]", uint32_t(playlist.GetCurrentEntryIndex() + 1), playlist.NumEntries());
+        }
     }
 
     void Deck::InvertWindowStates()
