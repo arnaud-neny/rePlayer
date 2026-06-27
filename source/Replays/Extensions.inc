@@ -53,8 +53,8 @@ EXTENSION(fmt)
 EXTENSION(mus)          // OpenMPT: ? & Sidplay: ? & UADE: UFO & NEZplug: FAC SoundTracker & VGMStream: Krome MUSC
 EXTENSION(stx)          // OpenMPT & XMP & VGMStream
 EXTENSION(symmod)
-EXTENSION(smod)
-EXTENSION(fc)
+EXTENSION(smod)			// OpenMPT & Future Composer & UADE
+EXTENSION(fc)			// OpenMPT & Future Composer & UADE
 EXTENSION(bao)          // VGMStream
 EXTENSION(owp)          // VGMStream
 EXTENSION(v2m)
@@ -121,7 +121,7 @@ EXTENSION(rmt)
 EXTENSION(tmc)
 EXTENSION(tm8)
 EXTENSION(tm2)
-EXTENSION(tfm)
+EXTENSION(tfm)			// Furnace & Future Composer
 EXTENSION(mp3)          // MP3 & VGMStream
 EXTENSION(flac)
 EXTENSION(ogg)
@@ -180,7 +180,7 @@ EXTENSION(dm2)          // UADE: DeltaMusic2.0
 EXTENSION(dsr)          // UADE: Desire
 EXTENSION(dsc)          // UADE: DigitalSonixChrome
 EXTENSION(dss)          // UADE: DigitalSoundStudio
-EXTENSION(dns)          // UADE: DynamicSynthesizer
+EXTENSION(dns)          // UADE & Future Composer: DynamicSynthesizer
 EXTENSION(ems)          // UADE: EMS & EMS-6
 EXTENSION(ex)           // UADE: FashionTracker
 EXTENSION(fred)         // UADE: Fred
@@ -192,7 +192,7 @@ EXTENSION(glue)         // UADE: GlueMon
 EXTENSION(gmc)          // UADE: GMC
 EXTENSION(ea)           // UADE: EarAche
 EXTENSION(hd)           // UADE: HowieDavies & VGMStream
-EXTENSION(hipc)         // UADE: JochenHippel-CoSo
+EXTENSION(hipc)         // UADE & Future Composer: JochenHippel-CoSo
 EXTENSION(emod)         // UADE & XMP: QuadraComposer
 EXTENSION(dum)          // UADE: Infogrames
 EXTENSION(is)           // UADE: InStereo
@@ -205,8 +205,8 @@ EXTENSION(jpn)          // UADE: JasonPage
 EXTENSION(jpo)          // UADE: JasonPage_JP & UADE: SteveTurner
 EXTENSION(jt)           // UADE: JeroenTel
 EXTENSION(jo)           // UADE: JesperOlsen
-EXTENSION(hip)          // UADE: JochenHippel
-EXTENSION(hip7)         // UADE: JochenHippel-7V
+EXTENSION(hip)          // UADE & Future Composer: JochenHippel
+EXTENSION(hip7)         // UADE & Future Composer: JochenHippel-7V
 EXTENSION(hst)          // UADE: Jochen_Hippel_ST
 EXTENSION(kim)          // UADE: Kim_Christensen
 EXTENSION(kh)           // UADE: KrisHatlelid
@@ -315,7 +315,7 @@ EXTENSION(667)          // OpenMPT: Composer 667
 EXTENSION(gtk)          // OpenMPT: Gramouf Tracker
 EXTENSION(gt2)          // OpenMPT: Gramouf Tracker
 EXTENSION(xmf)          // OpenMPT & XMP
-EXTENSION(mdat)         // TFMX & UADE: TFMX
+EXTENSION(mdat)         // TFMX & UADE & Future Composer: TFMX
 EXTENSION(ttt)          // TIATracker
 EXTENSION(mini2sf)      // vio2sf
 EXTENSION(gz)           // archive
@@ -388,7 +388,7 @@ EXTENSION(td0)          // ZXTune: TeleDisk Image
 EXTENSION(pcd)          // ZXTune: Powerfull Code Decreaser
 EXTENSION(soc)          // UADE: Jochen_Hippel_ST
 EXTENSION(sog)          // UADE: Jochen_Hippel_ST
-EXTENSION(mcmd)         // UADE: JochenHippel
+EXTENSION(mcmd)         // UADE & Future Composer: JochenHippel
 EXTENSION(cba)          // OpenMPT
 EXTENSION(a2t)          // Adlib: Adlib Tracker 2
 EXTENSION(eup)          // Euphony
@@ -1022,3 +1022,4 @@ EXTENSION(ueopus)       // VGMStream
 EXTENSION(usm)          // VGMStream
 EXTENSION(wmw)          // VGMStream
 EXTENSION(xmi)          // Adlib: Miles Design eXtended MIDI
+EXTENSION(wm)			// Adlib: MusicV WM

@@ -299,6 +299,9 @@
     <ClInclude Include="adplug\xmi_timbres.h">
       <Filter>Source Files\adplug</Filter>
     </ClInclude>
+    <ClInclude Include="adplug\wm.h">
+      <Filter>Source Files\adplug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayAdLib.cpp">
@@ -554,6 +557,9 @@
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
     <ClCompile Include="adplug\xmi.cpp">
+      <Filter>Source Files\adplug</Filter>
+    </ClCompile>
+    <ClCompile Include="adplug\wm.cpp">
       <Filter>Source Files\adplug</Filter>
     </ClCompile>
   </ItemGroup>
