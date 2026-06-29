@@ -46,6 +46,14 @@ private:
     // This allows access to the private constructor
     friend std::unique_ptr<FilterModelConfig6581>::deleter_type;
 
+public:
+    /*
+     * The ratio of the resistors of the mixer input for filter signals
+     * compared to the voice ones.
+     * See the 6581 filter schematic.
+     */
+    static constexpr double VF_TR_RATIO = 1.07;
+
 private:
     static constexpr unsigned int DAC_BITS = 11;
 

@@ -121,12 +121,16 @@ void Filter::writeMODE_VOL(uint8_t mode_vol)
     updateMixing();
 }
 
-Filter::Filter(FilterModelConfig& new_fmc) :
-    mixer(new_fmc.getMixer()),
-    summer(new_fmc.getSummer()),
-    resonance(new_fmc.getResonance()),
-    volume(new_fmc.getVolume()),
-    fmc(new_fmc)
+Filter::Filter(const FilterModelConfig& fmc,
+               const Integrator& hpIntegrator0, const Integrator& hpIntegrator1,
+               const Integrator& bpIntegrator0, const Integrator& bpIntegrator1) :
+    mixer(fmc.getMixer()),
+    summer(fmc.getSummer()),
+    resonance(fmc.getResonance()),
+    volume(fmc.getVolume()),
+    m_fmc(fmc),
+    m_hpIntegrator0(hpIntegrator0), m_hpIntegrator1(hpIntegrator1),
+    m_bpIntegrator0(bpIntegrator0), m_bpIntegrator1(bpIntegrator1)
 {
     input(0);
 }

@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004,2010 Dag Lem <resid@nimrod.no>
  *
@@ -28,25 +28,6 @@
 
 namespace reSIDfp
 {
-
-int Filter6581::solveIntegrators(int i)
-{
-    Vbp[i] = hpIntegrator[i].solve(Vhp[i]);
-    Vlp[i] = bpIntegrator[i].solve(Vbp[i]);
-
-    int32_t Vfilt = 0;
-    if (lp) Vfilt += Vlp[i];
-    if (bp) Vfilt += Vbp[i];
-    if (hp) Vfilt += Vhp[i];
-
-    // The filter input resistors are slightly bigger than the voice ones
-    // Scale the values accordingly
-    constexpr int32_t filterGain = static_cast<int32_t>(0.93 * (1 << 12));
-    // Scaling unsigned values adds a DC offset
-    constexpr int32_t offset = 32767 * ((1 << 12) - filterGain);
-    assert(Vfilt >= 0);
-    return (Vfilt * filterGain + offset) >> 12;
-}
 
 Filter6581::~Filter6581()
 {

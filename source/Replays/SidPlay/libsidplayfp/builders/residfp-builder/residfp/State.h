@@ -118,7 +118,7 @@ struct State
     int32_t Vhp[2][2];
     int32_t Vbp[2][2];
     int32_t Vlp[2][2];
-    int32_t Ve[2];
+    int32_t extin[2];
     uint8_t fc[2];
     uint8_t vol[2];
     uint8_t filt[2];

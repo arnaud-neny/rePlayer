@@ -198,7 +198,7 @@ FilterModelConfig6581::FilterModelConfig6581() :
             vmin,
             vmax);
 
-        buildMixerTable(opampModel, 8.0 / 6.0);
+        buildMixerTable(opampModel, 8.0 / (6.0 * VF_TR_RATIO));
     };
 
     auto filterGain = [this]

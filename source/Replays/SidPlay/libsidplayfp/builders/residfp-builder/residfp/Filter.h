@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004 Dag Lem <resid@nimrod.no>
  *
@@ -24,6 +24,7 @@
 #define FILTER_H
 
 #include "FilterModelConfig.h"
+#include "Integrator.h"
 #include "Voice.h"
 
 #include "siddefs-fp.h"
@@ -44,7 +45,13 @@ private:
     uint16_t* resonance;
     uint16_t* volume;
 
-    FilterModelConfig& fmc;
+    const FilterModelConfig& m_fmc;
+
+    const Integrator& m_hpIntegrator0;
+    const Integrator& m_hpIntegrator1;
+
+    const Integrator& m_bpIntegrator0;
+    const Integrator& m_bpIntegrator1;
 
     /// Current filter/voice mixer setting.
     uint16_t* currentMixer[2] = { nullptr };
@@ -58,7 +65,6 @@ private:
     /// Current volume amplifier setting.
     uint16_t* currentVolume = nullptr;
 
-protected:
     /// Filter highpass state.
     int32_t Vhp[2] = { 0 };
 
@@ -68,9 +74,8 @@ protected:
     /// Filter lowpass state.
     int32_t Vlp[2] = { 0 };
 
-private:
     /// Filter external input.
-    int32_t Ve = 0;
+    float extin = 0;
 
     /// Filter cutoff frequency.
     uint16_t fc = 0;
@@ -86,7 +91,6 @@ private:
     /// Switch voice 3 off.
     bool voice3off = false;
 
-protected:
     /// Highpass, bandpass, and lowpass filter modes.
     //@{
     bool hp = false;
@@ -105,19 +109,6 @@ private:
 
     /// Selects which inputs to route through filter.
     uint8_t filt = 0;
-
-private:
-    inline int32_t getNormalizedVoice(Voice& v) const
-    {
-        return fmc.getNormalizedVoice(v.output(), v.envelope()->output());
-    }
-
-    // If voice 3 is off we still need to clock the waveform generator
-    inline static int32_t getSilentVoice(Voice& v)
-    {
-        v.wave()->output();
-        return 0;
-    }
 
 protected:
     /**
@@ -142,12 +133,19 @@ protected:
      */
     inline unsigned int getFC() const { return static_cast<unsigned int>(fc); }
 
-    virtual int32_t solveIntegrators(int i) = 0;
-
     virtual void restartIntegrators() = 0;
 
+    inline int32_t getNormalizedVoice(float v, uint8_t env) const
+    {
+        return m_fmc.getNormalizedVoice(v, env);
+    }
+
+    virtual int32_t getNormalizedMixerVoice(float v, uint8_t env) const = 0;
+
 public:
-    Filter(FilterModelConfig& fmc);
+    Filter(const FilterModelConfig& fmc,
+           const Integrator& hpIntegrator0, const Integrator& hpIntegrator1,
+           const Integrator& bpIntegrator0, const Integrator& bpIntegrator1);
 
     virtual ~Filter() = default;
 
@@ -206,7 +204,7 @@ public:
      *
      * @param input a signed 16 bit sample
      */
-    void input(int16_t input) { Ve = fmc.getNormalizedVoice(input/32768.f, 0); }
+    void input(int16_t input) { extin = input/65535.f; }
 
     void restart() { restartIntegrators(); Vhp[0] = 0; Vlp[0] = 0; Vbp[0] = 0; Vhp[1] = 0; Vlp[1] = 0; Vbp[1] = 0; }
 
@@ -223,33 +221,66 @@ namespace reSIDfp
 RESIDFP_INLINE
 SampleU16 Filter::clock(Voice& voice1, Voice& voice2, Voice& voice3)
 {
-    const int32_t V1 = getNormalizedVoice(voice1);
-    const int32_t V2 = getNormalizedVoice(voice2);
-    // Voice 3 is silenced by voice3off if it is not routed through the filter.
-    const int V3 = (filt3 || !voice3off) ? getNormalizedVoice(voice3) : getSilentVoice(voice3);
+    // Waveform outputs
+    const float wav1 = voice1.output();
+    const float wav2 = voice2.output();
+    const float wav3 = voice3.output();
 
+    // Envelope outputs
+    const uint8_t env1 = voice1.envelope()->output();
+    const uint8_t env2 = voice2.envelope()->output();
+    const uint8_t env3 = voice3.envelope()->output();
+
+    int32_t v1 = getNormalizedVoice(wav1, env1);
+    int32_t v2 = getNormalizedVoice(wav2, env2);
+    int32_t v3 = getNormalizedVoice(wav3, env3);
+    int32_t vE = getNormalizedVoice(extin, 0);
+
+    // Voltage summer for filter input
     int32_t Vsum[2] = { 0 };
+    Vsum[0] += filt1 ? v1 : 0;
+    Vsum[0] += filt2 && !isSurroundEnabled ? v2 : 0;
+    Vsum[0] += filt3 ? v3 : 0;
+    Vsum[0] += filtE && !isSurroundEnabled ? vE : 0;
+    Vsum[0] += Vlp[0];
+    Vsum[0] += currentResonance[Vbp[0]];
+    Vsum[1] += filt1 && !isSurroundEnabled ? v1 : 0;
+    Vsum[1] += filt2 ? v2 : 0;
+    Vsum[1] += filt3 && !isSurroundEnabled ? v3 : 0;
+    Vsum[1] += filtE ? vE : 0;
+    Vsum[1] += Vlp[1];
+    Vsum[1] += currentResonance[Vbp[1]];
+
+    // Filter
+    Vhp[0] = currentSummer[0][Vsum[0]];
+    Vbp[0] = m_hpIntegrator0.solve(Vhp[0]);
+    Vlp[0] = m_bpIntegrator0.solve(Vbp[0]);
+    Vhp[1] = currentSummer[1][Vsum[1]];
+    Vbp[1] = m_hpIntegrator1.solve(Vhp[1]);
+    Vlp[1] = m_bpIntegrator1.solve(Vbp[1]);
+
+    int32_t Vfilt[2] =  { 0 };
+    if (lp) Vfilt[0] += Vlp[0];
+    if (bp) Vfilt[0] += Vbp[0];
+    if (hp) Vfilt[0] += Vhp[0];
+    if (lp) Vfilt[1] += Vlp[1];
+    if (bp) Vfilt[1] += Vbp[1];
+    if (hp) Vfilt[1] += Vhp[1];
+
+    // Voltage summer for mixer input
     int32_t Vmix[2] = { 0 };
-
-    (filt1 ? Vsum[0] : Vmix[0]) += V1;
-    if (!isSurroundEnabled)
-        (filt2 ? Vsum[0] : Vmix[0]) += V2;
-    (filt3 ? Vsum[0] : Vmix[0]) += V3;
-    if (!isSurroundEnabled)
-        (filtE ? Vsum[0] : Vmix[0]) += Ve;
-
-    if (!isSurroundEnabled)
-        (filt1 ? Vsum[1] : Vmix[1]) += V1;
-    (filt2 ? Vsum[1] : Vmix[1]) += V2;
-    if (!isSurroundEnabled)
-        (filt3 ? Vsum[1] : Vmix[1]) += V3;
-    (filtE ? Vsum[1] : Vmix[1]) += Ve;
-
-    Vhp[0] = currentSummer[0][currentResonance[Vbp[0]] + Vlp[0] + Vsum[0]];
-    Vhp[1] = currentSummer[1][currentResonance[Vbp[1]] + Vlp[1] + Vsum[1]];
-
-    Vmix[0] += solveIntegrators(0);
-    Vmix[1] += solveIntegrators(1);
+    Vmix[0] += filt1 ? 0 : v1;
+    Vmix[0] += filt2 || isSurroundEnabled ? 0 : v2;
+    // Voice 3 is silenced by voice3off if it is not routed through the filter
+    Vmix[0] += (filt3 || voice3off) ? 0 : v3;
+    Vmix[0] += filtE || isSurroundEnabled ? 0 : vE;
+    Vmix[0] += Vfilt[0];
+    Vmix[1] += filt1 || isSurroundEnabled ? 0 : v1;
+    Vmix[1] += filt2 ? 0 : v2;
+    // Voice 3 is silenced by voice3off if it is not routed through the filter
+    Vmix[1] += (filt3 || voice3off || isSurroundEnabled) ? 0 : v3;
+    Vmix[1] += filtE ? 0 : vE;
+    Vmix[1] += Vfilt[1];
 
     return { currentVolume[currentMixer[0][Vmix[0]]], currentVolume[currentMixer[1][Vmix[1]]] };
 }

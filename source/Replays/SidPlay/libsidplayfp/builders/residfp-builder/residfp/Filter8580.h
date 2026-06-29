@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2024 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004,2010 Dag Lem <resid@nimrod.no>
  *
@@ -293,13 +293,16 @@ protected:
      */
     void updateCenterFrequency() override;
 
-    int32_t solveIntegrators(int i) override;
-
     void restartIntegrators() override { hpIntegrator[0].restart(); bpIntegrator[0].restart(); hpIntegrator[1].restart(); bpIntegrator[1].restart(); }
+
+    int32_t getNormalizedMixerVoice(float v, uint8_t env) const override
+    {
+        return getNormalizedVoice(v, env);
+    }
 
 public:
     Filter8580() :
-        Filter(*FilterModelConfig8580::getInstance()),
+        Filter(*FilterModelConfig8580::getInstance(), hpIntegrator[0], hpIntegrator[1], bpIntegrator[0], bpIntegrator[1]),
         hpIntegrator{ Integrator8580(*FilterModelConfig8580::getInstance()), Integrator8580(*FilterModelConfig8580::getInstance()) },
         bpIntegrator{ Integrator8580(*FilterModelConfig8580::getInstance()), Integrator8580(*FilterModelConfig8580::getInstance()) }
     {

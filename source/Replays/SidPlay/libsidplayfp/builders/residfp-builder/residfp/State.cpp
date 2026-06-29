@@ -88,7 +88,7 @@ int State::saveState(SID &s, char* buffer, int size)
     state.bus_value_ttl = s.busValueTtl;
     state.nextVoiceSync = s.nextVoiceSync;
     state.paddle_x = s.paddleX;
-    state.paddle_x = s.paddleY;
+    state.paddle_y = s.paddleY;
     state.model = s.model;
     state.cws = s.cws;
 
@@ -98,7 +98,7 @@ int State::saveState(SID &s, char* buffer, int size)
         state.Vhp[i][0] = f->Vhp[0]; state.Vhp[i][1] = f->Vhp[1];
         state.Vbp[i][0] = f->Vbp[0]; state.Vbp[i][1] = f->Vbp[1];
         state.Vlp[i][0] = f->Vlp[0]; state.Vlp[i][1] = f->Vlp[1];
-        state.Ve[i] = f->Ve;
+        state.extin[i] = f->extin;
         state.fc[i] = f->fc;
         state.filt1[i] = f->filt1;
         state.filt2[i] = f->filt2;
@@ -198,7 +198,7 @@ void State::restoreState(SID &s, char* buffer, int size)
     s.busValueTtl = state.bus_value_ttl;
     s.nextVoiceSync = state.nextVoiceSync;
     s.paddleX = state.paddle_x;
-    s.paddleY = state.paddle_x;
+    s.paddleY = state.paddle_y;
     s.model = state.model;
     s.setChipModel(s.model);
     s.cws = state.cws;
@@ -210,7 +210,7 @@ void State::restoreState(SID &s, char* buffer, int size)
         f->Vhp[0] = state.Vhp[i][0]; f->Vhp[1] = state.Vhp[i][1];
         f->Vbp[0] = state.Vbp[i][0]; f->Vbp[1] = state.Vbp[i][1];
         f->Vlp[0] = state.Vlp[i][0]; f->Vlp[1] = state.Vlp[i][1];
-        f->Ve = state.Ve[i];
+        f->extin = state.extin[i];
         f->fc = state.fc[i];
         f->filt1 = state.filt1[i];
         f->filt2 = state.filt2[i];
