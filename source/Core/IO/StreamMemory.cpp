@@ -82,7 +82,7 @@ namespace core::io
 
     SmartPtr<Stream> StreamMemory::OnClone()
     {
-        auto stream = Create(m_name, m_mem, m_size, GetRoot());
+        auto stream = m_mem ? Create(m_name, m_mem, m_size, GetRoot()) : Create(m_name, m_buffer, m_size, true, GetRoot());
         return static_cast<SmartPtr<Stream>>(stream);
     }
 
