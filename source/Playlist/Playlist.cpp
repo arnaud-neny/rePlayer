@@ -832,288 +832,302 @@ namespace rePlayer
                 kNumIDs
             };
 
-            // song - artists - type - duration - rating
-            if (ImGui::BeginTable("tunes", kNumIDs, flags))
+            // Create a child to be able to detect the focus and do the Ctrl-A
+            if (ImGui::BeginChild("tunes"))
             {
-                ImGui::TableSetupColumn("Index", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder, 0.0f, kIndex);
-                ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthStretch, 0.0f, kTitle);
-                ImGui::TableSetupColumn("Artist", ImGuiTableColumnFlags_WidthStretch, 0.0f, kArtists);
-                ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 0.0f, kType);
-                ImGui::TableSetupColumn("Duration", ImGuiTableColumnFlags_WidthFixed, 0.0f, kDuration);
-                ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
-                ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
-                ImGui::TableHeadersRow();
-
-                char indexFormat[] = "%01d";
-                for (auto count = m_cue.entries.NumItems(); count >= 10; count /= 10)
-                    indexFormat[2]++;
-
-                ImGuiListClipper clipper;
-                clipper.Begin(m_cue.entries.NumItems<int32_t>());
-                while (clipper.Step())
+                // song - artists - type - duration - rating
+                if (ImGui::BeginTable("tunes", kNumIDs, flags))
                 {
-                    for (int32_t rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
+                    ImGui::TableSetupColumn("Index", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder, 0.0f, kIndex);
+                    ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_WidthStretch, 0.0f, kTitle);
+                    ImGui::TableSetupColumn("Artist", ImGuiTableColumnFlags_WidthStretch, 0.0f, kArtists);
+                    ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 0.0f, kType);
+                    ImGui::TableSetupColumn("Duration", ImGuiTableColumnFlags_WidthFixed, 0.0f, kDuration);
+                    ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
+                    ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
+                    ImGui::TableHeadersRow();
+
+                    char indexFormat[] = "%01d";
+                    for (auto count = m_cue.entries.NumItems(); count >= 10; count /= 10)
+                        indexFormat[2]++;
+
+                    ImGuiListClipper clipper;
+                    clipper.Begin(m_cue.entries.NumItems<int32_t>());
+                    while (clipper.Step())
                     {
-                        const auto curEntry = m_cue.entries[rowIdx];
-                        const auto subsongId = curEntry.subsongId;
-                        ImGui::PushID(uint32_t(curEntry.playlistId));
-
-                        auto* song = curEntry.GetSong();
-
-                        ImGui::TableNextRow();
-
-                        ImGui::TableNextColumn();
-
-                        if (deck.DisplayProgressBarInTable(curEntry))
+                        for (int32_t rowIdx = clipper.DisplayStart; rowIdx < clipper.DisplayEnd; rowIdx++)
                         {
-                            if (song->IsInvalid())
-                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.10f, 0.10f, 1.0f) : ImVec4(0.20f, 0.10f, 0.10f, 0.93f)));
-                            else if (song->IsUnavailable())
-                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.20f, 0.00f, 1.0f) : ImVec4(0.20f, 0.20f, 0.00f, 0.93f)));
-                            else if (!song->IsSubsongPlayed(subsongId.index))
-                                ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.25f, 0.25f, 0.25f, 1.0f) : ImVec4(0.25f, 0.25f, 0.25f, 0.93f)));
-                        }
+                            const auto curEntry = m_cue.entries[rowIdx];
+                            const auto subsongId = curEntry.subsongId;
+                            ImGui::PushID(uint32_t(curEntry.playlistId));
 
-                        ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick;
-                        if (ImGui::Selectable("##select", curEntry.isSelected, selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//TBD: using imgui_internal for row height
-                        {
-                            Core::GetSongEditor().OnSongSelected(curEntry);
+                            auto* song = curEntry.GetSong();
 
-                            if (ImGui::GetIO().KeyShift)
+                            ImGui::TableNextRow();
+
+                            ImGui::TableNextColumn();
+
+                            if (deck.DisplayProgressBarInTable(curEntry))
                             {
-                                if (m_lastSelectedEntry == PlaylistID::kInvalid)
-                                    m_lastSelectedEntry = curEntry.playlistId;
-                                if (!ImGui::GetIO().KeyCtrl)
-                                {
-                                    for (auto& entry : m_cue.entries)
-                                        entry.isSelected = false;
-                                }
-                                auto foundIt = m_cue.entries.Find(m_lastSelectedEntry);
-                                assert(foundIt != nullptr);
-                                auto currentIt = m_cue.entries.Items(rowIdx);
-                                if (currentIt > foundIt)
-                                    std::swap(foundIt, currentIt);
-                                for (; currentIt <= foundIt; currentIt++)
-                                    currentIt->isSelected = true;
+                                if (song->IsInvalid())
+                                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.10f, 0.10f, 1.0f) : ImVec4(0.20f, 0.10f, 0.10f, 0.93f)));
+                                else if (song->IsUnavailable())
+                                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.20f, 0.20f, 0.00f, 1.0f) : ImVec4(0.20f, 0.20f, 0.00f, 0.93f)));
+                                else if (!song->IsSubsongPlayed(subsongId.index))
+                                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::GetColorU32(rowIdx & 1 ? ImVec4(0.25f, 0.25f, 0.25f, 1.0f) : ImVec4(0.25f, 0.25f, 0.25f, 0.93f)));
                             }
-                            else
+
+                            ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick;
+                            if (ImGui::Selectable("##select", curEntry.isSelected, selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//TBD: using imgui_internal for row height
                             {
-                                m_lastSelectedEntry = curEntry.playlistId;
-                                if (ImGui::GetIO().KeyCtrl)
+                                Core::GetSongEditor().OnSongSelected(curEntry);
+
+                                if (ImGui::GetIO().KeyShift)
                                 {
-                                    m_cue.entries[rowIdx].isSelected = !curEntry.isSelected;
+                                    if (m_lastSelectedEntry == PlaylistID::kInvalid)
+                                        m_lastSelectedEntry = curEntry.playlistId;
+                                    if (!ImGui::GetIO().KeyCtrl)
+                                    {
+                                        for (auto& entry : m_cue.entries)
+                                            entry.isSelected = false;
+                                    }
+                                    auto foundIt = m_cue.entries.Find(m_lastSelectedEntry);
+                                    assert(foundIt != nullptr);
+                                    auto currentIt = m_cue.entries.Items(rowIdx);
+                                    if (currentIt > foundIt)
+                                        std::swap(foundIt, currentIt);
+                                    for (; currentIt <= foundIt; currentIt++)
+                                        currentIt->isSelected = true;
                                 }
                                 else
                                 {
-                                    auto isSelected = curEntry.isSelected;
-                                    for (auto& entry : m_cue.entries)
-                                        entry.isSelected = false;
-                                    m_cue.entries[rowIdx].isSelected = !isSelected;
-                                }
-                            }
-
-                            if (ImGui::IsMouseDoubleClicked(0))
-                            {
-                                auto numEntries = m_cue.entries.NumItems<int32_t>();
-                                auto currentEntryIndex = rowIdx;
-                                auto newEntryIndex = rowIdx;
-                                auto isLooping = deck.IsLooping();
-                                auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries;
-                                auto currentPlayerId = curEntry;
-                                SmartPtr<Player> player1;
-                                for (;;)
-                                {
-                                    player1 = LoadSong(currentPlayerId);
-                                    if (player1.IsInvalid())
+                                    m_lastSelectedEntry = curEntry.playlistId;
+                                    if (ImGui::GetIO().KeyCtrl)
                                     {
-                                        currentEntryIndex++;
-                                        if (currentEntryIndex >= lastEntryIndex)
-                                            break;
-                                        newEntryIndex = currentEntryIndex % numEntries;
-                                        currentPlayerId = m_cue.entries[newEntryIndex];
+                                        m_cue.entries[rowIdx].isSelected = !curEntry.isSelected;
                                     }
                                     else
                                     {
-                                        if (player1->IsNewSong())
-                                        {
-                                            player1->MarkSongAsNew(false);
-                                            auto currentSubsongIndex = curEntry.subsongId.index;
-                                            for (uint16_t i = 0; i <= player1->GetSong()->lastSubsongIndex; i++)
-                                            {
-                                                if (i == currentSubsongIndex)
-                                                    continue;
-                                                currentPlayerId.playlistId = ++m_uniqueIdGenerator;
-                                                currentPlayerId.subsongId.index = i;
-                                                m_cue.entries.Insert(newEntryIndex + i, currentPlayerId);
-                                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                                            }
-                                        }
+                                        auto isSelected = curEntry.isSelected;
+                                        for (auto& entry : m_cue.entries)
+                                            entry.isSelected = false;
+                                        m_cue.entries[rowIdx].isSelected = !isSelected;
+                                    }
+                                }
 
-                                        m_currentEntryIndex = newEntryIndex;
-                                        auto player2 = LoadNextSong(false);
-                                        deck.Play(player1, player2);
-                                        break;
+                                if (ImGui::IsMouseDoubleClicked(0))
+                                {
+                                    auto numEntries = m_cue.entries.NumItems<int32_t>();
+                                    auto currentEntryIndex = rowIdx;
+                                    auto newEntryIndex = rowIdx;
+                                    auto isLooping = deck.IsLooping();
+                                    auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries;
+                                    auto currentPlayerId = curEntry;
+                                    SmartPtr<Player> player1;
+                                    for (;;)
+                                    {
+                                        player1 = LoadSong(currentPlayerId);
+                                        if (player1.IsInvalid())
+                                        {
+                                            currentEntryIndex++;
+                                            if (currentEntryIndex >= lastEntryIndex)
+                                                break;
+                                            newEntryIndex = currentEntryIndex % numEntries;
+                                            currentPlayerId = m_cue.entries[newEntryIndex];
+                                        }
+                                        else
+                                        {
+                                            if (player1->IsNewSong())
+                                            {
+                                                player1->MarkSongAsNew(false);
+                                                auto currentSubsongIndex = curEntry.subsongId.index;
+                                                for (uint16_t i = 0; i <= player1->GetSong()->lastSubsongIndex; i++)
+                                                {
+                                                    if (i == currentSubsongIndex)
+                                                        continue;
+                                                    currentPlayerId.playlistId = ++m_uniqueIdGenerator;
+                                                    currentPlayerId.subsongId.index = i;
+                                                    m_cue.entries.Insert(newEntryIndex + i, currentPlayerId);
+                                                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                                                }
+                                            }
+
+                                            m_currentEntryIndex = newEntryIndex;
+                                            auto player2 = LoadNextSong(false);
+                                            deck.Play(player1, player2);
+                                            break;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        auto selectableMin = ImGui::GetItemRectMin();
-                        auto selectableMax = ImGui::GetItemRectMax();
-                        if (!m_dropTarget->IsEnabled() && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoPreviewTooltip))
-                        {
-                            m_cue.entries[rowIdx].isSelected = true;
-                            if (m_firstDraggedEntryIndex > m_lastDraggedEntryIndex && draggedIndex < 0)
-                                draggedIndex = rowIdx;
-
-                            ImGui::SetDragDropPayload("PLAYLIST", nullptr, 0);
-                            ImGui::EndDragDropSource();
-                        }
-                        if (ImGui::BeginDragDropTarget())
-                        {
-                            if (m_firstDraggedEntryIndex <= m_lastDraggedEntryIndex)
-                                draggedIndex = rowIdx;
-                            // simply accept the payload for playlist as it will never work because it's always dropping on itself
-                            ImGui::AcceptDragDropPayload("PLAYLIST", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
-
-                            if (ImGui::AcceptDragDropPayload("ExternalDragAndDropPlaylist"))
+                            auto selectableMin = ImGui::GetItemRectMin();
+                            auto selectableMax = ImGui::GetItemRectMax();
+                            if (!m_dropTarget->IsEnabled() && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoPreviewTooltip))
                             {
-                                auto mousePos = ImGui::GetMousePos();
-                                auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
-                                ProcessExternalDragAndDrop(insertPos);
+                                m_cue.entries[rowIdx].isSelected = true;
+                                if (m_firstDraggedEntryIndex > m_lastDraggedEntryIndex && draggedIndex < 0)
+                                    draggedIndex = rowIdx;
+
+                                ImGui::SetDragDropPayload("PLAYLIST", nullptr, 0);
+                                ImGui::EndDragDropSource();
+                            }
+                            if (ImGui::BeginDragDropTarget())
+                            {
+                                if (m_firstDraggedEntryIndex <= m_lastDraggedEntryIndex)
+                                    draggedIndex = rowIdx;
+                                // simply accept the payload for playlist as it will never work because it's always dropping on itself
+                                ImGui::AcceptDragDropPayload("PLAYLIST", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+
+                                if (ImGui::AcceptDragDropPayload("ExternalDragAndDropPlaylist"))
+                                {
+                                    auto mousePos = ImGui::GetMousePos();
+                                    auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
+                                    ProcessExternalDragAndDrop(insertPos);
+                                }
+
+                                if (auto payload = ImGui::AcceptDragDropPayload("DATABASE"))
+                                {
+                                    auto mousePos = ImGui::GetMousePos();
+                                    auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
+                                    auto currentPlayingEntry = insertPos <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : Cue::Entry();
+                                    auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
+                                    for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
+                                        m_cue.entries.Insert(insertPos + i, { selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
+                                    if (currentPlayingEntry.subsongId.IsValid())
+                                        m_currentEntryIndex = m_cue.entries.Find<int32_t>(currentPlayingEntry.playlistId);
+                                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                                    isDatabaseDropped = true;
+                                }
+                                ImGui::EndDragDropTarget();
                             }
 
-                            if (auto payload = ImGui::AcceptDragDropPayload("DATABASE"))
+                            ImGui::SameLine(0.0f, 0.0f);//no spacing
                             {
-                                auto mousePos = ImGui::GetMousePos();
-                                auto insertPos = abs(mousePos.y - selectableMin.y) < abs(mousePos.y - selectableMax.y) ? rowIdx : rowIdx + 1;
-                                auto currentPlayingEntry = insertPos <= m_currentEntryIndex ? m_cue.entries[m_currentEntryIndex] : Cue::Entry();
-                                auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
-                                for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
-                                    m_cue.entries.Insert(insertPos + i, { selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
-                                if (currentPlayingEntry.subsongId.IsValid())
-                                    m_currentEntryIndex = m_cue.entries.Find<int32_t>(currentPlayingEntry.playlistId);
-                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                                isDatabaseDropped = true;
+                                char label[16];
+                                sprintf(label, indexFormat, rowIdx + 1);
+                                if (ImGui::Button(label, ImVec2(ImGui::GetColumnWidth(), 0.f)))
+                                    curEntry.Track(ImGui::GetIO().KeyShift ? TrackMode::SongAndNextArtist : TrackMode::Song);
                             }
-                            ImGui::EndDragDropTarget();
-                        }
+                            ImGui::TableNextColumn();
+                            ImGui::TextUnformatted(curEntry.GetTitle().data());
+                            if (ImGui::IsItemHovered())
+                                curEntry.SongTooltip();
+                            ImGui::TableNextColumn();
+                            curEntry.DisplayArtists();
+                            ImGui::TableNextColumn();
+                            ImGui::TextUnformatted(song->GetType().GetExtension());
+                            ImGui::TableNextColumn();
+                            {
+                                auto subsongDurationCs = song->GetSubsongDurationCs(subsongId.index);
+                                ImGui::Text("%d:%02d", subsongDurationCs / 6000, (subsongDurationCs / 100) % 60);
+                            }
+                            ImGui::TableNextColumn();
+                            int32_t subsongRating = song->GetSubsongRating(subsongId.index);
+                            if (subsongRating == 0)
+                                ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
+                            else
+                                ImGui::ProgressBar((subsongRating - 1) * 0.01f);
+                            if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
+                            {
+                                currentRatingId = curEntry;
+                                if (m_currentRatingId != currentRatingId)
+                                    m_defaultRating = subsongRating;
+                                char label[8] = "N/A";
+                                if (subsongRating > 0)
+                                    sprintf(label, "%d%%%%", subsongRating - 1);
+                                ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput);
+                                song->Edit()->subsongs[subsongId.index].rating = subsongRating;
+                                ImGui::EndPopup();
+                            }
 
-                        ImGui::SameLine(0.0f, 0.0f);//no spacing
-                        {
-                            char label[16];
-                            sprintf(label, indexFormat, rowIdx + 1);
-                            if (ImGui::Button(label, ImVec2(ImGui::GetColumnWidth(), 0.f)))
-                                curEntry.Track(ImGui::GetIO().KeyShift ? TrackMode::SongAndNextArtist : TrackMode::Song);
+                            ImGui::PopID();
                         }
-                        ImGui::TableNextColumn();
-                        ImGui::TextUnformatted(curEntry.GetTitle().data());
-                        if (ImGui::IsItemHovered())
-                            curEntry.SongTooltip();
-                        ImGui::TableNextColumn();
-                        curEntry.DisplayArtists();
-                        ImGui::TableNextColumn();
-                        ImGui::TextUnformatted(song->GetType().GetExtension());
-                        ImGui::TableNextColumn();
-                        {
-                            auto subsongDurationCs = song->GetSubsongDurationCs(subsongId.index);
-                            ImGui::Text("%d:%02d", subsongDurationCs / 6000, (subsongDurationCs / 100) % 60);
-                        }
-                        ImGui::TableNextColumn();
-                        int32_t subsongRating = song->GetSubsongRating(subsongId.index);
-                        if (subsongRating == 0)
-                            ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
-                        else
-                            ImGui::ProgressBar((subsongRating - 1) * 0.01f);
-                        if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
-                        {
-                            currentRatingId = curEntry;
-                            if (m_currentRatingId != currentRatingId)
-                                m_defaultRating = subsongRating;
-                            char label[8] = "N/A";
-                            if (subsongRating > 0)
-                                sprintf(label, "%d%%%%", subsongRating - 1);
-                            ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput);
-                            song->Edit()->subsongs[subsongId.index].rating = subsongRating;
-                            ImGui::EndPopup();
-                        }
-
-                        ImGui::PopID();
                     }
+
+                    if (m_focus != Focus::kNone)
+                    {
+                        if (m_currentEntryIndex >= 0)
+                        {
+                            float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex + int(m_focus));
+                            ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
+                        }
+                        m_focus = Focus::kNone;
+                    }
+
+                    ImGui::EndTable();
                 }
 
-                if (m_focus != Focus::kNone)
+                if (ImGui::BeginDragDropTarget())
                 {
-                    if (m_currentEntryIndex >= 0)
+                    if (!isDatabaseDropped)
                     {
-                        float item_pos_y = float(clipper.StartPosY + clipper.ItemsHeight * m_currentEntryIndex + int(m_focus));
-                        ImGui::SetScrollFromPosY(item_pos_y - ImGui::GetWindowPos().y);
-                    }
-                    m_focus = Focus::kNone;
-                }
-
-                ImGui::EndTable();
-            }
-
-            if (ImGui::BeginDragDropTarget())
-            {
-                if (!isDatabaseDropped)
-                {
-                    //drop at the end of the playlist if only hovering over the table
-                    if (auto* payload = ImGui::AcceptDragDropPayload("DATABASE", ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
-                    {
-                        auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
-                        for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
-                            m_cue.entries.Add({ selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
-                        m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                    }
-                }
-                ImGui::EndDragDropTarget();
-            }
-
-            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && ImGui::IsKeyDown(ImGuiKey_Delete))
-            {
-                MusicID musicId;
-                auto currentEntryIndex = m_currentEntryIndex;
-                if (currentEntryIndex >= 0)
-                {
-                    // pick the first entry that is not selected from the current one
-                    for (;;)
-                    {
-                        if (!m_cue.entries[currentEntryIndex].isSelected)
+                        //drop at the end of the playlist if only hovering over the table
+                        if (auto* payload = ImGui::AcceptDragDropPayload("DATABASE", ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
                         {
-                            musicId = m_cue.entries[currentEntryIndex];
-                            break;
+                            auto* selectedSongs = reinterpret_cast<MusicID*>(payload->Data);
+                            for (uint32_t i = 0, e = payload->DataSize / sizeof(MusicID); i < e; i++)
+                                m_cue.entries.Add({ selectedSongs[i] })->playlistId = ++m_uniqueIdGenerator;
+                            m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                         }
-                        currentEntryIndex++;
-                        if (currentEntryIndex == m_cue.entries.NumItems<int32_t>())
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+
+                if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows))
+                {
+                    if (ImGui::IsKeyDown(ImGuiKey_Delete))
+                    {
+                        MusicID musicId;
+                        auto currentEntryIndex = m_currentEntryIndex;
+                        if (currentEntryIndex >= 0)
                         {
-                            // all gone, so try to pick the first one not selected before the current one
-                            currentEntryIndex = m_currentEntryIndex - 1;
+                            // pick the first entry that is not selected from the current one
                             for (;;)
                             {
-                                if (currentEntryIndex < 0)
-                                    break;
                                 if (!m_cue.entries[currentEntryIndex].isSelected)
                                 {
                                     musicId = m_cue.entries[currentEntryIndex];
                                     break;
                                 }
-                                currentEntryIndex--;
+                                currentEntryIndex++;
+                                if (currentEntryIndex == m_cue.entries.NumItems<int32_t>())
+                                {
+                                    // all gone, so try to pick the first one not selected before the current one
+                                    currentEntryIndex = m_currentEntryIndex - 1;
+                                    for (;;)
+                                    {
+                                        if (currentEntryIndex < 0)
+                                            break;
+                                        if (!m_cue.entries[currentEntryIndex].isSelected)
+                                        {
+                                            musicId = m_cue.entries[currentEntryIndex];
+                                            break;
+                                        }
+                                        currentEntryIndex--;
+                                    }
+                                    break;
+                                }
                             }
-                            break;
+                        }
+                        auto count = m_cue.entries.RemoveIf([](auto& entry)
+                        {
+                            return entry.isSelected;
+                        });
+                        if (count > 0)
+                        {
+                            m_currentEntryIndex = m_cue.entries.Find<int32_t>(musicId);
+                            m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
                         }
                     }
-                }
-                auto count = m_cue.entries.RemoveIf([](auto& entry)
-                {
-                    return entry.isSelected;
-                });
-                if (count > 0)
-                {
-                    m_currentEntryIndex = m_cue.entries.Find<int32_t>(musicId);
-                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                    // select all
+                    else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A))
+                    {
+                        for (auto& entry : m_cue.entries)
+                            entry.isSelected = true;
+                    }
                 }
             }
+            ImGui::EndChild();
 
             if (numColumns > 1)
             {
