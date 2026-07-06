@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2025 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2026 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -408,7 +408,7 @@ static int get_smpl(struct module_data *m, uint32 size, HIO_HANDLE *f, void *par
 
 		} else if (flags & DBM_SAMPLE_32BIT) {
 			/* Skip 32-bit samples */
-			hio_seek(f, (long)xxs->len << 2, SEEK_CUR);
+			hio_seek(f, (long) ((unsigned)xxs->len << 2), SEEK_CUR);
 			continue;
 		} else {
 			D_(D_CRIT "unknown sample type %08x", flags);

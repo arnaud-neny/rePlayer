@@ -68,13 +68,11 @@ struct bwdata {
   unsigned int *dbuf;
 };
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4324) /* structure was padded due to alignment specifier */
-#endif
 // Structure holding all the housekeeping data, including IO buffers and
 // memory that persists between calls to bunzip
 struct bunzip_data {
+  jmp_buf jmpbuf; /* libxmp: For I/O error handling */
+
   // Input stream, input buffer, input bit buffer
   HIO_HANDLE *in_fd; /* libxmp: int -> HIO_HANDLE * */
   int inbufCount, inbufPos;
@@ -99,13 +97,7 @@ struct bunzip_data {
   // Second pass decompression data (burrows-wheeler transform)
   unsigned int dbufSize;
   struct bwdata bwdata[THREADS];
-
-  /* libxmp: For I/O error handling */
-  jmp_buf jmpbuf;
 };
-#if defined(_MSC_VER)
-#pragma warning (pop)
-#endif
 
 /* libxmp addition */
 struct bunzip_output {
@@ -338,9 +330,9 @@ static int read_block_header(struct bunzip_data *bd, struct bwdata *bw)
 static int read_huffman_data(struct bunzip_data *bd, struct bwdata *bw)
 {
   struct group_data *hufGroup;
-  int ii, jj, kk, runPos, dbufCount, symCount, selector, nextSym,
+  int ii, jj, kk, dbufCount, symCount, selector, nextSym,
     *byteCount;
-  unsigned hh, *dbuf = bw->dbuf;
+  unsigned hh, runPos, *dbuf = bw->dbuf;
   unsigned char uc;
 
   // We've finished reading and digesting the block header.  Now read this

@@ -4,7 +4,7 @@
  * Checksum added by Sipos Attila <h430827@stud.u-szeged.hu>
  * Rewritten for libxmp by Claudio Matsuoka
  *
- * Copyright (C) 2013-2024 Claudio Matsuoka
+ * Copyright (C) 2013-2026 Claudio Matsuoka
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -87,7 +87,8 @@ static int get_bits_final(struct io *io, int count)
 	 */
 	int r = readmem24b(io->src + (io->offs >> 3));
 
-	r <<= (io->offs % 8) + 8;
+	//r <<= (io->offs % 8) + 8;
+	r = XMP_ASL(r, (io->offs % 8) + 8);
 	r >>= 32 - count;
 	io->offs += count;
 

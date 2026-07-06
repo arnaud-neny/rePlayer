@@ -213,6 +213,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libxmp\src\effects.h" />
     <ClInclude Include="libxmp\src\extras.h" />
     <ClInclude Include="libxmp\src\far_extras.h" />
+    <ClInclude Include="libxmp\src\flt_extras.h" />
     <ClInclude Include="libxmp\src\format.h" />
     <ClInclude Include="libxmp\src\hio.h" />
     <ClInclude Include="libxmp\src\hmn_extras.h" />
@@ -305,6 +306,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libxmp\src\filetype.c" />
     <ClCompile Include="libxmp\src\filter.c" />
     <ClCompile Include="libxmp\src\flow.c" />
+    <ClCompile Include="libxmp\src\flt_extras.c" />
     <ClCompile Include="libxmp\src\format.c" />
     <ClCompile Include="libxmp\src\hio.c" />
     <ClCompile Include="libxmp\src\hmn_extras.c" />

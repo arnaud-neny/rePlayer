@@ -1,5 +1,5 @@
 /* Extended Module Player
- * Copyright (C) 1996-2024 Claudio Matsuoka and Hipolito Carraro Jr
+ * Copyright (C) 1996-2026 Claudio Matsuoka and Hipolito Carraro Jr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -110,7 +110,7 @@ static fci_t get_fci (const char *in, int *pos)
 
 				if (in[3] & 0x80) {
 					size++;
-					a |= (in[4] & 0x3f) << 27;
+					a |= (uint32)(in[4] & 0x3f) << 27;
 				}
 			}
 		}
