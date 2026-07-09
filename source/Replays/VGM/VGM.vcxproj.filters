@@ -24,6 +24,9 @@
     <Filter Include="Source Files\libvgm\emu\cores">
       <UniqueIdentifier>{8a809ee0-f01d-4495-ba96-f777449dc841}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\libvgm\emu\cores\ymfm">
+      <UniqueIdentifier>{396a88f7-f00a-46c2-83bb-eedc92e128f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayVGM.h">
@@ -137,7 +140,7 @@
     <ClInclude Include="libvgm\emu\cores\fmopn_2608rom.h">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClInclude>
-    <ClInclude Include="libvgm\emu\cores\gb.h">
+    <ClInclude Include="libvgm\emu\cores\gb_mame.h">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClInclude>
     <ClInclude Include="libvgm\emu\cores\iremga20.h">
@@ -395,6 +398,30 @@
     <ClInclude Include="libvgm\emu\cores\msm5232.h">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm.h">
+      <Filter>Source Files\libvgm\emu\cores\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_fm.h">
+      <Filter>Source Files\libvgm\emu\cores\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_fm.ipp">
+      <Filter>Source Files\libvgm\emu\cores\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_opz.h">
+      <Filter>Source Files\libvgm\emu\cores\ymfm</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\gbintf.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\sameboy_apu.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\sameboy_apu_private.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymfmintf.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGM.cpp">
@@ -475,7 +502,7 @@
     <ClCompile Include="libvgm\emu\cores\fmopn.c">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
-    <ClCompile Include="libvgm\emu\cores\gb.c">
+    <ClCompile Include="libvgm\emu\cores\gb_mame.c">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
     <ClCompile Include="libvgm\emu\cores\iremga20.c">
@@ -707,6 +734,18 @@
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
     <ClCompile Include="libvgm\emu\cores\msm5232.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\ymfm\ymfm_opz.cpp">
+      <Filter>Source Files\libvgm\emu\cores\ymfm</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\gbintf.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\sameboy_apu.c">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClCompile>
+    <ClCompile Include="libvgm\emu\cores\ymfmintf.cpp">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClCompile>
   </ItemGroup>

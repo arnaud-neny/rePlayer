@@ -604,7 +604,7 @@ static void sn76496_reset(void *chip)
 
 	R->cycles_to_ready = 1;          // assume ready is not active immediately on init. is this correct?
 	R->stereo_mask = R->stereo_mask_df = 0xFF; // all channels enabled // rePlayer
-	//R->current_clock = R->clock_divider-1;
+	//R->current_clock = R->clock_divider - 1;
 
 	R->ready_state = 1;
 

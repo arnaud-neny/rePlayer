@@ -212,7 +212,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\fmopl.h" />
     <ClInclude Include="libvgm\emu\cores\fmopn.h" />
     <ClInclude Include="libvgm\emu\cores\fmopn_2608rom.h" />
-    <ClInclude Include="libvgm\emu\cores\gb.h" />
+    <ClInclude Include="libvgm\emu\cores\gbintf.h" />
+    <ClInclude Include="libvgm\emu\cores\gb_mame.h" />
     <ClInclude Include="libvgm\emu\cores\ics2115.h" />
     <ClInclude Include="libvgm\emu\cores\iremga20.h" />
     <ClInclude Include="libvgm\emu\cores\k005289.h" />
@@ -256,6 +257,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\saa1099_mame.h" />
     <ClInclude Include="libvgm\emu\cores\saa1099_vb.h" />
     <ClInclude Include="libvgm\emu\cores\saaintf.h" />
+    <ClInclude Include="libvgm\emu\cores\sameboy_apu.h" />
+    <ClInclude Include="libvgm\emu\cores\sameboy_apu_private.h" />
     <ClInclude Include="libvgm\emu\cores\scd_pcm.h" />
     <ClInclude Include="libvgm\emu\cores\scsp.h" />
     <ClInclude Include="libvgm\emu\cores\scspdsp.h" />
@@ -279,6 +282,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\ymf262.h" />
     <ClInclude Include="libvgm\emu\cores\ymf271.h" />
     <ClInclude Include="libvgm\emu\cores\ymf278b.h" />
+    <ClInclude Include="libvgm\emu\cores\ymfmintf.h" />
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm.h" />
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_fm.h" />
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_fm.ipp" />
+    <ClInclude Include="libvgm\emu\cores\ymfm\ymfm_opz.h" />
     <ClInclude Include="libvgm\emu\cores\ymz280b.h" />
     <ClInclude Include="libvgm\emu\dac_control.h" />
     <ClInclude Include="libvgm\emu\EmuCores.h" />
@@ -338,7 +346,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\es5506.c" />
     <ClCompile Include="libvgm\emu\cores\fmopl.c" />
     <ClCompile Include="libvgm\emu\cores\fmopn.c" />
-    <ClCompile Include="libvgm\emu\cores\gb.c" />
+    <ClCompile Include="libvgm\emu\cores\gbintf.c" />
+    <ClCompile Include="libvgm\emu\cores\gb_mame.c" />
     <ClCompile Include="libvgm\emu\cores\ics2115.c" />
     <ClCompile Include="libvgm\emu\cores\iremga20.c" />
     <ClCompile Include="libvgm\emu\cores\k005289.c" />
@@ -374,6 +383,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\saa1099_mame.c" />
     <ClCompile Include="libvgm\emu\cores\saa1099_vb.c" />
     <ClCompile Include="libvgm\emu\cores\saaintf.c" />
+    <ClCompile Include="libvgm\emu\cores\sameboy_apu.c" />
     <ClCompile Include="libvgm\emu\cores\scd_pcm.c" />
     <ClCompile Include="libvgm\emu\cores\scsp.c" />
     <ClCompile Include="libvgm\emu\cores\scspdsp.c" />
@@ -399,6 +409,8 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libvgm\emu\cores\ymf262.c" />
     <ClCompile Include="libvgm\emu\cores\ymf271.c" />
     <ClCompile Include="libvgm\emu\cores\ymf278b.c" />
+    <ClCompile Include="libvgm\emu\cores\ymfmintf.cpp" />
+    <ClCompile Include="libvgm\emu\cores\ymfm\ymfm_opz.cpp" />
     <ClCompile Include="libvgm\emu\cores\ymz280b.c" />
     <ClCompile Include="libvgm\emu\dac_control.c" />
     <ClCompile Include="libvgm\emu\logging.c" />

@@ -6,11 +6,13 @@
 // - emu/cores/es5503.c
 // - emu/cores/fmopn.c
 // - emu/cores/fmopn.h
-// - emu/cores/gb.c
+// - emu/cores/gb_mame.c
 // - emu/cores/Ootake_PSG.c
 // - emu/cores/Ootake_PSG_private.h
 // - emu/cores/oplintf.c
 // - emu/cores/oplnintf.c
+// - emu/sameboy.apu.c
+// - emu/sameboy.apu_private.h
 // - emu/cores/sn76496.c
 // - player/droplayer.hpp
 // - player/gymplayer.hpp
@@ -35,7 +37,7 @@
 
 #include "yrw801.h"
 
-#define LIBVGM_VERSION "@57585ea"
+#define LIBVGM_VERSION "r615"
 
 namespace rePlayer
 {
