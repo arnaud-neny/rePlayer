@@ -221,7 +221,7 @@ bool CldsPlayer::update()
 	unsigned char	transpose = positions[posplay * 9 + chan].transpose;
 
         if ((patnum + c->packpos) < patterns_size)
-	      comword = patterns[patnum + c->packpos];
+          comword = patterns[patnum + c->packpos];
         else
           comword = 0x8001;
 
