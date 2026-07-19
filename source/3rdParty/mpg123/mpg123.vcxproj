@@ -91,6 +91,7 @@
     <ClInclude Include="src\libmpg123\synth_8bit.h" />
     <ClInclude Include="src\libmpg123\synth_mono.h" />
     <ClInclude Include="src\libmpg123\synth_ntom.h" />
+    <ClInclude Include="src\libmpg123\x86_64_defs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

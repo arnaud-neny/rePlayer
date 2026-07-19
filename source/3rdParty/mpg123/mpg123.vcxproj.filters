@@ -227,5 +227,8 @@
     <ClInclude Include="src\libmpg123\dither_impl.h">
       <Filter>libmpg123</Filter>
     </ClInclude>
+    <ClInclude Include="src\libmpg123\x86_64_defs.h">
+      <Filter>libmpg123</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
