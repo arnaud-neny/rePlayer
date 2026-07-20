@@ -50,15 +50,15 @@ MP4::Chapter::Chapter(const Chapter &other) :
 
 MP4::Chapter::Chapter(Chapter &&other) noexcept = default;
 
-MP4::Chapter::Chapter::~Chapter() = default;
+MP4::Chapter::~Chapter() = default;
 
-MP4::Chapter &MP4::Chapter::Chapter::operator=(const Chapter &other)
+MP4::Chapter &MP4::Chapter::operator=(const Chapter &other)
 {
   Chapter(other).swap(*this);
   return *this;
 }
 
-MP4::Chapter &MP4::Chapter::Chapter::operator=(
+MP4::Chapter &MP4::Chapter::operator=(
   Chapter &&other) noexcept = default;
 
 bool MP4::Chapter::operator==(const Chapter &other) const

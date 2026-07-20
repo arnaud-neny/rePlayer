@@ -19,7 +19,10 @@
  ***************************************************************************/
 
 #include "ebmlutils.h"
+
+#include <algorithm>
 #include <random>
+
 #include "tbytevector.h"
 #include "matroskafile.h"
 #include "tutils.h"
@@ -31,7 +34,7 @@ std::unique_ptr<EBML::Element> EBML::findElement(File &file, Element::Id id, off
 {
   std::unique_ptr<Element> element;
   while(file.tell() < maxOffset) {
-    element = Element::factory(file);
+    element = Element::factory(file, maxOffset);
     if(!element || element->getId() == id)
       return element;
     element->skipData(file);
@@ -42,7 +45,7 @@ std::unique_ptr<EBML::Element> EBML::findElement(File &file, Element::Id id, off
 
 std::unique_ptr<EBML::Element> EBML::findNextElement(File &file, offset_t maxOffset)
 {
-  return file.tell() < maxOffset ? Element::factory(file) : nullptr;
+  return file.tell() < maxOffset ? Element::factory(file, maxOffset) : nullptr;
 }
 
 template <int maxSizeLength>

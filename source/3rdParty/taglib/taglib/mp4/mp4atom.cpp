@@ -25,6 +25,7 @@
 
 #include "mp4atom.h"
 
+#include <algorithm>
 #include <array>
 #include <climits>
 #include <utility>
@@ -87,7 +88,7 @@ MP4::Atom::Atom(File *file, int depth)
   d->name = header.mid(4, 4);
 
   if(d->name == "stem") {
-    file->seek(d->length - 8, File::Current);
+    file->seek(d->offset + d->length);
     return;
   }
 
@@ -222,7 +223,7 @@ public:
 MP4::Atoms::Atoms(File *file) :
   d(std::make_unique<AtomsPrivate>())
 {
-  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 5000;
+  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 50000;
 
   d->atoms.setAutoDelete(true);
 
