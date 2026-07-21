@@ -96,9 +96,13 @@ namespace rePlayer
                     }
 
                     uint64_t maxFrames = UINT64_MAX;
-                    auto duration = (uint64_t(replay->GetDurationMs()) * replay->GetSampleRate()) / 1000ull;
+                    auto duration = (uint64_t(entry.songSheet->subsongs[entry.id.subsongId.index].durationCs) * replay->GetSampleRate()) / 100ull;
                     if (duration == 0)
-                        maxFrames = 20ull * 60ull * replay->GetSampleRate();
+                    {
+                        duration = (uint64_t(replay->GetDurationMs()) * replay->GetSampleRate()) / 1000ull;
+                        if (duration == 0)
+                            duration = maxFrames = 20ull * 60ull * replay->GetSampleRate();
+                    }
                     replay->ResetPlayback();
 
                     ebur128_state* st = ebur128_init(2, replay->GetSampleRate(), EBUR128_MODE_I | EBUR128_MODE_S | EBUR128_MODE_TRUE_PEAK);
@@ -128,10 +132,7 @@ namespace rePlayer
                         }
                         ebur128_add_frames_float(st, pcCast<float>(player->m_waveData), numSamples);
                         position += numSamples;
-                        if (duration != 0)
-                            std::atomic_ref(m_progress).store(Saturate(float((double((position << 32) / duration) / 65536.0) / 65536.0)));
-                        else
-                            std::atomic_ref(m_progress).store(Saturate(float((double((position << 32) / maxFrames) / 65536.0) / 65536.0)));
+                        std::atomic_ref(m_progress).store(Saturate(float((double((position << 32) / duration) / 65536.0) / 65536.0)));
                         std::atomic_ref(m_duration).store(uint32_t(position / replay->GetSampleRate()));
                     }
                     std::atomic_ref(m_duration).store(0xffFFffFF);
