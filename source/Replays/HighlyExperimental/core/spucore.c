@@ -401,7 +401,6 @@ struct SPUCORE_STATE {
   uint32 noise;
   uint32 vmix[2];
   uint32 vmixe[2];
-  uint32 vmute;
   uint32 irq_address;
   uint32 noiseclock;
   uint32 noisecounter;
@@ -1736,34 +1735,9 @@ static void EMU_CALL render(struct SPUCORE_STATE *state, uint16 *ram, sint16 *bu
     if(state->flags & SPUREG_FLAG_MSNDEL) maskverb_l = state->vmixe[0] & 0xFFFFFF;
     if(state->flags & SPUREG_FLAG_MSNDER) maskverb_r = state->vmixe[1] & 0xFFFFFF;
   }
-  maskfm = state->fm & 0xFFFFFE;
-  if (state->vmute) {
-    uint32 vmask = state->vmute;
-	/*
-	** Either mute both channels of an FM pair, or unmute them both
-	*/
-	for (ch = 0, chanbit = 1; ch < 24; ch++, chanbit <<= 1) {
-	  if ((maskfm >> 1) & chanbit) {
-		if (vmask & chanbit) {
-		  vmask |= chanbit << 1;
-		  ch++;
-		  chanbit <<= 1;
-		}
-	  }
-	  else if (maskfm & chanbit) {
-		if (!(vmask & chanbit)) {
-		  vmask &= ~(chanbit >> 1);
-		}
-	  }
-	}
-    vmask = ~vmask;
-    maskmain_l &= vmask;
-    maskmain_r &= vmask;
-    maskverb_l &= vmask;
-    maskverb_r &= vmask;
-  }
   masknoise = state->noise;
   render_noise(state, masknoise ? ibufn : NULL, samples);
+  maskfm = state->fm & 0xFFFFFE;
 
   if(!mainout) { maskmain_l = 0; maskmain_r = 0; }
 
@@ -2164,21 +2138,6 @@ uint32 EMU_CALL spucore_cycles_until_interrupt(void *state, uint16 *ram, uint32 
   r = (SPUCORESTATE->irq_triggered_cycle == 0xFFFFFFFF) ? 0xFFFFFFFF : SPUCORESTATE->irq_triggered_cycle + r;
   free(backup);
   return r;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-/*
-** Mute control
-*/
-void EMU_CALL spucore_enable_mute(void *state, uint8 channel, uint8 enable) {
-  if (channel < 24) {
-	uint32 vbit = 1 << channel;
-	if (enable)
-	  SPUCORESTATE->vmute |= vbit;
-	else
-	  SPUCORESTATE->vmute &= ~vbit;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

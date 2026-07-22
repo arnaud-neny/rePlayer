@@ -729,36 +729,3 @@ void EMU_CALL r3000_predict(void *state, uint32 *profile) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-void EMU_CALL r3000_sb(void *state, uint32 a, uint32 d)
-{
-  sb(STATE, a, d);
-}
-
-void EMU_CALL r3000_sh(void *state, uint32 a, uint32 d)
-{
-  sh(STATE, a, d);
-}
-
-void EMU_CALL r3000_sw(void *state, uint32 a, uint32 d)
-{
-  sw(STATE, a, d);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-uint32 EMU_CALL r3000_lb(void *state, uint32 a)
-{
-  return lb(STATE, a);
-}
-
-uint32 EMU_CALL r3000_lh(void *state, uint32 a)
-{
-  return lh(STATE, a);
-}
-
-uint32 EMU_CALL r3000_lw(void *state, uint32 a)
-{
-  return lw(STATE, a);
-}
-

@@ -33,11 +33,6 @@ uint32 EMU_CALL spu_cycles_until_interrupt(void *state, uint32 samples);
 void EMU_CALL spu_enable_main(void *state, uint8 enable);
 void EMU_CALL spu_enable_reverb(void *state, uint8 enable);
 
-/*
-** Enable/disable mute for a given channel
-*/
-void EMU_CALL spu_enable_mute(void *state, uint8 channel, uint8 enable);
-
 #ifdef __cplusplus
 }
 #endif

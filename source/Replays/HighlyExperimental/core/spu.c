@@ -138,16 +138,6 @@ void EMU_CALL spu_enable_main(void *state, uint8 enable) {
   SPUSTATE->global_main_on = enable;
 }
 
-/*
-** Enable/disable mute
-*/
-void EMU_CALL spu_enable_mute(void *state, uint8 channel, uint8 enable) {
-  if (SPUSTATE->version < 2 || channel < 24)
-	spucore_enable_mute(CORESTATE(0), channel, enable);
-  else if (channel < 48)
-	spucore_enable_mute(CORESTATE(1), channel-24, enable);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /*
 ** Hardware register load/store

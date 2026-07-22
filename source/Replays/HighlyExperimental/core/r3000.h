@@ -53,21 +53,6 @@ void   EMU_CALL r3000_setreg(void *state, sint32 regnum, uint32 value);
 void   EMU_CALL r3000_setinterrupt(void *state, uint32 intpending);
 void   EMU_CALL r3000_break(void *state);
 
-// Technically, these should not have any penalty, as any synchronization
-// which occurs would not actually trigger the SPU to render, for instance,
-// but they may have the side effect of resetting some registers, or
-// otherwise altering the state.
-//
-// Use with caution.
-
-uint32 EMU_CALL r3000_lb(void *state, uint32 a);
-uint32 EMU_CALL r3000_lh(void *state, uint32 a);
-uint32 EMU_CALL r3000_lw(void *state, uint32 a);
-
-void   EMU_CALL r3000_sb(void *state, uint32 a, uint32 d);
-void   EMU_CALL r3000_sh(void *state, uint32 a, uint32 d);
-void   EMU_CALL r3000_sw(void *state, uint32 a, uint32 d);
-
 //
 // Returns 0 or positive on success
 // Returns negative on error

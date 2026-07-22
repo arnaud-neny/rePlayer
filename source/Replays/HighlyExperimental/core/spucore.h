@@ -19,8 +19,6 @@ void   EMU_CALL spucore_clear_state(void *state);
 
 void   EMU_CALL spucore_set_mem_size(void *state, uint32 size);
 
-void   EMU_CALL spucore_enable_mute(void *state, uint8 channel, uint8 enable);
-
 void   EMU_CALL spucore_render(void *state, uint16 *ram, sint16 *buf, sint16 *extinput, uint32 samples, uint8 mainout, uint8 effectout);
 
 uint32 EMU_CALL spucore_getreg      (void *state, uint32 n);
