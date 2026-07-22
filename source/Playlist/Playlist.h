@@ -71,7 +71,8 @@ namespace rePlayer
         {
             struct Entry : public MusicID
             {
-                bool isSelected = false;
+                bool IsSelected() const { return subsongId.external; }
+                void Select(bool isSelected) { subsongId.external = isSelected; }
 
                 Entry& operator=(const MusicID& musicId);
                 bool operator==(PlaylistID other) const;
@@ -102,6 +103,7 @@ namespace rePlayer
         void OnDisplay() override;
         void OnEndUpdate() override;
 
+        void UpdateSelectionContext(int32_t entryIndex);
         void MoveSelection(uint32_t draggedEntryIndex);
 
         void ProcessExternalDragAndDrop(int32_t droppedEntryIndex);
@@ -114,6 +116,9 @@ namespace rePlayer
         void ButtonSave();
         void ButtonClear();
         void ButtonSort();
+
+        template <typename GetEntries, typename Rebuild>
+        void Sort(GetEntries&& getEntries, int startIndex, bool isMergingEnabled, Rebuild&& rebuild);
 
         void AddFiles(int32_t droppedEntryIndex, const Array<std::string>& files, bool isAcceptingAll, bool isUrl);
         void UpdateFiles();

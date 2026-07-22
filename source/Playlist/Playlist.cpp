@@ -51,8 +51,8 @@ namespace rePlayer
 {
     inline Playlist::Cue::Entry& Playlist::Cue::Entry::operator=(const MusicID& musicId)
     {
-        *this = {};
         *static_cast<MusicID*>(this) = musicId;
+        subsongId.external = 0;
         return *this;
     }
 
@@ -878,7 +878,7 @@ namespace rePlayer
                             }
 
                             ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick;
-                            if (ImGui::Selectable("##select", curEntry.isSelected, selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//TBD: using imgui_internal for row height
+                            if (ImGui::Selectable("##select", curEntry.IsSelected(), selectable_flags, ImVec2(0.0f, ImGui::TableGetInstanceData(ImGui::GetCurrentTable(), ImGui::GetCurrentTable()->InstanceCurrent)->LastTopHeadersRowHeight)))//TBD: using imgui_internal for row height
                             {
                                 Core::GetSongEditor().OnSongSelected(curEntry);
 
@@ -889,7 +889,7 @@ namespace rePlayer
                                     if (!ImGui::GetIO().KeyCtrl)
                                     {
                                         for (auto& entry : m_cue.entries)
-                                            entry.isSelected = false;
+                                            entry.Select(false);
                                     }
                                     auto foundIt = m_cue.entries.Find(m_lastSelectedEntry);
                                     assert(foundIt != nullptr);
@@ -897,21 +897,21 @@ namespace rePlayer
                                     if (currentIt > foundIt)
                                         std::swap(foundIt, currentIt);
                                     for (; currentIt <= foundIt; currentIt++)
-                                        currentIt->isSelected = true;
+                                        currentIt->Select(true);
                                 }
                                 else
                                 {
                                     m_lastSelectedEntry = curEntry.playlistId;
                                     if (ImGui::GetIO().KeyCtrl)
                                     {
-                                        m_cue.entries[rowIdx].isSelected = !curEntry.isSelected;
+                                        m_cue.entries[rowIdx].Select(!curEntry.IsSelected());
                                     }
                                     else
                                     {
-                                        auto isSelected = curEntry.isSelected;
+                                        auto isSelected = curEntry.IsSelected();
                                         for (auto& entry : m_cue.entries)
-                                            entry.isSelected = false;
-                                        m_cue.entries[rowIdx].isSelected = !isSelected;
+                                            entry.Select(false);
+                                        m_cue.entries[rowIdx].Select(!isSelected);
                                     }
                                 }
 
@@ -964,7 +964,7 @@ namespace rePlayer
                             auto selectableMax = ImGui::GetItemRectMax();
                             if (!m_dropTarget->IsEnabled() && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoPreviewTooltip))
                             {
-                                m_cue.entries[rowIdx].isSelected = true;
+                                m_cue.entries[rowIdx].Select(true);
                                 if (m_firstDraggedEntryIndex > m_lastDraggedEntryIndex && draggedIndex < 0)
                                     draggedIndex = rowIdx;
 
@@ -999,6 +999,12 @@ namespace rePlayer
                                     isDatabaseDropped = true;
                                 }
                                 ImGui::EndDragDropTarget();
+                            }
+                            // Context menu
+                            if (ImGui::BeginPopupContextItem("Song Popup"))
+                            {
+                                UpdateSelectionContext(rowIdx);
+                                ImGui::EndPopup();
                             }
 
                             ImGui::SameLine(0.0f, 0.0f);//no spacing
@@ -1084,7 +1090,7 @@ namespace rePlayer
                             // pick the first entry that is not selected from the current one
                             for (;;)
                             {
-                                if (!m_cue.entries[currentEntryIndex].isSelected)
+                                if (!m_cue.entries[currentEntryIndex].IsSelected())
                                 {
                                     musicId = m_cue.entries[currentEntryIndex];
                                     break;
@@ -1098,7 +1104,7 @@ namespace rePlayer
                                     {
                                         if (currentEntryIndex < 0)
                                             break;
-                                        if (!m_cue.entries[currentEntryIndex].isSelected)
+                                        if (!m_cue.entries[currentEntryIndex].IsSelected())
                                         {
                                             musicId = m_cue.entries[currentEntryIndex];
                                             break;
@@ -1111,7 +1117,7 @@ namespace rePlayer
                         }
                         auto count = m_cue.entries.RemoveIf([](auto& entry)
                         {
-                            return entry.isSelected;
+                            return entry.IsSelected();
                         });
                         if (count > 0)
                         {
@@ -1123,7 +1129,7 @@ namespace rePlayer
                     else if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A))
                     {
                         for (auto& entry : m_cue.entries)
-                            entry.isSelected = true;
+                            entry.Select(true);
                     }
                 }
             }
@@ -1145,6 +1151,11 @@ namespace rePlayer
             {
                 ImGui::TableNextColumn();
                 m_openedTab == OpenedTab::kSongs ? m_songs->OnDisplay() : m_artists->OnDisplay();
+            }
+            if (numColumns <= 2 || m_openedTab != OpenedTab::kSongs)
+            {
+                m_songs->DisplayExportAsWav();
+                m_songs->DisplayReplayGain();
             }
 
             ImGui::EndTable();
@@ -1187,6 +1198,69 @@ namespace rePlayer
         m_artists->OnEndUpdate();
     }
 
+    void Playlist::UpdateSelectionContext(int32_t entryIndex)
+    {
+        if (ImGui::Selectable("Invert selection"))
+        {
+            for (auto& entry : m_cue.entries)
+                entry.Select(!entry.IsSelected());
+            ImGui::CloseCurrentPopup();
+        }
+        else
+            m_cue.entries[entryIndex].Select(true);
+        if (ImGui::BeginMenu("Sort selection"))
+        {
+            Array<uint32_t> pos;
+            Array<Cue::Entry> entries;
+            auto getEntries = [&]() -> Array<Cue::Entry>&
+            {
+                for (uint32_t i = 0, e = m_cue.entries.NumItems(); i < e; ++i)
+                {
+                    if (m_cue.entries[i].IsSelected())
+                    {
+                        pos.Add(i);
+                        entries.Add(m_cue.entries[i]);
+                    }
+                }
+                return entries;
+            };
+            auto rebuild = [&]()
+            {
+                for (uint32_t i = 0, e = pos.NumItems(); i < e; ++i)
+                    m_cue.entries[pos[i]] = entries[i];
+            };
+            Sort(getEntries, 0, false, rebuild);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::Selectable("Export as WAV"))
+        {
+            Array<MusicID> entries;
+            for (auto& entry : m_cue.entries)
+            {
+                if (entry.IsSelected() && !entries.FindIf([&entry](auto& otherEntry) { return entry.IsSameSong(otherEntry); }))
+                {
+                    entries.Add(entry);
+                    m_songs->EnqueueExport(entry);
+                }
+            }
+            ImGui::CloseCurrentPopup();
+        }
+        if (ImGui::Selectable("Scan ReplayGain"))
+        {
+            Array<MusicID> entries;
+            for (auto& entry : m_cue.entries)
+            {
+                if (entry.IsSelected() && !entries.FindIf([&entry](auto& otherEntry) { return entry.IsSameSong(otherEntry); }))
+                {
+                    entries.Add(entry);
+                    m_songs->EnqueueReplayGain(entry);
+                }
+            }
+            ImGui::CloseCurrentPopup();
+        }
+    }
+
     void Playlist::MoveSelection(uint32_t draggedEntryIndex)
     {
         auto currentPlaylistId = m_currentEntryIndex >= 0 ? m_cue.entries[m_currentEntryIndex].playlistId : PlaylistID::kInvalid;
@@ -1197,7 +1271,7 @@ namespace rePlayer
             auto firstSelected = draggedEntryIndex;
             for (auto i = static_cast<int32_t>(firstSelected) - 1; i >= 0; i--)
             {
-                if (m_cue.entries[i].isSelected)
+                if (m_cue.entries[i].IsSelected())
                 {
                     auto count = firstSelected - i;
                     if (count > 1)
@@ -1212,7 +1286,7 @@ namespace rePlayer
             auto lastSelected = firstSelected;
             for (auto i = lastSelected + 1; i < numEntries; i++)
             {
-                if (m_cue.entries[i].isSelected)
+                if (m_cue.entries[i].IsSelected())
                 {
                     auto count = i - lastSelected;
                     if (count > 1)
@@ -1501,101 +1575,110 @@ namespace rePlayer
             ImGui::OpenPopup("SortPopup");
         if (ImGui::BeginPopup("SortPopup"))
         {
-            const char* sortModes[] = { "Title", "Artists", "Duration", "Type", "Rating", "Random", "Invert", "AutoMerge" };
-            for (int32_t i = 0; i < IM_ARRAYSIZE(sortModes) - (ImGui::GetIO().KeyShift ? 0 : 1); i++)
-            {
-                if (ImGui::Selectable(sortModes[i]))
-                {
-                    MusicID currentPlayerId;
-                    if (m_currentEntryIndex >= 0)
-                        currentPlayerId = m_cue.entries[m_currentEntryIndex];
-                    if (i == 5)
-                    {
-                        for (uint32_t entryIdx = ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, count = m_cue.entries.NumItems(); entryIdx < count; entryIdx++)
-                            std::swap(m_cue.entries[entryIdx], m_cue.entries[entryIdx + std::rand() % (count - entryIdx)]);
-                    }
-                    else if (i == 6)
-                    {
-                        for (int32_t n = ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, j = m_cue.entries.NumItems<int32_t>() - 1; n < j; n++, j--)
-                            std::swap(m_cue.entries[n], m_cue.entries[j]);
-                    }
-                    else if (i == 7)
-                    {
-                        auto firstEntry = m_currentEntryIndex + 1;
-                        // sort by group
-                        std::sort(m_cue.entries.begin() + firstEntry, m_cue.entries.end(), [&](auto l, auto r)
-                        {
-                            return l.GetSong()->GetSourceId(0).AutoMerge() < r.GetSong()->GetSourceId(0).AutoMerge();
-                        });
-                        // build spans of entries per group
-                        Array<uint32_t> spans(1, SourceID::NumSourceIDs);
-                        spans[0] = firstEntry;
-                        int32_t group = m_cue.entries[firstEntry].GetSong()->GetSourceId(0).AutoMerge();
-                        for (uint32_t j = firstEntry + 1, e = m_cue.entries.NumItems(); j < e; ++j)
-                        {
-                            if (group != m_cue.entries[j].GetSong()->GetSourceId(0).AutoMerge())
-                            {
-                                group = m_cue.entries[j].GetSong()->GetSourceId(0).AutoMerge();
-                                spans.Add(j);
-                            }
-                        }
-                        spans.Add(m_cue.entries.NumItems());
-                        // randomize within each group and add to playlist
-                        for (int64_t j = 0, e = spans.NumItems() - 1; j < e; ++j)
-                        {
-                            for (int64_t begin = spans[j], end = spans[j + 1]; begin < end; ++begin)
-                            {
-                                auto index = rand() % (end - begin);
-                                std::swap(m_cue.entries[begin], m_cue.entries[begin + index]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        static constexpr uint32_t sortTables[5][5] = {
-                            {0, 1, 2, 3, 4},
-                            {1, 0, 2, 3, 4},
-                            {2, 1, 0, 3, 4},
-                            {3, 1, 0, 2, 4},
-                            {4, 1, 0, 2, 3}
-                        };
-                        std::sort(m_cue.entries.begin() + (ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0), m_cue.entries.end(), [this, i](const MusicID& l, const MusicID& r)
-                        {
-                            for (uint32_t sortIdx = 0; sortIdx < 6; sortIdx++)
-                            {
-                                int32_t d{ 0 };
-                                switch (sortTables[i][sortIdx])
-                                {
-                                case 0:
-                                    d = _stricmp(l.GetTitle().data(), r.GetTitle().data());
-                                    break;
-                                case 1:
-                                    d = _stricmp(l.GetArtists().data(), r.GetArtists().data());
-                                    break;
-                                case 2:
-                                    d = (l.GetSong()->GetSubsongDurationCs(l.subsongId.index) / 100) - (r.GetSong()->GetSubsongDurationCs(r.subsongId.index) / 100);
-                                    break;
-                                case 3:
-                                    d = _stricmp(l.GetSong()->GetType().GetExtension(), r.GetSong()->GetType().GetExtension());
-                                    break;
-                                case 4:
-                                    d = l.GetSong()->GetSubsongRating(l.subsongId.index) - r.GetSong()->GetSubsongRating(r.subsongId.index);
-                                    break;
-                                }
-                                if (d != 0)
-                                    return d < 0;
-                            }
-                            return l < r;
-                        });
-                    }
-                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                    if (currentPlayerId.subsongId.IsValid())
-                        m_currentEntryIndex = m_cue.entries.Find<int32_t>(currentPlayerId);
-                }
-            }
+            Sort([this]() -> Array<Cue::Entry>& { return m_cue.entries; }, ImGui::GetIO().KeyCtrl ? m_currentEntryIndex + 1 : 0, ImGui::GetIO().KeyShift, []() {});
             ImGui::EndPopup();
         }
         ImGui::EndDisabled();
+    }
+
+    template <typename GetEntries, typename Rebuild>
+    void Playlist::Sort(GetEntries&& getEntries, int startIndex, bool isMergingEnabled, Rebuild&& rebuild)
+    {
+        const char* sortModes[] = { "Title", "Artists", "Duration", "Type", "Rating", "Random", "Invert", "AutoMerge" };
+        for (int32_t i = 0; i < IM_ARRAYSIZE(sortModes) - (isMergingEnabled ? 0 : 1); i++)
+        {
+            if (ImGui::Selectable(sortModes[i]))
+            {
+                Array<Cue::Entry>& entries = getEntries();
+
+                MusicID currentPlayerId;
+                if (m_currentEntryIndex >= 0)
+                    currentPlayerId = m_cue.entries[m_currentEntryIndex];
+                if (i == 5)
+                {
+                    for (uint32_t entryIdx = startIndex, count = entries.NumItems(); entryIdx < count; entryIdx++)
+                        std::swap(entries[entryIdx], entries[entryIdx + std::rand() % (count - entryIdx)]);
+                }
+                else if (i == 6)
+                {
+                    for (int32_t n = startIndex, j = entries.NumItems<int32_t>() - 1; n < j; n++, j--)
+                        std::swap(entries[n], entries[j]);
+                }
+                else if (i == 7)
+                {
+                    auto firstEntry = m_currentEntryIndex + 1;
+                    // sort by group
+                    std::sort(entries.begin() + firstEntry, entries.end(), [&](auto l, auto r)
+                    {
+                        return l.GetSong()->GetSourceId(0).AutoMerge() < r.GetSong()->GetSourceId(0).AutoMerge();
+                    });
+                    // build spans of entries per group
+                    Array<uint32_t> spans(1, SourceID::NumSourceIDs);
+                    spans[0] = firstEntry;
+                    int32_t group = entries[firstEntry].GetSong()->GetSourceId(0).AutoMerge();
+                    for (uint32_t j = firstEntry + 1, e = entries.NumItems(); j < e; ++j)
+                    {
+                        if (group != entries[j].GetSong()->GetSourceId(0).AutoMerge())
+                        {
+                            group = entries[j].GetSong()->GetSourceId(0).AutoMerge();
+                            spans.Add(j);
+                        }
+                    }
+                    spans.Add(entries.NumItems());
+                    // randomize within each group and add to playlist
+                    for (int64_t j = 0, e = spans.NumItems() - 1; j < e; ++j)
+                    {
+                        for (int64_t begin = spans[j], end = spans[j + 1]; begin < end; ++begin)
+                        {
+                            auto index = rand() % (end - begin);
+                            std::swap(entries[begin], entries[begin + index]);
+                        }
+                    }
+                }
+                else
+                {
+                    static constexpr uint32_t sortTables[5][5] = {
+                        {0, 1, 2, 3, 4},
+                        {1, 0, 2, 3, 4},
+                        {2, 1, 0, 3, 4},
+                        {3, 1, 0, 2, 4},
+                        {4, 1, 0, 2, 3}
+                    };
+                    std::sort(entries.begin() + startIndex, entries.end(), [this, i](const MusicID& l, const MusicID& r)
+                    {
+                        for (uint32_t sortIdx = 0; sortIdx < 6; sortIdx++)
+                        {
+                            int32_t d{ 0 };
+                            switch (sortTables[i][sortIdx])
+                            {
+                            case 0:
+                                d = _stricmp(l.GetTitle().data(), r.GetTitle().data());
+                                break;
+                            case 1:
+                                d = _stricmp(l.GetArtists().data(), r.GetArtists().data());
+                                break;
+                            case 2:
+                                d = (l.GetSong()->GetSubsongDurationCs(l.subsongId.index) / 100) - (r.GetSong()->GetSubsongDurationCs(r.subsongId.index) / 100);
+                                break;
+                            case 3:
+                                d = _stricmp(l.GetSong()->GetType().GetExtension(), r.GetSong()->GetType().GetExtension());
+                                break;
+                            case 4:
+                                d = l.GetSong()->GetSubsongRating(l.subsongId.index) - r.GetSong()->GetSubsongRating(r.subsongId.index);
+                                break;
+                            }
+                            if (d != 0)
+                                return d < 0;
+                        }
+                        return l < r;
+                    });
+                }
+                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                rebuild();
+                if (currentPlayerId.subsongId.IsValid())
+                    m_currentEntryIndex = m_cue.entries.Find<int32_t>(currentPlayerId);
+            }
+        }
     }
 
     void Playlist::AddFiles(int32_t droppedEntryIndex, const Array<std::string>& files, bool isAcceptingAll, bool isUrl)

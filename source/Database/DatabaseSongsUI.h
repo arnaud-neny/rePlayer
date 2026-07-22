@@ -36,6 +36,12 @@ namespace rePlayer
         virtual void OnDisplay();
         virtual void OnEndUpdate();
 
+        void EnqueueExport(MusicID musicId);
+        void DisplayExportAsWav();
+
+        void EnqueueReplayGain(MusicID musicId);
+        void DisplayReplayGain();
+
     protected:
         struct SubsongEntry : public SubsongID
         {
@@ -52,8 +58,6 @@ namespace rePlayer
     private:
         void DisplaySongsFilter(bool& isDirty);
         void DisplaySongsTable(bool& isDirty);
-        void DisplayExportAsWav();
-        void DisplayReplayGain();
 
         // Used in DisplaySongsFilter
         void DisplaySongsFilterUI(bool& isDirty);

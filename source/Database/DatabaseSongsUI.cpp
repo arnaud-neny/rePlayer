@@ -641,16 +641,29 @@ namespace rePlayer
         ImGui::PopID();
     }
 
+    void DatabaseSongsUI::EnqueueExport(MusicID musicId)
+    {
+        if (!m_isExportAsWavTriggered)
+        {
+            m_isExportAsWavTriggered = true;
+            m_export = new Export();
+        }
+        m_export->Enqueue(musicId);
+    }
+
     void DatabaseSongsUI::DisplayExportAsWav()
     {
         if (m_isExportAsWavTriggered)
         {
             m_isExportAsWavTriggered = false;
-            m_export = new Export();
-            for (auto& entry : m_entries)
+            if (!m_export)
             {
-                if (entry.IsSelected())
-                    m_export->Enqueue({ entry, m_databaseId });
+                m_export = new Export();
+                for (auto& entry : m_entries)
+                {
+                    if (entry.IsSelected())
+                        m_export->Enqueue({ entry, m_databaseId });
+                }
             }
             if (m_export->Start())
             {
@@ -708,16 +721,29 @@ namespace rePlayer
         }
     }
 
+    void DatabaseSongsUI::EnqueueReplayGain(MusicID musicId)
+    {
+        if (!m_isReplayGainScannerTriggered)
+        {
+            m_isReplayGainScannerTriggered = true;
+            m_replayGainScanner = new ReplayGainScanner();
+        }
+        m_replayGainScanner->Enqueue(musicId);
+    }
+
     void DatabaseSongsUI::DisplayReplayGain()
     {
         if (m_isReplayGainScannerTriggered)
         {
             m_isReplayGainScannerTriggered = false;
-            m_replayGainScanner = new ReplayGainScanner();
-            for (auto& entry : m_entries)
+            if (!m_replayGainScanner)
             {
-                if (entry.IsSelected())
-                    m_replayGainScanner->Enqueue({ entry, m_databaseId });
+                m_replayGainScanner = new ReplayGainScanner();
+                for (auto& entry : m_entries)
+                {
+                    if (entry.IsSelected())
+                        m_replayGainScanner->Enqueue({ entry, m_databaseId });
+                }
             }
             if (m_replayGainScanner->Start())
             {
@@ -1120,7 +1146,7 @@ namespace rePlayer
             m_isExportAsWavTriggered = true;
             ImGui::CloseCurrentPopup();
         }
-        if (ImGui::Selectable("Build ReplayGain"))
+        if (ImGui::Selectable("Scan ReplayGain"))
         {
             m_isReplayGainScannerTriggered = true;
             ImGui::CloseCurrentPopup();
