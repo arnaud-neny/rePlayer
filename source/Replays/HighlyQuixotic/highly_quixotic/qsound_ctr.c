@@ -460,7 +460,7 @@ INLINE INT16 get_sample(struct qsound_chip *chip, UINT16 bank,UINT16 address)
 	
 	sample_data = chip->romData[rom_addr];
 	
-	return (INT16)(sample_data << 8);
+	return (INT16)((sample_data << 8) | (sample_data << 0));	// MAME currently expands the 8 bit ROM data to 16 bits this way.
 }
 
 INLINE const INT16* get_filter_table(struct qsound_chip *chip, UINT16 offset)
@@ -614,7 +614,7 @@ static void state_refresh_filter_2(struct qsound_chip *chip)
 		chip->alt_filter[ch].delay_pos = 0;
 		chip->alt_filter[ch].tap_count = 44;
 	
-		table = get_filter_table(chip,chip->alt_filter[ch].table_pos);
+		table = get_filter_table(chip,chip->filter[ch].table_pos);
 		if (table != NULL)
 			memcpy(chip->alt_filter[ch].taps, table, 44 * sizeof(INT16));
 	}
@@ -673,7 +673,7 @@ INLINE void adpcm_update(struct qsound_chip *chip, int voice_no, int nibble)
 	if(!nibble)
 	{
 		// Mute voice when it reaches the end address.
-		if(v->cur_addr == v->end_addr)
+		if(v->start_addr == v->end_addr)
 			v->cur_vol = 0;
 		
 		// Playback start flag
@@ -764,8 +764,8 @@ static void state_normal_update(struct qsound_chip *chip)
 	{
 		// Echo is output on the unfiltered component of the left channel and
 		// the filtered component of the right channel.
-		INT32 wet = (ch == 1) ? echo_output<<14 : 0;
-		INT32 dry = (ch == 0) ? echo_output<<14 : 0;
+		INT32 wet = (ch == 1) ? echo_output<<16 : 0;
+		INT32 dry = (ch == 0) ? echo_output<<16 : 0;
 		INT32 output = 0;
 		
 		for(v=0; v<19; v++)
@@ -775,13 +775,9 @@ static void state_normal_update(struct qsound_chip *chip)
 				pan_index = 97;
 			
 			// Apply different volume tables on the dry and wet inputs.
-			dry -= (chip->voice_output[v] * chip->pan_tables[ch][PANTBL_DRY][pan_index]);
-			wet -= (chip->voice_output[v] * chip->pan_tables[ch][PANTBL_WET][pan_index]);
+			dry -= (chip->voice_output[v] * chip->pan_tables[ch][PANTBL_DRY][pan_index])<<2;
+			wet -= (chip->voice_output[v] * chip->pan_tables[ch][PANTBL_WET][pan_index])<<2;
 		}
-
-		// Saturate accumulated voices
-		dry = CLAMP(dry, -0x1fffffff, 0x1fffffff) << 2;
-		wet = CLAMP(wet, -0x1fffffff, 0x1fffffff) << 2;
 		
 		// Apply FIR filter on 'wet' input
 		wet = fir(&chip->filter[ch], wet >> 16);
@@ -791,11 +787,11 @@ static void state_normal_update(struct qsound_chip *chip)
 			dry = fir(&chip->alt_filter[ch], dry >> 16);
 		
 		// output goes through a delay line and attenuation
-		output = (delay(&chip->wet[ch], wet) + delay(&chip->dry[ch], dry));
+		output = (delay(&chip->wet[ch], wet) + delay(&chip->dry[ch], dry))<<2;
 		
 		// DSP round function
-		output = (output + 0x2000) >> 14;
-		chip->out[ch] = CLAMP(output, -0x7fff, 0x7fff);
+		output = (output + 0x8000) & ~0xffff;
+		chip->out[ch] = output >> 16;
 		
 		if(chip->delay_update)
 		{
