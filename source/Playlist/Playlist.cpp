@@ -181,6 +181,7 @@ namespace rePlayer
     void Playlist::Enqueue(MusicID musicId)
     {
         musicId.playlistId = ++m_uniqueIdGenerator;
+        musicId.subsongId.external = 0;
         m_cue.entries.Add({ musicId });
         m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
     }
