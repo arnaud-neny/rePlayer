@@ -344,7 +344,7 @@ namespace rePlayer
                 return;
             auto vtxDst = reinterpret_cast<ImDrawVert*>(vtxResource);
             auto idxDst = reinterpret_cast<ImDrawIdx*>(idxResource);
-            for (int n = 0; n < drawData.CmdListsCount; n++)
+            for (int n = 0; n < drawData.CmdLists.Size; n++)
             {
                 const auto cmdList = drawData.CmdLists[n];
                 memcpy(vtxDst, cmdList->VtxBuffer.Data, cmdList->VtxBuffer.Size * sizeof(ImDrawVert));
@@ -368,7 +368,7 @@ namespace rePlayer
         int global_vtx_offset = 0;
         int global_idx_offset = 0;
         ImVec2 clip_off = drawData.DisplayPos;
-        for (int n = 0; n < drawData.CmdListsCount; n++)
+        for (int n = 0; n < drawData.CmdLists.Size; n++)
         {
             const ImDrawList* cmd_list = drawData.CmdLists[n];
             for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
