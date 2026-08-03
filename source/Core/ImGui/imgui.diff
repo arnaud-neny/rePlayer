@@ -49,7 +49,7 @@ index b40db389..54ac4df3 100644
  //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
  // Your renderer backend will need to support it (most example renderer backends support both 16/32-bit indices).
 diff --git a/external/imgui-docking/imgui.h b/source/Core/ImGui/imgui.h
-index 7e4a2564..6db23187 100644
+index adc96b78..bc8e4669 100644
 --- a/external/imgui-docking/imgui.h
 +++ b/source/Core/ImGui/imgui.h
 @@ -613,6 +613,7 @@ namespace ImGui
@@ -79,7 +79,7 @@ index 7e4a2564..6db23187 100644
  
      // Widgets: Regular Sliders
 diff --git a/external/imgui-docking/imgui.cpp b/source/Core/ImGui/imgui.cpp
-index 06b6a1aa..5040eca2 100644
+index a943bccf..a89bc25d 100644
 --- a/external/imgui-docking/imgui.cpp
 +++ b/source/Core/ImGui/imgui.cpp
 @@ -2755,8 +2755,10 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char*
@@ -95,7 +95,7 @@ index 06b6a1aa..5040eca2 100644
      }
  
      return wanted;
-@@ -7327,7 +7329,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, int* border_hove
+@@ -7329,7 +7331,7 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, int* border_hove
      ImGuiContext& g = *GImGui;
      ImGuiWindowFlags flags = window->Flags;
  
@@ -104,7 +104,7 @@ index 06b6a1aa..5040eca2 100644
          return false;
      if ((flags & ImGuiWindowFlags_AlwaysAutoResize) && (window->ChildFlags & (ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY)) == 0)
          return false;
-@@ -9940,6 +9942,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
+@@ -9942,6 +9944,20 @@ ImGuiID ImGuiWindow::GetID(const void* ptr)
      return id;
  }
  
@@ -125,7 +125,7 @@ index 06b6a1aa..5040eca2 100644
  ImGuiID ImGuiWindow::GetID(int n)
  {
      ImGuiID seed = IDStack.back();
-@@ -9995,6 +10011,16 @@ void ImGui::PushID(const void* ptr_id)
+@@ -9997,6 +10013,16 @@ void ImGui::PushID(const void* ptr_id)
      window->IDStack.push_back(id);
  }
  
@@ -143,10 +143,10 @@ index 06b6a1aa..5040eca2 100644
  {
      ImGuiContext& g = *GImGui;
 diff --git a/external/imgui-docking/imgui_internal.h b/source/Core/ImGui/imgui_internal.h
-index 2c4965f2..89818195 100644
+index 633d9e61..da83dfca 100644
 --- a/external/imgui-docking/imgui_internal.h
 +++ b/source/Core/ImGui/imgui_internal.h
-@@ -3061,6 +3061,7 @@ public:
+@@ -3062,6 +3062,7 @@ public:
  
      ImGuiID     GetID(const char* str, const char* str_end = NULL);
      ImGuiID     GetID(const void* ptr);
@@ -155,7 +155,7 @@ index 2c4965f2..89818195 100644
      ImGuiID     GetIDFromPos(const ImVec2& p_abs);
      ImGuiID     GetIDFromRectangle(const ImRect& r_abs);
 diff --git a/external/imgui-docking/imgui_widgets.cpp b/source/Core/ImGui/imgui_widgets.cpp
-index 7a4c26f4..550cffe2 100644
+index 365ed304..1872724e 100644
 --- a/external/imgui-docking/imgui_widgets.cpp
 +++ b/source/Core/ImGui/imgui_widgets.cpp
 @@ -2718,7 +2718,7 @@ static bool TempInputIsClampEnabled(ImGuiSliderFlags flags, ImGuiDataType data_t
