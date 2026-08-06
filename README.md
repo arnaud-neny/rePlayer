@@ -117,7 +117,8 @@ You can select the songs and reorder these. Click on the numbered button to trac
 An Url button to add a list of links to the playlist.  
 Buttons to load, save or clear the playlist.  
 And a button to sort (by type, artists, duration, type or random/shuffle). If you press Ctrl, the sort will happen only for entries after the current playing one.  
-A checkbox to enable or disable the crossfade between songs.  
+A checkbox to enable or disable the crossfade between songs.
+Right click on the selection to bring some options such as Sort, Export as WAV, rescan ReplayGain.
 Note 1: if you drag and drop files in there, the playlist will have a sidebar with buttons which open a database like the library managing all these files and urls. It's almost working the same way as the library.  
 Note 2: while drag and dropping files, keep Ctrl pressed to force all files in the playlist (by default, they are filtered by their extension or prefix). Keep Shift pressed and the current playlist is cleared. You can also drop on the deck.  
 Note 3: you can drag and drop url. On load, it will download the song or stream the online radio.

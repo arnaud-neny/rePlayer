@@ -2,7 +2,6 @@
 
 - adplug kill surround et fais du stereo dans l'opl; song loop (possibilité de ne pas boucler mais de continuer de générer de l'opl, à tester sur adl klepacki)
 - add radios database: https://de1.api.radio-browser.info/#List_of_all_radio_stations
-- sidplay: stereo resid (to remove dual sid in replayer for stereo...)
 - move surround from replays to player 
 - player: command buffer (play, stop...) to handle everything in the thread (no more extra thread management)
 - player: refactor position (get rid of m_seekPos, use a m_playingPosition to simplify everything)
