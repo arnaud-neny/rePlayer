@@ -45,6 +45,8 @@ CPlayer *CdroPlayer::factory(Copl *newopl)
 
 CdroPlayer::CdroPlayer(Copl *newopl) :
 	CPlayer(newopl),
+	majorVersion(0),
+	minorVersion(0),
 	data(0)
 {
 }
@@ -52,6 +54,81 @@ CdroPlayer::CdroPlayer(Copl *newopl) :
 CdroPlayer::~CdroPlayer()
 {
 	if (this->data) delete[] this->data;
+}
+
+bool CdroPlayer::parseTag(binistream *f, unsigned long offset, unsigned long size)
+{
+	f->seek(offset);
+	int tagsize = size - f->pos();
+
+	if (tagsize < 3) return false;
+
+	// The arbitrary Tag Data section begins here.
+	if ((uint8_t)f->readInt(1) != 0xFF ||
+		(uint8_t)f->readInt(1) != 0xFF ||
+		(uint8_t)f->readInt(1) != 0x1A)
+	{
+		// Tag data does not present or truncated.
+		return false;
+	}
+
+	// "title" is maximum 40 characters long.
+	f->readString(title, 40, 0);
+
+	author[0] = 0;
+	desc[0] = 0;
+
+	// Skip "author" if Tag marker byte is missing.
+	if (f->readInt(1) != 0x1B) {
+		f->seek(-1, binio::Add);
+		goto desc_section;
+	}
+
+	// "author" is maximum 40 characters long.
+	f->readString(author, 40, 0);
+
+desc_section:
+	// Skip "desc" if Tag marker byte is missing.
+	if (f->readInt(1) != 0x1C) {
+		goto end_section;
+	}
+
+	// "desc" is now maximum 1023 characters long (it was 140).
+	f->readString(desc, 1023, 0);
+
+end_section:
+	return true;
+}
+
+bool CdroPlayer::verifyLength(binistream *f, bool old, uint32_t len, unsigned long size)
+{
+	if (len < 3) return false;
+
+	if (size - (old ? 0x11 : 0x15) == len) {
+		// Some early .DRO files only used one byte for the hardware type.
+		this->iDataOffset = (old ? 0x11 : 0x15);
+	}
+	else if (!old && (size - 0x18 == len)) {
+		// Later changed to four bytes with no version number change.
+		// OPL type (0 == OPL2, 1 == OPL3, 2 == Dual OPL2)
+		this->iDataOffset = 0x18;
+	}
+	else if (size > len) {
+		// Check for the tag at file end
+		if (!old && (len + 0x18 < size) && parseTag(f, len + 0x18, size))
+			return verifyLength(f, old, len, len + 0x18);
+		if (!old && (len + 0x15 < size) && parseTag(f, len + 0x15, size))
+			return verifyLength(f, old, len, len + 0x15);
+		if (old && (len + 0x11 < size) && parseTag(f, len + 0x11, size))
+			return verifyLength(f, old, len, len + 0x11);
+		return false;
+	}
+	else {
+		return false;
+	}
+
+	this->iLength = len; // stored in file as number of bytes
+	return true;
 }
 
 bool CdroPlayer::load(const std::string &filename, const CFileProvider &fp)
@@ -65,80 +142,39 @@ bool CdroPlayer::load(const std::string &filename, const CFileProvider &fp)
 		fp.close(f);
 		return false;
 	}
-	int version = f->readInt(4);
-	if (version != 0x10000) {
-		fp.close(f);
-		return false;
-	}
 
-	f->ignore(4);	// Length in milliseconds
-	this->iLength = f->readInt(4); // stored in file as number of bytes
-	if (this->iLength < 3 || this->iLength > fp.filesize(f) - f->pos()) {
+	title[0] = 0;
+	author[0] = 0;
+	desc[0] = 0;
+
+	uint32_t field_08 = f->readInt(4);
+	uint32_t field_0C = f->readInt(4);
+	uint32_t field_10 = f->readInt(4);
+
+	if (verifyLength(f, false, field_10, fp.filesize(f))) {
+		// DRO v1.0 file
+		this->type = DRO_V1;
+		this->minorVersion = field_08 & 0xFFFF;
+		this->majorVersion = field_08 >> 16;
+	}
+	else if (verifyLength(f, true, field_0C, fp.filesize(f))) {
+		// DRO v0 file
+		this->type = DRO_V0;
+	}
+	else {
+		// DRO v2.0 (handled in dro2.cpp) or invalid file
 		fp.close(f);
 		return false;
 	}
 
 	this->data = new uint8_t[this->iLength];
-
-	unsigned long i;
-	// Some early .DRO files only used one byte for the hardware type, then
-  	// later changed to four bytes with no version number change.
-	// OPL type (0 == OPL2, 1 == OPL3, 2 == Dual OPL2)
-	f->ignore(1);	// Type of opl data this can contain - ignored
-	for (i = 0; i < 3; i++) {
-  		this->data[i]=f->readInt(1);
-	}
-
-	if (this->data[0] == 0 || this->data[1] == 0 || this->data[2] == 0) {
-		// If we're here then this is a later (more popular) file with
-		// the full four bytes for the hardware-type.
-  		i = 0; // so ignore the three bytes we just read and start again
-	}
+	f->seek(this->iDataOffset);
 
 	// Read the OPL data.
-	for (; i < this->iLength; i++) {
+	for (unsigned long i = 0; i < this->iLength; i++) {
 		this->data[i]=f->readInt(1);
 	}
 
-	title[0] = 0;
-	author[0] = 0;
-	desc[0] = 0;
-	int tagsize = fp.filesize(f) - f->pos();
-
-	if (tagsize >= 3)
-	{
-		// The arbitrary Tag Data section begins here.
-		if ((uint8_t)f->readInt(1) != 0xFF ||
-			(uint8_t)f->readInt(1) != 0xFF ||
-			(uint8_t)f->readInt(1) != 0x1A)
-		{
-			// Tag data does not present or truncated.
-			goto end_section;
-		}
-
-		// "title" is maximum 40 characters long.
-		f->readString(title, 40, 0);
-
-		// Skip "author" if Tag marker byte is missing.
-		if (f->readInt(1) != 0x1B) {
-			f->seek(-1, binio::Add);
-			goto desc_section;
-		}
-
-		// "author" is maximum 40 characters long.
-		f->readString(author, 40, 0);
-
-desc_section:
-		// Skip "desc" if Tag marker byte is missing.
-		if (f->readInt(1) != 0x1C) {
-			goto end_section;
-		}
-
-		// "desc" is now maximum 1023 characters long (it was 140).
-		f->readString(desc, 1023, 0);
-	}
-
-end_section:
 	fp.close(f);
 	rewind(0);
 
@@ -215,4 +251,19 @@ float CdroPlayer::getrefresh()
 {
 	if (this->iDelay > 0) return 1000.0 / this->iDelay;
 	else return 1000.0;
+}
+
+std::string CdroPlayer::gettype()
+{
+	char tmpstr[40];
+
+	switch (this->type) {
+	case DRO_V0:
+		return std::string("DOSBox Raw OPL v0");
+	case DRO_V1:
+		snprintf(tmpstr, sizeof(tmpstr), "DOSBox Raw OPL v%d.%d", this->majorVersion, this->minorVersion);
+		return std::string(tmpstr);
+	default:
+		return std::string{};
+	}
 }

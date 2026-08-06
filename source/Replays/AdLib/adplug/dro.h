@@ -41,11 +41,18 @@ class CdroPlayer: public CPlayer
 		unsigned int iLength;
 		unsigned int iPos;
 		unsigned int iDelay;
+		unsigned int iDataOffset;
 
 	private:
 		char title[40];
 		char author[40];
 		char desc[1023];
+		enum {DRO_V0, DRO_V1};
+		int type;
+		uint16_t majorVersion, minorVersion;
+
+		bool parseTag(binistream *f, unsigned long offset, unsigned long size);
+		bool verifyLength(binistream *f, bool old, uint32_t len, unsigned long size);
 
 	public:
 		static CPlayer *factory(Copl *newopl);
@@ -58,10 +65,7 @@ class CdroPlayer: public CPlayer
 		void rewind(int subsong);
 		float getrefresh();
 
-		std::string gettype()
-		{
-			return std::string("DOSBox Raw OPL v0.1");
-		}
+		std::string gettype();
 
 		std::string gettitle() { return std::string(title, 0, 40); };
 		std::string getauthor() { return std::string(author, 0, 40); };
