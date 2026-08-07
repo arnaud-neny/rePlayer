@@ -98,11 +98,16 @@ private:
     /// Time until #voiceSync must be run.
     unsigned int nextVoiceSync;
 
+    unsigned int offset_6581;
+
     /// Currently active chip model.
     ChipModel model;
 
     /// Currently selected combined waveforms strength.
     CombinedWaveforms cws;
+
+    // Dac leakage
+    double dacLeakage;
 
     /// Last written value
     uint8_t busValue;
@@ -358,6 +363,21 @@ public:
      * Set paddle coordinates.
      */
     void setPaddle(uint8_t x, uint8_t y);
+
+    /*
+     * Set the DAC leakage level.
+     */
+    void setDacLeakage(double level);
+
+    /*
+     * Set the 6581 wave offset.
+     */
+    void setOffset6581(double offset);
+
+    /*
+     * Set the DC-Blocker resistance.
+     */
+    void setDCBRes(double res);
 
     void surround(bool enabled);
 };

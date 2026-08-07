@@ -1,7 +1,7 @@
 /*
  * This file is part of libsidplayfp, a SID player engine.
  *
- * Copyright 2011-2025 Leandro Nini <drfiemost@users.sourceforge.net>
+ * Copyright 2011-2026 Leandro Nini <drfiemost@users.sourceforge.net>
  * Copyright 2007-2010 Antti Lankila
  * Copyright 2004 Dag Lem <resid@nimrod.no>
  *
@@ -41,8 +41,7 @@
 #  include <numbers>
 #endif
 
-
-#if __cplusplus >= 202306L
+#if __cplusplus >= 201402L
 #  define CONSTEXPR_FUNC  constexpr
 #  define CONSTEXPR_VAR   constexpr
 #else
@@ -141,7 +140,7 @@ int32_t convolve(const int32_t* a, const int16_t* b, int bLength)
     out = std::inner_product(a, a+bLength, b, out);
 #else
     // Apparently clang is unable to fully optimize the above
-    // feed it some plain ol' c code
+    // feed it some plain ol' C code
     for (int i=0; i<bLength; i++)
     {
         out += a[i] * static_cast<int32_t>(b[i]);
@@ -202,16 +201,20 @@ SincResampler::SincResampler(
 #  endif
 #endif
 
-    // 16 bits -> -96dB stopband attenuation.
-    CONSTEXPR_VAR double A = -20. * std::log10(1.0 / (1 << BITS));
     // A fraction of the bandwidth is allocated to the transition band, which we double
     // because we design the filter to transition halfway at nyquist.
     const double dw = (1. - 2.*highestAccurateFrequency / samplingFrequency) * PI * 2.;
 
+    // 16 bits -> -96dB stopband attenuation.
+#if __cplusplus >= 202306L
+    constexpr double A = -20. * std::log10(1.0 / (1 << BITS));
+#else
+    constexpr double A = 96.3295986125;
+#endif
     // For calculation of beta and N see the reference for the kaiserord
     // function in the MATLAB Signal Processing Toolbox:
     // http://www.mathworks.com/help/signal/ref/kaiserord.html
-    CONSTEXPR_VAR double beta = 0.1102 * (A - 8.7);
+    constexpr double beta = 0.1102 * (A - 8.7);
     CONSTEXPR_VAR double I0beta = I0(beta);
     const double cyclesPerSampleD = clockFrequency / samplingFrequency;
     const double inv_cyclesPerSampleD = samplingFrequency / clockFrequency;
@@ -258,7 +261,7 @@ SincResampler::SincResampler(
 
         for (int i = 0; i < firRES; i++)
         {
-            const double jPhase = (double) i / firRES + firN_2;
+            const double jPhase = static_cast<double>(i) / static_cast<double>(firRES) + firN_2;
 
             for (int j = 0; j < firN; j++)
             {
@@ -278,18 +281,18 @@ SincResampler::SincResampler(
 #ifdef RUNTIME_DISPATCH
 
 #define DISPATCH(simd, name) \
-    if (__builtin_cpu_supports (#simd)) \
+    (__builtin_cpu_supports (#simd)) \
         simd_convolve = convolve_ ## name;
 
-    DISPATCH(avx512f, avx512f)
+    if DISPATCH(avx512f, avx512f)
     else
-    DISPATCH(avx2, avx2)
+    if DISPATCH(avx2, avx2)
     else
-    DISPATCH(sse4.1, sse4)
+    if DISPATCH(sse4.1, sse4)
     else
-    DISPATCH(sse2, sse2)
+    if DISPATCH(sse2, sse2)
     else
-    DISPATCH(mmx, mmx)
+    if DISPATCH(mmx, mmx)
     else
         simd_convolve = convolve;
 #endif

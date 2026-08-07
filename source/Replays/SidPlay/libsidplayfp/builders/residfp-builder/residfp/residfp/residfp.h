@@ -283,6 +283,36 @@ public:
      */
     void restoreState(char* buffer, int size);
 
+    /**
+     * Set the DAC leakage level.
+     * Affects the envelope and waveforms.
+     *
+     * @param level the leakage level, between 0 (no leakage) and 1
+     *
+     * @since 1.2
+     */
+    void setDacLeakage(double level);
+
+    /**
+     * Set the 6581 wave offset.
+     * Affects the volume of digi samples.
+     *
+     * @param offset the waveform offset, between 0 (faint digis) and 1 (loud digis)
+     *
+     * @since 1.2
+     */
+    void setOffset6581(double offset);
+
+    /**
+     * Set the DC-Blocker resistance.
+     * Affects the highpass cutoff frequency.
+     *
+     * @param res the resistance value, between 0 (~1.6Hz) and 1 (~16Hz)
+     *
+     * @since 1.2
+     */
+    void setDCBRes(double res);
+
     void surround(bool enabled);
 };
 

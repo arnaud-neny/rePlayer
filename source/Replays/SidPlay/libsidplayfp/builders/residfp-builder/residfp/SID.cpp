@@ -24,6 +24,7 @@
 
 #include "SID.h"
 
+#include <algorithm>
 #include <limits>
 
 #include "array.h"
@@ -137,11 +138,23 @@ constexpr int BUS_TTL_6581 = 0x01d00;
 constexpr int BUS_TTL_8580 = 0xa2000;
 //@}
 
+// Clamp parameter in [0,1] range
+double clamp(double param)
+{
+#ifdef HAVE_CXX17
+     return std::clamp(param, 0.0, 1.0);
+#else
+     return std::max(std::min(param, 1.0), 0.0);
+#endif
+}
+
 SID::SID() :
     filter6581(new Filter6581()),
     filter8580(new Filter8580()),
     resampler(nullptr),
+    offset_6581(OFFSET_6581),
     cws(AVERAGE),
+    dacLeakage(1.0),
     p(new Params)
 {
     voice[0].setOtherVoices(voice[2], voice[1]);
@@ -161,19 +174,19 @@ SID::~SID()
 
 void SID::setFilter6581Curve(double filterCurve)
 {
-    p->filterCurve6581 = filterCurve;
+    p->filterCurve6581 = clamp(filterCurve);
     filter6581->setFilterCurve(filterCurve);
 }
 
 void SID::setFilter6581Range(double adjustment)
 {
-    p->filterRange6581 = adjustment;
+    p->filterRange6581 = clamp(adjustment);
     filter6581->setFilterRange(adjustment);
 }
 
 void SID::setFilter8580Curve(double filterCurve)
 {
-    p->filterCurve8580 = filterCurve;
+    p->filterCurve8580 = clamp(filterCurve);
     filter8580->setFilterCurve(filterCurve);
 }
 
@@ -252,7 +265,7 @@ void SID::setChipModel(ChipModel new_model)
     // calculate envelope DAC table
     {
         Dac dacBuilder(ENV_DAC_BITS);
-        dacBuilder.kinkedDac(model);
+        dacBuilder.kinkedDac(model, dacLeakage);
 
         for (unsigned int i = 0; i < (1 << ENV_DAC_BITS); i++)
         {
@@ -265,10 +278,9 @@ void SID::setChipModel(ChipModel new_model)
 
     {
         Dac dacBuilder(OSC_DAC_BITS);
-        dacBuilder.kinkedDac(model);
+        dacBuilder.kinkedDac(model, dacLeakage);
 
-        //const double offset = dacBuilder.getOutput(is6581 ? OFFSET_6581 : OFFSET_8580);
-        const double offset = dacBuilder.getOutput(is6581 ? OFFSET_6581 : 0x7ff, is6581);
+        const double offset = dacBuilder.getOutput(is6581 ? offset_6581 : 0x800, is6581);
 
         for (unsigned int i = 0; i < (1 << OSC_DAC_BITS); i++)
         {
@@ -539,7 +551,6 @@ void SID::setSamplingParameters(double clockFrequency, SamplingMethod method, do
     }
 
     p->method = method;
-    p->clockFrequency = clockFrequency;
     p->samplingFrequency = samplingFrequency;
 }
 
@@ -612,6 +623,24 @@ void SID::setPaddle(uint8_t x, uint8_t y)
 {
     paddleX = x;
     paddleY = y;
+}
+
+void SID::setDacLeakage(double level)
+{
+    dacLeakage = clamp(level);
+    setChipModel(model);
+}
+
+void SID::setOffset6581(double offset)
+{
+    // TODO determine a reasonable range
+    offset_6581 = 0x380 + static_cast<unsigned int>((1. - clamp(offset)) * 0x200);
+    setChipModel(model);
+}
+
+void SID::setDCBRes(double res)
+{
+    externalFilter.setExtResistance(clamp(res));
 }
 
 void SID::surround(bool enabled)

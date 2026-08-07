@@ -57,7 +57,7 @@ namespace reSIDfp
  *                                  GND
  * ~~~
  *
- * * Only for the 6581.
+ * * Pulldown resistor, only for the 6581.
  * ** The C64c board additionally includes a [bootstrap] capacitor to increase
  *    the input impedance of the common collector.
  *
@@ -98,6 +98,13 @@ private:
 
     int32_t w0hp_1_s17[2] = { 0 };
 
+    double m_frequency;
+
+    double m_ext_res = 10e3;
+
+private:
+    void recalcParams();
+
 public:
     /**
      * SID clocking.
@@ -115,9 +122,16 @@ public:
     /**
      * Setup of the external filter sampling parameters.
      *
-     * @param frequency the main system clock frequency
+     * @param frequency the main system clock frequency in Hertz
      */
     void setClockFrequency(double frequency);
+
+    /**
+     * Setup of the external filter sampling parameters.
+     *
+     * @param res the resistance value in Ohms
+     */
+    void setExtResistance(double res);
 
     /**
      * SID reset.

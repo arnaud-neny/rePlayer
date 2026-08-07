@@ -84,9 +84,11 @@ int State::saveState(SID &s, char* buffer, int size)
         state.env3[i] = envelope->env3;
     }
 
+    state.dacLeakage = s.dacLeakage;
     state.bus_value = s.busValue;
     state.bus_value_ttl = s.busValueTtl;
     state.nextVoiceSync = s.nextVoiceSync;
+    state.offset_6581 = s.offset_6581;
     state.paddle_x = s.paddleX;
     state.paddle_y = s.paddleY;
     state.model = s.model;
@@ -134,9 +136,10 @@ int State::saveState(SID &s, char* buffer, int size)
 
     state.exVlp[0] = s.externalFilter.Vlp[0]; state.exVlp[1] = s.externalFilter.Vlp[1];
     state.exVhp[0] = s.externalFilter.Vhp[0]; state.exVhp[1] = s.externalFilter.Vhp[1];
+    state.ext_res = s.externalFilter.m_ext_res;
+    state.clockFrequency = s.externalFilter.m_frequency;
 
     state.method = s.p->method;
-    state.clockFrequency = s.p->clockFrequency;
     state.samplingFrequency = s.p->samplingFrequency;
 
     switch (s.p->method)
@@ -194,9 +197,11 @@ void State::restoreState(SID &s, char* buffer, int size)
     State state;
     std::memcpy(&state, buffer, cnt);
 
+    s.dacLeakage = state.dacLeakage;
     s.busValue = state.bus_value;
     s.busValueTtl = state.bus_value_ttl;
     s.nextVoiceSync = state.nextVoiceSync;
+    s.offset_6581 = state.offset_6581;
     s.paddleX = state.paddle_x;
     s.paddleY = state.paddle_y;
     s.model = state.model;
@@ -246,8 +251,10 @@ void State::restoreState(SID &s, char* buffer, int size)
 
     s.externalFilter.Vlp[0] = state.exVlp[0]; s.externalFilter.Vlp[1] = state.exVlp[1];
     s.externalFilter.Vhp[0] = state.exVhp[0]; s.externalFilter.Vhp[1] = state.exVhp[1];
+    s.externalFilter.m_ext_res = state.ext_res;
 
     s.setSamplingParameters(state.clockFrequency, state.method, state.samplingFrequency);
+    s.externalFilter.recalcParams();
 
     for (int i = 0; i < 3; i++)
     {

@@ -108,8 +108,9 @@ public:
      * Build DAC model for specific chip.
      *
      * @param chipModel 6581 or 8580
+     * @param leakLevel the level of the transistor leakage
      */
-    void kinkedDac(ChipModel chipModel);
+    void kinkedDac(ChipModel chipModel, double leakLevel=1.0);
 
     /**
      * Get the Vo output for a  given combination of input bits.

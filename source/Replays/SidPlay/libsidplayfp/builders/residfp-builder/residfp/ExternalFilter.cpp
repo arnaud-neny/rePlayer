@@ -45,15 +45,27 @@ ExternalFilter::ExternalFilter()
 
 void ExternalFilter::setClockFrequency(double frequency)
 {
-    const double dt = 1. / frequency;
+    m_frequency = frequency;
+    recalcParams();
+}
+
+void ExternalFilter::setExtResistance(double res)
+{
+    m_ext_res = 1e3 + (res * 9e3);
+    recalcParams();
+}
+
+void ExternalFilter::recalcParams()
+{
+    const double dt = 1. / m_frequency;
 
     // Low-pass:  R = 10kOhm, C = 1000pF; w0l = dt/(dt+RC) = 1e-6/(1e-6+1e4*1e-9) = 0.091
-    // Cutoff 1/2*PI*RC = 1/2*PI*1e4*1e-9 = 15915.5 Hz
+    // Cutoff 1/(2*PI*RC) = 1/(2*PI*1e4*1e-9) = 15915.5 Hz
     w0lp_1_s7[0] = w0lp_1_s7[1] = static_cast<int32_t>((dt / (dt + getRC(10e3, 1000e-12))) * (1 << 7) + 0.5);
 
-    // High-pass: R = 10kOhm, C = 10uF;   w0h = dt/(dt+RC) = 1e-6/(1e-6+1e4*1e-5) = 0.00000999
-    // Cutoff 1/2*PI*RC = 1/2*PI*1e4*1e-5 = 1.59155 Hz
-    w0hp_1_s17[0] = w0hp_1_s17[1] = static_cast<int32_t>((dt / (dt + getRC(10e3, 10e-6))) * (1 << 17) + 0.5);
+    // High-pass: R = 1-10kOhm, C = 10uF;  w0h = dt/(dt+RC)
+    // Cutoff 1/(2*PI*RC) ∈ [1.59155,15.9155] Hz
+    w0hp_1_s17[0] = w0hp_1_s17[1] = static_cast<int32_t>((dt / (dt + getRC(m_ext_res, 10e-6))) * (1 << 17) + 0.5);
 }
 
 void ExternalFilter::reset()
