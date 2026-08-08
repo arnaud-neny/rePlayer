@@ -51,7 +51,7 @@ void ExternalFilter::setClockFrequency(double frequency)
 
 void ExternalFilter::setExtResistance(double res)
 {
-    m_ext_res = 1e3 + (res * 9e3);
+    m_ext_res = 1e3 + ((1. - res) * 9e3);
     recalcParams();
 }
 
