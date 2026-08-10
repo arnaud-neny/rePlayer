@@ -69,12 +69,12 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 	for (int i = 0; i < 2; ++i)
 	{
 		//Filter
-		unsigned char FilterSwitchReso = regs[0x17];
-		unsigned char VolumeBand = regs[0x18];
+		unsigned char FilterSwitchReso = m_regs[0x17];
+		unsigned char VolumeBand = m_regs[0x18];
 
-		int Cutoff = (regs[0x16] << 3) + (regs[0x15] & 7);
+		int Cutoff = (m_regs[0x16] << 3) + (m_regs[0x15] & 7);
 		int Resonance = FilterSwitchReso >> 4;
-		if (LIKELY(s->is8580()))
+		if (LIKELY(m_settings->is8580()))
 		{
 			Cutoff = CutoffMul8580[Cutoff];
 			Resonance = Resonances8580[Resonance];
@@ -119,7 +119,7 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 		//    (This is useful for fade-in/out tunes like Hades Nebula, where clicking ruins the intro.)
 		int MainVolume;
 		int Digi = 0;
-		if (LIKELY(s->getRealSIDmode()))
+		if (LIKELY(m_settings->getRealSIDmode()))
 		{
 			int Tmp = (signed int)((VolumeBand & 0xF) << FRACTIONAL_SHIFTS);
 			// highpass is digi, adding it to output must be before digifilter-code
@@ -145,8 +145,8 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 }
 
 Filter::Filter(settings *s, unsigned char *regs) :
-	regs(regs),
-	s(s)
+	m_regs(regs),
+	m_settings(s)
 {
 	reset();
 }
@@ -223,7 +223,7 @@ void Filter::rebuildCutoffTables(unsigned short samplerate)
 
 			constexpr double cap_6581_reciprocal = -1000000. / CAP_6581;
 			// pre-scale for 0...2048 cutoff-value range
-			constexpr double cutoff_steepness_6581 = FILTER_DARKNESS_6581 * (2048-VCR_FET_TRESHOLD); 
+			constexpr double cutoff_steepness_6581 = FILTER_DARKNESS_6581 * (2048-VCR_FET_TRESHOLD);
 
 			// 6581 Cutoff-curve: (for samplerate)
 			for (int i=0; i<CF_LEN; ++i)

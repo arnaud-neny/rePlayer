@@ -70,6 +70,10 @@ namespace rePlayer
         window.RegisterSerializedData(ms_surround, "ReplaySidPlaySurround");
         window.RegisterSerializedData(ms_powerOnDelay, "ReplaySidPlayPowerOnDelay");
         window.RegisterSerializedData(ms_combinedWaveforms, "ReplaySidPlayCombinedWaveforms");
+        window.RegisterSerializedData(ms_isOld6581capsEnable, "ReplaySidPlayOld6581caps");
+        window.RegisterSerializedData(ms_DACLeakage, "ReplaySidPlayDACLeakage");
+        window.RegisterSerializedData(ms_6581WaveOffset, "ReplaySidPlay6581WaveOffset");
+        window.RegisterSerializedData(ms_DCBlockerResistance, "ReplaySidPlayDCBlockerResistance");
 
         return false;
     }
@@ -161,6 +165,21 @@ namespace rePlayer
                 const char* const combinedWaveforms[] = { "Average", "Weak", "Strong" };
                 changed |= ImGui::Combo("Combined Waveforms###SidCW", &ms_combinedWaveforms, combinedWaveforms, NumItemsOf(combinedWaveforms));
             }
+            {
+                const char* const old6581caps[] = { "Off", "On" };
+                auto index = ms_isOld6581capsEnable ? 1 : 0;
+                changed |= ImGui::Combo("Old 6581 caps###Old6581caps", &index, old6581caps, NumItemsOf(old6581caps));
+                ms_isOld6581capsEnable = index != 0;
+            }
+            auto f = float(double(ms_DACLeakage) / INT_MAX);
+            changed |= ImGui::SliderFloat("DAC leakage level###DACLeakage", &f, 0.0f, 1.0f, "%.5f", ImGuiSliderFlags_AlwaysClamp);
+            ms_DACLeakage = int32_t(double(f) * INT_MAX);
+            f = float(double(ms_6581WaveOffset) / INT_MAX);
+            changed |= ImGui::SliderFloat("6581 wave offset###6581WaveOffset", &f, 0.0f, 1.0f, "%.5f", ImGuiSliderFlags_AlwaysClamp);
+            ms_6581WaveOffset = int32_t(double(f) * INT_MAX);
+            f = float(double(ms_DCBlockerResistance) / INT_MAX);
+            changed |= ImGui::SliderFloat("DC-Blocker resistance###DCBlockerResistance", &f, 0.0f, 1.0f, "%.5f", ImGuiSliderFlags_AlwaysClamp);
+            ms_DCBlockerResistance = int32_t(double(f) * INT_MAX);
         }
         {
             const char* const surround[] = { "Default", "Surround" };
@@ -171,12 +190,19 @@ namespace rePlayer
 
     void ReplaySidPlay::Settings::Edit(ReplayMetadataContext& context)
     {
-        auto* entry = context.metadata.Find<Settings>();
-        if (entry == nullptr)
+        auto* oldEntry = context.metadata.Find<Settings>();
+        auto* entry = new (_alloca(sizeof(Settings) + (oldEntry ? oldEntry->numSongs : 0) * sizeof(LoopInfo) + 3 * sizeof(int32_t))) Settings();
+        if (oldEntry)
         {
-            // ok, we are here because we never played this song in this player
-            entry = context.metadata.Create<Settings>();
+            memcpy(entry, oldEntry, sizeof(Settings) + (oldEntry ? oldEntry->numSongs : 0) * sizeof(LoopInfo));
+            int ofs = 0; // extra params are stacked after the loops if enabled
+            pCast<int32_t>(entry->loops + entry->numSongs)[0] = oldEntry->overrideDACLeakage ? pcCast<int32_t>(oldEntry->loops + entry->numSongs)[ofs++] : ms_DACLeakage;
+            pCast<int32_t>(entry->loops + entry->numSongs)[1] = oldEntry->override6581WaveOffset ? pcCast<int32_t>(oldEntry->loops + entry->numSongs)[ofs++] : ms_6581WaveOffset;
+            pCast<int32_t>(entry->loops + entry->numSongs)[2] = oldEntry->overrideDCBlockerResistance ? pcCast<int32_t>(oldEntry->loops + entry->numSongs)[ofs++] : ms_DCBlockerResistance;
+            entry->numEntries += uint16_t(3 - ofs);
         }
+        else
+            entry->numEntries += 3;
 
         SliderOverride("PowerOnDelay", GETSET(entry, overridePowerOnDelay), GETSET(entry, powerOnDelay),
             ms_powerOnDelay, 0, SidConfig::MAX_POWER_ON_DELAY, "Power On Delay: %d cycles");
@@ -196,9 +222,39 @@ namespace rePlayer
             ms_filter8580, 0, 100, "Filter 8580: %d%%");
         ComboOverride("SidCW", GETSET(entry, overrideCombinedWaveforms), GETSET(entry, combinedWaveforms),
             ms_combinedWaveforms, "Combined Waveforms: Average", "Combined Waveforms: Weak", "Combined Waveforms: Strong");
+        ComboOverride("Old6581caps", GETSET(entry, overrideOld6581caps), GETSET(entry, old6581capsEnabled),
+            ms_isOld6581capsEnable, "Old 6581 caps: Disable", "Old 6581 caps: Enable");
+        auto f = float(double(pcCast<int32_t>(entry->loops + entry->numSongs)[0]) / INT_MAX);
+        auto df = float(double(ms_DACLeakage) / INT_MAX);
+        SliderOverride("DACLeakage", GETSET(entry, overrideDACLeakage)
+            , GetSet([&]() { return f; }, [&](auto v) { f = v; })
+            , df, 0.0f, 1.0f, "DAC leakage level: %.5f");
+        pCast<int32_t>(entry->loops + entry->numSongs)[0] = int32_t(double(f) * INT_MAX);
+        f = float(double(pcCast<int32_t>(entry->loops + entry->numSongs)[1]) / INT_MAX);
+        df = float(double(ms_6581WaveOffset) / INT_MAX);
+        SliderOverride("6581WaveOffset", GETSET(entry, override6581WaveOffset)
+            , GetSet([&]() { return f; }, [&](auto v) { f = v; })
+            , df, 0.0f, 1.0f, "6581 wave offset: %.5f");
+        pCast<int32_t>(entry->loops + entry->numSongs)[1] = int32_t(double(f) * INT_MAX);
+        f = float(double(pcCast<int32_t>(entry->loops + entry->numSongs)[2]) / INT_MAX);
+        df = float(double(ms_DCBlockerResistance) / INT_MAX);
+        SliderOverride("DCBlockerResistance", GETSET(entry, overrideDCBlockerResistance)
+            , GetSet([&]() { return f; }, [&](auto v) { f = v; })
+            , df, 0.0f, 1.0f, "DC-Blocker resistance: %.5f");
+        pCast<int32_t>(entry->loops + entry->numSongs)[2] = int32_t(double(f) * INT_MAX);
         ComboOverride("Surround", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Default", "Output: Surround");
         Loops(context, entry->loops, entry->numSongs);
+
+        int ofs = 0; // extra params are stacked after the loops if enabled
+        if (entry->overrideDACLeakage)
+            ofs++;
+        if (entry->override6581WaveOffset)
+            pCast<int32_t>(entry->loops + entry->numSongs)[ofs++] = pcCast<int32_t>(entry->loops + entry->numSongs)[1];
+        if (entry->overrideDCBlockerResistance)
+            pCast<int32_t>(entry->loops + entry->numSongs)[ofs++] = pcCast<int32_t>(entry->loops + entry->numSongs)[2];
+        entry->numEntries -= uint16_t(3 - ofs);
+        context.metadata.Update(entry, false);
     }
 
     uint8_t ReplaySidPlay::ms_c64RomKernal[] = {
@@ -220,6 +276,10 @@ namespace rePlayer
     int32_t ReplaySidPlay::ms_surround = 1;
     int32_t ReplaySidPlay::ms_powerOnDelay = 4096;
     int32_t ReplaySidPlay::ms_combinedWaveforms = SidConfig::AVERAGE;
+    bool ReplaySidPlay::ms_isOld6581capsEnable = false;
+    int32_t ReplaySidPlay::ms_DACLeakage = INT_MAX;
+    int32_t ReplaySidPlay::ms_6581WaveOffset = INT_MAX;
+    int32_t ReplaySidPlay::ms_DCBlockerResistance = INT_MAX;
 
     void ReplaySidPlay::Release()
     {
@@ -413,6 +473,11 @@ namespace rePlayer
             pCast<ReSIDfpBuilder>(m_sidBuilder)->filter6581Curve(((settings && settings->overrideFilter6581) ? settings->filter6581 : ms_filter6581) / 100.0f);
             pCast<ReSIDfpBuilder>(m_sidBuilder)->filter8580Curve(((settings && settings->overrideFilter8580) ? settings->filter8580 : ms_filter8580) / 100.0f);
             pCast<ReSIDfpBuilder>(m_sidBuilder)->combinedWaveformsStrength(SidConfig::sid_cw_t((settings && settings->overrideCombinedWaveforms) ? settings->combinedWaveforms : ms_combinedWaveforms));
+            pCast<ReSIDfpBuilder>(m_sidBuilder)->enableOld6581caps((settings && settings->overrideOld6581caps) ? settings->old6581capsEnabled : ms_isOld6581capsEnable);
+            int ofs = 0; // extra params are stacked after the loops if enabled
+            pCast<ReSIDfpBuilder>(m_sidBuilder)->dacLeakage(double((settings && settings->overrideDACLeakage) ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_DACLeakage) / INT_MAX);
+            pCast<ReSIDfpBuilder>(m_sidBuilder)->offset6581(double((settings && settings->override6581WaveOffset) ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_6581WaveOffset) / INT_MAX);
+            pCast<ReSIDfpBuilder>(m_sidBuilder)->dcbRes(double((settings && settings->overrideDCBlockerResistance) ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_DCBlockerResistance) / INT_MAX);
         }
 
         if (m_currentPosition == 0 && (m_isSidModelForced != isSidModelForced || m_isSidModel8580 != isSidModel8580 || m_isClockForced != isClockForced || m_isNtsc != isNtsc || m_powerOnDelay != powerOnDelay))
@@ -535,10 +600,23 @@ namespace rePlayer
         else
         {
             uint32_t value[2] = { settings ? settings->value[0] : 0, settings ? settings->value[1] : 0 };
-            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(LoopInfo));
+            int ofs = 0; // extra params are stacked after the loops if enabled
+            int32_t extra[3] = {
+                settings && settings->overrideDACLeakage ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_DACLeakage,
+                settings && settings->override6581WaveOffset ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_6581WaveOffset,
+                settings && settings->overrideDCBlockerResistance ? pcCast<int32_t>(settings->loops + settings->numSongs)[ofs++] : ms_DCBlockerResistance
+            };
+            settings = metadata.Create<Settings>(sizeof(Settings) + numSongs * sizeof(LoopInfo) + ofs * sizeof(int32_t));
             settings->value[0] = value[0];
             settings->value[1] = value[1];
             settings->numSongs = numSongs;
+            ofs = 0;
+            if (settings->overrideDACLeakage)
+                pCast<int32_t>(settings->loops + settings->numSongs)[ofs++] = extra[ofs];
+            if (settings->override6581WaveOffset)
+                pCast<int32_t>(settings->loops + settings->numSongs)[ofs++] = extra[ofs];
+            if (settings->overrideDCBlockerResistance)
+                pCast<int32_t>(settings->loops + settings->numSongs)[ofs++] = extra[ofs];
 
             auto sidDatabase = ms_sidDatabase;
             if (sidDatabase == nullptr)

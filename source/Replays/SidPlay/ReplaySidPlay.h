@@ -50,6 +50,11 @@ namespace rePlayer
                     uint32_t combinedWaveforms : 2;
                     uint32_t overrideEnableFastSid : 1;
                     uint32_t fastSidEnabled : 1;
+                    uint32_t overrideOld6581caps : 1;
+                    uint32_t old6581capsEnabled : 1;
+                    uint32_t overrideDACLeakage : 1; // int32_t value stacked after the loops if enabled
+                    uint32_t override6581WaveOffset : 1; // int32_t value stacked after the loops if enabled
+                    uint32_t overrideDCBlockerResistance : 1; // int32_t value stacked after the loops if enabled
                 };
             };
             LoopInfo loops[0];
@@ -118,6 +123,10 @@ namespace rePlayer
         static int32_t ms_surround;
         static int32_t ms_powerOnDelay;
         static int32_t ms_combinedWaveforms;
+        static bool ms_isOld6581capsEnable;
+        static int32_t ms_DACLeakage; // normalized from 0 to INT_MAX
+        static int32_t ms_6581WaveOffset; // normalized from 0 to INT_MAX
+        static int32_t ms_DCBlockerResistance; // normalized from 0 to INT_MAX
     };
 }
 // namespace rePlayer
