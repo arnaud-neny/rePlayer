@@ -29,10 +29,6 @@
 #include <sndfile.h>
 #endif
 
-#if LIBINSTPATCH_SUPPORT
-#include <libinstpatch/libinstpatch.h>
-#endif
-
 /*=================================sfload.c========================
   Borrowed from Smurf SoundFont Editor by Josh Green
   =================================================================*/
@@ -319,23 +315,16 @@ int fluid_is_soundfont(const char *filename)
             break;  // seems to be DLS, stop here
         }
 #endif
-
-#ifdef LIBINSTPATCH_SUPPORT
-        {
-            IpatchFileHandle *fhandle = ipatch_file_identify_open(filename, NULL);
-
-            if(fhandle != NULL)
-            {
-                retcode = (ipatch_file_identify(fhandle->file, NULL) == IPATCH_TYPE_DLS_FILE);
-                ipatch_file_close(fhandle);
-            }
-            if(retcode)
-            {
-                break;
-            }
-        }
-
+        FLUID_LOG(FLUID_ERR,
+            "fluid_is_soundfont(): expected '0x%04X' ('sfbk') "
+#ifdef ENABLE_NATIVE_DLS
+            "or '0x%04X' ('DLS ') "
 #endif
+            "chunk id but got '0x%04X'.", (unsigned int)SFBK_FCC,
+#ifdef ENABLE_NATIVE_DLS
+            (unsigned int)DLS_FCC,
+#endif
+            (unsigned int)fcc);
     }
     while(0);
 
@@ -854,6 +843,7 @@ static int process_info(SFData *sf, int size)
 
                     /* force terminate info item */
                     item.chr[chunk.size] = '\0';
+                    FLUID_LOG(FLUID_DBG, "INFO chunk %c%c%c%c (%d bytes) -> %s", p[0], p[1], p[2], p[3], chunk.size, item.chr);
                 }
             }
             else
@@ -872,7 +862,6 @@ static int process_info(SFData *sf, int size)
                     return FALSE;
                 }
             }
-            FLUID_LOG(FLUID_DBG, "INFO chunk %c%c%c%c (%d bytes) -> %s", p[0], p[1], p[2], p[3], chunk.size, item.chr);
         }
 
         size -= chunk.size;

@@ -137,6 +137,9 @@
 /* Include the LADSPA Fx unit */
 /* #undef LADSPA */
 
+/* Include the Signalsmith reverb engine + Limiter */
+/* #undef SIGNALSMITH_SUPPORT */
+
 /* Define to enable IPV6 support */
 /* #undef IPV6_SUPPORT */
 
@@ -145,9 +148,6 @@
 
 /* Defined when fluidsynth is build in an automated environment, where no MSVC++ Runtime Debug Assertion dialogs should pop up */
 /* #undef NO_GUI */
-
-/* libinstpatch for DLS and GIG */
-/* #undef LIBINSTPATCH_SUPPORT */
 
 /* libsndfile has ogg vorbis support */
 /* #undef LIBSNDFILE_HASVORBIS */

@@ -227,6 +227,8 @@ void fluid_audio_driver_settings(fluid_settings_t *settings)
 
     fluid_settings_register_str(settings, "audio.sample-format", "16bits", 0);
     fluid_settings_add_option(settings, "audio.sample-format", "16bits");
+    fluid_settings_add_option(settings, "audio.sample-format", "24bits");
+    fluid_settings_add_option(settings, "audio.sample-format", "32bits");
     fluid_settings_add_option(settings, "audio.sample-format", "float");
 
 #if defined(_WIN32)

@@ -209,6 +209,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="fluidsynth\src\bindings\fluid_cmd.h" />
     <ClInclude Include="fluidsynth\src\bindings\fluid_ladspa.h" />
     <ClInclude Include="fluidsynth\src\drivers\fluid_adriver.h" />
+    <ClInclude Include="fluidsynth\src\drivers\fluid_audio_convert.h" />
     <ClInclude Include="fluidsynth\src\drivers\fluid_mdriver.h" />
     <ClInclude Include="fluidsynth\src\gentables\ConstExprArr.hpp" />
     <ClInclude Include="fluidsynth\src\midi\fluid_midi.h" />
@@ -217,9 +218,18 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="fluidsynth\src\rvoice\fluid_chorus.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_iir_filter.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_lfo.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_limiter.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_limiter_impl.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_phase.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rev.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_dattorro.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_fdn.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_filters.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_freeverb.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_lexverb.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_signalsmith.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice.h" />
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_dsp_sinc.hpp" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_dsp_tables.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_event.h" />
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.h" />
@@ -233,6 +243,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="fluidsynth\src\synth\fluid_gen.h" />
     <ClInclude Include="fluidsynth\src\synth\fluid_mod.h" />
     <ClInclude Include="fluidsynth\src\synth\fluid_synth.h" />
+    <ClInclude Include="fluidsynth\src\synth\fluid_synth_write_int.h" />
     <ClInclude Include="fluidsynth\src\synth\fluid_tuning.h" />
     <ClInclude Include="fluidsynth\src\synth\fluid_voice.h" />
     <ClInclude Include="fluidsynth\src\utils\fluidsynth_priv.h" />
@@ -320,6 +331,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="fluidsynth\src\bindings\fluid_cmd.c" />
     <ClCompile Include="fluidsynth\src\bindings\fluid_filerenderer.c" />
     <ClCompile Include="fluidsynth\src\drivers\fluid_adriver.c" />
+    <ClCompile Include="fluidsynth\src\drivers\fluid_audio_convert.cpp" />
     <ClCompile Include="fluidsynth\src\drivers\fluid_mdriver.c" />
     <ClCompile Include="fluidsynth\src\gentables\fluid_cb2amp.cpp" />
     <ClCompile Include="fluidsynth\src\gentables\fluid_concave.cpp" />
@@ -336,7 +348,14 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="fluidsynth\src\rvoice\fluid_iir_filter.c" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_iir_filter_impl.cpp" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_lfo.c" />
-    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev.c" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_limiter.c" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_limiter_impl.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_dattorro.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_fdn.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_freeverb.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_lexverb.cpp" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_signalsmith.cpp" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice.c" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_dsp.cpp" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_event.c" />
@@ -350,6 +369,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="fluidsynth\src\synth\fluid_mod.c" />
     <ClCompile Include="fluidsynth\src\synth\fluid_synth.c" />
     <ClCompile Include="fluidsynth\src\synth\fluid_synth_monopoly.c" />
+    <ClCompile Include="fluidsynth\src\synth\fluid_synth_write_int.cpp" />
     <ClCompile Include="fluidsynth\src\synth\fluid_tuning.c" />
     <ClCompile Include="fluidsynth\src\synth\fluid_voice.c" />
     <ClCompile Include="fluidsynth\src\utils\fluid_conv.c" />

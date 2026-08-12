@@ -21,7 +21,7 @@
 #define _FLUID_CONV_H
 
 #include "fluidsynth_priv.h"
-#include "fluid_conv_tables.h"
+#include "utils/fluid_conv_tables.h"
 
 #ifdef __cplusplus
 extern "C" {

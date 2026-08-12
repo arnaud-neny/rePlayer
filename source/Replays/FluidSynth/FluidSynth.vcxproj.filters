@@ -440,6 +440,39 @@
     <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_dsp_tables.h">
       <Filter>Source Files\fluidsynth\src\rvoice</Filter>
     </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_limiter.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_limiter_impl.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rvoice_dsp_sinc.hpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_filters.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_dattorro.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_fdn.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_freeverb.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_lexverb.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\rvoice\fluid_rev_signalsmith.h">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\synth\fluid_synth_write_int.h">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClInclude>
+    <ClInclude Include="fluidsynth\src\drivers\fluid_audio_convert.h">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayFluidSynth.cpp">
@@ -550,9 +583,6 @@
     <ClCompile Include="fluidsynth\src\rvoice\fluid_chorus.c">
       <Filter>Source Files\fluidsynth\src\rvoice</Filter>
     </ClCompile>
-    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev.c">
-      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
-    </ClCompile>
     <ClCompile Include="fluidsynth\src\utils\fluid_ringbuffer.c">
       <Filter>Source Files\fluidsynth\src\utils</Filter>
     </ClCompile>
@@ -570,6 +600,36 @@
     </ClCompile>
     <ClCompile Include="fluidsynth\src\midi\fluid_midi_router.c">
       <Filter>Source Files\fluidsynth\src\midi</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_limiter.c">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_limiter_impl.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_dattorro.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_fdn.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_freeverb.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_lexverb.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rev_signalsmith.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\synth\fluid_synth_write_int.cpp">
+      <Filter>Source Files\fluidsynth\src\synth</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\drivers\fluid_audio_convert.cpp">
+      <Filter>Source Files\fluidsynth\src\drivers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

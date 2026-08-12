@@ -117,6 +117,7 @@ fluid_mod_set_amount(fluid_mod_t *mod, double amount)
  * @param mod The modulator instance
  * @param mapping_function Pointer to the mapping function to assign
  * @param data User defined data pointer that will be passed into the mapping function, or NULL if not needed
+ * @since 2.5.0
  */
 void
 fluid_mod_set_custom_mapping(fluid_mod_t *mod, fluid_mod_mapping_t mapping_function, void* data)
@@ -300,7 +301,7 @@ fluid_mod_get_source_value(const unsigned char mod_src,
  * transforms the initial value retrieved by \c fluid_mod_get_source_value into [0.0;1.0]
  */
 fluid_real_t
-fluid_mod_transform_source_value(fluid_mod_t* mod, fluid_real_t val, const fluid_real_t range, int is_src1)
+fluid_mod_transform_source_value(fluid_mod_t* mod, fluid_real_t val, const fluid_real_t range, int is_src1, fluid_voice_t *voice)
 {
     /* normalized value, i.e. usually in the range [0;1] */
     const fluid_real_t val_norm = val / range;
@@ -314,6 +315,7 @@ fluid_mod_transform_source_value(fluid_mod_t* mod, fluid_real_t val, const fluid
      */
     unsigned char mod_src = is_src1 ? mod->src1 : mod->src2;
     unsigned char mod_flags = is_src1 ? mod->flags1 : mod->flags2;
+    unsigned char applyModulationDepth = is_src1 && (mod_flags & FLUID_MOD_CC) && (mod_src == MODULATION_MSB) && ((mod->dest == GEN_VIBLFOTOPITCH) || (mod->dest == GEN_MODLFOTOPITCH));
     mod_flags &= ~FLUID_MOD_CC;
 
     if(mod_src == FLUID_MOD_NONE)
@@ -404,6 +406,11 @@ fluid_mod_transform_source_value(fluid_mod_t* mod, fluid_real_t val, const fluid
         }
     }
 
+    if(applyModulationDepth && voice != NULL && voice->channel != NULL)
+    {
+        val *= fluid_channel_get_modulation_depth_range(voice->channel) / 50.0f;
+    }
+
     return val;
 }
 
@@ -482,13 +489,13 @@ fluid_mod_get_value(fluid_mod_t *mod, fluid_voice_t *voice)
     v1 = fluid_mod_get_source_value(mod->src1, mod->flags1, &range1, voice);
 
     /* transform the input value */
-    v1 = fluid_mod_transform_source_value(mod, v1, range1, TRUE);
+    v1 = fluid_mod_transform_source_value(mod, v1, range1, TRUE, voice);
 
     /* get the second input source */
     v2 = fluid_mod_get_source_value(mod->src2, mod->flags2, &range2, voice);
 
     /* transform the second input value */
-    v2 = fluid_mod_transform_source_value(mod, v2, range2, FALSE);
+    v2 = fluid_mod_transform_source_value(mod, v2, range2, FALSE, voice);
 
     /* it indeed is as simple as that: */
     final_value = (fluid_real_t) mod->amount * v1 * v2;
@@ -562,7 +569,7 @@ size_t fluid_mod_sizeof(void)
 /**
  * Checks if modulator with source 1 other than CC is FLUID_MOD_NONE.
  *
- * @param mod, modulator.
+ * @param mod modulator.
  * @return TRUE if modulator source 1 other than cc is FLUID_MOD_NONE, FALSE otherwise.
  */
 static int
@@ -574,8 +581,8 @@ fluid_mod_is_src1_none(const fluid_mod_t *mod)
 /**
  * Checks if modulators source other than CC source is invalid.
  *
- * @param mod, modulator.
- * @param src1_select, source input selection to check.
+ * @param mod modulator.
+ * @param src1_select source input selection to check.
  *   1 to check src1 source.
  *   0 to check src2 source.
  * @return FALSE if selected modulator source other than cc is invalid, TRUE otherwise.
@@ -613,8 +620,8 @@ fluid_mod_check_non_cc_source(const fluid_mod_t *mod, unsigned char src1_select)
 /**
  * Checks if modulator CC source is invalid (specs SF 2.01  7.4, 7.8, 8.2.1).
  *
- * @param mod, modulator.
- * @src1_select, source input selection:
+ * @param mod modulator.
+ * @param src1_select source input selection:
  *   1 to check src1 source or
  *   0 to check src2 source.
  * @return FALSE if selected modulator's source CC is invalid, TRUE otherwise.
@@ -657,8 +664,8 @@ fluid_mod_check_cc_source(const fluid_mod_t *mod, unsigned char src1_select)
 /**
  * Checks valid modulator sources (specs SF 2.01  7.4, 7.8, 8.2.1)
  *
- * @param mod, modulator.
- * @param name,if not NULL, pointer on a string displayed as a warning.
+ * @param mod modulator.
+ * @param name if not NULL, pointer on a string displayed as a warning.
  * @return TRUE if modulator sources src1, src2 are valid, FALSE otherwise.
  */
 int fluid_mod_check_sources(const fluid_mod_t *mod, char *name)
