@@ -53,10 +53,10 @@ namespace rePlayer
         std::string GetInfo() const override;
 
     private:
-        ReplayASAP(ASAP* song);
+        ReplayASAP(ASAP* song, ASAP* dupSong);
 
     private:
-        ASAP* m_song;
+        ASAP* m_song[2];
         uint64_t m_position = 0;
         uint64_t m_duration = 0;
         Surround m_surround;

@@ -73,9 +73,16 @@ namespace rePlayer
         {
             ASAP_Delete(song);
             return nullptr;
-        }
+        }  
 
-        return new ReplayASAP(song);
+        auto songInfo = ASAP_GetInfo(song);
+        if (ASAPInfo_GetChannels(songInfo) == 1)
+        {
+            auto dupSong = ASAP_New();
+            ASAP_LoadFiles(dupSong, stream->GetName().c_str(), &loader);
+            return new ReplayASAP(song, dupSong);
+        }
+        return new ReplayASAP(song, nullptr);
     }
 
     bool ReplayASAP::DisplaySettings()
@@ -105,7 +112,8 @@ namespace rePlayer
 
     ReplayASAP::~ReplayASAP()
     {
-        ASAP_Delete(m_song);
+        ASAP_Delete(m_song[0]);
+        ASAP_Delete(m_song[1]);
     }
 
     static MediaType BuildMediaType(const char* ext)
@@ -115,9 +123,9 @@ namespace rePlayer
         return MediaType(eExtension::_sap, eReplay::ASAP);
     }
 
-    ReplayASAP::ReplayASAP(ASAP* song)
+    ReplayASAP::ReplayASAP(ASAP* song, ASAP* dupSong)
         : Replay(BuildMediaType(ASAPInfo_GetModuleExt(ASAP_GetInfo(song))))
-        , m_song(song)
+        , m_song{ song, dupSong }
         , m_surround(ASAP_SAMPLE_RATE)
     {}
 
@@ -134,13 +142,10 @@ namespace rePlayer
             return 0;
         }
 
-        auto songInfo = ASAP_GetInfo(m_song);
-        auto channels = ASAPInfo_GetChannels(songInfo);
-
         auto position = m_position + numSamples;
         if (position > m_duration)
         {
-            numSamples = static_cast<uint32_t>(m_duration - m_position);
+            numSamples = uint32_t(m_duration - m_position);
             m_position = 0;
             if (numSamples == 0)
                 return 0;
@@ -149,23 +154,56 @@ namespace rePlayer
         else
             m_position = position;
 
-        auto buf = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * (channels == 1 ? 1 : 2);
+        if (m_song[1] != nullptr)
+        {
+            // asap mute is not deterministic (song0 != song1 when unmuting)... 
+            if (m_surround.IsEnabled())
+            {
+                auto* buf = pCast<int16_t>(output);
 
-        auto count = ASAP_Generate(m_song, reinterpret_cast<uint8_t*>(buf), numSamples * channels * 2, ASAPSampleFormat_S16_L_E);
-        assert(static_cast<uint32_t>(count) == numSamples * (channels == 1 ? 2 : 4));
-        numSamples = count / (channels == 1 ? 2 : 4);
+                // generate dual asap
+                auto count = ASAP_Generate(m_song[0], pCast<uint8_t>(buf), numSamples * sizeof(int16_t), ASAPSampleFormat_S16_L_E);
+                ASAP_Generate(m_song[1], pCast<uint8_t>(buf + numSamples), numSamples * sizeof(int16_t), ASAPSampleFormat_S16_L_E);
+                // interleaved
+                for (uint32_t i = 0; i < count / sizeof(int16_t); ++i)
+                {
+                    buf[(i + numSamples) * 2] = buf[i];
+                    buf[(i + numSamples) * 2 + 1] = buf[numSamples + i];
+                }
+                buf += numSamples * 2;
+                numSamples = count / 2;
 
-        if (channels == 1)
-            output->ConvertMono(buf, numSamples);
+                output->Convert(m_surround, buf, numSamples, m_stereoSeparation);
+            }
+            else
+            {
+                auto* buf = pCast<int16_t>(output + numSamples) - numSamples;
+
+                // generate dual asap
+                auto count = ASAP_Generate(m_song[0], pCast<uint8_t>(buf), numSamples * sizeof(int16_t), ASAPSampleFormat_S16_L_E);
+                ASAP_Generate(m_song[1], pCast<uint8_t>(buf), numSamples * sizeof(int16_t), ASAPSampleFormat_S16_L_E);
+                numSamples = count / 2;
+
+                output->ConvertMono(buf, numSamples);
+            }
+        }
         else
+        {
+            auto* buf = pCast<int16_t>(output + numSamples) - numSamples * 2;
+            auto count = ASAP_Generate(m_song[0], pCast<uint8_t>(buf), numSamples * sizeof(int16_t) * 2, ASAPSampleFormat_S16_L_E);
+            numSamples = count / 4;
+
             output->Convert(m_surround, buf, numSamples, m_stereoSeparation);
+        }
 
         return numSamples;
     }
 
     uint32_t ReplayASAP::Seek(uint32_t timeInMs)
     {
-        ASAP_Seek(m_song, timeInMs);
+        ASAP_Seek(m_song[0], timeInMs);
+        if (m_song[1])
+            ASAP_Seek(m_song[1], timeInMs);
         m_hasEnded = false;
         m_position = uint64_t(timeInMs) * ASAP_SAMPLE_RATE / 1000;
         m_surround.Reset();
@@ -174,7 +212,9 @@ namespace rePlayer
 
     void ReplayASAP::ResetPlayback()
     {
-        ASAP_PlaySong(m_song, m_subsongIndex, -1);
+        ASAP_PlaySong(m_song[0], m_subsongIndex, -1);
+        if (m_song[1])
+            ASAP_PlaySong(m_song[1], m_subsongIndex, -1);
         m_position = 0;
         m_hasEnded = false;
         m_surround.Reset();
@@ -185,35 +225,40 @@ namespace rePlayer
         auto settings = metadata.Find<Settings>();
         m_stereoSeparation = (settings && settings->overrideStereoSeparation) ? settings->stereoSeparation : ms_stereoSeparation;
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+        if (m_song[1])
+        {
+            ASAP_MutePokeyChannels(m_song[0], m_surround.IsEnabled() ? 0b10101010 : 0);
+            ASAP_MutePokeyChannels(m_song[1], m_surround.IsEnabled() ? 0b01010101 : 0);
+        }
     }
 
     void ReplayASAP::SetSubsong(uint32_t subsongIndex)
     {
         m_subsongIndex = subsongIndex;
         ResetPlayback();
-        auto duration = ASAPInfo_GetDuration(ASAP_GetInfo(m_song), m_subsongIndex);
+        auto duration = ASAPInfo_GetDuration(ASAP_GetInfo(m_song[0]), m_subsongIndex);
         if (duration < 0)
             duration = 60 * 4 * 1000;
-        m_duration = static_cast<uint64_t>(duration) * ASAP_SAMPLE_RATE / 1000;
+        m_duration = uint64_t(duration) * ASAP_SAMPLE_RATE / 1000;
     }
 
     uint32_t ReplayASAP::GetDurationMs() const
     {
-        auto duration = ASAPInfo_GetDuration(ASAP_GetInfo(m_song), m_subsongIndex);
+        auto duration = ASAPInfo_GetDuration(ASAP_GetInfo(m_song[0]), m_subsongIndex);
         if (duration < 0)
             return 60 * 4 * 1000;
-        return static_cast<uint32_t>(duration);
+        return uint32_t(duration);
     }
 
     uint32_t ReplayASAP::GetNumSubsongs() const
     {
-        return uint32_t(ASAPInfo_GetSongs(ASAP_GetInfo(m_song)));
+        return uint32_t(ASAPInfo_GetSongs(ASAP_GetInfo(m_song[0])));
     }
 
     std::string ReplayASAP::GetExtraInfo() const
     {
         std::string metadata;
-        auto songInfo = ASAP_GetInfo(m_song);
+        auto songInfo = ASAP_GetInfo(m_song[0]);
         metadata  = "Title  : ";
         metadata += ASAPInfo_GetTitle(songInfo);
         metadata += "\nArtist : ";
@@ -229,7 +274,7 @@ namespace rePlayer
     std::string ReplayASAP::GetInfo() const
     {
         std::string info;
-        auto songInfo = ASAP_GetInfo(m_song);
+        auto songInfo = ASAP_GetInfo(m_song[0]);
         info = ASAPInfo_GetChannels(songInfo) == 1 ? "1 channel\n" : "2 channels\n";
         auto* ext = ASAPInfo_GetOriginalModuleExt(songInfo);
         info += ASAPInfo_GetExtDescription(ext ? ext : "sap");
