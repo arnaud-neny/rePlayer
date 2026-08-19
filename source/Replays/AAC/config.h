@@ -1,4 +1,4 @@
-#define FAAD2_VERSION "2.11.2"
+#define FAAD2_VERSION "2.11.3"
 
 #define APPLY_DRC 1
 #define HAVE_INTTYPES_H 1

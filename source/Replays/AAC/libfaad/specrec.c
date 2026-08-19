@@ -372,6 +372,9 @@ uint8_t window_grouping_info(NeAACDecStruct *hDecoder, ic_stream *ics)
 #ifdef LD_DEC
         }
 #endif
+        if (ics->num_swb > 0 && ics->swb_offset[ics->num_swb] < ics->swb_offset[ics->num_swb-1]) {
+            return 32;
+        }
         return 0;
     case EIGHT_SHORT_SEQUENCE:
         ics->num_windows = 8;
@@ -444,34 +447,38 @@ static INLINE real_t iquant(int16_t q, const real_t *tab, uint8_t *error)
     real_t x1, x2;
 #endif
     int16_t sgn = 1;
+    /* compute the magnitude in int: -q is evaluated as int and so does not
+       wrap for q == -32768 the way an int16_t negation would, which keeps the
+       comparison against IQ_TABLE_SIZE in range like the floating-point path */
+    int aq = q;
 
-    if (q < 0)
+    if (aq < 0)
     {
-        q = -q;
+        aq = -aq;
         sgn = -1;
     }
 
-    if (q < IQ_TABLE_SIZE)
+    if (aq < IQ_TABLE_SIZE)
     {
 //#define IQUANT_PRINT
 #ifdef IQUANT_PRINT
-        //printf("0x%.8X\n", sgn * tab[q]);
-        printf("%d\n", sgn * tab[q]);
+        //printf("0x%.8X\n", sgn * tab[aq]);
+        printf("%d\n", sgn * tab[aq]);
 #endif
-        return sgn * tab[q];
+        return sgn * tab[aq];
     }
 
 #ifndef BIG_IQ_TABLE
-    if (q >= 8192)
+    if (aq >= 8192)
     {
         *error = 17;
         return 0;
     }
 
     /* linear interpolation */
-    x1 = tab[q>>3];
-    x2 = tab[(q>>3) + 1];
-    return sgn * 16 * (MUL_R(errcorr[q&7],(x2-x1)) + x1);
+    x1 = tab[aq>>3];
+    x2 = tab[(aq>>3) + 1];
+    return sgn * 16 * (MUL_R(errcorr[aq&7],(x2-x1)) + x1);
 #else
     *error = 17;
     return 0;
@@ -590,6 +597,13 @@ static uint8_t quant_to_spec(NeAACDecStruct *hDecoder,
             int16_t scale_factor = ics->scale_factors[g][sfb];
 
             width = ics->swb_offset[sfb+1] - ics->swb_offset[sfb];
+            if (width + 3 >= 1024) 
+            {
+                // quant_data contains 1024 uint16_t, the k iterator + 3
+                // should never reach more 1024
+                error = 17;
+                continue;
+            }
 
 #ifdef FIXED_POINT
             scale_factor -= 100;
@@ -847,27 +861,35 @@ static uint8_t allocate_channel_pair(NeAACDecStruct *hDecoder,
         }
 #endif
     }
-    if (hDecoder->time_out[channel] == NULL)
+    if (hDecoder->time_out[channel] != NULL)
     {
-        hDecoder->time_out[channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->time_out[channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
+        faad_free(hDecoder->time_out[channel]);
+        hDecoder->time_out[channel] = NULL;
     }
-    if (hDecoder->time_out[paired_channel] == NULL)
+    if (hDecoder->time_out[paired_channel] != NULL)
     {
-        hDecoder->time_out[paired_channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->time_out[paired_channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
+        faad_free(hDecoder->time_out[paired_channel]);
+        hDecoder->time_out[paired_channel] = NULL;
     }
+    hDecoder->time_out[channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
+    memset(hDecoder->time_out[channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
+    hDecoder->time_out[paired_channel] = (real_t*)faad_malloc(mul*hDecoder->frameLength*sizeof(real_t));
+    memset(hDecoder->time_out[paired_channel], 0, mul*hDecoder->frameLength*sizeof(real_t));
 
-    if (hDecoder->fb_intermed[channel] == NULL)
+    if (hDecoder->fb_intermed[channel] != NULL)
     {
-        hDecoder->fb_intermed[channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->fb_intermed[channel], 0, hDecoder->frameLength*sizeof(real_t));
+        faad_free(hDecoder->fb_intermed[channel]);
+        hDecoder->fb_intermed[channel] = NULL;
     }
-    if (hDecoder->fb_intermed[paired_channel] == NULL)
+    if (hDecoder->fb_intermed[paired_channel] != NULL)
     {
-        hDecoder->fb_intermed[paired_channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
-        memset(hDecoder->fb_intermed[paired_channel], 0, hDecoder->frameLength*sizeof(real_t));
+        faad_free(hDecoder->fb_intermed[paired_channel]);
+        hDecoder->fb_intermed[paired_channel] = NULL;
     }
+    hDecoder->fb_intermed[channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
+    memset(hDecoder->fb_intermed[channel], 0, hDecoder->frameLength*sizeof(real_t));
+    hDecoder->fb_intermed[paired_channel] = (real_t*)faad_malloc(hDecoder->frameLength*sizeof(real_t));
+    memset(hDecoder->fb_intermed[paired_channel], 0, hDecoder->frameLength*sizeof(real_t));
 
 #ifdef SSR_DEC
     if (hDecoder->object_type == SSR)
@@ -984,8 +1006,8 @@ uint8_t reconstruct_single_channel(NeAACDecStruct *hDecoder, ic_stream *ics,
     /* MAIN object type prediction */
     if (hDecoder->object_type == MAIN)
     {
-		if (!hDecoder->pred_stat[sce->channel])
-			return 33;
+        if (!hDecoder->pred_stat[sce->channel])
+            return 33;
 
         /* intra channel prediction */
         ic_prediction(ics, spec_coef, hDecoder->pred_stat[sce->channel], hDecoder->frameLength,
@@ -1013,6 +1035,9 @@ uint8_t reconstruct_single_channel(NeAACDecStruct *hDecoder, ic_stream *ics,
             ics->ltp.lag = hDecoder->ltp_lag[sce->channel];
         }
 #endif
+
+        if (!hDecoder->lt_pred_stat[sce->channel])
+            return 34;
 
         /* long term prediction */
         lt_prediction(ics, &(ics->ltp), spec_coef, hDecoder->lt_pred_stat[sce->channel], hDecoder->fb,
@@ -1218,6 +1243,9 @@ uint8_t reconstruct_channel_pair(NeAACDecStruct *hDecoder, ic_stream *ics1, ic_s
     /* MAIN object type prediction */
     if (hDecoder->object_type == MAIN)
     {
+        if (!hDecoder->pred_stat[cpe->channel] || !hDecoder->pred_stat[cpe->paired_channel])
+            return 33;
+
         /* intra channel prediction */
         ic_prediction(ics1, spec_coef1, hDecoder->pred_stat[cpe->channel], hDecoder->frameLength,
             hDecoder->sf_index);
@@ -1255,6 +1283,9 @@ uint8_t reconstruct_channel_pair(NeAACDecStruct *hDecoder, ic_stream *ics1, ic_s
             ltp2->lag = hDecoder->ltp_lag[cpe->paired_channel];
         }
 #endif
+
+        if (!hDecoder->lt_pred_stat[cpe->channel] || !hDecoder->lt_pred_stat[cpe->paired_channel])
+            return 34;
 
         /* long term prediction */
         lt_prediction(ics1, ltp1, spec_coef1, hDecoder->lt_pred_stat[cpe->channel], hDecoder->fb,

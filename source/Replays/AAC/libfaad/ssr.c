@@ -37,6 +37,11 @@
 #include "filtbank.h"
 #include "ssr.h"
 #include "ssr_fb.h"
+#include "ssr_ipqf.h"
+
+static void ssr_gc_function(ssr_info *ssr, real_t *prev_fmd,
+                            real_t *gc_function, uint8_t window_sequence,
+                            uint16_t frame_len);
 
 void ssr_decode(ssr_info *ssr, fb_info *fb, uint8_t window_sequence,
                 uint8_t window_shape, uint8_t window_shape_prev,
@@ -90,7 +95,7 @@ static void ssr_gain_control(ssr_info *ssr, real_t *data, real_t *output,
     if (window_sequence != EIGHT_SHORT_SEQUENCE)
     {
         ssr_gc_function(ssr, &prev_fmd[band * frame_len*2],
-            gc_function, window_sequence, band, frame_len);
+            gc_function, window_sequence, frame_len);
 
         for (i = 0; i < frame_len*2; i++)
             data[band * frame_len*2 + i] *= gc_function[i];
@@ -136,7 +141,7 @@ static void ssr_gain_control(ssr_info *ssr, real_t *data, real_t *output,
 
 static void ssr_gc_function(ssr_info *ssr, real_t *prev_fmd,
                             real_t *gc_function, uint8_t window_sequence,
-                            uint8_t band, uint16_t frame_len)
+                            uint16_t frame_len)
 {
     uint16_t i;
     uint16_t len_area1, len_area2;
