@@ -65,6 +65,7 @@ namespace rePlayer
 
         void UpdateImportArtists();
         void FindArtists();
+        void ImportArtists(Array<SourceID>& sources);
         void ImportArtist(SourceID artistID, SourceResults& sourceResults);
 
         void ProcessImports();
@@ -94,7 +95,7 @@ namespace rePlayer
 
         SmartPtr<BusySpinner> m_busySpinner;
 
-        struct ImportArtists
+        struct ImportArtistsData
         {
             struct State
             {

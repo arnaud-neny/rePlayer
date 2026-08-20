@@ -838,28 +838,84 @@ namespace rePlayer
                 m_imports = {};
                 m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
                 m_busySpinner->Info("Importing artists");
-                Core::AddJob([this]()
+                Array<SourceID> sources;
+                for (uint32_t i = 0; i < m_importArtists.artists.NumItems(); i++)
                 {
-                    m_busySpinner->Indent(1);
-
-                    SourceResults sourceResults;
-                    for (uint32_t i = 0; i < m_importArtists.artists.NumItems(); i++)
-                    {
-                        if (m_importArtists.states[i].isImported)
-                            ImportArtist(m_importArtists.artists[i].id, sourceResults);
-                    }
-
-                    m_busySpinner->Indent(-1);
-                    Core::FromJob([this, sourceResults = std::move(sourceResults)]()
-                    {
-                        m_imports.isOpened = &m_importArtists.isOpened;
-                        m_imports.sourceResults = std::move(sourceResults);
-                        m_busySpinner.Reset();
-                    });
-                });
+                    if (m_importArtists.states[i].isImported)
+                        sources.Add(m_importArtists.artists[i].id);
+                }
+                ImportArtists(sources);
             }
             ImGui::EndDisabled();
         }
+    }
+
+    void Library::ImportArtists(Array<SourceID>& sources)
+    {
+        Core::AddJob([this, sources = std::move(sources)]()
+        {
+            m_busySpinner->Indent(1);
+
+            SourceResults sourceResults;
+            for (auto& id : sources)
+                ImportArtist(id, sourceResults);
+
+            m_busySpinner->Indent(-1);
+            Core::FromJob([this, sourceResults = std::move(sourceResults), sources = std::move(sources)]()
+            {
+                // update fetch time for artists with their db complete
+                Array<bool> dirtyArtist(sourceResults.artists.NumItems(), 0);
+                for (uint32_t aIdx = 0; aIdx < dirtyArtist.NumItems(); ++aIdx)
+                {
+                    // default is dirty to avoid processing artists added during import phase
+                    dirtyArtist[aIdx] = true;
+                    for (auto id : sources)
+                    {
+                        if (sourceResults.artists[aIdx]->sources[0].id == id)
+                        {
+                            // reset the dirty state as it's going to be set depending on the imported songs
+                            dirtyArtist[aIdx] = false;
+                            break;
+                        }
+                    }
+                }
+                // mark dirty all artists with new songs
+                for (uint32_t i = 0; i < sourceResults.songs.NumItems(); ++i)
+                {
+                    for (uint32_t j = 0; j < sourceResults.songs[i]->artistIds.NumItems(); ++j)
+                        dirtyArtist[int(sourceResults.songs[i]->artistIds[j])] |= sourceResults.states[i].IsNew();
+                }
+                // now update the fetch time of fully imported artists without new songs
+                for (uint32_t aIdx = 0; aIdx < dirtyArtist.NumItems(); ++aIdx)
+                {
+                    // if it's dirty, don't bother set the fetch time
+                    if (dirtyArtist[aIdx])
+                        continue;
+
+                    // check if the artist is in the library
+                    for (Artist* artist : m_db.Artists())
+                    {
+                        bool isDone = false;
+                        for (uint16_t i = 0; i < artist->NumSources(); i++)
+                        {
+                            // found it, update
+                            if (artist->GetSource(i).id == sourceResults.artists[aIdx]->sources[0].id)
+                            {
+                                artist->Edit()->sources[i].timeFetch = sourceResults.artists[aIdx]->sources[0].timeFetch;
+                                isDone = true;
+                                break;
+                            }
+                        }
+                        if (isDone)
+                            break;
+                    }
+                }
+
+                m_imports.isOpened = &m_importArtists.isOpened;
+                m_imports.sourceResults = std::move(sourceResults);
+                m_busySpinner.Reset();
+            });
+        });
     }
 
     void Library::ImportArtist(SourceID artistId, SourceResults& sourceResults)

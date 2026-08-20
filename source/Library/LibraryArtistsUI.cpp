@@ -90,22 +90,10 @@ namespace rePlayer
             library.m_busySpinner.New(busySpinnerColor);
             library.m_busySpinner->Info("Importing artist");
             library.m_importArtists.isOpened = library.m_importArtists.isExternal = true;
-            Core::AddJob([&library, artist = SmartPtr<ArtistSheet>(selectedArtist->Edit())]()
-            {
-                library.m_busySpinner->Indent(1);
-
-                SourceResults sourceResults;
-                for (auto& source : artist->sources)
-                    library.ImportArtist(source.id, sourceResults);
-
-                library.m_busySpinner->Indent(-1);
-                Core::FromJob([&library, sourceResults = std::move(sourceResults)]()
-                {
-                    library.m_imports.isOpened = &library.m_importArtists.isOpened;
-                    library.m_imports.sourceResults = std::move(sourceResults);
-                    library.m_busySpinner.Reset();
-                });
-            });
+            Array<SourceID> sources;
+            for (uint32_t i = 0; i < selectedArtist->NumSources(); i++)
+                sources.Add(selectedArtist->GetSource(i).id);
+            library.ImportArtists(sources);
         }
         ImGui::PopStyleColor(3);
     }
