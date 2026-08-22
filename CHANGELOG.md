@@ -5,21 +5,25 @@
 
 ## Current version
 
+v0.22.10:
+- Updated FAAD2 to 2.11.3
+- Updated FluidSynth to 2.6.0
+- Updated libsidplay to 3.1.0
+- Updated libresidfp to 1.2.1
+- Updated libvgm to r624
+- Updated OpenMPT to 0.9.0-pre.13 r25674
+- ASAP with surround for single channel songs
+- Bug fixes
+
 v0.22.9:
 - Updated adplug to 2.4 r943
-- Updated FluidSynth to 2.5.7
-- Updated libresidfp to 1.1.2
 - Updated libxmp to 4.7.2
-- Updated OpenMPT to 0.9.0-pre.12 r25498
 - Updated ImGui to 1.92.9b
 - Updated TagLib to 2.3.1
 - Added context menu to playlist to sort, export as WAV or scan ReplayGain the selection
-- Bug fixes
 
 v0.22.8:
-- Updated libsidplay to 3.0.2
 - Updated libtfmxaudiodecoder to 1.0.14
-- Updated libvgm to r615
 - Updated libarchive to 3.8.8
 - Updated libcurl to 8.21.0
 
@@ -51,19 +55,19 @@ v0.22.0:
 - [0.22.8] adplug to 2.4 r938
 - [0.22.0] ASAP to 8.0.0
 - [0.17.3] FAAD2 to 2.11.2
-- [0.22.8] FluidSynth to 2.5.6
+- [0.22.9] FluidSynth to 2.5.7
 - [0.19.4] Furnace to 0.6.8.3
 - [0.21.9] gbsplay to 0.0.101
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
-- [0.22.8] libresidfp to 1.1.1
+- [0.22.9] libresidfp to 1.1.2
 - [0.16.15] libsc68 to 3.0.0a r706
-- [0.22.6] libsidplay to 3.0.1
+- [0.22.8] libsidplay to 3.0.2
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
-- [0.21.9] libvgm to 57585ea
+- [0.22.8] libvgm to r615
 - [0.22.8] libxmp to 4.7.1
-- [0.22.8] OpenMPT to 0.9.0-pre.12 r25462
+- [0.22.9] OpenMPT to 0.9.0-pre.12 r25498
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
 - [0.22.1] SNDH-Player to 1.00
@@ -117,8 +121,7 @@ v0.22.0:
 
 ## Older features
 
-- [0.12.7] Ability to play directly from an URL (drag and drop from the browser or import), including streaming (online
-  radios)
+- [0.12.7] Ability to play directly from an URL (drag and drop from the browser or import), including streaming (online radios)
 - [0.15.21] Archive loader (7zip, zip, rar...)
 - [0.19.4] Associate extension with replay in settings
 - [0.4.0] Atari SAP Music Archive import
