@@ -45,6 +45,7 @@ namespace rePlayer
         bool m_isMetadataOpened = false;
         uint16_t m_selectedSubsong = 0;
         Replayables m_playables;
+        uint32_t m_metadataCRC = 0;
 
         SmartPtr<SongEndEditor> m_songEndEditor;
 

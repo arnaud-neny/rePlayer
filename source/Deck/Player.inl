@@ -19,6 +19,11 @@ namespace rePlayer
         m_replay->ApplySettings(m_song->metadata.Container());
     }
 
+    inline void Player::UpdateSettings(CommandBuffer commandBuffer)
+    {
+        m_replay->ApplySettings(commandBuffer);
+    }
+
     inline bool Player::IsStopped() const
     {
         return m_status == Status::Stopped;

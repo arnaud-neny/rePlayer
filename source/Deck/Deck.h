@@ -56,6 +56,7 @@ namespace rePlayer
 
         void DisplaySettings();
         void ChangedSettings();
+        void UpdateSettings(core::CommandBuffer commandBuffer);
 
         void OnSystray(int32_t x, int32_t y, SystrayState state);
 

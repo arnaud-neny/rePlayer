@@ -324,6 +324,11 @@ namespace rePlayer
             m_nextPlayer->ApplySettings();
     }
 
+    void Deck::UpdateSettings(core::CommandBuffer commandBuffer)
+    {
+        m_currentPlayer->UpdateSettings(commandBuffer);
+    }
+
     inline constexpr Deck::ClippedTextFlags operator&(Deck::ClippedTextFlags a, Deck::ClippedTextFlags b)
     {
         return Deck::ClippedTextFlags(uint8_t(a) & uint8_t(b));

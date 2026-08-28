@@ -42,6 +42,7 @@ namespace rePlayer
         bool IsNewSong() const;
 
         void ApplySettings();
+        void UpdateSettings(CommandBuffer commandBuffer);
 
         bool IsStopped() const;
         bool IsPlaying() const;

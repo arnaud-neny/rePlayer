@@ -1,5 +1,4 @@
-#include "SongEditor.h"
-
+// Core
 #include <Core/Log.h>
 #include <Core/String.h>
 #include <Helpers/CommandBuffer.inl.h>
@@ -8,6 +7,7 @@
 #include <IO/File.h>
 #include <IO/Stream.h>
 
+// rePlayer
 #include <Database/SongEndEditor.h>
 #include <Deck/Deck.h>
 #include <Library/Library.h>
@@ -17,6 +17,12 @@
 #include <Replays/ReplayContexts.h>
 #include <UI/BusySpinner.h>
 
+#include "SongEditor.h"
+
+// zlib
+#include <zlib.h>
+
+// stl
 #include <algorithm>
 #include <chrono>
 
@@ -127,6 +133,10 @@ namespace rePlayer
             {
                 m_song.original.metadata = currentSong->Metadatas();
                 m_song.edited.metadata = m_song.original.metadata;
+
+                m_metadataCRC = crc32(0L, Z_NULL, 0);
+                if (m_song.edited.metadata.IsNotEmpty())
+                    m_metadataCRC = crc32_z(m_metadataCRC, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size());
             }
             if (m_song.original.tags != currentSong->GetTags())
             {
@@ -142,6 +152,7 @@ namespace rePlayer
             {
                 m_song.original = {};
                 m_song.edited = {};
+                m_metadataCRC = crc32(0L, Z_NULL, 0);
             }
             m_selectedSubsong = 0;
         }
@@ -804,6 +815,18 @@ namespace rePlayer
             }
 
             m_musicId.MarkForSave();
+        }
+        else if (Core::GetDeck().GetCurrentPlayerId().IsSameSong(m_musicId))
+        {
+            // if metadata of the current playing song are changing, make it live without saving
+            auto fileCrc = crc32(0L, Z_NULL, 0);
+            if (m_song.edited.metadata.IsNotEmpty())
+                fileCrc = crc32_z(fileCrc, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size());
+            if (fileCrc != m_metadataCRC)
+            {
+                Core::GetDeck().UpdateSettings(m_song.edited.metadata.Container());
+                m_metadataCRC = fileCrc;
+            }
         }
         ImGui::EndDisabled();
     }
