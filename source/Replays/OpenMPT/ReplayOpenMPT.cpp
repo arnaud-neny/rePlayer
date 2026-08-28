@@ -3,6 +3,8 @@
 // - libopenmpt/libopenmpt_c.cpp
 // - libopenmpt/libopenmpt_impl.cpp
 // - libopenmpt/libopenmpt_impl.hpp
+// - soundlib/Sndfile.h
+// - soundlib/Sndmix.cpp
 #include "ReplayOpenMPT.h"
 
 #include <Audio/AudioTypes.inl.h>
@@ -64,6 +66,8 @@ namespace rePlayer
             window.RegisterSerializedData(settings.surround, settings.labels[4].c_str());
             settings.labels[5] = std::string("ReplayOpenMPTPatterns_") + std::string(settings.serializedName);
             window.RegisterSerializedData(settings.patterns, settings.labels[5].c_str());
+            settings.labels[6] = std::string("ReplayOpenMPTForceStereo_") + std::string(settings.serializedName);
+            window.RegisterSerializedData(settings.forceStereo, settings.labels[6].c_str());
         }
 
         g_replayPlugin.extensions = openmpt_get_supported_extensions();
@@ -121,6 +125,8 @@ namespace rePlayer
         changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, NumItemsOf(surround));
         const char* const patterns[] = { "Disable", "Enable" };
         changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, NumItemsOf(patterns));
+        const char* const forceStereo[] = { "Default", "Max" };
+        changed |= ImGui::Combo("Panning", &ms_settings[settingsIndex].forceStereo, forceStereo, NumItemsOf(forceStereo));
         ImGui::EndDisabled();
         return changed;
     }
@@ -140,6 +146,8 @@ namespace rePlayer
             ms_settings[0].ramping, -1, 10, "Ramping %d", -1);
         ComboOverride("VBlank", GETSET(entry, overrideVblank), GETSET(entry, vblank),
             false, "CIA Timing", "VBlank Timing");
+        ComboOverride("ForceStereo", GETSET(entry, overrideForceStereo), GETSET(entry, forceStereo),
+            false, "Panning: Default", "Panning: Max");
 
         context.metadata.Update(entry, entry->value == 0);
     }
@@ -316,7 +324,7 @@ namespace rePlayer
         openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_INTERPOLATIONFILTER_LENGTH, (1 << ((settings && settings->overrideInterpolation) ? settings->interpolation : globalSettings->interpolation)) >> 1);
         openmpt_module_set_render_param(m_modulePlayback, OPENMPT_MODULE_RENDER_VOLUMERAMPING_STRENGTH, (settings && settings->overrideRamping) ? int64_t(settings->ramping) - 1 : int64_t(globalSettings->ramping));
 
-        int32_t vblank = (settings && (settings->overrideVblank)) ? settings->vblank : -1;
+        int32_t vblank = (settings && settings->overrideVblank) ? settings->vblank : -1;
         openmpt_module_ctl_set_integer(m_modulePlayback, "vblank", vblank);
         openmpt_module_ctl_set_integer(m_moduleVisuals, "vblank", vblank);
         if (m_vblank != vblank)
@@ -334,6 +342,9 @@ namespace rePlayer
         m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : globalSettings->surround);
 
         m_arePatternsDisplayed = globalSettings->patterns;
+
+        auto* sndfile = pCast<OpenMPT::CSoundFile>(openmpt_module_get_sndfile(m_modulePlayback));
+        sndfile->m_bForceStereo = (settings && settings->overrideForceStereo) ? settings->forceStereo : globalSettings->forceStereo;
     }
 
     void ReplayOpenMPT::SetSubsong(uint32_t subsongIndex)
@@ -535,7 +546,10 @@ namespace rePlayer
         char buf[128];
         sprintf(buf, "%d", openmpt_module_get_num_channels(m_modulePlayback));
         info = buf;
-        info += " channels\n";
+        if (m_surround.IsEnabled())
+            info += " channels + surround\n";
+        else
+            info += " channels\n";
         auto type = openmpt_module_get_metadata(m_modulePlayback, "type_long");
         if (type)
         {

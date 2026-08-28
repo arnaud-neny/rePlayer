@@ -602,6 +602,7 @@ public:
 	bool LoadExternalSample(SAMPLEINDEX smp, const mpt::PathString &filename);
 #endif // MPT_EXTERNAL_SAMPLES
 
+	bool m_bForceStereo = false; // rePlayer
 	bool m_bIsRendering = false;
 	TimingInfo m_TimingInfo; // only valid if !m_bIsRendering
 

@@ -34,6 +34,8 @@ namespace rePlayer
                     uint32_t surround : 1;
                     uint32_t overrideVblank : 1;
                     uint32_t vblank : 1;
+                    uint32_t overrideForceStereo : 1;
+                    uint32_t forceStereo : 1;
                 };
             };
 
@@ -75,8 +77,9 @@ namespace rePlayer
             int32_t stereoSeparation = 100;
             int32_t surround = 0;
             int32_t patterns = 1;
+            int32_t forceStereo = 0;
 
-            std::string labels[6];
+            std::string labels[7];
 
             GlobalSettings(const char* name, const char* fmt, bool isSurroundEnabled = false, bool isEnbl = false) : serializedName(name), format(fmt), surround(isSurroundEnabled), isEnabled(isEnbl) {}
      };

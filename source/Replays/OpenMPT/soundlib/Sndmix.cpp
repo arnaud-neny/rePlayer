@@ -2508,7 +2508,7 @@ bool CSoundFile::ReadNote()
 
 			// Adjusting volumes
 			{
-				int32 pan = (m_MixerSettings.gnChannels >= 2) ? Clamp(chn.nRealPan, 0, 256) : 128;
+				int32 pan = (m_MixerSettings.gnChannels >= 2) ? (m_bForceStereo ? ((nChn + 1) & 2) * 128 : Clamp(chn.nRealPan, 0, 256)) : 128; // rePlayer
 
 				int32 realvol = (chn.nRealVolume * kChnMasterVol) / 128;
 				// Extra attenuation required here if we're bypassing pre-amp.
