@@ -228,6 +228,8 @@ void State::restoreState(SID &s, char* buffer, int size)
         f->vol = state.vol[i];
         f->enabled = state.enabled[i];
         f->filt = state.filt[i];
+        f->updateResonance((f->filt >> 4) & 0x0f);
+        f->updateMixing();
     }
     s.setFilter6581Curve(state.filterCurve6581);
     s.setFilter6581Range(state.filterRange6581);
