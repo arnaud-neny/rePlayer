@@ -1,4 +1,4 @@
-# Atari Audio Library
+# Atari Audio Library v1.02
 
 AtariAudio/ directory contains Atari Audio library. You can use it to play SNDH files or directly use YM2149 emulator if you want to write your own tracker.
 The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
