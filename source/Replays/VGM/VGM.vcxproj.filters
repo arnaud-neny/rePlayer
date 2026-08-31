@@ -422,6 +422,9 @@
     <ClInclude Include="libvgm\emu\cores\ymfmintf.h">
       <Filter>Source Files\libvgm\emu\cores</Filter>
     </ClInclude>
+    <ClInclude Include="libvgm\emu\cores\ymf271_opx.h">
+      <Filter>Source Files\libvgm\emu\cores</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGM.cpp">

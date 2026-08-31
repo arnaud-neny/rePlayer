@@ -281,6 +281,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libvgm\emu\cores\ymdeltat.h" />
     <ClInclude Include="libvgm\emu\cores\ymf262.h" />
     <ClInclude Include="libvgm\emu\cores\ymf271.h" />
+    <ClInclude Include="libvgm\emu\cores\ymf271_opx.h" />
     <ClInclude Include="libvgm\emu\cores\ymf278b.h" />
     <ClInclude Include="libvgm\emu\cores\ymfmintf.h" />
     <ClInclude Include="libvgm\emu\cores\ymfm\ymfm.h" />

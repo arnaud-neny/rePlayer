@@ -163,18 +163,37 @@ static void update_sample(GB_gameboy_t *gb, GB_channel_t index, int8_t value, un
             right = gb->io_registers[GB_IO_NR51] & (1 << index);
             
             // rePlayer begin
-            if (gb->forceStereo) {
-                if (index & 1) {
-                    output.left = 0;
-                    output.right = (0xF - ((left || right) ? value * 2 + bias : silence)) * (left_volume >= right_volume ? left_volume : right_volume);
-                } else {
-                    output.left = (0xF - ((left || right) ? value * 2 + bias : silence)) * (left_volume >= right_volume ? left_volume : right_volume);
-                    output.right = 0;
+            if (!gb->noDcOffset) {
+                if (gb->forceStereo) {
+                    if (index & 1) {
+                        output.left = 0;
+                        output.right = (0xF - ((left || right) ? value * 2 + bias : silence)) * (left_volume >= right_volume ? left_volume : right_volume);
+                    } else {
+                        output.left = (0xF - ((left || right) ? value * 2 + bias : silence)) * (left_volume >= right_volume ? left_volume : right_volume);
+                        output.right = 0;
+                    }
+                }
+                else {
+                    output.left = (0xF - (left ? value * 2 + bias : silence)) * left_volume;
+                    output.right = (0xF - (right ? value * 2 + bias : silence)) * right_volume;
                 }
             }
             else {
-                output.left = (0xF - (left ? value * 2 + bias : silence)) * left_volume;
-                output.right = (0xF - (right ? value * 2 + bias : silence)) * right_volume;
+                if (index == GB_WAVE)
+                    value ^= 0xF;
+                if (gb->forceStereo) {
+                    if (index & 1) {
+                        output.left = 0;
+                        output.right = ((right || left) ? value * 2 : 0) * (left_volume >= right_volume ? left_volume : right_volume);
+                    } else {
+                        output.left = ((right || left) ? value * 2 : 0) * (left_volume >= right_volume ? left_volume : right_volume);
+                        output.right = 0;
+                    }
+                }
+                else {
+                    output.left = (left? value * 2 : 0) * left_volume;
+                    output.right = (right? value * 2 : 0) * right_volume;
+                }
             }
             // rePlayer end
             
@@ -207,14 +226,27 @@ static void update_sample(GB_gameboy_t *gb, GB_channel_t index, int8_t value, un
         }
         if (likely(!gb->apu_output.channel_muted[index])) {
             // rePlayer begin
-            if (gb->forceStereo) {
-                if (index & 1)
-                    output.right = (0xF - value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
-                else
-                    output.left = (0xF - value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
-            } else {
-                output.left = (0xF - value * 2) * left_volume;
-                output.right = (0xF - value * 2) * right_volume;
+            if (!gb->noDcOffset) {
+                if (gb->forceStereo) {
+                    if (index & 1)
+                        output.right = (0xF - value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
+                    else
+                        output.left = (0xF - value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
+                } else {
+                    output.left = (0xF - value * 2) * left_volume;
+                    output.right = (0xF - value * 2) * right_volume;
+                }
+            }
+            else {
+                if (gb->forceStereo) {
+                    if (index & 1)
+                        output.right = (value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
+                    else
+                        output.left = (value * 2) * (left_volume >= right_volume ? left_volume : right_volume);
+                } else {
+                    output.left = (value * 2) * left_volume;
+                    output.right = (value * 2) * right_volume;
+                }
             }
             // rePlayer end
         }
@@ -301,8 +333,8 @@ static void render(GB_gameboy_t *gb)
             }
         }
 
-        output.left += (int16_t)(gb->apu_output.channel_output[i].left * multiplier);
-        output.right += (int16_t)(gb->apu_output.channel_output[i].right * multiplier);
+        output.left += (int32_t)(gb->apu_output.channel_output[i].left * multiplier);
+        output.right += (int32_t)(gb->apu_output.channel_output[i].right * multiplier);
     }
     gb->apu_output.cycles_since_render = 0;
     if (unlikely(gb->apu_output.sample_fraction < (1 << 28))) {
@@ -314,8 +346,8 @@ static void render(GB_gameboy_t *gb)
     
     //if (gb->sgb && gb->sgb->intro_animation < GB_SGB_INTRO_ANIMATION_LENGTH) return;
 
-    filtered_output.left = gb->apu_output.highpass_mode? (output.left  - (int16_t)gb->apu_output.highpass_diff.left) : output.left;
-    filtered_output.right = gb->apu_output.highpass_mode? (output.right - (int16_t)gb->apu_output.highpass_diff.right) : output.right;
+    filtered_output.left = gb->apu_output.highpass_mode? (output.left  - (int32_t)gb->apu_output.highpass_diff.left) : output.left;
+    filtered_output.right = gb->apu_output.highpass_mode? (output.right - (int32_t)gb->apu_output.highpass_diff.right) : output.right;
 
     switch (gb->apu_output.highpass_mode) {
         case GB_HIGHPASS_OFF:
@@ -353,7 +385,7 @@ static void render(GB_gameboy_t *gb)
     
     if (gb->apu_output.interference_volume != 0.0) {
         signed interference_bias = interference(gb);
-        int16_t interference_sample = (int16_t)(interference_bias - gb->apu_output.interference_highpass);
+        int32_t interference_sample = (int32_t)(interference_bias - gb->apu_output.interference_highpass);
         gb->apu_output.interference_highpass = gb->apu_output.interference_highpass * gb->apu_output.highpass_rate +
         (1 - gb->apu_output.highpass_rate) * interference_sample;
         interference_bias *= gb->apu_output.interference_volume;
@@ -374,6 +406,11 @@ static void update_square_sample(GB_gameboy_t *gb, GB_channel_t index, unsigned 
         return;
     }
 
+    if (gb->apu.square_channels[index].sample_length >= gb->apu_output.sample_len_lowpass) {
+        // low-pass filter for inaudible square periods -Valley Bell
+        update_sample(gb, index, gb->apu.square_channels[index].current_volume / 2, cycles);
+        return;
+    }
     duty = gb->io_registers[index == GB_SQUARE_1? GB_IO_NR11 :GB_IO_NR21] >> 6;
     update_sample(gb, index,
                   duties[gb->apu.square_channels[index].current_sample_index + duty * 8]?
@@ -2162,9 +2199,18 @@ static void GB_set_sample_rate(GB_gameboy_t *gb, unsigned sample_rate)
         for (i = 1; i < GB_QUICK_MULTIPLY_COUNT; i++) {
             gb->apu_output.quick_fraction_multiply_cache[i] = gb->apu_output.quick_fraction_multiply_cache[0] * (i + 1);
         }
+        {
+            // square wave period = 1048576 [period update clock] / 8 [duty cycle samples] / sample_countdown
+            // where sample_countdown = [0xFFF low-pitch .. 0x001 high-pitch]
+            // sample_countdown = (NRx4|NRx3 ^ 0x7FF) * 2 + 1
+            double lowpass_cycles = GB_get_clock_rate(gb) / sample_rate;	// period update clock = GB clock / 4
+            lowpass_cycles /= 8;	// divide by total duty cycle length (APU cycles for whole duty period -> APU cycles for 1 duty sample)
+            gb->apu_output.sample_len_lowpass = 0x7FF - ((unsigned)lowpass_cycles - 1) / 2;	// note: rounding here is exactly intended
+        }
     }
     else {
         gb->apu_output.max_cycles_per_sample = 0x400;
+        gb->apu_output.sample_len_lowpass = 0x800;
     }
 }
 
@@ -2306,7 +2352,7 @@ static UINT8 device_start_gb_sameboy(const DEV_GEN_CFG* cfg, DEV_INFO* retDevInf
 		return 0xFF;
 
 	gb->clock_rate = cfg->clock;
-	gb->smpl_rate = gb->clock_rate / 64;
+	gb->smpl_rate = gb->clock_rate / 32;	// wave period update is with 131072 Hz
 	SRATE_CUSTOM_HIGHEST(cfg->srMode, gb->smpl_rate, cfg->smplRate);
 
 	gb->model = (cfg->flags & 0x01) ? GB_MODEL_CGB_A : GB_MODEL_DMG_B;
@@ -2317,10 +2363,12 @@ static UINT8 device_start_gb_sameboy(const DEV_GEN_CFG* cfg, DEV_INFO* retDevInf
 	RC_SET_RATIO(&gb->cycleCntr, cfg->clock, gb->smpl_rate);
 
 	gb_sameboy_set_mute_mask(gb, 0x00);
-	GB_set_highpass_filter_mode(gb, GB_HIGHPASS_ACCURATE);
-	GB_set_interference_volume(gb, 0.0);
 	gb->noWaveCorrupt = false;
+	gb->noDcOffset = false;
+	gb->enableHighpass = true;
 	gb->legacyMode = false;
+	GB_set_highpass_filter_mode(gb, gb->enableHighpass ? GB_HIGHPASS_ACCURATE : GB_HIGHPASS_OFF);
+	GB_set_interference_volume(gb, 0.0);
 
 	gb->_devData.chipInf = gb;
 	INIT_DEVINF(retDevInf, &gb->_devData, gb->smpl_rate, &devDef_GB_SameBoy);
@@ -2386,7 +2434,10 @@ static void gb_sameboy_set_options(void *chip, UINT32 Flags)
 	GB_gameboy_t *gb = (GB_gameboy_t *)chip;
 	
 	gb->noWaveCorrupt = (Flags & 0x02) >> 1;
+	gb->noDcOffset = (Flags & 0x04) >> 1;
+	gb->enableHighpass = (Flags & 0x08) >> 1;
 	gb->legacyMode = (Flags & 0x80) >> 7;
+	GB_set_highpass_filter_mode(gb, gb->enableHighpass ? GB_HIGHPASS_ACCURATE : GB_HIGHPASS_OFF);
 	
 	return;
 }

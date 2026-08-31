@@ -41,10 +41,10 @@
 typedef union
 {
     struct {
-        int16_t left;
-        int16_t right;
+        int32_t left;	// Note: needs to be int32_t to prevent overflow with MAX_CH_AMP=0x1E00
+        int32_t right;
     };
-    uint32_t packed;
+    uint64_t packed;
 } GB_sample_t;
 
 typedef struct
@@ -172,6 +172,7 @@ typedef enum {
 
 typedef struct {
     unsigned sample_rate;
+    unsigned sample_len_lowpass; // [square channels] assume inaudible wave when sample_length >= sample_len_lowpass
 
     unsigned sample_cycles; // Counts by sample_rate until it reaches the clock frequency
     unsigned max_cycles_per_sample;
@@ -205,33 +206,33 @@ typedef struct {
 #define GB_MODEL_NO_SFC_BIT 0x80
 
 typedef enum {
-	// GB_MODEL_DMG_0 = 0x000,
-	// GB_MODEL_DMG_A = 0x001,
-	GB_MODEL_DMG_B = 0x002,
-	// GB_MODEL_DMG_C = 0x003,
-	GB_MODEL_SGB = 0x004,
-	GB_MODEL_SGB_NTSC = GB_MODEL_SGB,
-	GB_MODEL_SGB_PAL = GB_MODEL_SGB | GB_MODEL_PAL_BIT,
-	GB_MODEL_SGB_NTSC_NO_SFC = GB_MODEL_SGB | GB_MODEL_NO_SFC_BIT,
-	GB_MODEL_SGB_NO_SFC = GB_MODEL_SGB_NTSC_NO_SFC,
-	GB_MODEL_SGB_PAL_NO_SFC = GB_MODEL_SGB | GB_MODEL_NO_SFC_BIT | GB_MODEL_PAL_BIT,
-	GB_MODEL_MGB = 0x100,
-	GB_MODEL_SGB2 = 0x101,
-	GB_MODEL_SGB2_NO_SFC = GB_MODEL_SGB2 | GB_MODEL_NO_SFC_BIT,
-	GB_MODEL_CGB_0 = 0x200,
-	GB_MODEL_CGB_A = 0x201,
-	GB_MODEL_CGB_B = 0x202,
-	GB_MODEL_CGB_C = 0x203,
-	GB_MODEL_CGB_D = 0x204,
-	GB_MODEL_CGB_E = 0x205,
-	// GB_MODEL_AGB_0 = 0x206,
-	GB_MODEL_AGB_A = 0x207,
-	GB_MODEL_GBP_A = GB_MODEL_AGB_A | GB_MODEL_GBP_BIT, // AGB-A inside a Game Boy Player
-	GB_MODEL_AGB = GB_MODEL_AGB_A,
-	GB_MODEL_GBP = GB_MODEL_GBP_A,
-	//GB_MODEL_AGB_B = 0x208
-	//GB_MODEL_AGB_E = 0x209
-	//GB_MODEL_GBP_E = GB_MODEL_AGB_E | GB_MODEL_GBP_BIT, // AGB-E inside a Game Boy Player
+    // GB_MODEL_DMG_0 = 0x000,
+    // GB_MODEL_DMG_A = 0x001,
+    GB_MODEL_DMG_B = 0x002,
+    // GB_MODEL_DMG_C = 0x003,
+    GB_MODEL_SGB = 0x004,
+    GB_MODEL_SGB_NTSC = GB_MODEL_SGB,
+    GB_MODEL_SGB_PAL = GB_MODEL_SGB | GB_MODEL_PAL_BIT,
+    GB_MODEL_SGB_NTSC_NO_SFC = GB_MODEL_SGB | GB_MODEL_NO_SFC_BIT,
+    GB_MODEL_SGB_NO_SFC = GB_MODEL_SGB_NTSC_NO_SFC,
+    GB_MODEL_SGB_PAL_NO_SFC = GB_MODEL_SGB | GB_MODEL_NO_SFC_BIT | GB_MODEL_PAL_BIT,
+    GB_MODEL_MGB = 0x100,
+    GB_MODEL_SGB2 = 0x101,
+    GB_MODEL_SGB2_NO_SFC = GB_MODEL_SGB2 | GB_MODEL_NO_SFC_BIT,
+    GB_MODEL_CGB_0 = 0x200,
+    GB_MODEL_CGB_A = 0x201,
+    GB_MODEL_CGB_B = 0x202,
+    GB_MODEL_CGB_C = 0x203,
+    GB_MODEL_CGB_D = 0x204,
+    GB_MODEL_CGB_E = 0x205,
+    // GB_MODEL_AGB_0 = 0x206,
+    GB_MODEL_AGB_A = 0x207,
+    GB_MODEL_GBP_A = GB_MODEL_AGB_A | GB_MODEL_GBP_BIT, // AGB-A inside a Game Boy Player
+    GB_MODEL_AGB = GB_MODEL_AGB_A,
+    GB_MODEL_GBP = GB_MODEL_GBP_A,
+    //GB_MODEL_AGB_B = 0x208
+    //GB_MODEL_AGB_E = 0x209
+    //GB_MODEL_GBP_E = GB_MODEL_AGB_E | GB_MODEL_GBP_BIT, // AGB-E inside a Game Boy Player
 } GB_model_t;
 
 struct GB_gameboy_s {
@@ -258,9 +259,10 @@ struct GB_gameboy_s {
     bool halted;
     bool stopped;
 
-	bool noWaveCorrupt;
-	bool legacyMode;
-
+    bool noWaveCorrupt;
+    bool legacyMode;
+    bool enableHighpass;
+    bool noDcOffset;
 	bool forceStereo; // rePlayer
 };
 typedef struct GB_gameboy_s GB_gameboy_t;
