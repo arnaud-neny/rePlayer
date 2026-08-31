@@ -5,15 +5,19 @@
 
 ## Current version
 
+v0.22.11:
+- Updated libresidfp to 1.2.2
+- Updated libsidplay to 3.1.1
+- Updated libvgm to r628
+- Updated SNDH-Player to 1.03
+- Added to OpenMPT an option to override the panning to make it fully separated
+- Bug fixes
+
 v0.22.10:
 - Updated FAAD2 to 2.11.3
 - Updated FluidSynth to 2.6.0
-- Updated libsidplay to 3.1.0
-- Updated libresidfp to 1.2.1
-- Updated libvgm to r624
 - Updated OpenMPT to 0.9.0-pre.13 r25674
 - ASAP with surround for single channel songs
-- Bug fixes
 
 v0.22.9:
 - Updated adplug to 2.4 r943
@@ -61,11 +65,11 @@ v0.22.0:
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
-- [0.22.9] libresidfp to 1.1.2
+- [0.22.10] libresidfp to 1.2.1
 - [0.16.15] libsc68 to 3.0.0a r706
-- [0.22.8] libsidplay to 3.0.2
+- [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
-- [0.22.8] libvgm to r615
+- [0.22.10] libvgm to r624
 - [0.22.8] libxmp to 4.7.1
 - [0.22.9] OpenMPT to 0.9.0-pre.12 r25498
 - [0.21.9] Opus to 1.6.1
