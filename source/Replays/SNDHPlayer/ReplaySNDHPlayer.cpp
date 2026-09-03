@@ -8,14 +8,12 @@
 
 namespace rePlayer
 {
-    #define SndhPlayerVersion "1.03"
-
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,
         .name = "SNDH-Player",
         .extensions = "sndh",
-        .about = "SNDH-Player " SndhPlayerVersion "\nCopyright (c) 2023-2026 Arnaud Carré",
-        .settings = "SNDH-Player " SndhPlayerVersion,
+        .about = "SNDH-Player " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",
+        .settings = "SNDH-Player " ATARI_AUDIO_VERSION,
         .init = ReplaySNDHPlayer::Init,
         .load = ReplaySNDHPlayer::Load,
         .displaySettings = ReplaySNDHPlayer::DisplaySettings,
@@ -244,7 +242,7 @@ namespace rePlayer
         char txt[16];
         sprintf(txt, "%d", subsongInfo.playerTickRate);
         info += txt;
-        info += " Hz\nSNDH-Player " SndhPlayerVersion;
+        info += " Hz\nSNDH-Player " ATARI_AUDIO_VERSION;
         return info;
     }
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.02
+	Atari Audio Library v1.04
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -24,9 +24,9 @@ public:
 		int samplePerTick;
 		const char* musicName;
 		const char* musicAuthor;
-		const char* year;
 		const char* ripper;
 		const char* converter;
+		const char* year;
 	};
 
 	bool	Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostReplayRate);
@@ -37,6 +37,7 @@ public:
 	int		GetDefaultSubsong() const { return m_defaultSubSong; }
 	bool	GetSubsongInfo(int subSongId, SubSongInfo& out) const;
 	bool	InitSubSong(int subSongId);
+	int 	FastForward(int framesToSkip);
 
 	/*
 	 * Main audio rendering function.
@@ -62,9 +63,9 @@ private:
 	bool	m_bLoaded;
 	const char*	m_Title;
 	const char*	m_Author;
+	const char* m_Ripper;
+	const char* m_Converter;
 	const char*	m_sYear;
-	const char*	m_Ripper;
-	const char*	m_Converter;
 	const void*	m_rawBuffer;
 	int		m_rawSize;
 

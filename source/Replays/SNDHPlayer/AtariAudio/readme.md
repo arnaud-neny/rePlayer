@@ -1,4 +1,4 @@
-# Atari Audio Library v1.02
+# Atari Audio Library v1.04
 
 AtariAudio/ directory contains Atari Audio library. You can use it to play SNDH files or directly use YM2149 emulator if you want to write your own tracker.
 The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
@@ -28,6 +28,11 @@ Like, let's say your replay rate is 44.1Khz and you want to generate 1 second of
   int16_t* buffer = buffer of 44100*2 bytes ( one sample is 16bits, mono )
   AudioRender(buffer, 44100);
 ````
+
+# Versions
+
+- 1.04 : added SndhFile::FastForward function
+- 1.03 : added Ripper & Converter into SubSongInfo struct. some minor linux compilation fixes
 
 # Credits
 

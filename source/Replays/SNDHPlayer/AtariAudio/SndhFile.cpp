@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.02
+	Atari Audio Library v1.04
 	Small & accurate ATARI-ST audio emulation
 	by Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -28,9 +28,9 @@ void	SndhFile::Unload()
 	m_rawBuffer = nullptr;
 	m_Title = nullptr;
 	m_Author = nullptr;
-	m_sYear = nullptr;
 	m_Ripper = nullptr;
 	m_Converter = nullptr;
+	m_sYear = nullptr;
 	m_rawSize = 0;
 	m_playerRate = 0;
 	m_subSongCount = -1;
@@ -265,9 +265,7 @@ int	SndhFile::AudioRender(int16_t* buffer, int count, uint32_t* pSampleViewInfo)
 			m_innerSamplePos = m_samplePerTick;
 			m_frame++;
 			if (m_frame >= m_frameCount)
-			{
 				m_loopCount++;
-			}
 		}
 
 		// compute the Atari machine sample (YM2149 and STE DAC)
@@ -290,9 +288,7 @@ int	SndhFile::AudioRenderStereo(int16_t* buffer, int count, uint32_t* pSampleVie
 			m_innerSamplePos = m_samplePerTick;
 			m_frame++;
 			if (m_frame >= m_frameCount)
-			{
 				m_loopCount++;
-			}
 		}
 
 		// compute the Atari machine sample (YM2149 and STE DAC)
@@ -315,13 +311,30 @@ int	SndhFile::AudioNull(int count)
 			m_innerSamplePos = m_samplePerTick;
 			m_frame++;
 			if (m_frame >= m_frameCount)
-			{
 				m_loopCount++;
-			}
 		}
 
 		// compute the Atari machine sample (YM2149 and STE DAC)
 		m_atariMachine.ComputeNextSample(nullptr);
 	}
 	return m_loopCount;
+}
+
+int SndhFile::FastForward(int framesToSkip)
+{
+	if (framesToSkip <= 0)
+		return 0;
+
+	if (framesToSkip + m_frame >= m_frameCount)
+		framesToSkip = m_frameCount - m_frame;
+
+	for (int i = 0; i < framesToSkip; i++)
+	{
+		m_atariMachine.Jsr(SNDH_UPLOAD_ADDR + 8, 0);
+		m_innerSamplePos = m_samplePerTick;
+		m_frame++;
+		if (m_frame >= m_frameCount)
+			m_loopCount++;
+	}
+	return framesToSkip;
 }
