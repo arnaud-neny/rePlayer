@@ -29,6 +29,9 @@
     <Filter Include="Source Files\lib\curlx">
       <UniqueIdentifier>{8d9bf75e-e399-4080-a234-5916bcd897d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\lib\vdns">
+      <UniqueIdentifier>{7929d0e3-abce-400e-8d65-001e229ba91d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\curl\curl.h">
@@ -76,9 +79,6 @@
     <ClInclude Include="lib\arpa_telnet.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\asyn.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\bufq.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -107,9 +107,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\config-os400.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\config-riscos.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\config-win32.h">
@@ -199,9 +196,6 @@
     <ClInclude Include="lib\dict.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\doh.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\dynhds.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -245,9 +239,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\headers.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\hostip.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\hsts.h">
@@ -469,9 +460,6 @@
     <ClInclude Include="lib\vtls\vtls_spack.h">
       <Filter>Source Files\lib\vtls</Filter>
     </ClInclude>
-    <ClInclude Include="lib\httpsrr.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\cshutdn.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -571,12 +559,6 @@
     <ClInclude Include="lib\curlx\strdup.h">
       <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
-    <ClInclude Include="lib\cf-dns.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\dnscache.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\ftp-int.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -625,15 +607,45 @@
     <ClInclude Include="lib\proxy.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\vdns\asyn.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vdns\cf-dns.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vdns\dnscache.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vdns\doh.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vdns\hostip.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vdns\httpsrr.h">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\api.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curl_ed25519.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\http_httpsig.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\uint-hashset.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="curl_config.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\altsvc.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\amigaos.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\asyn-ares.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\bufq.c">
@@ -720,9 +732,6 @@
     <ClCompile Include="lib\dict.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\doh.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\dynhds.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -769,15 +778,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\hmac.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\hostip.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\hostip4.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\hostip6.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\hsts.c">
@@ -1038,9 +1038,6 @@
     <ClCompile Include="lib\vtls\vtls_spack.c">
       <Filter>Source Files\lib\vtls</Filter>
     </ClCompile>
-    <ClCompile Include="lib\httpsrr.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\cshutdn.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -1085,12 +1082,6 @@
     </ClCompile>
     <ClCompile Include="lib\curlx\winapi.c">
       <Filter>Source Files\lib\curlx</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\asyn-base.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\asyn-thrdd.c">
-      <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\uint-bset.c">
       <Filter>Source Files\lib</Filter>
@@ -1149,12 +1140,6 @@
     <ClCompile Include="lib\curlx\strdup.c">
       <Filter>Source Files\lib\curlx</Filter>
     </ClCompile>
-    <ClCompile Include="lib\cf-dns.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\dnscache.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\protocol.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -1198,6 +1183,48 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\proxy.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\asyn-ares.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\asyn-base.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\asyn-thrdd.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\cf-dns.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\dnscache.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\doh.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\hostip.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\hostip4.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\hostip6.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vdns\httpsrr.c">
+      <Filter>Source Files\lib\vdns</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\api.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\curl_ed25519.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\http_httpsig.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\uint-hashset.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
