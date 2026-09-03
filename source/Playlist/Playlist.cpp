@@ -768,18 +768,42 @@ namespace rePlayer
     {
         //TODO: cache this operation and check for a dirty state (song/playlist update?)
         uint64_t duration = 0;
-        for (auto& entry : m_cue.entries)
+        uint64_t playingTime = 0;
+        auto currentEntryIndex = m_currentEntryIndex;
+        for (int32_t i = 0; i < currentEntryIndex; ++i)
+        {
+            auto& entry = m_cue.entries[i];
+            auto currentDuration = entry.GetSong()->GetSubsongDurationCs(entry.subsongId.index);
+            duration += currentDuration;
+            playingTime += currentDuration;
+        }
+        if (currentEntryIndex >= 0)
+        {
+            auto& entry = m_cue.entries[currentEntryIndex];
             duration += entry.GetSong()->GetSubsongDurationCs(entry.subsongId.index);
+            playingTime += Core::GetDeck().GetPlaylistPlayingTimeInMs() / 10;
+        }
+        for (int i = currentEntryIndex + 1, e = m_cue.entries.NumItems<int32_t>(); i < e; ++i)
+        {
+            auto& entry = m_cue.entries[i];
+            duration += entry.GetSong()->GetSubsongDurationCs(entry.subsongId.index);
+        }
         duration /= 100;
+        playingTime /= 100;
         char title[128];
         if (m_addFilesContext)
         {
             const char wait[] = "|/-\\";
-            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u %c###Playlist", uint32_t(m_currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60), wait[m_addFilesContext->time >> 14]);
+            if (currentEntryIndex >= 0)
+                sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u/%u:%02u:%02u %c###Playlist", uint32_t(currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(playingTime / 3600), uint32_t((playingTime % 3600) / 60), uint32_t(playingTime % 60), uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60), wait[m_addFilesContext->time >> 14]);
+            else
+                sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u %c###Playlist", uint32_t(currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60), wait[m_addFilesContext->time >> 14]);
             m_addFilesContext->time += uint16_t(11 * ImGui::GetIO().DeltaTime * ((1 << 14) - 1));
         }
+        else if (currentEntryIndex >= 0)
+            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u/%u:%02u:%02u###Playlist", uint32_t(currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(playingTime / 3600), uint32_t((playingTime % 3600) / 60), uint32_t(playingTime % 60), uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60));
         else
-            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u###Playlist", uint32_t(m_currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60));
+            sprintf(title, "Playlist: %u/%u %s - %u:%02u:%02u###Playlist", uint32_t(currentEntryIndex + 1), m_cue.entries.NumItems(), m_cue.entries.NumItems() > 1 ? "entries" : "entry", uint32_t(duration / 3600), uint32_t((duration % 3600) / 60), uint32_t(duration % 60));
 
         ImGui::SetNextWindowPos(ImVec2(16.0f, 188.0f), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(430.0f, 480.0f), ImGuiCond_FirstUseEver);

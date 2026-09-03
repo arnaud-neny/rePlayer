@@ -49,6 +49,7 @@ namespace rePlayer
 
         bool DisplayProgressBarInTable(MusicID id, float backgroundRatio = 0.0f);
 
+        uint32_t GetPlaylistPlayingTimeInMs() const;
         MusicID GetCurrentPlayerId() const;
         std::string GetMetadata(const MusicID musicId) const;
 

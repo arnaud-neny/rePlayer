@@ -208,6 +208,18 @@ namespace rePlayer
         return player == nullptr;
     }
 
+    uint32_t Deck::GetPlaylistPlayingTimeInMs() const
+    {
+        if (Player* player = m_shelvedPlayer)
+            return player->GetPlaybackTimeInMs();
+        if (Player* player = m_currentPlayer)
+        {
+            assert(m_mode == Mode::Playlist);
+            return player->GetPlaybackTimeInMs();
+        }
+        return 0;
+    }
+
     MusicID Deck::GetCurrentPlayerId() const
     {
         MusicID musicId;
