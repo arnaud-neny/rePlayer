@@ -103,6 +103,8 @@ namespace rePlayer
                         if (duration == 0)
                             duration = maxFrames = 20ull * 60ull * replay->GetSampleRate();
                     }
+                    if (maxFrames == UINT64_MAX)
+                        maxFrames = duration * 2;
                     replay->ResetPlayback();
 
                     ebur128_state* st = ebur128_init(2, replay->GetSampleRate(), EBUR128_MODE_I | EBUR128_MODE_S | EBUR128_MODE_TRUE_PEAK);
