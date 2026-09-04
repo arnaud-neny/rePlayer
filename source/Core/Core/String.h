@@ -44,6 +44,9 @@ namespace core
     // we compare without case; but if the two strings match
     // we are falling back to the case comparison
     int32_t CompareStringMixed(const char* dst, const char* src);
+    // we compare without case and with handling the numbers; but if the two strings match
+    // we are falling back to the case comparison
+    int32_t CompareStringMixedLogical(const char* dst, const char* src);
 
     // return the format (B, KB, MB, GB) and divisor for a size
     std::pair<const char*, double> GetSizeFormat(uint64_t size);

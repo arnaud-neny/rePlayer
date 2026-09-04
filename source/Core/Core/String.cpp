@@ -164,6 +164,89 @@ namespace core
         return f0 - l0;
     }
 
+    // we compare without case; but if the two strings match
+    // we are falling back to the case comparison
+    int32_t CompareStringMixedLogical(const char* dst, const char* src)
+    {
+        int32_t f0, f1, l0, l1;
+
+        do
+        {
+            f0 = f1 = uint8_t(*(dst++));
+            l0 = l1 = uint8_t(*(src++));
+            if (f0 >= '0' && f0 <= '9' && l0 >= '0' && l0 <= '9')
+            {
+                int64_t sf = 256 + f0 - '0';
+                int64_t sl = 256 + l0 - '0';
+
+                for (;;)
+                {
+                    f0 = f1 = uint8_t(*(dst++));
+                    if (f0 >= '0' && f0 <= '9')
+                        sf += sf * 10 + f0 - '0';
+                    else
+                        break;
+                }
+                for (;;)
+                {
+                    l0 = l1 = uint8_t(*(src++));
+                    if (l0 >= '0' && l0 <= '9')
+                        sl += sl * 10 + l0 - '0';
+                    else
+                        break;
+                }
+                if (sf != sl)
+                    return sf - sl;
+            }
+        } while (f0 && (f0 == l0));
+
+        if (f0 || l0)
+        {
+            for (;;)
+            {
+                if (f1 >= 'A' && f1 <= 'Z')
+                    f1 -= 'A' - 'a';
+                if (l1 >= 'A' && l1 <= 'Z')
+                    l1 -= 'A' - 'a';
+                if (f1 && (f1 == l1))
+                {
+                    f1 = uint8_t(*(dst++));
+                    l1 = uint8_t(*(src++));
+
+                    if (f1 >= '0' && f1 <= '9' && l1 >= '0' && l1 <= '9')
+                    {
+                        int64_t sf = 256 + f1 - '0';
+                        int64_t sl = 256 + l1 - '0';
+
+                        for (;;)
+                        {
+                            f1 = uint8_t(*(dst++));
+                            if (f1 >= '0' && f1 <= '9')
+                                sf += sf * 10 + f1 - '0';
+                            else
+                                break;
+                        }
+                        for (;;)
+                        {
+                            l1 = uint8_t(*(src++));
+                            if (l1 >= '0' && l1 <= '9')
+                                sl += sl * 10 + l1 - '0';
+                            else
+                                break;
+                        }
+                        if (sf != sl)
+                            return sf - sl;
+                    }
+                }
+                else if (f1 - l1)
+                    return f1 - l1;
+                else
+                    break;
+            }
+        }
+        return f0 - l0;
+    }
+
     std::pair<const char*, double> GetSizeFormat(uint64_t size)
     {
         if (size < 1024ull * 1024ull)
