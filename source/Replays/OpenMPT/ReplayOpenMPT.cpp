@@ -357,17 +357,6 @@ namespace rePlayer
         auto* property = m_properties.Push();
         property->label = "Info";
         property->numColumns = 2;
-        // push property message if any
-        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message_raw"))
-        {
-            if (str[0])
-            {
-                property = m_properties.Push();
-                property->label = "Message";
-                property->data.Add(pcCast<uint8_t>(str), uint32_t(strlen(str) + 1));
-            }
-            openmpt_free_string(str);
-        }
         // push property samples if any
         if (auto count = openmpt_module_get_num_samples(m_modulePlayback))
         {
@@ -480,6 +469,17 @@ namespace rePlayer
                     property->Add(envs.c_str(), Property::kIsNotEditable);
                 }
             }
+        }
+        // push property message if any
+        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message_raw"))
+        {
+            if (str[0])
+            {
+                property = m_properties.Push();
+                property->label = "Message";
+                property->data.Add(pcCast<uint8_t>(str), uint32_t(strlen(str) + 1));
+            }
+            openmpt_free_string(str);
         }
     }
 

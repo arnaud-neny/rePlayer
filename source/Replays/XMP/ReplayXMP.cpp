@@ -393,13 +393,6 @@ namespace rePlayer
         auto* property = m_properties.Push();
         property->label = "Info";
         property->numColumns = 2;
-        // push property message if any
-        if (m_moduleInfo.comment && m_moduleInfo.comment[0])
-        {
-            property = m_properties.Push();
-            property->label = "Message";
-            property->data.Add(pcCast<uint8_t>(m_moduleInfo.comment), uint32_t(strlen(m_moduleInfo.comment) + 1));
-        }
         // push property samples if any
         if (auto count = m_moduleInfo.mod->smp)
         {
@@ -491,6 +484,13 @@ namespace rePlayer
                     property->Add(envs.c_str(), Property::kIsNotEditable);
                 }
             }
+        }
+        // push property message if any
+        if (m_moduleInfo.comment && m_moduleInfo.comment[0])
+        {
+            property = m_properties.Push();
+            property->label = "Message";
+            property->data.Add(pcCast<uint8_t>(m_moduleInfo.comment), uint32_t(strlen(m_moduleInfo.comment) + 1));
         }
     }
 

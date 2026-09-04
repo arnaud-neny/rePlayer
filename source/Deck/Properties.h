@@ -1,6 +1,9 @@
 #pragma once
 
+#include <Containers/HashMap.h>
 #include <Core/Window.h>
+
+#include <Database/Types/SubsongID.h>
 #include <Replays/Replay.h>
 
 namespace rePlayer
@@ -21,9 +24,13 @@ namespace rePlayer
         std::string OnGetWindowTitle() override;
         void OnDisplay() override;
 
+        static uint32_t GetCRC(const char* str);
+
     private:
-//         Serialized<Scale> m_scale = { "Scale", Scale::kFit };
         SmartPtr<Player> m_player;
+        HashMap<MediaType, uint32_t> m_selectedTabs;
+
+        SubsongID m_currentSubsongId;
     };
 }
 // namespace rePlayer
