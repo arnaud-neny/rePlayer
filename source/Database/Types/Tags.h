@@ -44,6 +44,12 @@ namespace rePlayer
         static constexpr const char* const Name(T index);
         std::string ToString() const;
 
+        template <typename T>
+        static constexpr uint8_t GetSortedTag(T index);
+
+    private:
+        static const uint8_t* BuildSortedIndices();
+
     private:
         Type m_value = kNone;
         static const char* const ms_names[];

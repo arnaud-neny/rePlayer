@@ -481,9 +481,10 @@ namespace rePlayer
             for (uint32_t i = 0; i < Tag::kNumTags; i++)
             {
                 ImGui::TableNextColumn();
-                bool isChecked = m_song.edited.tags.IsEnabled(1ull << i);
-                if (ImGui::Checkbox(Tag::Name(i), &isChecked))
-                    m_song.edited.tags.Enable(1ull << i, isChecked);
+                uint8_t sortedTag = Tag::GetSortedTag(i);
+                bool isChecked = m_song.edited.tags.IsEnabled(1ull << sortedTag);
+                if (ImGui::Checkbox(Tag::Name(sortedTag), &isChecked))
+                    m_song.edited.tags.Enable(1ull << sortedTag, isChecked);
             }
             for (uint32_t i = Tag::kNumTags; i < ((Tag::kNumTags + 3) & ~3); i++)
                 ImGui::TableNextColumn();

@@ -65,5 +65,12 @@ namespace rePlayer
     {
         return ms_names[int32_t(index)];
     }
+
+    template <typename T>
+    inline constexpr uint8_t Tag::GetSortedTag(T index)
+    {
+        static const uint8_t* indices = BuildSortedIndices();
+        return indices[int32_t(index)];
+    }
 }
 // namespace rePlayer

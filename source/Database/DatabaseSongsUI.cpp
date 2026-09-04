@@ -1273,17 +1273,19 @@ namespace rePlayer
         }
         for (uint32_t i = 0; i < Tag::kNumTags; i++)
         {
-            bool isChecked = enabledTags.IsEnabled(1ull << i);
-            if (isChecked && disabledTags.IsEnabled(1ull << i))
+            uint8_t sortedTag = Tag::GetSortedTag(i);
+
+            bool isChecked = enabledTags.IsEnabled(1ull << sortedTag);
+            if (isChecked && disabledTags.IsEnabled(1ull << sortedTag))
             {
                 ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, true);
                 bool b = false;
-                if (ImGui::Checkbox(Tag::Name(i), &b))
+                if (ImGui::Checkbox(Tag::Name(sortedTag), &b))
                 {
                     for (auto& entry : m_entries)
                     {
                         if (entry.IsSelected())
-                            m_db[entry]->Edit()->tags.Raise(1ull << i);
+                            m_db[entry]->Edit()->tags.Raise(1ull << sortedTag);
                     }
                     m_db.Raise(Database::Flag::kSaveSongs);
                 }
@@ -1291,12 +1293,12 @@ namespace rePlayer
             }
             else
             {
-                if (ImGui::Checkbox(Tag::Name(i), &isChecked))
+                if (ImGui::Checkbox(Tag::Name(sortedTag), &isChecked))
                 {
                     for (auto& entry : m_entries)
                     {
                         if (entry.IsSelected())
-                            m_db[entry]->Edit()->tags.Enable(1ull << i, isChecked);
+                            m_db[entry]->Edit()->tags.Enable(1ull << sortedTag, isChecked);
                     }
                     m_db.Raise(Database::Flag::kSaveSongs);
                 }
