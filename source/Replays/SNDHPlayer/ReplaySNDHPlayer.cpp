@@ -12,8 +12,8 @@ namespace rePlayer
         .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,
         .name = "SNDH-Player",
         .extensions = "sndh",
-        .about = "SNDH-Player " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",
-        .settings = "SNDH-Player " ATARI_AUDIO_VERSION,
+        .about = "AtariAudio " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",
+        .settings = "SNDH-Player/AtariAudio " ATARI_AUDIO_VERSION,
         .init = ReplaySNDHPlayer::Init,
         .load = ReplaySNDHPlayer::Load,
         .displaySettings = ReplaySNDHPlayer::DisplaySettings,
@@ -123,7 +123,7 @@ namespace rePlayer
         else
         {
             auto* samples = reinterpret_cast<int16_t*>(output + numSamples) - numSamples;
-            m_sndh->AudioRender(samples, numSamples, reinterpret_cast<uint32_t*>(output));
+            m_sndh->AudioRenderWithVisualInfos(samples, numSamples, reinterpret_cast<uint32_t*>(output));
             auto activeChannels = m_activeChannels;
             for (uint32_t i = 0; i < numSamples; i++)
                 activeChannels |= reinterpret_cast<uint32_t*>(output)[i];
@@ -146,7 +146,8 @@ namespace rePlayer
             m_sndh->InitSubSong(m_subsongIndex + 1);
             currentPosition = 0;
         }
-        m_sndh->AudioNull(int(seekPosition - currentPosition));
+        for (auto toRender = int(seekPosition - currentPosition); toRender;)
+            toRender -= m_sndh->AudioNull(int(seekPosition - currentPosition));
         m_currentPosition = seekPosition;
         if (seekPosition != currentPosition)
             m_surround.Reset();
@@ -242,7 +243,7 @@ namespace rePlayer
         char txt[16];
         sprintf(txt, "%d", subsongInfo.playerTickRate);
         info += txt;
-        info += " Hz\nSNDH-Player " ATARI_AUDIO_VERSION;
+        info += " Hz\nAtariAudio " ATARI_AUDIO_VERSION;
         return info;
     }
 

@@ -1,51 +1,49 @@
-# SNDH-Archive-Player v1.03
-ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twitter.com/leonard_coder)
+# AtariAudio Library v1.06
 
-![image info](./thumbnail.png)
+src/ contains all files needed to compile AtariAudio library. It allows you to play ATARI SNDH music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
+The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
+
+# Playing SNDH file in your own app
+
+AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is class SndhFile.
+Look at SndhFile.h for API details but here is the absolute minimal:
+
+````
+bool	Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostReplayRate);
+````
+Load a raw SNDH file from memory. You should provide the memory buffer, size of the raw file, and host replay rate. ( ex 44100 for 44.1Khz )
+
+````
+bool	InitSubSong(int subSongId);
+````
+Atari SNDH musics could contain several subsongs. You should *always* call InitSubsong before any audio rendering function. By convention, subsongs starts at 1.
+
+````
+int		AudioRender(int16_t* buffer, int count);
+````
+This is the main audio rendering function. Render "count" samples into buffer. Buffer is a 16bits, signed, mono, sample buffer.
+Like, let's say your replay rate is 44.1Khz and you want to generate 1 second of music:
+
+````
+  int16_t* buffer = buffer of 44100*2 bytes ( one sample is 16bits, mono )
+  AudioRender(buffer, 44100);
+````
+
+AudioRender returns the amount of samples generated. If it's lower than "count", it means you reached the end of the music
 
 # Versions
 
-- v1.03 : bump to AtariAudio library 1.02
-- v1.02 : Thanks to @gdommergue : Add a 4-state play mode button (Single / Loop / Continuous / Random), Exact song length fix
-- v1.01 : fix sndh less than 1 sec replay ; fix half volume in some digidrum (ie synthdream 2) ; removed strdup/free usage in AtariAudio ; Added MIT license file
-- v1.00 : sndh2.2 song len support and official AtariAudio v1.00
-- v0.80 : fix minizip library when dealing with weird zip path name
-- v0.79 : minor STE DAC potential fix
-- v0.78 : fix oscilloscope scale issue in v0.77
-- v0.77 : ym2149 has now proper 32 steps volume enveloppe
-- v0.76 : Remove custom docking windows ability
-- v0.75 : Light speed large SNDH ZIP archive loading (multi-thread)
-- v0.74 : fix crash when loading some SNDH files
-- v0.73 : uninitialized vars potential crash fixed
-- v0.72 : "low level buzzers" support
-- v0.71 : minor fixes for some sndh musics
-- v0.70 : un-predictable YM square tone edges as on real hardware
-- v0.60 : Tao "MS3" songs support! Added subsong count in list
-- v0.50 : reload last loaded SNDH archive, bug fixes for some SNDH
-- v0.40 : per voice visualization oscilloscopes, 2MiB emulated Atari machine, AtariAudio API cleanup, some optimizations
-- v0.30 : WAV export, play/pause button, and low CPU usage when app minimized
-- v0.20 : SNDH music are time seekable! enjoy!
-- v0.10 : first version
+- 1.06 : added SetDefaultSongDuration for SNDH files without any duration info
+- 1.05 : SndhFile::AudioRender API change (now returns sample count). Use timedb database for SNDH without music len
+- 1.04 : added SndhFile::FastForward function
+- 1.03 : added Ripper & Converter into SubSongInfo struct. some minor linux compilation fixes
 
-# Simple AtariAudio library
+# Examples
 
-if you need to add SNDH music in your own code just use the simple [AtariAudio library](https://github.com/arnaud-carre/sndh-player/tree/main/AtariAudio). It doesn't need any external lib, and should compile on tiny plaform (doesn't even need float support). 
+The repo also contains a sndh2wav project to show how to convert a .sndh file into a WAV file
 
-# Why?
-While having fun writing a YM7 format player on embeded device, I started to re-write my 30 years old ym2149 emulation (StSound). The new emulation is more accurate and source code is really simple.
-To be able to properly test new emulatior (ym2149, mfp & STE DAC), I wrote a SNDH player (using great Musashi 68k emulator) to listen to thousands of SNDH files from sndh.atari.org.
-You can use this library to play SNDH in your own player. Everything is in AtariAudio/ directory
+# Credits
 
-# Drop single large ZIP file and enjoy
-Just drop the latest 100MiB SNDH ZIP archive file downloaded from awesome [SNDH-YM2149 Archive website](https://sndh.atari.org/download.php) and start to browse & play!
-
-[You can watch a running example here!](https://youtu.be/c0lH98TNtGg)
-
-# How to build
-This repo comes with a pre-build player (look at the GitHub Release section) but you can also compile the executable by your own. Easy way is to have a windows system, download latest "Visual Studio 2022 community" (it's free & awesome) and open SndhArchivePlayer.sln
-
-If you're still stuck in past century you can also create a makefile by yourself :)
-
-Enjoy!
-
-[https://github.com/arnaud-carre/sndh-player](https://github.com/arnaud-carre/sndh-player)
+- AtariAudio library written by Arnaud Carré aka Leonard/Oxygene.
+- MUSASHI 68000 emulation written by Karl Stenerud
+- Atari ICE depacker C version written by Hans Wessels

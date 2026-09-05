@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -19,7 +19,7 @@ public:
 	uint16_t	Read16(int ad);
 
 	int16_t		ComputeNextSample(const int8_t* atariRam, uint32_t ramSize, Mk68901& mfp);
-
+	uint32_t	GetCurrentVisualLevel() const { return uint32_t(m_currentDacLevel >> 8)&255; };
 private:
 	void		FetchSamplePtr();
 	int8_t		FetchSample(const int8_t* atariRam, uint32_t ramSize, uint32_t atariAd);

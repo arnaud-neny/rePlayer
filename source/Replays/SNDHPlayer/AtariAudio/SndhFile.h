@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -9,6 +9,7 @@
 #include "AtariMachine.h"
 
 static	const	int		kSubsongCountMax = 128;
+static const	int kDefaultSongDuration = 60 * 3;
 
 class SndhFile
 {
@@ -42,23 +43,29 @@ public:
 	/*
 	 * Main audio rendering function.
 	 * Compute the next "count" samples into "buffer" (mono, signed, 16bits samples)
-	 * pSampleViewInfo is an optional buffer of "count" uint32_t for gadget visualization purpose
-	 * The 32bits contains four 8bits signed values that are respectivly from low byte to high byte:
-	 * YM voices A,B,C and STE DAC
-	 * Note: Always use "buffer" as audio source. Do *not* mix yourself the SampleViewInfo data
-	 * It's visualization data only!
+	 * returns the amount of samples output (could be less than count when music is out of frames)
 	*/
-	int		AudioRender(int16_t* buffer, int count, uint32_t* pSampleViewInfo = NULL);
-	int		AudioRenderStereo(int16_t* buffer, int count, uint32_t* pSampleViewInfo = NULL);
+	int		AudioRender(int16_t* buffer, int count);
+	int		AudioRenderStereo(int16_t* buffer, int count, uint32_t* pVisualSamples);
 	int		AudioNull(int count);
+
+	/*
+	* Same as AudioRender but also fills pVisualSamples buffer with 1 32bits per sample
+	* the 32bits contains vu meter values for 3 ym voices and STE DAC in form of 8888
+	* Use it if you want to draw some per voice vu meter in a player
+	*/
+	int		AudioRenderWithVisualInfos(int16_t* buffer, int count, uint32_t* pVisualSamples);
 
 	const void*	GetRawData() const { return m_rawBuffer; }
 	const int	GetRawDataSize() const { return m_rawSize; }
+	void 	SetDefaultSongDuration(int durationInSec);
+
 
 private:
 	uint16_t		Read16(const char*);
 	uint32_t		Read32(const char*);
 	const char*	skipNTString(const char* r);
+	int		AudioRenderInternal(int16_t* buffer, int count, uint32_t* pSampleViewInfo);
 
 	bool	m_bLoaded;
 	const char*	m_Title;
@@ -70,7 +77,7 @@ private:
 	int		m_rawSize;
 
 	int		m_defaultSubSong;
-	int		m_subSongLenInTick[kSubsongCountMax];
+	uint32_t	m_subSongLenInTick[kSubsongCountMax];
 	int		m_subSongCount;
 	int		m_playerRate;
 
@@ -78,8 +85,8 @@ private:
 	int		m_innerSamplePos;
 	int		m_frame;
 	int		m_frameCount;
-	int		m_loopCount;
 	uint32_t m_hostReplayRate;
+	int 	m_defaultSongDurationInSec;
 
 	AtariMachine m_atariMachine;
 };

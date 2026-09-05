@@ -17,7 +17,7 @@ static void m68k_op_1111(void)
 	m68ki_exception_1111();
 }
 
-
+#if M68K_EMULATE_040
 static void m68k_op_040fpu0_32(void)
 {
 	if(CPU_TYPE_IS_040_PLUS(CPU_TYPE))
@@ -38,7 +38,7 @@ static void m68k_op_040fpu1_32(void)
 	}
 	m68ki_exception_1111();
 }
-
+#endif
 
 static void m68k_op_abcd_8_rr(void)
 {
@@ -34539,8 +34539,10 @@ static const opcode_handler_struct m68k_opcode_handler_table[] =
 	{m68k_op_blt_8               , 0xff00, 0x6d00, { 10,  10,   6,   6}},
 	{m68k_op_bgt_8               , 0xff00, 0x6e00, { 10,  10,   6,   6}},
 	{m68k_op_ble_8               , 0xff00, 0x6f00, { 10,  10,   6,   6}},
+#if M68K_EMULATE_040
 	{m68k_op_040fpu0_32          , 0xff00, 0xf200, {  0,   0,   0,   0}},
 	{m68k_op_040fpu1_32          , 0xff00, 0xf300, {  0,   0,   0,   0}},
+#endif
 	{m68k_op_btst_32_r_d         , 0xf1f8, 0x0100, {  6,   6,   4,   4}},
 	{m68k_op_movep_16_er         , 0xf1f8, 0x0108, { 16,  16,  12,  12}},
 	{m68k_op_btst_8_r_ai         , 0xf1f8, 0x0110, {  8,   8,   8,   8}},

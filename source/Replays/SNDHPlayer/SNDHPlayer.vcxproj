@@ -194,9 +194,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="AtariAudio\external\Musashi\m68kconf.h" />
     <ClInclude Include="AtariAudio\external\Musashi\m68kcpu.h" />
     <ClInclude Include="AtariAudio\external\Musashi\m68kops.h" />
+    <ClInclude Include="AtariAudio\external\timedb.inc.h" />
     <ClInclude Include="AtariAudio\Mk68901.h" />
     <ClInclude Include="AtariAudio\SndhFile.h" />
     <ClInclude Include="AtariAudio\SteDac.h" />
+    <ClInclude Include="AtariAudio\timedb.h" />
     <ClInclude Include="AtariAudio\ym2149c.h" />
     <ClInclude Include="AtariAudio\ym2149_tables.h" />
     <ClInclude Include="db.inc.h" />
@@ -206,34 +208,11 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="AtariAudio\AtariMachine.cpp" />
     <ClCompile Include="AtariAudio\external\ice_24.c" />
     <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.c" />
-    <ClCompile Include="AtariAudio\external\Musashi\m68kdasm.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kfpu.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kmake.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="AtariAudio\external\Musashi\m68kops.c" />
-    <ClCompile Include="AtariAudio\external\Musashi\m68k_in.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="AtariAudio\Mk68901.cpp" />
     <ClCompile Include="AtariAudio\SndhFile.cpp" />
     <ClCompile Include="AtariAudio\SteDac.cpp" />
+    <ClCompile Include="AtariAudio\timedb.cpp" />
     <ClCompile Include="AtariAudio\ym2149c.cpp" />
     <ClCompile Include="ReplaySNDHPlayer.cpp" />
   </ItemGroup>

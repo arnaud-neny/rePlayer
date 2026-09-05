@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -39,7 +39,7 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
 	m_currentLevel = 0;
 	m_innerCycle = 0;
 	m_envPos = 0;
-	m_currentDebugThreeVoices = 0;
+	m_currentVisualLevels = 0;
 	for (auto& dcAdjust : m_dcAdjust)
 		dcAdjust = {};
 }
@@ -180,7 +180,7 @@ uint16_t Ym2149c::Tick()
 
 // called at host replay rate ( like 48Khz )
 // internally update YM chip state machine at 250Khz and average output for each host sample
-Ym2149c::Levels Ym2149c::ComputeNextSample(uint32_t* pSampleDebugInfo)
+Ym2149c::Levels Ym2149c::ComputeNextSample()
 {
 	uint16_t highMask = 0;
 	do
@@ -218,10 +218,9 @@ Ym2149c::Levels Ym2149c::ComputeNextSample(uint32_t* pSampleDebugInfo)
 		uint32_t levelC = s_ym2149LogLevels[indexC] >> halfShiftC;
 		out.uLevels[i] = levelA + levelB + levelC;
 	}
+	m_currentVisualLevels = uint16_t(levels[0]);
 
 	out = dcAdjust(out);
-//	if (pSampleDebugInfo)
-//		*pSampleDebugInfo = (s_ViewVolTab[indexA] << 0) | (s_ViewVolTab[indexB] << 8) | (s_ViewVolTab[indexC] << 16);
 
 	return out;
 }

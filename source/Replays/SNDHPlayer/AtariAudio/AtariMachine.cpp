@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -20,7 +20,7 @@ static const uint32_t D_DUMP_WRITE_AD2 = 0xfffaff;
 #include <stdio.h>
 #endif
 
-static AtariMachine*	gCurrentMachine = NULL;
+static AtariMachine*	gCurrentMachine = nullptr;
 static const uint32_t ivector[5] = { 0x134,0x120,0x114,0x110,0x13c };
 
 unsigned int  m68k_read_memory_8(unsigned int address)
@@ -76,7 +76,7 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 #if D_DUMP_READ
 	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
 	{
-		uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
 		printf("$%06x: move.b $%06x,d0 ( =#$%02x )\n", pc, address, r);
 	}
 #endif
@@ -98,7 +98,7 @@ unsigned int  AtariMachine::memRead16(unsigned int address)
 #if D_DUMP_READ
 	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
 	{
-		uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
 		printf("$%06x: move.w $%06x,d0 ( =#$%04x )\n", pc, address, r);
 	}
 #endif
@@ -116,7 +116,7 @@ void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 #if D_DUMP_WRITE
 	if ((address >= D_DUMP_WRITE_AD1) && (address <= D_DUMP_WRITE_AD2))
 	{
-		uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
 		printf("$%06x: move.b #$%02x,$%06x\n", pc, value, address);
 	}
 #endif
@@ -140,7 +140,7 @@ void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 #if D_DUMP_WRITE
 	if ((address >= D_DUMP_WRITE_AD1) && (address <= D_DUMP_WRITE_AD2))
 	{
-		uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
 		printf("$%06x: move.w #$%04x,$%06x\n", pc, value, address);
 	}
 #endif
@@ -162,7 +162,7 @@ AtariMachine::~AtariMachine()
 	if (m_RAM)
 	{
 		free(m_RAM);
-		m_RAM = NULL;
+		m_RAM = nullptr;
 	}
 }
 
@@ -278,7 +278,7 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 			uint32_t callbackAddr = m68k_read_memory_32(a7 + 2);
 
 			// push PC on stack (so future RTS will get back right after the TRAP)
-			uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
+			uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
 			a7 -= 4;
 			m68k_write_memory_32(a7, pc);
 			m68k_set_reg(M68K_REG_SP, a7);
@@ -294,7 +294,7 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 void	AtariMachine::TrapInstructionCallback(int v)
 {
 
-	int a7 = m68k_get_reg(NULL, M68K_REG_SP);
+	int a7 = m68k_get_reg(nullptr, M68K_REG_SP);
 	int func = m68k_read_memory_16(a7);
 
 	switch (v)
@@ -343,7 +343,7 @@ void	AtariMachine::Startup(uint32_t hostReplayRate)
 	// so by default, set the timer C handler to RTE, just in case
 	m68k_write_memory_32(0x114, RTE_INSTRUCTION_ADDR);
 
-	gCurrentMachine = NULL;
+	gCurrentMachine = nullptr;
 }
 
 bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
@@ -351,7 +351,7 @@ bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
 	if (addr + size > RAM_SIZE)
 		return false;
 
-	if ((NULL == src) || (0 == size))
+	if ((nullptr == src) || (0 == size))
 		return false;
 
 	memcpy(m_RAM + addr, src, size);
@@ -398,17 +398,39 @@ bool	AtariMachine::Jsr(uint32_t addr, uint32_t d0)
 	ConfigureReturnByRts();
 	m68k_set_reg(M68K_REG_D0, d0);
 	ret = JmpBinary(addr, 50*10);		// timeout of 1sec for init
-	gCurrentMachine = NULL;
+	gCurrentMachine = nullptr;
 	return ret;
 }
 
-int16_t	AtariMachine::ComputeNextSample(uint32_t* pSampleDebugInfo)
+#define	k15toS8(a)	((((a*127)>>15)+63)^0x80)	// signed 8bits value for oscillators viewing display per voice
+static const uint32_t	s_ViewVolTab[16*2] =
+{
+	k15toS8(152),k15toS8(181),k15toS8(215),k15toS8(255),
+	k15toS8(304),k15toS8(362),k15toS8(430),k15toS8(511),
+	k15toS8(608),k15toS8(724),k15toS8(861),k15toS8(1023),
+	k15toS8(1217),k15toS8(1448),k15toS8(1722),k15toS8(2047),
+	k15toS8(2435),k15toS8(2896),k15toS8(3444),k15toS8(4095),
+	k15toS8(4870),k15toS8(5792),k15toS8(6888),k15toS8(8191),
+	k15toS8(9741),k15toS8(11584),k15toS8(13776),k15toS8(16383),
+	k15toS8(19483),k15toS8(23169),k15toS8(27553),k15toS8(32767)
+};
+
+uint32_t AtariMachine::ComputeCurrentVisualLevels() const
+{
+	const uint32_t ymVisual = m_Ym2149.GetCurrentVisualLevels();
+	const unsigned int indexA = (ymVisual >> 0) & 31;
+	const unsigned int indexB = (ymVisual >> 5) & 31;
+	const unsigned int indexC = (ymVisual >> 10) & 31;
+	uint32_t visualLevels = (s_ViewVolTab[indexA] << 0) | (s_ViewVolTab[indexB] << 8) | (s_ViewVolTab[indexC] << 16);
+	visualLevels |= (m_SteDac.GetCurrentVisualLevel()<<24);
+	return visualLevels;
+}
+
+int16_t	AtariMachine::ComputeNextSample()
 {
 	gCurrentMachine = this;
-	int32_t level = m_Ym2149.ComputeNextSample(pSampleDebugInfo).sMono;
+	int32_t level = m_Ym2149.ComputeNextSample().sMono;
 	int32_t steLevel = m_SteDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_Mfp);
-	if (steLevel && (pSampleDebugInfo))
-		*pSampleDebugInfo |= (steLevel >> 8) << 24;
 	level += steLevel;
 
 	if (level > 32767)
@@ -430,18 +452,21 @@ int16_t	AtariMachine::ComputeNextSample(uint32_t* pSampleDebugInfo)
 			m_Ym2149.InsideTimerIrq(false);
 		}
 	}
-	gCurrentMachine = NULL;
+	gCurrentMachine = nullptr;
 	return out;
 }
 
-void	AtariMachine::ComputeNextSample(int16_t*& buffer, uint32_t* pSampleDebugInfo)
+void AtariMachine::ComputeNextSample(int16_t*& buffer)
 {
 	gCurrentMachine = this;
-	auto level = m_Ym2149.ComputeNextSample(pSampleDebugInfo);
+	auto level = m_Ym2149.ComputeNextSample();
 	int16_t steLevel = m_SteDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_Mfp);
-	if (steLevel && (pSampleDebugInfo))
-		*pSampleDebugInfo |= (steLevel >> 8) << 24;
 	level.sRight += steLevel;
+
+	if (level.sRight > 32767)
+		level.sRight = 32767;
+	else if (level.sRight < -32768)
+		level.sRight = -32768;
 
 	*buffer++ = level.sLeft;
 	*buffer++ = level.sRight;
@@ -458,5 +483,5 @@ void	AtariMachine::ComputeNextSample(int16_t*& buffer, uint32_t* pSampleDebugInf
 			m_Ym2149.InsideTimerIrq(false);
 		}
 	}
-	gCurrentMachine = NULL;
+	gCurrentMachine = nullptr;
 }

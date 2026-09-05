@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -32,8 +32,9 @@ public:
 	void		Startup(uint32_t hostReplayRate);
 	bool		Upload(const void* src, uint32_t addr, uint32_t size);
 	bool		Jsr(uint32_t addr, uint32_t d0);
-	int16_t		ComputeNextSample(uint32_t* pSampleDebugInfo = NULL);
-	void		ComputeNextSample(int16_t*& buffer, uint32_t* pSampleDebugInfo = NULL);
+	int16_t		ComputeNextSample();
+	void		ComputeNextSample(int16_t*& buffer);
+	uint32_t	ComputeCurrentVisualLevels() const;
 
 	unsigned int	memRead8(unsigned int address);
 	unsigned int	memRead16(unsigned int address);
@@ -41,7 +42,6 @@ public:
 	void			memWrite16(unsigned int address, unsigned int value);
 	void			TrapInstructionCallback(int v);
 	void			ResetCb(void);
-
 
 private:
 	void		ConfigureReturnByRts();

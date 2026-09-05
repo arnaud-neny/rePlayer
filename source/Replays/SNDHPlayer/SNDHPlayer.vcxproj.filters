@@ -62,6 +62,12 @@
     <ClInclude Include="db.inc.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="AtariAudio\timedb.h">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClInclude>
+    <ClInclude Include="AtariAudio\external\timedb.inc.h">
+      <Filter>Source Files\AtariAudio\external</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplaySNDHPlayer.cpp">
@@ -70,19 +76,7 @@
     <ClCompile Include="AtariAudio\external\ice_24.c">
       <Filter>Source Files\AtariAudio\external</Filter>
     </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68k_in.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
     <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kdasm.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kfpu.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kmake.c">
       <Filter>Source Files\AtariAudio\external\Musashi</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\external\Musashi\m68kops.c">
@@ -101,6 +95,9 @@
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\ym2149c.cpp">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\timedb.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
   </ItemGroup>

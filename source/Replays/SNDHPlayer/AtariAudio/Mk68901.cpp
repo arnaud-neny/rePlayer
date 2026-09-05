@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.04
+	Atari Audio Library v1.06
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -113,9 +113,6 @@ void	Mk68901::Write8(int port,uint8_t data)
 		m_regs[port] = data;
 	}
 
-// 	uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
-// 	printf("$%06x: Write $%02x in $fffffa%02x\n", pc, data, ad);
-
 }
 
 uint8_t	Mk68901::Read8(int port)
@@ -145,9 +142,6 @@ uint8_t	Mk68901::Read8(int port)
 			break;
 		}
 	}
-
-// 	uint32_t pc = m68k_get_reg(NULL, M68K_REG_PC);
-// 	printf("$%06x: Read $fffffa%02x, returns $%02x\n", pc, ad, data);
 
 	return data;
 }
