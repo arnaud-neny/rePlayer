@@ -25,6 +25,7 @@ namespace rePlayer
         .replayId = eReplay::AdLib,
         .name = "AdPlug",
         .about = "AdPlug " ADPLUG_VERSION "\nCopyright (c) 1999-2025 Simon Peter, et al.",
+        .settings = "AdPlug " ADPLUG_VERSION,
         .init = ReplayAdLib::Init,
         .release = ReplayAdLib::Release,
         .load = ReplayAdLib::Load,
