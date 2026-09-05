@@ -34,7 +34,7 @@ namespace rePlayer
         .name = "Future Composer",
         .extensions = "fc;fc13;fc14;fc3;fc4;smod;hip;hip7;hipc;mcmd;tfmx;tfx;tfm;mdat;dns",
         .about = "libtfmxaudiodecoder " VERSION "\nCopyright(c) Michael Schwendt",
-        .settings = "libtfmxaudiodecoder " VERSION,
+        .settings = "Future Composer/libtfmxaudiodecoder " VERSION,
         .init = ReplayFutureComposer::Init,
         .load = ReplayFutureComposer::Load,
         .displaySettings = ReplayFutureComposer::DisplaySettings,
