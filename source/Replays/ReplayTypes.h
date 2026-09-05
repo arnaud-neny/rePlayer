@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Containers/HashTypes.h>
 #include <Core/Core.h>
 
 namespace rePlayer
@@ -77,3 +78,13 @@ namespace rePlayer
     }
 }
 // namespace rePlayer
+
+namespace core::Hash
+{
+    template<>
+    inline uint32_t Get(const rePlayer::MediaType& mediaType)
+    {
+        return mediaType.value;
+    }
+}
+// namespace core::Hash
