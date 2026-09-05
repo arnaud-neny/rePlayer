@@ -1,9 +1,4 @@
 /***************************************************************************
-    copyright            : (C) 2025 by Urs Fleisch
-    email                : ufleisch@users.sourceforge.net
- ***************************************************************************/
-
-/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -23,34 +18,54 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMKINFO_H
-#define TAGLIB_EBMLMKINFO_H
+#ifndef TAGLIB_EBMLDEFERREDBINARYELEMENT_H
+#define TAGLIB_EBMLDEFERREDBINARYELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
+#include "ebmlbinaryelement.h"
 
 namespace TagLib {
-  namespace Matroska {
-    class Properties;
-  }
+  class File;
 
   namespace EBML {
-    class MkInfo : public MasterElement
+    /*!
+     * A binary element whose data is not pulled into memory while the file is
+     * read.  read() only registers the offset of the data in the file and
+     * skips over it, so that the payload can be loaded later, when it is
+     * really requested.  This keeps reading the metadata of a file cheap even
+     * if it contains large attachments.
+     *
+     * Elements which are created to be rendered (i.e. not read from a file)
+     * behave exactly like a BinaryElement: setValue() makes the data
+     * available and isDeferred() stays false.
+     */
+    class DeferredBinaryElement : public BinaryElement
     {
     public:
-      MkInfo(int sizeLength, offset_t dataSize, offset_t offset);
-      MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset);
-      MkInfo();
-
-      void parse(Matroska::Properties * properties) const;
+      DeferredBinaryElement(Id id, int sizeLength, offset_t dataSize);
+      DeferredBinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit DeferredBinaryElement(Id id);
 
       /*!
-       * Returns the segment title, without requiring a Properties instance.
-       * Used when the file is read without audio properties, where the title
-       * is still needed for Matroska::Tag::title().
+       * Registers the offset of the data in \a file and skips the data.
        */
-      String parseTitle() const;
+      bool read(File &file) override;
+
+      /*!
+       * Returns \c true if the data has not been read into memory, i.e. if it
+       * has to be loaded from getDataOffset() to be available.
+       */
+      bool isDeferred() const;
+
+      /*!
+       * Returns the offset of the data inside the file, only valid if
+       * isDeferred() is \c true.
+       */
+      offset_t getDataOffset() const;
+
+    private:
+      offset_t dataOffset = 0;
+      bool deferred = false;
     };
   }
 }

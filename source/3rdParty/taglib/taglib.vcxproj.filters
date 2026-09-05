@@ -607,6 +607,9 @@
     <ClInclude Include="taglib\mp4\mp4qtchapterlist.h">
       <Filter>Source Files\taglib\mp4</Filter>
     </ClInclude>
+    <ClInclude Include="taglib\matroska\ebml\ebmldeferredbinaryelement.h">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="taglib\audioproperties.cpp">
@@ -1046,6 +1049,9 @@
     </ClCompile>
     <ClCompile Include="taglib\mp4\mp4qtchapterlist.cpp">
       <Filter>Source Files\taglib\mp4</Filter>
+    </ClCompile>
+    <ClCompile Include="taglib\matroska\ebml\ebmldeferredbinaryelement.cpp">
+      <Filter>Source Files\taglib\matroska\ebml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,4 @@
 /***************************************************************************
-    copyright            : (C) 2025 by Urs Fleisch
-    email                : ufleisch@users.sourceforge.net
- ***************************************************************************/
-
-/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -23,37 +18,42 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMKINFO_H
-#define TAGLIB_EBMLMKINFO_H
-#ifndef DO_NOT_DOCUMENT
+#include "ebmldeferredbinaryelement.h"
+#include "tfile.h"
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
+using namespace TagLib;
 
-namespace TagLib {
-  namespace Matroska {
-    class Properties;
-  }
-
-  namespace EBML {
-    class MkInfo : public MasterElement
-    {
-    public:
-      MkInfo(int sizeLength, offset_t dataSize, offset_t offset);
-      MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset);
-      MkInfo();
-
-      void parse(Matroska::Properties * properties) const;
-
-      /*!
-       * Returns the segment title, without requiring a Properties instance.
-       * Used when the file is read without audio properties, where the title
-       * is still needed for Matroska::Tag::title().
-       */
-      String parseTitle() const;
-    };
-  }
+EBML::DeferredBinaryElement::DeferredBinaryElement(Id id, int sizeLength, offset_t dataSize):
+  BinaryElement(id, sizeLength, dataSize)
+{
 }
 
-#endif
-#endif
+EBML::DeferredBinaryElement::DeferredBinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  BinaryElement(id, sizeLength, dataSize)
+{
+}
+
+EBML::DeferredBinaryElement::DeferredBinaryElement(Id id):
+  BinaryElement(id)
+{
+}
+
+bool EBML::DeferredBinaryElement::read(File &file)
+{
+  // The file is positioned at the data of the element, which is all we have
+  // to remember in order to be able to read it later.
+  dataOffset = file.tell();
+  deferred = true;
+  skipData(file);
+  return true;
+}
+
+bool EBML::DeferredBinaryElement::isDeferred() const
+{
+  return deferred;
+}
+
+offset_t EBML::DeferredBinaryElement::getDataOffset() const
+{
+  return dataOffset;
+}

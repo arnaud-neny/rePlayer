@@ -52,6 +52,7 @@
     <ClInclude Include="taglib\it\itfile.h" />
     <ClInclude Include="taglib\it\itproperties.h" />
     <ClInclude Include="taglib\matroska\ebml\ebmlbinaryelement.h" />
+    <ClInclude Include="taglib\matroska\ebml\ebmldeferredbinaryelement.h" />
     <ClInclude Include="taglib\matroska\ebml\ebmlelement.h" />
     <ClInclude Include="taglib\matroska\ebml\ebmlfloatelement.h" />
     <ClInclude Include="taglib\matroska\ebml\ebmlmasterelement.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="taglib\it\itfile.cpp" />
     <ClCompile Include="taglib\it\itproperties.cpp" />
     <ClCompile Include="taglib\matroska\ebml\ebmlbinaryelement.cpp" />
+    <ClCompile Include="taglib\matroska\ebml\ebmldeferredbinaryelement.cpp" />
     <ClCompile Include="taglib\matroska\ebml\ebmlelement.cpp" />
     <ClCompile Include="taglib\matroska\ebml\ebmlfloatelement.cpp" />
     <ClCompile Include="taglib\matroska\ebml\ebmlmasterelement.cpp" />
