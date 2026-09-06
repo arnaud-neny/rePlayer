@@ -202,6 +202,7 @@ Or add some comments (and likes) there:
 ### Replays 3rd parties:
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
+- [AtariAudio](https://github.com/arnaud-carre/AtariAudio): Simple library to play any Atari SNDH music file.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
 - [Ayumi](https://github.com/true-grue/ayumi): Highly precise emulation of AY-3-8910 and YM2149 sound chips. webAyumi for amad & fxm backend.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
@@ -245,7 +246,6 @@ Or add some comments (and likes) there:
 - [sc68](https://sourceforge.net/projects/sc68): Atari ST and Amiga music player (sc68, sndh).
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [SkaleTracker](https://www.pouet.net/prod.php?which=20929): Skale Tracker is a music tracker developed by Ruben Ramos Salvador (baktery) in the year 1998.
-- [SNDH-Player](https://github.com/arnaud-carre/sndh-player): ATARI-ST SNDH music player by Leonard/Oxygene.
 - SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
 - [StSound](https://github.com/arnaud-carre/StSound): ym files.
 - [SunVox](https://warmplace.ru/soft/sunvox): SunVox is a small, fast and powerful modular synthesizer with pattern-based sequencer (tracker).

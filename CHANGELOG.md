@@ -5,13 +5,18 @@
 
 ## Current version
 
+v0.22.12:
+- Updated adplug to 2.4 r947
+- Updated AtariAudio to 1.08
+- Updated libvgm to r630
+- Updated libcurl to 8.22.0
+- Updated TagLib to 2.3.2
+- Bug fixes
+
 v0.22.11:
 - Updated libresidfp to 1.2.2
 - Updated libsidplay to 3.1.1
-- Updated libvgm to r628
-- Updated SNDH-Player to 1.03
 - Added to OpenMPT an option to override the panning to make it fully separated
-- Bug fixes
 
 v0.22.10:
 - Updated FAAD2 to 2.11.3
@@ -20,16 +25,13 @@ v0.22.10:
 - ASAP with surround for single channel songs
 
 v0.22.9:
-- Updated adplug to 2.4 r943
 - Updated libxmp to 4.7.2
 - Updated ImGui to 1.92.9b
-- Updated TagLib to 2.3.1
 - Added context menu to playlist to sort, export as WAV or scan ReplayGain the selection
 
 v0.22.8:
 - Updated libtfmxaudiodecoder to 1.0.14
 - Updated libarchive to 3.8.8
-- Updated libcurl to 8.21.0
 
 v0.22.5:
 - Updated vgmstream to r2117
@@ -56,7 +58,7 @@ v0.22.0:
 
 ## Older updates
 
-- [0.22.8] adplug to 2.4 r938
+- [0.22.9] adplug to 2.4 r943
 - [0.22.0] ASAP to 8.0.0
 - [0.17.3] FAAD2 to 2.11.2
 - [0.22.9] FluidSynth to 2.5.7
@@ -69,12 +71,12 @@ v0.22.0:
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
-- [0.22.10] libvgm to r624
+- [0.22.11] libvgm to r628
 - [0.22.8] libxmp to 4.7.1
 - [0.22.9] OpenMPT to 0.9.0-pre.12 r25498
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
-- [0.22.1] SNDH-Player to 1.00
+- [0.22.11] SNDH-Player to 1.03
 - [0.21.9] SunVox to 2.1.4
 - [0.16.15] UADE to 3.0.5
 - [0.21.9] vgmstream to r2083
@@ -86,9 +88,9 @@ v0.22.0:
 - [0.21.9] FFTW 3.3.10
 - [0.22.3] ImGui to 1.92.8
 - [0.22.0] libarchive to 3.8.7
-- [0.22.2] libcurl to 8.20.0
+- [0.22.8] libcurl to 8.21.0
 - [0.21.9] libxml2 to 2.15.1
-- [0.22.3] TagLib to 2.3
+- [0.22.9] TagLib to 2.3.1
 
 ## Older players
 

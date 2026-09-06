@@ -17,6 +17,7 @@
 ## Replays Libraries:
 - adplug: https://github.com/adplug/adplug
 - ASAP: http://asap.sourceforge.net
+- AtariAudio: https://github.com/arnaud-carre/AtariAudio
 - Ayfly: https://github.com/l29ah/ayfly
 - Ayumi: https://github.com/true-grue/ayumi & https://bitbucket.org/wothke/webayumi
 - Buzzic 2: https://www.pouet.net/prod.php?which=54407
@@ -64,7 +65,6 @@
 - sc68: https://sourceforge.net/projects/sc68
 - SidPlay: https://github.com/libsidplayfp/libsidplayfp & https://github.com/libsidplayfp/libresidfp
 - SkaleTracker: https://www.pouet.net/prod.php?which=20929
-- SNDH-Player: https://github.com/arnaud-carre/sndh-player
 - SoundMon: Brian Postma website is gone.  
   Partially rewritten and fixed from original code.
 - StSound: https://github.com/arnaud-carre/StSound  
