@@ -89,6 +89,7 @@
 #include "mtr.h"
 #include "plx.h"
 #include "wm.h"
+#include "fmk.h"
 
 /***** CAdPlug *****/
 
@@ -149,6 +150,7 @@ const CPlayerDesc CAdPlug::allplayers[] = {
   CPlayerDesc(CsopPlayer::factory, "Note Sequencer by sopepos", ".sop\0"),
   CPlayerDesc(CheradPlayer::factory, "Herbulot AdLib System", ".hsq\0.sqx\0.sdb\0.agd\0.ha2\0"),
   CPlayerDesc(CwmPlayer::factory, "MusicV WM", ".wm\0.m\0"),
+  CPlayerDesc(CfmkPlayer::factory, "FM-Kingtracker", ".fmk\0"),
   CPlayerDesc()
 };
 
