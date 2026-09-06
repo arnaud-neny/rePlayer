@@ -68,7 +68,7 @@ namespace rePlayer
                 if (dataPos + chunkSize > kCacheSize)
                 {
                     auto splitSize = kCacheSize - dataPos;
-                    memcpy(output, m_data.Items(dataPos), splitSize);
+                    memcpy(output, m_data.Items(dataPos), size_t(splitSize));
                     output += splitSize;
                     tail += splitSize;
                     dataPos = 0;
@@ -76,7 +76,7 @@ namespace rePlayer
                     remainingSize -= splitSize;
                 }
 
-                memcpy(output, m_data.Items(dataPos), chunkSize);
+                memcpy(output, m_data.Items(dataPos), size_t(chunkSize));
                 output += chunkSize;
                 tail += chunkSize;
                 remainingSize -= chunkSize;
@@ -101,7 +101,7 @@ namespace rePlayer
 
                 availableSize = uint32_t(Min(remainingSize, uint64_t(availableSize)));
                 m_mutex.lock();
-                memcpy(output, m_data.Items(tail), availableSize);
+                memcpy(output, m_data.Items(tail), size_t(availableSize));
                 m_mutex.unlock();
                 output += availableSize;
                 tail += availableSize;
@@ -656,7 +656,7 @@ namespace rePlayer
             {
                 auto* str = (unsigned char*)input.data();
                 auto oldSize = input.size() + 1; // including nul char
-                auto newSize = 0;
+                auto newSize = 0u;
                 for (size_t i = 0; i < oldSize; i++, newSize++)
                 {
                     unsigned char c = str[i];

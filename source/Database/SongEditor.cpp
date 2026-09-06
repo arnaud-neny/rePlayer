@@ -136,7 +136,7 @@ namespace rePlayer
 
                 m_metadataCRC = crc32(0L, Z_NULL, 0);
                 if (m_song.edited.metadata.IsNotEmpty())
-                    m_metadataCRC = crc32_z(m_metadataCRC, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size());
+                    m_metadataCRC = crc32_z(m_metadataCRC, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size<z_size_t>());
             }
             if (m_song.original.tags != currentSong->GetTags())
             {
@@ -822,7 +822,7 @@ namespace rePlayer
             // if metadata of the current playing song are changing, make it live without saving
             auto fileCrc = crc32(0L, Z_NULL, 0);
             if (m_song.edited.metadata.IsNotEmpty())
-                fileCrc = crc32_z(fileCrc, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size());
+                fileCrc = crc32_z(fileCrc, pcCast<Bytef>(m_song.edited.metadata.Items()), m_song.edited.metadata.Container().Size<z_size_t>());
             if (fileCrc != m_metadataCRC)
             {
                 Core::GetDeck().UpdateSettings(m_song.edited.metadata.Container());
