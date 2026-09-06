@@ -1023,3 +1023,4 @@ EXTENSION(usm)          // VGMStream
 EXTENSION(wmw)          // VGMStream
 EXTENSION(xmi)          // Adlib: Miles Design eXtended MIDI
 EXTENSION(wm)			// Adlib: MusicV WM
+EXTENSION(fmk)			// Adlib: FM-Kingtracker
