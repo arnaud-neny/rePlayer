@@ -1,14 +1,14 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.06
+	Atari Audio Library v1.08
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
 --------------------------------------------------------------------*/
 #pragma once
 
-#define	ATARI_AUDIO_VERSION		"1.06"
+#define	ATARI_AUDIO_VERSION		"1.08"
 
-#include "Ym2149c.h"
+#include "ym2149c.h"
 #include "AtariMachine.h"
 #include "SndhFile.h"
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.06
+	Atari Audio Library v1.08
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -46,7 +46,7 @@ public:
 private:
 	void		ConfigureReturnByRts();
 	void		ConfigureReturnByRte();
-	bool		JmpBinary(int pc, int timeOut50Hz);
+	bool		JmpBinary(uint32_t pc, int timeOut50Hz);
 	void		Gemdos(int func, uint32_t a7);
 	void		XBios(int func, uint32_t a7);
 	void		XbiosTimerSet(int ctrlPort, int dataPort, int enablePort, int bit, int mask, int ctrlValue, int dataValue);

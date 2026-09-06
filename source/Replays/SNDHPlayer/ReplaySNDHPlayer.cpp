@@ -86,7 +86,7 @@ namespace rePlayer
     ReplaySNDHPlayer::ReplaySNDHPlayer(SndhFile* sndh, CommandBuffer metadata)
         : Replay(eExtension::_sndh, eReplay::SNDHPlayer)
         , m_sndh(sndh)
-        , m_loops(new LoopInfo[sndh->GetSubsongCount()])
+        , m_loops(new LoopInfo[sndh->GetSongInfo().subsongCount])
         , m_surround(kSampleRate)
     {
         BuildHash(sndh);
@@ -146,8 +146,7 @@ namespace rePlayer
             m_sndh->InitSubSong(m_subsongIndex + 1);
             currentPosition = 0;
         }
-        for (auto toRender = int(seekPosition - currentPosition); toRender;)
-            toRender -= m_sndh->AudioNull(int(seekPosition - currentPosition));
+        m_sndh->AudioRender(nullptr, uint32_t(seekPosition - currentPosition));
         m_currentPosition = seekPosition;
         if (seekPosition != currentPosition)
             m_surround.Reset();
@@ -185,47 +184,46 @@ namespace rePlayer
 
     uint32_t ReplaySNDHPlayer::GetDurationMs() const
     {
-        SndhFile::SubSongInfo subsongInfo;
-        m_sndh->GetSubsongInfo(m_subsongIndex + 1, subsongInfo);
         uint32_t currentDuration = m_loops[m_subsongIndex].GetDuration();
         if (currentDuration == 0)
-            currentDuration = uint32_t(((subsongInfo.playerTickCount == 0 ? GetTickCountFromSc68() : subsongInfo.playerTickCount) * 1000ull) / subsongInfo.playerTickRate);
+        {
+            auto sndhDuration = m_sndh->GetSubsongDurationMs(m_subsongIndex + 1);
+            currentDuration = sndhDuration == 0 ? uint32_t((GetTickCountFromSc68() * 1000ull) / m_sndh->GetSongInfo().playerTickRate) : sndhDuration;
+        }
         return currentDuration;
     }
 
     uint32_t ReplaySNDHPlayer::GetNumSubsongs() const
     {
-        return uint32_t(m_sndh->GetSubsongCount());
+        return uint32_t(m_sndh->GetSongInfo().subsongCount);
     }
 
     std::string ReplaySNDHPlayer::GetExtraInfo() const
     {
-        SndhFile::SubSongInfo subsongInfo;
-        m_sndh->GetSubsongInfo(m_subsongIndex + 1, subsongInfo);
+        auto& songInfo = m_sndh->GetSongInfo();
 
         std::string metadata;
         metadata  = "Title    : ";
-        if (subsongInfo.musicName)
-            metadata += subsongInfo.musicName;
+        if (songInfo.musicName)
+            metadata += songInfo.musicName;
         metadata += "\nArtist   : ";
-        if (subsongInfo.musicAuthor)
-            metadata += subsongInfo.musicAuthor;
+        if (songInfo.musicAuthor)
+            metadata += songInfo.musicAuthor;
         metadata += "\nYear     : ";
-        if (subsongInfo.year)
-            metadata += subsongInfo.year;
+        if (songInfo.year)
+            metadata += songInfo.year;
         metadata += "\nRipper   : ";
-        if (subsongInfo.ripper)
-            metadata += subsongInfo.ripper;
+        if (songInfo.ripper)
+            metadata += songInfo.ripper;
         metadata += "\nConverter: ";
-        if (subsongInfo.converter)
-            metadata += subsongInfo.converter;
+        if (songInfo.converter)
+            metadata += songInfo.converter;
         return metadata;
     }
 
     std::string ReplaySNDHPlayer::GetInfo() const
     {
-        SndhFile::SubSongInfo subsongInfo;
-        m_sndh->GetSubsongInfo(m_subsongIndex + 1, subsongInfo);
+        auto& songInfo = m_sndh->GetSongInfo();
 
         auto activeChannels = m_activeChannels;
         char numChannels = activeChannels & 0xff ? '1' : '0';
@@ -241,7 +239,7 @@ namespace rePlayer
         info += types[((activeChannels & 0xffFFff) ? 1 : 0) | ((activeChannels & 0xff000000) ? 2 : 0)];
 
         char txt[16];
-        sprintf(txt, "%d", subsongInfo.playerTickRate);
+        sprintf(txt, "%d", songInfo.playerTickRate);
         info += txt;
         info += " Hz\nAtariAudio " ATARI_AUDIO_VERSION;
         return info;
@@ -298,10 +296,12 @@ namespace rePlayer
 
     void ReplaySNDHPlayer::BuildHash(SndhFile* sndh)
     {
+        auto& songInfo = sndh->GetSongInfo();
+
         // Hash taken from sc68
         uint32_t h = 0;
         int n = 32;
-        const uint8_t* k = reinterpret_cast<const uint8_t*>(sndh->GetRawData());
+        const uint8_t* k = pcCast<uint8_t>(songInfo.rawBinaryPlayer);
         do
         {
             h += *k++;
@@ -309,8 +309,8 @@ namespace rePlayer
             h ^= h >> 6;
         } while (--n);
 
-        n = sndh->GetRawDataSize();
-        k = reinterpret_cast<const uint8_t*>(sndh->GetRawData());
+        n = songInfo.rawBinaryPlayerSize;
+        k = pcCast<uint8_t>(songInfo.rawBinaryPlayer);
         do
         {
             h += *k++;

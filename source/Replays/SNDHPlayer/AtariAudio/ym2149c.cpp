@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.06
+	Atari Audio Library v1.08
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -30,13 +30,11 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
 	m_insideTimerIrq = false;
 	m_hostReplayRate = hostReplayRate;
 	m_ymClockOneEighth = ymClock/8;
-	m_resamplingDividor = (hostReplayRate << 12) / m_ymClockOneEighth;
 	m_noiseRndRack = 1;
 	m_noiseHalf = 0;
 	for (int r=0;r<14;r++)
 		WriteReg(r, (7==r)?0x3f:0);
 	m_selectedReg = 0;
-	m_currentLevel = 0;
 	m_innerCycle = 0;
 	m_envPos = 0;
 	m_currentVisualLevels = 0;

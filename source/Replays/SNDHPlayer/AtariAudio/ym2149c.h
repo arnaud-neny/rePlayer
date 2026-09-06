@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.06
+	Atari Audio Library v1.08
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -49,7 +49,6 @@ private:
 	int			m_selectedReg;
 	const uint8_t* m_pCurrentEnv;
 	uint32_t	m_ymClockOneEighth;
-	uint32_t	m_resamplingDividor;
 	uint32_t	m_hostReplayRate;
 	uint32_t	m_toneCounter[3];
 	uint32_t	m_tonePeriod[3];
@@ -72,7 +71,6 @@ private:
 		uint32_t		sum;
 	}			m_dcAdjust[3];
 	uint8_t		m_regs[14];
-	uint32_t	m_currentLevel;
 	uint32_t	m_innerCycle;
 	uint32_t 	m_noiseHalf;
 	bool		m_insideTimerIrq;

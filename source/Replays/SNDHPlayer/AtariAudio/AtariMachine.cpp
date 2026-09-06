@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.06
+	Atari Audio Library v1.08
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -173,13 +173,6 @@ static int	fIllegalCb(int opcode)
 	return 1;
 }
 
-/*
-static void	fDebugCb(unsigned int pc)
-{
-	printf("$%06x .. \n", pc);
-}
-*/
-
 static void	fResetCb(void)
 {
 	assert(gCurrentMachine);
@@ -326,7 +319,6 @@ void	AtariMachine::Startup(uint32_t hostReplayRate)
 	m68k_init();
 	m68k_set_illg_instr_callback(fIllegalCb);
 	m68k_set_reset_instr_callback(fResetCb);
-//	m68k_set_instr_hook_callback(fDebugCb);
 
 	// setup some cookie jar for MaxyMizer player!
 	m68k_write_memory_32(0x900, '_SND');
@@ -371,7 +363,7 @@ void	AtariMachine::ConfigureReturnByRte()
 	m68k_write_memory_32(0, RAM_SIZE - 6);				// stack ptr at next reset on TOP of RAM
 }
 
-bool	AtariMachine::JmpBinary(int pc, int timeOut50Hz)
+bool	AtariMachine::JmpBinary(uint32_t pc, int timeOut50Hz)
 {
 	m68k_write_memory_32(0x14, RTE_INSTRUCTION_ADDR);		// DIV by ZERO excep jump at $500
 
