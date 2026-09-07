@@ -197,10 +197,11 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 		}
 	}
 
-	m_samplePerTick = m_hostReplayRate / m_songInfo.playerTickRate;
-
+	// rePlayer
 	if (!ret)
 		Unload();
+	else
+		m_samplePerTick = m_hostReplayRate / m_songInfo.playerTickRate;
 
 	return ret;
 }
