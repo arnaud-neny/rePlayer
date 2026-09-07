@@ -861,7 +861,7 @@ namespace rePlayer
                 ImportArtist(id, sourceResults);
 
             m_busySpinner->Indent(-1);
-            Core::FromJob([this, sourceResults = std::move(sourceResults), sources = std::move(sources)]()
+            Core::FromJob([this, sourceResults = std::move(sourceResults), sources = std::move(sources)]() mutable
             {
                 // update fetch time for artists with their db complete
                 Array<bool> dirtyArtist(sourceResults.artists.NumItems(), 0);
@@ -869,12 +869,13 @@ namespace rePlayer
                 {
                     // default is dirty to avoid processing artists added during import phase
                     dirtyArtist[aIdx] = true;
-                    for (auto id : sources)
+                    for (uint32_t sIdx = 0; sIdx < sources.NumItems(); ++sIdx)
                     {
-                        if (sourceResults.artists[aIdx]->sources[0].id == id)
+                        if (sourceResults.artists[aIdx]->sources[0].id == sources[sIdx])
                         {
                             // reset the dirty state as it's going to be set depending on the imported songs
                             dirtyArtist[aIdx] = false;
+                            sources.RemoveAtFast(sIdx);
                             break;
                         }
                     }
@@ -902,6 +903,27 @@ namespace rePlayer
                             if (artist->GetSource(i).id == sourceResults.artists[aIdx]->sources[0].id)
                             {
                                 artist->Edit()->sources[i].timeFetch = sourceResults.artists[aIdx]->sources[0].timeFetch;
+                                isDone = true;
+                                break;
+                            }
+                        }
+                        if (isDone)
+                            break;
+                    }
+                }
+                // and empty artists (because shit happens)
+                for (auto id : sources)
+                {
+                    // check if the artist is in the library
+                    for (Artist* artist : m_db.Artists())
+                    {
+                        bool isDone = false;
+                        for (uint16_t i = 0; i < artist->NumSources(); i++)
+                        {
+                            // found it, update
+                            if (artist->GetSource(i).id == id)
+                            {
+                                std::time(&artist->Edit()->sources[i].timeFetch);
                                 isDone = true;
                                 break;
                             }
