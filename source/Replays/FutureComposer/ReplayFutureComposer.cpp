@@ -226,6 +226,9 @@ namespace rePlayer
         metadata += "\nGame  : ";
         if (auto* str = m_decoder->getInfoString("game"))
             metadata += str;
+        metadata += "\nName  : ";
+        if (auto* str = m_decoder->getInfoString("name"))
+            metadata += str;
         return metadata;
     }
 
@@ -233,7 +236,10 @@ namespace rePlayer
     {
         std::string info;
 
-        info += m_decoder->getFormatName() == HippelDecoder::TFMX_7V_FORMAT_NAME || m_decoder->getFormatName() == TFMXDecoder::FORMAT_NAME_7V ? "7 channels\n" : "4 channels\n";
+        char txt[16];
+        sprintf(txt, "%d", m_decoder->getVoices());
+        info = txt;
+        info += " channels\n";
         info += m_decoder->getFormatName();
         info += "\nlibtfmxaudiodecoder " VERSION;
 
