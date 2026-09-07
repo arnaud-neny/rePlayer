@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.08
+	Atari Audio Library v1.09
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -9,12 +9,6 @@
 #include "ym2149c.h"
 #include "Mk68901.h"
 #include "SteDac.h"
-
-static	const	uint32_t	RAM_SIZE = 4*1024*1024;
-static	const	uint32_t	RTE_INSTRUCTION_ADDR = 0x500;
-static	const	uint32_t	RESET_INSTRUCTION_ADDR = 0x502;
-static	const	uint32_t	SNDH_UPLOAD_ADDR = 0x10002;		// some SNDH can't play below (ie SynthDream2) Also some driver crash if loaded at 64KiB bound ( metal planet by Floopy at 1:44 )
-static	const	uint32_t	GEMDOS_MALLOC_EMUL_BUFFER = RAM_SIZE-0x100000;
 
 
 class AtariMachine
@@ -42,8 +36,14 @@ public:
 	void			memWrite16(unsigned int address, unsigned int value);
 	void			TrapInstructionCallback(int v);
 	void			ResetCb(void);
+	void 			MuteVoices(uint32_t muteMask);
 
 private:
+	static	const	uint32_t	RAM_SIZE = 4*1024*1024;
+	static	const	uint32_t	RTE_INSTRUCTION_ADDR = 0x500;
+	static	const	uint32_t	RESET_INSTRUCTION_ADDR = 0x502;
+	static	const	uint32_t	GEMDOS_MALLOC_EMUL_BUFFER = RAM_SIZE-0x100000;
+
 	void		ConfigureReturnByRts();
 	void		ConfigureReturnByRte();
 	bool		JmpBinary(uint32_t pc, int timeOut50Hz);
@@ -52,10 +52,10 @@ private:
 	void		XbiosTimerSet(int ctrlPort, int dataPort, int enablePort, int bit, int mask, int ctrlValue, int dataValue);
 
 	uint8_t*	m_RAM;
-	int			m_ExitCode;
-	uint32_t	m_NextGemdosMallocAd;
-	Ym2149c		m_Ym2149;
-	Mk68901		m_Mfp;
-	SteDac		m_SteDac;
-
+	int			m_exitCode;
+	uint32_t	m_nextGemdosMallocAd;
+	uint32_t 	m_muteMask;
+	Ym2149c		m_ym2149;
+	Mk68901		m_mfp;
+	SteDac		m_steDac;
 };

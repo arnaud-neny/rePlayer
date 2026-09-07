@@ -65,14 +65,12 @@ namespace rePlayer
         static constexpr uint32_t kDefaultSongDuration = 180 * 1000; // in milliseconds
 
     private:
-        ReplaySNDHPlayer(SndhFile* sndh, CommandBuffer metadata);
+        ReplaySNDHPlayer(SndhRenderer* sndh, CommandBuffer metadata);
 
-        int32_t GetTickCountFromSc68() const;
-        void BuildHash(SndhFile* sndh);
         void BuildDurations(CommandBuffer metadata);
 
     private:
-        SndhFile* m_sndh;
+        SndhRenderer* m_sndh;
 
         uint64_t m_currentDuration = 0;
         uint64_t m_currentPosition = 0;
@@ -80,7 +78,6 @@ namespace rePlayer
 
         Surround m_surround;
 
-        uint32_t m_hash = 0;
         uint32_t m_activeChannels = 0;
 
     public:

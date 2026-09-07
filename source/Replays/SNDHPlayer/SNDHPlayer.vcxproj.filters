@@ -47,7 +47,7 @@
     <ClInclude Include="AtariAudio\Mk68901.h">
       <Filter>Source Files\AtariAudio</Filter>
     </ClInclude>
-    <ClInclude Include="AtariAudio\SndhFile.h">
+    <ClInclude Include="AtariAudio\SndhRenderer.h">
       <Filter>Source Files\AtariAudio</Filter>
     </ClInclude>
     <ClInclude Include="AtariAudio\SteDac.h">
@@ -88,7 +88,7 @@
     <ClCompile Include="AtariAudio\Mk68901.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
-    <ClCompile Include="AtariAudio\SndhFile.cpp">
+    <ClCompile Include="AtariAudio\SndhRenderer.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\SteDac.cpp">

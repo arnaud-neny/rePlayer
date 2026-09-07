@@ -37,10 +37,8 @@ namespace rePlayer
             return nullptr;
         auto data = stream->Read();
 
-        auto* sndh = new SndhFile();
-        if (sndh->Load(data.Items(), int(data.Size()), kSampleRate))
+        if (auto* sndh = SndhRenderer::Create(data.Items(), int(data.Size()), kSampleRate))
             return new ReplaySNDHPlayer(sndh, metadata);
-        delete sndh;
 
         return nullptr;
     }
@@ -79,17 +77,16 @@ namespace rePlayer
 
     ReplaySNDHPlayer::~ReplaySNDHPlayer()
     {
-        delete m_sndh;
+        SndhRenderer::Destroy(m_sndh);
         delete[] m_loops;
     }
 
-    ReplaySNDHPlayer::ReplaySNDHPlayer(SndhFile* sndh, CommandBuffer metadata)
+    ReplaySNDHPlayer::ReplaySNDHPlayer(SndhRenderer* sndh, CommandBuffer metadata)
         : Replay(eExtension::_sndh, eReplay::SNDHPlayer)
         , m_sndh(sndh)
         , m_loops(new LoopInfo[sndh->GetSongInfo().subsongCount])
         , m_surround(kSampleRate)
     {
-        BuildHash(sndh);
         BuildDurations(metadata);
     }
 
@@ -186,10 +183,7 @@ namespace rePlayer
     {
         uint32_t currentDuration = m_loops[m_subsongIndex].GetDuration();
         if (currentDuration == 0)
-        {
-            auto sndhDuration = m_sndh->GetSubsongDurationMs(m_subsongIndex + 1);
-            currentDuration = sndhDuration == 0 ? uint32_t((GetTickCountFromSc68() * 1000ull) / m_sndh->GetSongInfo().playerTickRate) : sndhDuration;
-        }
+            currentDuration = m_sndh->GetSubsongDurationMs(m_subsongIndex + 1);
         return currentDuration;
     }
 
@@ -243,81 +237,6 @@ namespace rePlayer
         info += txt;
         info += " Hz\nAtariAudio " ATARI_AUDIO_VERSION;
         return info;
-    }
-
-    int32_t ReplaySNDHPlayer::GetTickCountFromSc68() const
-    {
-        #define HBIT 32                         /* # of bit for hash     */
-        #define TBIT 6                          /* # of bit for track    */
-        #define WBIT 6                          /* # of bit for hardware */
-        #define FBIT (64-HBIT-TBIT-WBIT)        /* # of bit for frames   */
-        #define HFIX (32-HBIT)
-
-        #define TIMEDB_ENTRY(HASH,TRACK,FRAMES,FLAGS) \
-            { 0x##HASH>>HFIX, TRACK-1, FLAGS, FRAMES }
-        #define E_EMPTY { 0,0,0,0 }
-
-        typedef struct
-        {
-            unsigned int hash : HBIT;           /* hash code              */
-            unsigned int track : TBIT;           /* track number (0-based) */
-            unsigned int flags : WBIT;           /* see enum               */
-            unsigned int frames : FBIT;           /* length in frames       */
-        } dbentry_t;
-
-        #define STE 0
-        #define YM  0
-        #define TA  0
-        #define TB  0
-        #define TC  0
-        #define TD  0
-        #define NA  0
-
-        static dbentry_t s_db[] = {
-#           include "..\SC68\sc68\file68\src\timedb.inc.h"
-        };
-
-        dbentry_t e;
-        e.hash = m_hash >> HFIX;
-        e.track = m_subsongIndex;
-        if (auto* s = reinterpret_cast<dbentry_t*>(bsearch(&e, s_db, sizeof(s_db) / sizeof(dbentry_t), sizeof(dbentry_t), [](const void* ea, const void* eb)
-        {
-            auto* a = reinterpret_cast<const dbentry_t*>(ea);
-            auto* b = reinterpret_cast<const dbentry_t*>(eb);
-
-            int v = a->hash - b->hash;
-            if (!v)
-                v = a->track - b->track;
-            return v;
-        })))
-            return s->frames;
-        return 0;
-    }
-
-    void ReplaySNDHPlayer::BuildHash(SndhFile* sndh)
-    {
-        auto& songInfo = sndh->GetSongInfo();
-
-        // Hash taken from sc68
-        uint32_t h = 0;
-        int n = 32;
-        const uint8_t* k = pcCast<uint8_t>(songInfo.rawBinaryPlayer);
-        do
-        {
-            h += *k++;
-            h += h << 10;
-            h ^= h >> 6;
-        } while (--n);
-
-        n = songInfo.rawBinaryPlayerSize;
-        k = pcCast<uint8_t>(songInfo.rawBinaryPlayer);
-        do
-        {
-            h += *k++;
-            h += h << 10;
-            h ^= h >> 6;
-        } while (--n);
-        m_hash = h;
     }
 
     void ReplaySNDHPlayer::BuildDurations(CommandBuffer metadata)

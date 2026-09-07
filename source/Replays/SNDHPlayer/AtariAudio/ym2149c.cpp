@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.08
+	Atari Audio Library v1.09
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -26,6 +26,7 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
 		m_toneCounter[v] = 0;
 		m_tonePeriod[v] = 0;
 	}
+	MuteVoices(0);	// do not mute anything
 	m_toneEdges = (stdLibRand()&((1<<10)|(1<<5)|(1<<0)))*0x1f;		// YM internal edge state are un-predictable
 	m_insideTimerIrq = false;
 	m_hostReplayRate = hostReplayRate;
@@ -176,6 +177,13 @@ uint16_t Ym2149c::Tick()
 	return vmask;
 }
 
+void Ym2149c::MuteVoices(uint32_t muteMask)
+{
+	m_enableMask = 0;
+	for (int i = 0; i < 3; i++)
+		m_enableMask |= muteMask&(1 << i) ? 0 : 31 << (i * 5);
+}
+
 // called at host replay rate ( like 48Khz )
 // internally update YM chip state machine at 250Khz and average output for each host sample
 Ym2149c::Levels Ym2149c::ComputeNextSample()
@@ -197,6 +205,10 @@ Ym2149c::Levels Ym2149c::ComputeNextSample()
 	levels[1] = ((m_regs[8] & 0x10) ? envLevel : (m_regs[8]<<1)) << 0;
 	levels[2] = ((m_regs[9] & 0x10) ? envLevel : (m_regs[9]<<1)) << 5;
 	levels[1] |= ((m_regs[10] & 0x10) ? envLevel : (m_regs[10]<<1)) << 10;
+
+	levels[0] &= m_enableMask;		// ability to artificially mute some voices
+	levels[1] &= m_enableMask;		// ability to artificially mute some voices
+	levels[2] &= m_enableMask;		// ability to artificially mute some voices
 
 	// if period <=1 and TONE is active, empirically reduce final output value by 2 (some STF digisound use this mode)
 	const int halfShiftA = ((m_tonePeriod[0] > 1) || (m_regs[7]&(1<<0)))?0:1;

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.08
+	Atari Audio Library v1.09
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -37,12 +37,13 @@ public:
 	void	InsideTimerIrq(bool inside);
 
 	uint16_t GetCurrentVisualLevels() const { return m_currentVisualLevels; } // only used for some player visual, contains 3 YM voices volume and STE DAC in 8888 format
+	void MuteVoices(uint32_t muteMask);
 
 private:
 	void	WriteReg(int reg, uint8_t value);
 	uint16_t Tick();
 
-	static const uint32_t kDcAdjustHistoryBit = 11;	// 2048 values (~20ms at 44Khz)
+	static const uint32_t kDcAdjustHistoryBit = 11;	// 2048 values (~20ms at 44Khz) 
 
 	Levels	dcAdjust(Levels v);
 
@@ -73,6 +74,7 @@ private:
 	uint8_t		m_regs[14];
 	uint32_t	m_innerCycle;
 	uint32_t 	m_noiseHalf;
+	uint32_t 	m_enableMask;
 	bool		m_insideTimerIrq;
 	bool		m_edgeNeedReset[3];
 };

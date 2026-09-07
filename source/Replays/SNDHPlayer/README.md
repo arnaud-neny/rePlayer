@@ -1,17 +1,18 @@
-# AtariAudio Library v1.08
+# AtariAudio Library v1.09
 
 src/ contains all files needed to compile AtariAudio library. It allows you to play ATARI SNDH music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
 The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
 
 # Playing SNDH file in your own app
 
-AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is class SndhFile.
-Look at SndhFile.h for API details but here is the absolute minimal:
+AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is SndhRenderer class.
+Look at SndhRenderer.h for API details but here is the absolute minimal:
 
 ````
-bool	Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostReplayRate);
+static SndhRenderer* Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate);
+
 ````
-Load a raw SNDH file from memory. You should provide the memory buffer, size of the raw file, and host replay rate. ( ex 44100 for 44.1Khz )
+Load a SNDH file from memory. You should provide the memory buffer, size of the raw file, and host replay rate. ( ex 44100 for 44.1Khz )
 
 ````
 bool	InitSubSong(int subSongId);
@@ -22,18 +23,19 @@ Atari SNDH musics could contain several subsongs. You should *always* call InitS
 void	AudioRender(int16_t* buffer, uint32_t sampleCount);
 ````
 This is the main audio rendering function. Render "count" samples into buffer. Buffer is a 16bits, signed, mono, sample buffer.
-Like, let's say your replay rate is 44.1Khz and you want to generate 1 second of music:
+
+Musics doesn't have an end by default, so AudioRender doesn't returns anything. If you want to generate the exact amount of samples, you can use GetSubsongDurationSample()
+NOTE: some SNDH files doesn't provide any song duration information. In this case GetSubsongDurationSample() will return 0.
 
 ````
-  int16_t* buffer = buffer of 44100*2 bytes ( one sample is 16bits, mono )
-  AudioRender(buffer, 44100);
+static void Destroy(SndhRenderer* sr);
 ````
+Destroy SndhRenderer object and free any internal allocated memory
 
-Musics doesn't have an end by default, so AudioRender doesn't returns anything. If you want to generate the exact amount of samples, you can use GetSubsongDurationInSample()
-NOTE: some SNDH files doesn't provide any song duration information. In this case GetSubsongDurationInSample() will return 0.
 
 # Versions
 
+- 1.09 : API refactor and MuteVoices function added
 - 1.08 : more robust API
 - 1.07 : some API changes and cleanup
 - 1.06 : added SetDefaultSongDuration for SNDH files without any duration info

@@ -196,7 +196,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="AtariAudio\external\Musashi\m68kops.h" />
     <ClInclude Include="AtariAudio\external\timedb.inc.h" />
     <ClInclude Include="AtariAudio\Mk68901.h" />
-    <ClInclude Include="AtariAudio\SndhFile.h" />
+    <ClInclude Include="AtariAudio\SndhRenderer.h" />
     <ClInclude Include="AtariAudio\SteDac.h" />
     <ClInclude Include="AtariAudio\timedb.h" />
     <ClInclude Include="AtariAudio\ym2149c.h" />
@@ -210,7 +210,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.c" />
     <ClCompile Include="AtariAudio\external\Musashi\m68kops.c" />
     <ClCompile Include="AtariAudio\Mk68901.cpp" />
-    <ClCompile Include="AtariAudio\SndhFile.cpp" />
+    <ClCompile Include="AtariAudio\SndhRenderer.cpp" />
     <ClCompile Include="AtariAudio\SteDac.cpp" />
     <ClCompile Include="AtariAudio\timedb.cpp" />
     <ClCompile Include="AtariAudio\ym2149c.cpp" />

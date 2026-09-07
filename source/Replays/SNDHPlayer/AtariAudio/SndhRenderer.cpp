@@ -1,58 +1,71 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.08
+	Atari Audio Library v1.09
 	Small & accurate ATARI-ST audio emulation
-	by Arnaud Carré aka Leonard/Oxygene
+	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
 --------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "SndhFile.h"
+#include "SndhRenderer.h"
 #include "external/ice_24.h"
 #include "timedb.h"
 
-
-SndhFile::SndhFile()
+SndhRenderer*	SndhRenderer::Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate)
 {
+	SndhRenderer* sr = new SndhRenderer();
+	if ( sr->Load(sndhMemoryData, sndhMemorySize, hostReplayRate ))
+		return sr;
+	delete sr;
+	return nullptr;
+}
+
+void SndhRenderer::Destroy(SndhRenderer* sr)
+{
+	delete sr;
+}
+
+SndhRenderer::SndhRenderer()
+{
+	static const char* sEmptyString = "";
 	m_songInfo.rawBinaryPlayer = nullptr;
-	Unload();
-}
-
-SndhFile::~SndhFile()
-{
-	Unload();
-}
-
-void	SndhFile::Unload()
-{
-	free((void*)m_songInfo.rawBinaryPlayer);
 	memset(&m_songInfo, 0, sizeof(m_songInfo));
 	m_hostReplayRate = 0;
+	m_songInfo.musicName = sEmptyString;
+	m_songInfo.musicAuthor = sEmptyString;
+	m_songInfo.ripper = sEmptyString;
+	m_songInfo.converter = sEmptyString;
+	m_songInfo.year = sEmptyString;
+	m_subsongInit = false;
 }
 
-uint16_t	SndhFile::Read16(const char* r)
+SndhRenderer::~SndhRenderer()
+{
+	free((void*)m_songInfo.rawBinaryPlayer);
+}
+
+uint16_t	SndhRenderer::Read16(const char* r)
 {
 	const uint8_t* r8 = (const uint8_t*)r;
 	uint16_t v = (r8[0] << 8) | (r8[1]);
 	return v;
 }
 
-uint32_t	SndhFile::Read32(const char* r)
+uint32_t	SndhRenderer::Read32(const char* r)
 {
 	uint32_t v = (Read16(r) << 16) | Read16(r + 2);
 	return v;
 }
 
-const char* SndhFile::skipNTString(const char* r)
+const char* SndhRenderer::skipNTString(const char* r)
 {
 	r += strlen(r) + 1;
 	return r;
 }
 
-bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostReplayRate)
+bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t hostReplayRate)
 {
 
-	Unload();
 	m_hostReplayRate = hostReplayRate;
 	bool ret = false;
 	SongInfo& si = m_songInfo;
@@ -63,7 +76,6 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 		long csize = ice_24_depack((unsigned char*)rawSndhFile, (unsigned char*)si.rawBinaryPlayer);
 		if (si.rawBinaryPlayerSize != csize)
 		{
-			Unload();
 			return false;
 		}
 	}
@@ -197,16 +209,12 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 		}
 	}
 
-	// rePlayer
-	if (!ret)
-		Unload();
-	else
-		m_samplePerTick = m_hostReplayRate / m_songInfo.playerTickRate;
+	if (ret) m_samplePerTick = m_hostReplayRate / m_songInfo.playerTickRate;// rePlayer
 
 	return ret;
 }
 
-bool	SndhFile::InitSubSong(int subSongId)
+bool	SndhRenderer::InitSubSong(int subSongId)
 {
 	bool ret = false;
 	if ((subSongId >= 1) && (subSongId <= m_songInfo.subsongCount))
@@ -218,12 +226,13 @@ bool	SndhFile::InitSubSong(int subSongId)
 			ret = m_atariMachine.Jsr(SNDH_UPLOAD_ADDR, subSongId);
 		}
 	}
+	m_subsongInit = ret;
 	return ret;
 }
 
-void	SndhFile::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* pSampleViewInfo)
+void	SndhRenderer::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* pSampleViewInfo)
 {
-	if (!IsValid())
+	if (!m_subsongInit)
 		return;
 
 	while (count > 0)
@@ -265,24 +274,24 @@ void	SndhFile::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* pS
 	}
 }
 
-void SndhFile::AudioRender(int16_t* buffer, uint32_t count)
+void SndhRenderer::AudioRender(int16_t* buffer, uint32_t count)
 {
 	AudioRenderInternal(buffer, count, nullptr);
 }
 
-void 	SndhFile::FastForward(uint32_t sampleCount)
+void 	SndhRenderer::FastForward(uint32_t sampleCount)
 {
 	AudioRenderInternal(nullptr, sampleCount, nullptr);
 }
 
-void SndhFile::AudioRenderWithVisualInfos(int16_t* buffer, uint32_t count, uint32_t* pVisualSamples)
+void SndhRenderer::AudioRenderWithVisualInfos(int16_t* buffer, uint32_t count, uint32_t* pVisualSamples)
 {
 	AudioRenderInternal(buffer, count, pVisualSamples);
 }
 
-void	SndhFile::AudioRenderStereo(int16_t* buffer, uint32_t count, uint32_t* pSampleViewInfo)
+void	SndhRenderer::AudioRenderStereo(int16_t* buffer, uint32_t count, uint32_t* pSampleViewInfo)
 {
-	if (!IsValid())
+	if (!m_subsongInit)
 		return;
 
 	while (count > 0)
@@ -324,7 +333,7 @@ void	SndhFile::AudioRenderStereo(int16_t* buffer, uint32_t count, uint32_t* pSam
 	}
 }
 
-uint32_t SndhFile::GetSubsongDurationSample(int subsongId) const
+uint32_t SndhRenderer::GetSubsongDurationSample(int subsongId) const
 {
 	if ((subsongId <= 0) || (subsongId > m_songInfo.subsongCount))
 		return 0;
@@ -332,7 +341,7 @@ uint32_t SndhFile::GetSubsongDurationSample(int subsongId) const
 	return (m_subSongLenInTick[subsongId-1] * m_samplePerTick);	// by convention, SNDH subsong id starts at 1
 }
 
-uint32_t SndhFile::GetSubsongDurationMs(int subsongId) const
+uint32_t SndhRenderer::GetSubsongDurationMs(int subsongId) const
 {
 	uint32_t ms = 0;
 	if (m_hostReplayRate > 0)
