@@ -9,7 +9,7 @@
 namespace rePlayer
 {
     ReplayPlugin g_replayPlugin = {
-        .replayId = eReplay::SNDHPlayer, .isThreadSafe = false,
+        .replayId = eReplay::SNDHPlayer,
         .name = "SNDH-Player",
         .extensions = "sndh",
         .about = "AtariAudio " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",

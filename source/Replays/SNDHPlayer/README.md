@@ -1,7 +1,9 @@
-# AtariAudio Library v1.09
+# AtariAudio Library v1.10
 
 src/ contains all files needed to compile AtariAudio library. It allows you to play ATARI SNDH music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
 The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
+
+NOTE: Since 1.10 AtariAudio library is thread safe! Any thread could create any amount of SndhRenderer instances. (obviously two different threads can't use the same instance of SndhRenderer)
 
 # Playing SNDH file in your own app
 
@@ -35,6 +37,7 @@ Destroy SndhRenderer object and free any internal allocated memory
 
 # Versions
 
+- 1.10 : AtariAudio is now fully thread safe! (Use a custom Musashi 68k emulation version)
 - 1.09 : API refactor and MuteVoices function added
 - 1.08 : more robust API
 - 1.07 : some API changes and cleanup

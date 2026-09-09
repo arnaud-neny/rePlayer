@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.09
+	Atari Audio Library v1.10
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -9,6 +9,8 @@
 #include "ym2149c.h"
 #include "Mk68901.h"
 #include "SteDac.h"
+#include "external/Musashi/m68k.h"
+#include "external/Musashi/m68kops.h"
 
 
 class AtariMachine
@@ -58,4 +60,5 @@ private:
 	Ym2149c		m_ym2149;
 	Mk68901		m_mfp;
 	SteDac		m_steDac;
+	M68k m_cpu;
 };

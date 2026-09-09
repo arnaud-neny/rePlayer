@@ -76,12 +76,6 @@
     <ClCompile Include="AtariAudio\external\ice_24.c">
       <Filter>Source Files\AtariAudio\external</Filter>
     </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\Musashi\m68kops.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
     <ClCompile Include="AtariAudio\AtariMachine.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
@@ -100,5 +94,24 @@
     <ClCompile Include="AtariAudio\timedb.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
+    <ClCompile Include="AtariAudio\external\Musashi\m68k.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\external\Musashi\m68kops.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AtariAudio\external\Musashi\m68k_func.inc">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="AtariAudio\external\Musashi\readme.txt">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </Text>
   </ItemGroup>
 </Project>

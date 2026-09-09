@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.09
+	Atari Audio Library v1.10
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -7,7 +7,6 @@
 #include <stdlib.h>		// malloc & free
 #include <string.h>		// memset & memcpy
 #include <assert.h>
-#include "external/Musashi/m68k.h"
 #include "AtariMachine.h"
 
 #define D_DUMP_READ		0
@@ -20,42 +19,68 @@ static const uint32_t D_DUMP_WRITE_AD2 = 0xfffaff;
 #include <stdio.h>
 #endif
 
-static AtariMachine*	gCurrentMachine = nullptr;
+#define	D_ADDR_BUS_MASK(a)	((a)&0x00ffffff)
+
 static const uint32_t ivector[5] = { 0x134,0x120,0x114,0x110,0x13c };
 
-unsigned int  m68k_read_memory_8(unsigned int address)
+unsigned int M68k_Read8(void* user, unsigned int address)
 {
-	return gCurrentMachine->memRead8(address);
+	AtariMachine* mch = (AtariMachine*)user;
+	return mch->memRead8(address);
 }
 
-unsigned int  m68k_read_memory_16(unsigned int address)
+unsigned int M68k_Read16(void* user, unsigned int address)
 {
-	return gCurrentMachine->memRead16(address);
+	AtariMachine* mch = (AtariMachine*)user;
+	return mch->memRead16(address);
 }
 
-void m68k_write_memory_8(unsigned int address, unsigned int value)
+unsigned int M68k_Read32(void* user, unsigned int address)
 {
-	gCurrentMachine->memWrite8(address, value);
+	AtariMachine* mch = (AtariMachine*)user;
+	uint32_t v = mch->memRead16(address);
+	v = (v << 16) | mch->memRead16(address + 2);
+	return v;
 }
 
-void m68k_write_memory_16(unsigned int address, unsigned int value)
+void M68k_Write8(void* user, unsigned int address, unsigned int value)
 {
-	gCurrentMachine->memWrite16(address, value);
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->memWrite8(address, value);
 }
 
-unsigned int  m68k_read_memory_32(unsigned int address)
+void M68k_Write16(void* user, unsigned int address, unsigned int value)
 {
-	uint32_t r = m68k_read_memory_16(address) << 16;
-	r |= m68k_read_memory_16(address + 2);
-	return r;
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->memWrite16(address, value);
 }
 
-void m68k_write_memory_32(unsigned int address, unsigned int value)
+void M68k_Write32(void* user, unsigned int address, unsigned int value)
 {
-	m68k_write_memory_16(address, uint16_t(value >> 16));
-	m68k_write_memory_16(address + 2, uint16_t(value));
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->memWrite16(address, value>>16);
+	mch->memWrite16(address+2, value&0xffff);
 }
 
+void M68k_Reset_Callback(void* user)
+{
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->ResetCb();
+}
+
+int M68k_Illegal_Callback(void* user, int opcode)
+{
+	(void)user;
+	(void)opcode;
+	return 1;
+}
+
+int M68k_TrapN_Callback(void* user, int n)
+{
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->TrapInstructionCallback(n);
+	return 1;
+}
 
 unsigned int  AtariMachine::memRead8(unsigned int address)
 {
@@ -103,6 +128,12 @@ unsigned int  AtariMachine::memRead16(unsigned int address)
 	}
 #endif
 	return r;
+}
+
+void	AtariMachine::ResetCb(void)
+{
+	m_exitCode |= AtariMachine::ExitCode::kReset;
+	m_cpu.m68k_end_timeslice();
 }
 
 void AtariMachine::memWrite8(unsigned int address, unsigned int value)
@@ -166,34 +197,6 @@ AtariMachine::~AtariMachine()
 	}
 }
 
-static int	fIllegalCb(int opcode)
-{
-	assert(false);
-	m68k_end_timeslice();
-	return 1;
-}
-
-static void	fResetCb(void)
-{
-	assert(gCurrentMachine);
-	gCurrentMachine->ResetCb();
-	m68k_end_timeslice();
-}
-
-void	AtariMachine::ResetCb(void)
-{
-	m_exitCode |= AtariMachine::ExitCode::kReset;
-}
-
-extern "C"
-{
-	void	TrapInstructionCallback(int v)
-	{
-		assert(gCurrentMachine);
-		gCurrentMachine->TrapInstructionCallback(v);
-	}
-}
-
 void	AtariMachine::Gemdos(int func, uint32_t a7)
 {
 	switch (func)
@@ -201,15 +204,15 @@ void	AtariMachine::Gemdos(int func, uint32_t a7)
 	case 0x48:			// MALLOC
 	{
 		// very basic incremental allocator (required by Maxymizer player)
-		int size = m68k_read_memory_32(a7 + 2);
-		m68k_set_reg(M68K_REG_D0, m_nextGemdosMallocAd);
+		int size = m_cpu.MemRead32(a7 + 2);
+		m_cpu.m68k_set_reg(M68K_REG_D0, m_nextGemdosMallocAd);
 		m_nextGemdosMallocAd = (m_nextGemdosMallocAd + size + 1)&(-2);
 		assert(m_nextGemdosMallocAd <= RAM_SIZE);
 	}
 	break;
 	case 0x30:			// system version
 	{
-		m68k_set_reg(M68K_REG_D0, 0x0000);	// 0.15 : TOS 1.04 & 1.06
+		m_cpu.m68k_set_reg(M68K_REG_D0, 0x0000);	// 0.15 : TOS 1.04 & 1.06
 	}
 	break;
 
@@ -236,13 +239,13 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 	{
 	case 31:
 	{
-		uint16_t timer = m68k_read_memory_16(a7 + 2);
-		uint16_t ctrlWord = m68k_read_memory_16(a7 + 4);
-		uint16_t dataWord = m68k_read_memory_16(a7 + 6);
-		uint32_t vector = m68k_read_memory_32(a7 + 8);
+		uint16_t timer = m_cpu.MemRead16(a7 + 2);
+		uint16_t ctrlWord = m_cpu.MemRead16(a7 + 4);
+		uint16_t dataWord = m_cpu.MemRead16(a7 + 6);
+		uint32_t vector = m_cpu.MemRead32(a7 + 8);
 		if (timer < 4)
 		{
-			m68k_write_memory_32(ivector[timer], vector);
+			m_cpu.MemWrite32(ivector[timer], vector);
 			switch (timer)
 			{
 			case 0:		// A
@@ -268,14 +271,14 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 		{
 			// XBios(38) -> execute callback code in supervisor
 			// we just simulate a "jsr callback"
-			uint32_t callbackAddr = m68k_read_memory_32(a7 + 2);
+			uint32_t callbackAddr = m_cpu.MemRead32(a7 + 2);
 
 			// push PC on stack (so future RTS will get back right after the TRAP)
-			uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
+			uint32_t pc = m_cpu.m68k_get_reg(M68K_REG_PC);
 			a7 -= 4;
-			m68k_write_memory_32(a7, pc);
-			m68k_set_reg(M68K_REG_SP, a7);
-			m68k_set_reg(M68K_REG_PC, callbackAddr);
+			m_cpu.MemWrite32(a7, pc);
+			m_cpu.m68k_set_reg(M68K_REG_SP, a7);
+			m_cpu.m68k_set_reg(M68K_REG_PC, callbackAddr);
 		}
 		break;
 	default:
@@ -286,9 +289,8 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 
 void	AtariMachine::TrapInstructionCallback(int v)
 {
-
-	int a7 = m68k_get_reg(nullptr, M68K_REG_SP);
-	int func = m68k_read_memory_16(a7);
+	int a7 = m_cpu.m68k_get_reg(M68K_REG_SP);
+	int func = m_cpu.MemRead16(a7);
 
 	switch (v)
 	{
@@ -306,7 +308,6 @@ void	AtariMachine::TrapInstructionCallback(int v)
 
 void	AtariMachine::Startup(uint32_t hostReplayRate)
 {
-	gCurrentMachine = this;
 	assert(m_RAM);
 	memset(m_RAM, 0, RAM_SIZE);
 
@@ -316,27 +317,25 @@ void	AtariMachine::Startup(uint32_t hostReplayRate)
 	m_nextGemdosMallocAd = GEMDOS_MALLOC_EMUL_BUFFER;
 	MuteVoices(0);		// nothing is muted by default
 
-	m68k_set_cpu_type(M68K_CPU_TYPE_68000);
-	m68k_init();
-	m68k_set_illg_instr_callback(fIllegalCb);
-	m68k_set_reset_instr_callback(fResetCb);
+	memset(&m_cpu, 0, sizeof(m_cpu));// rePlayer
+	m_cpu.SetUserData(this);
+	m_cpu.m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 
 	// setup some cookie jar for MaxyMizer player!
-	m68k_write_memory_32(0x900, '_SND');
-	m68k_write_memory_32(0x904, 0x3);		// soundchip+STE DMA
-	m68k_write_memory_32(0x908, '_MCH');
-	m68k_write_memory_32(0x90c, 0x00010000);	// STE
-	m68k_write_memory_32(0x910, 0);			// end
-	m68k_write_memory_32(0x5a0, 0x900);		// cookie jar start
+	m_cpu.MemWrite32(0x900, 0x5f534e44);	// '_SND'
+	m_cpu.MemWrite32(0x904, 0x3);		// soundchip+STE DMA
+	m_cpu.MemWrite32(0x908, 0x5f4d4348);	// '_MCH'
+	m_cpu.MemWrite32(0x90c, 0x00010000);	// STE
+	m_cpu.MemWrite32(0x910, 0);			// end
+	m_cpu.MemWrite32(0x5a0, 0x900);		// cookie jar start
 
-	memWrite16(RESET_INSTRUCTION_ADDR, 0x4e70);			// 4e70=reset instruction
-	memWrite16(RTE_INSTRUCTION_ADDR, 0x4e73);			// 4e73=rte
+	m_cpu.MemWrite16(RESET_INSTRUCTION_ADDR, 0x4e70);			// 4e70=reset instruction
+	m_cpu.MemWrite16(RTE_INSTRUCTION_ADDR, 0x4e73);			// 4e73=rte
 
 	// some SNDH setup MFP registers with values from OS, with timer C running!
 	// so by default, set the timer C handler to RTE, just in case
-	m68k_write_memory_32(0x114, RTE_INSTRUCTION_ADDR);
+	m_cpu.MemWrite32(0x114, RTE_INSTRUCTION_ADDR);
 
-	gCurrentMachine = nullptr;
 }
 
 bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
@@ -353,29 +352,29 @@ bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
 
 void	AtariMachine::ConfigureReturnByRts()
 {
-	m68k_write_memory_32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTS will go to RESET_INSTRUCTION_ADDR (reset)
-	m68k_write_memory_32(0, RAM_SIZE-4);				// stack ptr at next reset on TOP of RAM
+	m_cpu.MemWrite32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTS will go to RESET_INSTRUCTION_ADDR (reset)
+	m_cpu.MemWrite32(0, RAM_SIZE-4);				// stack ptr at next reset on TOP of RAM
 }
 
 void	AtariMachine::ConfigureReturnByRte()
 {
-	m68k_write_memory_32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTE will go to RESET_INSTRUCTION_ADDR (reset)
-	memWrite16(RAM_SIZE - 6, 0x2300);					// SR=2300
-	m68k_write_memory_32(0, RAM_SIZE - 6);				// stack ptr at next reset on TOP of RAM
+	m_cpu.MemWrite32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTE will go to RESET_INSTRUCTION_ADDR (reset)
+	m_cpu.MemWrite16(RAM_SIZE - 6, 0x2300);					// SR=2300
+	m_cpu.MemWrite32(0, RAM_SIZE - 6);				// stack ptr at next reset on TOP of RAM
 }
 
 bool	AtariMachine::JmpBinary(uint32_t pc, int timeOut50Hz)
 {
-	m68k_write_memory_32(0x14, RTE_INSTRUCTION_ADDR);		// DIV by ZERO excep jump at $500
+	m_cpu.MemWrite32(0x14, RTE_INSTRUCTION_ADDR);		// DIV by ZERO excep jump at $500
 
-	m68k_write_memory_32(4, pc);			// pc at next RESET
-	m68k_pulse_reset();						// reset CPU & start execution at PC
+	m_cpu.MemWrite32(4, pc);			// pc at next RESET
+	m_cpu.m68k_pulse_reset();						// reset CPU & start execution at PC
 
 	m_exitCode = 0;
 	int cycles = 0;
 	for (int t = 0; t < timeOut50Hz; t++)
 	{
-		cycles += m68k_execute(512 * 313);				// 50hz frame
+		cycles += m_cpu.Execute(512 * 313);				// 50hz frame
 		if (m_exitCode)
 			break;
 	}
@@ -384,14 +383,11 @@ bool	AtariMachine::JmpBinary(uint32_t pc, int timeOut50Hz)
 
 bool	AtariMachine::Jsr(uint32_t addr, uint32_t d0)
 {
-	gCurrentMachine = this;
-
 	bool ret = false;
 	// upload data in RAM
 	ConfigureReturnByRts();
-	m68k_set_reg(M68K_REG_D0, d0);
+	m_cpu.m68k_set_reg(M68K_REG_D0, d0);
 	ret = JmpBinary(addr, 50*10);		// timeout of 1sec for init
-	gCurrentMachine = nullptr;
 	return ret;
 }
 
@@ -428,7 +424,6 @@ void AtariMachine::MuteVoices(uint32_t muteMask)
 
 int16_t	AtariMachine::ComputeNextSample()
 {
-	gCurrentMachine = this;
 	int32_t level = m_ym2149.ComputeNextSample().sMono;
 	int32_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_mfp);
 	if ( 0 == (m_muteMask&(1<<3)))
@@ -446,20 +441,18 @@ int16_t	AtariMachine::ComputeNextSample()
 	{
 		if (m_mfp.Tick(t))
 		{
-			uint32_t pc = m68k_read_memory_32(ivector[t]);
+			uint32_t pc = m_cpu.MemRead32(ivector[t]);
 			ConfigureReturnByRte();
 			m_ym2149.InsideTimerIrq(true);
 			JmpBinary(pc, 1);	// execute the timer code until RTE (probably SID or any other special fx code)
 			m_ym2149.InsideTimerIrq(false);
 		}
 	}
-	gCurrentMachine = nullptr;
 	return out;
 }
 
 void AtariMachine::ComputeNextSample(int16_t*& buffer)
 {
-	gCurrentMachine = this;
 	auto level = m_ym2149.ComputeNextSample();
 	int16_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_mfp);
 	if ( 0 == (m_muteMask&(1<<3)))
@@ -478,12 +471,11 @@ void AtariMachine::ComputeNextSample(int16_t*& buffer)
 	{
 		if (m_mfp.Tick(t))
 		{
-			uint32_t pc = m68k_read_memory_32(ivector[t]);
+			uint32_t pc = m_cpu.MemRead32(ivector[t]);
 			ConfigureReturnByRte();
 			m_ym2149.InsideTimerIrq(true);
 			JmpBinary(pc, 1);	// execute the timer code until RTE (probably SID or any other special fx code)
 			m_ym2149.InsideTimerIrq(false);
 		}
 	}
-	gCurrentMachine = nullptr;
 }

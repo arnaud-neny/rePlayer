@@ -207,14 +207,21 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
   <ItemGroup>
     <ClCompile Include="AtariAudio\AtariMachine.cpp" />
     <ClCompile Include="AtariAudio\external\ice_24.c" />
-    <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.c" />
-    <ClCompile Include="AtariAudio\external\Musashi\m68kops.c" />
+    <ClCompile Include="AtariAudio\external\Musashi\m68k.cpp" />
+    <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.cpp" />
+    <ClCompile Include="AtariAudio\external\Musashi\m68kops.cpp" />
     <ClCompile Include="AtariAudio\Mk68901.cpp" />
     <ClCompile Include="AtariAudio\SndhRenderer.cpp" />
     <ClCompile Include="AtariAudio\SteDac.cpp" />
     <ClCompile Include="AtariAudio\timedb.cpp" />
     <ClCompile Include="AtariAudio\ym2149c.cpp" />
     <ClCompile Include="ReplaySNDHPlayer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AtariAudio\external\Musashi\m68k_func.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="AtariAudio\external\Musashi\readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
