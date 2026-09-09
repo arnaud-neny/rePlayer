@@ -61,6 +61,8 @@ namespace rePlayer
         auto& properties = m_player->GetProperties();
         if (properties.IsEmpty())
         {
+            // no need to save the current song
+            m_currentSubsongId = {};
             // fallback to metadata if any
             auto metadata = m_player->GetMetadata();
             if (metadata.empty())
