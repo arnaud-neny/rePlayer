@@ -31,6 +31,7 @@ static UINT8 SCD_PCM_MemRead(void *info, UINT16 offset);
 static void SCD_PCM_MemWrite(void *info, UINT16 offset, UINT8 data);
 static void SCD_PCM_MemBlockWrite(void* info, UINT32 offset, UINT32 length, const UINT8* data);
 static void SCD_PCM_SetMuteMask(void* info, UINT32 MuteMask);
+static void SCD_PCM_SetPanning(void* info, const INT16* PanVals); // rePlayer
 
 
 static DEVDEF_RWFUNC devFunc[] =
@@ -41,6 +42,7 @@ static DEVDEF_RWFUNC devFunc[] =
 	{RWF_MEMORY | RWF_READ, DEVRW_A16D8, 0, SCD_PCM_MemRead},
 	{RWF_MEMORY | RWF_WRITE, DEVRW_BLOCK, 0, SCD_PCM_MemBlockWrite},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, SCD_PCM_SetMuteMask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, SCD_PCM_SetPanning}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 DEV_DEF devDef_RF5C68_Gens =
@@ -86,6 +88,7 @@ struct pcm_chip_
 	UINT8 Smpl0Patch;
 	UINT8 Enable;
 	UINT8 Cur_Chan;
+	UINT8 ForceStereo; // rePlayer
 	UINT16 Bank;
 
 	struct pcm_chan_ Channel[8];
@@ -164,6 +167,7 @@ static void SCD_PCM_Reset(void* info)
 	
 	chip->Enable = 0;
 	chip->Cur_Chan = 0;
+	chip->ForceStereo = 0; // rePlayer
 	chip->Bank = 0;
 	
 	/* clear channel registers */
@@ -388,11 +392,31 @@ static void SCD_PCM_Update(void* info, UINT32 Length, DEV_SMPL **buf)
 				}
 				else
 				{
+					// rePlayer begin
+					UINT16 ml;			/* envelope & pan product left */
+					UINT16 mr;			/* envelope & pan product right */
+					ml = CH->MUL_L;
+					mr = CH->MUL_R;
+					if (chip->ForceStereo)
+					{
+						if (i & 1)
+						{
+							ml = mr > ml ? mr : ml;
+							mr = 0;
+						}
+						else
+						{
+							mr = mr > ml ? mr : ml;
+							ml = 0;
+						}
+					}
+					// rePlayer end
+
 					if (chip->RAM[Addr] & 0x80)
 					{
 						CH->Data = chip->RAM[Addr] & 0x7F;
-						bufL[j] -= CH->Data * CH->MUL_L;
-						bufR[j] -= CH->Data * CH->MUL_R;
+						bufL[j] -= CH->Data * ml; // rePlayer
+						bufR[j] -= CH->Data * mr; // rePlayer
 					}
 					else
 					{
@@ -401,8 +425,8 @@ static void SCD_PCM_Update(void* info, UINT32 Length, DEV_SMPL **buf)
 						// although it's definitely false behaviour.
 						if (! CH->Data && chip->Smpl0Patch)
 							CH->Data = -0x7F;
-						bufL[j] += CH->Data * CH->MUL_L;
-						bufR[j] += CH->Data * CH->MUL_R;
+						bufL[j] += CH->Data * ml; // rePlayer
+						bufR[j] += CH->Data * mr; // rePlayer
 					}
 					
 					// update address register
@@ -472,3 +496,14 @@ static void SCD_PCM_SetMuteMask(void* info, UINT32 MuteMask)
 	
 	return;
 }
+
+// rePlayer begin
+static void SCD_PCM_SetPanning(void* info, const INT16* PanVals)
+{
+	struct pcm_chip_* chip = (struct pcm_chip_*)info;
+
+	chip->ForceStereo = PanVals[0] != 0;
+
+	return;
+}
+// rePlayer end

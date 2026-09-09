@@ -32,6 +32,7 @@ static void rf5c68_mem_w(void *info, UINT16 offset, UINT8 data);
 static void rf5c68_write_ram(void *info, UINT32 offset, UINT32 length, const UINT8* data);
 
 static void rf5c68_set_mute_mask(void *info, UINT32 MuteMask);
+static void rf5c68_set_panning(void* info, const INT16* PanVals); // rePlayer
 
 
 static DEVDEF_RWFUNC devFunc[] =
@@ -42,6 +43,7 @@ static DEVDEF_RWFUNC devFunc[] =
 	{RWF_MEMORY | RWF_READ, DEVRW_A16D8, 0, rf5c68_mem_r},
 	{RWF_MEMORY | RWF_WRITE, DEVRW_BLOCK, 0, rf5c68_write_ram},
 	{RWF_CHN_MUTE | RWF_WRITE, DEVRW_ALL, 0, rf5c68_set_mute_mask},
+	{RWF_CHN_PAN | RWF_WRITE, DEVRW_ALL, 0, rf5c68_set_panning}, // rePlayer
 	{0x00, 0x00, 0, NULL}
 };
 DEV_DEF devDef_RF5C68_MAME =
@@ -91,6 +93,7 @@ struct _rf5c68_state
 	UINT8				cbank;
 	UINT8				wbank;
 	UINT8				enable;
+	UINT8				forceStereo; // rePlayer
 	UINT32				datasize;
 	UINT8*				data;
 	
@@ -129,6 +132,22 @@ static void rf5c68_update(void *info, UINT32 samples, DEV_SMPL **outputs)
 		{
 			int lv = (chan->pan & 0x0f) * chan->env;
 			int rv = ((chan->pan >> 4) & 0x0f) * chan->env;
+
+			// rePlayer begin
+			if (chip->forceStereo)
+			{
+				if (i & 1)
+				{
+					lv = rv > lv ? rv : lv;
+					rv = 0;
+				}
+				else
+				{
+					rv = rv > lv ? rv : lv;
+					lv = 0;
+				}
+			}
+			// rePlayer end
 
 			/* loop over the sample buffer */
 			for (j = 0; j < samples; j++)
@@ -251,6 +270,7 @@ static void device_reset_rf5c68(void *info)
 	memset(chip->data, 0x00, chip->datasize);
 	
 	chip->enable = 0;
+	chip->forceStereo = 0; // rePlayer
 	chip->cbank = 0;
 	chip->wbank = 0;
 	
@@ -402,3 +422,14 @@ static void rf5c68_set_mute_mask(void *info, UINT32 MuteMask)
 	
 	return;
 }
+
+// rePlayer begin
+static void rf5c68_set_panning(void* info, const INT16* PanVals)
+{
+	rf5c68_state* chip = (rf5c68_state*)info;
+
+	chip->forceStereo = PanVals[0] != 0;
+
+	return;
+}
+// rePlayer end
