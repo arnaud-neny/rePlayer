@@ -180,6 +180,11 @@ namespace rePlayer
                         {
                             float trackingPos = float(clipper.StartPosY + clipper.ItemsHeight * trackedArtistIndex);
                             ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
+                            if (m_trackMode == TrackMode::NextArtist)
+                            {
+                                m_trackMode = TrackMode::None;
+                                m_trackedArtistId = ArtistID::Invalid;
+                            }
 
                             selectedArtist = m_db[selectedArtistId];
                             if (m_selectedArtistCopy.id != selectedArtistId)
@@ -484,6 +489,8 @@ namespace rePlayer
         if (selectedArtist)
         {
             selectedArtist->CopyTo(&ui->m_selectedArtistCopy);
+            ui->m_trackedArtistId = ui->m_selectedArtistCopy.id;
+            ui->m_trackMode = TrackMode::NextArtist;
         }
         else
             ui->m_selectedArtistCopy = {};
