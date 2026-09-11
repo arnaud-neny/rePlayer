@@ -51,6 +51,9 @@ namespace rePlayer
 
     inline const SubsongSheet& Player::GetSubsong() const
     {
+        static SubsongSheet dummy;
+        if (m_id.subsongId.index >= m_song->subsongs.NumItems())
+            return dummy;
         return m_song->subsongs[m_id.subsongId.index];
     }
 

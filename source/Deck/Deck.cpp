@@ -84,16 +84,13 @@ namespace rePlayer
 
     void Deck::Play(const SmartPtr<Player>& player1, const SmartPtr<Player>& player2)
     {
-        if (player1.IsValid())
-        {
-            m_shelvedPlayer.Reset();
-            if (m_currentPlayer)
-                m_currentPlayer->Stop();
-            m_currentPlayer = player1;
-            m_nextPlayer = player2;
-            m_mode = Mode::Playlist;
-            Play();
-        }
+        m_shelvedPlayer.Reset();
+        if (m_currentPlayer)
+            m_currentPlayer->Stop();
+        m_currentPlayer = player1;
+        m_nextPlayer = player2;
+        m_mode = Mode::Playlist;
+        Play();
     }
 
     void Deck::PlayPause()

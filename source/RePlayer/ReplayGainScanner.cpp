@@ -118,16 +118,20 @@ namespace rePlayer
                             double lPeak = 0.0, rPeak = 0.0;
                             ebur128_true_peak(st, 0, &lPeak);
                             ebur128_true_peak(st, 1, &rPeak);
-                            entry.songSheet->subsongs[entry.id.subsongId.index].replayGain.peak = float(Max(lPeak, rPeak));
-                            double loudness = 0.0;
-                            ebur128_loudness_global(st, &loudness);
-                            auto oldRG = rcCast<uint32_t>(entry.songSheet->subsongs[entry.id.subsongId.index].replayGain.gain);
-                            if (loudness != -HUGE_VAL)
-                                entry.songSheet->subsongs[entry.id.subsongId.index].replayGain.gain = float(-18.0 - loudness);
-                            else
-                                entry.songSheet->subsongs[entry.id.subsongId.index].replayGain.Invalidate();
-                            if (oldRG != rcCast<uint32_t>(entry.songSheet->subsongs[entry.id.subsongId.index].replayGain.gain))
-                                Core::GetDatabase(entry.id.databaseId).Raise(Database::Flag::kSaveSongs);
+                            if (entry.id.subsongId.index < entry.songSheet->subsongs.NumItems())
+                            {
+                                auto& subsong = entry.songSheet->subsongs[entry.id.subsongId.index];
+                                subsong.replayGain.peak = float(Max(lPeak, rPeak));
+                                double loudness = 0.0;
+                                ebur128_loudness_global(st, &loudness);
+                                auto oldRG = rcCast<uint32_t>(subsong.replayGain.gain);
+                                if (loudness != -HUGE_VAL)
+                                    subsong.replayGain.gain = float(-18.0 - loudness);
+                                else
+                                    subsong.replayGain.Invalidate();
+                                if (oldRG != rcCast<uint32_t>(subsong.replayGain.gain))
+                                    Core::GetDatabase(entry.id.databaseId).Raise(Database::Flag::kSaveSongs);
+                            }
 
                             std::atomic_ref(m_progress).store(1.0f);
                             break;

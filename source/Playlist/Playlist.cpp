@@ -364,10 +364,8 @@ namespace rePlayer
                                 }
                             }
                         }
-                        for (uint16_t i = 0; i < oldNumSubsongs; i++)
+                        for (uint32_t i = numSubsongs; i < oldNumSubsongs; i++)
                         {
-                            if (i == musicId.subsongId.index)
-                                continue;
                             for (uint32_t j = 0, e = m_cue.entries.NumItems(); j < e;)
                             {
                                 if (m_cue.entries[j].subsongId.songId == song->id && m_cue.entries[j].subsongId.index == j)
@@ -433,120 +431,130 @@ namespace rePlayer
     void Playlist::LoadPreviousSong(SmartPtr<Player>& currentPlayer, SmartPtr<Player>& nextPlayer)
     {
         auto isLooping = Core::GetDeck().IsLooping();
-        auto numEntries = m_cue.entries.NumItems<int32_t>();
-        auto currentEntryIndex = m_currentEntryIndex;
-        auto lastEntryIndex = isLooping ? currentEntryIndex - numEntries : 0;
-
-        for (;;)
+        bool retry = false;
+        do
         {
-            auto previousEntryIndex = --currentEntryIndex;
-            if (isLooping && previousEntryIndex < 0)
-                previousEntryIndex += numEntries;
+            auto numEntries = m_cue.entries.NumItems<int32_t>();
+            auto currentEntryIndex = m_currentEntryIndex;
+            auto lastEntryIndex = isLooping ? currentEntryIndex - numEntries : 0;
 
-            if (previousEntryIndex >= 0 && m_cue.entries[previousEntryIndex].IsAvailable())
+            for (;;)
             {
-                currentPlayer = LoadSong(m_cue.entries[previousEntryIndex]);
-                if (currentPlayer.IsValid())
-                {
-                    if (currentPlayer->IsNewSong())
-                    {
-                        currentPlayer->MarkSongAsNew(false);
+                auto previousEntryIndex = --currentEntryIndex;
+                if (isLooping && previousEntryIndex < 0)
+                    previousEntryIndex += numEntries;
 
-                        auto cueEntry = m_cue.entries[previousEntryIndex];
-                        auto currentSubsongIndex = cueEntry.subsongId.index;
-                        bool nextIsDirty = true;
-                        for (uint16_t i = 0; i <= currentPlayer->GetSong()->lastSubsongIndex; i++)
+                if (previousEntryIndex >= 0 && m_cue.entries[previousEntryIndex].IsAvailable())
+                {
+                    auto cueEntry = m_cue.entries[previousEntryIndex];
+                    currentPlayer = LoadSong(cueEntry);
+                    if (currentPlayer.IsValid())
+                    {
+                        if (numEntries <= m_cue.entries.NumItems<int32_t>())
                         {
-                            if (i == currentSubsongIndex)
-                                continue;
-                            cueEntry.playlistId = ++m_uniqueIdGenerator;
-                            cueEntry.subsongId.index = i;
-                            m_cue.entries.Insert(previousEntryIndex + i, cueEntry);
-                            if (nextIsDirty)
+                            m_currentEntryIndex = previousEntryIndex;
+                            if (currentPlayer->IsNewSong())
                             {
-                                nextPlayer = LoadSong(cueEntry);
-                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                                nextIsDirty = true;
+                                currentPlayer->MarkSongAsNew(false);
+
+                                auto currentSubsongIndex = cueEntry.subsongId.index;
+                                for (uint16_t i = 0; i <= currentPlayer->GetSong()->lastSubsongIndex; i++)
+                                {
+                                    if (i == currentSubsongIndex)
+                                        continue;
+                                    cueEntry.playlistId = ++m_uniqueIdGenerator;
+                                    cueEntry.subsongId.index = i;
+                                    m_cue.entries.Insert(previousEntryIndex + i, cueEntry);
+                                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                                }
                             }
                         }
+                        else
+                            retry = true;
+                        break;
                     }
+                    else if (numEntries != m_cue.entries.NumItems<int32_t>())
+                    {
+                        retry = true;
+                        break;
+                    }
+                }
 
-                    m_currentEntryIndex = previousEntryIndex;
+                if (currentEntryIndex <= lastEntryIndex)
+                {
+                    if (!isLooping)
+                        m_currentEntryIndex = 0;
                     break;
                 }
-                else
-                {
-                    if (numEntries != m_cue.entries.NumItems<int32_t>())
-                        return LoadPreviousSong(currentPlayer, nextPlayer);
-                }
             }
+        } while (std::exchange(retry, false));
 
-            if (currentEntryIndex <= lastEntryIndex)
-            {
-                if (!isLooping)
-                    m_currentEntryIndex = 0;
-                break;
-            }
-        }
+        if (currentPlayer.IsValid())
+            nextPlayer = LoadNextSong(false);
     }
 
     SmartPtr<Player> Playlist::LoadCurrentSong()
     {
         SmartPtr<Player> player;
         auto isLooping = Core::GetDeck().IsLooping();
-        auto numEntries = m_cue.entries.NumItems<int32_t>();
-        auto originalEntryIndex = m_currentEntryIndex;
-        auto currentEntryIndex = originalEntryIndex;
-        auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
-
-        if (currentEntryIndex >= 0) for (;;)
+        bool retry = false;
+        do
         {
-            auto entryIndex = currentEntryIndex;
-            if (isLooping && entryIndex >= numEntries)
-                entryIndex -= numEntries;
+            auto numEntries = m_cue.entries.NumItems<int32_t>();
+            auto currentEntryIndex = m_currentEntryIndex;
+            auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
 
-            if (entryIndex < numEntries && m_cue.entries[entryIndex].IsAvailable())
+            if (currentEntryIndex >= 0) for (;;)
             {
-                player = LoadSong(m_cue.entries[entryIndex]);
-                if (player.IsValid())
+                auto entryIndex = currentEntryIndex;
+                if (isLooping)
+                    entryIndex %= numEntries;
+
+                if (entryIndex < numEntries && m_cue.entries[entryIndex].IsAvailable())
                 {
-                    m_currentEntryIndex = entryIndex;
-
-                    if (player->IsNewSong())
+                    auto cueEntry = m_cue.entries[entryIndex];
+                    player = LoadSong(cueEntry);
+                    if (player.IsValid())
                     {
-                        player->MarkSongAsNew(false);
+                        if (numEntries == m_cue.entries.NumItems<int32_t>())
+                            m_currentEntryIndex = entryIndex;
+                        else
+                            entryIndex = m_currentEntryIndex;
 
-                        auto cueEntry = m_cue.entries[entryIndex];
-                        auto currentSubsongIndex = cueEntry.subsongId.index;
-                        for (uint16_t i = 0; i <= player->GetSong()->lastSubsongIndex; i++)
+                        if (player->IsNewSong())
                         {
-                            if (i == currentSubsongIndex)
-                                continue;
-                            cueEntry.playlistId = ++m_uniqueIdGenerator;
-                            cueEntry.subsongId.index = i;
-                            m_cue.entries.Insert(entryIndex + i, cueEntry);
-                            m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            player->MarkSongAsNew(false);
+
+                            auto currentSubsongIndex = cueEntry.subsongId.index;
+                            for (uint16_t i = 0; i <= player->GetSong()->lastSubsongIndex; i++)
+                            {
+                                if (i == currentSubsongIndex)
+                                    continue;
+                                cueEntry.playlistId = ++m_uniqueIdGenerator;
+                                cueEntry.subsongId.index = i;
+                                m_cue.entries.Insert(entryIndex + i, cueEntry);
+                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            }
                         }
+                        break;
                     }
+                    else if (numEntries != m_cue.entries.NumItems<int32_t>())
+                    {
+                        retry = true;
+                        break;
+                    }
+                }
+
+                if (currentEntryIndex == lastEntryIndex)
+                {
+                    if (!isLooping)
+                        m_currentEntryIndex = numEntries - 1;
                     break;
                 }
-                else
-                {
-                    if (numEntries != m_cue.entries.NumItems<int32_t>())
-                        return LoadCurrentSong();
-                }
+
+                currentEntryIndex++;
             }
-
-            if (currentEntryIndex == lastEntryIndex)
-            {
-                if (!isLooping)
-                    m_currentEntryIndex = numEntries - 1;
-                break;
-            }
-
-            currentEntryIndex++;
-        }
-
+        } while (std::exchange(retry, false));
         return player;
     }
 
@@ -554,68 +562,80 @@ namespace rePlayer
     {
         SmartPtr<Player> player;
         auto isLooping = Core::GetDeck().IsLooping();
-        auto numEntries = m_cue.entries.NumItems<int32_t>();
-        auto currentEntryIndex = m_currentEntryIndex;
-        auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
-        if (isAdvancing)
+        bool retry = false;
+        do
         {
+            auto numEntries = m_cue.entries.NumItems<int32_t>();
+            auto currentEntryIndex = m_currentEntryIndex;
+            auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
+            if (isAdvancing)
+            {
+                for (;;)
+                {
+                    currentEntryIndex++;
+                    auto entryIndex = currentEntryIndex % numEntries;
+                    if (currentEntryIndex <= lastEntryIndex && !m_cue.entries[entryIndex].GetSong()->IsInvalid())
+                    {
+                        m_currentEntryIndex = entryIndex;
+                        break;
+                    }
+                    if (currentEntryIndex > lastEntryIndex)
+                        break;
+                }
+            }
+
             for (;;)
             {
-                currentEntryIndex++;
-                auto entryIndex = currentEntryIndex % numEntries;
-                if (currentEntryIndex <= lastEntryIndex && !m_cue.entries[entryIndex].GetSong()->IsInvalid())
-                {
-                    m_currentEntryIndex = entryIndex;
-                    break;
-                }
-                if (currentEntryIndex > lastEntryIndex)
-                    break;
-            }
-        }
+                auto nextEntryIndex = currentEntryIndex + 1;
+                if (isLooping)
+                    nextEntryIndex %= numEntries;
 
-        for(;;)
-        {
-            auto nextEntryIndex = currentEntryIndex + 1;
-            if (isLooping)
-                nextEntryIndex = nextEntryIndex % numEntries;
-
-            if (nextEntryIndex < numEntries && m_cue.entries[nextEntryIndex].IsAvailable())
-            {
-                player = LoadSong(m_cue.entries[nextEntryIndex]);
-                if (player.IsValid())
+                if (nextEntryIndex < numEntries && m_cue.entries[nextEntryIndex].IsAvailable())
                 {
-                    if (player->IsNewSong())
+                    auto cueEntry = m_cue.entries[nextEntryIndex];
+                    player = LoadSong(cueEntry);
+                    if (player.IsValid())
                     {
-                        player->MarkSongAsNew(false);
-
-                        auto cueEntry = m_cue.entries[nextEntryIndex];
-                        auto currentSubsongIndex = cueEntry.subsongId.index;
-                        for (uint16_t i = 0; i <= player->GetSong()->lastSubsongIndex; i++)
+                        if (player->IsNewSong())
                         {
-                            if (i == currentSubsongIndex)
-                                continue;
-                            cueEntry.playlistId = ++m_uniqueIdGenerator;
-                            cueEntry.subsongId.index = i;
-                            m_cue.entries.Insert(nextEntryIndex + i, cueEntry);
-                            m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            player->MarkSongAsNew(false);
+
+                            if (numEntries != m_cue.entries.NumItems<int32_t>())
+                                nextEntryIndex = (m_currentEntryIndex + 1) % m_cue.entries.NumItems<int32_t>();
+                            auto currentSubsongIndex = cueEntry.subsongId.index;
+                            for (uint16_t i = 0; i <= player->GetSong()->lastSubsongIndex; i++)
+                            {
+                                if (i == currentSubsongIndex)
+                                    continue;
+                                cueEntry.playlistId = ++m_uniqueIdGenerator;
+                                cueEntry.subsongId.index = i;
+                                m_cue.entries.Insert(nextEntryIndex + i, cueEntry);
+                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            }
                         }
+
+                        break;
                     }
+                    else if (numEntries != m_cue.entries.NumItems<int32_t>())
+                    {
+                        if (isAdvancing)
+                        {
+                            if (isLooping)
+                                m_currentEntryIndex = (m_currentEntryIndex + m_cue.entries.NumItems<int32_t>() - 1) % m_cue.entries.NumItems<int32_t>();
+                            else if (m_currentEntryIndex > 0)
+                                m_currentEntryIndex--;
+                        }
+                        retry = true;
+                        break;
+                    }
+                }
 
+                if (currentEntryIndex == lastEntryIndex)
                     break;
-                }
-                else
-                {
-                    if (numEntries != m_cue.entries.NumItems<int32_t>())
-                        return LoadNextSong(false);
-                }
+
+                currentEntryIndex++;
             }
-
-            if (currentEntryIndex == lastEntryIndex)
-                break;
-
-            currentEntryIndex++;
-        }
-
+        } while (std::exchange(retry, false));
         return player;
     }
 
@@ -629,56 +649,62 @@ namespace rePlayer
 
         auto nextPlaylistId = player.IsValid() ? player->GetId().playlistId : PlaylistID::kInvalid;
 
-        auto isLooping = Core::GetDeck().IsLooping();
-        auto numEntries = m_cue.entries.NumItems<int32_t>();
-        auto currentEntryIndex = m_currentEntryIndex;
-        auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
-
         SmartPtr<Player> newPlayer;
-        for (;;)
+        auto isLooping = Core::GetDeck().IsLooping();
+        bool retry = false;
+        do
         {
-            auto nextEntryIndex = currentEntryIndex + 1;
-            if (isLooping)
-                nextEntryIndex = nextEntryIndex % numEntries;
+            auto numEntries = m_cue.entries.NumItems<int32_t>();
+            auto currentEntryIndex = m_currentEntryIndex;
+            auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries - 1;
 
-            if (nextEntryIndex < numEntries && m_cue.entries[nextEntryIndex].IsAvailable())
+            for (;;)
             {
-                if (nextPlaylistId == m_cue.entries[nextEntryIndex].playlistId)
-                    return;
-                newPlayer = LoadSong(m_cue.entries[nextEntryIndex]);
-                if (newPlayer.IsValid())
+                auto nextEntryIndex = currentEntryIndex + 1;
+                if (isLooping)
+                    nextEntryIndex %= numEntries;
+
+                if (nextEntryIndex < numEntries && m_cue.entries[nextEntryIndex].IsAvailable())
                 {
-                    if (newPlayer->IsNewSong())
+                    auto cueEntry = m_cue.entries[nextEntryIndex];
+                    if (nextPlaylistId == cueEntry.playlistId)
+                        return;
+                    newPlayer = LoadSong(cueEntry);
+                    if (newPlayer.IsValid())
                     {
-                        newPlayer->MarkSongAsNew(false);
-
-                        auto cueEntry = m_cue.entries[nextEntryIndex];
-                        auto currentSubsongIndex = cueEntry.subsongId.index;
-                        for (uint16_t i = 0; i <= newPlayer->GetSong()->lastSubsongIndex; i++)
+                        if (newPlayer->IsNewSong())
                         {
-                            if (i == currentSubsongIndex)
-                                continue;
-                            cueEntry.playlistId = ++m_uniqueIdGenerator;
-                            cueEntry.subsongId.index = i;
-                            m_cue.entries.Insert(nextEntryIndex + i, cueEntry);
-                            m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            newPlayer->MarkSongAsNew(false);
+
+                            if (numEntries != m_cue.entries.NumItems<int32_t>())
+                                nextEntryIndex = (m_currentEntryIndex + 1) % m_cue.entries.NumItems<int32_t>();
+                            auto currentSubsongIndex = cueEntry.subsongId.index;
+                            for (uint16_t i = 0; i <= newPlayer->GetSong()->lastSubsongIndex; i++)
+                            {
+                                if (i == currentSubsongIndex)
+                                    continue;
+                                cueEntry.playlistId = ++m_uniqueIdGenerator;
+                                cueEntry.subsongId.index = i;
+                                m_cue.entries.Insert(nextEntryIndex + i, cueEntry);
+                                m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
+                            }
                         }
+
+                        break;
                     }
+                    else if (numEntries != m_cue.entries.NumItems<int32_t>())
+                    {
+                        retry = true;
+                        break;
+                    }
+                }
 
+                if (currentEntryIndex == lastEntryIndex)
                     break;
-                }
-                else
-                {
-                    if (numEntries != m_cue.entries.NumItems<int32_t>())
-                        return ValidateNextSong(player);
-                }
+
+                currentEntryIndex++;
             }
-
-            if (currentEntryIndex == lastEntryIndex)
-                break;
-
-            currentEntryIndex++;
-        }
+        } while (std::exchange(retry, false));
 
         player = newPlayer;
     }
@@ -832,6 +858,7 @@ namespace rePlayer
         int32_t draggedIndex = -1;
         MusicID currentRatingId;
         bool isDatabaseDropped = false;
+        int32_t songIndexToPlay = -1;
 
         int32_t numColumns = m_cue.db.NumSongs() == 0 ? 1 : m_openedTab != OpenedTab::kNone ? 3 : 2;
         ImGuiTableFlags resizeFlags = numColumns < 3 ? ImGuiTableFlags_NoBordersInBody : ImGuiTableFlags_Resizable;
@@ -941,49 +968,7 @@ namespace rePlayer
                                 }
 
                                 if (ImGui::IsMouseDoubleClicked(0))
-                                {
-                                    auto numEntries = m_cue.entries.NumItems<int32_t>();
-                                    auto currentEntryIndex = rowIdx;
-                                    auto newEntryIndex = rowIdx;
-                                    auto isLooping = deck.IsLooping();
-                                    auto lastEntryIndex = isLooping ? currentEntryIndex + numEntries : numEntries;
-                                    auto currentPlayerId = curEntry;
-                                    SmartPtr<Player> player1;
-                                    for (;;)
-                                    {
-                                        player1 = LoadSong(currentPlayerId);
-                                        if (player1.IsInvalid())
-                                        {
-                                            currentEntryIndex++;
-                                            if (currentEntryIndex >= lastEntryIndex)
-                                                break;
-                                            newEntryIndex = currentEntryIndex % numEntries;
-                                            currentPlayerId = m_cue.entries[newEntryIndex];
-                                        }
-                                        else
-                                        {
-                                            if (player1->IsNewSong())
-                                            {
-                                                player1->MarkSongAsNew(false);
-                                                auto currentSubsongIndex = curEntry.subsongId.index;
-                                                for (uint16_t i = 0; i <= player1->GetSong()->lastSubsongIndex; i++)
-                                                {
-                                                    if (i == currentSubsongIndex)
-                                                        continue;
-                                                    currentPlayerId.playlistId = ++m_uniqueIdGenerator;
-                                                    currentPlayerId.subsongId.index = i;
-                                                    m_cue.entries.Insert(newEntryIndex + i, currentPlayerId);
-                                                    m_cue.db.Raise(Database::Flag::kSaveSongs | Database::Flag::kSaveArtists);
-                                                }
-                                            }
-
-                                            m_currentEntryIndex = newEntryIndex;
-                                            auto player2 = LoadNextSong(false);
-                                            deck.Play(player1, player2);
-                                            break;
-                                        }
-                                    }
-                                }
+                                    songIndexToPlay = rowIdx;
                             }
                             auto selectableMin = ImGui::GetItemRectMin();
                             auto selectableMax = ImGui::GetItemRectMax();
@@ -1189,7 +1174,7 @@ namespace rePlayer
         if (draggedIndex >= 0)
             MoveSelection(draggedIndex);
 
-        //simulate the OnPopupClose for the rating slider
+        // simulate the OnPopupClose for the rating slider
         if (currentRatingId != m_currentRatingId)
         {
             if (m_currentRatingId.subsongId.IsValid() && m_defaultRating != m_currentRatingId.GetSong()->GetSubsongRating(m_currentRatingId.subsongId.index))
@@ -1197,7 +1182,16 @@ namespace rePlayer
             m_currentRatingId = currentRatingId;
         }
 
-        //invalidate the move selection if the drag 'n drop is done
+        // now we are out of entry loop, we can load the songs
+        if (songIndexToPlay >= 0)
+        {
+            m_currentEntryIndex = songIndexToPlay;
+            auto player1 = LoadCurrentSong();
+            auto player2 = LoadNextSong(false);
+            deck.Play(player1, player2);
+        }
+
+        // invalidate the move selection if the drag 'n drop is done
         {
             auto payload = ImGui::GetDragDropPayload();
             if (!payload || memcmp(payload->DataType, "PLAYLIST", 8) != 0)

@@ -763,7 +763,7 @@ namespace rePlayer
                 //fix duration
                 auto duration = static_cast<uint32_t>((m_songPos * 100ull) / m_replay->GetSampleRate());
                 bool isDirty = false;
-                auto& subsong = m_song->subsongs[m_id.subsongId.index];
+                auto subsong = GetSubsong();
                 if (!m_hasSeeked && duration != subsong.durationCs)
                 {
                     subsong.durationCs = duration;
@@ -780,7 +780,11 @@ namespace rePlayer
                     isDirty = true;
                 }
                 if (isDirty)
+                {
+                    if (m_id.subsongId.index < m_song->subsongs.NumItems())
+                        m_song->subsongs[m_id.subsongId.index] = subsong;
                     m_id.MarkForSave();
+                }
 
                 m_songEnd = m_songPos;
                 memset(waveData + waveFillPos, 0, numSamples * sizeof(StereoSample));
@@ -812,7 +816,8 @@ namespace rePlayer
                         }
 
                         //send message to the database to update the song
-                        m_song->subsongs[m_id.subsongId.index].state = subsongState;
+                        if (m_id.subsongId.index < m_song->subsongs.NumItems())
+                            m_song->subsongs[m_id.subsongId.index].state = subsongState;
                         m_id.MarkForSave();
                     }
                 }
@@ -868,7 +873,7 @@ namespace rePlayer
                         //fix duration
                         auto duration = static_cast<uint32_t>(((m_songPos + fadeOutSize) * 100ull) / m_replay->GetSampleRate());
                         bool isDirty = false;
-                        auto& subsong = m_song->subsongs[m_id.subsongId.index];
+                        auto subsong = GetSubsong();
                         if (!m_hasSeeked && duration != subsong.durationCs)
                         {
                             subsong.durationCs = duration;
@@ -880,7 +885,11 @@ namespace rePlayer
                             isDirty = true;
                         }
                         if (isDirty)
+                        {
+                            if (m_id.subsongId.index < m_song->subsongs.NumItems())
+                                m_song->subsongs[m_id.subsongId.index] = subsong;
                             m_id.MarkForSave();
+                        }
 
                         m_songEnd = m_songPos;
                         if (!isCrossFadeEnabled)
@@ -909,7 +918,7 @@ namespace rePlayer
         if (ms_isReplayGainEnabled == false)
             return;
 
-        auto rg = m_song->subsongs[m_id.subsongId.index].replayGain;
+        auto rg = GetSubsong().replayGain;
         if (!rg.IsValid())
             return;
 

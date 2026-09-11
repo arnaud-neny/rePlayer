@@ -301,11 +301,8 @@ namespace rePlayer
                         }
                     }
                 }
-                for (uint16_t i = 0; i < oldNumSubsongs; i++)
-                {
-                    if (musicId.subsongId.index != i)
-                        Core::Discard(MusicID(SubsongID(song->id, i), DatabaseID::kLibrary));
-                }
+                for (uint32_t i = numSubsongs; i < oldNumSubsongs; i++)
+                    Core::Discard(MusicID(SubsongID(song->id, uint16_t(i)), DatabaseID::kLibrary));
             }
             else if (song->subsongs[0].isUnavailable)
             {
@@ -319,10 +316,7 @@ namespace rePlayer
                 Log::Message("%s: loaded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->GetType().GetExtension());
             }
             else
-            {
                 delete replay;
-                Log::Message("%s: discarded %06X%02X \"%s.%s\"\n", Core::GetReplays().GetName(song->replay), uint32_t(musicId.subsongId.songId), uint32_t(musicId.subsongId.index), m_db.GetTitleAndArtists(musicId.subsongId).c_str(), song->GetType().GetExtension());
-            }
             if (hasChanged)
                 m_db.Raise(Database::Flag::kSaveSongs);
         }
