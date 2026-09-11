@@ -214,7 +214,8 @@ namespace rePlayer
         // Create a child to be able to detect the focus and do the Ctrl-A
         std::string childId = m_header + "Child";
         float childStart = 0.0f;
-        if (ImGui::BeginChild(childId.c_str(), ImVec2(0.0f, 0.0f), m_isScrollingEnabled ? 0 : ImGuiChildFlags_AutoResizeY))
+        bool areSongDisplayed = ImGui::BeginChild(childId.c_str(), ImVec2(0.0f, 0.0f), m_isScrollingEnabled ? 0 : ImGuiChildFlags_AutoResizeY);
+        if (areSongDisplayed)
         {
             const ImGuiTableFlags flags = (m_isScrollingEnabled ? ImGuiTableFlags_ScrollY : ImGuiTableFlags_None)
                 | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
@@ -224,6 +225,8 @@ namespace rePlayer
 
             if (ImGui::BeginTable("songs", kNumIDs, flags))
             {
+                m_areSongsDisplayed = true;
+
                 auto getHiddenFlag = [this](uint32_t flag)
                 {
                     return (m_defaultHiddenColumns & (1 << flag)) ? ImGuiTableColumnFlags_DefaultHide : 0;
@@ -246,14 +249,14 @@ namespace rePlayer
                 ImGui::TableHeadersRow();
 
                 SortSubsongs(isDirty);
-                if (m_resetCrolling)
+                if (m_resetScrolling)
                 {
                     if (m_entries.IsNotEmpty())
                     {
                         m_trackedSubsongId = m_entries[0];
                         m_trackMode = TrackMode::Song;
                     }
-                    m_resetCrolling = false;
+                    m_resetScrolling = false;
                 }
 
                 SubsongID currentRatingSubsong;
@@ -509,7 +512,13 @@ namespace rePlayer
         ImGui::EndChild();
 
         // Track now if the scrolling is not enabled in the table
-        if (m_trackedSubsongId.IsValid())
+        if (!areSongDisplayed && !m_areSongsDisplayed)
+        {
+            ImGui::SetScrollFromPosY(ImGui::GetWindowPos().y + ImGui::GetWindowHeight());
+            m_dbSongsRevision = m_db.SongsRevision() - 1;
+            m_resetScrolling = m_trackedSubsongId.IsValid();
+        }
+        else if (m_trackedSubsongId.IsValid())
         {
             if (trackingPos != FLT_MAX)
                 ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
