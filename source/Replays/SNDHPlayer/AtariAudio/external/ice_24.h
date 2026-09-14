@@ -33,9 +33,6 @@
 #ifndef __ICE_24_C_H__
 #define __ICE_24_C_H__
 
-extern "C"
-{
-
 int ice_24_header(unsigned char *src); /* returns 0 if no ice 24 header was found */
 
 long ice_24_packedsize(unsigned char *src); /* returns packed size of ice packed data */
@@ -43,7 +40,5 @@ long ice_24_packedsize(unsigned char *src); /* returns packed size of ice packed
 long ice_24_origsize(unsigned char *src); /* returns origiginal size of ice packed data */
 
 long ice_24_depack(unsigned char *src, unsigned char *dst); /* Ice! V 2.4 depacker, returns size of depacked data */
-
-}
 
 #endif

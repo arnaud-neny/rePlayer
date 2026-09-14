@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.10
+	Atari Audio Library v1.22
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -70,8 +70,9 @@ void M68k_Reset_Callback(void* user)
 
 int M68k_Illegal_Callback(void* user, int opcode)
 {
-	(void)user;
 	(void)opcode;
+	AtariMachine* mch = (AtariMachine*)user;
+	mch->IllegalCb();
 	return 1;
 }
 
@@ -87,7 +88,10 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 	assert(0 == (address & 0xff000000));
 	uint8_t r = ~0;
 	if (address < RAM_SIZE)
+	{
+		assert(m_RAM);
 		return m_RAM[address];
+	}
 	if ((address >= 0xff8800) && (address < 0xff8900))
 		r = m_ym2149.ReadPort(address & 255);
 	else if (0xff8260 == address)
@@ -110,10 +114,14 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 
 unsigned int  AtariMachine::memRead16(unsigned int address)
 {
+	assert(0 == (address & 1));
 	assert(0 == (address & 0xff000000));
 	uint16_t r = ~0;
 	if (address < RAM_SIZE - 1)
+	{
+		assert(m_RAM);
 		return uint16_t((m_RAM[address] << 8) | (m_RAM[address + 1]));
+	}
 	if ((address >= 0xff8800) && (address < 0xff8900))
 		r = m_ym2149.ReadPort(address & 0xfe) << 8;
 	else if ((address >= 0xfffa00) && (address < 0xfffa26))
@@ -136,11 +144,18 @@ void	AtariMachine::ResetCb(void)
 	m_cpu.m68k_end_timeslice();
 }
 
+void AtariMachine::IllegalCb()
+{
+	m_exitCode |= AtariMachine::ExitCode::kCrash;
+	m_cpu.m68k_end_timeslice();
+}
+
 void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 {
 	assert(0 == (address & 0xff000000));
 	if (address < RAM_SIZE)
 	{
+		assert(m_RAM);
 		m_RAM[address] = value;
 		return;
 	}
@@ -161,9 +176,11 @@ void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 
 void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 {
+	assert(0 == (address & 1));
 	assert(0 == (address & 0xff000000));
 	if (address < RAM_SIZE - 1)
 	{
+		assert(m_RAM);
 		m_RAM[address] = uint8_t(value >> 8);
 		m_RAM[address + 1] = uint8_t(value);
 		return;
@@ -185,16 +202,12 @@ void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 
 AtariMachine::AtariMachine()
 {
-	m_RAM = (uint8_t*)malloc(RAM_SIZE);
+	m_RAM = nullptr;
 }
 
 AtariMachine::~AtariMachine()
 {
-	if (m_RAM)
-	{
-		free(m_RAM);
-		m_RAM = nullptr;
-	}
+	free(m_RAM);
 }
 
 void	AtariMachine::Gemdos(int func, uint32_t a7)
@@ -308,16 +321,17 @@ void	AtariMachine::TrapInstructionCallback(int v)
 
 void	AtariMachine::Startup(uint32_t hostReplayRate)
 {
-	assert(m_RAM);
+	if ( nullptr == m_RAM )
+		m_RAM = (uint8_t*)malloc(RAM_SIZE);
+
 	memset(m_RAM, 0, RAM_SIZE);
 
-	m_ym2149.Reset(hostReplayRate);
+	m_ym2149.Reset(hostReplayRate, 2000000);
 	m_mfp.Reset(hostReplayRate);
 	m_steDac.Reset(hostReplayRate);
 	m_nextGemdosMallocAd = GEMDOS_MALLOC_EMUL_BUFFER;
 	MuteVoices(0);		// nothing is muted by default
 
-	memset(&m_cpu, 0, sizeof(m_cpu));// rePlayer
 	m_cpu.SetUserData(this);
 	m_cpu.m68k_set_cpu_type(M68K_CPU_TYPE_68000);
 
@@ -346,6 +360,7 @@ bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
 	if ((nullptr == src) || (0 == size))
 		return false;
 
+	assert(m_RAM);
 	memcpy(m_RAM + addr, src, size);
 	return true;
 }
@@ -406,11 +421,7 @@ static const uint32_t	s_ViewVolTab[16*2] =
 
 uint32_t AtariMachine::ComputeCurrentVisualLevels() const
 {
-	const uint32_t ymVisual = m_ym2149.GetCurrentVisualLevels();
-	const unsigned int indexA = (ymVisual >> 0) & 31;
-	const unsigned int indexB = (ymVisual >> 5) & 31;
-	const unsigned int indexC = (ymVisual >> 10) & 31;
-	uint32_t visualLevels = (s_ViewVolTab[indexA] << 0) | (s_ViewVolTab[indexB] << 8) | (s_ViewVolTab[indexC] << 16);
+	uint32_t visualLevels = m_ym2149.ComputeCurrentVisualLevels();
 	if ( 0 == (m_muteMask&(1<<3)))
 		visualLevels |= (m_steDac.GetCurrentVisualLevel()<<24);
 	return visualLevels;
@@ -422,19 +433,26 @@ void AtariMachine::MuteVoices(uint32_t muteMask)
 	m_muteMask = muteMask;
 }
 
-int16_t	AtariMachine::ComputeNextSample()
+Ym2149c::Levels	AtariMachine::ComputeNextSample()
 {
-	int32_t level = m_ym2149.ComputeNextSample().sMono;
+	auto level = m_ym2149.ComputeNextSample();
+	assert(m_RAM);
 	int32_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_mfp);
 	if ( 0 == (m_muteMask&(1<<3)))
-		level += steLevel;
-
-	if (level > 32767)
-		level = 32767;
-	else if (level < -32768)
-		level = -32768;
-
-	int16_t out = (int16_t)level;
+	{
+		int32_t l = level.sMono + steLevel;
+		if (l > 32767)
+			l = 32767;
+		else if (l < -32768)
+			l = -32768;
+		level.sMono = int16_t(l);
+		l = level.sRight + steLevel;
+		if (l > 32767)
+			l = 32767;
+		else if (l < -32768)
+			l = -32768;
+		level.sRight = int16_t(l);
+	}
 
 	// tick 4 Atari timers, maybe one of them is running
 	for (int t = 0; t < 4+1; t++)
@@ -444,38 +462,10 @@ int16_t	AtariMachine::ComputeNextSample()
 			uint32_t pc = m_cpu.MemRead32(ivector[t]);
 			ConfigureReturnByRte();
 			m_ym2149.InsideTimerIrq(true);
-			JmpBinary(pc, 1);	// execute the timer code until RTE (probably SID or any other special fx code)
+			if (!JmpBinary(pc, 1))	// execute the timer code until RTE (probably SID or any other special fx code)
+				level.sLevels[0] = level.sLevels[1] = level.sLevels[2] = 0;		// output 0 in case something bad happen during emulation of the timer code
 			m_ym2149.InsideTimerIrq(false);
 		}
 	}
-	return out;
-}
-
-void AtariMachine::ComputeNextSample(int16_t*& buffer)
-{
-	auto level = m_ym2149.ComputeNextSample();
-	int16_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_mfp);
-	if ( 0 == (m_muteMask&(1<<3)))
-		level.sRight += steLevel;
-
-	if (level.sRight > 32767)
-		level.sRight = 32767;
-	else if (level.sRight < -32768)
-		level.sRight = -32768;
-
-	*buffer++ = level.sLeft;
-	*buffer++ = level.sRight;
-
-	// tick 4 Atari timers, maybe one of them is running
-	for (int t = 0; t < 4 + 1; t++)
-	{
-		if (m_mfp.Tick(t))
-		{
-			uint32_t pc = m_cpu.MemRead32(ivector[t]);
-			ConfigureReturnByRte();
-			m_ym2149.InsideTimerIrq(true);
-			JmpBinary(pc, 1);	// execute the timer code until RTE (probably SID or any other special fx code)
-			m_ym2149.InsideTimerIrq(false);
-		}
-	}
+	return level;
 }

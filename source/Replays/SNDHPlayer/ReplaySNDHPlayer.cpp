@@ -11,7 +11,7 @@ namespace rePlayer
     ReplayPlugin g_replayPlugin = {
         .replayId = eReplay::SNDHPlayer,
         .name = "SNDH-Player",
-        .extensions = "sndh",
+        .extensions = "sndh;ym",
         .about = "AtariAudio " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",
         .settings = "SNDH-Player/AtariAudio " ATARI_AUDIO_VERSION,
         .init = ReplaySNDHPlayer::Init,
@@ -37,8 +37,8 @@ namespace rePlayer
             return nullptr;
         auto data = stream->Read();
 
-        if (auto* sndh = SndhRenderer::Create(data.Items(), int(data.Size()), kSampleRate))
-            return new ReplaySNDHPlayer(sndh, metadata);
+        if (auto* atariAudio = AtariAudioRenderer::Create(data.Items(), int(data.Size()), kSampleRate))
+            return new ReplaySNDHPlayer(atariAudio, metadata);
 
         return nullptr;
     }
@@ -77,14 +77,14 @@ namespace rePlayer
 
     ReplaySNDHPlayer::~ReplaySNDHPlayer()
     {
-        SndhRenderer::Destroy(m_sndh);
+        AtariAudioRenderer::Destroy(m_atariAudio);
         delete[] m_loops;
     }
 
-    ReplaySNDHPlayer::ReplaySNDHPlayer(SndhRenderer* sndh, CommandBuffer metadata)
-        : Replay(eExtension::_sndh, eReplay::SNDHPlayer)
-        , m_sndh(sndh)
-        , m_loops(new LoopInfo[sndh->GetSongInfo().subsongCount])
+    ReplaySNDHPlayer::ReplaySNDHPlayer(AtariAudioRenderer* atariAudio, CommandBuffer metadata)
+        : Replay(atariAudio->GetSongInfo().fileType == AtariAudioRenderer::eFileType::eSndh ? eExtension::_sndh : eExtension::_ym, eReplay::SNDHPlayer)
+        , m_atariAudio(atariAudio)
+        , m_loops(new LoopInfo[atariAudio->GetSongInfo().subsongCount])
         , m_surround(kSampleRate)
     {
         BuildDurations(metadata);
@@ -110,7 +110,7 @@ namespace rePlayer
         if (m_surround.IsEnabled())
         {
             auto* samples = reinterpret_cast<int16_t*>(output + numSamples) - numSamples * 2;
-            m_sndh->AudioRenderStereo(samples, numSamples, reinterpret_cast<uint32_t*>(output));
+            m_atariAudio->AudioRenderStereo(samples, numSamples, reinterpret_cast<uint32_t*>(output));
             auto activeChannels = m_activeChannels;
             for (uint32_t i = 0; i < numSamples; i++)
                 activeChannels |= reinterpret_cast<uint32_t*>(output)[i];
@@ -120,7 +120,7 @@ namespace rePlayer
         else
         {
             auto* samples = reinterpret_cast<int16_t*>(output + numSamples) - numSamples;
-            m_sndh->AudioRenderWithVisualInfos(samples, numSamples, reinterpret_cast<uint32_t*>(output));
+            m_atariAudio->AudioRenderWithVisualInfos(samples, numSamples, reinterpret_cast<uint32_t*>(output));
             auto activeChannels = m_activeChannels;
             for (uint32_t i = 0; i < numSamples; i++)
                 activeChannels |= reinterpret_cast<uint32_t*>(output)[i];
@@ -140,10 +140,10 @@ namespace rePlayer
             seekPosition = currentDuration;
         if (seekPosition < currentPosition)
         {
-            m_sndh->InitSubSong(m_subsongIndex + 1);
+            m_atariAudio->InitSubSong(m_subsongIndex + 1);
             currentPosition = 0;
         }
-        m_sndh->AudioRender(nullptr, uint32_t(seekPosition - currentPosition));
+        m_atariAudio->AudioRender(nullptr, uint32_t(seekPosition - currentPosition));
         m_currentPosition = seekPosition;
         if (seekPosition != currentPosition)
             m_surround.Reset();
@@ -152,7 +152,7 @@ namespace rePlayer
 
     void ReplaySNDHPlayer::ResetPlayback()
     {
-        m_sndh->InitSubSong(m_subsongIndex + 1);
+        m_atariAudio->InitSubSong(m_subsongIndex + 1);
         m_activeChannels = 0;
         m_currentPosition = 0;
         m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
@@ -183,18 +183,18 @@ namespace rePlayer
     {
         uint32_t currentDuration = m_loops[m_subsongIndex].GetDuration();
         if (currentDuration == 0)
-            currentDuration = m_sndh->GetSubsongDurationMs(m_subsongIndex + 1);
+            currentDuration = uint32_t((1000ull * m_atariAudio->GetSubsongDurationSample(m_subsongIndex + 1)) / kSampleRate);
         return currentDuration;
     }
 
     uint32_t ReplaySNDHPlayer::GetNumSubsongs() const
     {
-        return uint32_t(m_sndh->GetSongInfo().subsongCount);
+        return uint32_t(m_atariAudio->GetSongInfo().subsongCount);
     }
 
     std::string ReplaySNDHPlayer::GetExtraInfo() const
     {
-        auto& songInfo = m_sndh->GetSongInfo();
+        auto& songInfo = m_atariAudio->GetSongInfo();
 
         std::string metadata;
         metadata  = "Title    : ";
@@ -217,7 +217,7 @@ namespace rePlayer
 
     std::string ReplaySNDHPlayer::GetInfo() const
     {
-        auto& songInfo = m_sndh->GetSongInfo();
+        auto& songInfo = m_atariAudio->GetSongInfo();
 
         auto activeChannels = m_activeChannels;
         char numChannels = activeChannels & 0xff ? '1' : '0';
@@ -229,7 +229,9 @@ namespace rePlayer
         info = numChannels;
         info += numChannels < '2' ? " channel\n" : " channels\n";
 
-        static const char* types[] = { "YM / ", "YM / ", "STE / ", "YM-STE / " };
+        info += songInfo.fileType == AtariAudioRenderer::eFileType::eSndh ? "SNDH: " : "YM: ";
+
+        static const char* types[] = { "ST / ", "ST / ", "STE / ", "ST-STE / " };
         info += types[((activeChannels & 0xffFFff) ? 1 : 0) | ((activeChannels & 0xff000000) ? 2 : 0)];
 
         char txt[16];

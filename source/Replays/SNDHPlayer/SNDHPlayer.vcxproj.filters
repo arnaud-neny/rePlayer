@@ -68,13 +68,22 @@
     <ClInclude Include="AtariAudio\external\timedb.inc.h">
       <Filter>Source Files\AtariAudio\external</Filter>
     </ClInclude>
+    <ClInclude Include="AtariAudio\external\lzh.h">
+      <Filter>Source Files\AtariAudio\external</Filter>
+    </ClInclude>
+    <ClInclude Include="AtariAudio\AtariAudioRenderer.h">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClInclude>
+    <ClInclude Include="AtariAudio\YmRenderer.h">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClInclude>
+    <ClInclude Include="AtariAudio\ym2data.h">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplaySNDHPlayer.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\external\ice_24.c">
-      <Filter>Source Files\AtariAudio\external</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\AtariMachine.cpp">
       <Filter>Source Files\AtariAudio</Filter>
@@ -102,6 +111,18 @@
     </ClCompile>
     <ClCompile Include="AtariAudio\external\Musashi\m68kops.cpp">
       <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\external\ice_24.cpp">
+      <Filter>Source Files\AtariAudio\external</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\external\lzh.cpp">
+      <Filter>Source Files\AtariAudio\external</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\AtariAudioRenderer.cpp">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\YmRenderer.cpp">
+      <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

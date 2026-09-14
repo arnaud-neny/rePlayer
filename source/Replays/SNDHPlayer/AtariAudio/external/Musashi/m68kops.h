@@ -43,15 +43,15 @@ public:
 	void MemWrite16(uint32 ad, uint16 v) { m68ki_write_16(ad, v); }
 	void MemWrite32(uint32 ad, uint32 v) { m68ki_write_32(ad, v); }
 
-	m68ki_cpu_core m68ki_cpu;
-	int  m68ki_initial_cycles;
+	m68ki_cpu_core m68ki_cpu = {};
+	int  m68ki_initial_cycles = 0;
 	int  m68ki_remaining_cycles = 0;                     /* Number of clocks remaining */
 	uint m68ki_tracing = 0;
-	uint m68ki_address_space;
+	uint m68ki_address_space = 0;
 
-	uint    m68ki_aerr_address;
-	uint    m68ki_aerr_write_mode;
-	uint    m68ki_aerr_fc;
+	uint    m68ki_aerr_address = 0;
+	uint    m68ki_aerr_write_mode = 0;
+	uint    m68ki_aerr_fc = 0;
 
 private:
 	void*	m_user = nullptr;

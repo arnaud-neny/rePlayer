@@ -188,8 +188,10 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AtariAudio\AtariAudio.h" />
+    <ClInclude Include="AtariAudio\AtariAudioRenderer.h" />
     <ClInclude Include="AtariAudio\AtariMachine.h" />
     <ClInclude Include="AtariAudio\external\ice_24.h" />
+    <ClInclude Include="AtariAudio\external\lzh.h" />
     <ClInclude Include="AtariAudio\external\Musashi\m68k.h" />
     <ClInclude Include="AtariAudio\external\Musashi\m68kconf.h" />
     <ClInclude Include="AtariAudio\external\Musashi\m68kcpu.h" />
@@ -201,12 +203,16 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="AtariAudio\timedb.h" />
     <ClInclude Include="AtariAudio\ym2149c.h" />
     <ClInclude Include="AtariAudio\ym2149_tables.h" />
+    <ClInclude Include="AtariAudio\ym2data.h" />
+    <ClInclude Include="AtariAudio\YmRenderer.h" />
     <ClInclude Include="db.inc.h" />
     <ClInclude Include="ReplaySNDHPlayer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AtariAudio\AtariAudioRenderer.cpp" />
     <ClCompile Include="AtariAudio\AtariMachine.cpp" />
-    <ClCompile Include="AtariAudio\external\ice_24.c" />
+    <ClCompile Include="AtariAudio\external\ice_24.cpp" />
+    <ClCompile Include="AtariAudio\external\lzh.cpp" />
     <ClCompile Include="AtariAudio\external\Musashi\m68k.cpp" />
     <ClCompile Include="AtariAudio\external\Musashi\m68kcpu.cpp" />
     <ClCompile Include="AtariAudio\external\Musashi\m68kops.cpp" />
@@ -215,6 +221,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="AtariAudio\SteDac.cpp" />
     <ClCompile Include="AtariAudio\timedb.cpp" />
     <ClCompile Include="AtariAudio\ym2149c.cpp" />
+    <ClCompile Include="AtariAudio\YmRenderer.cpp" />
     <ClCompile Include="ReplaySNDHPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>

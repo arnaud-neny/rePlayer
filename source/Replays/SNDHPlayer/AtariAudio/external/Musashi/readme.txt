@@ -7,6 +7,12 @@
             Copyright 1998-2002 Karl Stenerud.  All rights reserved.
 
 
+9-Sept-2026: Changes by Arnaud Carré
+             WARNING: This version is heavily modifyed and specific:
+                     - it's now thread safe (you can execute several instances
+					   of M68k class from different threads)
+                     - Only support 68000, Reset and TrapN callback
+
 
 INTRODUCTION:
 ------------

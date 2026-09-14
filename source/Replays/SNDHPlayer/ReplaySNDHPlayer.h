@@ -65,12 +65,12 @@ namespace rePlayer
         static constexpr uint32_t kDefaultSongDuration = 180 * 1000; // in milliseconds
 
     private:
-        ReplaySNDHPlayer(SndhRenderer* sndh, CommandBuffer metadata);
+        ReplaySNDHPlayer(AtariAudioRenderer* atariAudio, CommandBuffer metadata);
 
         void BuildDurations(CommandBuffer metadata);
 
     private:
-        SndhRenderer* m_sndh;
+        AtariAudioRenderer* m_atariAudio;
 
         uint64_t m_currentDuration = 0;
         uint64_t m_currentPosition = 0;
