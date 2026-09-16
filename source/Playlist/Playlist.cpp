@@ -1855,7 +1855,8 @@ namespace rePlayer
                                 break;
 
                             Array<CommandBuffer::Command> commands;
-                            if (auto* replay = replays.Load(stream, commands, entry.type))
+                            // TODO: change the way we parse the entries because archives contains more entries but we don't know yet what it is...
+                            if (auto* replay = replays.Load(stream, commands, streamArchive ? MediaType() : entry.type))
                             {
                                 isAdded = true;
 
