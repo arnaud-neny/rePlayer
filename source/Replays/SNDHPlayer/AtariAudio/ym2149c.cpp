@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.23
+	Atari Audio Library v1.24
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -177,12 +177,12 @@ Ym2149c::Level Ym2149c::Tick()
 
 	const uint32_t envLevel = m_pCurrentEnv[m_envPos + 64];
 	uint32_t levels[3];	//mono (a+b+c), left (a+c), right (b)
-	levels[0] = ((m_regs[8] & 0x10) ? envLevel : (m_regs[8]<<1)) << 0;
-	levels[0] |= ((m_regs[9] & 0x10) ? envLevel : (m_regs[9]<<1)) << 5;
-	levels[0] |= ((m_regs[10] & 0x10) ? envLevel : (m_regs[10]<<1)) << 10;
-	levels[1] = ((m_regs[8] & 0x10) ? envLevel : (m_regs[8]<<1)) << 0;
-	levels[2] = ((m_regs[9] & 0x10) ? envLevel : (m_regs[9]<<1)) << 5;
-	levels[1] |= ((m_regs[10] & 0x10) ? envLevel : (m_regs[10]<<1)) << 10;
+	levels[0]  = ((m_regs[8] & 0x10) ? envLevel : ((m_regs[8]<<1)|1)) << 0;
+	levels[0] |= ((m_regs[9] & 0x10) ? envLevel : ((m_regs[9]<<1)|1)) << 5;
+	levels[0] |= ((m_regs[10] & 0x10) ? envLevel : ((m_regs[10]<<1)|1)) << 10;
+	levels[1]  = ((m_regs[8] & 0x10) ? envLevel : ((m_regs[8]<<1)|1)) << 0;
+	levels[2]  = ((m_regs[9] & 0x10) ? envLevel : ((m_regs[9]<<1)|1)) << 5;
+	levels[1] |= ((m_regs[10] & 0x10) ? envLevel : ((m_regs[10]<<1)|1)) << 10;
 
 	for (int i = 0; i < 3; ++i)
 	{
@@ -194,24 +194,10 @@ Ym2149c::Level Ym2149c::Tick()
 
 	m_currentVisualLevels = uint16_t(levels[0]);
 
-	#if 0
-	// if period <=1 and TONE is active, empirically reduce final output value by 2 (some STF digisound use this mode)
-	const int halfShiftA = ((m_tonePeriod[0] > 1) || (m_regs[7]&(1<<0)))?0:1;
-	const int halfShiftB = ((m_tonePeriod[1] > 1) || (m_regs[7]&(1<<1)))?0:1;
-	const int halfShiftC = ((m_tonePeriod[2] > 1) || (m_regs[7]&(1<<2)))?0:1;
-	const uint32_t indexA = (levels >> 0) & 31;
-	const uint32_t indexB = (levels >> 5) & 31;
-	const uint32_t indexC = (levels >> 10) & 31;
-	uint32_t levelA = s_ym2149LogLevels[indexA] >> halfShiftA;
-	uint32_t levelB = s_ym2149LogLevels[indexB] >> halfShiftB;
-	uint32_t levelC = s_ym2149LogLevels[indexC] >> halfShiftC;
-	return levelA + levelB + levelC;
-	#else
 	Level out;
 	for (int i = 0; i < 3; ++i)
 		out.v[i] = s_ym2149RecordedMixTable[levels[i]];
 	return out;// (s_ym2149RecordedMixTable[levels]);
-	#endif
 }
 
 void Ym2149c::MuteVoices(uint32_t muteMask)

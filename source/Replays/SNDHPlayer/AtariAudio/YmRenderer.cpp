@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.23
+	Atari Audio Library v1.24
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -363,9 +363,9 @@ Ym2149c::Levels YmRenderer::ComputeNextYmTrackerSample()
 			out[i] = -32768;
 	}
 
-	m_mixLastSample = int8_t(out[0] >> 8);
+	m_mixLastSample = int8_t((out[0] >> 8) & m_muteSteMask);
 
-	return { .sLevels = { int16_t(out[0]), int16_t(out[1]), int16_t(out[2]) } };
+	return { .sLevels = { int16_t(out[0]) & m_muteSteMask, int16_t(out[1]) & m_muteSteMask, int16_t(out[2]) & m_muteSteMask } };
 }
 
 void YmRenderer::FetchNextDigimixBlock()
@@ -385,6 +385,7 @@ int16_t YmRenderer::ComputeNextYmMixSample()
 {
 
 	m_mixLastSample = (m_mixBank[m_mixBankOffset + m_mixSamplePos] ^ m_mixSignXor);
+	m_mixLastSample &= int8_t(m_muteSteMask);
 
 	m_mixFrac += m_mixReplayRate;
 	if (m_mixFrac >= m_songInfo.hostReplayRate)
@@ -792,6 +793,7 @@ void	YmRenderer::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* 
 
 void YmRenderer::MuteVoices(uint32_t muteVoiceMask)
 {
+	m_muteSteMask = (muteVoiceMask & (1<<3)) ? 0 : -1;
 	m_ym2149.MuteVoices(muteVoiceMask);
 }
 
