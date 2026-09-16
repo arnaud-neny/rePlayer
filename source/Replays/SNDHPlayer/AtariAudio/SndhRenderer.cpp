@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.22
+	Atari Audio Library v1.23
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -83,38 +83,38 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 				if (0 == strncmp(read8, "!#", 2))
 				{
 					si.defaultSubsong = atoi(read8 + 2);
-					read8 = AUskipNTString(read8+2);
+					read8 = SkipNTString(read8+2);
 					tagCount++;
 				}
 				else if (0 == strncmp(read8, "TITL", 4))
 				{
 					si.musicName = read8 + 4;
-					read8 = AUskipNTString(read8 + 4);
+					read8 = SkipNTString(read8 + 4);
 					tagCount++;
 				}
 				else if (0 == strncmp(read8, "COMM", 4))
 				{
 					si.musicAuthor = read8 + 4;
-					read8 = AUskipNTString(read8 + 4);
+					read8 = SkipNTString(read8 + 4);
 					tagCount++;
 				}
 				else if (0 == strncmp(read8, "RIPP", 4))
 				{
 					si.ripper = read8 + 4;
-					read8 = AUskipNTString(read8 + 4);
+					read8 = SkipNTString(read8 + 4);
 					tagCount++;
 				}
 				else if (0 == strncmp(read8, "CONV", 4))
 				{
 					si.converter = read8 + 4;
-					read8 = AUskipNTString(read8 + 4);
+					read8 = SkipNTString(read8 + 4);
 					tagCount++;
 				}
 				else if ((0 == strncmp(read8, "YEAR", 4)))
 				{
 					if ( read8[4] != 0)
 						si.year = read8 + 4;	// many sndh files have "" as year string
-					read8 = AUskipNTString(read8 + 4);
+					read8 = SkipNTString(read8 + 4);
 					tagCount++;
 				}
 				else if (0 == strncmp(read8, "##", 2))
@@ -166,7 +166,7 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 							(0 == strncmp(read8, "!V", 2)))
 				{
 					si.playerTickRate = atoi(read8 + 2);
-					read8 = AUskipNTString(read8 + 2);
+					read8 = SkipNTString(read8 + 2);
 					tagCount++;
 				}
 				else
@@ -195,6 +195,7 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 		assert(si.playerTickRate > 0);
 		assert(si.hostReplayRate > 0);
 		m_samplePerTick = si.hostReplayRate / si.playerTickRate;
+		m_songInfo.fileFormat = "SNDH";
 		si.fileType = eFileType::eSndh;
 	}
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.22
+	Atari Audio Library v1.23
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -30,7 +30,7 @@ public:
 		const char* ripper;
 		const char* converter;
 		const char* year;
-
+		const char* fileFormat;
 		const void* rawBinaryData;
 		uint32_t rawBinaryDataSize;
 	};
@@ -95,7 +95,7 @@ protected:
 	static eFileType QuickFileTypeCheck(const void* rawMemory, uint32_t rawSize);
 	uint16_t ReadBE16(const char* r);
 	uint32_t ReadBE32(const char* r);
-	const char* AUskipNTString(const char* r);
+	const char* SkipNTString(const char* r);
 
 	SongInfo m_songInfo;
 	uint32_t	m_subSongLenInTick[kSubsongCountMax];

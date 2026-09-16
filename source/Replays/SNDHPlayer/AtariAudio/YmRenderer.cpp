@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.22
+	Atari Audio Library v1.23
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -10,13 +10,6 @@
 #include "YmRenderer.h"
 #include "external/lzh.h"
 #include "ym2data.h"
-
-#define	D_DBG_OUTPUT				0
-
-#if D_DBG_OUTPUT
-#include <stdio.h>
-static FILE*	sDbgH;
-#endif
 
 YmRenderer*	YmRenderer::Create(const void* ymMemoryData, uint32_t ymMemorySize, uint32_t hostReplayRate)
 {
@@ -54,13 +47,7 @@ uint32_t YmRenderer::StreamBE32(const char** r)
 
 void YmRenderer::ConvertTo4Bits(void)
 {
-/*
-	// MadMAx 4bits table ripped from Wings Of Death replayer :)
-	$0002ea 0007 090a
-	$0002ee 0b0c 0c0d
-	$0002f2 0d0d 0e0e
-	$0002f6 0e0f 0f0f
-*/
+	// MadMax 4bits table ripped from Wings Of Death original Atari replayer :)
 	static const uint8_t sMadMax4BitsTable[16] = { 0x0, 0x7, 0x9, 0xa, 0xb, 0xc, 0xc, 0xd, 0xd, 0xd, 0xe, 0xe, 0xe, 0xf, 0xf, 0xf };
 	for (int s = 0; s < m_sampleCount; s++)
 	{
@@ -124,6 +111,7 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 				m_songLoopTick = *pr;
 			}
 			m_samplePerTick = si.hostReplayRate / si.playerTickRate;
+			m_songDurationSample = m_subSongLenInTick[0] * m_samplePerTick;
 			ret = true;
 		}
 		break;
@@ -158,11 +146,11 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 					}
 
 					si.musicName = r8;
-					r8 = AUskipNTString(r8);
+					r8 = SkipNTString(r8);
 					si.musicAuthor = r8;
-					r8 = AUskipNTString(r8);
+					r8 = SkipNTString(r8);
 					si.converter = r8;
-					r8 = AUskipNTString(r8);
+					r8 = SkipNTString(r8);
 
 					m_dataStream = (const uint8_t *)r8;
 					m_dataStreamStride = 16;
@@ -175,47 +163,47 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 			}
 		}
 		break;
-		case eYmType::eMIX1:	// 'YMT1'
+		case eYmType::eMIX1:	// 'MIX1'
 		{
 			m_songInfo.playerTickRate = 50;
 			r8 += 12;
 			uint32_t tmp = StreamBE32(&r8);
-			m_flags = kYmInterleaved;		// MIX is always interleaved format
+			m_flags = 0;		// MIX score data is not interleaved
 			if (tmp & 1)
 				m_flags |= kYmSignedSample;
 
+			si.playerTickRate = 50;
+
 			StreamBE32(&r8);			// skip total sample bank size
-			m_sampleCount = StreamBE32(&r8);
-			if (m_sampleCount <= kYmMaxSamples)
+			m_mixPatternCount = StreamBE32(&r8);
+			m_dataStream = (const uint8_t *)r8;
+			uint64_t duration = 0;
+			for (int i = 0; i < m_mixPatternCount; i++)
 			{
-				uint64_t duration = 0;
-				for (int i = 0; i < m_sampleCount; i++)
-				{
-					m_samples[i].data = nullptr;
-					m_samples[i].mixStart = StreamBE32(&r8);
-					m_samples[i].len = StreamBE32(&r8);
-					m_samples[i].mixRepeat = StreamBE16(&r8);
-					if (m_samples[i].mixRepeat > 16)
-						m_samples[i].mixRepeat = 16;
-					m_samples[i].replayRate = StreamBE16(&r8);
-					assert(m_samples[i].replayRate > 0);
-					duration += (uint64_t(m_samples[i].len * m_samples[i].mixRepeat) * m_songInfo.hostReplayRate) / m_samples[i].replayRate;
-				}
-				m_songDurationSample = uint32_t(duration);
-				si.musicName = r8;
-				r8 = AUskipNTString(r8);
-				si.musicAuthor = r8;
-				r8 = AUskipNTString(r8);
-				si.converter = r8;
-				r8 = AUskipNTString(r8);
-				m_mixBank = (const int8_t*)r8;	// mix bank is considered as signed
-				m_mixFrac = 0;
-				m_ymType = sign;
-				m_mixPatternPos = 0;
-				m_mixCurrentRepeat = m_samples[0].mixRepeat;
-				m_mixSamplePos = 0;
-				ret = true;
+				StreamBE32(&r8);	// skip sample start
+				uint32_t len = StreamBE32(&r8);
+				uint32_t mixRepeat = StreamBE16(&r8);
+				if (mixRepeat > 16)
+					mixRepeat = 16;
+				uint32_t replayRate = StreamBE16(&r8);
+				assert(replayRate > 0);
+				duration += (uint64_t(len * mixRepeat) * m_songInfo.hostReplayRate) / replayRate;
 			}
+			m_songDurationSample = uint32_t(duration);
+			si.musicName = r8;
+			r8 = SkipNTString(r8);
+			si.musicAuthor = r8;
+			r8 = SkipNTString(r8);
+			si.converter = r8;
+			r8 = SkipNTString(r8);
+			m_mixBank = (const int8_t*)r8;	// mix bank is considered as signed
+			m_mixFrac = 0;
+			m_ymType = sign;
+			m_mixPatternPos = -1;		// on purpose start at -1 so following FetchNext will fetch the first row
+			FetchNextDigimixBlock();
+			m_mixSamplePos = 0;
+			m_samplePerTick = si.hostReplayRate / si.playerTickRate;
+			ret = true;
 		}
 		break;
 		case eYmType::eYMT1:
@@ -232,11 +220,11 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 				m_sampleCount = StreamBE16(&r8);
 				m_flags = StreamBE32(&r8);
 				si.musicName = r8;
-				r8 = AUskipNTString(r8);
+				r8 = SkipNTString(r8);
 				si.musicAuthor = r8;
-				r8 = AUskipNTString(r8);
+				r8 = SkipNTString(r8);
 				si.converter = r8;
-				r8 = AUskipNTString(r8);
+				r8 = SkipNTString(r8);
 				if (m_sampleCount <= kYmMaxSamples)
 				{
 					if (m_sampleCount > 0)
@@ -289,6 +277,7 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 		si.subsongCount = 1;
 		si.defaultSubsong = 1;
 		si.fileType = eFileType::eYm;
+		si.fileFormat = GetFileFormatString();
 	}
 
 	return ret;
@@ -321,11 +310,6 @@ bool YmRenderer::InitSubSong(int subSongId)
 		SetTimer(0, 0, 0);
 		SetTimer(1, 0, 0);
 		ret = true;
-
-		#if D_DBG_OUTPUT
-		sDbgH = fopen("ymRecorder_log.txt", "w");
-		#endif
-
 	}
 	return ret;
 }
@@ -353,8 +337,8 @@ Ym2149c::Levels YmRenderer::ComputeNextYmTrackerSample()
 			assert(voice.sampleId < uint32_t(m_sampleCount));
 			const YmSample& smp = m_samples[voice.sampleId];
 			int data = int(int8_t(smp.data[voice.samplePos] ^ 0x80));
-			out[0] += (data * voice.volume) << (6 - 6);	// 6 bits because of MUL volume
-			out[1 + (v & 1)] += (data * voice.volume) << (6 - 6);	// 6 bits because of MUL volume
+			out[0] += (data * voice.volume)<<(6-6);	// 6 bits because of MUL volume
+			out[1 + (v & 1)] += (data * voice.volume)<<(6-6);	// 6 bits because of MUL volume
 
 			voice.innerClock += voice.replayRate;
 			while (voice.innerClock >= m_songInfo.hostReplayRate)	// most of the time it won't loop, but some tunes could imply greater sampling rate than hostReplayRate!
@@ -384,28 +368,34 @@ Ym2149c::Levels YmRenderer::ComputeNextYmTrackerSample()
 	return { .sLevels = { int16_t(out[0]), int16_t(out[1]), int16_t(out[2]) } };
 }
 
+void YmRenderer::FetchNextDigimixBlock()
+{
+	m_mixPatternPos++;
+	if (m_mixPatternPos >= m_mixPatternCount)
+		m_mixPatternPos = 0;
+
+	const char* r8 = (const char*)(m_dataStream + m_mixPatternPos * 12);
+	m_mixBankOffset = ReadBE32(r8 + 0);
+	m_mixSampleLen = ReadBE32(r8 + 4);
+	m_mixCurrentRepeat = ReadBE16(r8 + 8);
+	m_mixReplayRate = ReadBE16(r8 + 10);
+}
+
 int16_t YmRenderer::ComputeNextYmMixSample()
 {
-	// Digimix YM driver
-	const YmSample& smp = m_samples[m_mixPatternPos];
-	m_mixLastSample = (m_mixBank[smp.mixStart + m_mixSamplePos] ^ m_mixSignXor);
 
-	m_mixFrac += smp.replayRate;
+	m_mixLastSample = (m_mixBank[m_mixBankOffset + m_mixSamplePos] ^ m_mixSignXor);
+
+	m_mixFrac += m_mixReplayRate;
 	if (m_mixFrac >= m_songInfo.hostReplayRate)
 	{
 		m_mixSamplePos++;
-		if (m_mixSamplePos >= smp.len)
+		if (m_mixSamplePos >= m_mixSampleLen)
 		{
 			m_mixSamplePos = 0;
 			m_mixCurrentRepeat--;
 			if (m_mixCurrentRepeat <= 0)
-			{
-				m_mixPatternPos++;
-				if (m_mixPatternPos >= m_sampleCount)
-					m_mixPatternPos = 0;
-
-				m_mixCurrentRepeat = m_samples[m_mixPatternPos].mixRepeat;
-			}
+				FetchNextDigimixBlock();
 		}
 		m_mixFrac -= m_songInfo.hostReplayRate;
 	}
@@ -477,18 +467,15 @@ void YmRenderer::AudioRenderStereo(int16_t* buffer, uint32_t count, uint32_t* pS
 {
 	while (count > 0)
 	{
-		uint32_t todo = count;
-		if (eYmType::eMIX1 != m_ymType)
+		if (0 == m_innerSamplePos)
 		{
-			if (0 == m_innerSamplePos)
-			{
-				PlayerTick();
-				m_innerSamplePos = m_samplePerTick;
-			}
-
-			todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
-			assert(m_innerSamplePos >= todo);
+			PlayerTick();
+			m_innerSamplePos = m_samplePerTick;
 		}
+
+		uint32_t todo = count;
+		todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
+		assert(m_innerSamplePos >= todo);
 
 		if (buffer)
 		{
@@ -588,6 +575,7 @@ uint32_t YmRenderer::YmFxDecode(int fxSlot, int regCode, int regPrediv, int regC
 			case 0xc0:		// Sync-Buzzer.
 				fx.type = eYmFxType::eSyncBuzzer;
 				fx.syncBuzzShape = ReadInterleaved(fx.ymVoice + 8) & 15;
+				skipMask = 1 << (fx.ymVoice + 8);
 				SetTimer(fxSlot, prediv, count);
 				break;
 
@@ -764,18 +752,15 @@ void	YmRenderer::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* 
 {
 	while (count > 0)
 	{
-		uint32_t todo = count;
-		if (eYmType::eMIX1 != m_ymType)
+		if (0 == m_innerSamplePos)
 		{
-			if (0 == m_innerSamplePos)
-			{
-				PlayerTick();
-				m_innerSamplePos = m_samplePerTick;
-			}
-
-			todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
-			assert(m_innerSamplePos >= todo);
+			PlayerTick();
+			m_innerSamplePos = m_samplePerTick;
 		}
+
+		uint32_t todo = count;
+		todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
+		assert(m_innerSamplePos >= todo);
 
 		if (buffer)
 		{
@@ -808,4 +793,23 @@ void	YmRenderer::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* 
 void YmRenderer::MuteVoices(uint32_t muteVoiceMask)
 {
 	m_ym2149.MuteVoices(muteVoiceMask);
+}
+
+const char* YmRenderer::GetFileFormatString() const
+{
+	switch (m_ymType)
+	{
+		case eYmType::eYM2a: return "YM 2";
+		case eYmType::eYM3a: return "YM 3a";
+		case eYmType::eYM3b: return "YM 3b";
+		case eYmType::eYM4a: return "YM 4";
+		case eYmType::eYM5a: return "YM 5";
+		case eYmType::eYM6a: return "YM 6";
+		case eYmType::eMIX1: return "YM Digimix";
+		case eYmType::eYMT1: return "YM Tracker 1";
+		case eYmType::eYMT2: return "YM Tracker 2";
+		default:
+			break;
+	}
+	return "";
 }

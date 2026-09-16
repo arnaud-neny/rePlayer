@@ -229,9 +229,10 @@ namespace rePlayer
         info = numChannels;
         info += numChannels < '2' ? " channel\n" : " channels\n";
 
-        info += songInfo.fileType == AtariAudioRenderer::eFileType::eSndh ? "SNDH: " : "YM: ";
+        info += songInfo.fileFormat;
+        info += " / ";
 
-        static const char* types[] = { "ST / ", "ST / ", "STE / ", "ST-STE / " };
+        static const char* types[] = { "YM / ", "YM / ", "STE / ", "YM+STE / " };
         info += types[((activeChannels & 0xffFFff) ? 1 : 0) | ((activeChannels & 0xff000000) ? 2 : 0)];
 
         char txt[16];

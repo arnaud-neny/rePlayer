@@ -1,48 +1,49 @@
-# AtariAudio Library v1.22
+# AtariAudio Library v1.23
 
 src/ contains all files needed to compile AtariAudio library. It allows you to play ATARI .SNDH and .YM music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
-The libray doesn't use any dependency, and should compile on any platform, including embeded systems (it doesn't even use float )
+The library doesn't use any dependency, and should compile on any platform, including embedded systems (it doesn't even use float).
 
-**NOTE: .ym replay has been totally rewritten and is now cycle accurate. The old StSound library is now deprecated**
+**NOTE: .ym replay has been completely rewritten and is now cycle accurate. The old StSound library is now deprecated**
 
-**NOTE: Since 1.10 AtariAudio library is thread safe! Any thread could create any amount of SndhRenderer instances. (obviously two different threads can't use the same instance of SndhRenderer)**
+**NOTE: Since 1.10, AtariAudio library is thread safe! Any thread could create any amount of AtariAudioRenderer instances. (obviously two different threads can't use the same instance of AtariAudioRenderer)**
 
 # Playing .SNDH and .YM file in your own app
 
-AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is SndhRenderer class.
+AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is AtariAudioRenderer class.
 Look at AtariAudioRenderer.h for API details but here is the absolute minimal:
 
 ````
 static AtariAudioRenderer* Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate);
 
 ````
-Load a .SNDH or .YM file from memory. You should provide the memory buffer, size of the raw file, and host replay rate. ( ex 44100 for 44.1Khz )
+Load a .SNDH or .YM file from memory. You should provide the memory buffer, size of the raw file, and host replay rate. (ex. 44100 for 44.1kHz)
 
 ````
 bool	InitSubSong(int subSongId);
 ````
-Atari .SNDH musics could contain several subsongs. You should *always* call InitSubsong before any audio rendering function. By convention, subsongs starts at 1.
+Atari .SNDH musics could contain several subsongs. You should *always* call InitSubsong before any audio rendering function. By convention, subsongs start at 1.
 
 ````
 void	AudioRender(int16_t* buffer, uint32_t sampleCount);
 ````
-This is the main audio rendering function. Render "count" samples into buffer. Buffer is a 16bits, signed, mono, sample buffer.
+This is the main audio rendering function. Render *count* samples into buffer. Buffer is a 16bits, signed, mono, sample buffer.
 
-Musics doesn't have an end by default, so AudioRender doesn't returns anything. If you want to generate the exact amount of samples, you can use GetSubsongDurationSample()
-NOTE: some .SNDH files doesn't provide any song duration information. In this case GetSubsongDurationSample() will return 0.
+Musics don't have an end by default, so AudioRender doesn't return anything. If you want to generate the exact amount of samples, you can use GetSubsongDurationSample().
+NOTE: some .SNDH files don't provide any song duration information. In that case, GetSubsongDurationSample() will return 0.
 
 ````
-static void Destroy(SndhRenderer* sr);
+static void Destroy(AtariAudioRenderer* sr);
 ````
-Destroy SndhRenderer object and free any internal allocated memory
+Destroy AtariAudioRenderer object and free any internal allocated memory
 
 
-# Versions
+# Version history
 
-- 1.22 : Add YMT1 & YMT2 support. Now AtariAudio has full coverage of depracted StSound library
+- 1.23 : Fix time duration with YM MIX1. Added fileFormat string in SongInfo
+- 1.22 : Add YMT1 & YMT2 support. Now AtariAudio has full coverage of deprecated StSound library
 - 1.21 : Add old YM2 support
-- 1.20 : Major update: now supports both .sndh and .ym files. with a brand new rewritten cycle accurate .ym driver
-- 1.10 : AtariAudio is now fully thread safe! (Use a custom Musashi 68k emulation version)
+- 1.20 : Major update: now supports both .sndh and .ym files, with a brand new rewritten cycle accurate .ym driver
+- 1.10 : AtariAudio is now fully thread-safe! (Uses a custom Musashi 68k emulation version)
 - 1.09 : API refactor and MuteVoices function added
 - 1.08 : more robust API
 - 1.07 : some API changes and cleanup
@@ -57,7 +58,7 @@ The repo also contains a sndh2wav project to show how to convert a .sndh file in
 
 # Applications using AtariAudio library
 
-[SndhArchivePlayer](https://github.com/arnaud-carre/sndh-player) - Player able to directly open the large 100MiB SNDH ZIP archive file and instant play any of thousand Atari music
+[SndhArchivePlayer](https://github.com/arnaud-carre/sndh-player) - Player able to directly open a large 100MiB SNDH ZIP archive file and instantly play any of thousands Atari music files
 
 [BZR Player 2](https://github.com/aargirakis/BZRPlayer) - Audio player for Windows and Linux supporting a wide array of multi-platform exotic file formats
 
@@ -69,4 +70,4 @@ The repo also contains a sndh2wav project to show how to convert a .sndh file in
 - MUSASHI 68000 emulation written by Karl Stenerud
 - Atari ICE depacker C version written by Hans Wessels
 - timedb.inc.h database by Benjamin Gerard & SNDH Community
-- ym2149 now uses a volume mixing table measured and generated by Paulo Simoes on real hardware (updated to a 32*32*32 table by Arnaud Carré)
+- ym2149 now uses a volume mixing table measured and generated by Paulo Simoes on real hardware (updated to a `32*32*32` table by Arnaud Carré)
