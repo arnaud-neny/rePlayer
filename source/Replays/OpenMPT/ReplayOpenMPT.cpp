@@ -125,7 +125,7 @@ namespace rePlayer
         changed |= ImGui::Combo("Output", &ms_settings[settingsIndex].surround, surround, NumItemsOf(surround));
         const char* const patterns[] = { "Disable", "Enable" };
         changed |= ImGui::Combo("Show Patterns", &ms_settings[settingsIndex].patterns, patterns, NumItemsOf(patterns));
-        const char* const forceStereo[] = { "Default", "Max" };
+        const char* const forceStereo[] = { "Default", "Amiga" };
         changed |= ImGui::Combo("Panning", &ms_settings[settingsIndex].forceStereo, forceStereo, NumItemsOf(forceStereo));
         ImGui::EndDisabled();
         return changed;
@@ -147,7 +147,7 @@ namespace rePlayer
         ComboOverride("VBlank", GETSET(entry, overrideVblank), GETSET(entry, vblank),
             false, "CIA Timing", "VBlank Timing");
         ComboOverride("ForceStereo", GETSET(entry, overrideForceStereo), GETSET(entry, forceStereo),
-            false, "Panning: Default", "Panning: Max");
+            false, "Panning: Default", "Panning: Amiga");
 
         context.metadata.Update(entry, entry->value == 0);
     }
