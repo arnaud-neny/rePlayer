@@ -76,6 +76,7 @@ namespace rePlayer
 
         void MarkForSave();
         void Track(TrackMode trackMode) const;
+        void Discard() const;
 
         // Helpers
         SmartPtr<core::io::Stream> GetStream() const;

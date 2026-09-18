@@ -14,6 +14,8 @@ namespace rePlayer
     class Player;
     class Properties;
 
+    static constexpr int kAppCommandDiscard = 0x777;
+
     class Deck : public Window
     {
     public:
@@ -41,6 +43,7 @@ namespace rePlayer
         void IncreaseVolume();
         void DecreaseVolume();
         void MuteVolume();
+        void Discard();
 
         bool IsLooping() const { return m_loop == Loop::Playlist; }
         bool IsEndless() const { return m_loop == Loop::Single; }
@@ -165,6 +168,7 @@ namespace rePlayer
 
         Serialized<bool> m_arePlaybackMediaHotKeysEnabled = { "PlaybackMediaHotKeys", true };
         Serialized<bool> m_areVolumeMediaHotKeysEnabled = { "VolumeMediaHotKeys", true };
+        Serialized<bool> m_isF15HotKeyEnabled = { "F15HotKeys", false };
 
         Patterns* m_patterns;
         Properties* m_properties;

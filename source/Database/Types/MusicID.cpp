@@ -52,6 +52,12 @@ namespace rePlayer
         Core::GetDatabase(databaseId).TrackSubsong(subsongId, trackMode);
     }
 
+    void MusicID::Discard() const
+    {
+        auto& db = Core::GetDatabase(databaseId);
+        db.DeleteSubsong(subsongId);
+    }
+
     SmartPtr<core::io::Stream> MusicID::GetStream() const
     {
         SmartPtr<core::io::Stream> stream;

@@ -46,6 +46,7 @@ namespace rePlayer
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_UP, MOD_NOREPEAT, VK_VOLUME_UP);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN, MOD_NOREPEAT, VK_VOLUME_DOWN);
         ::RegisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE, MOD_NOREPEAT, VK_VOLUME_MUTE);
+        ::RegisterHotKey(hWnd, kAppCommandDiscard, MOD_NOREPEAT, VK_F15);
 
         RegisterSerializedData(Player::ms_isReplayGainEnabled, "ReplayGainEnabled");
         RegisterSerializedData(Player::ms_isReplayGainChecked, "ReplayGainChecked");
@@ -152,6 +153,12 @@ namespace rePlayer
         }
         m_isMuted = !m_isMuted;
         Player::SetVolume(m_volume, m_volumeCurve == VolumeCurve::Logarithmic);
+    }
+
+    void Deck::Discard()
+    {
+        if (m_currentPlayer.IsValid())
+            m_currentPlayer->GetId().Discard();
     }
 
     void Deck::OnNewPlaylist()
@@ -294,6 +301,14 @@ namespace rePlayer
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
                     ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_MUTE);
                 }
+            }
+            if (ImGui::Checkbox("F15 hot key to discard playing song", &m_isF15HotKeyEnabled))
+            {
+                auto hWnd = HWND(ImGui::GetMainViewport()->PlatformHandleRaw);
+                if (m_isF15HotKeyEnabled)
+                    ::RegisterHotKey(hWnd, kAppCommandDiscard, MOD_NOREPEAT, VK_F15);
+                else
+                    ::UnregisterHotKey(hWnd, kAppCommandDiscard);
             }
             ImGui::Separator();
             const char* const volumeCurves[] = { "Linear", "Logarithmic" };
@@ -814,6 +829,8 @@ namespace rePlayer
             ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_UP);
             ::UnregisterHotKey(hWnd, APPCOMMAND_VOLUME_DOWN);
         }
+        if (!m_isF15HotKeyEnabled)
+            ::UnregisterHotKey(hWnd, kAppCommandDiscard);
     }
 
     void Deck::PlaySubsong(bool isNext)
