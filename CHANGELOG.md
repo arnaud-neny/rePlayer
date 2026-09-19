@@ -5,13 +5,18 @@
 
 ## Current version
 
+v0.22.13:
+- Updated AtariAudio to 1.24
+- Updated FluidSynth to 2.6.1
+- Updated libxmp to 4.7.3
+- Added F15 hotkey to discard playing song
+- Bug fixes
+
 v0.22.12:
 - Updated adplug to 2.4 r947
-- Updated AtariAudio to 1.08
 - Updated libvgm to r630
 - Updated libcurl to 8.22.0
 - Updated TagLib to 2.3.2
-- Bug fixes
 
 v0.22.11:
 - Updated libresidfp to 1.2.2
@@ -20,12 +25,10 @@ v0.22.11:
 
 v0.22.10:
 - Updated FAAD2 to 2.11.3
-- Updated FluidSynth to 2.6.0
 - Updated OpenMPT to 0.9.0-pre.13 r25674
 - ASAP with surround for single channel songs
 
 v0.22.9:
-- Updated libxmp to 4.7.2
 - Updated ImGui to 1.92.9b
 - Added context menu to playlist to sort, export as WAV or scan ReplayGain the selection
 
@@ -60,8 +63,9 @@ v0.22.0:
 
 - [0.22.9] adplug to 2.4 r943
 - [0.22.0] ASAP to 8.0.0
+- [0.22.12] AtariAudio to 1.08
 - [0.17.3] FAAD2 to 2.11.2
-- [0.22.9] FluidSynth to 2.5.7
+- [0.22.10] FluidSynth to 2.6.0
 - [0.19.4] Furnace to 0.6.8.3
 - [0.21.9] gbsplay to 0.0.101
 - [0.9.4] Highly Advanced (cog 2023-09-30)
@@ -72,11 +76,10 @@ v0.22.0:
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
 - [0.22.11] libvgm to r628
-- [0.22.8] libxmp to 4.7.1
+- [0.22.9] libxmp to 4.7.2
 - [0.22.9] OpenMPT to 0.9.0-pre.12 r25498
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
-- [0.22.11] SNDH-Player to 1.03
 - [0.21.9] SunVox to 2.1.4
 - [0.16.15] UADE to 3.0.5
 - [0.21.9] vgmstream to r2083
