@@ -22,7 +22,7 @@ namespace rePlayer
 {
     ReplayPlugin g_replayPlugin =  { .replayId = eReplay::Unknown };
 
-    int16_t Replays::ms_priorities[uint16_t(eReplay::Count)] = {
+    int16_t Replays::ms_priorities[int(eReplay::Count)] = {
         0x7fFF,
         #define REPLAY(a, b) b,
         #include "../../Replays/replays.inc"
@@ -90,17 +90,15 @@ namespace rePlayer
         }
 
         // failed the default loader, then try to load using extension first
-        ReplayPlugin* plugins[uint16_t(eReplay::Count)];
+        ReplayPlugin* plugins[int(eReplay::Count)];
         memcpy(plugins, m_sortedPlugins, sizeof(m_sortedPlugins));
-        auto baseReplayIndex = m_replayToIndex[int32_t(type.replay)];
-        plugins[baseReplayIndex] = nullptr;
+        plugins[m_replayToIndex[int32_t(type.replay)]] = nullptr;
 
         if (type.ext != eExtension::Unknown)
         {
             auto currentExt = MediaType::extensionNames[int32_t(type.ext)];
-            for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+            for (int replayIndex = 0; replayIndex < int(eReplay::Count); replayIndex++)
             {
-                auto replayIndex = (i + baseReplayIndex) % uint16_t(eReplay::Count);
                 if (auto plugin = plugins[replayIndex])
                 {
                     for (auto extensions = plugin->extensions;;)
@@ -126,9 +124,8 @@ namespace rePlayer
         }
 
         // try to load with the remaining plugins
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        for (int replayIndex = 0; replayIndex < int(eReplay::Count); replayIndex++)
         {
-            auto replayIndex = (i + baseReplayIndex) % uint16_t(eReplay::Count);
             if (auto plugin = plugins[replayIndex])
             {
                 stream->Rewind();
@@ -144,7 +141,7 @@ namespace rePlayer
         Replayables replays;
         uint32_t numReplays = 0;
         Array<CommandBuffer::Command> commands;
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        for (int i = 0; i < int(eReplay::Count); i++)
         {
             if (auto plugin = m_plugins[i])
             {
@@ -165,9 +162,10 @@ namespace rePlayer
         if (type.ext == eExtension::Unknown)
             return Enumerate(stream);
 
-        ReplayPlugin* plugins[uint16_t(eReplay::Count)];
+        ReplayPlugin* plugins[int(eReplay::Count)];
         memcpy(plugins, m_sortedPlugins, sizeof(m_sortedPlugins));
-        auto baseReplayIndex = m_replayToIndex[int32_t(type.replay)];
+        for (auto baseReplayIndex = m_replayToIndex[int32_t(type.replay)]; baseReplayIndex; --baseReplayIndex)
+            std::swap(plugins[baseReplayIndex - 1], plugins[baseReplayIndex]);
 
         Replayables replays;
         uint32_t numReplays = 0;
@@ -175,9 +173,8 @@ namespace rePlayer
 
         // load by extension
         auto currentExt = MediaType::extensionNames[int32_t(type.ext)];
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        for (int replayIndex = 0; replayIndex < int(eReplay::Count); replayIndex++)
         {
-            auto replayIndex = (i + baseReplayIndex) % uint16_t(eReplay::Count);
             if (auto plugin = plugins[replayIndex])
             {
                 for (auto extensions = plugin->extensions;;)
@@ -205,7 +202,7 @@ namespace rePlayer
         }
 
         // try to load with the remaining plugins
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        for (int i = 0; i < int(eReplay::Count); i++)
         {
             if (auto plugin = plugins[i])
             {
@@ -279,7 +276,7 @@ namespace rePlayer
 
     void Replays::DisplayAbout() const
     {
-        for (uint16_t i = 1; i < uint16_t(eReplay::Count); i++)
+        for (int i = 1; i < int(eReplay::Count); i++)
         {
             if (auto about = m_plugins[i]->about)
             {
@@ -396,14 +393,14 @@ namespace rePlayer
             }
         }
 
-        int16_t indices[uint16_t(eReplay::Count)];
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        uint16_t indices[uint16_t(eReplay::Count)];
+        for (uint16_t i = 0; i < uint16_t(eReplay::Count); i++)
             indices[i] = i;
         std::sort(indices + 1, indices + uint16_t(eReplay::Count), [](auto l, auto r)
         {
             return ms_priorities[l] > ms_priorities[r];
         });
-        for (int16_t i = 0; i < uint16_t(eReplay::Count); i++)
+        for (int i = 0; i < int(eReplay::Count); i++)
         {
             m_replayToIndex[indices[i]] = uint8_t(i);
             m_sortedPlugins[i] = m_plugins[indices[i]];
