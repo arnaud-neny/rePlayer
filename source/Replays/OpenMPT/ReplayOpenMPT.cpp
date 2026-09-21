@@ -503,30 +503,12 @@ namespace rePlayer
 
     uint32_t ReplayOpenMPT::GetNumSubsongs() const
     {
-        uint32_t numSubsongs = openmpt_module_get_num_subsongs(m_modulePlayback);
-        assert(numSubsongs <= 65536);
-        return numSubsongs;
+        return uint32_t(openmpt_module_get_num_subsongs(m_modulePlayback));
     }
 
     std::string ReplayOpenMPT::GetExtraInfo() const
     {
         std::string metadata;
-        if (auto str = openmpt_module_get_metadata(m_modulePlayback, "title"))
-        {
-            if (str[0])
-                metadata = str;
-            openmpt_free_string(str);
-        }
-        if (auto str = openmpt_module_get_subsong_name(m_modulePlayback, m_subsongIndex))
-        {
-            if (str[0])
-            {
-                if (metadata.size())
-                    metadata += "\n";
-                metadata += str;
-            }
-            openmpt_free_string(str);
-        }
         if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message"))
         {
             if (str[0])
