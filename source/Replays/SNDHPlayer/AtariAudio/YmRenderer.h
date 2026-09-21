@@ -1,9 +1,10 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
---------------------------------------------------------------------*/
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #pragma once
 #include <stdint.h>
 #include "AtariAudioRenderer.h"
@@ -14,7 +15,7 @@ class YmRenderer : public AtariAudioRenderer
 {
 public:
 	// Read the base AtariAudioRenderer.h header for more details about API
-	static YmRenderer* Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate);
+	static YmRenderer* Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock);
 	const SongInfo&	GetSongInfo() const;
 	uint32_t GetSubsongDurationSample(int subsongId) const;
 	bool InitSubSong(int subSongId);
@@ -73,7 +74,7 @@ private:
 	void SetTimer(int slot, int prediv, int count);
 	uint32_t YmFxDecode(int fxSlot, int regCode, int regPrediv, int regCount);
 	Ym2149c::Levels ComputeNextSample(void);
-	bool	Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostReplayRate);
+	bool	Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock);
 	void		AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* pSampleViewInfo);
 	uint8_t ReadInterleaved(int reg) const;
 	void YmWrite(int reg, uint8_t d);
@@ -81,7 +82,7 @@ private:
 	uint32_t ComputeCurrentVisualLevels();
 
 	Ym2149c::Levels ComputeNextYmTrackerSample();
-	int16_t ComputeNextYmMixSample();
+	Ym2149c::Levels ComputeNextYmMixSample();
 	void FetchNextDigimixBlock();
 
 	uint16_t StreamBE16(const char** r);

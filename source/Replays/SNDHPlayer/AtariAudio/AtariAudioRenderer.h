@@ -1,15 +1,19 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
---------------------------------------------------------------------*/
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #pragma once
 #include <stdint.h>
 
 class AtariAudioRenderer
 {
 public:
+
+	static const uint32_t kDefaultAtariYmClock = 2000000;
+
 	enum class eFileType
 	{
 		eUnknown,
@@ -36,10 +40,11 @@ public:
 	};
 
 	// Create a AtariAudioRenderer instance from a .SNDH or .YM file data located in memory
-	// The input SNDH data could be ICE! packed and .YM could be LHA packed
 	// hostReplayRate is the rate you want to render audio stream ( ie 48000 for 48Khz )
+	// defaultYm2149Clock is only used for some song file format that doesn't include ym clock (ym2 or ym3)
+	// The input SNDH data could be ICE! packed and .YM could be LHA packed
 	// After create you can free fileMemoryData if needed (AtariAudioRenderer keep an internal copy of the required data)
-	static AtariAudioRenderer* Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate);
+	static AtariAudioRenderer* Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock = kDefaultAtariYmClock);
 	static void Destroy(AtariAudioRenderer* ar);
 	
 	// Get information about the SNDH (like song name, author, amount of subsong, etc.)

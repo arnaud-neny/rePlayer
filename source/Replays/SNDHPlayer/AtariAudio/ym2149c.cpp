@@ -1,11 +1,10 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
---------------------------------------------------------------------*/
-// Tiny & cycle accurate ym2149 emulation.
-// operate at original YM freq divided by 8 (so 250Khz, as nothing runs faster in the chip)
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #include <assert.h>
 #include "ym2149c.h"
 #include "ym2149_tables.h"
@@ -30,6 +29,7 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
 	m_toneEdges = (stdLibRand()&((1<<10)|(1<<5)|(1<<0)))*0x1f;		// YM internal edge state are un-predictable
 	m_insideTimerIrq = false;
 	m_hostReplayRate = hostReplayRate;
+	// operate at original YM freq divided by 8 (so 250Khz, as nothing runs faster in the chip)
 	m_ymClockOneEighth = ymClock/8;
 	m_noiseRndRack = 1;
 	m_noiseHalf = 0;
@@ -124,11 +124,11 @@ Ym2149c::Levels	Ym2149c::dcAdjust(Levels v)
 	for (int i = 0; i < 3; i++)
 	{
 		m_dcAdjust[i].sum -= m_dcAdjust[i].buffer[m_dcAdjust[i].pos];
-		m_dcAdjust[i].sum += v.uLevels[i];
-		m_dcAdjust[i].buffer[m_dcAdjust[i].pos] = v.uLevels[i];
+		m_dcAdjust[i].sum += v.sLevels[i];
+		m_dcAdjust[i].buffer[m_dcAdjust[i].pos] = v.sLevels[i];
 		m_dcAdjust[i].pos++;
 		m_dcAdjust[i].pos &= (1 << kDcAdjustHistoryBit) - 1;
-		ov.sLevels[i] = int16_t(int32_t(v.uLevels[i]) - int32_t(m_dcAdjust[i].sum >> kDcAdjustHistoryBit));
+		ov.sLevels[i] = int16_t(int32_t(v.sLevels[i]) - int32_t(m_dcAdjust[i].sum >> kDcAdjustHistoryBit));
 	}
 	// max amplitude is 15bits (not 16) so dc adjuster should never overshoot
 	return ov;
@@ -197,7 +197,7 @@ Ym2149c::Level Ym2149c::Tick()
 	Level out;
 	for (int i = 0; i < 3; ++i)
 		out.v[i] = s_ym2149RecordedMixTable[levels[i]];
-	return out;// (s_ym2149RecordedMixTable[levels]);
+	return out;
 }
 
 void Ym2149c::MuteVoices(uint32_t muteMask)

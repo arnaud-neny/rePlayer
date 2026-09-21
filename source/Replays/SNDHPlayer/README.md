@@ -1,15 +1,15 @@
-# AtariAudio Library v1.24
+# AtariAudio 1.25
 
-src/ contains all files needed to compile AtariAudio library. It allows you to play ATARI .SNDH and .YM music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
+src/ contains all files needed to compile AtariAudio. It allows you to play ATARI .SNDH and .YM music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
 The library doesn't use any dependency, and should compile on any platform, including embedded systems (it doesn't even use float).
 
 **NOTE: .ym replay has been completely rewritten and is now cycle accurate. The old StSound library is now deprecated**
 
-**NOTE: Since 1.10, AtariAudio library is thread safe! Any thread could create any amount of AtariAudioRenderer instances. (obviously two different threads can't use the same instance of AtariAudioRenderer)**
+**NOTE: Since 1.10, AtariAudio is thread safe! Any thread could create any amount of AtariAudioRenderer instances. (obviously two different threads can't use the same instance of AtariAudioRenderer)**
 
 # Playing .SNDH and .YM file in your own app
 
-AtariAudio library doesn't use any file IO. You should provide data from memory. Entry point is AtariAudioRenderer class.
+AtariAudio doesn't use any file IO. You should provide data from memory. Entry point is AtariAudioRenderer class.
 Look at AtariAudioRenderer.h for API details but here is the absolute minimal:
 
 ````
@@ -39,6 +39,7 @@ Destroy AtariAudioRenderer object and free any internal allocated memory
 
 # Version history
 
+- 1.25 : optional ym2149 clock parameter for missing information in some music files
 - 1.24 : added xbios(32) support for some .sndh files, fixed voice muting for digimix and ymtracker files
 - 1.23 : Fix time duration with YM MIX1. Added fileFormat string in SongInfo
 - 1.22 : Add YMT1 & YMT2 support. Now AtariAudio has full coverage of deprecated StSound library
@@ -57,7 +58,7 @@ Destroy AtariAudioRenderer object and free any internal allocated memory
 
 The repo also contains a sndh2wav project to show how to convert a .sndh file into a WAV file
 
-# Applications using AtariAudio library
+# Applications using AtariAudio
 
 [SndhArchivePlayer](https://github.com/arnaud-carre/sndh-player) - Player able to directly open a large 100MiB SNDH ZIP archive file and instantly play any of thousands Atari music files
 
@@ -67,7 +68,7 @@ The repo also contains a sndh2wav project to show how to convert a .sndh file in
 
 # Credits
 
-- AtariAudio library written by Arnaud Carré aka Leonard/Oxygene.
+- AtariAudio written by Arnaud Carré aka Leonard/Oxygene.
 - MUSASHI 68000 emulation written by Karl Stenerud
 - Atari ICE depacker C version written by Hans Wessels
 - timedb.inc.h database by Benjamin Gerard & SNDH Community

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "m68kops.h"
 
 /* ======================================================================== */
@@ -28128,7 +28127,8 @@ void M68k::op_pflush_32(void)
 {
 	if ((CPU_TYPE_IS_EC020_PLUS(CPU_TYPE)) && (HAS_PMMU))
 	{
-		fprintf(stderr,"68040: unhandled PFLUSH\n");
+		assert(false);
+//		fprintf(stderr,"68040: unhandled PFLUSH\n");
 		return;
 	}
 	m68ki_exception_1111();
@@ -34354,8 +34354,6 @@ void M68k::op_unpk_16_mm(void)
 /* ======================================================================== */
 /* ========================= OPCODE TABLE BUILDER ========================= */
 /* ======================================================================== */
-
-#include <stdio.h>
 #include "m68kops.h"
 
 #define NUM_CPU_TYPES 5

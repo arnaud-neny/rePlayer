@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdlib.h>
 #include "m68kops.h"
 
 /* Execute some instructions until we use up num_cycles clock cycles */

@@ -1,9 +1,10 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
-	--------------------------------------------------------------------*/
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -13,13 +14,13 @@
 #include "external/lzh.h"
 #include "external/ice_24.h"
 
-AtariAudioRenderer* AtariAudioRenderer::Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate)
+AtariAudioRenderer* AtariAudioRenderer::Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock)
 {
 	const eFileType t = QuickFileTypeCheck(fileMemoryData, fileMemorySize);
 	if ( eFileType::eSndh == t )
-		return SndhRenderer::Create(fileMemoryData, fileMemorySize, hostReplayRate);
+		return SndhRenderer::Create(fileMemoryData, fileMemorySize, hostReplayRate);	// sndh files are all 2MHz ym2149 clock
 	if ( eFileType::eYm == t )
-		return YmRenderer::Create(fileMemoryData, fileMemorySize, hostReplayRate);
+		return YmRenderer::Create(fileMemoryData, fileMemorySize, hostReplayRate, defaultYm2149Clock);	// ym2 or ym3 files do not provide ym2149 clock
 	return nullptr;
 }
 
@@ -50,32 +51,24 @@ AtariAudioRenderer::eFileType AtariAudioRenderer::QuickFileTypeCheck(const void*
 	if (rawSize > 16)
 	{
 		// check packed file
-		if (LzhDepacker::IsLzhPacked(rawMemory, rawSize))
-			return eFileType::eYm;
-
 		if (ice_24_header((unsigned char*)rawMemory))
 			return eFileType::eSndh;
 
-		// check unpacked input file
-		if (0 == strncmp(((const char*)rawMemory) + 4, "LeOnArD!", 8))
+		if (LzhDepacker::IsLzhPacked(rawMemory, rawSize))
 			return eFileType::eYm;
 
+		// check unpacked input file
 		const char* read8 = (const char*)rawMemory;
-		static const char* sSigns[] =
-		{
-			"YM2!","YM3!","YM3b","YM5!","YM6!","MIX1","YMT1","YMT2",
-			nullptr
-		};
-		const char** pr = sSigns;
-		while (*pr)
-		{
-			if ( 0 == strncmp(*pr, read8, 4))
-				return eFileType::eYm;
-			pr++;
-		}
-
-		if ((0x60 == read8[0]) && (0 == strncmp(read8 + 12, "SNDH", 4)))
+		if ((0x60 == read8[0]) && (0 == memcmp(read8 + 12, "SNDH", 4)))
 			return eFileType::eSndh;
+
+		if (0 == memcmp(read8 + 4, "LeOnArD!", 8))
+			return eFileType::eYm;
+
+		if ((0 == memcmp(read8, "YM2!", 4)) ||
+			(0 == memcmp(read8, "YM3!", 4)) ||
+			(0 == memcmp(read8, "YM3b", 4)))
+			return eFileType::eYm;
 	}
 	return eFileType::eUnknown;
 }

@@ -1,9 +1,10 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
---------------------------------------------------------------------*/
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #pragma once
 #include <stdint.h>
 
@@ -15,23 +16,14 @@ public:
 		uint64_t value = 0;
 		struct
 		{
-			uint16_t uMono;
-			uint16_t uLeft;
-			uint16_t uRight;
-		};
-		struct
-		{
 			int16_t sMono;
 			int16_t sLeft;
 			int16_t sRight;
 		};
-		uint16_t uLevels[3];
 		int16_t sLevels[3];
 	};
 
-	static const uint32_t kDefaultAtariYmClock = 2000000;
-
-	void	Reset(uint32_t hostReplayRate, uint32_t ymClock = kDefaultAtariYmClock);
+	void	Reset(uint32_t hostReplayRate, uint32_t ymClock);
 	void	WritePort(uint8_t port, uint8_t value);
 	uint8_t ReadPort(uint8_t port) const;
 	Levels	ComputeNextSample();
@@ -40,6 +32,7 @@ public:
 	uint32_t ComputeCurrentVisualLevels() const; // only used for some player visual, contains 3 YM voices volume and STE DAC in 8888 format
 
 	void MuteVoices(uint32_t muteMask);
+	Levels		dcAdjust(Levels v);
 
 private:
 	void	WriteReg(int reg, uint8_t value);
@@ -52,8 +45,6 @@ private:
 	Level Tick();
 
 	static const uint32_t kDcAdjustHistoryBit = 11;	// 2048 values (~20ms at 44Khz) 
-
-	Levels	dcAdjust(Levels v);
 
 	int			m_selectedReg;
 	const uint8_t* m_pCurrentEnv;
@@ -75,9 +66,9 @@ private:
 	uint16_t 	m_currentVisualLevels;
 	struct
 	{
-		uint16_t		buffer[1 << kDcAdjustHistoryBit];
-		unsigned int	pos;
-		uint32_t		sum;
+		int16_t	buffer[1<<kDcAdjustHistoryBit];
+		int32_t	pos;
+		int32_t	sum;
 	}			m_dcAdjust[3];
 	uint8_t		m_regs[14];
 	uint32_t	m_innerCycle;

@@ -1,9 +1,10 @@
-/*--------------------------------------------------------------------
-	Atari Audio Library v1.24
-	Small & accurate ATARI-ST audio emulation
-	Arnaud Carré aka Leonard/Oxygene
-	@leonard_coder
---------------------------------------------------------------------*/
+//----------------------------------------------------------
+//
+//	AtariAudio 1.25
+//	Small & accurate ATARI-ST audio emulation
+//	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
+//
+//----------------------------------------------------------
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -11,10 +12,10 @@
 #include "external/lzh.h"
 #include "ym2data.h"
 
-YmRenderer*	YmRenderer::Create(const void* ymMemoryData, uint32_t ymMemorySize, uint32_t hostReplayRate)
+YmRenderer*	YmRenderer::Create(const void* ymMemoryData, uint32_t ymMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock)
 {
 	YmRenderer* yr = new YmRenderer();
-	if ( yr->Load(ymMemoryData, ymMemorySize, hostReplayRate ))
+	if ( yr->Load(ymMemoryData, ymMemorySize, hostReplayRate, defaultYm2149Clock ))
 		return yr;
 	delete yr;
 	return nullptr;
@@ -61,7 +62,7 @@ void YmRenderer::ConvertTo4Bits(void)
 	}
 }
 
-bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostReplayRate)
+bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock)
 {
 
 	bool ret = false;
@@ -88,7 +89,7 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 		memcpy((void*)si.rawBinaryData, rawYmFile, ymFileSize);
 	}
 
-	uint32_t ymClock = Ym2149c::kDefaultAtariYmClock;
+	uint32_t ymClock = defaultYm2149Clock;
 
 	const char* r8 = (const char*)si.rawBinaryData;
 	const eYmType sign = eYmType(ReadBE32(r8));
@@ -118,7 +119,7 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 		case eYmType::eYM5a://'YM5!':		// Extended YM2149 format, all machines.
 		case eYmType::eYM6a://'YM6!':		// Extended YM2149 format, all machines.
 		{
-			if (0 == strncmp(r8 + 4, "LeOnArD!", 8))
+			if (0 == memcmp(r8 + 4, "LeOnArD!", 8))
 			{
 				r8 += 12;
 				m_subSongLenInTick[0] = StreamBE32(&r8);
@@ -364,7 +365,6 @@ Ym2149c::Levels YmRenderer::ComputeNextYmTrackerSample()
 	}
 
 	m_mixLastSample = int8_t((out[0] >> 8) & m_muteSteMask);
-
 	return { .sLevels = { int16_t(out[0]) & m_muteSteMask, int16_t(out[1]) & m_muteSteMask, int16_t(out[2]) & m_muteSteMask } };
 }
 
@@ -381,7 +381,7 @@ void YmRenderer::FetchNextDigimixBlock()
 	m_mixReplayRate = ReadBE16(r8 + 10);
 }
 
-int16_t YmRenderer::ComputeNextYmMixSample()
+Ym2149c::Levels YmRenderer::ComputeNextYmMixSample()
 {
 
 	m_mixLastSample = (m_mixBank[m_mixBankOffset + m_mixSamplePos] ^ m_mixSignXor);
@@ -400,7 +400,7 @@ int16_t YmRenderer::ComputeNextYmMixSample()
 		}
 		m_mixFrac -= m_songInfo.hostReplayRate;
 	}
-	return int16_t(m_mixLastSample) << 7;
+	return  { .sLevels = { (int16_t(m_mixLastSample) << 7), (int16_t(m_mixLastSample) << 7), (int16_t(m_mixLastSample) << 7) } };
 }
 
 Ym2149c::Levels YmRenderer::ComputeNextSample()
@@ -408,11 +408,11 @@ Ym2149c::Levels YmRenderer::ComputeNextSample()
 	Ym2149c::Levels out;
 	if ((eYmType::eYMT1 == m_ymType) || (eYmType::eYMT2 == m_ymType))
 	{
-		out = ComputeNextYmTrackerSample();
+		out = m_ym2149.dcAdjust(ComputeNextYmTrackerSample());
 	}
 	else if (eYmType::eMIX1 == m_ymType)
 	{
-		out.sLevels[0] = out.sLevels[1] = out.sLevels[2] = ComputeNextYmMixSample();
+		out = m_ym2149.dcAdjust(ComputeNextYmMixSample());
 	}
 	else
 	{
