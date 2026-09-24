@@ -431,7 +431,7 @@ namespace rePlayer
                             ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
                     }
 
-                    if (m_isScrollingEnabled)
+                    if (m_isScrollingEnabled || trackedSubsongIndex < 0)
                         m_trackedSubsongId = {};
                 }
 
@@ -520,11 +520,18 @@ namespace rePlayer
         }
         else if (m_trackedSubsongId.IsValid())
         {
+            // trackingPos not evaluated means songs tab is not displayed... so force it by scrolling to the bottom
             if (trackingPos != FLT_MAX)
+            {
                 ImGui::SetScrollFromPosY(trackingPos - ImGui::GetWindowPos().y);
-            // check this to fix the bug of not tracked when the window is appearing
-            if (!ImGui::IsWindowAppearing())
                 m_trackedSubsongId = {};
+            }
+            else
+            {
+                if (isDirty)
+                    m_dbSongsRevision = m_db.SongsRevision() - 1;
+                ImGui::SetScrollFromPosY(ImGui::GetWindowPos().y + ImGui::GetWindowHeight());
+            }
         }
     }
 
