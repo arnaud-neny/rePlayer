@@ -5,12 +5,14 @@
 
 ## Current version
 
+v0.22.14:
+- Updated AtariAudio to 1.25
+- Bug fixes
+
 v0.22.13:
-- Updated AtariAudio to 1.24
 - Updated FluidSynth to 2.6.1
 - Updated libxmp to 4.7.3
 - Added F15 hotkey to discard playing song
-- Bug fixes
 
 v0.22.12:
 - Updated adplug to 2.4 r947
@@ -63,7 +65,7 @@ v0.22.0:
 
 - [0.22.9] adplug to 2.4 r943
 - [0.22.0] ASAP to 8.0.0
-- [0.22.12] AtariAudio to 1.08
+- [0.22.13] AtariAudio to 1.24
 - [0.17.3] FAAD2 to 2.11.2
 - [0.22.10] FluidSynth to 2.6.0
 - [0.19.4] Furnace to 0.6.8.3
