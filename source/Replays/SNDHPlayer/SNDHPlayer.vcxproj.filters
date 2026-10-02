@@ -80,6 +80,9 @@
     <ClInclude Include="AtariAudio\ym2data.h">
       <Filter>Source Files\AtariAudio</Filter>
     </ClInclude>
+    <ClInclude Include="AtariAudio\Blitter.h">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplaySNDHPlayer.cpp">
@@ -122,6 +125,9 @@
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\YmRenderer.cpp">
+      <Filter>Source Files\AtariAudio</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\Blitter.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.25
+//	AtariAudio 1.26
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -111,8 +111,6 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 				const uint32_t* pr = (const uint32_t *)(r8 + si.rawBinaryDataSize - 4);
 				m_songLoopTick = *pr;
 			}
-			m_samplePerTick = si.hostReplayRate / si.playerTickRate;
-			m_songDurationSample = m_subSongLenInTick[0] * m_samplePerTick;
 			ret = true;
 		}
 		break;
@@ -157,8 +155,6 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 					m_dataStreamStride = 16;
 
 					m_ymType = sign;
-					m_samplePerTick = si.hostReplayRate / si.playerTickRate;
-					m_songDurationSample = m_subSongLenInTick[0] * m_samplePerTick;
 					ret = true;
 				}
 			}
@@ -166,14 +162,12 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 		break;
 		case eYmType::eMIX1:	// 'MIX1'
 		{
-			m_songInfo.playerTickRate = 50;
+			si.playerTickRate = 0;				// player rate doesn't make sense in MIX1 format
 			r8 += 12;
 			uint32_t tmp = StreamBE32(&r8);
 			m_flags = 0;		// MIX score data is not interleaved
 			if (tmp & 1)
 				m_flags |= kYmSignedSample;
-
-			si.playerTickRate = 50;
 
 			StreamBE32(&r8);			// skip total sample bank size
 			m_mixPatternCount = StreamBE32(&r8);
@@ -203,7 +197,7 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 			m_mixPatternPos = -1;		// on purpose start at -1 so following FetchNext will fetch the first row
 			FetchNextDigimixBlock();
 			m_mixSamplePos = 0;
-			m_samplePerTick = si.hostReplayRate / si.playerTickRate;
+			m_samplePerTick = 0;
 			ret = true;
 		}
 		break;
@@ -253,8 +247,6 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 
 					m_dataStream = (const uint8_t *)r8;
 					m_dataStreamStride = m_trkVoiceCount*4;	// 4 bytes per voice in YMT music score
-					m_samplePerTick = si.hostReplayRate / si.playerTickRate;
-					m_songDurationSample = m_subSongLenInTick[0] * m_samplePerTick;
 					memset(m_trkVoices, 0, sizeof(m_trkVoices));
 					ret = true;
 				}
@@ -269,6 +261,12 @@ bool YmRenderer::Load(const void* rawYmFile, uint32_t ymFileSize, uint32_t hostR
 	{
 		assert(ymClock > 0);
 		assert(m_songInfo.playerTickRate > 0);
+
+		if (m_ymType != eYmType::eMIX1)		// all format *but* MIX1 should call music driver code per frame tick
+		{
+			m_samplePerTick = ComputeHostSamplePerTick(si.hostReplayRate, si.playerTickRate);
+			m_songDurationSample = m_subSongLenInTick[0] * m_samplePerTick;
+		}
 
 		if (m_songLoopTick >= m_subSongLenInTick[0])
 			m_songLoopTick = 0;
@@ -468,15 +466,19 @@ void YmRenderer::AudioRenderStereo(int16_t* buffer, uint32_t count, uint32_t* pS
 {
 	while (count > 0)
 	{
-		if (0 == m_innerSamplePos)
-		{
-			PlayerTick();
-			m_innerSamplePos = m_samplePerTick;
-		}
-
 		uint32_t todo = count;
-		todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
-		assert(m_innerSamplePos >= todo);
+
+		if (m_ymType != eYmType::eMIX1)		// all format *but* MIX1 should call music driver code per frame tick
+		{
+			if (0 == m_innerSamplePos)
+			{
+				PlayerTick();
+				m_innerSamplePos = m_samplePerTick;
+			}
+
+			todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
+			assert(m_innerSamplePos >= todo);
+		}
 
 		if (buffer)
 		{
@@ -753,15 +755,19 @@ void	YmRenderer::AudioRenderInternal(int16_t* buffer, uint32_t count, uint32_t* 
 {
 	while (count > 0)
 	{
-		if (0 == m_innerSamplePos)
-		{
-			PlayerTick();
-			m_innerSamplePos = m_samplePerTick;
-		}
-
 		uint32_t todo = count;
-		todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
-		assert(m_innerSamplePos >= todo);
+
+		if (m_ymType != eYmType::eMIX1)		// all format *but* MIX1 should call music driver code per frame tick
+		{
+			if (0 == m_innerSamplePos)
+			{
+				PlayerTick();
+				m_innerSamplePos = m_samplePerTick;
+			}
+
+			todo = (m_innerSamplePos <= count) ? m_innerSamplePos : count;
+			assert(m_innerSamplePos >= todo);
+		}
 
 		if (buffer)
 		{

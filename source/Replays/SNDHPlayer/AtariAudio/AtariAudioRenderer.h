@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.25
+//	AtariAudio 1.26
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -13,6 +13,7 @@ class AtariAudioRenderer
 public:
 
 	static const uint32_t kDefaultAtariYmClock = 2000000;
+	static const uint32_t kAtariSTECpuClock = 8021247;
 
 	enum class eFileType
 	{
@@ -23,65 +24,65 @@ public:
 
 	struct SongInfo
 	{
-		int subsongCount;
-		int defaultSubsong;
-		int playerTickRate;
-		uint32_t 	hostReplayRate;
-		uint32_t ym2149Clock;
-		eFileType fileType;
-		const char* musicName;
-		const char* musicAuthor;
-		const char* ripper;
-		const char* converter;
-		const char* year;
-		const char* fileFormat;
-		const void* rawBinaryData;
-		uint32_t rawBinaryDataSize;
+		int subsongCount;					// Number of subsongs (.sndh can have several, .ym has 1)
+		int defaultSubsong;					// Default subsong when multiple are present
+		int playerTickRate;					// Original music driver tick rate (typically 50Hz)
+		uint32_t 	hostReplayRate;			// Emulation output sample rate (typically 48kHz)
+		uint32_t ym2149Clock;				// YM2149 audio chip clock (typically 2MHz for Atari ST)
+		eFileType fileType;					// File type (.sndh or .ym)
+		const char* musicName;				// Music name or empty string ""
+		const char* musicAuthor;			// Music author or empty string ""
+		const char* ripper;					// Music ripper or empty string ""
+		const char* converter;				// Music converter or empty string ""
+		const char* year;					// Music year or empty string ""
+		const char* fileFormat;				// Detailed file format string ("SNDH", "YM 5", etc.)
+		const void* rawBinaryData;			// Raw unpacked music file data
+		uint32_t rawBinaryDataSize;			// Raw unpacked music file data size (in bytes)
 	};
 
-	// Create a AtariAudioRenderer instance from a .SNDH or .YM file data located in memory
-	// hostReplayRate is the rate you want to render audio stream ( ie 48000 for 48Khz )
-	// defaultYm2149Clock is only used for some song file format that doesn't include ym clock (ym2 or ym3)
-	// The input SNDH data could be ICE! packed and .YM could be LHA packed
-	// After create you can free fileMemoryData if needed (AtariAudioRenderer keep an internal copy of the required data)
+	// Creates an AtariAudioRenderer instance from .sndh or .ym file data in memory.
+	// hostReplayRate is the target output sample rate (e.g., 48000 for 48kHz).
+	// defaultYm2149Clock is only used for legacy file formats that omit clock info (YM2 or YM3).
+	// The input .sndh file may be ICE! packed, and .ym may be LZH packed.
+	// After creation, fileMemoryData can be freed (AtariAudioRenderer retains an internal copy).
 	static AtariAudioRenderer* Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock = kDefaultAtariYmClock);
 	static void Destroy(AtariAudioRenderer* ar);
 	
-	// Get information about the SNDH (like song name, author, amount of subsong, etc.)
+	// Get information about the loaded song (title, author, subsong count, etc.)
 	const 	AtariAudioRenderer::SongInfo&	GetSongInfo() const { return m_songInfo; };
 
-	// Get a subsong duration in samples. 0 means there is no information about duration for this subsong
+	// Get subsong duration in samples. Returns 0 if duration info is unavailable for this subsong.
 	virtual uint32_t GetSubsongDurationSample(int subsongId) const = 0;
 
-	// Initialize music driver to play a sub-song. By convention, subsongId starts at 1 (not 0)
-	// You must call InitSubSong before any call to AudioRender
+	// Initialize the music driver for a specific subsong (starts at 1 by convention, not 0).
+	// Must be called before any AudioRender call, even for single subsong files (.ym).
 	virtual bool	InitSubSong(int subSongId) = 0;
 
 	// Main audio rendering function.
-	// Compute the next "count" samples into "buffer" (mono, signed, 16bits samples)
-	// by default the song will loop. If you want to stop at the perfect end, you can
-	// use GetSubsongDurationSample() upfront to get exact amount of samples.
+	// Renders the next "count" samples into "buffer" (mono, signed 16-bit samples).
+	// Songs loop by default. To stop at the exact duration, call GetSubsongDurationSample() in advance.
+	// Rendering can be broken into smaller blocks by calling AudioRender iteratively with smaller sample counts.
 	virtual void AudioRender(int16_t* buffer, uint32_t count) = 0;
 	virtual void AudioRenderStereo(int16_t* buffer, uint32_t sampleCount, uint32_t* pVisualSamples) = 0;
 
-	// Fast forward into the music. Doesn't output data, but perform full emulation
+	// Fast forward through the music. Performs full emulation without generating audio output.
 	void FastForward(uint32_t count) { AudioRender(nullptr, count); }
 
-	// Helper time unit convert functions
+	// Time unit conversion helpers
 	uint32_t SampleToMs(uint32_t sample) const;
 	uint32_t MsToSample(uint32_t ms) const;
 
 	//-------------------------------------------------------------------------
-	// Additional functions for high level players
+	// Additional functions for high-level players
 	//-------------------------------------------------------------------------
 
-	// Same as AudioRender but also fills pVisualSamples buffer with 1 32bits per sample
-	// the 32bits contains vu meter values for 3 ym voices and STE DAC in form of 8888
-	// Use it if you want to draw some per voice vu meter in a player
+	// Same as AudioRender, but also populates pVisualSamples with one 32bit value per sample.
+	// The 32bit value contains VU meter levels for 3 YM channels and the STE DAC (8 bits each, 8888 format).
+	// Use this to display per channel VU meters in a music player interface.
 	virtual void AudioRenderWithVisualInfos(int16_t* buffer, uint32_t sampleCount, uint32_t* pVisualSamples) = 0;
 
-	// Set a mute mask to artifically mute some YM or STE dac voices
-	// NOTE: InitSubSong always un-mute everything. So MuteVoices should be called after InitSubsong
+	// Sets a mask to artificially mute specific YM or STE DAC channels.
+	// NOTE: InitSubSong always unmutes all channels. Call MuteVoices after InitSubSong.
 	static const uint32_t kYMVoiceA = (1 << 0);
 	static const uint32_t kYMVoiceB = (1 << 1);
 	static const uint32_t kYMVoiceC = (1 << 2);
@@ -91,11 +92,12 @@ public:
 protected:
 	static	const	int		kSubsongCountMax = 128;
 
-	// Private constructors prevent direct instantiation
+	// Prevent direct instantiation
 	virtual ~AtariAudioRenderer();
 	AtariAudioRenderer();
-    AtariAudioRenderer(const AtariAudioRenderer&) = delete;            // Prevent copy construction
-    AtariAudioRenderer& operator=(const AtariAudioRenderer&) = delete; // Prevent copy assignment
+    AtariAudioRenderer(const AtariAudioRenderer&) = delete;
+    AtariAudioRenderer& operator=(const AtariAudioRenderer&) = delete;
+	uint32_t ComputeHostSamplePerTick(uint32_t hostReplayRate, int playerTickRate) const;
 
 	static eFileType QuickFileTypeCheck(const void* rawMemory, uint32_t rawSize);
 	uint16_t ReadBE16(const char* r);

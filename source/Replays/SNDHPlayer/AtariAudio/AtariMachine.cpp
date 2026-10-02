@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.25
+//	AtariAudio 1.26
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -102,6 +102,14 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 		r = m_mfp.Read8(address - 0xfffa00);
 	else if ((address >= 0xff8900) && (address < 0xff8926))
 		r = m_steDac.Read8(address - 0xff8900);
+	else if ((address >= 0xff8a00) && (address <= 0xff8a3d))
+		r = m_blitter.Read8(address - 0xff8a00);
+	else if ((address >= 0xfffc00) && (address <= 0xfffc06))
+		r = 0;
+	else
+	{
+		assert(false);
+	}
 #if D_DUMP_READ
 	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
 	{
@@ -128,6 +136,14 @@ unsigned int  AtariMachine::memRead16(unsigned int address)
 		r = m_mfp.Read16(address - 0xfffa00);
 	else if ((address >= 0xff8900) && (address < 0xff8926))
 		r = m_steDac.Read16(address - 0xff8900);
+	else if ((address >= 0xff8a00) && (address <= 0xff8a3c))
+		r = m_blitter.Read16(address - 0xff8a00);
+	else if ((address >= 0xfffc00) && (address <= 0xfffc06))
+		r = 0;
+	else
+	{
+		assert(false);
+	}
 #if D_DUMP_READ
 	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
 	{
@@ -172,6 +188,15 @@ void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 		m_mfp.Write8(address - 0xfffa00, uint8_t(value));
 	else if ((address >= 0xff8900) && (address < 0xff8926))
 		m_steDac.Write8(address - 0xff8900, uint8_t(value));
+	else if ((address >= 0xff8a00) && (address <= 0xff8a3d))
+		m_blitter.Write8(address - 0xff8a00, uint8_t(value), *this);
+	else if ((address >= 0xfffc00) && (address <= 0xfffc06))
+	{
+	}
+	else
+	{
+		assert(false);
+	}
 }
 
 void AtariMachine::memWrite16(unsigned int address, unsigned int value)
@@ -198,6 +223,15 @@ void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 		m_mfp.Write16(address - 0xfffa00, uint16_t(value));
 	else if ((address >= 0xff8900) && (address < 0xff8926))
 		m_steDac.Write16(address - 0xff8900, uint16_t(value));
+	else if ((address >= 0xff8a00) && (address <= 0xff8a3c))
+		m_blitter.Write16(address - 0xff8a00, uint16_t(value), *this);
+	else if ((address >= 0xfffc00) && (address <= 0xfffc06))
+	{
+	}
+	else
+	{
+		assert(false);
+	}
 }
 
 AtariMachine::AtariMachine()
@@ -217,10 +251,18 @@ void	AtariMachine::Gemdos(int func, uint32_t a7)
 	case 0x48:			// MALLOC
 	{
 		// very basic incremental allocator (required by Maxymizer player)
-		int size = m_cpu.MemRead32(a7 + 2);
-		m_cpu.m68k_set_reg(M68K_REG_D0, m_nextGemdosMallocAd);
-		m_nextGemdosMallocAd = (m_nextGemdosMallocAd + size + 1)&(-2);
-		assert(m_nextGemdosMallocAd <= RAM_SIZE);
+		uint32_t size = m_cpu.MemRead32(a7 + 2);
+		if (0xffffffff == size)
+		{
+			// return largest free block
+			m_cpu.m68k_set_reg(M68K_REG_D0, RAM_SIZE-m_nextGemdosMallocAd);
+		}
+		else
+		{
+			m_cpu.m68k_set_reg(M68K_REG_D0, m_nextGemdosMallocAd);
+			m_nextGemdosMallocAd = (m_nextGemdosMallocAd + size + 1)&(-2);
+			assert(m_nextGemdosMallocAd <= RAM_SIZE);
+		}
 	}
 	break;
 	case 0x30:			// system version
@@ -278,8 +320,8 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 				break;
 			}
 		}
+		break;
 	}
-	break;
 	case 32:
 	{
 		m_doSndPtr = m_cpu.MemRead32(a7 + 2);
@@ -297,8 +339,13 @@ void	AtariMachine::XBios(int func, uint32_t a7)
 		m_cpu.MemWrite32(a7, pc);
 		m_cpu.m68k_set_reg(M68K_REG_SP, a7);
 		m_cpu.m68k_set_reg(M68K_REG_PC, callbackAddr);
+		break;
 	}
-	break;
+	case 64:		// blitmode
+	{
+		m_cpu.m68k_set_reg(M68K_REG_D0, 0x3);	// always says blitter is present and enabled
+		break;
+	}
 	default:
 		assert(false);	// unsupported XBIOS function
 		break;
@@ -335,6 +382,7 @@ void	AtariMachine::Startup(uint32_t hostReplayRate)
 	m_ym2149.Reset(hostReplayRate, 2000000);
 	m_mfp.Reset(hostReplayRate);
 	m_steDac.Reset(hostReplayRate);
+	m_blitter.Reset();
 	m_nextGemdosMallocAd = GEMDOS_MALLOC_EMUL_BUFFER;
 	MuteVoices(0);		// nothing is muted by default
 

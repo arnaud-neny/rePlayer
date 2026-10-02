@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.25
+//	AtariAudio 1.26
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -195,7 +195,7 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 	{
 		assert(si.playerTickRate > 0);
 		assert(si.hostReplayRate > 0);
-		m_samplePerTick = si.hostReplayRate / si.playerTickRate;
+		m_samplePerTick = ComputeHostSamplePerTick(si.hostReplayRate, si.playerTickRate);
 		m_songInfo.fileFormat = "SNDH";
 		si.fileType = eFileType::eSndh;
 	}

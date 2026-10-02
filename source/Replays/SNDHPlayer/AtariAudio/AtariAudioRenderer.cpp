@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.25
+//	AtariAudio 1.26
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -103,4 +103,11 @@ const char* AtariAudioRenderer::SkipNTString(const char* r)
 {
 	r += strlen(r) + 1;
 	return r;
+}
+
+uint32_t AtariAudioRenderer::ComputeHostSamplePerTick(uint32_t hostReplayRate, int playerTickRate) const
+{
+	uint64_t denom = (uint64_t(hostReplayRate) * 313 * 512 * 50);
+	denom /= (uint64_t(playerTickRate) * kAtariSTECpuClock);
+	return uint32_t(denom);
 }
