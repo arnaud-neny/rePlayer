@@ -61,6 +61,7 @@ namespace rePlayer
 
         bool m_isSeekable = true;
         bool m_isEof = false;
+        uint8_t m_channels;
 
         uint8_t m_buffer[FAAD_MIN_STREAMSIZE * 6];
         uint32_t m_bytesIntoBuffer;
@@ -69,7 +70,7 @@ namespace rePlayer
         uint32_t m_sampleRate;
         uint32_t m_position = 0;
 
-        StereoSample* m_sampleBuffer;
+        float* m_sampleBuffer;
         uint32_t m_remainingSamples = 0;
         uint32_t m_numSamples = 0;
 

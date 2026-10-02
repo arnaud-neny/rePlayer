@@ -62,6 +62,7 @@ namespace rePlayer
 
     uint32_t ReplayAAC::Render(StereoSample* output, uint32_t numSamples)
     {
+        auto channels = m_channels;
         auto remainingSamples = numSamples;
         while (remainingSamples)
         {
@@ -71,7 +72,8 @@ namespace rePlayer
                     return numSamples - remainingSamples;
 
                 NeAACDecFrameInfo frameInfo;
-                m_sampleBuffer = reinterpret_cast<StereoSample*>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
+                m_sampleBuffer = pCast<float>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
+                m_channels = channels = frameInfo.channels;
 
                 AdvanceBuffer(frameInfo.bytesconsumed);
                 FillBuffer();
@@ -79,7 +81,7 @@ namespace rePlayer
                 if (m_sampleBuffer == nullptr || frameInfo.error > 0)
                     return numSamples - remainingSamples;
                 m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
-                assert(m_sampleRate == frameInfo.samplerate && frameInfo.channels == 2);
+                assert(m_sampleRate == frameInfo.samplerate);
 
                 // compute the bitrate per second
                 auto* bitRate = m_bitRate.free;
@@ -113,9 +115,21 @@ namespace rePlayer
             else
             {
                 auto numSamplesToCopy = Min(remainingSamples, m_remainingSamples);
-                memcpy(output, m_sampleBuffer, sizeof(StereoSample) * numSamplesToCopy);
+                if (channels == 1) for (uint32_t i = 0; i < numSamplesToCopy; ++i)
+                {
+                    output[i].left = output[i].right = m_sampleBuffer[i];
+                }
+                else if(channels == 2)
+                {
+                    memcpy(output, m_sampleBuffer, sizeof(StereoSample) * numSamplesToCopy);
+                }
+                else for (uint32_t i = 0; i < numSamplesToCopy; ++i)
+                {
+                    output[i].left = m_sampleBuffer[i * channels];
+                    output[i].right = m_sampleBuffer[i * channels + 1];
+                }
                 output += numSamplesToCopy;
-                m_sampleBuffer += numSamplesToCopy;
+                m_sampleBuffer += numSamplesToCopy * channels;
                 remainingSamples -= numSamplesToCopy;
                 m_remainingSamples -= numSamplesToCopy;
                 m_position += numSamplesToCopy;
@@ -128,7 +142,7 @@ namespace rePlayer
     uint32_t ReplayAAC::Seek(uint32_t timeInMs)
     {
         m_position = m_position + m_remainingSamples - m_numSamples;
-        m_sampleBuffer = m_sampleBuffer + m_remainingSamples - m_numSamples;
+        m_sampleBuffer = m_sampleBuffer + (m_remainingSamples - m_numSamples) * m_channels;
         m_remainingSamples = m_numSamples;
 
         auto numSamples = (uint64_t(timeInMs) * m_sampleRate) / 1000;
@@ -148,7 +162,7 @@ namespace rePlayer
             else
             {
                 auto numSamplesToCopy = Min(remainingSamples, m_remainingSamples);
-                m_sampleBuffer += numSamplesToCopy;
+                m_sampleBuffer += numSamplesToCopy * m_channels;
                 remainingSamples -= numSamplesToCopy;
                 m_remainingSamples -= numSamplesToCopy;
                 m_position += numSamplesToCopy;
@@ -283,10 +297,12 @@ namespace rePlayer
     std::string ReplayAAC::GetInfo() const
     {
         std::string info;
-        info = "2 channels\n";
-        char buf[32];
-        sprintf(buf, "%u kb/s - %u hz", m_bitRate.average.load(), m_sampleRate);
-        info += buf;
+        char buf[64];
+        if (m_channels == 1)
+            sprintf(buf, "1 channel\n%u kb/s - %u hz", m_bitRate.average.load(), m_sampleRate);
+        else
+            sprintf(buf, "%u channels\n%u kb/s - %u hz", uint32_t(m_channels), m_bitRate.average.load(), m_sampleRate);
+        info = buf;
         if (IsStreaming())
         {
             sprintf(buf, " (%.2f KB cache)", m_stream->GetAvailableSize() / 1024.0);
@@ -327,7 +343,7 @@ namespace rePlayer
 
         uint8_t channels;
         auto bytesUsed = NeAACDecInit(m_hDecoder, m_buffer, m_bytesIntoBuffer, reinterpret_cast<unsigned long*>(&m_sampleRate), &channels);
-        if (bytesUsed < 0 || channels != 2)
+        if (bytesUsed < 0)
             return Status::kFail;
 
         AdvanceBuffer(bytesUsed);
@@ -344,15 +360,16 @@ namespace rePlayer
             return Status::kFail;
 
         NeAACDecFrameInfo frameInfo;
-        m_sampleBuffer = reinterpret_cast<StereoSample*>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
+        m_sampleBuffer = pCast<float>(NeAACDecDecode(m_hDecoder, &frameInfo, m_buffer, m_bytesIntoBuffer));
 
         AdvanceBuffer(frameInfo.bytesconsumed);
         FillBuffer();
 
         if (m_sampleBuffer == nullptr || frameInfo.error > 0)
             return Status::kFail;
-        if (m_sampleRate != frameInfo.samplerate || frameInfo.channels != 2)
+        if (m_sampleRate != frameInfo.samplerate)
             return Status::kFail;
+        m_channels = frameInfo.channels;
         m_numSamples = m_remainingSamples = frameInfo.samples / frameInfo.channels;
 
         // compute the bitrate per second

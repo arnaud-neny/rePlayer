@@ -1,4 +1,4 @@
-#define FAAD2_VERSION "2.11.3"
+#define FAAD2_VERSION "2.11.4"
 
 #define APPLY_DRC 1
 #define HAVE_INTTYPES_H 1
@@ -9,3 +9,4 @@
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_LRINTF 1
 #define PACKAGE_VERSION FAAD2_VERSION
+#define DRM_SUPPORT 1
