@@ -38,7 +38,7 @@ class Resampler
 protected:
     virtual SampleI32 output() const = 0;
 
-    Resampler() {}
+    Resampler() = default;
 
 public:
     virtual ~Resampler() = default;

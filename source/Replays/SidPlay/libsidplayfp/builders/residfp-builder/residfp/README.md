@@ -77,11 +77,11 @@ in advance with the `autoreconf -vfi` command.
 In addition to the standard build options the following are available:
 
 * `--enable-debug[=no/yes]`:
-compile for debugging with inlining disabled and warnings
+compile for debugging with inlining disabled, asserts and warnings
 (disabled by default)
 
 * `--enable-branch-hints`:
-enable branch hints so the compiler can produce more optimized code
+disable branch hints optimizations
 (enabled by default)
 
 * `--with-simd=<runtime/mmx/sse2/sse4/avx2/avx512f/none>`:

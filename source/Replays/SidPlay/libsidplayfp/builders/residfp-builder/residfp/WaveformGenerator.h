@@ -393,7 +393,7 @@ uint32_t WaveformGenerator::output()
         // Triangle/Sawtooth output is delayed half cycle on 8580.
         // This will appear as a one cycle delay on OSC3 as it is latched
         // in the first phase of the clock.
-        if ((waveform & 3) && !is6581)
+        if (!is6581 && (waveform & 3))
         {
             osc3 = tri_saw_pipeline & (no_pulse | pulse_output) & no_noise_or_noise_output;
             if (pulldown != nullptr)
@@ -409,6 +409,7 @@ uint32_t WaveformGenerator::output()
         // when the sawtooth is selected
         if (is6581 && (waveform & 0x2) && ((waveform_output & 0x800) == 0))
         {
+            // On some chips it doesn't happen with P+S
             msb_rising = false;
             accumulator &= 0x7fffff;
         }

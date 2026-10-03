@@ -35,12 +35,9 @@ class PassThrough final : public Resampler
 
 private:
     /// Last sample
-    SampleI32 outputValue;
+    SampleI32 outputValue = {0};
 
 public:
-    PassThrough() :
-        outputValue(0) {}
-
     bool input(SampleI32 sample) override
     {
         outputValue = sample;

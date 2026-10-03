@@ -76,9 +76,9 @@ private:
 
     int sampleOffset = 0;
 
-    SampleI32 outputValue = { 0, 0 };
+    SampleI32 outputValue = {0};
 
-    int32_t sample[2][RINGSIZE * 2];
+    int32_t sample[2][RINGSIZE * 2] = {0};
 
 private:
     SampleI32 fir(int subcycle);
