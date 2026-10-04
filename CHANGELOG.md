@@ -5,8 +5,11 @@
 
 ## Current version
 
-v0.22.14:
-- Updated AtariAudio to 1.25
+v0.22.15:
+- Updated adplug to 2.4 r948
+- Updated AtariAudio to 1.26
+- Updated FAAD2 to 2.11.4
+- Updated libresidfp to 1.2.3
 - Bug fixes
 
 v0.22.13:
@@ -15,18 +18,15 @@ v0.22.13:
 - Added F15 hotkey to discard playing song
 
 v0.22.12:
-- Updated adplug to 2.4 r947
 - Updated libvgm to r630
 - Updated libcurl to 8.22.0
 - Updated TagLib to 2.3.2
 
 v0.22.11:
-- Updated libresidfp to 1.2.2
 - Updated libsidplay to 3.1.1
 - Added to OpenMPT an option to override the panning to make it fully separated
 
 v0.22.10:
-- Updated FAAD2 to 2.11.3
 - Updated OpenMPT to 0.9.0-pre.13 r25674
 - ASAP with surround for single channel songs
 
@@ -63,17 +63,17 @@ v0.22.0:
 
 ## Older updates
 
-- [0.22.9] adplug to 2.4 r943
+- [0.22.12] adplug to 2.4 r947
 - [0.22.0] ASAP to 8.0.0
-- [0.22.13] AtariAudio to 1.24
-- [0.17.3] FAAD2 to 2.11.2
+- [0.22.14] AtariAudio to 1.25
+- [0.22.10] FAAD2 to 2.11.3
 - [0.22.10] FluidSynth to 2.6.0
 - [0.19.4] Furnace to 0.6.8.3
 - [0.21.9] gbsplay to 0.0.101
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
-- [0.22.10] libresidfp to 1.2.1
+- [0.22.11] libresidfp to 1.2.2
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
