@@ -792,7 +792,7 @@ namespace rePlayer
                 max = sample;
             }
         }
-        silenceStart += kSilenceSampleRate / 4; // keep 0.25 second of silence
+        silenceStart += kSilenceSampleRate; // add 1s to avoid bad rounding
         std::atomic_ref(replay->m_silenceStart).exchange(silenceStart < totalSamples ? MulDiv(silenceStart, kSampleRate, kSilenceSampleRate) : 0);
         std::atomic_ref(replay->m_isSilenceDetectionRunning).store(false);
     }
