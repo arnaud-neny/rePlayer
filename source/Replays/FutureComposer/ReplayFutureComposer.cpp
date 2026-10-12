@@ -226,9 +226,11 @@ namespace rePlayer
         metadata += "\nGame  : ";
         if (auto* str = m_decoder->getInfoString("game"))
             metadata += str;
+/* no need to display this, it's just the filename
         metadata += "\nName  : ";
         if (auto* str = m_decoder->getInfoString("name"))
             metadata += str;
+*/
         return metadata;
     }
 
