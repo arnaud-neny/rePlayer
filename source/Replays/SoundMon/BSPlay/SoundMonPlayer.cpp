@@ -631,13 +631,26 @@ namespace SoundMon
     {
         Key key = { .pat = 0, .step = 0 };
         Array<int32_t> vals;
+        Array<int32_t> currentVals; // the goal is to have complete subsong, even if it's already played in a previous one (to pick up different intros for example)
         Array<Key> subsong;
         Array<uint16_t> subsongs;
 
         int blank = 0;
         while (key.step != m_modptr->GetNumSteps())
         {
-            if (vals.AddOnce(key.val).second)
+            bool isAdded = false;
+            if (currentVals.IsEmpty())
+			{
+				isAdded = vals.AddOnce(key.val).second;
+                currentVals.AddOnce(key.val);
+			}
+            else
+            {
+                vals.AddOnce(key.val);
+                isAdded = currentVals.AddOnce(key.val).second;
+            }
+
+            if (isAdded)
             {
                 std::sort(vals.begin(), vals.end());
                 subsong.Add(key);
@@ -659,6 +672,7 @@ namespace SoundMon
                 if (blank == kNotesPerPattern * kVoices && subsong.NumItems() == kNotesPerPattern)
                 {
                     subsong.Clear();
+                    currentVals.Clear();
                     key.val = 0;
                 }
                 else
@@ -690,6 +704,7 @@ namespace SoundMon
                 {
                     subsongs.Add(subsong[0].step);
                     subsong.Clear();
+                    currentVals.Clear();
                 }
 
                 key.val = 0;
