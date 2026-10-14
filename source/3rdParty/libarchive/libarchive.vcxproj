@@ -27,7 +27,6 @@
     <ClInclude Include="libarchive\archive_blake2.h" />
     <ClInclude Include="libarchive\archive_blake2_impl.h" />
     <ClInclude Include="libarchive\archive_cmdline_private.h" />
-    <ClInclude Include="libarchive\archive_crc32.h" />
     <ClInclude Include="libarchive\archive_cryptor_private.h" />
     <ClInclude Include="libarchive\archive_digest_private.h" />
     <ClInclude Include="libarchive\archive_endian.h" />
@@ -56,10 +55,12 @@
     <ClInclude Include="libarchive\archive_string.h" />
     <ClInclude Include="libarchive\archive_string_composition.h" />
     <ClInclude Include="libarchive\archive_time_private.h" />
+    <ClInclude Include="libarchive\archive_umask_private.h" />
     <ClInclude Include="libarchive\archive_windows.h" />
     <ClInclude Include="libarchive\archive_write_disk_private.h" />
     <ClInclude Include="libarchive\archive_write_private.h" />
     <ClInclude Include="libarchive\archive_write_set_format_private.h" />
+    <ClInclude Include="libarchive\archive_xml_private.h" />
     <ClInclude Include="libarchive\archive_xxhash.h" />
     <ClInclude Include="libarchive\config_freebsd.h" />
     <ClInclude Include="libarchive\filter_fork.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="libarchive\archive_blake2s_ref.c" />
     <ClCompile Include="libarchive\archive_check_magic.c" />
     <ClCompile Include="libarchive\archive_cmdline.c" />
+    <ClCompile Include="libarchive\archive_crc32.c" />
     <ClCompile Include="libarchive\archive_cryptor.c" />
     <ClCompile Include="libarchive\archive_digest.c" />
     <ClCompile Include="libarchive\archive_disk_acl_darwin.c" />
@@ -227,6 +229,7 @@
     <ClCompile Include="libarchive\archive_string.c" />
     <ClCompile Include="libarchive\archive_string_sprintf.c" />
     <ClCompile Include="libarchive\archive_time.c" />
+    <ClCompile Include="libarchive\archive_umask.c" />
     <ClCompile Include="libarchive\archive_util.c" />
     <ClCompile Include="libarchive\archive_version_details.c" />
     <ClCompile Include="libarchive\archive_virtual.c" />

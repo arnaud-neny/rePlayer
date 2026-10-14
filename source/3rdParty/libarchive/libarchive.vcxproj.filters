@@ -58,9 +58,6 @@
     <ClInclude Include="libarchive\archive_cmdline_private.h">
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
-    <ClInclude Include="libarchive\archive_crc32.h">
-      <Filter>Source Files\libarchive</Filter>
-    </ClInclude>
     <ClInclude Include="libarchive\archive_cryptor_private.h">
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
@@ -398,6 +395,12 @@
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
     <ClInclude Include="libarchive\archive_integer.h">
+      <Filter>Source Files\libarchive</Filter>
+    </ClInclude>
+    <ClInclude Include="libarchive\archive_umask_private.h">
+      <Filter>Source Files\libarchive</Filter>
+    </ClInclude>
+    <ClInclude Include="libarchive\archive_xml_private.h">
       <Filter>Source Files\libarchive</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1078,6 +1081,12 @@
       <Filter>Source Files\libarchive</Filter>
     </ClCompile>
     <ClCompile Include="libarchive\archive_time.c">
+      <Filter>Source Files\libarchive</Filter>
+    </ClCompile>
+    <ClCompile Include="libarchive\archive_crc32.c">
+      <Filter>Source Files\libarchive</Filter>
+    </ClCompile>
+    <ClCompile Include="libarchive\archive_umask.c">
       <Filter>Source Files\libarchive</Filter>
     </ClCompile>
   </ItemGroup>
