@@ -349,9 +349,6 @@
     <ClInclude Include="lib\slist.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\smb.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\smtp.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -371,9 +368,6 @@
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\strerror.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\system_win32.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\telnet.h">
@@ -505,9 +499,6 @@
     <ClInclude Include="lib\uint-bset.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\uint-hash.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\uint-spbset.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
@@ -522,9 +513,6 @@
     </ClInclude>
     <ClInclude Include="lib\cf-ip-happy.h">
       <Filter>Source Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\curlx\fopen.h">
-      <Filter>Source Files\lib\curlx</Filter>
     </ClInclude>
     <ClInclude Include="lib\curlx\strerr.h">
       <Filter>Source Files\lib\curlx</Filter>
@@ -634,11 +622,20 @@
     <ClInclude Include="lib\http_httpsig.h">
       <Filter>Source Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\uint-hashset.h">
-      <Filter>Source Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="curl_config.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\curlx\win32-fopen.h">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\ptrarray.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\u8_strset.h">
+      <Filter>Source Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\u32_ptrset.h">
+      <Filter>Source Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -894,9 +891,6 @@
     <ClCompile Include="lib\slist.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\smb.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\smtp.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -919,9 +913,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strerror.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\system_win32.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\telnet.c">
@@ -1086,9 +1077,6 @@
     <ClCompile Include="lib\uint-bset.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\uint-hash.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\uint-spbset.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -1103,9 +1091,6 @@
     </ClCompile>
     <ClCompile Include="lib\cf-ip-happy.c">
       <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\curlx\fopen.c">
-      <Filter>Source Files\lib\curlx</Filter>
     </ClCompile>
     <ClCompile Include="lib\curlx\strerr.c">
       <Filter>Source Files\lib\curlx</Filter>
@@ -1224,7 +1209,16 @@
     <ClCompile Include="lib\http_httpsig.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\uint-hashset.c">
+    <ClCompile Include="lib\curlx\win32-fopen.c">
+      <Filter>Source Files\lib\curlx</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\ptrarray.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\u8_strset.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\u32_ptrset.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
