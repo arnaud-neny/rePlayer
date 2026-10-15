@@ -605,7 +605,8 @@ namespace rePlayer
 
             ImGui::SameLine();
             static constexpr uint32_t kNumButtons = 3;
-            isDirty |= m_filters[filterIndex].ui->Draw("##filter", -(buttonSize + style.ItemInnerSpacing.x) * kNumButtons);
+            ImGui::SetNextItemWidth(-(buttonSize + style.ItemInnerSpacing.x) * kNumButtons);
+            isDirty |= m_filters[filterIndex].ui->DrawWithHint("##filter", nullptr);
 
             ImGui::SameLine(0, style.ItemInnerSpacing.x);
             ImGui::BeginDisabled(filterIndex == 0);

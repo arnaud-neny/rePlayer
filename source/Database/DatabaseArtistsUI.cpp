@@ -77,7 +77,8 @@ namespace rePlayer
                 // display and process the artist search bar
                 ImGui::TableNextColumn();
                 bool isFiltering = isDirty && m_artistFilter->IsActive();
-                if (m_artistFilter->Draw("##filter", -1) || isFiltering)
+                ImGui::SetNextItemWidth(-FLT_MIN);
+                if (m_artistFilter->DrawWithHint("##filter", nullptr) || isFiltering)
                 {
                     m_artists.Clear();
                     for (Artist* artist : m_db.Artists())
@@ -440,7 +441,8 @@ namespace rePlayer
 
     ArtistID DatabaseArtistsUI::PickArtist(ArtistID skippedArtistId)
     {
-        if (m_artistPicker.filter->Draw("##filter", -1) || !m_artistPicker.isOpened || m_artistPicker.revision != m_dbArtistsRevision)
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        if (m_artistPicker.filter->DrawWithHint("##filter", nullptr) || !m_artistPicker.isOpened || m_artistPicker.revision != m_dbArtistsRevision)
         {
             m_artistPicker.artists.Clear();
             m_artistPicker.artists.Reserve(m_db.NumArtists());

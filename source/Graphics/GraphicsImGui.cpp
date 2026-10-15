@@ -18,15 +18,24 @@ namespace rePlayer
     static int32_t s_rectIds[NumItemsOf(s_widths)];
     static ImFontLoader s_fontLoader;
 
-    static bool s_fontSrcContainsGlyph(ImFontAtlas* atlas, ImFontConfig* src, ImWchar codepoint)
+    static int s_fontSrcGetGlyphIndexFromCodepoint(ImFontAtlas* atlas, ImFontConfig* src, ImWchar codepoint)
     {
         if (codepoint >= ImWchar(0xE000) && codepoint < ImWchar(0xE000 + NumItemsOf(s_widths)))
-            return true;
-        return ImFontAtlasGetFontLoaderForStbTruetype()->FontSrcContainsGlyph(atlas, src, codepoint);
+            return int(codepoint) + 1;
+        return ImFontAtlasGetFontLoaderForStbTruetype()->FontSrcGetGlyphIndexFromCodepoint(atlas, src, codepoint);
     }
 
-    static bool s_fontBakedLoadGlyph(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, ImWchar codepoint, ImFontGlyph* out_glyph, float* out_advance_x)
+    static bool s_fontSrcContainsGlyph(ImFontAtlas* atlas, ImFontConfig* src, int glyph_index)
     {
+        int codepoint = (glyph_index - 1);
+        if (codepoint >= ImWchar(0xE000) && codepoint < ImWchar(0xE000 + NumItemsOf(s_widths)))
+            return true;
+        return ImFontAtlasGetFontLoaderForStbTruetype()->FontSrcContainsGlyph(atlas, src, glyph_index);
+    }
+
+    static bool s_fontBakedLoadGlyph(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, int glyph_index, ImFontGlyph* out_glyph, float* out_advance_x)
+    {
+        int codepoint = (glyph_index - 1);
         if (codepoint >= ImWchar(0xE000) && codepoint < ImWchar(0xE000 + NumItemsOf(s_widths)))
         {
             const int w = s_widths[codepoint - 0xe000];
@@ -78,7 +87,7 @@ namespace rePlayer
 
             return true;
         }
-        return ImFontAtlasGetFontLoaderForStbTruetype()->FontBakedLoadGlyph(atlas, src, baked, loader_data_for_baked_src, codepoint, out_glyph, out_advance_x);
+        return ImFontAtlasGetFontLoaderForStbTruetype()->FontBakedLoadGlyph(atlas, src, baked, loader_data_for_baked_src, glyph_index, out_glyph, out_advance_x);
     }
 
     GraphicsImGui::GraphicsImGui(void* hWnd)
@@ -101,6 +110,7 @@ namespace rePlayer
         imFontConfig.PixelSnapH = true;
 
         s_fontLoader = *ImFontAtlasGetFontLoaderForStbTruetype();
+        s_fontLoader.FontSrcGetGlyphIndexFromCodepoint = s_fontSrcGetGlyphIndexFromCodepoint;
         s_fontLoader.FontSrcContainsGlyph = s_fontSrcContainsGlyph;
         s_fontLoader.FontBakedLoadGlyph = s_fontBakedLoadGlyph;
         imFontConfig.FontLoader = &s_fontLoader;

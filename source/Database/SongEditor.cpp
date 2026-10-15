@@ -426,7 +426,8 @@ namespace rePlayer
         if (ImGui::BeginPopup("ArtistPopup"))
         {
             // Draw filter
-            m_artistFilter->Draw("##filter", m_artistMaxWidth);
+            ImGui::SetNextItemWidth(m_artistMaxWidth);
+            m_artistFilter->DrawWithHint("##filter", nullptr);
 
             // Build and sort the artist list
             auto& db = Core::GetDatabase(m_musicId.databaseId);

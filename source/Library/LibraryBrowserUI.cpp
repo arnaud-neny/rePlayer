@@ -158,7 +158,8 @@ namespace rePlayer
         while (m_filters.NumItems() < uint32_t(m_context->stage.id))
             m_filters.Add(new ImGuiTextFilter());
         auto& filter = *m_filters[int(m_context->stage.id) - 1];
-        if (filter.Draw("##filter", -1) || isDirty)
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        if (filter.DrawWithHint("##filter", nullptr) || isDirty)
             source.BrowserPopulate(*m_context, filter);
         return isDirty;
     }

@@ -890,7 +890,7 @@ namespace rePlayer
             }
             pos.x -= maxFrames;
             auto drawListFlags = drawList->Flags;
-            drawList->Flags &= ~(ImDrawListFlags_AntiAliasedLines | ImDrawListFlags_AntiAliasedLinesUseTex | ImDrawListFlags_AntiAliasedFill);
+            drawList->Flags &= ~(ImDrawFlags_AALines | ImDrawFlags_AAFill);
             for (auto loopPos : m_loops)
                 drawList->AddLine(ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y), ImVec2(pos.x - offset + loopPos / numMillisecondsPerPixel, pos.y + size.y), 0x8000ffff);
             if (m_silence < m_numSamples)
