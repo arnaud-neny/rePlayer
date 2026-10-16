@@ -312,7 +312,7 @@ namespace rePlayer
         }
         m_numVisualsAvailableSamples = numAvailableSamples;
 
-        if (!m_arePatternsDisplayed && !(flags & Patterns::kEnablePatterns)) // kEnablePatterns has priority over internal flag
+        if (!ms_patterns && !(flags & Patterns::kEnablePatterns)) // kEnablePatterns has priority over internal flag
             return {};
 
         int32_t numChannels = m_moduleVisuals->ht_Channels;

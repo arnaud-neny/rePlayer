@@ -69,7 +69,6 @@ namespace rePlayer
         Surround m_surround;
         uint32_t m_numPlaybackAvailableSamples = 0;
         uint32_t m_numVisualsAvailableSamples = 0;
-        bool m_arePatternsDisplayed = true;
 
         Properties m_properties;
 
