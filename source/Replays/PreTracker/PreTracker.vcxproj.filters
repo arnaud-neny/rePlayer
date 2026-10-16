@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\pretracker">
+      <UniqueIdentifier>{cda27bf4-301e-4e5b-8d57-b10cdd8d9a18}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayPreTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker_mixer.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker_parse.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker_sequencer.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker_tables.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+    <ClCompile Include="pretracker\pretracker_wavegen.c">
+      <Filter>Source Files\pretracker</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayPreTracker.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pretracker\pretracker.h">
+      <Filter>Source Files\pretracker</Filter>
+    </ClInclude>
+    <ClInclude Include="pretracker\pretracker_internal.h">
+      <Filter>Source Files\pretracker</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pretracker\LICENSE">
+      <Filter>Source Files\pretracker</Filter>
+    </None>
+    <None Include="pretracker\README.md">
+      <Filter>Source Files\pretracker</Filter>
+    </None>
+  </ItemGroup>
+</Project>

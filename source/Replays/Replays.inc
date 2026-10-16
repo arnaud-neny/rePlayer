@@ -2,7 +2,7 @@
 REPLAY(OpenMPT, 150)
 REPLAY(Hively, 100)
 REPLAY(SoundMon, 100)
-REPLAY(StSound, 109)
+REPLAY(PreTracker, 100)
 REPLAY(FutureComposer, 100)
 REPLAY(SidPlay, 0)
 REPLAY(V2, -100)
