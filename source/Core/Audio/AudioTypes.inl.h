@@ -65,6 +65,25 @@ namespace core
         return output;
     }
 
+    inline StereoSample* StereoSample::Convert(Surround& surround, uint32_t numSamples, uint32_t stereoSeparation)
+    {
+        auto output = this;
+        auto ctx = surround.Begin();
+        float stereo = 0.5f - 0.5f * stereoSeparation / 100.0f;
+        for (uint32_t i = 0; i < numSamples; i++)
+        {
+            float l = output->left;
+            float r = output->right;
+            StereoSample s;
+            s.left = l + (r - l) * stereo;
+            s.right = r + (l - r) * stereo;
+
+            *output++ = ctx(s);
+        }
+        surround.End(ctx);
+        return output;
+    }
+
     inline StereoSample* StereoSample::Convert(Surround& surround, const float* input, uint32_t numSamples, uint32_t stereoSeparation)
     {
         auto output = this;
