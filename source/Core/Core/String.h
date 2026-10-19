@@ -16,7 +16,7 @@ namespace core
     }
 
     template <uint32_t N, typename... Arguments>
-    inline int32_t sprintf(char(&buf)[N], char const* fmt, Arguments... args)
+    inline int32_t sprintf(char(&buf)[N], char const* fmt, Arguments... args) requires ((sizeof...(Arguments)) >= 1)
     {
         return stbsp_snprintf(buf, N, fmt, std::forward<Arguments>(args)...);
     }
