@@ -17,12 +17,12 @@ Homepage/Repo:   https://github.com/mmitch/gbsplay/
 Bug reports:     please use the issue tracker at
                  https://github.com/mmitch/gbsplay/issues
 
-gbsplay is compatible to GBSv1.  It uses a backwards compatible extension
-to store additional information in the file.  The gbsplay package contains
-the following parts:
+The gbsplay package contains the following parts:
 
  * `gbsplay`:    a console player
  * `gbsinfo`:    displays information about a gbs file
+ * `gbs2gb`:     convert a gbs file to gb to play it on real hardware
+ * `xgbsplay`:   an X11 player (need to be enabled during configure)
 
 ## Packaging status
 
@@ -30,8 +30,8 @@ the following parts:
 
 ## License
 
-``
-(C) 2003-2025 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
+```
+(C) 2003-2026 by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
                  Christian Garbs <mitch@cgarbs.de>
                  Maximilian Rehkopf <otakon@gmx.net>
                  Vegard Nossum <vegardno@ifi.uio.no>
@@ -60,4 +60,4 @@ File:       crc32.c
 Copyright:  Provided to GNUnet by peter@horizon.com
 License:    Public Domain
 Homepage:   n/a
-``
+```
