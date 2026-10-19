@@ -684,7 +684,7 @@ namespace rePlayer
 
         std::string url = m_replays[songSource->replay].name(m_strings);
         if (songSource->artists[0] == 0)
-            url += "/- unknown/";
+            url += "/_unknown/";
         else
         {
             url += "/";
@@ -1422,7 +1422,7 @@ namespace rePlayer
 
         unescape(m_db.replays[dbSong.replayId].name(m_db.strings));
         if (dbSong.artists[0] == 0)
-            url += "/-%20unknown/";
+            url += "/_unknown/";
         else
         {
             url += "/";
@@ -1475,7 +1475,7 @@ namespace rePlayer
 
         unescape(m_replays[songSource->replay].name(m_strings));
         if (songSource->artists[0] == 0)
-            url += "/-%20unknown/";
+            url += "/_unknown/";
         else
         {
             url += "/";
@@ -2120,8 +2120,8 @@ namespace rePlayer
                 {
                     line += strlen(m_db.replays[replayIndex].name(m_db.strings)) + 1;
                     uint16_t artists[2] = { 0, 0 };
-                    if (memcmp(line, "- unknown/", sizeof("- unknown/") - 1) == 0)
-                        line += sizeof("- unknown/") - 1;
+                    if (memcmp(line, "_unknown/", sizeof("_unknown/") - 1) == 0)
+                        line += sizeof("_unknown/") - 1;
                     else
                     {
                         auto newArtist = line;
