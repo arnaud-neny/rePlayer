@@ -9,69 +9,60 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\V2">
-      <UniqueIdentifier>{48386355-57d1-493c-bfb8-61cf8b996468}</UniqueIdentifier>
+    <Filter Include="Source Files\v2redux">
+      <UniqueIdentifier>{4cd2a75f-f8c2-4b58-9789-66283adc33ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReplayV2.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="V2\int128_t.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2redux.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\phonemtab.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2eras.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\scriptasm.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2load.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\sounddef.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2math.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\synth.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2seq.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\synthasm.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\v2core.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\types.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\phonemtab.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\v2mconv.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2redux\sounddef.h">
+      <Filter>Source Files\v2redux</Filter>
     </ClInclude>
-    <ClInclude Include="V2\v2mplayer.h">
-      <Filter>Source Files\V2</Filter>
-    </ClInclude>
-    <ClInclude Include="V2\scriptasm.inl.h">
-      <Filter>Source Files\V2</Filter>
+    <ClInclude Include="v2m_pattern.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayV2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="V2\ronan.cpp">
-      <Filter>Source Files\V2</Filter>
+    <ClCompile Include="v2redux\v2player.cpp">
+      <Filter>Source Files\v2redux</Filter>
     </ClCompile>
-    <ClCompile Include="V2\scriptasm.cpp">
-      <Filter>Source Files\V2</Filter>
+    <ClCompile Include="v2redux\v2load.cpp">
+      <Filter>Source Files\v2redux</Filter>
     </ClCompile>
-    <ClCompile Include="V2\sounddef.cpp">
-      <Filter>Source Files\V2</Filter>
+    <ClCompile Include="v2redux\v2seq.cpp">
+      <Filter>Source Files\v2redux</Filter>
     </ClCompile>
-    <ClCompile Include="V2\synth_core.cpp">
-      <Filter>Source Files\V2</Filter>
+    <ClCompile Include="v2redux\v2core.cpp">
+      <Filter>Source Files\v2redux</Filter>
     </ClCompile>
-    <ClCompile Include="V2\synthasm.cpp">
-      <Filter>Source Files\V2</Filter>
-    </ClCompile>
-    <ClCompile Include="V2\v2mconv.cpp">
-      <Filter>Source Files\V2</Filter>
-    </ClCompile>
-    <ClCompile Include="V2\v2mplayer.cpp">
-      <Filter>Source Files\V2</Filter>
+    <ClCompile Include="v2redux\ronan.cpp">
+      <Filter>Source Files\v2redux</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

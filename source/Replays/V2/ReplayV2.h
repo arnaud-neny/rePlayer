@@ -2,7 +2,8 @@
 
 #include <Replay.inl.h>
 
-class V2MPlayer;
+#include "v2redux/v2redux.h"
+#include "v2m_pattern.h"
 
 namespace rePlayer
 {
@@ -19,11 +20,13 @@ namespace rePlayer
         {
             union
             {
-                uint32_t value = 0;
+                uint32_t value[4] = { 0, 0 };
                 struct
                 {
-                    uint32_t overrideCoreSynth : 1;
-                    uint32_t coreSynth : 1;
+                    uint32_t version : 3;
+                    uint32_t overriddenDeltas : 29;
+                    uint32_t deltas : 29;
+                    uint32_t seed[2];
                 };
             };
 
@@ -49,17 +52,22 @@ namespace rePlayer
         std::string GetExtraInfo() const override;
         std::string GetInfo() const override;
 
-    private:
-        static constexpr uint32_t kSampleRate = 44100; // "The scene is dead" by Dubmood is not playing properly is it's set at 48000Hz
+        Patterns UpdatePatterns(uint32_t numSamples, uint32_t numLines, uint32_t charWidth, uint32_t spaceWidth, Patterns::Flags flags) override;
 
     private:
-        ReplayV2(V2MPlayer* player, uint8_t* tune);
+        static constexpr uint32_t kSampleRate = 44100;
 
     private:
-        V2MPlayer* m_player;
-        uint8_t* m_tune;
+        ReplayV2();
+
+    private:
+        v2redux::Player m_player;
+        v2mpat::Pattern m_pattern;
         bool m_hasEnded = false;
-        static bool ms_isCoreSynth;
+
+        uint32_t m_numPatSamples = 0;
+
+        static int32_t ms_patterns;
     };
 }
 // namespace rePlayer

@@ -1,0 +1,52 @@
+================================================================================
+ v2redux — licensing
+================================================================================
+
+This repository contains code under public-domain terms, plus a test corpus of
+third-party music that is NOT public domain. Read both sections.
+
+
+--------------------------------------------------------------------------------
+ 1. CODE  (everything except corpus/)
+--------------------------------------------------------------------------------
+
+All original work in this repository — the C++ port of the V2 engine, the
+test and oracle harness, the build system, and the documentation — is dedicated
+to the public domain under the Creative Commons CC0 1.0 Universal dedication.
+
+    To the extent possible under law, the authors of this port have waived all
+    copyright and related or neighboring rights to the original work in this
+    repository. This work is published from Germany / Cyprus.
+
+    CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+
+This port derives from the V2 synthesizer, written 2000–2008 by
+Tammo "kb" Hinrichs, who placed his V2 code in the public domain. His original
+dedication is preserved verbatim:
+
+    -----------------------------------------------------------------------
+    V2 code written 2000-2008 by Tammo "kb" Hinrichs
+
+    I hereby place this code (as contained in this directory and the
+    subdirectories "bin", "conv2m", "in_v2m", "libv2", "tinyplayer" and
+    "tool") in the public domain.
+    -----------------------------------------------------------------------
+
+(Some original V2 source files additionally carried an "Artistic License 2.0"
+header from their genthree lineage; the governing LICENSE.txt in the upstream
+release is the public-domain dedication above. Original notices in ported
+source files are preserved where present.)
+
+
+--------------------------------------------------------------------------------
+ 2. MUSIC CORPUS  (corpus/)
+--------------------------------------------------------------------------------
+
+The .v2m files under corpus/ are NOT covered by the public-domain dedication
+above. They are musical compositions © their original authors (Farbrausch /
+.theprodukkt), carved from freely-distributed demo releases and included here
+solely as test vectors / ground-truth for the determinism and fidelity tests.
+
+They are NOT relicensed and NO ownership is claimed over them. See
+corpus/LICENSE and corpus/embedded/PROVENANCE.md for the per-song source and
+provenance. Rights holders may request removal — see corpus/LICENSE.

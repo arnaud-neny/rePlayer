@@ -89,13 +89,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>V2_RONAN=1;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus /arch:SSE2 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -110,13 +110,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>V2_RONAN=1;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus /arch:SSE2 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -133,13 +133,13 @@
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>V2_RONAN=1;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus /arch:SSE2 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -162,13 +162,13 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>V2_RONAN=1;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/wd4201 /wd4706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus /arch:SSE2 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -188,26 +188,23 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ReplayV2.h" />
-    <ClInclude Include="V2\int128_t.h" />
-    <ClInclude Include="V2\phonemtab.h" />
-    <ClInclude Include="V2\scriptasm.h" />
-    <ClInclude Include="V2\scriptasm.inl.h" />
-    <ClInclude Include="V2\sounddef.h" />
-    <ClInclude Include="V2\synth.h" />
-    <ClInclude Include="V2\synthasm.h" />
-    <ClInclude Include="V2\types.h" />
-    <ClInclude Include="V2\v2mconv.h" />
-    <ClInclude Include="V2\v2mplayer.h" />
+    <ClInclude Include="v2m_pattern.h" />
+    <ClInclude Include="v2redux\phonemtab.h" />
+    <ClInclude Include="v2redux\sounddef.h" />
+    <ClInclude Include="v2redux\v2core.h" />
+    <ClInclude Include="v2redux\v2eras.h" />
+    <ClInclude Include="v2redux\v2load.h" />
+    <ClInclude Include="v2redux\v2math.h" />
+    <ClInclude Include="v2redux\v2redux.h" />
+    <ClInclude Include="v2redux\v2seq.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayV2.cpp" />
-    <ClCompile Include="V2\ronan.cpp" />
-    <ClCompile Include="V2\scriptasm.cpp" />
-    <ClCompile Include="V2\sounddef.cpp" />
-    <ClCompile Include="V2\synthasm.cpp" />
-    <ClCompile Include="V2\synth_core.cpp" />
-    <ClCompile Include="V2\v2mconv.cpp" />
-    <ClCompile Include="V2\v2mplayer.cpp" />
+    <ClCompile Include="v2redux\ronan.cpp" />
+    <ClCompile Include="v2redux\v2core.cpp" />
+    <ClCompile Include="v2redux\v2load.cpp" />
+    <ClCompile Include="v2redux\v2player.cpp" />
+    <ClCompile Include="v2redux\v2seq.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
