@@ -5,21 +5,32 @@
 
 ## Current version
 
+v0.22.16:
+- Added Art Of Noise
+- Added PreTracker
+- Removed StSound
+- Removed TFMX
+- Updated gbsplay to 0.0.103
+- Updated libvgm to r633
+- Updated libxmp to 4.7.4
+- Updated OpenMPT to 0.9.0-pre.13 r25800
+- Updated V2 to V2 Redux
+- Updated ImGui to 1.93.0
+- Updated libarchive to 3.8.10
+- Updated libcurl to 8.23.0
+- Bug fixes
+
 v0.22.15:
 - Updated adplug to 2.4 r948
 - Updated AtariAudio to 1.26
 - Updated FAAD2 to 2.11.4
 - Updated libresidfp to 1.2.3
-- Bug fixes
 
 v0.22.13:
 - Updated FluidSynth to 2.6.1
-- Updated libxmp to 4.7.3
 - Added F15 hotkey to discard playing song
 
 v0.22.12:
-- Updated libvgm to r630
-- Updated libcurl to 8.22.0
 - Updated TagLib to 2.3.2
 
 v0.22.11:
@@ -27,16 +38,13 @@ v0.22.11:
 - Added to OpenMPT an option to override the panning to make it fully separated
 
 v0.22.10:
-- Updated OpenMPT to 0.9.0-pre.13 r25674
 - ASAP with surround for single channel songs
 
 v0.22.9:
-- Updated ImGui to 1.92.9b
 - Added context menu to playlist to sort, export as WAV or scan ReplayGain the selection
 
 v0.22.8:
 - Updated libtfmxaudiodecoder to 1.0.14
-- Updated libarchive to 3.8.8
 
 v0.22.5:
 - Updated vgmstream to r2117
@@ -77,9 +85,9 @@ v0.22.0:
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
-- [0.22.11] libvgm to r628
-- [0.22.9] libxmp to 4.7.2
-- [0.22.9] OpenMPT to 0.9.0-pre.12 r25498
+- [0.22.12] libvgm to r630
+- [0.22.13] libxmp to 4.7.3
+- [0.22.10] OpenMPT to 0.9.0-pre.13 r25674
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
 - [0.21.9] SunVox to 2.1.4
@@ -91,9 +99,9 @@ v0.22.0:
 - [0.21.9] dr_mp3 to 0.7.3
 - [0.22.0] dr_wav to 0.14.5
 - [0.21.9] FFTW 3.3.10
-- [0.22.3] ImGui to 1.92.8
-- [0.22.0] libarchive to 3.8.7
-- [0.22.8] libcurl to 8.21.0
+- [0.22.9] ImGui to 1.92.9b
+- [0.22.8] libarchive to 3.8.8
+- [0.22.12] libcurl to 8.22.0
 - [0.21.9] libxml2 to 2.15.1
 - [0.22.9] TagLib to 2.3.1
 
@@ -163,7 +171,6 @@ v0.22.0:
 - [0.6.1] PreTracker support for UADE
 - [0.3.4] SNDH import
 - [0.21.9] Song End Editor to edit (and detect) loop instead of duration
-- [0.13.5] StSound with surround
 - [0.3.4] Unfold deck option to display song metadata
 - [0.14.0] VGMRips import
 - [0.8.7] ZX-Art import

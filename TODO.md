@@ -44,6 +44,7 @@
 - investigate the use of a tree for the songs (where subsongs are leaves), and then add a song playing all its subsongs in a single player
 - check WebAudio chiptune stuff for more players: https://bitbucket.org/wothke/workspace/projects/WCS
 - check NostalgicPlayer for more players: https://github.com/neumatho/NostalgicPlayer
+- check Retrovert for more players: https://github.com/RetrovertApp
 - Youtube music player? (using https://github.com/dujeonglee/YoutubeClipDownloader)
 - Soundcloud music player?
 - Bandcamp music player?
@@ -54,7 +55,7 @@
 - WaveSabre: https://github.com/logicomacorp/WaveSabre missing official file format
 - Full EdLib support (doh!): https://blog.chordian.net
 - Monotone: https://github.com/MobyGamer/MONOTONE (Virt: rickroll.mon)
-- single channel export
+- single channel export / channel scope (see Retrovert)
 - accessibility?
 - GTUltra: https://github.com/jpage8580/GTUltra
 - BambooTracker: https://github.com/BambooTracker/BambooTracker

@@ -16,6 +16,7 @@
 
 ## Replays Libraries:
 - adplug: https://github.com/adplug/adplug
+- Art Of Noise: https://github.com/RetrovertApp/playback-art-of-noise & https://github.com/neumatho/NostalgicPlayer
 - ASAP: http://asap.sourceforge.net
 - AtariAudio: https://github.com/arnaud-carre/AtariAudio
 - Ayfly: https://github.com/l29ah/ayfly
@@ -25,8 +26,7 @@
 - dr_libs (MP3/FLAC/WAV): https://github.com/mackron/dr_libs
 - eupmini: https://github.com/gzaffin/eupmini
 - FAAD2: https://github.com/knik0/faad2
-- Farbrausch ViruZ II: https://github.com/farbrausch/fr_public  
-  Made the x86 version available as "emulation" as it renders closer to the original than the C version.
+- Farbrausch ViruZ II: https://github.com/spheenik/v2redux & https://github.com/RetrovertApp/playback-v2m
 - FluidSynth: https://github.com/FluidSynth/fluidsynth
 - FMPlayer: https://github.com/myon98/98fmplayer
 - Furnace: https://github.com/tildearrow/furnace
@@ -58,6 +58,7 @@
 - Opus: https://opus-codec.org
 - Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
 - PMDWin: https://c60.la.coocan.jp & https://github.com/gzaffin/pmdmini
+- PreTracker: https://github.com/RetrovertApp/playback-pretracker & https://github.com/chrisly42/PretrackerRaspberryCasket
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
 - Psycle: https://sourceforge.net/projects/psycle
 - PxTone: https://pxtone.org/developer & https://github.com/yuxshao/ptweb
@@ -67,8 +68,6 @@
 - SkaleTracker: https://www.pouet.net/prod.php?which=20929
 - SoundMon: Brian Postma website is gone.  
   Partially rewritten and fixed from original code.
-- StSound: https://github.com/arnaud-carre/StSound  
-  Patched some players for continuous play and loop/end detection, added stereo support.
 - SunVox: https://warmplace.ru/soft/sunvox
 - TIATracker: https://bitbucket.org/kylearan/tiatracker
 - UADE: https://zakalwe.fi/uade and https://gitlab.com/uade-music-player/uade

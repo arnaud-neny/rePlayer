@@ -201,6 +201,7 @@ Or add some comments (and likes) there:
 
 ### Replays 3rd parties:
 - [adplug](https://github.com/adplug/adplug): a free AdLib sound player library.
+- [Art Of Noise](https://github.com/RetrovertApp/playback-art-of-noise): Soundtracker for amiga with synth samples.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
 - [AtariAudio](https://github.com/arnaud-carre/AtariAudio): Simple library to play any Atari SNDH music file.
 - [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
@@ -210,7 +211,7 @@ Or add some comments (and likes) there:
 - [dr_libs](https://github.com/mackron/dr_libs): FLAC and MP3 audio decoders; WAV audio loader and writer.
 - [eupmini](https://github.com/gzaffin/eupmini): Music driver EUPHONY (Extension ".EUP") format player.
 - [FAAD2](https://github.com/knik0/faad2): Freeware Advanced Audio (AAC) Decoder.
-- [Farbrausch ViruZ II](https://github.com/farbrausch/fr_public): Synthetizer (v2m). The C engine is there, but I've also ported the x86 assembly (some sort of emulation) as the C one is not working the same way.
+- [Farbrausch ViruZ II](https://github.com/spheenik/v2redux): Synthetizer (v2m). Using V2 Redux library.
 - [FluidSynth](https://www.fluidsynth.org): a real-time software synthesizer based on the SoundFont 2 specifications.
 - [FMPlayer](https://github.com/myon98/98fmplayer): PC-98 FM driver emulation.
 - [Furnace](https://github.com/tildearrow/furnace): a multi-system chiptune tracker compatible with DefleMask modules.
@@ -239,6 +240,7 @@ Or add some comments (and likes) there:
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
 - [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
 - [PMDWin](https://c60.la.coocan.jp): PC-98 PMD chiptunes.
+- [PreTracker](https://github.com/RetrovertApp/playback-pretracker): A C replayer for PreTracker modules — the synth-driven tracker format by Pink / Abyss.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
 - [PxTone](https://pxtone.org): PxTone Collage is a free but powerful music editor made by Pixel, the creator of Cave Story and Kero Blaster.
@@ -247,9 +249,7 @@ Or add some comments (and likes) there:
 - [SidPlay](https://github.com/libsidplayfp/libsidplayfp): Commodore 64 formats (sid, mus).
 - [SkaleTracker](https://www.pouet.net/prod.php?which=20929): Skale Tracker is a music tracker developed by Ruben Ramos Salvador (baktery) in the year 1998.
 - SoundMon: Sound Monitor (bp-bp3). I've rewritten some parts of the code as it didn't work as intented.
-- [StSound](https://github.com/arnaud-carre/StSound): ym files.
 - [SunVox](https://warmplace.ru/soft/sunvox): SunVox is a small, fast and powerful modular synthesizer with pattern-based sequencer (tracker).
-- TFMX: library to play Chris Huelsbeck files (customized).
 - [TIATracker](https://bitbucket.org/kylearan/tiatracker): a music tracker for making Atari VCS 2600 music on the PC, including a new sound routine for the VCS.
 - [UADE](https://zakalwe.fi/uade): Unix Amiga Delitracker Emulator, customized a little bit for a better playback.
 - [vgmstream](https://github.com/vgmstream/vgmstream): A library for playback of various streamed audio formats used in video games.
