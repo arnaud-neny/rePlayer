@@ -145,6 +145,12 @@ void sbuf_init_flt(sbuf_t* sbuf, float* buf, int samples, int channels) {
     sbuf_init(sbuf, SFMT_FLT, buf, samples, channels);
 }
 
+/* signals usage of internal bufs in some cases; needs max samples to do for layouts */
+void sbuf_init_default(sbuf_t* sbuf, int samples) {
+    memset(sbuf, 0, sizeof(sbuf_t));
+    sbuf->samples = samples;
+}
+
 
 int sfmt_get_sample_size(sfmt_t fmt) {
     switch(fmt) {
@@ -201,13 +207,22 @@ int sbuf_get_copy_max(sbuf_t* sdst, sbuf_t* ssrc) {
 void sbuf_silence_part(sbuf_t* sbuf, int from, int count) {
     int sample_size = sfmt_get_sample_size(sbuf->fmt);
 
+    // pre-clamped but just in case */
+    if (from < 0 || count < 0 || from > sbuf->samples || count > sbuf->samples - from) {
+        VGM_LOG("SBUF: wrong silence_part config, from=%i, count=%i, samples=%i\n", from, count, sbuf->samples);
+        return;
+    }
+
     uint8_t* buf = sbuf->buf;
     buf += from * sbuf->channels * sample_size;
     memset(buf, 0, count * sbuf->channels * sample_size);
 }
 
 void sbuf_silence_rest(sbuf_t* sbuf) {
-    sbuf_silence_part(sbuf, sbuf->filled, sbuf->samples - sbuf->filled);
+    int sample_count = sbuf->samples - sbuf->filled;
+    sbuf_silence_part(sbuf, sbuf->filled, sample_count);
+
+    sbuf->filled += sample_count;
 }
 
 
@@ -286,8 +301,13 @@ static sbuf_copy_t copy_matrix[SFMT_MAX][SFMT_MAX] = {
 //TODO: may want to handle sdst->flled + samples externally?
 void sbuf_copy_segments(sbuf_t* sdst, sbuf_t* ssrc, int samples) {
     // rarely when decoding with empty frames, may not setup ssrc
-    if (samples == 0)
+    if (samples <= 0)
         return;
+
+    if (samples > sdst->samples - sdst->filled) {
+        VGM_LOG("SBUF: wrong copy segments (src-filled=%i, dst-free=%i, requested=%i)\n", ssrc->filled, sdst->samples - sdst->filled, samples);
+        return;
+    }
 
     if (ssrc->channels != sdst->channels) {
         // 0'd other channels first (uncommon so probably fine albeit slower-ish)
@@ -415,8 +435,6 @@ static sbuf_layer_t layer_matrix[SFMT_MAX][SFMT_MAX] = {
 // dst_ch_start indicates it should write to dst's chN,chN+1,etc
 // sometimes one layer has less samples than others and need to 0-fill rest up to dst_max
 void sbuf_copy_layers(sbuf_t* sdst, sbuf_t* ssrc, int dst_ch_start, int dst_max) {
-    int src_pos = 0;
-    int dst_pos = sdst->filled * sdst->channels + dst_ch_start;
 
     int src_copy = dst_max;
     if (src_copy > ssrc->filled)
@@ -432,6 +450,9 @@ void sbuf_copy_layers(sbuf_t* sdst, sbuf_t* ssrc, int dst_ch_start, int dst_max)
         VGM_LOG_ONCE("SBUF: undefined layer function sfmt %i to %i\n", ssrc->fmt, sdst->fmt);
         return;
     }
+
+    int src_pos = 0;
+    int dst_pos = sdst->filled * sdst->channels + dst_ch_start;
 
     sbuf_layer_src_dst(ssrc->buf, sdst->buf, src_pos, dst_pos, src_copy, dst_max, ssrc->channels, sdst->channels);
 }
@@ -508,8 +529,10 @@ void sbuf_fadeout(sbuf_t* sbuf, int start, int to_do, int fade_pos, int fade_dur
 }
 
 void sbuf_interleave(sbuf_t* sbuf, float** ibuf) {
-    if (sbuf->fmt != SFMT_FLT)
+    if (sbuf->fmt != SFMT_FLT && sbuf->fmt != SFMT_F16) {
+        VGM_LOG("SBUF: interleave only supports float formats\n");
         return;
+    }
 
     // copy multidimensional buf (pcm[0]=[ch0,ch0,...], pcm[1]=[ch1,ch1,...])
     // to interleaved buf (buf[0]=ch0, sbuf[1]=ch1, sbuf[2]=ch0, sbuf[3]=ch1, ...)

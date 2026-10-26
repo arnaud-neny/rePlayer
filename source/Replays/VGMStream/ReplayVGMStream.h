@@ -23,6 +23,20 @@ namespace rePlayer
 
         static Replay* Load(io::Stream* stream, CommandBuffer metadata);
 
+        struct Settings : public Command<Settings, eReplay::VGMStream>
+        {
+            union
+            {
+                uint32_t value = 0;
+                struct
+                {
+                    uint32_t forceLoop : 1;
+                };
+            };
+
+            static void Edit(ReplayMetadataContext& context);
+        };
+
     private:
         static size_t StreamFileRead(StreamFile* sf, uint8_t* dst, offv_t offset, size_t length);
         static size_t StreamFileGetSize(StreamFile* sf);

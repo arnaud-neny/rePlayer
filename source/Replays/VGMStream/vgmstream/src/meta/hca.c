@@ -29,7 +29,7 @@ VGMSTREAM* init_vgmstream_hca_subkey(STREAMFILE* sf, uint16_t subkey) {
 
     /* checks */
     if ((read_u32be(0x00,sf) & 0x7F7F7F7F) != get_id32be("HCA\0")) /* masked in encrypted files */
-        goto fail;
+        return NULL;
 
     if (!check_extensions(sf, "hca"))
         return NULL;
@@ -78,9 +78,9 @@ VGMSTREAM* init_vgmstream_hca_subkey(STREAMFILE* sf, uint16_t subkey) {
     vgmstream->layout_type = layout_none;
     vgmstream->codec_data = hca_data;
 
-    /* Assumed mappings; seems correct vs Atom Viewer, that lists L/R/C/LFE/LS/RS and downmixes HCAs like that.
-     * USM HCA's seem to be L/R/SL/SR/C/LFE though (probably reordered at USM level, no detection done in Atom Viewer). */
-    if (vgmstream->channels <= 8) { // 8 is max but just in case
+    /* Assumed mappings; seems correct vs Atom Viewer, that lists L R FC LFE SL SR and downmixes HCAs like that.
+     * USM HCA's are L R SL SR FC LFE though (reordered at lib/USM level, no detection can be done here). */
+    if (vgmstream->channels <= 8 && !hca_info->ambisonics) {
         static const uint32_t hca_mappings[] = {
                 0,
                 mapping_MONO,

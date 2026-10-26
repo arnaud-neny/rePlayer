@@ -1667,6 +1667,23 @@ static const hcakey_info hcakey_list[] = {
     // Monsoni! (Android)
     {8148138013054819},         // 001CF2B037D95763
 
+    // Sakuna of Rice and Ruin ~Hinuka Pilgrimage Tale (Android)
+    {3464836862622683982},      // 301592C4E14DD34E
+
+    // Wizardry Variants Daphne (Android/PC)
+    {427327583497},             // 000000637EB57509
+
+    // Genso Suikoden STAR LEAP (Android)
+    {310004001},                // 00000000127A4921
+
+    // Final Fantasy Resonance Demo (PC)
+    {39734930526541068},        // 008D2AB57335950C
+
+    // Tales of Eternia Remastered (PC)
+    {31847960372542034},        // 0071258D1CD37A52
+
+    // Jujutsu Kaisen: Phantom Parade (PC)
+    {7825649332975864},        // 001BCD62F8A0F8F8
 };
 
 #endif

@@ -23,7 +23,7 @@ EXTENSION(med)          // OpenMPT & XMP & UADE: Octa-MED & VGMStream
 EXTENSION(mms)          // OpenMPT & UADE: MultiMedia_Sound
 EXTENSION(mt2)
 EXTENSION(mtm)          // OpenMPT & XMP
-EXTENSION(nst)
+EXTENSION(nst)			// OpenMPT & XMP & VGMStream
 EXTENSION(okt)          // OpenMPT & XMP & UADE: Oktalyzer
 EXTENSION(plm)
 EXTENSION(psm)          // OpenMPT & XMP & ZXTune: Pro Sound Maker
@@ -472,7 +472,7 @@ EXTENSION(awx)          // VGMStream: Dariusburst - Chronicle Saviors
 EXTENSION(binka)        // VGMStream: Bink Audio
 EXTENSION(bk2)          // VGMStream: RAD Game Tools Bink
 EXTENSION(blk)          // VGMStream: Ubisoft SBx
-EXTENSION(bmdx)         // VGMStream
+EXTENSION(at9psv)       // VGMStream
 EXTENSION(bms)          // VGMStream: Nintendo CWAV
 EXTENSION(bnk)          // VGMStream: Audiokinetic Wwise RIFF
 EXTENSION(bnm)          // VGMStream: Ubisoft SBx
@@ -533,7 +533,7 @@ EXTENSION(fag)          // VGMStream: Radical .FAG
 EXTENSION(baa)          // VGMStream: Nintendo JAudio
 EXTENSION(fda)          // VGMStream: Apple AIFF-C
 EXTENSION(amx)          // VGMStream
-EXTENSION(filp)         // VGMStream
+EXTENSION(fil)          // VGMStream
 EXTENSION(fish)         // VGMStream: Ogg Vorbis Encrypted
 EXTENSION(flx)          // VGMStream: Ultima IX .FLX
 EXTENSION(fsb)          // VGMStream: FMOD FSB
@@ -663,7 +663,7 @@ EXTENSION(mi4)          // VGMStream
 EXTENSION(mib)          // VGMStream: Headerless PS-ADPCM raw
 EXTENSION(mic)          // VGMStream: KOEI .MIC
 EXTENSION(msx)          // VGMStream
-EXTENSION(mjb)          // VGMStream
+EXTENSION(mjh)          // VGMStream
 EXTENSION(2dx)          // VGMStream
 EXTENSION(mogg)         // VGMStream
 EXTENSION(mov)          // VGMStream
@@ -689,7 +689,7 @@ EXTENSION(mups)         // VGMStream
 EXTENSION(musc)         // VGMStream: Krome MUSC
 EXTENSION(musx)         // VGMStream: Eurocom MUSX
 EXTENSION(mwv)          // VGMStream: RIFF Wave (Level 5)
-EXTENSION(mxst)         // VGMStream
+EXTENSION(msenc)        // VGMStream
 EXTENSION(myspd)        // VGMStream
 EXTENSION(n64)          // VGMStream
 EXTENSION(naac)         // VGMStream
@@ -899,7 +899,7 @@ EXTENSION(wv6)          // VGMStream
 EXTENSION(wve)          // VGMStream
 EXTENSION(wvs)          // VGMStream
 EXTENSION(wvx)          // VGMStream
-EXTENSION(wxd)          // VGMStream
+EXTENSION(wxh)          // VGMStream
 EXTENSION(x)            // VGMStream
 EXTENSION(x360audio)    // VGMStream
 EXTENSION(xa)           // VGMStream: Sony XA
@@ -1024,3 +1024,10 @@ EXTENSION(wmw)          // VGMStream
 EXTENSION(xmi)          // Adlib: Miles Design eXtended MIDI
 EXTENSION(wm)			// Adlib: MusicV WM
 EXTENSION(fmk)			// Adlib: FM-Kingtracker
+EXTENSION(11k)          // VGMStream
+EXTENSION(cwv)          // VGMStream
+EXTENSION(gen)          // VGMStream
+EXTENSION(ish)          // VGMStream
+EXTENSION(nxms)         // VGMStream
+EXTENSION(opusnsw)      // VGMStream
+EXTENSION(ste)          // VGMStream

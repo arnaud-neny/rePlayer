@@ -2,6 +2,7 @@
 #define _XWB_XSB_H_
 #include "meta.h"
 #include "../util/companion_files.h"
+#include "../util/string_utils.h"
 
 #define XSB_XACT1_0_MAX     5   // 0x05 // Unreal Championship (Xbox)
 #define XSB_XACT1_1_MAX     8   // 0x08 // The Sims 2 (Xbox)-v6, Die Hard: Vendetta (Xbox)-v8
@@ -11,7 +12,7 @@
 //#define XSB_XACT2_2_MAX   25  // 0x19 // XeDK 2.0.1332.0-v25
 #define XSB_XACT2_3_MAX     28  // 0x1C // XeDK 2.0.1434.0, Full Auto (X360, 2005-04-27)-v27, XeDK 2.0.1538.0-v28
 #define XSB_XACT2_4_MAX     34  // 0x22 // Amped 3-v31, Table Tennis-v34
-//#define XSB_XACT25_MAX    38  // 0x26 // Prey (v38) // v39 too?
+//#define XSB_XACT2_5_MAX   38  // 0x26 // Prey (v38) // v39 too?
 #define XSB_XACT2_6_MAX     41  // 0x29 // other PC/X360 games
 
 
@@ -63,24 +64,25 @@ static void xsb_check_stream(xsb_header* xsb, int stream_index, int wavebank_ind
     /* multiple names may correspond to a stream (ex. Blue Dragon), so we concat all */
     if (xsb->selected_stream == stream_index && (xsb->selected_wavebank == wavebank_index || wavebank_index == -1)) {
         char name[STREAM_NAME_SIZE];
-        size_t name_size;
 
-        name_size = read_string(name,sizeof(name), name_offset, sf); /* null-terminated */
+        size_t name_size = read_string(name,sizeof(name), name_offset, sf); // null-terminated
 
         if (xsb->name_len) {
             const char* cat = "; ";
             int cat_len = 2;
 
-            if (xsb->name_len + cat_len + name_size + 1 < STREAM_NAME_SIZE) {
-                strcat(xsb->name + xsb->name_len, cat);
-                strcat(xsb->name + xsb->name_len, name);
+            if (xsb->name_len + cat_len + name_size + 1 < sizeof(xsb->name)) {
+                strcat_v(xsb->name + xsb->name_len, sizeof(xsb->name) - xsb->name_len, cat);
+                strcat_v(xsb->name + xsb->name_len, sizeof(xsb->name) - xsb->name_len, name);
+                xsb->name_len += cat_len + name_size;
             }
         }
         else {
-            strcpy(xsb->name, name);
+            strcpy_v(xsb->name, sizeof(xsb->name), name);
+            xsb->name_len += name_size;
         }
-        xsb->name_len += name_size;
-        //xsb->parse_done = 1; /* uncomment this to stop reading after first name */
+
+        //xsb->parse_done = true; // uncomment this to stop reading after first name
         //;VGM_LOG("XSB: parse found stream=%i, wavebank=%i, name_offset=%lx\n", stream_index, wavebank_index, name_offset);
     }
 }
@@ -791,7 +793,7 @@ static bool parse_xsb(xsb_header* xsb, STREAMFILE* sf, char* xwb_wavebank_name) 
         xsb->index_size             = 0x14;
         xsb->entry_size             = 0x14;
     }
-    // TOD), although not much of a point since these XACT builds
+    // TODO, although not much of a point since these XACT builds
     // strictly force XWB stream names to be always enabled
     //else if (xsb->version <= XSB_XACT2_0_MAX) {}
     //else if (xsb->version <= XSB_XACT2_1_MAX) {}

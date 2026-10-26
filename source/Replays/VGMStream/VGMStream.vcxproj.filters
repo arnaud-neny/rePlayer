@@ -30,21 +30,6 @@
     <Filter Include="Source Files\vgmstream\src\util">
       <UniqueIdentifier>{0f9f25bf-9c40-4392-939e-ea046fbf80eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\libg719_decode">
-      <UniqueIdentifier>{0a930671-4427-4b9e-b497-c6e11ab51237}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\libg719_decode\reference_code">
-      <UniqueIdentifier>{c25b8f2c-00f0-4a2a-9d18-18c08f18ac24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\libg719_decode\reference_code\common">
-      <UniqueIdentifier>{2e278cd3-8001-4c57-a0da-57e33a892293}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\libg719_decode\reference_code\decoder">
-      <UniqueIdentifier>{50b974d6-f9d3-4a38-b8c7-7226b8f643fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\libg719_decode\reference_code\include">
-      <UniqueIdentifier>{609f4650-afb9-4ed9-bc73-d9d3089c06a0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\celt-0.6.1">
       <UniqueIdentifier>{c50f407c-21df-4935-94d2-63b39f06fc78}</UniqueIdentifier>
     </Filter>
@@ -129,9 +114,6 @@
       <Filter>Source Files\vgmstream\src\base</Filter>
     </ClInclude>
     <ClInclude Include="vgmstream\src\coding\coding.h">
-      <Filter>Source Files\vgmstream\src\coding</Filter>
-    </ClInclude>
-    <ClInclude Include="vgmstream\src\coding\g72x_state.h">
       <Filter>Source Files\vgmstream\src\coding</Filter>
     </ClInclude>
     <ClInclude Include="vgmstream\src\coding\mpeg_decoder.h">
@@ -370,24 +352,6 @@
     </ClInclude>
     <ClInclude Include="vgmstream\src\util\text_reader.h">
       <Filter>Source Files\vgmstream\src\util</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\g719.h">
-      <Filter>Source Files\libg719_decode</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\reference_code\include\cnst.h">
-      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\reference_code\include\complxop.h">
-      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\reference_code\include\proto.h">
-      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\reference_code\include\rom.h">
-      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
-    </ClInclude>
-    <ClInclude Include="libg719_decode\reference_code\include\state.h">
-      <Filter>Source Files\libg719_decode\reference_code\include</Filter>
     </ClInclude>
     <ClInclude Include="celt-0.6.1\libcelt\_kiss_fft_guts.h">
       <Filter>Source Files\celt-0.6.1</Filter>
@@ -1787,6 +1751,51 @@
     <ClInclude Include="vgmstream\src\meta\hvqm4_streamfile.h">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClInclude>
+    <ClInclude Include="vgmstream\src\base\rc.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\base\seek.h">
+      <Filter>Source Files\vgmstream\src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\atrac9_dec.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\atrac9_internal.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\atrac9_internal_data.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\clhca_data.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\g72x_vgmstream.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\g719_dec.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\g719_internal.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\maac.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\maac_extras.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\coding\libs\maac_vgmstream.h">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\meta\vig_kces_streamfile.h">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\hashes.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="vgmstream\src\util\string_utils.h">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReplayVGMStream.cpp">
@@ -2077,9 +2086,6 @@
     <ClCompile Include="vgmstream\src\layout\blocked_mul.c">
       <Filter>Source Files\vgmstream\src\layout</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\layout\blocked_mxch.c">
-      <Filter>Source Files\vgmstream\src\layout</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\layout\blocked_ps2_iab.c">
       <Filter>Source Files\vgmstream\src\layout</Filter>
     </ClCompile>
@@ -2188,9 +2194,6 @@
     <ClCompile Include="vgmstream\src\meta\adpcm_capcom.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ads.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ads_midway.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2227,13 +2230,7 @@
     <ClCompile Include="vgmstream\src\meta\alp.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ao.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\apc.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\apple_caff.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\asf.c">
@@ -2393,9 +2390,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ea_wve_au00.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ego_dic.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\encrypted.c">
@@ -2593,9 +2587,6 @@
     <ClCompile Include="vgmstream\src\meta\msf.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\msf_banpresto.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\msf_konami.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2639,9 +2630,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\naomi_adpcm.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\nds_hwas.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\nds_rrds.c">
@@ -2710,9 +2698,6 @@
     <ClCompile Include="vgmstream\src\meta\pasx.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\pc_mxst.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
     <ClCompile Include="vgmstream\src\meta\pcm_success.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
@@ -2732,15 +2717,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\ps2_adm.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_bmdx.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_joe.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\ps2_vbk.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\psb.c">
@@ -2876,9 +2852,6 @@
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\smv.c">
-      <Filter>Source Files\vgmstream\src\meta</Filter>
-    </ClCompile>
-    <ClCompile Include="vgmstream\src\meta\snds.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\sndx.c">
@@ -3207,81 +3180,6 @@
     </ClCompile>
     <ClCompile Include="vgmstream\src\util\text_reader.c">
       <Filter>Source Files\vgmstream\src\util</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\g719.c">
-      <Filter>Source Files\libg719_decode</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\bitalloc.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\bitstream.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\codesearch.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\common_rom.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\complxop.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\dct.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\idx2code.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\interleave_spectrum.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\recovernorm.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\reordvct.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\common\weight.c">
-      <Filter>Source Files\libg719_decode\reference_code\common</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\decode_frame.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_init.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\decoder_rom.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnf.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\dprocnobitsbfm.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\dqcoefs.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\fill_spectrum.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\flvqdec.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\hdeclvq.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\hdecnrm.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\trans_inv.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\unpackc.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
-    </ClCompile>
-    <ClCompile Include="libg719_decode\reference_code\decoder\window_ola.c">
-      <Filter>Source Files\libg719_decode\reference_code\decoder</Filter>
     </ClCompile>
     <ClCompile Include="celt-0.6.1\libcelt\bands.c">
       <Filter>Source Files\celt-0.6.1</Filter>
@@ -4881,6 +4779,96 @@
     </ClCompile>
     <ClCompile Include="vgmstream\src\meta\wmw.c">
       <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\atrac9_dec.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\atrac9_internal.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\g72x_vgmstream.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\g719_dec.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\g719_tables.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\g719_transform.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\libs\g719_unpack.c">
+      <Filter>Source Files\vgmstream\src\coding\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\aac_raw_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\cwv_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\coding\ka_decoder.c">
+      <Filter>Source Files\vgmstream\src\coding</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\layout\blocked_cf_df.c">
+      <Filter>Source Files\vgmstream\src\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\2msf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\alphaogg.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\caff.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cf_df_d5.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\cwv.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\dic1.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\hwas.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\joe.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ka.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\nxms.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\pxnd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\saud.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\ssdd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\sshd.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\vbk.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\wmsf.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\meta\xma_ue5.c">
+      <Filter>Source Files\vgmstream\src\meta</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\hashes.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="vgmstream\src\util\string_utils.c">
+      <Filter>Source Files\vgmstream\src\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

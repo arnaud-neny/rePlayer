@@ -297,7 +297,7 @@ static STREAMFILE* open_stdio_streamfile_buffer_by_file(FILE* infile, const char
 
     /* Typically fseek(o)/ftell(o) may only handle up to ~2.14GB, signed 32b = 0x7FFFFFFF (rarely
      * happens in giant banks like FSB/KTSR). Should work if configured properly using ftell_v, log otherwise. */
-    if (this_sf->file_size == 0xFFFFFFFF) { /* -1 on error */
+    if (this_sf->file_size == SIZE_MAX) { /* -1 on error */
         vgm_logi("STREAMFILE: file size too big (report)\n");
         goto fail; /* can be ignored but may result in strange/unexpected behaviors */
     }
@@ -338,6 +338,7 @@ static bool is_ascii(const char* str) {
     return true;
 }
 
+#define WIN_MODE_LIMIT (3+1)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -350,11 +351,11 @@ static FILE* fopen_win(const char* path, const char* mode) {
 
     int done;
     wchar_t wpath[PATH_LIMIT];
-    done = MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, sizeof(wpath));
+    done = MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, PATH_LIMIT);
     if (done <= 0) return NULL;
 
-    wchar_t wmode[3+1];
-    done = MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, sizeof(mode));
+    wchar_t wmode[WIN_MODE_LIMIT];
+    done = MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, WIN_MODE_LIMIT);
     if (done <= 0) return NULL;
 
     return _wfopen(wpath, wmode);
@@ -390,6 +391,20 @@ STREAMFILE* open_stdio_streamfile_by_file(FILE* file, const char* filename) {
 
 
 /* ************************************************************************* */
+
+#ifdef VGM_DEBUG_OUTPUT
+    #define VGM_LOGB(buf, buf_size, bytes_per_line) \
+        do { \
+            int i; \
+            for (i=0; i < buf_size; i++) { \
+                printf("%02x",buf[i] & 0xFF); \
+                if (bytes_per_line && (i+1) % bytes_per_line == 0) printf("\n"); \
+            } \
+            printf("\n"); \
+        } while (0)
+#else
+    #define VGM_LOGB(buf, buf_size, bytes_per_line) /* nothing */
+#endif
 
 void dump_streamfile(STREAMFILE* sf, int num) {
 #ifdef VGM_DEBUG_OUTPUT

@@ -24,7 +24,8 @@
 #include "streamfile.h"
 #include "vgmstream_types.h"
 
-#include "coding/g72x_state.h"
+//TODO: remove struct, but needs saving state during loop (memcpy'd)
+#include "coding/libs/g72x_vgmstream.h"
 
 
 typedef struct {
@@ -148,6 +149,16 @@ typedef struct {
 } VGMSTREAMCHANNEL;
 
 
+// TODO: improve
+typedef struct {
+    void* tmpbuf;                   /* garbage buffer used for seeking/trimming */
+    int tmpbuf_size;             /* for all channels (samples = tmpbuf_size / channels / sample_size) */
+
+    void* decbuf;
+    int decbuf_size;
+} vgmstream_state_t;
+
+
 /* main vgmstream info */
 typedef struct {
     /* basic config */
@@ -164,7 +175,10 @@ typedef struct {
     int32_t loop_end_sample;        /* last sample of the loop (not included in the loop) */
 
     /* layouts/block config */
-    size_t interleave_block_size;   /* interleave, or block/frame size (depending on the codec) */
+    union {                         /* interleave, or rarely block/frame size (depending on the codec) */
+        size_t interleave_block_size;
+        size_t interleave; // alias
+    };
     size_t interleave_first_block_size; /* different interleave for first block */
     size_t interleave_first_skip;   /* data skipped before interleave first (needed to skip other channels) */
     size_t interleave_last_block_size; /* smaller interleave for last block */
@@ -186,7 +200,8 @@ typedef struct {
 
     /* decoder config/state */
     int codec_endian;               /* little/big endian marker; name is left vague but usually means big endian */
-    int codec_config;               /* flags for codecs or layouts with minor variations; meaning is up to them (may change during decode) */
+    uint32_t codec_config;          /* flags for codecs or layouts with minor variations; meaning is up to them (may change during decode) */
+    uint32_t layout_config;         /* same as above */
     bool codec_internal_updates;    /* temp(?) kludge (see vgmstream_open_stream/decode) */
     int32_t ws_output_size;         /* WS ADPCM: output bytes for this block */
 
@@ -236,11 +251,9 @@ typedef struct {
     int loop_count;                 /* counter of complete loops (1=looped once) */
     int loop_target;                /* max loops before continuing with the stream end (loops forever if not set) */
 
-    void* tmpbuf;                   /* garbage buffer used for seeking/trimming */
-    size_t tmpbuf_size;             /* for all channels (samples = tmpbuf_size / channels / sample_size) */
-
     void* decode_state;             /* for some decoders (TO-DO: to be moved around) */
     void* seek_table;               /* for some decoders (TO-DO: to be moved around) */
+    void* state;                    /* state not copied/restored during loop or reset (TO-DO: to be moved around) */
 } VGMSTREAM;
 
 
@@ -248,8 +261,10 @@ typedef struct {
 /* vgmstream internal API                                                   */
 /* -------------------------------------------------------------------------*/
 
+#if 0
 /* do format detection, return pointer to a usable VGMSTREAM, or NULL on failure */
 VGMSTREAM* init_vgmstream(const char* const filename);
+#endif
 
 /* init with custom IO via streamfile */
 VGMSTREAM* init_vgmstream_from_STREAMFILE(STREAMFILE* sf);
@@ -259,18 +274,6 @@ void reset_vgmstream(VGMSTREAM* vgmstream);
 
 /* close an open vgmstream */
 void close_vgmstream(VGMSTREAM* vgmstream);
-
-// If you are using vgmstream as a library and wonder what happened to render_vgmstream(), you can use
-// render_vgmstream2() for the time being, it's 100% the same (it was renamed to bring this into attention,
-// typedef as needed). However, please migrate to the public API (see libvgmstream.h) instead, it's
-// fairly straightforward (see "Use external API" and related commits for various plugins).
-// In next versions the "API" in this .h will be removed without warning as it wasn't really intended to be
-// used by external projects. I hate breaking things but it's becoming very hard to improve anything otherwise, sorry.
-/* Decode data into sample buffer. Returns < sample_count on stream end */
-int render_vgmstream2(sample_t* buffer, int32_t sample_count, VGMSTREAM* vgmstream);
-
-/* Seek to sample position (next render starts from that point). Use only after config is set (vgmstream_apply_config) */
-void seek_vgmstream(VGMSTREAM* vgmstream, int32_t seek_sample);
 
 /* -------------------------------------------------------------------------*/
 /* vgmstream internal helpers                                               */

@@ -6,6 +6,7 @@
 
 #include <Core/String.h>
 #include <Core/Window.inl.h>
+#include <Imgui.h>
 #include <ReplayDll.h>
 
 extern "C" {
@@ -16,6 +17,7 @@ extern "C" {
 #include "vgmstream/src/base/play_state.h"
 #include "vgmstream/src/base/plugins.h"
 #include "vgmstream/src/base/render.h"
+#include "vgmstream/src/base/seek.h"
 }
 
 namespace rePlayer
@@ -35,7 +37,8 @@ namespace rePlayer
             "Portions Public Domain originating with Sun Microsystems",
         .init = ReplayVGMStream::Init,
         .release = ReplayVGMStream::Release,
-        .load = ReplayVGMStream::Load
+        .load = ReplayVGMStream::Load,
+        .editMetadata = ReplayVGMStream::Settings::Edit
     };
 
     bool ReplayVGMStream::Init(SharedContexts* ctx, Window& window)
@@ -262,6 +265,20 @@ namespace rePlayer
         delete sf;
     }
 
+    void ReplayVGMStream::Settings::Edit(ReplayMetadataContext& context)
+    {
+        Settings dummy;
+        auto* entry = context.metadata.Find<Settings>(&dummy);
+
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        int index = entry->forceLoop;
+        static const char* loopModes[] = { "Default Loop", "Force loop" };
+        ImGui::Combo("##ForceLoop", &index, loopModes, NumItemsOf(loopModes));
+        entry->forceLoop = uint32_t(index);
+
+        context.metadata.Update(entry, entry->value == 0);
+    }
+
     ReplayVGMStream::~ReplayVGMStream()
     {
         close_vgmstream(m_vgmstream);
@@ -274,15 +291,6 @@ namespace rePlayer
         , m_vgmstream(vgmstream)
         , m_loopCount(vgmstream->loop_count)
     {
-        vgmstream_cfg_t vcfg = {};
-        vcfg.allow_play_forever = 1;
-        vcfg.play_forever = 1;
-        vcfg.loop_count = 1;
-        vcfg.fade_time = 0;
-        vcfg.fade_delay = 0;
-        vcfg.ignore_loop = 0;
-        vgmstream_apply_config(vgmstream, &vcfg);
-
         vgmstream_mixing_autodownmix(vgmstream, 2);
         vgmstream_mixing_enable(vgmstream, 32768, nullptr, nullptr);
         mixing_macro_output_sample_format(vgmstream, SFMT_FLT);
@@ -301,10 +309,6 @@ namespace rePlayer
             return 0;
         }
 
-        // pfff.... TODO: check next update when play_adjust_totals is properly fixed
-        if (m_vgmstream->pstate.play_position == m_vgmstream->pstate.play_duration)
-            return 0;
-
         bool isMono = m_vgmstream->channels == 1;
         auto* buf = reinterpret_cast<sample_t*>(output);
         if (isMono)
@@ -314,11 +318,12 @@ namespace rePlayer
         sfmt_t sfmt = mixing_get_input_sample_type(m_vgmstream);
         sbuf_init(&sbuf, sfmt, buf, int(numSamples), m_vgmstream->channels);
 
-        auto numRendered = render_main(&sbuf, m_vgmstream);
+        if (auto rc = render_main(&sbuf, m_vgmstream); rc < 0)
+            return 0;
         if (isMono)
-            output->ConvertMono(reinterpret_cast<float*>(buf), numRendered);
+            output->ConvertMono(reinterpret_cast<float*>(buf), sbuf.filled);
 
-        return numRendered;
+        return sbuf.filled;
     }
 
     uint32_t ReplayVGMStream::Seek(uint32_t timeInMs)
@@ -340,8 +345,19 @@ namespace rePlayer
         }
     }
 
-    void ReplayVGMStream::ApplySettings(const CommandBuffer /*metadata*/)
-    {}
+    void ReplayVGMStream::ApplySettings(const CommandBuffer metadata)
+    {
+        auto settings = metadata.Find<Settings>();
+        vgmstream_cfg_t vcfg = {};
+        vcfg.allow_play_forever = 1;
+        vcfg.play_forever = 1;
+        vcfg.loop_count = 1;
+        vcfg.fade_time = 0;
+        vcfg.fade_delay = 0;
+        vcfg.ignore_loop = 0;
+        vcfg.force_loop = settings ? settings->forceLoop : 0;
+        vgmstream_apply_config(m_vgmstream, &vcfg);
+    }
 
     void ReplayVGMStream::SetSubsong(uint32_t subsongIndex)
     {
