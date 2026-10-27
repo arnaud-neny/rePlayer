@@ -461,6 +461,8 @@ namespace rePlayer
             {
                 m_imports = {};
                 m_importArtists.isOpened = isImportArtistsOpened = true;
+                m_importArtists.BuildStates(m_db);
+
                 Core::Lock();
                 ImGui::CloseCurrentPopup();
             }
@@ -651,28 +653,7 @@ namespace rePlayer
 
                         m_importArtists.lastSelected = -1;
 
-                        for (uint32_t i = 0, e = m_importArtists.artists.NumItems(); i < e; i++)
-                        {
-                            auto& importArtist = m_importArtists.artists[i];
-                            auto& state = m_importArtists.states[i];
-                            state.isSelected = false;
-                            state.isImported = false;
-                            state.id = ArtistID::Invalid;
-
-                            for (auto* dbArtist : m_db.Artists())
-                            {
-                                for (auto& source : dbArtist->Sources())
-                                {
-                                    if (importArtist.id == source.id)
-                                    {
-                                        state.id = dbArtist->GetId();
-                                        break;
-                                    }
-                                }
-                                if (state.id != ArtistID::Invalid)
-                                    break;
-                            }
-                        }
+                        m_importArtists.BuildStates(m_db);
                         m_busySpinner.Reset();
                     });
                 });
@@ -1488,6 +1469,32 @@ namespace rePlayer
             Log::Error("Artist %d (%s) validation failed!", uint32_t(artist->GetId()), artist->GetHandle(0));
             ((Artist*)artist)->Edit()->numSongs = uint16_t(numSongs);
             assert(0);
+        }
+    }
+
+    void Library::ImportArtistsData::BuildStates(LibraryDatabase& db)
+    {
+        for (uint32_t i = 0, e = artists.NumItems(); i < e; i++)
+        {
+            auto& importArtist = artists[i];
+            auto& state = states[i];
+            state.isSelected = false;
+            state.isImported = false;
+            state.id = ArtistID::Invalid;
+
+            for (auto* dbArtist : db.Artists())
+            {
+                for (auto& source : dbArtist->Sources())
+                {
+                    if (importArtist.id == source.id)
+                    {
+                        state.id = dbArtist->GetId();
+                        break;
+                    }
+                }
+                if (state.id != ArtistID::Invalid)
+                    break;
+            }
         }
     }
 }

@@ -109,6 +109,8 @@ namespace rePlayer
             int lastSelected = -1;
             bool isOpened = false;
             bool isExternal = false;
+
+            void BuildStates(LibraryDatabase& db);
         } m_importArtists;
 
         struct
