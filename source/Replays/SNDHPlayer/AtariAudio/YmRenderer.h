@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -18,7 +18,7 @@ public:
 	static YmRenderer* Create(const void* sndhMemoryData, uint32_t sndhMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock);
 	const SongInfo&	GetSongInfo() const;
 	uint32_t GetSubsongDurationSample(int subsongId) const;
-	bool InitSubSong(int subSongId);
+	bool InitSubSong(int subSongId, bool predictibleYm2149State = false);
 	void AudioRender(int16_t* buffer, uint32_t sampleCount);
 	void AudioRenderStereo(int16_t* buffer, uint32_t sampleCount, uint32_t* pVisualSamples);
 	void AudioRenderWithVisualInfos(int16_t* buffer, uint32_t sampleCount, uint32_t* pVisualSamples);

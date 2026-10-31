@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -229,17 +229,8 @@ void	SteDac::MicrowireProceed()
 			const int cmd = ((value >> 6) & 7);
 			switch (cmd)
 			{
-				case 1:	// set Bass
-					break;
-				case 0:	// set Treble
-					break;
-				case 4:	// right volume
-					break;
-				case 5:	// left volume
-					break;
 				case 3:	m_masterVolume = (data > 40) ? 64 : (data*64)/40;	break;
 			default:
-				assert(false);
 				break;
 			}
 		}

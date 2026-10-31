@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -56,7 +56,7 @@ public:
 
 	// Initialize the music driver for a specific subsong (starts at 1 by convention, not 0).
 	// Must be called before any AudioRender call, even for single subsong files (.ym).
-	virtual bool	InitSubSong(int subSongId) = 0;
+	virtual bool	InitSubSong(int subSongId, bool predictibleYm2149State = false) = 0;
 
 	// Main audio rendering function.
 	// Renders the next "count" samples into "buffer" (mono, signed 16-bit samples).

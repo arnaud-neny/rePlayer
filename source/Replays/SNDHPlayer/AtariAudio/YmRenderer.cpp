@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -291,7 +291,7 @@ uint32_t YmRenderer::GetSubsongDurationSample(int subsongId) const
 	return m_songDurationSample;
 }
 
-bool YmRenderer::InitSubSong(int subSongId)
+bool YmRenderer::InitSubSong(int subSongId, bool predictibleYm2149State)
 {
 	bool ret = false;
 	if ((subSongId >= 1) && (subSongId <= m_songInfo.subsongCount))
@@ -299,7 +299,7 @@ bool YmRenderer::InitSubSong(int subSongId)
 		m_innerSamplePos = 0;
 		m_tick = 0;
 
-		m_ym2149.Reset(m_songInfo.hostReplayRate, m_songInfo.ym2149Clock);
+		m_ym2149.Reset(m_songInfo.hostReplayRate, m_songInfo.ym2149Clock, predictibleYm2149State);
 		m_mfp.Reset(m_songInfo.hostReplayRate);
 		MuteVoices(0);		// nothing is muted by default
 

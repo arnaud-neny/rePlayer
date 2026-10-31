@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -372,14 +372,14 @@ int	AtariMachine::TrapInstructionCallback(int v)
 	return ret;
 }
 
-void	AtariMachine::Startup(uint32_t hostReplayRate)
+void	AtariMachine::Startup(uint32_t hostReplayRate, bool predictibleYm2149State)
 {
 	if ( nullptr == m_RAM )
 		m_RAM = (uint8_t*)malloc(RAM_SIZE);
 
 	memset(m_RAM, 0, RAM_SIZE);
 
-	m_ym2149.Reset(hostReplayRate, 2000000);
+	m_ym2149.Reset(hostReplayRate, 2000000, predictibleYm2149State);
 	m_mfp.Reset(hostReplayRate);
 	m_steDac.Reset(hostReplayRate);
 	m_blitter.Reset();

@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -27,7 +27,7 @@ public:
 		kReset = (1 << 1),
 	};
 
-	void		Startup(uint32_t hostReplayRate);
+	void		Startup(uint32_t hostReplayRate, bool predictibleYm2149State = false);
 	bool		Upload(const void* src, uint32_t addr, uint32_t size);
 	bool 		PlayerTick(uint32_t musicDriverCallAddr);
 	bool		Jsr(uint32_t addr, uint32_t d0);

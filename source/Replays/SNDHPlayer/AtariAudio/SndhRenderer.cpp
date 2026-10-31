@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -203,13 +203,13 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 	return ret;
 }
 
-bool	SndhRenderer::InitSubSong(int subSongId)
+bool	SndhRenderer::InitSubSong(int subSongId, bool predictibleYm2149State = false)
 {
 	bool ret = false;
 	if ((subSongId >= 1) && (subSongId <= m_songInfo.subsongCount))
 	{
 		m_innerSamplePos = 0;
-		m_atariMachine.Startup(m_songInfo.hostReplayRate);
+		m_atariMachine.Startup(m_songInfo.hostReplayRate, predictibleYm2149State);
 		if (m_atariMachine.Upload(m_songInfo.rawBinaryData, SNDH_UPLOAD_ADDR, m_songInfo.rawBinaryDataSize))
 		{
 			ret = m_atariMachine.Jsr(SNDH_UPLOAD_ADDR, subSongId);

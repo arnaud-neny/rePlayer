@@ -17,16 +17,15 @@ namespace rePlayer
         .init = ReplaySNDHPlayer::Init,
         .load = ReplaySNDHPlayer::Load,
         .displaySettings = ReplaySNDHPlayer::DisplaySettings,
-        .editMetadata = ReplaySNDHPlayer::Settings::Edit,
-        .globals = &ReplaySNDHPlayer::ms_surround
+        .editMetadata = ReplaySNDHPlayer::Settings::Edit
     };
 
     bool ReplaySNDHPlayer::Init(SharedContexts* ctx, Window& window)
     {
         ctx->Init();
 
-        if (&window != nullptr)
-            window.RegisterSerializedData(ms_surround, "ReplaySNDHPlayerSurround");
+        window.RegisterSerializedData(ms_surround, "ReplaySNDHPlayerSurround");
+        window.RegisterSerializedData(ms_predictable, "ReplaySNDHPlayerPredictable");
 
         return false;
     }
@@ -46,8 +45,10 @@ namespace rePlayer
     bool ReplaySNDHPlayer::DisplaySettings()
     {
         bool changed = false;
-        const char* const surround[] = { "Default", "Surround" };
+        const char* const surround[] = { "Mono", "Surround" };
         changed |= ImGui::Combo("Output", &ms_surround, surround, NumItemsOf(surround));
+        const char* const predictable[] = { "Off", "On" };
+        changed |= ImGui::Combo("Predictable", &ms_predictable, predictable, NumItemsOf(predictable));
         return changed;
     }
 
@@ -68,12 +69,15 @@ namespace rePlayer
 
         ComboOverride("Output", GETSET(entry, overrideSurround), GETSET(entry, surround),
             ms_surround, "Output: Default", "Output: Surround");
+        ComboOverride("Predictable", GETSET(entry, overridePredictable), GETSET(entry, predictable),
+            ms_predictable, "Predictable: Off", "Predictable: On");
         bool isZero = Loops(context, entry->loops, context.lastSubsongIndex + 1, kDefaultSongDuration);
 
         context.metadata.Update(entry, entry->value == 0 && isZero);
     }
 
     int32_t ReplaySNDHPlayer::ms_surround = 1;
+    int32_t ReplaySNDHPlayer::ms_predictable = 0;
 
     ReplaySNDHPlayer::~ReplaySNDHPlayer()
     {
@@ -140,7 +144,7 @@ namespace rePlayer
             seekPosition = currentDuration;
         if (seekPosition < currentPosition)
         {
-            m_atariAudio->InitSubSong(m_subsongIndex + 1);
+            m_atariAudio->InitSubSong(m_subsongIndex + 1, m_isPredictable);
             currentPosition = 0;
         }
         m_atariAudio->AudioRender(nullptr, uint32_t(seekPosition - currentPosition));
@@ -152,7 +156,7 @@ namespace rePlayer
 
     void ReplaySNDHPlayer::ResetPlayback()
     {
-        m_atariAudio->InitSubSong(m_subsongIndex + 1);
+        m_atariAudio->InitSubSong(m_subsongIndex + 1, m_isPredictable);
         m_activeChannels = 0;
         m_currentPosition = 0;
         m_currentDuration = (uint64_t(GetDurationMs()) * kSampleRate) / 1000;
@@ -162,7 +166,8 @@ namespace rePlayer
     void ReplaySNDHPlayer::ApplySettings(const CommandBuffer metadata)
     {
         auto* settings = metadata.Find<Settings>();
-        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : *static_cast<int32_t*>(g_replayPlugin.globals));
+        m_surround.Enable((settings && settings->overrideSurround) ? settings->surround : ms_surround);
+        m_isPredictable = (settings && settings->overridePredictable) ? settings->predictable : m_isPredictable;
 
         if (settings && settings->NumSubsongs() == GetNumSubsongs())
         {

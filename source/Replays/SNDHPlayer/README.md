@@ -1,4 +1,4 @@
-# AtariAudio 1.26
+# AtariAudio 1.27
 
 src/ contains all files needed to compile AtariAudio. It allows you to play ATARI .sndh and .ym music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
 The library doesn't use any dependency, and should compile on any platform, including embedded systems (it doesn't even use float).
@@ -38,6 +38,7 @@ Destroy AtariAudioRenderer object and free any internal allocated memory
 
 # Version history
 
+- 1.27 : added optional bool predictibleYm2149State as InitSubsong argument (for predictible automated testing) (false by default)
 - 1.26 : STE blitter support for some music drivers (ie BlitZwav demo by Cybernetics)
 - 1.25 : optional ym2149 clock parameter for missing information in some music files ; added dc adjust for YMT and DigiMix (some YMT files aren't properly centered)
 - 1.24 : added xbios(32) support for some .sndh files, fixed voice muting for digimix and ymtracker files

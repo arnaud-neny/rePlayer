@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.26
+//	AtariAudio 1.27
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -18,15 +18,35 @@ uint16_t stdLibRand()
 	return uint16_t((sRndSeed >> 16) & 0x7fff);
 }
 
-void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock)
+void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock, bool predictibleYm2149State)
 {
+
+	if (predictibleYm2149State)
+	{
+		for (int v = 0; v < 3; v++)
+		{
+			m_toneCounter[v] = 0;
+			m_tonePeriod[v] = 0;
+			m_edgeNeedReset[v] = false;
+		}
+		m_toneEdges = 0;
+		m_envCounter = 0;
+		m_noiseCounter = 0;
+		m_envPeriod = 0;
+		m_noisePeriod = 0;
+		m_currentNoiseMask = ~0;
+	}
+	else
+		m_toneEdges = (stdLibRand()&((1<<10)|(1<<5)|(1<<0)))*0x1f;		// YM internal edge state are un-predictable
+
 	for (int v = 0; v < 3; v++)
 	{
 		m_toneCounter[v] = 0;
 		m_tonePeriod[v] = 0;
+		m_edgeNeedReset[v] = false;
 	}
+	m_insideTimerIrq = false;
 	MuteVoices(0);	// do not mute anything
-	m_toneEdges = (stdLibRand()&((1<<10)|(1<<5)|(1<<0)))*0x1f;		// YM internal edge state are un-predictable
 	m_insideTimerIrq = false;
 	m_hostReplayRate = hostReplayRate;
 	// operate at original YM freq divided by 8 (so 250Khz, as nothing runs faster in the chip)

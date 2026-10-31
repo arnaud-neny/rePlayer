@@ -25,6 +25,8 @@ namespace rePlayer
                 {
                     uint32_t overrideSurround : 1;
                     uint32_t surround : 1;
+                    uint32_t overridePredictable : 1;
+                    uint32_t predictable : 1;
                 };
             };
             LoopInfo loops[0];
@@ -79,9 +81,11 @@ namespace rePlayer
         Surround m_surround;
 
         uint32_t m_activeChannels = 0;
+        bool m_isPredictable = false;
 
     public:
         static int32_t ms_surround;
+        static int32_t ms_predictable;
     };
 }
 // namespace rePlayer
