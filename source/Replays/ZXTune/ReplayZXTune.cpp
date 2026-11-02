@@ -132,13 +132,25 @@ namespace rePlayer
                     subsong->type.ext = eExtension::_pcd;
                 else
                 {
-                    if (firstInChain == "RAW" && chain->Elements().size() > 1)
+                    if (firstInChain == "RAW")
                     {
-                        firstInChain = chain->Elements()[1];
-                        if (firstInChain == "HRUST1")
-                            firstInChain = "bin";
+                        if (chain->Elements().size() > 1)
+                        {
+                            firstInChain = chain->Elements()[1];
+                            if (firstInChain == "HRUST1")
+                                firstInChain = "bin";
+                            subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
+                        }
+                        else
+						{
+							firstInChain = decoder.Id();
+                            subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
+                            if (subsong->type.ext == eExtension::Unknown)
+                                subsong->type.ext = eExtension::_raw;
+                        }
                     }
-                    subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
+                    else
+                        subsong->type = { firstInChain.c_str(), eReplay::ZXTune };
                 }
                 subsong->data = location.GetData();
                 subsong->holder = std::move(holder);
