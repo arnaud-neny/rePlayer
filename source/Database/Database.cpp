@@ -10,6 +10,7 @@
 #include "Database.h"
 
 // stl
+#include <algorithm>
 #include <atomic>
 
 namespace rePlayer
@@ -38,6 +39,7 @@ namespace rePlayer
         assert(m_items[uint32_t(id)].IsValid());
         m_items[uint32_t(id)].Reset();
         m_availableIds.Add(id);
+        SortAvailableIds();
         m_numItems--;
     }
 
@@ -88,6 +90,7 @@ namespace rePlayer
             }
             m_items.Add(item);
         }
+        SortAvailableIds();
         if (version < ItemType::kVersion)
         {
             for (uint32_t i = 0, n = m_items.NumItems(); i < n; i++)
@@ -119,6 +122,15 @@ namespace rePlayer
         m_items.Add(nullptr);
         m_availableIds.Reset();
         m_numItems = 0;
+    }
+
+    template <typename ItemType, typename ItemID>
+    void Database::Set<ItemType, ItemID>::SortAvailableIds()
+    {
+        std::sort(m_availableIds.begin(), m_availableIds.end(), [](auto l, auto r)
+        {
+            return l > r;
+        });
     }
 
     bool Database::Flag::IsEnabled(Flag flags) const

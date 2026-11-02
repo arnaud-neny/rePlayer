@@ -139,6 +139,7 @@ namespace rePlayer
             void Save(io::File& file);
 
             void Reset();
+            void SortAvailableIds();
 
             Array<SmartPtr<ItemType>> m_items;
             Array<ItemID> m_availableIds;
