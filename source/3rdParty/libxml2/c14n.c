@@ -313,6 +313,8 @@ xmlC14NVisibleNsStackAdd(xmlC14NVisibleNsStackPtr cur, xmlNsPtr ns, xmlNodePtr n
         newSize = xmlGrowCapacity(cur->nsMax,
                                   sizeof(tmp1[0]) + sizeof(tmp2[0]),
                                   XML_NAMESPACES_DEFAULT, XML_MAX_ITEMS);
+        if (newSize < 0)
+            return (-1);
 
 	tmp1 = xmlRealloc(cur->nsTab, newSize * sizeof(tmp1[0]));
 	if (tmp1 == NULL)
@@ -598,7 +600,7 @@ xmlC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
     }
 
     /* check all namespaces */
-    for(n = cur; n != NULL; n = n->parent) {
+    for(n = cur; n != NULL && n->type == XML_ELEMENT_NODE; n = n->parent) {
 	for(ns = n->nsDef; ns != NULL; ns = ns->next) {
 	    tmp = xmlSearchNs(cur->doc, cur, ns->prefix);
 
@@ -1022,16 +1024,13 @@ xmlC14NFixupBaseAttr(xmlC14NCtxPtr ctx, xmlAttrPtr xml_base_attr)
             to ensure that we are forced to go "up" all the time */
             tmp_str_len = xmlStrlen(tmp_str);
             if(tmp_str_len > 1 && tmp_str[tmp_str_len - 2] == '.') {
-                tmp_str2 = xmlStrcat(tmp_str, BAD_CAST "/");
-                if(tmp_str2 == NULL) {
-                    xmlFree(tmp_str);
+                tmp_str = xmlStrcat(tmp_str, BAD_CAST "/");
+                if(tmp_str == NULL) {
                     xmlFree(res);
 
                     xmlC14NErrMemory(ctx);
                     return (NULL);
                 }
-
-                tmp_str = tmp_str2;
             }
 
             /* build uri */
@@ -1173,7 +1172,7 @@ xmlC14NProcessAttrsAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int parent_visible)
              * visible!
              */
             tmp = cur->parent;
-            while (tmp != NULL) {
+            while (tmp != NULL && tmp->type == XML_ELEMENT_NODE) {
                 attr = tmp->properties;
                 while (attr != NULL) {
                     if (xmlC14NIsXmlAttr(attr) != 0) {

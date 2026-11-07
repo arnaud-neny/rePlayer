@@ -465,7 +465,8 @@ xmlParserEntityCheck(xmlParserCtxtPtr ctxt, unsigned long extra)
      * entity sizes to make the size checks reliable. If "sizeentcopy"
      * overflows, we have to abort.
      */
-    if ((*expandedSize > XML_PARSER_ALLOWED_EXPANSION) &&
+    if ((ctxt->maxAmpl > 0) &&
+        (*expandedSize > XML_PARSER_ALLOWED_EXPANSION) &&
         ((*expandedSize >= ULONG_MAX) ||
          (*expandedSize / ctxt->maxAmpl > consumed))) {
         xmlFatalErrMsg(ctxt, XML_ERR_RESOURCE_LIMIT,
@@ -983,7 +984,7 @@ struct _xmlDefAttrs {
  * @returns a pointer to the normalized value (dst) or NULL if no conversion
  *         is needed.
  */
-static xmlChar *
+xmlChar *
 xmlAttrNormalizeSpace(const xmlChar *src, xmlChar *dst)
 {
     if ((src == NULL) || (dst == NULL))
@@ -1003,6 +1004,42 @@ xmlAttrNormalizeSpace(const xmlChar *src, xmlChar *dst)
     if (dst == src)
        return(NULL);
     return(dst);
+}
+
+/**
+ * TODO: This function should also remove leading and trailing
+ *       whitespaces, and also group whitespaces together, but right
+ *       now the parse doesn't do that with XML_PARSE_NOENT, so this
+ *       replacement is consistent with the parser normalization
+ *
+ *       Maybe merge with xmlAttrNormalizeSpace, or do something
+ *       similar
+ *
+ * Normalize attritube entity values
+ * Replaces any space character with 0x20
+ * https://www.w3.org/TR/REC-xml/#AVNormalize
+ */
+xmlChar *
+xmlAttrNormalize(xmlChar *src)
+{
+    xmlChar *out = NULL;
+    xmlChar *dst = NULL;
+
+    if (src == NULL)
+        return(NULL);
+
+    out = src;
+    dst = out;
+    while (*src != 0) {
+        if (*src < 0x20) {
+            src++;
+            *dst++ = 0x20;
+        } else {
+            *dst++ = *src++;
+        }
+    }
+    *dst = 0;
+    return(out);
 }
 
 /**
@@ -7261,10 +7298,10 @@ xmlParseReference(xmlParserCtxt *ctxt) {
             if ((cur->type == XML_TEXT_NODE) ||
                 (ctxt->options & XML_PARSE_NOCDATA)) {
                 if (ctxt->sax->characters != NULL)
-                    ctxt->sax->characters(ctxt, cur->content, len);
+                    ctxt->sax->characters(ctxt->userData, cur->content, len);
             } else {
                 if (ctxt->sax->cdataBlock != NULL)
-                    ctxt->sax->cdataBlock(ctxt, cur->content, len);
+                    ctxt->sax->cdataBlock(ctxt->userData, cur->content, len);
             }
 
             cur = cur->next;
@@ -7284,10 +7321,12 @@ xmlParseReference(xmlParserCtxt *ctxt) {
                 if ((cur->type == XML_TEXT_NODE) ||
                     (ctxt->options & XML_PARSE_NOCDATA)) {
                     if (ctxt->sax->characters != NULL)
-                        ctxt->sax->characters(ctxt, cur->content, len);
+                        ctxt->sax->characters(ctxt->userData, cur->content,
+                                              len);
                 } else {
                     if (ctxt->sax->cdataBlock != NULL)
-                        ctxt->sax->cdataBlock(ctxt, cur->content, len);
+                        ctxt->sax->cdataBlock(ctxt->userData, cur->content,
+                                              len);
                 }
 
                 break;
@@ -11566,7 +11605,6 @@ xmlIOParseDTD(xmlSAXHandler *sax, xmlParserInputBuffer *input,
 
     pinput = xmlNewIOInputStream(ctxt, input, XML_CHAR_ENCODING_NONE);
     if (pinput == NULL) {
-        xmlFreeParserInputBuffer(input);
 	xmlFreeParserCtxt(ctxt);
 	return(NULL);
     }
@@ -12033,7 +12071,7 @@ xmlCtxtParseContent(xmlParserCtxt *ctxt, xmlParserInput *input,
         case XML_ENTITY_REF_NODE:
         case XML_PI_NODE:
         case XML_COMMENT_NODE:
-            for (cur = node->parent; cur != NULL; cur = node->parent) {
+            for (cur = node->parent; cur != NULL; cur = cur->parent) {
                 if ((cur->type == XML_ELEMENT_NODE) ||
                     (cur->type == XML_DOCUMENT_NODE) ||
                     (cur->type == XML_HTML_DOCUMENT_NODE)) {
@@ -13305,6 +13343,8 @@ void
 xmlCtxtSetMaxAmplification(xmlParserCtxt *ctxt, unsigned maxAmpl)
 {
     if (ctxt == NULL)
+        return;
+    if (maxAmpl == 0)
         return;
     ctxt->maxAmpl = maxAmpl;
 }

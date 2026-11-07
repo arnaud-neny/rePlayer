@@ -36,6 +36,7 @@
 #include <libxml/schematron.h>
 
 #include "private/error.h"
+#include "private/memory.h"
 
 #define SCHEMATRON_PARSE_OPTIONS XML_PARSE_NOENT
 
@@ -361,6 +362,7 @@ xmlSchematronAddTest(xmlSchematronParserCtxtPtr ctxt,
     ret = (xmlSchematronTestPtr) xmlMalloc(sizeof(xmlSchematronTest));
     if (ret == NULL) {
         xmlSchematronPErrMemory(ctxt);
+        xmlXPathFreeCompExpr(comp);
         return (NULL);
     }
     memset(ret, 0, sizeof(xmlSchematronTest));
@@ -776,15 +778,14 @@ xmlSchematronPushInclude(xmlSchematronParserCtxtPtr ctxt,
     } else if (ctxt->nbIncludes + 2 >= ctxt->maxIncludes) {
         xmlNodePtr *tmp;
 
-        tmp = (xmlNodePtr *)
-            xmlRealloc(ctxt->includes, ctxt->maxIncludes * 4 *
-                       sizeof(xmlNodePtr));
+        tmp = (xmlNodePtr *) xmlGrowArray(ctxt->includes,
+                2 * sizeof(xmlNodePtr), &ctxt->maxIncludes,
+                10, XML_MAX_ITEMS);
         if (tmp == NULL) {
             xmlSchematronPErrMemory(NULL);
             return;
         }
         ctxt->includes = tmp;
-        ctxt->maxIncludes *= 2;
     }
     ctxt->includes[2 * ctxt->nbIncludes] = cur;
     ctxt->includes[2 * ctxt->nbIncludes + 1] = (xmlNodePtr) doc;
@@ -841,15 +842,14 @@ xmlSchematronAddNamespace(xmlSchematronParserCtxtPtr ctxt,
     } else if (ctxt->nbNamespaces + 2 >= ctxt->maxNamespaces) {
         const xmlChar **tmp;
 
-        tmp = (const xmlChar **)
-            xmlRealloc((xmlChar **) ctxt->namespaces, ctxt->maxNamespaces * 4 *
-                       sizeof(const xmlChar *));
+        tmp = (const xmlChar **) xmlGrowArray((xmlChar **) ctxt->namespaces,
+                2 * sizeof(const xmlChar *), &ctxt->maxNamespaces,
+                10, XML_MAX_ITEMS);
         if (tmp == NULL) {
             xmlSchematronPErrMemory(NULL);
             return;
         }
         ctxt->namespaces = tmp;
-        ctxt->maxNamespaces *= 2;
     }
     ctxt->namespaces[2 * ctxt->nbNamespaces] =
         xmlDictLookup(ctxt->dict, ns, -1);
@@ -985,12 +985,14 @@ xmlSchematronParseRule(xmlSchematronParserCtxtPtr ctxt,
                                   XML_SCHEMAP_NOROOT,
                                   "let has no value attribute",
                                   NULL, NULL);
+                xmlFree(name);
                 return;
             } else if (value[0] == 0) {
                 xmlSchematronPErr(ctxt, cur,
                                   XML_SCHEMAP_NOROOT,
                                   "let has an empty value attribute",
                                   NULL, NULL);
+                xmlFree(name);
                 xmlFree(value);
                 return;
             }
@@ -1001,10 +1003,19 @@ xmlSchematronParseRule(xmlSchematronParserCtxtPtr ctxt,
                                   XML_SCHEMAP_NOROOT,
                                   "Failed to compile let expression %s",
                                   value, NULL);
+                xmlFree(name);
+                xmlFree(value);
                 return;
             }
 
             let = (xmlSchematronLetPtr) xmlMalloc(sizeof(xmlSchematronLet));
+            if (let == NULL) {
+                xmlSchematronPErrMemory(ctxt);
+                xmlFree(name);
+                xmlFree(value);
+                xmlXPathFreeCompExpr(var_comp);
+                return;
+            }
             let->name = name;
             let->comp = var_comp;
             let->next = NULL;
@@ -1036,8 +1047,10 @@ xmlSchematronParseRule(xmlSchematronParserCtxtPtr ctxt,
 
                 testptr = xmlSchematronAddTest(ctxt, XML_SCHEMATRON_ASSERT,
                                                ruleptr, cur, test, report);
-                if (testptr == NULL)
+                if (testptr == NULL) {
                     xmlFree(test);
+                    xmlFree(report);
+                }
             }
         } else if (IS_SCHEMATRON(cur, "report")) {
             nbChecks++;
@@ -1059,8 +1072,10 @@ xmlSchematronParseRule(xmlSchematronParserCtxtPtr ctxt,
 
                 testptr = xmlSchematronAddTest(ctxt, XML_SCHEMATRON_REPORT,
                                                ruleptr, cur, test, report);
-                if (testptr == NULL)
+                if (testptr == NULL) {
                     xmlFree(test);
+                    xmlFree(report);
+                }
             }
         } else {
             xmlSchematronPErr(ctxt, cur,

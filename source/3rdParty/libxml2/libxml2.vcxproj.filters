@@ -181,6 +181,9 @@
     <ClCompile Include="shell.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\arnau\Downloads\libxml2-2.15.4\testcatalog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">

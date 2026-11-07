@@ -48,7 +48,9 @@
     xmlRegexpErrCompile(ctxt, str);
 #define NEXT ctxt->cur++
 #define CUR (*(ctxt->cur))
-#define NXT(index) (ctxt->cur[index])
+#define NXT(index)									\
+    (((size_t)(ctxt->cur + index - ctxt->string) < ctxt->len)				\
+      ? ctxt->cur[index] : 0)
 
 #define NEXTL(l) ctxt->cur += l;
 #define XML_REG_STRING_SEPARATOR '|'
@@ -288,6 +290,7 @@ typedef xmlRegParserCtxt *xmlRegParserCtxtPtr;
 struct _xmlAutomata {
     xmlChar *string;
     xmlChar *cur;
+    size_t len;
 
     int error;
     int neg;
@@ -733,11 +736,12 @@ xmlRegNewParserCtxt(const xmlChar *string) {
 	return(NULL);
     memset(ret, 0, sizeof(xmlRegParserCtxt));
     if (string != NULL) {
-	ret->string = xmlStrdup(string);
+        ret->string = xmlStrdup(string);
         if (ret->string == NULL) {
             xmlFree(ret);
             return(NULL);
         }
+        ret->len = strlen((const char *) ret->string);
     }
     ret->cur = ret->string;
     ret->neg = 0;
@@ -4896,6 +4900,12 @@ xmlFAParseCharClassEsc(xmlRegParserCtxtPtr ctxt) {
                 case 't':
                     cur = '\t';
                     break;
+                case 'u':
+                    cur = parse_escaped_codepoint(ctxt);
+                    if (cur < 0) {
+                        return;
+                    }
+                    break;
             }
 	    xmlRegAtomAddRange(ctxt, ctxt->atom, ctxt->neg,
 			       XML_REGEXP_CHARVAL, cur, cur, NULL);
@@ -4980,9 +4990,17 @@ xmlFAParseCharRange(xmlRegParserCtxtPtr ctxt) {
 	    case 'n': start = 0xA; break;
 	    case 'r': start = 0xD; break;
 	    case 't': start = 0x9; break;
+	    case 'u':
+		start = parse_escaped_codepoint(ctxt);
+		if (start < 0) {
+		    return;
+		}
+		break;
 	    case '\\': case '|': case '.': case '-': case '^': case '?':
 	    case '*': case '+': case '{': case '}': case '(': case ')':
-	    case '[': case ']':
+	    case '[': case ']': case '!': case '"': case '#': case '$':
+	    case '%': case ',': case '/': case ':': case ';': case '=':
+	    case '>': case '@': case '`': case '~':
 		start = cur; break;
 	    default:
 		ERROR("Invalid escape value");
@@ -5025,9 +5043,17 @@ xmlFAParseCharRange(xmlRegParserCtxtPtr ctxt) {
 	    case 'n': end = 0xA; break;
 	    case 'r': end = 0xD; break;
 	    case 't': end = 0x9; break;
+	    case 'u':
+		end = parse_escaped_codepoint(ctxt);
+		if (end < 0) {
+		    return;
+		}
+		break;
 	    case '\\': case '|': case '.': case '-': case '^': case '?':
 	    case '*': case '+': case '{': case '}': case '(': case ')':
-	    case '[': case ']':
+	    case '[': case ']': case '!': case '"': case '#': case '$':
+	    case '%': case ',': case '/': case ':': case ';': case '=':
+	    case '>': case '@': case '`': case '~':
 		end = cur; break;
 	    default:
 		ERROR("Invalid escape value");
@@ -5064,8 +5090,30 @@ xmlFAParseCharRange(xmlRegParserCtxtPtr ctxt) {
 static void
 xmlFAParsePosCharGroup(xmlRegParserCtxtPtr ctxt) {
     do {
-	if (CUR == '\\') {
-	    xmlFAParseCharClassEsc(ctxt);
+        if (CUR == '\\') {
+	    switch (NXT(1)) {
+		case 'n': case 'r': case 't':
+		case '\\': case '|': case '.': case '-': case '^': case '?':
+		case '*': case '+': case '{': case '}': case '(': case ')':
+		case '[': case ']': case '!': case '"': case '#': case '$':
+		case '%': case ',': case '/': case ':': case ';': case '=':
+		case '>': case '@': case '`': case '~':
+		    if (NXT(2) == '-') {
+			xmlFAParseCharRange(ctxt);
+		    } else {
+			xmlFAParseCharClassEsc(ctxt);
+		    }
+		    break;
+		case 'u':
+		    if (NXT(6) == '-') {
+			xmlFAParseCharRange(ctxt);
+		    } else {
+			xmlFAParseCharClassEsc(ctxt);
+		    }
+		    break;
+		default:
+		    xmlFAParseCharClassEsc(ctxt);
+	    }
 	} else {
 	    xmlFAParseCharRange(ctxt);
 	}
