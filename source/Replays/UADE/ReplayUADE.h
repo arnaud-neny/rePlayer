@@ -47,7 +47,7 @@ namespace rePlayer
             Settings(uint32_t numSubsongs)
             {
                 numEntries += uint8_t(numSubsongs) * 2;
-                for (uint32_t i = 0; i < numSubsongs * 2; i++)
+                for (uint32_t i = 0; i < numSubsongs * 2 + 1; i++)
                     data[i] = 0;
             }
             uint32_t NumSubsongs() const { return (numEntries - 1 - overridePlayer) / 2; }
