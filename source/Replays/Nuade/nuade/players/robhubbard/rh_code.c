@@ -1,0 +1,339 @@
+// SPDX-License-Identifier: MIT
+// Instruction decoder and code hash for the replayers of the Rob Hubbard modules (see rh_code.h).
+//
+// The replayers are a few hundred bytes of 68000 code: moves, adds, compares, multiplies, bit operations, shifts and
+// branches. The decoder knows the length of each such instruction and which of its words are operands that belong to
+// the module and not to the replayer. Anything else (an unknown opcode, a 68020 addressing mode) fails the scan.
+
+#include "rh_code.h"
+
+#include "nuade_base.h"
+#include "nuade_utils.h"
+#include <stdlib.h>
+
+// The code starts with the entry table, the hooks for the audio interrupt vector and a longword to save it in; the
+// first instruction of the replayer proper is at the init routine, so a zero opcode (`ori.b #imm,d0`) before this
+// offset is data.
+#define CODE_DATA_END 0x30
+#define MAX_INSTRUCTIONS 1024
+#define MAX_INSTRUCTION_WORDS 6
+
+#define OP_LEA_BASE_PC 0x47FA // lea d16(pc),a3
+#define OP_NO_OPCODE 0x0000
+
+#define SIZE_BYTE 1
+#define SIZE_WORD 2
+#define SIZE_LONG 4
+
+// Address modes of an effective address (bits 3..5 of the opcode; mode 7 selects by the register field).
+#define MODE_ADDRESS_REG 1
+#define MODE_DISPLACEMENT 5
+#define MODE_INDEX 6
+#define MODE_OTHER 7
+#define REG_ABSOLUTE_WORD 0
+#define REG_ABSOLUTE_LONG 1
+#define REG_PC_DISPLACEMENT 2
+#define REG_PC_INDEX 3
+#define REG_IMMEDIATE 4
+#define REG_MODULE_BASE 3 // a3 holds the module base in every routine
+
+#define BRIEF_EXTENSION_FULL_FORMAT 0x0100 // bit 8 of an index extension word: 68020 formats
+
+// What a word of an instruction is, for the hash.
+typedef enum WordKind {
+    WordKind_Plain,          // part of the replayer
+    WordKind_PcDisplacement, // displacement of a pc-relative address: a table pointer of the module
+    WordKind_BaseOffset,     // displacement from the module base (a3): a variable of the replayer
+    WordKind_SampleCount,    // the immediate of the moveq that counts the samples
+    WordKind_SongTable,      // displacement from the module base that is the song table
+} WordKind;
+
+typedef struct Instruction {
+    uint32_t at;
+    int word_count;
+    uint16_t word[MAX_INSTRUCTION_WORDS];
+    WordKind kind[MAX_INSTRUCTION_WORDS];
+} Instruction;
+
+typedef struct Cursor {
+    const uint8_t* data;
+    size_t size;
+    Instruction* insn;
+} Cursor;
+
+// Takes the next word of the instruction.
+static bool take_word(Cursor* c, WordKind kind) {
+    Instruction* in = c->insn;
+    const uint32_t at = in->at + 2u * (uint32_t)in->word_count;
+    if (in->word_count == MAX_INSTRUCTION_WORDS || at > c->size || c->size - at < 2) {
+        return false;
+    }
+    in->word[in->word_count] = nuade_read_be16(c->data + at);
+    in->kind[in->word_count] = kind;
+    in->word_count++;
+    return true;
+}
+
+// The brief extension word of an indexed address; the 68020 formats are not part of the replayers.
+static bool take_index_extension(Cursor* c) {
+    return take_word(c, WordKind_Plain) && (c->insn->word[c->insn->word_count - 1] & BRIEF_EXTENSION_FULL_FORMAT) == 0;
+}
+
+// The extension words of an effective address for an operand of `size` bytes.
+static bool take_address_extension(Cursor* c, int mode, int reg, int size) {
+    switch (mode) {
+        case MODE_DISPLACEMENT:
+            return take_word(c, reg == REG_MODULE_BASE ? WordKind_BaseOffset : WordKind_Plain);
+        case MODE_INDEX:
+            return take_index_extension(c);
+        case MODE_OTHER:
+            switch (reg) {
+                case REG_ABSOLUTE_WORD:
+                    return take_word(c, WordKind_Plain);
+                case REG_ABSOLUTE_LONG:
+                    return take_word(c, WordKind_Plain) && take_word(c, WordKind_Plain);
+                case REG_PC_DISPLACEMENT:
+                    return take_word(c, WordKind_PcDisplacement);
+                case REG_PC_INDEX:
+                    return take_index_extension(c);
+                case REG_IMMEDIATE:
+                    return take_word(c, WordKind_Plain) && (size != SIZE_LONG || take_word(c, WordKind_Plain));
+                default:
+                    return false;
+            }
+        default:
+            return true; // register direct, indirect, post-increment, pre-decrement
+    }
+}
+
+static int ea_mode(uint16_t op) {
+    return (op >> 3) & 7;
+}
+
+static int ea_reg(uint16_t op) {
+    return op & 7;
+}
+
+static bool take_ea(Cursor* c, uint16_t op, int size) {
+    return take_address_extension(c, ea_mode(op), ea_reg(op), size);
+}
+
+// The operand size in bits 6..7 of the opcode; 0 for the encoding that selects another instruction.
+static int size_of_field(uint16_t op) {
+    switch ((op >> 6) & 3) {
+        case 0:
+            return SIZE_BYTE;
+        case 1:
+            return SIZE_WORD;
+        case 2:
+            return SIZE_LONG;
+        default:
+            return 0;
+    }
+}
+
+static bool decode_immediate_and_bit_operations(Cursor* c, uint16_t op) {
+    if ((op & 0x0100) != 0) {
+        // btst/bchg/bclr/bset Dn,<ea>; mode 1 would be movep
+        return ea_mode(op) != MODE_ADDRESS_REG && take_ea(c, op, SIZE_BYTE);
+    }
+    if ((op & 0xFF00) == 0x0800) {
+        // the same with a bit number in the next word
+        return take_word(c, WordKind_Plain) && take_ea(c, op, SIZE_BYTE);
+    }
+    const int size = size_of_field(op);
+    const int operation = (op >> 9) & 7; // ori, andi, subi, addi, (bit), eori, cmpi
+    if (size == 0 || operation == 4 || operation == 7) {
+        return false;
+    }
+    return take_word(c, WordKind_Plain) && (size != SIZE_LONG || take_word(c, WordKind_Plain)) && take_ea(c, op, size);
+}
+
+static bool decode_move(Cursor* c, uint16_t op) {
+    int size = 0;
+    switch (op >> 12) {
+        case 1:
+            size = SIZE_BYTE;
+            break;
+        case 3:
+            size = SIZE_WORD;
+            break;
+        default:
+            size = SIZE_LONG;
+            break;
+    }
+    const int destination_mode = (op >> 6) & 7;
+    const int destination_reg = (op >> 9) & 7;
+    return take_ea(c, op, size) && take_address_extension(c, destination_mode, destination_reg, size);
+}
+
+static bool decode_miscellaneous(Cursor* c, uint16_t op) {
+    if ((op & 0xF1C0) == 0x41C0) {
+        return take_ea(c, op, SIZE_LONG); // lea
+    }
+    if (op == 0x4E75 || op == 0x4E73 || op == 0x4E71) {
+        return true; // rts, rte, nop
+    }
+    if ((op & 0xFFB8) == 0x4880) {
+        return true; // ext.w, ext.l
+    }
+    if ((op & 0xFF00) == 0x4200 || (op & 0xFF00) == 0x4A00) {
+        const int size = size_of_field(op); // clr, tst
+        return size != 0 && take_ea(c, op, size);
+    }
+    if ((op & 0xFF80) == 0x4E80) {
+        return take_ea(c, op, SIZE_LONG); // jsr, jmp
+    }
+    return false;
+}
+
+static bool decode_quick_and_conditions(Cursor* c, uint16_t op) {
+    if ((op & 0x00C0) == 0x00C0) {
+        if (ea_mode(op) == MODE_ADDRESS_REG) {
+            return take_word(c, WordKind_Plain); // dbcc
+        }
+        return take_ea(c, op, SIZE_BYTE); // scc
+    }
+    const int size = size_of_field(op);
+    return take_ea(c, op, size); // addq, subq
+}
+
+static bool decode_branch(Cursor* c, uint16_t op) {
+    const int displacement = op & 0xFF;
+    if (displacement == 0xFF) {
+        return false; // 68020 long branch
+    }
+    return displacement != 0 || take_word(c, WordKind_Plain);
+}
+
+// The or, and, add, sub, cmp and eor group with its address register, multiply and divide forms.
+static bool decode_arithmetic(Cursor* c, uint16_t op) {
+    const int group = op >> 12;
+    const int field = (op >> 6) & 7;
+    if (field == 3 || field == 7) {
+        // divu, divs, mulu, muls work on words; suba, cmpa, adda on the word or long of bit 8
+        const bool word_operand = group == 0x8 || group == 0xC || field == 3;
+        return take_ea(c, op, word_operand ? SIZE_WORD : SIZE_LONG);
+    }
+    // sbcd, abcd, addx, subx and exg take registers (mode 0 or 1) where cmpm and eor are the only ones with such modes
+    const bool register_form = field >= 4 && ea_mode(op) <= MODE_ADDRESS_REG;
+    if (register_form && (group != 0xB || ea_mode(op) == MODE_ADDRESS_REG)) {
+        return false;
+    }
+    return take_ea(c, op, size_of_field(op));
+}
+
+static bool decode_instruction(Cursor* c) {
+    if (!take_word(c, WordKind_Plain)) {
+        return false;
+    }
+    const uint16_t op = c->insn->word[0];
+    switch (op >> 12) {
+        case 0x0:
+            return decode_immediate_and_bit_operations(c, op);
+        case 0x1:
+        case 0x2:
+        case 0x3:
+            return decode_move(c, op);
+        case 0x4:
+            return decode_miscellaneous(c, op);
+        case 0x5:
+            return decode_quick_and_conditions(c, op);
+        case 0x6:
+            return decode_branch(c, op);
+        case 0x7:
+            return (op & 0x0100) == 0; // moveq
+        case 0x8:
+        case 0x9:
+        case 0xB:
+        case 0xC:
+        case 0xD:
+            return decode_arithmetic(c, op);
+        case 0xE:
+            return (op & 0x00C0) != 0x00C0 || take_ea(c, op, SIZE_WORD);
+        default:
+            return false;
+    }
+}
+
+static uint64_t hash_byte(uint64_t hash, uint8_t value) {
+    return (hash ^ value) * 0x100000001B3ull;
+}
+
+static uint64_t hash_token(uint64_t hash, WordKind kind, uint16_t value) {
+    hash = hash_byte(hash, (uint8_t)kind);
+    hash = hash_byte(hash, (uint8_t)(value >> 8));
+    return hash_byte(hash, (uint8_t)value);
+}
+
+// Decodes from the start of the module up to the first zero opcode behind the entry hooks.
+static bool decode_code(const uint8_t* data, size_t size, Instruction* code, int* count) {
+    Cursor cursor = { .data = data, .size = size };
+    uint32_t at = 0;
+    *count = 0;
+    while (*count < MAX_INSTRUCTIONS) {
+        if (at > size || size - at < 2) {
+            return false;
+        }
+        if (at >= CODE_DATA_END && nuade_read_be16(data + at) == OP_NO_OPCODE) {
+            return true;
+        }
+        Instruction* in = &code[*count];
+        *in = (Instruction) { .at = at };
+        cursor.insn = in;
+        if (!decode_instruction(&cursor)) {
+            return false;
+        }
+        at += 2u * (uint32_t)in->word_count;
+        (*count)++;
+    }
+    return false;
+}
+
+bool rh_scan_code(const uint8_t* data, size_t size, uint32_t song_table, uint32_t sample_count_at, RhCodeScan* scan) {
+    Instruction* code = (Instruction*)calloc(MAX_INSTRUCTIONS, sizeof(Instruction));
+    int count = 0;
+    if (code == nullptr) {
+        return false;
+    }
+    if (!decode_code(data, size, code, &count) || count == 0) {
+        free(code);
+        return false;
+    }
+    const Instruction* last = &code[count - 1];
+    *scan = (RhCodeScan) { .end = last->at + 2u * (uint32_t)last->word_count, .hash = 0xCBF29CE484222325ull };
+    for (int i = 0; i < count; i++) {
+        const Instruction* in = &code[i];
+        const bool base_load = in->word[0] == OP_LEA_BASE_PC && in->word_count == 2
+                               && in->at + 2u + (uint32_t)(int32_t)(int16_t)in->word[1] == 0;
+        for (int w = 0; w < in->word_count; w++) {
+            const uint32_t at = in->at + 2u * (uint32_t)w;
+            WordKind kind = in->kind[w];
+            uint16_t value = in->word[w];
+            if (kind == WordKind_Plain && at == sample_count_at) {
+                kind = WordKind_SampleCount;
+                value &= 0xFF00;
+            } else if (kind == WordKind_PcDisplacement && base_load) {
+                kind = WordKind_Plain;
+            } else if (kind == WordKind_PcDisplacement) {
+                if (scan->pc_count == RH_MAX_PC_TARGETS) {
+                    free(code);
+                    return false;
+                }
+                scan->pc_targets[scan->pc_count++] = at + (uint32_t)(int32_t)(int16_t)value;
+                value = 0;
+            } else if (kind == WordKind_BaseOffset) {
+                // The song table is an offset the module chooses; the replayer's variables sit behind the code.
+                if (value == song_table) {
+                    kind = WordKind_SongTable;
+                    value = 0;
+                } else {
+                    value = (uint16_t)(value - scan->end);
+                }
+            }
+            scan->hash = hash_token(scan->hash, kind, value);
+        }
+    }
+    free(code);
+    return true;
+}

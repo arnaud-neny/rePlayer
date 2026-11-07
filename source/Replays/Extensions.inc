@@ -24,12 +24,12 @@ EXTENSION(mms)          // OpenMPT & UADE: MultiMedia_Sound
 EXTENSION(mt2)
 EXTENSION(mtm)          // OpenMPT & XMP
 EXTENSION(nst)			// OpenMPT & XMP & VGMStream
-EXTENSION(okt)          // OpenMPT & XMP & UADE: Oktalyzer
+EXTENSION(okt)          // OpenMPT & XMP & Nuade & UADE: Oktalyzer
 EXTENSION(plm)
 EXTENSION(psm)          // OpenMPT & XMP & ZXTune: Pro Sound Maker
 EXTENSION(pt36)
-EXTENSION(ptm)          // OpenMPT & XMP
-EXTENSION(sfx)          // OpenMPT & XMP & UADE: Sound-FX & VGMStream: FMOD FSB
+EXTENSION(ptm)          // OpenMPT & XMP & Nuade: Protracker4
+EXTENSION(sfx)          // OpenMPT & XMP & Nuade & UADE: Sound-FX & VGMStream: FMOD FSB
 EXTENSION(sfx2)
 EXTENSION(st26)
 EXTENSION(stk)          // OpenMPT & XMP
@@ -46,22 +46,22 @@ EXTENSION(ppm)
 EXTENSION(mmcmp)
 EXTENSION(hvl)
 EXTENSION(ahx)          // Hively & VGMStream: CRI AHX
-EXTENSION(bp)           // SoundMon & UAE: SoundMon2.0
+EXTENSION(bp)           // SoundMon & Nuade & UAE: SoundMon2.0
 EXTENSION(ym)           // ZXTune: ST-Sound
 EXTENSION(dsym)         // OpenMPT & XMP
 EXTENSION(fmt)
-EXTENSION(mus)          // OpenMPT: ? & Sidplay: ? & UADE: UFO & NEZplug: FAC SoundTracker & VGMStream: Krome MUSC
+EXTENSION(mus)          // OpenMPT: ? & Sidplay: ? & Nuade & UADE: UFO & NEZplug: FAC SoundTracker & VGMStream: Krome MUSC
 EXTENSION(stx)          // OpenMPT & XMP & VGMStream
 EXTENSION(symmod)
-EXTENSION(smod)			// OpenMPT & Future Composer & UADE
-EXTENSION(fc)			// OpenMPT & Future Composer & UADE
+EXTENSION(smod)			// OpenMPT & Future Composer & Nuade & UADE
+EXTENSION(fc)			// OpenMPT & Future Composer & Nuade & UADE
 EXTENSION(bao)          // VGMStream
 EXTENSION(owp)          // VGMStream
 EXTENSION(v2m)
 EXTENSION(sndh)
 EXTENSION(sc68)
 EXTENSION(hsc)
-EXTENSION(sng)          // Adlib: ? : & GoatTracker & UADE: ZoundMonitor & VGMStream: Electronic Arts SCHl
+EXTENSION(sng)          // Adlib: ? : & GoatTracker & Nuade & UADE: ZoundMonitor & VGMStream: Electronic Arts SCHl
 EXTENSION(wlf)
 EXTENSION(adlib)
 EXTENSION(a2m)
@@ -107,7 +107,7 @@ EXTENSION(sqx)
 EXTENSION(sdb)
 EXTENSION(agd)
 EXTENSION(ha2)
-EXTENSION(bp3)          // SoundMon & UAE: SoundMon2.2
+EXTENSION(bp3)          // SoundMon & Nuade & UAE: SoundMon2.2
 EXTENSION(sap)          // ASAP & VGMStream
 EXTENSION(cmc)
 EXTENSION(cm3)
@@ -125,7 +125,7 @@ EXTENSION(tfm)			// Furnace & Future Composer
 EXTENSION(mp3)          // MP3 & VGMStream
 EXTENSION(flac)
 EXTENSION(ogg)
-EXTENSION(ay)           // Ayfly & GME & NEZplug & ZXTune: AY/Emul
+EXTENSION(ay)           // GME & NEZplug & ZXTune: AY/Emul
 EXTENSION(vtx)          // ZXTune: Vortex Project
 EXTENSION(psg)          // ZXTune: Programmable Sound Generator
 EXTENSION(asc)          // ZXTune: ASC Sound Master
@@ -133,7 +133,7 @@ EXTENSION(pt1)          // ZXTune: Pro Tracker
 EXTENSION(pt2)          // ZXTune: Pro Tracker
 EXTENSION(pt3)          // ZXTune: Pro Tracker
 EXTENSION(stc)          // ZXTune: Sound Tracker
-EXTENSION(sqt)          // AyFly: ? & UADE: Quartet_PSG & ZXTune: SQ-Tracker
+EXTENSION(sqt)          // UADE: Quartet_PSG & ZXTune: SQ-Tracker
 EXTENSION(psc)          // ZXTune: Pro Sound Creator
 EXTENSION(gbs)          // GBSPlay & GME & NEZplug
 EXTENSION(gbr)          // GBSPlay & NEZplug
@@ -146,148 +146,148 @@ EXTENSION(nsfe)         // GME & NEZplug
 EXTENSION(spc)
 EXTENSION(sunvox)       // SunVox
 EXTENSION(mdx)          // MDX
-EXTENSION(rk)           // UADE: CustomMade
+EXTENSION(rk)           // Nuade & UADE: CustomMade
 EXTENSION(s98)
-EXTENSION(aps)          // UADE: AProSys
-EXTENSION(ast)          // UADE: ActionAmics & VGMStream: Nintendo AST
+EXTENSION(aps)          // Nuade & UADE: AProSys
+EXTENSION(ast)          // Nuade & UADE: ActionAmics & VGMStream: Nintendo AST
 EXTENSION(adpcm)        // UADE: ADPCM_mono & VGMStream: RIFF WAVE
-EXTENSION(amc)          // UADE: AM-Composer
-EXTENSION(abk)          // UADE & XMP: AMOS & VGMStream: Electronic Arts BNK
-EXTENSION(hot)          // UADE: Anders_0land
-EXTENSION(aam)          // UADE: ArtAndMagic
+EXTENSION(amc)          // Nuade & UADE: AM-Composer
+EXTENSION(abk)          // Nuade & UADE & XMP: AMOS & VGMStream: Electronic Arts BNK
+EXTENSION(hot)          // Nuade & UADE: Anders_0land
+EXTENSION(aam)          // Nuade & UADE: ArtAndMagic
 EXTENSION(alp)          // UADE: Alcatraz_Packer
-EXTENSION(bye)          // UADE: Andrew_Parton
-EXTENSION(aon)          // UADE: ArtOfNoise
-EXTENSION(ash)          // UADE: Ashley_Hogg
-EXTENSION(adsc)         // UADE: AudioSculpture
-EXTENSION(bss)          // UADE: BeathovenSynthesizer
-EXTENSION(bd)           // UADE: BenDaglish
-EXTENSION(bds)          // UADE: BenDaglish-SID
+EXTENSION(bye)          // Nuade & UADE: Andrew_Parton
+EXTENSION(aon)          // Art Of Noise & UADE: ArtOfNoise
+EXTENSION(ash)          // Nuade & UADE: Ashley_Hogg
+EXTENSION(adsc)         // XMP & Nuade & UADE: AudioSculpture
+EXTENSION(bss)          // Nuade & UADE: BeathovenSynthesizer
+EXTENSION(bd)           // Nuade & UADE: BenDaglish
+EXTENSION(bds)          // Nuade & UADE: BenDaglish-SID
 EXTENSION(uds)          // UADE: BladePacker
 EXTENSION(kris)         // UADE: ChipTracker
-EXTENSION(cin)          // UADE: Cinemaware
-EXTENSION(core)         // UADE: CoreDesign
+EXTENSION(cin)          // Nuade & UADE: Cinemaware
+EXTENSION(core)         // Nuade & UADE: CoreDesign
 EXTENSION(cus)          // UADE: custom
 EXTENSION(cm)           // UADE: CustomMade
-EXTENSION(dz)           // UADE: DariusZendeh
-EXTENSION(dl)           // UADE: DaveLowe
-EXTENSION(dl_deli)      // UADE: DaveLowe_Deli
-EXTENSION(dln)          // UADE: DaveLoweNew
-EXTENSION(dh)           // UADE: DavidHanney
-EXTENSION(dw)           // UADE: DavidWhittaker
-EXTENSION(dm)           // UADE: DeltaMusic1.3
-EXTENSION(dm2)          // UADE: DeltaMusic2.0
-EXTENSION(dsr)          // UADE: Desire
-EXTENSION(dsc)          // UADE: DigitalSonixChrome
-EXTENSION(dss)          // UADE: DigitalSoundStudio
-EXTENSION(dns)          // UADE & Future Composer: DynamicSynthesizer
-EXTENSION(ems)          // UADE: EMS & EMS-6
-EXTENSION(ex)           // UADE: FashionTracker
-EXTENSION(fred)         // UADE: Fred
-EXTENSION(gray)         // UADE: FredGray
-EXTENSION(bsi)          // UADE: FutureComposer-BSI
+EXTENSION(dz)           // Nuade & UADE: DariusZendeh
+EXTENSION(dl)           // Nuade & UADE: DaveLowe
+EXTENSION(dl_deli)      // Nuade & UADE: DaveLowe_Deli
+EXTENSION(dln)          // Nuade & UADE: DaveLoweNew
+EXTENSION(dh)           // Nuade & UADE: DavidHanney
+EXTENSION(dw)           // Nuade & UADE: DavidWhittaker
+EXTENSION(dm)           // Nuade & UADE: DeltaMusic1.3
+EXTENSION(dm2)          // Nuade & UADE: DeltaMusic2.0
+EXTENSION(dsr)          // Nuade & UADE: Desire
+EXTENSION(dsc)          // Nuade & UADE: DigitalSonixChrome
+EXTENSION(dss)          // Nuade & UADE: DigitalSoundStudio
+EXTENSION(dns)          // Nuade & UADE & Future Composer: DynamicSynthesizer
+EXTENSION(ems)          // Nuade & UADE: EMS & EMS-6
+EXTENSION(ex)           // Nuade & UADE: FashionTracker
+EXTENSION(fred)         // Nuade & UADE: Fred
+EXTENSION(gray)         // Nuade & UADE: FredGray
+EXTENSION(bsi)          // Nuade & UADE: FutureComposer-BSI
 EXTENSION(fp)           // UADE: FuturePlayer
-EXTENSION(fw)           // UADE: ForgottenWorlds_Game
-EXTENSION(glue)         // UADE: GlueMon
-EXTENSION(gmc)          // UADE: GMC
-EXTENSION(ea)           // UADE: EarAche
-EXTENSION(hd)           // UADE: HowieDavies & VGMStream
-EXTENSION(hipc)         // UADE & Future Composer: JochenHippel-CoSo
-EXTENSION(emod)         // UADE & XMP: QuadraComposer
-EXTENSION(dum)          // UADE: Infogrames
-EXTENSION(is)           // UADE: InStereo
-EXTENSION(is20)         // UADE: InStereo2.0
-EXTENSION(jam)          // UADE: JamCracker
-EXTENSION(jmf)          // UADE: JankoMrsicFlogel
+EXTENSION(fw)           // Nuade & UADE: ForgottenWorlds_Game
+EXTENSION(glue)         // Nuade & UADE: GlueMon
+EXTENSION(gmc)          // OpenMPT & XMP & Nuade & UADE: GMC
+EXTENSION(ea)           // Nuade & UADE: EarAche
+EXTENSION(hd)           // Nuade & UADE: HowieDavies & VGMStream
+EXTENSION(hipc)         // Nuade & UADE & Future Composer: JochenHippel-CoSo
+EXTENSION(emod)         // Nuade & UADE & XMP: QuadraComposer
+EXTENSION(dum)          // Nuade & UADE: Infogrames
+EXTENSION(is)           // Nuade & UADE: InStereo
+EXTENSION(is20)         // Nuade & UADE: InStereo2.0
+EXTENSION(jam)          // Nuade & UADE: JamCracker
+EXTENSION(jmf)          // Nuade & UADE: JankoMrsicFlogel
 EXTENSION(js)           // UADE: Janne_Salmijarvi_Optimizer
-EXTENSION(jb)           // UADE: JasonBrooke
-EXTENSION(jpn)          // UADE: JasonPage
+EXTENSION(jb)           // Nuade & UADE: JasonBrooke
+EXTENSION(jpn)          // Nuade & UADE: JasonPage
 EXTENSION(jpo)          // UADE: JasonPage_JP & UADE: SteveTurner
-EXTENSION(jt)           // UADE: JeroenTel
-EXTENSION(jo)           // UADE: JesperOlsen
-EXTENSION(hip)          // UADE & Future Composer: JochenHippel
-EXTENSION(hip7)         // UADE & Future Composer: JochenHippel-7V
+EXTENSION(jt)           // Nuade & UADE: JeroenTel
+EXTENSION(jo)           // Nuade & UADE: JesperOlsen
+EXTENSION(hip)          // Nuade & UADE & Future Composer: JochenHippel
+EXTENSION(hip7)         // Nuade & UADE & Future Composer: JochenHippel-7V
 EXTENSION(hst)          // UADE: Jochen_Hippel_ST
-EXTENSION(kim)          // UADE: Kim_Christensen
-EXTENSION(kh)           // UADE: KrisHatlelid
-EXTENSION(pt)           // UADE: Laxity
-EXTENSION(lme)          // UADE: LegglessMusicEditor
-EXTENSION(mon)          // UADE: ManiacsOfNoise & VGMStream: NBA Live 95
+EXTENSION(kim)          // Nuade & UADE: Kim_Christensen
+EXTENSION(kh)           // Nuade & UADE: KrisHatlelid
+EXTENSION(pt)           // Nuade & UADE: Laxity
+EXTENSION(lme)          // Nuade & UADE: LegglessMusicEditor
+EXTENSION(mon)          // Nuade & UADE: ManiacsOfNoise & VGMStream: NBA Live 95
 EXTENSION(mfp)          // UADE & XMP: MagneticFieldsPacker
-EXTENSION(hn)           // UADE: MajorTom
-EXTENSION(mc)           // UADE: Mark_Cooksey
-EXTENSION(mco)          // UADE: Mark_Cooksey_Old
-EXTENSION(mk2)          // UADE: MarkII
-EXTENSION(avp)          // UADE: MartinWalker
-EXTENSION(max)          // UADE: Maximum_Effect
+EXTENSION(hn)           // Nuade & UADE: MajorTom
+EXTENSION(mc)           // Nuade & UADE: Mark_Cooksey
+EXTENSION(mco)          // Nuade & UADE: Mark_Cooksey_Old
+EXTENSION(mk2)          // Nuade & UADE: MarkII
+EXTENSION(avp)          // Nuade & UADE: MartinWalker
+EXTENSION(max)          // Nuade & UADE: Maximum_Effect
 EXTENSION(midi)         // UADE: MIDI-Loriciel
-EXTENSION(md)           // UADE: MikeDavies
+EXTENSION(md)           // Nuade & UADE: MikeDavies
 EXTENSION(mosh)         // UADE: Mosh_Packer
-EXTENSION(mmdc)         // UADE: MMDC
-EXTENSION(dmu)          // UADE: Mugician
-EXTENSION(dmu2)         // UADE: MugicianII
-EXTENSION(ma)           // UADE: MusicAssembler
-EXTENSION(mm4)          // UADE: MusicMaker-4V
-EXTENSION(mm8)          // UADE: MusicMaker-8V
+EXTENSION(mmdc)         // Nuade & UADE: MMDC
+EXTENSION(dmu)          // Nuade & UADE: Mugician
+EXTENSION(dmu2)         // Nuade & UADE: MugicianII
+EXTENSION(ma)           // Nuade & UADE: MusicAssembler
+EXTENSION(mm4)          // Nuade & UADE: MusicMaker-4V
+EXTENSION(mm8)          // Nuade & UADE: MusicMaker-8V
 EXTENSION(npp)          // UADE: Nick_Pelling_Packer
 EXTENSION(ntp)          // UADE & XMP: NovoTradePacker
-EXTENSION(two)          // UADE: NTSP-system
-EXTENSION(one)          // UADE: onEscapee
-EXTENSION(dat)          // UADE: PaulRobotham
-EXTENSION(ps)           // UADE: PaulShields
-EXTENSION(snk)          // UADE: PaulSummers
+EXTENSION(two)          // Nuade & UADE: NTSP-system
+EXTENSION(one)          // Nuade & UADE: onEscapee
+EXTENSION(dat)          // Nuade & UADE: PaulRobotham
+EXTENSION(ps)           // Nuade & UADE: PaulShields
+EXTENSION(snk)          // Nuade & UADE: PaulSummers
 EXTENSION(pat)          // UADE: Paul_Tonge
-EXTENSION(pvp)          // UADE: PeterVerswyvelen
-EXTENSION(pap)          // UADE: PierreAdane
-EXTENSION(pn)           // UADE: Pokeynoise
-EXTENSION(psa)          // UADE: ProfessionalSoundArtists
-EXTENSION(puma)         // UADE: PumaTracker
+EXTENSION(pvp)          // Nuade & UADE: PeterVerswyvelen
+EXTENSION(pap)          // Nuade & UADE: PierreAdane
+EXTENSION(pn)           // Nuade & UADE: Pokeynoise
+EXTENSION(psa)          // Nuade & UADE: ProfessionalSoundArtists
+EXTENSION(puma)         // Nuade & UADE: PumaTracker
 EXTENSION(rj)           // UADE: RichardJoseph
-EXTENSION(rjp)          // UADE: RichardJoseph_Player
-EXTENSION(riff)         // UADE: RiffRaff & XMP: Galaxy Music System 4.0
-EXTENSION(rh)           // UADE: RobHubbard
-EXTENSION(rho)          // UADE: RobHubbard_ST
-EXTENSION(scumm)        // UADE: SCUMM
-EXTENSION(scn)          // UADE: SeanConnolly
-EXTENSION(scr)          // UADE: SeanConran
+EXTENSION(rjp)          // Nuade & UADE: RichardJoseph_Player
+EXTENSION(riff)         // Nuade & UADE: RiffRaff & XMP: Galaxy Music System 4.0
+EXTENSION(rh)           // Nuade & UADE: RobHubbard
+EXTENSION(rho)          // Nuade & UADE: RobHubbard_ST
+EXTENSION(scumm)        // Nuade & UADE: SCUMM
+EXTENSION(scn)          // Nuade & UADE: SeanConnolly
+EXTENSION(scr)          // Nuade & UADE: SeanConran
 EXTENSION(sid1)         // UADE: SIDMon1.0
-EXTENSION(sid2)         // UADE: SIDMon2.0
-EXTENSION(mok)          // UADE: Silmarils
-EXTENSION(sa)           // UADE: SonicArranger
-EXTENSION(smus)         // UADE: SonixMusicDriver
-EXTENSION(spl)          // UADE: SoundProgrammingLanguage
-EXTENSION(sc)           // UADE: SoundControl & VGMStream
-EXTENSION(psf)          // UADE: SoundFactory & Highly Experimental & VGMStream
-EXTENSION(tw)           // UADE: SoundImages
-EXTENSION(sm)           // UADE: SoundMaster & Ken
-EXTENSION(sm2)          // UADE: SoundMaster & VGMStream
-EXTENSION(sm3)          // UADE: SoundMaster & VGMStream: Ubisoft SBx
-EXTENSION(smpro)        // UADE: SoundMaster
-EXTENSION(sjs)          // UADE: SoundPlayer
-EXTENSION(jd)           // UADE: Special-FX
+EXTENSION(sid2)         // Nuade & UADE: SIDMon2.0
+EXTENSION(mok)          // Nuade & UADE: Silmarils
+EXTENSION(sa)           // Nuade & UADE: SonicArranger
+EXTENSION(smus)         // Nuade & UADE: SonixMusicDriver
+EXTENSION(spl)          // Nuade & UADE: SoundProgrammingLanguage
+EXTENSION(sc)           // Nuade & UADE: SoundControl & VGMStream
+EXTENSION(psf)          // Nuade & UADE: SoundFactory & Highly Experimental & VGMStream
+EXTENSION(tw)           // Nuade & UADE: SoundImages
+EXTENSION(sm)           // Nuade & UADE: SoundMaster & Ken
+EXTENSION(sm2)          // Nuade & UADE: SoundMaster & VGMStream
+EXTENSION(sm3)          // Nuade & UADE: SoundMaster & VGMStream: Ubisoft SBx
+EXTENSION(smpro)        // Nuade & UADE: SoundMaster
+EXTENSION(sjs)          // Nuade & UADE: SoundPlayer
+EXTENSION(jd)           // Nuade & UADE: Special-FX
 EXTENSION(doda)         // UADE: Special-FX_ST
-EXTENSION(sas)          // UADE: SpeedyA1System
-EXTENSION(ss)           // UADE: SpeedySystem
-EXTENSION(sb)           // UADE: SteveBarrett
-EXTENSION(sun)          // UADE: SUN-Tronic
-EXTENSION(syn)          // UADE: Synth
-EXTENSION(sdr)          // UADE: SynthDream
-EXTENSION(osp)          // UADE: SynthPack
-EXTENSION(synmod)       // UADE: SynTracker
+EXTENSION(sas)          // Nuade & UADE: SpeedyA1System
+EXTENSION(ss)           // Nuade & UADE: SpeedySystem
+EXTENSION(sb)           // Nuade & UADE: SteveBarrett
+EXTENSION(sun)          // Nuade & UADE: SUN-Tronic
+EXTENSION(syn)          // Nuade & UADE: Synth
+EXTENSION(sdr)          // Nuade & UADE: SynthDream
+EXTENSION(osp)          // Nuade & UADE: SynthPack
+EXTENSION(synmod)       // Nuade & UADE: SynTracker
 EXTENSION(tcb)          // UADE: TCB_Tracker
 EXTENSION(mdst)         // UADE: TFMX_ST
-EXTENSION(thm)          // UADE: ThomasHermann
-EXTENSION(tmk)          // UADE: TimeTracker
+EXTENSION(thm)          // Nuade & UADE: ThomasHermann
+EXTENSION(tmk)          // Nuade & UADE: TimeTracker
 EXTENSION(tits)         // UADE: Titanics_Packer
-EXTENSION(tme)          // UADE: TheMusicalEnlightenment
-EXTENSION(sg)           // UADE: TomyTracker
-EXTENSION(dp)           // UADE: Tronic
-EXTENSION(vss)          // UADE: VoodooSupremeSynthesizer
-EXTENSION(wb)           // UADE: WallyBeben & VGMStream: Triangle Service .WB
+EXTENSION(tme)          // Nuade & UADE: TheMusicalEnlightenment
+EXTENSION(sg)           // Nuade & UADE: TomyTracker
+EXTENSION(dp)           // Nuade & UADE: Tronic
+EXTENSION(vss)          // Nuade & UADE: VoodooSupremeSynthesizer
+EXTENSION(wb)           // Nuade & UADE: WallyBeben & VGMStream: Triangle Service .WB
 EXTENSION(ml)           // UADE: MusiclineEditor
 EXTENSION(agi)          // UADE: Sierra-AGI
-EXTENSION(tpu)          // UADE: DirkBialluch
-EXTENSION(qpa)          // UADE: Quartet
+EXTENSION(tpu)          // Nuade & UADE: DirkBialluch
+EXTENSION(qpa)          // Nuade & UADE: Quartet
 EXTENSION(qts)          // UADE: Quartet_ST & Quartet
 EXTENSION(miniqsf)      // Highly Quixotic
 EXTENSION(rar)          // archive
@@ -296,8 +296,8 @@ EXTENSION(7z)           // archive
 EXTENSION(ymst)         // UADE: YMST
 EXTENSION(wav)          // WAV
 EXTENSION(sid)          // SidPlay & UADE: SidMon1
-EXTENSION(mug)          // UADE: Mugician
-EXTENSION(mso)          // UADE: Medley
+EXTENSION(mug)          // Nuade & UADE: Mugician
+EXTENSION(mso)          // Nuade & UADE: Medley
 EXTENSION(ptk)          // ProTrekkr
 EXTENSION(mdy)          // Adlib: AdLib MIDI/IMS Format
 EXTENSION(mcr)          // UADE: Mark_Cooksey_Old
@@ -335,7 +335,7 @@ EXTENSION(fnk)          // XMP: Funktracker
 EXTENSION(usf)          // LazyUSF
 EXTENSION(miniusf)      // LazyUSF
 EXTENSION(arch)         // XMP: Archimedes Tracker
-EXTENSION(tf)           // UADE: TimFollin
+EXTENSION(tf)           // Nuade & UADE: TimFollin
 EXTENSION(cust)         // UADE: custom
 EXTENSION(snsf)         // Highly Competitive
 EXTENSION(minisnsf)     // Highly Competitive
@@ -388,7 +388,7 @@ EXTENSION(td0)          // ZXTune: TeleDisk Image
 EXTENSION(pcd)          // ZXTune: Powerfull Code Decreaser
 EXTENSION(soc)          // UADE: Jochen_Hippel_ST
 EXTENSION(sog)          // UADE: Jochen_Hippel_ST
-EXTENSION(mcmd)         // UADE & Future Composer: JochenHippel
+EXTENSION(mcmd)         // Nuade % UADE & Future Composer: JochenHippel
 EXTENSION(cba)          // OpenMPT
 EXTENSION(a2t)          // Adlib: Adlib Tracker 2
 EXTENSION(eup)          // Euphony
@@ -397,7 +397,7 @@ EXTENSION(4v)           // Quartet
 EXTENSION(fur)          // Furnace
 EXTENSION(aac)          // AAC
 EXTENSION(opus)         // Opus
-EXTENSION(ftm)          // Furnace: Famitracker
+EXTENSION(ftm)          // Nuade & OpenMPT: Face The Music & Furnace: Famitracker
 EXTENSION(wv)           // WavPack
 EXTENSION(dff)          // DSD
 EXTENSION(208)          // VGMStream

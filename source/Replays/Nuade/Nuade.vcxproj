@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{92C1B29D-7600-45F3-9F30-879A8B2B7DF4}</ProjectGuid>
+    <RootNamespace>Nuade</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\replays-win32\</OutDir>
+    <IntDir>$(SolutionDir)..\.output\$(Platform)_$(Configuration)\Replay_$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)nuade\include;$(ProjectDir)nuade\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)nuade\include;$(ProjectDir)nuade\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)nuade\include;$(ProjectDir)nuade\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)Core;$(SolutionDir)Replays;$(ProjectDir)nuade\include;$(ProjectDir)nuade\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/wd4201 /wd4706 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(RelativeDir)\</ObjectFileName>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Core.lib;;Replay.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir)..\</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)..\data\replays-win32 &gt; nul 2&gt;&amp;1
+copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt; nul 2&gt;&amp;1</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="nuade\include\nuade\io.h" />
+    <ClInclude Include="nuade\include\nuade\nuade.h" />
+    <ClInclude Include="nuade\include\nuade\paula.h" />
+    <ClInclude Include="nuade\include\nuade\player.h" />
+    <ClInclude Include="nuade\include\nuade\players\actionamics.h" />
+    <ClInclude Include="nuade\include\nuade\players\activisionpro.h" />
+    <ClInclude Include="nuade\include\nuade\players\amcomposer.h" />
+    <ClInclude Include="nuade\include\nuade\players\amos.h" />
+    <ClInclude Include="nuade\include\nuade\players\andersoland.h" />
+    <ClInclude Include="nuade\include\nuade\players\andrewparton.h" />
+    <ClInclude Include="nuade\include\nuade\players\aprosys.h" />
+    <ClInclude Include="nuade\include\nuade\players\artandmagic.h" />
+    <ClInclude Include="nuade\include\nuade\players\ashleyhogg.h" />
+    <ClInclude Include="nuade\include\nuade\players\audiosculpture.h" />
+    <ClInclude Include="nuade\include\nuade\players\beathoven.h" />
+    <ClInclude Include="nuade\include\nuade\players\bendaglish.h" />
+    <ClInclude Include="nuade\include\nuade\players\bendaglishsid.h" />
+    <ClInclude Include="nuade\include\nuade\players\cinemaware.h" />
+    <ClInclude Include="nuade\include\nuade\players\coredesign.h" />
+    <ClInclude Include="nuade\include\nuade\players\dariuszendeh.h" />
+    <ClInclude Include="nuade\include\nuade\players\davelowe.h" />
+    <ClInclude Include="nuade\include\nuade\players\davidhanney.h" />
+    <ClInclude Include="nuade\include\nuade\players\davidwhittaker.h" />
+    <ClInclude Include="nuade\include\nuade\players\deltamusic1.h" />
+    <ClInclude Include="nuade\include\nuade\players\deltamusic2.h" />
+    <ClInclude Include="nuade\include\nuade\players\desire.h" />
+    <ClInclude Include="nuade\include\nuade\players\digmug.h" />
+    <ClInclude Include="nuade\include\nuade\players\dirkbialluch.h" />
+    <ClInclude Include="nuade\include\nuade\players\dsc.h" />
+    <ClInclude Include="nuade\include\nuade\players\dss.h" />
+    <ClInclude Include="nuade\include\nuade\players\dynamicsynthesizer.h" />
+    <ClInclude Include="nuade\include\nuade\players\earache.h" />
+    <ClInclude Include="nuade\include\nuade\players\ems.h" />
+    <ClInclude Include="nuade\include\nuade\players\emsv6.h" />
+    <ClInclude Include="nuade\include\nuade\players\facethemusic.h" />
+    <ClInclude Include="nuade\include\nuade\players\fashiontracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\fcbsi.h" />
+    <ClInclude Include="nuade\include\nuade\players\forgottenworlds.h" />
+    <ClInclude Include="nuade\include\nuade\players\fredgray.h" />
+    <ClInclude Include="nuade\include\nuade\players\fred_np.h" />
+    <ClInclude Include="nuade\include\nuade\players\futurecomposer.h" />
+    <ClInclude Include="nuade\include\nuade\players\gluemon.h" />
+    <ClInclude Include="nuade\include\nuade\players\gmc.h" />
+    <ClInclude Include="nuade\include\nuade\players\hippel.h" />
+    <ClInclude Include="nuade\include\nuade\players\hippel7v.h" />
+    <ClInclude Include="nuade\include\nuade\players\hippelhip.h" />
+    <ClInclude Include="nuade\include\nuade\players\howiedavies.h" />
+    <ClInclude Include="nuade\include\nuade\players\infogrames.h" />
+    <ClInclude Include="nuade\include\nuade\players\instereo1.h" />
+    <ClInclude Include="nuade\include\nuade\players\instereo2.h" />
+    <ClInclude Include="nuade\include\nuade\players\jamcracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\jankomrsicflogel.h" />
+    <ClInclude Include="nuade\include\nuade\players\jasonbrooke.h" />
+    <ClInclude Include="nuade\include\nuade\players\jasonpage.h" />
+    <ClInclude Include="nuade\include\nuade\players\jeroentel.h" />
+    <ClInclude Include="nuade\include\nuade\players\jesperolsen.h" />
+    <ClInclude Include="nuade\include\nuade\players\kimchristensen.h" />
+    <ClInclude Include="nuade\include\nuade\players\krishatlelid.h" />
+    <ClInclude Include="nuade\include\nuade\players\laxity.h" />
+    <ClInclude Include="nuade\include\nuade\players\legglessmusiceditor.h" />
+    <ClInclude Include="nuade\include\nuade\players\majortom.h" />
+    <ClInclude Include="nuade\include\nuade\players\maniacsofnoise.h" />
+    <ClInclude Include="nuade\include\nuade\players\markcooksey.h" />
+    <ClInclude Include="nuade\include\nuade\players\markcooksey_old.h" />
+    <ClInclude Include="nuade\include\nuade\players\markii.h" />
+    <ClInclude Include="nuade\include\nuade\players\maximumeffect.h" />
+    <ClInclude Include="nuade\include\nuade\players\mcmd.h" />
+    <ClInclude Include="nuade\include\nuade\players\medley.h" />
+    <ClInclude Include="nuade\include\nuade\players\mikedavies.h" />
+    <ClInclude Include="nuade\include\nuade\players\mmdc.h" />
+    <ClInclude Include="nuade\include\nuade\players\musicalenlightenment.h" />
+    <ClInclude Include="nuade\include\nuade\players\musicassembler.h" />
+    <ClInclude Include="nuade\include\nuade\players\musicmaker.h" />
+    <ClInclude Include="nuade\include\nuade\players\ntsp.h" />
+    <ClInclude Include="nuade\include\nuade\players\oktalyzer.h" />
+    <ClInclude Include="nuade\include\nuade\players\onescapee.h" />
+    <ClInclude Include="nuade\include\nuade\players\paulrobotham.h" />
+    <ClInclude Include="nuade\include\nuade\players\paulshields.h" />
+    <ClInclude Include="nuade\include\nuade\players\paulsummers.h" />
+    <ClInclude Include="nuade\include\nuade\players\peterverswyvelen.h" />
+    <ClInclude Include="nuade\include\nuade\players\pierreadane.h" />
+    <ClInclude Include="nuade\include\nuade\players\pokeynoise.h" />
+    <ClInclude Include="nuade\include\nuade\players\professionalsoundartists.h" />
+    <ClInclude Include="nuade\include\nuade\players\protracker4.h" />
+    <ClInclude Include="nuade\include\nuade\players\pumatracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\quadracomposer.h" />
+    <ClInclude Include="nuade\include\nuade\players\quartet.h" />
+    <ClInclude Include="nuade\include\nuade\players\richardjoseph.h" />
+    <ClInclude Include="nuade\include\nuade\players\riffraff.h" />
+    <ClInclude Include="nuade\include\nuade\players\robhubbard.h" />
+    <ClInclude Include="nuade\include\nuade\players\robhubbardst.h" />
+    <ClInclude Include="nuade\include\nuade\players\ronklaren.h" />
+    <ClInclude Include="nuade\include\nuade\players\scottjohnston.h" />
+    <ClInclude Include="nuade\include\nuade\players\scumm.h" />
+    <ClInclude Include="nuade\include\nuade\players\seanconnolly.h" />
+    <ClInclude Include="nuade\include\nuade\players\seanconran.h" />
+    <ClInclude Include="nuade\include\nuade\players\sidmon2.h" />
+    <ClInclude Include="nuade\include\nuade\players\silmarils.h" />
+    <ClInclude Include="nuade\include\nuade\players\sonicarranger.h" />
+    <ClInclude Include="nuade\include\nuade\players\sonix.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundcontrol.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundfactory.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundfx.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundimages.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundmaster.h" />
+    <ClInclude Include="nuade\include\nuade\players\soundmon.h" />
+    <ClInclude Include="nuade\include\nuade\players\specialfx.h" />
+    <ClInclude Include="nuade\include\nuade\players\speedya1system.h" />
+    <ClInclude Include="nuade\include\nuade\players\speedysystem.h" />
+    <ClInclude Include="nuade\include\nuade\players\spl.h" />
+    <ClInclude Include="nuade\include\nuade\players\stevebarrett.h" />
+    <ClInclude Include="nuade\include\nuade\players\suntronic.h" />
+    <ClInclude Include="nuade\include\nuade\players\synthdream.h" />
+    <ClInclude Include="nuade\include\nuade\players\synthesis.h" />
+    <ClInclude Include="nuade\include\nuade\players\synthpack.h" />
+    <ClInclude Include="nuade\include\nuade\players\syntracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\thomashermann.h" />
+    <ClInclude Include="nuade\include\nuade\players\timetracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\timfollin.h" />
+    <ClInclude Include="nuade\include\nuade\players\tomytracker.h" />
+    <ClInclude Include="nuade\include\nuade\players\tronic.h" />
+    <ClInclude Include="nuade\include\nuade\players\ufo.h" />
+    <ClInclude Include="nuade\include\nuade\players\voodoo.h" />
+    <ClInclude Include="nuade\include\nuade\players\wallybeben.h" />
+    <ClInclude Include="nuade\include\nuade\players\zoundmonitor.h" />
+    <ClInclude Include="nuade\include\nuade\viz.h" />
+    <ClInclude Include="nuade\include\nuade\voice.h" />
+    <ClInclude Include="nuade\players\aprosys\aprosys_internal.h" />
+    <ClInclude Include="nuade\players\ashleyhogg\ah_internal.h" />
+    <ClInclude Include="nuade\players\beathoven\beathoven_code.h" />
+    <ClInclude Include="nuade\players\beathoven\beathoven_internal.h" />
+    <ClInclude Include="nuade\players\bendaglishsid\bds_internal.h" />
+    <ClInclude Include="nuade\players\coredesign\cd_internal.h" />
+    <ClInclude Include="nuade\players\dariuszendeh\dz_internal.h" />
+    <ClInclude Include="nuade\players\davelowe\dl_internal.h" />
+    <ClInclude Include="nuade\players\davidhanney\dh_internal.h" />
+    <ClInclude Include="nuade\players\desire\dsr_internal.h" />
+    <ClInclude Include="nuade\players\dirkbialluch\db_internal.h" />
+    <ClInclude Include="nuade\players\dynamicsynthesizer\dns_internal.h" />
+    <ClInclude Include="nuade\players\earache\ea_internal.h" />
+    <ClInclude Include="nuade\players\emsv6\emsv6_internal.h" />
+    <ClInclude Include="nuade\players\fredgray\fg_code.h" />
+    <ClInclude Include="nuade\players\fredgray\fg_internal.h" />
+    <ClInclude Include="nuade\players\fredgray\fg_section.h" />
+    <ClInclude Include="nuade\players\gluemon\gm_internal.h" />
+    <ClInclude Include="nuade\players\hippel7v\h7v_internal.h" />
+    <ClInclude Include="nuade\players\hippelhip\hh_internal.h" />
+    <ClInclude Include="nuade\players\hippel\hippel_effects.h" />
+    <ClInclude Include="nuade\players\howiedavies\hd_internal.h" />
+    <ClInclude Include="nuade\players\infogrames\ig_internal.h" />
+    <ClInclude Include="nuade\players\jankomrsicflogel\jmf_internal.h" />
+    <ClInclude Include="nuade\players\jasonbrooke\jb_internal.h" />
+    <ClInclude Include="nuade\players\jasonpage\jp_internal.h" />
+    <ClInclude Include="nuade\players\jeroentel\jt_internal.h" />
+    <ClInclude Include="nuade\players\jesperolsen\jo_internal.h" />
+    <ClInclude Include="nuade\players\kimchristensen\kim_internal.h" />
+    <ClInclude Include="nuade\players\krishatlelid\kh_internal.h" />
+    <ClInclude Include="nuade\players\legglessmusiceditor\lme_internal.h" />
+    <ClInclude Include="nuade\players\majortom\mt_internal.h" />
+    <ClInclude Include="nuade\players\maniacsofnoise\mon_internal.h" />
+    <ClInclude Include="nuade\players\markii\mk2_internal.h" />
+    <ClInclude Include="nuade\players\maximumeffect\mxe_internal.h" />
+    <ClInclude Include="nuade\players\medley\mdl_internal.h" />
+    <ClInclude Include="nuade\players\mikedavies\md_internal.h" />
+    <ClInclude Include="nuade\players\mmdc\mmdc_module.h" />
+    <ClInclude Include="nuade\players\musicmaker\mm4.h" />
+    <ClInclude Include="nuade\players\musicmaker\mm8.h" />
+    <ClInclude Include="nuade\players\musicmaker\mm8_mix.h" />
+    <ClInclude Include="nuade\players\musicmaker\mm_core.h" />
+    <ClInclude Include="nuade\players\musicmaker\mm_internal.h" />
+    <ClInclude Include="nuade\players\paulrobotham\pr_internal.h" />
+    <ClInclude Include="nuade\players\paulshields\ps_internal.h" />
+    <ClInclude Include="nuade\players\paulsummers\ps_internal.h" />
+    <ClInclude Include="nuade\players\pierreadane\pa_internal.h" />
+    <ClInclude Include="nuade\players\pokeynoise\pn_internal.h" />
+    <ClInclude Include="nuade\players\quartet\qt_internal.h" />
+    <ClInclude Include="nuade\players\richardjoseph\rjp_internal.h" />
+    <ClInclude Include="nuade\players\riffraff\rr_internal.h" />
+    <ClInclude Include="nuade\players\robhubbardst\rhst_module.h" />
+    <ClInclude Include="nuade\players\robhubbard\rh_code.h" />
+    <ClInclude Include="nuade\players\robhubbard\rh_module.h" />
+    <ClInclude Include="nuade\players\scottjohnston\sj_internal.h" />
+    <ClInclude Include="nuade\players\scumm\scm_internal.h" />
+    <ClInclude Include="nuade\players\seanconnolly\sc_internal.h" />
+    <ClInclude Include="nuade\players\seanconnolly\sc_v2.h" />
+    <ClInclude Include="nuade\players\seanconnolly\sc_v3.h" />
+    <ClInclude Include="nuade\players\seanconran\sc_code.h" />
+    <ClInclude Include="nuade\players\seanconran\sc_module.h" />
+    <ClInclude Include="nuade\players\silmarils\sil_internal.h" />
+    <ClInclude Include="nuade\players\sonix\sonix.h" />
+    <ClInclude Include="nuade\players\sonix\sonix_io.h" />
+    <ClInclude Include="nuade\players\soundimages\si_internal.h" />
+    <ClInclude Include="nuade\players\soundmaster\sm_internal.h" />
+    <ClInclude Include="nuade\players\speedya1system\sa_internal.h" />
+    <ClInclude Include="nuade\players\speedysystem\ss_internal.h" />
+    <ClInclude Include="nuade\players\spl\spl_module.h" />
+    <ClInclude Include="nuade\players\stevebarrett\sbr_internal.h" />
+    <ClInclude Include="nuade\players\suntronic\sun_internal.h" />
+    <ClInclude Include="nuade\players\synthdream\sdr_internal.h" />
+    <ClInclude Include="nuade\players\synthpack\sp_internal.h" />
+    <ClInclude Include="nuade\players\synthpack\sp_longs.h" />
+    <ClInclude Include="nuade\players\synthpack\sp_words.h" />
+    <ClInclude Include="nuade\players\thomashermann\thm_internal.h" />
+    <ClInclude Include="nuade\players\timfollin\tfol_internal.h" />
+    <ClInclude Include="nuade\players\timfollin\tfol_layout.h" />
+    <ClInclude Include="nuade\players\tronic\tronic_internal.h" />
+    <ClInclude Include="nuade\players\ufo\ufo_internal.h" />
+    <ClInclude Include="nuade\players\wallybeben\wb_decode.h" />
+    <ClInclude Include="nuade\players\wallybeben\wb_internal.h" />
+    <ClInclude Include="nuade\players\wallybeben\wb_replay.h" />
+    <ClInclude Include="nuade\src\nuade_base.h" />
+    <ClInclude Include="nuade\src\nuade_file_index.h" />
+    <ClInclude Include="nuade\src\nuade_grid.h" />
+    <ClInclude Include="nuade\src\nuade_mixer.h" />
+    <ClInclude Include="nuade\src\nuade_path.h" />
+    <ClInclude Include="nuade\src\nuade_paula.h" />
+    <ClInclude Include="nuade\src\nuade_paula_channel.h" />
+    <ClInclude Include="nuade\src\nuade_registry.h" />
+    <ClInclude Include="nuade\src\nuade_scheduler.h" />
+    <ClInclude Include="nuade\src\nuade_test.h" />
+    <ClInclude Include="nuade\src\nuade_trace.h" />
+    <ClInclude Include="nuade\src\nuade_tracker.h" />
+    <ClInclude Include="nuade\src\nuade_utils.h" />
+    <ClInclude Include="nuade\src\nuade_viz.h" />
+    <ClInclude Include="ReplayNuade.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nuade\players\actionamics\actionamics.c" />
+    <ClCompile Include="nuade\players\actionamics\actionamics_nuade.c" />
+    <ClCompile Include="nuade\players\activisionpro\activisionpro.c" />
+    <ClCompile Include="nuade\players\activisionpro\activisionpro_nuade.c" />
+    <ClCompile Include="nuade\players\amcomposer\amcomposer.c" />
+    <ClCompile Include="nuade\players\amcomposer\amcomposer_nuade.c" />
+    <ClCompile Include="nuade\players\amos\amos.c" />
+    <ClCompile Include="nuade\players\amos\amos_nuade.c" />
+    <ClCompile Include="nuade\players\andersoland\andersoland.c" />
+    <ClCompile Include="nuade\players\andersoland\andersoland_nuade.c" />
+    <ClCompile Include="nuade\players\andrewparton\andrewparton.c" />
+    <ClCompile Include="nuade\players\andrewparton\andrewparton_nuade.c" />
+    <ClCompile Include="nuade\players\aprosys\aprosys.c" />
+    <ClCompile Include="nuade\players\aprosys\aprosys_module.c" />
+    <ClCompile Include="nuade\players\aprosys\aprosys_nuade.c" />
+    <ClCompile Include="nuade\players\aprosys\aprosys_voice.c" />
+    <ClCompile Include="nuade\players\aprosys\aprosys_wave.c" />
+    <ClCompile Include="nuade\players\artandmagic\artandmagic.c" />
+    <ClCompile Include="nuade\players\artandmagic\artandmagic_nuade.c" />
+    <ClCompile Include="nuade\players\ashleyhogg\ah_module.c" />
+    <ClCompile Include="nuade\players\ashleyhogg\ah_new.c" />
+    <ClCompile Include="nuade\players\ashleyhogg\ah_old.c" />
+    <ClCompile Include="nuade\players\ashleyhogg\ashleyhogg.c" />
+    <ClCompile Include="nuade\players\ashleyhogg\ashleyhogg_nuade.c" />
+    <ClCompile Include="nuade\players\audiosculpture\audiosculpture.c" />
+    <ClCompile Include="nuade\players\audiosculpture\audiosculpture_nuade.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_legacy.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_locate.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_module.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_nuade.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_songs.c" />
+    <ClCompile Include="nuade\players\beathoven\beathoven_voice.c" />
+    <ClCompile Include="nuade\players\bendaglishsid\bds_driver.c" />
+    <ClCompile Include="nuade\players\bendaglishsid\bds_module.c" />
+    <ClCompile Include="nuade\players\bendaglishsid\bendaglishsid.c" />
+    <ClCompile Include="nuade\players\bendaglishsid\bendaglishsid_nuade.c" />
+    <ClCompile Include="nuade\players\bendaglish\bendaglish_nuade.c" />
+    <ClCompile Include="nuade\players\bendaglish\ben_daglish.c" />
+    <ClCompile Include="nuade\players\cinemaware\cinemaware.c" />
+    <ClCompile Include="nuade\players\cinemaware\cinemaware_nuade.c" />
+    <ClCompile Include="nuade\players\coredesign\cd_driver.c" />
+    <ClCompile Include="nuade\players\coredesign\cd_module.c" />
+    <ClCompile Include="nuade\players\coredesign\coredesign.c" />
+    <ClCompile Include="nuade\players\coredesign\coredesign_nuade.c" />
+    <ClCompile Include="nuade\players\dariuszendeh\dariuszendeh.c" />
+    <ClCompile Include="nuade\players\dariuszendeh\dariuszendeh_nuade.c" />
+    <ClCompile Include="nuade\players\dariuszendeh\dz_locate.c" />
+    <ClCompile Include="nuade\players\davelowe\davelowe.c" />
+    <ClCompile Include="nuade\players\davelowe\davelowe_nuade.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_code.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_deli.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_engine.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_game.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_hooks.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_midwinter.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_new.c" />
+    <ClCompile Include="nuade\players\davelowe\dl_record.c" />
+    <ClCompile Include="nuade\players\davidhanney\davidhanney.c" />
+    <ClCompile Include="nuade\players\davidhanney\davidhanney_nuade.c" />
+    <ClCompile Include="nuade\players\davidhanney\dh_data.c" />
+    <ClCompile Include="nuade\players\davidwhittaker\davidwhittaker.c" />
+    <ClCompile Include="nuade\players\davidwhittaker\davidwhittaker_nuade.c" />
+    <ClCompile Include="nuade\players\deltamusic1\deltamusic1.c" />
+    <ClCompile Include="nuade\players\deltamusic1\deltamusic1_nuade.c" />
+    <ClCompile Include="nuade\players\deltamusic2\deltamusic2.c" />
+    <ClCompile Include="nuade\players\deltamusic2\deltamusic2_nuade.c" />
+    <ClCompile Include="nuade\players\desire\desire.c" />
+    <ClCompile Include="nuade\players\desire\desire_nuade.c" />
+    <ClCompile Include="nuade\players\desire\dsr_driver.c" />
+    <ClCompile Include="nuade\players\desire\dsr_module.c" />
+    <ClCompile Include="nuade\players\digmug\digmug.c" />
+    <ClCompile Include="nuade\players\digmug\digmug_nuade.c" />
+    <ClCompile Include="nuade\players\dirkbialluch\db_module.c" />
+    <ClCompile Include="nuade\players\dirkbialluch\dirkbialluch.c" />
+    <ClCompile Include="nuade\players\dirkbialluch\dirkbialluch_nuade.c" />
+    <ClCompile Include="nuade\players\dsc\dsc.c" />
+    <ClCompile Include="nuade\players\dsc\dsc_nuade.c" />
+    <ClCompile Include="nuade\players\dss\dss.c" />
+    <ClCompile Include="nuade\players\dss\dss_nuade.c" />
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dns_module.c" />
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dns_replayer.c" />
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dynamicsynthesizer.c" />
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dynamicsynthesizer_nuade.c" />
+    <ClCompile Include="nuade\players\earache\earache.c" />
+    <ClCompile Include="nuade\players\earache\earache_nuade.c" />
+    <ClCompile Include="nuade\players\earache\ea_module.c" />
+    <ClCompile Include="nuade\players\emsv6\emsv6.c" />
+    <ClCompile Include="nuade\players\emsv6\emsv6_mixer.c" />
+    <ClCompile Include="nuade\players\emsv6\emsv6_nuade.c" />
+    <ClCompile Include="nuade\players\emsv6\emsv6_sequencer.c" />
+    <ClCompile Include="nuade\players\emsv6\emsv6_tables.c" />
+    <ClCompile Include="nuade\players\ems\ems.c" />
+    <ClCompile Include="nuade\players\ems\ems_nuade.c" />
+    <ClCompile Include="nuade\players\facethemusic\facethemusic.c" />
+    <ClCompile Include="nuade\players\facethemusic\facethemusic_nuade.c" />
+    <ClCompile Include="nuade\players\fashiontracker\fashiontracker.c" />
+    <ClCompile Include="nuade\players\fashiontracker\fashiontracker_nuade.c" />
+    <ClCompile Include="nuade\players\fcbsi\fcbsi.c" />
+    <ClCompile Include="nuade\players\fcbsi\fcbsi_nuade.c" />
+    <ClCompile Include="nuade\players\forgottenworlds\forgottenworlds.c" />
+    <ClCompile Include="nuade\players\forgottenworlds\forgottenworlds_nuade.c" />
+    <ClCompile Include="nuade\players\fredgray\fg_code.c" />
+    <ClCompile Include="nuade\players\fredgray\fg_locate.c" />
+    <ClCompile Include="nuade\players\fredgray\fg_module.c" />
+    <ClCompile Include="nuade\players\fredgray\fg_section.c" />
+    <ClCompile Include="nuade\players\fredgray\fredgray.c" />
+    <ClCompile Include="nuade\players\fredgray\fredgray_nuade.c" />
+    <ClCompile Include="nuade\players\fred_np\fred_np_nuade.c" />
+    <ClCompile Include="nuade\players\fred_np\fred_replayer.c" />
+    <ClCompile Include="nuade\players\futurecomposer\futurecomposer.c" />
+    <ClCompile Include="nuade\players\futurecomposer\futurecomposer_nuade.c" />
+    <ClCompile Include="nuade\players\gluemon\gluemon.c" />
+    <ClCompile Include="nuade\players\gluemon\gluemon_nuade.c" />
+    <ClCompile Include="nuade\players\gluemon\gm_module.c" />
+    <ClCompile Include="nuade\players\gmc\gmc.c" />
+    <ClCompile Include="nuade\players\gmc\gmc_nuade.c" />
+    <ClCompile Include="nuade\players\hippel7v\h7v_mixer.c" />
+    <ClCompile Include="nuade\players\hippel7v\h7v_module.c" />
+    <ClCompile Include="nuade\players\hippel7v\h7v_voice.c" />
+    <ClCompile Include="nuade\players\hippel7v\hippel7v.c" />
+    <ClCompile Include="nuade\players\hippel7v\hippel7v_nuade.c" />
+    <ClCompile Include="nuade\players\hippelhip\hh_a.c" />
+    <ClCompile Include="nuade\players\hippelhip\hh_b.c" />
+    <ClCompile Include="nuade\players\hippelhip\hh_c.c" />
+    <ClCompile Include="nuade\players\hippelhip\hh_common.c" />
+    <ClCompile Include="nuade\players\hippelhip\hippelhip.c" />
+    <ClCompile Include="nuade\players\hippelhip\hippelhip_nuade.c" />
+    <ClCompile Include="nuade\players\hippel\hippel.c" />
+    <ClCompile Include="nuade\players\hippel\hippel_nuade.c" />
+    <ClCompile Include="nuade\players\howiedavies\hd_module.c" />
+    <ClCompile Include="nuade\players\howiedavies\howiedavies.c" />
+    <ClCompile Include="nuade\players\howiedavies\howiedavies_nuade.c" />
+    <ClCompile Include="nuade\players\infogrames\ig_module.c" />
+    <ClCompile Include="nuade\players\infogrames\infogrames.c" />
+    <ClCompile Include="nuade\players\infogrames\infogrames_nuade.c" />
+    <ClCompile Include="nuade\players\instereo1\instereo1.c" />
+    <ClCompile Include="nuade\players\instereo1\instereo1_nuade.c" />
+    <ClCompile Include="nuade\players\instereo2\instereo2.c" />
+    <ClCompile Include="nuade\players\instereo2\instereo2_nuade.c" />
+    <ClCompile Include="nuade\players\jamcracker\jamcracker.c" />
+    <ClCompile Include="nuade\players\jamcracker\jamcracker_nuade.c" />
+    <ClCompile Include="nuade\players\jankomrsicflogel\jankomrsicflogel.c" />
+    <ClCompile Include="nuade\players\jankomrsicflogel\jankomrsicflogel_nuade.c" />
+    <ClCompile Include="nuade\players\jankomrsicflogel\jmf_module.c" />
+    <ClCompile Include="nuade\players\jasonbrooke\jasonbrooke.c" />
+    <ClCompile Include="nuade\players\jasonbrooke\jasonbrooke_nuade.c" />
+    <ClCompile Include="nuade\players\jasonbrooke\jb_a.c" />
+    <ClCompile Include="nuade\players\jasonbrooke\jb_b.c" />
+    <ClCompile Include="nuade\players\jasonbrooke\jb_locate.c" />
+    <ClCompile Include="nuade\players\jasonpage\jasonpage.c" />
+    <ClCompile Include="nuade\players\jasonpage\jasonpage_nuade.c" />
+    <ClCompile Include="nuade\players\jasonpage\jp_module.c" />
+    <ClCompile Include="nuade\players\jasonpage\jp_seq.c" />
+    <ClCompile Include="nuade\players\jasonpage\jp_voice.c" />
+    <ClCompile Include="nuade\players\jeroentel\jeroentel.c" />
+    <ClCompile Include="nuade\players\jeroentel\jeroentel_nuade.c" />
+    <ClCompile Include="nuade\players\jeroentel\jt_module.c" />
+    <ClCompile Include="nuade\players\jesperolsen\jesperolsen.c" />
+    <ClCompile Include="nuade\players\jesperolsen\jesperolsen_nuade.c" />
+    <ClCompile Include="nuade\players\jesperolsen\jo_a.c" />
+    <ClCompile Include="nuade\players\jesperolsen\jo_b.c" />
+    <ClCompile Include="nuade\players\jesperolsen\jo_c.c" />
+    <ClCompile Include="nuade\players\kimchristensen\kimchristensen.c" />
+    <ClCompile Include="nuade\players\kimchristensen\kimchristensen_nuade.c" />
+    <ClCompile Include="nuade\players\kimchristensen\kim_module.c" />
+    <ClCompile Include="nuade\players\krishatlelid\kh_module.c" />
+    <ClCompile Include="nuade\players\krishatlelid\krishatlelid.c" />
+    <ClCompile Include="nuade\players\krishatlelid\krishatlelid_nuade.c" />
+    <ClCompile Include="nuade\players\laxity\laxity.c" />
+    <ClCompile Include="nuade\players\laxity\laxity_nuade.c" />
+    <ClCompile Include="nuade\players\legglessmusiceditor\legglessmusiceditor.c" />
+    <ClCompile Include="nuade\players\legglessmusiceditor\legglessmusiceditor_nuade.c" />
+    <ClCompile Include="nuade\players\legglessmusiceditor\lme_module.c" />
+    <ClCompile Include="nuade\players\majortom\majortom.c" />
+    <ClCompile Include="nuade\players\majortom\majortom_nuade.c" />
+    <ClCompile Include="nuade\players\majortom\mt_data.c" />
+    <ClCompile Include="nuade\players\majortom\mt_module.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\maniacsofnoise.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\maniacsofnoise_nuade.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_commands.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_module.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_new.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_old.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_voice.c" />
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_walk.c" />
+    <ClCompile Include="nuade\players\markcooksey\markcooksey.c" />
+    <ClCompile Include="nuade\players\markcooksey\markcooksey_nuade.c" />
+    <ClCompile Include="nuade\players\markcooksey_old\markcooksey_old.c" />
+    <ClCompile Include="nuade\players\markcooksey_old\markcooksey_old_nuade.c" />
+    <ClCompile Include="nuade\players\markii\markii.c" />
+    <ClCompile Include="nuade\players\markii\markii_nuade.c" />
+    <ClCompile Include="nuade\players\markii\mk2_module.c" />
+    <ClCompile Include="nuade\players\maximumeffect\maximumeffect.c" />
+    <ClCompile Include="nuade\players\maximumeffect\maximumeffect_nuade.c" />
+    <ClCompile Include="nuade\players\maximumeffect\mxe_module.c" />
+    <ClCompile Include="nuade\players\mcmd\mcmd.c" />
+    <ClCompile Include="nuade\players\mcmd\mcmd_nuade.c" />
+    <ClCompile Include="nuade\players\medley\mdl_coverage.c" />
+    <ClCompile Include="nuade\players\medley\mdl_data.c" />
+    <ClCompile Include="nuade\players\medley\mdl_module.c" />
+    <ClCompile Include="nuade\players\medley\medley.c" />
+    <ClCompile Include="nuade\players\medley\medley_nuade.c" />
+    <ClCompile Include="nuade\players\mikedavies\md_module.c" />
+    <ClCompile Include="nuade\players\mikedavies\mikedavies.c" />
+    <ClCompile Include="nuade\players\mikedavies\mikedavies_nuade.c" />
+    <ClCompile Include="nuade\players\mmdc\mmdc.c" />
+    <ClCompile Include="nuade\players\mmdc\mmdc_module.c" />
+    <ClCompile Include="nuade\players\mmdc\mmdc_nuade.c" />
+    <ClCompile Include="nuade\players\musicalenlightenment\musicalenlightenment.c" />
+    <ClCompile Include="nuade\players\musicalenlightenment\musicalenlightenment_nuade.c" />
+    <ClCompile Include="nuade\players\musicassembler\music_assembler.c" />
+    <ClCompile Include="nuade\players\musicassembler\music_assembler_nuade.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm4.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm8.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm8_mix020.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm8_mix68k.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm8_mixer.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_block.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_effects.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_event.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_file.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_instruments.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_song.c" />
+    <ClCompile Include="nuade\players\musicmaker\mm_tables.c" />
+    <ClCompile Include="nuade\players\musicmaker\musicmaker.c" />
+    <ClCompile Include="nuade\players\musicmaker\musicmaker_nuade.c" />
+    <ClCompile Include="nuade\players\ntsp\ntsp.c" />
+    <ClCompile Include="nuade\players\ntsp\ntsp_nuade.c" />
+    <ClCompile Include="nuade\players\oktalyzer\oktalyzer.c" />
+    <ClCompile Include="nuade\players\oktalyzer\oktalyzer_nuade.c" />
+    <ClCompile Include="nuade\players\onescapee\onescapee.c" />
+    <ClCompile Include="nuade\players\onescapee\onescapee_nuade.c" />
+    <ClCompile Include="nuade\players\paulrobotham\paulrobotham.c" />
+    <ClCompile Include="nuade\players\paulrobotham\paulrobotham_nuade.c" />
+    <ClCompile Include="nuade\players\paulrobotham\pr_module.c" />
+    <ClCompile Include="nuade\players\paulshields\paulshields.c" />
+    <ClCompile Include="nuade\players\paulshields\paulshields_nuade.c" />
+    <ClCompile Include="nuade\players\paulshields\ps_check.c" />
+    <ClCompile Include="nuade\players\paulshields\ps_module.c" />
+    <ClCompile Include="nuade\players\paulshields\ps_old.c" />
+    <ClCompile Include="nuade\players\paulshields\ps_sequencer.c" />
+    <ClCompile Include="nuade\players\paulshields\ps_voice.c" />
+    <ClCompile Include="nuade\players\paulsummers\paulsummers.c" />
+    <ClCompile Include="nuade\players\paulsummers\paulsummers_nuade.c" />
+    <ClCompile Include="nuade\players\paulsummers\ps_module.c" />
+    <ClCompile Include="nuade\players\peterverswyvelen\peterverswyvelen.c" />
+    <ClCompile Include="nuade\players\peterverswyvelen\peterverswyvelen_nuade.c" />
+    <ClCompile Include="nuade\players\pierreadane\pa_module.c" />
+    <ClCompile Include="nuade\players\pierreadane\pierreadane.c" />
+    <ClCompile Include="nuade\players\pierreadane\pierreadane_nuade.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pn_cpu.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pn_info.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pn_pokey.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pn_waves.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pokeynoise.c" />
+    <ClCompile Include="nuade\players\pokeynoise\pokeynoise_nuade.c" />
+    <ClCompile Include="nuade\players\professionalsoundartists\professionalsoundartists.c" />
+    <ClCompile Include="nuade\players\professionalsoundartists\professionalsoundartists_nuade.c" />
+    <ClCompile Include="nuade\players\protracker4\protracker4.c" />
+    <ClCompile Include="nuade\players\protracker4\protracker4_nuade.c" />
+    <ClCompile Include="nuade\players\pumatracker\pumatracker.c" />
+    <ClCompile Include="nuade\players\pumatracker\pumatracker_nuade.c" />
+    <ClCompile Include="nuade\players\quadracomposer\quadracomposer.c" />
+    <ClCompile Include="nuade\players\quadracomposer\quadracomposer_nuade.c" />
+    <ClCompile Include="nuade\players\quartet\qt_module.c" />
+    <ClCompile Include="nuade\players\quartet\quartet.c" />
+    <ClCompile Include="nuade\players\quartet\quartet_nuade.c" />
+    <ClCompile Include="nuade\players\richardjoseph\richardjoseph.c" />
+    <ClCompile Include="nuade\players\richardjoseph\richardjoseph_nuade.c" />
+    <ClCompile Include="nuade\players\richardjoseph\rjp_module.c" />
+    <ClCompile Include="nuade\players\riffraff\riffraff.c" />
+    <ClCompile Include="nuade\players\riffraff\riffraff_nuade.c" />
+    <ClCompile Include="nuade\players\riffraff\rr_module.c" />
+    <ClCompile Include="nuade\players\robhubbardst\rhst_module.c" />
+    <ClCompile Include="nuade\players\robhubbardst\robhubbardst.c" />
+    <ClCompile Include="nuade\players\robhubbardst\robhubbardst_nuade.c" />
+    <ClCompile Include="nuade\players\robhubbard\rh_code.c" />
+    <ClCompile Include="nuade\players\robhubbard\rh_module.c" />
+    <ClCompile Include="nuade\players\robhubbard\robhubbard.c" />
+    <ClCompile Include="nuade\players\robhubbard\robhubbard_nuade.c" />
+    <ClCompile Include="nuade\players\ronklaren\ronklaren.c" />
+    <ClCompile Include="nuade\players\ronklaren\ronklaren_nuade.c" />
+    <ClCompile Include="nuade\players\scottjohnston\scottjohnston.c" />
+    <ClCompile Include="nuade\players\scottjohnston\scottjohnston_nuade.c" />
+    <ClCompile Include="nuade\players\scottjohnston\sj_module.c" />
+    <ClCompile Include="nuade\players\scottjohnston\sj_samples.c" />
+    <ClCompile Include="nuade\players\scottjohnston\sj_sequence.c" />
+    <ClCompile Include="nuade\players\scottjohnston\sj_tables.c" />
+    <ClCompile Include="nuade\players\scumm\scm_module.c" />
+    <ClCompile Include="nuade\players\scumm\scumm.c" />
+    <ClCompile Include="nuade\players\scumm\scumm_nuade.c" />
+    <ClCompile Include="nuade\players\seanconnolly\sc_module.c" />
+    <ClCompile Include="nuade\players\seanconnolly\sc_v2.c" />
+    <ClCompile Include="nuade\players\seanconnolly\sc_v3.c" />
+    <ClCompile Include="nuade\players\seanconnolly\seanconnolly.c" />
+    <ClCompile Include="nuade\players\seanconnolly\seanconnolly_nuade.c" />
+    <ClCompile Include="nuade\players\seanconran\sc_code.c" />
+    <ClCompile Include="nuade\players\seanconran\sc_module.c" />
+    <ClCompile Include="nuade\players\seanconran\seanconran.c" />
+    <ClCompile Include="nuade\players\seanconran\seanconran_nuade.c" />
+    <ClCompile Include="nuade\players\sidmon2\sidmon2.c" />
+    <ClCompile Include="nuade\players\sidmon2\sidmon2_nuade.c" />
+    <ClCompile Include="nuade\players\silmarils\silmarils.c" />
+    <ClCompile Include="nuade\players\silmarils\silmarils_nuade.c" />
+    <ClCompile Include="nuade\players\silmarils\sil_module.c" />
+    <ClCompile Include="nuade\players\silmarils\sil_music.c" />
+    <ClCompile Include="nuade\players\silmarils\sil_script.c" />
+    <ClCompile Include="nuade\players\sonicarranger\sonicarranger_nuade.c" />
+    <ClCompile Include="nuade\players\sonicarranger\sonic_arranger.c" />
+    <ClCompile Include="nuade\players\sonix\sonix.c" />
+    <ClCompile Include="nuade\players\sonix\sonix_io.c" />
+    <ClCompile Include="nuade\players\sonix\sonix_nuade.c" />
+    <ClCompile Include="nuade\players\soundcontrol\soundcontrol.c" />
+    <ClCompile Include="nuade\players\soundcontrol\soundcontrol_nuade.c" />
+    <ClCompile Include="nuade\players\soundfactory\soundfactory.c" />
+    <ClCompile Include="nuade\players\soundfactory\soundfactory_nuade.c" />
+    <ClCompile Include="nuade\players\soundfx\soundfx.c" />
+    <ClCompile Include="nuade\players\soundfx\soundfx_nuade.c" />
+    <ClCompile Include="nuade\players\soundimages\si_images.c" />
+    <ClCompile Include="nuade\players\soundimages\si_module.c" />
+    <ClCompile Include="nuade\players\soundimages\si_walk.c" />
+    <ClCompile Include="nuade\players\soundimages\soundimages.c" />
+    <ClCompile Include="nuade\players\soundimages\soundimages_nuade.c" />
+    <ClCompile Include="nuade\players\soundmaster\sm_module.c" />
+    <ClCompile Include="nuade\players\soundmaster\sm_voice.c" />
+    <ClCompile Include="nuade\players\soundmaster\soundmaster.c" />
+    <ClCompile Include="nuade\players\soundmaster\soundmaster_nuade.c" />
+    <ClCompile Include="nuade\players\soundmon\soundmon.c" />
+    <ClCompile Include="nuade\players\soundmon\soundmon_nuade.c" />
+    <ClCompile Include="nuade\players\specialfx\specialfx.c" />
+    <ClCompile Include="nuade\players\specialfx\specialfx_nuade.c" />
+    <ClCompile Include="nuade\players\speedya1system\sa_module.c" />
+    <ClCompile Include="nuade\players\speedya1system\speedya1system.c" />
+    <ClCompile Include="nuade\players\speedya1system\speedya1system_nuade.c" />
+    <ClCompile Include="nuade\players\speedysystem\speedysystem.c" />
+    <ClCompile Include="nuade\players\speedysystem\speedysystem_nuade.c" />
+    <ClCompile Include="nuade\players\speedysystem\ss_module.c" />
+    <ClCompile Include="nuade\players\spl\spl.c" />
+    <ClCompile Include="nuade\players\spl\spl_builds.c" />
+    <ClCompile Include="nuade\players\spl\spl_module.c" />
+    <ClCompile Include="nuade\players\spl\spl_nuade.c" />
+    <ClCompile Include="nuade\players\stevebarrett\sbr_module.c" />
+    <ClCompile Include="nuade\players\stevebarrett\stevebarrett.c" />
+    <ClCompile Include="nuade\players\stevebarrett\stevebarrett_nuade.c" />
+    <ClCompile Include="nuade\players\suntronic\suntronic.c" />
+    <ClCompile Include="nuade\players\suntronic\suntronic_nuade.c" />
+    <ClCompile Include="nuade\players\suntronic\sun_module.c" />
+    <ClCompile Include="nuade\players\synthdream\sdr_module.c" />
+    <ClCompile Include="nuade\players\synthdream\sdr_proof.c" />
+    <ClCompile Include="nuade\players\synthdream\sdr_tables.c" />
+    <ClCompile Include="nuade\players\synthdream\synthdream.c" />
+    <ClCompile Include="nuade\players\synthdream\synthdream_nuade.c" />
+    <ClCompile Include="nuade\players\synthesis\synthesis.c" />
+    <ClCompile Include="nuade\players\synthesis\synthesis_nuade.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_common.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_longs.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_module.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_tables.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_voice.c" />
+    <ClCompile Include="nuade\players\synthpack\sp_words.c" />
+    <ClCompile Include="nuade\players\synthpack\synthpack.c" />
+    <ClCompile Include="nuade\players\synthpack\synthpack_nuade.c" />
+    <ClCompile Include="nuade\players\syntracker\syntracker.c" />
+    <ClCompile Include="nuade\players\syntracker\syntracker_nuade.c" />
+    <ClCompile Include="nuade\players\thomashermann\thm_module.c" />
+    <ClCompile Include="nuade\players\thomashermann\thomashermann.c" />
+    <ClCompile Include="nuade\players\thomashermann\thomashermann_nuade.c" />
+    <ClCompile Include="nuade\players\timetracker\timetracker.c" />
+    <ClCompile Include="nuade\players\timetracker\timetracker_nuade.c" />
+    <ClCompile Include="nuade\players\timfollin\tfol.c" />
+    <ClCompile Include="nuade\players\timfollin\tfol_module.c" />
+    <ClCompile Include="nuade\players\timfollin\tfol_nuade.c" />
+    <ClCompile Include="nuade\players\timfollin\tfol_proof.c" />
+    <ClCompile Include="nuade\players\tomytracker\tomytracker.c" />
+    <ClCompile Include="nuade\players\tomytracker\tomytracker_nuade.c" />
+    <ClCompile Include="nuade\players\tronic\tronic.c" />
+    <ClCompile Include="nuade\players\tronic\tronic_check.c" />
+    <ClCompile Include="nuade\players\tronic\tronic_module.c" />
+    <ClCompile Include="nuade\players\tronic\tronic_nuade.c" />
+    <ClCompile Include="nuade\players\ufo\ufo.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_bank.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_nuade.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_sequencer.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_song.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_state.c" />
+    <ClCompile Include="nuade\players\ufo\ufo_voice.c" />
+    <ClCompile Include="nuade\players\voodoo\voodoo.c" />
+    <ClCompile Include="nuade\players\voodoo\voodoo_nuade.c" />
+    <ClCompile Include="nuade\players\wallybeben\wallybeben.c" />
+    <ClCompile Include="nuade\players\wallybeben\wallybeben_nuade.c" />
+    <ClCompile Include="nuade\players\wallybeben\wb_decode.c" />
+    <ClCompile Include="nuade\players\wallybeben\wb_module.c" />
+    <ClCompile Include="nuade\players\wallybeben\wb_replay.c" />
+    <ClCompile Include="nuade\players\wallybeben\wb_versions.c" />
+    <ClCompile Include="nuade\players\zoundmonitor\zoundmonitor.c" />
+    <ClCompile Include="nuade\players\zoundmonitor\zoundmonitor_nuade.c" />
+    <ClCompile Include="nuade\src\nuade_file_index.c" />
+    <ClCompile Include="nuade\src\nuade_grid.c" />
+    <ClCompile Include="nuade\src\nuade_io_default.c" />
+    <ClCompile Include="nuade\src\nuade_mixer.c" />
+    <ClCompile Include="nuade\src\nuade_path.c" />
+    <ClCompile Include="nuade\src\nuade_paula_channel.c" />
+    <ClCompile Include="nuade\src\nuade_players.c" />
+    <ClCompile Include="nuade\src\nuade_registry.c" />
+    <ClCompile Include="nuade\src\nuade_scheduler.c" />
+    <ClCompile Include="nuade\src\nuade_song.c" />
+    <ClCompile Include="nuade\src\nuade_trace.c" />
+    <ClCompile Include="nuade\src\nuade_tracker.c" />
+    <ClCompile Include="nuade\src\nuade_viz.c" />
+    <ClCompile Include="ReplayNuade.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="nuade\LICENSE" />
+    <None Include="nuade\players\pumatracker\pumatracker_waves.inc" />
+    <None Include="nuade\README.md" />
+    <None Include="nuade\THIRD_PARTY_NOTICES.md" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,2317 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\nuade">
+      <UniqueIdentifier>{14de4a2f-9767-46e1-811b-cdb5da4cac22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\include">
+      <UniqueIdentifier>{3ef3da57-3137-492b-90c4-2f40986ca8a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\include\players">
+      <UniqueIdentifier>{d60811d4-42d5-4619-8299-1fe2fc91d2eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players">
+      <UniqueIdentifier>{79572720-a561-427a-ae6b-a5b0d4b1343a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\src">
+      <UniqueIdentifier>{191b0a55-4ecf-4698-ba6b-b49877e6e18c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\actionamics">
+      <UniqueIdentifier>{3ce42b90-4725-4319-b90f-b8cea2d47d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\activisionpro">
+      <UniqueIdentifier>{3f503468-479d-475e-a5e8-0e1b98542ae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\amcomposer">
+      <UniqueIdentifier>{b914ab9c-a001-455d-bdb4-b2767c242b6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\amos">
+      <UniqueIdentifier>{874c9b62-ebd6-478e-9d2a-8578ced5c4a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\andersoland">
+      <UniqueIdentifier>{ad9862c1-1f9b-405d-95f8-4158c0ed271d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\andrewparton">
+      <UniqueIdentifier>{d65b2556-4040-41fe-8d94-d903de8d2a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\aprosys">
+      <UniqueIdentifier>{5927682d-2dbe-45a4-8b08-82760acaa603}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\artandmagic">
+      <UniqueIdentifier>{8f9a1ca7-8134-4baa-9cf8-ddb9166940c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\ashleyhogg">
+      <UniqueIdentifier>{7e7a1975-1b16-46cd-9837-047cff96407b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\audiosculpture">
+      <UniqueIdentifier>{a61bcd9e-09ac-4b90-9c3f-034d33894b35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\beathoven">
+      <UniqueIdentifier>{338e6b2d-e150-4bbc-96d3-3a3bae199811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\bendaglish">
+      <UniqueIdentifier>{0cc5d14e-c8f0-4306-830c-8a3b580698d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\bendaglishsid">
+      <UniqueIdentifier>{8d395fce-012d-488e-9364-d3dd1f3f7c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\cinemaware">
+      <UniqueIdentifier>{2bdbd578-e80f-4ae4-b292-15e2cb77dd91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\coredesign">
+      <UniqueIdentifier>{2e3b59e4-6485-41da-98b4-ad7a1a16b803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\dariuszendeh">
+      <UniqueIdentifier>{b8723351-a3d0-442e-81ef-5e47484bf342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\davelowe">
+      <UniqueIdentifier>{619309bb-b2ef-4a3d-989e-253c8b3fe5fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\davidhanney">
+      <UniqueIdentifier>{a446f210-3e1a-4688-b024-98bf71b5f1df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\davidwhittaker">
+      <UniqueIdentifier>{e6bf30d0-c821-436a-bec0-5529a1409394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\deltamusic1">
+      <UniqueIdentifier>{4c84b09b-f66b-4bd4-a57c-ca21679287ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\deltamusic2">
+      <UniqueIdentifier>{310ca80e-cec6-4bdd-a5b8-4fe9f6792b52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\desire">
+      <UniqueIdentifier>{0dd3e9b2-9857-48a2-8079-c4f2fa8ad73b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\digmug">
+      <UniqueIdentifier>{386210de-71c3-4ddc-b825-10731246aa6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\dirkbialluch">
+      <UniqueIdentifier>{86564602-6c48-4f42-a7a2-34f6a5f3a0a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\dsc">
+      <UniqueIdentifier>{db1efc2a-c8ab-4ade-bd9e-3f85936d5cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\dss">
+      <UniqueIdentifier>{ae0cab03-f05e-4e49-8933-b34a00900841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\dynamicsynthesizer">
+      <UniqueIdentifier>{7305079f-2065-4452-98bd-73ce17d111b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\earache">
+      <UniqueIdentifier>{189dc8ab-9d3c-4412-9708-264f02b4e7d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\ems">
+      <UniqueIdentifier>{af5fd038-a123-48c2-9a12-b33e3b20a9ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\emsv6">
+      <UniqueIdentifier>{f88f6a5a-43d1-4779-80e0-6e958ab1baf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\facethemusic">
+      <UniqueIdentifier>{2dc0a84e-d20a-4d3a-b5fe-fcc74795d488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\fashiontracker">
+      <UniqueIdentifier>{937db05b-bb8d-4ffb-8403-12287cd10c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\fcbsi">
+      <UniqueIdentifier>{d14f4c34-2180-458b-abff-a7633716a633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\forgottenworlds">
+      <UniqueIdentifier>{dc88ebda-f984-433a-b02c-d6bcfd41def6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\fred_np">
+      <UniqueIdentifier>{5c4e8b19-1a83-4672-91c8-f407a5a8c82b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\fredgray">
+      <UniqueIdentifier>{a0af2013-b611-467d-a247-65dd8dafb578}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\futurecomposer">
+      <UniqueIdentifier>{7afdb43a-f87d-485b-ad9d-316e9105b4fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\gluemon">
+      <UniqueIdentifier>{27151eda-bfb1-4e5f-b394-1be06f410450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\gmc">
+      <UniqueIdentifier>{fe4afb70-e207-4a2b-9eac-4f1522722974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\hippel">
+      <UniqueIdentifier>{8a130d43-a309-4032-a64e-0aa623e22e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\hippel7v">
+      <UniqueIdentifier>{919b95ca-bbce-4db3-a9fd-43cddcf84348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\hippelhip">
+      <UniqueIdentifier>{ffea7826-2b8b-4eca-9f5e-bce2a7367bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\howiedavies">
+      <UniqueIdentifier>{01be048b-faee-44c4-8c2f-b78497759c09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\infogrames">
+      <UniqueIdentifier>{625946ba-891b-4f0b-aa2c-56ae8a8105fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\instereo1">
+      <UniqueIdentifier>{01c974a9-4639-484c-b107-4c95caf7ffa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\instereo2">
+      <UniqueIdentifier>{64a7f76b-0520-4b67-ad87-4c6ea5b4b17d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jamcracker">
+      <UniqueIdentifier>{f82633e3-9583-4eac-a501-618725c171ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jankomrsicflogel">
+      <UniqueIdentifier>{52eb7d10-d291-4e57-85aa-b6ed56f6dcab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jasonbrooke">
+      <UniqueIdentifier>{d86d8d3b-d889-4f89-8b92-a4c6457dbee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jasonpage">
+      <UniqueIdentifier>{2207a6ae-cc46-4689-9ca0-5046a5fb6213}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jeroentel">
+      <UniqueIdentifier>{ebf284ff-55e2-4828-bf48-71550c60ba42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\jesperolsen">
+      <UniqueIdentifier>{9ae6df4b-c3ad-4d41-aabb-505b3082002c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\kimchristensen">
+      <UniqueIdentifier>{d971c9a1-2e1e-4649-8278-532c02f05089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\krishatlelid">
+      <UniqueIdentifier>{ed1a8953-48eb-44d7-a102-a03751984283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\laxity">
+      <UniqueIdentifier>{41633af8-bdf2-4f6d-b471-e26476464df9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\legglessmusiceditor">
+      <UniqueIdentifier>{4f91f6e7-5929-4206-99a9-4354288ba494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\majortom">
+      <UniqueIdentifier>{159d19f0-c1ce-47fe-8ea8-dbaefc647ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\maniacsofnoise">
+      <UniqueIdentifier>{add299d1-37b8-4cfb-9e7d-645907b9baf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\markcooksey">
+      <UniqueIdentifier>{d5db1fc3-1734-4520-8997-f83dda543ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\markcooksey_old">
+      <UniqueIdentifier>{69a37940-84e5-4e25-82b8-17a0e45f5544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\markii">
+      <UniqueIdentifier>{0759118b-219f-42f5-9b08-505f716cb121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\maximumeffect">
+      <UniqueIdentifier>{c70491ff-63e4-4fb7-b210-60e45d02bb77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\mcmd">
+      <UniqueIdentifier>{afb1c849-6b83-47c6-9a6e-291a064ea3e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\medley">
+      <UniqueIdentifier>{d874b8c3-1c66-484f-ad08-0ca216eecab7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\mikedavies">
+      <UniqueIdentifier>{f347ddf3-6fba-4bb5-bab0-cd60a2488938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\mmdc">
+      <UniqueIdentifier>{cbc7879c-b139-43c0-b4e9-aac7c9babad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\musicalenlightenment">
+      <UniqueIdentifier>{31012625-995c-483d-a88d-9891eb53442a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\musicassembler">
+      <UniqueIdentifier>{864ab7b5-7337-4ffc-a68f-634051ff9d0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\musicmaker">
+      <UniqueIdentifier>{7d13b967-5abb-4254-9ee4-34ffe2501903}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\ntsp">
+      <UniqueIdentifier>{5e27eaa2-73d9-4967-bd44-610cd80e6ebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\oktalyzer">
+      <UniqueIdentifier>{5550028e-d1fe-4116-bfd1-ab34ebdb92e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\onescapee">
+      <UniqueIdentifier>{f50eaeea-8bdc-4014-aa11-82de9c87bb40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\paulrobotham">
+      <UniqueIdentifier>{4d7edff5-37dd-473b-ab03-2683f76cd9ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\paulshields">
+      <UniqueIdentifier>{5d242254-9958-4e91-bc0f-1434359bf85e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\paulsummers">
+      <UniqueIdentifier>{28e88b71-2a67-4e5a-98c7-59613446d0c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\peterverswyvelen">
+      <UniqueIdentifier>{a78002a7-d340-4559-b4cc-186541e018a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\pierreadane">
+      <UniqueIdentifier>{616ccf16-b6fc-44aa-8480-e9182501ee2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\pokeynoise">
+      <UniqueIdentifier>{fc6cf2b3-2517-4e80-8f88-8795237212e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\professionalsoundartists">
+      <UniqueIdentifier>{a5362133-060a-4f53-87ee-f287e72228f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\protracker4">
+      <UniqueIdentifier>{8c9d5535-9ae4-44a9-81ab-1900f804142a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\pumatracker">
+      <UniqueIdentifier>{dc0f4da0-cd86-42fe-af44-bc656be4ffad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\quadracomposer">
+      <UniqueIdentifier>{043f97c5-561f-40a4-afd4-c9ef1add5274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\quartet">
+      <UniqueIdentifier>{2163a374-7d40-4f3c-a319-5dbc9b6aa738}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\richardjoseph">
+      <UniqueIdentifier>{f9912a00-3f18-4fc3-bd8b-560803cb4d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\riffraff">
+      <UniqueIdentifier>{d511f548-5522-4202-965a-572ea2043c65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\robhubbard">
+      <UniqueIdentifier>{a5a03d86-d0df-47ed-bf53-f72a4908872d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\robhubbardst">
+      <UniqueIdentifier>{029d1e75-6c77-4068-b5be-e63178b1e55a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\ronklaren">
+      <UniqueIdentifier>{53e11040-fb7c-4103-99b3-f5a29a0f95df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\scottjohnston">
+      <UniqueIdentifier>{5e9fd2ae-be71-4d8f-a4d2-d971d894eeb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\scumm">
+      <UniqueIdentifier>{f3c8dcb7-67d7-4c18-9f18-23ec7762485c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\seanconnolly">
+      <UniqueIdentifier>{4b3a988d-5a28-4036-815e-16e93e5cf1ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\seanconran">
+      <UniqueIdentifier>{f2234cf0-8384-4937-9ab2-0e0e067a2a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\sidmon2">
+      <UniqueIdentifier>{9bd03db3-2be3-4f0b-9ff5-ae621979639e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\silmarils">
+      <UniqueIdentifier>{26ef4b09-f3d5-46ad-8e17-4901732b1f79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\sonicarranger">
+      <UniqueIdentifier>{a4ef9ce4-3159-4197-95a1-a919257243df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\sonix">
+      <UniqueIdentifier>{8f6e218b-ab4a-4814-9c74-8590fb1cdc64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundcontrol">
+      <UniqueIdentifier>{455ded29-d919-498c-b3b6-1b8ada6c6fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundfactory">
+      <UniqueIdentifier>{d4eddcb5-2766-45b0-9806-d5d3937d0c85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundfx">
+      <UniqueIdentifier>{f4619fb2-d6eb-46b9-b3d3-63fe6d42cce6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundimages">
+      <UniqueIdentifier>{e89ed9e3-6190-4e67-b63c-1bd29f831d62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundmaster">
+      <UniqueIdentifier>{a14feec5-d670-4eee-ae1e-174b4837e1b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\soundmon">
+      <UniqueIdentifier>{eaee6dfa-2956-4f79-9dad-603b51f5f311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\specialfx">
+      <UniqueIdentifier>{d8dc4e89-dccf-4213-bda1-39b901b06d45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\speedya1system">
+      <UniqueIdentifier>{91742ebc-8d05-435b-b77c-71ef6d3f8563}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\speedysystem">
+      <UniqueIdentifier>{ba7944f5-ba1a-4da8-8a8f-6d725f203e4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\spl">
+      <UniqueIdentifier>{4911c1fe-43ba-4604-b4a9-32fa48985f19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\stevebarrett">
+      <UniqueIdentifier>{818606de-1f77-4927-b5b6-8ab4d4ffcc91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\suntronic">
+      <UniqueIdentifier>{6768ea06-4aec-40d1-ab46-8297b18ee7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\synthdream">
+      <UniqueIdentifier>{214c4c25-efef-444a-9eb1-1d6ffca57c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\synthesis">
+      <UniqueIdentifier>{9cb8188c-dcc7-4b3b-b8c9-1483ab8cca7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\synthpack">
+      <UniqueIdentifier>{df7e27ad-3b11-4da0-b0ab-774ab70c38af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\syntracker">
+      <UniqueIdentifier>{6bf1b5c9-845b-4b7f-90f8-19bdff87d3bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\thomashermann">
+      <UniqueIdentifier>{69a9eaaa-8839-47fe-8876-e1ce48e0f8a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\timetracker">
+      <UniqueIdentifier>{c1697952-c7d8-4bdc-9b3f-24a26e8aa039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\timfollin">
+      <UniqueIdentifier>{8d962827-6883-40c9-b50f-c3c32b8ca9c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\tomytracker">
+      <UniqueIdentifier>{7a896ba3-bfca-4aec-859f-a24251506985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\tronic">
+      <UniqueIdentifier>{116f3fcd-2e99-4648-89a0-7a9e9d972c03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\ufo">
+      <UniqueIdentifier>{7899af09-5732-4472-bf1f-b11428977c0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\voodoo">
+      <UniqueIdentifier>{eb6eeca3-e98c-4edc-aa28-1d76697cb4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\wallybeben">
+      <UniqueIdentifier>{268ae33f-69a5-4ec3-a513-6a37c51d8aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nuade\players\zoundmonitor">
+      <UniqueIdentifier>{592a7def-e300-4391-bd10-6a63d00113d2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ReplayNuade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_file_index.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_grid.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_io_default.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_mixer.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_path.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_paula_channel.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_registry.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_scheduler.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_song.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_trace.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_tracker.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_viz.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\actionamics\actionamics.c">
+      <Filter>Source Files\nuade\players\actionamics</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\actionamics\actionamics_nuade.c">
+      <Filter>Source Files\nuade\players\actionamics</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\src\nuade_players.c">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\activisionpro\activisionpro.c">
+      <Filter>Source Files\nuade\players\activisionpro</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\activisionpro\activisionpro_nuade.c">
+      <Filter>Source Files\nuade\players\activisionpro</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\amcomposer\amcomposer.c">
+      <Filter>Source Files\nuade\players\amcomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\amcomposer\amcomposer_nuade.c">
+      <Filter>Source Files\nuade\players\amcomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\amos\amos.c">
+      <Filter>Source Files\nuade\players\amos</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\amos\amos_nuade.c">
+      <Filter>Source Files\nuade\players\amos</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\andersoland\andersoland.c">
+      <Filter>Source Files\nuade\players\andersoland</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\andersoland\andersoland_nuade.c">
+      <Filter>Source Files\nuade\players\andersoland</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\andrewparton\andrewparton.c">
+      <Filter>Source Files\nuade\players\andrewparton</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\andrewparton\andrewparton_nuade.c">
+      <Filter>Source Files\nuade\players\andrewparton</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\aprosys\aprosys.c">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\aprosys\aprosys_module.c">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\aprosys\aprosys_nuade.c">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\aprosys\aprosys_voice.c">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\aprosys\aprosys_wave.c">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\artandmagic\artandmagic.c">
+      <Filter>Source Files\nuade\players\artandmagic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\artandmagic\artandmagic_nuade.c">
+      <Filter>Source Files\nuade\players\artandmagic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ashleyhogg\ah_module.c">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ashleyhogg\ah_new.c">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ashleyhogg\ah_old.c">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ashleyhogg\ashleyhogg.c">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ashleyhogg\ashleyhogg_nuade.c">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\audiosculpture\audiosculpture.c">
+      <Filter>Source Files\nuade\players\audiosculpture</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\audiosculpture\audiosculpture_nuade.c">
+      <Filter>Source Files\nuade\players\audiosculpture</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_legacy.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_locate.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_module.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_nuade.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_songs.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\beathoven\beathoven_voice.c">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglish\ben_daglish.c">
+      <Filter>Source Files\nuade\players\bendaglish</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglish\bendaglish_nuade.c">
+      <Filter>Source Files\nuade\players\bendaglish</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglishsid\bds_driver.c">
+      <Filter>Source Files\nuade\players\bendaglishsid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglishsid\bds_module.c">
+      <Filter>Source Files\nuade\players\bendaglishsid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglishsid\bendaglishsid.c">
+      <Filter>Source Files\nuade\players\bendaglishsid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\bendaglishsid\bendaglishsid_nuade.c">
+      <Filter>Source Files\nuade\players\bendaglishsid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\cinemaware\cinemaware.c">
+      <Filter>Source Files\nuade\players\cinemaware</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\cinemaware\cinemaware_nuade.c">
+      <Filter>Source Files\nuade\players\cinemaware</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\coredesign\cd_driver.c">
+      <Filter>Source Files\nuade\players\coredesign</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\coredesign\cd_module.c">
+      <Filter>Source Files\nuade\players\coredesign</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\coredesign\coredesign.c">
+      <Filter>Source Files\nuade\players\coredesign</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\coredesign\coredesign_nuade.c">
+      <Filter>Source Files\nuade\players\coredesign</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dariuszendeh\dariuszendeh.c">
+      <Filter>Source Files\nuade\players\dariuszendeh</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dariuszendeh\dariuszendeh_nuade.c">
+      <Filter>Source Files\nuade\players\dariuszendeh</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dariuszendeh\dz_locate.c">
+      <Filter>Source Files\nuade\players\dariuszendeh</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\davelowe.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\davelowe_nuade.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_code.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_deli.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_engine.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_game.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_hooks.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_midwinter.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_new.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davelowe\dl_record.c">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davidhanney\davidhanney.c">
+      <Filter>Source Files\nuade\players\davidhanney</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davidhanney\davidhanney_nuade.c">
+      <Filter>Source Files\nuade\players\davidhanney</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davidhanney\dh_data.c">
+      <Filter>Source Files\nuade\players\davidhanney</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davidwhittaker\davidwhittaker.c">
+      <Filter>Source Files\nuade\players\davidwhittaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\davidwhittaker\davidwhittaker_nuade.c">
+      <Filter>Source Files\nuade\players\davidwhittaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\deltamusic1\deltamusic1.c">
+      <Filter>Source Files\nuade\players\deltamusic1</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\deltamusic1\deltamusic1_nuade.c">
+      <Filter>Source Files\nuade\players\deltamusic1</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\deltamusic2\deltamusic2.c">
+      <Filter>Source Files\nuade\players\deltamusic2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\deltamusic2\deltamusic2_nuade.c">
+      <Filter>Source Files\nuade\players\deltamusic2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\desire\desire.c">
+      <Filter>Source Files\nuade\players\desire</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\desire\desire_nuade.c">
+      <Filter>Source Files\nuade\players\desire</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\desire\dsr_driver.c">
+      <Filter>Source Files\nuade\players\desire</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\desire\dsr_module.c">
+      <Filter>Source Files\nuade\players\desire</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\digmug\digmug.c">
+      <Filter>Source Files\nuade\players\digmug</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\digmug\digmug_nuade.c">
+      <Filter>Source Files\nuade\players\digmug</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dirkbialluch\db_module.c">
+      <Filter>Source Files\nuade\players\dirkbialluch</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dirkbialluch\dirkbialluch.c">
+      <Filter>Source Files\nuade\players\dirkbialluch</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dirkbialluch\dirkbialluch_nuade.c">
+      <Filter>Source Files\nuade\players\dirkbialluch</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dsc\dsc.c">
+      <Filter>Source Files\nuade\players\dsc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dsc\dsc_nuade.c">
+      <Filter>Source Files\nuade\players\dsc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dss\dss.c">
+      <Filter>Source Files\nuade\players\dss</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dss\dss_nuade.c">
+      <Filter>Source Files\nuade\players\dss</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dns_module.c">
+      <Filter>Source Files\nuade\players\dynamicsynthesizer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dns_replayer.c">
+      <Filter>Source Files\nuade\players\dynamicsynthesizer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dynamicsynthesizer.c">
+      <Filter>Source Files\nuade\players\dynamicsynthesizer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\dynamicsynthesizer\dynamicsynthesizer_nuade.c">
+      <Filter>Source Files\nuade\players\dynamicsynthesizer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\earache\ea_module.c">
+      <Filter>Source Files\nuade\players\earache</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\earache\earache.c">
+      <Filter>Source Files\nuade\players\earache</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\earache\earache_nuade.c">
+      <Filter>Source Files\nuade\players\earache</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ems\ems.c">
+      <Filter>Source Files\nuade\players\ems</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ems\ems_nuade.c">
+      <Filter>Source Files\nuade\players\ems</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\emsv6\emsv6.c">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\emsv6\emsv6_mixer.c">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\emsv6\emsv6_nuade.c">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\emsv6\emsv6_sequencer.c">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\emsv6\emsv6_tables.c">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\facethemusic\facethemusic.c">
+      <Filter>Source Files\nuade\players\facethemusic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\facethemusic\facethemusic_nuade.c">
+      <Filter>Source Files\nuade\players\facethemusic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fashiontracker\fashiontracker.c">
+      <Filter>Source Files\nuade\players\fashiontracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fashiontracker\fashiontracker_nuade.c">
+      <Filter>Source Files\nuade\players\fashiontracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fcbsi\fcbsi.c">
+      <Filter>Source Files\nuade\players\fcbsi</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fcbsi\fcbsi_nuade.c">
+      <Filter>Source Files\nuade\players\fcbsi</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\forgottenworlds\forgottenworlds.c">
+      <Filter>Source Files\nuade\players\forgottenworlds</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\forgottenworlds\forgottenworlds_nuade.c">
+      <Filter>Source Files\nuade\players\forgottenworlds</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fred_np\fred_np_nuade.c">
+      <Filter>Source Files\nuade\players\fred_np</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fred_np\fred_replayer.c">
+      <Filter>Source Files\nuade\players\fred_np</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fg_code.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fg_locate.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fg_module.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fg_section.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fredgray.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\fredgray\fredgray_nuade.c">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\futurecomposer\futurecomposer.c">
+      <Filter>Source Files\nuade\players\futurecomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\futurecomposer\futurecomposer_nuade.c">
+      <Filter>Source Files\nuade\players\futurecomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\gluemon\gluemon.c">
+      <Filter>Source Files\nuade\players\gluemon</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\gluemon\gluemon_nuade.c">
+      <Filter>Source Files\nuade\players\gluemon</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\gluemon\gm_module.c">
+      <Filter>Source Files\nuade\players\gluemon</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\gmc\gmc.c">
+      <Filter>Source Files\nuade\players\gmc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\gmc\gmc_nuade.c">
+      <Filter>Source Files\nuade\players\gmc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel\hippel.c">
+      <Filter>Source Files\nuade\players\hippel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel\hippel_nuade.c">
+      <Filter>Source Files\nuade\players\hippel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel7v\h7v_mixer.c">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel7v\h7v_module.c">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel7v\h7v_voice.c">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel7v\hippel7v.c">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippel7v\hippel7v_nuade.c">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hh_a.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hh_b.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hh_c.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hh_common.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hippelhip.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\hippelhip\hippelhip_nuade.c">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\howiedavies\hd_module.c">
+      <Filter>Source Files\nuade\players\howiedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\howiedavies\howiedavies.c">
+      <Filter>Source Files\nuade\players\howiedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\howiedavies\howiedavies_nuade.c">
+      <Filter>Source Files\nuade\players\howiedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\infogrames\ig_module.c">
+      <Filter>Source Files\nuade\players\infogrames</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\infogrames\infogrames.c">
+      <Filter>Source Files\nuade\players\infogrames</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\infogrames\infogrames_nuade.c">
+      <Filter>Source Files\nuade\players\infogrames</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\instereo1\instereo1.c">
+      <Filter>Source Files\nuade\players\instereo1</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\instereo1\instereo1_nuade.c">
+      <Filter>Source Files\nuade\players\instereo1</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\instereo2\instereo2.c">
+      <Filter>Source Files\nuade\players\instereo2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\instereo2\instereo2_nuade.c">
+      <Filter>Source Files\nuade\players\instereo2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jamcracker\jamcracker.c">
+      <Filter>Source Files\nuade\players\jamcracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jamcracker\jamcracker_nuade.c">
+      <Filter>Source Files\nuade\players\jamcracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jankomrsicflogel\jankomrsicflogel.c">
+      <Filter>Source Files\nuade\players\jankomrsicflogel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jankomrsicflogel\jankomrsicflogel_nuade.c">
+      <Filter>Source Files\nuade\players\jankomrsicflogel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jankomrsicflogel\jmf_module.c">
+      <Filter>Source Files\nuade\players\jankomrsicflogel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonbrooke\jasonbrooke.c">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonbrooke\jasonbrooke_nuade.c">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonbrooke\jb_a.c">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonbrooke\jb_b.c">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonbrooke\jb_locate.c">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonpage\jasonpage.c">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonpage\jasonpage_nuade.c">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonpage\jp_module.c">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonpage\jp_seq.c">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jasonpage\jp_voice.c">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jeroentel\jeroentel.c">
+      <Filter>Source Files\nuade\players\jeroentel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jeroentel\jeroentel_nuade.c">
+      <Filter>Source Files\nuade\players\jeroentel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jeroentel\jt_module.c">
+      <Filter>Source Files\nuade\players\jeroentel</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jesperolsen\jesperolsen.c">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jesperolsen\jesperolsen_nuade.c">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jesperolsen\jo_a.c">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jesperolsen\jo_b.c">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\jesperolsen\jo_c.c">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\kimchristensen\kim_module.c">
+      <Filter>Source Files\nuade\players\kimchristensen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\kimchristensen\kimchristensen.c">
+      <Filter>Source Files\nuade\players\kimchristensen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\kimchristensen\kimchristensen_nuade.c">
+      <Filter>Source Files\nuade\players\kimchristensen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\krishatlelid\kh_module.c">
+      <Filter>Source Files\nuade\players\krishatlelid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\krishatlelid\krishatlelid.c">
+      <Filter>Source Files\nuade\players\krishatlelid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\krishatlelid\krishatlelid_nuade.c">
+      <Filter>Source Files\nuade\players\krishatlelid</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\laxity\laxity.c">
+      <Filter>Source Files\nuade\players\laxity</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\laxity\laxity_nuade.c">
+      <Filter>Source Files\nuade\players\laxity</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\legglessmusiceditor\legglessmusiceditor.c">
+      <Filter>Source Files\nuade\players\legglessmusiceditor</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\legglessmusiceditor\legglessmusiceditor_nuade.c">
+      <Filter>Source Files\nuade\players\legglessmusiceditor</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\legglessmusiceditor\lme_module.c">
+      <Filter>Source Files\nuade\players\legglessmusiceditor</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\majortom\majortom.c">
+      <Filter>Source Files\nuade\players\majortom</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\majortom\majortom_nuade.c">
+      <Filter>Source Files\nuade\players\majortom</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\majortom\mt_data.c">
+      <Filter>Source Files\nuade\players\majortom</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\majortom\mt_module.c">
+      <Filter>Source Files\nuade\players\majortom</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\maniacsofnoise.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\maniacsofnoise_nuade.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_commands.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_module.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_new.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_old.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_voice.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maniacsofnoise\mon_walk.c">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markcooksey\markcooksey.c">
+      <Filter>Source Files\nuade\players\markcooksey</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markcooksey\markcooksey_nuade.c">
+      <Filter>Source Files\nuade\players\markcooksey</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markcooksey_old\markcooksey_old.c">
+      <Filter>Source Files\nuade\players\markcooksey_old</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markcooksey_old\markcooksey_old_nuade.c">
+      <Filter>Source Files\nuade\players\markcooksey_old</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markii\markii.c">
+      <Filter>Source Files\nuade\players\markii</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markii\markii_nuade.c">
+      <Filter>Source Files\nuade\players\markii</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\markii\mk2_module.c">
+      <Filter>Source Files\nuade\players\markii</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maximumeffect\maximumeffect.c">
+      <Filter>Source Files\nuade\players\maximumeffect</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maximumeffect\maximumeffect_nuade.c">
+      <Filter>Source Files\nuade\players\maximumeffect</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\maximumeffect\mxe_module.c">
+      <Filter>Source Files\nuade\players\maximumeffect</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mcmd\mcmd.c">
+      <Filter>Source Files\nuade\players\mcmd</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mcmd\mcmd_nuade.c">
+      <Filter>Source Files\nuade\players\mcmd</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\medley\mdl_coverage.c">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\medley\mdl_data.c">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\medley\mdl_module.c">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\medley\medley.c">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\medley\medley_nuade.c">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mikedavies\md_module.c">
+      <Filter>Source Files\nuade\players\mikedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mikedavies\mikedavies.c">
+      <Filter>Source Files\nuade\players\mikedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mikedavies\mikedavies_nuade.c">
+      <Filter>Source Files\nuade\players\mikedavies</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mmdc\mmdc.c">
+      <Filter>Source Files\nuade\players\mmdc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mmdc\mmdc_module.c">
+      <Filter>Source Files\nuade\players\mmdc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\mmdc\mmdc_nuade.c">
+      <Filter>Source Files\nuade\players\mmdc</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicalenlightenment\musicalenlightenment.c">
+      <Filter>Source Files\nuade\players\musicalenlightenment</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicalenlightenment\musicalenlightenment_nuade.c">
+      <Filter>Source Files\nuade\players\musicalenlightenment</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicassembler\music_assembler.c">
+      <Filter>Source Files\nuade\players\musicassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicassembler\music_assembler_nuade.c">
+      <Filter>Source Files\nuade\players\musicassembler</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_block.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_effects.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_event.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_file.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_instruments.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_song.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm_tables.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm4.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm8.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm8_mix020.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm8_mix68k.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\mm8_mixer.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\musicmaker.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\musicmaker\musicmaker_nuade.c">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ntsp\ntsp.c">
+      <Filter>Source Files\nuade\players\ntsp</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ntsp\ntsp_nuade.c">
+      <Filter>Source Files\nuade\players\ntsp</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\oktalyzer\oktalyzer.c">
+      <Filter>Source Files\nuade\players\oktalyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\oktalyzer\oktalyzer_nuade.c">
+      <Filter>Source Files\nuade\players\oktalyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\onescapee\onescapee.c">
+      <Filter>Source Files\nuade\players\onescapee</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\onescapee\onescapee_nuade.c">
+      <Filter>Source Files\nuade\players\onescapee</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulrobotham\paulrobotham.c">
+      <Filter>Source Files\nuade\players\paulrobotham</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulrobotham\paulrobotham_nuade.c">
+      <Filter>Source Files\nuade\players\paulrobotham</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulrobotham\pr_module.c">
+      <Filter>Source Files\nuade\players\paulrobotham</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\paulshields.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\paulshields_nuade.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\ps_check.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\ps_module.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\ps_old.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\ps_sequencer.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulshields\ps_voice.c">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulsummers\paulsummers.c">
+      <Filter>Source Files\nuade\players\paulsummers</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulsummers\paulsummers_nuade.c">
+      <Filter>Source Files\nuade\players\paulsummers</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\paulsummers\ps_module.c">
+      <Filter>Source Files\nuade\players\paulsummers</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\peterverswyvelen\peterverswyvelen.c">
+      <Filter>Source Files\nuade\players\peterverswyvelen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\peterverswyvelen\peterverswyvelen_nuade.c">
+      <Filter>Source Files\nuade\players\peterverswyvelen</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pierreadane\pa_module.c">
+      <Filter>Source Files\nuade\players\pierreadane</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pierreadane\pierreadane.c">
+      <Filter>Source Files\nuade\players\pierreadane</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pierreadane\pierreadane_nuade.c">
+      <Filter>Source Files\nuade\players\pierreadane</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pn_cpu.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pn_info.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pn_pokey.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pn_waves.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pokeynoise.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pokeynoise\pokeynoise_nuade.c">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\professionalsoundartists\professionalsoundartists.c">
+      <Filter>Source Files\nuade\players\professionalsoundartists</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\professionalsoundartists\professionalsoundartists_nuade.c">
+      <Filter>Source Files\nuade\players\professionalsoundartists</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\protracker4\protracker4.c">
+      <Filter>Source Files\nuade\players\protracker4</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\protracker4\protracker4_nuade.c">
+      <Filter>Source Files\nuade\players\protracker4</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pumatracker\pumatracker.c">
+      <Filter>Source Files\nuade\players\pumatracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\pumatracker\pumatracker_nuade.c">
+      <Filter>Source Files\nuade\players\pumatracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\quadracomposer\quadracomposer.c">
+      <Filter>Source Files\nuade\players\quadracomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\quadracomposer\quadracomposer_nuade.c">
+      <Filter>Source Files\nuade\players\quadracomposer</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\quartet\qt_module.c">
+      <Filter>Source Files\nuade\players\quartet</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\quartet\quartet.c">
+      <Filter>Source Files\nuade\players\quartet</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\quartet\quartet_nuade.c">
+      <Filter>Source Files\nuade\players\quartet</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\richardjoseph\richardjoseph.c">
+      <Filter>Source Files\nuade\players\richardjoseph</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\richardjoseph\richardjoseph_nuade.c">
+      <Filter>Source Files\nuade\players\richardjoseph</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\richardjoseph\rjp_module.c">
+      <Filter>Source Files\nuade\players\richardjoseph</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\riffraff\riffraff.c">
+      <Filter>Source Files\nuade\players\riffraff</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\riffraff\riffraff_nuade.c">
+      <Filter>Source Files\nuade\players\riffraff</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\riffraff\rr_module.c">
+      <Filter>Source Files\nuade\players\riffraff</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbard\rh_code.c">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbard\rh_module.c">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbard\robhubbard.c">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbard\robhubbard_nuade.c">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbardst\rhst_module.c">
+      <Filter>Source Files\nuade\players\robhubbardst</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbardst\robhubbardst.c">
+      <Filter>Source Files\nuade\players\robhubbardst</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\robhubbardst\robhubbardst_nuade.c">
+      <Filter>Source Files\nuade\players\robhubbardst</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ronklaren\ronklaren.c">
+      <Filter>Source Files\nuade\players\ronklaren</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ronklaren\ronklaren_nuade.c">
+      <Filter>Source Files\nuade\players\ronklaren</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\scottjohnston.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\scottjohnston_nuade.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\sj_module.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\sj_samples.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\sj_sequence.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scottjohnston\sj_tables.c">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scumm\scm_module.c">
+      <Filter>Source Files\nuade\players\scumm</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scumm\scumm.c">
+      <Filter>Source Files\nuade\players\scumm</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\scumm\scumm_nuade.c">
+      <Filter>Source Files\nuade\players\scumm</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconnolly\sc_module.c">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconnolly\sc_v2.c">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconnolly\sc_v3.c">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconnolly\seanconnolly.c">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconnolly\seanconnolly_nuade.c">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconran\sc_code.c">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconran\sc_module.c">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconran\seanconran.c">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\seanconran\seanconran_nuade.c">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sidmon2\sidmon2.c">
+      <Filter>Source Files\nuade\players\sidmon2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sidmon2\sidmon2_nuade.c">
+      <Filter>Source Files\nuade\players\sidmon2</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\silmarils\sil_module.c">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\silmarils\sil_music.c">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\silmarils\sil_script.c">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\silmarils\silmarils.c">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\silmarils\silmarils_nuade.c">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sonicarranger\sonic_arranger.c">
+      <Filter>Source Files\nuade\players\sonicarranger</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sonicarranger\sonicarranger_nuade.c">
+      <Filter>Source Files\nuade\players\sonicarranger</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sonix\sonix.c">
+      <Filter>Source Files\nuade\players\sonix</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sonix\sonix_io.c">
+      <Filter>Source Files\nuade\players\sonix</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\sonix\sonix_nuade.c">
+      <Filter>Source Files\nuade\players\sonix</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundcontrol\soundcontrol.c">
+      <Filter>Source Files\nuade\players\soundcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundcontrol\soundcontrol_nuade.c">
+      <Filter>Source Files\nuade\players\soundcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundfactory\soundfactory.c">
+      <Filter>Source Files\nuade\players\soundfactory</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundfactory\soundfactory_nuade.c">
+      <Filter>Source Files\nuade\players\soundfactory</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundfx\soundfx.c">
+      <Filter>Source Files\nuade\players\soundfx</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundfx\soundfx_nuade.c">
+      <Filter>Source Files\nuade\players\soundfx</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundimages\si_images.c">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundimages\si_module.c">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundimages\si_walk.c">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundimages\soundimages.c">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundimages\soundimages_nuade.c">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmaster\sm_module.c">
+      <Filter>Source Files\nuade\players\soundmaster</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmaster\sm_voice.c">
+      <Filter>Source Files\nuade\players\soundmaster</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmaster\soundmaster.c">
+      <Filter>Source Files\nuade\players\soundmaster</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmaster\soundmaster_nuade.c">
+      <Filter>Source Files\nuade\players\soundmaster</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmon\soundmon.c">
+      <Filter>Source Files\nuade\players\soundmon</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\soundmon\soundmon_nuade.c">
+      <Filter>Source Files\nuade\players\soundmon</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\specialfx\specialfx.c">
+      <Filter>Source Files\nuade\players\specialfx</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\specialfx\specialfx_nuade.c">
+      <Filter>Source Files\nuade\players\specialfx</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedya1system\sa_module.c">
+      <Filter>Source Files\nuade\players\speedya1system</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedya1system\speedya1system.c">
+      <Filter>Source Files\nuade\players\speedya1system</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedya1system\speedya1system_nuade.c">
+      <Filter>Source Files\nuade\players\speedya1system</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedysystem\speedysystem.c">
+      <Filter>Source Files\nuade\players\speedysystem</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedysystem\speedysystem_nuade.c">
+      <Filter>Source Files\nuade\players\speedysystem</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\speedysystem\ss_module.c">
+      <Filter>Source Files\nuade\players\speedysystem</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\spl\spl.c">
+      <Filter>Source Files\nuade\players\spl</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\spl\spl_builds.c">
+      <Filter>Source Files\nuade\players\spl</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\spl\spl_module.c">
+      <Filter>Source Files\nuade\players\spl</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\spl\spl_nuade.c">
+      <Filter>Source Files\nuade\players\spl</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\stevebarrett\sbr_module.c">
+      <Filter>Source Files\nuade\players\stevebarrett</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\stevebarrett\stevebarrett.c">
+      <Filter>Source Files\nuade\players\stevebarrett</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\stevebarrett\stevebarrett_nuade.c">
+      <Filter>Source Files\nuade\players\stevebarrett</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\suntronic\sun_module.c">
+      <Filter>Source Files\nuade\players\suntronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\suntronic\suntronic.c">
+      <Filter>Source Files\nuade\players\suntronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\suntronic\suntronic_nuade.c">
+      <Filter>Source Files\nuade\players\suntronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthdream\sdr_module.c">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthdream\sdr_proof.c">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthdream\sdr_tables.c">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthdream\synthdream.c">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthdream\synthdream_nuade.c">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthesis\synthesis.c">
+      <Filter>Source Files\nuade\players\synthesis</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthesis\synthesis_nuade.c">
+      <Filter>Source Files\nuade\players\synthesis</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_common.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_longs.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_module.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_tables.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_voice.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\sp_words.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\synthpack.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\synthpack\synthpack_nuade.c">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\syntracker\syntracker.c">
+      <Filter>Source Files\nuade\players\syntracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\syntracker\syntracker_nuade.c">
+      <Filter>Source Files\nuade\players\syntracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\thomashermann\thm_module.c">
+      <Filter>Source Files\nuade\players\thomashermann</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\thomashermann\thomashermann.c">
+      <Filter>Source Files\nuade\players\thomashermann</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\thomashermann\thomashermann_nuade.c">
+      <Filter>Source Files\nuade\players\thomashermann</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timetracker\timetracker.c">
+      <Filter>Source Files\nuade\players\timetracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timetracker\timetracker_nuade.c">
+      <Filter>Source Files\nuade\players\timetracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timfollin\tfol.c">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timfollin\tfol_module.c">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timfollin\tfol_nuade.c">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\timfollin\tfol_proof.c">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tomytracker\tomytracker.c">
+      <Filter>Source Files\nuade\players\tomytracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tomytracker\tomytracker_nuade.c">
+      <Filter>Source Files\nuade\players\tomytracker</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tronic\tronic.c">
+      <Filter>Source Files\nuade\players\tronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tronic\tronic_check.c">
+      <Filter>Source Files\nuade\players\tronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tronic\tronic_module.c">
+      <Filter>Source Files\nuade\players\tronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\tronic\tronic_nuade.c">
+      <Filter>Source Files\nuade\players\tronic</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_bank.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_nuade.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_sequencer.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_song.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_state.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\ufo\ufo_voice.c">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\voodoo\voodoo.c">
+      <Filter>Source Files\nuade\players\voodoo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\voodoo\voodoo_nuade.c">
+      <Filter>Source Files\nuade\players\voodoo</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wallybeben.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wallybeben_nuade.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wb_decode.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wb_module.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wb_replay.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\wallybeben\wb_versions.c">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\zoundmonitor\zoundmonitor.c">
+      <Filter>Source Files\nuade\players\zoundmonitor</Filter>
+    </ClCompile>
+    <ClCompile Include="nuade\players\zoundmonitor\zoundmonitor_nuade.c">
+      <Filter>Source Files\nuade\players\zoundmonitor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReplayNuade.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\io.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\nuade.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\paula.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\player.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\viz.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\voice.h">
+      <Filter>Source Files\nuade\include</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\actionamics.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\activisionpro.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\amcomposer.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\amos.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\andersoland.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\andrewparton.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\aprosys.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\artandmagic.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\ashleyhogg.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\audiosculpture.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\beathoven.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\bendaglish.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\bendaglishsid.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\cinemaware.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\coredesign.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\dariuszendeh.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\davelowe.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\davidhanney.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\davidwhittaker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\deltamusic1.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\deltamusic2.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\desire.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\digmug.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\dirkbialluch.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\dsc.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\dss.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\dynamicsynthesizer.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\earache.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\ems.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\emsv6.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\facethemusic.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\fashiontracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\fcbsi.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\forgottenworlds.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\fred_np.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\fredgray.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\futurecomposer.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\gluemon.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\gmc.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\hippel.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\hippel7v.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\hippelhip.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\howiedavies.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\infogrames.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\instereo1.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\instereo2.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jamcracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jankomrsicflogel.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jasonbrooke.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jasonpage.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jeroentel.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\jesperolsen.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\kimchristensen.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\krishatlelid.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\laxity.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\legglessmusiceditor.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\majortom.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\maniacsofnoise.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\markcooksey.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\markcooksey_old.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\markii.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\maximumeffect.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\mcmd.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\medley.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\mikedavies.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\mmdc.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\musicalenlightenment.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\musicassembler.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\musicmaker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\ntsp.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\oktalyzer.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\onescapee.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\paulrobotham.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\paulshields.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\paulsummers.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\peterverswyvelen.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\pierreadane.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\pokeynoise.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\professionalsoundartists.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\protracker4.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\pumatracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\quadracomposer.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\quartet.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\richardjoseph.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\riffraff.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\robhubbard.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\robhubbardst.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\ronklaren.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\scottjohnston.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\scumm.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\seanconnolly.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\seanconran.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\sidmon2.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\silmarils.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\sonicarranger.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\sonix.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundcontrol.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundfactory.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundfx.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundimages.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundmaster.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\soundmon.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\specialfx.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\speedya1system.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\speedysystem.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\spl.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\stevebarrett.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\suntronic.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\synthdream.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\synthesis.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\synthpack.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\syntracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\thomashermann.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\timetracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\timfollin.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\tomytracker.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\tronic.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\ufo.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\voodoo.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\wallybeben.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\include\nuade\players\zoundmonitor.h">
+      <Filter>Source Files\nuade\include\players</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_base.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_file_index.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_grid.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_mixer.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_path.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_paula.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_paula_channel.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_registry.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_scheduler.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_test.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_trace.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_tracker.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_utils.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\src\nuade_viz.h">
+      <Filter>Source Files\nuade\src</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\aprosys\aprosys_internal.h">
+      <Filter>Source Files\nuade\players\aprosys</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\ashleyhogg\ah_internal.h">
+      <Filter>Source Files\nuade\players\ashleyhogg</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\beathoven\beathoven_code.h">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\beathoven\beathoven_internal.h">
+      <Filter>Source Files\nuade\players\beathoven</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\bendaglishsid\bds_internal.h">
+      <Filter>Source Files\nuade\players\bendaglishsid</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\coredesign\cd_internal.h">
+      <Filter>Source Files\nuade\players\coredesign</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\dariuszendeh\dz_internal.h">
+      <Filter>Source Files\nuade\players\dariuszendeh</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\davelowe\dl_internal.h">
+      <Filter>Source Files\nuade\players\davelowe</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\davidhanney\dh_internal.h">
+      <Filter>Source Files\nuade\players\davidhanney</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\desire\dsr_internal.h">
+      <Filter>Source Files\nuade\players\desire</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\dirkbialluch\db_internal.h">
+      <Filter>Source Files\nuade\players\dirkbialluch</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\dynamicsynthesizer\dns_internal.h">
+      <Filter>Source Files\nuade\players\dynamicsynthesizer</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\earache\ea_internal.h">
+      <Filter>Source Files\nuade\players\earache</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\emsv6\emsv6_internal.h">
+      <Filter>Source Files\nuade\players\emsv6</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\fredgray\fg_code.h">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\fredgray\fg_internal.h">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\fredgray\fg_section.h">
+      <Filter>Source Files\nuade\players\fredgray</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\gluemon\gm_internal.h">
+      <Filter>Source Files\nuade\players\gluemon</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\hippel\hippel_effects.h">
+      <Filter>Source Files\nuade\players\hippel</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\hippel7v\h7v_internal.h">
+      <Filter>Source Files\nuade\players\hippel7v</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\hippelhip\hh_internal.h">
+      <Filter>Source Files\nuade\players\hippelhip</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\howiedavies\hd_internal.h">
+      <Filter>Source Files\nuade\players\howiedavies</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\infogrames\ig_internal.h">
+      <Filter>Source Files\nuade\players\infogrames</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\jankomrsicflogel\jmf_internal.h">
+      <Filter>Source Files\nuade\players\jankomrsicflogel</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\jasonbrooke\jb_internal.h">
+      <Filter>Source Files\nuade\players\jasonbrooke</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\jasonpage\jp_internal.h">
+      <Filter>Source Files\nuade\players\jasonpage</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\jeroentel\jt_internal.h">
+      <Filter>Source Files\nuade\players\jeroentel</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\jesperolsen\jo_internal.h">
+      <Filter>Source Files\nuade\players\jesperolsen</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\kimchristensen\kim_internal.h">
+      <Filter>Source Files\nuade\players\kimchristensen</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\krishatlelid\kh_internal.h">
+      <Filter>Source Files\nuade\players\krishatlelid</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\legglessmusiceditor\lme_internal.h">
+      <Filter>Source Files\nuade\players\legglessmusiceditor</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\majortom\mt_internal.h">
+      <Filter>Source Files\nuade\players\majortom</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\maniacsofnoise\mon_internal.h">
+      <Filter>Source Files\nuade\players\maniacsofnoise</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\markii\mk2_internal.h">
+      <Filter>Source Files\nuade\players\markii</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\maximumeffect\mxe_internal.h">
+      <Filter>Source Files\nuade\players\maximumeffect</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\medley\mdl_internal.h">
+      <Filter>Source Files\nuade\players\medley</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\mikedavies\md_internal.h">
+      <Filter>Source Files\nuade\players\mikedavies</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\mmdc\mmdc_module.h">
+      <Filter>Source Files\nuade\players\mmdc</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\musicmaker\mm_core.h">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\musicmaker\mm_internal.h">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\musicmaker\mm4.h">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\musicmaker\mm8.h">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\musicmaker\mm8_mix.h">
+      <Filter>Source Files\nuade\players\musicmaker</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\paulrobotham\pr_internal.h">
+      <Filter>Source Files\nuade\players\paulrobotham</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\paulshields\ps_internal.h">
+      <Filter>Source Files\nuade\players\paulshields</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\paulsummers\ps_internal.h">
+      <Filter>Source Files\nuade\players\paulsummers</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\pierreadane\pa_internal.h">
+      <Filter>Source Files\nuade\players\pierreadane</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\pokeynoise\pn_internal.h">
+      <Filter>Source Files\nuade\players\pokeynoise</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\quartet\qt_internal.h">
+      <Filter>Source Files\nuade\players\quartet</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\richardjoseph\rjp_internal.h">
+      <Filter>Source Files\nuade\players\richardjoseph</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\riffraff\rr_internal.h">
+      <Filter>Source Files\nuade\players\riffraff</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\robhubbard\rh_code.h">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\robhubbard\rh_module.h">
+      <Filter>Source Files\nuade\players\robhubbard</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\robhubbardst\rhst_module.h">
+      <Filter>Source Files\nuade\players\robhubbardst</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\scottjohnston\sj_internal.h">
+      <Filter>Source Files\nuade\players\scottjohnston</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\scumm\scm_internal.h">
+      <Filter>Source Files\nuade\players\scumm</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\seanconnolly\sc_internal.h">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\seanconnolly\sc_v2.h">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\seanconnolly\sc_v3.h">
+      <Filter>Source Files\nuade\players\seanconnolly</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\seanconran\sc_code.h">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\seanconran\sc_module.h">
+      <Filter>Source Files\nuade\players\seanconran</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\silmarils\sil_internal.h">
+      <Filter>Source Files\nuade\players\silmarils</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\sonix\sonix.h">
+      <Filter>Source Files\nuade\players\sonix</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\sonix\sonix_io.h">
+      <Filter>Source Files\nuade\players\sonix</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\soundimages\si_internal.h">
+      <Filter>Source Files\nuade\players\soundimages</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\soundmaster\sm_internal.h">
+      <Filter>Source Files\nuade\players\soundmaster</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\speedya1system\sa_internal.h">
+      <Filter>Source Files\nuade\players\speedya1system</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\speedysystem\ss_internal.h">
+      <Filter>Source Files\nuade\players\speedysystem</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\spl\spl_module.h">
+      <Filter>Source Files\nuade\players\spl</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\stevebarrett\sbr_internal.h">
+      <Filter>Source Files\nuade\players\stevebarrett</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\suntronic\sun_internal.h">
+      <Filter>Source Files\nuade\players\suntronic</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\synthdream\sdr_internal.h">
+      <Filter>Source Files\nuade\players\synthdream</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\synthpack\sp_internal.h">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\synthpack\sp_longs.h">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\synthpack\sp_words.h">
+      <Filter>Source Files\nuade\players\synthpack</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\thomashermann\thm_internal.h">
+      <Filter>Source Files\nuade\players\thomashermann</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\timfollin\tfol_internal.h">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\timfollin\tfol_layout.h">
+      <Filter>Source Files\nuade\players\timfollin</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\tronic\tronic_internal.h">
+      <Filter>Source Files\nuade\players\tronic</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\ufo\ufo_internal.h">
+      <Filter>Source Files\nuade\players\ufo</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\wallybeben\wb_decode.h">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\wallybeben\wb_internal.h">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClInclude>
+    <ClInclude Include="nuade\players\wallybeben\wb_replay.h">
+      <Filter>Source Files\nuade\players\wallybeben</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="nuade\LICENSE">
+      <Filter>Source Files\nuade</Filter>
+    </None>
+    <None Include="nuade\README.md">
+      <Filter>Source Files\nuade</Filter>
+    </None>
+    <None Include="nuade\THIRD_PARTY_NOTICES.md">
+      <Filter>Source Files\nuade</Filter>
+    </None>
+    <None Include="nuade\players\pumatracker\pumatracker_waves.inc">
+      <Filter>Source Files\nuade\players\pumatracker</Filter>
+    </None>
+  </ItemGroup>
+</Project>
