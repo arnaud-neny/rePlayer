@@ -1734,40 +1734,54 @@ namespace rePlayer
                                     guessedExtension = prefix;
                                 break;
                             }
-                            if (_stricmp(reinterpret_cast<const char*>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
+                            if (_stricmp(pcCast<char>(guessedExtension.c_str()), MediaType::extensionNames[i]) == 0)
                                 break;
-                            if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], reinterpret_cast<const char*>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
+                            if (prefix.empty() && _strnicmp(MediaType::extensionNames[i], pcCast<char>(pathStem.c_str()), MediaType::extensionLengths[i]) == 0)
                             {
                                 if (MediaType::extensionLengths[i] == pathStem.size() || pathStem[MediaType::extensionLengths[i]] == '.')
-                                    prefix = reinterpret_cast<const char8_t*>(MediaType::extensionNames[i]);
+                                    prefix = pcCast<char8_t>(MediaType::extensionNames[i]);
                             }
                         }
                     }
 
-                    MediaType type = replays.Find(reinterpret_cast<const char*>(guessedExtension.c_str()));
+                    MediaType type = replays.Find(pcCast<char>(guessedExtension.c_str()));
                     if (!addFilesContext->isAcceptingAll && type.value == 0 && !addFilesContext->isUrl)
                     {
-                        addFilesContext->Lock();
-                        addFilesContext->failedEntries.Add(reinterpret_cast<const char*>(path.u8string().c_str()));
-                        addFilesContext->Unlock();
-                        return;
+                        static const char* archiveExtensions[] = { "zip", "rar", "7z", "lha" };
+                        bool isMissing = true;
+                        for (uint16_t i = 0; i < NumItemsOf(archiveExtensions); ++i)
+                        {
+                            if (_stricmp(pcCast<char>(guessedExtension.c_str()), archiveExtensions[i]) == 0)
+                            {
+                                isMissing = false;
+                                break;
+                            }
+                        }
+
+                        if (isMissing)
+                        {
+                            addFilesContext->Lock();
+                            addFilesContext->failedEntries.Add(pcCast<char>(path.u8string().c_str()));
+                            addFilesContext->Unlock();
+                            return;
+                        }
                     }
                     addFilesContext->numEntries++;
 
                     auto* songSheet = new SongSheet;
                     songSheet->SetType(type);
                     if (type.ext == eExtension::Unknown)
-                        songSheet->name = reinterpret_cast<const char*>(path.filename().u8string().c_str());
-                    else if (_stricmp(reinterpret_cast<const char*>(pathExtension.c_str()), type.GetExtension()) == 0)
-                        songSheet->name = reinterpret_cast<const char*>(pathStem.c_str());
+                        songSheet->name = pcCast<char>(path.filename().u8string().c_str());
+                    else if (_stricmp(pcCast<char>(pathExtension.c_str()), type.GetExtension()) == 0)
+                        songSheet->name = pcCast<char>(pathStem.c_str());
                     else
                     {
                         auto name = path.filename().u8string();
                         auto extSize = type.extensionLengths[size_t(type.ext)];
-                        if (_strnicmp(reinterpret_cast<const char*>(name.c_str()), type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
-                            songSheet->name = reinterpret_cast<const char*>(name.c_str() + extSize + 1);
+                        if (_strnicmp(pcCast<char>(name.c_str()), type.GetExtension(), extSize) == 0 && name.size() > extSize && name.c_str()[extSize] == '.')
+                            songSheet->name = pcCast<char>(name.c_str() + extSize + 1);
                         else
-                            songSheet->name = reinterpret_cast<const char*>(name.c_str());
+                            songSheet->name = pcCast<char>(name.c_str());
                     }
                     if (addFilesContext->isUrl)
                     {
@@ -1787,14 +1801,14 @@ namespace rePlayer
                     songSheet->subsongs.Resize(1);
 
                     addFilesContext->Lock();
-                    addFilesContext->entries.Add({ reinterpret_cast<const char*>(path.u8string().c_str()), songSheet });
+                    addFilesContext->entries.Add({ pcCast<char>(path.u8string().c_str()), songSheet });
                     addFilesContext->Unlock();
                 };
 
-                auto path = std::filesystem::path(reinterpret_cast<const char8_t*>(newFile.c_str()));
+                auto path = std::filesystem::path(pcCast<char8_t>(newFile.c_str()));
                 if (addFilesContext->isUrl)
                 {
-                    assert(strcmp((const char*)path.u8string().c_str(), newFile.c_str()) == 0);
+                    assert(strcmp(pcCast<char>(path.u8string().c_str()), newFile.c_str()) == 0);
                     addFile(path);
                 }
                 else
