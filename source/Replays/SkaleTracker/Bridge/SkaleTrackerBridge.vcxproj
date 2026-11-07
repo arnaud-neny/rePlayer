@@ -65,7 +65,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Core.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(IntermediateOutputPath)..\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir)..\..\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(TargetDir)..\..\..\x64_Debug\replays\SkaleTracker &gt; nul 2&gt;&amp;1
@@ -89,7 +89,7 @@ copy /Y $(TargetDir) $(TargetDir)..\..\..\x64_Debug\replays\SkaleTracker\ &gt; n
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Core.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(IntermediateOutputPath)..\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir)..\..\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)..\data\replays\SkaleTracker &gt; nul 2&gt;&amp;1
