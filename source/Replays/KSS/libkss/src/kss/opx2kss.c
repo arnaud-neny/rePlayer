@@ -135,8 +135,8 @@ KSS *KSS_opx2kss(uint8_t *data, uint32_t size) {
   int i;
 
   uint8_t *buf;
-  uint16_t load_adr = 0x0100, load_size = 0x8000 + size - load_adr;
-  uint16_t init_adr = 0x0106, play_adr = 0x0103;
+  uint32_t load_adr = 0x0100, load_size = 0x8000 + size - load_adr;
+  uint32_t init_adr = 0x0106, play_adr = 0x0103;
 
   if (size < 16 || opxdrv_size == 0)
     return NULL;
