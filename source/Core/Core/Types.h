@@ -53,7 +53,7 @@ namespace core
     template <typename TOut, typename TIn>
     inline TOut& rCast(TIn& data)
     {
-        return reinterpret_cast<TOut&>(data);
+        return reinterpret_cast<TOut&>(const_cast<std::remove_const<TIn>::type&>(data));
     }
 
     template <typename TOut, typename TIn>
