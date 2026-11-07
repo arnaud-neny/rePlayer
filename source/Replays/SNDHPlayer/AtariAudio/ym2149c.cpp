@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.27
+//	AtariAudio 1.28
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -22,20 +22,7 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock, bool predictibleY
 {
 
 	if (predictibleYm2149State)
-	{
-		for (int v = 0; v < 3; v++)
-		{
-			m_toneCounter[v] = 0;
-			m_tonePeriod[v] = 0;
-			m_edgeNeedReset[v] = false;
-		}
 		m_toneEdges = 0;
-		m_envCounter = 0;
-		m_noiseCounter = 0;
-		m_envPeriod = 0;
-		m_noisePeriod = 0;
-		m_currentNoiseMask = ~0;
-	}
 	else
 		m_toneEdges = (stdLibRand()&((1<<10)|(1<<5)|(1<<0)))*0x1f;		// YM internal edge state are un-predictable
 
@@ -45,7 +32,12 @@ void	Ym2149c::Reset(uint32_t hostReplayRate, uint32_t ymClock, bool predictibleY
 		m_tonePeriod[v] = 0;
 		m_edgeNeedReset[v] = false;
 	}
-	m_insideTimerIrq = false;
+	m_envCounter = 0;
+	m_noiseCounter = 0;
+	m_envPeriod = 0;
+	m_noisePeriod = 0;
+	m_currentNoiseMask = ~0;
+
 	MuteVoices(0);	// do not mute anything
 	m_insideTimerIrq = false;
 	m_hostReplayRate = hostReplayRate;
@@ -159,7 +151,7 @@ Ym2149c::Level Ym2149c::Tick()
 {
 
 	// three voices at same time
-	const uint32_t vmask = (m_toneEdges | m_toneMask) & (m_currentNoiseMask | m_noiseMask);
+	uint32_t vmask = (m_toneEdges | m_toneMask) & (m_currentNoiseMask | m_noiseMask);
 
 	// update internal state
 	for (int v = 0; v < 3; v++)
@@ -170,6 +162,8 @@ Ym2149c::Level Ym2149c::Tick()
 			m_toneEdges ^= 0x1f<<(v*5);
 			m_toneCounter[v] = 0;
 		}
+		if ( 0 == m_tonePeriod[v])			// at highest rate, consider edge always 1 (classic STF sample sound mode)
+			vmask |= 0x1f<<(v*5);
 	}
 
 	m_envCounter++;
