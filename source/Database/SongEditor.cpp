@@ -515,7 +515,7 @@ namespace rePlayer
             if (ImGui::Button("Scan") && m_playables[0] == eReplay::Unknown)
             {
                 m_busySpinner.New(ImGui::GetColorU32(ImGuiCol_ButtonHovered));
-                Core::AddJob([this, &replays, musicId = m_musicId]()
+                Core::AddJob([this, &replays, musicId = m_musicId, song = SmartPtr<SongSheet>(m_musicId.GetSong()->Edit())]() // edit in smartptr to keep it alive in background
                 {
                     SmartPtr<core::io::Stream> stream = musicId.GetStream();
                     Core::FromJob([this, musicId, playables = stream.IsValid() ? replays.Enumerate(stream) : Replayables()]()
@@ -802,19 +802,6 @@ namespace rePlayer
 
             if (areMetadataUpdated)
                 Core::GetDeck().ChangedSettings();
-
-            if (isTypeUpdated)
-            {
-                for (; currentSongEdit->lastSubsongIndex; --currentSongEdit->lastSubsongIndex)
-                {
-                    SubsongID subsongIdToRemove(currentSongEdit->id, currentSongEdit->lastSubsongIndex);
-
-                    // todo: remove System::Discard to do only Playlist::Discard
-                    Core::Discard(MusicID(subsongIdToRemove, m_musicId.databaseId));
-                }
-                currentSongEdit->subsongs[0].Clear();
-                CommandBuffer(currentSongEdit->metadata.Container()).Remove(uint16_t(m_song.original.replay));
-            }
 
             m_musicId.MarkForSave();
         }
