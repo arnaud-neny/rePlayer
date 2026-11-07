@@ -357,11 +357,11 @@ namespace rePlayer
         auto* property = m_properties.Push();
         property->label = "Info";
         property->numColumns = 2;
-        // push property samples if any
+        // push property samples
+        property = m_properties.Push();
+        property->label = "Samples";
         if (auto count = openmpt_module_get_num_samples(m_modulePlayback))
         {
-            property = m_properties.Push();
-            property->label = "Samples";
             auto* sndfile = pcCast<OpenMPT::CSoundFile>(openmpt_module_get_sndfile(m_modulePlayback));
             uint32_t columns = 0;
             for (int i = 0; i < count; ++i)
@@ -427,11 +427,13 @@ namespace rePlayer
                     openmpt_free_string(str);
             }
         }
-        // push property instruments if any
+        else
+            property->data.Add(0);
+        // push property instruments
+        property = m_properties.Push();
+        property->label = "Instruments";
         if (auto count = openmpt_module_get_num_instruments(m_modulePlayback))
         {
-            property = m_properties.Push();
-            property->label = "Instruments";
             auto* sndfile = pcCast<OpenMPT::CSoundFile>(openmpt_module_get_sndfile(m_modulePlayback));
             property->numColumns = 1;
             for (int i = 0; i < count; ++i)
@@ -470,17 +472,18 @@ namespace rePlayer
                 }
             }
         }
-        // push property message if any
+        else
+            property->data.Add(0);
+        // push property message
+        property = m_properties.Push();
+        property->label = "Message";
         if (auto str = openmpt_module_get_metadata(m_modulePlayback, "message_raw"))
         {
-            if (str[0])
-            {
-                property = m_properties.Push();
-                property->label = "Message";
-                property->data.Add(pcCast<uint8_t>(str), uint32_t(strlen(str) + 1));
-            }
+            property->data.Add(pcCast<uint8_t>(str), uint32_t(strlen(str) + 1));
             openmpt_free_string(str);
         }
+        else
+            property->data.Add(0);
     }
 
     MediaType ReplayOpenMPT::BuildMediaType(openmpt_module* module)
