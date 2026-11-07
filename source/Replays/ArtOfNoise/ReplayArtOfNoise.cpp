@@ -15,7 +15,7 @@ namespace rePlayer
         .replayId = eReplay::ArtOfNoise,
         .name = "Art Of Noise",
         .extensions = "aon",
-        .about = "Copyright (c) 2026 Daniel Collin"
+        .about = "Art Of Noise\nCopyright (c) 2026 Daniel Collin"
             "Ported from NostalgicPlayer by Thomas Neumann",
         .settings = "Art Of Noise",
         .init = ReplayArtOfNoise::Init,
