@@ -221,6 +221,9 @@
     <ClCompile Include="RePlayer\ReplayGainScanner.cpp">
       <Filter>Source Files\RePlayer</Filter>
     </ClCompile>
+    <ClCompile Include="IO\Downloader.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\GraphicsImGuiDx12.h">
@@ -468,6 +471,9 @@
     </ClInclude>
     <ClInclude Include="RePlayer\ReplayGainScanner.h">
       <Filter>Source Files\RePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\Downloader.h">
+      <Filter>Source Files\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
