@@ -1921,6 +1921,9 @@ static void GB_apu_write(GB_gameboy_t *gb, uint8_t reg, uint8_t value)
                         if (!was_active) {
                             gb->apu.square_sweep_calculate_countdown_reload_timer++;
                         }
+                        gb->apu.shadow_sweep_sample_length = gb->apu.square_channels[GB_SQUARE_1].sample_length; // TODO: Is this correct or just a workaround for a timing bug in the SameBoy libvgm port? -Valley Bell
+                        // https://web.archive.org/web/20261015034906/https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep says:
+                        // "frequency is copied to the shadow register", so this may be correct.
                         gb->apu.sweep_length_addend = gb->apu.square_channels[GB_SQUARE_1].sample_length;
                         gb->apu.sweep_length_addend >>= (gb->io_registers[GB_IO_NR10] & 7);
                     }
@@ -2400,6 +2403,28 @@ static void device_reset_gb_sameboy(void *chip)
 	RC_RESET(&gb->cycleCntr);
 
 	gb_sameboy_set_mute_mask(gb, muteMask);
+
+	if (gb->model < GB_MODEL_CGB_0)
+	{
+		// DMG model
+		static const uint8_t waveRamInit[GB_IO_WAV_END + 1 - GB_IO_WAV_START] = {
+			//0xAC, 0xDD, 0xDA, 0x48, 0x36, 0x02, 0xCF, 0x16,	// initialization values from MAME
+			//0x2C, 0x04, 0xE5, 0x2C, 0xAC, 0xDD, 0xDA, 0x48,
+			0x84, 0x40, 0x43, 0xAA, 0x2D, 0x78, 0x92, 0x3C,	// initialization values from GbdevWiki (gbdev.gg8.se)
+			0x60, 0x59, 0x59, 0xB0, 0x34, 0xB8, 0x2E, 0xDA,
+		};
+		// Note: SameBoy initializes this using random values on every reset. (see Core/gb.c: reset_ram())
+		memcpy(&gb->io_registers[GB_IO_WAV_START], waveRamInit, GB_IO_WAV_END + 1 - GB_IO_WAV_START);
+	}
+	else
+	{
+		// GameBoy Color / Advance
+		static const uint8_t waveRamInit[GB_IO_WAV_END + 1 - GB_IO_WAV_START] = {
+			0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
+			0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
+		};
+		memcpy(&gb->io_registers[GB_IO_WAV_START], waveRamInit, GB_IO_WAV_END + 1 - GB_IO_WAV_START);
+	}
 
 	return;
 }

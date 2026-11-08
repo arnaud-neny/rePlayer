@@ -37,7 +37,7 @@
 
 #include "yrw801.h"
 
-#define LIBVGM_VERSION "r630"
+#define LIBVGM_VERSION "r637"
 
 namespace rePlayer
 {
