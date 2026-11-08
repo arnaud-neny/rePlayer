@@ -204,7 +204,6 @@ Or add some comments (and likes) there:
 - [Art Of Noise](https://github.com/RetrovertApp/playback-art-of-noise): Soundtracker for amiga with synth samples.
 - [ASAP](http://asap.sourceforge.net): Another Slight Atari Player.
 - [AtariAudio](https://github.com/arnaud-carre/AtariAudio): Simple library to play any Atari SNDH music file.
-- [Ayfly](https://github.com/l29ah/ayfly): Cross-platform AY-3-8910 music player.
 - [Ayumi](https://github.com/true-grue/ayumi): Highly precise emulation of AY-3-8910 and YM2149 sound chips. webAyumi for amad & fxm backend.
 - [Buzzic 2](https://www.pouet.net/prod.php?which=54407): Music synthesizing tool.
 - [Direct Stream Digital](https://github.com/Sound-Linux-More/sacd): Plays Philips DSDIFF and Sony DSF files, heavily inspired by SACD Decoder from Robert Tari.
@@ -236,11 +235,12 @@ Or add some comments (and likes) there:
 - [MTPng](https://aminet.net/package/mus/play/mtpng_68k): MegaTracker Player (MTP or MTPng) is a program which will play most Apple IIgs SoundSmith and MegaTracker songs on your more modern computer.
 - [MVX](https://github.com/ConspiracyHu/apEx-public): Conspiracy's MVX Synth.
 - [NEZplug++](https://github.com/jprjr/libnezplug): using the [libnezplug](http://offgao.net/program/nezplug++.html) fork to decode .nsf, .nsfe, .hes, .kss, .gbr, .gbs, .ay, .sgc, .nsd, .mus.
+- [Nuade](https://github.com/emoon/nuade): Nuade is a port of the player routines used in UADE from 68000 assembly to C.
 - [OpenMPT](https://lib.openmpt.org/libopenmpt): all protracker like formats (ProTracker, Fast Tracker, Scream Tracker, Impulse Tracker...).
 - [Opus](https://opus-codec.org): Opus Interactive Audio Codec.
 - [Organya](https://www.cavestory.org/pixels-works/org-maker.php): music format used in Cave Story.
 - [PMDWin](https://c60.la.coocan.jp): PC-98 PMD chiptunes.
-- [PreTracker](https://github.com/RetrovertApp/playback-pretracker): A C replayer for PreTracker modules — the synth-driven tracker format by Pink / Abyss.
+- [PreTracker](https://github.com/RetrovertApp/playback-pretracker): A C replayer for PreTracker modules ï¿½ the synth-driven tracker format by Pink / Abyss.
 - [ProTrekkr](https://github.com/hitchhikr/protrekkr): Tracker/Synth program.
 - [Psycle](https://sourceforge.net/projects/psycle): Psycle is a Music tracker (like FastTracker 2 or Impulse Tracker) combined with plugin modularity. It supports its own plugin API, the VST2 plugin standard, and a tracker style sampler playback.
 - [PxTone](https://pxtone.org): PxTone Collage is a free but powerful music editor made by Pixel, the creator of Cave Story and Kero Blaster.

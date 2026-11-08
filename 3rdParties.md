@@ -19,7 +19,6 @@
 - Art Of Noise: https://github.com/RetrovertApp/playback-art-of-noise & https://github.com/neumatho/NostalgicPlayer
 - ASAP: http://asap.sourceforge.net
 - AtariAudio: https://github.com/arnaud-carre/AtariAudio
-- Ayfly: https://github.com/l29ah/ayfly
 - Ayumi: https://github.com/true-grue/ayumi & https://bitbucket.org/wothke/webayumi
 - Buzzic 2: https://www.pouet.net/prod.php?which=54407
 - Direct Stream Digital: https://github.com/Sound-Linux-More/sacd
@@ -53,6 +52,7 @@
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - MTPng: https://aminet.net/package/mus/play/mtpng_68k (and https://github.com/mrkite/soundsmith)
 - MVX: https://github.com/ConspiracyHu/apEx-public`
+- Nuade: https://github.com/emoon/nuade
 - OpenMPT: https://source.openmpt.org
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org

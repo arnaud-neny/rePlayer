@@ -5,29 +5,38 @@
 
 ## Current version
 
+v0.22.17:
+- Added Nuade
+- Removed AyFly
+- Updated AtariAudio to 1.28
+- Updated FluidSynth to 2.6.2
+- Updated gbsplay to 0.0.104
+- Updated libvgm to r637
+- Updated vgmstream to r2168
+- Updated dr_flac to 0.13.4
+- Updated dr_mp3 to 0.7.4
+- Updated dr_wav to 0.14.6
+- Updated libarchive to 3.8.11
+- Updated libxml2 to 2.15.4
+- Bug fixes
+
 v0.22.16:
 - Added Art Of Noise
 - Added PreTracker
 - Removed StSound
 - Removed TFMX
-- Updated gbsplay to 0.0.103
-- Updated libvgm to r633
 - Updated libxmp to 4.7.4
 - Updated OpenMPT to 0.9.0-pre.13 r25800
 - Updated V2 to V2 Redux
 - Updated ImGui to 1.93.0
-- Updated libarchive to 3.8.10
 - Updated libcurl to 8.23.0
-- Bug fixes
 
 v0.22.15:
 - Updated adplug to 2.4 r948
-- Updated AtariAudio to 1.26
 - Updated FAAD2 to 2.11.4
 - Updated libresidfp to 1.2.3
 
 v0.22.13:
-- Updated FluidSynth to 2.6.1
 - Added F15 hotkey to discard playing song
 
 v0.22.12:
@@ -45,9 +54,6 @@ v0.22.9:
 
 v0.22.8:
 - Updated libtfmxaudiodecoder to 1.0.14
-
-v0.22.5:
-- Updated vgmstream to r2117
 
 v0.22.3:
 - Added JayTrax
@@ -73,11 +79,11 @@ v0.22.0:
 
 - [0.22.12] adplug to 2.4 r947
 - [0.22.0] ASAP to 8.0.0
-- [0.22.14] AtariAudio to 1.25
+- [0.22.15] AtariAudio to 1.26
 - [0.22.10] FAAD2 to 2.11.3
-- [0.22.10] FluidSynth to 2.6.0
+- [0.22.13] FluidSynth to 2.6.1
 - [0.19.4] Furnace to 0.6.8.3
-- [0.21.9] gbsplay to 0.0.101
+- [0.22.16] gbsplay to 0.0.103
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
@@ -85,14 +91,14 @@ v0.22.0:
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
-- [0.22.12] libvgm to r630
+- [0.22.16] libvgm to r633
 - [0.22.13] libxmp to 4.7.3
 - [0.22.10] OpenMPT to 0.9.0-pre.13 r25674
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
 - [0.21.9] SunVox to 2.1.4
 - [0.16.15] UADE to 3.0.5
-- [0.21.9] vgmstream to r2083
+- [0.22.5] vgmstream to r2117
 - [0.21.9] WavPack to 5.9.0
 - [0.17.3] ZXTune to r5081
 - [0.21.9] dr_flac to 0.13.3
@@ -100,7 +106,7 @@ v0.22.0:
 - [0.22.0] dr_wav to 0.14.5
 - [0.21.9] FFTW 3.3.10
 - [0.22.9] ImGui to 1.92.9b
-- [0.22.8] libarchive to 3.8.8
+- [0.22.16] libarchive to 3.8.10
 - [0.22.12] libcurl to 8.22.0
 - [0.21.9] libxml2 to 2.15.1
 - [0.22.9] TagLib to 2.3.1
