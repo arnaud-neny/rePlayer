@@ -1,7 +1,7 @@
 /*
- * gbsplay is a Gameboy sound player
+ * gbsplay is a Game Boy sound player
  *
- * 2003-2021 (C) by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
+ * 2003-2026 (C) by Tobias Diedrich <ranma+gbsplay@tdiedrich.de>
  *                  Christian Garbs <mitch@cgarbs.de>
  *
  * Licensed under GNU GPL v1 or, at your option, any later version.
@@ -80,6 +80,7 @@ struct gbs {
 	char *copyright;
 	unsigned long codelen;
 	char *code;
+	int code_owned;
 	size_t filesize;
 	uint32_t crc;
 	uint32_t crcnow;
@@ -458,7 +459,7 @@ long gbs_step(struct gbs* const gbs, long time_to_work)
 	return true;
 }
 
-void gbs_print_info(const struct gbs* const gbs, long verbose)
+void gbs_print_info(const struct gbs* const gbs)
 {
 	printf(_("GBSVersion:       %u\n"
 	         "Title:            \"%s\"\n"
@@ -501,13 +502,19 @@ void gbs_print_info(const struct gbs* const gbs, long verbose)
 
 static void update_status_on_subsong_change(struct gbs* const gbs) {
 	struct gbs_status *status = &gbs->status;
+	int subsong = gbs->subsong;
+	if (subsong >= 0 && subsong < gbs->songs) {
+		status->songtitle = gbs->subsong_info[gbs->subsong].title;
+		status->subsong_len = gbs->subsong_info[gbs->subsong].len;
+	} else {
+		status->songtitle = NULL;
+		status->subsong_len = 0;
+	}
 
-	status->songtitle = gbs->subsong_info[gbs->subsong].title;
 	if (!status->songtitle) {
 		status->songtitle = _("Untitled");
 	}
 	status->subsong = gbs->subsong;
-	status->subsong_len = gbs->subsong_info[gbs->subsong].len;
 	if (status->subsong_len == 0 && gbs->status.loop_mode != LOOP_SINGLE) {
 		status->subsong_len = gbs->subsong_timeout * 1024;
 	}
@@ -538,6 +545,8 @@ static void gbs_free(struct gbs* const gbs)
 		mapper_free(gbs->mapper);
 	if (gbs->buf && gbs->buf_owned)
 		free(gbs->buf);
+	if (gbs->code && gbs->code_owned)
+		free(gbs->code);
 	if (gbs->rom)
 		free(gbs->rom);
 	if (gbs->subsong_info)
@@ -707,12 +716,16 @@ const uint8_t *gbs_get_bootrom(void)
 {
 	static uint8_t bootrom[256];
 	char *bootname = NULL;
+	char *home = getenv("HOME");
 	size_t name_len;
 	FILE *romf;
 
-	name_len = strlen(getenv("HOME")) + strlen(boot_rom_file) + 2;
+	if (!home) {
+		return NULL;
+	}
+	name_len = strlen(home) + strlen(boot_rom_file) + 2;
 	bootname = malloc(name_len);
-	snprintf(bootname, name_len, "%s/%s", getenv("HOME"), boot_rom_file);
+	snprintf(bootname, name_len, "%s/%s", home, boot_rom_file);
 	romf = fopen(bootname, "rb");
 	free(bootname);
 	if (!romf) {
@@ -727,14 +740,18 @@ const uint8_t *gbs_get_bootrom(void)
 	return bootrom;
 }
 
-static struct gbs *gb_open(const char* const name, char *buf, size_t size)
+static struct gbs *gb_open(char *buf, size_t size)
 {
 	long i;
 	struct gbs* gbs = gbs_new(buf);
 	char *na_str = _("gb / not available");
 	const uint8_t *bootrom = gbs_get_bootrom();
 
-	UNUSED(name);
+	if (size < HDR_LEN_GB) {
+		fprintf(stderr, _("Truncated GB ROM, must be >=%d: %ld\n"), HDR_LEN_GB, (long)size);
+		gbs_free(gbs);
+		return NULL;
+	}
 
 	/* Test if this looks like a valid rom header title */
 	for (i=0x0134; i<0x0143; i++) {
@@ -777,7 +794,7 @@ static struct gbs *gb_open(const char* const name, char *buf, size_t size)
 	return gbs;
 }
 
-static struct gbs *gbr_open(const char* const name, char *buf, size_t size)
+static struct gbs *gbr_open(char *buf, size_t size)
 {
 	long i;
 	struct gbs* gbs = gbs_new(buf);
@@ -785,11 +802,12 @@ static struct gbs *gbr_open(const char* const name, char *buf, size_t size)
 	uint16_t vsync_addr;
 	uint16_t timer_addr;
 
-	if (strncmp(buf, GBR_MAGIC, 4) != 0) {
-		fprintf(stderr, _("Not a GBR-File: %s\n"), name);
+	if (size < HDR_LEN_GBR) {
+		fprintf(stderr, _("Truncated GBR, must be >=%d: %ld\n"), HDR_LEN_GBR, (long)size);
 		gbs_free(gbs);
 		return NULL;
 	}
+
 	if (buf[0x07] < 1 || buf[0x07] > 3) {
 		fprintf(stderr, _("Unsupported timerflag value: %d\n"), buf[0x07]);
 		gbs_free(gbs);
@@ -810,16 +828,17 @@ static struct gbs *gbr_open(const char* const name, char *buf, size_t size)
 	gbs->tma = buf[0x0e];
 	gbs->tac = buf[0x0f];
 
-	/* Test if this looks like a valid rom header title */
-	for (i=0x0154; i<0x0163; i++) {
-		if (!(isalnum(buf[i]) || isspace(buf[i])))
-			break;
-	}
-	if (buf[i] == 0) {
-		/* Title looks valid and is zero-terminated. */
-		gbs->title = &buf[0x0154];
-	} else {
-		gbs->title = na_str;
+	gbs->title = na_str;
+	/* Test if this looks like a valid rom header title (not part of the spec, but often true) */
+	if (size > (HDR_LEN_GB + HDR_LEN_GBR) && gbs_crc32(0, &buf[0x124], 48) == 0x46195417) {
+		for (i=0x0154; i<0x0163 && i<size; i++) {
+			if (!(isalnum(buf[i]) || isspace(buf[i])))
+				break;
+		}
+		if (buf[i] == 0) {
+			/* Title looks valid and is zero-terminated. */
+			gbs->title = &buf[0x0154];
+		}
 	}
 	gbs->author = na_str;
 	gbs->copyright = na_str;
@@ -906,7 +925,7 @@ static void gd3_parse(struct gbs **gbs, const char* const gd3, long gd3_len)
 	}
 	*gbs = realloc(*gbs, sizeof(struct gbs) + gd3_len);
 	s = buf = (char *)&(*gbs)[1];
-	while (ofs < gd3_len) {
+	while (ofs + 1 < gd3_len) {
 		uint16_t val = le16(&gd3[ofs]);
 		if (val == 0) {
 			*(buf++) = 0;
@@ -927,18 +946,17 @@ static void gd3_parse(struct gbs **gbs, const char* const gd3, long gd3_len)
 	}
 }
 
-static struct gbs *vgm_open(const char* const name, char* const buf, size_t size)
+static struct gbs *vgm_open(char* const buf, size_t size)
 {
 	struct gbs* gbs = gbs_new(buf);
 	char *na_str = _("vgm / not available");
 	char *gd3 = NULL;
-	char *data;
+	char *data, *data_end;
 	long dmg_clock;
-	uint32_t eof_ofs;
-	long gd3_ofs;
-	long gd3_len;
-	long data_ofs;
-	long data_len;
+	size_t eof_ofs;
+	size_t gd3_ofs;
+	size_t gd3_len;
+	size_t data_ofs;
 	long vgm_parsed = false;
 	long total_wait;
 	long total_clocks;
@@ -946,11 +964,12 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 	long addr;
 	long jpaddr;
 
-	if (strncmp(buf, VGM_MAGIC, 4) != 0) {
-		fprintf(stderr, _("Not a VGM-File: %s\n"), name);
+	if (size < HDR_LEN_VGM) {
+		fprintf(stderr, _("Truncated VGM, must be >=%d: %ld\n"), HDR_LEN_VGM, (long)size);
 		gbs_free(gbs);
 		return NULL;
 	}
+
 	if (buf[0x09] != 1 || buf[0x08] < 0x61) {
 		fprintf(stderr, _("Unsupported VGM version: %d.%02x\n"), buf[0x09], buf[0x08]);
 		gbs_free(gbs);
@@ -962,30 +981,30 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 		gbs_free(gbs);
 		return NULL;
 	}
-	eof_ofs = le32(&buf[0x4]) + 0x4;
-	if (eof_ofs > size) {
-		fprintf(stderr, _("Bad file size in header: %ld\n"), eof_ofs);
+	eof_ofs = (size_t)le32(&buf[0x4]) + 0x4;
+	if (eof_ofs < HDR_LEN_VGM || eof_ofs > size) {
+		fprintf(stderr, _("Bad file size in header: %ld\n"), (long)eof_ofs);
 		gbs_free(gbs);
 		return NULL;
 	}
-	gd3_ofs = le32(&buf[0x14]) + 0x14;
+	gd3_ofs = (size_t)le32(&buf[0x14]) + 0x14;
 	if (gd3_ofs == 0x14) {
 		gd3_ofs = eof_ofs;
 		gd3_len = 0;
 	} else {
 		gd3_len = eof_ofs - gd3_ofs;
 		gd3 = &buf[gd3_ofs];
-		if (gd3_len < 4 || strncmp(gd3, GD3_MAGIC, 4) != 0) {
-			fprintf(stderr, _("Bad GD3 offset: %08lx\n"), gd3_ofs);
+		if (gd3_ofs > eof_ofs || gd3_len < 4 || strncmp(gd3, GD3_MAGIC, 4) != 0) {
+			fprintf(stderr, _("Bad GD3 offset: %08lx\n"), (long)gd3_ofs);
 			gbs_free(gbs);
 			return NULL;
 		}
 	}
-	data_ofs = le32(&buf[0x34]) + 0x34;
-	data_len = gd3_ofs - data_ofs;
+	data_ofs = (size_t)le32(&buf[0x34]) + 0x34;
 	data = &buf[data_ofs];
-	if (data_len < 0) {
-		fprintf(stderr, _("Bad data length: %ld\n"), data_len);
+	data_end = &buf[gd3_ofs];
+	if (data >= data_end) {
+		fprintf(stderr, _("Bad data offset: %ld\n"), (long)data_ofs);
 		gbs_free(gbs);
 		return NULL;
 	}
@@ -993,16 +1012,21 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 	gbs->filetype = FILETYPE_VGM;
 	gbs->codelen = 0x4000;
 	gbs->code = calloc(1, gbs->codelen);
+	gbs->code_owned = 1;
 	code_used = 0;
 
 	total_wait = total_clocks = 0;
-	while (!vgm_parsed) {
+	while (!vgm_parsed && data < data_end) {
 		switch ((uint8_t)*data) {
 		default:
 			fprintf(stderr, _("Unsupported VGM opcode: 0x%02x\n"), *data);
 			gbs_free(gbs);
 			return NULL;
 		case 0x61:  /* Wait n samples */
+			if (data_end - data < 3) {
+				data = data_end;
+				continue;
+			}
 			total_wait += le16(&data[1]);
 			data += 2;
 			break;
@@ -1035,6 +1059,10 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 			total_wait += (*data & 0xf) + 1;
 			break;
 		case 0xb3:  /* DMG write */
+			if (data_end - data < 3) {
+				data = data_end;
+				continue;
+			}
 			{
 				long delay = (total_wait * 41943L / 441L) - total_clocks;
 				long units = (delay + 31) / 64;
@@ -1061,6 +1089,12 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 		}
 		data++;
 	}
+	if (!vgm_parsed) {
+		fputs(_("EOF before reaching end of data tag\n"), stderr);
+		gbs_free(gbs);
+		return NULL;
+	}
+
 	/* RST 0x38 */
 	emit(gbs, &code_used, 0xff, 1);
 
@@ -1151,12 +1185,10 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 	return gbs;
 }
 
-static struct gbs* gbs_open_internal(const char* const name, char* const buf, size_t size)
+static struct gbs* gbs_open_internal(char* const buf, size_t size)
 {
 	struct gbs* const gbs = gbs_new(buf);
 	long i;
-
-	UNUSED(name);
 
 	gbs->version = buf[0x03];
 	if (gbs->version != 1) {
@@ -1263,15 +1295,25 @@ static struct gbs* gbs_open_internal(const char* const name, char* const buf, si
 	return gbs;
 }
 
-static struct gbs* gbs_open_mem(const char* const name, char* const buf, size_t size);
+static struct gbs* gbs_open_mem(const char* const name, char* const buf, size_t size, int recursion);
 
 #ifdef USE_ZLIB
-static struct gbs *gzip_open(const char* const name, char* const buf, size_t size)
+static struct gbs *gzip_open(const char* const name, char* const buf, size_t size, int recursion)
 {
 	struct gbs* gbs = NULL;
 	int ret;
 	char *out = malloc(GB_MAX_ROM_SIZE);
-	z_stream strm;
+        z_stream strm;
+
+	if (recursion) {
+		fprintf(stderr, _("Could not open %s: gzip recursion not allowed\n"), name);
+		goto exit_free;
+        }
+
+	if (size < HDR_LEN_GZIP) {
+		fprintf(stderr, _("Truncated gzip, must be >=%d: %ld\n"), HDR_LEN_GZIP, (long)size);
+		goto exit_free;
+	}
 
 	strm.zalloc = Z_NULL;
 	strm.zfree = Z_NULL;
@@ -1293,41 +1335,45 @@ static struct gbs *gzip_open(const char* const name, char* const buf, size_t siz
 		fprintf(stderr, _("Could not open %s: inflate: %d\n"), name, ret);
 		goto exit_free;
 	}
-	inflateEnd(&strm);
-	gbs = gbs_open_mem(name, out, GB_MAX_ROM_SIZE - strm.avail_out);
+	gbs = gbs_open_mem(name, out, GB_MAX_ROM_SIZE - strm.avail_out, recursion + 1);
 
 exit_free:
+	inflateEnd(&strm);
 	if (gbs == NULL || gbs->buf != out) {
 		free(out);
 	}
 	return gbs;
 }
 #else
-static struct gbs *gzip_open(const char* const name, char* const buf, size_t size)
+static struct gbs *gzip_open(const char* const name, char* const buf, size_t size, int recursion)
 {
 	fprintf(stderr, _("Could not open %s: %s\n"), name, _("Not compiled with zlib support"));
 	return NULL;
 }
 #endif
 
-static struct gbs* gbs_open_mem(const char* const name, char* const buf, size_t size)
+static struct gbs* gbs_open_mem(const char* const name, char* const buf, size_t size, int recursion)
 {
-	if (size > HDR_LEN_GZIP && strncmp(buf, GZIP_MAGIC, 3) == 0) {
-		return gzip_open(name, buf, size);
+	if (size >= 3) {
+		if (strncmp(buf, GZIP_MAGIC, 3) == 0) {
+			return gzip_open(name, buf, size, recursion);
+		}
+		if (strncmp(buf, GBS_MAGIC, 3) == 0) {
+			return gbs_open_internal(buf, size);
+                }
 	}
-	if (size > HDR_LEN_GBR && strncmp(buf, GBR_MAGIC, 4) == 0) {
-		return gbr_open(name, buf, size);
-	}
-	if (size > HDR_LEN_VGM && strncmp(buf, VGM_MAGIC, 4) == 0) {
-		return vgm_open(name, buf, size);
-	}
-	if (size > HDR_LEN_GBS && strncmp(buf, GBS_MAGIC, 3) == 0) {
-		return gbs_open_internal(name, buf, size);
+	if (size >= 4) {
+		if (strncmp(buf, GBR_MAGIC, 4) == 0) {
+			return gbr_open(buf, size);
+		}
+		if (strncmp(buf, VGM_MAGIC, 4) == 0) {
+			return vgm_open(buf, size);
+                }
 	}
 	if (size > HDR_LEN_GB && gbs_crc32(0, &buf[0x104], 48) == 0x46195417) {
-		return gb_open(name, buf, size);
+		return gb_open(buf, size);
 	}
-	fprintf(stderr, _("Not a GBS-File: %s\n"), name);
+	fprintf(stderr, _("No supported file format detected: %s\n"), name);
 	return NULL;
 }
 
@@ -1356,7 +1402,7 @@ struct gbs* gbs_open(const char* const name)
 		goto exit_free;
 	}
 
-	gbs = gbs_open_mem(name, buf, st.st_size);
+	gbs = gbs_open_mem(name, buf, st.st_size, 0);
 	if (gbs != NULL) {
 		gbs->status.songs = gbs->songs;
 		gbs->status.defaultsong = gbs->defaultsong;
@@ -1378,7 +1424,7 @@ struct gbs* gbs_open_memory(const char* const name, char* const buf, size_t size
 	char *buf_copy = malloc(size);
 	memcpy(buf_copy, buf, size);
 
-	gbs = gbs_open_mem(name, buf_copy, size);
+	gbs = gbs_open_mem(name, buf_copy, size, 0);
 	if (gbs != NULL) {
 		gbs->status.songs = gbs->songs;
 		gbs->status.defaultsong = gbs->defaultsong;
