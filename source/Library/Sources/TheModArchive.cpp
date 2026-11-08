@@ -258,8 +258,8 @@ namespace rePlayer
 
             search.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=search_artist&query=%s&page=%u", search.Escape(name).c_str(), i);
             search.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=search_artist&query=%s&page=%u", search.Escape(name).c_str(), i);
-            if (!search.error.empty())
-                busySpinner.Error(search.error);
+            if (!search.m_error.empty())
+                busySpinner.Error(search.m_error);
             i++;
             if (i > search.numPages)
                 break;
@@ -274,8 +274,8 @@ namespace rePlayer
 
                 searchGuessed.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_guessed_artist&query=*%s*&page=%u", search.Escape(name).c_str(), i);
                 searchGuessed.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_guessed_artist&query=*%s*&page=%u", search.Escape(name).c_str(), i);
-                if (!searchGuessed.error.empty())
-                    busySpinner.Error(searchGuessed.error);
+                if (!searchGuessed.m_error.empty())
+                    busySpinner.Error(searchGuessed.m_error);
                 i++;
                 if (i > searchGuessed.numPages)
                     break;
@@ -330,8 +330,8 @@ namespace rePlayer
 
                 collector.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_guessed_artist&query=%s&page=%u", collector.Escape(guessedArtistName.c_str()).c_str(), i);
                 collector.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_guessed_artist&query=%s&page=%u", collector.Escape(guessedArtistName.c_str()).c_str(), i);
-                if (!collector.error.empty())
-                    busySpinner.Error(collector.error);
+                if (!collector.m_error.empty())
+                    busySpinner.Error(collector.m_error);
                 i++;
                 if (i > collector.numPages)
                     break;
@@ -349,8 +349,8 @@ namespace rePlayer
 
                 collector.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=view_modules_by_artistid&query=%u&page=%u", artistId, i);
                 collector.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=view_modules_by_artistid&query=%u&page=%u", artistId, i);
-                if (!collector.error.empty())
-                    busySpinner.Error(collector.error);
+                if (!collector.m_error.empty())
+                    busySpinner.Error(collector.m_error);
                 i++;
                 if (i > collector.numPages)
                     break;
@@ -458,8 +458,8 @@ namespace rePlayer
 
             search.SetUrlLog("https://modarchive.org/data/xml-tools.php?request=search&type=filename_or_songtitle&query=%s&page=%u", search.Escape(name).c_str(), i);
             search.Fetch("https://modarchive.org/data/xml-tools.php?key=" TheModArchiveKey "&request=search&type=filename_or_songtitle&query=%s&page=%u", search.Escape(name).c_str(), i);
-            if (!search.error.empty())
-                busySpinner.Error(search.error);
+            if (!search.m_error.empty())
+                busySpinner.Error(search.m_error);
             i++;
             if (i > search.numPages)
                 break;
@@ -520,59 +520,34 @@ namespace rePlayer
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
-        CURL* curl = curl_easy_init();
-
-        char errorBuffer[CURL_ERROR_SIZE];
-        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-        char url[128];
-        sprintf(url, "https://api.modarchive.org/downloads.php?moduleid=%u", sourceToDownload.internalId);
-        Log::Message("The Mod Archive: downloading \"%s\"...", url);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
-        struct Buffer : public Array<uint8_t>
-        {
-            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
-            {
-                buffer->Add(data, uint32_t(size * nmemb));
-                return size * nmemb;
-            }
-        } buffer;
-
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        auto curlError = curl_easy_perform(curl);
+        Downloader downloader("The Mod Archive: downloading \"%s\"...");
+        auto status = downloader.Fetch("https://api.modarchive.org/downloads.php?moduleid=%u", sourceToDownload.internalId);
         SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
-        if (curlError == CURLE_OK && buffer.IsNotEmpty())
+        if (status == Status::kOk && downloader.IsNotEmpty())
         {
-            if (memcmp(buffer.begin(), "Invalid ID Error", sizeof("Invalid ID Error")) == 0)
+            if (memcmp(downloader.begin(), "Invalid ID Error", sizeof("Invalid ID Error")) == 0)
             {
                 isEntryMissing = true;
                 auto* song = FindSong(sourceToDownload.internalId);
                 m_songs.RemoveAt(song - m_songs);
 
-                Log::Error("The Mod Archive: file \"%s\" not found\n", url);
+                Log::Error("The Mod Archive: file \"%s\" not found\n", downloader.m_urlLog.c_str());
             }
             else
             {
                 auto* songSource = FindSong(sourceToDownload.internalId);
                 songSource->crc = crc32(0L, Z_NULL, 0);
-                songSource->crc = crc32_z(songSource->crc, buffer.Items(), buffer.Size<size_t>());
-                songSource->size = buffer.Size<uint32_t>();
+                songSource->crc = crc32_z(songSource->crc, downloader.Items(), downloader.Size<size_t>());
+                songSource->size = downloader.Size<uint32_t>();
 
-                stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
-                buffer.Detach();
+                stream = io::StreamMemory::Create(path, downloader.Items(), downloader.Size(), false);
+                downloader.Detach();
 
                 Log::Message("OK\n");
             }
             m_isDirty = true;
         }
-        else
-            Log::Error("The Mod Archive: %s\n", curl_easy_strerror(curlError));
-
-        curl_easy_cleanup(curl);
 
         return { stream, isEntryMissing };
     }

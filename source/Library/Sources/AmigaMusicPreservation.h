@@ -8,7 +8,6 @@ namespace rePlayer
 {
     class SourceAmigaMusicPreservation : public Source
     {
-        struct Collector;
         struct CollectorArtist;
         struct CollectorSong;
         struct SearchArtist;
@@ -52,7 +51,6 @@ namespace rePlayer
     private:
         SongSource* AddSong(uint32_t id);
         SongSource* FindSong(uint32_t id) const;
-        Collector Collect(uint32_t artistID, BusySpinner* busySpinner) const;
 
     private:
         Array<SongSource> m_songs;

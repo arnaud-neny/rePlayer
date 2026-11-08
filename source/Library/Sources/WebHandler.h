@@ -1,147 +1,49 @@
 #pragma once
 
-// Core
-#include <Core/Log.h>
-#include <Core/String.h>
-
 // rePlayer
-#include <Replayer/Core.h>
-
-// curl
-#include <Curl/curl.h>
+#include <IO/Downloader.h>
 
 // libxml
 #include <libxml/HTMLparser.h>
 
 namespace rePlayer
 {
-    class WebHandler
+    class WebHandler : public Downloader
     {
     public:
         virtual void OnReadNode(xmlNode* node) = 0;
 
         WebHandler(const char* encoding = nullptr)
-            : curl(curl_easy_init())
-            , encoding(encoding)
-        {}
-        WebHandler(const WebHandler& other)
-            : curl(curl_easy_init())
-            , encoding(other.encoding)
+            : encoding(encoding)
         {}
         WebHandler(WebHandler&& other)
-            : curl(other.curl)
+            : Downloader(std::move(other))
             , encoding(other.encoding)
-            , isInitialized(other.isInitialized)
-        {
-            other.curl = curl_easy_init();
-            other.isInitialized = false;
-        }
-        WebHandler& operator=(const WebHandler& other)
-        {
-            curl_easy_cleanup(curl);
-            curl = curl_easy_init();
-            encoding = other.encoding;
-            isInitialized = false;
-            return *this;
-        }
+        {}
         WebHandler& operator=(WebHandler&& other)
         {
-            curl_easy_cleanup(curl);
-            curl = other.curl;
+            Downloader::operator=(std::move(other));
             encoding = other.encoding;
-            isInitialized = other.isInitialized;
-            other.curl = curl_easy_init();
-            other.isInitialized = false;
             return *this;
         }
-        virtual ~WebHandler()
+
+        Status OnDownloaded() override
         {
-            curl_easy_cleanup(curl);
-        }
-
-        template <typename... Arguments>
-        Status Fetch(Arguments&&... args)
-        {
-            error.clear();
-
-            char url[1024];
-            core::sprintf(url, std::forward<Arguments>(args)...);
-
-            Array<char> buffer;
-
-            if (!isInitialized)
+            auto status = Status::kOk;
+            if (auto* doc = htmlReadMemory(Items<char>(), NumItems(), nullptr, encoding, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING))
             {
-                isInitialized = true;
-                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-                curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-                curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-                curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
+                OnReadNode(xmlDocGetRootElement(doc));
 
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-
-                curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
-
-                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 30L); // 30 bytes per sec
-                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 5L); // 5 seconds check
+                xmlFreeDoc(doc);
             }
             else
             {
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-            }
-
-            curl_easy_setopt(curl, CURLOPT_URL, url);
-
-            Status status = Status::kOk;
-            auto curlErr = curl_easy_perform(curl);
-            if (curlErr == CURLE_OK)
-            {
-                if (auto* doc = htmlReadMemory(buffer.Items(), buffer.NumItems(), nullptr, encoding, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING))
-                {
-                    OnReadNode(xmlDocGetRootElement(doc));
-
-                    xmlFreeDoc(doc);
-                }
-                else
-                {
-                    error = "libxml: can't parse html";
-                    Log::Error("libxml: can't parse html (%s)\n", url);
-                    status = Status::kFail;
-                }
-                xmlResetLastError();
-            }
-            else
-            {
-                error = "Curl: ";
-                error += curl_easy_strerror(curlErr);
-                Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), url);
+                m_error = "libxml: can't parse html";
+                Log::Error("libxml: can't parse html (%s)\n", m_urlLog.c_str());
                 status = Status::kFail;
             }
+            xmlResetLastError();
             return status;
-        }
-
-        std::string Escape(const char* buf)
-        {
-            auto escapeBuf = curl_easy_escape(curl, buf, 0);
-            std::string newBuf = escapeBuf;
-            curl_free(escapeBuf);
-            return newBuf;
-        }
-
-        std::string Unescape(const char* buf)
-        {
-            auto unescapeBuf = curl_easy_unescape(curl, buf, 0, nullptr);
-            std::string newBuf = unescapeBuf;
-            curl_free(unescapeBuf);
-            return newBuf;
-        }
-
-        static size_t WriteCallback(char* in, size_t size, size_t nmemb, Array<char>* out)
-        {
-            size *= nmemb;
-            out->Add(in, uint32_t(size));
-            return size;
         }
 
         static void ConvertString(const xmlChar* text, std::string& output)
@@ -173,10 +75,7 @@ namespace rePlayer
             output = str;
         }
 
-        CURL* curl;
         const char* encoding;
-        bool isInitialized = false;
-        std::string error;
     };
 }
 // namespace rePlayer

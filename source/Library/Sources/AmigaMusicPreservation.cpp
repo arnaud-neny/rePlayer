@@ -1,15 +1,23 @@
 // Core
 #include <Core/Log.h>
+#include <Core/String.h>
 #include <IO/File.h>
 #include <IO/StreamMemory.h>
+#include <JSON/json.hpp>
 
 // rePlayer
 #include <Database/Types/Countries.h>
+#include <IO/Downloader.h>
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <UI/BusySpinner.h>
 #include "AmigaMusicPreservation.h"
-#include "WebHandler.h"
+#if __has_include("AmigaMusicPreservationKey.h")
+#include "AmigaMusicPreservationKey.h"
+#endif
+
+// curl
+#include <Curl/curl.h>
 
 // zlib
 #include <zlib.h>
@@ -21,330 +29,194 @@ namespace rePlayer
 {
     const char* const SourceAmigaMusicPreservation::ms_filename = MusicPath "AmigaMusicPreservation" MusicExt;
 
-    struct SourceAmigaMusicPreservation::CollectorArtist
+    class AMPHandler : public Downloader
     {
+    public:
+        virtual void OnReadJson(nlohmann::json& json) = 0;
+
+        AMPHandler()
+        {
+            AddHTTPHeader("X-API-Key: " AmigaMusicPreservationKey);
+        }
+
+        Status OnDownloaded() override
+        {
+            nlohmann::json json;
+            std::istringstream(Items<char>()) >> json;
+            OnReadJson(json);
+            return Status::kOk;
+        }
+
+        Status Fetch(const char* url) override
+        {
+            char newUrl[1024] = "https://amp.dascene.net/api/";
+            strcat_s(newUrl, url);
+            return Downloader::Fetch(newUrl);
+        }
+
+        using Downloader::Fetch;
+    };
+
+    struct SourceAmigaMusicPreservation::CollectorArtist : public AMPHandler
+    {
+        CollectorArtist() = default;
+        CollectorArtist(ArtistSheet* otherArtist)
+            : artist(otherArtist)
+        {}
+
         ArtistSheet::Handles handles;
         std::string name;
         Array<std::string> countries;
         ArtistSheet::Groups groups;
+
+        ArtistSheet* artist = new ArtistSheet;
+
+        void OnReadJson(nlohmann::json& json) final;
     };
 
-    struct SourceAmigaMusicPreservation::CollectorSong
+    void SourceAmigaMusicPreservation::CollectorArtist::OnReadJson(nlohmann::json& json)
     {
-        uint32_t id;
-        std::string name;
-        std::string ext;
-        Array<uint32_t> artists;
-    };
-
-    struct SourceAmigaMusicPreservation::Collector : public WebHandler
-    {
-        SourceAmigaMusicPreservation::CollectorArtist artist;
-        Array<SourceAmigaMusicPreservation::CollectorSong> songs;
-
-        enum
+        if (!json.contains("message"))
         {
-            kStateInit = 0,
-            kStateArtistHandleBegin = kStateInit,
-            kStateArtistHandleStep,
-            kStateArtistHandleEnd,
-            kStateArtistNameBegin,
-            kStateArtistNameStep,
-            kStateArtistNameEnd,
-            kStateArtistCountries,
-            kStateArtistCountry,
-            kStateArtistExHandlesBegin,
-            kStateArtistExHandlesStep,
-            kStateArtistExHandlesEnd,
-            kStateArtistGroups,
-            kStateArtistGroup,
-            kStateSongs,
-            kStateSong = 0x10,
-            kStateSongArtistsBegin,
-            kStateSongArtistsEnd
-        } state = kStateInit;
-        int32_t stack = 0;
+            artist->handles.Clear();
+            artist->handles.Add(json["composer_handle"].get<std::string>());
 
-        std::string ext;
+            artist->realName = json["real_name"];
 
-        void OnReadNode(xmlNode* node) final;
-    };
+            for (auto& jsonAlt : json["alt_handle"])
+                artist->handles.Add(jsonAlt.get<std::string>());
 
-    void SourceAmigaMusicPreservation::Collector::OnReadNode(xmlNode* node)
-    {
-        if (state & kStateSong)
-            stack++;
-        for (; node; node = node->next)
-        {
-            if (node->type == XML_ELEMENT_NODE)
+            artist->countries.Clear();
+            for (auto& jsonCountries = json["country"]; auto& jsonCountry : jsonCountries)
             {
-                if (state == kStateArtistHandleStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
-                    state = kStateArtistHandleEnd;
-                else if (state == kStateArtistNameStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
-                    state = kStateArtistNameEnd;
-                else if (state == kStateArtistExHandlesStep && xmlStrcmp(node->name, BAD_CAST"td") == 0)
-                    state = kStateArtistExHandlesEnd;
-                else for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
+                auto country = jsonCountry["country_name"].get<std::string>();
+                if (country != "R.I.P.")
                 {
-                    if (state == kStateArtistCountry)
-                    {
-                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"title"))
-                            artist.countries.Add((const char*)propChild->content);
-                    }
-                    else if (state == kStateArtistGroups)
-                    {
-                        if (xmlStrstr(propChild->content, BAD_CAST"newresult.php?request=groupid&search="))
-                            state = kStateArtistGroup;
-                    }
-                    else if (state == kStateSongArtistsBegin || state == kStateSongArtistsEnd)
-                    {
-                        if (xmlStrstr(propChild->content, BAD_CAST"detail.php?view="))
-                        {
-                            uint32_t id;
-                            sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id);
-                            songs.Last().artists.Add(id);
-                        }
-                    }
-                    else if (state == kStateSongs)
-                    {
-                        if (xmlStrstr(propChild->content, BAD_CAST"downmod.php?index="))
-                        {
-                            songs.Add(SourceAmigaMusicPreservation::CollectorSong());
-                            stack = 0;
-                            state = kStateSong;
-                            sscanf_s((const char*)propChild->content, "downmod.php?index=%u", &songs.Last().id);
-                        }
-                    }
-                }
-            }
-            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
-            {
-            case kStateArtistHandleBegin:
-                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
-                    state = kStateArtistHandleStep;
-                break;
-            case kStateArtistHandleEnd:
-                {
-                    std::string str;
-                    ConvertString(node->content, str);
-                    artist.handles.Add(std::move(str));
-                }
-                state = kStateArtistNameBegin;
-                break;
-            case kStateArtistNameBegin:
-                if (xmlStrstr(node->content, BAD_CAST"Real\xc2\xa0Name:"))
-                    state = kStateArtistNameStep;
-                break;
-            case kStateArtistNameEnd:
-                ConvertString(node->content, artist.name);
-                state = kStateArtistCountries;
-                break;
-            case kStateArtistCountries:
-                if (xmlStrstr(node->content, BAD_CAST"Lived\xc2\xa0in:"))
-                    state = kStateArtistCountry;
-                break;
-            case kStateArtistCountry:
-                if (xmlStrstr(node->content, BAD_CAST"Ex.Handles:"))
-                    state = kStateArtistExHandlesStep;
-                break;
-            case kStateArtistExHandlesEnd:
-                {
-                    std::string str;
-                    ConvertString(node->content, str);
-                    auto txt = str.data();
-                    while (1)
-                    {
-                        auto next = strstr(txt, ", ");
-                        if (next)
-                            next[0] = 0;
-                        if (strcmp(txt, "n/a") != 0)
-                            artist.handles.Add(txt);
-                        if (next)
-                            txt = next + 2;
-                        else
-                            break;
-                    }
-                }
-                state = kStateArtistGroups;
-                break;
-            case kStateArtistGroups:
-                if (xmlStrstr(node->content, BAD_CAST"Modules:"))
-                    state = kStateSongs;
-                break;
-            case kStateArtistGroup:
-                {
-                    std::string str;
-                    ConvertString(node->content, str);
-                    artist.groups.Add(std::move(str));
-                }
-                state = kStateArtistGroups;
-                break;
-            case kStateSong:
-                ConvertString(node->content, songs.Last().name);
-                state = kStateSongArtistsBegin;
-                break;
-            case kStateSongArtistsBegin:
-                if (stack == 0)
-                {
-                    int32_t modSize;
-                    char kb[3];
-                    if (sscanf_s((const char*)node->content, "%d%s", &modSize, kb, uint32_t(sizeof(kb))) != 2 || kb[0] != 'K' || kb[1] != 'b' || kb[2] != 0)
-                        ConvertString(node->content, ext);
+                    auto countryCode = Countries::GetCode(country.data());
+                    if (countryCode == 0)
+                        assert(0 && "todo find the right country");
                     else
-                        state = kStateSongArtistsEnd;
+                        artist->countries.Add(countryCode);
                 }
-                break;
-            default:
-                break;
             }
-            OnReadNode(node->children);
-        }
-        if (state & kStateSong)
-        {
-            stack--;
-            if (stack == -2)
-            {
-                songs.Last().ext = ext;
-                state = kStateSongs;
-            }
+
+            artist->groups.Clear();
+            for (auto& jsonGroups = json["groups"]; auto& jsonGroup : jsonGroups)
+                artist->groups.Add(jsonGroup["group_name"].get<std::string>());
         }
     }
 
-    struct SourceAmigaMusicPreservation::SearchArtist : public WebHandler
+    struct SourceAmigaMusicPreservation::CollectorSong : public AMPHandler
+    {
+        struct Module
+        {
+            uint32_t id;
+            std::string name;
+            std::string ext;
+            Array<uint32_t> artists;
+        };
+        Array<Module> songs;
+
+        void OnReadJson(nlohmann::json& json) final;
+    };
+
+    void SourceAmigaMusicPreservation::CollectorSong::OnReadJson(nlohmann::json& json)
+    {
+        for (auto& jsonModule : json)
+        {
+            auto* song = songs.Push();
+
+            song->id = jsonModule["module_id"].get<uint32_t>();
+
+            song->name = jsonModule["module_name"].get<std::string>();
+            song->ext = jsonModule["module_type"];
+
+            for (auto& jsonAuthor : jsonModule["authors"])
+                song->artists.Add(jsonAuthor["composer_id"].get<uint32_t>());
+        }
+    }
+
+    struct SourceAmigaMusicPreservation::SearchArtist : public AMPHandler
     {
         Array<ArtistsCollection::Artist> artists;
-        bool hasNextPage;
-        bool isFirstEntry;
 
-        enum
-        {
-            kStateInit = 0,
-            kStateArtistHandleBegin = kStateInit,
-            kStateArtistHandleEnd,
-            kStateArtistNameBegin,
-            kStateArtistNameEnd,
-            kStateArtistCountries,
-            kStateArtistCountry,
-            kStateArtistGroups,
-            kStateArtistGroup
-        } state = kStateInit;
-
-        void OnReadNode(xmlNode* node) final;
+        void OnReadJson(nlohmann::json& json) final;
     };
 
-    void SourceAmigaMusicPreservation::SearchArtist::OnReadNode(xmlNode* node)
+    void SourceAmigaMusicPreservation::SearchArtist::OnReadJson(nlohmann::json& json)
     {
-        for (; node; node = node->next)
+        for (auto& jsonComposer : json)
         {
-            if (node->type == XML_ELEMENT_NODE)
+            auto* artist = artists.Push();
+
+            artist->id = SourceID(kID, jsonComposer["composer_id"].get<uint32_t>());
+
+            artist->name = jsonComposer["composer_handle"].get<std::string>();
+
+            auto s = jsonComposer["real_name"].get<std::string>();
+            if (!s.empty())
             {
-                for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
-                {
-                    if (state == kStateArtistHandleBegin)
-                    {
-                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"src"))
-                            hasNextPage |= xmlStrcmp(propChild->content, BAD_CAST"images/right.gif") == 0;
-                    }
-                    else if (state == kStateArtistHandleEnd)
-                    {
-                        if (xmlStrstr(propChild->content, BAD_CAST"detail.php?view="))
-                        {
-                            uint32_t id;
-                            sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id);
-                            artists.Last().id = SourceID(kID, id);
-                        }
-                    }
-                    else if (state == kStateArtistCountry)
-                    {
-                        if (xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"title"))
-                        {
-                            if (isFirstEntry)
-                            {
-                                artists.Last().description += "\nCountries: ";
-                                isFirstEntry = false;
-                            }
-                            else
-                                artists.Last().description += ", ";
-                            artists.Last().description += (const char*)propChild->content;
-                        }
-                    }
-                    else if (state == kStateArtistGroups)
-                    {
-                        if (xmlStrstr(propChild->content, BAD_CAST"newresult.php?request=groupid&search="))
-                            state = kStateArtistGroup;
-                    }
-                }
+                artist->description = "Real Name  : ";
+                artist->description += s;
             }
-            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
+
+            for (int i = 2; auto& jsonAlt : jsonComposer["alt_handle"])
             {
-            case kStateArtistHandleBegin:
-                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
+                if (i == 2)
                 {
-                    artists.Push();
-                    state = kStateArtistHandleEnd;
+                    if (!artist->description.empty())
+                        artist->description += "\n";
+                    artist->description += "Alt Handles: ";
                 }
-                break;
-            case kStateArtistHandleEnd:
-                ConvertString(node->content, artists.Last().name);
-                state = kStateArtistNameBegin;
-                break;
-            case kStateArtistNameBegin:
-                if (xmlStrstr(node->content, BAD_CAST"Real Name:"))
-                    state = kStateArtistNameEnd;
-                break;
-            case kStateArtistNameEnd:
-                {
-                    std::string str;
-                    ConvertString(node->content, str);
-                    artists.Last().description += "Real Name: ";
-                    artists.Last().description += str;
-                }
-                state = kStateArtistCountries;
-                break;
-            case kStateArtistCountries:
-                if (xmlStrstr(node->content, BAD_CAST"Country:"))
-                {
-                    isFirstEntry = true;
-                    state = kStateArtistCountry;
-                }
-                break;
-            case kStateArtistCountry:
-                if (xmlStrstr(node->content, BAD_CAST"Groups:"))
-                {
-                    isFirstEntry = true;
-                    state = kStateArtistGroups;
-                }
-                break;
-            case kStateArtistGroups:
-                if (xmlStrstr(node->content, BAD_CAST"Handle:"))
-                {
-                    artists.Push();
-                    state = kStateArtistHandleEnd;
-                }
-                break;
-            case kStateArtistGroup:
-                {
-                    std::string str;
-                    ConvertString(node->content, str);
-                    if (isFirstEntry)
-                    {
-                        artists.Last().description += "\nGroups   : ";
-                        isFirstEntry = false;
-                    }
-                    else
-                        artists.Last().description += "\n         : ";
-                    artists.Last().description += str;
-                }
-                state = kStateArtistGroups;
-                break;
-            default:
-                break;
+                else if (i == 0)
+                    artist->description += "\n             ";
+                else
+                    artist->description += ", ";
+                artist->description += jsonAlt.get<std::string>();
+                i = abs(i - 1);
             }
-            OnReadNode(node->children);
+
+
+            for (int i = 2; auto& jsonCountry : jsonComposer["country"])
+            {
+                if (i == 2)
+                {
+                    if (!artist->description.empty())
+                        artist->description += "\n";
+                    artist->description += "Countries  : ";
+                }
+                else if (i == 0)
+                    artist->description += "\n             ";
+                else
+                    artist->description += ", ";
+                artist->description += jsonCountry["country_name"].get<std::string>();
+                i = abs(i - 1);
+            }
+
+            for (int i = 2; auto& jsonGroup : jsonComposer["groups"])
+            {
+                if (i == 2)
+                {
+                    if (!artist->description.empty())
+                        artist->description += "\n";
+                    artist->description += "Groups     : ";
+                }
+                else if (i == 0)
+                    artist->description += "\n             ";
+                else
+                    artist->description += ", ";
+                artist->description += jsonGroup["group_name"].get<std::string>();
+                i = abs(i - 1);
+            }
+
+            if (!artist->description.empty())
+                artist->description += "\n";
+            artist->description += "Modules    : ";
+            artist->description += jsonComposer["module_count"].dump();
         }
     }
 
-    struct SourceAmigaMusicPreservation::SearchSong : public WebHandler
+    struct SourceAmigaMusicPreservation::SearchSong : public AMPHandler
     {
         struct Song
         {
@@ -354,85 +226,30 @@ namespace rePlayer
             Array<std::pair<uint32_t, std::string>> artist;
         };
         Array<Song> songs;
-        bool hasNextPage;
 
         std::string ext;
+        uint32_t page = 1;
+        uint32_t numPages = 0;
 
-        enum
-        {
-            kStateInit = 0,
-            kStateSongBegin = kStateInit,
-            kStateSongEnd,
-            kStateArtistBegin,
-            kStateArtistContinue,
-            kStateArtistEnd,
-        } state = kStateInit;
-
-        void OnReadNode(xmlNode* node) final;
+        void OnReadJson(nlohmann::json& json) final;
     };
 
-    void SourceAmigaMusicPreservation::SearchSong::OnReadNode(xmlNode* node)
+    void SourceAmigaMusicPreservation::SearchSong::OnReadJson(nlohmann::json& json)
     {
-        for (; node; node = node->next)
+        page = json["current_page"].get<uint32_t>();
+        if (numPages == 0)
+            numPages = json["total_page"].get<uint32_t>();
+        for (auto& jsonModule : json["modules"])
         {
-            if (node->type == XML_ELEMENT_NODE)
-            {
-                for (auto* property = node->properties; property; property = property->next) for (auto* propChild = property->children; propChild; propChild = propChild->next)
-                {
-                    if (state == kStateSongBegin)
-                    {
-                        if (songs.IsEmpty() && xmlStrstr(node->name, BAD_CAST"img") && xmlStrstr(property->name, BAD_CAST"src"))
-                            hasNextPage |= xmlStrcmp(propChild->content, BAD_CAST"images/right.gif") == 0;
+            auto* song = songs.Push();
 
-                        uint32_t id;
-                        if (sscanf_s((const char*)propChild->content, "downmod.php?index=%u", &id) == 1)
-                        {
-                            songs.Push();
-                            songs.Last().id = id;
-                            state = kStateSongEnd;
-                        }
-                    }
-                    else if (state == kStateArtistBegin || state == kStateArtistContinue)
-                    {
-                        uint32_t id;
-                        if (sscanf_s((const char*)propChild->content, "detail.php?view=%u", &id) == 1)
-                        {
-                            songs.Last().artist.Push();
-                            songs.Last().artist.Last().first = id;
-                            state = kStateArtistEnd;
-                        }
-                        else if (xmlStrstr(propChild->content, BAD_CAST"analyzer2.php?idx="))
-                        {
-                            songs.Last().ext = ext;
-                            state = kStateSongBegin;
-                        }
-                    }
-                }
-            }
-            else if (node->type == XML_TEXT_NODE && node->content) switch (state)
-            {
-            case kStateSongEnd:
-                ConvertString(node->content, songs.Last().name);
-                state = kStateArtistBegin;
-                break;
-            case kStateArtistBegin:
-                {
-                    int32_t modSize;
-                    char kb[3];
-                    if (sscanf_s((const char*)node->content, "%d%s", &modSize, kb, uint32_t(sizeof(kb))) != 2 || kb[0] != 'K' || kb[1] != 'b' || kb[2] != 0)
-                        ConvertString(node->content, ext);
-                    else
-                        state = kStateArtistContinue;
-                }
-                break;
-            case kStateArtistEnd:
-                ConvertString(node->content, songs.Last().artist.Last().second);
-                state = kStateArtistBegin;
-                break;
-            default:
-                break;
-            }
-            OnReadNode(node->children);
+            song->id = jsonModule["module_id"].get<uint32_t>();
+
+            song->name = jsonModule["module_name"].get<std::string>();
+            song->ext = jsonModule["module_type"];
+
+            for (auto& jsonAuthor : jsonModule["authors"])
+                song->artist.Add({ jsonAuthor["composer_id"].get<uint32_t>(), jsonAuthor["composer_handle"].get<std::string>() });
         }
     }
 
@@ -445,46 +262,34 @@ namespace rePlayer
 
     void SourceAmigaMusicPreservation::FindArtists(ArtistsCollection& artists, const char* name, BusySpinner& busySpinner)
     {
-        auto* message = busySpinner.Info("looking in handle category at %u", 0);
         SearchArtist search;
-        for (uint32_t i = 0;; i += 50)
-        {
-            busySpinner.UpdateMessageParam(message, i);
 
-            search.hasNextPage = false;
-            search.Fetch("https://amp.dascene.net/newresult.php?request=handle&search=%s&position=%u", search.Escape(name).c_str(), i);
-            if (!search.error.empty())
-                busySpinner.Error(search.error);
-            if (!search.hasNextPage)
-                break;
-            search.state = SearchArtist::kStateInit;
+        if (strlen(name) <= 1)
+        {
+            busySpinner.Error("Search too short, need at least 2 characters");
         }
-
-        message = busySpinner.Info("looking in old handles category at %u", 0);
-        auto newArtists = std::move(search.artists);
-        search.hasNextPage = false;
-        for (uint32_t i = 0;; i += 50)
+        else
         {
-            busySpinner.UpdateMessageParam(message, i);
+            busySpinner.Info("looking for handle");
+            search.Fetch("search_by_handle?search=%s&match=false", search.Escape(name).c_str());
+            if (!search.m_error.empty())
+                busySpinner.Error(search.m_error);
+            artists.matches = std::move(search.artists);
 
-            search.hasNextPage = false;
-            search.Fetch("https://amp.dascene.net/newresult.php?request=oldhandles&search=%s&position=%u", search.Escape(name).c_str(), i);
-            if (!search.error.empty())
-                busySpinner.Error(search.error);
-            if (!search.hasNextPage)
-                break;
-            search.state = SearchArtist::kStateInit;
-        }
-        for (auto& artist : search.artists)
-        {
-            if (std::find_if(newArtists.begin(), newArtists.end(), [id = artist.id](auto& entry)
+            busySpinner.Info("looking for alias");
+            search.Fetch("search_composers?search=*%s*&field=oldhandles", search.Escape(name).c_str());
+            if (!search.m_error.empty())
+                busySpinner.Error(search.m_error);
+            for (auto& altArtist : search.artists)
             {
-                return entry.id == id;
-            }) == newArtists.end())
-                artists.alternatives.Add(std::move(artist));
+                // check if it's not already in the matches
+                if (artists.matches.FindIf([&altArtist](auto& artist) {
+                    return artist.id == altArtist.id;
+                }))
+                    continue;
+                artists.alternatives.Add(std::move(altArtist));
+            }
         }
-        for (auto& artist : newArtists)
-            artists.matches.Add(std::move(artist));
     }
 
     void SourceAmigaMusicPreservation::ImportArtist(SourceID importedArtistID, SourceResults& results, BusySpinner& busySpinner)
@@ -492,9 +297,10 @@ namespace rePlayer
         assert(importedArtistID.sourceId == kID);
         results.importedArtists.Add(importedArtistID);
 
-        Collector collector = Collect(importedArtistID.internalId, &busySpinner);
+        CollectorSong collectorSongs;
+        collectorSongs.Fetch("get_modules_by_author?index=%u", importedArtistID.internalId);
 
-        for (auto& collectedSong : collector.songs)
+        for (auto& collectedSong : collectorSongs.songs)
         {
             SourceID songSourceId(kID, collectedSong.id);
             if (results.IsSongAvailable(songSourceId))
@@ -540,37 +346,19 @@ namespace rePlayer
                 {
                     artistIndex = results.artists.NumItems<int32_t>();
 
-                    auto createArtist = [artistSourceId](const Collector& collector)
+                    CollectorArtist collectedArtist;
+                    collectedArtist.Fetch("get_author_details?index=%u", artistId);
+                    if (collectedArtist.artist->handles.IsEmpty())
                     {
-                        auto* rplArtist = new ArtistSheet();
-                        if (collector.artist.name != "n/a" && collector.artist.name != "currently not public")
-                            rplArtist->realName = collector.artist.name;
-                        rplArtist->handles = collector.artist.handles;
-                        if (collector.artist.handles.IsEmpty())
-                        {
-                            // Shit happens (server failure?)
-                            char buf[32];
-                            sprintf(buf, "#Error:ID%u", artistSourceId.value);
-                            rplArtist->handles.Add(buf);
-                        }
-                        rplArtist->groups = collector.artist.groups;
-                        rplArtist->sources.Add(artistSourceId);
-                        for (auto& country : collector.artist.countries)
-                        {
-                            if (country != "R.I.P.")
-                            {
-                                auto countryCode = Countries::GetCode(country.data());
-                                if (countryCode == 0)
-                                    assert(0 && "todo find the right country");
-                                rplArtist->countries.Add(countryCode);
-                            }
-                        }
+                        // Shit happens (server failure?)
+                        char buf[32];
+                        sprintf(buf, "#Error:ID%u", artistSourceId.value);
+                        collectedArtist.artist->handles.Add(buf);
+                        busySpinner.Error("Fail to fetch artist details");
+                    }
+                    collectedArtist.artist->sources.Add(artistSourceId);
 
-                        return rplArtist;
-                    };
-
-                    auto* rplArtist = createArtist(artistId == importedArtistID.internalId ? collector : Collect(artistId, &busySpinner));
-                    results.artists.Add(rplArtist);
+                    results.artists.Add(collectedArtist.artist);
                 }
                 if (artistId == importedArtistID.internalId)//main artist
                     song->artistIds.Insert(0, static_cast<ArtistID>(artistIndex));
@@ -585,72 +373,66 @@ namespace rePlayer
 
     void SourceAmigaMusicPreservation::FindSongs(const char* name, SourceResults& collectedSongs, BusySpinner& busySpinner)
     {
-        auto* message = busySpinner.Info("looking in module category at %u", 0);
+        busySpinner.Info("looking for modules");
         SearchSong search;
-        for (uint32_t i = 0;; i += 50)
+
+        do 
         {
-            busySpinner.UpdateMessageParam(message, i);
+            search.Fetch("search_modules_paged?search=*%s*&page=%u", search.Escape(name).c_str(), search.page);
+            if (!search.m_error.empty())
+                busySpinner.Error(search.m_error);
+        } while (++search.page <= search.numPages);
 
-            search.hasNextPage = false;
-            search.Fetch("https://amp.dascene.net/newresult.php?request=module&search=%s&position=%u", search.Escape(name).c_str(), i);
-            if (!search.error.empty())
-                busySpinner.Error(search.error);
+        for (auto& searchSong : search.songs)
+        {
+            auto song = new SongSheet();
 
-            for (auto& searchSong : search.songs)
+            SourceResults::State state;
+            if (auto sourceSong = FindSong(searchSong.id))
             {
-                auto song = new SongSheet();
+                song->id = sourceSong->songId;
+                if (sourceSong->isDiscarded)
+                    state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
+                else
+                    state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kNew : SourceResults::kOwned);
+            }
+            else
+            {
+                state.SetSongStatus(SourceResults::kNew);
+            }
 
-                SourceResults::State state;
-                if (auto sourceSong = FindSong(searchSong.id))
-                {
-                    song->id = sourceSong->songId;
-                    if (sourceSong->isDiscarded)
-                        state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kDiscarded : SourceResults::kMerged);
-                    else
-                        state.SetSongStatus(song->id == SongID::Invalid ? SourceResults::kNew : SourceResults::kOwned);
-                }
+            song->name = searchSong.name;
+            song->SetType(Core::GetReplays().Find(searchSong.ext.c_str()));
+            if (song->ext == eExtension::Unknown)
+            {
+                if (searchSong.ext == "FST")
+                    song->SetType(Core::GetReplays().Find("mod"));
+                else if (searchSong.ext == "OSS")
+                    song->SetType(Core::GetReplays().Find("med"));
                 else
                 {
-                    state.SetSongStatus(SourceResults::kNew);
+                    song->name.String() += ".";
+                    song->name.String() += searchSong.ext;
                 }
-
-                song->name = searchSong.name;
-                song->SetType(Core::GetReplays().Find(searchSong.ext.c_str()));
-                if (song->ext == eExtension::Unknown)
-                {
-                    if (searchSong.ext == "FST")
-                        song->SetType(Core::GetReplays().Find("mod"));
-                    else if (searchSong.ext == "OSS")
-                        song->SetType(Core::GetReplays().Find("med"));
-                    else
-                    {
-                        song->name.String() += ".";
-                        song->name.String() += searchSong.ext;
-                    }
-                }
-                song->sourceIds.Add(SourceID(kID, searchSong.id));
-                for (auto& searchArtist : searchSong.artist)
-                {
-                    auto it = std::find_if(collectedSongs.artists.begin(), collectedSongs.artists.end(), [id = searchArtist.first](auto entry)
-                    {
-                        return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == id;
-                    });
-                    song->artistIds.Add(static_cast<ArtistID>(it - collectedSongs.artists.begin()));
-                    if (it == collectedSongs.artists.end())
-                    {
-                        auto artist = new ArtistSheet();
-                        artist->sources.Add(SourceID(kID, searchArtist.first));
-                        artist->handles.Add(searchArtist.second.c_str());
-                        collectedSongs.artists.Add(artist);
-                    }
-                }
-                collectedSongs.songs.Add(song);
-                collectedSongs.states.Add(state);
             }
-            if (!search.hasNextPage)
-                break;
-            search.songs.Clear();
-            search.state = SearchSong::kStateInit;
+            song->sourceIds.Add(SourceID(kID, searchSong.id));
+            for (auto& searchArtist : searchSong.artist)
+            {
+                auto it = std::find_if(collectedSongs.artists.begin(), collectedSongs.artists.end(), [id = searchArtist.first](auto entry)
+                {
+                    return entry->sources[0].id.sourceId == kID && entry->sources[0].id.internalId == id;
+                });
+                song->artistIds.Add(static_cast<ArtistID>(it - collectedSongs.artists.begin()));
+                if (it == collectedSongs.artists.end())
+                {
+                    auto artist = new ArtistSheet();
+                    artist->sources.Add(SourceID(kID, searchArtist.first));
+                    artist->handles.Add(searchArtist.second.c_str());
+                    collectedSongs.artists.Add(artist);
+                }
+            }
+            collectedSongs.songs.Add(song);
+            collectedSongs.states.Add(state);
         }
     }
 
@@ -660,101 +442,36 @@ namespace rePlayer
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
-        CURL* curl = curl_easy_init();
+        Downloader downloader("Amiga Music Preservation: downloading \"%s\"...");
+        auto status = downloader.Fetch("https://amp.dascene.net/module/%u", sourceToDownload.internalId);
 
-        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-        char url[128];
-        sprintf(url, "https://amp.dascene.net/downmod.php?index=%u", sourceToDownload.internalId);
-        Log::Message("Amiga Music Preservation: downloading \"%s\"...", url);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, Core::GetLabel());
-
-        struct Buffer : public Array<uint8_t>
-        {
-            static size_t Writer(const uint8_t* data, size_t size, size_t nmemb, Buffer* buffer)
-            {
-                buffer->Add(data, uint32_t(size * nmemb));
-                return size * nmemb;
-            }
-        } buffer;
-
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Buffer::Writer);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-        auto curlError = curl_easy_perform(curl);
         SmartPtr<io::Stream> stream;
-        if (curlError == CURLE_OK && buffer.IsNotEmpty())
+        if (status == Status::kOk&& downloader.IsNotEmpty())
         {
-            if (memcmp(buffer.begin(), "<!DOCTYPE html", sizeof("<!DOCTYPE html") - 1) == 0)
+            // There are issues sometimes
+            if (memcmp(downloader.begin(), "<!DOCTYPE html", sizeof("<!DOCTYPE html") - 1) == 0)
             {
-                // AMP server is buggy, it can say the index is invalid because it can't access its database, so we can't rely on that anymore to discard the entry :(
-                Log::Error("Amiga Music Preservation: file \"%s\" not found\n", url);
+                Log::Error("Amiga Music Preservation: file \"%s\" not found\n", downloader.m_urlLog.c_str());
             }
             else
             {
                 Log::Message("OK...");
 
-                z_stream strm = {};
-                strm.next_in = reinterpret_cast<Bytef*>(buffer.Items());
-                strm.avail_in = static_cast<uint32_t>(buffer.Size());
+                SongSource* songAMP = FindSong(sourceToDownload.internalId);
+                songAMP->crc = crc32(0L, Z_NULL, 0);
+                songAMP->crc = crc32_z(songAMP->crc, downloader.Items(), downloader.Size());
+                songAMP->size = downloader.NumItems();
+                m_isDirty = true;
 
-                if (inflateInit2(&strm, (16 + MAX_WBITS)) == Z_OK)
-                {
-                    gz_header gzhdr = {};
-                    char filename[1024] = {};
-                    gzhdr.name = reinterpret_cast<Bytef*>(filename);
-                    gzhdr.name_max = 1024;
-                    inflateGetHeader(&strm, &gzhdr);
-
-                    Array<uint8_t> unpackedData;
-                    unpackedData.Resize(buffer[buffer.NumItems() - 4] | (buffer[buffer.NumItems() - 3] << 8) | (buffer[buffer.NumItems() - 2] << 16) | (buffer[buffer.NumItems() - 1] << 24));//gzip file last 2 dwords are crc & decompressed size
-
-                    for (;;)
-                    {
-                        if (strm.total_out >= unpackedData.NumItems())//just in case something is wrong with the gzip file
-                            unpackedData.Resize(unpackedData.NumItems() + 65536);
-
-                        strm.next_out = reinterpret_cast<Bytef*>(unpackedData.Items() + strm.total_out);
-                        strm.avail_out = static_cast<uint32_t>(unpackedData.Size()) - strm.total_out;
-
-                        auto zError = inflate(&strm, Z_SYNC_FLUSH);
-                        if (zError == Z_STREAM_END)
-                        {
-                            unpackedData.Resize(strm.total_out);
-                            break;
-                        }
-                        else if (zError != Z_OK)
-                        {
-                            unpackedData.Reset();
-                            break;
-                        }
-                    }
-
-                    if (unpackedData.IsNotEmpty())
-                    {
-                        SongSource* songAMP = FindSong(sourceToDownload.internalId);
-                        songAMP->crc = buffer[buffer.NumItems() - 8] | (buffer[buffer.NumItems() - 7] << 8) | (buffer[buffer.NumItems() - 6] << 16) | (buffer[buffer.NumItems() - 5] << 24);
-                        songAMP->size = buffer.NumItems();
-                        m_isDirty = true;
-
-                        stream = io::StreamMemory::Create(path, unpackedData.Items(), unpackedData.Size(), false);
-                        unpackedData.Detach();
-                    }
-                }
+                stream = io::StreamMemory::Create(path, downloader.Items(), downloader.Size(), false);
+                downloader.Detach();
 
                 if (stream.IsInvalid())
                     Log::Error("Amiga Music Preservation: failed to process package\n");
                 else
                     Log::Message("Unpacked\n");
-
-                inflateEnd(&strm);
             }
         }
-        else
-            Log::Error("Amiga Music Preservation: %s\n", curl_easy_strerror(curlError));
-
-        curl_easy_cleanup(curl);
 
         return { stream, false };
     }
@@ -763,23 +480,14 @@ namespace rePlayer
     {
         assert(artist->sources[0].id.sourceId == kID);
 
-        Collector collector = Collect(artist->sources[0].id.internalId, nullptr);
-        if (collector.artist.name != "n/a" && collector.artist.name != "currently not public")
-            artist->realName = std::move(collector.artist.name);
-        else
-            artist->realName = {};
-        artist->handles = std::move(collector.artist.handles);
-        artist->groups = std::move(collector.artist.groups);
-        artist->countries.Clear();
-        for (auto& country : collector.artist.countries)
+        CollectorArtist collector(artist);
+        collector.Fetch("get_author_details?index=%u", artist->sources[0].id.internalId);
+        if (artist->handles.IsEmpty())
         {
-            if (country != "R.I.P.")
-            {
-                auto countryCode = Countries::GetCode(country.data());
-                if (countryCode == 0)
-                    assert(0 && "todo find the right country");
-                artist->countries.Add(countryCode);
-            }
+            // Shit happens (server failure?)
+            char buf[32];
+            sprintf(buf, "#Error:ID%u", artist->sources[0].id.value);
+            artist->handles.Add(buf);
         }
     }
 
@@ -873,24 +581,6 @@ namespace rePlayer
             return song.id < id;
         });
         return song != m_songs.end() && song->id == id ? const_cast<SongSource*>(song) : nullptr;
-    }
-
-    SourceAmigaMusicPreservation::Collector SourceAmigaMusicPreservation::Collect(uint32_t artistID, BusySpinner* busySpinner) const
-    {
-        Collector collector;
-
-        if (busySpinner)
-        {
-            char txt[128];
-            sprintf(txt, "importing artist %u", artistID);
-            busySpinner->Info(txt);
-        }
-
-        collector.Fetch("https://amp.dascene.net/detail.php?detail=modules&view=%u", artistID);
-        if (busySpinner && !collector.error.empty())
-            busySpinner->Error(collector.error);
-
-        return collector;
     }
 }
 // namespace rePlayer

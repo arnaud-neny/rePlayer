@@ -8,9 +8,13 @@
 
 // rePlayer
 #include <Database/Database.h>
+#include <Replayer/Core.h>
 #include <UI/BusySpinner.h>
 #include "VGMRips.h"
 #include "WebHandler.h"
+
+// curl
+#include <Curl/curl.h>
 
 // zlib
 #include <zlib.h>
@@ -1967,8 +1971,8 @@ namespace rePlayer
 
             ArtistsCollector collector(m_db);
             collector.Fetch("https://vgmrips.net/packs/composers");
-            if (!collector.error.empty())
-                busySpinner.Error(collector.error);
+            if (!collector.m_error.empty())
+                busySpinner.Error(collector.m_error);
         }
         return m_db.artists.IsEmpty();
     }

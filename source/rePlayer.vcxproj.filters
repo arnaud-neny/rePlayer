@@ -472,6 +472,9 @@
     <ClInclude Include="RePlayer\ReplayGainScanner.h">
       <Filter>Source Files\RePlayer</Filter>
     </ClInclude>
+    <ClInclude Include="Library\Sources\AmigaMusicPreservationKey.h">
+      <Filter>Source Files\Library\Sources</Filter>
+    </ClInclude>
     <ClInclude Include="IO\Downloader.h">
       <Filter>Source Files\IO</Filter>
     </ClInclude>
