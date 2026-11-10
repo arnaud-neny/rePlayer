@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -140,7 +140,7 @@ void	Blitter::Run(AtariMachine& machine)
 
 				uint16_t iOriginalValue = machine.memRead16( m_dstAd);
 
-				uint16_t iHOPResult;
+				uint16_t iHOPResult = 0;
 				switch (iLogicalOp)
 				{
 					case 0:		iHOPResult = 0;										break;

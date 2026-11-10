@@ -8,6 +8,9 @@
 #include <string.h>
 #include "lzh.h"
 
+void*	AtariAudioMalloc(size_t size);
+void 	AtariAudioFree(void* p);
+
 bool LzhDepacker::IsLzhPacked(const void* data, uint32_t size)
 {
 	if (size < 16)
@@ -52,15 +55,18 @@ void*	LzhDepacker::Unpack(const void* dataIn, uint32_t inSize, uint32_t& outSize
 
 	r8 += headerSize;
 
-	ret = malloc(originalSize);
-	if (LzUnpack((void*)r8, packedSize, ret, originalSize))
+	ret = AtariAudioMalloc(originalSize);
+	if (ret)
 	{
-		outSize = originalSize;
-	}
-	else
-	{
-		free(ret);
-		ret = nullptr;
+		if (LzUnpack((void*)r8, packedSize, ret, originalSize))
+		{
+			outSize = originalSize;
+		}
+		else
+		{
+			AtariAudioFree(ret);
+			ret = nullptr;
+		}
 	}
 	return ret;
 }

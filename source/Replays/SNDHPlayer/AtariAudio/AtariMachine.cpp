@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -12,10 +12,6 @@
 
 #define D_DUMP_READ		0
 #define D_DUMP_WRITE	0
-static const uint32_t D_DUMP_READ_AD1 = 0xfffa00;
-static const uint32_t D_DUMP_READ_AD2 = 0xfffaff;
-static const uint32_t D_DUMP_WRITE_AD1 = 0xfffa00;
-static const uint32_t D_DUMP_WRITE_AD2 = 0xfffaff;
 #if (D_DUMP_READ|D_DUMP_WRITE)
 #include <stdio.h>
 #endif
@@ -87,7 +83,7 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 {
 	assert(0 == (address & 0xff000000));
 	uint8_t r = ~0;
-	if (address < RAM_SIZE)
+	if (address < kAtariMachineRamSize)
 	{
 		assert(m_RAM);
 		return m_RAM[address];
@@ -108,15 +104,11 @@ unsigned int  AtariMachine::memRead8(unsigned int address)
 		r = 0;
 	else
 	{
-		assert(false);
+		#if D_DUMP_READ
+		uint32_t pc = m_cpu.m68k_get_reg(M68K_REG_PC);
+		printf("$%06x: READ8 Error from $%08x\n", pc, address);
+		#endif
 	}
-#if D_DUMP_READ
-	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
-	{
-		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
-		printf("$%06x: move.b $%06x,d0 ( =#$%02x )\n", pc, address, r);
-	}
-#endif
 	return r;
 }
 
@@ -125,7 +117,7 @@ unsigned int  AtariMachine::memRead16(unsigned int address)
 	assert(0 == (address & 1));
 	assert(0 == (address & 0xff000000));
 	uint16_t r = ~0;
-	if (address < RAM_SIZE - 1)
+	if (address < kAtariMachineRamSize - 1)
 	{
 		assert(m_RAM);
 		return uint16_t((m_RAM[address] << 8) | (m_RAM[address + 1]));
@@ -142,15 +134,11 @@ unsigned int  AtariMachine::memRead16(unsigned int address)
 		r = 0;
 	else
 	{
-		assert(false);
+		#if D_DUMP_READ
+		uint32_t pc = m_cpu.m68k_get_reg(M68K_REG_PC);
+		printf("$%06x: READ16 Error from $%08x\n", pc, address);
+		#endif
 	}
-#if D_DUMP_READ
-	if ((address >= D_DUMP_READ_AD1) && (address <= D_DUMP_READ_AD2))
-	{
-		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
-		printf("$%06x: move.w $%06x,d0 ( =#$%04x )\n", pc, address, r);
-	}
-#endif
 	return r;
 }
 
@@ -169,20 +157,13 @@ void AtariMachine::IllegalCb()
 void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 {
 	assert(0 == (address & 0xff000000));
-	if (address < RAM_SIZE)
+	if (address < kAtariMachineRamSize)
 	{
 		assert(m_RAM);
 		m_RAM[address] = value;
 		return;
 	}
-#if D_DUMP_WRITE
-	if ((address >= D_DUMP_WRITE_AD1) && (address <= D_DUMP_WRITE_AD2))
-	{
-		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
-		printf("$%06x: move.b #$%02x,$%06x\n", pc, value, address);
-	}
-#endif
-	if ((address >= 0xff8800) && (address < 0xff8900))
+	else if ((address >= 0xff8800) && (address < 0xff8900))
 		m_ym2149.WritePort(address & 0xfe, (uint8_t)value);	// atari ym 8800 is also shadowed in 8801 and 8802 in 8803
 	else if ((address >= 0xfffa00) && (address < 0xfffa26))
 		m_mfp.Write8(address - 0xfffa00, uint8_t(value));
@@ -195,7 +176,10 @@ void AtariMachine::memWrite8(unsigned int address, unsigned int value)
 	}
 	else
 	{
-		assert(false);
+		#if D_DUMP_WRITE
+		uint32_t pc = m_cpu.m68k_get_reg(M68K_REG_PC);
+		printf("$%06x: WRITE8 Error #$%02x to $%08x\n", pc, uint8_t(value), address);
+		#endif
 	}
 }
 
@@ -203,21 +187,14 @@ void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 {
 	assert(0 == (address & 1));
 	assert(0 == (address & 0xff000000));
-	if (address < RAM_SIZE - 1)
+	if (address < kAtariMachineRamSize - 1)
 	{
 		assert(m_RAM);
 		m_RAM[address] = uint8_t(value >> 8);
 		m_RAM[address + 1] = uint8_t(value);
 		return;
 	}
-#if D_DUMP_WRITE
-	if ((address >= D_DUMP_WRITE_AD1) && (address <= D_DUMP_WRITE_AD2))
-	{
-		uint32_t pc = m68k_get_reg(nullptr, M68K_REG_PC);
-		printf("$%06x: move.w #$%04x,$%06x\n", pc, value, address);
-	}
-#endif
-	if ((address >= 0xff8800) && (address < 0xff8900))
+	else if ((address >= 0xff8800) && (address < 0xff8900))
 		m_ym2149.WritePort(address & 0xfe, uint8_t(value >> 8));
 	else if ((address >= 0xfffa00) && (address < 0xfffa26))
 		m_mfp.Write16(address - 0xfffa00, uint16_t(value));
@@ -230,7 +207,10 @@ void AtariMachine::memWrite16(unsigned int address, unsigned int value)
 	}
 	else
 	{
-		assert(false);
+		#if D_DUMP_WRITE
+		uint32_t pc = m_cpu.m68k_get_reg(M68K_REG_PC);
+		printf("$%06x: WRITE16 Error #$%04x to $%08x\n", pc, uint16_t(value), address);
+		#endif
 	}
 }
 
@@ -241,7 +221,7 @@ AtariMachine::AtariMachine()
 
 AtariMachine::~AtariMachine()
 {
-	free(m_RAM);
+	AtariAudioFree(m_RAM);
 }
 
 void	AtariMachine::Gemdos(int func, uint32_t a7)
@@ -255,13 +235,13 @@ void	AtariMachine::Gemdos(int func, uint32_t a7)
 		if (0xffffffff == size)
 		{
 			// return largest free block
-			m_cpu.m68k_set_reg(M68K_REG_D0, RAM_SIZE-m_nextGemdosMallocAd);
+			m_cpu.m68k_set_reg(M68K_REG_D0, kAtariMachineRamSize-m_nextGemdosMallocAd);
 		}
 		else
 		{
 			m_cpu.m68k_set_reg(M68K_REG_D0, m_nextGemdosMallocAd);
 			m_nextGemdosMallocAd = (m_nextGemdosMallocAd + size + 1)&(-2);
-			assert(m_nextGemdosMallocAd <= RAM_SIZE);
+			assert(m_nextGemdosMallocAd <= kAtariMachineRamSize);
 		}
 	}
 	break;
@@ -372,18 +352,25 @@ int	AtariMachine::TrapInstructionCallback(int v)
 	return ret;
 }
 
-void	AtariMachine::Startup(uint32_t hostReplayRate, bool predictibleYm2149State)
+bool	AtariMachine::Startup(uint32_t hostReplayRate, bool predictibleYm2149State)
 {
-	if ( nullptr == m_RAM )
-		m_RAM = (uint8_t*)malloc(RAM_SIZE);
+	if (!m68kTablesValid())
+		return false;
 
-	memset(m_RAM, 0, RAM_SIZE);
+	if ( nullptr == m_RAM )
+		m_RAM = (uint8_t*)AtariAudioMalloc(kAtariMachineRamSize);
+
+	if (nullptr == m_RAM)
+		return false;
+
+	memset(m_RAM, 0, kAtariMachineRamSize);
 
 	m_ym2149.Reset(hostReplayRate, 2000000, predictibleYm2149State);
 	m_mfp.Reset(hostReplayRate);
 	m_steDac.Reset(hostReplayRate);
 	m_blitter.Reset();
-	m_nextGemdosMallocAd = GEMDOS_MALLOC_EMUL_BUFFER;
+	static_assert(kAtariMachineGemdosAllocSize < kAtariMachineRamSize, "Please change either kAtariMachineRamSize or kAtariMachineGemdosAllocSize");
+	m_nextGemdosMallocAd = kAtariMachineRamSize-kAtariMachineGemdosAllocSize;
 	MuteVoices(0);		// nothing is muted by default
 
 	m_cpu.SetUserData(this);
@@ -407,11 +394,12 @@ void	AtariMachine::Startup(uint32_t hostReplayRate, bool predictibleYm2149State)
 	m_doSndPtr = 0;
 	m_doSndVal = 0;
 	m_doSndDelay = 0;
+	return true;
 }
 
 bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
 {
-	if (addr + size > RAM_SIZE)
+	if (addr + size > kAtariMachineRamSize)
 		return false;
 
 	if ((nullptr == src) || (0 == size))
@@ -424,15 +412,15 @@ bool	AtariMachine::Upload(const void* src, uint32_t addr, uint32_t size)
 
 void	AtariMachine::ConfigureReturnByRts()
 {
-	m_cpu.MemWrite32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTS will go to RESET_INSTRUCTION_ADDR (reset)
-	m_cpu.MemWrite32(0, RAM_SIZE-4);				// stack ptr at next reset on TOP of RAM
+	m_cpu.MemWrite32(kAtariMachineRamSize - 4, RESET_INSTRUCTION_ADDR);		// next RTS will go to RESET_INSTRUCTION_ADDR (reset)
+	m_cpu.MemWrite32(0, kAtariMachineRamSize-4);				// stack ptr at next reset on TOP of RAM
 }
 
 void	AtariMachine::ConfigureReturnByRte()
 {
-	m_cpu.MemWrite32(RAM_SIZE - 4, RESET_INSTRUCTION_ADDR);		// next RTE will go to RESET_INSTRUCTION_ADDR (reset)
-	m_cpu.MemWrite16(RAM_SIZE - 6, 0x2300);					// SR=2300
-	m_cpu.MemWrite32(0, RAM_SIZE - 6);				// stack ptr at next reset on TOP of RAM
+	m_cpu.MemWrite32(kAtariMachineRamSize - 4, RESET_INSTRUCTION_ADDR);		// next RTE will go to RESET_INSTRUCTION_ADDR (reset)
+	m_cpu.MemWrite16(kAtariMachineRamSize - 6, 0x2300);					// SR=2300
+	m_cpu.MemWrite32(0, kAtariMachineRamSize - 6);				// stack ptr at next reset on TOP of RAM
 }
 
 bool	AtariMachine::JmpBinary(uint32_t pc, int timeOut50Hz)
@@ -544,7 +532,7 @@ Ym2149c::Levels	AtariMachine::ComputeNextSample()
 {
 	auto level = m_ym2149.ComputeNextSample();
 	assert(m_RAM);
-	int32_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, RAM_SIZE, m_mfp);
+	int32_t steLevel = m_steDac.ComputeNextSample((const int8_t*)m_RAM, kAtariMachineRamSize, m_mfp);
 	if ( 0 == (m_muteMask&(1<<3)))
 	{
 		int32_t l = level.sMono + steLevel;

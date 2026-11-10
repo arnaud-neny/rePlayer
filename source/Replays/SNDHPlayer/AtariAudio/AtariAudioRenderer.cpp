@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -13,6 +13,9 @@
 #include "YmRenderer.h"
 #include "external/lzh.h"
 #include "external/ice_24.h"
+#ifdef ESP_PLATFORM
+#include "esp_heap_caps.h"
+#endif
 
 AtariAudioRenderer* AtariAudioRenderer::Create(const void* fileMemoryData, uint32_t fileMemorySize, uint32_t hostReplayRate, uint32_t defaultYm2149Clock)
 {
@@ -43,7 +46,7 @@ AtariAudioRenderer::AtariAudioRenderer()
 
 AtariAudioRenderer::~AtariAudioRenderer()
 {
-	free((void*)m_songInfo.rawBinaryData);
+	AtariAudioFree((void*)m_songInfo.rawBinaryData);
 }
 
 AtariAudioRenderer::eFileType AtariAudioRenderer::QuickFileTypeCheck(const void* rawMemory, uint32_t rawSize)
@@ -110,4 +113,29 @@ uint32_t AtariAudioRenderer::ComputeHostSamplePerTick(uint32_t hostReplayRate, i
 	uint64_t denom = (uint64_t(hostReplayRate) * 313 * 512 * 50);
 	denom /= (uint64_t(playerTickRate) * kAtariSTECpuClock);
 	return uint32_t(denom);
+}
+
+void*	AtariAudioMalloc(size_t size)
+{
+#ifdef ESP_PLATFORM
+	// try to allocate fast RAM first
+	void* buffer = heap_caps_malloc(size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+	if (nullptr == buffer)
+	{
+		// if not enough fast RAM, try slow SPRAM if available
+		buffer = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	}
+	return buffer;
+#else
+	return malloc(size);
+#endif
+}
+
+void AtariAudioFree(void* p)
+{
+#ifdef ESP_PLATFORM
+	heap_caps_free(p);
+#else
+	free(p);
+#endif
 }

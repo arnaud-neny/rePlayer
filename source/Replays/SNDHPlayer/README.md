@@ -1,4 +1,4 @@
-# AtariAudio 1.28
+# AtariAudio 1.30
 
 src/ contains all files needed to compile AtariAudio. It allows you to play ATARI .sndh and .ym music files. You can also directly use YM2149 emulator if you want to write your own YM tracker.
 The library doesn't use any dependency, and should compile on any platform, including embedded systems (it doesn't even use float).
@@ -38,6 +38,8 @@ Destroy AtariAudioRenderer object and free any internal allocated memory
 
 # Version history
 
+- 1.30 : added support for ESP32 tiny platform!
+- 1.29 : fixed typo in sndh header parser
 - 1.28 : fixed noisy high pitch regression with STF digisound
 - 1.27 : added optional bool predictibleYm2149State as InitSubsong argument (for predictible automated testing) (false by default)
 - 1.26 : STE blitter support for some music drivers (ie BlitZwav demo by Cybernetics)
@@ -76,9 +78,20 @@ To make this possible, the Musashi 68k emulator used by AtariAudio has been modi
 
 # About memory and object lifetime
 
-AtariAudio is memory-efficient. When you call AtariAudioRenderer::Create(), only two allocations are performed:
-- One allocation for the AtariAudioRenderer object itself (using standard new operator)
+AtariAudio is memory-efficient.
+
+At program startup, 2 dynamic allocations are performed, regardless of how many renderer instances you create:
+- 64K pointers for 68k opcode emulation (so 1 MiB on 64-bit platforms, or 512 KiB on 32-bit platforms)
+- a 64 KiB table of 68k instruction cycle counts (will be removed soon)
+
+When you call AtariAudioRenderer::Create(), only two allocations are performed:
+- One allocation for the AtariAudioRenderer object itself (using the standard new operator)
 - One single allocation (using malloc) containing all the song data required for playback
+
+For a .sndh music file, the first call to InitSubSong() requires one additional allocation:
+- 4 MiB of Atari RAM (you can change the default using kAtariMachineRamSize)
+
+All allocations other than the renderer object itself are handled through AtariAudioMalloc(), and the corresponding memory is released through AtariAudioFree()
 
 Once AtariAudioRenderer::Create() returns, you are free to do whatever you want with the fileMemoryData buffer passed to it. AtariAudio keeps all the data required for playback in its single internal allocation, so the original buffer is no longer needed.
 
