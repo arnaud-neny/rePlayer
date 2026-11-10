@@ -1,5 +1,6 @@
 // Core
 #include <Core/Log.h>
+#include <Core/String.h>
 
 // rePlayer
 #include <Replayer/Core.h>
@@ -83,16 +84,57 @@ namespace rePlayer
             Log::Message(m_urlMessage, url);
 
         Status status = Status::kOk;
-        auto curlErr = curl_easy_perform(m_curl);
-        if (curlErr == CURLE_OK)
+        if (auto curlErr = curl_easy_perform(m_curl); curlErr == CURLE_OK)
         {
             status = OnDownloaded();
         }
         else
         {
+            char buf[64];
+            auto* err = curl_easy_strerror(curlErr);
+            if (long responseCode = 0; curlErr == CURLE_HTTP_RETURNED_ERROR && curl_easy_getinfo(m_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK)
+            {
+                switch (responseCode)
+                {
+                // 4xx Client Errors
+                case 400:
+                    err = "Bad Request";
+                    break;
+                case 401:
+                    err = "Unauthorized";
+                    break;
+                case 403:
+                    err = "Forbidden";
+                    break;
+                case 404:
+                    err = "Not Found";
+                    break;
+                case 405:
+                    err = "Method Not Allowed";
+                    break;
+                // 5xx Server Errors
+                case 500:
+                    err = "Internal Server Error";
+                    break;
+                case 502:
+                    err = "Bad Gateway";
+                    break;
+                case 503:
+                    err = "Service Unavailable";
+                    break;
+                case 504:
+                    err = "Gateway Timeout";
+                    break;
+                default:
+                    err = "Unknown HTTP Status";
+                }
+
+                sprintf(buf, "%i %s", responseCode, err);
+                err = buf;
+            }
             m_error = "Curl: ";
-            m_error += curl_easy_strerror(curlErr);
-            Log::Error("Curl: %s (%s)\n", curl_easy_strerror(curlErr), m_urlLog.c_str());
+            m_error += err;
+            Log::Error("Curl: %s (%s)\n", err, m_urlLog.c_str());
             status = Status::kFail;
         }
         return status;
