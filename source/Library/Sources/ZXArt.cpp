@@ -256,7 +256,7 @@ namespace rePlayer
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         char url[128];
         sprintf(url, "https://zxart.ee/file/id:%u/", sourceToDownload.internalId);
-        Log::Message("ZX-Art: downloading \"%s\"...", url);
+        Log::Message("ZX-Art: downloading \"%s\"\n", url);
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
@@ -295,8 +295,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }

@@ -442,7 +442,7 @@ namespace rePlayer
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
-        Downloader downloader("Amiga Music Preservation: downloading \"%s\"...");
+        Downloader downloader("Amiga Music Preservation: downloading \"%s\"\n");
         auto status = downloader.Fetch("https://amp.dascene.net/module/%u", sourceToDownload.internalId);
 
         SmartPtr<io::Stream> stream;
@@ -455,8 +455,6 @@ namespace rePlayer
             }
             else
             {
-                Log::Message("OK...");
-
                 SongSource* songAMP = FindSong(sourceToDownload.internalId);
                 songAMP->crc = crc32(0L, Z_NULL, 0);
                 songAMP->crc = crc32_z(songAMP->crc, downloader.Items(), downloader.Size());
@@ -465,11 +463,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, downloader.Items(), downloader.Size(), false);
                 downloader.Detach();
-
-                if (stream.IsInvalid())
-                    Log::Error("Amiga Music Preservation: failed to process package\n");
-                else
-                    Log::Message("Unpacked\n");
             }
         }
 

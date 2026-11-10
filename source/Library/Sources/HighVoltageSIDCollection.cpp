@@ -230,8 +230,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }
@@ -961,7 +959,7 @@ namespace rePlayer
         unescape(songSource->name);
         url += ".sid";
 
-        Log::Message("High Voltage SID Collection: downloading \"%s\"...", url.c_str());
+        Log::Message("High Voltage SID Collection: downloading \"%s\"\n", url.c_str());
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 

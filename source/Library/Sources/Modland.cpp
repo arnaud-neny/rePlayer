@@ -568,7 +568,7 @@ namespace rePlayer
             {
                 if (strcmp(m_replays[songSource->replay].name(m_strings), "Delitracker Custom") == 0)
                 {
-                    Log::Message("Discarded\n");
+                    Log::Message("Modland: Discarded\n");
                     curl_easy_cleanup(curl);
                     return ImportPkSong(sourceId, ModlandReplay::kDelitrackerCustom, path);
                 }
@@ -592,8 +592,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }
@@ -1494,7 +1492,7 @@ namespace rePlayer
             unescape(m_replays[songSource->replay].ext(m_strings));
         }
 
-        Log::Message("Modland: downloading \"%s\"...", url.c_str());
+        Log::Message("Modland: downloading \"%s\"\n", url.c_str());
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
@@ -1607,7 +1605,7 @@ namespace rePlayer
             replay->nextUrlAndName(curl, replay, *this, url, name);
             if (!url.empty())
             {
-                Log::Message("\"%s\"...", url.c_str());
+                Log::Message("Modland: downloading \"%s\"\n", url.c_str());
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 curlError = curl_easy_perform(curl);
                 if (curlError == CURLE_OK)
@@ -1636,8 +1634,6 @@ namespace rePlayer
 
             stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
             archiveBuffer.Detach();
-
-            Log::Message("OK\n");
         }
         else if (curlError == CURLE_HTTP_RETURNED_ERROR)
         {
@@ -1761,14 +1757,13 @@ namespace rePlayer
             auto r = archive_write_open2(archive, &archiveBuffer, archiveBuffer.ArchiveOpen, ArchiveBuffer::ArchiveWrite, archiveBuffer.ArchiveClose, archiveBuffer.ArchiveFree);
             assert(r == ARCHIVE_OK);
             auto entry = archive_entry_new();
-            Log::Message("Modland: downloading ");
             for (auto& item : items)
             {
                 std::string url = baseUrl;
                 auto e = curl_easy_escape(curl, item.c_str(), int32_t(item.size()));
                 url += e;
                 curl_free(e);
-                Log::Message("\"%s\"...", url.c_str());
+                Log::Message("Modland: downloading \"%s\"\n", url.c_str());
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 auto curlError = curl_easy_perform(curl);
                 if (curlError == CURLE_OK && curlBuffer.IsNotEmpty())
@@ -1830,8 +1825,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, archiveBuffer.Items(), archiveBuffer.Size(), false);
                 archiveBuffer.Detach();
-
-                Log::Message("OK\n");
             }
             std::string dbSongName(dbSong.name(m_db.strings));
             return { stream, isEntryMissing, true, false, UpdateMediaType(dbSong, dbSongName).ext };

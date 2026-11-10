@@ -520,7 +520,7 @@ namespace rePlayer
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
-        Downloader downloader("The Mod Archive: downloading \"%s\"...");
+        Downloader downloader("The Mod Archive: downloading \"%s\"\n");
         auto status = downloader.Fetch("https://api.modarchive.org/downloads.php?moduleid=%u", sourceToDownload.internalId);
         SmartPtr<io::Stream> stream;
         bool isEntryMissing = false;
@@ -543,8 +543,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, downloader.Items(), downloader.Size(), false);
                 downloader.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }
