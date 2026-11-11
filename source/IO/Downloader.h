@@ -56,7 +56,9 @@ namespace rePlayer
         CURL* m_curl;
         curl_slist* m_headers = nullptr;
         const char* m_urlMessage = nullptr;
-        bool m_isInitialized = false;
+        uint32_t m_isInitialized : 1 = false;
+        uint32_t m_lowSpeedLimit : 15 = 0; // 30 bytes
+        uint32_t m_lowSpeedTime : 16 = 0; // 10 seconds
         std::string m_urlLog;
         std::string m_error;
     };
