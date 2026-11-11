@@ -337,7 +337,7 @@ namespace rePlayer
         SourceID sourceToDownload = sourceId;
         assert(sourceToDownload.sourceId == kID);
 
-        Downloader downloader("SNDH: downloading \"%s\"...");
+        Downloader downloader("SNDH: downloading \"%s\"\n");
         downloader.SetReferer("https://sndh.atari.org/");
         auto status = downloader.Fetch("https://sndh.atari.org/dl.php?ID=%u", sourceToDownload.internalId);
         SmartPtr<io::Stream> stream;
@@ -361,8 +361,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, downloader.Items(), downloader.Size(), false);
                 downloader.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }

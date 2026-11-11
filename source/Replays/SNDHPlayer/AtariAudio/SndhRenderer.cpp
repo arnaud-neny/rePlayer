@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -41,7 +41,9 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 	if (ice_24_header((unsigned char*)rawSndhFile))
 	{
 		si.rawBinaryDataSize = (uint32_t)ice_24_origsize((unsigned char*)rawSndhFile);
-		si.rawBinaryData = malloc(si.rawBinaryDataSize);
+		si.rawBinaryData = AtariAudioMalloc(si.rawBinaryDataSize);
+		if (nullptr == si.rawBinaryData)
+			return false;
 		long csize = ice_24_depack((unsigned char*)rawSndhFile, (unsigned char*)si.rawBinaryData);
 		if (si.rawBinaryDataSize != csize)
 			return false;
@@ -49,7 +51,9 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 	else
 	{
 		si.rawBinaryDataSize = sndhFileSize;
-		si.rawBinaryData = malloc(si.rawBinaryDataSize);
+		si.rawBinaryData = AtariAudioMalloc(si.rawBinaryDataSize);
+		if (nullptr == si.rawBinaryData)
+			return false;
 		memcpy((void*)si.rawBinaryData, rawSndhFile, sndhFileSize);
 	}
 
@@ -75,13 +79,13 @@ bool	SndhRenderer::Load(const void* rawSndhFile, uint32_t sndhFileSize, uint32_t
 			read8 += 16;
 			while (read8 + 4 <= readEnd)
 			{
-				if (0 == strncmp(read8, "!#SN", 4))
+				if (0 == strncmp(read8, "#!SN", 4))
 				{
 					assert(si.subsongCount > 0);
 					read8 += 4 + si.subsongCount * 2;			// skip 2bytes per offset
 					tagCount++;
 				}
-				if (0 == strncmp(read8, "!#", 2))
+				if (0 == strncmp(read8, "#!", 2))
 				{
 					si.defaultSubsong = atoi(read8 + 2);
 					read8 = SkipNTString(read8+2);
@@ -209,7 +213,9 @@ bool	SndhRenderer::InitSubSong(int subSongId, bool predictibleYm2149State = fals
 	if ((subSongId >= 1) && (subSongId <= m_songInfo.subsongCount))
 	{
 		m_innerSamplePos = 0;
-		m_atariMachine.Startup(m_songInfo.hostReplayRate, predictibleYm2149State);
+		if (!m_atariMachine.Startup(m_songInfo.hostReplayRate, predictibleYm2149State))
+			return false;
+
 		if (m_atariMachine.Upload(m_songInfo.rawBinaryData, SNDH_UPLOAD_ADDR, m_songInfo.rawBinaryDataSize))
 		{
 			ret = m_atariMachine.Jsr(SNDH_UPLOAD_ADDR, subSongId);

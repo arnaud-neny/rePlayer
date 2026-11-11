@@ -1397,16 +1397,9 @@ namespace rePlayer
                             {
                                 CommandBuffer(song->metadata.Container()).Remove(uint16_t(song->replay));
                                 song->replay = eReplay(i);
-
-                                for (; song->lastSubsongIndex; --song->lastSubsongIndex)
-                                {
-                                    SubsongID subsongIdToRemove(song->id, song->lastSubsongIndex);
-                                    Core::Discard(MusicID(subsongIdToRemove, m_databaseId));
-                                }
-                                song->subsongs[0].Clear();
                             }
-                            else
-                                song->subsongs[0].isInvalid = false;
+                            song->subsongs[0].isInvalid = false;
+                            song->subsongs[0].isPlayed = false;
                         }
                     }
                     m_db.Raise(Database::Flag::kSaveSongs);

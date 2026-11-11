@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -14,6 +14,8 @@
 #include "external/Musashi/m68k.h"
 #include "external/Musashi/m68kops.h"
 
+static	const	uint32_t	kAtariMachineRamSize = 4*1024*1024;				// you can reduce this to 512KiB if needed for tiny platform such as ESP32
+static const	uint32_t	kAtariMachineGemdosAllocSize = 1*1024*1024;
 
 class AtariMachine
 {
@@ -27,7 +29,7 @@ public:
 		kReset = (1 << 1),
 	};
 
-	void		Startup(uint32_t hostReplayRate, bool predictibleYm2149State = false);
+	bool		Startup(uint32_t hostReplayRate, bool predictibleYm2149State = false);
 	bool		Upload(const void* src, uint32_t addr, uint32_t size);
 	bool 		PlayerTick(uint32_t musicDriverCallAddr);
 	bool		Jsr(uint32_t addr, uint32_t d0);
@@ -44,10 +46,8 @@ public:
 	void 			MuteVoices(uint32_t muteMask);
 
 private:
-	static	const	uint32_t	RAM_SIZE = 4*1024*1024;
 	static	const	uint32_t	RTE_INSTRUCTION_ADDR = 0x500;
 	static	const	uint32_t	RESET_INSTRUCTION_ADDR = 0x502;
-	static	const	uint32_t	GEMDOS_MALLOC_EMUL_BUFFER = RAM_SIZE-0x100000;
 
 	// Peter Johnson used Xbios(32) (DoSound) for Arkanoid and Wizball!!
 	void 		DoSoundTick();

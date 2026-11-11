@@ -1097,7 +1097,7 @@ namespace rePlayer
         url += packSource->url(m_data);
         url += '/';
         url += songSource->url(m_data);
-        Log::Message("VGMRips: downloading \"%s\"...", url.c_str());
+        Log::Message("VGMRips: downloading \"%s\"\n", url.c_str());
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_REFERER, "https://vgmrips.net/");
@@ -1125,8 +1125,6 @@ namespace rePlayer
             stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
             buffer.Detach();
             m_isDirty = true;
-
-            Log::Message("OK\n");
         }
         else if (curlError == CURLE_HTTP_RETURNED_ERROR)
         {

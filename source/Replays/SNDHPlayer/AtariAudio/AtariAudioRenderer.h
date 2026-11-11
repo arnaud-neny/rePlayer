@@ -1,12 +1,13 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.28
+//	AtariAudio 1.30
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
 //----------------------------------------------------------
 #pragma once
 #include <stdint.h>
+#include <stddef.h>
 
 class AtariAudioRenderer
 {
@@ -110,3 +111,6 @@ protected:
 	uint32_t	m_innerSamplePos;
 	bool 		m_subsongInit;
 };
+
+void*	AtariAudioMalloc(size_t size);
+void 	AtariAudioFree(void* p);

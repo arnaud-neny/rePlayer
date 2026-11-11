@@ -245,8 +245,6 @@ namespace rePlayer
 
                 stream = io::StreamMemory::Create(path, buffer.Items(), buffer.Size(), false);
                 buffer.Detach();
-
-                Log::Message("OK\n");
             }
             m_isDirty = true;
         }
@@ -1037,7 +1035,7 @@ namespace rePlayer
         }
         unescape(songSource->name());
 
-        Log::Message("Atari SAP Music Archive: downloading \"%s\"...", url.c_str());
+        Log::Message("Atari SAP Music Archive: downloading \"%s\"\n", url.c_str());
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 

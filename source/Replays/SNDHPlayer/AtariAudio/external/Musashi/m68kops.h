@@ -6,12 +6,12 @@
 /* ======================================================================== */
 
 
+#include <stddef.h>
 #include "m68kcpu.h"
 
 /* Build the opcode handler table */
 void m68ki_build_opcode_table(void);
-
-extern unsigned char m68ki_cycles[][0x10000];
+bool m68kTablesValid();
 
 /* Helper to load a bitfield from EA */
 typedef struct {
@@ -182,7 +182,10 @@ public:
 	#include "m68k_func.inc"
 };
 
-extern void (M68k::*m68ki_instruction_jump_table[0x10000])(void); /* opcode handler jump table */
+extern void (M68k::**m68ki_instruction_jump_table)(void);	/* opcode handler jump table */
+extern unsigned char* m68ki_cycles; /* Cycles used by CPU type */
+void*	AtariAudioMalloc(size_t size);
+void AtariAudioFree(void* p);
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
