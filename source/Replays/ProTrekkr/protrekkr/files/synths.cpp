@@ -81,7 +81,7 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, ReplayerFile&),
         
                     Read_Function_Swap(&PARASynth[idx].osc_1_pw, sizeof(int), 1, in);
                     Read_Function_Swap(&PARASynth[idx].osc_2_pw, sizeof(int), 1, in);
-        
+
                     Read_Function(&PARASynth[idx].osc_2_detune, sizeof(char), 1, in);
                     Read_Function(&PARASynth[idx].osc_2_finetune, sizeof(char), 1, in);
         
@@ -129,7 +129,7 @@ void Read_Synth_Params(int (*Read_Function)(void *, int ,int, ReplayerFile&),
                     Read_Function(&PARASynth[idx].lfo_2_osc_1_volume, sizeof(char), 1, in);
                     Read_Function(&PARASynth[idx].lfo_2_osc_2_volume, sizeof(char), 1, in);
                     Read_Function(&PARASynth[idx].lfo_2_vcf_cutoff, sizeof(char), 1, in);
-                    Read_Function(&PARASynth[idx].lfo_2_vcf_resonance, sizeof(char), 1, in);//81
+                    Read_Function(&PARASynth[idx].lfo_2_vcf_resonance, sizeof(char), 1, in); //81
 
                     Read_Function(&PARASynth[idx].env_1_osc_1_pw, sizeof(char), 1, in);
                     Read_Function(&PARASynth[idx].env_1_osc_2_pw, sizeof(char), 1, in);
@@ -512,7 +512,7 @@ void Load_Synth(char *FileName)
         if(PARASynth[Current_Instrument].lfo_1_period > 128) PARASynth[Current_Instrument].lfo_1_period = 128;
         if(PARASynth[Current_Instrument].lfo_2_period > 128) PARASynth[Current_Instrument].lfo_2_period = 128;
 
-        Synthprg[Current_Instrument] = SYNTH_WAVE_CURRENT;
+        Synth_Prg[Current_Instrument] = SYNTH_WAVE_CURRENT;
         sprintf(nameins[Current_Instrument],PARASynth[Current_Instrument].Preset_Name);
         Actualize_Synth_Ed(UPDATE_SYNTH_ED_ALL);
 

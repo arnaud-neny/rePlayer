@@ -207,14 +207,12 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="protrekkr\include\ptk.h" />
     <ClInclude Include="protrekkr\include\variables.h" />
     <ClInclude Include="protrekkr\include\version.h" />
-    <ClInclude Include="protrekkr\replay\include\cubic_spline.h" />
     <ClInclude Include="protrekkr\replay\include\endianness.h" />
     <ClInclude Include="protrekkr\replay\include\ptkreplay.h" />
     <ClInclude Include="protrekkr\replay\include\ptk_def_properties.h" />
     <ClInclude Include="protrekkr\replay\include\replay.h" />
     <ClInclude Include="protrekkr\replay\include\samples_unpack.h" />
     <ClInclude Include="protrekkr\replay\include\sounddriver_dummy.h" />
-    <ClInclude Include="protrekkr\replay\include\spline.h" />
     <ClInclude Include="protrekkr\replay\include\synth.h" />
     <ClInclude Include="protrekkr\replay\include\tb_303.h" />
     <ClInclude Include="protrekkr\replay\include\wavpack.h" />
@@ -231,7 +229,6 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="protrekkr\files\synths.cpp" />
     <ClCompile Include="protrekkr\replay\replay.cpp" />
     <ClCompile Include="protrekkr\replay\samples_unpack.cpp" />
-    <ClCompile Include="protrekkr\replay\spline.cpp" />
     <ClCompile Include="protrekkr\replay\synth.cpp" />
     <ClCompile Include="protrekkr\replay\tb_303.cpp" />
     <ClCompile Include="protrekkr\replay\wavpack.cpp" />

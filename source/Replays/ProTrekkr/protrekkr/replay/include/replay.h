@@ -35,8 +35,6 @@
 // ------------------------------------------------------
 // Includes
 #include "tb_303.h"
-#include "cubic_spline.h"
-#include "spline.h"
 #if defined(__WIN32__)
 #include "../sounddriver/include/sounddriver_windows.h"
 #elif defined(__FREEBSD__)
@@ -72,8 +70,10 @@
 #define USE_FASTPOW
 
 #define MAX_TRACKS 16
+#define MAX_EFFECTS 4
 #define MAX_POLYPHONY 16
 #define DEFAULT_POLYPHONY 1
+#define MAX_CHORUS_FILTER 4
 #define MAX_FILTER 23
 #define MAX_COMB_FILTERS 10
 #define PI 3.1415926535897932384626433832795
@@ -81,10 +81,6 @@
 
 #define MIX_RATE 44100
 #define fMIX_RATE 44100.0f
-
-#define NONE_INT 0
-#define CUBIC_INT 1
-#define SPLINE_INT 2
 
 #define DEFAULT_BASE_NOTE 48
 
@@ -218,25 +214,6 @@ extern int rawrender_to;
 
 // ------------------------------------------------------
 // Structures
-
-// SAMPLE COUNTER
-struct smpos
-{
-#if defined(__BIG_ENDIAN__)
-    Uint32 first;
-    Uint32 last;
-#else
-    Uint32 last;
-    Uint32 first;
-#endif
-};
-
-union s_access
-{
-    smpos half;
-    int64 absolu;
-};
-
 typedef struct
 {
     int inote;
@@ -318,6 +295,7 @@ extern int lchorus_delay;
 extern int rchorus_delay;
 extern float Track_Volume[MAX_TRACKS];
 extern char Track_Surround[MAX_TRACKS];
+extern char Track_Denoise[MAX_TRACKS];
 extern float mas_comp_threshold_Track[MAX_TRACKS];
 extern float mas_comp_ratio_Track[MAX_TRACKS];
 extern char Compress_Track[MAX_TRACKS];
@@ -333,7 +311,7 @@ extern char nameins[MAX_INSTRS][20];
 extern int Midiprg[MAX_INSTRS];
 
 #if defined(PTK_SYNTH)
-extern unsigned char Synthprg[MAX_INSTRS];
+extern unsigned char Synth_Prg[MAX_INSTRS];
 #endif
 
 #if !defined(__STAND_ALONE__)
@@ -359,11 +337,14 @@ extern float TCut[MAX_TRACKS];
 extern float ICut[MAX_TRACKS];
 extern float TPan[MAX_TRACKS];
 extern float old_TPan[MAX_TRACKS];
+extern int ChorType;
+extern int ChorCut;
+extern int ChorRez;
 extern int FType[MAX_TRACKS];
 extern int FRez[MAX_TRACKS];
 extern float DThreshold[MAX_TRACKS];
 extern float DClamp[MAX_TRACKS];
-extern float DSend[MAX_TRACKS];
+extern float DSend[MAX_TRACKS]; 
 extern int CSend[MAX_TRACKS];
 extern char Channels_Polyphony[MAX_TRACKS];
 extern char compressor; // 0-->Off 1-->On
@@ -435,7 +416,7 @@ extern int Locked_Sub_Channels[MAX_TRACKS][MAX_POLYPHONY];
 extern int sp_Stage[MAX_TRACKS][MAX_POLYPHONY];
 extern int Cut_Stage[MAX_TRACKS][MAX_POLYPHONY];
 extern int Glide_Stage[MAX_TRACKS][MAX_POLYPHONY];
-extern unsigned int Current_Pointer[4];
+extern unsigned int Current_Pointer;
 
 #if defined(PTK_SYNTH)
 extern int sp_Stage2[MAX_TRACKS][MAX_POLYPHONY];
@@ -460,8 +441,6 @@ extern volatile int Song_Playing;
 #else
 extern int Song_Playing;
 #endif
-extern int left_value;
-extern int right_value;
 
 #if defined(PTK_SYNTH)
 #if !defined(__STAND_ALONE__) || defined(__WINAMP__)
@@ -493,9 +472,11 @@ void Schedule_Instrument(int channel, int sub_channel,
                          int Pos,
                          int Row);
 void Play_Instrument(int channel, int sub_channel);
+void Reset_Chorus_Filters(void);
 void Reset_Filters(int tr);
 void Compute_Stereo(int channel);
 void Fix_Stereo(int channel);
+void Calc_Tempo(void);
 void Get_Player_Values(void);
 void Note_Off_303(char strack);
 void Init_Sample_Bank(void);
@@ -521,18 +502,18 @@ float Do_RMS(float input, float *rms_sum, float *buffer);
 int Get_Free_Sub_Channel(int channel, int polyphony);
 int Get_Pattern_Offset(int pattern, int track, int row);
 void Init_Reverb_Filter(void);
-void Set_Spline_Boundaries(unsigned int Position,
-                           unsigned int *Boundaries,
-                           int LoopType,
-                           unsigned int LoopWay,
-                           unsigned int Length,
-                           unsigned int LoopEnd,
-                           unsigned int LoopStart);
-float Process_Sample(short *Data, int c, int i, unsigned int res_dec);
+void Set_Carrier_Boundaries(unsigned int Position,
+                            unsigned int *Boundaries,
+                            int LoopType,
+                            unsigned int LoopWay,
+                            unsigned int Length,
+                            unsigned int LoopEnd,
+                            unsigned int LoopStart);
 void Init_Equ(LPEQSTATE es);
 float Do_Equ(LPEQSTATE es, float sample, int Left);
 #if defined(PTK_SHUFFLE)
 void Update_Shuffle(void);
+void Update_Shuffle_Midi(void);
 float absf(float x);
 
 #endif

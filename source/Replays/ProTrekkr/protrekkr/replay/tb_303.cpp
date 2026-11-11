@@ -44,6 +44,24 @@ gear303::gear303()
     reset();
 }
 
+#define DENORMAL_303 0
+
+#if DENORMAL_303
+__inline float denormal_303(float sample)
+{
+    unsigned int isample;
+    *(unsigned int *) &isample = *(unsigned int *) &sample;
+
+    int abs_mantissa = isample & 0x007FFFFF;
+    int biased_exponent = isample & 0x7F800000;
+    if(biased_exponent == 0 && abs_mantissa != 0) 
+    {
+        return 0;
+    }
+    return sample;
+}
+#endif
+
 // ------------------------------------------------------
 // 303 initialization
 void gear303::reset(void)
@@ -59,6 +77,9 @@ void gear303::reset(void)
     tbRealEnvmod = 0.0f;
     tbRealResonance = 0.0f;
     tbRealAccent = 0.0f;
+    tbLastCutoff = 0.0f;
+    tbLastEnvmod = 0.0f;
+    tbLastResonance = 0.0f;
     tbAutoSlidect = 1;
     tbAutoSlideres = 1;
     tbAutoSlideenv = 1;
@@ -230,13 +251,13 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
 
         RampVolume = 1.0f;
 
-        tbWaveform = PARAT303->waveform; 
+        tbWaveform = PARAT303->waveform;
         tbOscSpeedFreak = 0;
-        float frune = float(tbNote) - 17;
+        float ftune = float(tbNote) - 17;
 
         // 0.1889763f seems to be about right
-        frune += (float) PARAT303->tune * 0.1889763f;
-        float tbOscSpeedTmp = POWF2(frune / 12.0f) * 64.0f;
+        ftune += (float) PARAT303->tune * 0.1889763f;
+        float tbOscSpeedTmp = POWF2(ftune / 12.0f) * 64.0f;
 
         int tbLine2 = (tbLine - 1);
         if(tbLine2 < 0) tbLine2 = PARAT303->patternlength[tbPattern] - 1;
@@ -315,13 +336,13 @@ void gear303::tbNoteOn(int tbNote, para303 *PARAT303)
             tbOscSpeed = tbOscSpeedTmp;
             forcefault = 0;
             // Retrieve the previous speed
-            frune = float(PARAT303->tone[tbPattern][tbLine2]) - 17;
-            if(PARAT303->flag[tbPattern][tbLine2].transposeup_flag) frune += 12;
-            if(PARAT303->flag[tbPattern][tbLine2].transposedown_flag) frune -= 12;
-            frune += (float) PARAT303->tune * 0.1889763f;
+            ftune = float(PARAT303->tone[tbPattern][tbLine2]) - 17;
+            if(PARAT303->flag[tbPattern][tbLine2].transposeup_flag) ftune += 12;
+            if(PARAT303->flag[tbPattern][tbLine2].transposedown_flag) ftune -= 12;
+            ftune += (float) PARAT303->tune * 0.1889763f;
             tbInnertime = SamplesPerTick * 0.5f;
             float tbDestiny = tbOscSpeed;                            // Dest
-            float tbSource = POWF2(frune / 12.0f) * 64.0f;
+            float tbSource = POWF2(ftune / 12.0f) * 64.0f;
             // Previous speed
             tbOscSpeed = tbSource;
             tbOscSpeedFreak = (tbDestiny - tbSource) / tbInnertime;  // Get glide coefficient
@@ -380,6 +401,7 @@ float gear303::tbFilter(void)
     float f;
     float p;
     float q;
+    float in;
     float t[4];
     float cut = tbRealCutoff2;
     float res = tbRealResonance2;
@@ -391,13 +413,25 @@ float gear303::tbFilter(void)
     cut += 0.55f;
     cut *= envcut;
     cut *= 0.50f;
+
     q = (0.85f - cut);
     p = ((cut * cut) * 0.45f);
     f = (p + p) - 1.0f;
     res *= 5.0f;
     q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
     if(q > 2.42f) q = 2.42f;
-    float in = (tbSample / 16384.0f) - (q * tbBuf[4] * envcut2);
+
+#if DENORMAL_303
+    q = denormal_303(q);
+    tbBuf[0] = denormal_303(tbBuf[0]);
+    tbBuf[1] = denormal_303(tbBuf[1]);
+    tbBuf[2] = denormal_303(tbBuf[2]);
+    tbBuf[3] = denormal_303(tbBuf[3]);
+    tbBuf[4] = denormal_303(tbBuf[4]);
+#endif
+
+    in = (tbSample / 16384.0f) - (q * tbBuf[4] * envcut2);
+
     t[1] = tbBuf[1];
     t[2] = tbBuf[2];
     t[3] = tbBuf[3];

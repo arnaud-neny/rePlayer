@@ -3,7 +3,7 @@
 // Based on Juan Antonio Arguelles Rius's NoiseTrekker.
 //
 // Copyright (C) 2008-2025 Franck Charlet.
-// All rights reserved.
+// All rights reserFed.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -40,7 +40,6 @@ float SIN[360];     // Sine float-precalculated table, in absolute degrees.
 #if defined(PTK_SYNTH)
 
 int SIZE_WAVEFORMS;
-extern char Use_Cubic;
 
 #if defined(PTK_SYNTH_SIN)
 short STOCK_SIN[SIZE_WAVEFORMS_SPACE];
@@ -62,7 +61,7 @@ short STOCK_WHITE[SIZE_WAVEFORMS_SPACE];
 short STOCK_TRI[SIZE_WAVEFORMS_SPACE];
 #endif
 
-#define WAVEFORM_ADJUST_FREQ 0.5325
+#define WAVEFORM_ADJUST_FREQ 0.5325f
 
 // ------------------------------------------------------
 // This next function resets the synthesizer to default values
@@ -169,8 +168,15 @@ void CSynth::Reset(void)
     Data.LFO_2_RELEASE = 0.0f;
 
     Data.OSC_3_VOLUME = 0;
-
     Data.PTC_GLIDE_64 = 0;
+
+    GLIDE_64_ALIGN = 0;
+
+    Data.GLB_VOLUME = 1.0f;
+    Data.OSC_COMBINE = COMBINE_ADD;
+
+    Data.OSC_SYNC = FALSE;
+    Data.OSC_3_INTERVAL = 12;
 
 #endif
 
@@ -223,6 +229,24 @@ void CSynth::Reset(void)
     MoogBufferR[4] = 0.0f;
 #endif
 }
+
+#define DENORMAL_SYNTH 0
+
+#if DENORMAL_SYNTH
+__inline float denormal_synth(float sample)
+{
+    unsigned int isample;
+    *(unsigned int *) &isample = *(unsigned int *) &sample;
+
+    int abs_mantissa = isample & 0x007FFFFF;
+    int biased_exponent = isample & 0x7F800000;
+    if(biased_exponent == 0 && abs_mantissa != 0) 
+    {
+        return 0;
+    }
+    return sample;
+}
+#endif
 
 // ------------------------------------------------------
 // This function is for internal use only. Makes the LFO's run.
@@ -733,20 +757,26 @@ float CSynth::GetSample(short *Left_Samples,
                         float vol,
                         int *track,
                         int *track2,
-                        Uint64 *position_osc_1,
-                        Uint64 *position_osc_2,
+                        s_access *position_osc_1,
+                        s_access *position_osc_2,
+
 #if defined(PTK_SYNTH_OSC_3)
-                        Uint64 *position_osc_3,
+                        s_access *position_osc_3,
 #endif
-                        int64 osc_speed,
+
+                        float osc_speed,
                         float Ampi_Vol)
     {
 
-    s_access *pos_osc_1 = (s_access *) position_osc_1;
-    s_access *pos_osc_2 = (s_access *) position_osc_2;
+    s_access *pos_osc_1;
+    pos_osc_1 = position_osc_1;
+    
+    s_access *pos_osc_2;
+    pos_osc_2 = position_osc_2;
 
 #if defined(PTK_SYNTH_OSC_3)
-    s_access *pos_osc_3 = (s_access *) position_osc_3;
+    s_access *pos_osc_3;
+    pos_osc_3 = position_osc_3;
 #endif
 
     short *Left_Samples1 = NULL;
@@ -754,20 +784,20 @@ float CSynth::GetSample(short *Left_Samples,
     unsigned int res_dec;
 
 #if defined(PTK_SYNTH_PITCH)
-    int64 osc_speed1;
-    int64 osc_speed1b;
+    float osc_speed1;
+    float osc_speed1b;
 #endif
 
-    int64 osc_speed2;
-    double osc_speed_dbl;
+    float osc_speed2;
+    float osc_speed_dbl;
 
 #if defined(PTK_SYNTH_OSC_2)
-    int64 osc_speed_tune;
+    float osc_speed_tune;
 #endif
 
     float mul_datL;
     float mul_datR;
-    unsigned int i_POSITION[4];
+    unsigned int i_POSITION;
 
 #if defined(PTK_SYNTH_SYNC)
     int do_sync = FALSE;
@@ -779,10 +809,10 @@ float CSynth::GetSample(short *Left_Samples,
     char Loop_Type1 = Loop_Type;
     char Loop_Type2 = Loop_Type;
 
-    unsigned int Loop_Sub1 = Loop_Sub;
-    unsigned int Loop_Sub2 = Loop_Sub;
-    unsigned int Length1 = Length;
-    unsigned int Length2 = Length;
+    int Loop_Sub1 = Loop_Sub;
+    int Loop_Sub2 = Loop_Sub;
+    int Length1 = Length;
+    int Length2 = Length;
 
 // ------------------------------------------------
 // Oscillator 1
@@ -807,16 +837,16 @@ float CSynth::GetSample(short *Left_Samples,
 
             if(*track)
             {
-                if(Data.PTC_GLIDE_64 != 0 && OSC_1_SPEED != 0)
+                if(GLIDE_64_ALIGN != 0 && OSC_1_SPEED != 0)
                 {
                     if(osc_speed > OSC_1_SPEED)
                     {
-                        OSC_1_SPEED += Data.PTC_GLIDE_64;
+                        OSC_1_SPEED += GLIDE_64_ALIGN;
                         if(OSC_1_SPEED > osc_speed) OSC_1_SPEED = osc_speed;
                     }
                     else
                     {
-                        OSC_1_SPEED -= Data.PTC_GLIDE_64;
+                        OSC_1_SPEED -= GLIDE_64_ALIGN;
                         if(OSC_1_SPEED < osc_speed) OSC_1_SPEED = osc_speed;
                     }
                 }
@@ -826,7 +856,7 @@ float CSynth::GetSample(short *Left_Samples,
                 }
 
 #if defined(PTK_SYNTH_PITCH)
-                osc_speed1 = (int64) ((double)
+                osc_speed1 = (float)
                              (
 #if defined(PTK_SYNTH_LFO_1_PITCH)
                               LFO_1_VALUE * Data.LFO_1_OSC_1_PITCH
@@ -840,7 +870,7 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_ENV_2_PITCH)
                             + ENV_2_VALUE * Data.ENV_2_OSC_1_PITCH
 #endif
-                           ) * 4294967296.0);
+                           );
 #endif
 
                 osc_speed2 = OSC_1_SPEED;
@@ -899,13 +929,13 @@ float CSynth::GetSample(short *Left_Samples,
 
 #endif
 
-                    osc_speed_dbl = (double) osc_speed1;
+                    osc_speed_dbl = (float) osc_speed1;
                     osc_speed_dbl *= WAVEFORM_ADJUST_FREQ;
-                    osc_speed1 = (int64) osc_speed_dbl;
+                    osc_speed1 = osc_speed_dbl;
 
-                    osc_speed_dbl = (double) osc_speed2;
+                    osc_speed_dbl = (float) osc_speed2;
                     osc_speed_dbl *= WAVEFORM_ADJUST_FREQ;
-                    osc_speed2 = (int64) osc_speed_dbl;
+                    osc_speed2 = osc_speed_dbl;
 
                     // Those always loop
                     Loop_Type1 = SMP_LOOP_FORWARD;
@@ -913,15 +943,16 @@ float CSynth::GetSample(short *Left_Samples,
 
                 if(Left_Samples1)
                 {
-                    res_dec = pos_osc_1->half.last;
+                    // ******
+                    res_dec = pos_osc_1->int_pos;
                     
-                    Set_Spline_Boundaries(pos_osc_1->half.first,
-                                          i_POSITION,
-                                          Loop_Type1,
-                                          ENV_1_LOOP_BACKWARD,
-                                          Length1,
-                                          Length1,
-                                          Length1 - Loop_Sub1);
+                    Set_Carrier_Boundaries(pos_osc_1->int_pos,
+                                           &i_POSITION,
+                                           Loop_Type1,
+                                           ENV_1_LOOP_BACKWARD,
+                                           Length1,
+                                           Length1,
+                                           Length1 - Loop_Sub1);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -944,124 +975,35 @@ float CSynth::GetSample(short *Left_Samples,
                                  + (ENV_2_VALUE * Data.ENV_2_OSC_1_PW)
 #endif
                                 );
-                        if(*(Left_Samples1 + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
 
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                    GS_VAL_L = (Cubic_Work(
-                                (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                res_dec)) * T_OSC_1_VOLUME;
-#elif defined(PTK_USE_SPLINE)
-                    GS_VAL_L = (Spline_Work(
-                                (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                res_dec)) * T_OSC_1_VOLUME;
-#else
-                    GS_VAL_L = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                              * T_OSC_1_VOLUME;
-#endif
-
-#else
-                    switch(Use_Cubic)
-                    {
-                        case CUBIC_INT:
-                            GS_VAL_L = (Cubic_Work(
-                                        (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                        res_dec)) * T_OSC_1_VOLUME;
-                            break;
-                        case SPLINE_INT:
-                            GS_VAL_L = (Spline_Work(
-                                        (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                        (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                        res_dec)) * T_OSC_1_VOLUME;
-                            break;
-                        default:
-                            GS_VAL_L = (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                                        * T_OSC_1_VOLUME;
-                            break;
-                    }
-#endif
+                    GS_VAL_L = (*(Left_Samples1 + i_POSITION) * mul_datL) * T_OSC_1_VOLUME;
 
                     // Stereo sample
                     if(Stereo == 2)
                     {
-
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                        GS_VAL_R = (Cubic_Work(
-                                     (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                     res_dec)) * T_OSC_1_VOLUME;
-#elif defined(PTK_USE_SPLINE)
-                        GS_VAL_R = (Spline_Work(
-                                     (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                     (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                     res_dec)) * T_OSC_1_VOLUME;
-#else
-                        GS_VAL_R = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                   * T_OSC_1_VOLUME;
-#endif
-
-#else
-                        switch(Use_Cubic)
-                        {
-                            case CUBIC_INT:
-                                GS_VAL_R = (Cubic_Work(
-                                             (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                             res_dec)) * T_OSC_1_VOLUME;
-                                break;
-                            case SPLINE_INT:
-                                GS_VAL_R = (Spline_Work(
-                                             (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                             (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                             res_dec)) * T_OSC_1_VOLUME;
-                                break;
-                            default:
-                                GS_VAL_R = (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                           * T_OSC_1_VOLUME;
-                                break;
-                        }
-#endif
+                        GS_VAL_R = (*(Right_Samples1 + i_POSITION) * mul_datR) * T_OSC_1_VOLUME;
                     }
-
 
 #if defined(PTK_SYNTH_PITCH)
                     osc_speed2 += osc_speed1;
-                    if(osc_speed2 < 16) osc_speed2 = 16;
 #endif
 
                     if(ENV_1_LOOP_BACKWARD == TRUE)
                     {
-                        if(pos_osc_1->half.first > 0)
+                        if(pos_osc_1->int_pos > 0)
                         {
-                            pos_osc_1->absolu -= osc_speed2;
+                            pos_osc_1->flt_pos -= osc_speed2;
+                            pos_osc_1->int_pos = (int32) pos_osc_1->flt_pos;
                         }
                     }
                     else
                     {
-                        pos_osc_1->absolu += osc_speed2;
+                        pos_osc_1->flt_pos += osc_speed2;
+                        pos_osc_1->int_pos = (int32) pos_osc_1->flt_pos;
                     }
 
 #if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
@@ -1071,17 +1013,19 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                             if(ENV_1_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_1->half.first <= 0)
+                                if((int) pos_osc_1->int_pos <= 0)
                                 {
-                                    pos_osc_1->half.first = 0;
+                                    pos_osc_1->int_pos = 0;
+                                    pos_osc_1->flt_pos = 0;
                                     *track = PLAYING_NOSAMPLE;
                                 }
                             }
                             else
                             {
-                                if(pos_osc_1->half.first >= Length1)
+                                if(pos_osc_1->int_pos >= Length1)
                                 {
-                                    pos_osc_1->half.first = Length1;
+                                    pos_osc_1->int_pos = Length1;
+                                    pos_osc_1->flt_pos = (float) Length1;
                                     *track = PLAYING_NOSAMPLE;
                                 }
                             }
@@ -1094,16 +1038,18 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_FORWARD:
                             if(ENV_1_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_1->half.first <= (int) (Length1 - Loop_Sub1))
+                                if((int) pos_osc_1->int_pos <= (int) (Length1 - Loop_Sub1))
                                 {
-                                    pos_osc_1->half.first += Length1;
+                                    pos_osc_1->int_pos += Length1;
+                                    pos_osc_1->flt_pos += Length1;
                                 }
                             }
                             else
                             {
-                                if(pos_osc_1->half.first >= Length1)
+                                if(pos_osc_1->int_pos >= Length1)
                                 {
-                                    pos_osc_1->half.first -= Loop_Sub1;
+                                    pos_osc_1->int_pos -= Loop_Sub1;
+                                    pos_osc_1->flt_pos -= Loop_Sub1;
                                 }
                             }
                             break;
@@ -1113,17 +1059,19 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_PINGPONG:
                             if(ENV_1_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_1->half.first <= (int) (Length1 - Loop_Sub1))
+                                if((int) pos_osc_1->int_pos <= (int) (Length1 - Loop_Sub1))
                                 {
-                                    pos_osc_1->half.first = Length1 - Loop_Sub1;
+                                    pos_osc_1->int_pos = Length1 - Loop_Sub1;
+                                    pos_osc_1->flt_pos = Length1 - (float) Loop_Sub1;
                                     ENV_1_LOOP_BACKWARD = FALSE;
                                 }
                             }
                             else
                             {
-                                if(pos_osc_1->half.first >= Length1)
+                                if(pos_osc_1->int_pos >= Length1)
                                 {
-                                    pos_osc_1->half.first = Length1;
+                                    pos_osc_1->int_pos = Length1;
+                                    pos_osc_1->flt_pos = (float) Length1;
                                     ENV_1_LOOP_BACKWARD = TRUE;
                                 }
                             }
@@ -1149,37 +1097,38 @@ float CSynth::GetSample(short *Left_Samples,
         {
             if(*track)
             {
-                double semitones_intervals[] =
+                float semitones_intervals[] =
                 {
-                    2.0,
-                    1.89072,
-                    1.78615, 
-                    1.68631, 
-                    1.59118, 
-                    1.50076, 
-                    1.41508, 
-                    1.33410, 
-                    1.25784, 
-                    1.18630, 
-                    1.11949, 
-                    1.05738, 
-                    1.0
+                    2.0f,
+                    1.89072f,
+                    1.78615f, 
+                    1.68631f, 
+                    1.59118f, 
+                    1.50076f, 
+                    1.41508f, 
+                    1.33410f, 
+                    1.25784f, 
+                    1.18630f, 
+                    1.11949f, 
+                    1.05738f, 
+                    1.0f
                 };
-                osc_speed_dbl = (double) osc_speed2 / 2.0;
+                osc_speed_dbl = (float) osc_speed2 / 2.0f;
                 osc_speed_dbl *= semitones_intervals[Data.OSC_3_INTERVAL];
-                osc_speed2 = (int64) osc_speed_dbl;
+                osc_speed2 = osc_speed_dbl;
 
                 if(Left_Samples1)
                 {
-                    res_dec = pos_osc_3->half.last;
+                    // ******
+                    res_dec = pos_osc_3->int_pos;
 
-                    Set_Spline_Boundaries(pos_osc_3->half.first,
-                                          i_POSITION,
-                                          Loop_Type1,
-                                          ENV_3_LOOP_BACKWARD,
-                                          Length1,
-                                          Length1,
-                                          Length1 - Loop_Sub1);
+                    Set_Carrier_Boundaries(pos_osc_3->int_pos,
+                                           &i_POSITION,
+                                           Loop_Type1,
+                                           ENV_3_LOOP_BACKWARD,
+                                           Length1,
+                                           Length1,
+                                           Length1 - Loop_Sub1);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -1203,119 +1152,33 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                                 );
 
-                        if(*(Left_Samples1 + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples1 + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples1 + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
 
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                    GS_VAL_L = Math_Func(GS_VAL_L, (Cubic_Work(
-                                                    (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                                    res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#elif defined(PTK_USE_SPLINE)
-                    GS_VAL_L = Math_Func(GS_VAL_L, (Spline_Work(
-                                                    (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                                    (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                                    res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#else
-                    GS_VAL_L = Math_Func(GS_VAL_L, (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
+                    GS_VAL_L = Math_Func(GS_VAL_L, (*(Left_Samples1 + i_POSITION) * mul_datL)
                                                     * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#endif
-
-#else
-                    switch(Use_Cubic)
-                    {
-                        case CUBIC_INT:
-                            GS_VAL_L = Math_Func(GS_VAL_L, (Cubic_Work(
-                                                            (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                                             res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                            break;
-                        case SPLINE_INT:
-                            GS_VAL_L = Math_Func(GS_VAL_L, (Spline_Work(
-                                                            (float) (*(Left_Samples1 + i_POSITION[3])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[0])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[1])) * mul_datL,
-                                                            (float) (*(Left_Samples1 + i_POSITION[2])) * mul_datL,
-                                                            res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                            break;
-                        default:
-                            GS_VAL_L = Math_Func(GS_VAL_L, (*(Left_Samples1 + i_POSITION[0]) * mul_datL)
-                                                            * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                            break;
-                    }
-#endif
 
                     if(Stereo == 2)
                     {
-
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                        GS_VAL_R = Math_Func(GS_VAL_R, (Cubic_Work(
-                                                        (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                        res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#elif defined(PTK_USE_SPLINE)
-                        GS_VAL_R = Math_Func(GS_VAL_R, (Spline_Work(
-                                                        (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                                        (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                        res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#else
-                        GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
+                        GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples1 + i_POSITION) * mul_datR)
                                                         * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-#endif
-
-#else
-                        switch(Use_Cubic)
-                        {
-                            case CUBIC_INT:
-                                GS_VAL_R = Math_Func(GS_VAL_R, (Cubic_Work(
-                                                                (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                                res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                                break;
-                            case SPLINE_INT:
-                                GS_VAL_R = Math_Func(GS_VAL_R, (Spline_Work(
-                                                                (float) (*(Right_Samples1 + i_POSITION[3])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[0])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[1])) * mul_datR,
-                                                                (float) (*(Right_Samples1 + i_POSITION[2])) * mul_datR,
-                                                                res_dec)) * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                                break;
-                            default:
-                                GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples1 + i_POSITION[0]) * mul_datR)
-                                                                * T_OSC_1_VOLUME * Data.OSC_3_VOLUME);
-                                break;
-                        }
-#endif
-
                     }
                 }
 
                 if(ENV_3_LOOP_BACKWARD == TRUE)
                 {
-                    if(pos_osc_3->half.first > 0)
+                    if(pos_osc_3->int_pos > 0)
                     {
-                        pos_osc_3->absolu -= osc_speed2;
+                        pos_osc_3->flt_pos -= osc_speed2;
+                        pos_osc_3->int_pos = (int32) pos_osc_3->flt_pos;
                     }
                 }
                 else
                 {
-                    pos_osc_3->absolu += osc_speed2;
+                    pos_osc_3->flt_pos += osc_speed2;
+                    pos_osc_3->int_pos = (int32) pos_osc_3->flt_pos;
                 }
 
 #if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
@@ -1325,17 +1188,19 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                         if(ENV_3_LOOP_BACKWARD)
                         {
-                            if((int) pos_osc_3->half.first <= 0)
+                            if((int) pos_osc_3->int_pos <= 0)
                             {
-                                pos_osc_3->half.first = 0;
+                                pos_osc_3->int_pos = 0;
+                                pos_osc_3->flt_pos = 0;
                                 *track = PLAYING_NOSAMPLE;
                             }
                         }
                         else
                         {
-                            if(pos_osc_3->half.first >= Length1)
+                            if(pos_osc_3->int_pos >= Length1)
                             {
-                                pos_osc_3->half.first = Length1;
+                                pos_osc_3->int_pos = Length1;
+                                pos_osc_3->flt_pos = (float) Length1;
                                 *track = PLAYING_NOSAMPLE;
                             }
                         }
@@ -1347,16 +1212,19 @@ float CSynth::GetSample(short *Left_Samples,
                     case SMP_LOOP_FORWARD:
                         if(ENV_3_LOOP_BACKWARD)
                         {
-                            if((int) pos_osc_3->half.first <= (int) (Length1 - Loop_Sub1))
+                            if((int) pos_osc_3->int_pos <= (int) (Length1 - Loop_Sub1))
                             {
-                                pos_osc_3->half.first += Length1;
+                                // ******
+                                pos_osc_3->int_pos += Length1;
+                                pos_osc_3->flt_pos += Length1;
                             }
                         }
                         else
                         {
-                            if(pos_osc_3->half.first >= Length1)
+                            if(pos_osc_3->int_pos >= Length1)
                             {
-                                pos_osc_3->half.first -= Loop_Sub1;
+                                pos_osc_3->int_pos -= Loop_Sub1;
+                                pos_osc_3->flt_pos -= Loop_Sub1;
                             }
                         }
                         break;
@@ -1366,17 +1234,19 @@ float CSynth::GetSample(short *Left_Samples,
                     case SMP_LOOP_PINGPONG:
                         if(ENV_3_LOOP_BACKWARD)
                         {
-                            if((int) pos_osc_3->half.first <= (int) (Length1 - Loop_Sub1))
+                            if((int) pos_osc_3->int_pos <= (int) (Length1 - Loop_Sub1))
                             {
-                                pos_osc_3->half.first = Length1 - Loop_Sub1;
+                                pos_osc_3->int_pos = Length1 - Loop_Sub1;
+                                pos_osc_3->flt_pos = (float) (Length1 - Loop_Sub);
                                 ENV_3_LOOP_BACKWARD = FALSE;
                             }
                         }
                         else
                         {
-                            if(pos_osc_3->half.first >= Length1)
+                            if(pos_osc_3->int_pos >= Length1)
                             {
-                                pos_osc_3->half.first = Length1;
+                                pos_osc_3->int_pos = Length1;
+                                pos_osc_3->flt_pos = (float) Length1;
                                 ENV_3_LOOP_BACKWARD = TRUE;
                             }
                         }
@@ -1401,18 +1271,18 @@ float CSynth::GetSample(short *Left_Samples,
         {
             if(*track2)
             {
-                osc_speed_tune = osc_speed + (int64) ((double) Data.OSC_2_FINETUNE * 536870912.0)
-                                           + (int64) ((double) Data.OSC_2_DETUNE * 536870912.0);
-                if(Data.PTC_GLIDE_64 != 0 && OSC_2_SPEED != 0)
+                osc_speed_tune = osc_speed + ((float) Data.OSC_2_FINETUNE * 0.125f)
+                                           + ((float) Data.OSC_2_DETUNE  * 0.125f);
+                if(GLIDE_64_ALIGN != 0 && OSC_2_SPEED != 0)
                 {
                     if(osc_speed_tune > OSC_2_SPEED)
                     {
-                        OSC_2_SPEED += Data.PTC_GLIDE_64;
+                        OSC_2_SPEED += GLIDE_64_ALIGN;
                         if(OSC_2_SPEED > osc_speed_tune) OSC_2_SPEED = osc_speed_tune;
                     }
                     else
                     {
-                        OSC_2_SPEED -= Data.PTC_GLIDE_64;
+                        OSC_2_SPEED -= GLIDE_64_ALIGN;
                         if(OSC_2_SPEED < osc_speed_tune) OSC_2_SPEED = osc_speed_tune;
                     }
                 }
@@ -1422,7 +1292,7 @@ float CSynth::GetSample(short *Left_Samples,
                 }
 
 #if defined(PTK_SYNTH_PITCH)
-                osc_speed1b = ((int64) ((double)
+                osc_speed1b = ((float)
                                (
 #if defined(PTK_SYNTH_LFO_1_PITCH)
                                   LFO_1_VALUE * Data.LFO_1_OSC_2_PITCH
@@ -1436,7 +1306,8 @@ float CSynth::GetSample(short *Left_Samples,
 #if defined(PTK_SYNTH_ENV_2_PITCH)
                                 + ENV_2_VALUE * Data.ENV_2_OSC_2_PITCH
 #endif
-                               ) * 4294967296.0));
+                               ))
+                              ;
 #endif
 
                 osc_speed2 = OSC_2_SPEED;
@@ -1490,13 +1361,13 @@ float CSynth::GetSample(short *Left_Samples,
 
                     }
 
-                    osc_speed_dbl = (double) osc_speed1b;
+                    osc_speed_dbl = (float) osc_speed1b;
                     osc_speed_dbl *= WAVEFORM_ADJUST_FREQ;
-                    osc_speed1b = (int64) osc_speed_dbl;
+                    osc_speed1b = osc_speed_dbl;
 
-                    osc_speed_dbl = (double) osc_speed2;
+                    osc_speed_dbl = (float) osc_speed2;
                     osc_speed_dbl *= WAVEFORM_ADJUST_FREQ;
-                    osc_speed2 = (int64) osc_speed_dbl;
+                    osc_speed2 = osc_speed_dbl;
 
                     // Those always loop
                     Loop_Type2 = SMP_LOOP_FORWARD;
@@ -1516,15 +1387,16 @@ float CSynth::GetSample(short *Left_Samples,
 
                     if(Data.OSC_2_WAVEFORM == WAVEFORM_NONE) T_OSC_2_VOLUME *= Ampi_Vol;
 
-                    res_dec = pos_osc_2->half.last;
+                    // ******
+                    res_dec = pos_osc_2->int_pos;
 
-                    Set_Spline_Boundaries(pos_osc_2->half.first,
-                                          i_POSITION,
-                                          Loop_Type2,
-                                          ENV_2_LOOP_BACKWARD,
-                                          Length2,
-                                          Length2,
-                                          Length2 - Loop_Sub2);
+                    Set_Carrier_Boundaries(pos_osc_2->int_pos,
+                                           &i_POSITION,
+                                           Loop_Type2,
+                                           ENV_2_LOOP_BACKWARD,
+                                           Length2,
+                                           Length2,
+                                           Length2 - Loop_Sub2);
 
                     mul_datL = 1.0f;
                     mul_datR = 1.0f;
@@ -1547,114 +1419,37 @@ float CSynth::GetSample(short *Left_Samples,
                                     + (ENV_2_VALUE * Data.ENV_2_OSC_2_PW)
 #endif
                                    );
-                        if(*(Left_Samples + i_POSITION[0]) > 0) mul_datL = T_OSC_PW * 2.0f;
-                        if(Stereo == 2) if(*(Right_Samples + i_POSITION[0]) > 0) mul_datR = T_OSC_PW * 2.0f;
+                        if(*(Left_Samples + i_POSITION) > 0) mul_datL = T_OSC_PW * 2.0f;
+                        if(Stereo == 2) if(*(Right_Samples + i_POSITION) > 0) mul_datR = T_OSC_PW * 2.0f;
                     }
 #endif
 
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                    GS_VAL_L = Math_Func(GS_VAL_L, Cubic_Work((float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
-                                                              (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
-                                                              (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
-                                                              (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                                              res_dec) * T_OSC_2_VOLUME);
-#elif defined(PTK_USE_SPLINE)
-                    GS_VAL_L = Math_Func(GS_VAL_L, Spline_Work((float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
-                                                               (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
-                                                               (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
-                                                               (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                                               res_dec) * T_OSC_2_VOLUME);
-#else
-                    GS_VAL_L = Math_Func(GS_VAL_L, *(Left_Samples + i_POSITION[0]) * mul_datL) * T_OSC_2_VOLUME;
-#endif
-
-#else
-                    switch(Use_Cubic)
-                    {
-                        case CUBIC_INT:
-                            GS_VAL_L = Math_Func(GS_VAL_L, Cubic_Work((float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
-                                                                      (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
-                                                                      (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
-                                                                      (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                                                      res_dec) * T_OSC_2_VOLUME);
-                            break;
-                        case SPLINE_INT:
-                            GS_VAL_L = Math_Func(GS_VAL_L, Spline_Work((float) (*(Left_Samples + i_POSITION[3])) * mul_datL,
-                                                                       (float) (*(Left_Samples + i_POSITION[0])) * mul_datL,
-                                                                       (float) (*(Left_Samples + i_POSITION[1])) * mul_datL,
-                                                                       (float) (*(Left_Samples + i_POSITION[2])) * mul_datL,
-                                                                       res_dec) * T_OSC_2_VOLUME);
-                            break;
-                        default:
-                            GS_VAL_L = Math_Func(GS_VAL_L, (*(Left_Samples + i_POSITION[0]) * mul_datL) * T_OSC_2_VOLUME);
-                            break;
-                    }
-#endif
+                    GS_VAL_L = Math_Func(GS_VAL_L, (*(Left_Samples + i_POSITION) * mul_datL) * T_OSC_2_VOLUME);
 
                     // Stereo sample
                     if(Stereo == 2)
                     {
 
-#if defined(__STAND_ALONE__) && !defined(__WINAMP__)
-#if defined(PTK_USE_CUBIC)
-                        GS_VAL_R = Math_Func(GS_VAL_R, Cubic_Work((float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
-                                                                (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
-                                                                (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
-                                                                (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                                                res_dec) * T_OSC_2_VOLUME);
-#elif defined(PTK_USE_SPLINE)
-                        GS_VAL_R = Math_Func(GS_VAL_R, Spline_Work((float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
-                                                                 (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
-                                                                 (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
-                                                                 (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                                                 res_dec) * T_OSC_2_VOLUME);
-#else
-                        GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples + i_POSITION[0]) * mul_datR) * T_OSC_2_VOLUME);
-#endif
-
-#else
-                        switch(Use_Cubic)
-                        {
-                            case CUBIC_INT:
-                                GS_VAL_R = Math_Func(GS_VAL_R, Cubic_Work((float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
-                                                                        (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
-                                                                        (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
-                                                                        (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                                                        res_dec) * T_OSC_2_VOLUME);
-                                break;
-                            case SPLINE_INT:
-                                GS_VAL_R = Math_Func(GS_VAL_R, Spline_Work((float) (*(Right_Samples + i_POSITION[3])) * mul_datR,
-                                                                         (float) (*(Right_Samples + i_POSITION[0])) * mul_datR,
-                                                                         (float) (*(Right_Samples + i_POSITION[1])) * mul_datR,
-                                                                         (float) (*(Right_Samples + i_POSITION[2])) * mul_datR,
-                                                                         res_dec) * T_OSC_2_VOLUME);
-                                break;
-                            default:
-                                GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples + i_POSITION[0]) * mul_datR) * T_OSC_2_VOLUME);
-                                break;
-                        }
-#endif
+                        GS_VAL_R = Math_Func(GS_VAL_R, (*(Right_Samples + i_POSITION) * mul_datR) * T_OSC_2_VOLUME);
                     }
 
 #if defined(PTK_SYNTH_PITCH)
                     osc_speed2 += osc_speed1b;
-                    if(osc_speed2 < 16)
-                    {
-                        osc_speed2 = 16;
-                    }
 #endif
 
                     if(ENV_2_LOOP_BACKWARD == TRUE)
                     {
-                        if(pos_osc_2->half.first > 0)
+                        // ******
+                        if(pos_osc_2->int_pos > 0)
                         {
-                            pos_osc_2->absolu -= osc_speed2;
+                            pos_osc_2->flt_pos -= osc_speed2;
+                            pos_osc_2->int_pos = (int32) pos_osc_2->flt_pos;
                         }
                     }
                     else
                     {
-                        pos_osc_2->absolu += osc_speed2;
+                        pos_osc_2->flt_pos += osc_speed2;
+                        pos_osc_2->int_pos = (int32) pos_osc_2->flt_pos;
                     }
 
 #if defined(PTK_LOOP_FORWARD) || defined(PTK_LOOP_PINGPONG)
@@ -1664,9 +1459,10 @@ float CSynth::GetSample(short *Left_Samples,
 #endif
                             if(ENV_2_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_2->half.first <= 0)
+                                if((int) pos_osc_2->int_pos <= 0)
                                 {
-                                    pos_osc_2->half.first = 0;
+                                    pos_osc_2->int_pos = 0;
+                                    pos_osc_2->flt_pos = 0;
                                     *track2 = PLAYING_NOSAMPLE;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
@@ -1675,9 +1471,10 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                             else
                             {
-                                if(pos_osc_2->half.first >= Length2)
+                                if(pos_osc_2->int_pos >= Length2)
                                 {
-                                    pos_osc_2->half.first = Length2;
+                                    pos_osc_2->int_pos = Length2;
+                                    pos_osc_2->flt_pos = (float) Length2;
                                     *track2 = PLAYING_NOSAMPLE;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
@@ -1693,9 +1490,11 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_FORWARD:
                             if(ENV_2_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_2->half.first <= (int) (Length2 - Loop_Sub2))
+                                // ******
+                                if((int) pos_osc_2->int_pos <= (int) (Length2 - Loop_Sub2))
                                 {
-                                    pos_osc_2->half.first += Length2;
+                                    pos_osc_2->int_pos += Length2;
+                                    pos_osc_2->flt_pos += Length2;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
 #endif
@@ -1703,9 +1502,10 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                             else
                             {
-                                if(pos_osc_2->half.first >= Length2)
+                                if(pos_osc_2->int_pos >= Length2)
                                 {
-                                    pos_osc_2->half.first -= Loop_Sub2;
+                                    pos_osc_2->int_pos -= Loop_Sub2;
+                                    pos_osc_2->flt_pos -= Loop_Sub2;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
 #endif
@@ -1718,9 +1518,10 @@ float CSynth::GetSample(short *Left_Samples,
                         case SMP_LOOP_PINGPONG:
                             if(ENV_2_LOOP_BACKWARD)
                             {
-                                if((int) pos_osc_2->half.first <= (int) (Length2 - Loop_Sub2))
+                                if((int) pos_osc_2->int_pos <= (int) (Length2 - Loop_Sub2))
                                 {
-                                    pos_osc_2->half.first = Length2 - Loop_Sub2;
+                                    pos_osc_2->int_pos = Length2 - Loop_Sub2;
+                                    pos_osc_2->flt_pos = (float) (Length2 - Loop_Sub2);
                                     ENV_2_LOOP_BACKWARD = FALSE;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
@@ -1729,9 +1530,10 @@ float CSynth::GetSample(short *Left_Samples,
                             }
                             else
                             {
-                                if(pos_osc_2->half.first >= Length2)
+                                if(pos_osc_2->int_pos >= Length2)
                                 {
-                                    pos_osc_2->half.first = Length2;
+                                    pos_osc_2->int_pos = Length2;
+                                    pos_osc_2->flt_pos = (float) Length2;
                                     ENV_2_LOOP_BACKWARD = TRUE;
 #if defined(PTK_SYNTH_SYNC)
                                     do_sync = TRUE;
@@ -1750,8 +1552,10 @@ float CSynth::GetSample(short *Left_Samples,
                     {
                         if(do_sync)
                         {
-                            pos_osc_1->absolu = 0;
-                            pos_osc_3->absolu = 0;
+                            pos_osc_1->int_pos = 0;
+                            pos_osc_1->flt_pos = 0;
+                            pos_osc_3->int_pos = 0;
+                            pos_osc_3->flt_pos = 0;
                         }
                     }
 #endif
@@ -2023,7 +1827,7 @@ void CSynth::ChangeParameters(Synth_Parameters TSP)
     Data.OSC_3_SWITCH =         TSP.osc_3_switch;
 
     Data.PTC_GLIDE =            ((float) TSP.ptc_glide * (float) TSP.ptc_glide) * 0.0000015625f;
-    Data.PTC_GLIDE_64 =         (int64) ((double) Data.PTC_GLIDE * 4294967296.0);
+    GLIDE_64_ALIGN =            ((float) Data.PTC_GLIDE);
 
     Data.DISTO =                ((float) TSP.disto - 64) * 0.015625f;
 
@@ -2050,6 +1854,12 @@ float CSynth::Filter_L(void)
 {
     sbuf0L = FILT_A * sbuf0L + FILT_CUTO * (GS_VAL_L + FILT_B * (sbuf0L - sbuf1L)); 
     sbuf1L = FILT_A * sbuf1L + FILT_CUTO * sbuf0L;
+
+#if DENORMAL_SYNTH
+    sbuf0L = denormal_synth(sbuf0L);
+    sbuf1L = denormal_synth(sbuf1L);
+#endif
+
 #if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)
     return(Data.VCF_TYPE == 0 ? sbuf1L : GS_VAL_L - sbuf1L);
 #else
@@ -2066,6 +1876,12 @@ float CSynth::Filter_R(void)
 {
     sbuf0R = FILT_A * sbuf0R + FILT_CUTO * (GS_VAL_R + FILT_B * (sbuf0R - sbuf1R));
     sbuf1R = FILT_A * sbuf1R + FILT_CUTO * sbuf0R;
+
+#if DENORMAL_SYNTH
+    sbuf0R = denormal_synth(sbuf0R);
+    sbuf1R = denormal_synth(sbuf1R);
+#endif
+
 #if defined(PTK_SYNTH_FILTER_LO) && defined(PTK_SYNTH_FILTER_HI)
     return(Data.VCF_TYPE == 0 ? sbuf1R : GS_VAL_R - sbuf1R);
 #else
@@ -2085,6 +1901,7 @@ float CSynth::Moog_Filter_L(void)
     float f;
     float p;
     float q;
+    float in;
     float t[4];
     float cut = FILT_CUTO;
     float res = FILT_RESO;
@@ -2096,14 +1913,24 @@ float CSynth::Moog_Filter_L(void)
     res *= 5.0f;
     q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
     if(q > 2.42f) q = 2.42f;
-    float in = (GS_VAL_L / 32767.0f) - (q * MoogBufferL[4]);
+
+#if DENORMAL_SYNTH
+    q = denormal_synth(q);
+    MoogBufferL[1] = denormal_synth(MoogBufferL[1]);
+    MoogBufferL[2] = denormal_synth(MoogBufferL[2]);
+    MoogBufferL[3] = denormal_synth(MoogBufferL[3]);
+    MoogBufferL[4] = denormal_synth(MoogBufferL[4]);
+#endif
+
+    in = (GS_VAL_L / 32767.0f) - (q * MoogBufferL[4]);
+
     t[1] = MoogBufferL[1];
     t[2] = MoogBufferL[2];
     t[3] = MoogBufferL[3];
-    MoogBufferL[1] = ((in + MoogBufferL[0]) * p ) - (MoogBufferL[1] * f);
-    MoogBufferL[2] = ((MoogBufferL[1] + t[1]) * p ) - (MoogBufferL[2] * f);
-    MoogBufferL[3] = ((MoogBufferL[2] + t[2]) * p ) - (MoogBufferL[3] * f);
-    MoogBufferL[4] = ((MoogBufferL[3] + t[3]) * p ) - (MoogBufferL[4] * f);
+    MoogBufferL[1] = ((in + MoogBufferL[0]) * p) - (MoogBufferL[1] * f);
+    MoogBufferL[2] = ((MoogBufferL[1] + t[1]) * p) - (MoogBufferL[2] * f);
+    MoogBufferL[3] = ((MoogBufferL[2] + t[2]) * p) - (MoogBufferL[3] * f);
+    MoogBufferL[4] = ((MoogBufferL[3] + t[3]) * p) - (MoogBufferL[4] * f);
     MoogBufferL[0] = in;
 
 #if defined(PTK_SYNTH_FILTER_MOOG_LO) && defined(PTK_SYNTH_FILTER_MOOG_BAND)
@@ -2124,6 +1951,7 @@ float CSynth::Moog_Filter_R(void)
     float p;
     float q;
     float t[4];
+    float in;
     float cut = FILT_CUTO;
     float res = FILT_RESO;
 
@@ -2134,7 +1962,17 @@ float CSynth::Moog_Filter_R(void)
     res *= 5.0f;
     q = res * ((1.0f + (0.5f * q) * (1.0f - q + (5.6f * q * q))));
     if(q > 2.42f) q = 2.42f;
-    float in = (GS_VAL_L / 32767.0f) - (q * MoogBufferR[4]);
+
+#if DENORMAL_SYNTH
+    q = denormal_synth(q);
+    MoogBufferR[1] = denormal_synth(MoogBufferR[1]);
+    MoogBufferR[2] = denormal_synth(MoogBufferR[2]);
+    MoogBufferR[3] = denormal_synth(MoogBufferR[3]);
+    MoogBufferR[4] = denormal_synth(MoogBufferR[4]);
+#endif
+
+    in = (GS_VAL_L / 32767.0f) - (q * MoogBufferR[4]);
+
     t[1] = MoogBufferR[1];
     t[2] = MoogBufferR[2];
     t[3] = MoogBufferR[3];

@@ -35,7 +35,7 @@
 // ------------------------------------------------------
 // Includes
 #include <math.h>
-#include "replay.h"
+//#include "replay.h"
 
 // ------------------------------------------------------
 // Constants
@@ -73,6 +73,12 @@ typedef unsigned long long Uint64;
 extern float SIN[360];
 
 #if defined(PTK_SYNTH)
+
+struct s_access
+{
+    int32 int_pos;
+    float flt_pos;
+};
 
 // ------------------------------------------------------
 // Structures
@@ -357,13 +363,14 @@ class CSynth
                         float vol,
                         int *track,
                         int *track2,
-                        Uint64 *position_osc_1,
-                        Uint64 *position_osc_2,
+                        s_access *position_osc_1,
+                        s_access *position_osc_2,
 
 #if defined(PTK_SYNTH_OSC_3)
-                        Uint64 *position_osc_3,
+                        s_access *position_osc_3,
 #endif
-                        int64 osc_speed,
+
+                        float osc_speed,
                         float Ampli_Vol);
 
         void NoteOn(int noten, float speed, int Looping, unsigned int Length,
@@ -405,9 +412,10 @@ class CSynth
         float T_OSC_1_VOLUME;
         float T_OSC_2_VOLUME;
         
-        int64 OSC_1_SPEED;
-        int64 OSC_2_SPEED;
-        int64 OSC_3_SPEED;
+        float OSC_1_SPEED;
+        float OSC_2_SPEED;
+        float OSC_3_SPEED;
+        float GLIDE_64_ALIGN;
 
         /* Envelopes and LFO's properties */
         float ENV_1b_ATTACK;
@@ -510,11 +518,6 @@ class CSynth
 #if defined(PTK_COMPRESSOR)
 class rFilter
 {
-    private: 
-
-        float buffy0;
-        float buffy1;
-
     public:
 
         rFilter()
@@ -537,6 +540,9 @@ class rFilter
             buffy1 = fa * buffy1 + f * buffy0;
             return buffy1;
         };
+
+        float buffy0;
+        float buffy1;
 };
 #endif
 

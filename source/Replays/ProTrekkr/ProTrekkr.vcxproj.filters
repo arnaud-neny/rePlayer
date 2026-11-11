@@ -65,12 +65,6 @@
     <ClInclude Include="protrekkr\replay\include\ptk_def_properties.h">
       <Filter>Source Files\protrekkr\replay\include</Filter>
     </ClInclude>
-    <ClInclude Include="protrekkr\replay\include\cubic_spline.h">
-      <Filter>Source Files\protrekkr\replay\include</Filter>
-    </ClInclude>
-    <ClInclude Include="protrekkr\replay\include\spline.h">
-      <Filter>Source Files\protrekkr\replay\include</Filter>
-    </ClInclude>
     <ClInclude Include="protrekkr\replay\include\tb_303.h">
       <Filter>Source Files\protrekkr\replay\include</Filter>
     </ClInclude>
@@ -161,9 +155,6 @@
       <Filter>Source Files\protrekkr\replay</Filter>
     </ClCompile>
     <ClCompile Include="protrekkr\replay\tb_303.cpp">
-      <Filter>Source Files\protrekkr\replay</Filter>
-    </ClCompile>
-    <ClCompile Include="protrekkr\replay\spline.cpp">
       <Filter>Source Files\protrekkr\replay</Filter>
     </ClCompile>
     <ClCompile Include="protrekkr\replay\samples_unpack.cpp">
