@@ -439,7 +439,13 @@ namespace rePlayer
                 {
                     if (m_silent.isStuck == 1)
                         m_silent.player->rewind(m_subsongIndex);
-                    m_silent.isStuck++;
+                    else if (m_silent.isStuck > 1)
+					{
+						m_silent.isStuck = 0;
+                        break;
+					}
+                    else
+                        m_silent.isStuck++;
                 }
             }
             m_silent.remainingSamples = remainingSamples;
