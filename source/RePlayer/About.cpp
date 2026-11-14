@@ -62,7 +62,7 @@ namespace rePlayer
         ImGui::TextUnformatted("Dear ImGui " IMGUI_VERSION "\n"
             "Copyright (c) 2014-2026 Omar Cornut");
         ImGui::Bullet();
-        ImGui::TextUnformatted("stb\n"
+        ImGui::TextUnformatted("stb_sprintf\n"
             "Copyright (c) 2017 Sean Barrett");
         ImGui::Bullet();
         ImGui::TextUnformatted("Curl " LIBCURL_VERSION "\n"
