@@ -84,7 +84,7 @@ private:
     //@}
 
     double vcr_mult;
-    bool m_oldCaps;
+    CapsType m_capsType;
 
     // Voice DC offset LUT
     double voiceDC[256];
@@ -112,7 +112,7 @@ public:
 
     void setFilterRange(double adjustment);
 
-    void enableOldCaps(bool enable);
+    void setCaps(CapsType type);
 
     /**
      * Construct an 11 bit cutoff frequency DAC output voltage table.

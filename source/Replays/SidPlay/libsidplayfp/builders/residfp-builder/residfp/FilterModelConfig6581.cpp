@@ -83,8 +83,9 @@ constexpr Spline::Point opamp_voltage[OPAMP_SIZE] =
   { 10.31,  0.81 },  // Approximate end of actual range
 };
 
-constexpr double CAPS_OLD = 2200e-12; // ASSY 326298 uses 2200pF caps
-constexpr double CAPS_NEW =  470e-12; // Standard 470pF caps used on other ASSY
+constexpr double CAPS_OLD    = 2200e-12; // ASSY 326298 uses 2200pF caps
+constexpr double CAPS_NEW    =  470e-12; // Standard 470pF caps used on other ASSY
+constexpr double CAPS_GALWAY =  330e-12; // Non-standard 330pF caps
 
 std::unique_ptr<FilterModelConfig6581> FilterModelConfig6581::instance(nullptr);
 
@@ -117,12 +118,12 @@ void FilterModelConfig6581::setFilterRange(double adjustment)
     updateParams();
 }
 
-void FilterModelConfig6581::enableOldCaps(bool enable)
+void FilterModelConfig6581::setCaps(CapsType type)
 {
-    if (m_oldCaps == enable)
+    if (m_capsType == type)
         return;
 
-    m_oldCaps = enable;
+    m_capsType = type;
     updateParams();
 }
 
@@ -131,11 +132,23 @@ void FilterModelConfig6581::updateParams()
     calcCurrFactorCoeff();
     vcr_mult = uCox;
 
-    if (m_oldCaps)
+    switch (m_capsType)
     {
+    case CAPS2200: {
         constexpr double caps_mult = CAPS_NEW/CAPS_OLD;
         currFactorCoeff *= caps_mult;
         vcr_mult *= caps_mult;
+        break;
+    }
+    case CAPS470:
+        // keep parameters unchanged
+        break;
+    case CAPS330: {
+        constexpr double caps_mult = CAPS_NEW/CAPS_GALWAY;
+        currFactorCoeff *= caps_mult;
+        vcr_mult *= caps_mult;
+        break;
+    }
     }
 }
 
@@ -154,7 +167,7 @@ FilterModelConfig6581::FilterModelConfig6581() :
     dac_zero(7.15),
     dac_scale(2.63),
     dac(DAC_BITS),
-    m_oldCaps(false)
+    m_capsType(CAPS470)
 {
     updateParams();
 

@@ -202,8 +202,9 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator6581.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Integrator8580.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Limiter.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Noise.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\OpAmp.h" />
-    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Limiter.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\PassThrough.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Resampler.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\SincResampler.h" />

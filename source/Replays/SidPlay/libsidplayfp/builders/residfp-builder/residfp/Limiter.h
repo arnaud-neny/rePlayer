@@ -27,13 +27,18 @@
 
 #include "siddefs-fp.h"
 
-class Limiter
+namespace reSIDfp
 {
-private:
-    static constexpr int32_t threshold = 28000;
+
+namespace Limiter
+{
+
+namespace
+{
+    constexpr int32_t threshold = 28000;
 
     template<int m>
-    static inline int32_t clipper(int32_t x)
+    inline int32_t clipper(int32_t x)
     {
         static_assert(m > 0, "Clipper range must be a positive value");
         assert(x >= 0);
@@ -41,11 +46,12 @@ private:
             return x;
 
         constexpr double max_val = static_cast<double>(m);
+        constexpr double max_val_inv = 1. / static_cast<double>(m);
         constexpr double t = threshold / max_val;
         constexpr double a = 1. - t;
         constexpr double b = 1. / a;
 
-        double value = static_cast<double>(x - threshold) / max_val;
+        double value = static_cast<double>(x - threshold) * max_val_inv;
         value = a * std::tanh(b * value);
         return static_cast<int32_t>(threshold + (value * max_val));
     }
@@ -53,17 +59,18 @@ private:
     /*
      * Soft Clipping implementation, splitted for test.
      */
-    static inline int32_t softClipImpl(int32_t x)
+    inline int32_t softClipImpl(int32_t x)
     {
         return x < 0 ? -clipper<32768>(-x) : clipper<32767>(x);
     }
+} // anon namespace
 
-public:
     /*
      * Soft Clipping into 16 bit range [-32768,32767]
      */
-    static inline SampleI16 softClip(SampleI32 x) { return { static_cast<int16_t>(softClipImpl(x.left)), static_cast<int16_t>(softClipImpl(x.right)) }; }
+    inline SampleI16 softClip(SampleI32 x) { return { static_cast<int16_t>(softClipImpl(x.left)), static_cast<int16_t>(softClipImpl(x.right)) }; }
+} // namespace Limiter
 
-};
+} // namespace reSIDfp
 
 #endif

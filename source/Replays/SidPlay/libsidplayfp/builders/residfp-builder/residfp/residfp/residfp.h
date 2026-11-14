@@ -231,7 +231,7 @@ public:
     /**
      * Enable filter emulation.
      *
-     * @param enable false to turn off filter emulation
+     * @param enable false to turn off filter emulation (default enabled)
      */
     void enableFilter(bool enable);
 
@@ -241,8 +241,10 @@ public:
      *
      * @param enable true to enable old 2200pF caps used on ASSY 326298
      *               false to use the standard 470pF caps. (default off)
+     * @deprecated since 1.3
+     * @see #set6581caps(CapsType)
      */
-    void enableOld6581caps(bool enable);
+    RESIDFP_DEPRECATED void enableOld6581caps(bool enable);
 
     /**
      * Set paddle coordinates.
@@ -312,6 +314,42 @@ public:
      * @since 1.2
      */
     void setDCBRes(double res);
+
+    /**
+     * Set caps for 6581 model.
+     * Affects the filter cutoff frequency.
+     * Choose between:
+     * - 2200pF: low cutoff, found on old ASSY 326298
+     * -  470pF: normal cutoff, found on most of the boards
+     * -  330pF: high cutoff, found on some boards and likely on Galway's C128D
+     *
+     * @param type caps type @see #reSIDfp::CapsType
+     *
+     * @since 1.3
+     */
+    void set6581caps(CapsType type);
+
+    /**
+     * Set strong P+S for 6581 model.
+     * If enabled when Pulse and Saw are combined the
+     * topbit is not pulled down, providing a stronger
+     * sound.
+     *
+     * @param enable true to turn on strong PS (default disabled)
+     *
+     * @since 1.3
+     */
+    void enableStrongPS(bool enable);
+
+    /**
+     * Set background noise level.
+     * @note: if noise is disabled there will be audible quantization noise.
+     *
+     * @param level the noise level, between 0 (no noise) and 8 (max level) (default 5)
+     *
+     * @since 1.3
+     */
+    void noiseLevel(int level);
 
     void surround(bool enabled);
 };

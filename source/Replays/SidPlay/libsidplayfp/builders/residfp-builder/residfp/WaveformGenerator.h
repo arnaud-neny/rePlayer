@@ -154,6 +154,9 @@ private:
 
     bool is6581; //-V730_NOINIT this is initialized in the SID constructor
 
+    bool strongPS = false;
+    bool msb_pulldown = false;
+
     /// The other two waveform generators, for syncing and ring-mod.
     //@{
     const WaveformGenerator* prevVoice;
@@ -204,6 +207,8 @@ private:
 public:
     void setWaveformModels(rc_matrix_t models);
     void setPulldownModels(rc_matrix_t models);
+
+    inline void setStrongPS(bool sps) { strongPS = sps; }
 
     void setOtherWaveforms(const WaveformGenerator* prev, WaveformGenerator* next)
     {
@@ -407,9 +412,9 @@ uint32_t WaveformGenerator::output()
 
         // In the 6581 the top bit of the accumulator may be driven low by combined waveforms
         // when the sawtooth is selected
-        if (is6581 && (waveform & 0x2) && ((waveform_output & 0x800) == 0))
+        // On some chips it doesn't happen with P+S
+        if (msb_pulldown && ((waveform_output & 0x800) == 0))
         {
-            // On some chips it doesn't happen with P+S
             msb_rising = false;
             accumulator &= 0x7fffff;
         }

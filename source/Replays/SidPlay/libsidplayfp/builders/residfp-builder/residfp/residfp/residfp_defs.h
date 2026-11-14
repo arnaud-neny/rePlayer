@@ -46,6 +46,17 @@
 #  endif
 #endif
 
+/* Deprecated attributes */
+#if __cplusplus >= 201402L
+# define RESIDFP_DEPRECATED [[deprecated]]
+#elif defined(_MSCVER)
+#  define RESIDFP_DEPRECATED __declspec(deprecated)
+#elif defined(__GNUC__) || defined(__clang__)
+#  define RESIDFP_DEPRECATED __attribute__ ((deprecated))
+#else
+#  define RESIDFP_DEPRECATED
+#endif
+
 namespace reSIDfp
 {
     /**
@@ -69,6 +80,15 @@ namespace reSIDfp
         RESAMPLE,   ///< Sinc resampling (high quality but CPU intensive)
         NONE        ///< No resampling (raw 1MHz output)
     } SamplingMethod;
+
+    /**
+     *  The SID 6581 caps type
+     */
+    typedef enum {
+        CAPS2200,    ///< Old 2200pF
+        CAPS470,     ///< New 440pF
+        CAPS330      ///< "Galway" 330pF
+    } CapsType;
 }
 
 #endif

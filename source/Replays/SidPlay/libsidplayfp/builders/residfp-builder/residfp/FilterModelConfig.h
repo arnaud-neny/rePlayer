@@ -54,44 +54,10 @@ public:
     };
 
 protected:
-    static inline uint16_t to_uint16_dither(double x, double d_noise)
-    {
-        const int tmp = static_cast<int>(x + d_noise);
-        assert((tmp >= 0) && (tmp <= USHRT_MAX));
-        return static_cast<uint16_t>(tmp);
-    }
-
     static inline uint16_t to_uint16(double x)
     {
-        return to_uint16_dither(x, 0.5);
+        return static_cast<uint16_t>(x);
     }
-
-private:
-    /*
-     * Hack to add quick dither when converting values from float to int
-     * and avoid quantization noise.
-     * Hopefully this can be removed the day we move all the analog part
-     * processing to floats.
-     *
-     * Not sure about the effect of using such small buffer of numbers
-     * since the random sequence repeats every 1024 values but for
-     * now it seems to do the job.
-     */
-    class Randomnoise
-    {
-    private:
-        double buffer[1024];
-        mutable int index = 0;
-    public:
-        Randomnoise()
-        {
-            std::uniform_real_distribution<double> unif(0., 1.);
-            std::default_random_engine re;
-            for (int i=0; i<1024; i++)
-                buffer[i] = unif(re);
-        }
-        double getNoise() const { index = (index + 1) & 0x3ff; return buffer[index]; }
-    };
 
 protected:
     /// Capacitor value.
@@ -133,9 +99,6 @@ protected:
 
     /// Reverse op-amp transfer function.
     uint16_t opamp_rev[1 << 16]; //-V730_NOINIT this is initialized in the derived class constructor
-
-private:
-    Randomnoise rnd;
 
 private:
     FilterModelConfig(const FilterModelConfig&) = delete;
@@ -296,7 +259,7 @@ public:
 
     inline uint16_t getNormalizedValue(double value) const
     {
-        return to_uint16_dither(N16 * (value - vmin), rnd.getNoise());
+        return to_uint16(N16 * (value - vmin));
     }
 
     template<int N>

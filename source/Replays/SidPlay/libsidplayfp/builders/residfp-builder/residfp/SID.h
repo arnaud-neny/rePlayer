@@ -33,6 +33,9 @@
 #include "ExternalFilter.h"
 #include "Filter.h"
 #include "Voice.h"
+#include "Limiter.h"
+#include "Noise.h"
+
 #include "State.h"
 
 namespace reSIDfp
@@ -85,6 +88,8 @@ private:
 
     /// SID voices
     Voice voice[3];
+
+    Noise m_noise;
 
     /// Used to amplify the output by x/2 to get an adequate playback volume
     int scaleFactor;
@@ -173,6 +178,15 @@ private:
         SampleU16 filtOutput = filter->clock(voice[0], voice[1], voice[2]);
         SampleI32 exFiltInput = { static_cast<int32_t>(filtOutput.left) + INT16_MIN, static_cast<int32_t>(filtOutput.right) + INT16_MIN };
         return externalFilter.clock(exFiltInput);
+    }
+
+    /// scale and limit output
+    inline SampleI16 getOutput()
+    {
+        auto output = resampler->output();
+        auto noise = m_noise.output();
+        SampleI32 out = { noise + (scaleFactor * output.left) / 2, noise + (scaleFactor * output.right) / 2 };
+        return Limiter::softClip(out);
     }
 
 private:
@@ -355,11 +369,6 @@ public:
     void enableFilter(bool enable);
 
     /**
-     * Enable/disable old caps (2200pF) for 6581 model.
-     */
-    void enableOld6581caps(bool enable);
-
-    /**
      * Set paddle coordinates.
      */
     void setPaddle(uint8_t x, uint8_t y);
@@ -378,6 +387,21 @@ public:
      * Set the DC-Blocker resistance.
      */
     void setDCBRes(double res);
+
+    /**
+     * Set caps for 6581 model.
+     */
+    void set6581caps(CapsType type);
+
+    /**
+     * Set strong P+S for 6581 model.
+     */
+    void enableStrongPS(bool enable);
+
+    /*
+     * Set the background noise level.
+     */
+    void setNoiseLevel(int level);
 
     void surround(bool enabled);
 };
@@ -430,7 +454,7 @@ int SID::clock(unsigned int cycles, SampleI16* buf)
                 SampleI32 output = clockFilt();
                 if (unlikely(resampler->input(output)))
                 {
-                    buf[s++] = resampler->getOutput(scaleFactor);
+                    buf[s++] = getOutput();
                 }
             }
 
@@ -471,7 +495,7 @@ int SID::clock(SampleI16* buf, int bufSize)
                 SampleI32 output = clockFilt();
                 if (unlikely(resampler->input(output)))
                 {
-                    buf[s++] = resampler->getOutput(scaleFactor);
+                    buf[s++] = getOutput();
                     if (unlikely(s == bufSize))
                     {
                         break;

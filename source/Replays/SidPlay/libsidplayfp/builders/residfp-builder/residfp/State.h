@@ -39,11 +39,12 @@ struct Params
     double filterCurve6581;
     double filterRange6581;
     double filterCurve8580;
-    bool   old6581caps;
+    CapsType caps6581;
 };
 
-struct State
+class State
 {
+public:
     /**
      * Save current state.
      */
@@ -59,6 +60,7 @@ struct State
      */
     static int size(SID &s);
 
+private:
     // SID
     int bus_value_ttl;
     unsigned int nextVoiceSync;
@@ -92,6 +94,8 @@ struct State
     bool sync[3];
     bool test_or_reset[3];
     bool msb_rising[3];
+    bool strongPS[3];
+    bool msb_pulldown[3];
     uint8_t waveform[3];
 
     // Envelope
@@ -136,7 +140,7 @@ struct State
     double filterCurve6581;
     double filterRange6581;
     double filterCurve8580;
-    bool   old6581caps;
+    CapsType caps6581;
 
     // Integrators
     int32_t vx[2][2][2];

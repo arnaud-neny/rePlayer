@@ -22,9 +22,8 @@
 #ifndef RESAMPLER_H
 #define RESAMPLER_H
 
-#include "Limiter.h"
-
 #include <cstdint>
+#include "../siddefs-fp.h"
 
 namespace reSIDfp
 {
@@ -36,8 +35,6 @@ namespace reSIDfp
 class Resampler
 {
 protected:
-    virtual SampleI32 output() const = 0;
-
     Resampler() = default;
 
 public:
@@ -56,13 +53,7 @@ public:
      *
      * @return resampled sample
      */
-    inline SampleI16 getOutput(int scaleFactor) const
-    {
-        SampleI32 out = output();
-        out.left = (scaleFactor * out.left) / 2;
-        out.right = (scaleFactor * out.right) / 2;
-        return Limiter::softClip(out);
-    }
+    virtual SampleI32 output() const = 0;
 
     virtual void reset() = 0;
 };

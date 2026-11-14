@@ -386,9 +386,6 @@
     <ClInclude Include="libsidplayfp\builders\sidlite-builder\sidlite\WavGen.h">
       <Filter>Source Files\libsidplayfp\builders\sidlite-builder\sidlite</Filter>
     </ClInclude>
-    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\Limiter.h">
-      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
-    </ClInclude>
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\resample\PassThrough.h">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp\resample</Filter>
     </ClInclude>
@@ -414,6 +411,12 @@
       <Filter>Source Files\libsidplayfp\libs\hashlib</Filter>
     </ClInclude>
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\State.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Limiter.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Noise.h">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
     </ClInclude>
   </ItemGroup>

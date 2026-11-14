@@ -377,13 +377,13 @@ public:
     }
 
     /**
-     * Enable/disable old caps for 6581 model.
+     * Set caps type for 6581 model.
      *
-     * @param enable true to enable old 2200pF caps, false to use new 470pF caps.
+     * @param type
      */
-    static void enableOldCaps(bool enable)
+    static void setCaps(CapsType type)
     {
-        FilterModelConfig6581::getInstance()->enableOldCaps(enable);
+        FilterModelConfig6581::getInstance()->setCaps(type);
     }
 };
 
