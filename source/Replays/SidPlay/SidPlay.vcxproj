@@ -213,6 +213,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\residfp_defs.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\residfp\sidversion.h" />
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Sample.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\SID.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\siddefs-fp.h" />
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Spline.h" />

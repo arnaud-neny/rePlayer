@@ -419,6 +419,9 @@
     <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Noise.h">
       <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
     </ClInclude>
+    <ClInclude Include="libsidplayfp\builders\residfp-builder\residfp\Sample.h">
+      <Filter>Source Files\libsidplayfp\builders\residfp-builder\residfp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libsidplayfp\EventScheduler.cpp">

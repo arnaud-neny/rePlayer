@@ -82,7 +82,7 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 		else
 		{ // 6581
 			// MOSFET-VCR control-voltage calculation (resistance-modulation aka 6581 filter distortion) emulation
-			Cutoff += ((&FilterInput.left)[i] * 105) >> 16;
+			Cutoff += (FilterInput[i] * 105) >> 16;
 			if (Cutoff > SID_CUTOFF_MAX)
 				Cutoff = SID_CUTOFF_MAX;
 			else if (Cutoff < 0)
@@ -93,7 +93,7 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 
 		int FilterOutput = 0;
 		{
-			int Tmp = (&FilterInput.left)[i] + ((PrevBandPass[i] * Resonance) / CRSID_FILTERTABLE_MAGNITUDE) + PrevLowPass[i];
+			int Tmp = FilterInput[i] + ((PrevBandPass[i] * Resonance) / CRSID_FILTERTABLE_MAGNITUDE) + PrevLowPass[i];
 			if (VolumeBand & HIGHPASS_BITVAL)
 				FilterOutput -= Tmp;
 			Tmp = PrevBandPass[i] - ((Tmp * Cutoff) / CRSID_FILTERTABLE_MAGNITUDE);
@@ -132,14 +132,14 @@ SampleI32 Filter::clock(SampleI32 FilterInput, SampleI32 NonFiltered)
 		else
 			MainVolume = VolumeBand & 0xF;
 
-		(&Output.left)[i] = (((&NonFiltered.left)[i] + FilterOutput) * MainVolume) + Digi;// / ((CHANNELS*VOLUME_MAX) + Attenuation);
+		Output[i] = ((NonFiltered[i] + FilterOutput) * MainVolume) + Digi;// / ((CHANNELS*VOLUME_MAX) + Attenuation);
 
 		if (UNLIKELY(!++VUmeterUpdateCounter[i]))
 		{
 			// average level (for VU-meter)
-			Level[i] += ((std::abs((&Output.left)[i]) >> VUMETER_DIVSHIFTS) - Level[i]) / VUMETER_LOWPASS_DIV;
+			Level[i] += ((std::abs(Output[i]) >> VUMETER_DIVSHIFTS) - Level[i]) / VUMETER_LOWPASS_DIV;
 		}
-		(&Output.left)[i] /= Attenuation;
+		Output[i] /= Attenuation;
 	}
 	return Output; // master output
 }

@@ -61,8 +61,7 @@ public:
 
         if (unlikely(sampleOffset < 1024))
         {
-            outputValue.left = cachedSample.left + (sampleOffset * (sample.left - cachedSample.left) >> 10);
-            outputValue.right = cachedSample.right + (sampleOffset * (sample.right - cachedSample.right) >> 10);
+            outputValue = cachedSample + (sampleOffset * (sample - cachedSample) >> 10);
             ready = true;
             sampleOffset += cyclesPerSample;
         }

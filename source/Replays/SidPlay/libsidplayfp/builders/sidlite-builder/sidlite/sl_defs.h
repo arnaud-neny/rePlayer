@@ -33,8 +33,6 @@
 #  define UNLIKELY(x)    (x)
 #endif
 
-struct SampleI16 { short left, right; };
-struct SampleU16 { unsigned short left, right; };
-struct SampleI32 { int left, right; };
+#include "../../residfp-builder/residfp/Sample.h"
 
 #endif // SIDLITE_DEFS_H

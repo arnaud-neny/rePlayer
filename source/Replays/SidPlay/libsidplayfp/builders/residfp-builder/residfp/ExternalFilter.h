@@ -152,10 +152,10 @@ SampleI32 ExternalFilter::clock(SampleI32 input)
     for (int i = 0; i < 2; ++i)
     {
 #if __cplusplus >= 202002L
-        const int32_t Vi = (&input.left)[i] << 11;
+        const int32_t Vi = input[i] << 11;
 #else
     // Left shift of negative values is undefined
-        const int32_t Vi = (&input.left)[i] * (1 << 11);
+        const int32_t Vi = input[i] * (1 << 11);
 #endif
         const int32_t dVlp = (w0lp_1_s7[i] * (Vi - Vlp[i])) >> 7;
         const int32_t dVhp = (w0hp_1_s17[i] * (Vlp[i] - Vhp[i])) >> 17;

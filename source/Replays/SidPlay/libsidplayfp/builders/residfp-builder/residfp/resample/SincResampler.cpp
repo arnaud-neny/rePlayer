@@ -181,8 +181,7 @@ SampleI32 SincResampler::fir(int subcycle)
 
     // Linear interpolation between the sinc tables yields good
     // approximation for the exact value.
-    return { v1.left + (firTableOffset * (v2.left - v1.left) >> 10)
-        , v1.right + (firTableOffset * (v2.right - v1.right) >> 10) };
+    return v1 + (firTableOffset * (v2 - v1) >> 10);
 }
 
 SincResampler::SincResampler(

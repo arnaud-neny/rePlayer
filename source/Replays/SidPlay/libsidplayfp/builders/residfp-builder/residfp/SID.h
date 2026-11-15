@@ -183,10 +183,8 @@ private:
     /// scale and limit output
     inline SampleI16 getOutput()
     {
-        auto output = resampler->output();
-        auto noise = m_noise.output();
-        SampleI32 out = { noise + (scaleFactor * output.left) / 2, noise + (scaleFactor * output.right) / 2 };
-        return Limiter::softClip(out);
+        const SampleI32 out = (scaleFactor * resampler->output()) / 2;
+        return Limiter::softClip(out + m_noise.output());
     }
 
 private:
