@@ -151,8 +151,8 @@ wg_output_t WavGen::clock(const ADSR *adsr)
 
     unsigned int WavGenOut = 0;
     unsigned char EnvOut = 0;
-    SampleI32 FilterInput = { 0 };
-    SampleI32 NonFiltered = { 0 };
+    SampleI32 FilterInput = {};
+    SampleI32 NonFiltered = {};
     const unsigned char FilterSwitchReso = m_regs[0x17];
     const unsigned char VolumeBand = m_regs[0x18];
 

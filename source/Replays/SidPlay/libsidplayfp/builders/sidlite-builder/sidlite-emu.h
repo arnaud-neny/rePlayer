@@ -66,7 +66,7 @@ public:
 
     void model(SidConfig::sid_model_t model, bool digiboost) override;
 
-    int getLevel(int i) const;
+    int getLevel() const;
 
     void surround(bool enabled);
 };

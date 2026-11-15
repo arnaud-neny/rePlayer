@@ -84,9 +84,9 @@ void SIDLiteEmu::clock()
     m_bufferpos += m_sid.clock(cycles, m_buffer+m_bufferpos);
 }
 
-int SIDLiteEmu::getLevel(int i) const
+int SIDLiteEmu::getLevel() const
 {
-    return m_sid.getLevel(i);
+    return m_sid.getLevel();
 }
 
 /*

@@ -60,6 +60,6 @@
 #  define SID_UNUSED
 #endif
 
-struct SampleI16 { short left; short right; };
+#include "../builders/residfp-builder/residfp/Sample.h"
 
 #endif /* SIDDEFS_H */

@@ -30,8 +30,6 @@
 
 #include <array>
 
-struct SampleI16;
-
 namespace SIDLite
 {
 
@@ -55,7 +53,7 @@ public:
     void setRealSIDmode(bool mode);
     bool setSamplingParameters(unsigned int clockFrequency, unsigned short samplingFrequency);
 
-    int getLevel(int i) const { return filter.getLevel(i); }
+    int getLevel() const { return filter.getLevel(); }
 
     void surround(bool enabled) { wavgen.isSurroundEnabled = enabled; }
 private:
