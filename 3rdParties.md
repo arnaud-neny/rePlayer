@@ -11,8 +11,8 @@
 - libarchive: https://github.com/libarchive/libarchive
 - libebur128: https://github.com/jiixyj/libebur128
 - libxml2: https://gitlab.gnome.org/GNOME/libxml2
+- stb_sprintf: https://github.com/nothings/stb_sprintf
 - TagLib: https://taglib.org
-- stb (sprintf): https://github.com/nothings/stb
 
 ## Replays Libraries:
 - adplug: https://github.com/adplug/adplug

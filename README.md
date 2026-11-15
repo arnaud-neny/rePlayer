@@ -196,7 +196,7 @@ Or add some comments (and likes) there:
 - [libarchive](https://github.com/libarchive/libarchive): to read and write streaming archives (zip, rar...).
 - [libebur128](https://github.com/jiixyj/libebur128): a library implementing the EBU R128 loudness standard.
 - [libxml2](https://gitlab.gnome.org/GNOME/libxml2): XML toolkit.
-- [stb](https://github.com/nothings/stb): for the optimized sprintf.
+- [stb_sprintf](https://github.com/nothings/stb_sprintf): single-header-file sprintf replacement.
 - [TagLib](https://taglib.org): to read tag from music formats.
 
 ### Replays 3rd parties:

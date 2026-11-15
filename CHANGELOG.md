@@ -5,6 +5,12 @@
 
 ## Current version
 
+v0.22.18:
+- Updated AtariAudio to 1.31
+- Updated libresidfp to 1.3.0
+- Updated ProTrekkr to 2.3 pre 5
+- Bug fixes
+
 v0.22.17:
 - Added Nuade
 - Removed AyFly
@@ -18,7 +24,6 @@ v0.22.17:
 - Updated dr_wav to 0.14.6
 - Updated libarchive to 3.8.11
 - Updated libxml2 to 2.15.4
-- Bug fixes
 
 v0.22.16:
 - Added Art Of Noise
@@ -34,7 +39,6 @@ v0.22.16:
 v0.22.15:
 - Updated adplug to 2.4 r948
 - Updated FAAD2 to 2.11.4
-- Updated libresidfp to 1.2.3
 
 v0.22.13:
 - Added F15 hotkey to discard playing song
@@ -87,7 +91,7 @@ v0.22.0:
 - [0.9.4] Highly Advanced (cog 2023-09-30)
 - [0.22.1] libgme to 0.6.5
 - [0.16.15] libkss to 1.2.1
-- [0.22.11] libresidfp to 1.2.2
+- [0.22.15] libresidfp to 1.2.3
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
 - [0.22.7] libtfmxaudiodecoder to 1.0.13
