@@ -1,6 +1,6 @@
 //----------------------------------------------------------
 //
-//	AtariAudio 1.30
+//	AtariAudio 1.31
 //	Small & accurate ATARI-ST audio emulation
 //	by Arnaud Carré aka Leonard/Oxygene (@leonard_coder)
 //
@@ -309,6 +309,15 @@ bool YmRenderer::InitSubSong(int subSongId, bool predictibleYm2149State)
 		m_mfp.Write8(0x13, (1 << 5) | (1 << 0));
 		SetTimer(0, 0, 0);
 		SetTimer(1, 0, 0);
+
+		if (eYmType::eMIX1 == m_ymType)
+		{
+			m_mixPatternPos = -1;		// on purpose start at -1 so following FetchNext will fetch the first row
+			FetchNextDigimixBlock();
+			m_mixSamplePos = 0;
+			m_samplePerTick = 0;
+		}
+
 		ret = true;
 	}
 	return ret;
