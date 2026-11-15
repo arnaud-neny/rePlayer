@@ -299,8 +299,8 @@ namespace rePlayer
         curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, OnCurlWrite);
         curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, this);
 
-        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_LIMIT, 30L); // 30 bytes per sec
-        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_TIME, 5L); // 5 seconds check
+        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_LIMIT, 100L); // 100 bytes per sec
+        curl_easy_setopt(m_curl, CURLOPT_LOW_SPEED_TIME, 10L); // 10 seconds check
 
         curl_easy_setopt(m_curl, CURLOPT_TCP_KEEPALIVE, 1L);
         curl_easy_setopt(m_curl, CURLOPT_TCP_KEEPIDLE, 60L); // Idle time before sending probes
