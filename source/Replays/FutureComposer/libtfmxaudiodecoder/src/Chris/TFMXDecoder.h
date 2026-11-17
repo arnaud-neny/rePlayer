@@ -33,8 +33,6 @@ class TFMXDecoder : public Decoder {
     TFMXDecoder();
     ~TFMXDecoder() override;
 
-    void setPath(std::string, LoaderCallback loaderArg, void* loaderDataArg) override;// rePlayer
-
     bool init(void*, udword, int) override;
     bool detect(void*,udword) override;
     void restart() override;
@@ -51,6 +49,7 @@ class TFMXDecoder : public Decoder {
     void adjustTraitsPost();
     void dumpMacros();
     void dumpModule();
+    void setDefaultName();
     
     static const std::string FORMAT_NAME;
     static const std::string FORMAT_NAME_PRO;
@@ -244,7 +243,6 @@ class TFMXDecoder : public Decoder {
 
     bool isMerged();
     bool loadSamplesFile();
-    bool loadSamplesFile(const std::string &path);
     void setTFMXv1();
     void traitsByChecksum();  // final step after successful initialization
     void findSongs();
@@ -301,6 +299,7 @@ class TFMXDecoder : public Decoder {
     void trackCmd_Speed(udword);
     void trackCmd_7V(udword);
     void trackCmd_Fade(udword);
+    void trackCmd_Jump(udword);
 
     static const int TRACK_CMD_MAX = 4;
     typedef void (TFMXDecoder::*TrackCmdFuncPtr)(udword);
@@ -584,25 +583,13 @@ class TFMXDecoder : public Decoder {
         bool noAddBeginCount;
         bool noDelayedDMAon;
         bool noTrackMute;
+        bool oldTrackCmds;
         // Main player order of execution.
         ExecOrder execOrder;
     } variant;
 
-    struct {
-        ubyte *buf;     // the allocated buffer
-        udword bufLen;  // the allocated amount
-        udword len;     // length of the data we copy
-
-        std::string path, ext;
-        LoaderCallback loader = nullptr; // rePlayer
-        void* loaderData = nullptr; // rePlayer
-
-        unsigned int mdatSize, smplSize, mdatSizeCurrent, smplSizeCurrent;
-        bool smplLoaded;
-
-        int versionHint;  // from TFHD flag
-        int startSongHint;  // from TFMX-MOD struct
-    } input;
+    int TFHDversionHint;  // from TFHD flag
+    int startSongHint;  // from TFMX-MOD struct
 };
 
 }  // namespace

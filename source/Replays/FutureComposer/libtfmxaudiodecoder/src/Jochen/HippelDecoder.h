@@ -44,14 +44,17 @@ class HippelDecoder : public Decoder {
     int run() override;
     void restart() override;
 
-    int getSongs() override { return stats.songs; }
+    int getSongs() override;
 
  public:// rePlayer
     friend class Analyze;
 
+    void updateSmartBuffer();
     void reset();
     void clearFormat();
     void dumpModule();
+    bool loadSamplesFile();
+    void setDefaultName();
 
     static const std::string FORMAT_NAME;
     static const std::string FORMAT_NAME_7V;
@@ -68,7 +71,9 @@ class HippelDecoder : public Decoder {
     static const uword SMOD_SMPHEADERS_OFFSET = 0x0028;   // 40
     static const uword SMOD_TRACKTAB_OFFSET = 0x0064;     // 100
     static const uword SMOD_PERIOD_MIN = 0x0071;
-    static const uword SMOD_PERIOD_MAX = 0x06b0;
+    // (NOTE) Tons of SMOD player source files on the Amiga
+    // apply 0x06b0, which is wrong.
+    static const uword SMOD_PERIOD_MAX = 0xd60;
 
     static const std::string FC14_TAG;
     static const uword FC14_WAVEHEADERS_OFFSET = 0x0064;  // 100
@@ -131,6 +136,7 @@ class HippelDecoder : public Decoder {
     smartPtr<ubyte> fcBuf;   // for safe unsigned access
     smartPtr<sbyte> fcBufS;  // for safe signed access
 
+    std::vector<ubyte> vSongs;
     udword songPosCurrent;
 
     Analyze *analyze;  // TODO
@@ -323,13 +329,6 @@ class HippelDecoder : public Decoder {
     bool findTag(const ubyte*, udword, const std::string, udword&);  // generic
     void traitsByChecksum();
 
-
-    struct {
-        ubyte *buf;     // the allocated buffer
-        udword bufLen;  // the allocated amount
-        udword len;     // length of the data we copy
-    } input;
-    
     uword FC_portamento_pitchbend(VoiceVars&, uword period);
     void FC_volSlide(VoiceVars&);
 
@@ -355,6 +354,7 @@ class HippelDecoder : public Decoder {
     bool TFMX_4V_maybe();
     bool TFMX_findPortamentoCode();
     bool TFMX_init(int songNumber);
+    void TFMX_findSongs(int songEntrySize);
     void TFMX_startSong();
     void TFMX_nextNote(VoiceVars&);
     void TFMX_processPattern(VoiceVars&);

@@ -100,17 +100,36 @@ PaulaVoice* LamePaulaMixer::getVoice(ubyte v) {
 }
 
 void LamePaulaMixer::setPanning(int p) {
-    if (p < 0)
+    if (p < 0) {
         p = 0;
-    if (p > 100)
+    }
+    if (p > 100) {
         p = 100;
+    }
     panning = p;
+    initMixTables();
 }
 
 void LamePaulaMixer::setFiltering(int p) {
     lowpass2 = (p == 1);
 }
 
+void LamePaulaMixer::reset() {
+    playerRate = 0;  // force update
+    updateRate(50<<8);
+    toFill = 0;
+
+    f1C = (3.14159265*2*4420.97)/pcmFreq;
+    f1Ci = 1.0-((3.14159265*2*4420.97)/pcmFreq);
+    f1LastLw = f1LastRw = 0;
+    f1LastLb = f1LastRb = 0;
+
+    f2L.setup(3275.0,pcmFreq);
+    f2R.setup(3275.0,pcmFreq);
+}
+
+// Once the decoder is available, the decoder proxy calls this
+// during song init.
 void LamePaulaMixer::init(Decoder *decoder) {
     if ( !decoder ) {
         return;
@@ -118,6 +137,7 @@ void LamePaulaMixer::init(Decoder *decoder) {
     // Push Paula voices to decoder.
     int vnew = decoder->getVoices();
     if (vnew <= MAX_VOICES) {
+        int vold = voices;
         end();
         voices = vnew;
         for (ubyte v=0; v<voices; v++) {
@@ -125,7 +145,11 @@ void LamePaulaMixer::init(Decoder *decoder) {
             decoder->setPaulaVoice(v,pVoice[v]);
             initVoice(v);
         }
+        if (vold != vnew) {
+            initMixTables();
+        }
     }
+    reset();
 }
 
 void LamePaulaMixer::initVoice(ubyte v) {
@@ -150,11 +174,8 @@ void LamePaulaMixer::init(udword freq, ubyte bits, ubyte chn, uword zero, ubyte 
     channels = chn;
 
     basePeriod = (float)AMIGA_CLOCK / pcmFreq;
-    playerRate = 0;  // force update
-    updateRate(50<<8);
+
     bufferScale = 0;
-    toFill = 0;
-    
     if (bits == 8) {
         zero8bit = zero;
         if (channels == 1) {
@@ -176,16 +197,9 @@ void LamePaulaMixer::init(udword freq, ubyte bits, ubyte chn, uword zero, ubyte 
             ++bufferScale;
         }
     }
-    setPanning(panLevel);
-    initMixTables();
-
-    f1C = (3.14159265*2*4420.97)/pcmFreq;
-    f1Ci = 1.0-((3.14159265*2*4420.97)/pcmFreq);
-    f1LastLw = f1LastRw = 0;
-    f1LastLb = f1LastRb = 0;
-
-    f2L.setup(3275.0,pcmFreq);
-    f2R.setup(3275.0,pcmFreq);
+    setPanning(panLevel);  // also calls initMixTables()
+    // initMixTables();
+    reset();
 }
 
 void LamePaulaMixer::initMixTables() {

@@ -44,6 +44,7 @@ class LamePaulaMixer
     void initVoice(ubyte num);
     void initMixTables();
     void end();
+    void reset();
     void updatePeriods();
     void updateRate(udword);
     void updateVoiceVolume();

@@ -79,7 +79,7 @@ class DecoderProxy {
     udword endShortsDuration;
     bool endShortsMode;
     
-    std::string path, ext;
+    std::string path;
     std::string formatName, formatID;
 
     LoaderCallback loader = nullptr; // rePlayer

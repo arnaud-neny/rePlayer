@@ -43,8 +43,8 @@ namespace tfmxaudiodecoder {
 }
 
 bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
-    input.versionHint = 0;
-    input.startSongHint = -1;
+    TFHDversionHint = 0;
+    startSongHint = -1;
 
     // ----------------------------------------------------------------------
     // "TFMXPAK 012345 0123456 >>>" ASCII header from the early 90s.
@@ -84,10 +84,10 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
         // 0 = unspecified / 1 = TFMX v1.5 / 2 = TFMX Pro / 3 = TFMX 7V
         // bit 7 = forced
         // Only few TFHD files specify the version.
-        input.versionHint = pBuf[8];
-        if (input.versionHint != 0) {
+        TFHDversionHint = pBuf[8];
+        if (TFHDversionHint != 0) {
 #if defined(DEBUG)
-            cout << "TFHD version=" << input.versionHint << "  for  " << input.path << endl;
+            cout << "TFHD version=" << TFHDversionHint << "  for  " << path << endl;
 #endif
         }
         
@@ -183,7 +183,7 @@ bool tfmxaudiodecoder::TFMXDecoder::isMerged() {
             };
         }
         while (offs < input.len);
-        input.startSongHint = startSong;
+        startSongHint = startSong;
         return true;
     }
 

@@ -15,6 +15,8 @@
 
 #include "Decoder.h"
 
+//#include <fstream> // rePlayer
+
 namespace tfmxaudiodecoder {
 
 const std::string Decoder::UNKNOWN_FORMAT_ID = "???";
@@ -26,6 +28,13 @@ Decoder::Decoder() {
     loopMode = false;
     rate = 50<<8;
     blacklisted = false;
+
+    input.buf = 0;
+    input.bufLen = input.len = 0;
+}
+
+Decoder::~Decoder() {
+    delete[] input.buf;
 }
 
 void Decoder::seek(sdword ms) {
@@ -62,15 +71,6 @@ void Decoder::setPath(std::string pathArg, LoaderCallback loaderArg, void* loade
     loader = loaderArg;
     loaderData = loaderDataArg;
 // rePlayer end
-    // Since most modules in these formats don't store a title/name internally,
-    // this helper function contructs a name from the filename.
-    name.clear();
-    std::size_t found = path.find_last_of("/\\");
-    if (found != std::string::npos) {
-        std::string fname = path.substr(found+1);
-        // Strip the filename extension.
-        name = fname.substr(0, fname.rfind('.'));
-    }
 }
 
 // For accuracy reasons, play speed cannot be specified as integral value,
@@ -82,6 +82,65 @@ void Decoder::setRate(udword r) {  // in [Hz]*256
 
 void Decoder::setBPM(uword bpm) {
     setRate( ((bpm<<8)*2)/5 );
+}
+
+void Decoder::bufferInputData(void *data, udword dataLen, udword excessLen) {
+    udword bufLenNew = dataLen + excessLen;
+    ubyte* newInputBuf = new ubyte[bufLenNew];
+    memcpy(newInputBuf,data,dataLen);
+    delete[] input.buf;
+    input.buf = newInputBuf;
+    input.bufLen = bufLenNew;
+    input.len = dataLen;
+}
+
+bool Decoder::appendSamplesFile(const std::string &pathSmpl) {
+#if 0
+    std::ifstream fIn( pathSmpl, std::ios::in|std::ios::binary|std::ios::ate );
+    if ( !fIn.is_open() ) {
+        return false;
+    }
+    //fIn.seekg(0,std::ios::end);
+    uint32_t fLen = fIn.tellg();
+    fIn.seekg(0,std::ios::beg);
+
+    udword bufLenNew = input.bufLen + fLen;
+    char* newInputBuf = new char[bufLenNew];
+    memcpy(newInputBuf,input.buf,input.bufLen);
+    delete[] input.buf;
+    input.buf = reinterpret_cast<ubyte*>(newInputBuf);
+    input.bufLen = bufLenNew;
+
+    fIn.read(newInputBuf+input.len,fLen);
+    if (fIn.bad()) {
+        return false;
+    }
+    fIn.close();
+
+    input.len += fLen;  // total size of loaded/copied data
+    input.smplSize = fLen;
+    return true;
+#else
+    auto res = loader(loaderData, pathSmpl.c_str());
+    if (res.first)
+    {
+        uint32_t fLen = res.second;
+
+        udword bufLenNew = input.bufLen + fLen;
+        char* newInputBuf = new char[bufLenNew];
+        memcpy(newInputBuf, input.buf, input.bufLen);
+        delete[] input.buf;
+        input.buf = reinterpret_cast<ubyte*>(newInputBuf);
+        input.bufLen = bufLenNew;
+
+        memcpy(newInputBuf + input.len, res.first, fLen);
+
+        input.len += fLen;  // total size of loaded/copied data
+        input.smplSize = fLen;
+        return true;
+    }
+    return false;
+#endif
 }
 
 }  // namespace

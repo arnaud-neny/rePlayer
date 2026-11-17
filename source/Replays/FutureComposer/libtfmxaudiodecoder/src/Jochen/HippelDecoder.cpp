@@ -22,10 +22,6 @@ namespace tfmxaudiodecoder {
 
 HippelDecoder::HippelDecoder() {
     analyze = new Analyze;
-    
-    input.buf = 0;
-    input.bufLen = input.len = 0;
-
     admin.initialized = false;
     
     // Set up some dummy voices to decouple the decoder from the mixer.
@@ -38,11 +34,58 @@ HippelDecoder::HippelDecoder() {
 }
 
 HippelDecoder::~HippelDecoder() {
-    delete[] input.buf;
     delete analyze;
 }
 
 // ----------------------------------------------------------------------
+
+// Since most modules in these formats don't store a title/name internally,
+// this helper function constructs a name from the filename.
+void HippelDecoder::setDefaultName() {
+    std::vector<std::string> vPrefixNames = {
+        "SOC.", "SOG.", "S7G.", "HIP.", "HIPC.",
+        "soc.", "sog.", "s7g.", "hip.", "hipc.",
+        "MCMD."
+    };
+    // since C++17 could use std::filesystem::path::filename
+    std::size_t found = path.find_last_of("/\\");
+    if (found != std::string::npos) {
+        for ( std::vector<std::string>::iterator it = vPrefixNames.begin(); it != vPrefixNames.end(); ++it ) {
+            if ( *it == path.substr( found+1, it->size()) ) {
+                name = path.substr( found+1 + it->size());
+                return;
+            }
+        }
+        std::string fname = path.substr(found+1);
+        // Strip the filename extension.
+        name = fname.substr(0, fname.rfind('.'));
+    }
+    else {
+        name.clear();
+    }
+}
+
+// Set up smart pointers for signed and unsigned input buffer access.
+// Ought to be read-only (const), but this implementation appends
+// a few values to the end of the buffer (see further below) and
+// may repair some data, too.
+//
+// We also need this, if the buffer size changes, e.g. because of
+// appending data such as the contents of a separate samples file.
+void HippelDecoder::updateSmartBuffer() {
+    fcBufS.setBuffer(reinterpret_cast<sbyte*>(input.buf),input.bufLen);
+    fcBuf.setBuffer(input.buf,input.bufLen);
+
+    // (NOTE) This next bit is just for convenience.
+    //
+    // Copy ``silent'' modulation sequence to end of module buffer so it
+    // is in the address space of the module and thus allows using the
+    // same smart pointers as throughout the rest of the code.
+    offsets.silence = input.len;
+    for (ubyte i=0; i<sizeof(silenceData); i++) {
+        fcBuf[offsets.silence+i] = silenceData[i];
+    }
+}
 
 void HippelDecoder::reset() {
     songEnd = false;
@@ -166,6 +209,10 @@ void HippelDecoder::clearFormat() {
     std::copy(std::begin(defaultSndModFuncs),std::end(defaultSndModFuncs),std::begin(TFMX_sndModFuncs));
 }
 
+int HippelDecoder::getSongs() {
+    return vSongs.empty() ? stats.songs : vSongs.size(); // rePlayer
+}
+
 ubyte HippelDecoder::getVoices() {
     return stats.voices;
 }
@@ -178,45 +225,23 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
 #if defined(DEBUG)
     cout << "HippelDecoder::init()" << endl;
 #endif
-    udword newLen;
-    
     if ( (data==0 || length==0) && admin.initialized) {  // re-init mode
         goto mainInit;
     }
 
+    title.clear();
+    author.clear();
+    game.clear();
+    name.clear();
     analyze->clear();
     clearFormat();
     if ( !detect(data,length) || offsets.header==0xffffffff) {
         return false;
     }
-    // If we still have a sufficiently large buffer, reuse it.
-    newLen = length+sizeof(silenceData);
-    if (newLen > input.bufLen) {
-        if (input.buf) {
-            delete[] input.buf;
-        }
-        input.bufLen = newLen;
-        input.buf = new ubyte[newLen];
-    }
-    memcpy(input.buf,data,length);
-    input.len = length;
-        
-    // Set up smart pointers for signed and unsigned input buffer access.
-    // Ought to be read-only (const), but this implementation appends
-    // a few values to the end of the buffer (see further below) and
-    // may repair some data, too.
-    fcBufS.setBuffer(reinterpret_cast<sbyte*>(input.buf),input.bufLen);
-    fcBuf.setBuffer(input.buf,input.bufLen);
-        
-    // (NOTE) This next bit is just for convenience.
-    //
-    // Copy ``silent'' modulation sequence to end of FC module buffer so it
-    // is in the address space of the FC module and thus allows using the
-    // same smart pointers as throughout the rest of the code.
-    offsets.silence = input.len;
-    for (ubyte i=0; i<sizeof(silenceData); i++) {
-        fcBuf[offsets.silence+i] = silenceData[i];
-    }
+    // Copy the data and append some space for the "silence data".
+    bufferInputData( data, length, sizeof(silenceData) );
+    // Update the smart pointers and helper contents.
+    updateSmartBuffer();
 
     // A short silent sample to use,
     // if sample definitions don't pass buffer range checks.
@@ -228,29 +253,18 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
         samples[s] = silentSample;
     }
     
-    // (NOTE) Instead of addresses (pointers) use 32-bit offsets everywhere.
-    // This is just for added safety and convenience. One could range-check
-    // each pointer/offset where appropriate to avoid segmentation faults
-    // caused by damaged input data.
-    //
-    // Smart pointer usage avoids the problem of out-of-bounds access.
-    //
-    // On the topic of rejecting damaged/corrupted input data, over many
-    // years of browsing MOD collections containing Future Composer modules,
-    // no extremely corrupted modules have been found. Those with bad header
-    // data or truncated sample data have been replaced with the help of
-    // a module collection's maintainers. Bad/broken modules may still be
-    // encountered "in the wild" and as copies in private collections.
-    // So, if not implementing pedantic validation of all input data (such
-    // as via a dry-run through the player and watching out for problematic
-    // data), only checking that some offsets are within the module boundaries
-    // is not worthwhile. A broken module may sound broken in unknown ways.
-
  mainInit:
     admin.initialized = (this->*pInitFunc)(songNumber);
     if (!admin.initialized) {
         return false;
     }
+    // Reject modules that don't pass these strict plausibility checks.
+    if (stats.patterns == 0 || stats.sndSeqs == 0 || stats.volSeqs == 0 ||
+       offsets.sndModSeqs >= input.len || offsets.volModSeqs >= input.len ||
+       offsets.patterns >= input.len ) {
+        return false;
+    }
+    setDefaultName();
     
     // Determine duration with a dry-run till song-end.
     duration = 0;
@@ -260,7 +274,12 @@ bool HippelDecoder::init(void *data, udword length, int songNumber) {
         duration += run();
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
-    
+#if defined(DEBUG)
+    cout << "Duration of " << path << "  #" << dec << admin.startSong << "  ";
+    dumpTimestamp(duration);
+    cout << endl;
+#endif
+
     if (analyze->usesE7setDiffWave(this) ) {
         TFMX_sndModFuncs[7] = &HippelDecoder::TFMX_sndSeq_E7_setDiffWave;
     }

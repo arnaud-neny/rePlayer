@@ -165,13 +165,19 @@ void tfmxaudiodecoder::HippelDecoder::traitsByChecksum() {
             pPortamentoFunc = &HippelDecoder::TFMX_portamento;
             pVibratoFunc = &HippelDecoder::TFMX_vibrato;
         }
-        // A Prehistoric Tale (music4). The original music in TFMX COSO
+        // A Prehistoric Tale (ingame3 aka music4). The original music in TFMX COSO
         // format glitches at 0:53 and 1:11 because pattern transpose is
         // to be applied immediately, and since it affects a currently
         // playing sound, in corner-cases the resulting transposition is
         // undesired. This enables a fix at runtime.
         else if (crc2 == 0x5cf7578f) {
             traits.avoidTRglitch = true;
+        }
+        // Enchanted Land (3) song #2 is just the first three seconds of
+        // song #1.
+        else if (crc2 == 0xcb441135) {
+            vSongs.clear();
+            vSongs.push_back(0);
         }
     }
 }

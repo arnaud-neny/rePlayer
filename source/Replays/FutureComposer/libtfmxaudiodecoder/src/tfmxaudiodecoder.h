@@ -35,7 +35,7 @@
  * only support filtering/sorting by file name extension.
  */
 
-#define TFMXAUDIODECODER_VERSION 10014
+#define TFMXAUDIODECODER_VERSION 10017
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,7 +109,9 @@ extern "C" {
 
     /* Optional!
        Apply input format header check to a memory buffer containing
-       at least 0xb80 bytes (= HippelDecoder::TFMX_PROBE_SIZE).
+       at least 0xb80 bytes (= HippelDecoder::TFMX_PROBE_SIZE) unless the
+       file is shorter. Some Hippel TFMX files and derivatives like MCMD
+       start with machine code, so sufficient data must be provided.
        With a minimum of 5 bytes it can detect only some raw modules with
        a tag at the very beginning. And full init may reject such data
        later, if taking a closer look.
@@ -120,7 +122,7 @@ extern "C" {
     int tfmxdec_load(void* decoder, const char* path, int songNumber);
 
     /* Since most modules in these formats don't store a title/name internally,
-       this helper function contructs a name from the filename. */
+       this helper function constructs a name from the filename. */
     const char* tfmxdec_get_name(void* decoder);
     
     /* Not that useful, but some TFMX-MOD files provide content for them. */
@@ -138,6 +140,9 @@ extern "C" {
 
     /* Returns: 0 to 100 */
     unsigned short int tfmxdec_get_voice_volume(void* decoder, unsigned int voice);
+
+    /* With the mixer initialized to stereo, change the panning level. */
+    void tfmxdec_set_panning(void* decoder, int panning);
 
     /* Not recommended and ought not be on by default, because Paula's
        external low-pass filter is applied to the whole output and creates

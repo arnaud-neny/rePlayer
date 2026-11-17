@@ -155,3 +155,8 @@ void tfmxdec_set_filtering(void* decoder, int flag) {
     TFMX_DECLARE_DECODER;
     p->mixer.setFiltering(flag);
 }
+
+void tfmxdec_set_panning(void* decoder, int panning) {
+    TFMX_DECLARE_DECODER;
+    p->mixer.setPanning(panning);
+}

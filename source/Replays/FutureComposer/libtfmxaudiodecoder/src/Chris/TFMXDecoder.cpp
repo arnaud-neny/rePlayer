@@ -29,10 +29,6 @@ const std::string TFMXDecoder::TAG_TFMXSONG = "TFMX-SONG ";
 const std::string TFMXDecoder::TAG_TFMXSONG_LC = "tfmxsong";
 
 TFMXDecoder::TFMXDecoder() {
-    input.buf = 0;
-    input.bufLen = input.len = 0;
-    input.smplLoaded = false;
-
     admin.initialized = false;
 
     // Set up some dummy voices to decouple the decoder from the mixer.
@@ -45,10 +41,33 @@ TFMXDecoder::TFMXDecoder() {
 }
 
 TFMXDecoder::~TFMXDecoder() {
-    delete[] input.buf;
 }
 
 // ----------------------------------------------------------------------
+
+// Since most modules in these formats don't store a title/name internally,
+// this helper function constructs a name from the filename.
+void TFMXDecoder::setDefaultName() {
+    std::vector<std::string> vPrefixNames = {
+        "MDAT.", "mdat."
+    };
+    // since C++17 could use std::filesystem::path::filename
+    std::size_t found = path.find_last_of("/\\");
+    if (found != std::string::npos) {
+        for ( std::vector<std::string>::iterator it = vPrefixNames.begin(); it != vPrefixNames.end(); ++it ) {
+            if ( *it == path.substr( found+1, it->size()) ) {
+                name = path.substr( found+1 + it->size());
+                return;
+            }
+        }
+        std::string fname = path.substr(found+1);
+        // Strip the filename extension.
+        name = fname.substr(0, fname.rfind('.'));
+    }
+    else {
+        name.clear();
+    }
+}
 
 // Assign default values to essential runtime variables.
 void TFMXDecoder::reset() {
@@ -124,37 +143,13 @@ ubyte TFMXDecoder::getVoices() {
 void TFMXDecoder::setPaulaVoice(ubyte v, PaulaVoice* p) {
     voiceVars[v].ch = p;
 }
-// rePlayer begin
-void TFMXDecoder::setPath(std::string path, LoaderCallback loaderArg, void* loaderDataArg) {
-    input.path = path;
-    input.loader = loaderArg;
-    input.loaderData = loaderDataArg;
-// rePlayer end
-    // Since most modules in these formats don't store a title/name internally,
-    // this helper function constructs a name from the filename.
-    name.clear();
-    std::size_t found = path.find_last_of("/\\");
-    if (found != std::string::npos) {
-        std::string fname = path.substr(found+1);
-        std::string mdatLC = "mdat.";
-        std::string mdatUC = "MDAT.";
-        if (fname.compare(0,mdatLC.length(),mdatLC) == 0 ||
-            fname.compare(0,mdatUC.length(),mdatUC) == 0) {
-            name = fname.substr( mdatLC.length() );
-        }
-        else {
-            // Strip the filename extension.
-            name = fname.substr(0, fname.rfind('.'));
-        }
-    }
-}
 
 // ----------------------------------------------------------------------
 
 bool TFMXDecoder::init(void *data, udword length, int songNumber) {
-    title.clear();
-    author.clear();
-    game.clear();
+#if defined(DEBUG)
+    cout << "TFMXDecoder::init()" << endl;
+#endif
     duration = 0;
 
     if (data==0 || length==0 ) {  // re-init mode
@@ -163,40 +158,34 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         }
     }
     else {  // invalidate what has been found out before
-        input.smplLoaded = false;
         input.mdatSize = input.smplSize = 0;
+        title.clear();
+        author.clear();
+        game.clear();
+        name.clear();
 
         if ( !detect(data,length) ) {
             return false;
         }
-        // If we still have a sufficiently large buffer, reuse it.
-        udword newLen = length;
-        if (newLen > input.bufLen) {
-            if (input.buf) {
-                delete[] input.buf;
-            }
-            input.bufLen = 0;
-            input.buf = new ubyte[newLen];
-        }
-        memcpy(input.buf,data,length);
-        input.bufLen = newLen;
-        input.len = length;
-        
+        bufferInputData(data,length);
+        input.mdatSize = input.len-offsets.header;
         // Set up smart pointer for unsigned input buffer access.
         pBuf.setBuffer(input.buf,input.bufLen);
-    }
 
-    // Check whether it's a single-file format.
-    // If it is, this method defines various variables.
-    if ( isMerged() || loadSamplesFile() ) {
-        input.smplLoaded = true;
-        // Make these the current ones.
-        input.mdatSizeCurrent = input.mdatSize;
-        input.smplSizeCurrent = input.smplSize;
-    }
-    else {
-        // Can't proceed without samples data.
-        return false;
+        // Check whether it's a single-file format.
+        // If it is, this method defines various variables.
+        // Else search for second file.
+        if ( !isMerged() ) {
+            offsets.sampleData = input.len;
+            if ( loadSamplesFile() ) {
+                // Update the smart pointer for changed buffer size.
+                pBuf.setBuffer(input.buf,input.bufLen);
+            }
+            else {
+                // Can't proceed without samples data.
+                return false;
+            }
+        }
     }
 
 // --------
@@ -260,7 +249,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
         };
         if (foundStop && foundHighMacroCmd) {
 #if defined(DEBUG)
-            cout << "WARNING: Rejecting Atari ST TFMX file!  " << input.path << endl;
+            cout << "WARNING: Rejecting Atari ST TFMX file!  " << path << endl;
 #endif
             return false;
         }            
@@ -309,6 +298,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     variant.noAddBeginCount = false;
     variant.noDelayedDMAon = false;
     variant.noTrackMute = false;
+    variant.oldTrackCmds = false;
     variant.execOrder = MAC_MOD_SEQ;
     
     PattCmdFuncs[0] = &TFMXDecoder::pattCmd_End;
@@ -323,7 +313,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     PattCmdFuncs[9] = &TFMXDecoder::pattCmd_ReturnFromGoto;
     PattCmdFuncs[10] = &TFMXDecoder::pattCmd_Fade;
     PattCmdFuncs[11] = &TFMXDecoder::pattCmd_NOP;
-    PattCmdFuncs[12] = &TFMXDecoder::pattCmd_Note;
+    PattCmdFuncs[12] = &TFMXDecoder::pattCmd_NOP;  // FXPR not implemented
     PattCmdFuncs[13] = &TFMXDecoder::pattCmd_NOP;
     PattCmdFuncs[14] = &TFMXDecoder::pattCmd_Stop;
     PattCmdFuncs[15] = &TFMXDecoder::pattCmd_NOP;
@@ -341,6 +331,8 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     for (ubyte m = 0; m<0x40; m++) {
         MacroDefs[m] = &macroDef_NOP;
     }
+    // Set up a default set of macro commands covering what is referred to
+    // as the "TFMX Pro" family of player features.
     MacroDefs[0] = &macroDef_StopSound;
     MacroDefs[1] = &macroDef_StartSample;
     MacroDefs[2] = &macroDef_SetBegin;
@@ -355,7 +347,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     MacroDefs[0xa] = &macroDef_Reset;
     MacroDefs[0xb] = &macroDef_Portamento;
     MacroDefs[0xc] = &macroDef_Vibrato;
-    MacroDefs[0xd] = &macroDef_AddVolNote;
+    MacroDefs[0xd] = &macroDef_AddVolNote;  // AddVolume in v1.5
     MacroDefs[0xe] = &macroDef_SetVolume;
     MacroDefs[0xf] = &macroDef_Envelope;
 
@@ -370,23 +362,28 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     
     MacroDefs[0x18] = &macroDef_SampleLoop;
     MacroDefs[0x19] = &macroDef_OneShot;
+    // New macro commands in variants and v2.2.
     MacroDefs[0x1a] = &macroDef_WaitOnDMA;
     MacroDefs[0x1b] = &macroDef_RandomPlay;
     MacroDefs[0x1c] = &macroDef_SplitKey;
     MacroDefs[0x1d] = &macroDef_SplitVolume;
-    MacroDefs[0x1e] = &macroDef_RandomMask;
+    MacroDefs[0x1e] = &macroDef_RandomMask;  // AddVolNote in v2.2
+    // Macro commands > $1E available only in variants.
     MacroDefs[0x1f] = &macroDef_SetPrevNote;
 
     // Macro commands $1F AddChannel and $20 SubChannel are not implemented
     // since no file seems to use them. Also, number $1F is occupied by
     // SetPrevNote already. which would cause a conlict that would need
-    // to be detected and prevent somehow.
+    // to be detected and prevented somehow.
     //
     // Macro command $20 Signal and its external write-only registers
     // as added by some TFMX variants is not needed either.
     MacroDefs[0x20] = &macroDef_UNDEF;
     
     MacroDefs[0x21] = &macroDef_PlayMacro;
+    // Although there are cryptic short names for the sound synthesis macro
+    // commands, such as in heavily modified versions of the TFMX-editor,
+    // here the functions are numbered only.
     MacroDefs[0x22] = &macroDef_22;
     MacroDefs[0x23] = &macroDef_23;
     MacroDefs[0x24] = &macroDef_24;
@@ -407,15 +404,19 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     // music created with v1/v2, a checksum based detection of specific
     // modules may be the only way. And the differences between v1 and v2
     // are of little use when detecting file contents.
+    //
+    // The compression fields cannot be relied on either, because although
+    // compression is not available in v1/v2, it is optional, and some
+    // v1 modules (like Hard'n'Heavy) exist also as compressed versions.
 
     // TFMX v1.x
     if ( ((readBEudword(pBuf,offsets.header) == TFMX_HEX) &&  // old header
           (pBuf[offsets.header+4] == 0x20))
-         || (input.versionHint == 1) ) {  // from TFHD
+         || (TFHDversionHint == 1) ) {  // from TFHD
         setTFMXv1();
     }
     // aka TFMX Professional
-    else {  // also  input.versionHint == 2   // from TFHD
+    else {  // also  TFHDversionHint == 2   // from TFHD
         formatName = FORMAT_NAME_PRO;
     }
     // TFMX 7V is checked and set by adjustTraitsPost()
@@ -435,10 +436,10 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     }
     // If the file specifies a default start song (like TFMX-MOD does),
     // assume it's a single-song file format, and reduce number of songs to 1.
-    if (input.startSongHint >= 0) {
-        //cout << "MODSONG = " << input.startSongHint << endl;
+    if (startSongHint >= 0) {
+        //cout << "MODSONG = " << startSongHint << endl;
         vSongs.clear();
-        vSongs.push_back(input.startSongHint);
+        vSongs.push_back(startSongHint);
     }
     
     admin.startSong = (songNumber < 0) ? 0 : songNumber;
@@ -447,6 +448,8 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     }
     restart();
     admin.initialized = true;
+
+    setDefaultName();
 
     // Determine duration with a dry-run till song-end.
     duration = 0;
@@ -457,7 +460,7 @@ bool TFMXDecoder::init(void *data, udword length, int songNumber) {
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
 #if defined(DEBUG)
-    cout << "Duration of " << input.path << "  #" << dec << admin.startSong << "  ";
+    cout << "Duration of " << path << "  #" << dec << admin.startSong << "  ";
     dumpTimestamp(duration);
     cout << endl;
 #endif
@@ -531,6 +534,7 @@ void TFMXDecoder::setTFMXv1() {
     variant.extraWaitV1 = true;
     variant.noDelayedDMAon = true;
     variant.execOrder = SEQ_MOD_MAC;
+    // The newer AddVolNote should be compatible too.
     MacroDefs[0xd] = &macroDef_AddVolume;
     // max. macro cmd = $19
     for (ubyte m = 0x1a; m<0x40; m++) {
@@ -544,7 +548,7 @@ void TFMXDecoder::adjustTraitsPost() {
     // to Amiga Paula using a logical AND 3, we cannot rely on
     // searching for the highest channel number.
     if (trackCmdUsed[3] ||
-        input.versionHint==3 ) {  // from TFHD
+        TFHDversionHint==3 ) {  // from TFHD
         voices = 8;
         formatName = FORMAT_NAME_7V;
         // Hippel TFMX7V is 7 voices, mapping 3,4,5,6 to 3
@@ -834,9 +838,7 @@ void TFMXDecoder::noteCmd() {
 #if defined(DEBUG_RUN)
     cout << "  ::noteCmd()  v" << tohex(v.voiceNum) << endl;
 #endif
-    if (cmd.aa == 0xfc) {  // lock note
-    }
-    else if (cmd.aa == 0xf7) {  // envelope
+    if (cmd.aa == 0xf7) {  // envelope
         v.envelope.speed = cmd.bb;
         ubyte tmp = (cmd.cd>>4)+1;
         v.envelope.count = v.envelope.flag = tmp;

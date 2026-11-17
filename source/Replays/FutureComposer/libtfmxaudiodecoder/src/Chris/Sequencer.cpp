@@ -87,10 +87,26 @@ void TFMXDecoder::processTrackStep() {
 #if defined(DEBUG_RUN)
         cout << "# Step = " << hexW(sequencer.step.current) << " at 0x" << tohex(stepOffset) << endl;
 #endif
-        // 0xEFFE is the prefix of a track command.
-        if ( 0xeffe == readBEuword(pBuf,stepOffset) ) {
-            stepOffset += 2;
-            uword command = readBEuword(pBuf,stepOffset);
+        bool trackCommand = false;
+        int command = 0;
+        if ( variant.oldTrackCmds ) {
+            // Unique to Danger Freak (1989).
+            // 0xFA0X is a track command.
+            if ( 0xfa00 == (readBEuword(pBuf,stepOffset) & 0xfffc) ) {
+                command = readBEuword(pBuf,stepOffset) & 3;
+                trackCommand = true;
+            }
+        }
+        else {
+            // 0xEFFE is the prefix of a track command.
+            if ( 0xeffe == readBEuword(pBuf,stepOffset) ) {
+                stepOffset += 2;
+                command = readBEuword(pBuf,stepOffset);
+                trackCommand = true;
+            }
+        }
+
+        if (trackCommand) {
 #if defined(DEBUG_RUN)
             cout << "  ";
             dumpBytes(pBuf,stepOffset,2);
@@ -218,6 +234,16 @@ void TFMXDecoder::trackCmd_7V(udword stepOffset) {
     }
     sequencer.step.current++;
     sequencer.evalNext = true;
+}
+
+// unique to "Danger Freak"
+void TFMXDecoder::trackCmd_Jump(udword stepOffset) {
+#if defined(DEBUG_RUN)
+    dumpBytes(pBuf,stepOffset,2);
+#endif
+    sequencer.step.current = readBEuword(pBuf,stepOffset);
+    sequencer.evalNext = true;
+    songEnd = true;
 }
 
 }  // namespace

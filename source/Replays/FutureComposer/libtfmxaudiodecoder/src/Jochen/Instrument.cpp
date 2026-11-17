@@ -109,6 +109,14 @@ void HippelDecoder::TFMX_processSndModSustain(VoiceVars& voiceX) {
 }
 
 void HippelDecoder::TFMX_processSndModSeq(VoiceVars& voiceX) {
+    // Corner-case: Stop processing, if it advances beyond the last sequence.
+    // Two FC14 mods and one SMOD have been found that are affected.
+    if (voiceX.currentSndSeq == (stats.sndSeqs-1) && voiceX.sndSeqPos >= 64) {
+        return;
+    }
+    // Undefined sequences get redirected to the silent sequence
+    // by getSndSeq() already.
+
     udword seqOffs = voiceX.sndSeq+voiceX.sndSeqPos;
     ubyte f = fcBuf[seqOffs];
     // Commands are E0 to EA. Positive bytes are transpose values,

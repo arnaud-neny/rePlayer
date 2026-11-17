@@ -16,7 +16,7 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     udword p0 = offsets.header + readBEudword(sBuf,offsets.patterns);
     udword crc1 = crc.get(sBuf,p0,0x100);
 #if defined(DEBUG)
-    cout << "CRC = " << tohex(crc1) << "  " << input.path << endl;
+    cout << "CRC = " << tohex(crc1) << "  " << path << endl;
 #endif
 
     // Gem'X. No checksum based adjustments required, but the soundtrack
@@ -79,6 +79,8 @@ void tfmxaudiodecoder::TFMXDecoder::traitsByChecksum() {
     else if (crc1 == 0x48960d8c || crc1 == 0x5dcd624f || crc1 == 0x3f0b151f) {
         setTFMXv1();
         variant.noNoteDetune = true;
+        variant.oldTrackCmds = true;
+        TrackCmdFuncs[1] = &TFMXDecoder::trackCmd_Jump;
     }
     // Hard'n'Heavy (1989) is a TFMX v1 variant. In particular, it strictly
     // requires the old AddBegin macro that is missing the effect updates.

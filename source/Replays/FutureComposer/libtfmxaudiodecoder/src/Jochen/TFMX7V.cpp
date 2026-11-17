@@ -62,7 +62,7 @@ void HippelDecoder::TFMX_7V_subInit() {
 }
 
 void HippelDecoder::TFMX_7V_startSong() {
-    udword offsetSongDef = offsets.subSongTab+admin.startSong*TFMX_7V_SONGTAB_ENTRY_SIZE;
+    udword offsetSongDef = offsets.subSongTab+vSongs[admin.startSong]*TFMX_7V_SONGTAB_ENTRY_SIZE;
     firstStep = readBEuword(fcBuf,offsetSongDef);
     lastStep = readBEuword(fcBuf,offsetSongDef+2);
     admin.startSpeed = readBEuword(fcBuf,offsetSongDef+6);

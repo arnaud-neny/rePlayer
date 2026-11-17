@@ -16,6 +16,7 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include <cstring>
 #include <string>
 
 #include "MyTypes.h"
@@ -27,7 +28,7 @@ class PaulaVoice;
 class Decoder {
 public:
     Decoder();
-    virtual ~Decoder() { };
+    virtual ~Decoder();
 
     virtual void setPath(std::string pathArg, LoaderCallback loaderArg, void* loaderDataArg); // rePlayer
 
@@ -53,6 +54,8 @@ public:
 protected:
     void setRate(udword);  // [Hz] *256
     void setBPM(uword);
+    void bufferInputData(void *data, udword dataLen, udword excessLen = 0);
+    bool appendSamplesFile(const std::string &pathSmpl);
 
     static const std::string UNKNOWN_FORMAT_ID;
         
@@ -69,6 +72,17 @@ protected:
     udword rate;
     udword tickFP, tickFPadd;
     bool blacklisted;
+
+    // As a common trait of the file format decoders, they all access
+    // music data and samples data within a single buffer. So, we let
+    // the base class provide some of what is reused.
+    struct {
+        ubyte *buf;     // the allocated buffer
+        udword bufLen;  // the allocated amount
+        udword len;     // length of the data we copy
+
+        unsigned int mdatSize, smplSize;
+    } input;
 };
 
 }  // namespace

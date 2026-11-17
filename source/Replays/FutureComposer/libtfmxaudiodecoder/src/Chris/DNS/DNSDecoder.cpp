@@ -19,7 +19,7 @@
 #include "CRCLight.h"
 
 #include <cstring>
-#include <fstream>
+//#include <fstream> // rePlayer
 #include <set>
 
 namespace tfmxaudiodecoder {
@@ -30,10 +30,6 @@ const std::string DNSDecoder::FORMAT_NAME = "Dynamic Synthesizer (AMIGA)";
 const std::string DNSDecoder::TAG = "DNS";
 
 DNSDecoder::DNSDecoder() {
-    input.buf = 0;
-    input.bufLen = input.len = 0;
-    input.smplLoaded = false;
-
     admin.initialized = false;
 
     // Set up some dummy voices to decouple the decoder from the mixer.
@@ -45,7 +41,6 @@ DNSDecoder::DNSDecoder() {
 }
 
 DNSDecoder::~DNSDecoder() {
-    delete[] input.buf;
 }
 
 // ----------------------------------------------------------------------
@@ -90,7 +85,7 @@ bool DNSDecoder::detect(void* data, udword len) {
         CRCLight crc;
         udword crc1 = crc.get(sBuf,0,0x100);
 #if defined(DEBUG)
-        cout << "CRC(1) = " << tohex(crc1) << "  " << input.path << endl;
+        cout << "CRC(1) = " << tohex(crc1) << "  " << path << endl;
 #endif
         std::set<udword> checksums1 = {
             0x4f593264,  // Hollywood Poker Pro title
@@ -112,7 +107,7 @@ bool DNSDecoder::detect(void* data, udword len) {
         CRCLight crc;
         udword crc2 = crc.get(sBuf,0x800-0x100,0x100);
 #if defined(DEBUG)
-        cout << "CRC(2) = " << tohex(crc2) << "  " << input.path << endl;
+        cout << "CRC(2) = " << tohex(crc2) << "  " << path << endl;
 #endif
         std::set<udword> checksums2 = {
             0x04ec1634,  // Hollywood Poker Pro title
@@ -148,48 +143,30 @@ bool DNSDecoder::init(void *data, udword length, int songNumber) {
         }
     }
     else {  // invalidate what has been found out before
-        input.smplLoaded = false;
         input.mdatSize = input.smplSize = 0;
+        title.clear();
+        author.clear();
+        game.clear();
+        name.clear();
 
         if ( !detect(data,length) ) {
             return false;
         }
-        // If we still have a sufficiently large buffer, reuse it.
-        udword newLen = length;
-        if (newLen > input.bufLen) {
-            if (input.buf) {
-                delete[] input.buf;
-            }
-            input.bufLen = 0;
-            input.buf = new ubyte[newLen];
+        bufferInputData(data,length);
+        input.mdatSize = input.len-offsets.header;
+
+        offsets.sampleData = input.len;
+        if ( !loadSamplesFile() ) {
+            // Can't proceed without samples data.
+            return false;
         }
-        memcpy(input.buf,data,length);
-        input.bufLen = newLen;
-        input.len = length;
-        
+        offsets.silence = offsets.sampleData;
         // Set up smart pointer for unsigned input buffer access.
         pBuf.setBuffer(input.buf,input.bufLen);
+        // Clear the first two words for one-shot samples.
+        udword o = offsets.sampleData;
+        pBuf[o] = pBuf[o+1] = pBuf[o+2] = pBuf[o+3] = 0;
     }
-
-    if ( loadSamplesFile() ) {
-        input.smplLoaded = true;
-        // Make these the current ones.
-        input.mdatSizeCurrent = input.mdatSize;
-        input.smplSizeCurrent = input.smplSize;
-    }
-    else {
-        // Can't proceed without samples data.
-        return false;
-    }
-
-#if defined(DEBUG)
-    cout << "samples loaded" << endl;
-#endif
-    offsets.sampleData = offsets.header+input.mdatSize;
-    offsets.silence = offsets.sampleData;
-    // Clear the first two words for one-shot samples.
-    udword o = offsets.sampleData;
-    pBuf[o] = pBuf[o+1] = pBuf[o+2] = pBuf[o+3] = 0;
 
     // Defaults.
     setRate(50<<8);
@@ -281,6 +258,8 @@ bool DNSDecoder::init(void *data, udword length, int songNumber) {
 
     // ----------
 
+    setDefaultName();
+
     admin.startSong = (songNumber < 0) ? 0 : songNumber;
     restart();
 
@@ -293,7 +272,7 @@ bool DNSDecoder::init(void *data, udword length, int songNumber) {
     } while ( !songEnd && (duration<1000*60*59));
     loopMode = loopModeBak;
 #if defined(DEBUG)
-    cout << "Duration of " << input.path << "  #" << admin.startSong << "  ";
+    cout << "Duration of " << path << "  #" << admin.startSong << "  ";
     dumpTimestamp(duration);
     cout << endl;
 #endif
@@ -844,15 +823,10 @@ ubyte DNSDecoder::getVoices() {
 void DNSDecoder::setPaulaVoice(ubyte v, PaulaVoice* p) {
     voiceVars[v].ch = p;
 }
-// rePlayer begin
-void DNSDecoder::setPath(std::string path, LoaderCallback loaderArg, void* loaderDataArg) {
-    input.path = path;
-    input.loader = loaderArg;
-    input.loaderData = loaderDataArg;
-// rePlayer end
+
+void DNSDecoder::setDefaultName() {
     // Since most modules in these formats don't store a title/name internally,
-    // this helper function contructs a name from the filename.
-    name.clear();
+    // this helper function constructs a name from the filename.
     std::size_t found = path.find_last_of("/\\");
     if (found != std::string::npos) {
         std::string fname = path.substr(found+1);
@@ -867,16 +841,13 @@ void DNSDecoder::setPath(std::string path, LoaderCallback loaderArg, void* loade
             name = fname.substr(0, fname.rfind('.'));
         }
     }
+    else {
+        name.clear();
+    }
 }
 
 bool DNSDecoder::loadSamplesFile() {
-    // Got both the DNS and SMP file?
-    if ( input.smplLoaded ) {  // if loaded before, reuse it
-        input.mdatSize = input.mdatSizeCurrent;
-        input.smplSize = input.smplSizeCurrent;
-        return true;
-    }
-    if ( input.path.empty() ) {
+    if ( path.empty() ) {
         return false;
     }
 
@@ -888,60 +859,16 @@ bool DNSDecoder::loadSamplesFile() {
         { ".DNS", ".SMP" }
     };
     for ( std::vector<ExtPair>::iterator it = vExtPairs.begin(); it != vExtPairs.end(); ++it ) {
-        std::string pathSmpl = input.path;
+        std::string pathSmpl = path;
         std::size_t found = pathSmpl.rfind(it->first);
         if (found != std::string::npos) {
             pathSmpl.replace(found,it->first.length(),it->second);
-#if 0 // rePlayer begin
-            std::ifstream fIn( pathSmpl, std::ios::in|std::ios::binary|std::ios::ate );
-            if ( fIn.is_open() ) {
-                //fIn.seekg(0,std::ios::end);
-                uint32_t fLen = fIn.tellg();
-                fIn.seekg(0,std::ios::beg);
-
-                char* newInputBuf = new char[fLen+input.bufLen];
-                memcpy(newInputBuf,input.buf,input.bufLen);
-                delete[] input.buf;
-                input.buf = reinterpret_cast<ubyte*>(newInputBuf);
-
-                fIn.read(newInputBuf+input.len,fLen);
-                if (fIn.bad()) {
-                    return false;
-                }
-                fIn.close();
-                input.smplSize = fLen;
-                input.mdatSize = input.len - offsets.header;
-                offsets.sampleData = input.len;
-                input.bufLen += input.smplSize;
-                input.len += input.smplSize;
-
-                // Update smart pointers.
-                pBuf.setBuffer(input.buf,input.bufLen);
+            if (appendSamplesFile( pathSmpl ) ) {
+#if defined(DEBUG)
+                cout << "Samples loaded: " << pathSmpl << endl;
+#endif
                 return true;
             }
-#else
-            auto res = input.loader(input.loaderData, pathSmpl.c_str());
-            if (res.first)
-            {
-                char* newInputBuf = new char[res.second + input.bufLen];
-                memcpy(newInputBuf, input.buf, input.bufLen);
-                delete[] input.buf;
-                input.buf = reinterpret_cast<ubyte*>(newInputBuf);
-
-                memcpy(newInputBuf + input.len, res.first, res.second);
-                delete[] res.first;
-
-                input.smplSize = res.second;
-                input.mdatSize = input.len - offsets.header;
-                offsets.sampleData = input.len;
-                input.bufLen += input.smplSize;
-                input.len += input.smplSize;
-
-                // Update smart pointers.
-                pBuf.setBuffer(input.buf, input.bufLen);
-                return true;
-            }
-#endif // rePlayer end
         }
     }  // next ExtPair
     return false;

@@ -238,6 +238,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\ModPack.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Portamento.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\Probe.cpp" />
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\SampleSets.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\SMOD.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\TFMX.cpp" />
     <ClCompile Include="libtfmxaudiodecoder\src\Jochen\TFMX7V.cpp" />

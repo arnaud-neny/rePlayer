@@ -61,11 +61,22 @@ bool HippelDecoder::TFMX_init(int songNumber) {
     if (traits.patternSize != PATTERN_LENGTH) {  // potentially never true
         return false;
     }
+    // NB! There may be invalid/silent songs, but the total number of songs
+    // is needed when calculating the offset to sample headers.
     stats.songs = readBEuword(fcBuf,h+0x10);
+    // Some precautions.
+    if (stats.songs > 32) {
+        return false;
+    }
+    if (admin.startSong >= stats.songs) {
+        admin.startSong = 0;
+    }
+
     stats.samples = readBEuword(fcBuf,h+0x12);
-    if (stats.samples > SAMPLES_MAX)
+    if (stats.samples > SAMPLES_MAX) {
         stats.samples = SAMPLES_MAX;
-    
+    }
+
     udword offs = h+0x20;  // this is constant
     offsets.sndModSeqs = offs;
     
@@ -102,12 +113,22 @@ bool HippelDecoder::TFMX_init(int songNumber) {
         }
     }
 
+    // Vector that holds the valid song numbers.
+    vSongs.clear();
+
     bool maybe4V = TFMX_4V_maybe();
     bool maybe7V = TFMX_7V_maybe();
     if ( !maybe4V && maybe7V ) {
         TFMX_7V_subInit();
-     }
-        
+        TFMX_findSongs(TFMX_7V_SONGTAB_ENTRY_SIZE);
+    }
+    else {
+        TFMX_findSongs(TFMX_SONGTAB_ENTRY_SIZE);
+    }
+    if (vSongs.size() < 1) {
+        return false;
+    }
+
     udword sh = offsets.sampleHeaders;
     sh += 0x12;  // skip file name
     for (int sam = 0; sam < stats.samples; sam++) {
@@ -135,8 +156,23 @@ bool HippelDecoder::TFMX_init(int songNumber) {
     return true;
 }
 
+void HippelDecoder::TFMX_findSongs(int songEntrySize) {
+    // Examine all (sub-)song definitions.
+    for (int so=0; so<stats.songs; ++so) {
+        udword offsetSongDef = offsets.subSongTab+so*songEntrySize;
+        // If start step is greater or equal to end step,
+        // that would end the song immediately.
+        if (readBEuword(fcBuf,offsetSongDef) >= readBEuword(fcBuf,offsetSongDef+2)) {
+            continue;
+        }
+        else {  // accept this song number
+            vSongs.push_back(so);
+        }
+    }
+}
+
 void HippelDecoder::TFMX_startSong() {
-    udword offsetSongDef = offsets.subSongTab+admin.startSong*TFMX_SONGTAB_ENTRY_SIZE;
+    udword offsetSongDef = offsets.subSongTab+vSongs[admin.startSong]*TFMX_SONGTAB_ENTRY_SIZE;
     firstStep = readBEuword(fcBuf,offsetSongDef);
     lastStep = readBEuword(fcBuf,offsetSongDef+2);
     admin.speed = admin.startSpeed = readBEuword(fcBuf,offsetSongDef+4);

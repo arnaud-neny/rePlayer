@@ -187,6 +187,9 @@
     <ClCompile Include="libtfmxaudiodecoder\src\Chris\DNS\DNSDecoder.cpp">
       <Filter>Source Files\libtfmxaudiodecoder\Chris\DNS</Filter>
     </ClCompile>
+    <ClCompile Include="libtfmxaudiodecoder\src\Jochen\SampleSets.cpp">
+      <Filter>Source Files\libtfmxaudiodecoder\Jochen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="libtfmxaudiodecoder\README.md" />

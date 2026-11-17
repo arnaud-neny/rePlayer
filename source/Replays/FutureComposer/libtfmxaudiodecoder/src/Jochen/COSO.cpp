@@ -78,26 +78,65 @@ bool HippelDecoder::COSO_init(int songNumber) {
     // As to support module packs, we maintain a list of headers.
     std::vector<udword> vHeaders;
     vHeaders.push_back(h);
+
+    // NB! There may be invalid/silent songs, but the total number of songs
+    // is needed when calculating the offset to sample headers.
+    // If it's a modpack, this is not the total number of songs yet.
     stats.songs = readBEuword(fcBuf,ht+0x10);
 
     offsets.sampleHeaders = h+readBEudword(fcBuf,h+0x18);
     offsets.sampleData = h+readBEudword(fcBuf,h+0x1c);
 
-    bool reject = false;
-    if ( COSO_isModPack(vHeaders,reject) && reject ) {
-        return false;
+    if (offsets.sampleData >= input.len) {  // missing samples for sure!
+        if ( loadSamplesFile() ) {
+            // Update the smart pointers and the helper data at buffer end
+            // to match the changed buffer size.
+            updateSmartBuffer();
+        }
+        else {
+            // Can't proceed without samples data.
+            return false;
+        }
     }
 
-    // Traverse through found modules and select the right song number.
-    for (udword i=0; i<vHeaders.size(); i++) {
-        h = vHeaders[i];
-        ubyte songsInThisMod = readBEuword(fcBuf,h+0x20+0x10);
-        if (admin.startSong < songsInThisMod) {
-            offsets.header = h;
-            ht = h+0x20;
-            break;
+    // Vector that holds the valid song numbers.
+    vSongs.clear();
+
+    bool reject = false;
+    bool isModPack = COSO_isModPack(vHeaders,reject);
+    // Some precautions.
+    if (stats.songs > 32) {
+        return false;
+    }
+    if (admin.startSong >= stats.songs) {
+        admin.startSong = 0;
+    }
+    if (isModPack) {
+        if (reject) {
+            return false;
         }
-        admin.startSong -= songsInThisMod;
+        // The total number of songs in the modpack.
+        vSongs.resize(stats.songs,0);
+        // Traverse through found modules and select the right song number.
+        for (udword i=0; i<vHeaders.size(); i++) {
+            h = vHeaders[i];
+            ubyte songsInThisMod = readBEuword(fcBuf,h+0x20+0x10);
+            // Some precautions because of the vector access.
+            if (songsInThisMod > stats.songs) {
+                songsInThisMod = stats.songs;
+            }
+            // Is the selected song part of this module?
+            if (admin.startSong < songsInThisMod) {
+                offsets.header = h;
+                ht = h+0x20;
+                // Create the list of song numbers for this module.
+                for (int so = 0; so<songsInThisMod; ++so) {
+                    vSongs[so] = so;
+                }
+                break;
+            }
+            admin.startSong -= songsInThisMod;
+        }
     }
 
     offsets.sndModSeqs = h+readBEudword(fcBuf,h+0x4);
@@ -114,13 +153,21 @@ bool HippelDecoder::COSO_init(int songNumber) {
     traits.patternSize = 0;  // fcBuf[ht+0xd];
 
     stats.samples = readBEuword(fcBuf,ht+0x12);  // not +1 like TFMX
-    if (stats.samples > SAMPLES_MAX)
+    if (stats.samples > SAMPLES_MAX) {
         stats.samples = SAMPLES_MAX;
+    }
 
     bool maybe4V = COSO_4V_maybe();
     bool maybe7V = COSO_7V_maybe();
     if ( !maybe4V && maybe7V ) {
         TFMX_7V_subInit();
+        TFMX_findSongs(TFMX_7V_SONGTAB_ENTRY_SIZE);
+    }
+    else if ( !isModPack) {
+        TFMX_findSongs(TFMX_SONGTAB_ENTRY_SIZE);
+    }
+    if (vSongs.size() < 1) {
+        return false;
     }
 
     // (NOTE) Debug output only. Sometimes number of samples is off by one.

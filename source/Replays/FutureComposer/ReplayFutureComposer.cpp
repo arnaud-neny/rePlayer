@@ -4,7 +4,9 @@
 // - Chris/SamplesFile.cpp
 // - Chris/TFMXDecoder.cpp
 // - Chris/TFMXDecoder.h
+// - Jochen/HippelDecoder.cpp
 // - Jochen/HippelDecoder.h
+// - Jochen/SampleSets.cpp
 // - Config.h
 // - Decoder.cpp
 // - Decoder.h
@@ -25,7 +27,7 @@
 #include "libtfmxaudiodecoder/src/Chris/TFMXDecoder.h"
 #include "libtfmxaudiodecoder/src/Jochen/HippelDecoder.h"
 
-#define VERSION "1.0.14"
+#define VERSION "1.0.17"
 
 namespace rePlayer
 {
