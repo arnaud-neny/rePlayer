@@ -1671,10 +1671,10 @@ namespace rePlayer
                             switch (sortTables[i][sortIdx])
                             {
                             case 0:
-                                d = _stricmp(l.GetTitle().data(), r.GetTitle().data());
+                                d = CompareStringMixedLogical(l.GetTitle().data(), r.GetTitle().data());
                                 break;
                             case 1:
-                                d = _stricmp(l.GetArtists().data(), r.GetArtists().data());
+                                d = CompareStringMixedLogical(l.GetArtists().data(), r.GetArtists().data());
                                 break;
                             case 2:
                                 d = (l.GetSong()->GetSubsongDurationCs(l.subsongId.index) / 100) - (r.GetSong()->GetSubsongDurationCs(r.subsongId.index) / 100);
