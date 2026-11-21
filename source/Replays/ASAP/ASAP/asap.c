@@ -43,6 +43,7 @@ static char *FuString_Format(const char *format, ...)
 	va_end(args);
 	return str;
 }
+typedef struct ASAPModuleTransfer ASAPModuleTransfer;
 typedef struct ASAPMptSamples ASAPMptSamples;
 
 typedef enum {
@@ -71,7 +72,6 @@ typedef enum {
 	ASAPModuleType_D15
 } ASAPModuleType;
 typedef struct DurationParser DurationParser;
-typedef struct ASAPNativeModuleWriter ASAPNativeModuleWriter;
 typedef struct Cpu6502 Cpu6502;
 
 typedef enum {
@@ -87,6 +87,32 @@ typedef struct FlashPack FlashPack;
 typedef struct PokeyChannel PokeyChannel;
 typedef struct Pokey Pokey;
 typedef struct PokeyPair PokeyPair;
+
+struct ASAPModuleTransfer {
+	uint8_t const *source;
+	int sourceOffset;
+	uint8_t *output;
+	int outputOffset;
+	int addressDiff;
+};
+
+static void ASAPModuleTransfer_WriteByte(ASAPModuleTransfer *self, int value);
+
+static void ASAPModuleTransfer_WriteWord(ASAPModuleTransfer *self, int value);
+
+static void ASAPModuleTransfer_WriteBytes(ASAPModuleTransfer *self, uint8_t const *source, int offset, int count);
+
+static int ASAPModuleTransfer_ReadWord(ASAPModuleTransfer *self);
+
+static void ASAPModuleTransfer_Copy(ASAPModuleTransfer *self, int count);
+
+static void ASAPModuleTransfer_RelocateBytes(ASAPModuleTransfer *self, int lowOffset, int highOffset, int count, int shift);
+
+static void ASAPModuleTransfer_RelocateLowHigh(ASAPModuleTransfer *self, int count);
+
+static void ASAPModuleTransfer_RelocateWords(ASAPModuleTransfer *self, int count);
+
+static void ASAPModuleTransfer_TransferModule(ASAPModuleTransfer *self, const ASAPInfo *info, int sourceEnd, bool header, bool rmtNames);
 
 typedef struct {
 	int (*load)(const ASAPFileLoader *self, const char *filename, uint8_t *buffer, int length);
@@ -226,9 +252,7 @@ static void Pokey_StartFrame(Pokey *self);
 
 static void Pokey_Initialize(Pokey *self, int sampleRate);
 
-static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta);
-
-static void Pokey_AddPokeyDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta, bool muted);
+static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta, bool muted);
 
 static void Pokey_AddExternalDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta);
 
@@ -242,9 +266,9 @@ static void Pokey_EndFrame(Pokey *self, const PokeyPair *pokeys, int cycle);
 
 static bool Pokey_IsSilent(const Pokey *self);
 
-static void Pokey_Mute(Pokey *self, int mask);
+static int Pokey_GetMute(const Pokey *self);
 
-static void Pokey_EndSongInit(Pokey *self);
+static void Pokey_Mute(Pokey *self, int mask);
 
 static void Pokey_InitMute(Pokey *self, int cycle);
 
@@ -314,6 +338,7 @@ struct ASAPInfo {
 	int player;
 	int covoxAddr;
 	int headerLen;
+	int mptSongBugExtra;
 	uint8_t songPos[32];
 };
 static void ASAPInfo_Construct(ASAPInfo *self);
@@ -338,6 +363,12 @@ static bool ASAPInfo_IsDltPatternEnd(uint8_t const *module, int pos, int i);
 static void ASAPInfo_ParseDltSong(ASAPInfo *self, uint8_t const *module, bool *seen, int pos);
 
 static bool ASAPInfo_ParseDlt(ASAPInfo *self, uint8_t const *module, int moduleLen);
+
+static int ASAPInfo_GetMptTrackAddress(uint8_t const *module, int ch);
+
+static int ASAPInfo_GetMptFirstInstrOrPatternAddr(uint8_t const *module);
+
+static int ASAPInfo_GetMptTrackLen(uint8_t const *module, int ch);
 
 static void ASAPInfo_ParseMptSong(ASAPInfo *self, uint8_t const *module, bool *globalSeen, int songLen, int pos);
 
@@ -382,6 +413,8 @@ static int ASAPInfo_ParseDec(uint8_t const *module, int i, int argEnd, int minVa
 static int ASAPInfo_ParseHex(uint8_t const *module, int i, int argEnd);
 
 static bool ASAPInfo_ValidateSap(uint8_t const *module, int moduleLen);
+
+static int ASAPInfo_GetFirstBlockLen(const ASAPInfo *self, uint8_t const *module);
 
 static int ASAPInfo_GetRmtSapOffset(const ASAPInfo *self, uint8_t const *module, int moduleLen);
 
@@ -453,7 +486,7 @@ static int ASAP_DoFrame(ASAP *self);
 
 static bool ASAP_Do6502Init(ASAP *self, int pc, int a, int x, int y);
 
-static bool ASAP_RestartSong(ASAP *self);
+static bool ASAP_RestartSong(ASAP *self, int muteMask);
 
 static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds);
 
@@ -476,27 +509,6 @@ struct DurationParser {
 static int DurationParser_ParseDigit(DurationParser *self, int max);
 
 static int DurationParser_Parse(DurationParser *self, const char *s);
-
-struct ASAPNativeModuleWriter {
-	ASAPWriter *writer;
-	uint8_t const *sourceModule;
-	int sourceOffset;
-	int addressDiff;
-};
-
-static int ASAPNativeModuleWriter_GetByte(const ASAPNativeModuleWriter *self, int offset);
-
-static int ASAPNativeModuleWriter_GetWord(const ASAPNativeModuleWriter *self, int offset);
-
-static bool ASAPNativeModuleWriter_Copy(const ASAPNativeModuleWriter *self, int endOffset);
-
-static bool ASAPNativeModuleWriter_RelocateBytes(const ASAPNativeModuleWriter *self, int lowOffset, int highOffset, int count, int shift);
-
-static bool ASAPNativeModuleWriter_RelocateLowHigh(const ASAPNativeModuleWriter *self, int count);
-
-static bool ASAPNativeModuleWriter_RelocateWords(const ASAPNativeModuleWriter *self, int count);
-
-static bool ASAPNativeModuleWriter_Write(ASAPNativeModuleWriter *self, const ASAPInfo *info, ASAPModuleType type, int moduleLen);
 
 typedef struct {
 	bool (*save)(ASAPWriter *self, const char *filename, uint8_t const *buffer, int offset, int length);
@@ -547,6 +559,16 @@ static bool ASAPWriter_WritePlaTaxLda0(ASAPWriter *self);
 static bool ASAPWriter_WriteCmcInit(ASAPWriter *self, const ASAPInfo *info);
 
 static bool ASAPWriter_WriteExecutableFromSap(ASAPWriter *self, bool toSap, const ASAPInfo *info, int type, uint8_t const *module, int moduleLen);
+
+/**
+ * Writes a native module, possibly extracting it from a SAP file.
+ * @param self This <code>ASAPWriter</code>.
+ * @param info Source file information, optionally with the address changed.
+ * @param module Contents of the source file.
+ * @param moduleLen Length of the source file.
+ * @return <code>NULL</code> on error.
+ */
+static uint8_t const *ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen, bool rmtNames);
 
 static int ASAPWriter_WriteExecutableHeaderForSongPos(ASAPWriter *self, bool toSap, const ASAPInfo *info, int type, int player, int codeForOneSong, int codeForManySongs, int playerOffset);
 
@@ -2192,7 +2214,7 @@ static const uint8_t FuResource_tmc_obx[2671] = {
 	156, 8, 157, 164, 8, 136, 177, 252, 41, 192, 24, 125, 228, 7, 157, 228,
 	7, 157, 34, 5, 168, 185, 60, 6, 157, 244, 7, 169, 0, 157, 44, 8,
 	157, 100, 8, 157, 108, 8, 157, 148, 8, 169, 1, 157, 188, 7, 96 };
-static const uint8_t FuResource_xexb_obx[183] = {
+static const uint8_t FuResource_xexb_obx[194] = {
 	255, 255, 36, 1, 223, 1, 120, 160, 0, 140, 14, 212, 173, 11, 212, 208,
 	251, 141, 0, 212, 162, 29, 157, 0, 208, 202, 16, 250, 162, 15, 157, 16,
 	210, 157, 0, 210, 202, 16, 247, 169, 3, 141, 31, 210, 141, 15, 210, 169,
@@ -2204,8 +2226,9 @@ static const uint8_t FuResource_xexb_obx[183] = {
 	189, 220, 1, 105, 125, 176, 5, 221, 210, 1, 144, 4, 253, 210, 1, 56,
 	141, 162, 1, 189, 222, 1, 105, 0, 141, 181, 1, 201, 0, 208, 252, 173,
 	162, 1, 176, 198, 72, 138, 72, 174, 145, 1, 32, 152, 252, 104, 170, 104,
-	238, 186, 1, 64, 156, 131, 76 };
-static const uint8_t FuResource_xexd_obx[114] = {
+	238, 186, 1, 64, 156, 131, 76, 0, 0, 76, 0, 0, 0, 0, 0, 0,
+	0, 0 };
+static const uint8_t FuResource_xexd_obx[120] = {
 	255, 255, 36, 1, 149, 1, 120, 160, 0, 140, 14, 212, 173, 11, 212, 208,
 	251, 141, 0, 212, 162, 29, 157, 0, 208, 202, 16, 250, 162, 15, 157, 16,
 	210, 157, 0, 210, 202, 16, 247, 169, 3, 141, 31, 210, 141, 15, 210, 169,
@@ -2213,7 +2236,7 @@ static const uint8_t FuResource_xexd_obx[114] = {
 	169, 1, 141, 251, 255, 169, 64, 141, 14, 212, 173, 149, 1, 88, 76, 143,
 	1, 40, 8, 72, 138, 72, 152, 72, 32, 146, 1, 174, 53, 1, 240, 11,
 	174, 20, 208, 202, 240, 2, 162, 1, 32, 152, 252, 104, 168, 104, 170, 104,
-	64, 76 };
+	64, 76, 0, 0, 76, 0, 0, 0 };
 static const uint8_t FuResource_xexinfo_obx[178] = {
 	255, 255, 112, 252, 221, 252, 65, 80, 252, 173, 11, 212, 208, 251, 141, 5,
 	212, 162, 38, 142, 22, 208, 162, 10, 142, 23, 208, 162, 33, 142, 0, 212,
@@ -2227,6 +2250,172 @@ static const uint8_t FuResource_xexinfo_obx[178] = {
 	211, 185, 0, 224, 72, 185, 0, 225, 72, 185, 0, 227, 202, 142, 1, 211,
 	232, 153, 0, 255, 104, 153, 0, 254, 104, 153, 0, 253, 200, 208, 223, 32,
 	115, 252 };
+
+static void ASAPModuleTransfer_WriteByte(ASAPModuleTransfer *self, int value)
+{
+	self->output[self->outputOffset++] = (uint8_t) value;
+}
+
+static void ASAPModuleTransfer_WriteWord(ASAPModuleTransfer *self, int value)
+{
+	ASAPModuleTransfer_WriteByte(self, value & 255);
+	ASAPModuleTransfer_WriteByte(self, value >> 8);
+}
+
+static void ASAPModuleTransfer_WriteBytes(ASAPModuleTransfer *self, uint8_t const *source, int offset, int count)
+{
+	memcpy(self->output + self->outputOffset, source + offset, count);
+	self->outputOffset += count;
+}
+
+static int ASAPModuleTransfer_ReadWord(ASAPModuleTransfer *self)
+{
+	int value = ASAPInfo_GetWord(self->source, self->sourceOffset);
+	self->sourceOffset += 2;
+	return value;
+}
+
+static void ASAPModuleTransfer_Copy(ASAPModuleTransfer *self, int count)
+{
+	ASAPModuleTransfer_WriteBytes(self, self->source, self->sourceOffset, count);
+	self->sourceOffset += count;
+}
+
+static void ASAPModuleTransfer_RelocateBytes(ASAPModuleTransfer *self, int lowOffset, int highOffset, int count, int shift)
+{
+	lowOffset += self->sourceOffset;
+	highOffset += self->sourceOffset;
+	for (int i = 0; i < count; i++) {
+		int address = self->source[lowOffset + i] + (self->source[highOffset + i] << 8);
+		if (address != 0 && address != 65535)
+			address += self->addressDiff;
+		ASAPModuleTransfer_WriteByte(self, address >> shift & 255);
+	}
+	self->sourceOffset += count;
+}
+
+static void ASAPModuleTransfer_RelocateLowHigh(ASAPModuleTransfer *self, int count)
+{
+	ASAPModuleTransfer_RelocateBytes(self, 0, count, count, 0);
+	ASAPModuleTransfer_RelocateBytes(self, -count, 0, count, 8);
+}
+
+static void ASAPModuleTransfer_RelocateWords(ASAPModuleTransfer *self, int count)
+{
+	while (--count >= 0) {
+		int address = ASAPModuleTransfer_ReadWord(self);
+		if (address != 0 && address != 65535)
+			address += self->addressDiff;
+		ASAPModuleTransfer_WriteWord(self, address);
+	}
+}
+
+static void ASAPModuleTransfer_TransferModule(ASAPModuleTransfer *self, const ASAPInfo *info, int sourceEnd, bool header, bool rmtNames)
+{
+	self->sourceOffset += 2;
+	int startAddr = ASAPModuleTransfer_ReadWord(self);
+	int endAddr = ASAPModuleTransfer_ReadWord(self);
+	self->addressDiff = info->music < 0 ? 0 : info->music - startAddr;
+	if (header) {
+		ASAPModuleTransfer_WriteWord(self, 65535);
+		ASAPModuleTransfer_WriteWord(self, startAddr + self->addressDiff);
+		ASAPModuleTransfer_WriteWord(self, endAddr + self->addressDiff);
+	}
+	switch (info->originalType) {
+	case ASAPModuleType_CMC:
+	case ASAPModuleType_CM3:
+	case ASAPModuleType_CMR:
+	case ASAPModuleType_CMS:
+		ASAPModuleTransfer_Copy(self, 20);
+		ASAPModuleTransfer_RelocateLowHigh(self, 64);
+		break;
+	case ASAPModuleType_DLT:
+		break;
+	case ASAPModuleType_MPT:
+	case ASAPModuleType_MD1:
+	case ASAPModuleType_MD2:
+		;
+		int trackAddr[5];
+		trackAddr[4] = 0;
+		for (int i = 0; i < 96; i++) {
+			int address = ASAPModuleTransfer_ReadWord(self);
+			if (address != 0) {
+				address += self->addressDiff;
+				if (trackAddr[4] == 0)
+					trackAddr[4] = address;
+			}
+			ASAPModuleTransfer_WriteWord(self, address);
+		}
+		if (trackAddr[4] == 0)
+			trackAddr[4] = endAddr + 1 + self->addressDiff;
+		ASAPModuleTransfer_Copy(self, 256);
+		for (int ch = 0; ch < 4; ch++) {
+			int address = self->source[self->sourceOffset + ch] + (self->source[self->sourceOffset + 4 + ch] << 8) + self->addressDiff;
+			trackAddr[ch] = address;
+			ASAPModuleTransfer_WriteByte(self, address & 255);
+		}
+		for (int ch = 0; ch < 4; ch++)
+			ASAPModuleTransfer_WriteByte(self, trackAddr[ch] >> 8);
+		self->sourceOffset += 8;
+		if (info->mptSongBugExtra != 0) {
+			int track0Len = trackAddr[1] - trackAddr[0];
+			ASAPModuleTransfer_Copy(self, 2 + track0Len);
+			for (int ch = 1; ch < 4; ch++) {
+				int trackLen = trackAddr[ch + 1] - trackAddr[ch];
+				if (trackLen <= track0Len) {
+					ASAPModuleTransfer_Copy(self, trackLen);
+					self->sourceOffset += track0Len - trackLen;
+				}
+				else {
+					ASAPModuleTransfer_Copy(self, track0Len);
+					for (; trackLen > track0Len; trackLen--)
+						ASAPModuleTransfer_WriteByte(self, 255);
+				}
+			}
+		}
+		break;
+	case ASAPModuleType_RMT:
+		;
+		int startOffset = self->sourceOffset;
+		int channels = self->source[startOffset + 3] - '0';
+		ASAPModuleTransfer_Copy(self, 8);
+		int patternLowAddr = ASAPInfo_GetWord(self->source, startOffset + 10);
+		int patternHighAddr = ASAPInfo_GetWord(self->source, startOffset + 12);
+		int songAddr = ASAPInfo_GetWord(self->source, startOffset + 14);
+		ASAPModuleTransfer_RelocateWords(self, (patternLowAddr - startAddr - 8) >> 1);
+		ASAPModuleTransfer_RelocateLowHigh(self, patternHighAddr - patternLowAddr);
+		ASAPModuleTransfer_Copy(self, songAddr - startAddr + startOffset - self->sourceOffset);
+		int songEnd = endAddr + 1 - startAddr + startOffset;
+		while (self->sourceOffset < songEnd) {
+			int songLineLen = FuInt_Min(channels, songEnd - self->sourceOffset);
+			if (songLineLen >= 4 && self->source[self->sourceOffset] == 254) {
+				ASAPModuleTransfer_Copy(self, 2);
+				ASAPModuleTransfer_RelocateWords(self, 1);
+				songLineLen -= 4;
+			}
+			ASAPModuleTransfer_Copy(self, songLineLen);
+		}
+		if (!rmtNames)
+			return;
+		if (sourceEnd >= songEnd + 5)
+			ASAPModuleTransfer_RelocateWords(self, 2);
+		break;
+	case ASAPModuleType_TMC:
+		ASAPModuleTransfer_Copy(self, 32);
+		ASAPModuleTransfer_RelocateLowHigh(self, 64);
+		ASAPModuleTransfer_RelocateLowHigh(self, 128);
+		break;
+	case ASAPModuleType_TM2:
+		ASAPModuleTransfer_Copy(self, 128);
+		ASAPModuleTransfer_RelocateBytes(self, 0, 640, 128, 0);
+		ASAPModuleTransfer_RelocateLowHigh(self, 256);
+		ASAPModuleTransfer_RelocateBytes(self, -640, 0, 128, 8);
+		break;
+	default:
+		abort();
+	}
+	ASAPModuleTransfer_Copy(self, sourceEnd - self->sourceOffset);
+}
 
 static bool ASAPMptSamples_DoLoad(ASAPMptSamples *self, const ASAPFileLoader *loader, const char *moduleFilename, ptrdiff_t moduleFilenameLength, int extNumber)
 {
@@ -2487,14 +2676,14 @@ static void ASAP_Call6502Player(ASAP *self)
 		break;
 	case ASAPModuleType_TMC:
 		if (--self->tmcPerFrameCounter <= 0) {
-			self->tmcPerFrameCounter = self->cpu.memory[ASAPInfo_GetMusicAddress(&self->moduleInfo) + 31];
+			self->tmcPerFrameCounter = self->cpu.memory[self->moduleInfo.music + 31];
 			ASAP_Call6502(self, player + 3);
 		}
 		else
 			ASAP_Call6502(self, player + 6);
 		break;
 	case ASAPModuleType_D15:
-		if (self->cpu.cycle < 1254 || self->mptSamplesCurrentAddress >> 8 >= self->cpu.memory[ASAPInfo_GetMusicAddress(&self->moduleInfo) + 16 + self->currentSong])
+		if (self->cpu.cycle < 1254 || self->mptSamplesCurrentAddress >> 8 >= self->cpu.memory[self->moduleInfo.music + 16 + self->currentSong])
 			break;
 		int b = self->cpu.memory[self->mptSamplesCurrentAddress];
 		if (self->mptSamplesSecondNibble) {
@@ -2579,39 +2768,45 @@ bool ASAP_LoadWithExtraFiles(ASAP *self, const char *filename, uint8_t const *mo
 {
 	if (!ASAPInfo_Load(&self->moduleInfo, filename, module, moduleLen))
 		return false;
+	memset(self->cpu.memory, 0, sizeof(self->cpu.memory));
+	int music = self->moduleInfo.music;
+	if (self->moduleInfo.type == ASAPModuleType_D15) {
+		memcpy(self->cpu.memory + music, module, moduleLen);
+		return true;
+	}
 	uint8_t const *playerRoutine = ASAP6502_GetPlayerRoutine(&self->moduleInfo);
 	if (playerRoutine != NULL) {
 		int player = ASAPInfo_GetWord(playerRoutine, 2);
-		int playerLastByte = ASAPInfo_GetWord(playerRoutine, 4);
-		int music = ASAPInfo_GetMusicAddress(&self->moduleInfo);
-		if (music <= playerLastByte)
-			return false;
-		if (self->moduleInfo.type == ASAPModuleType_MD1 || self->moduleInfo.type == ASAPModuleType_MD2) {
-			if (loader == NULL)
-				return false;
-			ASAPMptSamples samples;
-			if (!ASAPMptSamples_Load(&samples, loader, filename))
-				return false;
-			ASAPMptSamples_Relocate(&samples, music, music + moduleLen - 5);
-			self->mptSamplesPage = samples.content[0];
-			self->mptSamples15kHz = samples.is15kHz;
-			memcpy(self->cpu.memory + ((self->mptSamplesPage << 8) - 32), samples.content, samples.contentLength);
-		}
-		self->cpu.memory[19456] = 0;
 		if (self->moduleInfo.type == ASAPModuleType_FC)
 			memcpy(self->cpu.memory + music, module, moduleLen);
-		else
-			memcpy(self->cpu.memory + music, module + 6, moduleLen - 6);
+		else {
+			int musicLow = self->moduleInfo.type == ASAPModuleType_TM2 ? 5120 : 4096;
+			if (music < musicLow)
+				self->moduleInfo.music = music = musicLow;
+			if (self->moduleInfo.type == ASAPModuleType_MD1 || self->moduleInfo.type == ASAPModuleType_MD2) {
+				if (loader == NULL)
+					return false;
+				ASAPMptSamples samples;
+				if (!ASAPMptSamples_Load(&samples, loader, filename))
+					return false;
+				ASAPMptSamples_Relocate(&samples, music, music + moduleLen - 5);
+				self->mptSamplesPage = samples.content[0];
+				self->mptSamples15kHz = samples.is15kHz;
+				memcpy(self->cpu.memory + ((self->mptSamplesPage << 8) - 32), samples.content, samples.contentLength);
+			}
+			ASAPModuleTransfer trans;
+			trans.source = module;
+			trans.sourceOffset = 0;
+			trans.output = self->cpu.memory;
+			trans.outputOffset = music;
+			ASAPModuleTransfer_TransferModule(&trans, &self->moduleInfo, moduleLen, false, false);
+		}
+		int playerLastByte = ASAPInfo_GetWord(playerRoutine, 4);
 		memcpy(self->cpu.memory + player, playerRoutine + 6, playerLastByte + 1 - player);
 		if (self->moduleInfo.player < 0)
 			self->moduleInfo.player = player;
 		return true;
 	}
-	if (self->moduleInfo.type == ASAPModuleType_D15) {
-		memcpy(self->cpu.memory + ASAPInfo_GetMusicAddress(&self->moduleInfo), module, moduleLen);
-		return true;
-	}
-	memset(self->cpu.memory, 0, sizeof(self->cpu.memory));
 	int moduleIndex = self->moduleInfo.headerLen + 2;
 	while (moduleIndex + 5 <= moduleLen) {
 		int startAddr = ASAPInfo_GetWord(module, moduleIndex);
@@ -2652,7 +2847,13 @@ static bool ASAP_Do6502Init(ASAP *self, int pc, int a, int x, int y)
 	return false;
 }
 
-static bool ASAP_RestartSong(ASAP *self)
+void ASAP_MutePokeyChannels(ASAP *self, int mask)
+{
+	Pokey_Mute(&self->pokeys.basePokey, mask);
+	Pokey_Mute(&self->pokeys.extraPokey, mask >> 4);
+}
+
+static bool ASAP_RestartSong(ASAP *self, int muteMask)
 {
 	self->nextPlayerCycle = 8388608;
 	self->blocksPlayed = 0;
@@ -2665,8 +2866,9 @@ static bool ASAP_RestartSong(ASAP *self)
 	self->covox[2] = 128;
 	self->covox[3] = 128;
 	PokeyPair_Initialize(&self->pokeys, ASAPInfo_IsNtsc(&self->moduleInfo), ASAPInfo_GetChannels(&self->moduleInfo) > 1, self->currentSampleRate);
+	ASAP_MutePokeyChannels(self, 255);
 	int player = self->moduleInfo.player;
-	int music = ASAPInfo_GetMusicAddress(&self->moduleInfo);
+	int music = self->moduleInfo.music;
 	switch (self->moduleInfo.type) {
 	case ASAPModuleType_SAP_B:
 		if (!ASAP_Do6502Init(self, ASAPInfo_GetInitAddress(&self->moduleInfo), self->currentSong, 0, 0))
@@ -2729,14 +2931,13 @@ static bool ASAP_RestartSong(ASAP *self)
 			return false;
 		break;
 	case ASAPModuleType_D15:
-		self->mptSamplesCurrentAddress = self->cpu.memory[ASAPInfo_GetMusicAddress(&self->moduleInfo) + self->currentSong] << 8;
+		self->mptSamplesCurrentAddress = self->cpu.memory[self->moduleInfo.music + self->currentSong] << 8;
 		self->mptSamplesSecondNibble = false;
 		self->cpu.memory[53760] = 210;
 		self->cpu.pc = 53760;
 		break;
 	}
-	Pokey_EndSongInit(&self->pokeys.basePokey);
-	Pokey_EndSongInit(&self->pokeys.extraPokey);
+	ASAP_MutePokeyChannels(self, muteMask);
 	self->nextPlayerCycle = 0;
 	return true;
 }
@@ -2747,13 +2948,7 @@ bool ASAP_PlaySong(ASAP *self, int song, int duration)
 		return false;
 	self->currentSong = song;
 	self->currentDuration = duration;
-	return ASAP_RestartSong(self);
-}
-
-void ASAP_MutePokeyChannels(ASAP *self, int mask)
-{
-	Pokey_Mute(&self->pokeys.basePokey, mask);
-	Pokey_Mute(&self->pokeys.extraPokey, mask >> 4);
+	return ASAP_RestartSong(self, 0);
 }
 
 int ASAP_GetBlocksPlayed(const ASAP *self)
@@ -2775,7 +2970,7 @@ static int ASAP_MillisecondsToBlocks(const ASAP *self, int milliseconds)
 bool ASAP_SeekSample(ASAP *self, int block)
 {
 	if (block < self->blocksPlayed) {
-		if (!ASAP_RestartSong(self))
+		if (!ASAP_RestartSong(self, Pokey_GetMute(&self->pokeys.basePokey) | Pokey_GetMute(&self->pokeys.extraPokey) << 4))
 			return false;
 	}
 	while (self->blocksPlayed + self->pokeys.readySamplesEnd < block) {
@@ -3244,9 +3439,30 @@ static bool ASAPInfo_ParseDlt(ASAPInfo *self, uint8_t const *module, int moduleL
 	return true;
 }
 
+static int ASAPInfo_GetMptTrackAddress(uint8_t const *module, int ch)
+{
+	return module[454 + ch] + (module[458 + ch] << 8);
+}
+
+static int ASAPInfo_GetMptFirstInstrOrPatternAddr(uint8_t const *module)
+{
+	for (int offset = 6; offset < 198; offset += 2) {
+		int addr = ASAPInfo_GetWord(module, offset);
+		if (addr != 0)
+			return addr;
+	}
+	return ASAPInfo_GetWord(module, 4) + 1;
+}
+
+static int ASAPInfo_GetMptTrackLen(uint8_t const *module, int ch)
+{
+	int endAddr = ch == 3 ? ASAPInfo_GetMptFirstInstrOrPatternAddr(module) : ASAPInfo_GetMptTrackAddress(module, ch + 1);
+	return endAddr - ASAPInfo_GetMptTrackAddress(module, ch);
+}
+
 static void ASAPInfo_ParseMptSong(ASAPInfo *self, uint8_t const *module, bool *globalSeen, int songLen, int pos)
 {
-	int addrToOffset = ASAPInfo_GetWord(module, 2) - 6;
+	int addrToOffset = ASAPInfo_GetWord(module, 2) - 6 - self->mptSongBugExtra;
 	int tempo = module[463];
 	int playerCalls = 0;
 	uint8_t seen[256] = { 0 };
@@ -3261,19 +3477,21 @@ static void ASAPInfo_ParseMptSong(ASAPInfo *self, uint8_t const *module, bool *g
 		}
 		seen[pos] = 1;
 		globalSeen[pos] = true;
-		int i = module[464 + pos * 2];
+		int i = module[464 + (pos << 1)];
 		if (i == 255) {
-			pos = module[465 + pos * 2];
+			pos = module[465 + (pos << 1)];
 			continue;
 		}
 		int ch;
 		for (ch = 3; ch >= 0; ch--) {
-			i = module[454 + ch] + (module[458 + ch] << 8) - addrToOffset;
-			i = module[i + pos * 2];
+			if (self->mptSongBugExtra == 0)
+				i = ASAPInfo_GetMptTrackAddress(module, ch) - addrToOffset;
+			else
+				i = 464 + ch * ASAPInfo_GetMptTrackLen(module, 0);
+			i = module[i + (pos << 1)];
 			if (i >= 64)
 				break;
-			i <<= 1;
-			i = ASAPInfo_GetWord(module, 70 + i);
+			i = ASAPInfo_GetWord(module, 70 + (i << 1));
 			patternOffset[ch] = i == 0 ? 0 : i - addrToOffset;
 			blankRowsCounter[ch] = 0;
 		}
@@ -3321,12 +3539,18 @@ static bool ASAPInfo_ParseMpt(ASAPInfo *self, uint8_t const *module, int moduleL
 	if (moduleLen < 464)
 		return false;
 	self->originalType = self->type = type;
+	int track0Len = ASAPInfo_GetMptTrackLen(module, 0);
+	if (7 + ASAPInfo_GetWord(module, 4) - ASAPInfo_GetWord(module, 2) == moduleLen)
+		self->mptSongBugExtra = 0;
+	else {
+		self->mptSongBugExtra = 3 * track0Len + ASAPInfo_GetMptTrackAddress(module, 1) - ASAPInfo_GetMptFirstInstrOrPatternAddr(module);
+		moduleLen -= self->mptSongBugExtra;
+	}
 	if (!ASAPInfo_ParseModule(self, module, moduleLen))
 		return false;
-	int track0Addr = ASAPInfo_GetWord(module, 2) + 458;
-	if (module[454] + (module[458] << 8) != track0Addr)
+	if (ASAPInfo_GetMptTrackAddress(module, 0) != ASAPInfo_GetWord(module, 2) + 458)
 		return false;
-	int songLen = (module[455] + (module[459] << 8) - track0Addr) >> 1;
+	int songLen = track0Len >> 1;
 	if (songLen > 254)
 		return false;
 	bool globalSeen[256] = { false };
@@ -4050,11 +4274,16 @@ static bool ASAPInfo_ValidateSap(uint8_t const *module, int moduleLen)
 	return moduleLen >= 30 && ASAPInfo_HasStringAt(module, 0, "SAP\r\n");
 }
 
+static int ASAPInfo_GetFirstBlockLen(const ASAPInfo *self, uint8_t const *module)
+{
+	return ASAPInfo_GetWord(module, self->headerLen + 4) - ASAPInfo_GetWord(module, self->headerLen + 2) + 7;
+}
+
 static int ASAPInfo_GetRmtSapOffset(const ASAPInfo *self, uint8_t const *module, int moduleLen)
 {
 	if (self->player != 13315)
 		return -1;
-	int offset = self->headerLen + ASAPInfo_GetWord(module, self->headerLen + 4) - ASAPInfo_GetWord(module, self->headerLen + 2) + 7;
+	int offset = self->headerLen + ASAPInfo_GetFirstBlockLen(self, module);
 	if (offset + 6 >= moduleLen || module[offset + 4] != 'R' || module[offset + 5] != 'M' || module[offset + 6] != 'T')
 		return -1;
 	return offset;
@@ -4713,150 +4942,6 @@ const char *ASAPInfo_GetOriginalModuleExt(const ASAPInfo *self)
 	}
 }
 
-static int ASAPNativeModuleWriter_GetByte(const ASAPNativeModuleWriter *self, int offset)
-{
-	return self->sourceModule[self->sourceOffset + offset];
-}
-
-static int ASAPNativeModuleWriter_GetWord(const ASAPNativeModuleWriter *self, int offset)
-{
-	return ASAPInfo_GetWord(self->sourceModule, self->sourceOffset + offset);
-}
-
-static bool ASAPNativeModuleWriter_Copy(const ASAPNativeModuleWriter *self, int endOffset)
-{
-	return ASAPWriter_WriteBytes(self->writer, self->sourceModule, self->sourceOffset + ASAPWriter_GetOutputLength(self->writer), self->sourceOffset + endOffset);
-}
-
-static bool ASAPNativeModuleWriter_RelocateBytes(const ASAPNativeModuleWriter *self, int lowOffset, int highOffset, int count, int shift)
-{
-	lowOffset += self->sourceOffset;
-	highOffset += self->sourceOffset;
-	for (int i = 0; i < count; i++) {
-		int address = self->sourceModule[lowOffset + i] + (self->sourceModule[highOffset + i] << 8);
-		if (address != 0 && address != 65535)
-			address += self->addressDiff;
-		if (!ASAPWriter_WriteByte(self->writer, address >> shift & 255))
-			return false;
-	}
-	return true;
-}
-
-static bool ASAPNativeModuleWriter_RelocateLowHigh(const ASAPNativeModuleWriter *self, int count)
-{
-	int lowOffset = ASAPWriter_GetOutputLength(self->writer);
-	if (!ASAPNativeModuleWriter_RelocateBytes(self, lowOffset, lowOffset + count, count, 0))
-		return false;
-	return ASAPNativeModuleWriter_RelocateBytes(self, lowOffset, lowOffset + count, count, 8);
-}
-
-static bool ASAPNativeModuleWriter_RelocateWords(const ASAPNativeModuleWriter *self, int count)
-{
-	while (--count >= 0) {
-		int address = ASAPNativeModuleWriter_GetWord(self, ASAPWriter_GetOutputLength(self->writer));
-		if (address != 0 && address != 65535)
-			address += self->addressDiff;
-		if (!ASAPWriter_WriteWord(self->writer, address))
-			return false;
-	}
-	return true;
-}
-
-static bool ASAPNativeModuleWriter_Write(ASAPNativeModuleWriter *self, const ASAPInfo *info, ASAPModuleType type, int moduleLen)
-{
-	int startAddr = ASAPNativeModuleWriter_GetWord(self, 2);
-	self->addressDiff = ASAPInfo_GetMusicAddress(info) < 0 ? 0 : ASAPInfo_GetMusicAddress(info) - startAddr;
-	if (ASAPNativeModuleWriter_GetWord(self, 4) + self->addressDiff > 65535)
-		return false;
-	switch (type) {
-	case ASAPModuleType_CMC:
-	case ASAPModuleType_CM3:
-	case ASAPModuleType_CMR:
-	case ASAPModuleType_CMS:
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 3))
-			return false;
-		if (!ASAPNativeModuleWriter_Copy(self, 26))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, 64))
-			return false;
-		break;
-	case ASAPModuleType_DLT:
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 3))
-			return false;
-		break;
-	case ASAPModuleType_MPT:
-	case ASAPModuleType_MD1:
-	case ASAPModuleType_MD2:
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 99))
-			return false;
-		if (!ASAPNativeModuleWriter_Copy(self, 454))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, 4))
-			return false;
-		break;
-	case ASAPModuleType_RMT:
-		if (!ASAPWriter_WriteWord(self->writer, 65535))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 2))
-			return false;
-		if (!ASAPNativeModuleWriter_Copy(self, 14))
-			return false;
-		int patternLowAddress = ASAPNativeModuleWriter_GetWord(self, 16);
-		if (!ASAPNativeModuleWriter_RelocateWords(self, (patternLowAddress - startAddr - 8) >> 1))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, ASAPNativeModuleWriter_GetWord(self, 18) - patternLowAddress))
-			return false;
-		int songOffset = 6 + ASAPNativeModuleWriter_GetWord(self, 20) - startAddr;
-		if (!ASAPNativeModuleWriter_Copy(self, songOffset))
-			return false;
-		int songEnd = 7 + ASAPNativeModuleWriter_GetWord(self, 4) - startAddr;
-		while (songOffset + 3 < songEnd) {
-			int nextSongOffset = FuInt_Min(songOffset + ASAPNativeModuleWriter_GetByte(self, 9) - '0', songEnd);
-			if (ASAPNativeModuleWriter_GetByte(self, songOffset) == 254) {
-				if (!ASAPNativeModuleWriter_Copy(self, songOffset + 2))
-					return false;
-				if (!ASAPNativeModuleWriter_RelocateWords(self, 1))
-					return false;
-			}
-			if (!ASAPNativeModuleWriter_Copy(self, nextSongOffset))
-				return false;
-			songOffset = nextSongOffset;
-		}
-		if (!ASAPNativeModuleWriter_Copy(self, songEnd))
-			return false;
-		if (moduleLen >= songEnd + 5) {
-			if (!ASAPNativeModuleWriter_RelocateWords(self, 2))
-				return false;
-		}
-		break;
-	case ASAPModuleType_TMC:
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 3))
-			return false;
-		if (!ASAPNativeModuleWriter_Copy(self, 38))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, 64))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, 128))
-			return false;
-		break;
-	case ASAPModuleType_TM2:
-		if (!ASAPNativeModuleWriter_RelocateWords(self, 3))
-			return false;
-		if (!ASAPNativeModuleWriter_Copy(self, 134))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateBytes(self, 134, 774, 128, 0))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateLowHigh(self, 256))
-			return false;
-		if (!ASAPNativeModuleWriter_RelocateBytes(self, 134, 774, 128, 8))
-			return false;
-		break;
-	default:
-		return false;
-	}
-	return ASAPNativeModuleWriter_Copy(self, moduleLen);
-}
-
 static void ASAPWriter_Construct(ASAPWriter *self)
 {
 	static const ASAPWriterVtbl vtbl = {
@@ -5084,7 +5169,7 @@ static bool ASAPWriter_WriteSapHeader(ASAPWriter *self, const ASAPInfo *info, in
 			return false;
 	}
 	if (type == 'C') {
-		if (!ASAPWriter_WriteHexSapTag(self, "MUSIC ", ASAPInfo_GetMusicAddress(info)))
+		if (!ASAPWriter_WriteHexSapTag(self, "MUSIC ", info->music))
 			return false;
 	}
 	if (!ASAPWriter_WriteHexSapTag(self, "INIT ", self->init))
@@ -5132,14 +5217,13 @@ static bool ASAPWriter_WriteCmcInit(ASAPWriter *self, const ASAPInfo *info)
 		return false;
 	if (!ASAPWriter_WriteByte(self, 72))
 		return false;
-	int music = ASAPInfo_GetMusicAddress(info);
 	if (!ASAPWriter_WriteByte(self, 162))
 		return false;
-	if (!ASAPWriter_WriteByte(self, music & 255))
+	if (!ASAPWriter_WriteByte(self, info->music & 255))
 		return false;
 	if (!ASAPWriter_WriteByte(self, 160))
 		return false;
-	if (!ASAPWriter_WriteByte(self, music >> 8))
+	if (!ASAPWriter_WriteByte(self, info->music >> 8))
 		return false;
 	if (!ASAPWriter_WriteByte(self, 169))
 		return false;
@@ -5171,6 +5255,45 @@ static bool ASAPWriter_WriteExecutableFromSap(ASAPWriter *self, bool toSap, cons
 	return ASAPWriter_WriteBytes(self, module, info->headerLen, moduleLen);
 }
 
+static uint8_t const *ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen, bool rmtNames)
+{
+	ASAPModuleTransfer trans;
+	trans.source = module;
+	trans.output = self->output;
+	trans.outputOffset = self->outputLen;
+	switch (info->type) {
+	case ASAPModuleType_SAP_B:
+	case ASAPModuleType_SAP_C:
+	case ASAPModuleType_SAP_D:
+		;
+		int offset = ASAPInfo_GetRmtSapOffset(info, module, moduleLen);
+		if (offset > 0) {
+			trans.sourceOffset = offset - 2;
+			ASAPModuleTransfer_TransferModule(&trans, info, moduleLen, true, false);
+			break;
+		}
+		trans.sourceOffset = info->headerLen;
+		int blockLen = ASAPInfo_GetFirstBlockLen(info, module);
+		if (blockLen < 7 || trans.sourceOffset + blockLen >= moduleLen)
+			return NULL;
+		if (info->originalType == ASAPModuleType_FC)
+			ASAPModuleTransfer_WriteBytes(&trans, module, trans.sourceOffset + 6, blockLen - 6);
+		else
+			ASAPModuleTransfer_TransferModule(&trans, info, trans.sourceOffset + blockLen, true, false);
+		break;
+	case ASAPModuleType_FC:
+	case ASAPModuleType_D15:
+		ASAPModuleTransfer_WriteBytes(&trans, module, 0, moduleLen);
+		break;
+	default:
+		trans.sourceOffset = 0;
+		ASAPModuleTransfer_TransferModule(&trans, info, moduleLen, true, rmtNames);
+		break;
+	}
+	self->outputLen = trans.outputOffset;
+	return self->output;
+}
+
 static int ASAPWriter_WriteExecutableHeaderForSongPos(ASAPWriter *self, bool toSap, const ASAPInfo *info, int type, int player, int codeForOneSong, int codeForManySongs, int playerOffset)
 {
 	self->player = player + playerOffset;
@@ -5198,14 +5321,13 @@ static bool ASAPWriter_WriteMptInit(ASAPWriter *self, const ASAPInfo *info, int 
 		if (!ASAPWriter_WriteByte(self, 72))
 			return false;
 	}
-	int music = ASAPInfo_GetMusicAddress(info);
 	if (!ASAPWriter_WriteByte(self, 160))
 		return false;
-	if (!ASAPWriter_WriteByte(self, music & 255))
+	if (!ASAPWriter_WriteByte(self, info->music & 255))
 		return false;
 	if (!ASAPWriter_WriteByte(self, 162))
 		return false;
-	if (!ASAPWriter_WriteByte(self, music >> 8))
+	if (!ASAPWriter_WriteByte(self, info->music >> 8))
 		return false;
 	if (!ASAPWriter_WriteByte(self, 169))
 		return false;
@@ -5244,7 +5366,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 	uint8_t const *playerRoutine = ASAP6502_GetPlayerRoutine(info);
 	int player = -1;
 	int playerLastByte = -1;
-	int music = ASAPInfo_GetMusicAddress(info);
+	int music = info->music;
 	if (playerRoutine != NULL) {
 		player = ASAPInfo_GetWord(playerRoutine, 2);
 		playerLastByte = ASAPInfo_GetWord(playerRoutine, 4);
@@ -5284,9 +5406,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 			if (!ASAPWriter_WriteSapHeader(self, info, 'C'))
 				return false;
 		}
-		if (!ASAPWriter_WriteWord(self, 65535))
-			return false;
-		if (!ASAPWriter_WriteBytes(self, module, 2, moduleLen))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteBytes(self, playerRoutine, 2, playerLastByte - player + 7))
 			return false;
@@ -5342,7 +5462,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 	case ASAPModuleType_MPT:
 		if ((startAddr = ASAPWriter_WriteExecutableHeaderForSongPos(self, toSap, info, 'B', player, 13, 17, 3)) == -1)
 			return false;
-		if (!ASAPWriter_WriteBytes(self, module, 0, moduleLen))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteWord(self, startAddr))
 			return false;
@@ -5367,7 +5487,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 		int codeForOneSong = info->type == ASAPModuleType_MD1 ? 29 : 27;
 		if ((startAddr = ASAPWriter_WriteExecutableHeaderForSongPos(self, toSap, info, 'D', player, codeForOneSong, codeForOneSong + 4, 3)) == -1)
 			return false;
-		if (!ASAPWriter_WriteBytes(self, module, 0, moduleLen))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteByte(self, 224))
 			return false;
@@ -5433,7 +5553,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 			if (!ASAPWriter_WriteSapHeader(self, info, 'B'))
 				return false;
 		}
-		if (!ASAPWriter_WriteBytes(self, module, 0, ASAPInfo_GetWord(module, 4) - music + 7))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteWord(self, 3200))
 			return false;
@@ -5487,7 +5607,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 			if (!ASAPWriter_WriteSapHeader(self, info, 'B'))
 				return false;
 		}
-		if (!ASAPWriter_WriteBytes(self, module, 0, moduleLen))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteWord(self, self->init))
 			return false;
@@ -5600,7 +5720,7 @@ static bool ASAPWriter_WriteExecutable(ASAPWriter *self, bool toSap, const ASAPI
 			if (!ASAPWriter_WriteSapHeader(self, info, 'B'))
 				return false;
 		}
-		if (!ASAPWriter_WriteBytes(self, module, 0, moduleLen))
+		if (ASAPWriter_WriteNative(self, info, module, moduleLen, false) == NULL)
 			return false;
 		if (!ASAPWriter_WriteWord(self, 4992))
 			return false;
@@ -5788,51 +5908,6 @@ static bool ASAPWriter_WriteXexInfo(ASAPWriter *self, const ASAPInfo *info)
 	return ASAPWriter_WriteBytes(self, FuResource_xexinfo_obx, 6, 178);
 }
 
-uint8_t const *ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen)
-{
-	ASAPNativeModuleWriter nativeWriter;
-	nativeWriter.writer = self;
-	nativeWriter.sourceModule = module;
-	self->outputLen = 0;
-	switch (info->type) {
-	case ASAPModuleType_SAP_B:
-	case ASAPModuleType_SAP_C:
-	case ASAPModuleType_SAP_D:
-		;
-		int offset = ASAPInfo_GetRmtSapOffset(info, module, moduleLen);
-		if (offset > 0) {
-			nativeWriter.sourceOffset = offset - 2;
-			if (!ASAPNativeModuleWriter_Write(&nativeWriter, info, ASAPModuleType_RMT, moduleLen - offset + 2))
-				return NULL;
-			break;
-		}
-		nativeWriter.sourceOffset = info->headerLen;
-		int blockLen = ASAPNativeModuleWriter_GetWord(&nativeWriter, 4) - ASAPNativeModuleWriter_GetWord(&nativeWriter, 2) + 7;
-		if (blockLen < 7 || info->headerLen + blockLen >= moduleLen)
-			return NULL;
-		if (info->originalType == ASAPModuleType_FC) {
-			if (!ASAPWriter_WriteBytes(self, module, info->headerLen + 6, info->headerLen + blockLen))
-				return NULL;
-		}
-		else {
-			if (!ASAPNativeModuleWriter_Write(&nativeWriter, info, info->originalType, blockLen))
-				return NULL;
-		}
-		break;
-	case ASAPModuleType_FC:
-	case ASAPModuleType_D15:
-		if (!ASAPWriter_WriteBytes(self, module, 0, moduleLen))
-			return NULL;
-		break;
-	default:
-		nativeWriter.sourceOffset = 0;
-		if (!ASAPNativeModuleWriter_Write(&nativeWriter, info, info->type, moduleLen))
-			return NULL;
-		break;
-	}
-	return self->output;
-}
-
 uint8_t const *ASAPWriter_WriteSap(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen)
 {
 	return ASAPWriter_WriteExecutable(self, true, info, module, moduleLen) ? self->output : NULL;
@@ -5951,7 +6026,8 @@ bool ASAPWriter_Write(ASAPWriter *self, const char *targetFilename, const ASAPIn
 		if (possibleExt != NULL) {
 			int packedPossibleExt = ASAPInfo_PackExt(possibleExt);
 			if (destExt == packedPossibleExt || (destExt == 3698036 && packedPossibleExt == 6516084)) {
-				if (ASAPWriter_WriteNative(self, info, module, moduleLen) == NULL)
+				self->outputLen = 0;
+				if (ASAPWriter_WriteNative(self, info, module, moduleLen, true) == NULL)
 					return false;
 				if (!self->vtbl->save(self, targetFilename, self->output, 0, self->outputLen))
 					return false;
@@ -7381,14 +7457,14 @@ static void PokeyChannel_Initialize(PokeyChannel *self)
 	self->periodCycles = 28;
 	self->tickCycle = 8388608;
 	self->timerCycle = 8388608;
-	self->mute = 8;
+	self->mute = 0;
 	self->out = 0;
 	self->delta = 0;
 }
 
 static void PokeyChannel_AddDelta(const PokeyChannel *self, Pokey *pokey, const PokeyPair *pokeys, int cycle, int delta)
 {
-	Pokey_AddPokeyDelta(pokey, pokeys, cycle, delta, (self->mute & 10) != 0);
+	Pokey_AddDelta(pokey, pokeys, cycle, delta, (self->mute & 2) != 0);
 }
 
 static void PokeyChannel_Slope(PokeyChannel *self, Pokey *pokey, const PokeyPair *pokeys, int cycle)
@@ -7527,7 +7603,17 @@ static void Pokey_Initialize(Pokey *self, int sampleRate)
 	Pokey_StartFrame(self);
 }
 
-static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta)
+static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta, bool muted)
+{
+	self->sumDACInputs += delta;
+	if (muted)
+		return;
+	int newOutput = Pokey_COMPRESSED_SUMS[self->sumDACInputs] << 16;
+	Pokey_AddExternalDelta(self, pokeys, cycle, newOutput - self->sumDACOutputs);
+	self->sumDACOutputs = newOutput;
+}
+
+static void Pokey_AddExternalDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta)
 {
 	if (delta == 0)
 		return;
@@ -7537,22 +7623,6 @@ static void Pokey_AddDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int 
 	delta >>= 14;
 	for (int j = 0; j < 32; j++)
 		self->deltaBuffer[i + j] += delta * pokeys->sincLookup[fraction][j];
-}
-
-static void Pokey_AddPokeyDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta, bool muted)
-{
-	self->sumDACInputs += delta;
-	if (muted)
-		return;
-	int newOutput = Pokey_COMPRESSED_SUMS[self->sumDACInputs] << 16;
-	Pokey_AddDelta(self, pokeys, cycle, newOutput - self->sumDACOutputs);
-	self->sumDACOutputs = newOutput;
-}
-
-static void Pokey_AddExternalDelta(Pokey *self, const PokeyPair *pokeys, int cycle, int delta)
-{
-	if ((self->channels[0].mute & 8) == 0)
-		Pokey_AddDelta(self, pokeys, cycle, delta);
 }
 
 static void Pokey_GenerateUntilCycle(Pokey *self, const PokeyPair *pokeys, int cycleLimit)
@@ -7615,16 +7685,19 @@ static bool Pokey_IsSilent(const Pokey *self)
 	return true;
 }
 
+static int Pokey_GetMute(const Pokey *self)
+{
+	int mask = 0;
+	for (int i = 0; i < 4; i++)
+		if ((self->channels[i].mute & 2) != 0)
+			mask |= 1 << i;
+	return mask;
+}
+
 static void Pokey_Mute(Pokey *self, int mask)
 {
 	for (int i = 0; i < 4; i++)
 		PokeyChannel_SetMute(&self->channels[i], (mask & 1 << i) != 0, 2, 0);
-}
-
-static void Pokey_EndSongInit(Pokey *self)
-{
-	for (int channel = 0; channel < 4; channel++)
-		PokeyChannel_SetMute(self->channels + channel, false, 8, 0);
 }
 
 static void Pokey_InitMute(Pokey *self, int cycle)

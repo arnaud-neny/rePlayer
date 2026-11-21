@@ -93,6 +93,13 @@ bool ASAP_LoadWithExtraFiles(ASAP *self, const char *filename, uint8_t const *mo
 const ASAPInfo *ASAP_GetInfo(const ASAP *self);
 
 /**
+ * Mutes the selected POKEY channels.
+ * @param self This <code>ASAP</code>.
+ * @param mask An 8-bit mask which selects POKEY channels to be muted.
+ */
+void ASAP_MutePokeyChannels(ASAP *self, int mask);
+
+/**
  * Prepares playback of the specified song of the loaded module.
  * @param self This <code>ASAP</code>.
  * @param song Zero-based song index.
@@ -100,13 +107,6 @@ const ASAPInfo *ASAP_GetInfo(const ASAP *self);
  * @return <code>false</code> on error.
  */
 bool ASAP_PlaySong(ASAP *self, int song, int duration);
-
-/**
- * Mutes the selected POKEY channels.
- * @param self This <code>ASAP</code>.
- * @param mask An 8-bit mask which selects POKEY channels to be muted.
- */
-void ASAP_MutePokeyChannels(ASAP *self, int mask);
 
 /**
  * Returns current playback position in blocks.
@@ -179,12 +179,12 @@ void ASAPInfo_Delete(ASAPInfo *self);
 /**
  * ASAP version - micro part.
  */
-#define ASAPInfo_VERSION_MICRO 0
+#define ASAPInfo_VERSION_MICRO 1
 
 /**
  * ASAP version as a string.
  */
-#define ASAPInfo_VERSION "8.0.0"
+#define ASAPInfo_VERSION "8.0.1"
 
 /**
  * Years ASAP was created in.
@@ -560,16 +560,6 @@ int ASAPWriter_DurationToString(uint8_t *result, int value);
  * @param loader Loader for extra files, if needed.
  */
 void ASAPWriter_SetInput(ASAPWriter *self, const char *sourceFilename, const ASAPFileLoader *loader);
-
-/**
- * Writes the a native module, possibly extracting it from a SAP file.
- * @param self This <code>ASAPWriter</code>.
- * @param info Source file information, optionally with the address changed.
- * @param module Contents of the source file.
- * @param moduleLen Length of the source file.
- * @return <code>NULL</code> on error.
- */
-uint8_t const *ASAPWriter_WriteNative(ASAPWriter *self, const ASAPInfo *info, uint8_t const *module, int moduleLen);
 
 /**
  * Writes the given module in the SAP format.
