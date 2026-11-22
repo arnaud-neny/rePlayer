@@ -5,17 +5,22 @@
 
 ## Current version
 
+v0.22.19:
+- Updated ASAP to 8.0.1
+- Updated FluidSynth to 2.6.3
+- Updated libtfmxaudiodecoder to 1.0.17
+- Updated OpenMPT to 0.9.0-pre.13 r26028
+- Bug fixes
+
 v0.22.18:
 - Updated AtariAudio to 1.31
 - Updated libresidfp to 1.3.0
 - Updated ProTrekkr to 2.3 pre 5
-- Bug fixes
 
 v0.22.17:
 - Added Nuade
 - Removed AyFly
 - Updated AtariAudio to 1.28
-- Updated FluidSynth to 2.6.2
 - Updated gbsplay to 0.0.104
 - Updated libvgm to r637
 - Updated vgmstream to r2168
@@ -31,7 +36,6 @@ v0.22.16:
 - Removed StSound
 - Removed TFMX
 - Updated libxmp to 4.7.4
-- Updated OpenMPT to 0.9.0-pre.13 r25800
 - Updated V2 to V2 Redux
 - Updated ImGui to 1.93.0
 - Updated libcurl to 8.23.0
@@ -55,9 +59,6 @@ v0.22.10:
 
 v0.22.9:
 - Added context menu to playlist to sort, export as WAV or scan ReplayGain the selection
-
-v0.22.8:
-- Updated libtfmxaudiodecoder to 1.0.14
 
 v0.22.3:
 - Added JayTrax
@@ -85,7 +86,7 @@ v0.22.0:
 - [0.22.0] ASAP to 8.0.0
 - [0.22.15] AtariAudio to 1.26
 - [0.22.10] FAAD2 to 2.11.3
-- [0.22.13] FluidSynth to 2.6.1
+- [0.22.17] FluidSynth to 2.6.2
 - [0.19.4] Furnace to 0.6.8.3
 - [0.22.16] gbsplay to 0.0.103
 - [0.9.4] Highly Advanced (cog 2023-09-30)
@@ -94,10 +95,10 @@ v0.22.0:
 - [0.22.15] libresidfp to 1.2.3
 - [0.16.15] libsc68 to 3.0.0a r706
 - [0.22.10] libsidplay to 3.1.0
-- [0.22.7] libtfmxaudiodecoder to 1.0.13
+- [0.22.8] libtfmxaudiodecoder to 1.0.14
 - [0.22.16] libvgm to r633
 - [0.22.13] libxmp to 4.7.3
-- [0.22.10] OpenMPT to 0.9.0-pre.13 r25674
+- [0.22.16] OpenMPT to 0.9.0-pre.13 r25800
 - [0.21.9] Opus to 1.6.1
 - [0.17.3] ProTrekkr to 2.8.2
 - [0.21.9] SunVox to 2.1.4

@@ -32,7 +32,7 @@
 - game-music-emu: https://github.com/libgme/game-music-emu
 - gbsplay: https://github.com/mmitch/gbsplay
 - GoatTracker: https://sourceforge.net/p/goattracker2
-- Highly Advanced: https://bitbucket.org/losnoco/cog
+- Highly Advanced: https://github.com/losnoco/Cog
 - Highly Competitive/snsf9x: https://github.com/loveemu/snsf9x
 - Highly Experimental: https://bitbucket.org/losnoco/highly_experimental and https://bitbucket.org/losnoco/psflib
 - Highly Quixotic: https://gitlab.com/kode54/highly_quixotic, https://gitlab.com/kode54/psflib and https://gitlab.com/kode54/foo_input_qsf
@@ -51,12 +51,12 @@
 - libvgm: https://github.com/ValleyBell/libvgm
 - mdxmini: https://github.com/mistydemeo/mdxmini
 - MTPng: https://aminet.net/package/mus/play/mtpng_68k (and https://github.com/mrkite/soundsmith)
-- MVX: https://github.com/ConspiracyHu/apEx-public`
+- MVX: https://github.com/ConspiracyHu/apEx-public
 - Nuade: https://github.com/emoon/nuade
 - OpenMPT: https://source.openmpt.org
   Some changes have been made to manually change the protracker timings (cia or vblank).
 - Opus: https://opus-codec.org
-- Organya: https://bitbucket.org/losnoco/cog/src/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
+- Organya: https://github.com/losnoco/Cog/tree/main/Plugins/Organya & https://github.com/Strultz/orgmaker-3
 - PMDWin: https://c60.la.coocan.jp & https://github.com/gzaffin/pmdmini
 - PreTracker: https://github.com/RetrovertApp/playback-pretracker & https://github.com/chrisly42/PretrackerRaspberryCasket
 - ProTrekkr: https://github.com/hitchhikr/protrekkr
