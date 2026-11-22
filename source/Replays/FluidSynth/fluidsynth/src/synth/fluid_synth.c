@@ -64,7 +64,7 @@ static void fluid_synth_api_exit(fluid_synth_t *synth);
 static int fluid_synth_noteon_LOCAL(fluid_synth_t *synth, int chan, int key,
                                     int vel);
 static int fluid_synth_noteoff_LOCAL(fluid_synth_t *synth, int chan, int key);
-static int fluid_synth_cc_LOCAL(fluid_synth_t *synth, int channum, int num);
+static int fluid_synth_cc_LOCAL(fluid_synth_t *synth, int channum, int num, int old_value);
 static int fluid_synth_sysex_midi_tuning(fluid_synth_t *synth, const char *data,
         int len, char *response,
         int *response_len, int avail_response,
@@ -1776,6 +1776,7 @@ int
 fluid_synth_cc(fluid_synth_t *synth, int chan, int num, int val)
 {
     int result = FLUID_FAILED;
+    int old_value;
     fluid_channel_t *channel;
     fluid_return_val_if_fail(num >= 0 && num <= 127, FLUID_FAILED);
     fluid_return_val_if_fail(val >= 0 && val <= 127, FLUID_FAILED);
@@ -1791,8 +1792,9 @@ fluid_synth_cc(fluid_synth_t *synth, int chan, int num, int val)
             FLUID_LOG(FLUID_INFO, "cc\t\t%d\t%d\t%d", chan, num, val);
         }
 
+        old_value = fluid_channel_get_cc(channel, num);
         fluid_channel_set_cc(channel, num, val);
-        result = fluid_synth_cc_LOCAL(synth, chan, num);
+        result = fluid_synth_cc_LOCAL(synth, chan, num, old_value);
     }
     else /* chan is disabled so it is a candidate for global channel */
     {
@@ -1825,8 +1827,9 @@ fluid_synth_cc(fluid_synth_t *synth, int chan, int num, int val)
                     FLUID_LOG(FLUID_INFO, "cc\t\t%d\t%d\t%d", i, num, val);
                 }
 
+                old_value = fluid_channel_get_cc(synth->channel[i], num);
                 fluid_channel_set_cc(synth->channel[i], num, val);
-                result = fluid_synth_cc_LOCAL(synth, i, num);
+                result = fluid_synth_cc_LOCAL(synth, i, num, old_value);
             }
         }
         /* The channel chan is not a valid 'global channel' */
@@ -1872,7 +1875,7 @@ fluid_synth_cc(fluid_synth_t *synth, int chan, int num, int val)
  these SF recommendations on CC receive.
 */
 static int
-fluid_synth_cc_LOCAL(fluid_synth_t *synth, int channum, int num)
+fluid_synth_cc_LOCAL(fluid_synth_t *synth, int channum, int num, int old_value)
 {
     fluid_channel_t *chan = synth->channel[channum];
     int nrpn_select;
@@ -1980,8 +1983,7 @@ fluid_synth_cc_LOCAL(fluid_synth_t *synth, int channum, int num)
         {
             fluid_synth_damp_voices_by_sostenuto_LOCAL(synth, channum);
         }
-        else /* Sostenuto is depressed */
-            /* Update sostenuto order id when pedaling on Sostenuto */
+        else if(old_value < 64) /* Sostenuto changed from released to depressed */
         {
             chan->sostenuto_orderid = synth->noteid; /* future voice id value */
         }
@@ -2778,7 +2780,7 @@ fluid_synth_sysex_gs_dt1(fluid_synth_t *synth, const char *data, int len,
             // MSGS selects the standard drum kit right after this message (which is equivalent to sending a prog change 0).
             // However, this behavior is insonsistent with the note on site 60:
             // "To select a drum set after setting the part mode, transmit a program change [...]"
-            fluid_synth_cc_LOCAL(synth, chan, ALL_CTRL_OFF);
+            fluid_synth_cc_LOCAL(synth, chan, ALL_CTRL_OFF, 0);
             fluid_channel_set_sfont_bank_prog(synth->channel[chan],
                                               -1,
                                               type == CHANNEL_TYPE_DRUM ? DRUM_INST_BANK : 0,
@@ -5104,7 +5106,7 @@ fluid_synth_check_finished_voices(fluid_synth_t *synth)
 
     while(NULL != (fv = fluid_rvoice_eventhandler_get_finished_voice(synth->eventhandler)))
     {
-        for(j = 0; j < synth->polyphony; j++)
+        for(j = 0; j < synth->nvoice; j++)
         {
             if(synth->voice[j]->rvoice == fv)
             {
@@ -7100,7 +7102,7 @@ fluid_synth_release_voice_on_same_note_LOCAL(fluid_synth_t *synth, int chan,
             enum fluid_msgs_note_cut note_cut_mode = synth->msgs_note_cut_mode;
 
             /* Id of voices that was sustained by sostenuto */
-            if(fluid_voice_is_sostenuto(voice))
+            if(fluid_voice_is_sostenuto(voice) && !voice->has_noteoff)
             {
                 synth->storeid = fluid_voice_get_id(voice);
             }

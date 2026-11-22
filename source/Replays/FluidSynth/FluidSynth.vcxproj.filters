@@ -565,9 +565,6 @@
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_event.c">
       <Filter>Source Files\fluidsynth\src\rvoice</Filter>
     </ClCompile>
-    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.c">
-      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
-    </ClCompile>
     <ClCompile Include="fluidsynth\src\rvoice\fluid_iir_filter_impl.cpp">
       <Filter>Source Files\fluidsynth\src\rvoice</Filter>
     </ClCompile>
@@ -630,6 +627,9 @@
     </ClCompile>
     <ClCompile Include="fluidsynth\src\drivers\fluid_audio_convert.cpp">
       <Filter>Source Files\fluidsynth\src\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.cpp">
+      <Filter>Source Files\fluidsynth\src\rvoice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

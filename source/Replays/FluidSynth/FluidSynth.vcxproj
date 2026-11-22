@@ -359,7 +359,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\replays-win32\$(TargetFileName) &gt;
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice.c" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_dsp.cpp" />
     <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_event.c" />
-    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.c" />
+    <ClCompile Include="fluidsynth\src\rvoice\fluid_rvoice_mixer.cpp" />
     <ClCompile Include="fluidsynth\src\sfloader\fluid_defsfont.c" />
     <ClCompile Include="fluidsynth\src\sfloader\fluid_samplecache.c" />
     <ClCompile Include="fluidsynth\src\sfloader\fluid_sffile.c" />

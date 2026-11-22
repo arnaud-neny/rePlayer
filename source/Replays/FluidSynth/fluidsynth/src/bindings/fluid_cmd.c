@@ -2573,12 +2573,12 @@ int fluid_handle_channelsmode(void *data, int ac, char **av,
                 const char *p_basicchan;  /* field basic channel */
                 const char *p_mode;  /* field mode */
                 const char *p_nbr; /* field Nbr */
+                char nbr[10]; /* field Nbr */
                 static const char blank[] = "--"; /* field empty */
 
                 if(chan == basic_chan)
                 {
                     /* This channel is a basic channel */
-                    char nbr[10]; /* field Nbr */
                     FLUID_SNPRINTF(nbr, sizeof(nbr), "nbr:%3d", val);
                     p_nbr = nbr;
                     p_mode = mode_name[mode];
@@ -4482,6 +4482,7 @@ new_fluid_server2(fluid_settings_t *settings,
 
     if(server->socket == NULL)
     {
+        fluid_mutex_destroy(server->mutex);
         FLUID_FREE(server);
         return NULL;
     }
@@ -4516,6 +4517,7 @@ delete_fluid_server(fluid_server_t *server)
     fluid_return_if_fail(server != NULL);
 
     fluid_server_close(server);
+    fluid_mutex_destroy(server->mutex);
 
     FLUID_FREE(server);
 #endif
