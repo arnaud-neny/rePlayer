@@ -189,5 +189,10 @@ namespace core
     private:
         Storage m_storage;
     };
+
+    inline constexpr uint32_t Version(uint32_t major, uint32_t minor, uint32_t patch)
+    {
+        return (major << 28) | (minor << 14) | patch;
+    }
 }
 // namespace core

@@ -117,7 +117,7 @@ namespace rePlayer
         void CopyTo(SongSheet* song) const;
         void CopySubsongsTo(SongSheet* song) const;
 
-        static constexpr uint32_t kVersion = (0 << 28) | (22 << 14) | 7;
+        static constexpr uint32_t kVersion = Version(0, 22, 7);
         void Patch(uint32_t version);
 
     private:

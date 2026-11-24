@@ -21,7 +21,7 @@ namespace rePlayer
     static constexpr uint32_t kMajorVersion = REPLAYER_VERSION_MAJOR;
     static constexpr uint32_t kMinorVersion = REPLAYER_VERSION_MINOR;
     static constexpr uint32_t kPatchVersion = REPLAYER_VERSION_PATCH;
-    static constexpr uint32_t kVersion = (kMajorVersion << 28) | (kMinorVersion << 14) | kPatchVersion;
+    static constexpr uint32_t kVersion = Version(kMajorVersion, kMinorVersion, kPatchVersion);
 
     uint32_t Core::GetVersion()
     {
@@ -90,7 +90,7 @@ namespace rePlayer
                 uint32_t patchVersion = 0;
                 if (sscanf_s(url, "https://github.com/arnaud-neny/rePlayer/releases/tag/v%u.%u.%u", &majorVersion, &minorVersion, &patchVersion) >= 2
                     && (majorVersion < 16 && minorVersion < 16384 && patchVersion < 16384
-                    && ((majorVersion << 28) + (minorVersion << 14) + patchVersion) > kVersion)
+                    && Version(majorVersion, minorVersion, patchVersion) > kVersion)
                     || !std::filesystem::exists(mainPath / "replays" REPLAYER_OS_STUB / "Psycle" / "VstPlugins")) // extra check to re-update if the previous version was older than the 0.19.0)
                 {
                     // download

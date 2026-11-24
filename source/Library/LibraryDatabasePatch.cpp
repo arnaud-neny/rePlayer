@@ -361,7 +361,7 @@ namespace rePlayer
             Raise(Database::Flag::kSaveSongs);
             m_hasFailedDeletes = true;
         }
-        static constexpr uint32_t kVersionSid = (0 << 28) | (21 << 14) | 5; // psid and rsid are merged into sid
+        static constexpr uint32_t kVersionSid = Version(0, 21, 5); // psid and rsid are merged into sid
         if (SongsVersion() <= kVersionSid)
         {
             static constexpr eExtension kExtension_rsid = eExtension::_bao;

@@ -519,7 +519,7 @@ namespace rePlayer
                         m_availableArtistIds.nextId = i;
                 }
             }
-            static constexpr uint32_t kVersionFix = (0 << 28) | (22 << 14); // fix wrong value check
+            static constexpr uint32_t kVersionFix = Version(0, 22, 0); // fix wrong value check
             if (version < kVersionFix)
             {
                 if (m_strings.IsEmpty())
