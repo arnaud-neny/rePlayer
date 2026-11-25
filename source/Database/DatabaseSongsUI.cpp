@@ -14,6 +14,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Export.h>
 #include <RePlayer/ReplayGainScanner.h>
+#include <UI/RatingWidget.h>
 
 #include "DatabaseSongsUI.h"
 
@@ -240,7 +241,7 @@ namespace rePlayer
                 ImGui::TableSetupColumn("Year", ImGuiTableColumnFlags_WidthFixed | getHiddenFlag(kYear), 0.0f, kYear);
                 ImGui::TableSetupColumn("CRC", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize | getHiddenFlag(kCRC), 0.0f, kCRC);
                 ImGui::TableSetupColumn(">|", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize | getHiddenFlag(kState), 0.0f, kState);
-                ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed | getHiddenFlag(kRating), 0.0f, kRating);
+                ImGui::TableSetupColumn(RatingStr(1), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize | getHiddenFlag(kRating), ImGui::CalcTextSize(RatingStr(1)).x, kRating);
                 ImGui::TableSetupColumn("Added", ImGuiTableColumnFlags_WidthFixed | getHiddenFlag(kDatabaseDate), 0.0f, kDatabaseDate);
                 ImGui::TableSetupColumn("Source", ImGuiTableColumnFlags_WidthStretch | getHiddenFlag(kSource), 0.0f, kSource);
                 ImGui::TableSetupColumn("Replay", ImGuiTableColumnFlags_WidthStretch | getHiddenFlag(kReplay), 0.0f, kReplay);
@@ -373,25 +374,11 @@ namespace rePlayer
                         }
                         if (ImGui::TableNextColumn())
                         {
-                            int32_t subsongRating = song->GetSubsongRating(musicId.subsongId.index);
-                            if (subsongRating == 0)
-                                ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
-                            else
-                                ImGui::ProgressBar((subsongRating - 1) * 0.01f);
-                            if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
+                            uint8_t subsongRating = song->GetSubsongRating(musicId.subsongId.index);
+                            if (DrawRating(subsongRating))
                             {
-                                char label[8] = "N/A";
-                                if (subsongRating > 0)
-                                    sprintf(label, "%u%%%%", subsongRating - 1);
-                                if (ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput))
-                                {
-                                    if (song->GetSubsongRating(musicId.subsongId.index) != subsongRating)
-                                    {
-                                        song->Edit()->subsongs[musicId.subsongId.index].rating = subsongRating;
-                                        m_db.Raise(Database::Flag::kSaveSongs);
-                                    }
-                                }
-                                ImGui::EndPopup();
+                                song->Edit()->subsongs[musicId.subsongId.index].rating = subsongRating;
+                                m_db.Raise(Database::Flag::kSaveSongs);
                             }
                         }
                         if (ImGui::TableNextColumn())

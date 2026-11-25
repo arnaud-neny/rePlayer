@@ -36,6 +36,8 @@ namespace rePlayer
         template <typename ID>
         bool IsValid(ID id) const;
 
+        uint32_t GetSongsVersion() const;
+
         auto Songs() const;
         auto Artists() const;
 
@@ -135,7 +137,7 @@ namespace rePlayer
             template <typename OtherItemType>
             ItemType* AddFrozen(OtherItemType* item);
 
-            Status Load(io::File& file);
+            Status Load(Database& db, io::File& file);
             void Save(io::File& file);
 
             void Reset();
@@ -182,6 +184,9 @@ namespace rePlayer
 
     protected:
         Array<SubsongID> m_deletedSubsongs;
+
+    public:
+        Array<SubsongID> m_oldRatings;
     };
 }
 // namespace rePlayer

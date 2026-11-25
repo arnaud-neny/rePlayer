@@ -326,7 +326,7 @@ namespace rePlayer
         }
     }
 
-    void Song::Patch(uint32_t version)
+    void Song::Patch(Database& db, uint32_t version)
     {
         // !!!!                                       !!!!
         // !!!! never forget to update Song::kVersion !!!!
@@ -353,7 +353,7 @@ namespace rePlayer
         }
 
         // Media type size increase and moved member
-        static constexpr uint32_t kVersionMediaType17 = (0 << 28) | (22 << 14) | 6;
+        static constexpr uint32_t kVersionMediaType17 = Version(0, 22, 6);
         if (version <= kVersionMediaType17)
         {
             struct MediaType16
@@ -372,7 +372,7 @@ namespace rePlayer
         }
 
         // replay gain added a field to subsongdata
-        static constexpr uint32_t kVersionReplayGain = (0 << 28) | (22 << 14) | 1;
+        static constexpr uint32_t kVersionReplayGain = Version(0, 22, 1);
         if (version <= kVersionReplayGain)
         {
             struct OldSubsongData
@@ -405,7 +405,7 @@ namespace rePlayer
         }
 
         // duration is deprecated and changed to loop info
-        static constexpr uint32_t kVersionLoop = (0 << 28) | (21 << 14) | 4;
+        static constexpr uint32_t kVersionLoop = Version(0, 21, 4);
         if (version <= kVersionLoop && metadata.IsNotEmpty())
         {
             auto find = [](Span<CommandBuffer::Command> commands, eReplay replayToFind)
@@ -456,6 +456,28 @@ namespace rePlayer
                 if (auto* command = find(Metadatas(), replay))
                     Edit()->Patch002104VGM(command);
                 break;
+            }
+        }
+
+        // rating moved to stars
+        static constexpr uint32_t kVersionRating = Version(0, 22, 19);
+        if (version <= kVersionRating)
+        {
+            db.m_oldRatings.Reserve(lastSubsongIndex + 1);
+            for (uint16_t i = 0; i <= lastSubsongIndex; ++i)
+            {
+                if (subsongs[i].rating != 0 || subsongs[i].unused != 0)
+                {
+                    SubsongID subsongId;
+                    subsongId.songId = id;
+                    subsongId.index = i;
+                    subsongId.external = (subsongs[i].rating | (subsongs[i].unused << 4)) - 1;
+                    db.m_oldRatings.Add(subsongId);
+
+                    auto* song = Edit();
+                    song->subsongs[i].rating = 0;
+                    song->subsongs[i].unused = 0;
+                }
             }
         }
     }

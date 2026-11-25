@@ -38,7 +38,8 @@ namespace rePlayer
             struct
             {
                 uint8_t isDiscarded : 1;    // subsong is not visible
-                uint8_t rating : 7;         // percentage 1-101, with 0 as undefined
+                uint8_t rating : 4;         // 0 = unset, 1-11 half-stars, 12 favorite
+                uint8_t unused : 3;         // unused, was part of rating (7bits)
                 SubsongState state : 2;     // playback mode
                 uint8_t isPlayed : 1;       // subsong has been fully played (no seek) at least once
                 uint8_t isDirty : 1;        // force rebuild of subsongs
@@ -138,6 +139,26 @@ namespace rePlayer
         file.Write(replayGain.peak);
         file.Write(initializer);
         name.Save(file);
+    }
+
+    inline const char* RatingStr(uint32_t rating)
+    {
+        static constexpr char ratings[][16] = {
+            "\xE2\x94\x81" "\xE2\x94\x81" "\xE2\x94\x81" "\xE2\x94\x81" "\xE2\x94\x81", // N/A
+            "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86", // 0   stars
+            "\xE2\xAF\xAA" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86", // 0.5 stars
+            "\xE2\x98\x85" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86", // 1   stars
+            "\xE2\x98\x85" "\xE2\xAF\xAA" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86", // 1.5 stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x86" "\xE2\x98\x86" "\xE2\x98\x86", // 2   stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\xAF\xAA" "\xE2\x98\x86" "\xE2\x98\x86", // 2.5 stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x86" "\xE2\x98\x86", // 3   stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\xAF\xAA" "\xE2\x98\x86", // 3.5 stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x86", // 4   stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\xAF\xAA", // 4.5 stars
+            "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85" "\xE2\x98\x85", // 5   stars
+            "\xE2\x9D\xA4" "\xE2\x9D\xA4" "\xE2\x9D\xA4" "\xE2\x9D\xA4" "\xE2\x9D\xA4", // favorite
+        };
+        return ratings[rating];
     }
 
     typedef SubsongData<Blob::kIsDynamic> SubsongSheet;

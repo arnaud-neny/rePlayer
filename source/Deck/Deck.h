@@ -112,6 +112,8 @@ namespace rePlayer
         void UpdateSystray();
         void InvertWindowStates();
 
+        void PatchRates();
+
     private:
         SmartPtr<Player> m_currentPlayer;
         SmartPtr<Player> m_nextPlayer;
@@ -172,6 +174,8 @@ namespace rePlayer
 
         Patterns* m_patterns;
         Properties* m_properties;
+
+        bool m_areRatingsDirty = true;
     };
 }
 // namespace rePlayer

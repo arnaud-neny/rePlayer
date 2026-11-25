@@ -613,7 +613,7 @@ namespace rePlayer
             if (isSeekDisabled)
                 col.w *= 0.2f;
             ImGui::PushStyleColor(ImGuiCol_SliderGrab, col);
-            ImGui::SetNextItemWidth(-1.0f);
+            ImGui::SetNextItemWidth(-FLT_MIN);
             uint32_t minPlaybackTime = 0;
             uint32_t maxPlaybackTime = Max(1u, durationCs * 10, playbackTime);
             ImGui::BeginDisabled(isSeekDisabled);
@@ -641,7 +641,7 @@ namespace rePlayer
             auto col = ImGui::GetStyleColorVec4(ImGuiCol_SliderGrab);
             col.w = 0.f;
             ImGui::PushStyleColor(ImGuiCol_SliderGrab, col);
-            ImGui::SetNextItemWidth(-1.0f);
+            ImGui::SetNextItemWidth(-FLT_MIN);
             int32_t pos{ 0 };
             ImGui::BeginDisabled(true);
             ImGui::SliderInt("###progress", &pos, 0, 0, "", ImGuiSliderFlags_NoInput);
@@ -770,6 +770,8 @@ namespace rePlayer
             }
             ImGui::EndChild();
         }
+
+        PatchRates();
     }
 
     void Deck::OnEndUpdate()

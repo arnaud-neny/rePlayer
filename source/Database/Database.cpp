@@ -61,7 +61,7 @@ namespace rePlayer
     }
 
     template <typename ItemType, typename ItemID>
-    Status Database::Set<ItemType, ItemID>::Load(io::File& file)
+    Status Database::Set<ItemType, ItemID>::Load(Database& db, io::File& file)
     {
         m_revision++;
         m_items.Clear();
@@ -96,7 +96,7 @@ namespace rePlayer
             for (uint32_t i = 0, n = m_items.NumItems(); i < n; i++)
             {
                 if (m_items[i])
-                    m_items[i]->Patch(version);
+                    m_items[i]->Patch(db, version);
             }
         }
 
@@ -271,7 +271,7 @@ namespace rePlayer
 
     Status Database::LoadSongs(io::File& file)
     {
-        return m_songs.Load(file);
+        return m_songs.Load(*this, file);
     }
 
     void Database::SaveSongs(io::File& file)
@@ -281,7 +281,7 @@ namespace rePlayer
 
     Status Database::LoadArtists(io::File& file)
     {
-        return m_artists.Load(file);
+        return m_artists.Load(*this, file);
     }
 
     void Database::SaveArtists(io::File& file)

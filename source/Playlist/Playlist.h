@@ -66,6 +66,9 @@ namespace rePlayer
 
         bool IsCrossFadeEnabled() const { return m_isCrossFadeEnabled; }
 
+        template <typename Predicate>
+        void ForEachPlaylist(Predicate predicate);
+
     private:
         struct Cue
         {
@@ -166,9 +169,6 @@ namespace rePlayer
 
         DatabaseArtistsUI* m_artists = nullptr;
         SongsUI* m_songs = nullptr;
-
-        MusicID m_currentRatingId;
-        int32_t m_defaultRating = 0;
 
         PlaylistID m_uniqueIdGenerator = PlaylistID::kInvalid;
 

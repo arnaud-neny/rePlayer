@@ -16,6 +16,7 @@ namespace rePlayer
 {
     using namespace core;
 
+    class Database;
     enum class ArtistID : uint16_t { Invalid = 0 };
 
     struct ArtistSource
@@ -95,7 +96,7 @@ namespace rePlayer
         void CopyTo(ArtistSheet* artist) const;
 
         static constexpr uint32_t kVersion = Version(0, 0, 0);
-        void Patch(uint32_t version) { (void)version; }
+        void Patch(Database& db, uint32_t version) { UnusedArg(db, version); }
 
     private:
         Artist(Artist&&) = delete;

@@ -96,6 +96,11 @@ namespace rePlayer
         }
     }
 
+    inline uint32_t Database::GetSongsVersion() const
+    {
+        return m_songs.m_version;
+    }
+
     inline auto Database::Songs() const
     {
         return m_songs.Items();

@@ -16,6 +16,7 @@
 #include <RePlayer/Replays.h>
 #include <Replays/ReplayContexts.h>
 #include <UI/BusySpinner.h>
+#include <UI/RatingWidget.h>
 
 #include "SongEditor.h"
 
@@ -308,7 +309,7 @@ namespace rePlayer
         subsong.isDiscarded = !isSubsongValid;
         ImGui::SameLine();
         ImGui::SetNextItemWidth(-FLT_MIN);
-        ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x) * 3));
+        ImGui::SetNextItemWidth(Max(1.0f, ImGui::CalcItemWidth() - (buttonSize + style.ItemInnerSpacing.x * 2 + ImGui::CalcTextSize(RatingStr(0)).x)));
         ImGui::InputText("##Name", &subsong.name.String());
         char duration[16];
         sprintf(duration, "%u:%02u", subsong.durationCs / 6000, (subsong.durationCs / 100) % 60);
@@ -359,20 +360,9 @@ namespace rePlayer
         else if (ImGui::IsItemHovered())
             ImGui::Tooltip(subsongStates[uint32_t(subsong.state)]);
         ImGui::SameLine();
-        int32_t subsongRating = subsong.rating;
-        if (subsongRating == 0)
-            ImGui::ProgressBar(0.0f, ImVec2(buttonSize * 2 + style.ItemInnerSpacing.x, 0.0f), "N/A");
-        else
-            ImGui::ProgressBar((subsongRating - 1) * 0.01f, ImVec2(buttonSize * 2 + style.ItemInnerSpacing.x, 0.0f));
-        if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
-        {
-            char label[8] = "N/A";
-            if (subsongRating > 0)
-                sprintf(label, "%u%%%%", subsongRating - 1);
-            ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput);
-            subsong.rating = uint8_t(subsongRating);
-            ImGui::EndPopup();
-        }
+        uint8_t subsongRating = subsong.rating;
+        if (DrawRating(subsongRating))
+            subsong.rating = subsongRating;
         ImGui::PopID();
     }
 

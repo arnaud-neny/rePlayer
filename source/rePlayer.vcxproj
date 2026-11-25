@@ -228,6 +228,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="Database\Types\SourceID.cpp" />
     <ClCompile Include="Database\Types\Tags.cpp" />
     <ClCompile Include="Deck\Deck.cpp" />
+    <ClCompile Include="Deck\DeckPatch.cpp" />
     <ClCompile Include="Deck\Patterns.cpp" />
     <ClCompile Include="Deck\Player.cpp" />
     <ClCompile Include="Deck\Properties.cpp" />
@@ -276,6 +277,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClCompile Include="RePlayer\Settings.cpp" />
     <ClCompile Include="UI\BusySpinner.cpp" />
     <ClCompile Include="UI\FileSelector.cpp" />
+    <ClCompile Include="UI\RatingWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Database\Database.h" />
@@ -346,6 +348,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="Library\Sources\XmlHandler.h" />
     <ClInclude Include="Library\Sources\ZXArt.h" />
     <ClInclude Include="Playlist\Playlist.h" />
+    <ClInclude Include="Playlist\Playlist.inl.h" />
     <ClInclude Include="Playlist\PlaylistDatabase.h" />
     <ClInclude Include="Playlist\PlaylistDropTarget.h" />
     <ClInclude Include="Playlist\PlaylistSongsUI.h" />
@@ -362,6 +365,7 @@ copy /Y $(TargetPath) $(SolutionDir)..\data\$(TargetFileName) &gt; nul 2&gt;&amp
     <ClInclude Include="resource.h" />
     <ClInclude Include="UI\BusySpinner.h" />
     <ClInclude Include="UI\FileSelector.h" />
+    <ClInclude Include="UI\RatingWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />

@@ -26,6 +26,7 @@
 #include <RePlayer/Core.h>
 #include <RePlayer/Replays.h>
 #include <Replays/Replay.h>
+#include <UI/RatingWidget.h>
 
 // TagLib
 #include <fileref.h>
@@ -895,7 +896,7 @@ namespace rePlayer
                     ImGui::TableSetupColumn("Artist", ImGuiTableColumnFlags_WidthStretch, 0.0f, kArtists);
                     ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 0.0f, kType);
                     ImGui::TableSetupColumn("Duration", ImGuiTableColumnFlags_WidthFixed, 0.0f, kDuration);
-                    ImGui::TableSetupColumn("[%]", ImGuiTableColumnFlags_WidthFixed, 0.0f, kRating);
+                    ImGui::TableSetupColumn(RatingStr(1), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize, ImGui::CalcTextSize(RatingStr(1)).x, kRating);
                     ImGui::TableSetupScrollFreeze(0, 1); // Make row always visible
                     ImGui::TableHeadersRow();
 
@@ -1038,22 +1039,11 @@ namespace rePlayer
                                 ImGui::Text("%d:%02d", subsongDurationCs / 6000, (subsongDurationCs / 100) % 60);
                             }
                             ImGui::TableNextColumn();
-                            int32_t subsongRating = song->GetSubsongRating(subsongId.index);
-                            if (subsongRating == 0)
-                                ImGui::ProgressBar(0.0f, ImVec2(-1.f, 0.f), "N/A");
-                            else
-                                ImGui::ProgressBar((subsongRating - 1) * 0.01f);
-                            if (ImGui::BeginPopupContextItem("Rating", ImGuiPopupFlags_MouseButtonLeft))
+                            uint8_t subsongRating = song->GetSubsongRating(subsongId.index);
+                            if (DrawRating(subsongRating))
                             {
-                                currentRatingId = curEntry;
-                                if (m_currentRatingId != currentRatingId)
-                                    m_defaultRating = subsongRating;
-                                char label[8] = "N/A";
-                                if (subsongRating > 0)
-                                    sprintf(label, "%d%%%%", subsongRating - 1);
-                                ImGui::SliderInt("##rating", &subsongRating, 0, 101, label, ImGuiSliderFlags_NoInput);
                                 song->Edit()->subsongs[subsongId.index].rating = subsongRating;
-                                ImGui::EndPopup();
+                                m_cue.db.Raise(Database::Flag::kSaveSongs);
                             }
 
                             ImGui::PopID();
@@ -1173,14 +1163,6 @@ namespace rePlayer
 
         if (draggedIndex >= 0)
             MoveSelection(draggedIndex);
-
-        // simulate the OnPopupClose for the rating slider
-        if (currentRatingId != m_currentRatingId)
-        {
-            if (m_currentRatingId.subsongId.IsValid() && m_defaultRating != m_currentRatingId.GetSong()->GetSubsongRating(m_currentRatingId.subsongId.index))
-                m_currentRatingId.MarkForSave();
-            m_currentRatingId = currentRatingId;
-        }
 
         // now we are out of entry loop, we can load the songs
         if (songIndexToPlay >= 0)
