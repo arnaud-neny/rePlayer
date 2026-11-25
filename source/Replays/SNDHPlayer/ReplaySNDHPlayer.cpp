@@ -15,6 +15,13 @@ namespace rePlayer
         .about = "AtariAudio " ATARI_AUDIO_VERSION "\nCopyright (c) 2023-2026 Arnaud Carré",
         .settings = "SNDH-Player/AtariAudio " ATARI_AUDIO_VERSION,
         .init = ReplaySNDHPlayer::Init,
+        .release = []()
+        {
+            AtariAudioFree(m68ki_instruction_jump_table);
+            m68ki_instruction_jump_table = nullptr;
+            AtariAudioFree(m68ki_cycles);
+            m68ki_cycles = nullptr;
+        },
         .load = ReplaySNDHPlayer::Load,
         .displaySettings = ReplaySNDHPlayer::DisplaySettings,
         .editMetadata = ReplaySNDHPlayer::Settings::Edit
