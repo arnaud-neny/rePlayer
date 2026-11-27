@@ -524,7 +524,7 @@ namespace rePlayer
     {
         // Hack begin
         // We want this to be the "main" window
-        auto viewport = ImGui::GetWindowViewport();
+        auto* viewport = ImGui::GetWindowViewport();
         viewport->Flags &= ~ImGuiViewportFlags_NoTaskBarIcon;
         // Taskbar hack to bring the icon back
         static bool needSetup = true;
@@ -539,6 +539,12 @@ namespace rePlayer
                 needSetup = false;
             }
         }
+        // nav window hack: it depends on the main viewport, so copy deck info to the main viewport
+        auto* mainViewport = ImGui::GetMainViewport();
+        mainViewport->Pos = viewport->Pos;
+        mainViewport->Size = viewport->Size;
+        if (auto* navWindow = ImGui::GetCurrentContext()->NavWindowingListWindow; navWindow && navWindow->Viewport && navWindow->Viewport->PlatformHandleRaw)
+            ::SetWindowPos(HWND(navWindow->Viewport->PlatformHandleRaw), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
         // Hack end
 
         Core::GetPlaylist().UpdateDragDropSource(1);
